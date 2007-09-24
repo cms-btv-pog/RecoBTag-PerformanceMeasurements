@@ -1,0 +1,41 @@
+
+module Performance = PerformanceAnalyzer {
+
+       include "RecoBTag/PerformanceMeasurements/data/JetCuts.cfi"
+       include "RecoBTag/PerformanceMeasurements/data/MuonCuts.cfi"
+
+       InputTag simG4 = g4SimHits
+       untracked string outputFile = "results.root"
+       string Muons = "globalMuons"
+       string Jets  = "iterativeCone5CaloJets"
+       untracked string TrackCollection = "ctfWithMaterialTracks"
+       untracked string PrimaryVertexCollection = "offlinePrimaryVerticesFromCTFTracks"
+       untracked vstring bTaggerList = { 
+         "TrackCounting",
+	 "TrackProbability"
+       }
+       string GenJets= "iterativeCone5GenJets"
+       string SimTracks = "g4SimHits"
+
+       PSet jetIdParameters = {
+              string mcSource = "VtxSmeared"
+              bool fillPartons = true
+              bool fillHeavyHadrons = false
+              bool fillLeptons =  false
+              double coneSizeToAssociate = 0.3
+              bool physicsDefinition = false
+              bool rejectBCSplitting = false
+              vstring vetoFlavour = {  }
+       }
+       PSet jetIdParameters2 = {
+              string mcSource = "VtxSmeared"
+              bool fillPartons = true
+              bool fillHeavyHadrons = false
+              bool fillLeptons =  false
+              double coneSizeToAssociate = 0.3
+              bool physicsDefinition = true
+              bool rejectBCSplitting = true
+              vstring vetoFlavour = {  }
+       }
+ 
+}

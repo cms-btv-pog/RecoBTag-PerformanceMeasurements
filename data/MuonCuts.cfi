@@ -1,0 +1,8 @@
+PSet muoncuts = {
+
+     double MinMuonPt = 6.0
+     double MaxMuonEta = 2.2
+     double MaxMuonChi2 = 5.0
+     int32 MinNHits = 7
+
+}

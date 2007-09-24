@@ -1,0 +1,6 @@
+
+<use name=RecoBTag/PerformanceMeasurements>
+<use name=root>
+
+<library file=Template.cc name=Template>
+</library>

@@ -1,0 +1,36 @@
+<use name=FWCore/Framework>
+<use name=FWCore/Utilities>
+<use name=Foundation/PluginManager>
+<use name=FWCore/ParameterSet>
+<use name=FWCore/ServiceRegistry>
+<use name=DataFormats/Common>
+<use name=RecoBTag/BTagTools>
+<use name=DataFormats/TrackReco>
+<use name=DataFormats/JetReco>
+<use name=DataFormats/MuonReco>
+<use name=JetMETCorrections/Objects>
+<use name=RecoMuon/TrackingTools>
+<use name=TrackingTools/TransientTrack>
+<use name=SimDataFormats/Track>
+<use name=SimTracker/TrackAssociation>
+<use name=SimTracker/Records>
+<use name=rootrflx>
+<use name=DataFormats/Math>
+<use name=RecoBTag/MCTools>
+<use name=CLHEP>
+<use name=root>
+
+<flags SEAL_PLUGIN_NAME="RecoBTagPerformanceMeasurements">
+
+<export>
+   <lib name=RecoBTagPerformanceMeasurements>
+   <use name=FWCore/Framework>
+   <use name=Foundation/PluginManager>
+   <use name=FWCore/ParameterSet>
+   <use name=RecoBTag/BTagTools>
+   <use name=DataFormats/JetReco>
+   <use name=RecoBTag/MCTools>
+   <use name=rootrflx>
+   <use name=DataFormats/Math>
+   <use name=root>
+</export>
