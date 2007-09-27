@@ -5,7 +5,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.cc,v 1.5 2007/07/03 20:57:11 yumiceva Exp $
+ version $Id: BTagEvent.cc,v 1.1 2007/09/24 18:26:47 yumiceva Exp $
 
 ________________________________________________________________**/
 
@@ -47,6 +47,7 @@ void BTagEvent::Reset() {
 	jet_pt.clear();
 	jet_eta.clear();
 	jet_phi.clear();
+	jet_e.clear();
 	jet_et.clear();
 	jet_ntrks.clear();
 	jet_vx.clear();

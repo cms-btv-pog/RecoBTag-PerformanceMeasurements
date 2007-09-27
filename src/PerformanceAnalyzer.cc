@@ -246,16 +246,25 @@ int PerformanceAnalyzer::TaggedJet(reco::CaloJet calojet, reco::JetTagCollection
 	double small = 1.e-5;
 	int result = -1; // no tagged
 	int ith = 0;
+
+	//std::cout << "calo jet: pz = " << calojet.pz() << " pt = " << calojet.pt() << std::endl;
 	
 	for ( reco::JetTagCollection::const_iterator jetTag = taggedColl.begin(); jetTag != taggedColl.end(); ++jetTag ) {
+		
 	  
 		double deltar  = ROOT::Math::VectorUtil::DeltaR( calojet.p4().Vect(), (*jetTag).jet().p4().Vect() );
 		double deltapt = std::abs( calojet.pt() - (*jetTag).jet().pt() );
+		//std::cout << "   deltar = " << deltar << "  deltapt = " << deltapt << std::endl;
 		// check if calo jet is a tagged jet
-		if ( deltar < 0.05 && deltapt < small ) result = ith;
+		if ( deltar < 0.05 && deltapt < small ) {
+			result = ith;
+			//std::cout << "  tag jet: pz = " << (*jetTag).jet().pz() << " pt = " << (*jetTag).jet().pt() << std::endl;
+		}
 		ith++;
 	}
-  
+
+	//if (result==-1) std::cout << " no jet tagged" << std::endl;
+	
 	return result;
 }
 
@@ -559,12 +568,12 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		int isbtagged = 0;
 		ith_tagged = this->TaggedJet(*jet,btagCollTC);
 		if (ith_tagged != -1 ) {
-			fS8evt->btag_TrkCounting_disc3D_1trk.push_back( TrkCountingInfo[ith_tagged].discriminator(2,0) ); // 1st trk, 3D
-			fS8evt->btag_TrkCounting_disc3D_2trk.push_back( TrkCountingInfo[ith_tagged].discriminator(3,0) ); // 2nd trk, 3D
-			fS8evt->btag_TrkCounting_disc3D_3trk.push_back( TrkCountingInfo[ith_tagged].discriminator(4,0) ); // 2nd trk, 3D
-			fS8evt->btag_TrkCounting_disc2D_1trk.push_back( TrkCountingInfo[ith_tagged].discriminator(2,1) ); // 1st trk, 2D
-			fS8evt->btag_TrkCounting_disc2D_2trk.push_back( TrkCountingInfo[ith_tagged].discriminator(3,1) ); // 2nd trk, 2D
-			fS8evt->btag_TrkCounting_disc2D_2trk.push_back( TrkCountingInfo[ith_tagged].discriminator(4,1) ); // 2nd trk, 2D
+			fS8evt->btag_TrkCounting_disc3D_1trk.push_back( TrkCountingInfo[ith_tagged].discriminator(1,0) ); // 1st trk, 3D
+			fS8evt->btag_TrkCounting_disc3D_2trk.push_back( TrkCountingInfo[ith_tagged].discriminator(2,0) ); // 2nd trk, 3D
+			fS8evt->btag_TrkCounting_disc3D_3trk.push_back( TrkCountingInfo[ith_tagged].discriminator(3,0) ); // 3nd trk, 3D
+			fS8evt->btag_TrkCounting_disc2D_1trk.push_back( TrkCountingInfo[ith_tagged].discriminator(1,1) ); // 1st trk, 2D
+			fS8evt->btag_TrkCounting_disc2D_2trk.push_back( TrkCountingInfo[ith_tagged].discriminator(2,1) ); // 2nd trk, 2D
+			fS8evt->btag_TrkCounting_disc2D_2trk.push_back( TrkCountingInfo[ith_tagged].discriminator(3,1) ); // 3nd trk, 2D
 			isbtagged = 1;
 
 			int NtrksInJet = TrkCountingInfo[ith_tagged].tracks().size();

@@ -8,7 +8,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagLeptonEvent.h,v 1.5 2007/07/03 20:57:10 yumiceva Exp $
+ version $Id: BTagLeptonEvent.h,v 1.1 2007/09/24 18:26:47 yumiceva Exp $
 
 ________________________________________________________________**/
 
@@ -27,6 +27,7 @@ class BTagLeptonEvent : public TObject {
 	std::vector< double > pt;
 	std::vector< double > eta;
 	std::vector< double > phi;
+	std::vector< double > e;
 	std::vector< double > charge;
 	std::vector< double > p;
 	std::vector< double > trkchi2;

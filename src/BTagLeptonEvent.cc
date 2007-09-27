@@ -5,7 +5,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagLeptonEvent.cc,v 1.5 2007/07/03 20:57:11 yumiceva Exp $
+ version $Id: BTagLeptonEvent.cc,v 1.1 2007/09/24 18:26:47 yumiceva Exp $
 
 ________________________________________________________________**/
 
@@ -34,6 +34,7 @@ void BTagLeptonEvent::Reset() {
 	pt.clear();
     eta.clear();
     phi.clear();
+	e.clear();
     charge.clear();
     p.clear();
     trkchi2.clear();
