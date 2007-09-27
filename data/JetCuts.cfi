@@ -1,7 +1,7 @@
 PSet jetcuts = {
 
      double MinEt = 20.
-     double MaxEta = 2.0
+     double MaxEta = 2.5
      double MinDeltaR = 0.4
      double MinPtRel = -1.
 }

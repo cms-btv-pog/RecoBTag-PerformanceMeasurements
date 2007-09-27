@@ -457,7 +457,8 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	for( jet = recoJets.begin(); jet != recoJets.end(); ++jet ) {
 
 		// initial set of cuts on jets
-		if ( jet->pt() <= MinJetEt_ || std::abs( jet->eta() ) >= MaxJetEta_ ) continue;
+		double jetcorrection =  acorrector->correction(*jet, iEvent, iSetup);
+		if ( (jet->pt() * jetcorrection ) <= MinJetEt_ || std::abs( jet->eta() ) >= MaxJetEta_ ) continue;
 		int hasLepton = 0;
 		int tmptotmuon = 0;
 		BTagLeptonEvent leptonEvent;
@@ -471,7 +472,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			double normChi2 = (*(muon->combinedMuon())).chi2() / (*(muon->combinedMuon())).ndof();// use global fit
 			if ( (muon->pt()<= MinMuonPt_) || (normChi2 >= MaxMuonChi2_ ) ) continue;
 
-			// jet cuts
+			// lepton in jet cuts			
 			double deltaR  = ROOT::Math::VectorUtil::DeltaR(jet->p4().Vect(), muonTrk.momentum() );// use tracker muon
 			TVector3 tmpvec(jet->p4().Vect().X(),jet->p4().Vect().Y(),  jet->p4().Vect().Z());
 			TVector3 leptonvec(muonTrk.momentum().X(), muonTrk.momentum().Y(),muonTrk.momentum().Z());
@@ -538,6 +539,8 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		fS8evt->jet_vx.push_back(jet->vx());
 		fS8evt->jet_vy.push_back(jet->vy());
 		fS8evt->jet_vz.push_back(jet->vz());
+		// get jet correction
+		fS8evt->jetcorrection.push_back( jetcorrection );
 		
 		// find generated jet
 		reco::GenJet genjet = this->GetGenJet(*jet,genJets);
@@ -560,9 +563,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			fS8evt->genjet_vy.push_back(-100000);
 			fS8evt->genjet_vz.push_back(-100000);
 		}
-		
-		// get jet correction
-		fS8evt->jetcorrection.push_back( acorrector->correction(*jet, iEvent, iSetup) );
+				
 		// b tagging
 		int ith_tagged = -1;
 		int isbtagged = 0;
