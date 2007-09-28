@@ -8,7 +8,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.h,v 1.2 2007/09/27 03:23:00 yumiceva Exp $
+ version $Id: BTagEvent.h,v 1.3 2007/09/28 15:11:00 yumiceva Exp $
 
 ________________________________________________________________**/
 
@@ -63,7 +63,7 @@ class BTagEvent : public TObject {
 	std::vector< float > genjet_pt;
 	std::vector< float > genjet_eta;
 	std::vector< float > genjet_phi;
-	std::vector< float > genjet_et;
+	std::vector< float > genjet_e;
 	//std::vector< float > genjet_vx;
 	//std::vector< float > genjet_vy;
 	//std::vector< float > genjet_vz;

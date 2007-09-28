@@ -482,6 +482,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			tmptotmuon++;
 			
 			leptonEvent.pdgid.push_back( 13 ); // muon only for the moment
+			leptonEvent.e.push_back( muon->energy());
 			leptonEvent.pt.push_back( muonTrk.pt());
 			leptonEvent.eta.push_back( muonTrk.eta());
 			leptonEvent.phi.push_back( muonTrk.phi());
@@ -508,6 +509,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			leptonEvent.mc_pt.push_back(           genlepton.momentum().perp());
 			leptonEvent.mc_phi.push_back(          genlepton.momentum().phi());
 			leptonEvent.mc_eta.push_back(          genlepton.momentum().pseudoRapidity());
+			leptonEvent.mc_e.push_back(           genlepton.momentum().e());
 			leptonEvent.mc_charge.push_back(       genlepton.charge());
 			//leptonEvent.mc_vx.push_back(           genlepton.momentum().x());
 			//leptonEvent.mc_vy.push_back(           genlepton.momentum().y());
@@ -528,6 +530,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		fS8evt->jet_flavour_alg.push_back(jetFlavourIdentifier_.identifyBasedOnPartons(*jet).flavour());	
 		fS8evt->jet_flavour_phy.push_back(jetFlavourIdentifier2_.identifyBasedOnPartons(*jet).flavour());	
 		//fS8evt->jet_p.push_back(jet->p());
+		fS8evt->jet_e.push_back(jet->energy());
 		fS8evt->jet_pt.push_back(jet->pt());
 		fS8evt->jet_eta.push_back(jet->eta());
 		fS8evt->jet_phi.push_back(jet->phi());
@@ -545,7 +548,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			fS8evt->genjet_pt.push_back(genjet.pt());
 			fS8evt->genjet_eta.push_back(genjet.eta());
 			fS8evt->genjet_phi.push_back(genjet.phi());
-			fS8evt->genjet_et.push_back(genjet.et());
+			fS8evt->genjet_e.push_back(genjet.energy());
 			//fS8evt->genjet_vx.push_back(genjet.vx());
 			//fS8evt->genjet_vy.push_back(genjet.vy());
 			//fS8evt->genjet_vz.push_back(genjet.vz());
@@ -554,7 +557,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			fS8evt->genjet_pt.push_back(-100000);
 			fS8evt->genjet_eta.push_back(-100000);
 			fS8evt->genjet_phi.push_back(-100000);
-			fS8evt->genjet_et.push_back(-100000);
+			fS8evt->genjet_e.push_back(-100000);
 			//fS8evt->genjet_vx.push_back(-100000);
 			//fS8evt->genjet_vy.push_back(-100000);
 			//fS8evt->genjet_vz.push_back(-100000);

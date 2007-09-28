@@ -5,7 +5,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.cc,v 1.2 2007/09/27 03:23:01 yumiceva Exp $
+ version $Id: BTagEvent.cc,v 1.3 2007/09/28 15:11:01 yumiceva Exp $
 
 ________________________________________________________________**/
 
@@ -64,7 +64,7 @@ void BTagEvent::Reset() {
 	genjet_pt.clear();
 	genjet_eta.clear();
 	genjet_phi.clear();
-	genjet_et.clear();
+	genjet_e.clear();
 	//genjet_vx.clear();
 	//genjet_vy.clear();
 	//genjet_vz.clear();
