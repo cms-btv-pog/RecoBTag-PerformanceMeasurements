@@ -5,7 +5,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagLeptonEvent.cc,v 1.1 2007/09/24 18:26:47 yumiceva Exp $
+ version $Id: BTagLeptonEvent.cc,v 1.2 2007/09/27 03:23:01 yumiceva Exp $
 
 ________________________________________________________________**/
 
@@ -36,7 +36,7 @@ void BTagLeptonEvent::Reset() {
     phi.clear();
 	e.clear();
     charge.clear();
-    p.clear();
+    //p.clear();
     trkchi2.clear();
     trkndof.clear();
 	chi2.clear();
@@ -45,9 +45,9 @@ void BTagLeptonEvent::Reset() {
     trkrechits.clear();
 	d0.clear();
 	d0sigma.clear();
-	vx.clear();
-	vy.clear();
-	vz.clear();
+	//vx.clear();
+	//vy.clear();
+	//vz.clear();
 	jet_deltaR.clear();
 	jet_ptrel.clear();
 	
@@ -55,11 +55,11 @@ void BTagLeptonEvent::Reset() {
 	mc_eta.clear();
 	mc_phi.clear();
 	mc_charge.clear();
-	mc_p.clear();
+	//mc_p.clear();
 	mc_pdgid.clear();
-	mc_vx.clear();
-	mc_vy.clear();
-	mc_vz.clear();
+	//mc_vx.clear();
+	//mc_vy.clear();
+	//mc_vz.clear();
     mc_mother_pdgid.clear();
 
 }

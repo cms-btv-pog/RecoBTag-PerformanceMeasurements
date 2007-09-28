@@ -36,7 +36,7 @@ void Template::Loop()
 		if ( jentry%100 == 0 ) std::cout << " processing entry: " << jentry << std::endl;
 
 		
-		std::vector<double> jet_pt_vec = fS8evt->jet_pt;
+		std::vector<float> jet_pt_vec = fS8evt->jet_pt;
 		int vec_size = jet_pt_vec.size();
 		
 		for ( int ijet =0; ijet != vec_size; ++ijet) {
@@ -47,7 +47,7 @@ void Template::Loop()
 
 				BTagLeptonEvent Muons = fS8evt->lepton[ijet];
 				
-				int mu_size = Muons.p.size();
+				int mu_size = Muons.pt.size();
 				
 				for ( int imu = 0; imu != mu_size; ++imu ) {
 					

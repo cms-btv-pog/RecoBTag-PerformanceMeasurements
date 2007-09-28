@@ -137,29 +137,23 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
   fnselectors= bTaggerList_.size();
   for(std::vector<std::string>::iterator objectName = bTaggerList_.begin(); objectName != bTaggerList_.end(); ++objectName) {
 	  if ( *objectName == "TrackCounting" ) {
-		  //std::cout << "in TrackCounting ini" << std::endl;
-		  moduleLabel_.push_back("trackCountingJetTags");
-		  //moduleLabel_.push_back("trackProbabilityJetTags");
-		  //std::cout << "in TrackCounting summary to be created" << std::endl;
 		  
-		  //std::cout << " ini done" << std::endl;
-		  //fnselector++;
+		  moduleLabel_.push_back("trackCountingJetTags");
+		 
 	  }
 	  if ( *objectName == "TrackProbability" ) {
+		  
 		  moduleLabel_.push_back("trackProbabilityJetTags");
-		  //fevt[fnselector] = new BTagEvent();
-		  //ftree->Branch("jp.","BTagEvent",&fS8evt,64000,1);
-		  //fnselector++;
+		  
 	  }
 	  if ( *objectName == "SoftElectron" ) {
-		  //fevt[fnselector] = new BTagEvent();
-		  //ftree->Branch("se.","BTagEvent",&fS8evt,64000,1);
-		  //fnselector++;
+
+		  moduleLabel_.push_back("softElectronJetTags");
 	  }
 	  if ( *objectName == "SoftMuon" ) {
-		  //fevt[fnselector] = new BTagEvent();
-		  //ftree->Branch("sm.","BTagEvent",&fS8evt,64000,1);
-		  //fnselector++;
+
+		  moduleLabel_.push_back("softMuonJetTags");
+		  
 	  }
 	  
   }
@@ -441,8 +435,9 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 
 	
 	// loop over jets
-	fS8evt->njets = recoJets.size();
-	fS8evt->nmuons = recoMuons.size();
+	//fS8evt->njets = recoJets.size();
+	//fS8evt->nmuons = recoMuons.size();
+	int total_nmuons = 0;
 	fS8evt->ngenjets = genJets.size();
 	fS8evt->nvertices = recoPV.size();
 	
@@ -482,6 +477,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			if ( (deltaR >= MinDeltaR_ ) || (ptrel <= MinPtRel_ ) ) continue;
 
 			// now we have a good lepton in a jet
+			total_nmuons++;
 			hasLepton = 1;
 			tmptotmuon++;
 			
@@ -490,7 +486,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			leptonEvent.eta.push_back( muonTrk.eta());
 			leptonEvent.phi.push_back( muonTrk.phi());
 			leptonEvent.charge.push_back( muonTrk.charge());
-			leptonEvent.p.push_back( muonTrk.p());
+			//leptonEvent.p.push_back( muonTrk.p());
 			leptonEvent.trkchi2.push_back( muonTrk.chi2());
 			leptonEvent.trkndof.push_back( muonTrk.ndof());
 			leptonEvent.chi2.push_back(    (*(muon->combinedMuon())).chi2() );
@@ -501,21 +497,21 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			leptonEvent.trkrechits.push_back( muonTrk.recHitsSize());
 			leptonEvent.d0.push_back(         muonTrk.d0());
 			leptonEvent.d0sigma.push_back(    muonTrk.d0Error());
-			leptonEvent.vx.push_back(         muonTrk.vx());
-			leptonEvent.vy.push_back(         muonTrk.vy());
-			leptonEvent.vz .push_back(        muonTrk.vz());
+			//leptonEvent.vx.push_back(         muonTrk.vx());
+			//leptonEvent.vy.push_back(         muonTrk.vy());
+			//leptonEvent.vz .push_back(        muonTrk.vz());
 			
 			// find a sim track
 			SimTrack genlepton = this->GetGenTrk(muonTrk, simTrks, simVtcs );
 			
-			leptonEvent.mc_p.push_back(            genlepton.momentum().vect().mag());
+			//leptonEvent.mc_p.push_back(            genlepton.momentum().vect().mag());
 			leptonEvent.mc_pt.push_back(           genlepton.momentum().perp());
 			leptonEvent.mc_phi.push_back(          genlepton.momentum().phi());
 			leptonEvent.mc_eta.push_back(          genlepton.momentum().pseudoRapidity());
 			leptonEvent.mc_charge.push_back(       genlepton.charge());
-			leptonEvent.mc_vx.push_back(           genlepton.momentum().x());
-			leptonEvent.mc_vy.push_back(           genlepton.momentum().y());
-			leptonEvent.mc_vz.push_back(           genlepton.momentum().z());
+			//leptonEvent.mc_vx.push_back(           genlepton.momentum().x());
+			//leptonEvent.mc_vy.push_back(           genlepton.momentum().y());
+			//leptonEvent.mc_vz.push_back(           genlepton.momentum().z());
 			leptonEvent.mc_pdgid.push_back(        genlepton.type());
 			leptonEvent.mc_mother_pdgid.push_back( GetMotherId(simVtcs, simTrks, genlepton));
 	
@@ -531,37 +527,37 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		
 		fS8evt->jet_flavour_alg.push_back(jetFlavourIdentifier_.identifyBasedOnPartons(*jet).flavour());	
 		fS8evt->jet_flavour_phy.push_back(jetFlavourIdentifier2_.identifyBasedOnPartons(*jet).flavour());	
-		fS8evt->jet_p.push_back(jet->p());
+		//fS8evt->jet_p.push_back(jet->p());
 		fS8evt->jet_pt.push_back(jet->pt());
 		fS8evt->jet_eta.push_back(jet->eta());
 		fS8evt->jet_phi.push_back(jet->phi());
 		fS8evt->jet_et.push_back(jet->et());
-		fS8evt->jet_vx.push_back(jet->vx());
-		fS8evt->jet_vy.push_back(jet->vy());
-		fS8evt->jet_vz.push_back(jet->vz());
+		//fS8evt->jet_vx.push_back(jet->vx());
+		//fS8evt->jet_vy.push_back(jet->vy());
+		//fS8evt->jet_vz.push_back(jet->vz());
 		// get jet correction
 		fS8evt->jetcorrection.push_back( jetcorrection );
 		
 		// find generated jet
 		reco::GenJet genjet = this->GetGenJet(*jet,genJets);
 		if ( genjet.p() !=0 ) {
-			fS8evt->genjet_p.push_back(genjet.p());
+			//fS8evt->genjet_p.push_back(genjet.p());
 			fS8evt->genjet_pt.push_back(genjet.pt());
 			fS8evt->genjet_eta.push_back(genjet.eta());
 			fS8evt->genjet_phi.push_back(genjet.phi());
 			fS8evt->genjet_et.push_back(genjet.et());
-			fS8evt->genjet_vx.push_back(genjet.vx());
-			fS8evt->genjet_vy.push_back(genjet.vy());
-			fS8evt->genjet_vz.push_back(genjet.vz());
+			//fS8evt->genjet_vx.push_back(genjet.vx());
+			//fS8evt->genjet_vy.push_back(genjet.vy());
+			//fS8evt->genjet_vz.push_back(genjet.vz());
 		} else {
-			fS8evt->genjet_p.push_back(-100000);
+			//fS8evt->genjet_p.push_back(-100000);
 			fS8evt->genjet_pt.push_back(-100000);
 			fS8evt->genjet_eta.push_back(-100000);
 			fS8evt->genjet_phi.push_back(-100000);
 			fS8evt->genjet_et.push_back(-100000);
-			fS8evt->genjet_vx.push_back(-100000);
-			fS8evt->genjet_vy.push_back(-100000);
-			fS8evt->genjet_vz.push_back(-100000);
+			//fS8evt->genjet_vx.push_back(-100000);
+			//fS8evt->genjet_vy.push_back(-100000);
+			//fS8evt->genjet_vz.push_back(-100000);
 		}
 				
 		// b tagging
@@ -590,6 +586,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 					goodtrksInJet3D++;
 			}
             //an example of how can we get the 3 tracks with the smallests IPs
+			/*
 			if( goodtrksInJet2D > 2 ) {
 				fS8evt->btag_NegTag_disc2D_1trk.push_back(
 					TrkCountingInfo[ith_tagged].significance(goodtrksInJet2D-3,1) ); //2D
@@ -602,7 +599,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 				fS8evt->btag_NegTag_disc2D_2trk.push_back( -9999. );
 				fS8evt->btag_NegTag_disc2D_3trk.push_back( -9999. );
 			}
-
+			*/
 			if( goodtrksInJet3D > 2 ) {
 				fS8evt->btag_NegTag_disc3D_1trk.push_back(
 					TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-3,0) ); //3D
@@ -625,9 +622,9 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			fS8evt->btag_TrkCounting_disc3D_3trk.push_back( -9999. );
 			
 			fS8evt->jet_ntrks.push_back( 0 );
-			fS8evt->btag_NegTag_disc2D_1trk.push_back( -9999. );
-			fS8evt->btag_NegTag_disc2D_2trk.push_back( -9999. );
-			fS8evt->btag_NegTag_disc2D_3trk.push_back( -9999. );
+			//fS8evt->btag_NegTag_disc2D_1trk.push_back( -9999. );
+			//fS8evt->btag_NegTag_disc2D_2trk.push_back( -9999. );
+			//fS8evt->btag_NegTag_disc2D_3trk.push_back( -9999. );
 			fS8evt->btag_NegTag_disc3D_1trk.push_back( -9999. );
 			fS8evt->btag_NegTag_disc3D_2trk.push_back( -9999. );
 			fS8evt->btag_NegTag_disc3D_3trk.push_back( -9999. );
@@ -637,17 +634,20 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		ith_tagged = this->TaggedJet(*jet,btagCollTP);
 		if (ith_tagged != -1 ) {
 			fS8evt->btag_JetProb_disc3D.push_back( JetProbInfo[ith_tagged].discriminator(2,0) ); // 3D
-			fS8evt->btag_JetProb_disc2D.push_back( JetProbInfo[ith_tagged].discriminator(2,1) ); // 2D
+			//fS8evt->btag_JetProb_disc2D.push_back( JetProbInfo[ith_tagged].discriminator(2,1) ); // 2D
 			isbtagged = 1;
 		} else {
 			fS8evt->btag_JetProb_disc3D.push_back( -9999. );
-			fS8evt->btag_JetProb_disc2D.push_back( -9999. );
+			//fS8evt->btag_JetProb_disc2D.push_back( -9999. );
 		}
 
-		fS8evt->jet_isbtagged.push_back( isbtagged );
+		//fS8evt->jet_isbtagged.push_back( isbtagged );
 		
 		ijet++;
-	}
+	} //end loop over reco jets
+
+	fS8evt->njets = fS8evt->jet_pt.size();
+	fS8evt->nmuons = total_nmuons;
 
 	// fill tree
 	
