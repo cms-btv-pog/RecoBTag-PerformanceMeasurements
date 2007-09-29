@@ -4,3 +4,6 @@
 
 <library file=Template.cc name=Template>
 </library>
+
+<library file=S8Tools/S8Plotter.cc name=S8Plotter>
+</library>
