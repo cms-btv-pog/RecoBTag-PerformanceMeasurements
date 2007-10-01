@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: Template.h,v 1.3 2007/05/09 03:34:07 yumiceva Exp $
+ * \version $Id: Template.h,v 1.1 2007/09/24 18:26:48 yumiceva Exp $
  *
  */
 
@@ -41,12 +41,14 @@ class Template {
 	TFile            *foutfile;
 	
 	virtual Int_t  GetEntry(Long64_t entry);
-	virtual void     Init(TChain *tree);
+	virtual void     Init();
 	virtual void     Loop();
 	virtual Long64_t LoadTree(Long64_t entry);
 	virtual void     Show(Long64_t entry = -1);
 	virtual Int_t    Cut(Long64_t entry);
 	virtual Bool_t   Notify();
+	void Add(TString filename);
+	
 };
 
 #endif
@@ -54,17 +56,14 @@ class Template {
 #ifdef Template_cxx
 Template::Template(TString filename)
 {
-	//ffile = (TFile*)gROOT->GetListOfFiles()->FindObject(filename);
-	//ffile = new TFile(filename);
-	//TTree *tree = (TTree*)gDirectory->Get("summary");
-		
-	TChain *tree = new TChain("summary");
-	tree->Add(filename);
+			
+	fChain = new TChain("summary");
+	fChain->Add(filename);
 	
 	fS8evt = new BTagEvent();
 	
 	//cout << " file loaded and objects created" << endl;
-	Init(tree);
+	Init();
 	
 }
 
@@ -96,12 +95,17 @@ Long64_t Template::LoadTree(Long64_t entry)
    return centry;
 }
 
-void Template::Init(TChain *tree)
+void Template::Add(TString filename)
+{
+	fChain->Add(filename);
+}
+
+void Template::Init()
 {
 
-	if (!tree) return;
+	//if (!tree) return;
 
-	fChain = tree;
+	//fChain = tree;
 	fCurrent = -1;
 	
 	fChain->SetBranchAddress("s8.",&fS8evt);
