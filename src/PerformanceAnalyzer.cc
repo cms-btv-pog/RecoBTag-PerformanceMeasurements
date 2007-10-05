@@ -632,11 +632,12 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			fS8evt->btag_NegTag_disc3D_2trk.push_back( -9999. );
 			fS8evt->btag_NegTag_disc3D_3trk.push_back( -9999. );
 		}
-
+   
 		ith_tagged = -1;
 		ith_tagged = this->TaggedJet(*jet,btagCollTP);
 		if (ith_tagged != -1 ) {
-			fS8evt->btag_JetProb_disc3D.push_back( JetProbInfo[ith_tagged].discriminator(2,0) ); // 3D
+		  fS8evt->btag_JetProb_disc3D.push_back(btagCollTP[ith_tagged].discriminator());
+		  //fS8evt->btag_JetProb_disc3D.push_back( JetProbInfo[ith_tagged].discriminator(2,0) ); // 3D
 			//fS8evt->btag_JetProb_disc2D.push_back( JetProbInfo[ith_tagged].discriminator(2,1) ); // 2D
 			isbtagged = 1;
 		} else {
