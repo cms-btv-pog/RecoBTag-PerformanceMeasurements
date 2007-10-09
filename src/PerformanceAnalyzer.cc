@@ -315,7 +315,7 @@ PerformanceAnalyzer::GetMotherId(edm::SimVertexContainer simVtxColl, edm::SimTra
   
   
   int motherType = motherId == -1 ? 0 : simTrkColl[motherId].type();
-
+  
   return motherType;
 
 }
@@ -470,6 +470,8 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			// lepton in jet cuts			
 			double deltaR  = ROOT::Math::VectorUtil::DeltaR(jet->p4().Vect(), muonTrk.momentum() );// use tracker muon
 			TVector3 tmpvec(jet->p4().Vect().X(),jet->p4().Vect().Y(),  jet->p4().Vect().Z());
+			// use calibrated jet
+			tmpvec = jetcorrection * tmpvec;
 			TVector3 leptonvec(muonTrk.momentum().X(), muonTrk.momentum().Y(),muonTrk.momentum().Z());
 			tmpvec += leptonvec;
 			double ptrel = leptonvec.Perp(tmpvec);
