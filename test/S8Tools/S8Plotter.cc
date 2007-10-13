@@ -100,21 +100,25 @@ void S8Plotter::Book() {
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
 	
-	hname = "jet_et";
-	htitle = "E_{T} [GeV]";
 	
 }
 
 void S8Plotter::Loop()
 {
-  
+
+	// setup tree
+	Init();
+	// book histograms
 	Book();
+
+	std::map<std::string, double> totalTagged;
+	std::map<std::string, double> totalJets;
 	
 	const int nptbins = 14;
 	Double_t jetptbins[nptbins] = {30., 40., 50., 60., 70., 80, 90., 100., 120., 140., 160., 180., 230., 300.};
 	
 	Double_t jetetabins[8] = {0.0,0.25,0.5,0.75,1.0,1.25,1.5,2.0};
-
+		
 	h2["npT"] = new TH2F("npT","MuTag pT vs pTrel",nptbins-1,jetptbins,50,0.,5.);
 	h2["ppT"] = new TH2F("ppT","MuTag && CMBtag pT vs pTrel",nptbins-1,jetptbins,50,0.,5.);
 	h2["ncmbpT"] = new TH2F("ncmbpT","opp tag: MuTag pT vs pTrel",nptbins-1,jetptbins,50,0.,5.);
@@ -140,6 +144,11 @@ void S8Plotter::Loop()
 	h2["cl_ncmbpT"] = new TH2F("cl_ncmbpT","cl opp tag: MuTag pT vs pTrel",nptbins-1,jetptbins,50,0.,5.);
 	h2["cl_pcmbpT"] = new TH2F("cl_pcmbpT","cl opp tag MuTag && CMBtag pT vs pTrel",nptbins-1,jetptbins,50,0.,5.);
 
+	h2["c_npT"] = new TH2F("c_npT","c MuTag pT vs pTrel",nptbins-1,jetptbins,50,0.,5.);
+	h2["l_npT"] = new TH2F("l_npT","l MuTag pT vs pTrel",nptbins-1,jetptbins,50,0.,5.);
+	h2["c_ncmbpT"] = new TH2F("c_ncmbpT","c opp tag: MuTag pT vs pTrel",nptbins-1,jetptbins,50,0.,5.);
+	h2["l_ncmbpT"] = new TH2F("l_ncmbpT","l opp tag MuTag pT vs pTrel",nptbins-1,jetptbins,50,0.,5.);
+
 	h2["cl_nEta"] = new TH2F("cl_nEta","cl MuTag Eta vs pTrel",7,jetetabins,50,0.,5.);
 	h2["cl_pEta"] = new TH2F("cl_pEta","cl MuTag && CMBtag Eta vs pTrel",7,jetetabins,50,0.,5.);
 	h2["cl_ncmbEta"] = new TH2F("cl_ncmbEta","cl opp tag: MuTag Eta vs pTrel",7,jetetabins,50,0.,5.);
@@ -163,6 +172,12 @@ void S8Plotter::Loop()
 	h2["b_ppT"]->Sumw2();
 	h2["b_ncmbpT"]->Sumw2();
 	h2["b_pcmbpT"]->Sumw2();
+
+	h2["c_npT"]->Sumw2();
+	h2["l_npT"]->Sumw2();
+	h2["c_ncmbpT"]->Sumw2();
+	h2["l_ncmbpT"]->Sumw2();
+	
 	h2["b_nEta"]->Sumw2();
 	h2["b_pEta"]->Sumw2();
 	h2["b_ncmbEta"]->Sumw2();
@@ -185,9 +200,6 @@ void S8Plotter::Loop()
 	Long64_t nentries = fChain->GetEntriesFast();
 	std::cout << " Total entries = " << fChain->GetEntries() << std::endl;
 	//int count_multiple_mu = 0;
-		
-	//double TCdiscriminator = 4.0;
-	//double TCdiscriminatorLoose = 2.0;
 	
 	std::vector< int > counters;
 	TString tmpfilename = "";
@@ -314,7 +326,19 @@ void S8Plotter::Loop()
 						h1["jet_ptrel_cl"]->Fill( ptrel );
 					}
 					
-					if ( fS8evt->btag_TrkCounting_disc3D_3trk[ijet] > 4. ) passJetbTagger = true;
+					// check tagger and level
+					if ( ftagger == "TrackCounting" ) {
+					  if ( flevel == "Tight" ) {
+						  if ( fS8evt->btag_TrkCounting_disc3D_3trk[ijet] > fbTaggerMap["Tight"] ) passJetbTagger = true;
+					  } else {
+						  if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[flevel] << std::endl;
+					    if ( fS8evt->btag_TrkCounting_disc3D_2trk[ijet] > fbTaggerMap[flevel] ) passJetbTagger = true;
+						
+					  }
+					}
+					if ( ftagger == "TrackProbability" ) {
+					  if ( fS8evt->btag_JetProb_disc3D[ijet] > fbTaggerMap[flevel] ) passJetbTagger = true;
+					}
 				}
 			}//check lepton in jet
 			
@@ -368,6 +392,7 @@ void S8Plotter::Loop()
 		h2["npT"]->Fill( p4Jet.Pt() , ptrel );
 		h2["nEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
 		if ( JetFlavor == 5 ) {
+			totalJets["b"]++;
 			h2["b_npT"]->Fill( p4Jet.Pt() , ptrel );
 			h2["b_nEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
 		}
@@ -375,11 +400,14 @@ void S8Plotter::Loop()
 			h2["cl_npT"]->Fill( p4Jet.Pt() , ptrel);
 			h2["cl_nEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
 		}
-
+		if ( JetFlavor == 4 ) { totalJets["c"]++; h2["c_npT"]->Fill( p4Jet.Pt() , ptrel ); }
+		if ( (JetFlavor>0 && JetFlavor<4) || JetFlavor==21 ) { totalJets["l"]++; h2["l_npT"]->Fill( p4Jet.Pt() , ptrel ); }
+		
 		if ( passJetbTagger ) {
 			h2["ncmbpT"]->Fill( p4Jet.Pt() , ptrel );
 			h2["ncmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
 			if ( JetFlavor == 5 ) {
+				totalTagged["b"]++;
 				h2["b_ncmbpT"]->Fill( p4Jet.Pt() , ptrel );
 				h2["b_ncmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
 			}
@@ -387,6 +415,8 @@ void S8Plotter::Loop()
 				h2["cl_ncmbpT"]->Fill( p4Jet.Pt() , ptrel);
 				h2["cl_ncmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
 			}
+			if ( JetFlavor == 4 ) { totalTagged["c"]++; h2["c_ncmbpT"]->Fill( p4Jet.Pt() , ptrel ); }
+			if ( (JetFlavor>0 && JetFlavor<4) || JetFlavor==21 ) { totalTagged["l"]++; h2["l_ncmbpT"]->Fill( p4Jet.Pt() , ptrel ); }
 		}
 		if ( passOppJetbTagger ) {
 			h2["ppT"]->Fill( p4Jet.Pt() , ptrel );
@@ -417,9 +447,13 @@ void S8Plotter::Loop()
 	}// end loop over entries
 
 	std::cout << " Total entries = " << fChain->GetEntries() << std::endl;
+	std::cout << " Average efficiencies: " << std::endl;
+	std::cout << " b-efficiency = " << totalTagged["b"]/totalJets["b"] << std::endl;
+	std::cout << " c-efficiency = " << totalTagged["c"]/totalJets["c"] << std::endl;
+	std::cout << " udsg-mistag = " << totalTagged["l"]/totalJets["l"] << std::endl;
 	
 	//std::cout << " Events with a jet with multiple muons " <<  << std::endl;
-	
+
 
 	//______________________________________________________
 
@@ -450,6 +484,9 @@ void S8Plotter::Loop()
 	h1["eff_TaggedJet_b"] = new TH1D("eff_TaggedJet_b","eff_TaggedJet_b",nptbins-1,jetptbins);
 	h1["eff_TaggedJet_cl"] = new TH1D("eff_TaggedJet_cl","eff_TaggedJet_cl",nptbins-1,jetptbins);
 
+	h1["eff_TaggedJet_c"] = new TH1D("eff_TaggedJet_c","eff_TaggedJet_c",nptbins-1,jetptbins);
+	h1["eff_TaggedJet_l"] = new TH1D("eff_TaggedJet_l","eff_TaggedJet_l",nptbins-1,jetptbins);
+	
 	h1["eff_OppTaggedJet"] = new TH1D("eff_OppTaggedJet","eff_OppTaggedJet",nptbins-1,jetptbins);
 	h1["eff_OppTaggedJet_b"] = new TH1D("eff_OppTaggedJet_b","eff_OppTaggedJet_b",nptbins-1,jetptbins);
 	h1["eff_OppTaggedJet_cl"] = new TH1D("eff_OppTaggedJet_cl","eff_OppTaggedJet_cl",nptbins-1,jetptbins);
@@ -474,6 +511,8 @@ void S8Plotter::Loop()
 	TH1D *halljets = h2["npT"]->ProjectionX("halljets", -1 , -1,"e");
 	TH1D *halljets_b = h2["b_npT"]->ProjectionX("halljets_b", -1 , -1,"e");
 	TH1D *halljets_cl = h2["cl_npT"]->ProjectionX("halljets_cl", -1 , -1,"e");
+	TH1D *halljets_c = h2["c_npT"]->ProjectionX("halljets_c", -1 , -1,"e");
+	TH1D *halljets_l = h2["l_npT"]->ProjectionX("halljets_l", -1 , -1,"e");
 
 	h1["eff_pTrel"]->Divide( h2["npT"]->ProjectionX("halljets_ptrel", 9 , -1,"e") , halljets ,1.,1.,"B");
 	h1["eff_pTrel_b"]->Divide( h2["b_npT"]->ProjectionX("b_halljets_ptrel", 9 , -1,"e") , halljets_b ,1.,1.,"B");
@@ -483,6 +522,11 @@ void S8Plotter::Loop()
 	h1["eff_TaggedJet_b"]->Divide( h2["b_ncmbpT"]->ProjectionX("b_halljets_tagged", -1 , -1,"e") , halljets_b ,1.,1.,"B");
 	h1["eff_TaggedJet_cl"]->Divide( h2["cl_ncmbpT"]->ProjectionX("cl_halljets_tagged", -1 , -1,"e") , halljets_cl ,1.,1.,"B");
 
+
+	h1["eff_TaggedJet_c"]->Divide( h2["c_ncmbpT"]->ProjectionX("c_halljets_tagged", -1 , -1,"e") , halljets_c ,1.,1.,"B");
+	h1["eff_TaggedJet_l"]->Divide( h2["l_ncmbpT"]->ProjectionX("l_halljets_tagged", -1 , -1,"e") , halljets_l ,1.,1.,"B");
+	
+	
 	h1["eff_pTrel_TaggedJet"]->Divide( h2["ncmbpT"]->ProjectionX("halljets_ptreltagged", 9 , -1,"e") , halljets ,1.,1.,"B");
 	h1["eff_pTrel_TaggedJet_b"]->Divide( h2["b_ncmbpT"]->ProjectionX("b_halljets_ptreltagged", 9 , -1,"e") , halljets_b ,1.,1.,"B");
 	h1["eff_pTrel_TaggedJet_cl"]->Divide( h2["cl_ncmbpT"]->ProjectionX("cl_halljets_ptrelltagged", 9 , -1,"e") , halljets_cl ,1.,1.,"B");
