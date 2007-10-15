@@ -6,11 +6,12 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8Plotter.h,v 1.1 2007/10/06 06:41:11 yumiceva Exp $
+ * \version $Id: S8Plotter.h,v 1.2 2007/10/13 14:54:13 yumiceva Exp $
  *
  */
 
 #include "TROOT.h"
+#include "TAxis.h"
 #include "TChain.h"
 #include "TFile.h"
 #include "TString.h"
@@ -91,6 +92,13 @@ class S8Plotter {
 			delete ih->second;
 		}
 	}
+
+	double EffErr(double n, double p) {
+		double w= n/p;
+		return sqrt(w*(1-w)/p);
+	}
+
+	void PrintInfo();
 		
 
   private:
@@ -107,6 +115,8 @@ class S8Plotter {
 	TString           flevel;
 	double            fMinPt;
 	double            fMaxPt;
+	TAxis             fJetPtAxis;
+	TAxis             fJetEtaAxis;
 	
 	std::map<std::string, TCanvas*> cv_map;
 	std::map<std::string, TH1*> h1;
@@ -137,14 +147,20 @@ S8Plotter::S8Plotter(TString filename)
 	ftagger = "TrackCounting";
 	flevel  = "Loose";
 	
-	fTrackCountingMap["Loose"]  = 2.3; // use TC2:high eff.
-	fTrackCountingMap["Medium"] = 5.3; // use TC2:high eff.
-	fTrackCountingMap["Tight"]  = 4.8; // use TC3:high purity
+	fTrackCountingMap["Loose"]  = 2.5; // use TC2:high eff.
+	fTrackCountingMap["Medium"] = 5.4; // use TC2:high eff.
+	fTrackCountingMap["Tight"]  = 4.8;// use TC3:high purity
  
-	fTrackProbabilityMap["Loose"] = 0.3;
-	fTrackProbabilityMap["Medium"] = 0.57;
-	fTrackProbabilityMap["Tight"] = 0.85;
+	fTrackProbabilityMap["Loose"] = 0.29;
+	fTrackProbabilityMap["Medium"] = 0.54;
+	fTrackProbabilityMap["Tight"] = 0.75;
 
+	// Binning
+	const int nptbins = 13;
+	Double_t jetptbins[nptbins] = {30., 40., 50., 60., 70., 80, 90., 100., 120., 140., 160., 180., 230.};
+	Double_t jetetabins[8] = {0.0,0.25,0.5,0.75,1.0,1.25,1.5,2.0};
+	fJetPtAxis.Set(nptbins-1, jetptbins );
+	fJetEtaAxis.Set(8-1, jetetabins );
 
 	fChain = new TChain("summary");
 
@@ -243,11 +259,14 @@ void S8Plotter::Init()
 	//fChain->SetBranchAddress("summaryTKF.",&fBTagSummary[2]);
 
 	//cout << "Init done" << endl;
+}
 
-	// print setup
+void S8Plotter::PrintInfo() {
+
 	std::cout << " Tagger: " << ftagger << std::endl;
 	std::cout << " Level:  " << flevel << std::endl;
 }
+
 
 Bool_t S8Plotter::Notify()
 {
