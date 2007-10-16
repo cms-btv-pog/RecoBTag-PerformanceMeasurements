@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8Plotter.h,v 1.2 2007/10/13 14:54:13 yumiceva Exp $
+ * \version $Id: S8Plotter.h,v 1.3 2007/10/15 23:35:10 yumiceva Exp $
  *
  */
 
@@ -97,9 +97,32 @@ class S8Plotter {
 		double w= n/p;
 		return sqrt(w*(1-w)/p);
 	}
-
+	void SetAxis(TString name, TAxis axis) {
+	  if (name == "Pt") fJetPtAxis.Set(axis.GetNbins(),(axis.GetXbins())->GetArray());
+	  if (name == "Eta") fJetEtaAxis.Set(axis.GetNbins(),(axis.GetXbins())->GetArray());
+	}
 	void PrintInfo();
-		
+	void PrintBins(TString option="Pt") {
+	  if (option =="Pt" || option =="Eta") {
+	    const Double_t *ax;
+	    int nbins = 0;
+	    if (option=="Pt") { 
+	      ax = (fJetPtAxis.GetXbins())->GetArray();
+	      nbins = fJetPtAxis.GetNbins();
+	    }
+	    if (option=="Eta") {
+	      ax = (fJetEtaAxis.GetXbins())->GetArray();
+	      nbins = fJetEtaAxis.GetNbins();
+	    }
+	    std::cout << option << " binning =" << std::endl;
+	    std::cout << "{";
+	    for( int i=0; i<nbins; ++i) {
+	      std::cout << ax[i];
+	      if (i!=nbins-1) std::cout << ",";
+	    }
+	    std::cout << "}" << std::endl;
+	  } else { std::cout << " don't know about " << option << std::endl;}
+	}
 
   private:
 	
@@ -147,8 +170,8 @@ S8Plotter::S8Plotter(TString filename)
 	ftagger = "TrackCounting";
 	flevel  = "Loose";
 	
-	fTrackCountingMap["Loose"]  = 2.5; // use TC2:high eff.
-	fTrackCountingMap["Medium"] = 5.4; // use TC2:high eff.
+	fTrackCountingMap["Loose"]  = 2.3; // use TC2:high eff.
+	fTrackCountingMap["Medium"] = 5.3; // use TC2:high eff.
 	fTrackCountingMap["Tight"]  = 4.8;// use TC3:high purity
  
 	fTrackProbabilityMap["Loose"] = 0.29;
@@ -264,7 +287,7 @@ void S8Plotter::Init()
 void S8Plotter::PrintInfo() {
 
 	std::cout << " Tagger: " << ftagger << std::endl;
-	std::cout << " Level:  " << flevel << std::endl;
+	std::cout << " Level:  " << flevel << " (discriminator>" << fbTaggerMap[flevel] << ")" << std::endl;
 }
 
 

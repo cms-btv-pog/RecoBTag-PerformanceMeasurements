@@ -226,7 +226,6 @@ void S8Plotter::Loop()
 		
 		double ptrel = 0.;
 		bool isTaggability = false;
-		bool isMuonJetSample = false;
 		//bool isOppositeJetSample = false;
 		bool passGoodMuon = false;
 		bool passJetbTagger = false;
@@ -240,18 +239,6 @@ void S8Plotter::Loop()
 		int JetFlavor = -1;
 		int OppJetFlavor = -1;
 				
-		// first check that we have a lepton in a jet
-		if (fVerbose) std::cout << " loop over jets, collection size = " << vec_size << std::endl;
-		for ( int ijet =0; ijet != vec_size; ++ijet) {
-			
-			if ( fS8evt->jet_hasLepton[ijet] == 1 ) isMuonJetSample = true;
-		}
-		
-		// no lepton+jet in this event therefore continue
-		//if (!isMuonJetSample) continue;
-		//if (fVerbose) std::cout << " found event with lepton in jet" << std::endl;
-		//counters[1]++;
-
 		int ntagtracks = 0;
 		////////// Loop over jets ////////////////////////
 		for ( int ijet =0; ijet != vec_size; ++ijet) {
@@ -529,12 +516,14 @@ void S8Plotter::Loop()
 	}// end loop over entries
 
 	std::cout << std::setfill('#') << std::setw(100) << "#" << std::endl;
+	std::cout << std::setfill(' ');
 	std::cout << " Total entries = " << fChain->GetEntries() << std::endl;
 	std::cout << " Events with multiple muon-in-jet = " << count_mu_jets << std::endl;
 	std::cout << " Events with multiple muons in a jet = " << count_multiple_mu << std::endl;
 	PrintInfo();
+	//std::cout << "no cut" << std::setw(10) << totalJets["uds"] << std::setw(10) << totalJets["c"] << std::setw(10) << totalJets["b"] << std::setw(10) << totalJets["g"] << std::endl;
+	//std::cout << "tagged" << std::setw(10) << totalTagged["uds"] << std::setw(10) << totalTagged["c"] << std::setw(10) << totalTagged["b"] << std::setw(10) << totalTagged["g"] << std::endl;
 	std::cout << std::fixed;
-	std::cout << std::setfill(' ');
 	std::cout << " <b-efficiency> = " << std::setprecision(2) << std::setw(10) << 100.*totalTagged["b"]/totalJets["b"] <<" \\pm "<< 100.*EffErr(totalTagged["b"],totalJets["b"])<< std::endl;
 	std::cout << " <c-mistag>     = " << std::setprecision(2) << std::setw(10) << 100.*totalTagged["c"]/totalJets["c"] <<" \\pm "<< 100.*EffErr(totalTagged["c"],totalJets["c"])<< std::endl;
 	std::cout << " <uds-mistag>   = " << std::setprecision(2) << std::setw(10) << 100.*totalTagged["uds"]/totalJets["uds"] <<" \\pm "<< 100.*EffErr(totalTagged["uds"],totalJets["uds"])<< std::endl;
@@ -542,7 +531,6 @@ void S8Plotter::Loop()
 	std::cout << " <udsg-mistag>  = " << std::setprecision(2) << std::setw(10) << 100.*(totalTagged["g"]+totalTagged["uds"])/(totalJets["g"]+totalTagged["uds"]) <<" \\pm "<< 100.*EffErr(totalTagged["g"]+totalTagged["uds"],totalJets["g"]+totalTagged["uds"])<< std::endl;
 	std::cout << std::setfill('#') << std::setw(100) << "#" << std::endl;
 	std::cout << std::setfill(' ');
-	//std::cout << " Events with a jet with multiple muons " <<  << std::endl;
 
 
 	//______________________________________________________
