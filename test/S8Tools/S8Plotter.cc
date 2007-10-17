@@ -137,26 +137,43 @@ void S8Plotter::Loop()
 	h2["ncmbpT"] = new TH2F("ncmbpT","opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["pcmbpT"] = new TH2F("pcmbpT","opp tag MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 
+	h2["qpT"] = new TH2F("qpT","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
+	h2["qcmbpT"] = new TH2F("qcmbpT","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.);
+	
+	
 	h2["nEta"] = new TH2F("nEta","MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["pEta"] = new TH2F("pEta","MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["ncmbEta"] = new TH2F("ncmbEta","opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["pcmbEta"] = new TH2F("pcmbEta","opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 
+	h2["qEta"] = new TH2F("qEta","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
+	h2["qcmbEta"] = new TH2F("qcmbEta","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.);
+	
 	h2["b_npT"] = new TH2F("b_npT","b MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["b_ppT"] = new TH2F("b_ppT","b MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["b_ncmbpT"] = new TH2F("b_ncmbpT","b opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["b_pcmbpT"] = new TH2F("b_pcmbpT","b opp tag MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 
+	h2["b_qpT"] = new TH2F("b_qpT","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
+	h2["b_qcmbpT"] = new TH2F("b_qcmbpT","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.);
+	
 	h2["b_nEta"] = new TH2F("b_nEta","b MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["b_pEta"] = new TH2F("b_pEta","b MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["b_ncmbEta"] = new TH2F("b_ncmbEta","b opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["b_pcmbEta"] = new TH2F("b_pcmbEta","b opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 
+	h2["b_qEta"] = new TH2F("b_qEta","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
+	h2["b_qcmbEta"] = new TH2F("b_qcmbEta","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.);
+	
+	
 	h2["cl_npT"] = new TH2F("cl_npT","cl MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["cl_ppT"] = new TH2F("cl_ppT","cl MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["cl_ncmbpT"] = new TH2F("cl_ncmbpT","cl opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["cl_pcmbpT"] = new TH2F("cl_pcmbpT","cl opp tag MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 
+	h2["cl_qpT"] = new TH2F("cl_qpT","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
+	h2["cl_qcmbpT"] = new TH2F("cl_qcmbpT","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.);
+	
 	h2["c_npT"] = new TH2F("c_npT","c MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["c_ncmbpT"] = new TH2F("c_ncmbpT","c opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["g_npT"] = new TH2F("g_npT","g MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
@@ -168,6 +185,9 @@ void S8Plotter::Loop()
 	h2["cl_pEta"] = new TH2F("cl_pEta","cl MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["cl_ncmbEta"] = new TH2F("cl_ncmbEta","cl opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["cl_pcmbEta"] = new TH2F("cl_pcmbEta","cl opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
+
+	h2["cl_qEta"] = new TH2F("cl_qEta","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
+	h2["cl_qcmbEta"] = new TH2F("cl_qcmbEta","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	
 	h1["alpha"] = new TH1D("alpha","alpha",nptbins,jetptbins);
 	h1["beta"] = new TH1D("beta","beta",nptbins,jetptbins);
@@ -388,6 +408,11 @@ void S8Plotter::Loop()
 					h1["taggedjet_pt_g"]->Fill( p4Jet.Pt() );
 				}
 			}
+
+			// performance plots
+			fperformanceTC2.Add(fS8evt->btag_TrkCounting_disc3D_2trk[ijet],JetFlavor);
+			fperformanceTC3.Add(fS8evt->btag_TrkCounting_disc3D_3trk[ijet],JetFlavor);
+			fperformanceTP.Add(fS8evt->btag_JetProb_disc3D[ijet],JetFlavor);
 			
 		}// end loop over jets
 
@@ -515,6 +540,34 @@ void S8Plotter::Loop()
 		
 	}// end loop over entries
 
+	//recover b performace plots
+	std::map<std::string,TGraph> tmpha = fperformanceTC2.GetMap();
+	std::map<std::string,TGraph> tmphb = fperformanceTC3.GetMap();
+	std::map<std::string,TGraph> tmphc = fperformanceTP.GetMap();
+	if (fVerbose) std::cout << "got TGraph's " << std::endl;
+	/* FIX ME
+	cv_map["bPerformance"] = new TCanvas("bPerformance","bPerformance",700,700);
+	int ig =0;
+	for(std::map<std::string,TGraph>::const_iterator it = tmpha.begin(); it!=tmpha.end(); ++it) {
+	  TGraph gtemp = (TGraph) it->second;
+	  if (ig==0) gtemp.Draw("AP");
+	  else {gtemp.Draw("P"); }
+	  gtemp.Print();
+	  //gg1[it->first] = TGraph(gtemp.GetN(),gtemp.GetX(),gtemp.GetY());
+	  //gg1[it->first].Print();
+	  ig++;
+	}
+       
+	for(std::map<std::string,TGraph>::const_iterator it = tmphb.begin(); it!=tmphb.end(); ++it) {
+		TGraph gtemp = (TGraph) (it->second );
+		gg1[it->first] = gtemp;
+		gg1[it->first].Print();
+	}
+	for(std::map<std::string,TGraph>::const_iterator it = tmphc.begin(); it!=tmphc.end(); ++it) {
+		gg1[it->first] = TGraph( it->second );
+	}
+	*/
+	
 	std::cout << std::setfill('#') << std::setw(100) << "#" << std::endl;
 	std::cout << std::setfill(' ');
 	std::cout << " Total entries = " << fChain->GetEntries() << std::endl;

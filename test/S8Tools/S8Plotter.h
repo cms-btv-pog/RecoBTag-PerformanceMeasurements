@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8Plotter.h,v 1.3 2007/10/15 23:35:10 yumiceva Exp $
+ * \version $Id: S8Plotter.h,v 1.4 2007/10/16 18:27:09 yumiceva Exp $
  *
  */
 
@@ -18,6 +18,7 @@
 #include "TH1.h"
 #include "TH2.h"
 #include "TCanvas.h"
+#include "TGraph.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -26,6 +27,7 @@
 
 #include "RecoBTag/PerformanceMeasurements/interface/BTagEvent.h"
 #include "RecoBTag/PerformanceMeasurements/interface/BTagLeptonEvent.h"
+#include "S8bPerformance.h"
 
 
 class S8Plotter {
@@ -79,11 +81,18 @@ class S8Plotter {
 			TH2 *htemp = ih->second;
 			htemp->Write();
 		}
+		//for(std::map<std::string,TGraph >::const_iterator ih=g1.begin(); ih!=g1.end(); ++ih){
+		//TGraph gtemp = ih->second;
+		//gtemp.Write();
+		//}
 		
 		foutfile->Write();
 		foutfile->Close();
 	};
 
+	bool IsGoodMuon() {
+
+	};
 	void Clean() {
 		for(std::map<std::string,TH1* >::const_iterator ih=h1.begin(); ih!=h1.end(); ++ih){
 			delete ih->second;
@@ -144,6 +153,7 @@ class S8Plotter {
 	std::map<std::string, TCanvas*> cv_map;
 	std::map<std::string, TH1*> h1;
 	std::map<std::string, TH2*> h2;
+	std::map<std::string, TGraph> gg1;
 	
 	std::vector < std::string > quark_label;
 	std::map<std::string, int>  quark_color;
@@ -151,6 +161,10 @@ class S8Plotter {
 	std::map< TString, float > fTrackCountingMap; // discriminator cut and level
 	std::map< TString, float > fTrackProbabilityMap; // discriminator cut and level
 	std::map< TString, float > fbTaggerMap; // point to the selected tagger
+
+	S8bPerformance fperformanceTC2;
+	S8bPerformance fperformanceTC3;
+	S8bPerformance fperformanceTP;
 };
 
 #endif
@@ -178,21 +192,32 @@ S8Plotter::S8Plotter(TString filename)
 	fTrackProbabilityMap["Medium"] = 0.54;
 	fTrackProbabilityMap["Tight"] = 0.75;
 
-	// Binning
+	// default Binning
 	const int nptbins = 13;
 	Double_t jetptbins[nptbins] = {30., 40., 50., 60., 70., 80, 90., 100., 120., 140., 160., 180., 230.};
 	Double_t jetetabins[8] = {0.0,0.25,0.5,0.75,1.0,1.25,1.5,2.0};
 	fJetPtAxis.Set(nptbins-1, jetptbins );
 	fJetEtaAxis.Set(8-1, jetetabins );
 
+	// eff plots for all discriminator values
+	fperformanceTC2.Set("TC2");
+	fperformanceTC3.Set("TC3");
+	fperformanceTP.Set("TP");
+	fperformanceTC2.SetMinDiscriminator(-10);
+	fperformanceTC2.SetMaxDiscriminator(10);
+	fperformanceTC3.SetMinDiscriminator(-10);
+	fperformanceTC3.SetMaxDiscriminator(10);
+	fperformanceTP.SetMinDiscriminator(0);
+	fperformanceTP.SetMaxDiscriminator(1);
+	
+	
+	// chain
 	fChain = new TChain("summary");
-
 	if ( filename != "" ) fChain->Add(filename);
-	
+
+	// event container
 	fS8evt = new BTagEvent();
-	
-	//Init();
-		
+			
 }
 void S8Plotter::Add(TString filename)
 {
