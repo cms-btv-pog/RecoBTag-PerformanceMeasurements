@@ -242,14 +242,14 @@ void S8Plotter::Loop()
 		int nmultiple_muons = 0;
 		bool event_with_mult_mu = 0;
 		int njets_with_lepton = 0;
-		int nopposite_jets = 0;
+		//int nopposite_jets = 0;
 		
 		double ptrel = 0.;
-		bool isTaggability = false;
+		//bool isTaggability = false;
 		//bool isOppositeJetSample = false;
-		bool passGoodMuon = false;
-		bool passJetbTagger = false;
-		bool passOppJetbTagger = false;
+		//bool passGoodMuon = false;
+		//bool passJetbTagger = false;
+		//bool passOppJetbTagger = false;
 		//bool passptrel = false;
 		
 		
@@ -257,7 +257,7 @@ void S8Plotter::Loop()
 		TLorentzVector p4MuJet;
 		TLorentzVector p4OppJet;
 		int JetFlavor = -1;
-		int OppJetFlavor = -1;
+		//int OppJetFlavor = -1;
 				
 		int ntagtracks = 0;
 		////////// Loop over jets ////////////////////////
@@ -273,23 +273,26 @@ void S8Plotter::Loop()
 			p4Jet.SetPtEtaPhiE(fS8evt->jet_pt[ijet], fS8evt->jet_eta[ijet], fS8evt->jet_phi[ijet], fS8evt->jet_e[ijet] );
 			p4Jet = jetcorr * p4Jet;
 
+			//// Jet Selection /////
 			if ( p4Jet.Pt() < 20. ) continue;
 			
 			// get MC flavor of jet
 			JetFlavor = fS8evt->jet_flavour_alg[ijet];
 
 			nmultiple_muons = 0;
+			bool passGoodMuon = false;
 			if ( fS8evt->jet_hasLepton[ijet] == 1 ) {
 					
-					BTagLeptonEvent Muons = fS8evt->lepton[ijet];	
-					int mu_size = Muons.pt.size();
-
-					if ( fVerbose && mu_size > 1 ) std::cout << " Muons in jet = " << mu_size << std::endl;
+			  // get a muon
+			  BTagLeptonEvent Muons = fS8evt->lepton[ijet];	
+					
+					if ( fVerbose ) std::cout << " Muons in jet = " << Muons.pt.size() << std::endl;
 					int ith_mu_highest_pt = -1;
 					double mu_highest_pt = 0;
 				
-					for ( int imu = 0; imu != mu_size; ++imu ) {
+					for ( size_t imu = 0; imu != Muons.pt.size(); ++imu ) {
 						
+					  //// Muon Selection /////
 						if ( ( Muons.trkrechits[imu] >= 8 ) && ( Muons.chi2[imu]/Muons.ndof[imu] <5 ) ) {
 							passGoodMuon = true;
 							nmultiple_muons++;
@@ -301,249 +304,213 @@ void S8Plotter::Loop()
 							//	passptrel = true;
 							//	}
 
-							if ( fVerbose && mu_size>1 ) std::cout << " muon " << imu << " pt= " << Muons.pt[imu] << " eta= " << Muons.eta[imu] << " chamber hits= " << Muons.SArechits[imu] << " chi2/ndof = " << Muons.chi2[imu]/Muons.ndof[imu] << " IPS= " << Muons.d0sigma[imu] << " mcpdgid= " << Muons.mc_pdgid[imu] << std::endl;
+							if ( fVerbose) std::cout << " muon " << imu << " pt= " << Muons.pt[imu] << " eta= " << Muons.eta[imu] << " chamber hits= " << Muons.SArechits[imu] << " chi2/ndof = " << Muons.chi2[imu]/Muons.ndof[imu] << " IPS= " << Muons.d0sigma[imu] << " mcpdgid= " << Muons.mc_pdgid[imu] << std::endl;
 							
 						}
 					}
 					// select only one muon in jet, the one with the highest pt
-					// and select the muon-jet with the highest pt
-					if (passGoodMuon && njets_with_lepton==0 ) {
-						p4MuJet.SetPtEtaPhiE(fS8evt->jet_pt[ijet]*fS8evt->jetcorrection[ijet],
-											 fS8evt->jet_eta[ijet], fS8evt->jet_phi[ijet],
-											 fS8evt->jet_e[ijet]*fS8evt->jetcorrection[ijet]);
-						
-						TLorentzVector vmu, vtot;
-						vmu.SetPtEtaPhiE(Muons.pt[ith_mu_highest_pt], Muons.eta[ith_mu_highest_pt], Muons.phi[ith_mu_highest_pt], Muons.e[ith_mu_highest_pt]);
-						
-						vtot = vmu + p4MuJet;
-						ptrel = ( vmu.Px() * vtot.Px() 
-								  + vmu.Py() * vtot.Py()
-								  + vmu.Pz() * vtot.Pz() ) / vtot.P();
-						ptrel = TMath::Sqrt( vmu.P() * vmu.P() - ptrel * ptrel );
+					if ( passGoodMuon ) {
+					  p4MuJet.SetPtEtaPhiE(fS8evt->jet_pt[ijet]*fS8evt->jetcorrection[ijet],
+							       fS8evt->jet_eta[ijet], fS8evt->jet_phi[ijet],
+							       fS8evt->jet_e[ijet]*fS8evt->jetcorrection[ijet]);
 
-						//ptrel = Muons.jet_ptrel[ith_mu_highest_pt];
-					
-						h1["muon_pt"]->Fill( Muons.pt[ith_mu_highest_pt] );
-						h1["jet_deltar"]->Fill( Muons.jet_deltaR[ith_mu_highest_pt] );
-						h1["jet_ptrel"]->Fill( ptrel );
-						if ( JetFlavor == 5 ) {
-							h1["jet_deltar_b"]->Fill( Muons.jet_deltaR[ith_mu_highest_pt] );
-							h1["jet_ptrel_b"]->Fill( ptrel );
-						}
-						if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor==21 ) {
-							h1["jet_deltar_cl"]->Fill( Muons.jet_deltaR[ith_mu_highest_pt] );
-							h1["jet_ptrel_cl"]->Fill( ptrel );
-						}
-					
-						// check tagger and level
-						if ( ftagger == "TrackCounting" ) {
-							if ( flevel == "Tight" ) {
-								if ( fS8evt->btag_TrkCounting_disc3D_3trk[ijet] > fbTaggerMap["Tight"] ) passJetbTagger = true;
-							} else {
-								if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[flevel] << std::endl;
-								if ( fS8evt->btag_TrkCounting_disc3D_2trk[ijet] > fbTaggerMap[flevel] ) passJetbTagger = true;
-						
-							}
-						}
-						if ( ftagger == "TrackProbability" ) {
-							if ( fS8evt->btag_JetProb_disc3D[ijet] > fbTaggerMap[flevel] ) passJetbTagger = true;
-						}
-					}
-					
-					if (passGoodMuon) {
-						njets_with_lepton++;
-						if (nmultiple_muons>1) event_with_mult_mu = true;
-					}
-					
-			}//check lepton in jet loop
+					  TLorentzVector vmu, vtot;
+					  vmu.SetPtEtaPhiE(Muons.pt[ith_mu_highest_pt], Muons.eta[ith_mu_highest_pt], Muons.phi[ith_mu_highest_pt], Muons.e[ith_mu_highest_pt]);
 
+					  vtot = vmu + p4MuJet;
+					  ptrel = ( vmu.Px() * vtot.Px()
+						    + vmu.Py() * vtot.Py()
+						    + vmu.Pz() * vtot.Pz() ) / vtot.P();
+					  ptrel = TMath::Sqrt( vmu.P() * vmu.P() - ptrel * ptrel );
 
+					  // check btagging
+					  bool isbTaggedJet = false;
+					  if ( ftagger == "TrackCounting" ) {
+					    if ( flevel == "Tight" ) {
+					      if ( fS8evt->btag_TrkCounting_disc3D_3trk[ijet] > fbTaggerMap["Tight"] ) isbTaggedJet = true;
+					    } else {
+					      if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[flevel] << std::endl;
+					      if ( fS8evt->btag_TrkCounting_disc3D_2trk[ijet] > fbTaggerMap[flevel] ) isbTaggedJet = true;
+
+					    }
+					  }
+					  if ( ftagger == "TrackProbability" ) {
+					    if ( fS8evt->btag_JetProb_disc3D[ijet] > fbTaggerMap[flevel] ) isbTaggedJet = true;
+					  }
+
+					  FillHistos("n",p4MuJet, ptrel, JetFlavor,isbTaggedJet);
+					  
+					  ///// find away jet /////
+					  bool OtherTaggedJet = false;
+					  bool OtherMuonJet = false;
+					  for ( int kjet =0; kjet != vec_size; ++kjet) {
+					    // skip selected mu+jet
+					    if ( ijet == kjet ) continue;
+
+					    TLorentzVector p4OppJet;
+					    p4OppJet.SetPtEtaPhiE(fS8evt->jet_pt[kjet], fS8evt->jet_eta[kjet], fS8evt->jet_phi[kjet], fS8evt->jet_e[kjet] );
+					    double ojetcorr = fS8evt->jetcorrection[kjet];
+					    p4OppJet = ojetcorr * p4OppJet;
+					    int OppJetFlavor = fS8evt->jet_flavour_alg[kjet];
+
+					    if ( !OtherTaggedJet ) {
+					      
+					      bool isbTaggedOtherJet = false;
+					      if ( ftagger == "TrackCounting" ) {
+						if ( flevel == "Tight" ) {
+						  if ( fS8evt->btag_TrkCounting_disc3D_3trk[kjet] > fbTaggerMap["Tight"] ) isbTaggedOtherJet = true;
+						} else {
+						  if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[flevel] << std::endl;
+						  if ( fS8evt->btag_TrkCounting_disc3D_2trk[kjet] > fbTaggerMap[flevel] ) isbTaggedOtherJet = true;
+
+						}
+					      }
+					      if ( ftagger == "TrackProbability" ) {
+						if ( fS8evt->btag_JetProb_disc3D[kjet] > fbTaggerMap[flevel] ) isbTaggedOtherJet = true;
+					      }
+					      
+					      if (isbTaggedOtherJet) {
+
+						FillHistos("p",p4OppJet, ptrel, OppJetFlavor, isbTaggedJet);
+						OtherTaggedJet = true;
+					      }
+					    }
+
+					    if ( !OtherMuonJet ) {
+					      // skip selected mu+jet
+					      if ( ijet == kjet ) continue;
+					      // look for another muon-in-jet
+					      if ( fS8evt->jet_hasLepton[kjet] == 1 ) {
+						// get a muon
+						BTagLeptonEvent oMuons = fS8evt->lepton[kjet];
+						bool pass2GoodMuon = false;
+						if ( fVerbose ) std::cout << " other Muons in jet = " << oMuons.pt.size() << std::endl;
+						int ith_omu_highest_pt = -1;
+						double omu_highest_pt = 0;
+						for ( size_t imu = 0; imu != oMuons.pt.size(); ++imu ) {
+
+						  //// Muon Selection /////
+						  if ( ( oMuons.trkrechits[imu] >= 8 ) && ( oMuons.chi2[imu]/oMuons.ndof[imu] <5 ) ) {
+						    pass2GoodMuon = true;
+						    
+						    if (oMuons.pt[imu] > omu_highest_pt ) { omu_highest_pt = oMuons.pt[imu]; ith_omu_highest_pt = imu; }
+
+						  }
+						}
+						// select only one muon in jet, the one with the highest pt
+						if ( pass2GoodMuon ) {
+						  OtherMuonJet = true;
+						  TLorentzVector p4oMuJet;
+						  p4oMuJet.SetPtEtaPhiE(fS8evt->jet_pt[kjet]*fS8evt->jetcorrection[kjet],
+								       fS8evt->jet_eta[kjet], fS8evt->jet_phi[kjet],
+								       fS8evt->jet_e[kjet]*fS8evt->jetcorrection[kjet]);
+						  
+						  //TLorentzVector vmu, vtot;
+						  vmu.SetPtEtaPhiE(oMuons.pt[ith_omu_highest_pt], Muons.eta[ith_omu_highest_pt], Muons.phi[ith_omu_highest_pt], Muons.e[ith_omu_highest_pt]);
+
+						  vtot = vmu + p4MuJet;
+						  ptrel = ( vmu.Px() * vtot.Px()
+							    + vmu.Py() * vtot.Py()
+							    + vmu.Pz() * vtot.Pz() ) / vtot.P();
+						  ptrel = TMath::Sqrt( vmu.P() * vmu.P() - ptrel * ptrel );
+
+						  // check btagging
+						  bool isbTaggedOtherMuJet = false;
+						  if ( ftagger == "TrackCounting" ) {
+						    if ( flevel == "Tight" ) {
+						      if ( fS8evt->btag_TrkCounting_disc3D_3trk[ijet] > fbTaggerMap["Tight"] ) isbTaggedOtherMuJet = true;
+						    } else {
+						      if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[flevel] << std::endl;
+						      if ( fS8evt->btag_TrkCounting_disc3D_2trk[ijet] > fbTaggerMap[flevel] ) isbTaggedOtherMuJet = true;
+
+						    }
+						  }
+						  if ( ftagger == "TrackProbability" ) {
+						    if ( fS8evt->btag_JetProb_disc3D[ijet] > fbTaggerMap[flevel] ) isbTaggedOtherMuJet = true;
+						  }
+
+						  FillHistos("q",p4oMuJet, ptrel, OppJetFlavor,isbTaggedOtherMuJet);
+						}
+					      }
+					    }// otherMuonJet
+					  }// second loop over jets
+					  
+					  njets_with_lepton++;
+					  if (nmultiple_muons>1) event_with_mult_mu = true;
+					  
+					} // first MuonJet
+			}
+	       		
 			// Fill histograms for all jets
 			h1["jet_pt"]->Fill( p4Jet.Pt() );
 			if ( JetFlavor == 5 ) {
-				totalJets["b"]++;
-				h1["jet_pt_b"]->Fill( p4Jet.Pt() );
+			  totalJets["b"]++;
+			  h1["jet_pt_b"]->Fill( p4Jet.Pt() );
 			}
 			if ( JetFlavor == 4 ) {
-				totalJets["c"]++;
-				h1["jet_pt_c"]->Fill( p4Jet.Pt() );
+			  totalJets["c"]++;
+			  h1["jet_pt_c"]->Fill( p4Jet.Pt() );
 			}
 			if ( JetFlavor>0 && JetFlavor<4 ) {
-				totalJets["uds"]++;
-				h1["jet_pt_uds"]->Fill( p4Jet.Pt() );
+			  totalJets["uds"]++;
+			  h1["jet_pt_uds"]->Fill( p4Jet.Pt() );
 			}
 			if ( JetFlavor==21 ) {
-				totalJets["g"]++;
-				h1["jet_pt_g"]->Fill( p4Jet.Pt() );
+			  totalJets["g"]++;
+			  h1["jet_pt_g"]->Fill( p4Jet.Pt() );
 			}
 			bool ataggedjet = false;
 			if ( ftagger == "TrackCounting" ) {
-				if ( flevel == "Tight" ) {
-					if ( fS8evt->btag_TrkCounting_disc3D_3trk[ijet] > fbTaggerMap["Tight"] ) ataggedjet = true;
-				} else {
-					if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[flevel] << std::endl;
-					if ( fS8evt->btag_TrkCounting_disc3D_2trk[ijet] > fbTaggerMap[flevel] ) ataggedjet = true;
-						
-				}
+			  if ( flevel == "Tight" ) {
+			    if ( fS8evt->btag_TrkCounting_disc3D_3trk[ijet] > fbTaggerMap["Tight"] ) ataggedjet = true;
+			  } else {
+			    if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[flevel] << std::endl;
+			    if ( fS8evt->btag_TrkCounting_disc3D_2trk[ijet] > fbTaggerMap[flevel] ) ataggedjet = true;
+			    
+			  }
 			}
 			if ( ftagger == "TrackProbability" ) {
-				if ( fS8evt->btag_JetProb_disc3D[ijet] > fbTaggerMap[flevel] ) ataggedjet = true;
+			  if ( fS8evt->btag_JetProb_disc3D[ijet] > fbTaggerMap[flevel] ) ataggedjet = true;
 			}
 			if (ataggedjet) {
-				h1["taggedjet_pt"]->Fill( p4Jet.Pt() );
-				if ( JetFlavor == 5 ) {
-					totalTagged["b"]++;
-					h1["taggedjet_pt_b"]->Fill( p4Jet.Pt() );
-				}
-				if ( JetFlavor == 4 ) {
-					totalTagged["c"]++;
-					h1["taggedjet_pt_c"]->Fill( p4Jet.Pt() );
-				}
-				if ( JetFlavor>0 && JetFlavor<4 ) {
-					totalTagged["uds"]++;
-					h1["taggedjet_pt_uds"]->Fill( p4Jet.Pt() );
-				}
-				if ( JetFlavor==21 ) {
-					totalTagged["g"]++;
-					h1["taggedjet_pt_g"]->Fill( p4Jet.Pt() );
-				}
+			  h1["taggedjet_pt"]->Fill( p4Jet.Pt() );
+			  if ( JetFlavor == 5 ) {
+			    totalTagged["b"]++;
+			    h1["taggedjet_pt_b"]->Fill( p4Jet.Pt() );
+			  }
+			  if ( JetFlavor == 4 ) {
+			    totalTagged["c"]++;
+			    h1["taggedjet_pt_c"]->Fill( p4Jet.Pt() );
+			  }
+			  if ( JetFlavor>0 && JetFlavor<4 ) {
+			    totalTagged["uds"]++;
+			    h1["taggedjet_pt_uds"]->Fill( p4Jet.Pt() );
+			  }
+			  if ( JetFlavor==21 ) {
+			    totalTagged["g"]++;
+			    h1["taggedjet_pt_g"]->Fill( p4Jet.Pt() );
+			  }
 			}
-
+			
 			// performance plots
 			fperformanceTC2.Add(fS8evt->btag_TrkCounting_disc3D_2trk[ijet],JetFlavor);
 			fperformanceTC3.Add(fS8evt->btag_TrkCounting_disc3D_3trk[ijet],JetFlavor);
 			fperformanceTP.Add(fS8evt->btag_JetProb_disc3D[ijet],JetFlavor);
 			
-		}// end loop over jets
-
+		}//// end loop over jets
+		
 		if (event_with_mult_mu) count_multiple_mu++;
 		if (njets_with_lepton>1) count_mu_jets++;
 			
-		if (!passGoodMuon) continue;
-		
-		// find opposite tagged jet
-		int ith_oppjet_highest_pt = -1;
-		double oppjet_highest_pt = 0;
-		for ( int ijet =0; ijet != vec_size; ++ijet) {
-			// select jet other than the jet with lepton
-			if ( fS8evt->jet_hasLepton[ijet] == 0 ) {
-				double jetcorr = fS8evt->jetcorrection[ijet];
-				//double jet_e = sqrt( fS8evt->jet_et[ijet]*fS8evt->jet_et[ijet] - fS8evt->jet_pt[ijet]*fS8evt->jet_pt[ijet] + fS8evt->jet_p[ijet]*fS8evt->jet_p[ijet] );
-
-				bool ataggedjet = false;
-				if ( ftagger == "TrackCounting" ) {
-					if ( flevel == "Tight" ) {
-						if ( fS8evt->btag_TrkCounting_disc3D_3trk[ijet] > fbTaggerMap["Tight"] ) ataggedjet = true;
-					} else {
-						if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[flevel] << std::endl;
-						if ( fS8evt->btag_TrkCounting_disc3D_2trk[ijet] > fbTaggerMap[flevel] ) ataggedjet = true;
-						
-					}
-				}
-				if ( ftagger == "TrackProbability" ) {
-					if ( fS8evt->btag_JetProb_disc3D[ijet] > fbTaggerMap[flevel] ) ataggedjet = true;
-				}
-			
-				if ( ataggedjet ) {
-					nopposite_jets++;
-					passOppJetbTagger = true;
-					p4OppJet.SetPtEtaPhiE(fS8evt->jet_pt[ijet], fS8evt->jet_eta[ijet], fS8evt->jet_phi[ijet], fS8evt->jet_e[ijet] );
-					p4OppJet = jetcorr * p4OppJet;
-
-					if ( p4OppJet.Pt() > oppjet_highest_pt ) { ith_oppjet_highest_pt = ijet; oppjet_highest_pt = p4OppJet.Pt(); }
-										
-				}
-			}
-		}
-		if (passOppJetbTagger) {
-			p4OppJet.SetPtEtaPhiE(fS8evt->jet_pt[ith_oppjet_highest_pt], fS8evt->jet_eta[ith_oppjet_highest_pt], fS8evt->jet_phi[ith_oppjet_highest_pt], fS8evt->jet_e[ith_oppjet_highest_pt] );
-			double jetcorr = fS8evt->jetcorrection[ith_oppjet_highest_pt];
-			p4OppJet = jetcorr * p4OppJet;
-			OppJetFlavor = fS8evt->jet_flavour_alg[ith_oppjet_highest_pt];
-			
-			double deltaphi = TMath::Abs(p4Jet.Phi() - p4OppJet.Phi() );
-			if ( deltaphi > TMath::Pi() ) deltaphi = TMath::Abs(2.*TMath::Pi() - deltaphi);
-			h1["jet_deltaphi"]->Fill( deltaphi );
-			if ( JetFlavor==5 && OppJetFlavor==5 ) h1["jet_deltaphi_b"]->Fill( deltaphi );
-
-			if(fVerbose) {
-				if (deltaphi == 0 ) std::cout << " deltaphi is zero " << std::endl;
-				std::cout << " lepton-jet: px= " << p4Jet.Px() << " py= " << p4Jet.Py() << " pz = " << p4Jet.Pz() << " e = " << p4Jet.E() << std::endl;
-				std::cout << " opp.   jet: px= " << p4OppJet.Px() << " py= " << p4OppJet.Py() << " pz = " << p4OppJet.Pz() << " e = " << p4OppJet.E() << std::endl;
-			}
-		}
-		
-		if (fVerbose && nopposite_jets>1) std::cout << " number of opposite jets = " << nopposite_jets << std::endl;
-		
-		
-		// Total entries //
-		//////////////////
-		h2["npT"]->Fill( p4Jet.Pt() , ptrel );
-		h2["nEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-		if ( JetFlavor == 5 ) {
-			h2["b_npT"]->Fill( p4Jet.Pt() , ptrel );
-			h2["b_nEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-		}
-		if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor==21 ) {
-			h2["cl_npT"]->Fill( p4Jet.Pt() , ptrel);
-			h2["cl_nEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-		}
-		if ( JetFlavor == 4 ) { h2["c_npT"]->Fill( p4Jet.Pt() , ptrel ); }
-		if ( JetFlavor>0 && JetFlavor<4 ) { h2["uds_npT"]->Fill( p4Jet.Pt() , ptrel ); }
-		if ( JetFlavor==21 ) {
-			//totalJets["g"]++;
-		}
-		
-		if ( passJetbTagger ) {
-			h2["ncmbpT"]->Fill( p4Jet.Pt() , ptrel );
-			h2["ncmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-			if ( JetFlavor == 5 ) {
-				//totalTagged["b"]++;
-				h2["b_ncmbpT"]->Fill( p4Jet.Pt() , ptrel );
-				h2["b_ncmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-			}
-			if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor==21 ) {
-				h2["cl_ncmbpT"]->Fill( p4Jet.Pt() , ptrel);
-				h2["cl_ncmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-			}
-			if ( JetFlavor == 4 ) { h2["c_ncmbpT"]->Fill( p4Jet.Pt() , ptrel ); }
-			if ( JetFlavor>0 && JetFlavor<4 ){ h2["uds_ncmbpT"]->Fill( p4Jet.Pt() , ptrel ); }
-			if ( JetFlavor==21 ) {
-				//totalTagged["g"]++;
-			}
-		}
-		if ( passOppJetbTagger ) {
-			h2["ppT"]->Fill( p4Jet.Pt() , ptrel );
-			h2["pEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-			if ( JetFlavor == 5 ) {
-				h2["b_ppT"]->Fill( p4Jet.Pt() , ptrel );
-				h2["b_pEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-			}
-			if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor==21 ) {
-				h2["cl_ppT"]->Fill( p4Jet.Pt() , ptrel);
-				h2["cl_pEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-			}
-		}
-		
-		if ( passJetbTagger && passOppJetbTagger ) {
-			h2["pcmbpT"]->Fill( p4Jet.Pt() , ptrel);
-			h2["pcmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-			if ( JetFlavor == 5 ) {
-				h2["b_pcmbpT"]->Fill( p4Jet.Pt() , ptrel);
-				h2["b_pcmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-			}
-			if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor==21 ) {
-				h2["cl_pcmbpT"]->Fill( p4Jet.Pt() , ptrel);
-				h2["cl_pcmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-			}
-		}
-		
 	}// end loop over entries
 
 	//recover b performace plots
-	std::map<std::string,TGraph> tmpha = fperformanceTC2.GetMap();
-	std::map<std::string,TGraph> tmphb = fperformanceTC3.GetMap();
-	std::map<std::string,TGraph> tmphc = fperformanceTP.GetMap();
+	fperformanceTC2.Eval();
+	fperformanceTC3.Eval();
+	fperformanceTP.Eval();
+	//std::map<std::string,TGraph> tmpha = fperformanceTC2.GetMap();
+	//std::map<std::string,TGraph> tmphb = fperformanceTC3.GetMap();
+	//std::map<std::string,TGraph> tmphc = fperformanceTP.GetMap();
 	if (fVerbose) std::cout << "got TGraph's " << std::endl;
 	/* FIX ME
 	cv_map["bPerformance"] = new TCanvas("bPerformance","bPerformance",700,700);
@@ -581,7 +548,7 @@ void S8Plotter::Loop()
 	std::cout << " <c-mistag>     = " << std::setprecision(2) << std::setw(10) << 100.*totalTagged["c"]/totalJets["c"] <<" \\pm "<< 100.*EffErr(totalTagged["c"],totalJets["c"])<< std::endl;
 	std::cout << " <uds-mistag>   = " << std::setprecision(2) << std::setw(10) << 100.*totalTagged["uds"]/totalJets["uds"] <<" \\pm "<< 100.*EffErr(totalTagged["uds"],totalJets["uds"])<< std::endl;
 	std::cout << " <g-mistag>     = " << std::setprecision(2) << std::setw(10) << 100.*totalTagged["g"]/totalJets["g"] <<" \\pm "<< 100.*EffErr(totalTagged["g"],totalJets["g"])<< std::endl;
-	std::cout << " <udsg-mistag>  = " << std::setprecision(2) << std::setw(10) << 100.*(totalTagged["g"]+totalTagged["uds"])/(totalJets["g"]+totalTagged["uds"]) <<" \\pm "<< 100.*EffErr(totalTagged["g"]+totalTagged["uds"],totalJets["g"]+totalTagged["uds"])<< std::endl;
+	std::cout << " <udsg-mistag>  = " << std::setprecision(2) << std::setw(10) << 100.*(totalTagged["g"]+totalTagged["uds"])/(totalJets["g"]+totalJets["uds"]) <<" \\pm "<< 100.*EffErr(totalTagged["g"]+totalTagged["uds"],totalJets["g"]+totalJets["uds"])<< std::endl;
 	std::cout << std::setfill('#') << std::setw(100) << "#" << std::endl;
 	std::cout << std::setfill(' ');
 
@@ -765,7 +732,53 @@ void S8Plotter::Loop()
 		
 }
 
+void S8Plotter::FillHistos(std::string type, TLorentzVector p4Jet, double ptrel, int flavor, bool tagged) {
 
+  h2[type+"pT"]->Fill( p4Jet.Pt() , ptrel );
+  h2[type+"Eta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
+  if ( flavor == 5 ) {
+    h2["b_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel );
+    h2["b_"+type+"Eta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
+  }
+  if ( (flavor>0 && flavor<5) || flavor==21 ) {
+    h2["cl_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel);
+    h2["cl_"+type+"Eta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
+  }
+  if ( flavor == 4 ) { 
+    //h2["c_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel ); 
+  }
+  if ( flavor>0 && flavor<4 ) { 
+    //h2["uds_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel ); 
+  }
+  if ( flavor==21 ) {
+    //h2["g_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel );
+  }
+  
+  if ( tagged ) {
+    h2[type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel );
+    h2[type+"cmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
+    if ( flavor == 5 ) {
+      h2["b_"+type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel );
+      h2["b_"+type+"cmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
+    }
+    if ( (flavor>0 && flavor<5) || flavor==21 ) {
+      h2["cl_"+type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel);
+      h2["cl_"+type+"cmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
+    }
+    if ( flavor == 4 ) {
+      //h2["c_"+type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel );
+    }
+    if ( flavor>0 && flavor<4 ) {
+      //h2["uds_"+type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel );
+    }
+    if ( flavor==21 ) {
+      //h2["g_"+type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel );
+    }
+
+  }
+  
+
+}
 
 
 		

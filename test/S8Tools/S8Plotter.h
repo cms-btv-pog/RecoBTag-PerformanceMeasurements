@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8Plotter.h,v 1.4 2007/10/16 18:27:09 yumiceva Exp $
+ * \version $Id: S8Plotter.h,v 1.5 2007/10/17 03:24:36 yumiceva Exp $
  *
  */
 
@@ -19,6 +19,7 @@
 #include "TH2.h"
 #include "TCanvas.h"
 #include "TGraph.h"
+#include "TLorentzVector.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -57,6 +58,7 @@ class S8Plotter {
 	};
 	void SetPtMin(double value) { fMinPt = value; };
 	void SetPtMax(double value) { fMaxPt = value; };
+	void FillHistos(std::string type, TLorentzVector p4Jet, double ptrel, int flavor, bool tagged);
 	void Print(std::string extension="png",std::string tag="") {
 		if ( tag != "" ) tag = "_"+tag;
 		
@@ -89,10 +91,8 @@ class S8Plotter {
 		foutfile->Write();
 		foutfile->Close();
 	};
-
-	bool IsGoodMuon() {
-
-	};
+	//bool IsGoodMuon() {
+	//};
 	void Clean() {
 		for(std::map<std::string,TH1* >::const_iterator ih=h1.begin(); ih!=h1.end(); ++ih){
 			delete ih->second;
