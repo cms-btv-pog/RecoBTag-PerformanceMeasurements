@@ -282,7 +282,7 @@ void S8Plotter::Loop()
 
 			nmultiple_muons = 0;
 			bool passGoodMuon = false;
-			if ( fS8evt->jet_hasLepton[ijet] == 1 ) {
+			if ( fS8evt->jet_hasLepton[ijet] == 1 && fS8evt->njets>1 ) {
 					
 			  // get a muon
 			  BTagLeptonEvent Muons = fS8evt->lepton[ijet];	
@@ -357,17 +357,17 @@ void S8Plotter::Loop()
 					    if ( !OtherTaggedJet ) {
 					      
 							bool isbTaggedOtherJet = false;
-							if ( ftagger == "TrackCounting" ) {
-								if ( flevel == "Tight" ) {
+							if ( fAwaytagger == "TrackCounting" ) {
+								if ( fAwaylevel == "Tight" ) {
 									if ( fS8evt->btag_TrkCounting_disc3D_3trk[kjet] > fbTaggerMap["Tight"] ) isbTaggedOtherJet = true;
 								} else {
-									if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[flevel] << std::endl;
-									if ( fS8evt->btag_TrkCounting_disc3D_2trk[kjet] > fbTaggerMap[flevel] ) isbTaggedOtherJet = true;
+									if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[fAwaylevel] << std::endl;
+									if ( fS8evt->btag_TrkCounting_disc3D_2trk[kjet] > fbTaggerMap[fAwaylevel] ) isbTaggedOtherJet = true;
 
 								}
 							}
-							if ( ftagger == "TrackProbability" ) {
-								if ( fS8evt->btag_JetProb_disc3D[kjet] > fbTaggerMap[flevel] ) isbTaggedOtherJet = true;
+							if ( fAwaytagger == "TrackProbability" ) {
+								if ( fS8evt->btag_JetProb_disc3D[kjet] > fbTaggerMap[fAwaylevel] ) isbTaggedOtherJet = true;
 							}
 					      
 							if (isbTaggedOtherJet) {
@@ -418,17 +418,17 @@ void S8Plotter::Loop()
 								  
 								  // check btagging
 								  bool isbTaggedOtherMuJet = false;
-								  if ( ftagger == "TrackCounting" ) {
-									  if ( flevel == "Tight" ) {
+								  if ( fAwaytagger == "TrackCounting" ) {
+									  if ( fAwaylevel == "Tight" ) {
 										  if ( fS8evt->btag_TrkCounting_disc3D_3trk[ijet] > fbTaggerMap["Tight"] ) isbTaggedOtherMuJet = true;
 									  } else {
-										  if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[flevel] << std::endl;
-										  if ( fS8evt->btag_TrkCounting_disc3D_2trk[ijet] > fbTaggerMap[flevel] ) isbTaggedOtherMuJet = true;
+										  if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[fAwaylevel] << std::endl;
+										  if ( fS8evt->btag_TrkCounting_disc3D_2trk[ijet] > fbTaggerMap[fAwaylevel] ) isbTaggedOtherMuJet = true;
 										  
 									  }
 								  }
-								  if ( ftagger == "TrackProbability" ) {
-									  if ( fS8evt->btag_JetProb_disc3D[ijet] > fbTaggerMap[flevel] ) isbTaggedOtherMuJet = true;
+								  if ( fAwaytagger == "TrackProbability" ) {
+									  if ( fS8evt->btag_JetProb_disc3D[ijet] > fbTaggerMap[fAwaylevel] ) isbTaggedOtherMuJet = true;
 								  }
 
 								  FillHistos("q",p4MuJet, ptrel, JetFlavor, isbTaggedOtherMuJet);
@@ -511,46 +511,46 @@ void S8Plotter::Loop()
 	fperformanceTC3.Eval();
 	fperformanceTP.Eval();
 	
-	TGraphErrors *gTC2_b = new TGraphErrors(fperformanceTC2.GetN(),
+	gTC2_b = new TGraphErrors(fperformanceTC2.GetN(),
 											fperformanceTC2.GetArray("b").GetArray(),fperformanceTC2.GetArray("b").GetArray(),
 											fperformanceTC2.GetArray("bErr").GetArray(),fperformanceTC2.GetArray("bErr").GetArray());
 	
-	TGraphErrors *gTC2_c = new TGraphErrors(fperformanceTC2.GetN(),
+	gTC2_c = new TGraphErrors(fperformanceTC2.GetN(),
 											fperformanceTC2.GetArray("b").GetArray(),fperformanceTC2.GetArray("c").GetArray(),
 											fperformanceTC2.GetArray("bErr").GetArray(),fperformanceTC2.GetArray("cErr").GetArray());
 	
-	TGraphErrors *gTC2_udsg = new TGraphErrors(fperformanceTC2.GetN(),
+	gTC2_udsg = new TGraphErrors(fperformanceTC2.GetN(),
 											fperformanceTC2.GetArray("b").GetArray(),fperformanceTC2.GetArray("udsg").GetArray(),
 											fperformanceTC2.GetArray("bErr").GetArray(),fperformanceTC2.GetArray("udsgErr").GetArray());
 	
-	TGraphErrors *gTC3_b = new TGraphErrors(fperformanceTC3.GetN(),
+	gTC3_b = new TGraphErrors(fperformanceTC3.GetN(),
 											fperformanceTC3.GetArray("b").GetArray(),fperformanceTC3.GetArray("b").GetArray(),
 											fperformanceTC3.GetArray("bErr").GetArray(),fperformanceTC3.GetArray("bErr").GetArray());
 	
-	TGraphErrors *gTC3_c = new TGraphErrors(fperformanceTC3.GetN(),
+	gTC3_c = new TGraphErrors(fperformanceTC3.GetN(),
 											fperformanceTC3.GetArray("b").GetArray(),fperformanceTC3.GetArray("c").GetArray(),
 											fperformanceTC3.GetArray("bErr").GetArray(),fperformanceTC3.GetArray("cErr").GetArray());
 	
-	TGraphErrors *gTC3_udsg = new TGraphErrors(fperformanceTC3.GetN(),
+	gTC3_udsg = new TGraphErrors(fperformanceTC3.GetN(),
 											fperformanceTC3.GetArray("b").GetArray(),fperformanceTC3.GetArray("udsg").GetArray(),
 											fperformanceTC3.GetArray("bErr").GetArray(),fperformanceTC3.GetArray("udsgErr").GetArray());
 	
-	TGraphErrors *gTP_b = new TGraphErrors(fperformanceTP.GetN(),
+	gTP_b = new TGraphErrors(fperformanceTP.GetN(),
 											fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("b").GetArray(),
 											fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("bErr").GetArray());
 	
-	TGraphErrors *gTP_c = new TGraphErrors(fperformanceTP.GetN(),
+	gTP_c = new TGraphErrors(fperformanceTP.GetN(),
 											fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("c").GetArray(),
 											fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("cErr").GetArray());
 	
-	TGraphErrors *gTP_udsg = new TGraphErrors(fperformanceTP.GetN(),
+	gTP_udsg = new TGraphErrors(fperformanceTP.GetN(),
 											fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("udsg").GetArray(),
 											fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("udsgErr").GetArray());
 	
 	
-	TMultiGraph *multiTC2 = new TMultiGraph();
-	TMultiGraph *multiTC3 = new TMultiGraph();
-	TMultiGraph *multiTP = new TMultiGraph();
+	multiTC2 = new TMultiGraph();
+	multiTC3 = new TMultiGraph();
+	multiTP = new TMultiGraph();
 
 	multiTC2->Add(gTC2_b,"p");
 	multiTC2->Add(gTC2_c,"p");
@@ -697,6 +697,39 @@ void S8Plotter::Loop()
 	h1["eff_pTrel_TaggedBothJets_b"] = new TH1D("eff_pTrel_TaggedBothJets_b","eff_pTrel_TaggedBothJets_b",nptbins,jetptbins);
 	h1["eff_pTrel_TaggedBothJets_cl"] = new TH1D("eff_pTrel_TaggedBothJets_cl","eff_pTrel_TaggedBothJets_cl",nptbins,jetptbins);
 
+	// Booking for eta dependencyjetetabins
+
+        h1["eff_pTrel_eta"] = new TH1D("eff_pTrel_eta","eff_pTrel_eta",netabins,jetetabins);
+        h1["eff_pTrel_eta_b"] = new TH1D("eff_pTrel_eta_b","eff_pTrel_eta_b",netabins,jetetabins);
+        h1["eff_pTrel_eta_cl"] = new TH1D("eff_pTrel_eta_cl","eff_pTrel_eta_cl",netabins,jetetabins);
+
+        h1["eff_TaggedJet_eta"] = new TH1D("eff_TaggedJet_eta","eff_TaggedJet_eta",netabins,jetetabins);
+        h1["eff_TaggedJet_eta_b"] = new TH1D("eff_TaggedJet_eta_b","eff_TaggedJet_eta_b",netabins,jetetabins);
+        h1["eff_TaggedJet_eta_cl"] = new TH1D("eff_TaggedJet_eta_cl","eff_TaggedJet_eta_cl",netabins,jetetabins);
+
+        h1["eff_TaggedJet_eta_c"] = new TH1D("eff_TaggedJet_eta_c","eff_TaggedJet_eta_c",netabins,jetetabins);
+        h1["eff_TaggedJet_eta_uds"] = new TH1D("eff_TaggedJet_eta_uds","eff_TaggedJet_eta_uds",netabins,jetetabins);
+
+        h1["eff_OppTaggedJet_eta"] = new TH1D("eff_OppTaggedJet_eta","eff_OppTaggedJet_eta",netabins,jetetabins);
+        h1["eff_OppTaggedJet_eta_b"] = new TH1D("eff_OppTaggedJet_eta_b","eff_OppTaggedJet_eta_b",netabins,jetetabins);
+        h1["eff_OppTaggedJet_eta_cl"] = new TH1D("eff_OppTaggedJet_eta_cl","eff_OppTaggedJet_eta_cl",netabins,jetetabins);
+
+        h1["eff_TaggedBothJets_eta"] = new TH1D("eff_TaggedBothJets_eta","eff_TaggedBothJets_eta",netabins,jetetabins);
+        h1["eff_TaggedBothJets_eta_b"] = new TH1D("eff_TaggedBothJets_eta_b","eff_TaggedBothJets_eta_b",netabins,jetetabins);
+        h1["eff_TaggedBothJets_eta_cl"] = new TH1D("eff_TaggedBothJets_eta_cl","eff_TaggedBothJets_eta_cl",netabins,jetetabins);
+
+        h1["eff_pTrel_TaggedJet_eta"] = new TH1D("eff_pTrel_TaggedJet_eta","eff_pTrel_TaggedJet_eta",netabins,jetetabins);
+        h1["eff_pTrel_TaggedJet_eta_b"] = new TH1D("eff_pTrel_TaggedJet_eta_b","eff_pTrel_TaggedJet_eta_b",netabins,jetetabins);
+        h1["eff_pTrel_TaggedJet_eta_cl"] = new TH1D("eff_pTrel_TaggedJet_eta_cl","eff_pTrel_TaggedJet_eta_cl",netabins,jetetabins);
+
+        h1["eff_pTrel_OppTaggedJet_eta"] = new TH1D("eff_pTrel_OppTaggedJet_eta","eff_pTrel_OppTaggedJet_eta",netabins,jetetabins);
+        h1["eff_pTrel_OppTaggedJet_eta_b"] = new TH1D("eff_pTrel_OppTaggedJet_eta_b","eff_pTrel_OppTaggedJet_eta_b",netabins,jetetabins);
+        h1["eff_pTrel_OppTaggedJet_eta_cl"] = new TH1D("eff_pTrel_OppTaggedJet_eta_cl","eff_pTrel_OppTaggedJet_eta_cl",netabins,jetetabins);
+
+        h1["eff_pTrel_TaggedBothJets_eta"] = new TH1D("eff_pTrel_TaggedBothJets_eta","eff_pTrel_TaggedBothJets_eta",netabins,jetetabins);
+        h1["eff_pTrel_TaggedBothJets_eta_b"] = new TH1D("eff_pTrel_TaggedBothJets_eta_b","eff_pTrel_TaggedBothJets_eta_b",netabins,jetetabins);
+        h1["eff_pTrel_TaggedBothJets_eta_cl"] = new TH1D("eff_pTrel_TaggedBothJets_eta_cl","eff_pTrel_TaggedBothJets_eta_cl",netabins,jetetabins);
+
 	//TH1D *halljets = (TH1D*) h1["eff_pTrel"]->Clone("halljets");
 	TH1D *halljets = h2["npT"]->ProjectionX("halljets", -1 , -1,"e");
 	TH1D *halljets_b = h2["b_npT"]->ProjectionX("halljets_b", -1 , -1,"e");
@@ -721,6 +754,38 @@ void S8Plotter::Loop()
 	h1["eff_pTrel_TaggedJet_b"]->Divide( h2["b_ncmbpT"]->ProjectionX("b_halljets_ptreltagged", 9 , -1,"e") , halljets_b ,1.,1.,"B");
 	h1["eff_pTrel_TaggedJet_cl"]->Divide( h2["cl_ncmbpT"]->ProjectionX("cl_halljets_ptrelltagged", 9 , -1,"e") , halljets_cl ,1.,1.,"B");
 
+	// Eta dependency
+
+        TH1D *halljets_eta = h2["nEta"]->ProjectionX("halljetseta", -1 , -1,"e");
+        TH1D *halljets_eta_b = h2["b_nEta"]->ProjectionX("halljetseta_b", -1 , -1,"e");
+        TH1D *halljets_eta_cl = h2["cl_nEta"]->ProjectionX("halljetseta_cl", -1 , -1,"e");
+        // TH1D *halljets_eta_c = h2["c_nEta"]->ProjectionX("halljetseta_c", -1 , -1,"e");
+        // TH1D *halljets_eta_uds = h2["uds_nEta"]->ProjectionX("halljetseta_uds", -1 , -1,"e");
+
+        h1["eff_pTrel_eta"]->Divide( h2["nEta"]->ProjectionX("halljetseta_ptrel", 9 , -1,"e") , halljets_eta ,1.,1.,"B");
+        h1["eff_pTrel_eta_b"]->Divide( h2["b_nEta"]->ProjectionX("b_halljetseta_ptrel", 9 , -1,"e") , halljets_eta_b ,1.,1.,"B");
+        h1["eff_pTrel_eta_cl"]->Divide( h2["cl_nEta"]->ProjectionX("cl_halljetseta_ptrel", 9 , -1,"e") , halljets_eta_cl ,1.,1.,"B");
+
+        h1["eff_TaggedJet_eta"]->Divide( h2["ncmbEta"]->ProjectionX("halljetseta_tagged", -1 , -1,"e") , halljets_eta ,1.,1.,"B");
+        h1["eff_TaggedJet_eta_b"]->Divide( h2["b_ncmbEta"]->ProjectionX("b_halljetseta_tagged", -1 , -1,"e") , halljets_eta_b ,1.,1.,"B");
+        h1["eff_TaggedJet_eta_cl"]->Divide( h2["cl_ncmbEta"]->ProjectionX("cl_halljetseta_tagged", -1 , -1,"e") , halljets_eta_cl ,1.,1.,"B");
+
+        // h1["eff_TaggedJet_eta_c"]->Divide( h2["c_ncmbEta"]->ProjectionX("c_halljetseta_tagged", -1 , -1,"e") , halljets_eta_c ,1.,1.,"B");
+        // h1["eff_TaggedJet_eta_uds"]->Divide( h2["uds_ncmbEta"]->ProjectionX("uds_halljetseta_tagged", -1 , -1,"e") , halljets_eta_uds ,1.,1.,"B");
+
+        h1["eff_pTrel_TaggedJet_eta"]->Divide( h2["ncmbEta"]->ProjectionX("halljetseta_ptreltagged", 9 , -1,"e") , halljets_eta ,1.,1.,"B");
+        h1["eff_pTrel_TaggedJet_eta_b"]->Divide( h2["b_ncmbEta"]->ProjectionX("b_halljetseta_ptreltagged", 9 , -1,"e") , halljets_eta_b ,1.,1.,"B");
+        h1["eff_pTrel_TaggedJet_eta_cl"]->Divide( h2["cl_ncmbEta"]->ProjectionX("cl_halljetseta_ptrelltagged", 9 , -1,"e") , halljets_eta_cl ,1.,1.,"B");
+
+        TH1D *halloppjets_eta = h2["pEta"]->ProjectionX("halloppjetseta", -1 , -1,"e");
+        TH1D *halloppjets_eta_b = h2["b_pEta"]->ProjectionX("halloppjetseta_b", -1 , -1,"e");
+        TH1D *halloppjets_eta_cl = h2["cl_pEta"]->ProjectionX("halloppjetseta_cl", -1 , -1,"e");
+
+        h1["eff_TaggedBothJets_eta"]->Divide( h2["pcmbEta"]->ProjectionX("halloppjetseta_tagged", -1 , -1,"e") , halloppjets_eta ,1.,1.,"B");
+        h1["eff_TaggedBothJets_eta_b"]->Divide( h2["b_pcmbEta"]->ProjectionX("b_halloppjetseta_tagged", -1 , -1,"e") , halloppjets_eta_b ,1.,1.,"B");
+        h1["eff_TaggedBothJets_eta_cl"]->Divide( h2["cl_pcmbEta"]->ProjectionX("cl_halloppjetseta_tagged", -1 , -1,"e") , halloppjets_eta_cl ,1.,1.,"B");
+
+
 
 	TH1D *halloppjets = h2["ppT"]->ProjectionX("halloppjets", -1 , -1,"e");
 	TH1D *halloppjets_b = h2["b_ppT"]->ProjectionX("halloppjets_b", -1 , -1,"e");
@@ -743,7 +808,23 @@ void S8Plotter::Loop()
 	// kappa_cl
 	h1["kappa_cl"]->Divide( h1["eff_pTrel_TaggedJet_cl"], h1["eff_pTrel_cl"] );
 	h1["kappa_cl"]->Divide(  h1["eff_TaggedJet_cl"] );
-	
+
+	        // eta dependency for the correlations
+
+        // alpha
+        h1["alpha_eta"]->Divide( h1["eff_TaggedBothJets_eta_cl"], h1["eff_TaggedJet_eta_cl"]);
+        //h1["alpha"]->Divide( halloppjets_cl, h1["eff_TaggedJet_cl"]);
+        // beta
+        h1["beta_eta"]->Divide( h1["eff_TaggedBothJets_eta_b"], h1["eff_TaggedJet_eta_b"]);
+        //h1["beta"]->Divide( halloppjets_b, h1["eff_TaggedJet_b"]);
+
+        // kappa_b
+        h1["kappa_eta_b"]->Divide( h1["eff_pTrel_TaggedJet_eta_b"], h1["eff_pTrel_eta_b"]  );
+        h1["kappa_eta_b"]->Divide( h1["eff_TaggedJet_eta_b"] );
+        // kappa_cl
+        h1["kappa_eta_cl"]->Divide( h1["eff_pTrel_TaggedJet_eta_cl"], h1["eff_pTrel_eta_cl"] );
+        h1["kappa_eta_cl"]->Divide(  h1["eff_TaggedJet_eta_cl"] );
+
 	//______________________________________________________
 
 	cv_map["eff_pTrel"] = new TCanvas("eff_pTrel","eff_pTrel",700,700);

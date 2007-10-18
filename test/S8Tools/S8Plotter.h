@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8Plotter.h,v 1.6 2007/10/17 14:50:58 yumiceva Exp $
+ * \version $Id: S8Plotter.h,v 1.7 2007/10/18 05:13:21 yumiceva Exp $
  *
  */
 
@@ -19,6 +19,8 @@
 #include "TH2.h"
 #include "TCanvas.h"
 #include "TGraph.h"
+#include "TGraphErrors.h"
+#include "TMultiGraph.h"
 #include "TLorentzVector.h"
 
 #include <stdlib.h>
@@ -53,6 +55,8 @@ class S8Plotter {
 	void Book();
 	void SetTagger(TString name) { ftagger = name; };
 	void SetTaggerLevel(TString name) { flevel = name; };
+	void SetAwayTagger(TString name) { fAwaytagger = name; };
+	void SetAwayTaggerLevel(TString name) { fAwaylevel = name; };
 	void SampleName(TString sample) {
 		fsamplename = sample;
 	};
@@ -100,6 +104,18 @@ class S8Plotter {
 		for(std::map<std::string,TH2* >::const_iterator ih=h2.begin(); ih!=h2.end(); ++ih){
 			delete ih->second;
 		}
+		delete gTC2_b;
+		delete gTC2_c;
+		delete gTC2_udsg;
+		delete gTC3_b;
+		delete gTC3_c;
+		delete gTC3_udsg;
+		delete gTP_b;
+		delete gTP_c;
+		delete gTP_udsg;
+		delete multiTC2;
+		delete multiTC3;
+		delete multiTP;
 	}
 
 	double EffErr(double n, double p) {
@@ -145,6 +161,8 @@ class S8Plotter {
 	bool              fVerbose;
 	TString           ftagger;
 	TString           flevel;
+	TString           fAwaytagger;
+	TString           fAwaylevel;
 	double            fMinPt;
 	double            fMaxPt;
 	TAxis             fJetPtAxis;
@@ -165,6 +183,20 @@ class S8Plotter {
 	S8bPerformance fperformanceTC2;
 	S8bPerformance fperformanceTC3;
 	S8bPerformance fperformanceTP;
+	
+	TGraphErrors *gTC2_b;	
+	TGraphErrors *gTC2_c;	
+	TGraphErrors *gTC2_udsg;	
+	TGraphErrors *gTC3_b;	
+	TGraphErrors *gTC3_c;	
+	TGraphErrors *gTC3_udsg;	
+	TGraphErrors *gTP_b;	
+	TGraphErrors *gTP_c;	
+	TGraphErrors *gTP_udsg;	
+	TMultiGraph *multiTC2;
+	TMultiGraph *multiTC3;
+	TMultiGraph *multiTP;
+
 };
 
 #endif
@@ -183,7 +215,9 @@ S8Plotter::S8Plotter(TString filename)
 	fVerbose = false;
 	ftagger = "TrackCounting";
 	flevel  = "Loose";
-	
+	fAwaytagger = "TrackCounting";
+	fAwaylevel = "Loose";
+
 	fTrackCountingMap["Loose"]  = 2.3; // use TC2:high eff.
 	fTrackCountingMap["Medium"] = 5.3; // use TC2:high eff.
 	fTrackCountingMap["Tight"]  = 4.8;// use TC3:high purity
@@ -313,6 +347,9 @@ void S8Plotter::PrintInfo() {
 
 	std::cout << " Tagger: " << ftagger << std::endl;
 	std::cout << " Level:  " << flevel << " (discriminator>" << fbTaggerMap[flevel] << ")" << std::endl;
+	std::cout << " Tagger for away-jet: " << fAwaytagger << std::endl;
+	std::cout << " Level of Tagger for away-jet:  " << fAwaylevel << " (discriminator>" << fbTaggerMap[fAwaylevel] << ")" << std::endl;
+	
 }
 
 
