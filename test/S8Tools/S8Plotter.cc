@@ -756,9 +756,9 @@ void S8Plotter::Loop()
 
 	// Eta dependency
 
-        TH1D *halljets_eta = h2["nEta"]->ProjectionX("halljetseta", -1 , -1,"e");
-        TH1D *halljets_eta_b = h2["b_nEta"]->ProjectionX("halljetseta_b", -1 , -1,"e");
-        TH1D *halljets_eta_cl = h2["cl_nEta"]->ProjectionX("halljetseta_cl", -1 , -1,"e");
+        TH1D *halljets_eta = h2["nEta"]->ProjectionX("halljets_eta", -1 , -1,"e");
+        TH1D *halljets_eta_b = h2["b_nEta"]->ProjectionX("halljets_eta_b", -1 , -1,"e");
+        TH1D *halljets_eta_cl = h2["cl_nEta"]->ProjectionX("halljets_eta_cl", -1 , -1,"e");
         // TH1D *halljets_eta_c = h2["c_nEta"]->ProjectionX("halljetseta_c", -1 , -1,"e");
         // TH1D *halljets_eta_uds = h2["uds_nEta"]->ProjectionX("halljetseta_uds", -1 , -1,"e");
 
@@ -863,7 +863,7 @@ void S8Plotter::Loop()
 	h1["kappa_b"]->SetMinimum(minYaxis);
 	h1["kappa_b"]->Draw("PE1");
 	std::cout << " kappa_b Fit" << std::endl;
-	h1["kappa_b"]->Fit("pol1","0");
+	h1["kappa_b"]->Fit("pol0","0");
 	TF1 *f1_kb = h1["kappa_b"]->GetFunction("pol1");
 	f1_kb->SetLineColor(quark_color["b"]);
 	f1_kb->Draw("same");
@@ -896,7 +896,7 @@ void S8Plotter::Loop()
 	h1["kappa_cl"]->SetMinimum(minYaxis);
 	h1["kappa_cl"]->Draw("PE1");
 	std::cout << " kappa_cl Fit" << std::endl;
-	h1["kappa_cl"]->Fit("pol1","0");
+	h1["kappa_cl"]->Fit("pol0","0");
 	TF1 *f1_kcl = h1["kappa_cl"]->GetFunction("pol1");
 	f1_kcl->SetLineColor(quark_color["c"]);
 	f1_kcl->Draw("same");
@@ -926,7 +926,7 @@ void S8Plotter::Loop()
 	h1["alpha"]->SetMinimum(minYaxis);
 	h1["alpha"]->Draw("PE1");
 	std::cout << " alpha Fit" << std::endl;
-	h1["alpha"]->Fit("pol1","0");
+	h1["alpha"]->Fit("pol0","0");
 	TF1 *f1_alpha = h1["alpha"]->GetFunction("pol1");
 	f1_alpha->SetLineColor(quark_color["c"]);
 	f1_alpha->Draw("same");
@@ -954,7 +954,7 @@ void S8Plotter::Loop()
 	h1["beta"]->SetMinimum(minYaxis);
 	h1["beta"]->Draw("PE1");
 	std::cout << " beta Fit" << std::endl;
-	h1["beta"]->Fit("pol1","0");
+	h1["beta"]->Fit("pol0","0");
 	TF1 *f1_beta = h1["beta"]->GetFunction("pol1");
 	f1_beta->SetLineColor(quark_color["b"]);
 	f1_beta->Draw("same");
