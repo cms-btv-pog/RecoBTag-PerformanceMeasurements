@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8Plotter.h,v 1.5 2007/10/17 03:24:36 yumiceva Exp $
+ * \version $Id: S8Plotter.h,v 1.6 2007/10/17 14:50:58 yumiceva Exp $
  *
  */
 
@@ -203,10 +203,10 @@ S8Plotter::S8Plotter(TString filename)
 	fperformanceTC2.Set("TC2");
 	fperformanceTC3.Set("TC3");
 	fperformanceTP.Set("TP");
-	fperformanceTC2.SetMinDiscriminator(-10);
-	fperformanceTC2.SetMaxDiscriminator(10);
-	fperformanceTC3.SetMinDiscriminator(-10);
-	fperformanceTC3.SetMaxDiscriminator(10);
+	fperformanceTC2.SetMinDiscriminator(-1);
+	fperformanceTC2.SetMaxDiscriminator(15);
+	fperformanceTC3.SetMinDiscriminator(-1);
+	fperformanceTC3.SetMaxDiscriminator(15);
 	fperformanceTP.SetMinDiscriminator(0);
 	fperformanceTP.SetMaxDiscriminator(1);
 	

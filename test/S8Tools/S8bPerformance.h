@@ -6,11 +6,12 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8bPerformance.h,v 1.1 2007/10/17 03:24:36 yumiceva Exp $
+ * \version $Id: S8bPerformance.h,v 1.2 2007/10/17 14:50:58 yumiceva Exp $
  *
  */
 
 #include "TGraph.h"
+#include "TArrayD.h"
 
 class S8bPerformance {
 
@@ -25,12 +26,7 @@ class S8bPerformance {
 		  c_tagged[i] = 0;
 		  udsg_tagged[i] = 0;
 		}
-		//h1["b"+fname] = new TH1F("b"+TString(fname),"b efficiency",40,0.,0.8);
-		//h1["c"+fname] = new TH1F("c"+TString(fname),"c efficiency",40,0.,0.8);
-		//h1["udsg"+fname] = new TH1F("udsg"+TString(fname),"udsg efficiency",40,0.,0.8);
-		//g1["b"+fname].Set(fNcuts);//		b_vsbgraph.Set(fNcuts);
-		//g1["c"+fname].Set(fNcuts);//		b_vscgraph.Set(fNcuts);
-		//g1["udsg"+fname].Set(fNcuts);//		b_vsudsggraph.Set(fNcuts);
+		
 	};
 	void SetMinDiscriminator( double value) { fMinDisc = value; };
 	void SetMaxDiscriminator( double value) { fMaxDisc = value; };
@@ -64,11 +60,13 @@ class S8bPerformance {
 	};
 
 	void Eval() {
+		double small = 1.e-5;
 		int ip = 0;
 		for(std::map<int,double>::const_iterator im=b_tagged.begin(); im!=b_tagged.end(); ++im) {
 
 			double eff = (im->second)/((double)b_all);
 			double err = sqrt(eff*(1-eff)/b_all);
+			if ( eff==0 || eff< small ) { eff = small; err=0; }
 			b_eff[ip] = eff;
 			b_effErr[ip] = err;
 			//g1["b"+fname].SetPoint(ip,eff,eff);
@@ -80,6 +78,7 @@ class S8bPerformance {
 		  
 		  double eff = (im->second)/((double)c_all);
 		  double err = sqrt(eff*(1-eff)/c_all);
+		  if ( eff==0 || eff< small ) { eff = small; err=0; }
 		  c_eff[ip] = eff;
 		  c_effErr[ip] = err;
 		  //g1["c"+fname].SetPoint(ip,b_tagged[ip],eff);
@@ -91,6 +90,7 @@ class S8bPerformance {
 
 			double eff = (im->second)/((double)udsg_all);
 			double err = sqrt(eff*(1-eff)/udsg_all);
+			if ( eff==0 || eff< small ) { eff = small; err=0; }
 			udsg_eff[ip] = eff;
 			udsg_effErr[ip] = err;
 			//g1["udsg"+fname].SetPoint(ip,b_tagged[ip],eff);
@@ -109,18 +109,21 @@ class S8bPerformance {
 	  //return NULL;
 	};
 
-	Double_t *GetArray(TString option="b") {
+	TArrayD GetArray(TString option="b") {
 	  std::map<int,double> amap = GetMap(option);
-	  Double_t *array;//[(int)amap.size()];
-	  int ip=0;
+	  TArrayD tarray(fNcuts);
 	  for(std::map<int,double>::const_iterator im=amap.begin(); im!=amap.end(); ++im) {
-	    array[ip] = im->second;
+		  //std::cout << "i= " << im->first << " value= " << im->second << std::endl;
+	    tarray[im->first] = im->second;
 	  }
-	  return array;
+	  return tarray;
 	  
 	};
 
+	int GetN() { return fNcuts; };
+
   private:
+	Double_t *farray;
 	double fdisc;
 	int    fflavor;
 	double fMinDisc;

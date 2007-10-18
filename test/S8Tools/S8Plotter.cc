@@ -7,6 +7,7 @@
 #include "TCanvas.h"
 #include "TGraph.h"
 #include "TGraphErrors.h"
+#include "TMultiGraph.h"
 #include "TF1.h"
 #include "TLatex.h"
 #include "TLegend.h"
@@ -352,85 +353,86 @@ void S8Plotter::Loop()
 					    double ojetcorr = fS8evt->jetcorrection[kjet];
 					    p4OppJet = ojetcorr * p4OppJet;
 					    int OppJetFlavor = fS8evt->jet_flavour_alg[kjet];
-
+						
 					    if ( !OtherTaggedJet ) {
 					      
-					      bool isbTaggedOtherJet = false;
-					      if ( ftagger == "TrackCounting" ) {
-						if ( flevel == "Tight" ) {
-						  if ( fS8evt->btag_TrkCounting_disc3D_3trk[kjet] > fbTaggerMap["Tight"] ) isbTaggedOtherJet = true;
-						} else {
-						  if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[flevel] << std::endl;
-						  if ( fS8evt->btag_TrkCounting_disc3D_2trk[kjet] > fbTaggerMap[flevel] ) isbTaggedOtherJet = true;
+							bool isbTaggedOtherJet = false;
+							if ( ftagger == "TrackCounting" ) {
+								if ( flevel == "Tight" ) {
+									if ( fS8evt->btag_TrkCounting_disc3D_3trk[kjet] > fbTaggerMap["Tight"] ) isbTaggedOtherJet = true;
+								} else {
+									if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[flevel] << std::endl;
+									if ( fS8evt->btag_TrkCounting_disc3D_2trk[kjet] > fbTaggerMap[flevel] ) isbTaggedOtherJet = true;
 
-						}
-					      }
-					      if ( ftagger == "TrackProbability" ) {
-						if ( fS8evt->btag_JetProb_disc3D[kjet] > fbTaggerMap[flevel] ) isbTaggedOtherJet = true;
-					      }
+								}
+							}
+							if ( ftagger == "TrackProbability" ) {
+								if ( fS8evt->btag_JetProb_disc3D[kjet] > fbTaggerMap[flevel] ) isbTaggedOtherJet = true;
+							}
 					      
-					      if (isbTaggedOtherJet) {
+							if (isbTaggedOtherJet) {
 
-						FillHistos("p",p4OppJet, ptrel, OppJetFlavor, isbTaggedJet);
-						OtherTaggedJet = true;
-					      }
+								FillHistos("p",p4MuJet, ptrel, JetFlavor, isbTaggedJet);
+								OtherTaggedJet = true;
+							}
 					    }
 
 					    if ( !OtherMuonJet ) {
 					      // skip selected mu+jet
-					      if ( ijet == kjet ) continue;
+					      //if ( ijet == kjet ) continue;
 					      // look for another muon-in-jet
 					      if ( fS8evt->jet_hasLepton[kjet] == 1 ) {
-						// get a muon
-						BTagLeptonEvent oMuons = fS8evt->lepton[kjet];
-						bool pass2GoodMuon = false;
-						if ( fVerbose ) std::cout << " other Muons in jet = " << oMuons.pt.size() << std::endl;
-						int ith_omu_highest_pt = -1;
-						double omu_highest_pt = 0;
-						for ( size_t imu = 0; imu != oMuons.pt.size(); ++imu ) {
+							  // get a muon
+							  BTagLeptonEvent oMuons = fS8evt->lepton[kjet];
+							  bool pass2GoodMuon = false;
+							  if ( fVerbose ) std::cout << " other Muons in jet = " << oMuons.pt.size() << std::endl;
+							  int ith_omu_highest_pt = -1;
+							  double omu_highest_pt = 0;
+							  for ( size_t imu = 0; imu != oMuons.pt.size(); ++imu ) {
 
-						  //// Muon Selection /////
-						  if ( ( oMuons.trkrechits[imu] >= 8 ) && ( oMuons.chi2[imu]/oMuons.ndof[imu] <5 ) ) {
-						    pass2GoodMuon = true;
-						    
-						    if (oMuons.pt[imu] > omu_highest_pt ) { omu_highest_pt = oMuons.pt[imu]; ith_omu_highest_pt = imu; }
-
-						  }
-						}
-						// select only one muon in jet, the one with the highest pt
-						if ( pass2GoodMuon ) {
-						  OtherMuonJet = true;
-						  TLorentzVector p4oMuJet;
-						  p4oMuJet.SetPtEtaPhiE(fS8evt->jet_pt[kjet]*fS8evt->jetcorrection[kjet],
-								       fS8evt->jet_eta[kjet], fS8evt->jet_phi[kjet],
-								       fS8evt->jet_e[kjet]*fS8evt->jetcorrection[kjet]);
+								  //// Muon Selection /////
+								  if ( ( oMuons.trkrechits[imu] >= 8 ) && ( oMuons.chi2[imu]/oMuons.ndof[imu] <5 ) ) {
+									  pass2GoodMuon = true;
+									  
+									  if (oMuons.pt[imu] > omu_highest_pt ) { omu_highest_pt = oMuons.pt[imu]; ith_omu_highest_pt = imu; }
+									  
+								  }
+							  }
+							  // select only one muon in jet, the one with the highest pt
+							  if ( pass2GoodMuon ) {
+								  OtherMuonJet = true;
+								  TLorentzVector p4oMuJet;
+								  p4oMuJet.SetPtEtaPhiE(fS8evt->jet_pt[kjet]*fS8evt->jetcorrection[kjet],
+														fS8evt->jet_eta[kjet], fS8evt->jet_phi[kjet],
+														fS8evt->jet_e[kjet]*fS8evt->jetcorrection[kjet]);
 						  
-						  //TLorentzVector vmu, vtot;
-						  vmu.SetPtEtaPhiE(oMuons.pt[ith_omu_highest_pt], Muons.eta[ith_omu_highest_pt], Muons.phi[ith_omu_highest_pt], Muons.e[ith_omu_highest_pt]);
+								  //TLorentzVector vmu, vtot;
+								  vmu.SetPtEtaPhiE(oMuons.pt[ith_omu_highest_pt], Muons.eta[ith_omu_highest_pt], Muons.phi[ith_omu_highest_pt], Muons.e[ith_omu_highest_pt]);
+								  
+								  vtot = vmu + p4MuJet;
+								  double optrel = ( vmu.Px() * vtot.Px()
+													+ vmu.Py() * vtot.Py()
+													+ vmu.Pz() * vtot.Pz() ) / vtot.P();
+								  optrel = TMath::Sqrt( vmu.P() * vmu.P() - ptrel * ptrel );
+								  // do we need ptrel of this muon?
+								  
+								  // check btagging
+								  bool isbTaggedOtherMuJet = false;
+								  if ( ftagger == "TrackCounting" ) {
+									  if ( flevel == "Tight" ) {
+										  if ( fS8evt->btag_TrkCounting_disc3D_3trk[ijet] > fbTaggerMap["Tight"] ) isbTaggedOtherMuJet = true;
+									  } else {
+										  if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[flevel] << std::endl;
+										  if ( fS8evt->btag_TrkCounting_disc3D_2trk[ijet] > fbTaggerMap[flevel] ) isbTaggedOtherMuJet = true;
+										  
+									  }
+								  }
+								  if ( ftagger == "TrackProbability" ) {
+									  if ( fS8evt->btag_JetProb_disc3D[ijet] > fbTaggerMap[flevel] ) isbTaggedOtherMuJet = true;
+								  }
 
-						  vtot = vmu + p4MuJet;
-						  ptrel = ( vmu.Px() * vtot.Px()
-							    + vmu.Py() * vtot.Py()
-							    + vmu.Pz() * vtot.Pz() ) / vtot.P();
-						  ptrel = TMath::Sqrt( vmu.P() * vmu.P() - ptrel * ptrel );
-
-						  // check btagging
-						  bool isbTaggedOtherMuJet = false;
-						  if ( ftagger == "TrackCounting" ) {
-						    if ( flevel == "Tight" ) {
-						      if ( fS8evt->btag_TrkCounting_disc3D_3trk[ijet] > fbTaggerMap["Tight"] ) isbTaggedOtherMuJet = true;
-						    } else {
-						      if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[flevel] << std::endl;
-						      if ( fS8evt->btag_TrkCounting_disc3D_2trk[ijet] > fbTaggerMap[flevel] ) isbTaggedOtherMuJet = true;
-
-						    }
-						  }
-						  if ( ftagger == "TrackProbability" ) {
-						    if ( fS8evt->btag_JetProb_disc3D[ijet] > fbTaggerMap[flevel] ) isbTaggedOtherMuJet = true;
-						  }
-
-						  FillHistos("q",p4oMuJet, ptrel, OppJetFlavor,isbTaggedOtherMuJet);
-						}
+								  FillHistos("q",p4MuJet, ptrel, JetFlavor, isbTaggedOtherMuJet);
+							  }
 					      }
 					    }// otherMuonJet
 					  }// second loop over jets
@@ -508,32 +510,122 @@ void S8Plotter::Loop()
 	fperformanceTC2.Eval();
 	fperformanceTC3.Eval();
 	fperformanceTP.Eval();
-	//std::map<std::string,TGraph> tmpha = fperformanceTC2.GetMap();
-	//std::map<std::string,TGraph> tmphb = fperformanceTC3.GetMap();
-	//std::map<std::string,TGraph> tmphc = fperformanceTP.GetMap();
-	if (fVerbose) std::cout << "got TGraph's " << std::endl;
-	/* FIX ME
-	cv_map["bPerformance"] = new TCanvas("bPerformance","bPerformance",700,700);
-	int ig =0;
-	for(std::map<std::string,TGraph>::const_iterator it = tmpha.begin(); it!=tmpha.end(); ++it) {
-	  TGraph gtemp = (TGraph) it->second;
-	  if (ig==0) gtemp.Draw("AP");
-	  else {gtemp.Draw("P"); }
-	  gtemp.Print();
-	  //gg1[it->first] = TGraph(gtemp.GetN(),gtemp.GetX(),gtemp.GetY());
-	  //gg1[it->first].Print();
-	  ig++;
-	}
-       
-	for(std::map<std::string,TGraph>::const_iterator it = tmphb.begin(); it!=tmphb.end(); ++it) {
-		TGraph gtemp = (TGraph) (it->second );
-		gg1[it->first] = gtemp;
-		gg1[it->first].Print();
-	}
-	for(std::map<std::string,TGraph>::const_iterator it = tmphc.begin(); it!=tmphc.end(); ++it) {
-		gg1[it->first] = TGraph( it->second );
-	}
-	*/
+	
+	TGraphErrors *gTC2_b = new TGraphErrors(fperformanceTC2.GetN(),
+											fperformanceTC2.GetArray("b").GetArray(),fperformanceTC2.GetArray("b").GetArray(),
+											fperformanceTC2.GetArray("bErr").GetArray(),fperformanceTC2.GetArray("bErr").GetArray());
+	
+	TGraphErrors *gTC2_c = new TGraphErrors(fperformanceTC2.GetN(),
+											fperformanceTC2.GetArray("b").GetArray(),fperformanceTC2.GetArray("c").GetArray(),
+											fperformanceTC2.GetArray("bErr").GetArray(),fperformanceTC2.GetArray("cErr").GetArray());
+	
+	TGraphErrors *gTC2_udsg = new TGraphErrors(fperformanceTC2.GetN(),
+											fperformanceTC2.GetArray("b").GetArray(),fperformanceTC2.GetArray("udsg").GetArray(),
+											fperformanceTC2.GetArray("bErr").GetArray(),fperformanceTC2.GetArray("udsgErr").GetArray());
+	
+	TGraphErrors *gTC3_b = new TGraphErrors(fperformanceTC3.GetN(),
+											fperformanceTC3.GetArray("b").GetArray(),fperformanceTC3.GetArray("b").GetArray(),
+											fperformanceTC3.GetArray("bErr").GetArray(),fperformanceTC3.GetArray("bErr").GetArray());
+	
+	TGraphErrors *gTC3_c = new TGraphErrors(fperformanceTC3.GetN(),
+											fperformanceTC3.GetArray("b").GetArray(),fperformanceTC3.GetArray("c").GetArray(),
+											fperformanceTC3.GetArray("bErr").GetArray(),fperformanceTC3.GetArray("cErr").GetArray());
+	
+	TGraphErrors *gTC3_udsg = new TGraphErrors(fperformanceTC3.GetN(),
+											fperformanceTC3.GetArray("b").GetArray(),fperformanceTC3.GetArray("udsg").GetArray(),
+											fperformanceTC3.GetArray("bErr").GetArray(),fperformanceTC3.GetArray("udsgErr").GetArray());
+	
+	TGraphErrors *gTP_b = new TGraphErrors(fperformanceTP.GetN(),
+											fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("b").GetArray(),
+											fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("bErr").GetArray());
+	
+	TGraphErrors *gTP_c = new TGraphErrors(fperformanceTP.GetN(),
+											fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("c").GetArray(),
+											fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("cErr").GetArray());
+	
+	TGraphErrors *gTP_udsg = new TGraphErrors(fperformanceTP.GetN(),
+											fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("udsg").GetArray(),
+											fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("udsgErr").GetArray());
+	
+	
+	TMultiGraph *multiTC2 = new TMultiGraph();
+	TMultiGraph *multiTC3 = new TMultiGraph();
+	TMultiGraph *multiTP = new TMultiGraph();
+
+	multiTC2->Add(gTC2_b,"p");
+	multiTC2->Add(gTC2_c,"p");
+	multiTC2->Add(gTC2_udsg,"p");
+	multiTC3->Add(gTC3_b,"p");
+	multiTC3->Add(gTC3_c,"p");
+	multiTC3->Add(gTC3_udsg,"p");
+	multiTP->Add(gTP_b,"p");
+	multiTP->Add(gTP_c,"p");
+	multiTP->Add(gTP_udsg,"p");
+	gTC2_b->SetMarkerColor(quark_color["b"]);
+	gTC2_c->SetMarkerColor(quark_color["c"]);
+	gTC2_udsg->SetMarkerColor(quark_color["uds"]);
+	gTC3_b->SetMarkerColor(quark_color["b"]);
+	gTC3_c->SetMarkerColor(quark_color["c"]);
+	gTC3_udsg->SetMarkerColor(quark_color["uds"]);
+	gTP_b->SetMarkerColor(quark_color["b"]);
+	gTP_c->SetMarkerColor(quark_color["c"]);
+	gTP_udsg->SetMarkerColor(quark_color["uds"]);
+	
+	gTC2_b->SetMarkerStyle(20);
+	gTC2_c->SetMarkerStyle(22);
+	gTC2_udsg->SetMarkerStyle(23);
+	gTC3_b->SetMarkerStyle(20);
+	gTC3_c->SetMarkerStyle(22);
+	gTC3_udsg->SetMarkerStyle(23);
+	gTP_b->SetMarkerStyle(20);
+	gTP_c->SetMarkerStyle(22);
+	gTP_udsg->SetMarkerStyle(23);
+	
+	TLegend *legtc2 = new TLegend(0.65,0.65,0.85,0.85,"","NDC");
+	legtc2->SetFillColor(10);
+	legtc2->AddEntry(gTC2_b,"b-jet","P");
+	legtc2->AddEntry(gTC2_c,"c-jet","P");
+	legtc2->AddEntry(gTC2_udsg,"udsg-jet","P");
+	legtc2->SetHeader("TrkCounting 2nd trk");
+	cv_map["bPerformanceTC2"] = new TCanvas("bPerformanceTC2","bPerformanceTC2",700,700);
+	multiTC2->Draw("a");
+	multiTC2->GetXaxis()->SetTitle("b-jet efficiency");
+	multiTC2->GetYaxis()->SetTitle("non-b jet efficiency");
+	multiTC2->SetMinimum(1.e-4);
+	multiTC2->SetMaximum(1);
+	gPad->SetLogy();
+	gPad->SetGrid();
+	legtc2->Draw();
+	TLegend *legtc3 = new TLegend(0.65,0.65,0.85,0.85,"","NDC");
+	legtc3->SetFillColor(10);
+	legtc3->AddEntry(gTC2_b,"b-jet","P");
+	legtc3->AddEntry(gTC2_c,"c-jet","P");
+	legtc3->AddEntry(gTC2_udsg,"udsg-jet","P");
+	legtc3->SetHeader("TrkCounting 3rd trk");
+	cv_map["bPerformanceTC3"] = new TCanvas("bPerformanceTC3","bPerformanceTC3",700,700);
+	multiTC3->Draw("a");
+	multiTC3->GetXaxis()->SetTitle("b-jet efficiency");
+	multiTC3->GetYaxis()->SetTitle("non-b jet efficiency");
+	multiTC3->SetMinimum(1.e-4);
+	multiTC3->SetMaximum(1);
+	gPad->SetLogy();
+	gPad->SetGrid();
+	legtc3->Draw();
+	TLegend *legtp = new TLegend(0.65,0.65,0.85,0.85,"","NDC");
+	legtp->SetFillColor(10);
+	legtp->AddEntry(gTC2_b,"b-jet","P");
+	legtp->AddEntry(gTC2_c,"c-jet","P");
+	legtp->AddEntry(gTC2_udsg,"udsg-jet","P");
+	legtp->SetHeader("TrkProbability");
+	cv_map["bPerformanceTP"] = new TCanvas("bPerformanceTP","bPerformanceTP",700,700);
+	multiTP->Draw("a");
+	multiTP->GetXaxis()->SetTitle("b-jet efficiency");
+	multiTP->GetYaxis()->SetTitle("non-b jet efficiency");
+	multiTP->SetMinimum(1.e-4);
+	multiTP->SetMaximum(1);
+	gPad->SetLogy();
+	gPad->SetGrid();
+	legtp->Draw();
 	
 	std::cout << std::setfill('#') << std::setw(100) << "#" << std::endl;
 	std::cout << std::setfill(' ');
@@ -678,58 +770,125 @@ void S8Plotter::Loop()
 	gPad->SetGrid();
 	//______________________________________________________
 
+	double maxYaxis = 1.1;
+	double minYaxis = 0.1;
 	cv_map["kappa_b"] = new TCanvas("kappa_b","kappa_b",700,700);
 	h1["kappa_b"]->SetMarkerStyle(8);
 	h1["kappa_b"]->SetMarkerSize(1.5);
-	h1["kappa_b"]->SetLineColor(2);
-	h1["kappa_b"]->SetMarkerColor(2);
+	h1["kappa_b"]->SetLineColor(quark_color["b"]);
+	h1["kappa_b"]->SetMarkerColor(quark_color["b"]);
+	h1["kappa_b"]->SetXTitle("jet p_{T} [GeV/c]");
+	h1["kappa_b"]->SetMaximum(maxYaxis);
+	h1["kappa_b"]->SetMinimum(minYaxis);
 	h1["kappa_b"]->Draw("PE1");
+	std::cout << " kappa_b Fit" << std::endl;
 	h1["kappa_b"]->Fit("pol1","0");
 	TF1 *f1_kb = h1["kappa_b"]->GetFunction("pol1");
-	f1_kb->SetLineColor(2);
+	f1_kb->SetLineColor(quark_color["b"]);
 	f1_kb->Draw("same");
+	h1["eff_TaggedJet_b"]->SetMarkerStyle(23);
 	h1["eff_TaggedJet_b"]->Draw("PE1 same");
+	h1["eff_pTrel_b"]->SetMarkerStyle(21);
 	h1["eff_pTrel_b"]->Draw("PE1 same");
-	
+	h1["eff_pTrel_TaggedJet_b"]->SetMarkerStyle(26);
+	h1["eff_pTrel_TaggedJet_b"]->Draw("PE1 same");
+	TLegend *legkb = new TLegend(0.6,0.65,0.85,0.85,"","NDC");
+	legkb->SetFillColor(10);
+	legkb->AddEntry(h1["kappa_b"],"#kappa_{b}","P");
+	TString strTag;
+	if ( ftagger == "TrackCounting")  strTag = "TC";
+	if ( ftagger == "TrackProbability") strTag = "TP";
+	legkb->AddEntry(h1["eff_pTrel_TaggedJet_b"],"#epsilon(p_{T}^{Rel}#wedge"+strTag+"-"+flevel+")_{b}^{#mu-jet}","P");
+	legkb->AddEntry(h1["eff_pTrel_b"],"#epsilon(p_{T}^{Rel})_{b}^{muon-jet}","P");
+	legkb->AddEntry(h1["eff_TaggedJet_b"],"#epsilon("+strTag+"-"+flevel+")_{b}^{#mu-jet}","P");
+	legkb->Draw();
+	gPad->SetGrid();
     //______________________________________________________
 
 	cv_map["kappa_cl"] = new TCanvas("kappa_cl","kappa_cl",700,700);
 	h1["kappa_cl"]->SetMarkerStyle(8);
 	h1["kappa_cl"]->SetMarkerSize(1.5);
-	h1["kappa_cl"]->SetLineColor(2);
-	h1["kappa_cl"]->SetMarkerColor(2);
+	h1["kappa_cl"]->SetLineColor(quark_color["c"]);
+	h1["kappa_cl"]->SetMarkerColor(quark_color["c"]);
+	h1["kappa_cl"]->SetXTitle("jet p_{T} [GeV/c]");
+	h1["kappa_cl"]->SetMaximum(maxYaxis);
+	h1["kappa_cl"]->SetMinimum(minYaxis);
 	h1["kappa_cl"]->Draw("PE1");
+	std::cout << " kappa_cl Fit" << std::endl;
 	h1["kappa_cl"]->Fit("pol1","0");
 	TF1 *f1_kcl = h1["kappa_cl"]->GetFunction("pol1");
-	f1_kcl->SetLineColor(3);
+	f1_kcl->SetLineColor(quark_color["c"]);
 	f1_kcl->Draw("same");
+	h1["eff_TaggedJet_cl"]->SetMarkerStyle(23);
 	h1["eff_TaggedJet_cl"]->Draw("PE1 same");
+	h1["eff_pTrel_cl"]->SetMarkerStyle(21);
 	h1["eff_pTrel_cl"]->Draw("PE1 same");
+	h1["eff_pTrel_TaggedJet_cl"]->SetMarkerStyle(26);
+        h1["eff_pTrel_TaggedJet_cl"]->Draw("PE1 same");
+	TLegend *legkc = new TLegend(0.6,0.65,0.85,0.85,"","NDC");
+	legkc->SetFillColor(10);
+	legkc->AddEntry(h1["kappa_cl"],"#kappa_{cl}","P");
+	legkc->AddEntry(h1["eff_pTrel_TaggedJet_cl"],"#epsilon(p_{T}^{Rel}#wedge"+strTag+"-"+flevel+")_{cl}^{#mu-jet}","P");
+	legkc->AddEntry(h1["eff_pTrel_cl"],"#epsilon(p_{T}^{Rel})_{cl}^{#mu-jet}","P");
+	legkc->AddEntry(h1["eff_TaggedJet_cl"],"#epsilon("+strTag+"-"+flevel+")_{cl}^{#mu-jet}","P");
+	legkc->Draw();
+	gPad->SetGrid();
     //______________________________________________________
 	
 	cv_map["alpha"] = new TCanvas("alpha","alpha",700,700);
 	h1["alpha"]->SetMarkerStyle(8);
 	h1["alpha"]->SetMarkerSize(1.5);
+	h1["alpha"]->SetLineColor(quark_color["c"]);
+	h1["alpha"]->SetMarkerColor(quark_color["c"]);
+	h1["alpha"]->SetXTitle("jet p_{T} [GeV/c]");
+	h1["alpha"]->SetMaximum(maxYaxis);
+	h1["alpha"]->SetMinimum(minYaxis);
 	h1["alpha"]->Draw("PE1");
+	std::cout << " alpha Fit" << std::endl;
 	h1["alpha"]->Fit("pol1","0");
 	TF1 *f1_alpha = h1["alpha"]->GetFunction("pol1");
-	f1_alpha->SetLineColor(3);
+	f1_alpha->SetLineColor(quark_color["c"]);
 	f1_alpha->Draw("same");
+	h1["eff_TaggedBothJets_cl"]->SetMarkerStyle(26);
 	h1["eff_TaggedBothJets_cl"]->Draw("PE1 same");
+	h1["eff_TaggedJet_cl"]->SetMarkerStyle(23);
 	h1["eff_TaggedJet_cl"]->Draw("PE1 same");
+	TLegend *lega = new TLegend(0.6,0.65,0.85,0.85,"","NDC");
+        lega->SetFillColor(10);
+        lega->AddEntry(h1["alpha"],"#alpha","P");
+        lega->AddEntry(h1["eff_TaggedJet_cl"],"#epsilon("+strTag+"-"+flevel+")_{cl}^{#mu-jet}","P");
+        lega->AddEntry(h1["eff_TaggedBothJets_cl"],"#epsilon("+strTag+"-"+flevel+")_{cl}^{#mu-jet-away-jet}","P");
+        lega->Draw();
+	gPad->SetGrid();
+
     //______________________________________________________
 	
 	cv_map["beta"] = new TCanvas("beta","beta",700,700);
 	h1["beta"]->SetMarkerStyle(8);
 	h1["beta"]->SetMarkerSize(1.5);
+	h1["beta"]->SetLineColor(quark_color["b"]);
+	h1["beta"]->SetMarkerColor(quark_color["b"]);
+	h1["beta"]->SetXTitle("jet p_{T} [GeV/c]");
+	h1["beta"]->SetMaximum(maxYaxis);
+	h1["beta"]->SetMinimum(minYaxis);
 	h1["beta"]->Draw("PE1");
+	std::cout << " beta Fit" << std::endl;
 	h1["beta"]->Fit("pol1","0");
 	TF1 *f1_beta = h1["beta"]->GetFunction("pol1");
-	f1_beta->SetLineColor(3);
+	f1_beta->SetLineColor(quark_color["b"]);
 	f1_beta->Draw("same");
+	h1["eff_TaggedBothJets_b"]->SetMarkerStyle(26);
 	h1["eff_TaggedBothJets_b"]->Draw("PE1 same");
+	h1["eff_TaggedJet_b"]->SetMarkerStyle(23);
 	h1["eff_TaggedJet_b"]->Draw("PE1 same");
-		
+	TLegend *legb = new TLegend(0.6,0.65,0.85,0.85,"","NDC");
+        legb->SetFillColor(10);
+        legb->AddEntry(h1["beta"],"#beta","P");
+        legb->AddEntry(h1["eff_TaggedJet_b"],"#epsilon("+strTag+"-"+flevel+")_{b}^{#mu-jet}","P");
+        legb->AddEntry(h1["eff_TaggedBothJets_b"],"#epsilon("+strTag+"-"+flevel+")_{b}^{#mu-jet-away-jet}","P");
+        legb->Draw();
+	gPad->SetGrid();
+	
 }
 
 void S8Plotter::FillHistos(std::string type, TLorentzVector p4Jet, double ptrel, int flavor, bool tagged) {
