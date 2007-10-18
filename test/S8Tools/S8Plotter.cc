@@ -194,6 +194,11 @@ void S8Plotter::Loop()
 	h1["beta"] = new TH1D("beta","beta",nptbins,jetptbins);
 	h1["kappa_cl"] = new TH1D("kappa_cl","kappa_cl",nptbins,jetptbins);
 	h1["kappa_b"] = new TH1D("kappa_b","kappa_b",nptbins,jetptbins);
+
+	h1["alpha_eta"] = new TH1D("alpha_eta","alpha_eta",netabins,jetetabins);
+	h1["beta_eta"] = new TH1D("beta_eta","beta_eta",netabins,jetetabins);
+	h1["kappa_eta_cl"] = new TH1D("kappa_eta_cl","kappa_eta_cl",netabins,jetetabins);
+	h1["kappa_eta_b"] = new TH1D("kappa_eta_b","kappa_eta_b",netabins,jetetabins);
 	
 	// enable errors
 	for(std::map<std::string,TH2* >::const_iterator ih=h2.begin(); ih!=h2.end(); ++ih){
@@ -777,14 +782,13 @@ void S8Plotter::Loop()
         h1["eff_pTrel_TaggedJet_eta_b"]->Divide( h2["b_ncmbEta"]->ProjectionX("b_halljetseta_ptreltagged", 9 , -1,"e") , halljets_eta_b ,1.,1.,"B");
         h1["eff_pTrel_TaggedJet_eta_cl"]->Divide( h2["cl_ncmbEta"]->ProjectionX("cl_halljetseta_ptrelltagged", 9 , -1,"e") , halljets_eta_cl ,1.,1.,"B");
 
-        TH1D *halloppjets_eta = h2["pEta"]->ProjectionX("halloppjetseta", -1 , -1,"e");
-        TH1D *halloppjets_eta_b = h2["b_pEta"]->ProjectionX("halloppjetseta_b", -1 , -1,"e");
-        TH1D *halloppjets_eta_cl = h2["cl_pEta"]->ProjectionX("halloppjetseta_cl", -1 , -1,"e");
+        TH1D *halloppjets_eta = h2["pEta"]->ProjectionX("halloppjets_eta", -1 , -1,"e");
+        TH1D *halloppjets_eta_b = h2["b_pEta"]->ProjectionX("halloppjets_eta_b", -1 , -1,"e");
+        TH1D *halloppjets_eta_cl = h2["cl_pEta"]->ProjectionX("halloppjets_eta_cl", -1 , -1,"e");
 
         h1["eff_TaggedBothJets_eta"]->Divide( h2["pcmbEta"]->ProjectionX("halloppjetseta_tagged", -1 , -1,"e") , halloppjets_eta ,1.,1.,"B");
         h1["eff_TaggedBothJets_eta_b"]->Divide( h2["b_pcmbEta"]->ProjectionX("b_halloppjetseta_tagged", -1 , -1,"e") , halloppjets_eta_b ,1.,1.,"B");
         h1["eff_TaggedBothJets_eta_cl"]->Divide( h2["cl_pcmbEta"]->ProjectionX("cl_halloppjetseta_tagged", -1 , -1,"e") , halloppjets_eta_cl ,1.,1.,"B");
-
 
 
 	TH1D *halloppjets = h2["ppT"]->ProjectionX("halloppjets", -1 , -1,"e");
@@ -795,12 +799,14 @@ void S8Plotter::Loop()
 	h1["eff_TaggedBothJets_b"]->Divide( h2["b_pcmbpT"]->ProjectionX("b_halloppjets_tagged", -1 , -1,"e") , halloppjets_b ,1.,1.,"B");
 	h1["eff_TaggedBothJets_cl"]->Divide( h2["cl_pcmbpT"]->ProjectionX("cl_halloppjets_tagged", -1 , -1,"e") , halloppjets_cl ,1.,1.,"B");
 
+		
 	// alpha
 	h1["alpha"]->Divide( h1["eff_TaggedBothJets_cl"], h1["eff_TaggedJet_cl"]);
 	//h1["alpha"]->Divide( halloppjets_cl, h1["eff_TaggedJet_cl"]);
 	// beta
 	h1["beta"]->Divide( h1["eff_TaggedBothJets_b"], h1["eff_TaggedJet_b"]);
 	//h1["beta"]->Divide( halloppjets_b, h1["eff_TaggedJet_b"]);
+
 	
 	// kappa_b
 	h1["kappa_b"]->Divide( h1["eff_pTrel_TaggedJet_b"], h1["eff_pTrel_b"]  );
@@ -808,7 +814,7 @@ void S8Plotter::Loop()
 	// kappa_cl
 	h1["kappa_cl"]->Divide( h1["eff_pTrel_TaggedJet_cl"], h1["eff_pTrel_cl"] );
 	h1["kappa_cl"]->Divide(  h1["eff_TaggedJet_cl"] );
-
+	
 	        // eta dependency for the correlations
 
         // alpha
@@ -825,6 +831,7 @@ void S8Plotter::Loop()
         h1["kappa_eta_cl"]->Divide( h1["eff_pTrel_TaggedJet_eta_cl"], h1["eff_pTrel_eta_cl"] );
         h1["kappa_eta_cl"]->Divide(  h1["eff_TaggedJet_eta_cl"] );
 
+	
 	//______________________________________________________
 
 	cv_map["eff_pTrel"] = new TCanvas("eff_pTrel","eff_pTrel",700,700);
@@ -864,7 +871,7 @@ void S8Plotter::Loop()
 	h1["kappa_b"]->Draw("PE1");
 	std::cout << " kappa_b Fit" << std::endl;
 	h1["kappa_b"]->Fit("pol0","0");
-	TF1 *f1_kb = h1["kappa_b"]->GetFunction("pol1");
+	TF1 *f1_kb = h1["kappa_b"]->GetFunction("pol0");
 	f1_kb->SetLineColor(quark_color["b"]);
 	f1_kb->Draw("same");
 	h1["eff_TaggedJet_b"]->SetMarkerStyle(23);
@@ -897,7 +904,7 @@ void S8Plotter::Loop()
 	h1["kappa_cl"]->Draw("PE1");
 	std::cout << " kappa_cl Fit" << std::endl;
 	h1["kappa_cl"]->Fit("pol0","0");
-	TF1 *f1_kcl = h1["kappa_cl"]->GetFunction("pol1");
+	TF1 *f1_kcl = h1["kappa_cl"]->GetFunction("pol0");
 	f1_kcl->SetLineColor(quark_color["c"]);
 	f1_kcl->Draw("same");
 	h1["eff_TaggedJet_cl"]->SetMarkerStyle(23);
@@ -927,7 +934,7 @@ void S8Plotter::Loop()
 	h1["alpha"]->Draw("PE1");
 	std::cout << " alpha Fit" << std::endl;
 	h1["alpha"]->Fit("pol0","0");
-	TF1 *f1_alpha = h1["alpha"]->GetFunction("pol1");
+	TF1 *f1_alpha = h1["alpha"]->GetFunction("pol0");
 	f1_alpha->SetLineColor(quark_color["c"]);
 	f1_alpha->Draw("same");
 	h1["eff_TaggedBothJets_cl"]->SetMarkerStyle(26);
@@ -955,7 +962,7 @@ void S8Plotter::Loop()
 	h1["beta"]->Draw("PE1");
 	std::cout << " beta Fit" << std::endl;
 	h1["beta"]->Fit("pol0","0");
-	TF1 *f1_beta = h1["beta"]->GetFunction("pol1");
+	TF1 *f1_beta = h1["beta"]->GetFunction("pol0");
 	f1_beta->SetLineColor(quark_color["b"]);
 	f1_beta->Draw("same");
 	h1["eff_TaggedBothJets_b"]->SetMarkerStyle(26);
