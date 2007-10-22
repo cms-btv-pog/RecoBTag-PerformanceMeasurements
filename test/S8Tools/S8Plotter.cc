@@ -132,6 +132,10 @@ void S8Plotter::Loop()
 	const Double_t *jetptbins = (fJetPtAxis.GetXbins())->GetArray();
 	int netabins = fJetEtaAxis.GetNbins();
 	const Double_t *jetetabins = (fJetEtaAxis.GetXbins())->GetArray();
+	int ncorrptbins = fCorrPtAxis.GetNbins();
+	const Double_t *corrptbins = (fCorrPtAxis.GetXbins())->GetArray();
+	int ncorretabins = fCorrEtaAxis.GetNbins();
+	const Double_t *corretabins = (fCorrEtaAxis.GetXbins())->GetArray();
 	
 	h2["npT"] = new TH2F("npT","MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["ppT"] = new TH2F("ppT","MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
@@ -190,15 +194,15 @@ void S8Plotter::Loop()
 	h2["cl_qEta"] = new TH2F("cl_qEta","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["cl_qcmbEta"] = new TH2F("cl_qcmbEta","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	
-	h1["alpha"] = new TH1D("alpha","alpha",nptbins,jetptbins);
-	h1["beta"] = new TH1D("beta","beta",nptbins,jetptbins);
-	h1["kappa_cl"] = new TH1D("kappa_cl","kappa_cl",nptbins,jetptbins);
-	h1["kappa_b"] = new TH1D("kappa_b","kappa_b",nptbins,jetptbins);
+	h1["alpha"] = new TH1D("alpha","alpha",ncorrptbins,corrptbins);
+	h1["beta"] = new TH1D("beta","beta",ncorrptbins,corrptbins);
+	h1["kappa_cl"] = new TH1D("kappa_cl","kappa_cl",ncorrptbins,corrptbins);
+	h1["kappa_b"] = new TH1D("kappa_b","kappa_b",ncorrptbins,corrptbins);
 
-	h1["alpha_eta"] = new TH1D("alpha_eta","alpha_eta",netabins,jetetabins);
-	h1["beta_eta"] = new TH1D("beta_eta","beta_eta",netabins,jetetabins);
-	h1["kappa_eta_cl"] = new TH1D("kappa_eta_cl","kappa_eta_cl",netabins,jetetabins);
-	h1["kappa_eta_b"] = new TH1D("kappa_eta_b","kappa_eta_b",netabins,jetetabins);
+	h1["alpha_eta"] = new TH1D("alpha_eta","alpha_eta",ncorretabins,corretabins);
+	h1["beta_eta"] = new TH1D("beta_eta","beta_eta",ncorretabins,corretabins);
+	h1["kappa_eta_cl"] = new TH1D("kappa_eta_cl","kappa_eta_cl",ncorretabins,corretabins);
+	h1["kappa_eta_b"] = new TH1D("kappa_eta_b","kappa_eta_b",ncorretabins,corretabins);
 	
 	// enable errors
 	for(std::map<std::string,TH2* >::const_iterator ih=h2.begin(); ih!=h2.end(); ++ih){
@@ -357,7 +361,7 @@ void S8Plotter::Loop()
 					    p4OppJet.SetPtEtaPhiE(fS8evt->jet_pt[kjet], fS8evt->jet_eta[kjet], fS8evt->jet_phi[kjet], fS8evt->jet_e[kjet] );
 					    double ojetcorr = fS8evt->jetcorrection[kjet];
 					    p4OppJet = ojetcorr * p4OppJet;
-					    int OppJetFlavor = fS8evt->jet_flavour_alg[kjet];
+					    //int OppJetFlavor = fS8evt->jet_flavour_alg[kjet];
 						
 					    if ( !OtherTaggedJet ) {
 					      
@@ -981,53 +985,54 @@ void S8Plotter::Loop()
 
 void S8Plotter::FillHistos(std::string type, TLorentzVector p4Jet, double ptrel, int flavor, bool tagged) {
 
-  h2[type+"pT"]->Fill( p4Jet.Pt() , ptrel );
-  h2[type+"Eta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-  if ( flavor == 5 ) {
-    h2["b_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel );
-    h2["b_"+type+"Eta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-  }
-  if ( (flavor>0 && flavor<5) || flavor==21 ) {
-    h2["cl_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel);
-    h2["cl_"+type+"Eta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-  }
-  if ( flavor == 4 ) { 
-    //h2["c_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel ); 
-  }
-  if ( flavor>0 && flavor<4 ) { 
-    //h2["uds_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel ); 
-  }
-  if ( flavor==21 ) {
-    //h2["g_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel );
-  }
-  
-  if ( tagged ) {
-    h2[type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel );
-    h2[type+"cmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-    if ( flavor == 5 ) {
-      h2["b_"+type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel );
-      h2["b_"+type+"cmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-    }
-    if ( (flavor>0 && flavor<5) || flavor==21 ) {
-      h2["cl_"+type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel);
-      h2["cl_"+type+"cmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
-    }
-    if ( flavor == 4 ) {
-      //h2["c_"+type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel );
-    }
-    if ( flavor>0 && flavor<4 ) {
-      //h2["uds_"+type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel );
-    }
-    if ( flavor==21 ) {
-      //h2["g_"+type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel );
-    }
-
-  }
-  
-
-}
-
+	if ( ( p4Jet.Pt() >= fMinPt ) && (p4Jet.Pt() < fMaxPt ) &&
+		( p4Jet.Eta() >= fMinEta ) && (p4Jet.Eta() < fMaxEta ) ) {
 
 		
+	h2[type+"pT"]->Fill( p4Jet.Pt() , ptrel );
+	h2[type+"Eta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
+	if ( flavor == 5 ) {
+		h2["b_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel );
+		h2["b_"+type+"Eta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
+	}
+	if ( (flavor>0 && flavor<5) || flavor==21 ) {
+		h2["cl_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel);
+		h2["cl_"+type+"Eta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
+	}
+	if ( flavor == 4 ) { 
+		//h2["c_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel ); 
+	}
+	if ( flavor>0 && flavor<4 ) { 
+		//h2["uds_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel ); 
+	}
+	if ( flavor==21 ) {
+		//h2["g_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel );
+	}
+	
+	if ( tagged ) {
+		h2[type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel );
+		h2[type+"cmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
+		if ( flavor == 5 ) {
+			h2["b_"+type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel );
+			h2["b_"+type+"cmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
+		}
+		if ( (flavor>0 && flavor<5) || flavor==21 ) {
+			h2["cl_"+type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel);
+			h2["cl_"+type+"cmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
+		}
+		if ( flavor == 4 ) {
+			//h2["c_"+type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel );
+		}
+		if ( flavor>0 && flavor<4 ) {
+			//h2["uds_"+type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel );
+		}
+		if ( flavor==21 ) {
+			//h2["g_"+type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel );
+		}
+		
+	}
 
+	}
+
+}
 

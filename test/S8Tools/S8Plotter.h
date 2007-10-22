@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8Plotter.h,v 1.7 2007/10/18 05:13:21 yumiceva Exp $
+ * \version $Id: S8Plotter.h,v 1.8 2007/10/18 18:16:30 yumiceva Exp $
  *
  */
 
@@ -60,8 +60,8 @@ class S8Plotter {
 	void SampleName(TString sample) {
 		fsamplename = sample;
 	};
-	void SetPtMin(double value) { fMinPt = value; };
-	void SetPtMax(double value) { fMaxPt = value; };
+	//void SetPtMin(double value) { fMinPt = value; };
+	//void SetPtMax(double value) { fMaxPt = value; };
 	void FillHistos(std::string type, TLorentzVector p4Jet, double ptrel, int flavor, bool tagged);
 	void Print(std::string extension="png",std::string tag="") {
 		if ( tag != "" ) tag = "_"+tag;
@@ -94,6 +94,7 @@ class S8Plotter {
 		
 		foutfile->Write();
 		foutfile->Close();
+		std::cout << " File " << filename << " saved." << std::endl;
 	};
 	//bool IsGoodMuon() {
 	//};
@@ -123,8 +124,26 @@ class S8Plotter {
 		return sqrt(w*(1-w)/p);
 	}
 	void SetAxis(TString name, TAxis axis) {
-	  if (name == "Pt") fJetPtAxis.Set(axis.GetNbins(),(axis.GetXbins())->GetArray());
-	  if (name == "Eta") fJetEtaAxis.Set(axis.GetNbins(),(axis.GetXbins())->GetArray());
+	  if (name == "Pt") {
+		  fJetPtAxis.Set(axis.GetNbins(),(axis.GetXbins())->GetArray());
+		  fMinPt = fJetPtAxis.GetXmin();
+		  fMaxPt = fJetPtAxis.GetXmax();
+	  }
+	  if (name == "Eta") {
+		  fJetEtaAxis.Set(axis.GetNbins(),(axis.GetXbins())->GetArray());
+		  fMinEta = fJetEtaAxis.GetXmin();
+		  fMaxEta = fJetEtaAxis.GetXmax();
+	  }
+	  if (name == "CorrPt") {
+		  fCorrPtAxis.Set(axis.GetNbins(),(axis.GetXbins())->GetArray());
+		  fMinCorrPt = fCorrPtAxis.GetXmin();
+		  fMaxCorrPt = fCorrPtAxis.GetXmax();
+	  }
+	  if (name == "CorrEta") {
+		  fCorrEtaAxis.Set(axis.GetNbins(),(axis.GetXbins())->GetArray());
+		  fMinCorrEta = fCorrEtaAxis.GetXmin();
+		  fMaxCorrEta = fCorrEtaAxis.GetXmax();
+	  }
 	}
 	void PrintInfo();
 	void PrintBins(TString option="Pt") {
@@ -139,6 +158,15 @@ class S8Plotter {
 	      ax = (fJetEtaAxis.GetXbins())->GetArray();
 	      nbins = fJetEtaAxis.GetNbins();
 	    }
+		if (option=="CorrPt") { 
+	      ax = (fCorrPtAxis.GetXbins())->GetArray();
+	      nbins = fCorrPtAxis.GetNbins();
+	    }
+		if (option=="CorrEta") {
+	      ax = (fCorrEtaAxis.GetXbins())->GetArray();
+	      nbins = fCorrEtaAxis.GetNbins();
+	    }
+		
 	    std::cout << option << " binning =" << std::endl;
 	    std::cout << "{";
 	    for( int i=0; i<nbins; ++i) {
@@ -165,8 +193,17 @@ class S8Plotter {
 	TString           fAwaylevel;
 	double            fMinPt;
 	double            fMaxPt;
+	double            fMinEta;
+	double            fMaxEta;
+	double            fMinCorrPt;
+	double            fMaxCorrPt;
+	double            fMinCorrEta;
+	double            fMaxCorrEta;
+	
 	TAxis             fJetPtAxis;
 	TAxis             fJetEtaAxis;
+	TAxis             fCorrPtAxis;
+	TAxis             fCorrEtaAxis;
 	
 	std::map<std::string, TCanvas*> cv_map;
 	std::map<std::string, TH1*> h1;
@@ -227,12 +264,28 @@ S8Plotter::S8Plotter(TString filename)
 	fTrackProbabilityMap["Tight"] = 0.75;
 
 	// default Binning
-	const int nptbins = 13;
-	Double_t jetptbins[nptbins] = {30., 40., 50., 60., 70., 80, 90., 100., 120., 140., 160., 180., 230.};
-	Double_t jetetabins[8] = {0.0,0.25,0.5,0.75,1.0,1.25,1.5,2.0};
-	fJetPtAxis.Set(nptbins-1, jetptbins );
-	fJetEtaAxis.Set(8-1, jetetabins );
-
+	const int nptarray = 14;
+	const int netaarray = 10;
+	const int ncorrptarray = 5;
+	const int ncorretaarray = 5;
+	Double_t jetptbins[nptarray] = {20.,30., 40., 50., 60., 70., 80, 90., 100., 120., 140., 160., 180., 230.};
+	Double_t jetetabins[netaarray] = {0.0,0.25,0.5,0.75,1.0,1.25,1.5,1.75,2.0,2.5};
+	Double_t corrptbins[ncorrptarray] = {20.,40.,60.,80.,230.};
+	Double_t corretabins[ncorrptarray] = {0.,0.5,1.,1.5,2.5};
+	fJetPtAxis.Set(nptarray-1, jetptbins );
+	fJetEtaAxis.Set(netaarray-1, jetetabins );
+	fCorrPtAxis.Set(ncorrptarray-1, corrptbins );
+	fCorrEtaAxis.Set(ncorretaarray-1, corretabins );
+	
+	fMinPt = fJetPtAxis.GetXmin();
+	fMaxPt = fJetPtAxis.GetXmax();
+	fMinEta = fJetEtaAxis.GetXmin();
+	fMaxEta = fJetEtaAxis.GetXmax();
+	fMinCorrPt = fCorrPtAxis.GetXmin();
+	fMaxCorrPt = fCorrPtAxis.GetXmax();
+	fMinCorrEta = fCorrEtaAxis.GetXmin();
+	fMaxCorrEta = fCorrEtaAxis.GetXmax();
+	
 	// eff plots for all discriminator values
 	fperformanceTC2.Set("TC2");
 	fperformanceTC3.Set("TC3");
