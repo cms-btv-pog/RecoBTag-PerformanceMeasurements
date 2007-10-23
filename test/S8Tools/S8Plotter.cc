@@ -151,8 +151,8 @@ void S8Plotter::Loop()
 	h2["ncmbEta"] = new TH2F("ncmbEta","opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["pcmbEta"] = new TH2F("pcmbEta","opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 
-	h2["qEta"] = new TH2F("qEta","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
-	h2["qcmbEta"] = new TH2F("qcmbEta","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.);
+	h2["qEta"] = new TH2F("qEta","other MuTag pT vs pTrel",netabins,jetetabins,50,0.,5.);
+	h2["qcmbEta"] = new TH2F("qcmbEta","other MuTag && Tagger pT vs pTrel",netabins,jetetabins,50,0.,5.);
 	
 	h2["b_npT"] = new TH2F("b_npT","b MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["b_ppT"] = new TH2F("b_ppT","b MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
@@ -194,6 +194,16 @@ void S8Plotter::Loop()
 	h2["cl_qEta"] = new TH2F("cl_qEta","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["cl_qcmbEta"] = new TH2F("cl_qcmbEta","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	
+	h1["alpha"] = new TH1D("alpha","alpha",nptbins,jetptbins);
+	h1["beta"] = new TH1D("beta","beta",nptbins,jetptbins);
+	h1["kappa_cl"] = new TH1D("kappa_cl","kappa_cl",nptbins,jetptbins);
+	h1["kappa_b"] = new TH1D("kappa_b","kappa_b",nptbins,jetptbins);
+
+	h1["alpha_eta"] = new TH1D("alpha_eta","alpha_eta",netabins,jetetabins);
+	h1["beta_eta"] = new TH1D("beta_eta","beta_eta",netabins,jetetabins);
+	h1["kappa_eta_cl"] = new TH1D("kappa_eta_cl","kappa_eta_cl",netabins,jetetabins);
+	h1["kappa_eta_b"] = new TH1D("kappa_eta_b","kappa_eta_b",netabins,jetetabins);
+/*
 	h1["alpha"] = new TH1D("alpha","alpha",ncorrptbins,corrptbins);
 	h1["beta"] = new TH1D("beta","beta",ncorrptbins,corrptbins);
 	h1["kappa_cl"] = new TH1D("kappa_cl","kappa_cl",ncorrptbins,corrptbins);
@@ -203,7 +213,7 @@ void S8Plotter::Loop()
 	h1["beta_eta"] = new TH1D("beta_eta","beta_eta",ncorretabins,corretabins);
 	h1["kappa_eta_cl"] = new TH1D("kappa_eta_cl","kappa_eta_cl",ncorretabins,corretabins);
 	h1["kappa_eta_b"] = new TH1D("kappa_eta_b","kappa_eta_b",ncorretabins,corretabins);
-	
+*/
 	// enable errors
 	for(std::map<std::string,TH2* >::const_iterator ih=h2.begin(); ih!=h2.end(); ++ih){
 		TH2 *htemp = ih->second;
