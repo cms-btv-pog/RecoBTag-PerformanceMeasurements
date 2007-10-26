@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8Plotter.h,v 1.8 2007/10/18 18:16:30 yumiceva Exp $
+ * \version $Id: S8Plotter.h,v 1.9 2007/10/22 18:47:37 yumiceva Exp $
  *
  */
 
@@ -216,7 +216,8 @@ class S8Plotter {
 	std::map< TString, float > fTrackCountingMap; // discriminator cut and level
 	std::map< TString, float > fTrackProbabilityMap; // discriminator cut and level
 	std::map< TString, float > fbTaggerMap; // point to the selected tagger
-
+	std::map< TString, float > fbAwayTaggerMap; // point to the selected tagger
+	
 	S8bPerformance fperformanceTC2;
 	S8bPerformance fperformanceTC3;
 	S8bPerformance fperformanceTP;
@@ -376,10 +377,16 @@ Long64_t S8Plotter::LoadTree(Long64_t entry)
 void S8Plotter::Init()
 {
 	// check b-tagging
-	if ( ftagger == "TrackCounting" ) fbTaggerMap = fTrackCountingMap;
+	if ( ftagger == "TrackCounting" ) 		  fbTaggerMap = fTrackCountingMap;
 	else if ( ftagger == "TrackProbability" ) fbTaggerMap = fTrackProbabilityMap;
 	else { 
 	  std::cout << " No b tagger " << ftagger << " available, options are: TrackCounting, TrackProbability" << std::endl;
+	  exit(1);//gApplication->Terminate(); 
+	}
+	if ( fAwaytagger == "TrackCounting" ) 		  fbAwayTaggerMap = fTrackCountingMap;
+	else if ( fAwaytagger == "TrackProbability" ) fbAwayTaggerMap = fTrackProbabilityMap;
+	else { 
+	  std::cout << " No b tagger, for away jet, " << ftagger << " available, options are: TrackCounting, TrackProbability" << std::endl;
 	  exit(1);//gApplication->Terminate(); 
 	}
 

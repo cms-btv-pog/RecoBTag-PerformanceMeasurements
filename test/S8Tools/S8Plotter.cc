@@ -167,8 +167,8 @@ void S8Plotter::Loop()
 	h2["b_ncmbEta"] = new TH2F("b_ncmbEta","b opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["b_pcmbEta"] = new TH2F("b_pcmbEta","b opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 
-	h2["b_qEta"] = new TH2F("b_qEta","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
-	h2["b_qcmbEta"] = new TH2F("b_qcmbEta","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.);
+	h2["b_qEta"] = new TH2F("b_qEta","other MuTag pT vs pTrel",netabins,jetetabins,50,0.,5.);
+	h2["b_qcmbEta"] = new TH2F("b_qcmbEta","other MuTag && Tagger pT vs pTrel",netabins,jetetabins,50,0.,5.);
 	
 	
 	h2["cl_npT"] = new TH2F("cl_npT","cl MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
@@ -191,8 +191,8 @@ void S8Plotter::Loop()
 	h2["cl_ncmbEta"] = new TH2F("cl_ncmbEta","cl opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["cl_pcmbEta"] = new TH2F("cl_pcmbEta","cl opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 
-	h2["cl_qEta"] = new TH2F("cl_qEta","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
-	h2["cl_qcmbEta"] = new TH2F("cl_qcmbEta","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.);
+	h2["cl_qEta"] = new TH2F("cl_qEta","other MuTag pT vs pTrel",netabins,jetetabins,50,0.,5.);
+	h2["cl_qcmbEta"] = new TH2F("cl_qcmbEta","other MuTag && Tagger pT vs pTrel",netabins,jetetabins,50,0.,5.);
 	
 	h1["alpha"] = new TH1D("alpha","alpha",nptbins,jetptbins);
 	h1["beta"] = new TH1D("beta","beta",nptbins,jetptbins);
@@ -372,21 +372,22 @@ void S8Plotter::Loop()
 					    double ojetcorr = fS8evt->jetcorrection[kjet];
 					    p4OppJet = ojetcorr * p4OppJet;
 					    //int OppJetFlavor = fS8evt->jet_flavour_alg[kjet];
+						if ( p4OppJet.Pt() < 20. ) continue;
 						
 					    if ( !OtherTaggedJet ) {
 					      
 							bool isbTaggedOtherJet = false;
 							if ( fAwaytagger == "TrackCounting" ) {
 								if ( fAwaylevel == "Tight" ) {
-									if ( fS8evt->btag_TrkCounting_disc3D_3trk[kjet] > fbTaggerMap["Tight"] ) isbTaggedOtherJet = true;
+									if ( fS8evt->btag_TrkCounting_disc3D_3trk[kjet] > fbAwayTaggerMap["Tight"] ) isbTaggedOtherJet = true;
 								} else {
-									if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[fAwaylevel] << std::endl;
-									if ( fS8evt->btag_TrkCounting_disc3D_2trk[kjet] > fbTaggerMap[fAwaylevel] ) isbTaggedOtherJet = true;
+									if (fVerbose) std::cout << "discriminator= " << fbAwayTaggerMap[fAwaylevel] << std::endl;
+									if ( fS8evt->btag_TrkCounting_disc3D_2trk[kjet] > fbAwayTaggerMap[fAwaylevel] ) isbTaggedOtherJet = true;
 
 								}
 							}
 							if ( fAwaytagger == "TrackProbability" ) {
-								if ( fS8evt->btag_JetProb_disc3D[kjet] > fbTaggerMap[fAwaylevel] ) isbTaggedOtherJet = true;
+								if ( fS8evt->btag_JetProb_disc3D[kjet] > fbAwayTaggerMap[fAwaylevel] ) isbTaggedOtherJet = true;
 							}
 					      
 							if (isbTaggedOtherJet) {
@@ -439,15 +440,15 @@ void S8Plotter::Loop()
 								  bool isbTaggedOtherMuJet = false;
 								  if ( fAwaytagger == "TrackCounting" ) {
 									  if ( fAwaylevel == "Tight" ) {
-										  if ( fS8evt->btag_TrkCounting_disc3D_3trk[ijet] > fbTaggerMap["Tight"] ) isbTaggedOtherMuJet = true;
+										  if ( fS8evt->btag_TrkCounting_disc3D_3trk[ijet] > fbAwayTaggerMap["Tight"] ) isbTaggedOtherMuJet = true;
 									  } else {
-										  if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[fAwaylevel] << std::endl;
-										  if ( fS8evt->btag_TrkCounting_disc3D_2trk[ijet] > fbTaggerMap[fAwaylevel] ) isbTaggedOtherMuJet = true;
+										  if (fVerbose) std::cout << "discriminator= " << fbAwayTaggerMap[fAwaylevel] << std::endl;
+										  if ( fS8evt->btag_TrkCounting_disc3D_2trk[ijet] > fbAwayTaggerMap[fAwaylevel] ) isbTaggedOtherMuJet = true;
 										  
 									  }
 								  }
 								  if ( fAwaytagger == "TrackProbability" ) {
-									  if ( fS8evt->btag_JetProb_disc3D[ijet] > fbTaggerMap[fAwaylevel] ) isbTaggedOtherMuJet = true;
+									  if ( fS8evt->btag_JetProb_disc3D[ijet] > fbAwayTaggerMap[fAwaylevel] ) isbTaggedOtherMuJet = true;
 								  }
 
 								  FillHistos("q",p4MuJet, ptrel, JetFlavor, isbTaggedOtherMuJet);
