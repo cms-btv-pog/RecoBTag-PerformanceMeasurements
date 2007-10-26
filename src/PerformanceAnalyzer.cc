@@ -585,9 +585,9 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			int goodtrksInJet3D = 0;
 			//search all tracks with an IPs > -10
 			for(int n=0; n < NtrksInJet ; ++n) {
-				if( TrkCountingInfo[ith_tagged].significance(n,1)  > -9.)
+				if( TrkCountingInfo[ith_tagged].significance(n,1)  > -99.)
 					goodtrksInJet2D++;
-				if( TrkCountingInfo[ith_tagged].significance(n,0)  > -9.)
+				if( TrkCountingInfo[ith_tagged].significance(n,0)  > -99.)
 					goodtrksInJet3D++;
 			}
             //an example of how can we get the 3 tracks with the smallests IPs
@@ -607,13 +607,28 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			*/
 			if( goodtrksInJet3D > 2 ) {
 				fS8evt->btag_NegTag_disc3D_1trk.push_back(
-					TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-3,0) ); //3D
+					TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-3,0) ); //3D	
+				//std::cout << "test -3   " << TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-3,0) << std::endl;
+
 				fS8evt->btag_NegTag_disc3D_2trk.push_back(
 					TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-2,0) );
+				//std::cout << "test -2   " << TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-2,0) << std::endl;
 				fS8evt->btag_NegTag_disc3D_3trk.push_back(
 					TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-1,0) );
+				//std::cout << "test -1   " << TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-1,0) << std::endl;
 				
-			} else {
+			} 
+			if(goodtrksInJet3D ==2) {
+				fS8evt->btag_NegTag_disc3D_1trk.push_back( -9999. );
+
+				fS8evt->btag_NegTag_disc3D_2trk.push_back(
+					TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-2,0) );
+				//std::cout << "test -2   " << TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-2,0) << std::endl;
+				fS8evt->btag_NegTag_disc3D_3trk.push_back(
+					TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-1,0) );
+				//std::cout << "test -1   " << TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-1,0) << std::endl;
+			}
+			if(goodtrksInJet3D<2) {
 				fS8evt->btag_NegTag_disc3D_1trk.push_back( -9999. );
 				fS8evt->btag_NegTag_disc3D_2trk.push_back( -9999. );
 				fS8evt->btag_NegTag_disc3D_3trk.push_back( -9999. );
