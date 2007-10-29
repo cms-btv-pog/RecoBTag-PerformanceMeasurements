@@ -75,6 +75,20 @@ void S8Plotter::Book() {
 		h1[hname] = new TH1D(hname.c_str(),htitle.c_str(), fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray() );
 		h1[hname]->SetLineColor( quark_color[quark_label[i]] );
 	}
+	htitle = "jet |#eta|";
+	for( size_t i = 0; i != quark_label.size(); ++i ) {
+		hname = "jet_eta"; 
+		if (i!=0) hname += "_"+quark_label[i];
+		h1[hname] = new TH1D(hname.c_str(),htitle.c_str(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() );
+		h1[hname]->SetLineColor( quark_color[quark_label[i]] );
+	}
+	htitle = "jet |#eta|";
+	for( size_t i = 0; i != quark_label.size(); ++i ) {
+		hname = "taggedjet_eta"; 
+		if (i!=0) hname += "_"+quark_label[i];
+		h1[hname] = new TH1D(hname.c_str(),htitle.c_str(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() );
+		h1[hname]->SetLineColor( quark_color[quark_label[i]] );
+	}
 	
 	hname = "jet_deltar"; 
 	htitle = "#Delta R";
@@ -294,7 +308,7 @@ void S8Plotter::Loop()
 			p4Jet = jetcorr * p4Jet;
 
 			//// Jet Selection /////
-			if ( p4Jet.Pt() < 20. ) continue;
+			if ( p4Jet.Pt() <= 20. ) continue;
 			
 			// get MC flavor of jet
 			JetFlavor = fS8evt->jet_flavour_alg[ijet];
@@ -302,7 +316,7 @@ void S8Plotter::Loop()
 			nmultiple_muons = 0;
 			bool passGoodMuon = false;
 			if ( fS8evt->jet_hasLepton[ijet] == 1 && fS8evt->njets>1 ) {
-					
+			//if ( fS8evt->jet_hasLepton[ijet] == 1 ) {		
 			  // get a muon
 			  BTagLeptonEvent Muons = fS8evt->lepton[ijet];	
 					
@@ -440,15 +454,15 @@ void S8Plotter::Loop()
 								  bool isbTaggedOtherMuJet = false;
 								  if ( fAwaytagger == "TrackCounting" ) {
 									  if ( fAwaylevel == "Tight" ) {
-										  if ( fS8evt->btag_TrkCounting_disc3D_3trk[ijet] > fbAwayTaggerMap["Tight"] ) isbTaggedOtherMuJet = true;
+										  if ( fS8evt->btag_TrkCounting_disc3D_3trk[kjet] > fbAwayTaggerMap["Tight"] ) isbTaggedOtherMuJet = true;
 									  } else {
 										  if (fVerbose) std::cout << "discriminator= " << fbAwayTaggerMap[fAwaylevel] << std::endl;
-										  if ( fS8evt->btag_TrkCounting_disc3D_2trk[ijet] > fbAwayTaggerMap[fAwaylevel] ) isbTaggedOtherMuJet = true;
+										  if ( fS8evt->btag_TrkCounting_disc3D_2trk[kjet] > fbAwayTaggerMap[fAwaylevel] ) isbTaggedOtherMuJet = true;
 										  
 									  }
 								  }
 								  if ( fAwaytagger == "TrackProbability" ) {
-									  if ( fS8evt->btag_JetProb_disc3D[ijet] > fbAwayTaggerMap[fAwaylevel] ) isbTaggedOtherMuJet = true;
+									  if ( fS8evt->btag_JetProb_disc3D[kjet] > fbAwayTaggerMap[fAwaylevel] ) isbTaggedOtherMuJet = true;
 								  }
 
 								  FillHistos("q",p4MuJet, ptrel, JetFlavor, isbTaggedOtherMuJet);
@@ -465,21 +479,26 @@ void S8Plotter::Loop()
 	       		
 			// Fill histograms for all jets
 			h1["jet_pt"]->Fill( p4Jet.Pt() );
+			h1["jet_eta"]->Fill( p4Jet.Eta() );
 			if ( JetFlavor == 5 ) {
 			  totalJets["b"]++;
 			  h1["jet_pt_b"]->Fill( p4Jet.Pt() );
+			  h1["jet_eta_b"]->Fill( p4Jet.Eta() );
 			}
 			if ( JetFlavor == 4 ) {
 			  totalJets["c"]++;
 			  h1["jet_pt_c"]->Fill( p4Jet.Pt() );
+			  h1["jet_eta_c"]->Fill( p4Jet.Eta() );
 			}
 			if ( JetFlavor>0 && JetFlavor<4 ) {
 			  totalJets["uds"]++;
 			  h1["jet_pt_uds"]->Fill( p4Jet.Pt() );
+			  h1["jet_eta_uds"]->Fill( p4Jet.Eta() );
 			}
 			if ( JetFlavor==21 ) {
 			  totalJets["g"]++;
 			  h1["jet_pt_g"]->Fill( p4Jet.Pt() );
+			  h1["jet_eta_g"]->Fill( p4Jet.Eta() );
 			}
 			bool ataggedjet = false;
 			if ( ftagger == "TrackCounting" ) {
@@ -496,21 +515,26 @@ void S8Plotter::Loop()
 			}
 			if (ataggedjet) {
 			  h1["taggedjet_pt"]->Fill( p4Jet.Pt() );
+			  h1["taggedjet_eta"]->Fill( p4Jet.Eta() );
 			  if ( JetFlavor == 5 ) {
 			    totalTagged["b"]++;
 			    h1["taggedjet_pt_b"]->Fill( p4Jet.Pt() );
+				h1["taggedjet_eta_b"]->Fill( p4Jet.Eta() );
 			  }
 			  if ( JetFlavor == 4 ) {
 			    totalTagged["c"]++;
 			    h1["taggedjet_pt_c"]->Fill( p4Jet.Pt() );
+				h1["taggedjet_eta_c"]->Fill( p4Jet.Eta() );
 			  }
 			  if ( JetFlavor>0 && JetFlavor<4 ) {
 			    totalTagged["uds"]++;
 			    h1["taggedjet_pt_uds"]->Fill( p4Jet.Pt() );
+				h1["taggedjet_eta_uds"]->Fill( p4Jet.Eta() );
 			  }
 			  if ( JetFlavor==21 ) {
 			    totalTagged["g"]++;
 			    h1["taggedjet_pt_g"]->Fill( p4Jet.Pt() );
+				h1["taggedjet_eta_g"]->Fill( p4Jet.Eta() );
 			  }
 			}
 			
@@ -568,17 +592,19 @@ void S8Plotter::Loop()
 											fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("udsgErr").GetArray());
 	
 	
-	multiTC2 = new TMultiGraph();
+	//multiTC2 = new TMultiGraph();
 	multiTC3 = new TMultiGraph();
 	multiTP = new TMultiGraph();
 
-	multiTC2->Add(gTC2_b,"p");
-	multiTC2->Add(gTC2_c,"p");
-	multiTC2->Add(gTC2_udsg,"p");
-	multiTC3->Add(gTC3_b,"p");
+	// put TC2 and TC3 in one plot
+	
+	//multiTC2->Add(gTC2_b,"p");
+	multiTC3->Add(gTC2_c,"p");
+	multiTC3->Add(gTC2_udsg,"p");
+	//multiTC3->Add(gTC3_b,"p");
 	multiTC3->Add(gTC3_c,"p");
 	multiTC3->Add(gTC3_udsg,"p");
-	multiTP->Add(gTP_b,"p");
+	//multiTP->Add(gTP_b,"p");
 	multiTP->Add(gTP_c,"p");
 	multiTP->Add(gTP_udsg,"p");
 	gTC2_b->SetMarkerColor(quark_color["b"]);
@@ -592,21 +618,21 @@ void S8Plotter::Loop()
 	gTP_udsg->SetMarkerColor(quark_color["uds"]);
 	
 	gTC2_b->SetMarkerStyle(20);
-	gTC2_c->SetMarkerStyle(22);
-	gTC2_udsg->SetMarkerStyle(23);
+	gTC2_c->SetMarkerStyle(24);
+	gTC2_udsg->SetMarkerStyle(26);
 	gTC3_b->SetMarkerStyle(20);
 	gTC3_c->SetMarkerStyle(22);
 	gTC3_udsg->SetMarkerStyle(23);
 	gTP_b->SetMarkerStyle(20);
 	gTP_c->SetMarkerStyle(22);
 	gTP_udsg->SetMarkerStyle(23);
-	
+	/*
 	TLegend *legtc2 = new TLegend(0.65,0.65,0.85,0.85,"","NDC");
 	legtc2->SetFillColor(10);
-	legtc2->AddEntry(gTC2_b,"b-jet","P");
+	//legtc2->AddEntry(gTC2_b,"b-jet","P");
 	legtc2->AddEntry(gTC2_c,"c-jet","P");
 	legtc2->AddEntry(gTC2_udsg,"udsg-jet","P");
-	legtc2->SetHeader("TrkCounting 2nd trk");
+	legtc2->SetHeader("TrkCounting");
 	cv_map["bPerformanceTC2"] = new TCanvas("bPerformanceTC2","bPerformanceTC2",700,700);
 	multiTC2->Draw("a");
 	multiTC2->GetXaxis()->SetTitle("b-jet efficiency");
@@ -616,12 +642,15 @@ void S8Plotter::Loop()
 	gPad->SetLogy();
 	gPad->SetGrid();
 	legtc2->Draw();
+	*/
 	TLegend *legtc3 = new TLegend(0.65,0.65,0.85,0.85,"","NDC");
 	legtc3->SetFillColor(10);
-	legtc3->AddEntry(gTC2_b,"b-jet","P");
-	legtc3->AddEntry(gTC2_c,"c-jet","P");
-	legtc3->AddEntry(gTC2_udsg,"udsg-jet","P");
-	legtc3->SetHeader("TrkCounting 3rd trk");
+	//legtc3->AddEntry(gTC2_b,"b-jet","P");
+	legtc3->AddEntry(gTC2_c,"TC2 c-jet","P");
+	legtc3->AddEntry(gTC2_udsg,"TC2 udsg-jet","P");
+	legtc3->AddEntry(gTC3_c,"TC3 c-jet","P");
+	legtc3->AddEntry(gTC3_udsg,"TC3 udsg-jet","P");
+	legtc3->SetHeader("TrkCounting");
 	cv_map["bPerformanceTC3"] = new TCanvas("bPerformanceTC3","bPerformanceTC3",700,700);
 	multiTC3->Draw("a");
 	multiTC3->GetXaxis()->SetTitle("b-jet efficiency");
@@ -633,7 +662,7 @@ void S8Plotter::Loop()
 	legtc3->Draw();
 	TLegend *legtp = new TLegend(0.65,0.65,0.85,0.85,"","NDC");
 	legtp->SetFillColor(10);
-	legtp->AddEntry(gTC2_b,"b-jet","P");
+	//legtp->AddEntry(gTC2_b,"b-jet","P");
 	legtp->AddEntry(gTC2_c,"c-jet","P");
 	legtp->AddEntry(gTC2_udsg,"udsg-jet","P");
 	legtp->SetHeader("TrkProbability");
@@ -997,8 +1026,8 @@ void S8Plotter::Loop()
 void S8Plotter::FillHistos(std::string type, TLorentzVector p4Jet, double ptrel, int flavor, bool tagged) {
 
 	if ( ( p4Jet.Pt() >= fMinPt ) && (p4Jet.Pt() < fMaxPt ) &&
-		( p4Jet.Eta() >= fMinEta ) && (p4Jet.Eta() < fMaxEta ) ) {
-
+		 ( TMath::Abs(p4Jet.Eta()) >= fMinEta ) && (TMath::Abs(p4Jet.Eta()) < fMaxEta ) ) {
+			
 		
 	h2[type+"pT"]->Fill( p4Jet.Pt() , ptrel );
 	h2[type+"Eta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );

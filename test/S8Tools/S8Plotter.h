@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8Plotter.h,v 1.9 2007/10/22 18:47:37 yumiceva Exp $
+ * \version $Id: S8Plotter.h,v 1.10 2007/10/26 21:09:25 yumiceva Exp $
  *
  */
 
@@ -265,11 +265,12 @@ S8Plotter::S8Plotter(TString filename)
 	fTrackProbabilityMap["Tight"] = 0.75;
 
 	// default Binning
-	const int nptarray = 14;
+	const int nptarray = 12;
 	const int netaarray = 10;
 	const int ncorrptarray = 5;
 	const int ncorretaarray = 5;
-	Double_t jetptbins[nptarray] = {20.,30., 40., 50., 60., 70., 80, 90., 100., 120., 140., 160., 180., 230.};
+	Double_t jetptbins[nptarray] = {20.,30., 40., 50., 60., 70., 80, 90., 100., 120., 140., 230.};
+//{20.,30., 40., 50., 60., 70., 80, 90., 100., 120., 140., 160., 180., 230.};
 	Double_t jetetabins[netaarray] = {0.0,0.25,0.5,0.75,1.0,1.25,1.5,1.75,2.0,2.5};
 	Double_t corrptbins[ncorrptarray] = {20.,40.,60.,80.,230.};
 	Double_t corretabins[ncorrptarray] = {0.,0.5,1.,1.5,2.5};
