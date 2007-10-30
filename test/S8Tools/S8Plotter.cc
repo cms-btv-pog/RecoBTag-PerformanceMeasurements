@@ -233,6 +233,10 @@ void S8Plotter::Loop()
 		TH2 *htemp = ih->second;
 		htemp->Sumw2();
 	}
+	for(std::map<std::string,TH1* >::const_iterator ih=h1.begin(); ih!=h1.end(); ++ih){
+		TH1 *htemp = ih->second;
+		htemp->Sumw2();
+	}
 
 	// variable definitions
 	std::map<std::string, double> totalTagged; // total tagged jets

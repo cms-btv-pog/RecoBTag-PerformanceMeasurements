@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8Plotter.h,v 1.10 2007/10/26 21:09:25 yumiceva Exp $
+ * \version $Id: S8Plotter.h,v 1.11 2007/10/29 18:31:35 yumiceva Exp $
  *
  */
 
@@ -114,7 +114,7 @@ class S8Plotter {
 		delete gTP_b;
 		delete gTP_c;
 		delete gTP_udsg;
-		delete multiTC2;
+		//delete multiTC2;
 		delete multiTC3;
 		delete multiTP;
 	}
