@@ -8,11 +8,14 @@
 #include<map>
 #include<iostream>
 
+// InclName=
+// systName=
+// sample = "TCL"
 void SemileptonicSL(TString InclName, TString SemiName, TString SystName, TString sample) {
 
   gROOT->SetStyle("CMS");
 
-  TString path = "";//"~/lpcbtag/PerformanceMeasurements/2007_Oct_9_13X/histogramsV3/";
+  TString path = "~/lpcbtag/PerformanceMeasurements/2007_Oct_9_13X/histogramsV4/";
 	
 	std::map<TString, TCanvas*> cv_map;
 	
@@ -135,24 +138,36 @@ void SemileptonicSL(TString InclName, TString SemiName, TString SystName, TStrin
 	//TH1D * delta_pt = (TH1D*) jet_pt_b_S->Clone("delta_pt");
 	//delta_pt->Reset();
 	//delta_pt->Sumw2();
+	double minsyst = 999999.;
+	double maxsyst = -1.;
 	for (int i=1; i<=eff_pt_b_I->GetNbinsX(); ++i) {
 	  double delta_pt = TMath::Abs(eff_pt_b_I->GetBinContent(i) - eff_pt_b_syst->GetBinContent(i))/(eff_pt_b_S->GetBinContent(i));
 	  double error = scale_pt->GetBinError(i);
-	  std::cout << "stat= " << error << " syst= " << delta_pt << std::endl;
+	  std::cout << " pt bin # " << i << " stat= " << error << " syst= " << delta_pt << std::endl;
 	  scale_pt->SetBinError(i, TMath::Sqrt(error*error+delta_pt*delta_pt));
+	  if (minsyst > delta_pt && i>1) minsyst = delta_pt;
+	  if (maxsyst < delta_pt && i>1) maxsyst = delta_pt;
 	}
+	std::cout << " pt min syst = " << minsyst << std::endl;
+	std::cout << " pt max syst = " << maxsyst << std::endl;
 	
 	eff_eta_b_I->Divide(taggedjet_eta_b_I,jet_eta_b_I,1.,1.,"B");
 	eff_eta_b_S->Divide(taggedjet_eta_b_S,jet_eta_b_S,1.,1.,"B");
 	scale_eta->Divide(eff_eta_b_I,eff_eta_b_S);
-	eff_eta_b_syst->Divide(taggedjet_eta_b_syst,jet_eta_b_syst,1.,1.,"B"); 
+	eff_eta_b_syst->Divide(taggedjet_eta_b_syst,jet_eta_b_syst,1.,1.,"B");
+	minsyst = 999999.;
+	maxsyst = -1.;
 	for (int i=1; i<=eff_eta_b_I->GetNbinsX(); ++i) { 
           double delta_pt = TMath::Abs(eff_eta_b_I->GetBinContent(i) - eff_eta_b_syst->GetBinContent(i))/(eff_eta_b_S->GetBinContent(i)); 
           double error = scale_eta->GetBinError(i); 
-	  std::cout << "eta stat= " << error << " syst= " << delta_pt << std::endl; 
-          scale_eta->SetBinError(i, TMath::Sqrt(error*error+delta_pt*delta_pt)); 
-        } 
-
+		  std::cout << "eta bin # " << i << " stat= " << error << " syst= " << delta_pt << std::endl; 
+          scale_eta->SetBinError(i, TMath::Sqrt(error*error+delta_pt*delta_pt));
+		  if (minsyst > delta_pt) minsyst = delta_pt;
+		  if (maxsyst < delta_pt) maxsyst = delta_pt;
+	} 
+	std::cout << " eta min syst = " << minsyst << std::endl;
+	std::cout << " eta max syst = " << maxsyst << std::endl;
+	
 	
 	//std::cout << "hola4" << std::endl;
 	

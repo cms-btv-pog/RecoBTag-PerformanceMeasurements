@@ -7,3 +7,9 @@
 
 <library file=S8Tools/S8Plotter.cc name=S8Plotter>
 </library>
+
+<library file=S8Solver/*.cc name=S8Solver>
+<use name=root>
+<use name=rootminuit2> 
+<use name=clhep> 
+</library>
