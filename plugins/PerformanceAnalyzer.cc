@@ -32,6 +32,8 @@
 
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 
+#include "PhysicsTools/Utilities/interface/DeltaR.h"
+
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 
 #include "SimTracker/Records/interface/TrackAssociatorRecord.h"
@@ -49,8 +51,8 @@
 #include "CLHEP/HepMC/GenVertex.h"
 
 // HepPDT // for simtracks
-#include "SimGeneral/HepPDT/interface/HepPDTable.h"
-#include "SimGeneral/HepPDT/interface/HepParticleData.h"
+//#include "SimGeneral/HepPDT/interface/HepPDTable.h"
+//#include "SimGeneral/HepPDT/interface/HepParticleData.h"
 
 // Root
 #include "TH1.h"
@@ -136,9 +138,14 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
   bTaggerList_ = iConfig.getUntrackedParameter<std::vector<std::string> >("bTaggerList");
   fnselectors= bTaggerList_.size();
   for(std::vector<std::string>::iterator objectName = bTaggerList_.begin(); objectName != bTaggerList_.end(); ++objectName) {
-	  if ( *objectName == "TrackCounting" ) {
+	  if ( *objectName == "TrackCountingHighEff" ) {
 		  
-		  moduleLabel_.push_back("trackCountingJetTags");
+		  moduleLabel_.push_back("trackCountingHighEffJetTags");
+		 
+	  }
+	  if ( *objectName == "TrackCountingHighPur" ) {
+		  
+		  moduleLabel_.push_back("trackCountingHighPurJetTags");
 		 
 	  }
 	  if ( *objectName == "TrackProbability" ) {
@@ -235,19 +242,37 @@ reco::GenJet PerformanceAnalyzer::GetGenJet(reco::CaloJet calojet, reco::GenJetC
   return matchedJet;
 }
 
-int PerformanceAnalyzer::TaggedJet(reco::CaloJet calojet, reco::JetTagCollection taggedColl) {
+int PerformanceAnalyzer::TaggedJet(reco::CaloJet calojet, edm::Handle<std::vector<reco::JetTag> > jetTags ) {
 	
 	double small = 1.e-5;
 	int result = -1; // no tagged
 	int ith = 0;
 
 	//std::cout << "calo jet: pz = " << calojet.pz() << " pt = " << calojet.pt() << std::endl;
+	//for (size_t k=0; k<jetTags_testManyByType.size(); k++) {
+	//  edm::Handle<std::vector<reco::JetTag> > jetTags = jetTags_testManyByType[k];
+
+	//get label and module names
+	std::string moduleLabel = (jetTags).provenance()->moduleLabel();
+
+	for (size_t t = 0; t < jetTags->size(); ++t) {
+		edm::RefToBase<reco::Jet> jet_p = (*jetTags)[t].jet();
+		if (jet_p.isNull()) {
+			/*std::cout << "-----------> JetTag::jet() returned null reference" << std::endl; */
+			continue;
+		}
+		if (DeltaR<reco::Candidate>()( calojet, *jet_p ) < small) {
+			
+			result = ith;
+			
+		}				
+	}
+	/*
+
 	
-	for ( reco::JetTagCollection::const_iterator jetTag = taggedColl.begin(); jetTag != taggedColl.end(); ++jetTag ) {
-		
-	  
-		double deltar  = ROOT::Math::VectorUtil::DeltaR( calojet.p4().Vect(), (*jetTag).jet().p4().Vect() );
-		double deltapt = std::abs( calojet.pt() - (*jetTag).jet().pt() );
+	for ( reco::JetTagCollection::const_iterator jetTag = taggedColl.begin(); jetTag != taggedColl.end(); ++jetTag ) {		
+		double deltar  = ROOT::Math::VectorUtil::DeltaR( calojet.p4().Vect(), (*jetTag).jet()->p4().Vect() );
+		double deltapt = std::abs( calojet.pt() - (*jetTag).jet()->pt() );
 		//std::cout << "   deltar = " << deltar << "  deltapt = " << deltapt << std::endl;
 		// check if calo jet is a tagged jet
 		if ( deltar < 0.05 && deltapt < small ) {
@@ -256,7 +281,8 @@ int PerformanceAnalyzer::TaggedJet(reco::CaloJet calojet, reco::JetTagCollection
 		}
 		ith++;
 	}
-
+	*/
+	
 	//if (result==-1) std::cout << " no jet tagged" << std::endl;
 	
 	return result;
@@ -372,23 +398,30 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	//const TrackingParticleCollection tPC = *(TPCollectionH.product());
 
 	// Tag Jets
-	edm::Handle<reco::JetTagCollection> tagHandle;
+	std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType ;
+	iEvent.getManyByType(jetTags_testManyByType);
+	// Define the handles for the specific algorithms
+	//edm::Handle<reco::SoftLeptonTagInfoCollection> jetsInfoHandle_sl;
+	//edm::Handle<reco::TrackProbabilityTagInfoCollection> jetsInfoHandleTP;
+	//edm::Handle<reco::TrackCountingTagInfoCollection> jetsInfoHandleTC;
+	
+	//edm::Handle<reco::JetTagCollection> tagHandle;
 	//	const reco::JetTagCollection & btagCollTC;
 	//const reco::JetTagCollection & btagCollTP;
 
 	// Track Counting
-	iEvent.getByLabel(moduleLabel_[0], tagHandle);
-	const reco::JetTagCollection &btagCollTC = *(tagHandle.product());
-	edm::Handle<reco::TrackCountingTagInfoCollection> tagInfoHandleTC;
-	iEvent.getByLabel(moduleLabel_[0], tagInfoHandleTC);
-	const reco::TrackCountingTagInfoCollection & TrkCountingInfo = *(tagInfoHandleTC.product());
+	//iEvent.getByLabel(moduleLabel_[0], tagHandle);
+	//const reco::JetTagCollection &btagCollTC = *(tagHandle.product());
+	//edm::Handle<reco::TrackCountingTagInfoCollection> tagInfoHandleTC;
+	//iEvent.getByLabel(moduleLabel_[0], tagInfoHandleTC);
+	//const reco::TrackCountingTagInfoCollection & TrkCountingInfo = *(tagInfoHandleTC.product());
 	
 	// Track Probability
-	iEvent.getByLabel(moduleLabel_[1], tagHandle);
-	const reco::JetTagCollection &btagCollTP = *(tagHandle.product());
-	edm::Handle<reco::TrackProbabilityTagInfoCollection> tagInfoHandleTP;
-	iEvent.getByLabel(moduleLabel_[1], tagInfoHandleTP);
-	const reco::TrackProbabilityTagInfoCollection & JetProbInfo = *(tagInfoHandleTP.product());
+	//iEvent.getByLabel(moduleLabel_[1], tagHandle);
+	//const reco::JetTagCollection &btagCollTP = *(tagHandle.product());
+	//edm::Handle<reco::TrackProbabilityTagInfoCollection> tagInfoHandleTP;
+	//iEvent.getByLabel(moduleLabel_[1], tagInfoHandleTP);
+	//const reco::TrackProbabilityTagInfoCollection & JetProbInfo = *(tagInfoHandleTP.product());
 	
 	const reco::CaloJetCollection recoJets =   *(jetsColl.product());
 	const reco::GenJetCollection  genJets  =   *(genjetsColl.product());
@@ -404,26 +437,17 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	bool MC=false;
 	Handle<HepMCProduct> evtMC;
   
-	try {
-		iEvent.getByLabel("VtxSmeared",evtMC);
-		MC=true;
+	      
+	try{
+		iEvent.getByLabel("source",evtMC);
 		if(verbose_){
-			std::cout << "VtxSmeared HepMCProduct found"<< std::endl;
+			std::cout << "source HepMCProduct found"<< std::endl;
 		}
-		
-	} catch(const Exception&){
-      
-		try{
-			iEvent.getByLabel("source",evtMC);
-			if(verbose_){
-				std::cout << "source HepMCProduct found"<< std::endl;
-			}
-			MC=true;
-		} catch(const Exception&) {
-			MC=false;
-			if(verbose_){
-				std::cout << "no HepMCProduct found"<< std::endl;
-			}
+		MC=true;
+	} catch(const Exception&) {
+		MC=false;
+		if(verbose_){
+			std::cout << "no HepMCProduct found"<< std::endl;
 		}
 	}
   
@@ -568,7 +592,60 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		// b tagging
 		int ith_tagged = -1;
 		int isbtagged = 0;
-		ith_tagged = this->TaggedJet(*jet,btagCollTC);
+
+		bool gotTCHE = false;
+		bool gotTCHP = false;
+		bool gotJP   = false;
+		bool gotSMT  = false;
+		
+		for (size_t k=0; k<jetTags_testManyByType.size(); k++) {
+			edm::Handle<std::vector<reco::JetTag> > jetTags = jetTags_testManyByType[k];
+			
+			ith_tagged = this->TaggedJet(*jet,jetTags);
+
+			if (ith_tagged == -1) continue;
+		
+			std::string moduleLabel = (jetTags).provenance()->moduleLabel();
+
+			
+			if ( moduleLabel == "trackCountingHighEffJetTags" ) {
+
+				fS8evt->btag_TrkCounting_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D
+				
+				gotTCHE = true;
+
+				int NtrksInJet = (*jetTags)[ith_tagged].tracks().size();
+				fS8evt->jet_ntrks.push_back( NtrksInJet );
+			}
+			else if ( moduleLabel == "trackCountingHighPurJetTags" ) {
+
+				fS8evt->btag_TrkCounting_disc3D_3trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 3rd trk, 3D
+
+				gotTCHP = true;
+			}
+			else if ( moduleLabel == "jetProbabilityJetTags" ) {
+
+				fS8evt->btag_JetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
+				
+				gotJP = true;
+
+			}
+			else if ( moduleLabel == "softMuonJetTags" ) {
+
+				gotSMT = true;
+
+			}
+
+			if (!gotTCHE) fS8evt->btag_TrkCounting_disc3D_2trk.push_back( -9999. );
+			
+			if (!gotTCHE) fS8evt->btag_TrkCounting_disc3D_3trk.push_back( -9999. );
+			
+			if (!gotJP)   fS8evt->btag_JetProb_disc3D.push_back( -9999. );
+			
+		}
+
+		
+		/*
 		if (ith_tagged != -1 ) {
 			fS8evt->btag_TrkCounting_disc3D_1trk.push_back( TrkCountingInfo[ith_tagged].discriminator(1,0) ); // 1st trk, 3D
 			fS8evt->btag_TrkCounting_disc3D_2trk.push_back( TrkCountingInfo[ith_tagged].discriminator(2,0) ); // 2nd trk, 3D
@@ -591,7 +668,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 					goodtrksInJet3D++;
 			}
             //an example of how can we get the 3 tracks with the smallests IPs
-			/*
+			
 			if( goodtrksInJet2D > 2 ) {
 				fS8evt->btag_NegTag_disc2D_1trk.push_back(
 					TrkCountingInfo[ith_tagged].significance(goodtrksInJet2D-3,1) ); //2D
@@ -604,7 +681,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 				fS8evt->btag_NegTag_disc2D_2trk.push_back( -9999. );
 				fS8evt->btag_NegTag_disc2D_3trk.push_back( -9999. );
 			}
-			*/
+			
 			if( goodtrksInJet3D > 2 ) {
 				fS8evt->btag_NegTag_disc3D_1trk.push_back(
 					TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-3,0) ); //3D	
@@ -661,9 +738,11 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			fS8evt->btag_JetProb_disc3D.push_back( -9999. );
 			//fS8evt->btag_JetProb_disc2D.push_back( -9999. );
 		}
-
+		
 		//fS8evt->jet_isbtagged.push_back( isbtagged );
 		
+		*/
+								   
 		ijet++;
 	} //end loop over reco jets
 

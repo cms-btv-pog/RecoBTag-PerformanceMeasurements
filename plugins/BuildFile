@@ -1,0 +1,26 @@
+<use name=FWCore/Framework>
+<use name=FWCore/Utilities>
+<use name=FWCore/PluginManager>
+<use name=FWCore/ParameterSet>
+<use name=FWCore/ServiceRegistry>
+<use name=DataFormats/Common>
+<use name=RecoBTag/BTagTools>
+<use name=DataFormats/TrackReco>
+<use name=DataFormats/JetReco>
+<use name=DataFormats/MuonReco>
+<use name=JetMETCorrections/Objects>
+<use name=RecoMuon/TrackingTools>
+<use name=TrackingTools/TransientTrack>
+<use name=SimDataFormats/Track>
+<use name=SimTracker/TrackAssociation>
+<use name=SimTracker/Records>
+<use name=rootrflx>
+<use name=DataFormats/Math>
+<use name=RecoBTag/MCTools>
+<use name=CLHEP>
+<use name=root>
+<use name=RecoBTag/PerformanceMeasurements>
+
+<library file="*.cc" name=RecoBTagPerformanceMeasurementsPlugins>
+	 <flags EDM_PLUGIN = 1 >
+</library>
