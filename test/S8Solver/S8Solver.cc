@@ -40,6 +40,9 @@ S8Solver::S8Solver() {
 	fKappabConst = false;
 	fKappaclConst = true;
 	fisCorrFile = false;
+	fDeltaConst = false;
+	fGammaConst = false;
+
 }
 //____________________________________________________________
 void S8Solver::LoadHistos() {
@@ -91,10 +94,14 @@ void S8Solver::LoadHistos() {
 		fh_beta = (TH1D*) fnHisto->Clone("fh_beta");
 		fh_kcl = (TH1D*) fnHisto->Clone("fh_kcl");
 		fh_kb = (TH1D*) fnHisto->Clone("fh_kb");
+		fh_delta = (TH1D*) fnHisto->Clone("fh_delta");
+		fh_gamma = (TH1D*) fnHisto->Clone("fh_gamma");
 		fh_alpha->Reset();
 		fh_beta->Reset();
 		fh_kcl->Reset();
 		fh_kb->Reset();
+		fh_delta->Reset();
+		fh_gamma->Reset();
 		//fh_alpha->Sumw2();
 		//fh_beta->Sumw2();
 		//fh_kcl->Sumw2();
@@ -137,7 +144,10 @@ void S8Solver::LoadHistos() {
 		h1["eff_TaggedJet_cl"] = (TH1D*) fnHisto->Clone("eff_TaggedJet_cl");
 		h1["eff_TaggedBothJets_b"] = (TH1D*) fnHisto->Clone("eff_TaggedBothJets_b");
 		h1["eff_TaggedBothJets_cl"] = (TH1D*) fnHisto->Clone("eff_TaggedBothJets_cl");
-		
+
+		h1["eff_mu_taggedaway_b"] = (TH1D*) fnHisto->Clone("eff_mu_taggedaway_b");
+		h1["eff_mu_taggedaway_cl"] = (TH1D*) fnHisto->Clone("eff_mu_taggedaway_cl");
+
 		h1["eff_pTrel_b"]->Reset();
 		h1["eff_pTrel_cl"]->Reset();
 		h1["eff_pTrel_TaggedJet_b"]->Reset();
@@ -146,6 +156,9 @@ void S8Solver::LoadHistos() {
 		h1["eff_TaggedJet_cl"]->Reset();
 		h1["eff_TaggedBothJets_b"]->Reset();
 		h1["eff_TaggedBothJets_cl"]->Reset();
+		h1["eff_mu_taggedaway_b"]->Reset();
+		h1["eff_mu_taggedaway_cl"]->Reset();
+
 		//h1["eff_pTrel_b"]->Sumw2();
 		//h1["eff_pTrel_cl"]->Sumw2();
 		//h1["eff_pTrel_TaggedJet_b"]->Sumw2();
@@ -165,6 +178,9 @@ void S8Solver::LoadHistos() {
 		
 		h1["eff_TaggedBothJets_b"]->Divide( h2["b_pcmbpT"]->ProjectionX("b_halloppjets_tagged", -1 , ith_max_bin,"e") , halloppjets_b ,1.,1.,"B");
 		h1["eff_TaggedBothJets_cl"]->Divide( h2["cl_pcmbpT"]->ProjectionX("cl_halloppjets_tagged", -1 , ith_max_bin,"e") , halloppjets_cl ,1.,1.,"B");
+
+		h1["eff_mu_taggedaway_b"]->Divide( h2["b_ppT"]->ProjectionX("b_hallopppjets_ptrel",ith_ptrel_bin, ith_max_bin ,"e") , halloppjets_b, 1.,1.,"B");
+		h1["eff_mu_taggedaway_cl"]->Divide( h2["cl_ppT"]->ProjectionX("cl_halloppjets_ptrel",ith_ptrel_bin, ith_max_bin ,"e") , halloppjets_cl, 1.,1.,"B");
 
 		feffTag_b = (TH1D*) h1["eff_TaggedJet_b"]->Clone("feffTag_b"); 
 		feffTag_cl = (TH1D*) h1["eff_TaggedJet_b"]->Clone("feffTab_cl");
@@ -206,14 +222,18 @@ void S8Solver::LoadHistos() {
 			std::cout << "rebinning done" << std::endl;
 		} else {
 
-			fh_alpha->Divide( h1["eff_TaggedBothJets_cl"], h1["eff_TaggedJet_cl"],1.,1.,"B");
-			fh_beta->Divide( h1["eff_TaggedBothJets_b"], h1["eff_TaggedJet_b"],1.,1.,"B");
+			fh_alpha->Divide( h1["eff_TaggedBothJets_cl"], h1["eff_TaggedJet_cl"]);
+			fh_beta->Divide( h1["eff_TaggedBothJets_b"], h1["eff_TaggedJet_b"]);
 		
 			fh_kb->Divide( h1["eff_pTrel_TaggedJet_b"], h1["eff_pTrel_b"]  );
 			fh_kb->Divide( h1["eff_TaggedJet_b"] );
 
 			fh_kcl->Divide( h1["eff_pTrel_TaggedJet_cl"], h1["eff_pTrel_cl"] );
 			fh_kcl->Divide(  h1["eff_TaggedJet_cl"] );
+			
+			fh_delta->Divide( h1["eff_mu_taggedaway_b"], h1["eff_pTrel_b"] );
+			fh_gamma->Divide( h1["eff_mu_taggedaway_cl"], h1["eff_pTrel_cl"] );
+
 		}
 			
 		// fit to pol0
@@ -221,14 +241,20 @@ void S8Solver::LoadHistos() {
 		fh_beta->Fit("pol0","0");
 		fh_kb->Fit("pol0","0");
 		fh_kcl->Fit("pol0","0");
-		
+		fh_delta->Fit("pol0","0");
+		fh_gamma->Fit("pol0","0");
+
 	}
 	else {
 
 		// true efficiency
 		feffTag_b = (TH1D*) gDirectory->Get("eff_TaggedJet_b");
 		feffTag_cl = (TH1D*) gDirectory->Get("eff_TaggedJet_cl");
-	
+		feffmu_b = (TH1D*) gDirectory->Get("eff_pTrel_b");
+		feffmu_cl = (TH1D*) gDirectory->Get("eff_pTrel_cl");
+		feffTagmu_b = (TH1D*) gDirectory->Get("eff_pTrel_TaggedJet_b");
+		feffTagmu_cl = (TH1D*) gDirectory->Get("eff_pTrel_TaggedJet_cl");
+		
 		if (fisCorrFile) finputCorrFile->cd();
 		
 		if (fcategory=="pT") {
@@ -303,11 +329,15 @@ void S8Solver::GetInput() {
 	TF1 *Fkcl = fh_kcl->GetFunction("pol0");
 	TF1 *Falpha = fh_alpha->GetFunction("pol0");
 	TF1 *Fbeta = fh_beta->GetFunction("pol0");
-	
+	TF1 *Fdelta = fh_delta->GetFunction("pol0");
+	TF1 *Fgamma = fh_gamma->GetFunction("pol0");
+
 	TotalInput["kappa_b"] = fKappabf * Fkb->GetParameter(0);
 	TotalInput["kappa_cl"] = fKappaclf * Fkcl->GetParameter(0);
 	TotalInput["alpha"] = fAlphaf * Falpha->GetParameter(0);
 	TotalInput["beta"] = fBetaf * Fbeta->GetParameter(0);
+	TotalInput["delta"] = Fdelta->GetParameter(0);
+	TotalInput["gamma"] = Fgamma->GetParameter(0);
 
 	//check
 	/*
@@ -339,7 +369,9 @@ void S8Solver::GetInput() {
 	HistoList.push_back(fh_kcl);
 	HistoList.push_back(fh_alpha);
 	HistoList.push_back(fh_beta);
-	
+	HistoList.push_back(fh_delta);
+	HistoList.push_back(fh_gamma);
+
 	std::vector< TString> name;
 	name.push_back("n");
 	name.push_back("nMu");
@@ -353,7 +385,8 @@ void S8Solver::GetInput() {
 	name.push_back("kappa_cl");
 	name.push_back("alpha");
 	name.push_back("beta");
-	
+	name.push_back("delta");
+	name.push_back("gamma");
 
 	for (int ibin = 1; ibin<= fnHisto->GetNbinsX(); ++ibin) {
 
@@ -365,7 +398,9 @@ void S8Solver::GetInput() {
 			
 			TH1D *htemp = (TH1D*) HistoList[ihisto];
 
-			if (name[ihisto]=="kappa_b"||name[ihisto]=="kappa_cl"||name[ihisto]=="alpha"||name[ihisto]=="beta") {
+			if (name[ihisto]=="kappa_b"||name[ihisto]=="kappa_cl"||
+			    name[ihisto]=="alpha"||name[ihisto]=="beta"||
+			    name[ihisto]=="delta"||name[ihisto]=="gamma") {
 
 				if(name[ihisto]=="beta") {
 					if (!fBetaConst) {
@@ -399,7 +434,23 @@ void S8Solver::GetInput() {
 				    tmpmap[name[ihisto]] = fKappaclf * TotalInput["kappa_cl"]; 
 				  }
 				}
-				
+				else if(name[ihisto]=="delta") {
+                                  if (!fDeltaConst) {
+                                    int abin = htemp->GetXaxis()->FindBin(pt);
+                                    tmpmap[name[ihisto]] = htemp->GetBinContent(abin);
+                                  } else {
+                                    tmpmap[name[ihisto]] = TotalInput["delta"];
+                                  }
+                                }
+				else if(name[ihisto]=="gamma") {
+                                  if (!fGammaConst) {
+                                    int abin = htemp->GetXaxis()->FindBin(pt);
+                                    tmpmap[name[ihisto]] = htemp->GetBinContent(abin);
+                                  } else {
+                                    tmpmap[name[ihisto]] = TotalInput["gamma"];
+                                  }
+                                }
+
 			} else {
 				tmpmap[name[ihisto]] = htemp->GetBinContent(ibin);
 			}
@@ -473,7 +524,10 @@ void S8Solver::Solve() {
 		//sol.SetCorr(TotalInput["kappa_b"],1.,TotalInput["beta"],
 		//	    TotalInput["kappa_cl"],1.,TotalInput["alpha"]);
 		sol.SetCorr(TotalInput["kappa_b"],TotalInput["beta"],1.,
-					TotalInput["kappa_cl"],TotalInput["alpha"],1);
+			    TotalInput["kappa_cl"],TotalInput["alpha"],1.);
+		//sol.SetCorr(TotalInput["kappa_b"],TotalInput["beta"],TotalInput["delta"],
+		//    TotalInput["kappa_cl"],TotalInput["alpha"],TotalInput["gamma"]);
+
 		sol.SetCorrError(0.,0.,0.,0.,0.,0.);
 		sol.SetError(2);
 		sol.SetNbErrorIteration(200);
@@ -481,16 +535,16 @@ void S8Solver::Solve() {
 		bool converge = true;
 		
 		if(!sol.Solve()) {
-			converge = false;
-			sol.SetInitialOrder(0,0);   // OK en principe...
+			//converge = false;
+			sol.SetInitialOrder(0,-1);   // OK en principe...
 			if(!sol.Solve()) {
-				converge = false;
+				//converge = false;
 				sol.SetInitialOrder(3,1);   // OK en principe...
 				if(!sol.Solve()) {
-					converge = false;
+					//converge = false;
 					sol.SetInitialOrder(2,1);   // OK en principe...
 					if(!sol.Solve())
-						converge = false;
+						//converge = false;
 						std::cout << "Arrggg : Impossible de determiner une solution physique I" << std::endl;
 				}
 				
@@ -542,24 +596,26 @@ void S8Solver::Solve() {
 			S8NumericSolver solu("solu",inputs);
 			//solu.SetCorr(tmpinput["kappa_b"],1.,tmpinput["beta"],
 			//     tmpinput["kappa_cl"],1.,tmpinput["alpha"]);
-			solu.SetCorr(tmpinput["kappa_b"],tmpinput["beta"],1., 
-						 tmpinput["kappa_cl"],tmpinput["alpha"],1.); 
+			//solu.SetCorr(tmpinput["kappa_b"],tmpinput["beta"],1., 
+			//tmpinput["kappa_cl"],tmpinput["alpha"],1.); 
+			solu.SetCorr(tmpinput["kappa_b"],tmpinput["beta"],tmpinput["delta"],
+						 tmpinput["kappa_cl"],tmpinput["alpha"],tmpinput["gamma"]);
 
 			solu.SetCorrError(0.,0.,0.,0.,0.,0.);
 			solu.SetError(2);
 			solu.SetNbErrorIteration(200);
 			solu.SetInitialOrder(1,1);
 			if(!solu.Solve()) {
-				converge = false;
-				solu.SetInitialOrder(0,-1);   // OK en principe...
+				//converge = false;
+				solu.SetInitialOrder(0,0);   // OK en principe...
 				if(!solu.Solve()) {
-					converge = false;
+					//converge = false;
 					solu.SetInitialOrder(3,1);   // OK en principe...
 					if(!solu.Solve()) {
-						converge = false;
+						//converge = false;
 						solu.SetInitialOrder(2,1);   // OK en principe...
 						if(!solu.Solve())
-							converge = false;
+							//converge = false;
 							std::cout << "Arrggg : Impossible de determiner une solution physique" << std::endl;
 					}
 				}
@@ -670,8 +726,20 @@ void S8Solver::Draw(int maxNbins) {
   TArrayD ptarrayErr(nxbins);
   TArrayD s8effTag_b(nxbins);
   TArrayD s8effTag_bErr(nxbins);
+
+  
   TArrayD effTag_b(nxbins);
   TArrayD effTag_bErr(nxbins);
+  TArrayD effTag_cl(nxbins);
+  TArrayD effTag_clErr(nxbins);
+  TArrayD effmu_b(nxbins);
+  TArrayD effmu_bErr(nxbins);
+  TArrayD effmu_cl(nxbins);
+  TArrayD effmu_clErr(nxbins);
+  TArrayD effTagmu_b(nxbins);
+  TArrayD effTagmu_bErr(nxbins);
+  TArrayD effTagmu_cl(nxbins);
+  TArrayD effTagmu_clErr(nxbins);
 
   TArrayD input_n(nxbins);
   TArrayD input_p(nxbins);
@@ -808,7 +876,27 @@ void S8Solver::Draw(int maxNbins) {
 	legc->AddEntry(fh_beta,"#beta","P");
 	legc->Draw();
 	gPad->SetGrid();
-		
+
+	acvname = "xcorrelations_"+fthename;
+        cv_map[acvname] = new TCanvas(acvname,acvname,700,700);
+        fh_delta->SetMarkerColor(1);
+        fh_gamma->SetMarkerColor(2);
+        fh_delta->SetLineColor(1);
+        fh_gamma->SetLineColor(2);
+	fh_delta->SetMinimum(0.7);
+        fh_delta->SetMaximum(1.3);
+        fh_delta->Draw("P");
+        fh_gamma->Draw("Psame");
+        
+        TLegend *legcc = new TLegend(0.77,0.22,0.87,0.38,"","NDC");
+        //legc->SetMargin(0.12);
+        legcc->SetTextSize(0.029);
+        legcc->SetFillColor(10);
+        legcc->AddEntry(fh_delta,"#delta","P");
+        legcc->AddEntry(fh_gamma,"#gamma","P");
+	legcc->Draw();
+        gPad->SetGrid();
+
 	ginput_n   = new TGraphErrors(nxbins,ptarray.GetArray(),input_n.GetArray(),ptarrayErr.GetArray(),0);
 	ginput_nmu = new TGraphErrors(nxbins,ptarray.GetArray(),input_nmu.GetArray(),ptarrayErr.GetArray(),0);
 	ginput_ntag   = new TGraphErrors(nxbins,ptarray.GetArray(),input_ntag.GetArray(),ptarrayErr.GetArray(),0);

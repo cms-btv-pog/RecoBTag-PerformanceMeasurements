@@ -41,6 +41,8 @@ class S8Solver {
 		void SetBetaFactor(double value) { fBetaf = value; }
 		void SetKappabFactor(double value) { fKappabf = value; }
 		void SetKappaclFactor(double value) { fKappaclf = value; }
+		void SetDeltaConstant(bool option) { fDeltaConst = option; }
+		void SetGammaConstant(bool option) { fGammaConst = option; }
 		void SetMethod( TString option ) { fmethod = option; };
 		void Solve();
         void Verbose(bool option) { fVerbose = option; };
@@ -93,6 +95,8 @@ class S8Solver {
 		bool fBetaConst;
 		bool fKappabConst;
 		bool fKappaclConst;
+		bool fDeltaConst;
+		bool fGammaConst;
 		bool fisCorrFile;
 		double fAlphaf;
 		double fBetaf;
@@ -127,8 +131,14 @@ class S8Solver {
 		TH1D* fh_kcl;
 		TH1D* fh_alpha;
 		TH1D* fh_beta;
+		TH1D* fh_delta;
+		TH1D* fh_gamma;
 		TH1D* feffTag_b;
 		TH1D* feffTag_cl;
+		TH1D* feffmu_b;
+		TH1D* feffmu_cl;
+		TH1D* feffTagmu_b;
+		TH1D* feffTagmu_cl;
 		
 		TGraphErrors *geffTag_b;
 		TGraphErrors *gS8effTag_b;
