@@ -6,19 +6,20 @@ module Performance = PerformanceAnalyzer {
 
        InputTag simG4 = g4SimHits
        untracked string outputFile = "results.root"
-       string Muons = "globalMuons"
+       string Muons = "muons"
        string Jets  = "iterativeCone5CaloJets"
        untracked string TrackCollection = "ctfWithMaterialTracks"
        untracked string PrimaryVertexCollection = "offlinePrimaryVerticesFromCTFTracks"
        untracked vstring bTaggerList = { 
-         "TrackCounting",
+         "TrackCountingHighEff",
+	 "TrackCountingHighPur",
 	 "TrackProbability"
        }
        string GenJets= "iterativeCone5GenJets"
        string SimTracks = "g4SimHits"
 
        PSet jetIdParameters = {
-              string mcSource = "VtxSmeared"
+              string mcSource = "source"
               bool fillPartons = true
               bool fillHeavyHadrons = false
               bool fillLeptons =  false
@@ -28,7 +29,7 @@ module Performance = PerformanceAnalyzer {
               vstring vetoFlavour = {  }
        }
        PSet jetIdParameters2 = {
-              string mcSource = "VtxSmeared"
+              string mcSource = "source"
               bool fillPartons = true
               bool fillHeavyHadrons = false
               bool fillLeptons =  false

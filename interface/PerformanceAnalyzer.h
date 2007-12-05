@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.4 2007/07/03 20:57:10 yumiceva Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.1 2007/09/24 18:26:47 yumiceva Exp $
  *
  */
 
@@ -81,7 +81,7 @@ public:
   reco::GenJet GetGenJet(reco::CaloJet calojet, reco::GenJetCollection genJetColl);
   SimTrack GetGenTrk(reco::Track atrack, edm::SimTrackContainer simTrkColl, edm::SimVertexContainer simVtcs);
   int GetMotherId(edm::SimVertexContainer simVtxColl, edm::SimTrackContainer simTrkColl, SimTrack muonMC);
-  int TaggedJet(reco::CaloJet calojet, reco::JetTagCollection taggedColl);
+  int TaggedJet(reco::CaloJet calojet, edm::Handle<std::vector<reco::JetTag> > jetTags );
   
 private:
  
