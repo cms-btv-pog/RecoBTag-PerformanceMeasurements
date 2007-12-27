@@ -8,7 +8,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.h,v 1.3 2007/09/28 15:11:00 yumiceva Exp $
+ version $Id: BTagEvent.h,v 1.4 2007/09/28 23:13:14 yumiceva Exp $
 
 ________________________________________________________________**/
 
@@ -28,60 +28,50 @@ class BTagEvent : public TObject {
 	BTagEvent();
 	~BTagEvent();
 
-	void Reset();
+	void                 Reset();
+	double               calculProbability(std::vector< float > );
+	std::vector< float > getTrackProbabilies(std::vector< float > v, int ipType);
 	
 	Int_t event; // event number
 	Int_t run;   // run number
 
-		
-	// mc
-
+	
 	// reco
 	Int_t njets;    // number of jets
 	Int_t nmuons;   // number of muons
 	Int_t nvertices;  // number of vertices
 	Int_t ngenjets; // number of generated jets
-
-	//std::vector< float > jet_p;
+	
 	std::vector< float > jet_pt;
 	std::vector< float > jet_eta;
 	std::vector< float > jet_phi;
 	std::vector< float > jet_e;
 	std::vector< float > jet_et;
-	//std::vector< float > jet_vx;
-	//std::vector< float > jet_vy;
-	//std::vector< float > jet_vz;
 	std::vector< int > jet_ntrks;
 
 	std::vector< int > jet_flavour_phy;
 	std::vector< int > jet_flavour_alg;
-	//std::vector< int > jet_isbtagged;
 	std::vector< int > jet_hasLepton;
 	std::vector< float > jetcorrection;
+	std::vector< std::vector< float > > jet_Tracks_Probability;
 	
-	//std::vector< float > genjet_p;
 	std::vector< float > genjet_pt;
 	std::vector< float > genjet_eta;
 	std::vector< float > genjet_phi;
 	std::vector< float > genjet_e;
-	//std::vector< float > genjet_vx;
-	//std::vector< float > genjet_vy;
-	//std::vector< float > genjet_vz;
 
-	std::vector< float > btag_TrkCounting_disc2D_1trk;
-	std::vector< float > btag_TrkCounting_disc2D_2trk;
-	std::vector< float > btag_TrkCounting_disc2D_3trk;
-	std::vector< float > btag_TrkCounting_disc3D_1trk;
+	//std::vector< float > btag_TrkCounting_disc2D_1trk;
+	//std::vector< float > btag_TrkCounting_disc2D_2trk;
+	//std::vector< float > btag_TrkCounting_disc2D_3trk;
+	//std::vector< float > btag_TrkCounting_disc3D_1trk;
 	std::vector< float > btag_TrkCounting_disc3D_2trk;
 	std::vector< float > btag_TrkCounting_disc3D_3trk;
-
-	//std::vector< float > btag_JetProb_disc2D;
+	
 	std::vector< float > btag_JetProb_disc3D;
-
-	//std::vector< float > btag_NegTag_disc2D_1trk;
-	//std::vector< float > btag_NegTag_disc2D_2trk;
-	//std::vector< float > btag_NegTag_disc2D_3trk;
-	std::vector< float > btag_NegTag_disc3D_1trk;
+	std::vector< float > btag_negJetProb_disc3D;
+	std::vector< float > btag_posJetProb_disc3D;
+	
+	//std::vector< float > btag_NegTag_disc3D_1trk;
 	std::vector< float > btag_NegTag_disc3D_2trk;
 	std::vector< float > btag_NegTag_disc3D_3trk;
 		

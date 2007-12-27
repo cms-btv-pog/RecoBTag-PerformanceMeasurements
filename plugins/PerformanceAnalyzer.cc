@@ -29,6 +29,7 @@
 #include "DataFormats/BTauReco/interface/TrackCountingTagInfoFwd.h"
 #include "DataFormats/BTauReco/interface/TrackProbabilityTagInfo.h"
 #include "DataFormats/BTauReco/interface/TrackProbabilityTagInfoFwd.h"
+#include "DataFormats/BTauReco/interface/TrackIPTagInfo.h"
 
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 
@@ -122,7 +123,7 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
   SimTrkCollectionTags_ = iConfig.getParameter<std::string>("SimTracks");
   
   jetFlavourIdentifier_ = JetFlavourIdentifier(iConfig.getParameter<edm::ParameterSet>("jetIdParameters"));
-  jetFlavourIdentifier2_ = JetFlavourIdentifier(iConfig.getParameter<edm::ParameterSet>("jetIdParameters2"));
+  //jetFlavourIdentifier2_ = JetFlavourIdentifier(iConfig.getParameter<edm::ParameterSet>("jetIdParameters2"));
 
 
   MinJetEt_ = iConfig.getParameter<edm::ParameterSet>("jetcuts").getParameter<double>("MinEt");
@@ -138,26 +139,46 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
   bTaggerList_ = iConfig.getUntrackedParameter<std::vector<std::string> >("bTaggerList");
   fnselectors= bTaggerList_.size();
   for(std::vector<std::string>::iterator objectName = bTaggerList_.begin(); objectName != bTaggerList_.end(); ++objectName) {
-	  if ( *objectName == "TrackCountingHighEff" ) {
+	  if ( *objectName == "trackCountingHighEffJetTags" ) {
 		  
 		  moduleLabel_.push_back("trackCountingHighEffJetTags");
 		 
 	  }
-	  if ( *objectName == "TrackCountingHighPur" ) {
+	  if ( *objectName == "trackCountingHighPurJetTags" ) {
 		  
 		  moduleLabel_.push_back("trackCountingHighPurJetTags");
 		 
 	  }
-	  if ( *objectName == "TrackProbability" ) {
+	  if ( *objectName == "negativeTrackCounting2ndTrck" ) {
 		  
-		  moduleLabel_.push_back("trackProbabilityJetTags");
+		  moduleLabel_.push_back("negativeTrackCounting2ndTrck");
 		  
 	  }
-	  if ( *objectName == "SoftElectron" ) {
+	  if ( *objectName == "negativeTrackCounting3rdTrck" ) {
+		  
+		  moduleLabel_.push_back("negativeTrackCounting3rdTrck");
+
+	  }
+	  if ( *objectName == "jetProbabilityJetTagsNegativeOnly" ) {
+
+		  moduleLabel_.push_back("jetProbabilityJetTagsNegativeOnly");
+
+	  }
+	  if ( *objectName == "jetProbabilityJetTagsPositiveOnly" ) {
+
+		  moduleLabel_.push_back("jetProbabilityJetTagsPositiveOnly");
+
+	  }
+	  if ( *objectName == "jetProbabilityJetTags" ) {
+		  
+		  moduleLabel_.push_back("jetProbabilityJetTags");
+		  
+	  }
+	  if ( *objectName == "SoftElectronJetTags" ) {
 
 		  moduleLabel_.push_back("softElectronJetTags");
 	  }
-	  if ( *objectName == "SoftMuon" ) {
+	  if ( *objectName == "SoftMuonJetTags" ) {
 
 		  moduleLabel_.push_back("softMuonJetTags");
 		  
@@ -168,10 +189,10 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
   
   
   //simUnit_= 1.0;  // starting with CMSSW_1_2_x ??
-  if ( (edm::getReleaseVersion()).find("CMSSW_1_1_",0)!=std::string::npos){
-    simUnit_=0.1;  // for use in  CMSSW_1_1_1 tutorial
-  }
-  simUnit_= 1.;  // apparently not, still need this
+  //if ( (edm::getReleaseVersion()).find("CMSSW_1_1_",0)!=std::string::npos){
+  //  simUnit_=0.1;  // for use in  CMSSW_1_1_1 tutorial
+  //}
+  //simUnit_= 1.;  // apparently not, still need this
 
   feventcounter = 0;
   
@@ -353,7 +374,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 
 	// initialize flavour identifiers
 	jetFlavourIdentifier_.readEvent(iEvent);
-	jetFlavourIdentifier2_.readEvent(iEvent);
+	//jetFlavourIdentifier2_.readEvent(iEvent);
 	
     // Trakcs
 	Handle<reco::TrackCollection> recTrks;
@@ -434,6 +455,9 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	//Handle<SimTrackContainer> simTrks;
 	//iEvent.getByLabel( simG4_, simTrks);
 
+	Handle<std::vector<reco::TrackIPTagInfo> > tagInfo;
+	iEvent.getByLabel("impactParameterTagInfos", tagInfo);
+	
 	bool MC=false;
 	Handle<HepMCProduct> evtMC;
   
@@ -593,11 +617,16 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		int ith_tagged = -1;
 		int isbtagged = 0;
 
-		bool gotTCHE = false;
-		bool gotTCHP = false;
-		bool gotJP   = false;
-		bool gotSMT  = false;
-		
+		bool gotTCHE     = false;
+		bool gotTCHEneg  = false;
+		bool gotTCHP     = false;
+		bool gotTCHPneg  = false;
+		bool gotJP       = false;
+		bool gotJPneg    = false;
+		bool gotJPpos    = false;
+		bool gotSMT      = false;
+
+		//start loop over all jetTags
 		for (size_t k=0; k<jetTags_testManyByType.size(); k++) {
 			edm::Handle<std::vector<reco::JetTag> > jetTags = jetTags_testManyByType[k];
 			
@@ -607,7 +636,11 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		
 			std::string moduleLabel = (jetTags).provenance()->moduleLabel();
 
-			
+			//*********************************
+			// Track Counting taggers
+			//*********************************
+
+
 			if ( moduleLabel == "trackCountingHighEffJetTags" ) {
 
 				fS8evt->btag_TrkCounting_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D
@@ -623,125 +656,70 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 
 				gotTCHP = true;
 			}
+			else if ( moduleLabel == "negativeTrackCounting2ndTrck" ) {
+				
+				fS8evt->btag_NegTag_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D
+				
+				gotTCHEneg = true;
+			}
+			else if ( moduleLabel == "negativeTrackCounting3rdTrck" ) {
+				
+				fS8evt->btag_NegTag_disc3D_3trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 3rd trk, 3D
+				
+				gotTCHPneg = true;
+			}
+
+			//*********************************
+			// Jet Probability taggers
+			//*********************************
 			else if ( moduleLabel == "jetProbabilityJetTags" ) {
 
 				fS8evt->btag_JetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
 				
 				gotJP = true;
 
+				std::string moduleLabel = (jetTags).provenance()->moduleLabel();
+				int NtrksInJet = (*jetTags)[ith_tagged].tracks().size();
+				fS8evt->jet_ntrks.push_back( NtrksInJet );
+
+				std::vector< float > track_proba = (*tagInfo)[ith_tagged].probabilities(0) ;
+				fS8evt->jet_Tracks_Probability.push_back(track_proba);
+				
 			}
+			else if ( moduleLabel == "jetProbabilityJetTagsNegativeOnly" ) {
+
+				fS8evt->btag_negJetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
+				
+				gotJPneg = true;
+
+			}
+			else if ( moduleLabel == "jetProbabilityJetTagsPositiveOnly" ) {
+
+				fS8evt->btag_posJetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
+				
+				gotJPpos = true;
+
+			}
+			//*********************************
+			// SoftLeptons Taggers 
+			//*********************************
 			else if ( moduleLabel == "softMuonJetTags" ) {
 
-				gotSMT = true;
+				//gotSMT = true;
 
 			}
 
-			if (!gotTCHE) fS8evt->btag_TrkCounting_disc3D_2trk.push_back( -9999. );
-			
-			if (!gotTCHE) fS8evt->btag_TrkCounting_disc3D_3trk.push_back( -9999. );
-			
-			if (!gotJP)   fS8evt->btag_JetProb_disc3D.push_back( -9999. );
-			
-		}
-
-		
-		/*
-		if (ith_tagged != -1 ) {
-			fS8evt->btag_TrkCounting_disc3D_1trk.push_back( TrkCountingInfo[ith_tagged].discriminator(1,0) ); // 1st trk, 3D
-			fS8evt->btag_TrkCounting_disc3D_2trk.push_back( TrkCountingInfo[ith_tagged].discriminator(2,0) ); // 2nd trk, 3D
-			fS8evt->btag_TrkCounting_disc3D_3trk.push_back( TrkCountingInfo[ith_tagged].discriminator(3,0) ); // 3nd trk, 3D
-			fS8evt->btag_TrkCounting_disc2D_1trk.push_back( TrkCountingInfo[ith_tagged].discriminator(1,1) ); // 1st trk, 2D
-			fS8evt->btag_TrkCounting_disc2D_2trk.push_back( TrkCountingInfo[ith_tagged].discriminator(2,1) ); // 2nd trk, 2D
-			fS8evt->btag_TrkCounting_disc2D_2trk.push_back( TrkCountingInfo[ith_tagged].discriminator(3,1) ); // 3nd trk, 2D
-			isbtagged = 1;
-
-			int NtrksInJet = TrkCountingInfo[ith_tagged].tracks().size();
-			fS8evt->jet_ntrks.push_back( NtrksInJet );
-			//negative tags
-			int goodtrksInJet2D = 0;
-			int goodtrksInJet3D = 0;
-			//search all tracks with an IPs > -10
-			for(int n=0; n < NtrksInJet ; ++n) {
-				if( TrkCountingInfo[ith_tagged].significance(n,1)  > -99.)
-					goodtrksInJet2D++;
-				if( TrkCountingInfo[ith_tagged].significance(n,0)  > -99.)
-					goodtrksInJet3D++;
-			}
-            //an example of how can we get the 3 tracks with the smallests IPs
-			
-			if( goodtrksInJet2D > 2 ) {
-				fS8evt->btag_NegTag_disc2D_1trk.push_back(
-					TrkCountingInfo[ith_tagged].significance(goodtrksInJet2D-3,1) ); //2D
-				fS8evt->btag_NegTag_disc2D_2trk.push_back(
-					TrkCountingInfo[ith_tagged].significance(goodtrksInJet2D-2,1) );
-				fS8evt->btag_NegTag_disc2D_3trk.push_back(
-					TrkCountingInfo[ith_tagged].significance(goodtrksInJet2D-1,1) );
-			} else {
-				fS8evt->btag_NegTag_disc2D_1trk.push_back( -9999. );
-				fS8evt->btag_NegTag_disc2D_2trk.push_back( -9999. );
-				fS8evt->btag_NegTag_disc2D_3trk.push_back( -9999. );
-			}
-			
-			if( goodtrksInJet3D > 2 ) {
-				fS8evt->btag_NegTag_disc3D_1trk.push_back(
-					TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-3,0) ); //3D	
-				//std::cout << "test -3   " << TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-3,0) << std::endl;
-
-				fS8evt->btag_NegTag_disc3D_2trk.push_back(
-					TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-2,0) );
-				//std::cout << "test -2   " << TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-2,0) << std::endl;
-				fS8evt->btag_NegTag_disc3D_3trk.push_back(
-					TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-1,0) );
-				//std::cout << "test -1   " << TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-1,0) << std::endl;
-				
-			} 
-			if(goodtrksInJet3D ==2) {
-				fS8evt->btag_NegTag_disc3D_1trk.push_back( -9999. );
-
-				fS8evt->btag_NegTag_disc3D_2trk.push_back(
-					TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-2,0) );
-				//std::cout << "test -2   " << TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-2,0) << std::endl;
-				fS8evt->btag_NegTag_disc3D_3trk.push_back(
-					TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-1,0) );
-				//std::cout << "test -1   " << TrkCountingInfo[ith_tagged].significance(goodtrksInJet3D-1,0) << std::endl;
-			}
-			if(goodtrksInJet3D<2) {
-				fS8evt->btag_NegTag_disc3D_1trk.push_back( -9999. );
-				fS8evt->btag_NegTag_disc3D_2trk.push_back( -9999. );
-				fS8evt->btag_NegTag_disc3D_3trk.push_back( -9999. );
-			}
-		} else {
-			fS8evt->btag_TrkCounting_disc2D_1trk.push_back( -9999. );
-			fS8evt->btag_TrkCounting_disc2D_2trk.push_back( -9999. );
-			fS8evt->btag_TrkCounting_disc2D_3trk.push_back( -9999. );
-			fS8evt->btag_TrkCounting_disc3D_1trk.push_back( -9999. );
-			fS8evt->btag_TrkCounting_disc3D_2trk.push_back( -9999. );
-			fS8evt->btag_TrkCounting_disc3D_3trk.push_back( -9999. );
-			
-			fS8evt->jet_ntrks.push_back( 0 );
-			//fS8evt->btag_NegTag_disc2D_1trk.push_back( -9999. );
-			//fS8evt->btag_NegTag_disc2D_2trk.push_back( -9999. );
-			//fS8evt->btag_NegTag_disc2D_3trk.push_back( -9999. );
-			fS8evt->btag_NegTag_disc3D_1trk.push_back( -9999. );
-			fS8evt->btag_NegTag_disc3D_2trk.push_back( -9999. );
-			fS8evt->btag_NegTag_disc3D_3trk.push_back( -9999. );
-		}
-   
-		ith_tagged = -1;
-		ith_tagged = this->TaggedJet(*jet,btagCollTP);
-		if (ith_tagged != -1 ) {
-		  fS8evt->btag_JetProb_disc3D.push_back(btagCollTP[ith_tagged].discriminator());
-		  //fS8evt->btag_JetProb_disc3D.push_back( JetProbInfo[ith_tagged].discriminator(2,0) ); // 3D
-			//fS8evt->btag_JetProb_disc2D.push_back( JetProbInfo[ith_tagged].discriminator(2,1) ); // 2D
-			isbtagged = 1;
-		} else {
-			fS8evt->btag_JetProb_disc3D.push_back( -9999. );
-			//fS8evt->btag_JetProb_disc2D.push_back( -9999. );
 		}
 		
-		//fS8evt->jet_isbtagged.push_back( isbtagged );
+		if (!gotTCHE)    fS8evt->btag_TrkCounting_disc3D_2trk.push_back( -9999. );
+		if (!gotTCHEneg) fS8evt->btag_NegTag_disc3D_2trk.push_back( -9999. );
 		
-		*/
+		if (!gotTCHP)    fS8evt->btag_TrkCounting_disc3D_3trk.push_back( -9999. );
+		if (!gotTCHPneg) fS8evt->btag_NegTag_disc3D_3trk.push_back( -9999. );
+		
+		if (!gotJP)      fS8evt->btag_JetProb_disc3D.push_back( -9999. );
+		if (!gotJPneg)   fS8evt->btag_negJetProb_disc3D.push_back( -9999. );
+		if (!gotJPpos)   fS8evt->btag_posJetProb_disc3D.push_back( -9999. );		
 								   
 		ijet++;
 	} //end loop over reco jets
