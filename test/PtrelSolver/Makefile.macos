@@ -28,7 +28,7 @@ all:	$(OBJS)
 
 %Dict.cc: %.h %LinkDef.h
 	@echo "Generating dictionary $@"
-	@rootcint -f $@  -c  $^
+	@rootcint -f $@ -c -DNOSCRAMV $^
 
 clean:        
 	@rm -f $(OBJS) core *~ *.o *.so *.eps *.root
