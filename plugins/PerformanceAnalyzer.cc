@@ -63,6 +63,7 @@
 #include "TLorentzVector.h"
 #include "Math/GenVector/VectorUtil.h"
 #include "Math/GenVector/PxPyPzE4D.h"
+#include "TGraphErrors.h"
 
 #include <map>
 
@@ -93,7 +94,7 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
   // create or update output root file
   rootFile_ = TFile::Open(outputFile_.c_str(),"RECREATE");
   // verbose std output
-  verbose_= iConfig.getUntrackedParameter<bool>("verbose", false);
+  fverbose= iConfig.getUntrackedParameter<bool>("verbose", false);
   // default tree
   ftree = new TTree("summary","summary");
   ftree->AutoSave();
@@ -196,6 +197,9 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
   // get tagger for away jet
   fAwayJetTagger = iConfig.getParameter<std::string>("AwayJetTagger");
 
+  // write performance plots?
+  fWritePerformancePlots = iConfig.getParameter< bool > ("WritePerformancePlots");
+  
   topdir = rootFile_->mkdir("Histograms");
   topdir->cd();
   topdir->mkdir("ptrel");
@@ -236,6 +240,17 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
 	  TaggedAwayjetHistos->Init("ptag","cl",imap->first);
 	  
   }
+
+  fperformanceTC2trk.Set("TC2trk");
+  fperformanceTC3trk.Set("TC3trk");
+  fperformanceTP.Set("TP");
+  fperformanceTC2trk.SetMinDiscriminator(-1);
+  fperformanceTC2trk.SetMaxDiscriminator(15);
+  fperformanceTC3trk.SetMinDiscriminator(-1);
+  fperformanceTC3trk.SetMaxDiscriminator(15);
+  fperformanceTP.SetMinDiscriminator(0);
+  fperformanceTP.SetMaxDiscriminator(1);
+
   //simUnit_= 1.0;  // starting with CMSSW_1_2_x ??
   //if ( (edm::getReleaseVersion()).find("CMSSW_1_1_",0)!=std::string::npos){
   //  simUnit_=0.1;  // for use in  CMSSW_1_1_1 tutorial
@@ -255,12 +270,88 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
 	topdir->cd();
 	topdir->cd("efficiencies");
 	EffHistos->Save();
+	if (fWritePerformancePlots) {
+		
+		fperformanceTC2trk.Eval();
+		fperformanceTC3trk.Eval();
+		fperformanceTP.Eval();
+		
+		TGraphErrors *gTC2_b = new TGraphErrors(fperformanceTC2trk.GetN(),
+												fperformanceTC2trk.GetArray("b").GetArray(),fperformanceTC2trk.GetArray("b").GetArray(),
+												fperformanceTC2trk.GetArray("bErr").GetArray(),fperformanceTC2trk.GetArray("bErr").GetArray());
+	
+		TGraphErrors *gTC2_c = new TGraphErrors(fperformanceTC2trk.GetN(),
+								  fperformanceTC2trk.GetArray("b").GetArray(),fperformanceTC2trk.GetArray("c").GetArray(),
+								  fperformanceTC2trk.GetArray("bErr").GetArray(),fperformanceTC2trk.GetArray("cErr").GetArray());
+		
+		TGraphErrors *gTC2_udsg = new TGraphErrors(fperformanceTC2trk.GetN(),
+									 fperformanceTC2trk.GetArray("b").GetArray(),fperformanceTC2trk.GetArray("udsg").GetArray(),
+									 fperformanceTC2trk.GetArray("bErr").GetArray(),fperformanceTC2trk.GetArray("udsgErr").GetArray());
+		
+		TGraphErrors *gTC3_b = new TGraphErrors(fperformanceTC3trk.GetN(),
+								  fperformanceTC3trk.GetArray("b").GetArray(),fperformanceTC3trk.GetArray("b").GetArray(),
+								  fperformanceTC3trk.GetArray("bErr").GetArray(),fperformanceTC3trk.GetArray("bErr").GetArray());
+		
+		TGraphErrors *gTC3_c = new TGraphErrors(fperformanceTC3trk.GetN(),
+								  fperformanceTC3trk.GetArray("b").GetArray(),fperformanceTC3trk.GetArray("c").GetArray(),
+								  fperformanceTC3trk.GetArray("bErr").GetArray(),fperformanceTC3trk.GetArray("cErr").GetArray());
+		
+		TGraphErrors *gTC3_udsg = new TGraphErrors(fperformanceTC3trk.GetN(),
+									 fperformanceTC3trk.GetArray("b").GetArray(),fperformanceTC3trk.GetArray("udsg").GetArray(),
+									 fperformanceTC3trk.GetArray("bErr").GetArray(),fperformanceTC3trk.GetArray("udsgErr").GetArray());
+		
+		TGraphErrors *gTP_b = new TGraphErrors(fperformanceTP.GetN(),
+								 fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("b").GetArray(),
+								 fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("bErr").GetArray());
+		
+		TGraphErrors *gTP_c = new TGraphErrors(fperformanceTP.GetN(),
+								 fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("c").GetArray(),
+								 fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("cErr").GetArray());
+	
+		TGraphErrors *gTP_udsg = new TGraphErrors(fperformanceTP.GetN(),
+									fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("udsg").GetArray(),
+									fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("udsgErr").GetArray());
+
+		gTC2_b->SetName("gTC2_b");
+		gTC2_c->SetName("gTC2_c");
+		gTC2_udsg->SetName("gTC2_udsg");
+		gTC3_b->SetName("gTC3_b");
+		gTC3_c->SetName("gTC3_c");
+		gTC3_udsg->SetName("gTC3_udsg");
+		gTP_b->SetName("gTP_b");
+		gTP_c->SetName("gTP_c");
+		gTP_udsg->SetName("gTP_udsg");
+				
+		gTC2_b->SetTitle("Jet b Efficiency");
+		gTC2_c->SetTitle("Jet c Mistagging");
+		gTC2_udsg->SetTitle("Jet udsg Mistagging");
+		gTC3_b->SetTitle("Jet b Efficiency");
+		gTC3_c->SetTitle("Jet c Mistagging");
+		gTC3_udsg->SetTitle("Jet udsg Mistagging");
+		gTP_b->SetTitle("Jet b Efficiency");
+		gTP_c->SetTitle("Jet c Mistagging");
+		gTP_udsg->SetTitle("Jet udsg Mistagging");
+				
+		gTC2_b->Write();
+		gTC2_c->Write();
+		gTC2_udsg->Write();
+		gTC3_b->Write();
+		gTC3_c->Write();
+		gTC3_udsg->Write();
+		gTP_b->Write();
+		gTP_c->Write();
+		gTP_udsg->Write();
+		
+	}
+	
 	topdir->cd("ptrel");
 	PtrelHistos->Save();
 	topdir->cd("samples");
 	MujetHistos->Save();
 	AwayjetHistos->Save();
-
+	TaggedMujetHistos->Save();
+	TaggedAwayjetHistos->Save();
+	
 	topdir->Write();
 	
    // do anything here that needs to be done at desctruction time
@@ -438,7 +529,6 @@ PerformanceAnalyzer::GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<st
 	std::map< std::string, bool > aMap;
 	
 	int ith_tagged = -1;
-	int isbtagged = 0;
 
 	aMap["TCL"] = false;
 	aMap["TCM"] = false;
@@ -492,6 +582,44 @@ PerformanceAnalyzer::GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<st
 	return aMap;
 }
 
+//______________________________________________________________________________________________________________________
+void PerformanceAnalyzer::FillPerformance(reco::CaloJet jet, int JetFlavor, std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType) {
+
+	std::map< std::string, bool > aMap;
+	int ith_tagged = -1;
+	
+	//start loop over all jetTags
+	for (size_t k=0; k<jetTags_testManyByType.size(); k++) {
+		
+		edm::Handle<std::vector<reco::JetTag> > jetTags = jetTags_testManyByType[k];
+			
+		ith_tagged = this->TaggedJet(jet,jetTags);
+
+		if (ith_tagged == -1) continue;
+		
+		std::string moduleLabel = (jetTags).provenance()->moduleLabel();
+			
+		//*********************************
+		// Track Counting taggers
+		//*********************************
+		if ( moduleLabel == "trackCountingHighEffJetTags" ) {
+			
+			fperformanceTC2trk.Add( (*jetTags)[ith_tagged].discriminator(), JetFlavor );			
+		}
+		else if ( moduleLabel == "trackCountingHighPurJetTags" ) {
+
+			fperformanceTC3trk.Add( (*jetTags)[ith_tagged].discriminator(), JetFlavor );		
+		}
+		//*********************************
+		// Jet Probability taggers
+		//*********************************
+		else if ( moduleLabel == "jetProbabilityJetTags" ) {
+
+			fperformanceTP.Add( (*jetTags)[ith_tagged].discriminator(), JetFlavor );
+		}
+	}
+}
+	
 //______________________________________________________________________________________________________________________
 void PerformanceAnalyzer::FillEff(TLorentzVector p4MuJet, int JetFlavor, std::map<std::string, bool> aMap) {
 
@@ -764,13 +892,13 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	      
 	try{
 		iEvent.getByLabel("source",evtMC);
-		if(verbose_){
+		if(fverbose){
 			std::cout << "source HepMCProduct found"<< std::endl;
 		}
 		MC=true;
 	} catch(const Exception&) {
 		MC=false;
-		if(verbose_){
+		if(fverbose){
 			std::cout << "no HepMCProduct found"<< std::endl;
 		}
 	}
@@ -984,10 +1112,11 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 				}
 			}
 			
-		}
+		} // close away jet loop
 
 		std::map< std::string, bool > thebtaggingmap = this->GetBTaggingMap(*jet,jetTags_testManyByType);
 		FillEff(p4Jet, JetFlavor, thebtaggingmap );
+		FillPerformance(*jet, JetFlavor, jetTags_testManyByType );
 			
 		if ( hasLepton == 1 ) {
 			p4MuJet.SetPtEtaPhiE(jet->pt(), jet->eta(), jet->phi(), jet->energy() );
@@ -1037,7 +1166,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		
 		// b tagging
 		int ith_tagged = -1;
-		int isbtagged = 0;
+		//int isbtagged = 0;
 
 		bool gotTCHE     = false;
 		bool gotTCHEneg  = false;
@@ -1105,17 +1234,17 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 				fS8evt->jet_ntrks.push_back( NtrksInJet );
 
 				int i=0;
-	std::vector< float > track_proba = (*tagInfo)[ith_tagged].probabilities(0) ;
-	std::vector< float > probabilities;
-	for(std::vector<float>::const_iterator it = track_proba.begin(); it!=track_proba.end(); ++it, i++){
+				std::vector< float > track_proba = (*tagInfo)[ith_tagged].probabilities(0) ;
+				std::vector< float > probabilities;
+				for(std::vector<float>::const_iterator it = track_proba.begin(); it!=track_proba.end(); ++it, i++){
+					
+					double delta  = -2.; 
+					delta = ROOT::Math::VectorUtil::DeltaR( (*(*jetTags)[ith_tagged].jet()).p4().Vect(), (*(*jetTags)[ith_tagged].tracks()[i]).momentum());
+					if(delta <0.3|| 0.3 <= 0) probabilities.push_back((*it));
+					
 	  
-	  double delta  = -2.; 
-	  delta = ROOT::Math::VectorUtil::DeltaR( (*(*jetTags)[ith_tagged].jet()).p4().Vect(), (*(*jetTags)[ith_tagged].tracks()[i]).momentum());
-	  if(delta <0.3|| 0.3 <= 0) probabilities.push_back((*it));
-
-	  
-	}
-	fS8evt->jet_Tracks_Probability.push_back(probabilities);
+				}
+				fS8evt->jet_Tracks_Probability.push_back(probabilities);
 				
 			}
 			else if ( moduleLabel == "jetProbabilityJetTagsNegativeOnly" ) {

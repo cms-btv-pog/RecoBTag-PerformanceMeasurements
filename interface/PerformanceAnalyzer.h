@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.2 2007/12/05 17:35:21 yumiceva Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.3 2008/01/04 16:18:22 yumiceva Exp $
  *
  */
 
@@ -65,6 +65,8 @@
 #include "RecoBTag/PerformanceMeasurements/interface/BTagEvent.h"
 #include "RecoBTag/PerformanceMeasurements/interface/BTagHistograms.h"
 
+#include "RecoBTag/PerformanceMeasurements/test/S8Tools/S8bPerformance.h"
+
 TrackAssociatorBase * associatorByHits;
 
 // class declaration
@@ -89,7 +91,8 @@ public:
 				  int JetFlavor, std::map<std::string, bool> aMap);
   void FillEff(TLorentzVector p4MuJet, int JetFlavor, std::map<std::string, bool> aMap);
   void FillPtrel(double ptrel, int JetFlavor, std::map<std::string, bool> aMap);
-	  
+  void FillPerformance(reco::CaloJet jet, int JetFlavor, std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType);
+  
 private:
  
   // ----------member data ---------------------------
@@ -122,7 +125,7 @@ private:
   
   TFile*  rootFile_;
   TDirectory *topdir; 
-  bool verbose_;
+  bool fverbose;
 
   BTagHistograms *EffHistos;
   BTagHistograms *PtrelHistos;
@@ -130,6 +133,11 @@ private:
   BTagHistograms *AwayjetHistos;
   BTagHistograms *TaggedMujetHistos;
   BTagHistograms *TaggedAwayjetHistos;
+
+  S8bPerformance fperformanceTC2trk;
+  S8bPerformance fperformanceTC3trk;
+  S8bPerformance fperformanceTP;
+  bool fWritePerformancePlots;
   
   //edm::InputTag simG4_;
   //double simUnit_;               

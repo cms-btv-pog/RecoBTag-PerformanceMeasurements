@@ -27,6 +27,8 @@ module Performance = PerformanceAnalyzer {
        }
 
        string AwayJetTagger = "TCL"
+       
+       bool WritePerformancePlots = true
 
        string GenJets= "iterativeCone5GenJets"
        string SimTracks = "g4SimHits"
