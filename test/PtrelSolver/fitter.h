@@ -1,5 +1,5 @@
-#ifndef PtrelSolver_h
-#define PtrelSolver_h
+#ifndef fitter_h
+#define fitter_h
 
 #include "TFile.h"
 #include "TTree.h"
@@ -32,7 +32,7 @@ Double_t combined_pdf(Double_t *xx, Double_t *par);
 static double pthatbining[100];
 static double etabining[100];
 
-class PtrelSolver : public TObject {
+class fitter : public TObject {
 
  protected:
 
@@ -58,7 +58,6 @@ class PtrelSolver : public TObject {
   TF1     *func;
   TH1F    *hist;
   TFile   *inputfile;
-  TFile   *mistagfile;
   TFile   *outfile;
 
   TLatex  *label;
@@ -86,9 +85,9 @@ class PtrelSolver : public TObject {
 
  public:
 
-  PtrelSolver();
-  virtual ~PtrelSolver();
-  PtrelSolver(int ptbins, int etabins);
+  fitter();
+  virtual ~fitter();
+  fitter(int ptbins, int etabins);
 
 
 
@@ -166,7 +165,7 @@ class PtrelSolver : public TObject {
 
   void measure(const char *inputfilename, const char *tag, const char *pthist="npT", const char *etahist= "nEta", bool sys= false);
 
-  void counting(const char *tag, const char *outfilename, const char *inputfilename, const char *mistagfilename = 0);
+
 
   void Fit(TH1F *data, TF1 *pdf, std::vector<double> *num, std::vector<double> *num_err);
   
@@ -176,7 +175,7 @@ class PtrelSolver : public TObject {
   TGraphErrors *checkPurity2(TF1 *pdf, int steps, int num_bs, bool verbose);
 
 
-  ClassDef(PtrelSolver, 1)
+  ClassDef(fitter, 1)
 };
 
 #endif
