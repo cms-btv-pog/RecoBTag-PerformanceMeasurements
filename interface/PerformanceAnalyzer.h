@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.1 2007/09/24 18:26:47 yumiceva Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.2 2007/12/05 17:35:21 yumiceva Exp $
  *
  */
 
@@ -55,13 +55,15 @@
 #include "SimTracker/TrackAssociation/interface/TrackAssociatorByHits.h"
 
 // Root
-#include <TH1.h>
-#include <TFile.h>
-#include <TTree.h>
+#include "TH1.h"
+#include "TFile.h"
+#include "TTree.h"
+#include "TLorentzVector.h"
+#include "TDirectory.h"
 
 // event class
 #include "RecoBTag/PerformanceMeasurements/interface/BTagEvent.h"
-
+#include "RecoBTag/PerformanceMeasurements/interface/BTagHistograms.h"
 
 TrackAssociatorBase * associatorByHits;
 
@@ -82,7 +84,12 @@ public:
   SimTrack GetGenTrk(reco::Track atrack, edm::SimTrackContainer simTrkColl, edm::SimVertexContainer simVtcs);
   int GetMotherId(edm::SimVertexContainer simVtxColl, edm::SimTrackContainer simTrkColl, SimTrack muonMC);
   int TaggedJet(reco::CaloJet calojet, edm::Handle<std::vector<reco::JetTag> > jetTags );
-  
+  std::map< std::string, bool > GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType);
+  void FillHistos(std::string type, TLorentzVector p4MuJet, double ptrel,
+				  int JetFlavor, std::map<std::string, bool> aMap);
+  void FillEff(TLorentzVector p4MuJet, int JetFlavor, std::map<std::string, bool> aMap);
+  void FillPtrel(double ptrel, int JetFlavor, std::map<std::string, bool> aMap);
+	  
 private:
  
   // ----------member data ---------------------------
@@ -90,6 +97,7 @@ private:
   std::string recoTrackList_; // collection of tracks
   std::string recoVtxList_;   // collection of vertices
   std::vector< std::string > bTaggerList_;    // list of b-tagggers
+  std::vector< double > bTagCutList_; 
   std::vector< std::string > moduleLabel_;
 	  //std::string JetTrackAssociatorTags_;
   std::string MuonCollectionTags_; 
@@ -98,11 +106,12 @@ private:
   std::string GenJetCollectionTags_;
   std::string SimTrkCollectionTags_;
   std::string analyzer_;
-  
+  std::string fAwayJetTagger;
+	  
   JetFlavourIdentifier jetFlavourIdentifier_;
-  JetFlavourIdentifier jetFlavourIdentifier2_;
+  //JetFlavourIdentifier jetFlavourIdentifier2_;
 
-  double MinJetEt_;
+  double MinJetPt_;
   double MaxJetEta_;
   double MinDeltaR_;
   double MinPtRel_;
@@ -111,10 +120,19 @@ private:
   double MaxMuonChi2_;
   int MinMuonNHits_;
   
-  TFile*  rootFile_;             
+  TFile*  rootFile_;
+  TDirectory *topdir; 
   bool verbose_;
-  edm::InputTag simG4_;
-  double simUnit_;               
+
+  BTagHistograms *EffHistos;
+  BTagHistograms *PtrelHistos;
+  BTagHistograms *MujetHistos;
+  BTagHistograms *AwayjetHistos;
+  BTagHistograms *TaggedMujetHistos;
+  BTagHistograms *TaggedAwayjetHistos;
+  
+  //edm::InputTag simG4_;
+  //double simUnit_;               
 
   //std::map<std::string, TH1*> h;
 
@@ -126,6 +144,8 @@ private:
 
   TrackAssociatorBase *associatorByChi2;
   TrackAssociatorByHits *associatorByHits;
+
+  std::map< std::string, float > fOPMap;
   
 };
 

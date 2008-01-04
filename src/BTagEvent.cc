@@ -5,7 +5,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.cc,v 1.4 2007/09/28 23:13:15 yumiceva Exp $
+ version $Id: BTagEvent.cc,v 1.6 2008/01/03 13:04:40 jandrea Exp $
 
 ________________________________________________________________**/
 
@@ -43,53 +43,36 @@ void BTagEvent::Reset() {
 	nvertices     = -1;
 	ngenjets    = -1;
 
-	//jet_p.clear();
 	jet_pt.clear();
 	jet_eta.clear();
 	jet_phi.clear();
 	jet_e.clear();
 	jet_et.clear();
 	jet_ntrks.clear();
-	//jet_vx.clear();
-	//jet_vy.clear();
-	//jet_vz.clear();
-	jet_flavour_alg.clear();
-	jet_flavour_phy.clear();
-	//jet_isbtagged.clear();
+	jet_flavour.clear();
 	jet_hasLepton.clear();
 	
 	jetcorrection.clear();
 	jet_Tracks_Probability.clear();
 	
 	
-	//genjet_p.clear();
 	genjet_pt.clear();
 	genjet_eta.clear();
 	genjet_phi.clear();
 	genjet_e.clear();
-	//genjet_vx.clear();
-	//genjet_vy.clear();
-	//genjet_vz.clear();
-
-	btag_TrkCounting_disc2D_1trk.clear();
-	btag_TrkCounting_disc2D_2trk.clear();
-	btag_TrkCounting_disc2D_3trk.clear();
-	btag_TrkCounting_disc3D_1trk.clear();
+	
 	btag_TrkCounting_disc3D_2trk.clear();
 	btag_TrkCounting_disc3D_3trk.clear();
-
-	//btag_JetProb_disc2D.clear();
+	
 	btag_JetProb_disc3D.clear();
 	btag_negJetProb_disc3D.clear();
 	btag_posJetProb_disc3D.clear();
-
-	//btag_NegTag_disc2D_1trk.clear();
-	//btag_NegTag_disc2D_2trk.clear();
-	//btag_NegTag_disc2D_3trk.clear();
-	btag_NegTag_disc3D_1trk.clear();
+	
 	btag_NegTag_disc3D_2trk.clear();
 	btag_NegTag_disc3D_3trk.clear();
 
+	btag_SoftMuon_disc.clear();
+	
 	lepton.clear();
 	
 }

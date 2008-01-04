@@ -8,7 +8,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.h,v 1.4 2007/09/28 23:13:14 yumiceva Exp $
+ version $Id: BTagEvent.h,v 1.6 2008/01/03 13:04:39 jandrea Exp $
 
 ________________________________________________________________**/
 
@@ -30,7 +30,7 @@ class BTagEvent : public TObject {
 
 	void                 Reset();
 	double               calculProbability(std::vector< float > );
-	std::vector< float > getTrackProbabilies(std::vector< float >, int);
+	std::vector< float > getTrackProbabilies(std::vector< float > v , int ipType);
 	
 	Int_t event; // event number
 	Int_t run;   // run number
@@ -50,8 +50,8 @@ class BTagEvent : public TObject {
 	std::vector< float > jet_et;
 	std::vector< int > jet_ntrks;
 
-	std::vector< int > jet_flavour_phy;
-	std::vector< int > jet_flavour_alg;
+	//std::vector< int > jet_flavour_phy;
+	std::vector< int > jet_flavour;
 	std::vector< int > jet_hasLepton;
 	std::vector< float > jetcorrection;
 	std::vector< std::vector< float > > jet_Tracks_Probability;
@@ -60,11 +60,7 @@ class BTagEvent : public TObject {
 	std::vector< float > genjet_eta;
 	std::vector< float > genjet_phi;
 	std::vector< float > genjet_e;
-
-	std::vector< float > btag_TrkCounting_disc2D_1trk;
-	std::vector< float > btag_TrkCounting_disc2D_2trk;
-	std::vector< float > btag_TrkCounting_disc2D_3trk;
-	std::vector< float > btag_TrkCounting_disc3D_1trk;
+	
 	std::vector< float > btag_TrkCounting_disc3D_2trk;
 	std::vector< float > btag_TrkCounting_disc3D_3trk;
 
@@ -72,10 +68,11 @@ class BTagEvent : public TObject {
 	std::vector< float > btag_negJetProb_disc3D;
 	std::vector< float > btag_posJetProb_disc3D;
 
-	std::vector< float > btag_NegTag_disc3D_1trk;
 	std::vector< float > btag_NegTag_disc3D_2trk;
 	std::vector< float > btag_NegTag_disc3D_3trk;
-		
+
+	std::vector< float > btag_SoftMuon_disc;
+	
 	std::vector< BTagLeptonEvent > lepton;
 	
 	ClassDef(BTagEvent,1);
