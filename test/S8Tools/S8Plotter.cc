@@ -315,7 +315,7 @@ void S8Plotter::Loop()
 			if ( p4Jet.Pt() <= 20. ) continue;
 			
 			// get MC flavor of jet
-			JetFlavor = fS8evt->jet_flavour_alg[ijet];
+			JetFlavor = fS8evt->jet_flavour[ijet];
 
 			nmultiple_muons = 0;
 			bool passGoodMuon = false;
