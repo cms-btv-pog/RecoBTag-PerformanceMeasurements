@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8bPerformance.h,v 1.2 2007/10/17 14:50:58 yumiceva Exp $
+ * \version $Id: S8bPerformance.h,v 1.3 2007/10/18 05:13:21 yumiceva Exp $
  *
  */
 
@@ -51,6 +51,7 @@ class S8bPerformance {
 			double cut = i*binwidth + fMinDisc;
 			if (cut > fMaxDisc) cut = fMaxDisc;
 
+			disc_map[i] = cut;
 			if ( fdisc > cut ) {
 				if ( fflavor==5 ) b_tagged[i]++;
 				if ( fflavor==4 ) c_tagged[i]++;
@@ -106,6 +107,7 @@ class S8bPerformance {
 	  if (option=="bErr") return b_effErr;
 	  if (option=="cErr") return c_effErr;
 	  if (option=="udsgErr") return udsg_effErr;
+	  if (option=="discriminator") return disc_map;
 	  //return NULL;
 	};
 
@@ -138,7 +140,8 @@ class S8bPerformance {
 	std::map< int, double > b_effErr;
 	std::map< int, double > c_effErr;
 	std::map< int, double > udsg_effErr;
-
+	std::map< int, double > disc_map;
+	
 	std::map< int, double > b_tagged;
 	std::map< int, double > c_tagged;
 	std::map< int, double > udsg_tagged;

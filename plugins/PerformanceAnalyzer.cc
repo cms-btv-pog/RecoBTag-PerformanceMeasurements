@@ -287,6 +287,9 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
 		TGraphErrors *gTC2_udsg = new TGraphErrors(fperformanceTC2trk.GetN(),
 									 fperformanceTC2trk.GetArray("b").GetArray(),fperformanceTC2trk.GetArray("udsg").GetArray(),
 									 fperformanceTC2trk.GetArray("bErr").GetArray(),fperformanceTC2trk.GetArray("udsgErr").GetArray());
+		TGraph *dTC2_udsg = new TGraph(fperformanceTC2trk.GetN(),
+									 fperformanceTC2trk.GetArray("udsg").GetArray(),
+									 fperformanceTC2trk.GetArray("discriminator").GetArray());
 		
 		TGraphErrors *gTC3_b = new TGraphErrors(fperformanceTC3trk.GetN(),
 								  fperformanceTC3trk.GetArray("b").GetArray(),fperformanceTC3trk.GetArray("b").GetArray(),
@@ -299,6 +302,9 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
 		TGraphErrors *gTC3_udsg = new TGraphErrors(fperformanceTC3trk.GetN(),
 									 fperformanceTC3trk.GetArray("b").GetArray(),fperformanceTC3trk.GetArray("udsg").GetArray(),
 									 fperformanceTC3trk.GetArray("bErr").GetArray(),fperformanceTC3trk.GetArray("udsgErr").GetArray());
+		TGraph *dTC3_udsg = new TGraph(fperformanceTC3trk.GetN(),
+									 fperformanceTC3trk.GetArray("udsg").GetArray(),
+									 fperformanceTC3trk.GetArray("discriminator").GetArray());
 		
 		TGraphErrors *gTP_b = new TGraphErrors(fperformanceTP.GetN(),
 								 fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("b").GetArray(),
@@ -311,7 +317,10 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
 		TGraphErrors *gTP_udsg = new TGraphErrors(fperformanceTP.GetN(),
 									fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("udsg").GetArray(),
 									fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("udsgErr").GetArray());
-
+		TGraph *dTP_udsg = new TGraph(fperformanceTP.GetN(),
+									 fperformanceTP.GetArray("udsg").GetArray(),
+									 fperformanceTP.GetArray("discriminator").GetArray());
+		
 		gTC2_b->SetName("gTC2_b");
 		gTC2_c->SetName("gTC2_c");
 		gTC2_udsg->SetName("gTC2_udsg");
@@ -321,16 +330,23 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
 		gTP_b->SetName("gTP_b");
 		gTP_c->SetName("gTP_c");
 		gTP_udsg->SetName("gTP_udsg");
-				
-		gTC2_b->SetTitle("Jet b Efficiency");
-		gTC2_c->SetTitle("Jet c Mistagging");
-		gTC2_udsg->SetTitle("Jet udsg Mistagging");
-		gTC3_b->SetTitle("Jet b Efficiency");
-		gTC3_c->SetTitle("Jet c Mistagging");
-		gTC3_udsg->SetTitle("Jet udsg Mistagging");
-		gTP_b->SetTitle("Jet b Efficiency");
-		gTP_c->SetTitle("Jet c Mistagging");
-		gTP_udsg->SetTitle("Jet udsg Mistagging");
+
+		dTC2_udsg->SetName("discTC2_udsg");
+		dTC3_udsg->SetName("discTC3_udsg");
+		dTP_udsg->SetName("discTP_udsg");
+		dTC2_udsg->SetTitle("TC2trk discriminator vs udsg-mistagging");
+		dTC3_udsg->SetTitle("TC3trk discriminator vs udsg-mistagging");
+		dTP_udsg->SetTitle("TP discriminator vs udsg-mistagging");
+		
+		gTC2_b->SetTitle("Jet b-efficiency");
+		gTC2_c->SetTitle("Jet c-mistagging");
+		gTC2_udsg->SetTitle("Jet udsg-mistagging");
+		gTC3_b->SetTitle("Jet b-efficiency");
+		gTC3_c->SetTitle("Jet c-mistagging");
+		gTC3_udsg->SetTitle("Jet udsg-mistagging");
+		gTP_b->SetTitle("Jet b-efficiency");
+		gTP_c->SetTitle("Jet c-mistagging");
+		gTP_udsg->SetTitle("Jet udsg-mistagging");
 				
 		gTC2_b->Write();
 		gTC2_c->Write();
@@ -341,6 +357,10 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
 		gTP_b->Write();
 		gTP_c->Write();
 		gTP_udsg->Write();
+
+		dTC2_udsg->Write();
+		dTC3_udsg->Write();
+		dTP_udsg->Write();
 		
 	}
 	
