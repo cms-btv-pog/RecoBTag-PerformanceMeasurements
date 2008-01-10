@@ -10,6 +10,7 @@ module Performance = PerformanceAnalyzer {
        string Jets  = "iterativeCone5CaloJets"
        untracked string TrackCollection = "ctfWithMaterialTracks"
        untracked string PrimaryVertexCollection = "offlinePrimaryVerticesFromCTFTracks"
+       // b-tagedd jet collection
        untracked vstring bTaggerList = { 
          "trackCountingHighEffJetTags",
 	 "trackCountingHighPurJetTags",
@@ -17,8 +18,11 @@ module Performance = PerformanceAnalyzer {
 	 "jetProbabilityJetTagsPositiveOnly",
 	 "jetProbabilityJetTags"
        }
+
        // definition of the Operating Points (L,M,T)
        // cuts estimated using QCD-80-120, 10k events.
+       // sorted as TCL,TCM,TCT,JPL,JPM,JPT
+
        untracked vdouble bTagCutList = {
           2.0,
 	  4.6,
