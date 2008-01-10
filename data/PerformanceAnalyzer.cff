@@ -17,13 +17,15 @@ module Performance = PerformanceAnalyzer {
 	 "jetProbabilityJetTagsPositiveOnly",
 	 "jetProbabilityJetTags"
        }
+       // definition of the Operating Points (L,M,T)
+       // cuts estimated using QCD-80-120, 10k events.
        untracked vdouble bTagCutList = {
-          2.3,
-	  5.3,
-	  4.8,
-	  0.29,
-	  0.54,
-	  0.75
+          2.0,
+	  4.6,
+	  4.7,
+	  0.26,
+	  0.50,
+	  0.76
        }
 
        string AwayJetTagger = "TCL"

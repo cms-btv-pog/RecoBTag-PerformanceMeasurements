@@ -4,7 +4,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagHistograms.cc,v 1.11 2007/11/03 00:39:24 yumiceva Exp $
+ version $Id: BTagHistograms.cc,v 1.1 2008/01/04 16:20:31 yumiceva Exp $
 
 ________________________________________________________________**/
 
@@ -29,9 +29,9 @@ BTagHistograms::~BTagHistograms() {
 //_______________________________________________________________
 void BTagHistograms::Init(TString type, TString suffix1, TString suffix2) {
 
-	const int nptarray = 12;
+	const int nptarray = 11;
 	const int netaarray = 10;
-	Double_t jetptbins[nptarray] = {20.,30., 40., 50., 60., 70., 80, 90., 100., 120., 140., 230.};
+	Double_t jetptbins[nptarray] = {30., 40., 50., 60., 70., 80, 90., 100., 120., 140., 230.};
 	Double_t jetetabins[netaarray] = {0.0,0.25,0.5,0.75,1.0,1.25,1.5,1.75,2.0,2.5};
 			
 	if (suffix1 != "") suffix1 = "_" + suffix1;
@@ -39,22 +39,23 @@ void BTagHistograms::Init(TString type, TString suffix1, TString suffix2) {
 
 	if ( type == "efficiencies" ) {
 
-		h1["jet_pt"+suffix1] = new TH1D("jet_pt"+suffix1,"Jet p_{T} [GeV/c]",12,30.,230.);
-		h1["jet_pt_b"+suffix1] = new TH1D("jet_pt_b"+suffix1,"Jet p_{T} [GeV/c]",12,30.,230.);
-		h1["jet_pt_c"+suffix1] = new TH1D("jet_pt_c"+suffix1,"Jet p_{T} [GeV/c]",12,30.,230.);
+		h1["jet_pt"+suffix1] = new TH1D("jet_pt"+suffix1,"Jet p_{T} [GeV/c]",nptarray-1,jetptbins);
+		h1["jet_pt_b"+suffix1] = new TH1D("jet_pt_b"+suffix1,"Jet p_{T} [GeV/c]",nptarray-1,jetptbins);
+		h1["jet_pt_c"+suffix1] = new TH1D("jet_pt_c"+suffix1,"Jet p_{T} [GeV/c]",nptarray-1,jetptbins);
 		h1["jet_pt_udsg"+suffix1] = new TH1D("jet_pt_udsg"+suffix1,"Jet p_{T} [GeV/c]",12,30.,230.);
-		h1["jet_eta"+suffix1] = new TH1D("jet_eta"+suffix1,"Jet |#eta|",12,30.,230.);
-		h1["jet_eta_b"+suffix1] = new TH1D("jet_eta_b"+suffix1,"Jet |#eta|",12,30.,230.);
-		h1["jet_eta_c"+suffix1] = new TH1D("jet_eta_c"+suffix1,"Jet |#eta|",12,30.,230.);
-		h1["jet_eta_udsg"+suffix1] = new TH1D("jet_eta_udsg"+suffix1,"Jet |#eta|",12,30.,230.);
+		
+		h1["jet_eta"+suffix1] = new TH1D("jet_eta"+suffix1,"Jet |#eta|",netaarray-1,jetetabins);
+		h1["jet_eta_b"+suffix1] = new TH1D("jet_eta_b"+suffix1,"Jet |#eta|",netaarray-1,jetetabins);
+		h1["jet_eta_c"+suffix1] = new TH1D("jet_eta_c"+suffix1,"Jet |#eta|",netaarray-1,jetetabins);
+		h1["jet_eta_udsg"+suffix1] = new TH1D("jet_eta_udsg"+suffix1,"Jet |#eta|",netaarray-1,jetetabins);
 		
 	}
 	if ( type == "ptrel") {
 		
 		h1["jet_ptrel"+suffix1] = new TH1D("jet_ptrel"+suffix1,"p_{Trel} [GeV/c]",50,0.,5.);
-		h1["jet_ptrel_b"+suffix1] = new TH1D("jet_ptrel_b"+suffix1,"p_{Trel} [GeV/c]",30,0.,4.);
-		h1["jet_ptrel_c"+suffix1] = new TH1D("jet_ptrel_c"+suffix1,"p_{Trel} [GeV/c]",30,0.,4.);
-		h1["jet_ptrel_udsg"+suffix1] = new TH1D("jet_ptrel_udsg"+suffix1,"p_{Trel} [GeV/c]",30,0.,4.);
+		h1["jet_ptrel_b"+suffix1] = new TH1D("jet_ptrel_b"+suffix1,"p_{Trel} [GeV/c]",50,0.,5.);
+		h1["jet_ptrel_c"+suffix1] = new TH1D("jet_ptrel_c"+suffix1,"p_{Trel} [GeV/c]",50,0.,5.);
+		h1["jet_ptrel_udsg"+suffix1] = new TH1D("jet_ptrel_udsg"+suffix1,"p_{Trel} [GeV/c]",50,0.,5.);
 		
 	}
 	else if ( type == "n") {
