@@ -1094,7 +1094,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 					Track muonTrk = *muon->track();
 					TrackingParticleRef TrueHitsTrk;
 					Track muonSA = *muon->standAloneMuon();
-					int nhit = muonSA.recHitsSize();
+					int nhit = muonTrk.recHitsSize();
 			
 					// muon cuts
 					double normChi2 = (*(muon->combinedMuon())).chi2() / (*(muon->combinedMuon())).ndof();// use global fit
