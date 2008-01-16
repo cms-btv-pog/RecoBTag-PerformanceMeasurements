@@ -1,0 +1,13 @@
+<environment>
+ <use name=AnalysisDataFormats/TopObjects>
+ <use name=TopQuarkAnalysis/TopTools>
+ <use name=RecoBTag/PerformanceMeasurements>
+ <use name=FWCore/FWLite>
+ <use name=FWCore/Framework>
+ <use name=rootcintex>
+ <use name=root> 
+ <bin file="TtDilepSignalSel_LRobs.cpp"> </bin>
+ <bin file="TtDilepSignalSel_LR.cpp"> </bin>
+ <bin file="TtBTagAnalysis.cpp"> </bin>
+
+</environment>
