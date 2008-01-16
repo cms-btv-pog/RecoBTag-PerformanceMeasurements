@@ -20,6 +20,9 @@
 <use name=CLHEP>
 <use name=root>
 <use name=RecoBTag/PerformanceMeasurements>
+<use name=AnalysisDataFormats/TopObjects>
+<use name=TopQuarkAnalysis/TopTools>
+<use name=TopQuarkAnalysis/TopEventSelection>
 
 <library file="*.cc" name=RecoBTagPerformanceMeasurementsPlugins>
 	 <flags EDM_PLUGIN = 1 >
