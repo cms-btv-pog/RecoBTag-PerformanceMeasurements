@@ -235,7 +235,7 @@ void TtEtEtaHistoCollector::write()
 }
 
 
-void TtEtEtaHistoCollector::buildTtDifferentialPlots(int bin)
+void TtEtEtaHistoCollector::buildDifferentialPlots(int bin)
 {
   for (vector<TtDifferentialPlot *>::iterator iPlotter = differentialPlots.begin();
     	      iPlotter != differentialPlots.end(); ++ iPlotter) {

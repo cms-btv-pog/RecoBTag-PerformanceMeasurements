@@ -70,14 +70,14 @@ public:
   TtEtEtaHistoCollector * buildDiffCollector(const TString& name,
 			TtEtEtaHistoCollector & otherColl);
 
-  void buildTtDifferentialPlots(int bin = -1);
+  void buildDifferentialPlots(int bin = -1);
 
   void eps( TH1F * histo, const TString & ext);
   void eps(const TString & ext);
   void setLabels(const TString& xLabel, const TString& yLabel);
   void setRange(const float min, const float max);
 
-  const diffPlotVect & getTtDifferentialPlots() const { return differentialPlots;}
+  const diffPlotVect & getDifferentialPlots() const { return differentialPlots;}
 
 
    private:
