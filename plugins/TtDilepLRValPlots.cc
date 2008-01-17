@@ -81,7 +81,7 @@ TtDilepLRValPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       }
 //       cout << endl;
       // Fill the LR 
-      lr.push_back(myLRhelper->calcLRval(obsVals) );
+      lr.push_back(myLRhelper->calcPtdrLRval(obsVals) );
 
 //       if (lr[i]>highestLR) {
 //         highestLR = lr[i];

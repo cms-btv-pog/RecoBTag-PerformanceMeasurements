@@ -54,8 +54,8 @@ void TtDilepLRObsPlots::endJob()
 {
    cout << "TtDilepLRObsPlots: Events " << goodSolution <<endl;
    cout << "TtDilepLRObsPlots: Events per fb-1 " << goodSolution*weight << endl;
-   pair<double, double> match = myLRhelper->getBnumbers();
-cout << "TtDilepLRObsPlots match " << B*weight<<" "<<nonB*weight<< " "<< tau<<" "<<match.second<<endl;
+//    pair<double, double> match = myLRhelper->getBnumbers();
+// cout << "TtDilepLRObsPlots match " << B*weight<<" "<<nonB*weight<< " "<< tau<<" "<<match.second<<endl;
 
    // store histograms and fits in root-file
    myLRhelper -> storeToROOTfile(rootFileName);

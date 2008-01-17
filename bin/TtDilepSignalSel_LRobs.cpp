@@ -128,10 +128,10 @@ int main() {
 
   // make some control plots and put them in a .ps file
   myLRhelper -> storeControlPlots(dir+outputPSfile);
-  pair<double, double> match = myLRhelper->getBnumbers();
-  cout << "Matched B jets   : " <<match.first <<endl;
-  cout << "Non-matched jets : "<<match.second<<endl;
-  cout << "Purity           : "<< match.first/(match.first+match.second)<<endl;
+//   pair<double, double> match = myLRhelper->getBnumbers();
+//   cout << "Matched B jets   : " <<match.first <<endl;
+//   cout << "Non-matched jets : "<<match.second<<endl;
+//   cout << "Purity           : "<< match.first/(match.first+match.second)<<endl;
 //   for(int j = 1; j < nrSignalSelObs+1; ++j){
 //     TString name = "Obs"; name += j;
 //     myLRhelper->singlePlot(name,j,"eps");

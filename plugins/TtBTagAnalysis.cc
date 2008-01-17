@@ -229,7 +229,7 @@ TtBTagAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           obsVals.push_back(sols[i].getLRSignalEvtObsVal(obsNrs[j]));
 //	  cout << "Obs " << j<<" "<<sols[i].getLRSignalEvtObsVal(obsNrs[j])<<endl;
       }
-      lr.push_back(myLRhelper->calcLRval(obsVals) );
+      lr.push_back(myLRhelper->calcPtdrLRval(obsVals) );
 //       if (lr[i]>highestLR) {
 //         highestLR = lr[i];
 // 	bestSol = i;
