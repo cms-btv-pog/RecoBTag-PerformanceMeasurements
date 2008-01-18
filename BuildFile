@@ -1,42 +1,25 @@
-<use name=AnalysisDataFormats/TopObjects>
-<use name=DataFormats/BTauReco>
-<use name=DataFormats/Common>
-<use name=DataFormats/GeometryCommonDetAlgo>
-<use name=DataFormats/JetReco>
-<use name=DataFormats/TrackReco>
-<use name=DataFormats/VertexReco>
 <use name=FWCore/Framework>
-<use name=FWCore/MessageLogger>
-<use name=FWCore/ParameterSet>
 <use name=FWCore/Utilities>
-<use name=RecoBTag/MCTools>
-<use name=RecoVertex/VertexPrimitives>
-<use name=SimDataFormats/HepMCProduct>
+<use name=FWCore/PluginManager>
+<use name=FWCore/ParameterSet>
+<use name=FWCore/ServiceRegistry>
+<use name=DataFormats/Common>
+<use name=RecoBTag/BTagTools>
+<use name=DataFormats/TrackReco>
+<use name=DataFormats/JetReco>
+<use name=DataFormats/MuonReco>
+<use name=JetMETCorrections/Objects>
+<use name=RecoMuon/TrackingTools>
+<use name=TrackingTools/TransientTrack>
 <use name=SimDataFormats/Track>
-<use name=SimDataFormats/Vertex>
 <use name=SimTracker/TrackAssociation>
-<use name=clhep>
-<use name=rootcintex>
-<use name=rootcore>
-<export>
-  <use name=AnalysisDataFormats/TopObjects>
-  <use name=DataFormats/BTauReco>
-  <use name=DataFormats/Common>
-  <use name=DataFormats/GeometryCommonDetAlgo>
-  <use name=DataFormats/JetReco>
-  <use name=DataFormats/TrackReco>
-  <use name=DataFormats/VertexReco>
-  <use name=FWCore/Framework>
-  <use name=FWCore/MessageLogger>
-  <use name=FWCore/ParameterSet>
-  <use name=RecoBTag/MCTools>
-  <use name=RecoVertex/VertexPrimitives>
-  <use name=SimDataFormats/HepMCProduct>
-  <use name=SimDataFormats/Track>
-  <use name=SimDataFormats/Vertex>
-  <use name=SimTracker/TrackAssociation>
-  <use name=clhep>
-  <use name=rootcore>
-  <lib name=RecoBTagPerformanceMeasurements>
-</export>
+<use name=SimTracker/Records>
+<use name=rootrflx>
+<use name=DataFormats/Math>
+<use name=RecoBTag/MCTools>
+<use name=CLHEP>
+<use name=root>
 
+<export>
+   <lib name=RecoBTagPerformanceMeasurements>
+</export>
