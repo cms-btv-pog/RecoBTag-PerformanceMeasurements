@@ -120,7 +120,7 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
 
   SimTrkCollectionTags_ = iConfig.getParameter<std::string>("SimTracks");
   
-  jetFlavourIdentifier_ = JetFlavourIdentifier(iConfig.getParameter<edm::ParameterSet>("jetIdParameters"));
+  //jetFlavourIdentifier_ = JetFlavourIdentifier(iConfig.getParameter<edm::ParameterSet>("jetIdParameters"));
   //jetFlavourIdentifier2_ = JetFlavourIdentifier(iConfig.getParameter<edm::ParameterSet>("jetIdParameters2"));
 
   // jet cuts
@@ -185,6 +185,16 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
 	  
   }
 
+  // Flavour identification
+  flavourMatchOptionf = iConfig.getParameter<std::string>( "flavourMatchOption" );
+  if (flavourMatchOptionf == "fastMC") {
+	  flavourSourcef = iConfig.getParameter<edm::InputTag>("flavourSource");
+  } else if (flavourMatchOptionf == "hepMC") {
+	  jetFlavourIdentifier_ = JetFlavourIdentifier(iConfig.getParameter<edm::ParameterSet>("jetIdParameters"));
+  } else if (flavourMatchOptionf == "genParticle") {
+	  flavourSourcef = iConfig.getParameter<edm::InputTag> ("flavourSource");
+  }
+  
   // get operating points
   bTagCutList_ = iConfig.getUntrackedParameter<std::vector<double> >("bTagCutList");
   fOPMap["TCL"] = bTagCutList_[0];
@@ -1029,8 +1039,8 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			leptonEvent.trkndof.push_back( muonTrk.ndof());
 			leptonEvent.chi2.push_back(    (*(muon->combinedMuon())).chi2() );
 			leptonEvent.ndof.push_back(    (*(muon->combinedMuon())).ndof() );
-			leptonEvent.SArechits.push_back(  nhit );
-			leptonEvent.trkrechits.push_back( muonTrk.recHitsSize());
+			leptonEvent.SArechits.push_back(  muonSA.recHitsSize() );
+			leptonEvent.trkrechits.push_back( muonTrk.recHitsSize() );
 			leptonEvent.d0.push_back(         muonTrk.d0());
 			leptonEvent.d0sigma.push_back(    muonTrk.d0Error());
 						
@@ -1048,7 +1058,13 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			leptonEvent.jet_ptrel.push_back( ptrel);
 			leptonEvent.jet_deltaR.push_back( deltaR);
 			
+		} //close loop over muons
+		
+		if ( hasLepton == 1 ) {
+		  p4MuJet.SetPtEtaPhiE(jet->pt(), jet->eta(), jet->phi(), jet->energy() );
+		  p4MuJet = jetcorrection * p4MuJet;
 		}
+		  
 
 		/////////////////////////////
 		// find away jet
@@ -1059,8 +1075,10 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		
 		for( awayjet = recoJets.begin(); awayjet != recoJets.end(); ++awayjet ) {
 
+		  if ( hasLepton == 1 ) continue;
+
 			TLorentzVector p4AwayJet;
-			p4AwayJet.SetPtEtaPhiE(jet->pt(), jet->eta(), jet->phi(), jet->energy() );
+			p4AwayJet.SetPtEtaPhiE(awayjet->pt(), awayjet->eta(), awayjet->phi(), awayjet->energy() );
 			p4AwayJet = p4AwayJet * ( acorrector->correction(*awayjet, iEvent, iSetup) );
 
 			// Jet quality cuts
@@ -1260,7 +1278,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 					
 					double delta  = -2.; 
 					delta = ROOT::Math::VectorUtil::DeltaR( (*(*jetTags)[ith_tagged].jet()).p4().Vect(), (*(*jetTags)[ith_tagged].tracks()[i]).momentum());
-					if(delta <0.3|| 0.3 <= 0) probabilities.push_back((*it));
+					if(delta <0.3) probabilities.push_back((*it));
 					
 	  
 				}

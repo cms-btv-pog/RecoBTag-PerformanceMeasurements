@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.3 2008/01/04 16:18:22 yumiceva Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.4 2008/01/04 19:16:41 yumiceva Exp $
  *
  */
 
@@ -18,11 +18,12 @@
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
-
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/ParameterSet/interface/InputTag.h"
+
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
@@ -110,7 +111,9 @@ private:
   std::string SimTrkCollectionTags_;
   std::string analyzer_;
   std::string fAwayJetTagger;
-	  
+  std::string flavourMatchOptionf;
+  edm::InputTag flavourSourcef;
+		  
   JetFlavourIdentifier jetFlavourIdentifier_;
   //JetFlavourIdentifier jetFlavourIdentifier2_;
 
