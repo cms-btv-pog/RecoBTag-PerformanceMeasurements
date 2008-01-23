@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.4 2008/01/04 19:16:41 yumiceva Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.5 2008/01/20 22:17:47 yumiceva Exp $
  *
  */
 
@@ -23,6 +23,8 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ParameterSet/interface/InputTag.h"
+
+#include "DataFormats/Candidate/interface/CandMatchMap.h"
 
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
@@ -84,8 +86,8 @@ public:
   virtual void endJob();
   
   reco::GenJet GetGenJet(reco::CaloJet calojet, reco::GenJetCollection genJetColl);
-  SimTrack GetGenTrk(reco::Track atrack, edm::SimTrackContainer simTrkColl, edm::SimVertexContainer simVtcs);
-  int GetMotherId(edm::SimVertexContainer simVtxColl, edm::SimTrackContainer simTrkColl, SimTrack muonMC);
+  SimTrack GetGenTrk(reco::Track atrack, edm::SimTrackContainer simTrkColl, const edm::SimVertexContainer *simVtcs);
+  int GetMotherId(const edm::SimVertexContainer *simVtxColl, edm::SimTrackContainer simTrkColl, SimTrack muonMC);
   int TaggedJet(reco::CaloJet calojet, edm::Handle<std::vector<reco::JetTag> > jetTags );
   std::map< std::string, bool > GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType);
   void FillHistos(std::string type, TLorentzVector p4MuJet, double ptrel,
@@ -93,7 +95,8 @@ public:
   void FillEff(TLorentzVector p4MuJet, int JetFlavor, std::map<std::string, bool> aMap);
   void FillPtrel(double ptrel, int JetFlavor, std::map<std::string, bool> aMap);
   void FillPerformance(reco::CaloJet jet, int JetFlavor, std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType);
-  
+  JetFlavour getMatchedParton(const reco::CaloJet &jet);
+
 private:
  
   // ----------member data ---------------------------
@@ -113,7 +116,10 @@ private:
   std::string fAwayJetTagger;
   std::string flavourMatchOptionf;
   edm::InputTag flavourSourcef;
-		  
+
+  std::map<reco::CaloJetRef, unsigned int> flavoursMapf;
+  edm::Handle<reco::CandMatchMap> theJetPartonMapf;
+
   JetFlavourIdentifier jetFlavourIdentifier_;
   //JetFlavourIdentifier jetFlavourIdentifier2_;
 

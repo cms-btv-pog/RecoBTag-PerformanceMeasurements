@@ -39,6 +39,9 @@ module Performance = PerformanceAnalyzer {
        string GenJets= "iterativeCone5GenJets"
        string SimTracks = "g4SimHits"
 
+       string flavourMatchOption = "genParticle"
+       InputTag flavourSource    = tagJet
+		
        PSet jetIdParameters = {
               string mcSource = "source"
               bool fillPartons = true

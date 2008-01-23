@@ -19,6 +19,7 @@
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/TrackingRecHit/interface/TrackingRecHit.h"
 #include "DataFormats/TrackingRecHit/interface/TrackingRecHitFwd.h"
+//#include "DataFormats/HepMCCandidate/interfave/GenParticleFwd.h"
 
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
@@ -44,6 +45,7 @@
 #include <SimDataFormats/Vertex/interface/SimVertexContainer.h>
 #include <SimDataFormats/Track/interface/SimTrack.h>
 #include <SimDataFormats/Track/interface/SimTrackContainer.h>
+#include "SimDataFormats/JetMatching/interface/JetFlavourMatching.h"
 
 //generator level + CLHEP
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
@@ -496,9 +498,10 @@ int PerformanceAnalyzer::TaggedJet(reco::CaloJet calojet, edm::Handle<std::vecto
 
 
 
-SimTrack PerformanceAnalyzer::GetGenTrk(reco::Track atrack, edm::SimTrackContainer simTrkColl, edm::SimVertexContainer simVtcs) {
+SimTrack PerformanceAnalyzer::GetGenTrk(reco::Track atrack, edm::SimTrackContainer simTrkColl, const edm::SimVertexContainer *simVtcs) {
 
 	  SimTrack matchedTrk;
+	  edm::SimVertexContainer mysimVtcs = *simVtcs;
 
   double predelta = 99999.;
   for (SimTrackContainer::const_iterator gentrk = simTrkColl.begin(); gentrk != simTrkColl.end(); ++gentrk) {
@@ -509,7 +512,7 @@ SimTrack PerformanceAnalyzer::GetGenTrk(reco::Track atrack, edm::SimTrackContain
 		( abs(type)==11 || abs(type)==13 || abs(type)==15 || abs(type)==211 || abs(type)==321 ) ) {
 		  matchedTrk = *gentrk;
 		  predelta = delta;
-		  HepLorentzVector v = (simVtcs)[(*gentrk).vertIndex()].position();
+		  HepLorentzVector v = (mysimVtcs)[(*gentrk).vertIndex()].position();
 		  
 		  //std::cout << "gentrk: vx = " << v.x() << std::endl;
 		  //std::cout << "rectrk: vx = " << atrack.vx() << std::endl;
@@ -521,7 +524,9 @@ SimTrack PerformanceAnalyzer::GetGenTrk(reco::Track atrack, edm::SimTrackContain
 }
 
 int
-PerformanceAnalyzer::GetMotherId(edm::SimVertexContainer simVtxColl, edm::SimTrackContainer simTrkColl, SimTrack muonMC) {
+PerformanceAnalyzer::GetMotherId(const edm::SimVertexContainer *simVtxColl, edm::SimTrackContainer simTrkColl, SimTrack muonMC) {
+
+  edm::SimVertexContainer mysimVtxColl = *simVtxColl;;
 
   // fill map of simtracks
   std::map<unsigned, unsigned> geantToIndex;
@@ -531,7 +536,7 @@ PerformanceAnalyzer::GetMotherId(edm::SimVertexContainer simVtxColl, edm::SimTra
 
   // The origin vertex
   int vertexId = muonMC.vertIndex();
-  SimVertex vertex = simVtxColl[vertexId];
+  SimVertex vertex = mysimVtxColl[vertexId];
 
   // The mother track 
   int motherId = -1;
@@ -825,15 +830,68 @@ void PerformanceAnalyzer::FillHistos(std::string type, TLorentzVector p4MuJet, d
 	
 }
 
+JetFlavour PerformanceAnalyzer::getMatchedParton(const reco::CaloJet &jet)
+{
+  JetFlavour jetFlavour;
+
+  if (flavourMatchOptionf == "fastMC") {
+
+    jetFlavour.underlyingParton4Vec(jet.p4());
+    //const edm::RefToBase<reco::Jet> & caloRefTB = jetTag.jet();
+    //const reco::CaloJetRef & caloRef = jet.castTo<reco::CaloJetRef>(); 
+    //jetFlavour.flavour(flavoursMapf[caloRef]); 
+
+  } else if (flavourMatchOptionf == "hepMC") {
+
+    jetFlavour = jetFlavourIdentifier_.identifyBasedOnPartons(jet);
+
+  } else if (flavourMatchOptionf == "genParticle") {
+
+    for( reco::CandMatchMap::const_iterator f  = theJetPartonMapf->begin();
+	 f != theJetPartonMapf->end(); f++) {
+      const reco::Candidate *theJetInTheMatchMap = &*(f->key);    
+      const reco::Candidate *theMatchedParton    = &*(f->val);
+      if(theJetInTheMatchMap->hasMasterClone ()) {
+	const reco::CaloJet* theMasterClone = dynamic_cast<const reco::CaloJet*>(theJetInTheMatchMap->masterClone().get());
+	if ( theMasterClone == &jet ) {
+	  jetFlavour.flavour(abs(theMatchedParton->pdgId()));
+	  jetFlavour.underlyingParton4Vec(theMatchedParton->p4());
+	  return jetFlavour;
+	}
+      }
+    }
+
+  }
+
+  return jetFlavour;
+}
+
 // ------------ method called to produce the data  ------------
 void
 PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 {
 
-	// initialize flavour identifiers
-	jetFlavourIdentifier_.readEvent(iEvent);
+  // initialize flavour identifiers
+  edm::Handle<JetFlavourMatchingCollection> jetMC;
+
+  if (flavourMatchOptionf == "fastMC") {
+    iEvent.getByLabel(flavourSourcef, jetMC);
+    for(JetFlavourMatchingCollection::const_iterator iter =
+	  jetMC->begin(); iter != jetMC->end(); iter++)
+      flavoursMapf.insert(*iter);
+  } else if (flavourMatchOptionf == "hepMC") {
+    jetFlavourIdentifier_.readEvent(iEvent);
+  } else if (flavourMatchOptionf == "genParticle") {
+    iEvent.getByLabel (flavourSourcef, theJetPartonMapf);
+  }
+
+  //jetFlavourIdentifier_.readEvent(iEvent);
 	//jetFlavourIdentifier2_.readEvent(iEvent);
 	
+  // generator candidates
+  Handle<CandidateCollection> genParticles;
+  iEvent.getByLabel("genParticle", genParticles);
+
     // Trakcs
 	Handle<reco::TrackCollection> recTrks;
 	iEvent.getByLabel(recoTrackList_, recTrks);
@@ -850,9 +908,6 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	Handle<reco::MuonCollection> muonsColl;
 	iEvent.getByLabel(MuonCollectionTags_, muonsColl);
 
-	Handle<edm::SimTrackContainer> simtrkColl;
-	iEvent.getByLabel(SimTrkCollectionTags_, simtrkColl);
-
 	// Calo Jets
 	Handle<reco::CaloJetCollection> jetsColl;
 	iEvent.getByLabel(CaloJetCollectionTags_, jetsColl);
@@ -867,8 +922,15 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	iEvent.getByLabel(GenJetCollectionTags_, genjetsColl);
 
 	Handle<edm::SimVertexContainer> simVtxColl;
-	iEvent.getByLabel( "g4SimHits", simVtxColl);
-	const edm::SimVertexContainer simVtcs =    *(simVtxColl.product());
+	Handle<edm::SimTrackContainer> simtrkColl;
+	const edm::SimVertexContainer *simVtcs;
+	if (flavourMatchOptionf == "hepMC") {
+
+	  iEvent.getByLabel( "g4SimHits", simVtxColl);
+	  simVtcs = simVtxColl.product();
+	
+	  iEvent.getByLabel(SimTrkCollectionTags_, simtrkColl);
+	}
 
 
 	// truth tracks
@@ -916,18 +978,16 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	Handle<std::vector<reco::TrackIPTagInfo> > tagInfo;
 	iEvent.getByLabel("impactParameterTagInfos", tagInfo);
 	
-	bool MC=false;
 	Handle<HepMCProduct> evtMC;
-  
-	      
+  	      
 	try{
 		iEvent.getByLabel("source",evtMC);
 		if(fverbose){
 			std::cout << "source HepMCProduct found"<< std::endl;
 		}
-		MC=true;
+	
 	} catch(const Exception&) {
-		MC=false;
+	
 		if(fverbose){
 			std::cout << "no HepMCProduct found"<< std::endl;
 		}
@@ -970,7 +1030,8 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		// Jet quality cuts
 		if ( (jet->pt() * jetcorrection ) <= MinJetPt_ || std::abs( jet->eta() ) >= MaxJetEta_ ) continue;
 		// get MC flavor of jet
-		int JetFlavor = jetFlavourIdentifier_.identifyBasedOnPartons(*jet).flavour();
+		//int JetFlavor = jetFlavourIdentifier_.identifyBasedOnPartons(*jet).flavour();
+		int JetFlavor = getMatchedParton(*jet).flavour();
 
 		p4Jet.SetPtEtaPhiE(jet->pt(), jet->eta(), jet->phi(), jet->energy() );
 		p4Jet = jetcorrection * p4Jet;
@@ -1043,21 +1104,43 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			leptonEvent.trkrechits.push_back( muonTrk.recHitsSize() );
 			leptonEvent.d0.push_back(         muonTrk.d0());
 			leptonEvent.d0sigma.push_back(    muonTrk.d0Error());
-						
-			// find a sim track
-			SimTrack genlepton = this->GetGenTrk(muonTrk, simTrks, simVtcs );
-												 
-			leptonEvent.mc_pt.push_back(           genlepton.momentum().perp());
-			leptonEvent.mc_phi.push_back(          genlepton.momentum().phi());
-			leptonEvent.mc_eta.push_back(          genlepton.momentum().pseudoRapidity());
-			leptonEvent.mc_e.push_back(           genlepton.momentum().e());
-			leptonEvent.mc_charge.push_back(       genlepton.charge());
-			leptonEvent.mc_pdgid.push_back(        genlepton.type());
-			leptonEvent.mc_mother_pdgid.push_back( GetMotherId(simVtcs, simTrks, genlepton));
-												 
+
 			leptonEvent.jet_ptrel.push_back( ptrel);
 			leptonEvent.jet_deltaR.push_back( deltaR);
-			
+
+			// find a sim track
+			if (flavourMatchOptionf == "hepMC" ) {
+			  SimTrack genlepton = this->GetGenTrk(muonTrk, simTrks, simVtcs );
+												 
+			  leptonEvent.mc_pt.push_back(           genlepton.momentum().perp());
+			  leptonEvent.mc_phi.push_back(          genlepton.momentum().phi());
+			  leptonEvent.mc_eta.push_back(          genlepton.momentum().pseudoRapidity());
+			  leptonEvent.mc_e.push_back(           genlepton.momentum().e());
+			  leptonEvent.mc_charge.push_back(       genlepton.charge());
+			  leptonEvent.mc_pdgid.push_back(        genlepton.type());
+			  leptonEvent.mc_mother_pdgid.push_back( GetMotherId(simVtcs, simTrks, genlepton));
+												 
+			} else if (flavourMatchOptionf == "genParticle") {
+			  
+			  for(size_t i = 0; i < genParticles->size(); ++ i) {
+			    const Candidate & p = (*genParticles)[i];
+
+			    if ( abs(p.pdgId()) == 13 && p.status()==2 ) {
+
+			      leptonEvent.mc_pt.push_back(           p.pt() );
+			      leptonEvent.mc_phi.push_back(          p.phi() );
+			      leptonEvent.mc_eta.push_back(          p.eta() );
+			      leptonEvent.mc_e.push_back(            p.energy() );
+			      leptonEvent.mc_charge.push_back(       p.charge() );
+			      leptonEvent.mc_pdgid.push_back(        p.pdgId() );
+			      leptonEvent.mc_mother_pdgid.push_back( p.mother()->pdgId() );
+
+			    }
+			    
+			  }
+
+			}
+
 		} //close loop over muons
 		
 		if ( hasLepton == 1 ) {
