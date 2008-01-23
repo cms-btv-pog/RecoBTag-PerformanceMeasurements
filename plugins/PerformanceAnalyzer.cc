@@ -890,7 +890,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	
   // generator candidates
   Handle<CandidateCollection> genParticles;
-  iEvent.getByLabel("genParticle", genParticles);
+  iEvent.getByLabel("genParticleCandidates", genParticles);
 
     // Trakcs
 	Handle<reco::TrackCollection> recTrks;
