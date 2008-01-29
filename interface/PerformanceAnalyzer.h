@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.5 2008/01/20 22:17:47 yumiceva Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.6 2008/01/23 22:56:18 yumiceva Exp $
  *
  */
 
@@ -86,8 +86,8 @@ public:
   virtual void endJob();
   
   reco::GenJet GetGenJet(reco::CaloJet calojet, reco::GenJetCollection genJetColl);
-  SimTrack GetGenTrk(reco::Track atrack, edm::SimTrackContainer simTrkColl, const edm::SimVertexContainer *simVtcs);
-  int GetMotherId(const edm::SimVertexContainer *simVtxColl, edm::SimTrackContainer simTrkColl, SimTrack muonMC);
+  SimTrack GetGenTrk(reco::Track atrack, const edm::SimTrackContainer *simTrkColl, const edm::SimVertexContainer *simVtcs);
+  int GetMotherId(const edm::SimVertexContainer *simVtxColl, const edm::SimTrackContainer *simTrkColl, SimTrack muonMC);
   int TaggedJet(reco::CaloJet calojet, edm::Handle<std::vector<reco::JetTag> > jetTags );
   std::map< std::string, bool > GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType);
   void FillHistos(std::string type, TLorentzVector p4MuJet, double ptrel,

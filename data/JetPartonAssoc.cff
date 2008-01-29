@@ -1,0 +1,13 @@
+
+module caloJetCollectionClone = CaloJetShallowCloneProducer {
+    InputTag src = iterativeCone5CaloJets
+}
+
+module tagJet = CandJetFlavourIdentifier {
+    InputTag jets = caloJetCollectionClone
+    double coneSizeToAssociate = 0.3
+    bool physicsDefinition = false
+    bool debug = false
+    vstring vetoFlavour = {  }
+}
+

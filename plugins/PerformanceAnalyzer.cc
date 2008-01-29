@@ -447,6 +447,7 @@ reco::GenJet PerformanceAnalyzer::GetGenJet(reco::CaloJet calojet, reco::GenJetC
   return matchedJet;
 }
 
+
 int PerformanceAnalyzer::TaggedJet(reco::CaloJet calojet, edm::Handle<std::vector<reco::JetTag> > jetTags ) {
 	
 	double small = 1.e-5;
@@ -459,8 +460,11 @@ int PerformanceAnalyzer::TaggedJet(reco::CaloJet calojet, edm::Handle<std::vecto
 
 	//get label and module names
 	std::string moduleLabel = (jetTags).provenance()->moduleLabel();
-
+	std::string processname = (jetTags).provenance()->processName();
+	
 	//std::cout << "[TaggedJet] moduleLabel = " << moduleLabel << std::endl;
+	//std::cout << "[TaggedJet] processName = " << processname << std::endl;
+	
 	
 	for (size_t t = 0; t < jetTags->size(); ++t) {
 		edm::RefToBase<reco::Jet> jet_p = (*jetTags)[t].jet();
@@ -498,13 +502,13 @@ int PerformanceAnalyzer::TaggedJet(reco::CaloJet calojet, edm::Handle<std::vecto
 
 
 
-SimTrack PerformanceAnalyzer::GetGenTrk(reco::Track atrack, edm::SimTrackContainer simTrkColl, const edm::SimVertexContainer *simVtcs) {
+SimTrack PerformanceAnalyzer::GetGenTrk(reco::Track atrack, const edm::SimTrackContainer *simTrkColl, const edm::SimVertexContainer *simVtcs) {
 
 	  SimTrack matchedTrk;
 	  edm::SimVertexContainer mysimVtcs = *simVtcs;
 
   double predelta = 99999.;
-  for (SimTrackContainer::const_iterator gentrk = simTrkColl.begin(); gentrk != simTrkColl.end(); ++gentrk) {
+  for (SimTrackContainer::const_iterator gentrk = simTrkColl->begin(); gentrk != simTrkColl->end(); ++gentrk) {
 
 	  double delta  = ROOT::Math::VectorUtil::DeltaR( TVector3((*gentrk).momentum().x(),(*gentrk).momentum().y(),(*gentrk).momentum().z()) , atrack.momentum() );
 	  int type = (*gentrk).type();
@@ -524,14 +528,16 @@ SimTrack PerformanceAnalyzer::GetGenTrk(reco::Track atrack, edm::SimTrackContain
 }
 
 int
-PerformanceAnalyzer::GetMotherId(const edm::SimVertexContainer *simVtxColl, edm::SimTrackContainer simTrkColl, SimTrack muonMC) {
+PerformanceAnalyzer::GetMotherId(const edm::SimVertexContainer *simVtxColl, const edm::SimTrackContainer *simTrkColl, SimTrack muonMC) {
 
-  edm::SimVertexContainer mysimVtxColl = *simVtxColl;;
+  edm::SimVertexContainer mysimVtxColl = *simVtxColl;
+
+  edm::SimTrackContainer mysimTrkColl = *simTrkColl;
 
   // fill map of simtracks
   std::map<unsigned, unsigned> geantToIndex;
-  for( unsigned it=0; it<simTrkColl.size(); ++it ) {
-    geantToIndex[ simTrkColl[it].trackId() ] = it;
+  for( unsigned it=0; it< mysimTrkColl.size(); ++it ) {
+    geantToIndex[ mysimTrkColl[it].trackId() ] = it;
   }
 
   // The origin vertex
@@ -551,7 +557,7 @@ PerformanceAnalyzer::GetMotherId(const edm::SimVertexContainer *simVtxColl, edm:
   }
   
   
-  int motherType = motherId == -1 ? 0 : simTrkColl[motherId].type();
+  int motherType = motherId == -1 ? 0 : mysimTrkColl[motherId].type();
   
   return motherType;
 
@@ -573,9 +579,11 @@ PerformanceAnalyzer::GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<st
 	aMap["JPT"] = false;
 	
 	//start loop over all jetTags
+	
 	for (size_t k=0; k<jetTags_testManyByType.size(); k++) {
 		
 			edm::Handle<std::vector<reco::JetTag> > jetTags = jetTags_testManyByType[k];
+
 			
 			ith_tagged = this->TaggedJet(jet,jetTags);
 
@@ -613,7 +621,7 @@ PerformanceAnalyzer::GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<st
 			}
 			
 	}
-
+	
 	return aMap;
 }
 
@@ -871,6 +879,7 @@ void
 PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 {
 
+		
   // initialize flavour identifiers
   edm::Handle<JetFlavourMatchingCollection> jetMC;
 
@@ -917,19 +926,22 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 
     // initialize jet corrector
 	const JetCorrector *acorrector = JetCorrector::getJetCorrector("MCJetCorrectorIcone5",iSetup);
-		
+	
 	Handle<reco::GenJetCollection> genjetsColl;
 	iEvent.getByLabel(GenJetCollectionTags_, genjetsColl);
-
+		
 	Handle<edm::SimVertexContainer> simVtxColl;
 	Handle<edm::SimTrackContainer> simtrkColl;
 	const edm::SimVertexContainer *simVtcs;
+	const edm::SimTrackContainer *simTrks;
 	if (flavourMatchOptionf == "hepMC") {
 
 	  iEvent.getByLabel( "g4SimHits", simVtxColl);
 	  simVtcs = simVtxColl.product();
 	
 	  iEvent.getByLabel(SimTrkCollectionTags_, simtrkColl);
+	  simTrks = simtrkColl.product();
+	  
 	}
 
 
@@ -938,46 +950,32 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	//iEvent.getByLabel("trackingtruth","TrackTruth",TPCollectionH);
 	//const TrackingParticleCollection tPC = *(TPCollectionH.product());
 
-	// Tag Jets
+	// Tag Jets	
 	std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType ;
-	iEvent.getManyByType(jetTags_testManyByType);
-	// Define the handles for the specific algorithms
-	//edm::Handle<reco::SoftLeptonTagInfoCollection> jetsInfoHandle_sl;
-	//edm::Handle<reco::TrackProbabilityTagInfoCollection> jetsInfoHandleTP;
-	//edm::Handle<reco::TrackCountingTagInfoCollection> jetsInfoHandleTC;
-	
-	//edm::Handle<reco::JetTagCollection> tagHandle;
-	//	const reco::JetTagCollection & btagCollTC;
-	//const reco::JetTagCollection & btagCollTP;
 
-	// Track Counting
-	//iEvent.getByLabel(moduleLabel_[0], tagHandle);
-	//const reco::JetTagCollection &btagCollTC = *(tagHandle.product());
-	//edm::Handle<reco::TrackCountingTagInfoCollection> tagInfoHandleTC;
-	//iEvent.getByLabel(moduleLabel_[0], tagInfoHandleTC);
-	//const reco::TrackCountingTagInfoCollection & TrkCountingInfo = *(tagInfoHandleTC.product());
+	edm::Handle<reco::JetTagCollection> tagHandle;
+	for (size_t im = 0; im!= moduleLabel_.size(); ++im ) {
+		iEvent.getByLabel(moduleLabel_[im], tagHandle);
+		jetTags_testManyByType.push_back(tagHandle);
+	}
 	
-	// Track Probability
-	//iEvent.getByLabel(moduleLabel_[1], tagHandle);
-	//const reco::JetTagCollection &btagCollTP = *(tagHandle.product());
-	//edm::Handle<reco::TrackProbabilityTagInfoCollection> tagInfoHandleTP;
-	//iEvent.getByLabel(moduleLabel_[1], tagInfoHandleTP);
-	//const reco::TrackProbabilityTagInfoCollection & JetProbInfo = *(tagInfoHandleTP.product());
 	
 	const reco::CaloJetCollection recoJets =   *(jetsColl.product());
 	const reco::GenJetCollection  genJets  =   *(genjetsColl.product());
 	const reco::MuonCollection    recoMuons =  *(muonsColl.product());
-	const edm::SimTrackContainer simTrks =    *(simtrkColl.product());
+	
+
+	
 	//const reco::VertexCollection recoPV = *(recVtxs.product());
 	
 	// MC
   
 	//Handle<SimTrackContainer> simTrks;
 	//iEvent.getByLabel( simG4_, simTrks);
-
+	
 	Handle<std::vector<reco::TrackIPTagInfo> > tagInfo;
 	iEvent.getByLabel("impactParameterTagInfos", tagInfo);
-	
+		
 	Handle<HepMCProduct> evtMC;
   	      
 	try{
@@ -1022,7 +1020,8 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	TLorentzVector p4MuJet;
 	TLorentzVector p4OppJet;
 	TLorentzVector p4Muon;
-	int ijet = 0;	
+	int ijet = 0;
+	
 	for( jet = recoJets.begin(); jet != recoJets.end(); ++jet ) {
 
 		// get jet corrections
@@ -1032,7 +1031,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		// get MC flavor of jet
 		//int JetFlavor = jetFlavourIdentifier_.identifyBasedOnPartons(*jet).flavour();
 		int JetFlavor = getMatchedParton(*jet).flavour();
-
+		
 		p4Jet.SetPtEtaPhiE(jet->pt(), jet->eta(), jet->phi(), jet->energy() );
 		p4Jet = jetcorrection * p4Jet;
 		
@@ -1046,14 +1045,14 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		double mu_highest_pt = 0;
 		double ptrel = 0;
 		for ( muon = recoMuons.begin(); muon != recoMuons.end(); ++muon) {
-
+			
 			Track muonTrk = *muon->track();
-			TrackingParticleRef TrueHitsTrk;
+			//TrackingParticleRef TrueHitsTrk;
 			Track muonSA = *muon->standAloneMuon();
-			int nhit = muonTrk.recHitsSize();
+			int nhit = muonTrk.numberOfValidHits();//muonTrk.recHitsSize();
 			
 			// muon cuts
-			double normChi2 = (*(muon->combinedMuon())).chi2() / (*(muon->combinedMuon())).ndof();// use global fit
+			double normChi2 = (*(muon->combinedMuon())).normalizedChi2();//(*(muon->combinedMuon())).chi2() / (*(muon->combinedMuon())).ndof();// use global fit
 			if ( (nhit <= MinMuonNHits_ ) || (muon->pt()<= MinMuonPt_) || (normChi2 >= MaxMuonChi2_ ) ) continue;
 
 			// delta R(muon,jet)			
@@ -1100,8 +1099,8 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			leptonEvent.trkndof.push_back( muonTrk.ndof());
 			leptonEvent.chi2.push_back(    (*(muon->combinedMuon())).chi2() );
 			leptonEvent.ndof.push_back(    (*(muon->combinedMuon())).ndof() );
-			leptonEvent.SArechits.push_back(  muonSA.recHitsSize() );
-			leptonEvent.trkrechits.push_back( muonTrk.recHitsSize() );
+			leptonEvent.SArechits.push_back(  muonSA.numberOfValidHits() );
+			leptonEvent.trkrechits.push_back( muonTrk.numberOfValidHits() );
 			leptonEvent.d0.push_back(         muonTrk.d0());
 			leptonEvent.d0sigma.push_back(    muonTrk.d0Error());
 
@@ -1193,12 +1192,12 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 				for ( muon = recoMuons.begin(); muon != recoMuons.end(); ++muon) {
 
 					Track muonTrk = *muon->track();
-					TrackingParticleRef TrueHitsTrk;
+					//TrackingParticleRef TrueHitsTrk;
 					Track muonSA = *muon->standAloneMuon();
-					int nhit = muonTrk.recHitsSize();
+					int nhit = muonTrk.numberOfValidHits();
 			
 					// muon cuts
-					double normChi2 = (*(muon->combinedMuon())).chi2() / (*(muon->combinedMuon())).ndof();// use global fit
+					double normChi2 = (*(muon->combinedMuon())).normalizedChi2();
 					if ( (nhit <= MinMuonNHits_ ) || (muon->pt()<= MinMuonPt_) || (normChi2 >= MaxMuonChi2_ ) ) continue;
 
 					// delta R(muon,jet)
@@ -1298,7 +1297,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		bool gotJPpos    = false;
 		bool gotSMT      = false;
 
-		//start loop over all jetTags
+		//start loop over all jetTags	
 		for (size_t k=0; k<jetTags_testManyByType.size(); k++) {
 			edm::Handle<std::vector<reco::JetTag> > jetTags = jetTags_testManyByType[k];
 			
@@ -1351,6 +1350,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 				gotJP = true;
 
 				std::string moduleLabel = (jetTags).provenance()->moduleLabel();
+				
 				int NtrksInJet = (*jetTags)[ith_tagged].tracks().size();
 				fS8evt->jet_ntrks.push_back( NtrksInJet );
 

@@ -36,7 +36,7 @@ module Performance = PerformanceAnalyzer {
        
        bool WritePerformancePlots = true
 
-       string GenJets= "iterativeCone5GenJets"
+       string GenJets= "iterativeCone5GenJetsPt10"
        string SimTracks = "g4SimHits"
 
        string flavourMatchOption = "genParticle"
