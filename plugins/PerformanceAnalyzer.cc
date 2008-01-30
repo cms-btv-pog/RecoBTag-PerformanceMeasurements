@@ -644,7 +644,7 @@ void PerformanceAnalyzer::FillPerformance(reco::CaloJet jet, int JetFlavor, std:
 			
 		//*********************************
 		// Track Counting taggers
-		//*********************************
+		//*********************************		
 		if ( moduleLabel == "trackCountingHighEffJetTags" ) {
 			
 			fperformanceTC2trk.Add( (*jetTags)[ith_tagged].discriminator(), JetFlavor );			
@@ -841,7 +841,7 @@ void PerformanceAnalyzer::FillHistos(std::string type, TLorentzVector p4MuJet, d
 JetFlavour PerformanceAnalyzer::getMatchedParton(const reco::CaloJet &jet)
 {
   JetFlavour jetFlavour;
-
+  
   if (flavourMatchOptionf == "fastMC") {
 
     jetFlavour.underlyingParton4Vec(jet.p4());
@@ -861,7 +861,10 @@ JetFlavour PerformanceAnalyzer::getMatchedParton(const reco::CaloJet &jet)
       const reco::Candidate *theMatchedParton    = &*(f->val);
       if(theJetInTheMatchMap->hasMasterClone ()) {
 	const reco::CaloJet* theMasterClone = dynamic_cast<const reco::CaloJet*>(theJetInTheMatchMap->masterClone().get());
-	if ( theMasterClone == &jet ) {
+	//std::cout << " masterclone pt = " << theMasterClone->pt() << " calo jet pt = " << jet.pt() << std::endl;
+	// FIXME, compare pointers rather than values:
+	if ( ( theMasterClone->pt() - jet.pt() ) < 1.e-5 ) {
+		//std::cout << " it matches! " << std::endl;
 	  jetFlavour.flavour(abs(theMatchedParton->pdgId()));
 	  jetFlavour.underlyingParton4Vec(theMatchedParton->p4());
 	  return jetFlavour;
