@@ -8,7 +8,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.h,v 1.6 2008/01/03 13:04:39 jandrea Exp $
+ version $Id: BTagEvent.h,v 1.7 2008/01/04 16:18:22 yumiceva Exp $
 
 ________________________________________________________________**/
 
@@ -34,8 +34,7 @@ class BTagEvent : public TObject {
 	
 	Int_t event; // event number
 	Int_t run;   // run number
-
-		
+	double evt_weight; // event weight		
 
 	// reco
 	Int_t njets;      // number of jets

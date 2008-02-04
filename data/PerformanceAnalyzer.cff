@@ -35,6 +35,7 @@ module Performance = PerformanceAnalyzer {
        string AwayJetTagger = "TCL"
        
        bool WritePerformancePlots = true
+       bool IncludeWeights = false
 
        string GenJets= "iterativeCone5GenJetsPt10"
        string SimTracks = "g4SimHits"
@@ -43,6 +44,7 @@ module Performance = PerformanceAnalyzer {
        InputTag flavourSource    = tagJet
 		
        PSet jetIdParameters = {
+
               string mcSource = "source"
               bool fillPartons = true
               bool fillHeavyHadrons = false

@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.6 2008/01/23 22:56:18 yumiceva Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.7 2008/01/29 23:16:14 yumiceva Exp $
  *
  */
 
@@ -91,9 +91,9 @@ public:
   int TaggedJet(reco::CaloJet calojet, edm::Handle<std::vector<reco::JetTag> > jetTags );
   std::map< std::string, bool > GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType);
   void FillHistos(std::string type, TLorentzVector p4MuJet, double ptrel,
-				  int JetFlavor, std::map<std::string, bool> aMap);
-  void FillEff(TLorentzVector p4MuJet, int JetFlavor, std::map<std::string, bool> aMap);
-  void FillPtrel(double ptrel, int JetFlavor, std::map<std::string, bool> aMap);
+				  int JetFlavor, std::map<std::string, bool> aMap, double weight);
+  void FillEff(TLorentzVector p4MuJet, int JetFlavor, std::map<std::string, bool> aMap, double weight);
+  void FillPtrel(double ptrel, int JetFlavor, std::map<std::string, bool> aMap, double weight);
   void FillPerformance(reco::CaloJet jet, int JetFlavor, std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType);
   JetFlavour getMatchedParton(const reco::CaloJet &jet);
 
@@ -116,6 +116,7 @@ private:
   std::string fAwayJetTagger;
   std::string flavourMatchOptionf;
   edm::InputTag flavourSourcef;
+  bool fIncludeWeights;
 
   std::map<reco::CaloJetRef, unsigned int> flavoursMapf;
   edm::Handle<reco::CandMatchMap> theJetPartonMapf;

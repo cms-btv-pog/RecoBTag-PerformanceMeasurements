@@ -103,7 +103,6 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
 
   
   fS8evt = new BTagEvent();
-  //std::cout << "summary branch created" << std::endl;
   ftree->Branch("s8.","BTagEvent",&fS8evt,64000,1); //system8 branch
 
   
@@ -211,6 +210,10 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
 
   // write performance plots?
   fWritePerformancePlots = iConfig.getParameter< bool > ("WritePerformancePlots");
+ 
+  // include weights?
+  fIncludeWeights = iConfig.getParameter< bool > ("IncludeWeights");
+
   
   topdir = rootFile_->mkdir("Histograms");
   topdir->cd();
@@ -590,10 +593,10 @@ PerformanceAnalyzer::GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<st
 			if (ith_tagged == -1) continue;
 		
 			std::string moduleLabel = (jetTags).provenance()->moduleLabel();
+			std::string processName = (jetTags).provenance()->processName();
 
-			//std::cout << "[GetBTaggingMap] moduleLabel= " << moduleLabel << " ith_tagged= " << ith_tagged << std::endl;
+
 			
-			//*********************************
 			// Track Counting taggers
 			//*********************************
 
@@ -664,8 +667,8 @@ void PerformanceAnalyzer::FillPerformance(reco::CaloJet jet, int JetFlavor, std:
 }
 	
 //______________________________________________________________________________________________________________________
-void PerformanceAnalyzer::FillEff(TLorentzVector p4MuJet, int JetFlavor, std::map<std::string, bool> aMap) {
-
+void PerformanceAnalyzer::FillEff(TLorentzVector p4MuJet, int JetFlavor, std::map<std::string, bool> aMap, double weight) {
+  
 	std::string flavor = "";
 	for (std::map<std::string,bool>::const_iterator imap = aMap.begin(); imap != aMap.end(); ++imap ) {
 
@@ -674,8 +677,8 @@ void PerformanceAnalyzer::FillEff(TLorentzVector p4MuJet, int JetFlavor, std::ma
 			std::string tag = "_"+imap->first;
 			flavor = "";
 
-			EffHistos->Fill1d("jet_pt"+tag,p4MuJet.Pt() );
-			EffHistos->Fill1d("jet_eta"+tag,p4MuJet.Eta() );
+			EffHistos->Fill1d("jet_pt"+tag,p4MuJet.Pt(), weight );
+			EffHistos->Fill1d("jet_eta"+tag,p4MuJet.Eta(), weight );
 			
 			if ( JetFlavor == 5 ) {
 				flavor = "_b";
@@ -688,14 +691,14 @@ void PerformanceAnalyzer::FillEff(TLorentzVector p4MuJet, int JetFlavor, std::ma
 			}
 		
 			if (flavor!="") {
-				EffHistos->Fill1d("jet_pt"+flavor+tag,p4MuJet.Pt() );
-				EffHistos->Fill1d("jet_eta"+flavor+tag,p4MuJet.Eta() );
+			  EffHistos->Fill1d("jet_pt"+flavor+tag,p4MuJet.Pt(), weight );
+			  EffHistos->Fill1d("jet_eta"+flavor+tag,p4MuJet.Eta(),weight );
 			}			
 		}
 	}
 
-	EffHistos->Fill1d("jet_pt",p4MuJet.Pt() );
-	EffHistos->Fill1d("jet_eta",p4MuJet.Eta() );
+	EffHistos->Fill1d("jet_pt",p4MuJet.Pt(),weight );
+	EffHistos->Fill1d("jet_eta",p4MuJet.Eta(),weight );
 			
 	if ( JetFlavor == 5 ) {
 		flavor = "_b";
@@ -708,14 +711,14 @@ void PerformanceAnalyzer::FillEff(TLorentzVector p4MuJet, int JetFlavor, std::ma
 	}
 	
 	if (flavor!="") {
-		EffHistos->Fill1d("jet_pt"+flavor,p4MuJet.Pt() );
-		EffHistos->Fill1d("jet_eta"+flavor,p4MuJet.Eta() );
+	  EffHistos->Fill1d("jet_pt"+flavor,p4MuJet.Pt(), weight );
+	  EffHistos->Fill1d("jet_eta"+flavor,p4MuJet.Eta(),weight );
 	}
 	
 }
 
 //______________________________________________________________________________________________________________________
-void PerformanceAnalyzer::FillPtrel(double ptrel, int JetFlavor, std::map<std::string, bool> aMap) {
+void PerformanceAnalyzer::FillPtrel(double ptrel, int JetFlavor, std::map<std::string, bool> aMap, double weight) {
 
 	std::string flavor = "";
 	
@@ -726,7 +729,7 @@ void PerformanceAnalyzer::FillPtrel(double ptrel, int JetFlavor, std::map<std::s
 			std::string tag = "_"+imap->first;
 			flavor = "";
 
-			PtrelHistos->Fill1d("jet_ptrel"+tag,ptrel);
+			PtrelHistos->Fill1d("jet_ptrel"+tag,ptrel,weight);
 			
 			if ( JetFlavor == 5 ) {
 				flavor = "_b";
@@ -738,12 +741,12 @@ void PerformanceAnalyzer::FillPtrel(double ptrel, int JetFlavor, std::map<std::s
 				flavor = "_udsg";
 			}
 		
-			if (flavor!="") PtrelHistos->Fill1d("jet_ptrel"+flavor+tag,ptrel);
+			if (flavor!="") PtrelHistos->Fill1d("jet_ptrel"+flavor+tag,ptrel,weight);
 
 		}
 	}
 
-	PtrelHistos->Fill1d("jet_ptrel",ptrel);
+	PtrelHistos->Fill1d("jet_ptrel",ptrel,weight);
 	
 	if ( JetFlavor == 5 ) {
 		flavor = "_b";
@@ -755,44 +758,44 @@ void PerformanceAnalyzer::FillPtrel(double ptrel, int JetFlavor, std::map<std::s
 		flavor = "_udsg";
 	}
 	
-	if (flavor!="") PtrelHistos->Fill1d("jet_ptrel"+flavor,ptrel);
+	if (flavor!="") PtrelHistos->Fill1d("jet_ptrel"+flavor,ptrel,weight);
 	
 }
 
 //______________________________________________________________________________________________________________________
 void PerformanceAnalyzer::FillHistos(std::string type, TLorentzVector p4MuJet, double ptrel,
-									 int JetFlavor, std::map<std::string, bool> aMap) {
-
+				     int JetFlavor, std::map<std::string, bool> aMap, double weight)
+{
+  
 	if ( type == "n") {
-		//std::cout << "FillHistos: n pt=" << p4MuJet.Pt() << " ptrel= "<< ptrel << " flavor= " << JetFlavor << std::endl;
+		
 			
-		MujetHistos->Fill2d(type+"_pT",p4MuJet.Pt(),ptrel);
-		MujetHistos->Fill2d(type+"_eta",TMath::Abs(p4MuJet.Eta()),ptrel);
+	  MujetHistos->Fill2d(type+"_pT",p4MuJet.Pt(),ptrel,weight);
+	  MujetHistos->Fill2d(type+"_eta",TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 		if ( JetFlavor == 5 ) {
 			std::string flavor = "b";
-			MujetHistos->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel);
-			MujetHistos->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel);
+			MujetHistos->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
+			MujetHistos->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 		}
 		if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor == 21 ) {
 			std::string flavor = "cl";
-			MujetHistos->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel);
-			MujetHistos->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel);
+			MujetHistos->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
+			MujetHistos->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 		}
 	}
 	else if ( type == "p") {
-		//std::cout << "FillHistos: p pt=" << p4MuJet.Pt() << " ptrel= "<< ptrel << " flavor= " << JetFlavor << std::endl;
-			
-		AwayjetHistos->Fill2d(type+"_pT",p4MuJet.Pt(),ptrel);
-		AwayjetHistos->Fill2d(type+"_eta",TMath::Abs(p4MuJet.Eta()),ptrel);
+					
+	  AwayjetHistos->Fill2d(type+"_pT",p4MuJet.Pt(),ptrel,weight);
+	  AwayjetHistos->Fill2d(type+"_eta",TMath::Abs(p4MuJet.Eta()),ptrel, weight);
 		if ( JetFlavor == 5 ) {
 			std::string flavor = "b";
-			AwayjetHistos->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel);
-			AwayjetHistos->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel);	
+			AwayjetHistos->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
+			AwayjetHistos->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);	
 		}
 		if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor == 21 ) {
 			std::string flavor = "cl";
-			AwayjetHistos->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel);
-			AwayjetHistos->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel);
+			AwayjetHistos->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
+			AwayjetHistos->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 		}
 	}
 				
@@ -801,36 +804,36 @@ void PerformanceAnalyzer::FillHistos(std::string type, TLorentzVector p4MuJet, d
 		if ( imap->second ) {
 			
 			if ( type == "n") {
-				//std::cout << "FillHistos: n pt=" << p4MuJet.Pt() << " ptrel= "<< ptrel << " flavor= " << JetFlavor << std::endl;			
-				TaggedMujetHistos->Fill2d(type+"tag_pT_"+(imap->first),p4MuJet.Pt(),ptrel);
-				TaggedMujetHistos->Fill2d(type+"tag_eta_"+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel);
+				
+			  TaggedMujetHistos->Fill2d(type+"tag_pT_"+(imap->first),p4MuJet.Pt(),ptrel,weight);
+			  TaggedMujetHistos->Fill2d(type+"tag_eta_"+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 				
 				if ( JetFlavor == 5 ) {
 					std::string flavor = "b_";
-					TaggedMujetHistos->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel);
-					TaggedMujetHistos->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel);
+					TaggedMujetHistos->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
+					TaggedMujetHistos->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 				}
 				if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor == 21 ) {
 					std::string flavor = "cl_";
-					TaggedMujetHistos->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel);
-					TaggedMujetHistos->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel);
+					TaggedMujetHistos->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
+					TaggedMujetHistos->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 				}
 			}
 			else if ( type == "p") {
 
-				//std::cout << "FillHistos: p pt=" << p4MuJet.Pt() << " ptrel= "<< ptrel << " flavor= " << JetFlavor << std::endl;
-				TaggedAwayjetHistos->Fill2d(type+"tag_pT_"+(imap->first),p4MuJet.Pt(),ptrel);
-				TaggedAwayjetHistos->Fill2d(type+"tag_eta_"+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel);
+				
+			  TaggedAwayjetHistos->Fill2d(type+"tag_pT_"+(imap->first),p4MuJet.Pt(),ptrel,weight);
+			  TaggedAwayjetHistos->Fill2d(type+"tag_eta_"+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 			
 				if ( JetFlavor == 5 ) {
 					std::string flavor = "b_";
-					TaggedAwayjetHistos->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel);
-					TaggedAwayjetHistos->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel);
+					TaggedAwayjetHistos->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
+					TaggedAwayjetHistos->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 				}
 				if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor == 21 ) {
 					std::string flavor = "cl_";
-					TaggedAwayjetHistos->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel);
-					TaggedAwayjetHistos->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel);
+					TaggedAwayjetHistos->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
+					TaggedAwayjetHistos->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 				}
 			}
 		}
@@ -935,8 +938,8 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		
 	Handle<edm::SimVertexContainer> simVtxColl;
 	Handle<edm::SimTrackContainer> simtrkColl;
-	const edm::SimVertexContainer *simVtcs;
-	const edm::SimTrackContainer *simTrks;
+	const edm::SimVertexContainer *simVtcs = 0;
+	const edm::SimTrackContainer *simTrks = 0;
 	if (flavourMatchOptionf == "hepMC") {
 
 	  iEvent.getByLabel( "g4SimHits", simVtxColl);
@@ -958,7 +961,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 
 	edm::Handle<reco::JetTagCollection> tagHandle;
 	for (size_t im = 0; im!= moduleLabel_.size(); ++im ) {
-		iEvent.getByLabel(moduleLabel_[im], tagHandle);
+	  iEvent.getByLabel(moduleLabel_[im], tagHandle);
 		jetTags_testManyByType.push_back(tagHandle);
 	}
 	
@@ -993,15 +996,20 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			std::cout << "no HepMCProduct found"<< std::endl;
 		}
 	}
-  
-  	  
+  	// WEIGHTS   
+	double weight = 1.;
+	if (fIncludeWeights){
+	  Handle< double> weightHandle;
+	  iEvent.getByLabel ("csaweightproducer", weightHandle);
+	  weight = *weightHandle;
+	  
+	}
+	  
 	fS8evt->Reset();
 	
 	fS8evt->event = iEvent.id().event();
 	fS8evt->run = iEvent.id().run();
-
-	
-	
+	fS8evt->evt_weight = weight ;	
 	//fS8evt->njets = recoJets.size();
 	//fS8evt->nmuons = recoMuons.size();
 	int total_nmuons = 0;
@@ -1238,17 +1246,17 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		} // close away jet loop
 
 		std::map< std::string, bool > thebtaggingmap = this->GetBTaggingMap(*jet,jetTags_testManyByType);
-		FillEff(p4Jet, JetFlavor, thebtaggingmap );
+		FillEff(p4Jet, JetFlavor, thebtaggingmap, weight );
 		FillPerformance(*jet, JetFlavor, jetTags_testManyByType );
 			
 		if ( hasLepton == 1 ) {
 			p4MuJet.SetPtEtaPhiE(jet->pt(), jet->eta(), jet->phi(), jet->energy() );
 			p4MuJet = jetcorrection * p4MuJet;
 
-			FillPtrel(ptrel, JetFlavor, thebtaggingmap );
-			FillHistos("n",p4MuJet, ptrel, JetFlavor, thebtaggingmap );
+			FillPtrel(ptrel, JetFlavor, thebtaggingmap, weight );
+			FillHistos("n",p4MuJet, ptrel, JetFlavor, thebtaggingmap, weight );
 			
-			if (AwayTaggedJet) FillHistos("p",p4MuJet, ptrel, JetFlavor, thebtaggingmap);
+			if (AwayTaggedJet) FillHistos("p",p4MuJet, ptrel, JetFlavor, thebtaggingmap, weight);
 			//if (AwayMuonJet) FillHistos("q",p4MuJet, ptrel, JetFlavor, this->GetBTaggingMap(*jet,jetTags_testManyByType));
 		
 		}
@@ -1309,6 +1317,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			if (ith_tagged == -1) continue;
 		
 			std::string moduleLabel = (jetTags).provenance()->moduleLabel();
+			std::string processName = (jetTags).provenance()->processName();
 
 			//*********************************
 			// Track Counting taggers
@@ -1320,14 +1329,11 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 				fS8evt->btag_TrkCounting_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D
 				
 				gotTCHE = true;
-
-				//int NtrksInJet = (*jetTags)[ith_tagged].tracks().size();
-				//fS8evt->jet_ntrks.push_back( NtrksInJet );
+			      
 			}
 			else if ( moduleLabel == "trackCountingHighPurJetTags" ) {
 
 				fS8evt->btag_TrkCounting_disc3D_3trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 3rd trk, 3D
-
 				gotTCHP = true;
 			}
 			else if ( moduleLabel == "negativeTrackCounting2ndTrck" ) {
@@ -1356,7 +1362,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 				
 				int NtrksInJet = (*jetTags)[ith_tagged].tracks().size();
 				fS8evt->jet_ntrks.push_back( NtrksInJet );
-
+				
 				int i=0;
 				std::vector< float > track_proba = (*tagInfo)[ith_tagged].probabilities(0) ;
 				std::vector< float > probabilities;

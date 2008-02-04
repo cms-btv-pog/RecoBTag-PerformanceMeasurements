@@ -5,7 +5,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.cc,v 1.6 2008/01/03 13:04:40 jandrea Exp $
+ version $Id: BTagEvent.cc,v 1.7 2008/01/04 16:20:30 yumiceva Exp $
 
 ________________________________________________________________**/
 
@@ -32,8 +32,7 @@ void BTagEvent::Reset() {
 
 	event   = -1;
 	run     = -1;
-
-		
+	evt_weight = 1.;		
 	// mc
 
 	// reco
@@ -42,7 +41,7 @@ void BTagEvent::Reset() {
 	
 	nvertices     = -1;
 	ngenjets    = -1;
-
+	
 	jet_pt.clear();
 	jet_eta.clear();
 	jet_phi.clear();

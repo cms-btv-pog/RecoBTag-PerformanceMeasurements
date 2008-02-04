@@ -4,7 +4,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagHistograms.cc,v 1.1 2008/01/04 16:20:31 yumiceva Exp $
+ version $Id: BTagHistograms.cc,v 1.2 2008/01/10 00:34:32 yumiceva Exp $
 
 ________________________________________________________________**/
 
@@ -91,7 +91,7 @@ void BTagHistograms::Init(TString type, TString suffix1, TString suffix2) {
 //_______________________________________________________________
 void BTagHistograms::Fill1d(TString name, Double_t x, Double_t weight) {
 
-        h1[name]->Fill(x);
+  h1[name]->Fill(x,weight);
 }
 
 //_______________________________________________________________
