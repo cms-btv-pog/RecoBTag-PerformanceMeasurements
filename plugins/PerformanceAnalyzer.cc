@@ -1168,7 +1168,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		
 		for( awayjet = recoJets.begin(); awayjet != recoJets.end(); ++awayjet ) {
 
-		  if ( hasLepton == 1 ) continue;
+		  if ( hasLepton == 0 ) continue;
 
 			TLorentzVector p4AwayJet;
 			p4AwayJet.SetPtEtaPhiE(awayjet->pt(), awayjet->eta(), awayjet->phi(), awayjet->energy() );
