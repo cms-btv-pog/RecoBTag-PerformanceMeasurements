@@ -8,7 +8,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.h,v 1.7 2008/01/04 16:18:22 yumiceva Exp $
+ version $Id: BTagEvent.h,v 1.8 2008/02/04 20:55:05 jindal Exp $
 
 ________________________________________________________________**/
 
@@ -42,6 +42,10 @@ class BTagEvent : public TObject {
 	Int_t nvertices;  // number of vertices
 	Int_t ngenjets;   // number of generated jets
 
+	Int_t trackProvaVector_Size;  // size of the vector of tracks
+	//== track multiplicity of quality cuted tracks
+
+	
 	std::vector< float > jet_pt;
 	std::vector< float > jet_eta;
 	std::vector< float > jet_phi;
@@ -54,12 +58,12 @@ class BTagEvent : public TObject {
 	std::vector< int > jet_hasLepton;
 	std::vector< float > jetcorrection;
 	std::vector< std::vector< float > > jet_Tracks_Probability;
-	
 	std::vector< float > genjet_pt;
 	std::vector< float > genjet_eta;
 	std::vector< float > genjet_phi;
 	std::vector< float > genjet_e;
 	
+	std::vector< float > btag_TrkCounting_disc3D_1trk;
 	std::vector< float > btag_TrkCounting_disc3D_2trk;
 	std::vector< float > btag_TrkCounting_disc3D_3trk;
 
@@ -67,6 +71,7 @@ class BTagEvent : public TObject {
 	std::vector< float > btag_negJetProb_disc3D;
 	std::vector< float > btag_posJetProb_disc3D;
 
+	std::vector< float > btag_NegTag_disc3D_1trk;
 	std::vector< float > btag_NegTag_disc3D_2trk;
 	std::vector< float > btag_NegTag_disc3D_3trk;
 

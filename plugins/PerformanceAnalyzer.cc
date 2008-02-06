@@ -123,7 +123,10 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
   
   //jetFlavourIdentifier_ = JetFlavourIdentifier(iConfig.getParameter<edm::ParameterSet>("jetIdParameters"));
   //jetFlavourIdentifier2_ = JetFlavourIdentifier(iConfig.getParameter<edm::ParameterSet>("jetIdParameters2"));
-
+  
+  
+  StoreTrackProba_ = iConfig.getParameter<bool>("StoreTrackProba");
+  
   // jet cuts
   MinJetPt_ = iConfig.getParameter<edm::ParameterSet>("jetcuts").getParameter<double>("MinPt");
   MaxJetEta_ = iConfig.getParameter<edm::ParameterSet>("jetcuts").getParameter<double>("MaxEta");
@@ -139,6 +142,7 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
   bTaggerList_ = iConfig.getUntrackedParameter<std::vector<std::string> >("bTaggerList");
   fnselectors= bTaggerList_.size();
   for(std::vector<std::string>::iterator objectName = bTaggerList_.begin(); objectName != bTaggerList_.end(); ++objectName) {
+    std::cout << "*objectName  " << *objectName << std::endl;
 	  if ( *objectName == "trackCountingHighEffJetTags" ) {
 		  
 		  moduleLabel_.push_back("trackCountingHighEffJetTags");
@@ -1168,7 +1172,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		
 		for( awayjet = recoJets.begin(); awayjet != recoJets.end(); ++awayjet ) {
 
-		  if ( hasLepton == 0 ) continue;
+		  if ( hasLepton == 1 ) continue;
 
 			TLorentzVector p4AwayJet;
 			p4AwayJet.SetPtEtaPhiE(awayjet->pt(), awayjet->eta(), awayjet->phi(), awayjet->energy() );
@@ -1323,13 +1327,18 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			// Track Counting taggers
 			//*********************************
 
-
 			if ( moduleLabel == "trackCountingHighEffJetTags" ) {
-
-				fS8evt->btag_TrkCounting_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D
-				
-				gotTCHE = true;
-			      
+			  
+			  std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
+			  if((trackIP).size()>=2){
+			    float iptrack1 = (trackIP)[0].significance();
+			    fS8evt->btag_TrkCounting_disc3D_1trk.push_back( iptrack1 );
+			  }
+			  
+			  fS8evt->btag_TrkCounting_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D
+			  
+			  gotTCHE = true;
+			  
 			}
 			else if ( moduleLabel == "trackCountingHighPurJetTags" ) {
 
@@ -1337,7 +1346,15 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 				gotTCHP = true;
 			}
 			else if ( moduleLabel == "negativeTrackCounting2ndTrck" ) {
-				
+
+			  std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
+			  if((trackIP).size()>=2){
+			    float iptrack1 = (trackIP)[(trackIP).size()-1].significance();
+			    fS8evt->btag_NegTag_disc3D_1trk.push_back( iptrack1 );
+			  }
+			
+
+			  std::cout << "discri neg tc " << (*jetTags)[ith_tagged].discriminator() << std::endl;
 				fS8evt->btag_NegTag_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D
 				
 				gotTCHEneg = true;
@@ -1362,34 +1379,36 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 				
 				int NtrksInJet = (*jetTags)[ith_tagged].tracks().size();
 				fS8evt->jet_ntrks.push_back( NtrksInJet );
-				
-				int i=0;
-				std::vector< float > track_proba = (*tagInfo)[ith_tagged].probabilities(0) ;
-				std::vector< float > probabilities;
-				for(std::vector<float>::const_iterator it = track_proba.begin(); it!=track_proba.end(); ++it, i++){
-					
-					double delta  = -2.; 
-					delta = ROOT::Math::VectorUtil::DeltaR( (*(*jetTags)[ith_tagged].jet()).p4().Vect(), (*(*jetTags)[ith_tagged].tracks()[i]).momentum());
-					if(delta <0.3) probabilities.push_back((*it));
-					
-	  
+				fS8evt->trackProvaVector_Size = (*tagInfo)[ith_tagged].probabilities(0).size();
+				if(StoreTrackProba_){
+				  int i=0;
+				  std::vector< float > track_proba = (*tagInfo)[ith_tagged].probabilities(0) ;
+				  std::vector< float > probabilities;
+				  for(std::vector<float>::const_iterator it = track_proba.begin(); it!=track_proba.end(); ++it, i++){
+				    
+				    double delta  = -2.; 
+				    delta = ROOT::Math::VectorUtil::DeltaR( (*(*jetTags)[ith_tagged].jet()).p4().Vect(), (*(*jetTags)[ith_tagged].tracks()[i]).momentum());
+				    if(delta <0.3) probabilities.push_back((*it));
+				    
+				    
+				  }
+				  fS8evt->jet_Tracks_Probability.push_back(probabilities);
 				}
-				fS8evt->jet_Tracks_Probability.push_back(probabilities);
 				
 			}
 			else if ( moduleLabel == "jetProbabilityJetTagsNegativeOnly" ) {
-
-				fS8evt->btag_negJetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
-				
-				gotJPneg = true;
-
+			  
+			  fS8evt->btag_negJetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
+			  
+			  gotJPneg = true;
+			  
 			}
 			else if ( moduleLabel == "jetProbabilityJetTagsPositiveOnly" ) {
-
-				fS8evt->btag_posJetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
-				
-				gotJPpos = true;
-
+			  
+			  fS8evt->btag_posJetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
+			  
+			  gotJPpos = true;
+			  
 			}
 			//*********************************
 			// SoftLeptons Taggers 

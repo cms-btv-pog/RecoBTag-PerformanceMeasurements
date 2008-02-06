@@ -10,10 +10,14 @@ module Performance = PerformanceAnalyzer {
        string Jets  = "iterativeCone5CaloJets"
        untracked string TrackCollection = "ctfWithMaterialTracks"
        untracked string PrimaryVertexCollection = "offlinePrimaryVerticesFromCTFTracks"
+       bool StoreTrackProba = false
+    
        // b-tagedd jet collection
        untracked vstring bTaggerList = { 
          "trackCountingHighEffJetTags",
 	 "trackCountingHighPurJetTags",
+	 "negativeTrackCounting2ndTrck",
+	 "negativeTrackCounting3rdTrck",
 	 "jetProbabilityJetTagsNegativeOnly",
 	 "jetProbabilityJetTagsPositiveOnly",
 	 "jetProbabilityJetTags"

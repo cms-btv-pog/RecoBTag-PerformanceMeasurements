@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.7 2008/01/29 23:16:14 yumiceva Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.8 2008/02/04 20:55:06 jindal Exp $
  *
  */
 
@@ -123,7 +123,7 @@ private:
 
   JetFlavourIdentifier jetFlavourIdentifier_;
   //JetFlavourIdentifier jetFlavourIdentifier2_;
-
+  bool StoreTrackProba_;
   double MinJetPt_;
   double MaxJetEta_;
   double MinDeltaR_;
