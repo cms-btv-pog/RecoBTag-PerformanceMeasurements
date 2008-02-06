@@ -5,7 +5,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.cc,v 1.7 2008/01/04 16:20:30 yumiceva Exp $
+ version $Id: BTagEvent.cc,v 1.8 2008/02/04 20:55:07 jindal Exp $
 
 ________________________________________________________________**/
 
@@ -41,6 +41,8 @@ void BTagEvent::Reset() {
 	
 	nvertices     = -1;
 	ngenjets    = -1;
+
+	trackProvaVector_Size = -1;
 	
 	jet_pt.clear();
 	jet_eta.clear();
@@ -59,14 +61,16 @@ void BTagEvent::Reset() {
 	genjet_eta.clear();
 	genjet_phi.clear();
 	genjet_e.clear();
-	
+
+	btag_TrkCounting_disc3D_1trk.clear();
 	btag_TrkCounting_disc3D_2trk.clear();
 	btag_TrkCounting_disc3D_3trk.clear();
 	
 	btag_JetProb_disc3D.clear();
 	btag_negJetProb_disc3D.clear();
 	btag_posJetProb_disc3D.clear();
-	
+
+	btag_NegTag_disc3D_1trk.clear();
 	btag_NegTag_disc3D_2trk.clear();
 	btag_NegTag_disc3D_3trk.clear();
 
