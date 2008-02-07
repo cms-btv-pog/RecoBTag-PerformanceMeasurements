@@ -55,15 +55,15 @@ void S8Solver::LoadHistos() {
 	finputFile->cd();
 	
 	
-	fnHistoBase = (TH2F*) gDirectory->Get("n"+fcategory);
-	fpHistoBase = (TH2F*) gDirectory->Get("p"+fcategory);
-	fnSvxHistoBase = (TH2F*) gDirectory->Get("ncmb"+fcategory);
-	fpSvxHistoBase = (TH2F*) gDirectory->Get("pcmb"+fcategory);
+	fnHistoBase = (TH2F*) gDirectory->Get("Histograms/samples/n_"+fcategory);
+	fpHistoBase = (TH2F*) gDirectory->Get("Histograms/samples/p_"+fcategory);
+	fnSvxHistoBase = (TH2F*) gDirectory->Get("Histograms/samples/ntag_"+fcategory+"_"+fthename);
+	fpSvxHistoBase = (TH2F*) gDirectory->Get("Histograms/samples/ptag_"+fcategory+"_"+fthename);
 
 	//std::cout << " 2D histos loaded " << fcategory << std::endl;
 
 	// get bin for pTrel cut
-	std::cout << "entries=" << fnHistoBase->GetEntries() << std::endl;
+	std::cout << "entries fn =" << fnHistoBase->GetEntries() << std::endl;
 	int ith_ptrel_bin = (int) fnHistoBase->GetYaxis()->FindBin(fminPtrel);
 	int ith_max_bin = -1;
 	if (fMaxPtrel != -1) ith_max_bin = (int) fnHistoBase->GetYaxis()->FindBin(fMaxPtrel);
@@ -77,8 +77,8 @@ void S8Solver::LoadHistos() {
 	fpHistoSvx = (TH1D*) fpSvxHistoBase->ProjectionX("fpHistoSvx", -1, ith_max_bin, "e");
 	fnHistoAll = (TH1D*) fnSvxHistoBase->ProjectionX("fnHistoAll",ith_ptrel_bin, ith_max_bin,"e");
 	fpHistoAll = (TH1D*) fpSvxHistoBase->ProjectionX("fpHistoAll",ith_ptrel_bin, ith_max_bin,"e");
-
-	//std::cout << " got projections" << std::endl;
+	
+	std::cout << " got projections" << std::endl;
 	// rebin correlation factors
 	const int ncorrptarray = 5;
 	const int ncorretaarray = 3;
@@ -119,15 +119,15 @@ void S8Solver::LoadHistos() {
 		}
 		finputFile->cd();
 		
-		h2["b_npT"] = (TH2F*) gDirectory->Get("b_n"+fcategory);
+		h2["b_npT"] = (TH2F*) gDirectory->Get("Histograms/samples/n_"+fcategory+"_b");
 		std::cout << "got one" << std::endl;
-		h2["cl_npT"] = (TH2F*) gDirectory->Get("cl_n"+fcategory);
-		h2["b_ppT"] = (TH2F*) gDirectory->Get("b_p"+fcategory);
-		h2["cl_ppT"] = (TH2F*) gDirectory->Get("cl_p"+fcategory);
-		h2["b_ncmbpT"] = (TH2F*) gDirectory->Get("b_ncmb"+fcategory);
-		h2["cl_ncmbpT"] = (TH2F*) gDirectory->Get("cl_ncmb"+fcategory);
-		h2["b_pcmbpT"] = (TH2F*) gDirectory->Get("b_pcmb"+fcategory);
-		h2["cl_pcmbpT"] = (TH2F*) gDirectory->Get("cl_pcmb"+fcategory);
+		h2["cl_npT"] = (TH2F*) gDirectory->Get("Histograms/samples/n_"+fcategory+"_cl");
+		h2["b_ppT"] = (TH2F*) gDirectory->Get("Histograms/samples/p_"+fcategory+"_b");
+		h2["cl_ppT"] = (TH2F*) gDirectory->Get("Histograms/samples/p_"+fcategory+"_cl");
+		h2["b_ncmbpT"] = (TH2F*) gDirectory->Get("Histograms/samples/ntag_"+fcategory+"_b_"+fthename);
+		h2["cl_ncmbpT"] = (TH2F*) gDirectory->Get("Histograms/samples/ntag_"+fcategory+"_cl_"+fthename);
+		h2["b_pcmbpT"] = (TH2F*) gDirectory->Get("Histograms/samples/ptag_"+fcategory+"_b_"+fthename);
+		h2["cl_pcmbpT"] = (TH2F*) gDirectory->Get("Histograms/samples/ptag_"+fcategory+"_cl_"+fthename);
 
 		std::cout << " got initial truth dist." << std::endl;
 		
@@ -183,7 +183,7 @@ void S8Solver::LoadHistos() {
 		h1["eff_mu_taggedaway_cl"]->Divide( h2["cl_ppT"]->ProjectionX("cl_halloppjets_ptrel",ith_ptrel_bin, ith_max_bin ,"e") , halloppjets_cl, 1.,1.,"B");
 
 		feffTag_b = (TH1D*) h1["eff_TaggedJet_b"]->Clone("feffTag_b"); 
-		feffTag_cl = (TH1D*) h1["eff_TaggedJet_b"]->Clone("feffTab_cl");
+		feffTag_cl = (TH1D*) h1["eff_TaggedJet_cl"]->Clone("feffTag_cl");
 		std::cout << "clonned" << std::endl;
 		
 		if (frebin) {
