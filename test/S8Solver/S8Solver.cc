@@ -80,9 +80,9 @@ void S8Solver::LoadHistos() {
 	
 	std::cout << " got projections" << std::endl;
 	// rebin correlation factors
-	const int ncorrptarray = 5;
+	const int ncorrptarray = 6;
 	const int ncorretaarray = 3;
-	Double_t corrptbins[ncorrptarray] = {20.,40.,60.,80,230.};
+	Double_t corrptbins[ncorrptarray] = {30.,40.,60.,80,120,230.};//{30.,40.,60.,80,230.};
 	Double_t corretabins[ncorrptarray] = {0.,1.5,2.5};
 	//if (fcategory=="Eta") {
 	//  ncorrptarray = tmpncorretaarray;
@@ -192,10 +192,14 @@ void S8Solver::LoadHistos() {
 			TH1D* tmpfh_beta = (TH1D*) fnHisto->Clone("tmpfh_beta");
 			TH1D* tmpfh_kb = (TH1D*)  fnHisto->Clone("tmpfh_kb");
 			TH1D* tmpfh_kcl = (TH1D*) fnHisto->Clone("tmpfh_kcl");
+			TH1D* tmpfh_gamma = (TH1D*) fnHisto->Clone("tmpfh_gamma");
+			TH1D* tmpfh_delta = (TH1D*) fnHisto->Clone("tmpfh_delta");
 			tmpfh_alpha->Reset();
 			tmpfh_beta->Reset();
 			tmpfh_kb->Reset();
 			tmpfh_kcl->Reset();
+			tmpfh_gamma->Reset();
+			tmpfh_delta->Reset();
 			//tmpfh_alpha->Sumw2();
 			//tmpfh_beta->Sumw2();
 			//tmpfh_kb->Sumw2();
@@ -203,7 +207,10 @@ void S8Solver::LoadHistos() {
 			
 			tmpfh_alpha->Divide( h1["eff_TaggedBothJets_cl"], h1["eff_TaggedJet_cl"]);
 			tmpfh_beta->Divide( h1["eff_TaggedBothJets_b"], h1["eff_TaggedJet_b"]);
-		
+
+			tmpfh_delta->Divide( h1["eff_mu_taggedaway_b"], h1["eff_pTrel_b"]);
+			tmpfh_gamma->Divide( h1["eff_mu_taggedaway_cl"], h1["eff_pTrel_cl"]);
+			
 			tmpfh_kb->Divide( h1["eff_pTrel_TaggedJet_b"], h1["eff_pTrel_b"]  );
 			tmpfh_kb->Divide( h1["eff_TaggedJet_b"] );
 
@@ -264,6 +271,8 @@ void S8Solver::LoadHistos() {
 				TH1D* tmpfh_beta = (TH1D*) gDirectory->Get("beta");
 				TH1D* tmpfh_kb = (TH1D*) gDirectory->Get("kappa_b");
 				TH1D* tmpfh_kcl = (TH1D*) gDirectory->Get("kappa_cl");
+				//TH1D* tmpfh_gamma = (TH1D*) gDirectory->Get("gamma");
+				//TH1D* tmpfh_delta = (TH1D*) gDirectory->Get("delta");
 				
 				fh_alpha = (TH1D*) tmpfh_alpha->Rebin(ncorrptarray-1,"fh_alpha",corrptbins);
 				fh_beta = (TH1D*)tmpfh_beta->Rebin(ncorrptarray-1,"fh_beta",corrptbins);

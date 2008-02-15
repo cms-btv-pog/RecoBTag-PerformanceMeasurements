@@ -216,8 +216,8 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
   fWritePerformancePlots = iConfig.getParameter< bool > ("WritePerformancePlots");
  
   // include weights?
-  fIncludeWeights = iConfig.getParameter< bool > ("IncludeWeights");
-
+  fWeightHistograms = iConfig.getParameter< bool > ("WeightHistograms");
+  fStoreWeightsInNtuple = iConfig.getParameter< bool > ("StoreWeightsInNtuple");
   
   topdir = rootFile_->mkdir("Histograms");
   topdir->cd();
@@ -1002,13 +1002,20 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	}
   	// WEIGHTS   
 	double weight = 1.;
-	if (fIncludeWeights){
-	  Handle< double> weightHandle;
-	  iEvent.getByLabel ("csaweightproducer", weightHandle);
-	  weight = *weightHandle;
-	  
+
+	Handle< double> weightHandle;
+
+	if (fWeightHistograms || fStoreWeightsInNtuple){
+
+		iEvent.getByLabel ("csaweightproducer", weightHandle);
+
 	}
-	  
+
+	if (fWeightHistograms) weight = *weightHandle;
+	
+	if (fStoreWeightsInNtuple) fS8evt->evt_weight =  (*weightHandle);
+	else fS8evt->evt_weight = 1.;
+		  
 	fS8evt->Reset();
 	
 	fS8evt->event = iEvent.id().event();

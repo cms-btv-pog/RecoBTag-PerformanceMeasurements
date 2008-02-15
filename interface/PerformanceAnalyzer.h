@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.8 2008/02/04 20:55:06 jindal Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.9 2008/02/06 14:40:15 jandrea Exp $
  *
  */
 
@@ -116,8 +116,9 @@ private:
   std::string fAwayJetTagger;
   std::string flavourMatchOptionf;
   edm::InputTag flavourSourcef;
-  bool fIncludeWeights;
-
+  bool fWeightHistograms;
+  bool fStoreWeightsInNtuple;
+  
   std::map<reco::CaloJetRef, unsigned int> flavoursMapf;
   edm::Handle<reco::CandMatchMap> theJetPartonMapf;
 
