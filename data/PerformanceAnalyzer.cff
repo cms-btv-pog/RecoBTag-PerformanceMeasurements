@@ -40,7 +40,7 @@ module Performance = PerformanceAnalyzer {
        
        bool WritePerformancePlots = true
        bool WeightHistograms = false
-       bool StoreWeightsInNutple = false
+       bool StoreWeightsInNtuple = false
  
        string GenJets= "iterativeCone5GenJetsPt10"
        string SimTracks = "g4SimHits"
