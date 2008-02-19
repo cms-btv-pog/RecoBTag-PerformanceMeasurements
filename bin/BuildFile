@@ -8,6 +8,7 @@
  <use name=root> 
  <bin file="TtDilepSignalSel_LRobs.cpp"> </bin>
  <bin file="TtDilepSignalSel_LR.cpp"> </bin>
+ <bin file="TtSemilepJetComb_LRobs.cpp"> </bin>
  <bin file="TtBTagAnalysis.cpp"> </bin>
 
 </environment>
