@@ -312,14 +312,14 @@ void S8Plotter::Loop()
 			p4Jet = jetcorr * p4Jet;
 
 			//// Jet Selection /////
-			if ( p4Jet.Pt() <= 20. ) continue;
+			if ( p4Jet.Pt() <= 20.|| TMath::Abs( p4Jet.Eta() ) >= 2.5 ) continue;
 			
 			// get MC flavor of jet
 			JetFlavor = fS8evt->jet_flavour[ijet];
 
 			nmultiple_muons = 0;
 			bool passGoodMuon = false;
-			if ( fS8evt->jet_hasLepton[ijet] == 1 && fS8evt->njets>1 ) {
+			if ( fS8evt->jet_hasLepton[ijet] == 1 && fS8evt->njets>0 ) {
 			//if ( fS8evt->jet_hasLepton[ijet] == 1 ) {		
 			  // get a muon
 			  BTagLeptonEvent Muons = fS8evt->lepton[ijet];	
@@ -331,7 +331,7 @@ void S8Plotter::Loop()
 					for ( size_t imu = 0; imu != Muons.pt.size(); ++imu ) {
 						
 					  //// Muon Selection /////
-						if ( ( Muons.trkrechits[imu] >= 8 ) && ( Muons.chi2[imu]/Muons.ndof[imu] <5 ) ) {
+					  //if ( ( Muons.trkrechits[imu] >= 8 ) && ( Muons.chi2[imu]/Muons.ndof[imu] <5 ) ) {
 							passGoodMuon = true;
 							nmultiple_muons++;
 							
@@ -344,7 +344,7 @@ void S8Plotter::Loop()
 
 							if ( fVerbose) std::cout << " muon " << imu << " pt= " << Muons.pt[imu] << " eta= " << Muons.eta[imu] << " chamber hits= " << Muons.SArechits[imu] << " chi2/ndof = " << Muons.chi2[imu]/Muons.ndof[imu] << " IPS= " << Muons.d0sigma[imu] << " mcpdgid= " << Muons.mc_pdgid[imu] << std::endl;
 							
-						}
+							//}
 					}
 					// select only one muon in jet, the one with the highest pt
 					if ( passGoodMuon ) {
@@ -390,7 +390,7 @@ void S8Plotter::Loop()
 					    double ojetcorr = fS8evt->jetcorrection[kjet];
 					    p4OppJet = ojetcorr * p4OppJet;
 					    //int OppJetFlavor = fS8evt->jet_flavour_alg[kjet];
-						if ( p4OppJet.Pt() < 20. ) continue;
+						if ( p4OppJet.Pt() < 20. || TMath::Abs( p4OppJet.Eta() ) >= 2.5 ) continue;
 						
 					    if ( !OtherTaggedJet ) {
 					      
@@ -429,12 +429,12 @@ void S8Plotter::Loop()
 							  for ( size_t imu = 0; imu != oMuons.pt.size(); ++imu ) {
 
 								  //// Muon Selection /////
-								  if ( ( oMuons.trkrechits[imu] >= 8 ) && ( oMuons.chi2[imu]/oMuons.ndof[imu] <5 ) ) {
+								  //if ( ( oMuons.trkrechits[imu] >= 8 ) && ( oMuons.chi2[imu]/oMuons.ndof[imu] <5 ) ) {
 									  pass2GoodMuon = true;
 									  
 									  if (oMuons.pt[imu] > omu_highest_pt ) { omu_highest_pt = oMuons.pt[imu]; ith_omu_highest_pt = imu; }
 									  
-								  }
+									  //}
 							  }
 							  // select only one muon in jet, the one with the highest pt
 							  if ( pass2GoodMuon ) {
@@ -1029,8 +1029,7 @@ void S8Plotter::Loop()
 
 void S8Plotter::FillHistos(std::string type, TLorentzVector p4Jet, double ptrel, int flavor, bool tagged) {
 
-	if ( ( p4Jet.Pt() >= fMinPt ) && (p4Jet.Pt() < fMaxPt ) &&
-		 ( TMath::Abs(p4Jet.Eta()) >= fMinEta ) && (TMath::Abs(p4Jet.Eta()) < fMaxEta ) ) {
+  if ( ( p4Jet.Pt() >= fMinPt ) && ( TMath::Abs(p4Jet.Eta()) >= fMinEta ) && (TMath::Abs(p4Jet.Eta()) < fMaxEta ) ) {
 			
 		
 	h2[type+"pT"]->Fill( p4Jet.Pt() , ptrel );
