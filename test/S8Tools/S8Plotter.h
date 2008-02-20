@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8Plotter.h,v 1.11 2007/10/29 18:31:35 yumiceva Exp $
+ * \version $Id: S8Plotter.h,v 1.12 2007/10/30 19:35:10 yumiceva Exp $
  *
  */
 
@@ -256,13 +256,13 @@ S8Plotter::S8Plotter(TString filename)
 	fAwaytagger = "TrackCounting";
 	fAwaylevel = "Loose";
 
-	fTrackCountingMap["Loose"]  = 2.3; // use TC2:high eff.
-	fTrackCountingMap["Medium"] = 5.3; // use TC2:high eff.
-	fTrackCountingMap["Tight"]  = 4.8;// use TC3:high purity
+	fTrackCountingMap["Loose"]  = 2.0; // use TC2:high eff.
+	fTrackCountingMap["Medium"] = 4.6; // use TC2:high eff.
+	fTrackCountingMap["Tight"]  = 4.7;// use TC3:high purity
  
-	fTrackProbabilityMap["Loose"] = 0.29;
-	fTrackProbabilityMap["Medium"] = 0.54;
-	fTrackProbabilityMap["Tight"] = 0.75;
+	fTrackProbabilityMap["Loose"] = 0.26;
+	fTrackProbabilityMap["Medium"] = 0.50;
+	fTrackProbabilityMap["Tight"] = 0.76;
 
 	// default Binning
 	const int nptarray = 12;
