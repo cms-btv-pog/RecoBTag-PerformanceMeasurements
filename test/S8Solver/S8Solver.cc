@@ -860,6 +860,10 @@ void S8Solver::Draw(int maxNbins) {
 
 	TString acvname = "correlations_"+fthename;
 	cv_map[acvname] = new TCanvas(acvname,acvname,700,700);
+	fh_kb->SetMarkerStyle(20); 
+	fh_kcl->SetMarkerStyle(21); 
+	fh_beta->SetMarkerStyle(22); 
+	fh_alpha->SetMarkerStyle(23);
 	fh_kb->SetMarkerColor(1); 
 	fh_kcl->SetMarkerColor(2); 
 	fh_beta->SetMarkerColor(3); 
@@ -888,6 +892,8 @@ void S8Solver::Draw(int maxNbins) {
 
 	acvname = "xcorrelations_"+fthename;
         cv_map[acvname] = new TCanvas(acvname,acvname,700,700);
+		fh_delta->SetMarkerStyle(22);
+        fh_gamma->SetMarkerStyle(23);
         fh_delta->SetMarkerColor(1);
         fh_gamma->SetMarkerColor(2);
         fh_delta->SetLineColor(1);
