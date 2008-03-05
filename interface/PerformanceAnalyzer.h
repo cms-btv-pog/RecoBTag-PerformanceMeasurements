@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.9 2008/02/06 14:40:15 jandrea Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.10 2008/02/15 23:49:25 yumiceva Exp $
  *
  */
 
@@ -56,6 +56,7 @@
 
 #include "SimTracker/TrackAssociation/interface/TrackAssociatorBase.h"
 #include "SimTracker/TrackAssociation/interface/TrackAssociatorByHits.h"
+#include "SimTracker/TrackHistory/interface/TrackOrigin.h"
 
 // Root
 #include "TH1.h"
@@ -165,6 +166,14 @@ private:
   TrackAssociatorByHits *associatorByHits;
 
   std::map< std::string, float > fOPMap;
+  
+  bool hasLongLived(const TrackHistory &, int) const;
+  bool hasPhotonConversion(const TrackHistory &) const;
+  BTagEvent::Flags getTrackCategories( 
+    reco::TrackRef, 
+    const reco::RecoToSimCollection &, 
+    bool bestMatchByMaxValue
+  ) const;
   
 };
 

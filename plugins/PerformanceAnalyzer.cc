@@ -53,6 +53,8 @@
 #include "CLHEP/HepMC/GenVertex.h"
 
 // HepPDT // for simtracks
+#include "HepPDT/ParticleID.hh"
+
 //#include "SimGeneral/HepPDT/interface/HepPDTable.h"
 //#include "SimGeneral/HepPDT/interface/HepParticleData.h"
 
@@ -419,12 +421,12 @@ void PerformanceAnalyzer::beginJob(edm::EventSetup const& iSetup){
   // track matching MC
   edm::ESHandle<TrackAssociatorBase> theChiAssociator;
   iSetup.get<TrackAssociatorRecord>().get("TrackAssociatorByChi2",theChiAssociator);
-  associatorByChi2 = (TrackAssociatorBase *) theChiAssociator.product();
+  associatorByChi2 = (TrackAssociatorBase *) theChiAssociator.product(); */
   
   edm::ESHandle<TrackAssociatorBase> theHitsAssociator;
   iSetup.get<TrackAssociatorRecord>().get("TrackAssociatorByHits",theHitsAssociator);
   associatorByHits = (TrackAssociatorByHits *) theHitsAssociator.product();
-  */
+  
 }
 
 
@@ -884,6 +886,84 @@ JetFlavour PerformanceAnalyzer::getMatchedParton(const reco::CaloJet &jet)
   return jetFlavour;
 }
 
+// --------------------- TrackCategories ----------------------
+
+BTagEvent::Flags PerformanceAnalyzer::getTrackCategories(
+  reco::TrackRef track, 
+  const reco::RecoToSimCollection & association, 
+  bool bestMatchByMaxValue
+) const
+{
+  BTagEvent::Flags flags(BTagEvent::Unknown+1, false);
+  
+  TrackOrigin tracer(-2);
+	
+  if (tracer.evaluate(track, association, bestMatchByMaxValue))
+  {
+    // Get the simulated particle.
+    const HepMC::GenParticle * particle = tracer.particle();
+  
+    // Get the event id for the initial TP.
+    EncodedEventId eventId = tracer.simParticleTrail()[0]->eventId();
+  
+    // Check for signal events.	
+    if ( eventId.bunchCrossing() && eventId.event() )
+    {
+      flags[BTagEvent::SignalEvent] = true;
+      // Check for PV, SV, TV
+      TrackHistory::GenVertexTrail genVertexTrail(tracer.genVertexTrail());
+      if ( genVertexTrail.empty() )
+        flags[BTagEvent::PV] = true;
+      else if ( genVertexTrail.size() == 1 )
+        flags[BTagEvent::SV] = true;
+      else
+        flags[BTagEvent::TV] = true;
+    }
+  
+    // Check for the existence of a simulated vertex (displaced).
+    if ( !tracer.simVertexTrail().empty() )
+      flags[BTagEvent::Displaced] = true;
+		
+    // Checks for long lived particle
+    flags[BTagEvent::Ks] = hasLongLived(tracer, 310);      // Ks
+    flags[BTagEvent::Lambda] = hasLongLived(tracer, 3122); // Lambda 
+  
+    // Check for photon conversion
+    flags[BTagEvent::PhotonConversion] = hasPhotonConversion(tracer);
+    
+    // Check for the initial hadron
+    if (particle)
+    {
+      HepPDT::ParticleID pid(particle->pdg_id());
+      flags[BTagEvent::Up] = pid.hasUp();
+      flags[BTagEvent::Down] = pid.hasDown();
+      flags[BTagEvent::Strange] = pid.hasStrange();
+      flags[BTagEvent::Charm] = pid.hasCharm();
+      flags[BTagEvent::Bottom] = pid.hasBottom();
+      flags[BTagEvent::Light] = !pid.hasCharm() || !pid.hasBottom();
+    }
+    else
+      flags[BTagEvent::Unknown] = true;
+  }
+  else
+    flags[BTagEvent::Fake] = true;
+  
+  return flags;
+}
+
+bool PerformanceAnalyzer::hasLongLived(const TrackHistory & tracer, int pdgid) const
+{
+  if ( !tracer.genParticleTrail().empty() )
+  {
+    if( abs(tracer.genParticleTrail()[0]->pdg_id()) == pdgid )
+      return true;
+  }
+  return false;}
+
+bool PerformanceAnalyzer::hasPhotonConversion(const TrackHistory & tracer) const{  TrackOrigin::SimVertexTrail::const_iterator tvr;  TrackingParticleRefVector sources, daughters;  for (tvr = tracer.simVertexTrail().begin(); tvr != tracer.simVertexTrail().end(); tvr++)  {    sources = (*tvr)->sourceTracks();    daughters = (*tvr)->daughterTracks();    if (sources.size() == 1              &&  // require one source         daughters.size() == 2            &&  //    "    two daughters        sources[0]->pdgId() == 22        &&  //    "    a photon in the source        abs(daughters[0]->pdgId()) == 11 &&  //    "    two electrons        abs(daughters[1]->pdgId()) == 11    ) return true;  }  return false;}
+
+// ------------ End of Track Categories -----------------------
+
 // ------------ method called to produce the data  ------------
 void
 PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
@@ -956,9 +1036,12 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 
 
 	// truth tracks
-	//edm::Handle<TrackingParticleCollection>  TPCollectionH ;
-	//iEvent.getByLabel("trackingtruth","TrackTruth",TPCollectionH);
-	//const TrackingParticleCollection tPC = *(TPCollectionH.product());
+	edm::Handle<TrackingParticleCollection>  TPCollectionH ;
+	iEvent.getByType(TPCollectionH);
+
+    reco::RecoToSimCollection association;
+    // if ( !trackCollection_.empty() )
+    association = associatorByHits->associateRecoToSim ( recTrks, TPCollectionH, &iEvent ); 
 
 	// Tag Jets	
 	std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType ;
@@ -972,10 +1055,8 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	
 	const reco::CaloJetCollection recoJets =   *(jetsColl.product());
 	const reco::GenJetCollection  genJets  =   *(genjetsColl.product());
-	const reco::MuonCollection    recoMuons =  *(muonsColl.product());
-	
-
-	
+	const reco::MuonCollection    recoMuons =  *(muonsColl.product());	 
+	 
 	//const reco::VertexCollection recoPV = *(recVtxs.product());
 	
 	// MC
@@ -1319,6 +1400,8 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		bool gotJPpos    = false;
 		bool gotSMT      = false;
 
+        std::vector<BTagEvent::Flags> trackFlags;
+
 		//start loop over all jetTags	
 		for (size_t k=0; k<jetTags_testManyByType.size(); k++) {
 			edm::Handle<std::vector<reco::JetTag> > jetTags = jetTags_testManyByType[k];
@@ -1329,7 +1412,19 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		
 			std::string moduleLabel = (jetTags).provenance()->moduleLabel();
 			std::string processName = (jetTags).provenance()->processName();
-
+			
+			
+			//*********************************
+			// TrackCategories
+			//*********************************
+        
+            TrackRefVector tracks((*tagInfo)[ith_tagged].tracks());
+        
+            trackFlags.resize(tracks.size());
+           
+            for ( size_t index=0; index < trackFlags.size(); index++ )
+              trackFlags[index] = getTrackCategories(tracks[index], association, true);
+           
 			//*********************************
 			// Track Counting taggers
 			//*********************************
@@ -1441,6 +1536,9 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		if (!gotJP)      fS8evt->btag_JetProb_disc3D.push_back( -9999. );
 		if (!gotJPneg)   fS8evt->btag_negJetProb_disc3D.push_back( -9999. );
 		if (!gotJPpos)   fS8evt->btag_posJetProb_disc3D.push_back( -9999. );		
+       
+        // TrackHistory
+		fS8evt->trackCategories.push_back(trackFlags);
 								   
 		ijet++;
 	} //end loop over reco jets
