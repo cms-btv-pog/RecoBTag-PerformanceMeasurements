@@ -423,10 +423,14 @@ void PerformanceAnalyzer::beginJob(edm::EventSetup const& iSetup){
   iSetup.get<TrackAssociatorRecord>().get("TrackAssociatorByChi2",theChiAssociator);
   associatorByChi2 = (TrackAssociatorBase *) theChiAssociator.product(); */
   
-  edm::ESHandle<TrackAssociatorBase> theHitsAssociator;
-  iSetup.get<TrackAssociatorRecord>().get("TrackAssociatorByHits",theHitsAssociator);
-  associatorByHits = (TrackAssociatorByHits *) theHitsAssociator.product();
-  
+  // TrackCategories (only on reco samples)
+  if (flavourMatchOptionf == "hepMC")
+  {
+    edm::ESHandle<TrackAssociatorBase> theHitsAssociator;
+    iSetup.get<TrackAssociatorRecord>().get("TrackAssociatorByHits",theHitsAssociator);
+    associatorByHits = (TrackAssociatorByHits *) theHitsAssociator.product();
+  }
+
 }
 
 
@@ -968,10 +972,15 @@ bool PerformanceAnalyzer::hasPhotonConversion(const TrackHistory & tracer) const
 void
 PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 {
-
+  // Trakcs
+  Handle<reco::TrackCollection> recTrks;
+  iEvent.getByLabel(recoTrackList_, recTrks);
 		
   // initialize flavour identifiers
   edm::Handle<JetFlavourMatchingCollection> jetMC;
+
+  // Used by TrackCategories.
+  reco::RecoToSimCollection association;
 
   if (flavourMatchOptionf == "fastMC") {
     iEvent.getByLabel(flavourSourcef, jetMC);
@@ -980,6 +989,14 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
       flavoursMapf.insert(*iter);
   } else if (flavourMatchOptionf == "hepMC") {
     jetFlavourIdentifier_.readEvent(iEvent);
+    
+    // ----------- TrackCategories ----------------
+	edm::Handle<TrackingParticleCollection>  TPCollectionH ;
+	iEvent.getByType(TPCollectionH);
+
+    association = associatorByHits->associateRecoToSim ( recTrks, TPCollectionH, &iEvent );
+    // ----------- End of TrackCategories ----------
+    
   } else if (flavourMatchOptionf == "genParticle") {
     iEvent.getByLabel (flavourSourcef, theJetPartonMapf);
   }
@@ -990,10 +1007,6 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
   // generator candidates
   Handle<CandidateCollection> genParticles;
   iEvent.getByLabel("genParticleCandidates", genParticles);
-
-    // Trakcs
-	Handle<reco::TrackCollection> recTrks;
-	iEvent.getByLabel(recoTrackList_, recTrks);
 	
 	// Primary vertices
 	//Handle<reco::VertexCollection> recVtxs;
@@ -1034,15 +1047,6 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	  
 	}
 
-
-	// truth tracks
-	edm::Handle<TrackingParticleCollection>  TPCollectionH ;
-	iEvent.getByType(TPCollectionH);
-
-    reco::RecoToSimCollection association;
-    // if ( !trackCollection_.empty() )
-    association = associatorByHits->associateRecoToSim ( recTrks, TPCollectionH, &iEvent ); 
-
 	// Tag Jets	
 	std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType ;
 
@@ -1051,7 +1055,6 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	  iEvent.getByLabel(moduleLabel_[im], tagHandle);
 		jetTags_testManyByType.push_back(tagHandle);
 	}
-	
 	
 	const reco::CaloJetCollection recoJets =   *(jetsColl.product());
 	const reco::GenJetCollection  genJets  =   *(genjetsColl.product());
@@ -1416,14 +1419,17 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			
 			//*********************************
 			// TrackCategories
+			// Running only on reco samples
 			//*********************************
+            if (flavourMatchOptionf == "hepMC")
+            {
+              TrackRefVector tracks((*tagInfo)[ith_tagged].tracks());
         
-            TrackRefVector tracks((*tagInfo)[ith_tagged].tracks());
-        
-            trackFlags.resize(tracks.size());
+              trackFlags.resize(tracks.size());
            
-            for ( size_t index=0; index < trackFlags.size(); index++ )
-              trackFlags[index] = getTrackCategories(tracks[index], association, true);
+              for ( size_t index=0; index < trackFlags.size(); index++ )
+                trackFlags[index] = getTrackCategories(tracks[index], association, true);
+            } 
            
 			//*********************************
 			// Track Counting taggers
