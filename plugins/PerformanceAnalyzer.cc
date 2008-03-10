@@ -911,7 +911,7 @@ BTagEvent::Flags PerformanceAnalyzer::getTrackCategories(
     EncodedEventId eventId = tracer.simParticleTrail()[0]->eventId();
   
     // Check for signal events.	
-    if ( eventId.bunchCrossing() && eventId.event() )
+    if ( !eventId.bunchCrossing() && !eventId.event() )
     {
       flags[BTagEvent::SignalEvent] = true;
       // Check for PV, SV, TV
@@ -1427,8 +1427,12 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
         
               trackFlags.resize(tracks.size());
            
-              for ( size_t index=0; index < trackFlags.size(); index++ )
+              for ( size_t index=0; index < trackFlags.size(); index++ ) {
                 trackFlags[index] = getTrackCategories(tracks[index], association, true);
+                for ( size_t j=0; j < trackFlags[index].size(); j++ )
+                  std::cout << " " << trackFlags[index][j];
+                std::cout << std::endl;  
+              }
             } 
            
 			//*********************************
