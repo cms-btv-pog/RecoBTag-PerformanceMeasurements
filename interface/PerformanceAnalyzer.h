@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.10 2008/02/15 23:49:25 yumiceva Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.11 2008/03/05 17:49:08 bazterra Exp $
  *
  */
 
@@ -168,8 +168,10 @@ private:
   std::map< std::string, float > fOPMap;
   
   bool hasLongLived(const TrackHistory &, int) const;
+
   bool hasPhotonConversion(const TrackHistory &) const;
-  BTagEvent::Flags getTrackCategories( 
+
+  std::vector<bool> getTrackCategories( 
     reco::TrackRef, 
     const reco::RecoToSimCollection &, 
     bool bestMatchByMaxValue

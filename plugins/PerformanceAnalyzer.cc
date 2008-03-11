@@ -892,13 +892,13 @@ JetFlavour PerformanceAnalyzer::getMatchedParton(const reco::CaloJet &jet)
 
 // --------------------- TrackCategories ----------------------
 
-BTagEvent::Flags PerformanceAnalyzer::getTrackCategories(
+BTagTrackEvent::Flags PerformanceAnalyzer::getTrackCategories(
   reco::TrackRef track, 
   const reco::RecoToSimCollection & association, 
   bool bestMatchByMaxValue
 ) const
 {
-  BTagEvent::Flags flags(BTagEvent::Unknown+1, false);
+  BTagTrackEvent::Flags flags(BTagTrackEvent::Unknown+1, false);
   
   TrackOrigin tracer(-2);
 	
@@ -913,44 +913,44 @@ BTagEvent::Flags PerformanceAnalyzer::getTrackCategories(
     // Check for signal events.	
     if ( !eventId.bunchCrossing() && !eventId.event() )
     {
-      flags[BTagEvent::SignalEvent] = true;
+      flags[BTagTrackEvent::SignalEvent] = true;
       // Check for PV, SV, TV
       TrackHistory::GenVertexTrail genVertexTrail(tracer.genVertexTrail());
       if ( genVertexTrail.empty() )
-        flags[BTagEvent::PV] = true;
+        flags[BTagTrackEvent::PV] = true;
       else if ( genVertexTrail.size() == 1 )
-        flags[BTagEvent::SV] = true;
+        flags[BTagTrackEvent::SV] = true;
       else
-        flags[BTagEvent::TV] = true;
+        flags[BTagTrackEvent::TV] = true;
     }
   
     // Check for the existence of a simulated vertex (displaced).
     if ( !tracer.simVertexTrail().empty() )
-      flags[BTagEvent::Displaced] = true;
+      flags[BTagTrackEvent::Displaced] = true;
 		
     // Checks for long lived particle
-    flags[BTagEvent::Ks] = hasLongLived(tracer, 310);      // Ks
-    flags[BTagEvent::Lambda] = hasLongLived(tracer, 3122); // Lambda 
+    flags[BTagTrackEvent::Ks] = hasLongLived(tracer, 310);      // Ks
+    flags[BTagTrackEvent::Lambda] = hasLongLived(tracer, 3122); // Lambda 
   
     // Check for photon conversion
-    flags[BTagEvent::PhotonConversion] = hasPhotonConversion(tracer);
+    flags[BTagTrackEvent::PhotonConversion] = hasPhotonConversion(tracer);
     
     // Check for the initial hadron
     if (particle)
     {
       HepPDT::ParticleID pid(particle->pdg_id());
-      flags[BTagEvent::Up] = pid.hasUp();
-      flags[BTagEvent::Down] = pid.hasDown();
-      flags[BTagEvent::Strange] = pid.hasStrange();
-      flags[BTagEvent::Charm] = pid.hasCharm();
-      flags[BTagEvent::Bottom] = pid.hasBottom();
-      flags[BTagEvent::Light] = !pid.hasCharm() || !pid.hasBottom();
+      flags[BTagTrackEvent::Up] = pid.hasUp();
+      flags[BTagTrackEvent::Down] = pid.hasDown();
+      flags[BTagTrackEvent::Strange] = pid.hasStrange();
+      flags[BTagTrackEvent::Charm] = pid.hasCharm();
+      flags[BTagTrackEvent::Bottom] = pid.hasBottom();
+      flags[BTagTrackEvent::Light] = !pid.hasCharm() || !pid.hasBottom();
     }
     else
-      flags[BTagEvent::Unknown] = true;
+      flags[BTagTrackEvent::Unknown] = true;
   }
   else
-    flags[BTagEvent::Fake] = true;
+    flags[BTagTrackEvent::Fake] = true;
   
   return flags;
 }
@@ -1403,7 +1403,9 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		bool gotJPpos    = false;
 		bool gotSMT      = false;
 
-        std::vector<BTagEvent::Flags> trackFlags;
+		// use calibrated jet
+		TVector3 tmpvec, tmpvecOrg(jet->p4().Vect().X(), jet->p4().Vect().Y(), jet->p4().Vect().Z());
+		tmpvec = jetcorrection * tmpvecOrg;
 
 		//start loop over all jetTags	
 		for (size_t k=0; k<jetTags_testManyByType.size(); k++) {
@@ -1417,24 +1419,68 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			std::string processName = (jetTags).provenance()->processName();
 			
 			
-			//*********************************
-			// TrackCategories
-			// Running only on reco samples
-			//*********************************
-            if (flavourMatchOptionf == "hepMC")
+			//*************************************
+			// TrackEvents
+			// Running only on reco/aod samples
+			// TrackCategories only in reco samples
+			//*************************************
+				
+			// Get a vector of reference to the selected tracks in each jet
+            TrackRefVector tracks((*tagInfo)[ith_tagged].selectedTracks());
+            
+            std::vector<Measurement1D> ip3ds( (*tagInfo)[ith_tagged].impactParameters(0) );
+            std::vector<Measurement1D> ip2ds( (*tagInfo)[ith_tagged].impactParameters(1) );
+            std::vector<Measurement1D> sdls( (*tagInfo)[ith_tagged].decayLengths() );
+            std::vector<Measurement1D> dtas( (*tagInfo)[ith_tagged].jetDistances() );
+
+            // Create a new BTagTrackEvent
+            BTagTrackEvent trackEvent;
+           
+            for ( size_t index=0; index < tracks.size(); index++ )
             {
-              TrackRefVector tracks((*tagInfo)[ith_tagged].tracks());
-        
-              trackFlags.resize(tracks.size());
-           
-              for ( size_t index=0; index < trackFlags.size(); index++ ) {
-                trackFlags[index] = getTrackCategories(tracks[index], association, true);
-                for ( size_t j=0; j < trackFlags[index].size(); j++ )
-                  std::cout << " " << trackFlags[index][j];
-                std::cout << std::endl;  
-              }
+              TrackRef track = tracks[index];
+
+              // collect reco track data (including their categories)
+ 			  trackEvent.pt.push_back( track->pt() );
+ 			  trackEvent.eta.push_back( track->eta() );
+ 			  trackEvent.phi.push_back( track->phi() );
+ 			  trackEvent.charge.push_back( track->charge() );
+              trackEvent.trkchi2.push_back( track->chi2() );
+			  trackEvent.trkndof.push_back( track->ndof() );
+			  trackEvent.trkrechits.push_back( track->numberOfValidHits() );
+  			  trackEvent.d0.push_back( track->d0() );
+			  trackEvent.d0sigma.push_back( track->d0Error() );
+
+              // Get the IP information.
+              trackEvent.ip2d.push_back( ip2ds[index].value() );
+              trackEvent.ip2dSigma.push_back( ip2ds[index].error() );
+              trackEvent.ip3d.push_back( ip3ds[index].value() );
+              trackEvent.ip3dSigma.push_back( ip3ds[index].error() );
+              trackEvent.sdl.push_back( sdls[index].value() );
+              trackEvent.sdlSigma.push_back( sdls[index].error() );
+              trackEvent.dta.push_back( dtas[index].value() );
+              trackEvent.dtaSigma.push_back( dtas[index].error() );
+
+ 			  // delta R(muon,jet)			
+			  trackEvent.jet_deltaR.push_back( 
+			    ROOT::Math::VectorUtil::DeltaR(jet->p4().Vect(), track->momentum())
+			  );
+			  
+			  // ptrel calculation per track
+			  // find pTrel
+			  TVector3 trackvec(track->px(), track->py(), track->pz());
+			  trackEvent.jet_ptrel.push_back(
+			  	trackvec.Perp(tmpvec + trackvec)
+			  );
+
+			  // If hepMC exist get the track categories.
+			  if (flavourMatchOptionf == "hepMC" )
+                trackEvent.is.push_back( getTrackCategories(track, association, true) );
             } 
-           
+
+            // Add the track event into BTagEvent.
+            fS8evt->tracks.push_back( trackEvent );
+                      
 			//*********************************
 			// Track Counting taggers
 			//*********************************
@@ -1546,10 +1592,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		if (!gotJP)      fS8evt->btag_JetProb_disc3D.push_back( -9999. );
 		if (!gotJPneg)   fS8evt->btag_negJetProb_disc3D.push_back( -9999. );
 		if (!gotJPpos)   fS8evt->btag_posJetProb_disc3D.push_back( -9999. );		
-       
-        // TrackHistory
-		fS8evt->trackCategories.push_back(trackFlags);
-								   
+       								   
 		ijet++;
 	} //end loop over reco jets
 

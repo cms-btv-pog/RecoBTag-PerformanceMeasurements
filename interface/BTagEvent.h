@@ -8,7 +8,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.h,v 1.9 2008/02/06 14:40:15 jandrea Exp $
+ version $Id: BTagEvent.h,v 1.10 2008/03/05 17:49:08 bazterra Exp $
 
 ________________________________________________________________**/
 
@@ -18,6 +18,7 @@ ________________________________________________________________**/
 // ROOT
 #include "TObject.h"
 #include "TMatrixDSym.h"
+#include "RecoBTag/PerformanceMeasurements/interface/BTagTrackEvent.h"
 #include "RecoBTag/PerformanceMeasurements/interface/BTagLeptonEvent.h"
 
 class BTagEvent : public TObject {
@@ -75,36 +76,10 @@ class BTagEvent : public TObject {
 	std::vector< float > btag_NegTag_disc3D_3trk;
 
 	std::vector< float > btag_SoftMuon_disc;
-	
+
+	std::vector< BTagTrackEvent > tracks;
 	std::vector< BTagLeptonEvent > lepton;
-
-    // TrackCategories
-    
-    enum Category {
-      Fake = 0,
-      Bad,
-      SignalEvent,
-      PV,
-      SV,
-      TV,
-      Displaced,
-      Ks,
-      Lambda,
-      PhotonConversion,
-      Up,
-      Down,
-      Strange,
-      Charm,
-      Bottom,
-      Light,
-      Unknown
-    };
-
-    typedef std::vector<bool> Flags;
-    std::vector< std::vector< Flags > > trackCategories;
-    
-    // End of TrackCategories
-	
+    	
     ClassDef(BTagEvent,1);
 
 };

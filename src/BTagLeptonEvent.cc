@@ -5,7 +5,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagLeptonEvent.cc,v 1.3 2007/09/28 15:11:01 yumiceva Exp $
+ version $Id: BTagLeptonEvent.cc,v 1.4 2007/09/28 23:13:15 yumiceva Exp $
 
 ________________________________________________________________**/
 
@@ -17,39 +17,15 @@ ClassImp(BTagLeptonEvent)
 // ROOT
 
 //_______________________________________________________________
-BTagLeptonEvent::BTagLeptonEvent() {
-
-	this->Reset();
-	
-}
-
-//_______________________________________________________________
-BTagLeptonEvent::~BTagLeptonEvent() {
-}
-
-//_______________________________________________________________
-void BTagLeptonEvent::Reset() {
-
+void BTagLeptonEvent::Reset() {	
+    e.clear();
 	pdgid.clear();
-	pt.clear();
-    eta.clear();
-    phi.clear();
-	e.clear();
-    charge.clear();
-    //p.clear();
-    trkchi2.clear();
-    trkndof.clear();
 	chi2.clear();
 	ndof.clear();
 	SArechits.clear();
-    trkrechits.clear();
-	d0.clear();
-	d0sigma.clear();
 	//vx.clear();
 	//vy.clear();
 	//vz.clear();
-	jet_deltaR.clear();
-	jet_ptrel.clear();
 	
 	mc_pt.clear();
 	mc_eta.clear();
@@ -60,6 +36,5 @@ void BTagLeptonEvent::Reset() {
 	//mc_vx.clear();
 	//mc_vy.clear();
 	//mc_vz.clear();
-    mc_mother_pdgid.clear();
-
+	mc_mother_pdgid.clear();
 }
