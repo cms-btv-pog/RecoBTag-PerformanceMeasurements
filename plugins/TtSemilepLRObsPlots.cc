@@ -24,6 +24,9 @@ TtSemilepLRObsPlots::TtSemilepLRObsPlots(const edm::ParameterSet& iConfig)
 
   evtsols    = iConfig.getParameter<edm::InputTag>("evtSolution");
   jetSource_ = iConfig.getParameter<edm::InputTag>("jetSource");
+  
+  bTagCutLabel = iConfig.getParameter< string >("bTagCutLabel");
+  bCut = iConfig.getParameter< double >("bCut");
 
   for(int j = 0; j < nrJetCombObs; j++){
     obsFits.push_back("pol4");
@@ -76,68 +79,110 @@ TtSemilepLRObsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   if(sols.size()== 12) {
     
     ++goodSolution;
-    
+   
     vector < vector< TtSemiLRJetCombObservables::IntBoolPair > > obsMatch;
     vector <int> matchSum;
     int bestSol=-1, bestMatch = -1;
-    int goodMatch=0, badMatch=0, corrWeight=0;
-    
+    int corrWeight=0;
+    vector <int> goodMatch(nrJetCombObs); 
+    vector <int> badMatch(nrJetCombObs); 
+    vector <int> totMatch(nrJetCombObs);
+
     for (int i = 0; i < 12; ++i) {
       obsMatch.push_back(myLRJetCombObservables->operator()(sols[i],iEvent, true));
+    }	  
+    
+    if (debug) cout << "--- b-Tag cut --- " << endl;
+    if (debug) cout << bTagCutLabel << " cut at : " << bCut << endl;
+    
+    for(int j = 0; j < nrJetCombObs; ++j) { 
+      goodMatch[j]=0;
+      badMatch[j]=0;
+      totMatch[j]=0;
     }
-    for (int i = 0; i < 12; ++i) {
-      // Fill the observables 
-      for(int j = 0; j < nrJetCombObs; ++j) {
-	if( myLRhelper->obsFitIncluded(obsNrs[j]) ) {
-	  
-	  for (int w = 0; w < 12; w++){
-	    goodMatch+=obsMatch[w][obsNrs[j]-1].second;
-	    badMatch+=!obsMatch[w][obsNrs[j]-1].second;
-	  }  
-	  if (obsMatch[i][obsNrs[j]-1].second) {
-	        
-	    myLRhelper->fillToSignalHists(obsNrs[j],sols[i].getLRJetCombObsVal(obsNrs[j]), weight/goodMatch);
-	    
-	    for(int k = j; k < nrJetCombObs; ++k) {
-	       if (obsMatch[i][obsNrs[k]-1].second) {
-	 
-		 for (int w = 0; w < 12; w++){
-		   corrWeight+=(obsMatch[w][obsNrs[j]-1].second * obsMatch[w][obsNrs[k]-1].second);
-		 } 
+    if (debug) cout << "Start calculating weights for observables depending on the matching" << endl;
+    // Fill the observables 
+    for(int j = 0; j < nrJetCombObs; ++j) { 
+      for (int w = 0; w < 12; w++){      //this 2 selection cuts can only be applied solution by solution 
+	if (debug) cout << "Chi2 prob :  " << sols[w].getProbChi2() << endl;
+	if (sols[w].getProbChi2()>0) { // don't consider non converged solutions
+	  if (debug) cout << "b-Tag value : " << sols[w].getCalHadb().getBDiscriminator(bTagCutLabel) << endl;
+	  if (sols[w].getCalHadb().getBDiscriminator(bTagCutLabel) > bCut) { // b-tag cut to suppres W+jets
+	    if( myLRhelper->obsFitIncluded(obsNrs[j]) ) { 
+	      goodMatch[j]+=obsMatch[w][obsNrs[j]-1].second;
+	      badMatch[j]+=!obsMatch[w][obsNrs[j]-1].second;
+	      totMatch[j]++;
+	    }  
+	  }
+      	}
+      }
+    }
+    
+    if (debug) {
+      for(int j = 0; j < nrJetCombObs; ++j) { 
+	if( myLRhelper->obsFitIncluded(obsNrs[j]) ) { 
+	  cout << "obs " << j << ": goodmatch " << goodMatch[j] << "  badmatch " << badMatch[j] << "  totmatch " << totMatch[j] << endl;
+	}  
+      }
+    }
+     
 
-		 myLRhelper->fillToSignalCorrelation(obsNrs[j], sols[i].getLRJetCombObsVal(obsNrs[j]), obsNrs[k], sols[i].getLRJetCombObsVal(obsNrs[k]), weight/corrWeight);
-	       
-		 // cout << "Fill :" << obsMatch[0][obsNrs[j]-1].second*obsMatch[0][obsNrs[k]-1].second<<" "<<
-		 // 		  	obsMatch[0][obsNrs[j]-1].second<<" "<<obsMatch[0][obsNrs[k]-1].second<<" "<<
-		 // 			obsNrs[j]<<" "<< sols[i].getLRSignalEvtObsVal(obsNrs[j])<<" "<<
-		 // obsNrs[k]<<" "<< sols[i].getLRSignalEvtObsVal(obsNrs[k])<<endl;
-	       }
+    for (int i = 0; i < 12; ++i) { 
+
+      //this 2 selection cuts can only be applied solution by solution
+      if (sols[i].getProbChi2()>0) { // don't consider non converged solutions
+	if (sols[i].getCalHadb().getBDiscriminator(bTagCutLabel) > bCut) { // b-tag cut to suppres W+jets
+	  
+	  // Fill the observables 
+	  for(int j = 0; j < nrJetCombObs; ++j) {
+	    if( myLRhelper->obsFitIncluded(obsNrs[j]) ) {
+	      if (goodMatch[j]!=0&&badMatch[j]!=0){
+		if (obsMatch[i][obsNrs[j]-1].second) {
+		  
+		  myLRhelper->fillToSignalHists(obsNrs[j],sols[i].getLRJetCombObsVal(obsNrs[j]), weight*totMatch[j]/goodMatch[j]);
+		  
+		  for(int k = j; k < nrJetCombObs; ++k) {
+		    if (obsMatch[i][obsNrs[k]-1].second) {
+		      
+		      for (int w = 0; w < 12; w++){
+			corrWeight+=(obsMatch[w][obsNrs[j]-1].second * obsMatch[w][obsNrs[k]-1].second);
+		      } 
+		      
+		      myLRhelper->fillToSignalCorrelation(obsNrs[j], sols[i].getLRJetCombObsVal(obsNrs[j]), obsNrs[k], sols[i].getLRJetCombObsVal(obsNrs[k]), weight/corrWeight); //FIXME: probably corrWeight wrongly calculated
+		      
+		      // cout << "Fill :" << obsMatch[0][obsNrs[j]-1].second*obsMatch[0][obsNrs[k]-1].second<<" "<<
+		      // 		  	obsMatch[0][obsNrs[j]-1].second<<" "<<obsMatch[0][obsNrs[k]-1].second<<" "<<
+		      // 			obsNrs[j]<<" "<< sols[i].getLRSignalEvtObsVal(obsNrs[j])<<" "<<
+		      // obsNrs[k]<<" "<< sols[i].getLRSignalEvtObsVal(obsNrs[k])<<endl;
+		    }
+		  }
+		} else myLRhelper->fillToBackgroundHists(obsNrs[j],sols[i].getLRJetCombObsVal(obsNrs[j]), weight*totMatch[j]/badMatch[j]);
+	      }
 	    }
-	  } else myLRhelper->fillToBackgroundHists(obsNrs[j],sols[i].getLRJetCombObsVal(obsNrs[j]), weight/badMatch);
+	  }
+	  
+	  
+	  int matchSum = 0;
+	  for(int j = 0; j < nrJetCombObs; j++){
+	    if (obsMatch[i][j].second) ++matchSum;
+	    if (debug) cout <<obsMatch[i][j].second;
+	  }
+	  if (debug) cout <<endl;
+	  if (matchSum>bestMatch) {
+	    bestMatch = matchSum;
+	    bestSol = i;
+	  }
 	}
-	
-      }
-      
-      
-      int matchSum = 0;
-      for(int j = 0; j < nrJetCombObs; j++){
-	if (obsMatch[i][j].second) ++matchSum;
-	if (debug) cout <<obsMatch[i][j].second;
-      }
-      if (debug) cout <<endl;
-      if (matchSum>bestMatch) {
-        bestMatch = matchSum;
-	bestSol = i;
       }
     }
-    //FIXME: fix this cout for 12 solution case
-    if (debug) cout << "\nBest Solution:" <<sols[0].getLRBestJetComb() << " - "<<sols[1].getLRBestJetComb()<< " = "<<bestMatch<<" = "<<bestSol<< endl;
+    //FIXME: fix this cout for 12 solution case and for the extra cuts I've made
+    /*if (debug) cout << "\nBest Solution:" <<sols[0].getLRBestJetComb() << " - "<<sols[1].getLRBestJetComb()<< " = "<<bestMatch<<" = "<<bestSol<< endl;
     
     for(int i = 0; i < 12; i++){
       B+=obsMatch[bestSol][i].second;
       nonB+=(!obsMatch[bestSol][i].second);
     }
-    if (debug)  cout<< B <<" " <<nonB << " " << obsMatch[bestSol][0].second << " " <<obsMatch[bestSol][1].second<<endl;
+    if (debug)  cout<< B <<" " <<nonB << " " << obsMatch[bestSol][0].second << " " <<obsMatch[bestSol][1].second<<endl;*/
     //FIXME
     //if (sols[bestSol].getJetB().getPartonFlavour()==5) ++tau;
     //if (sols[bestSol].getJetBbar().getPartonFlavour()==5) ++tau;

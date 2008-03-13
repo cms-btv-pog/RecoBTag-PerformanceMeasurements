@@ -58,7 +58,8 @@ class TtSemilepLRObsPlots : public edm::EDAnalyzer {
     double weight;
     int signal, background, goodSolution, allSolution, B, nonB, tau;
     int bestSol;
-    
+    std::string bTagCutLabel;
+    double bCut;
 
     edm::InputTag evtsols, jetSource_;
     LRHelpFunctions *myLRhelper;
