@@ -28,15 +28,15 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //input files
-const TString dir = "/msa1/jmmaes/CMSSW_1_6_9/src/TopQuarkAnalysis/Examples/crab/test/";
-const  TString  inputFile    = "plots_CLR.root";
-const  TString  outputFile   = "final_lr_plots.root";
-const  TString  outputPSfile = "LRplots.ps";
+const TString dir = "/msa1/jmmaes/CMSSW_1_6_9_NOPAT/src/TopQuarkAnalysis/Examples/crab/test/";
+const  TString  inputFile    = "plots_CLR_test9.root";
+const  TString  outputFile   = "final_lr_plots_test9.root";
+const  TString  outputPSfile = "LRplots_test9.ps";
 
 //observable histogram variables
-const  int      nrJetCombObs  		= 2;
+const  int      nrJetCombObs  		= 8;
 //const  int      JetCombObs[nrJetCombObs] 	= {1,2,3,4,5,6,7,8,9,10,11,12,13};
-const  int      JetCombObs[nrJetCombObs] 	= {1,8};
+const  int      JetCombObs[nrJetCombObs] 	= {8,29,42,46,48,54,56,65};
 //const  int      JetCombObs[nrJetCombObs] 	= {1,2,3,4,7,8,9,10,11,12};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
