@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.11 2008/03/05 17:49:08 bazterra Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.12 2008/03/11 21:09:38 bazterra Exp $
  *
  */
 
@@ -177,6 +177,7 @@ private:
     bool bestMatchByMaxValue
   ) const;
   
+  bool bTagTrackEventFlag_;
 };
 
 #endif

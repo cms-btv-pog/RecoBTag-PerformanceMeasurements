@@ -11,6 +11,8 @@ module Performance = PerformanceAnalyzer {
        untracked string TrackCollection = "ctfWithMaterialTracks"
        untracked string PrimaryVertexCollection = "offlinePrimaryVerticesFromCTFTracks"
        bool StoreTrackProba = false
+
+       bool bTagTrackEvent = false
     
        // b-tagedd jet collection
        untracked vstring bTaggerList = { 

@@ -123,6 +123,8 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
 
   SimTrkCollectionTags_ = iConfig.getParameter<std::string>("SimTracks");
   
+  bTagTrackEventFlag_ = iConfig.getParameter<bool>("bTagTrackEvent");
+  
   //jetFlavourIdentifier_ = JetFlavourIdentifier(iConfig.getParameter<edm::ParameterSet>("jetIdParameters"));
   //jetFlavourIdentifier2_ = JetFlavourIdentifier(iConfig.getParameter<edm::ParameterSet>("jetIdParameters2"));
   
@@ -1425,62 +1427,65 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			// TrackCategories only in reco samples
 			//*************************************
 				
-			// Get a vector of reference to the selected tracks in each jet
-            TrackRefVector tracks((*tagInfo)[ith_tagged].selectedTracks());
+			if (bTagTrackEventFlag_)	
+			{	
+				// Get a vector of reference to the selected tracks in each jet
+            	TrackRefVector tracks((*tagInfo)[ith_tagged].selectedTracks());
             
-            std::vector<Measurement1D> ip3ds( (*tagInfo)[ith_tagged].impactParameters(0) );
-            std::vector<Measurement1D> ip2ds( (*tagInfo)[ith_tagged].impactParameters(1) );
-            std::vector<Measurement1D> sdls( (*tagInfo)[ith_tagged].decayLengths() );
-            std::vector<Measurement1D> dtas( (*tagInfo)[ith_tagged].jetDistances() );
+           		std::vector<Measurement1D> ip3ds( (*tagInfo)[ith_tagged].impactParameters(0) );
+            	std::vector<Measurement1D> ip2ds( (*tagInfo)[ith_tagged].impactParameters(1) );
+            	std::vector<Measurement1D> sdls( (*tagInfo)[ith_tagged].decayLengths() );
+            	std::vector<Measurement1D> dtas( (*tagInfo)[ith_tagged].jetDistances() );
 
-            // Create a new BTagTrackEvent
-            BTagTrackEvent trackEvent;
+            	// Create a new BTagTrackEvent
+            	BTagTrackEvent trackEvent;
            
-            for ( size_t index=0; index < tracks.size(); index++ )
-            {
-              TrackRef track = tracks[index];
+            	for ( size_t index=0; index < tracks.size(); index++ )
+            	{
+              		TrackRef track = tracks[index];
 
-              // collect reco track data (including their categories)
- 			  trackEvent.pt.push_back( track->pt() );
- 			  trackEvent.eta.push_back( track->eta() );
- 			  trackEvent.phi.push_back( track->phi() );
- 			  trackEvent.charge.push_back( track->charge() );
-              trackEvent.trkchi2.push_back( track->chi2() );
-			  trackEvent.trkndof.push_back( track->ndof() );
-			  trackEvent.trkrechits.push_back( track->numberOfValidHits() );
-  			  trackEvent.d0.push_back( track->d0() );
-			  trackEvent.d0sigma.push_back( track->d0Error() );
+              		// collect reco track data (including their categories)
+ 			  		trackEvent.pt.push_back( track->pt() );
+ 			  		trackEvent.eta.push_back( track->eta() );
+ 			  		trackEvent.phi.push_back( track->phi() );
+ 			  		trackEvent.charge.push_back( track->charge() );
+              		trackEvent.trkchi2.push_back( track->chi2() );
+			  		trackEvent.trkndof.push_back( track->ndof() );
+			  		trackEvent.trkrechits.push_back( track->numberOfValidHits() );
+  			  		trackEvent.d0.push_back( track->d0() );
+			  		trackEvent.d0sigma.push_back( track->d0Error() );
 
-              // Get the IP information.
-              trackEvent.ip2d.push_back( ip2ds[index].value() );
-              trackEvent.ip2dSigma.push_back( ip2ds[index].error() );
-              trackEvent.ip3d.push_back( ip3ds[index].value() );
-              trackEvent.ip3dSigma.push_back( ip3ds[index].error() );
-              trackEvent.sdl.push_back( sdls[index].value() );
-              trackEvent.sdlSigma.push_back( sdls[index].error() );
-              trackEvent.dta.push_back( dtas[index].value() );
-              trackEvent.dtaSigma.push_back( dtas[index].error() );
+              		// Get the IP information.
+              		trackEvent.ip2d.push_back( ip2ds[index].value() );
+              		trackEvent.ip2dSigma.push_back( ip2ds[index].error() );
+              		trackEvent.ip3d.push_back( ip3ds[index].value() );
+              		trackEvent.ip3dSigma.push_back( ip3ds[index].error() );
+              		trackEvent.sdl.push_back( sdls[index].value() );
+              		trackEvent.sdlSigma.push_back( sdls[index].error() );
+              		trackEvent.dta.push_back( dtas[index].value() );
+              		trackEvent.dtaSigma.push_back( dtas[index].error() );
 
- 			  // delta R(muon,jet)			
-			  trackEvent.jet_deltaR.push_back( 
-			    ROOT::Math::VectorUtil::DeltaR(jet->p4().Vect(), track->momentum())
-			  );
+ 			  		// delta R(muon,jet)			
+			  		trackEvent.jet_deltaR.push_back( 
+			    	  ROOT::Math::VectorUtil::DeltaR(jet->p4().Vect(), track->momentum())
+			  		);
 			  
-			  // ptrel calculation per track
-			  // find pTrel
-			  TVector3 trackvec(track->px(), track->py(), track->pz());
-			  trackEvent.jet_ptrel.push_back(
-			  	trackvec.Perp(tmpvec + trackvec)
-			  );
+			  		// ptrel calculation per track
+			  		// find pTrel
+			  		TVector3 trackvec(track->px(), track->py(), track->pz());
+			  		trackEvent.jet_ptrel.push_back(
+			  			trackvec.Perp(tmpvec + trackvec)
+			  		);
 
-			  // If hepMC exist get the track categories.
-			  if (flavourMatchOptionf == "hepMC" )
-                trackEvent.is.push_back( getTrackCategories(track, association, true) );
-            } 
+			  		// If hepMC exist get the track categories.
+			  		if (flavourMatchOptionf == "hepMC" )
+                		trackEvent.is.push_back( getTrackCategories(track, association, true) );
+            	} 
 
-            // Add the track event into BTagEvent.
-            fS8evt->tracks.push_back( trackEvent );
-                      
+            	// Add the track event into BTagEvent.
+            	fS8evt->tracks.push_back( trackEvent );
+			}
+                  
 			//*********************************
 			// Track Counting taggers
 			//*********************************

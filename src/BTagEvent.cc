@@ -5,7 +5,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.cc,v 1.8 2008/02/04 20:55:07 jindal Exp $
+ version $Id: BTagEvent.cc,v 1.9 2008/02/06 23:37:45 yumiceva Exp $
 
 ________________________________________________________________**/
 
@@ -77,7 +77,7 @@ void BTagEvent::Reset() {
 	btag_SoftMuon_disc.clear();
 	
 	lepton.clear();
-	
+        tracks.clear();	
 }
 
 
