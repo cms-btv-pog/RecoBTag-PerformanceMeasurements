@@ -77,6 +77,7 @@ TtSemilepLRValPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       for(int j = 0; j < nrJetCombObs; j++){
 	if( myLRhelper->obsFitIncluded(obsNrs[j]) )
           obsVals.push_back(sols[i].getLRJetCombObsVal(obsNrs[j]));
+	cout <<sols[i].getLRJetCombObsVal(obsNrs[j]) << endl;
 	//	  cout << "Obs " << j<<" "<<sols[i].getLRSignalEvtObsVal(obsNrs[j])<<endl;
 	//       cout << j<<myLRhelper->obsFitIncluded(obsNrs[j])<<" ";
       }
@@ -84,7 +85,10 @@ TtSemilepLRValPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       // Fill the LR 
       //FIXME: this should not be the one from ptdr
       //lr.push_back(myLRhelper->calcPtdrLRval(obsVals) );
-      double lr = myLRhelper->calcPtdrLRval(obsVals);
+      //double lr = myLRhelper->calcPtdrLRval(obsVals);
+      if (debug) cout << "start calculating Combined LR value" << endl;
+      double lr = myLRhelper->calcLRval(obsVals);
+      if (debug) cout << "Combined LR value : " << lr << endl;
       if (lr >= bestlr) {
 	bestlr = lr;
 	bestSol = i;
@@ -115,6 +119,7 @@ TtSemilepLRValPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       
     } catch (...){cout << "Exception\n";}
     
+    if (debug) cout << "Best LR value" << bestlr <<endl;
     if (matchB) myLRhelper -> fillLRSignalHist(bestlr, weight);
     else myLRhelper -> fillLRBackgroundHist(bestlr, weight);
    
