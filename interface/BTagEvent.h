@@ -8,7 +8,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.h,v 1.10 2008/03/05 17:49:08 bazterra Exp $
+ version $Id: BTagEvent.h,v 1.11 2008/03/11 21:09:38 bazterra Exp $
 
 ________________________________________________________________**/
 
@@ -42,7 +42,7 @@ class BTagEvent : public TObject {
 	Int_t nvertices;  // number of vertices
 	Int_t ngenjets;   // number of generated jets
 
-	Int_t trackProvaVector_Size;  // size of the vector of tracks
+	std::vector< Int_t > trackProvaVector_Size;  // size of the vector of tracks
 	//== track multiplicity of quality cuted tracks
 
 	

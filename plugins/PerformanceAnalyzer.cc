@@ -878,7 +878,8 @@ JetFlavour PerformanceAnalyzer::getMatchedParton(const reco::CaloJet &jet)
 	const reco::CaloJet* theMasterClone = dynamic_cast<const reco::CaloJet*>(theJetInTheMatchMap->masterClone().get());
 	//std::cout << " masterclone pt = " << theMasterClone->pt() << " calo jet pt = " << jet.pt() << std::endl;
 	// FIXME, compare pointers rather than values:
-	if ( fabs( theMasterClone->pt() - jet.pt() ) < 1.e-5 ) {
+	//if ( fabs( theMasterClone->pt() - jet.pt() ) < 1.e-5 ) {
+	if ( fabs(theMasterClone->phi() - jet.phi()) < 1.e-5 && fabs(theMasterClone->eta() - jet.eta()) ){ 
 		//std::cout << " it matches! " << std::endl;
 	  jetFlavour.flavour(abs(theMatchedParton->pdgId()));
 	  jetFlavour.underlyingParton4Vec(theMatchedParton->p4());
@@ -1542,7 +1543,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 				
 				int NtrksInJet = (*jetTags)[ith_tagged].tracks().size();
 				fS8evt->jet_ntrks.push_back( NtrksInJet );
-				fS8evt->trackProvaVector_Size = (*tagInfo)[ith_tagged].probabilities(0).size();
+				fS8evt->trackProvaVector_Size.push_back((*tagInfo)[ith_tagged].probabilities(0).size());
 				if(StoreTrackProba_){
 				  int i=0;
 				  std::vector< float > track_proba = (*tagInfo)[ith_tagged].probabilities(0) ;
