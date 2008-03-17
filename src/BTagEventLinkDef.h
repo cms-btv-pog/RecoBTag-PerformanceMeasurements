@@ -10,6 +10,7 @@
 #pragma link off all functions;
  
 #pragma link C++ class BTagEvent+;
+#pragma link C++ class BTagBaseTrackEvent+;
 #pragma link C++ class BTagTrackEvent+;
 #pragma link C++ class BTagLeptonEvent+;
 

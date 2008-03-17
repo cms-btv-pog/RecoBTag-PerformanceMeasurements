@@ -9,7 +9,7 @@
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
          Victor E. Bazterra, UIC (baites@fnal.gov)
          
- version $Id: BTagLeptonEvent.h,v 1.4 2007/09/28 23:13:14 yumiceva, bazterra Exp $
+ version $Id: BTagBaseTrackEvent.h,v 1.1 2008/03/11 21:09:38 bazterra Exp $
 ________________________________________________________________________________**/
 
 #include "TObject.h"
@@ -37,7 +37,7 @@ class BTagBaseTrackEvent : public TObject {
 	std::vector< float > jet_deltaR;
 	std::vector< float > jet_ptrel;
   
-// 	ClassDef(BTagLeptonEvent,1);
+ 	ClassDef(BTagBaseTrackEvent,1);
 };
 
 #endif

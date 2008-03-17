@@ -6,18 +6,13 @@
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
          Victor E. Bazterra, UIC (baites@fnal.gov)
 
- version $Id: BTagBaseTrackEvent.cc,v 1.4 2007/09/28 23:13:15 yumiceva Exp $
+ version $Id: BTagBaseTrackEvent.cc,v 1.1 2008/03/11 21:09:39 bazterra Exp $
 
 ________________________________________________________________**/
 
 #include "RecoBTag/PerformanceMeasurements/interface/BTagBaseTrackEvent.h"
 
-/*BTagBaseTrackEvent::BTagBaseTrackEvent()
-{
-	Reset();
-}
-
-BTagBaseTrackEvent::~BTagBaseTrackEvent(){}*/
+ClassImp(BTagBaseTrackEvent)
 
 //_______________________________________________________________
 void BTagBaseTrackEvent::Reset() 

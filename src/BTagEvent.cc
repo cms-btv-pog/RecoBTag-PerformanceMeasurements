@@ -5,7 +5,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.cc,v 1.10 2008/03/13 16:33:04 bazterra Exp $
+ version $Id: BTagEvent.cc,v 1.11 2008/03/14 11:10:52 jandrea Exp $
 
 ________________________________________________________________**/
 
@@ -65,6 +65,10 @@ void BTagEvent::Reset() {
 	btag_TrkCounting_disc3D_1trk.clear();
 	btag_TrkCounting_disc3D_2trk.clear();
 	btag_TrkCounting_disc3D_3trk.clear();
+
+	btag_TrkCounting_disc3D_1trk_is.clear();
+	btag_TrkCounting_disc3D_2trk_is.clear();
+	btag_TrkCounting_disc3D_3trk_is.clear();
 	
 	btag_JetProb_disc3D.clear();
 	btag_negJetProb_disc3D.clear();
@@ -74,10 +78,14 @@ void BTagEvent::Reset() {
 	btag_NegTag_disc3D_2trk.clear();
 	btag_NegTag_disc3D_3trk.clear();
 
+	btag_NegTag_disc3D_1trk_is.clear();
+	btag_NegTag_disc3D_2trk_is.clear();
+	btag_NegTag_disc3D_3trk_is.clear();
+
 	btag_SoftMuon_disc.clear();
 	
 	lepton.clear();
-        tracks.clear();	
+    tracks.clear();	
 }
 
 

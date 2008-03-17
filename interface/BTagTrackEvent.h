@@ -8,7 +8,7 @@
 
  author: Victor E. Bazterra, UIC (baites@fnal.gov)
 
- version $Id: BTagTrackEvent.h,v 1.4 2007/09/28 23:13:14 bazterra Exp $
+ version $Id: BTagTrackEvent.h,v 1.1 2008/03/11 21:09:38 bazterra Exp $
 ________________________________________________________________**/
 
 #include "RecoBTag/PerformanceMeasurements/interface/BTagBaseTrackEvent.h"
@@ -45,7 +45,7 @@ class BTagTrackEvent : public BTagBaseTrackEvent {
  		Unknown
   	};
 
-    typedef std::vector<bool> Flags;
+        typedef std::vector<bool> Flags;
 
 	std::vector<Flags> is;
 
