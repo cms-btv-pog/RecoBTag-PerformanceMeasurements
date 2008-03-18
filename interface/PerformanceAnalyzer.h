@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.12 2008/03/11 21:09:38 bazterra Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.13 2008/03/13 16:33:04 bazterra Exp $
  *
  */
 
@@ -149,6 +149,8 @@ private:
   S8bPerformance fperformanceTC2trk;
   S8bPerformance fperformanceTC3trk;
   S8bPerformance fperformanceTP;
+  S8bPerformance fperformanceMTC2trk;
+  S8bPerformance fperformanceMTC3trk;
   bool fWritePerformancePlots;
   
   //edm::InputTag simG4_;

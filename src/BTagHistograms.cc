@@ -4,7 +4,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagHistograms.cc,v 1.3 2008/02/04 20:55:07 jindal Exp $
+ version $Id: BTagHistograms.cc,v 1.4 2008/02/15 23:49:28 yumiceva Exp $
 
 ________________________________________________________________**/
 
@@ -42,7 +42,7 @@ void BTagHistograms::Init(TString type, TString suffix1, TString suffix2) {
 		h1["jet_pt"+suffix1] = new TH1D("jet_pt"+suffix1,"Jet p_{T} [GeV/c]",nptarray-1,jetptbins);
 		h1["jet_pt_b"+suffix1] = new TH1D("jet_pt_b"+suffix1,"Jet p_{T} [GeV/c]",nptarray-1,jetptbins);
 		h1["jet_pt_c"+suffix1] = new TH1D("jet_pt_c"+suffix1,"Jet p_{T} [GeV/c]",nptarray-1,jetptbins);
-		h1["jet_pt_udsg"+suffix1] = new TH1D("jet_pt_udsg"+suffix1,"Jet p_{T} [GeV/c]",12,30.,230.);
+		h1["jet_pt_udsg"+suffix1] = new TH1D("jet_pt_udsg"+suffix1,"Jet p_{T} [GeV/c]",nptarray-1,jetptbins);
 		
 		h1["jet_eta"+suffix1] = new TH1D("jet_eta"+suffix1,"Jet |#eta|",netaarray-1,jetetabins);
 		h1["jet_eta_b"+suffix1] = new TH1D("jet_eta_b"+suffix1,"Jet |#eta|",netaarray-1,jetetabins);

@@ -27,7 +27,7 @@ module Performance = PerformanceAnalyzer {
 
        // definition of the Operating Points (L,M,T)
        // cuts estimated using QCD-80-120, 10k events.
-       // sorted as TCL,TCM,TCT,JPL,JPM,JPT
+       // sorted as TCL,TCM,TCT,JPL,JPM,JPT,MTCL,MTCM,MTCT
 
        untracked vdouble bTagCutList = {
           2.0,
@@ -35,7 +35,10 @@ module Performance = PerformanceAnalyzer {
 	  4.7,
 	  0.26,
 	  0.50,
-	  0.76
+	  0.76,
+          2.0,
+	  4.6,
+	  4.7
        }
 
        string AwayJetTagger = "TCL"
