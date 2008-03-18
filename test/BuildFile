@@ -14,7 +14,7 @@
 <use name=clhep> 
 </library>
 
-<library file=PtrelSolver/fitter.cc name=PtrelSolver>
+<library file=PtrelSolver/PtrelSolver.cc name=PtrelSolver>
 </library>
 
 <library file=PtrelSolver/*.cc name=PtrelSolver>

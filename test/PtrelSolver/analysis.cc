@@ -1,7 +1,6 @@
 #include "analysis.h"
 
 
-
 void formatHist1(TH1 *hh, const char *xtitle, const char *ytitle) {
 
   if (!hh) return;

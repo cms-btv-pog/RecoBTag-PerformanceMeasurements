@@ -1,8 +1,8 @@
 
 #ifdef NOSCRAMV
-#include "fitter.h"
+#include "PtrelSolver.h"
 #else
-#include "RecoBTag/PerformanceMeasurements/test/PtrelSolver/fitter.h"
+#include "RecoBTag/PerformanceMeasurements/test/PtrelSolver/PtrelSolver.h"
 #endif
 
 #ifdef __CINT__

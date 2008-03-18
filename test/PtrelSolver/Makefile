@@ -18,7 +18,7 @@ LD_LIBRARY_PATH:= $(ROOTSYS)/lib/:$(LD_LIBRARY_PATH)
 INCLUDEDIR    = -I$(ROOTSYS)/include -I./ 
 
 
-OBJS          = fitter.o fitterDict.o analysis.o
+OBJS          = PtrelSolver.o PtrelSolverDict.o analysis.o
 
 
 all:	$(OBJS)

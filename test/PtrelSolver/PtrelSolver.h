@@ -74,24 +74,24 @@ class PtrelSolver : public TObject {
   std::vector<std::vector<double> > *pdfs_c_tag;
   TObjArray                          combined_pdfs_tag;
 
-
   TObjArray                          combined_pdfs_sys;
   TObjArray                          combined_pdfs_sys_tag;
 
-
-  TObjArray data, mc;  // store histograms. 
-
+  TObjArray data, mc;  // store histograms.
 
   void init();
 
  public:
 
+  // Default constructor.
   PtrelSolver();
-  virtual ~PtrelSolver();
+  // ???
   PtrelSolver(int ptbins, int etabins);
 
+  // Destructor.
+  virtual ~PtrelSolver();
 
-
+  
   void   setPtAverage(int threshold, int sum);
   void   setEtaAverage(int threshold, int sum);
 

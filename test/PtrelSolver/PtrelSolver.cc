@@ -18,7 +18,7 @@
 #include "stdlib.h"
 #include "vector.h"
 
-#include "fitter.h"
+#include "PtrelSolver.h"
 #include "analysis.h"
 
 /**************************************************************************
@@ -58,11 +58,6 @@ Double_t combined_pdf(Double_t *xx, Double_t *par) {
   return f;
 }
 /**************************************************************************/
-
-
-
-
-
 
 ClassImp(PtrelSolver)
 
@@ -204,7 +199,6 @@ TF1 *PtrelSolver::getPdfByIndex(int jj) {
 }
 
 TF1 *PtrelSolver::getTaggedPdfByIndex(int jj) {
-
 
   char index[100];
   sprintf(index, "tag_%d", jj);
@@ -534,9 +528,6 @@ void PtrelSolver::measure(const char *inputfilename, const char *outfilename, co
   TString big_plot(tag);
   big_plot.Append("_pt.eps");
   c2->SaveAs(big_plot.Data());
-
-
-
 
   // 2. eta dependence
   // duplicate the binning for efficiency table
@@ -1881,8 +1872,6 @@ void PtrelSolver::makeTemplates(int flavor, const char *inputfilename, const cha
 	    << etahist << "]"
 	    << std::endl;
 
-
-
   TFile *inputfile = new TFile(inputfilename, "READ");
   TFile *rootfile = new TFile(rootfilename, "RECREATE");
   if (!inputfile || !rootfile) return;
@@ -2569,11 +2558,9 @@ void PtrelSolver::make(bool sys) {
 
   if (!sys) {
   
-
   // make all the templates for the fitting 
   setPtAverage(1, 1);
   setEtaAverage(1, 1);
-
 
   makeTemplates(5, "/uscms_data/d1/lpcbtag/yumiceva/PerformanceMeasurements/2007_Oct_9_13X/histogramsV4/results_MuBBbarCCbar_TCL_AwayTCL.root", "b_flavor_notag.data", "b_pdf_notag.root");
 
@@ -2664,7 +2651,6 @@ void PtrelSolver::make(bool sys) {
   makeTemplates(4, "/uscms/home/baites/work/CMSSW/1_3_3/src/RecoBTag/PerformanceMeasurements/test/MuBBbarCCbar_TPT_AwayTCL_Mu10.root", "c_flavor_sys_TPT.data", "c_pdf_sys_TPT.root", "sys_TPT", "ncmbpT", "ncmbEta");
   }
 }
-
 
 
 void PtrelSolver::makettbar() {
