@@ -13,7 +13,7 @@
 //
 // Original Author:  Gena Kukartsev, kukarzev@fnal.gov
 //         Created:  Fri Jun 29 14:53:10 CDT 2007
-// $Id$
+// $Id: TtSemiLeptonicTagCounting.h,v 1.1.2.1 2008/02/15 22:27:07 kukartse Exp $
 //
 //
 
@@ -84,6 +84,8 @@ private:
   map< int, map< int, map< int, map< int, int > > > > Fxijk;
 
   map< double, map< int, int> > Nn; // number of events with n tagged jets
+  map< double, map< int, int> > Nn_2; // number of events with n tagged jets, second tagger
+  map< double, map< int, int> > Nn_3; // number of events with n tagged jets, third tagger
 
   double dRCut;
   int nCaloJetsLow;
@@ -92,11 +94,14 @@ private:
   int _interFreq;
   string _dataType;
   bool _lookForGenJetMatch;
-  string _jetSource, _electronSource, _muonSource, _METSource, _jetTagSource;
+  string _jetSource, _electronSource, _muonSource, _METSource;
+ string _jetTagSource, _jetTagSource_2, _jetTagSource_3;
   string _genJetSource;
   string _outputFileName;
 
   double dLow, dHigh, dStep;
+  double dLow_2, dHigh_2, dStep_2;
+  double dLow_3, dHigh_3, dStep_3;
 
   RooGKCounter nOfPassedLJets;
   RooGKCounter nOfPassedBJets;
@@ -106,24 +111,25 @@ private:
   map<double,RooGKCounter> nOfTaggedPassedBJets;
   map<double,RooGKCounter> nOfTaggedPassedCJets;
   map<double,RooGKCounter> nOfTaggedPassedUnknownJets;
+  map<double,RooGKCounter> nOfTaggedPassedLJets_2;
+  map<double,RooGKCounter> nOfTaggedPassedBJets_2;
+  map<double,RooGKCounter> nOfTaggedPassedCJets_2;
+  map<double,RooGKCounter> nOfTaggedPassedUnknownJets_2;
+  map<double,RooGKCounter> nOfTaggedPassedLJets_3;
+  map<double,RooGKCounter> nOfTaggedPassedBJets_3;
+  map<double,RooGKCounter> nOfTaggedPassedCJets_3;
+  map<double,RooGKCounter> nOfTaggedPassedUnknownJets_3;
 
   RooGKCounter interCounter; // counts intermediate results
 
   ofstream _outputFile; 
+
   ofstream _outputFileTable; 
+  ofstream _outputFileTable_2;
+  ofstream _outputFileTable_3;
+
   ofstream _outputFileMC; 
   ofstream _outputFileMC2; 
   
 };
 
-//
-// constants, enums and typedefs
-//
-
-//
-// static data member definitions
-//
-
-//
-// constructors and destructor
-//
