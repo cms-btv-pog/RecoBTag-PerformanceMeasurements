@@ -13,7 +13,7 @@
 //
 // Original Author:  Gena Kukartsev, kukarzev@fnal.gov
 //         Created:  Fri Jun 29 14:53:10 CDT 2007
-// $Id$
+// $Id: TtObservables.cc,v 1.1.2.1 2008/02/15 22:27:08 kukartse Exp $
 //
 //
 
@@ -46,7 +46,7 @@ TtObservables::TtObservables(const edm::ParameterSet& iConfig)
   _METSource    = iConfig.getParameter<string>("METSource");
   _jetTagSource    = iConfig.getParameter<string>("jetTagSource");
 
-  _genJetSource    = iConfig.getParameter<string>("genJetSource");
+  //_genJetSource    = iConfig.getParameter<string>("genJetSource");
   _outputFileName    = iConfig.getParameter<string>("outputFileName");
 
   //Histograms
@@ -195,7 +195,7 @@ TtObservables::beginJob(const edm::EventSetup&)
 
   eventCounter . setMessage( "=== Input event counter: " );
   eventCounter . setDivider( 100 );
-  eventCounter . setPrintCount( true );
+  eventCounter . setPrintCount( false );
 
 }
 

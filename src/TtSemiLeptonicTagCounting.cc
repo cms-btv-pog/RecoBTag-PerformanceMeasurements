@@ -13,7 +13,7 @@
 //
 // Original Author:  Gena Kukartsev, kukarzev@fnal.gov
 //         Created:  Fri Jun 29 14:53:10 CDT 2007
-// $Id$
+// $Id: TtSemiLeptonicTagCounting.cc,v 1.1.2.1 2008/02/15 22:27:08 kukartse Exp $
 //
 //
 
@@ -40,7 +40,7 @@ TtSemiLeptonicTagCounting::TtSemiLeptonicTagCounting(const edm::ParameterSet& iC
   _METSource    = iConfig.getParameter<string>("METSource");
   _jetTagSource    = iConfig.getParameter<string>("jetTagSource");
 
-  _genJetSource    = iConfig.getParameter<string>("genJetSource");
+  //_genJetSource    = iConfig.getParameter<string>("genJetSource");
   _outputFileName    = iConfig.getParameter<string>("outputFileName");
 
 }
@@ -81,14 +81,17 @@ TtSemiLeptonicTagCounting::analyze(const edm::Event& iEvent, const edm::EventSet
   
   eventCounter . count();
 
-  Handle< vector< GenJet > > genJets;
+  /* 
+  //Handle< vector< GenJet > > genJets; //obsolete since CSA07
+  Handle< vector<genParticle > > genParticleCollection;
   vector<int> goodGenJetIndex; // indices of the jets that pass quality cuts
   if ( _dataType == "MC" )
     {
       
       
       // loop over gen jets
-      iEvent . getByLabel( _genJetSource, genJets );
+      //iEvent . getByLabel( _genJetSource, genJets );
+      iEvent . getByLabel( _genJetSource, genParticleCollection );
       vector<reco::GenJet>::const_iterator gjet;
       RooGKCounter nOfGoodGenJets;
       for ( gjet = genJets -> begin(); gjet != genJets -> end(); gjet++ )  // loop over calo jets
@@ -103,7 +106,7 @@ TtSemiLeptonicTagCounting::analyze(const edm::Event& iEvent, const edm::EventSet
 	  
 	}
     }
-
+  */
 
   // loop over jets
   //
@@ -129,10 +132,12 @@ TtSemiLeptonicTagCounting::analyze(const edm::Event& iEvent, const edm::EventSet
       
       bool _foundGenJetMatch = true;
 
+      /*
       if ( _dataType == "MC" && _lookForGenJetMatch )
 	{
 	  _foundGenJetMatch = ( findJetMatch( (*cjet), *genJets, goodGenJetIndex, dRCut ) > -1 );
 	}
+      */
 
       if ( 
 	  ( fabs( (*cjet) . eta() ) < 2.4 ) &&
