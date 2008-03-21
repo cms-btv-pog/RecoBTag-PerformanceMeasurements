@@ -55,10 +55,10 @@ void S8Solver::LoadHistos() {
 	finputFile->cd();
 	
 	
-	fnHistoBase = (TH2F*) gDirectory->Get("Histograms/samples/n_"+fcategory);
-	fpHistoBase = (TH2F*) gDirectory->Get("Histograms/samples/p_"+fcategory);
-	fnSvxHistoBase = (TH2F*) gDirectory->Get("Histograms/samples/ntag_"+fcategory+"_"+fthename);
-	fpSvxHistoBase = (TH2F*) gDirectory->Get("Histograms/samples/ptag_"+fcategory+"_"+fthename);
+	fnHistoBase = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/n_"+fcategory);
+	fpHistoBase = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/p_"+fcategory);
+	fnSvxHistoBase = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/ntag_"+fcategory+"_"+fthename);
+	fpSvxHistoBase = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/ptag_"+fcategory+"_"+fthename);
 
 	//std::cout << " 2D histos loaded " << fcategory << std::endl;
 
@@ -119,15 +119,15 @@ void S8Solver::LoadHistos() {
 		}
 		finputFile->cd();
 		
-		h2["b_npT"] = (TH2F*) gDirectory->Get("Histograms/samples/n_"+fcategory+"_b");
+		h2["b_npT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/n_"+fcategory+"_b");
 		std::cout << "got one" << std::endl;
-		h2["cl_npT"] = (TH2F*) gDirectory->Get("Histograms/samples/n_"+fcategory+"_cl");
-		h2["b_ppT"] = (TH2F*) gDirectory->Get("Histograms/samples/p_"+fcategory+"_b");
-		h2["cl_ppT"] = (TH2F*) gDirectory->Get("Histograms/samples/p_"+fcategory+"_cl");
-		h2["b_ncmbpT"] = (TH2F*) gDirectory->Get("Histograms/samples/ntag_"+fcategory+"_b_"+fthename);
-		h2["cl_ncmbpT"] = (TH2F*) gDirectory->Get("Histograms/samples/ntag_"+fcategory+"_cl_"+fthename);
-		h2["b_pcmbpT"] = (TH2F*) gDirectory->Get("Histograms/samples/ptag_"+fcategory+"_b_"+fthename);
-		h2["cl_pcmbpT"] = (TH2F*) gDirectory->Get("Histograms/samples/ptag_"+fcategory+"_cl_"+fthename);
+		h2["cl_npT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/n_"+fcategory+"_cl");
+		h2["b_ppT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/p_"+fcategory+"_b");
+		h2["cl_ppT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/p_"+fcategory+"_cl");
+		h2["b_ncmbpT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/ntag_"+fcategory+"_b_"+fthename);
+		h2["cl_ncmbpT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/ntag_"+fcategory+"_cl_"+fthename);
+		h2["b_pcmbpT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/ptag_"+fcategory+"_b_"+fthename);
+		h2["cl_pcmbpT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/ptag_"+fcategory+"_cl_"+fthename);
 
 		std::cout << " got initial truth dist." << std::endl;
 		
