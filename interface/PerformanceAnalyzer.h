@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.13 2008/03/13 16:33:04 bazterra Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.14 2008/03/18 22:02:58 jindal Exp $
  *
  */
 
@@ -90,7 +90,7 @@ public:
   SimTrack GetGenTrk(reco::Track atrack, const edm::SimTrackContainer *simTrkColl, const edm::SimVertexContainer *simVtcs);
   int GetMotherId(const edm::SimVertexContainer *simVtxColl, const edm::SimTrackContainer *simTrkColl, SimTrack muonMC);
   int TaggedJet(reco::CaloJet calojet, edm::Handle<std::vector<reco::JetTag> > jetTags );
-  std::map< std::string, bool > GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType);
+  std::map< std::string, bool > GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType, double ptrel=0.);
   void FillHistos(std::string type, TLorentzVector p4MuJet, double ptrel,
 				  int JetFlavor, std::map<std::string, bool> aMap, double weight);
   void FillEff(TLorentzVector p4MuJet, int JetFlavor, std::map<std::string, bool> aMap, double weight);

@@ -22,7 +22,9 @@ module Performance = PerformanceAnalyzer {
 	 "negativeTrackCounting3rdTrck",
 	 "jetProbabilityJetTagsNegativeOnly",
 	 "jetProbabilityJetTagsPositiveOnly",
-	 "jetProbabilityJetTags"
+	 "jetProbabilityJetTags",
+         "modifiedtrackCountingHighEffJetTags",
+         "modifiedtrackCountingHighPurJetTags"
        }
 
        // definition of the Operating Points (L,M,T)
@@ -36,6 +38,10 @@ module Performance = PerformanceAnalyzer {
 	  0.26,
 	  0.50,
 	  0.76,
+          2.0,
+	  4.6,
+	  4.7,
+	  0.8,	
           2.0,
 	  4.6,
 	  4.7

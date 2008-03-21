@@ -220,10 +220,14 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
   fOPMap["TCT"] = bTagCutList_[2];
   fOPMap["JPL"] = bTagCutList_[3];
   fOPMap["JPM"] = bTagCutList_[4];
-  fOPMap["MTCL"] = bTagCutList_[6];
-  fOPMap["MTCM"] = bTagCutList_[7];
-  fOPMap["MTCT"] = bTagCutList_[8];
   fOPMap["JPT"] = bTagCutList_[5];
+  fOPMap["MTCL"] = bTagCutList_[6];     //  Mod. TC Loose
+  fOPMap["MTCM"] = bTagCutList_[7];     //  Mod. TC Medium
+  fOPMap["MTCT"] = bTagCutList_[8];     //  Mod. TC Tight
+  fOPMap["SLT"] = bTagCutList_[9];      // Soft Lepton Tagger
+  fOPMap["SLTMTCL"] = bTagCutList_[10]; // Soft Lepton Tagger + Mod. TC Loose
+  fOPMap["SLTMTCM"] = bTagCutList_[11]; // Soft Lepton Tagger + Mod. TC Medium
+  fOPMap["SLTMTCT"] = bTagCutList_[12]; // Soft Lepton Tagger + Mod. TC Tight
   
   // get tagger for away jet
   fAwayJetTagger = iConfig.getParameter<std::string>("AwayJetTagger");
@@ -657,7 +661,7 @@ PerformanceAnalyzer::GetMotherId(const edm::SimVertexContainer *simVtxColl, cons
 
 //______________________________________________________________________________________________________________________
 std::map< std::string, bool >
-PerformanceAnalyzer::GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType) {
+PerformanceAnalyzer::GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType, double ptrel) {
 
 	std::map< std::string, bool > aMap;
 	
@@ -672,6 +676,10 @@ PerformanceAnalyzer::GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<st
 	aMap["MTCL"] = false;
 	aMap["MTCM"] = false;
 	aMap["MTCT"] = false;
+	aMap["SLT"] = false;
+	aMap["SLTMTCL"] = false;
+	aMap["SLTMTCM"] = false;
+	aMap["SLTMTCT"] = false;
 	
 	//start loop over all jetTags
 	
@@ -687,8 +695,9 @@ PerformanceAnalyzer::GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<st
 			std::string moduleLabel = (jetTags).provenance()->moduleLabel();
 			std::string processName = (jetTags).provenance()->processName();
 
+			//std::cout << " GetBTaggingMap : " << moduleLabel <<std::endl; 
 
-			
+			//*********************************		
 			// Track Counting taggers
 			//*********************************
 
@@ -704,6 +713,7 @@ PerformanceAnalyzer::GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<st
 				 if ( (*jetTags)[ith_tagged].discriminator() > fOPMap["TCT"] ) aMap["TCT"] = true; // 3rd trk, 3D
 				 
 			}
+			//*********************************
 			//Modified Track Counting taggers
 			//*********************************
 			else if ( moduleLabel == "modifiedtrackCountingHighEffJetTags" ) {
@@ -715,7 +725,6 @@ PerformanceAnalyzer::GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<st
 			else if ( moduleLabel == "modifiedtrackCountingHighPurJetTags" ) {
 
 				 if ( (*jetTags)[ith_tagged].discriminator() > fOPMap["MTCT"] ) aMap["MTCT"] = true; // 3rd trk, 3D
-				 
 			}
 
 
@@ -729,8 +738,41 @@ PerformanceAnalyzer::GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<st
 				if ( (*jetTags)[ith_tagged].discriminator() > fOPMap["JPT"] ) aMap["JPT"] = true;
 				
 			}
-			
 	}
+		
+
+
+	                //*************************************
+			//Soft Lepton Tag ( ptrel cut)
+			//*************************************
+    
+			if (ptrel  > fOPMap["SLT"]) {
+			  aMap["SLT"] = true; //Soft Lepton Tag
+			  for (size_t k=0; k<jetTags_testManyByType.size(); k++) {
+			    edm::Handle<std::vector<reco::JetTag> > jetTags = jetTags_testManyByType[k];
+			    
+			    ith_tagged = this->TaggedJet(jet,jetTags);
+
+			    if (ith_tagged == -1) continue;
+		
+			    std::string moduleLabel = (jetTags).provenance()->moduleLabel();
+			    std::string processName = (jetTags).provenance()->processName();
+
+                            //***************************************************
+			    //Soft Lepton Tag + Modified Track Counting taggers
+			    //***************************************************
+				if ( moduleLabel == "modifiedtrackCountingHighEffJetTags" ) {
+				  if ( (*jetTags)[ith_tagged].discriminator() > fOPMap["SLTMTCL"]) aMap["SLTMTCL"] = true; // 2nd trk, 3D
+				  if ( (*jetTags)[ith_tagged].discriminator() > fOPMap["SLTMTCM"]) aMap["SLTMTCM"] = true; // 2nd trk, 3D				
+				}
+			    else if ( moduleLabel == "modifiedtrackCountingHighPurJetTags" ) {
+			      
+			      if ( (*jetTags)[ith_tagged].discriminator() > fOPMap["SLTMTCT"] ) aMap["SLTMTCT"] = true; // 3rd trk, 3D
+				 
+			    }
+			  }
+			}
+			
 	
 	return aMap;
 }
@@ -989,7 +1031,7 @@ JetFlavour PerformanceAnalyzer::getMatchedParton(const reco::CaloJet &jet)
 	//std::cout << " masterclone pt = " << theMasterClone->pt() << " calo jet pt = " << jet.pt() << std::endl;
 	// FIXME, compare pointers rather than values:
 	//if ( fabs( theMasterClone->pt() - jet.pt() ) < 1.e-5 ) {
-	if ( fabs(theMasterClone->phi() - jet.phi()) < 1.e-5 && fabs(theMasterClone->eta() - jet.eta()) ){ 
+	if ( fabs(theMasterClone->phi() - jet.phi()) < 1.e-5 && fabs(theMasterClone->eta() - jet.eta())< 1.e-5 ){ 
 		//std::cout << " it matches! " << std::endl;
 	  jetFlavour.flavour(abs(theMatchedParton->pdgId()));
 	  jetFlavour.underlyingParton4Vec(theMatchedParton->p4());
@@ -1453,7 +1495,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			
 		} // close away jet loop
 
-		std::map< std::string, bool > thebtaggingmap = this->GetBTaggingMap(*jet,jetTags_testManyByType);
+		std::map< std::string, bool > thebtaggingmap = this->GetBTaggingMap(*jet,jetTags_testManyByType,ptrel);
 		FillEff(p4Jet, JetFlavor, thebtaggingmap, weight );
 		FillPerformance(*jet, JetFlavor, jetTags_testManyByType );
 			
