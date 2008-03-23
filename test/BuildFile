@@ -1,0 +1,7 @@
+<use name=RecoBTag/PerformanceMeasurements>
+
+<bin file=tagConsistency/bTagEff.cc name=bTagEff>
+   <use name=rootrflx>
+   <use name=boost>
+   <use name=boost_program_options>
+</bin>
