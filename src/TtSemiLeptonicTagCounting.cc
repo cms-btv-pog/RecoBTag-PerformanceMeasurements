@@ -13,7 +13,7 @@
 //
 // Original Author:  Gena Kukartsev, kukarzev@fnal.gov
 //         Created:  Fri Jun 29 14:53:10 CDT 2007
-// $Id: TtSemiLeptonicTagCounting.cc,v 1.1.2.2 2008/03/21 16:59:37 kukartse Exp $
+// $Id: TtSemiLeptonicTagCounting.cc,v 1.1.2.3 2008/03/21 20:53:22 kukartse Exp $
 //
 //
 
@@ -174,14 +174,48 @@ TtSemiLeptonicTagCounting::analyze(const edm::Event& iEvent, const edm::EventSet
 	  for(double _d = dLow_2; _d <= dHigh_2; _d += 0.5) isTagged_2[_d] = false;
 	  for(double _d = dLow_3; _d <= dHigh_3; _d += 0.5) isTagged_3[_d] = false;
 
-	  JetTagRef _theJetTagRef = cjet -> getBJetTagRef( _jetTagSource );
-	  JetTagRef _theJetTagRef_2 = cjet -> getBJetTagRef( _jetTagSource_2 );
-	  JetTagRef _theJetTagRef_3 = cjet -> getBJetTagRef( _jetTagSource_3 );
+	  //JetTagRef _theJetTagRef = cjet -> getBJetTagRef( _jetTagSource );
+	  //JetTagRef _theJetTagRef_2 = cjet -> getBJetTagRef( _jetTagSource_2 );
+	  //JetTagRef _theJetTagRef_3 = cjet -> getBJetTagRef( _jetTagSource_3 );
 
+	  //cjet -> dumpBTagLabels();
+	  //cout << cjet -> getBDiscriminator( _jetTagSource ) << endl;
+	  //cout << cjet -> getBDiscriminator( _jetTagSource_2 ) << endl;
+	  //cout << cjet -> getBDiscriminator( _jetTagSource_3 ) << endl;
+
+	  double jetBDiscr  = cjet -> getBDiscriminator( _jetTagSource );
+	  double jetBDiscr2 = cjet -> getBDiscriminator( _jetTagSource_2 );
+	  double jetBDiscr3 = cjet -> getBDiscriminator( _jetTagSource_3 );
+
+	  // loop over discriminator values
+	  for(double _d = dLow; _d < dHigh+0.0001; _d += dStep){
+	      if ( jetBDiscr > _d ){
+		nTaggedJets[_d] . count(); // check the discriminator
+		isTagged[_d] = true;
+	      }
+	  }
+	  for(double _d = dLow_2; _d < dHigh_2+0.0001; _d += dStep_2){
+	    if ( jetBDiscr2 > _d )
+	      {
+		nTaggedJets_2[_d] . count(); // check the discriminator
+		isTagged_2[_d] = true;
+	      }
+	  }
+	  for(double _d = dLow_3; _d < dHigh_3+0.0001; _d += dStep_3){
+	    if ( jetBDiscr3 > _d )
+	      {
+		nTaggedJets_3[_d] . count(); // check the discriminator
+		isTagged_3[_d] = true;
+	      }
+	  }
+
+	  /* obsolete
 	  // check if the jet is tagged
 	  if ( _theJetTagRef . isNonnull() )
 	    {
 	      const JetTag * theJetTag = &*( cjet -> getBJetTagRef( _jetTagSource ) );
+
+	      cout << "### " << theJetTag->discriminator() << endl;
 
 	      for(double _d = dLow; _d < dHigh+0.0001; _d += dStep) // loop over discriminator values
 		{
@@ -232,7 +266,8 @@ TtSemiLeptonicTagCounting::analyze(const edm::Event& iEvent, const edm::EventSet
 		      isTagged_3[_d] = true;
 		    }
 		}
-	    }
+	      }
+    obsolete */
 
 
 	  // ---- jet flavor (MC only!!!)
