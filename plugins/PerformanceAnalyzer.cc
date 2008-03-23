@@ -238,6 +238,7 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
   // include weights?
   fWeightHistograms = iConfig.getParameter< bool > ("WeightHistograms");
   fStoreWeightsInNtuple = iConfig.getParameter< bool > ("StoreWeightsInNtuple");
+  fStorePtHat = iConfig.getParameter< bool > ("StorePtHat");
   
   topdir = rootFile_->mkdir("Histograms");
   topdir->cd();
@@ -245,7 +246,7 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
   topdir->cd();
   topdir->mkdir("MCtruth");
   topdir->cd();
-  topdir->mkdir("muon_in_jet");
+  topdir->mkdir("muon_in_jet"); 
   topdir->cd();
   rootFile_->cd();
   
@@ -1254,7 +1255,22 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	
 	if (fStoreWeightsInNtuple) fS8evt->evt_weight =  (*weightHandle);
 	else fS8evt->evt_weight = 1.;
-		  
+	
+	
+	if(fStorePtHat){
+	  edm::Handle<int> genProcessID;
+	  iEvent.getByLabel( "genEventProcID", genProcessID );
+	  double processID = *genProcessID; 
+	  edm::Handle<double> genEventScale;
+	  iEvent.getByLabel( "genEventScale", genEventScale );
+	  double pthat = *genEventScale;
+	  
+	  if(processID == 11 || processID == 12 || processID == 13 
+	     || processID == 28 || processID == 68 || processID == 53) fS8evt->ptHat = pthat;
+	  else fS8evt->ptHat = -99;
+	}
+	
+	
 	fS8evt->Reset();
 	
 	fS8evt->event = iEvent.id().event();

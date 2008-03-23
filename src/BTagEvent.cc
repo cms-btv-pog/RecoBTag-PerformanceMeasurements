@@ -5,7 +5,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.cc,v 1.13 2008/03/18 22:02:58 jindal Exp $
+ version $Id: BTagEvent.cc,v 1.14 2008/03/23 00:54:27 jandrea Exp $
 
 ________________________________________________________________**/
 
@@ -30,17 +30,17 @@ BTagEvent::~BTagEvent() {
 //_______________________________________________________________
 void BTagEvent::Reset() {
 
-	event   = -1;
-	run     = -1;
+	event      = -1;
+	run        = -1;
 	evt_weight = 1.;		
 	// mc
-
+	ptHat      = -1; 
 	// reco
-	njets       = -1;
-	nmuons      = -1;
+	njets      = -1;
+	nmuons     = -1;
 	
-	nvertices     = -1;
-	ngenjets    = -1;
+	nvertices  = -1;
+	ngenjets   = -1;
 
 	trackProbaVector_Size.clear();
 	
@@ -93,7 +93,7 @@ void BTagEvent::Reset() {
 	btag_SoftMuon_disc.clear();
 	
 	lepton.clear();
-    tracks.clear();	
+        tracks.clear();	
 }
 
 

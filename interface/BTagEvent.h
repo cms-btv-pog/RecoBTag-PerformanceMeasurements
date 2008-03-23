@@ -8,7 +8,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.h,v 1.14 2008/03/18 22:02:58 jindal Exp $
+ version $Id: BTagEvent.h,v 1.15 2008/03/23 00:54:26 jandrea Exp $
 
 ________________________________________________________________**/
 
@@ -32,16 +32,16 @@ class BTagEvent : public TObject {
 	double               calculProbability(std::vector< float > );
 	std::vector< float > getTrackProbabilies(std::vector< float > v , int ipType);
 	
-	Int_t event; // event number
-	Int_t run;   // run number
-	double evt_weight; // event weight		
+	Int_t event;       // event number
+	Int_t run;         // run number
+	double evt_weight; // event weight
+	float ptHat;       // hatted pt if runnging over the soup		
 
 	// reco
-	Int_t njets;      // number of jets
-	Int_t nmuons;     // number of muons
-	Int_t nvertices;  // number of vertices
-	Int_t ngenjets;   // number of generated jets
-
+	Int_t njets;       // number of jets
+	Int_t nmuons;      // number of muons
+	Int_t nvertices;   // number of vertices
+	Int_t ngenjets;    // number of generated jets
 	std::vector< Int_t > trackProbaVector_Size;  // size of the vector of tracks
 	//== track multiplicity of quality cuted tracks
 
