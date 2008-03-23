@@ -5,7 +5,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.cc,v 1.12 2008/03/17 02:23:04 bazterra Exp $
+ version $Id: BTagEvent.cc,v 1.13 2008/03/18 22:02:58 jindal Exp $
 
 ________________________________________________________________**/
 
@@ -42,7 +42,7 @@ void BTagEvent::Reset() {
 	nvertices     = -1;
 	ngenjets    = -1;
 
-	trackProvaVector_Size.clear();
+	trackProbaVector_Size.clear();
 	
 	jet_pt.clear();
 	jet_eta.clear();
