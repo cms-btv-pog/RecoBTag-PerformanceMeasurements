@@ -28,14 +28,19 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //input files
-const TString dir = "/msa1/jmmaes/CMSSW_1_6_9_NOPAT/src/TopQuarkAnalysis/Examples/crab/test/";
-const  TString  inputFile    = "plots_test9_7.root";
-const  TString  outputFile   = "final_obs_plots_test9_7.root";
-const  TString  outputPSfile = "LRJetCombAllObs_test9_7.ps";
+const TString dir = "/msa1/jmmaes/CMSSW_1_6_9_NOPAT/src/TopQuarkAnalysis/Examples/crab/SanityCheck/rootfiles/";
+const  TString  inputFile    = "plots_obs_all_semimu.root";
+const  TString  outputFile   = "final_obs_plots_all_semimu.root";
+const  TString  outputPSfile = "LRJetCombAllObs_all_semimu.ps";
+
+//const  TString  inputFile    = "plots_obs_tt0j_semimu.root";
+//const  TString  outputFile   = "final_obs_plots_tt0j_semimu.root";
+//const  TString  outputPSfile = "LRJetCombAllObs_tt0j_semimu.ps";
 
 //observable histogram variables
 const  int      nrJetCombObs  		= 66;
-//const  int      JetCombObs[nrJetCombObs] 	= {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+//const  int      nrJetCombObs  		= 1;
+//const  int      JetCombObs[nrJetCombObs] 	= {62};
 const  int      JetCombObs[nrJetCombObs] 	= {  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66};
 
 //definitions to make life more easy
@@ -50,20 +55,6 @@ TFormula symdblsigm("symdblsigm", "[0]/(1 + 1/exp([1]**2*([2] - x)))/(1 + 1/exp(
 
 //observable fit functions
 /*const char*     JetCombObsFits[nrJetCombObs]= {           
-   "[0]/(1 + 1/exp([1]*([2] - x)))", //obs1
-   "[0]/(1 + 1/exp([1]*([2] - x)))", //obs2
-   "([0]+[3]*x+[4]*x*x)/(1 + 1/exp([1]*([2] - x)))", //obs3
-   "([0]+[3]*x+[4]*x*x)/(1 + 1/exp([1]*([2] - x)))", //obs4
-   "[0]/(1 + 1/exp([1]*([2] - x)))", //obs5
-   "[0]/(1 + 1/exp([1]*([2] - x)))", //obs6
-   "[0]/(1 + 1/exp([1]*([2] - x)))", //obs7
-   "[0]/(1 + 1/exp([1]*([2] - x)))", //obs8
-   "pol4", //obs9
-   "pol4", //obs10
-   "[0]/(1 + 1/exp([1]*([2] - x)))", //obs11
-   "[0]/(1 + 1/exp([1]*([2] - x)))", //obs12
-   "[0]/(1 + 1/exp([1]*([2] - x)))", //obs13
-   "pol4", //obs14
    "pol4" //obs15
    };*/
 const char*     JetCombObsFits[nrJetCombObs] 	= { 
@@ -139,7 +130,7 @@ const char*     JetCombObsFits[nrJetCombObs] 	= {
   "pol5",//obs64
   "gauss+gauss",//obs65
   "pol5"//obs66
-};
+  };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

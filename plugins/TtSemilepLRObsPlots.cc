@@ -78,8 +78,21 @@ TtSemilepLRObsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   
   if(sols.size()== 12) {
     
-    ++goodSolution;
-   
+    double maxProbChi2=-999;
+    double maxbTagCut=-9999;
+
+    //counting the number of events which past the cuts	
+    for (int w = 0; w < 12; w++){  
+      if (sols[w].getProbChi2()>maxProbChi2){maxProbChi2=sols[w].getProbChi2();}   
+      if (sols[w].getCalHadb().getBDiscriminator(bTagCutLabel) > maxbTagCut) {maxbTagCut=sols[w].getCalHadb().getBDiscriminator(bTagCutLabel);} 
+    }
+    //cout << maxProbChi2 << " " << maxbTagCut << endl;
+    if(maxProbChi2>0&&maxbTagCut>bCut)  {
+      ++goodSolution;
+      //cout << "this event is selected" <<endl;
+    }
+
+    int matchMode =0;
     vector < vector< TtSemiLRJetCombObservables::IntBoolPair > > obsMatch;
     vector <int> matchSum;
     int bestSol=-1, bestMatch = -1;
@@ -100,32 +113,56 @@ TtSemilepLRObsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       badMatch[j]=0;
       totMatch[j]=0;
     }
+
     if (debug) cout << "Start calculating weights for observables depending on the matching" << endl;
     // Fill the observables 
-    for(int j = 0; j < nrJetCombObs; ++j) { 
-      for (int w = 0; w < 12; w++){      //this 2 selection cuts can only be applied solution by solution 
-	if (debug) cout << "Chi2 prob :  " << sols[w].getProbChi2() << endl;
-	if (sols[w].getProbChi2()>0) { // don't consider non converged solutions
-	  if (debug) cout << "b-Tag value : " << sols[w].getCalHadb().getBDiscriminator(bTagCutLabel) << endl;
-	  if (sols[w].getCalHadb().getBDiscriminator(bTagCutLabel) > bCut) { // b-tag cut to suppres W+jets
-	    if( myLRhelper->obsFitIncluded(obsNrs[j]) ) { 
-	      goodMatch[j]+=obsMatch[w][obsNrs[j]-1].second;
-	      badMatch[j]+=!obsMatch[w][obsNrs[j]-1].second;
-	      totMatch[j]++;
-	    }  
+    if(matchMode==0){
+      for(int j = 0; j < nrJetCombObs; ++j) { 
+	for (int w = 0; w < 12; w++){      //this 2 selection cuts can only be applied solution by solution 
+	  //if (debug) cout << "Chi2 prob :  " << sols[w].getProbChi2() << endl;
+	  if (sols[w].getProbChi2()>0) { // don't consider non converged solutions
+	    //if (debug) cout << "b-Tag value : " << sols[w].getCalHadb().getBDiscriminator(bTagCutLabel) << endl;
+	    if (sols[w].getCalHadb().getBDiscriminator(bTagCutLabel) > bCut) { // b-tag cut to suppres W+jets
+	      if( myLRhelper->obsFitIncluded(obsNrs[j]) ) { 
+		if (debug) cout << "Matching : " << obsMatch[w][obsNrs[j]-1].second<<endl;
+		goodMatch[j]+=obsMatch[w][obsNrs[j]-1].second;
+		badMatch[j]+=!obsMatch[w][obsNrs[j]-1].second;
+		totMatch[j]++;
+	      }  
+	    }
 	  }
       	}
       }
     }
     
-    if (debug) {
+ 
+
+
+    /*  if (debug) {
       for(int j = 0; j < nrJetCombObs; ++j) { 
 	if( myLRhelper->obsFitIncluded(obsNrs[j]) ) { 
 	  cout << "obs " << j << ": goodmatch " << goodMatch[j] << "  badmatch " << badMatch[j] << "  totmatch " << totMatch[j] << endl;
 	}  
       }
-    }
+      }*/
      
+    if (matchMode==1){
+      for(int j = 0; j < nrJetCombObs; ++j) { 
+	for (int w = 0; w < 12; w++){      //this 2 selection cuts can only be applied solution by solution 
+	  if (debug) cout << "Chi2 prob :  " << sols[w].getProbChi2() << endl;
+	  if (sols[w].getProbChi2()>0) { // don't consider non converged solutions
+	    if (debug) cout << "b-Tag value : " << sols[w].getCalHadb().getBDiscriminator(bTagCutLabel) << endl;
+	    if (sols[w].getCalHadb().getBDiscriminator(bTagCutLabel) > bCut) { // b-tag cut to suppres W+jets
+	      if( myLRhelper->obsFitIncluded(obsNrs[j]) ) { 
+		if (sols[w].getCalLepb().getPartonFlavour()==5) {goodMatch[j]++;} else {badMatch[j]++;}
+		totMatch[j]++;
+	      }  
+	    }
+	  }
+	}
+      }
+    }
+
 
     for (int i = 0; i < 12; ++i) { 
 
@@ -136,28 +173,67 @@ TtSemilepLRObsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	  // Fill the observables 
 	  for(int j = 0; j < nrJetCombObs; ++j) {
 	    if( myLRhelper->obsFitIncluded(obsNrs[j]) ) {
-	      if (goodMatch[j]!=0&&badMatch[j]!=0){
-		if (obsMatch[i][obsNrs[j]-1].second) {
-		  
-		  myLRhelper->fillToSignalHists(obsNrs[j],sols[i].getLRJetCombObsVal(obsNrs[j]), weight*totMatch[j]/goodMatch[j]);
-		  
-		  for(int k = j; k < nrJetCombObs; ++k) {
-		    if (obsMatch[i][obsNrs[k]-1].second) {
-		      
-		      for (int w = 0; w < 12; w++){
-			corrWeight+=(obsMatch[w][obsNrs[j]-1].second * obsMatch[w][obsNrs[k]-1].second);
-		      } 
-		      
-		      myLRhelper->fillToSignalCorrelation(obsNrs[j], sols[i].getLRJetCombObsVal(obsNrs[j]), obsNrs[k], sols[i].getLRJetCombObsVal(obsNrs[k]), weight/corrWeight); //FIXME: probably corrWeight wrongly calculated
-		      
-		      // cout << "Fill :" << obsMatch[0][obsNrs[j]-1].second*obsMatch[0][obsNrs[k]-1].second<<" "<<
-		      // 		  	obsMatch[0][obsNrs[j]-1].second<<" "<<obsMatch[0][obsNrs[k]-1].second<<" "<<
-		      // 			obsNrs[j]<<" "<< sols[i].getLRSignalEvtObsVal(obsNrs[j])<<" "<<
-		      // obsNrs[k]<<" "<< sols[i].getLRSignalEvtObsVal(obsNrs[k])<<endl;
+
+	      if (matchMode == 0){
+		//FIXME: dirty hack to make obs 62 (ET4/ET5) not normalized
+		bool sandbPresent = false;
+		if (goodMatch[j]!=0&&badMatch[j]!=0&&j!=61){ sandbPresent = true;}
+		if(j==61){sandbPresent = true;}
+
+		if(sandbPresent){
+		  if (obsMatch[i][obsNrs[j]-1].second) {
+		    
+		    myLRhelper->fillToSignalHists(obsNrs[j],sols[i].getLRJetCombObsVal(obsNrs[j]), weight*totMatch[j]/goodMatch[j]);
+		    
+		    for(int k = j; k < nrJetCombObs; ++k) {
+		      if (obsMatch[i][obsNrs[k]-1].second) {
+			
+			for (int w = 0; w < 12; w++){
+			  corrWeight+=(obsMatch[w][obsNrs[j]-1].second * obsMatch[w][obsNrs[k]-1].second);
+			} 
+			
+			myLRhelper->fillToSignalCorrelation(obsNrs[j], sols[i].getLRJetCombObsVal(obsNrs[j]), obsNrs[k], sols[i].getLRJetCombObsVal(obsNrs[k]), weight/corrWeight); //FIXME: probably corrWeight wrongly calculated
+			
+			// cout << "Fill :" << obsMatch[0][obsNrs[j]-1].second*obsMatch[0][obsNrs[k]-1].second<<" "<<
+			// 		  	obsMatch[0][obsNrs[j]-1].second<<" "<<obsMatch[0][obsNrs[k]-1].second<<" "<<
+			// 			obsNrs[j]<<" "<< sols[i].getLRSignalEvtObsVal(obsNrs[j])<<" "<<
+			// obsNrs[k]<<" "<< sols[i].getLRSignalEvtObsVal(obsNrs[k])<<endl;
+		      }
 		    }
+		  } else {
+		    myLRhelper->fillToBackgroundHists(obsNrs[j],sols[i].getLRJetCombObsVal(obsNrs[j]), weight*totMatch[j]/badMatch[j]);
 		  }
-		} else myLRhelper->fillToBackgroundHists(obsNrs[j],sols[i].getLRJetCombObsVal(obsNrs[j]), weight*totMatch[j]/badMatch[j]);
-	      }
+		}
+	      }//end of MatchMode
+
+	      //***new matchMode
+	      if (matchMode == 1){
+		//if (goodMatch[j]!=0&&badMatch[j]!=0){
+		  if (sols[i].getCalLepb().getPartonFlavour()==5) {
+		    
+		    myLRhelper->fillToSignalHists(obsNrs[j],sols[i].getLRJetCombObsVal(obsNrs[j]), weight*totMatch[j]/goodMatch[j]);
+		    
+		    for(int k = j; k < nrJetCombObs; ++k) {
+		      if (sols[i].getCalLepb().getPartonFlavour()==5) {
+			
+			for (int w = 0; w < 12; w++){
+			  //corrWeight+=(obsMatch[w][obsNrs[j]-1].second * obsMatch[w][obsNrs[k]-1].second);
+			  corrWeight+=1;//FIXME
+			} 
+			
+			myLRhelper->fillToSignalCorrelation(obsNrs[j], sols[i].getLRJetCombObsVal(obsNrs[j]), obsNrs[k], sols[i].getLRJetCombObsVal(obsNrs[k]), weight/corrWeight); //FIXME: probably corrWeight wrongly calculated
+			
+			// cout << "Fill :" << obsMatch[0][obsNrs[j]-1].second*obsMatch[0][obsNrs[k]-1].second<<" "<<
+			// 		  	obsMatch[0][obsNrs[j]-1].second<<" "<<obsMatch[0][obsNrs[k]-1].second<<" "<<
+			// 			obsNrs[j]<<" "<< sols[i].getLRSignalEvtObsVal(obsNrs[j])<<" "<<
+			// obsNrs[k]<<" "<< sols[i].getLRSignalEvtObsVal(obsNrs[k])<<endl;
+		      }
+		    }
+		  } else myLRhelper->fillToBackgroundHists(obsNrs[j],sols[i].getLRJetCombObsVal(obsNrs[j]), weight*totMatch[j]/badMatch[j]);
+		  //	}
+	      }//end of MatchMode
+
+
 	    }
 	  }
 	  

@@ -55,10 +55,10 @@ TtSemilepSolutionFilter::filter(edm::Event& iEvent, edm::EventSetup const & iSet
   if (sols.size()!= 12)  return false;
   TtSemiEvtSolution & sol = sols[0];
  allSolution++;
-  if ((sol.getCalLepb().pt()<jetPtCut) || (sol.getCalHadb().pt()<jetPtCut) ||  (sol.getCalHadp().pt()<jetPtCut) || (sol.getCalHadp().pt()<jetPtCut))
+  if ((sol.getCalLepb().pt()<jetPtCut) || (sol.getCalHadb().pt()<jetPtCut) ||  (sol.getCalHadp().pt()<jetPtCut) || (sol.getCalHadq().pt()<jetPtCut))
       return false;
 
-  if ((sol.getCalLepb().et()<jetPtCut) || (sol.getCalHadb().et()<jetPtCut) ||  (sol.getCalHadp().et()<jetPtCut) || (sol.getCalHadp().et()<jetPtCut))
+  if ((sol.getCalLepb().et()<jetEtCut) || (sol.getCalHadb().et()<jetEtCut) ||  (sol.getCalHadp().et()<jetEtCut) || (sol.getCalHadq().et()<jetEtCut))
       return false;
 
   //FIXME: what is this in semilep case?
@@ -95,6 +95,8 @@ TtSemilepSolutionFilter::filter(edm::Event& iEvent, edm::EventSetup const & iSet
    //if (sols[0].getJetBbar().getPartonFlavour()==5) ++B;
    //  else ++nonB;
 
+  if (debug) cout << sol.getCalLepb().et() << " " <<sol.getCalHadb().et() << " " << sol.getCalHadp().et()<< " " << sol.getCalHadq().et()<< "" << endl; 
+  if (debug) cout << sol.getCalLepb().pt() << " " <<sol.getCalHadb().pt() << " " << sol.getCalHadp().pt()<< " " << sol.getCalHadq().pt()<< "" << endl;
  if (debug) cout <<" ============================ End TtSemilepSolutionFilter ============================" <<endl;
   return true;
 }

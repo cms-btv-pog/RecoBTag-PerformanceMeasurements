@@ -28,12 +28,17 @@ TtSemilepLRValPlots::TtSemilepLRValPlots(const edm::ParameterSet& iConfig)
   evtsols           = iConfig.getParameter<edm::InputTag> ("EvtSolution");
   lrFits = "pol4";
 
+  bTagCutLabel = iConfig.getParameter< string >("bTagCutLabel");
+  bCut = iConfig.getParameter< double >("bCut");
+
   theFile = new TFile("a.root", "RECREATE");
   theFile->cd();
 
   // define all histograms & fit functions
   myLRhelper = new LRHelpFunctions(lrBins, lrMin, lrMax, lrFits);
   myLRhelper->readObsHistsAndFits(obsFileName, obsNrs, false);
+
+  goodSolution = 0;
 }
 
 
@@ -49,6 +54,8 @@ TtSemilepLRValPlots::~TtSemilepLRValPlots()
 void TtSemilepLRValPlots::endJob()
 {
    if (debug) cout << "TtSemilepLRValPlots endJob" << endl;
+   cout << "TtSemiLepLRValPlots: Events " << goodSolution <<endl;
+   cout << "TtSemiLepLRValPlots: Events per fb-1 " << goodSolution*weight << endl;
    // store histograms and fits in root-file
    myLRhelper->makeAndFitPurityHists();
    myLRhelper->storeToROOTfile(rootFileName);
@@ -71,13 +78,26 @@ TtSemilepLRValPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     double bestlr = -999999.;
     int bestSol=-1;
     //double highestLR = -10000000000000.;
+    double maxProbChi2=-999;
+    double maxbTagCut=-9999; 
     
+    //counting the number of events which past the cuts	
+    for (int w = 0; w < 12; w++){  
+      if (sols[w].getProbChi2()>maxProbChi2){maxProbChi2=sols[w].getProbChi2();}   
+      if (sols[w].getCalHadb().getBDiscriminator(bTagCutLabel) > maxbTagCut) {maxbTagCut=sols[w].getCalHadb().getBDiscriminator(bTagCutLabel);} 
+    }
+    //cout << maxProbChi2 << " " << maxbTagCut << endl;
+    if(maxProbChi2>0&&maxbTagCut>bCut) {
+      ++goodSolution;
+      //cout << "this event is selected" <<endl;
+    }
+
     for (int i = 0; i < 12; ++i) {
       vector<double> obsVals;
       for(int j = 0; j < nrJetCombObs; j++){
 	if( myLRhelper->obsFitIncluded(obsNrs[j]) )
           obsVals.push_back(sols[i].getLRJetCombObsVal(obsNrs[j]));
-	cout <<sols[i].getLRJetCombObsVal(obsNrs[j]) << endl;
+	//cout <<sols[i].getLRJetCombObsVal(obsNrs[j]) << endl;
 	//	  cout << "Obs " << j<<" "<<sols[i].getLRSignalEvtObsVal(obsNrs[j])<<endl;
 	//       cout << j<<myLRhelper->obsFitIncluded(obsNrs[j])<<" ";
       }
@@ -109,19 +129,22 @@ TtSemilepLRValPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     //     sols[bestSol].getJetBbar().getPartonFlavour()<< endl;
     
     bool matchB = false;
-     
+    
+    if (debug) cout << "Best LR value : " << bestlr << "  partonflavour : " << fabs(sols[bestSol].getCalLepb().getPartonFlavour()) <<endl;  
+ 
     try {
 
       edm::Handle<TtGenEvent> genEvent;
       iEvent.getByLabel ("genEvt",genEvent);
       
-      matchB = (sols[bestSol].getCalLepb().getPartonFlavour()==5) ;	
+      matchB = (fabs(sols[bestSol].getCalLepb().getPartonFlavour())==5) ;	
       
     } catch (...){cout << "Exception\n";}
     
-    if (debug) cout << "Best LR value" << bestlr <<endl;
-    if (matchB) myLRhelper -> fillLRSignalHist(bestlr, weight);
-    else myLRhelper -> fillLRBackgroundHist(bestlr, weight);
-   
+    if (debug) cout << "Best LR value" << bestlr <<endl;   
+    if(maxProbChi2>0&&maxbTagCut>bCut){
+      if (matchB) myLRhelper -> fillLRSignalHist(bestlr, weight);
+      else myLRhelper -> fillLRBackgroundHist(bestlr, weight);
+    }
   }
 }

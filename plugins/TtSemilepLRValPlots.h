@@ -51,13 +51,15 @@ class TtSemilepLRValPlots : public edm::EDAnalyzer {
     std::string rootFileName, obsFileName;
     double weight;
     
-
+    int goodSolution;
     edm::InputTag evtsols;
     LRHelpFunctions *myLRhelper;
     std::vector<int> obsNrs;
     int lrBins;
     double lrMin,lrMax;
     const char* lrFits;
+    std::string bTagCutLabel;
+    double bCut;
 
     //observable histogram variables
     int nrJetCombObs;
