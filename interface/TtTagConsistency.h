@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // Package:    BTagPerformanceMeasurementFromTop
-// Class:      TtSemiLeptonicTagCounting
+// Class:      TtTagConsistency
 // 
-/**\class TtSemiLeptonicTagCounting TtSemiLeptonicTagCounting.cc TopQuarkAnalysis/BTagPerformanceMeasurementFromTop/src/TtSemiLeptonicTagCounting.cc
+/**\class TtTagConsistency TtTagConsistency.cc TopQuarkAnalysis/BTagPerformanceMeasurementFromTop/src/TtTagConsistency.cc
 
  Description: Tag counting method for b-,c- and light tagging efficiency measurement with ttbar semileptonic events
 
@@ -13,12 +13,13 @@
 //
 // Original Author:  Gena Kukartsev, kukarzev@fnal.gov
 //         Created:  Fri Jun 29 14:53:10 CDT 2007
-// $Id: TtSemiLeptonicTagCounting.h,v 1.1.2.1 2008/02/15 22:27:07 kukartse Exp $
+// $Id: TtTagConsistency.h,v 1.1.2.2 2008/03/21 21:09:17 kukartse Exp $
 //
 //
 
+#ifndef PerformanceMeasurementsTtTagConsistency
+#define PerformanceMeasurementsTtTagConsistency
 
-// system include files
 #include <memory>
 
 // user include files
@@ -56,11 +57,11 @@
 // class decleration
 //
 
-class TtSemiLeptonicTagCounting : public edm::EDAnalyzer
+class TtTagConsistency : public edm::EDAnalyzer
 {
 public:
-  explicit TtSemiLeptonicTagCounting(const edm::ParameterSet&);
-  ~TtSemiLeptonicTagCounting();
+  explicit TtTagConsistency(const edm::ParameterSet&);
+  ~TtTagConsistency();
   
   
 private:
@@ -133,3 +134,4 @@ private:
   
 };
 
+#endif

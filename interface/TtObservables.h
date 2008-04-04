@@ -13,10 +13,12 @@
 //
 // Original Author:  Gena Kukartsev, kukarzev@fnal.gov
 //         Created:  Fri Jun 29 14:53:10 CDT 2007
-// $Id$
+// $Id: TtObservables.h,v 1.1.2.1 2008/02/15 22:27:07 kukartse Exp $
 //
 //
 
+#ifndef PerformanceMeasurementsTtObservables
+#define PerformanceMeasurementsTtObservables
 
 // system include files
 #include <memory>
@@ -132,14 +134,4 @@ private:
   
 };
 
-//
-// constants, enums and typedefs
-//
-
-//
-// static data member definitions
-//
-
-//
-// constructors and destructor
-//
+#endif

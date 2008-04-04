@@ -1,16 +1,18 @@
 #include <iostream>
 #include <boost/program_options.hpp>
 
+#include "RecoBTag/PerformanceMeasurements/interface/TtTagConsistencyRoot.h"
+
 namespace po = boost::program_options;
 using namespace std;
 
 int main( int argc, char ** argv )
 {
-  // Declare the supported options.
   po::options_description desc("Allowed options");
   desc.add_options()
     ("help", "produce help message")
-    ("compression", po::value<int>(), "set compression level")
+    ("test", po::value<string>(), "print test string")
+    ("scan-plot", "tag eff scan plot")
     ;
   
   po::variables_map vm;
@@ -22,14 +24,21 @@ int main( int argc, char ** argv )
     return 1;
   }
   
-  if (vm.count("compression")) {
-    cout << "Compression level was set to " 
-	 << vm["compression"].as<int>() << ".\n";
-  } else {
-    cout << "Compression level was not set.\n";
+  if (vm.count("test")) {
+    cout << "Test: " 
+	 << vm["test"].as<string>() << ".\n";
+  }
+
+  if (vm.count("scan-plot")) {
+    cout << desc << "\n";
+    TtTagConsistencyRoot _root;
+    _root . scan_plot();
+    return 0;
   }
   
-  cout << "Welcome to the desert of the real!" << endl;
+  else {
+    cout << "Test: Welcome to the desert of the real!\n";
+  }
 
   return 0;
 }

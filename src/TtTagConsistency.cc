@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
-// Package:    BTagPerformanceMeasurementFromTop
-// Class:      TtSemiLeptonicTagCounting
+// Package:    RecoBTag/PerformanceMeasurements
+// Class:      TtTagConsistency
 // 
-/**\class TtSemiLeptonicTagCounting TtSemiLeptonicTagCounting.cc TopQuarkAnalysis/BTagPerformanceMeasurementFromTop/src/TtSemiLeptonicTagCounting.cc
+/**\class TtTagConsistency TtTagConsistency.cc RecoBTag/PerformanceMeasurements/src/TtTagConsistency.cc
 
  Description: Tag counting method for b-,c- and light tagging efficiency measurement with ttbar semileptonic events
 
@@ -13,13 +13,13 @@
 //
 // Original Author:  Gena Kukartsev, kukarzev@fnal.gov
 //         Created:  Fri Jun 29 14:53:10 CDT 2007
-// $Id: TtSemiLeptonicTagCounting.cc,v 1.1.2.3 2008/03/21 20:53:22 kukartse Exp $
+// $Id: TtTagConsistency.cc,v 1.1.2.4 2008/03/23 22:33:02 kukartse Exp $
 //
 //
 
-#include "RecoBTag/PerformanceMeasurements/interface/TtSemiLeptonicTagCounting.h"
+#include "RecoBTag/PerformanceMeasurements/interface/TtTagConsistency.h"
 
-TtSemiLeptonicTagCounting::TtSemiLeptonicTagCounting(const edm::ParameterSet& iConfig)
+TtTagConsistency::TtTagConsistency(const edm::ParameterSet& iConfig)
 {
   
   dRCut        = iConfig.getParameter<double>("dRGenJetMatch");
@@ -56,7 +56,7 @@ TtSemiLeptonicTagCounting::TtSemiLeptonicTagCounting(const edm::ParameterSet& iC
 }
 
 
-TtSemiLeptonicTagCounting::~TtSemiLeptonicTagCounting()
+TtTagConsistency::~TtTagConsistency()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -71,7 +71,7 @@ TtSemiLeptonicTagCounting::~TtSemiLeptonicTagCounting()
 
 // ------------ method called to for each event  ------------
 void
-TtSemiLeptonicTagCounting::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+TtTagConsistency::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
   using namespace edm;
@@ -477,7 +477,7 @@ TtSemiLeptonicTagCounting::analyze(const edm::Event& iEvent, const edm::EventSet
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-TtSemiLeptonicTagCounting::beginJob(const edm::EventSetup&)
+TtTagConsistency::beginJob(const edm::EventSetup&)
 {
 
   eventCounter . setMessage( "=== Preselected event counter: " );
@@ -509,7 +509,7 @@ TtSemiLeptonicTagCounting::beginJob(const edm::EventSetup&)
 
 }
 
-int TtSemiLeptonicTagCounting::findJetMatch( const reco::Jet & theJet, const std::vector<reco::GenJet> & jets, std::vector<int> & jetIndex, double dRCut ) {
+int TtTagConsistency::findJetMatch( const reco::Jet & theJet, const std::vector<reco::GenJet> & jets, std::vector<int> & jetIndex, double dRCut ) {
 
   int currentIndex = -1; // index of the current match, -1 if none
 
@@ -543,9 +543,9 @@ int TtSemiLeptonicTagCounting::findJetMatch( const reco::Jet & theJet, const std
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
-TtSemiLeptonicTagCounting::endJob() {
+TtTagConsistency::endJob() {
 
-  _outputFile << "============= TtSemiLeptonicTagCounting summary ================" << endl;
+  _outputFile << "============= TtTagConsistency summary ================" << endl;
   _outputFile << "Processed events:  " << eventCounter . getCount() << endl;
   _outputFile << "Selected events:  " << selectedEvents . getCount() << endl;
 
@@ -782,5 +782,3 @@ TtSemiLeptonicTagCounting::endJob() {
 
 }
 
-//define this as a plug-in
-//DEFINE_FWK_MODULE(TtSemiLeptonicTagCounting);
