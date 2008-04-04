@@ -22,6 +22,7 @@
 <use name=RecoBTag/MCTools>
 <use name=CLHEP>
 <use name=root>
+<lib name=RooFit>
 <use name=AnalysisDataFormats/TopObjects>
 
 <export>
