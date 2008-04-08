@@ -24,6 +24,8 @@
 #include "TLegend.h"
 #include "TLatex.h"
 
+#define PT_BASE  100
+#define ETA_BASE 1
 
 Double_t pdf(Double_t *xx, Double_t *par);
 Double_t pdf1(Double_t *xx, Double_t *par);
@@ -72,8 +74,9 @@ class PtrelSolver : public TObject {
 
   std::vector<std::vector<double> > *pdfs_b_tag;
   std::vector<std::vector<double> > *pdfs_c_tag;
-  TObjArray                          combined_pdfs_tag;
 
+
+  TObjArray                          combined_pdfs_tag;
   TObjArray                          combined_pdfs_sys;
   TObjArray                          combined_pdfs_sys_tag;
 
@@ -81,20 +84,6 @@ class PtrelSolver : public TObject {
 
   void init();
 
- public:
-
-  // Default constructor.
-  PtrelSolver();
-  PtrelSolver(double fitmin, double fitmax);
-  // ???
-  PtrelSolver(double fitmin, double fitmax, int ptbins, int etabins);
-
-  // Destructor.
-  virtual ~PtrelSolver();
-
-  
-  void   setPtAverage(int threshold, int sum);
-  void   setEtaAverage(int threshold, int sum);
 
   int    getBin(double xx, double *binning);
   int    index( double pt, double eta, double others = 0);
@@ -104,9 +93,37 @@ class PtrelSolver : public TObject {
 
   TF1   *getAPdf(int ii);
   TF1   *getAPdf(int pt_bin, int eta_bin);
-  TF1   *getPdfByIndex(int ii);
-  TF1   *getPdfByIndex(int ii, const char *tag);
-  TF1   *getTaggedPdfByIndex(int ii);
+  TF1   *getPdfByIndex(TObjArray *list, int jj, const char *tag=0);
+  TF1   *getPdfByIndex(int ii); // return the pdf before tagging
+  TF1   *getPdfByIndex(int ii, const char *tag); // other methods
+  TF1   *getTaggedPdfByIndex(int ii); // return the pdf after tagging
+
+
+  // calculate the efficiency with a fit to the ptrel distributions.
+  // there are several cases:
+  // a) used the same templates before/after tagging.
+  // b) used different templates before/after tagging.
+  void effCal(TH1F *hist, TH1F *hist_tag, TF1  *pdf, std::vector<double> *eff);
+  void effCal(TH1F *hist, TH1F *hist_tag, TF1  *pdf, TF1  *pdf_tag,  std::vector<double> *eff);
+  void effCal(TH1F *hist, TH1F *hist_tag, TF1  *pdf, std::vector<double> *eff, const char *rootfilename);
+
+
+ public:
+
+  // Default constructor.
+  PtrelSolver();
+  PtrelSolver(double fitmin, double fitmax);
+  PtrelSolver(double fitmin, double fitmax, int ptbins, int etabins);
+
+  // Destructor.
+  virtual ~PtrelSolver();
+
+  
+  void   setPtAverage( int threshold, int sum);
+  void   setEtaAverage(int threshold, int sum);
+
+
+
 
 
 
@@ -137,20 +154,8 @@ class PtrelSolver : public TObject {
 		std::vector<std::vector<double> > *c,
 		const char *rootfilename = "fit_result.root",
 		const char *filename = "fit_result.dat");
-  void effCal(TH1F *hist,
-	      TH1F *hist_tag, 
-	      TF1  *pdf,
-	      std::vector<double> *eff,
-	      const char *rootfilename);
-  void effCal(TH1F *hist,
-	      TH1F *hist_tag, 
-	      TF1  *pdf,
-	      std::vector<double> *eff);
-  void effCal(TH1F *hist,
-	      TH1F *hist_tag, 
-	      TF1  *pdf,
-	      TF1  *pdf_tag, 
-	      std::vector<double> *eff);
+
+
 
   void makePlot(const char *epsname, TH1 *hist, TF1 *pdf);
 

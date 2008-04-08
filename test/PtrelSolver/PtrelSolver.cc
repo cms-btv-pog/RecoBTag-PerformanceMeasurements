@@ -136,6 +136,7 @@ void PtrelSolver::setEtaAverage(int threshold, int sum) {
 /**************************************************************************
  *
  * access pdf index, etc.
+ * binning start with 1, 2, ..., n
  *
  **************************************************************************/
 int  PtrelSolver::getBin(double xx, double *binning) {
@@ -148,16 +149,14 @@ int  PtrelSolver::getBin(double xx, double *binning) {
   return nbin;
 }
 
-
-
 int PtrelSolver::index(double pt, double eta, double others) {
 
   int ptnum = getBin(pt, pthatbining);
   int etanum = getBin(eta, etabining);
 
-  return ptnum*100 + etanum;
+  return ptnum*PT_BASE + etanum*ETA_BASE;
 }
-int PtrelSolver::index(int ptnum, int etanum, int others) { return ptnum*100 + etanum; }
+int PtrelSolver::index(int ptnum, int etanum, int others) { return ptnum*PT_BASE + etanum*ETA_BASE; }
 
 // calculate error of N2/N1
 double PtrelSolver::effErr(double N1, double N1_err, double N2, double N2_err) {
@@ -167,9 +166,12 @@ double PtrelSolver::effErr(double N1, double N1_err, double N2, double N2_err) {
 
 
 
-
-// 
-//  access pdfs
+/**************************************************************************
+ * 
+ *  access pdfs
+ *  pdf is expected to be arranged as "pt num * etabins + eta num"
+ *         index starts from 0.
+ **************************************************************************/
 TF1 *PtrelSolver::getAPdf(int ii) {
 
   if (combined_pdfs.GetLast() < ii) return 0;
@@ -180,46 +182,16 @@ TF1 *PtrelSolver::getAPdf(int pt_bin, int eta_bin) {
   int index = (pt_bin-1) *eta_bins + (eta_bin -1);
   return this->getAPdf(index);
 }
-TF1 *PtrelSolver::getPdfByIndex(int jj) {
 
-
-  char index[100];
-  sprintf(index, "%d", jj);
-  for (int ii = 0; ii <= combined_pdfs.GetLast(); ii ++) {
-
-    TString pdfname(  ((TF1 *)combined_pdfs.At(ii))->GetName()  );
-    if (!pdfname.CompareTo(index)) return (TF1 *) combined_pdfs.At(ii);
-  }
-
-  return 0;
-}
-
-TF1 *PtrelSolver::getTaggedPdfByIndex(int jj) {
-
-  char index[100];
-  sprintf(index, "tag_%d", jj);
-  for (int ii = 0; ii <= combined_pdfs_tag.GetLast(); ii ++) {
-
-    TString pdfname(  ((TF1 *)combined_pdfs_tag.At(ii))->GetName()  );
-    if (!pdfname.CompareTo(index)) return (TF1 *) combined_pdfs_tag.At(ii);
-  }
-
-  return 0;
-}
-TF1 *PtrelSolver::getPdfByIndex(int jj, const char *tag) {
-
-
-  TObjArray *list = 0;
-
-  if ( !strcmp(tag, "") )        list = &combined_pdfs;
-  if ( !strcmp(tag, "tag") )     list = &combined_pdfs_tag;
-  if ( !strcmp(tag, "sys") )     list = &combined_pdfs_sys;
-  if ( !strcmp(tag, "sys_tag") ) list = &combined_pdfs_sys_tag;
-  
+TF1 *PtrelSolver::getPdfByIndex(TObjArray *list, int jj, const char *tag) {
   if (!list) return 0;
 
+  // build the pdf index name
   char index[100];
-  sprintf(index, "%s_%d", tag, jj);
+  if (tag && strlen(tag) >0 ) sprintf(index, "%s_%d", tag, jj);
+  else sprintf(index, "%d", jj);
+
+
   for (int ii = 0; ii <= list->GetLast(); ii ++) {
 
     TString pdfname(  ((TF1 *)list->At(ii))->GetName()  );
@@ -230,6 +202,27 @@ TF1 *PtrelSolver::getPdfByIndex(int jj, const char *tag) {
 }
 
 
+TF1 *PtrelSolver::getPdfByIndex(int jj) {this->getPdfByIndex( &combined_pdfs, jj);}
+
+TF1 *PtrelSolver::getTaggedPdfByIndex(int jj) {
+
+  return  this->getPdfByIndex( &combined_pdfs_tag, jj, "tag");
+}
+
+TF1 *PtrelSolver::getPdfByIndex(int jj, const char *tag) {
+
+
+  TObjArray *list = 0;
+
+  if ( !strcmp(tag, "") )        list = &combined_pdfs;
+  if ( !strcmp(tag, "tag") )     list = &combined_pdfs_tag;
+  if ( !strcmp(tag, "sys") )     list = &combined_pdfs_sys;
+  if ( !strcmp(tag, "sys_tag") ) list = &combined_pdfs_sys_tag;
+
+  return this->getPdfByIndex(list, jj, tag);
+}
+
+
 
 /**************************************************************************
  *
@@ -237,13 +230,15 @@ TF1 *PtrelSolver::getPdfByIndex(int jj, const char *tag) {
  *
  **************************************************************************/
 void PtrelSolver::effCal(TH1F *hist,
-		    TH1F *hist_tag, 
-		    TF1  *pdf,
-		    std::vector<double> *eff) {
+			 TH1F *hist_tag, 
+			 TF1  *pdf,
+			 std::vector<double> *eff) {
 
   if (!eff || !pdf || !hist || !hist_tag) return;
   eff->clear();
-  x_max = 4.5;
+  x_min = hist->GetXaxis()->GetXmin();
+  x_max = hist->GetXaxis()->GetXmax();
+
 
   std::vector<double>  Nb, Nb_err;
   std::vector<double>  Nb_tag, Nb_tag_err;
@@ -261,18 +256,17 @@ void PtrelSolver::effCal(TH1F *hist,
 
 
 void PtrelSolver::effCal(TH1F *hist,
-		    TH1F *hist_tag, 
-		    TF1  *pdf,
-		    TF1 *pdf_tag,
-		    std::vector<double> *eff) {
-
+			 TH1F *hist_tag, 
+			 TF1  *pdf,
+			 TF1 *pdf_tag,
+			 std::vector<double> *eff) {
+  
   if (!eff || !pdf || !hist || !hist_tag || !pdf_tag) return;
   eff->clear();
-  x_max = 4.5;
+
 
   std::vector<double>  Nb, Nb_err;
   std::vector<double>  Nb_tag, Nb_tag_err;
-
 
 
   Fit(hist, pdf, &Nb, &Nb_err);
@@ -282,9 +276,97 @@ void PtrelSolver::effCal(TH1F *hist,
   (*eff).push_back( 1.0*Nb_tag[0]/Nb[0] );
   (*eff).push_back( effErr(Nb[0], Nb_err[0], Nb_tag[0], Nb_tag_err[0]));
 
-
   return;
 }
+
+
+//
+//  make results from root histograms
+void PtrelSolver::effCal(TH1F *hist,
+			 TH1F *hist_tag, 
+			 TF1  *pdf,
+			 std::vector<double> *eff,
+			 const char *rootfilename){
+
+  if (!eff || !pdf || !hist || !hist_tag || !rootfilename) return;
+  TFile *rootfile = new TFile(rootfilename, "UPDATE");
+
+
+  std::vector<double>  Nb, Nb_err;
+  std::vector<double>  Nb_tag, Nb_tag_err;
+  char hist_name[100];
+
+
+  //  a) before applying tagging
+  Fit(hist, pdf, &Nb, &Nb_err);
+  sprintf(hist_name, "%s_before", pdf->GetName());
+  hist->SetName(hist_name);
+  rootfile->cd();
+  hist->Write();
+  c1->cd();
+  hist->SetMarkerStyle(20);
+  hist->SetMarkerSize(1.2);
+  hist->Draw("PE");
+  pdf->Draw("SAME"); pdf->SetLineWidth(2);
+  pdf->SetLineColor(kBlack);
+
+  TF1 sig(*pdf);
+  sig.SetParameter("Nc", 0);
+  sig.SetLineColor(kRed);sig.SetLineWidth(2);
+  sig.Draw("SAME");
+
+
+  TF1 bkg(*pdf);
+  bkg.SetParameter("Nb", 0);
+  bkg.SetLineColor(kBlue);sig.SetLineWidth(2);
+  bkg.Draw("SAME");
+  TString epsname(hist_name);
+  epsname.Append(".eps");
+  c1->SaveAs(epsname.Data());
+  /**********************************************************************/
+
+
+  //b) after applying tagging
+  Fit(hist_tag, pdf, &Nb_tag, &Nb_tag_err);
+  sprintf(hist_name, "%s_tag", pdf->GetName());
+  hist->SetName(hist_name);
+  rootfile->cd();
+  hist->Write();
+  c1->cd();
+  hist->SetMarkerStyle(20);
+  hist->SetMarkerSize(1.2);
+  hist->Draw("PE");
+  pdf->Draw("SAME"); pdf->SetLineWidth(2);
+  pdf->SetLineColor(kBlack);
+
+  TF1 sig_tag(*pdf);
+  sig_tag.SetParameter("Nc", 0);
+  sig_tag.SetLineColor(kRed);sig_tag.SetLineWidth(2);
+  sig_tag.Draw("SAME");
+
+
+  TF1 bkg_tag(*pdf);
+  bkg_tag.SetParameter("Nb", 0);
+  bkg_tag.SetLineColor(kBlue);sig_tag.SetLineWidth(2);
+  bkg_tag.Draw("SAME");
+  TString epsname_tag(hist_name);
+  epsname_tag.Append(".eps");
+  c1->SaveAs(epsname_tag.Data());
+  /**********************************************************************/
+
+
+
+  (*eff).push_back( 1.0*Nb_tag[0]/Nb[0] );
+  (*eff).push_back( effErr(Nb[0], Nb_err[0], Nb_tag[0], Nb_tag_err[0]));
+
+
+  rootfile->cd();
+  rootfile->Write();
+  rootfile->Close();
+}
+
+
+
 
 
 TH1F *PtrelSolver::getMCeff(TFile *file, const char *hist) {
@@ -1611,92 +1693,6 @@ void PtrelSolver::makeHistEPS(TObjArray &data, TObjArray &mc) {
 }
 
 
-//
-//  make results from root histograms
-void PtrelSolver::effCal(TH1F *hist,
-		    TH1F *hist_tag, 
-		    TF1  *pdf,
-		    std::vector<double> *eff,
-		    const char *rootfilename){
-
-  if (!eff || !pdf || !hist || !hist_tag || !rootfilename) return;
-  TFile *rootfile = new TFile(rootfilename, "UPDATE");
-
-
-  std::vector<double>  Nb, Nb_err;
-  std::vector<double>  Nb_tag, Nb_tag_err;
-  char hist_name[100];
-
-
-  //  a) before applying tagging
-
-  Fit(hist, pdf, &Nb, &Nb_err);
-  sprintf(hist_name, "%s_before", pdf->GetName());
-  hist->SetName(hist_name);
-  rootfile->cd();
-  hist->Write();
-  c1->cd();
-  hist->SetMarkerStyle(20);
-  hist->SetMarkerSize(1.2);
-  hist->Draw("PE");
-  pdf->Draw("SAME"); pdf->SetLineWidth(2);
-  pdf->SetLineColor(kBlack);
-
-  TF1 sig(*pdf);
-  sig.SetParameter("Nc", 0);
-  sig.SetLineColor(kRed);sig.SetLineWidth(2);
-  sig.Draw("SAME");
-
-
-  TF1 bkg(*pdf);
-  bkg.SetParameter("Nb", 0);
-  bkg.SetLineColor(kBlue);sig.SetLineWidth(2);
-  bkg.Draw("SAME");
-  TString epsname(hist_name);
-  epsname.Append(".eps");
-  c1->SaveAs(epsname.Data());
-  /**********************************************************************/
-
-
-  //b) after applying tagging
-  Fit(hist_tag, pdf, &Nb_tag, &Nb_tag_err);
-  sprintf(hist_name, "%s_tag", pdf->GetName());
-  hist->SetName(hist_name);
-  rootfile->cd();
-  hist->Write();
-  c1->cd();
-  hist->SetMarkerStyle(20);
-  hist->SetMarkerSize(1.2);
-  hist->Draw("PE");
-  pdf->Draw("SAME"); pdf->SetLineWidth(2);
-  pdf->SetLineColor(kBlack);
-
-  TF1 sig_tag(*pdf);
-  sig_tag.SetParameter("Nc", 0);
-  sig_tag.SetLineColor(kRed);sig_tag.SetLineWidth(2);
-  sig_tag.Draw("SAME");
-
-
-  TF1 bkg_tag(*pdf);
-  bkg_tag.SetParameter("Nb", 0);
-  bkg_tag.SetLineColor(kBlue);sig_tag.SetLineWidth(2);
-  bkg_tag.Draw("SAME");
-  TString epsname_tag(hist_name);
-  epsname_tag.Append(".eps");
-  c1->SaveAs(epsname_tag.Data());
-  /**********************************************************************/
-
-
-
-  (*eff).push_back( 1.0*Nb_tag[0]/Nb[0] );
-  (*eff).push_back( effErr(Nb[0], Nb_err[0], Nb_tag[0], Nb_tag_err[0]));
-
-
-  rootfile->cd();
-  rootfile->Write();
-  rootfile->Close();
-}
-
 
 
 
@@ -2443,10 +2439,10 @@ void PtrelSolver::initPdfs(const char *b_pdf, const char *c_pdf) {
  *
  **************************************************************************/
 void PtrelSolver::Fit(TH1F *data, 
-		 TF1 *pdf, 
-		 std::vector<double> *num, 
-		 std::vector<double> *num_err) {
-
+		      TF1 *pdf, 
+		      std::vector<double> *num, 
+		      std::vector<double> *num_err) {
+  
   if (!data || !pdf || !num || !num_err) return;
 
 
