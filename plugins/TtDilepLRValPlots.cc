@@ -3,6 +3,7 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "PhysicsTools/Utilities/interface/DeltaR.h"
 #include "AnalysisDataFormats/TopObjects/interface/TtGenEvent.h"
+#include "CSA07EffAnalyser/CSA07EffAnalyser/interface/CSA07ProcessId.h"
 
 using namespace std;
 using namespace reco;
@@ -17,7 +18,10 @@ TtDilepLRValPlots::TtDilepLRValPlots(const edm::ParameterSet& iConfig)
   debug = iConfig.getParameter<bool> ("debug");
   rootFileName      = iConfig.getParameter<string> ("rootFileName");
   obsFileName      = iConfig.getParameter<string> ("obsFileName");
-  weight = iConfig.getParameter< double > ("weight");
+  csa = iConfig.getParameter< bool > ("CSA");
+  if (!csa) {
+    weight = iConfig.getParameter< double > ("weight");
+  }
 
   nrSignalSelObs   = iConfig.getParameter<int> ("nrSignalSelObs");
   obsNrs	   = iConfig.getParameter< vector<int> > ("SignalSelObs");
@@ -66,6 +70,16 @@ TtDilepLRValPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   sols = *eSols;
 
   if(sols.size()== 2) {
+
+    if (csa) {
+      edm::Handle< double> weightHandle;
+      iEvent.getByLabel ("csa07EventWeightProducer","weight", weightHandle);
+      weight = * weightHandle;
+      int procID = csa07::csa07ProcessId(iEvent);
+      if (debug) cout << "processID: " << procID
+	<< " - name: " << csa07::csa07ProcessName(procID) 
+	<< " - weight: "<< weight << endl;
+    }
 
     vector < double > lr;
     int bestSol=-1;

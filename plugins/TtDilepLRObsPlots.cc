@@ -1,5 +1,5 @@
 #include "RecoBTag/PerformanceMeasurements/plugins/TtDilepLRObsPlots.h"
-
+#include "CSA07EffAnalyser/CSA07EffAnalyser/interface/CSA07ProcessId.h"
 #include "PhysicsTools/Utilities/interface/DeltaR.h"
 
 using namespace std;
@@ -14,7 +14,10 @@ TtDilepLRObsPlots::TtDilepLRObsPlots(const edm::ParameterSet& iConfig)
    //now do what ever initialization is needed
   debug = iConfig.getParameter<bool> ("debug");
   rootFileName      = iConfig.getParameter<string> ("rootFileName");
-  weight = iConfig.getParameter< double > ("weight");
+  csa = iConfig.getParameter< bool > ("CSA");
+  if (!csa) {
+    weight = iConfig.getParameter< double > ("weight");
+  }
 
   nrSignalSelObs   = iConfig.getParameter<int> ("nrSignalSelObs");
   obsNrs	   = iConfig.getParameter< vector<int> > ("SignalSelObs");
@@ -52,14 +55,13 @@ TtDilepLRObsPlots::~TtDilepLRObsPlots()
 
 void TtDilepLRObsPlots::endJob()
 {
-   cout << "TtDilepLRObsPlots: Events " << goodSolution <<endl;
-   cout << "TtDilepLRObsPlots: Events per fb-1 " << goodSolution*weight << endl;
+   cout << "TtDilepLRObsPlots: Events per fb-1 " << goodSolution << endl;
 //    pair<double, double> match = myLRhelper->getBnumbers();
 // cout << "TtDilepLRObsPlots match " << B*weight<<" "<<nonB*weight<< " "<< tau<<" "<<match.second<<endl;
 
    // store histograms and fits in root-file
    myLRhelper -> storeToROOTfile(rootFileName);
-   if (debug) cout << "************* Finished writing histograms to file" << endl;
+   if (debug) cout << "************* Finished writing histograms to file: " << rootFileName<<endl;
 
 }
 
@@ -76,7 +78,17 @@ TtDilepLRObsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   if(sols.size()== 2) {
 
-    ++goodSolution;
+    if (csa) {
+      edm::Handle< double> weightHandle;
+      iEvent.getByLabel ("csa07EventWeightProducer","weight", weightHandle);
+      weight = * weightHandle;
+      int procID = csa07::csa07ProcessId(iEvent);
+      if (debug) cout << "processID: " << procID
+	<< " - name: " << csa07::csa07ProcessName(procID) 
+	<< " - weight: "<< weight << endl;
+    }
+
+    goodSolution += weight;
 
     vector < vector< TtDilepLRSignalSelObservables::IntBoolPair > > obsMatch;
     vector <int> matchSum;

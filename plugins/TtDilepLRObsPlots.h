@@ -55,8 +55,9 @@ class TtDilepLRObsPlots : public edm::EDAnalyzer {
 
     std::string rootFileName;
     std::string leptonFlavour;
+    bool csa;
     double weight;
-    int signal, background, goodSolution, allSolution, B, nonB, tau;
+    float signal, background, goodSolution, allSolution, B, nonB, tau;
     int bestSol;
     
 

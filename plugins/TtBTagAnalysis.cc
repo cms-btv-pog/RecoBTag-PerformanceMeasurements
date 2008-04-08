@@ -3,6 +3,7 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "PhysicsTools/Utilities/interface/DeltaR.h"
 #include "AnalysisDataFormats/TopObjects/interface/TtGenEvent.h"
+#include "CSA07EffAnalyser/CSA07EffAnalyser/interface/CSA07ProcessId.h"
 
 using namespace std;
 using namespace reco;
@@ -26,6 +27,10 @@ TtBTagAnalysis::TtBTagAnalysis(const edm::ParameterSet& iConfig)
   evtsols           = iConfig.getParameter<edm::InputTag> ("EvtSolution");
   weight = iConfig.getParameter< double > ("weight");
 
+  csa = iConfig.getParameter< bool > ("CSA");
+  if (!csa) {
+    weight = iConfig.getParameter< double > ("weight");
+  }
 
 
   bool update = iConfig.getParameter<bool>( "update" );
@@ -43,6 +48,14 @@ TtBTagAnalysis::TtBTagAnalysis(const edm::ParameterSet& iConfig)
   mcMode = iConfig.getParameter<bool>( "mcMode" );
 
 
+
+  if (debug) cout << "LHR plots" << endl;
+  // define all histograms & fit functions
+  myLRhelper = new LRHelpFunctions();
+  if (debug) cout << "Read LHR observables" << endl;
+  myLRhelper->readObsHistsAndFits(obsFileName, obsNrs, false);
+  if (debug) cout << "LHR observables read" << endl;
+
   if (update) {
     TString inputFileName = iConfig.getParameter<string> ("inputFileName");
     theFile = new TFile (inputFileName) ;
@@ -50,27 +63,21 @@ TtBTagAnalysis::TtBTagAnalysis(const edm::ParameterSet& iConfig)
   } else {
     theFile = new TFile (TString (rootFileName) , "RECREATE" ) ;
     theFile->cd();
+    if (debug) cout << "Open file: " << rootFileName<<endl;
   }
   TH1::AddDirectory(kFALSE);
-
-  if (debug) cout << "LHR plots" << endl;
-  // define all histograms & fit functions
-  myLRhelper = new LRHelpFunctions(lrBins, lrMin, lrMax, lrFits);
-  if (debug) cout << "Read LHR observables" << endl;
-  myLRhelper->readObsHistsAndFits(obsFileName, obsNrs, false);
-  if (debug) cout << "LHR observables read" << endl;
-
   if (debug) cout << "Create analysis histos" << endl;
   for (unsigned int iWP = 0; iWP != taggerConfig.size(); ++iWP) {
 
     string bTaggerName = taggerConfig[iWP].getParameter<string>("tagger");
     double cut = taggerConfig[iWP].getParameter<double>("cut");
+    string baseName = taggerConfig[iWP].getParameter<string>("histoName");
     bTagger.push_back( StringIntPair(bTaggerName, cut) );
 
-    TString baseName(bTaggerName);
-    baseName+="_";
-    baseName+=cut;
-    baseName.ReplaceAll ( " " , "" );
+//     TString baseName(bTaggerName);
+//     baseName+="_";
+//     baseName+=cut;
+//     baseName.ReplaceAll ( " " , "" );
 
     if (debug) cout << "Book plots for Working Point " << baseName<<endl;
 
@@ -219,6 +226,18 @@ TtBTagAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   if(sols.size()== 2) {
 
+
+    if (csa) {
+      edm::Handle< double> weightHandle;
+      iEvent.getByLabel ("csa07EventWeightProducer","weight", weightHandle);
+      weight = * weightHandle;
+      int procID = csa07::csa07ProcessId(iEvent);
+      if (debug) cout << "processID: " << procID
+	<< " - name: " << csa07::csa07ProcessName(procID) 
+	<< " - weight: "<< weight << endl;
+    }
+
+
     vector < double > lr;
     int bestSol=-1;
 
@@ -272,12 +291,12 @@ TtBTagAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 
-    analyzeJet(sols[bestSol].getCalJetB(), lr[bestSol], matchB);
-    analyzeJet(sols[bestSol].getCalJetBbar(), lr[bestSol], matchBbar);
+    analyzeJet(sols[bestSol].getCalJetB(), lr[bestSol], weight, matchB);
+    analyzeJet(sols[bestSol].getCalJetBbar(), lr[bestSol], weight, matchBbar);
   }
 }
 
-void TtBTagAnalysis::analyzeJet(const TopJet& jet, double lr, bool matchB)
+void TtBTagAnalysis::analyzeJet(const TopJet& jet, double lr, double weight, bool matchB)
 {
 //   int flavour = jet.getPartonFlavour();
 //   matchB = flavour==5;

@@ -19,6 +19,8 @@
 #include <map>
 #include <string>
 #include <utility> 
+#include "TFile.h"
+#include "TH1F.h"
 
 
 class TtDilepSolutionFilter : public edm::EDFilter {
@@ -42,10 +44,14 @@ class TtDilepSolutionFilter : public edm::EDFilter {
 
     // Switch for debug output
     bool debug;
+    bool csa;
+    TString rootFileName;
 
-    std::string rootFileName;
+    // The file which will store the histos, if any
+    TFile *theFile;
+    TH1F *procA, *procB, *procBee, *procBem, *procBmm;
     double jetPtCut, leptonPtCut, leptonTriggerPtCut, weight, jetEtCut;
-    int signal, background, goodSolution, allSolution, B, nonB, tau;
+    double signal, background, goodSolution, allSolution, B, nonB, tau;
     int bestSol,exception;
     edm::InputTag evtsols;
 };
