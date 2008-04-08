@@ -85,8 +85,9 @@ class PtrelSolver : public TObject {
 
   // Default constructor.
   PtrelSolver();
+  PtrelSolver(double fitmin, double fitmax);
   // ???
-  PtrelSolver(int ptbins, int etabins);
+  PtrelSolver(double fitmin, double fitmax, int ptbins, int etabins);
 
   // Destructor.
   virtual ~PtrelSolver();

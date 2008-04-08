@@ -61,52 +61,48 @@ Double_t combined_pdf(Double_t *xx, Double_t *par) {
 
 ClassImp(PtrelSolver)
 
-PtrelSolver::PtrelSolver() {
 
-  // other parameter settings
-  x_min = 0;
-  x_max = 5.0;
+PtrelSolver::PtrelSolver() { init();}
+PtrelSolver::PtrelSolver(double fitmin, double fitmax) {
+
+  init();
+
+  fit_min = fitmin;
+  fit_max = fitmax;
+}
+PtrelSolver::PtrelSolver(double fitmin, double fitmax, int ptbins, int etabins) {
+
+  init();
+
+
+  fit_min = fitmin;
+  fit_max = fitmax;
+
+  pthat_bins = ptbins;
+  eta_bins   = etabins;
+}
+PtrelSolver::~PtrelSolver() {}
+
+
+
+void PtrelSolver::init() {
+
+  x_min = 0; 
+  x_max = 5;
+
   fit_min = 0;
   fit_max = 5;
-  hist_bins = 50;
-  pt_threshold = 8;
-  pt_sumbins = 2;
+
+  hist_bins  = 50;
+  pthat_bins = 0;
+  eta_bins   = 0;
+
+  pt_threshold = 1;
+  pt_sumbins = 1;
 
   eta_threshold = 1;
   eta_sumbins = 1;
 
-  // define cuts
-  muon = "pMuonPt > 10 && pMuonTrkChi2 < 5 && pMuonTrkHits > 8 && pMuonHits > 20";
-  jet="";
-
-  init();
-}
-
-
-PtrelSolver::~PtrelSolver() {}
-
-PtrelSolver::PtrelSolver(int ptbins, int etabins) {
-
-
-  // other parameter settings
-  x_min = 0;
-  x_max = 3.5;
-  hist_bins = 50;
-
-
-  // define cuts
-  muon = "pMuonPt > 10 && pMuonTrkChi2 < 5 && pMuonTrkHits > 8 && pMuonHits > 20";
-  jet="";
-
-
-  pthat_bins = ptbins;
-  eta_bins = etabins;
-
-  init();
-}
-
-
-void PtrelSolver::init() {
 
   eff_table= new std::vector<std::vector<double> >;
   pdfs_b   = new std::vector<std::vector<double> >;
@@ -121,8 +117,8 @@ void PtrelSolver::init() {
 
   label = new TLatex;
   label->SetNDC();
-  //  label->SetTextAlign(23);
 }
+
 
 void PtrelSolver::setPtAverage(int threshold, int sum) {
 
