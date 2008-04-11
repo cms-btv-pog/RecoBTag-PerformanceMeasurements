@@ -163,6 +163,8 @@ class PtrelSolver : public TObject {
   void makeEffTable(std::vector<std::vector<double> > *eff, const char *filename="eff.table");
   void makeEffHists(std::vector<std::vector<double> > *eff, const char *tag ="run1");
   void makeHistEPS(TObjArray &data, TObjArray &mc);
+
+
   void test(bool sys = false);
   void make(bool sys = false);
 

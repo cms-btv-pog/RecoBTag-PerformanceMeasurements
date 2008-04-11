@@ -1,6 +1,47 @@
 #include "analysis.h"
 
 
+/**************************************************************************
+ *
+ * templates: d * [x^a * e( bx^2) +c]
+ * d is the normalization factor. 
+ *
+ **************************************************************************/
+Double_t pdf(Double_t *xx, Double_t *par) {
+
+
+  Double_t x = xx[0];
+
+  return par[3] * (pow(x, par[0]) * exp(par[1] * x * x) + par[2]);
+}
+
+
+// this is for c flavor
+Double_t pdf1(Double_t *xx, Double_t *par) {
+
+
+  Double_t x = xx[0];
+
+  return par[4] * (pow(x, par[0]) * exp(par[1] * pow(x, par[3])) + par[2]);
+}
+
+
+
+// make combined functions, assuming that each has parameter size 4
+Double_t combined_pdf(Double_t *xx, Double_t *par) {
+
+  Double_t f= 0;
+
+  f += pdf1(xx, &par[0]); 
+  f += pdf1(xx, &par[5]); 
+
+  return f;
+}
+/**************************************************************************/
+
+
+
+
 void formatHist1(TH1 *hh, const char *xtitle, const char *ytitle) {
 
   if (!hh) return;
