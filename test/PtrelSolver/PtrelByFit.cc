@@ -24,6 +24,9 @@
 ClassImp(PtrelSolver)
 
 
+
+
+
 /**************************************************************************
  *
  *  access histograms in "inputfilename:/dir/" (2-D histograms)
@@ -55,7 +58,7 @@ void PtrelSolver::measure(const char *inputfilename, const char *dir, const char
 
   //  input and output files.
   inputfile = new TFile(inputfilename, "READ");
-  outfile   = new TFile(outfilename,   "RECREATE");
+  outfile   = new TFile(outfilename,   "UPDATE");
   char data_name[100];
 
 
@@ -202,6 +205,7 @@ void PtrelSolver::measure(const char *inputfilename, const char *dir, const char
     eff->SetMinimum(0);
     eff->SetMaximum(1.35);
     if (pdfbase == PT_BASE) formatHist1(eff, "p_{T} (GeV)", "Efficiency");
+    if (pdfbase == ETA_BASE) formatHist1(eff, "Pseudorapidity", "Efficiency");
     eff_sys->SetLineColor(kBlack);
     eff_sys->SetMarkerColor(kBlack);
 
@@ -223,6 +227,7 @@ void PtrelSolver::measure(const char *inputfilename, const char *dir, const char
     c1->SaveAs(tmp);
   }
 
+  c1->Clear();
   outfile->Write();
   outfile->Close();
   inputfile->Close();
@@ -244,16 +249,23 @@ void PtrelSolver::make(bool sys) {
 }
 
 
-void PtrelSolver::test(bool sys) {
+void PtrelSolver::produceAll(const char *datafile, const char *dir, const char *outputfile, bool sys) {
   
+
+  initPdfs("./templates/b_flavor_TCM.data", "./templates/c_flavor_TCM.data");
+  initPdfs("./templates/b_flavor_TCM.data", "./templates/c_flavor_TCM.data", &combined_pdfs_tag,"tag" );
+
+
+  measure(datafile, dir, outputfile, "TCL",  "n_pT",  PT_BASE,  sys, datafile, dir);
+  measure(datafile, dir, outputfile, "TCL",  "n_eta", ETA_BASE, sys, datafile, dir);
   
-  initPdfs("/uscms/home/ptan/work/data/pTrelMacro/b_flavor_TCM.data", "/uscms/home/ptan/work/data/pTrelMacro/c_flavor_TCM.data",&combined_pdfs_tag,"tag" );
 
-  initPdfs("/uscms/home/ptan/work/data/pTrelMacro/b_flavor_notag.data", "/uscms/home/ptan/work/data/pTrelMacro/c_flavor_notag.data");
+  measure(datafile, dir, outputfile, "TCM",  "n_pT",  PT_BASE,  sys, datafile, dir);
+  measure(datafile, dir, outputfile, "TCM",  "n_eta", ETA_BASE, sys, datafile, dir);
 
-  measure("./data/results_QCD_15_1000.root", "/Histograms/muon_in_jet/", "test.root", "TCM",  "n_pT", PT_BASE, sys,"./data/results_QCD_15_1000.root","/Histograms/muon_in_jet/");
 
-    //measure("./data/results_QCD_15_1000.root", "TCM",  "n_pT", "n_eta", sys);
+  measure(datafile, dir, outputfile, "TCT",  "n_pT",  PT_BASE,  sys, datafile, dir);
+  measure(datafile, dir, outputfile, "TCT",  "n_eta", ETA_BASE, sys, datafile, dir);
 
 }
 

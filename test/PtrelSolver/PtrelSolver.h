@@ -127,13 +127,7 @@ class PtrelSolver : public TObject {
   TH1F  *getMCeff(TFile *file, const char *hist,     const char *tagger); 
   TH1F  *getMCeff(TFile *file, const char *dir, const char *hist, const char *tagger); 
   TH1F  *getMCeff(const char *filename, const char *dir, const char *hist, const char *tagger); 
-  void   measure(const char *inputfilename, const char *dir, const char *outfilename, const char *tag, const char *histname, int pdf_base, bool sys,  const char *mcfilename=0, const char *mcdir=0);
 
-
-
-  void measure(const char *inputfilename, const char *dir, const char *outputfilename, const char *tag, const char *pthist, const char *etahist, bool sys);
-  void measure(const char *inputfilename, const char *outputfilename, const char *tag, const char *pthist, const char *etahist, bool sys);
-  void measure(const char *inputfilename, const char *tag, const char *pthist="npT", const char *etahist= "nEta", bool sys= false);
 
 
   void counting(const char *tag, const char *outfilename, const char *inputfilename, const char *mistagfilename = 0);
@@ -165,8 +159,12 @@ class PtrelSolver : public TObject {
   void makeHistEPS(TObjArray &data, TObjArray &mc);
 
 
-  void test(bool sys = false);
   void make(bool sys = false);
+
+
+  // for fitting
+  void   measure(const char *inputfilename, const char *dir, const char *outfilename, const char *tag, const char *histname, int pdf_base, bool sys,  const char *mcfilename=0, const char *mcdir=0);
+    void produceAll(const char *datafile, const char *dir, const char *outputfile, bool sys = false);
 
 
 
