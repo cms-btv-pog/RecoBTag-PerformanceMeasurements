@@ -106,6 +106,9 @@ class PtrelSolver : public TObject {
   void effCal(TH1F *hist, TH1F *hist_tag, TF1  *pdf, std::vector<double> *eff);
   void effCal(TH1F *hist, TH1F *hist_tag, TF1  *pdf, TF1  *pdf_tag,  std::vector<double> *eff);
   void effCal(TH1F *hist, TH1F *hist_tag, TF1  *pdf, std::vector<double> *eff, const char *rootfilename);
+  void effCal(TH1F *hist, TH1F *hist_tag, TF1  *pdf, TF1 *pdf_tag, std::vector<double> *eff, const char *rootfilename);
+
+  void Fit(TH1F *data, TF1 *pdf, std::vector<double> *num, std::vector<double> *num_err);
 
 
  public:
@@ -121,13 +124,26 @@ class PtrelSolver : public TObject {
   
   void   setPtAverage( int threshold, int sum);
   void   setEtaAverage(int threshold, int sum);
+  TH1F  *getMCeff(TFile *file, const char *hist,     const char *tagger); 
+  TH1F  *getMCeff(TFile *file, const char *dir, const char *hist, const char *tagger); 
+  TH1F  *getMCeff(const char *filename, const char *dir, const char *hist, const char *tagger); 
+  void   measure(const char *inputfilename, const char *dir, const char *outfilename, const char *tag, const char *histname, int pdf_base, bool sys,  const char *mcfilename=0, const char *mcdir=0);
+
+
+
+  void measure(const char *inputfilename, const char *dir, const char *outputfilename, const char *tag, const char *pthist, const char *etahist, bool sys);
+  void measure(const char *inputfilename, const char *outputfilename, const char *tag, const char *pthist, const char *etahist, bool sys);
+  void measure(const char *inputfilename, const char *tag, const char *pthist="npT", const char *etahist= "nEta", bool sys= false);
+
+
+  void counting(const char *tag, const char *outfilename, const char *inputfilename, const char *mistagfilename = 0);
+
+  
 
 
 
 
-
-
-
+  void makeTemplates(int flavor, const char *inputfilename, const char *pdffilename, const char *rootfilename, const char *tag  ="", const char *pthist = "npT", const char *etahist="nEta", bool latex = false);
   void readTemplates(const char *filename, std::vector<std::vector<double> > *parameters);
   void buildPdfs(TObjArray *combined, std::vector<std::vector<double> > *b, std::vector<std::vector<double> > *c, const char *tag = 0);
   TF1 *buildAPdf(int ii, std::vector<std::vector<double> > *b, std::vector<std::vector<double> > *c);
@@ -137,24 +153,9 @@ class PtrelSolver : public TObject {
   void initPdfs(const char *b_pdf,  const char *c_pdf, TObjArray *combined, const char *tag);
 
 
-  void makeTemplates(int flavor, const char *inputfilename, const char *pdffilename, const char *rootfilename, const char *tag  ="", const char *pthist = "npT", const char *etahist="nEta", bool latex = false);
 
-  void makeTemplates(int flavor = 5, const char *filename = "b_flavor.dat", const char *rootfilename = "b_pdfs.root" );
 
   
-
-  TH1F *getData(double pt_min, double pt_max, double eta_min, double eta_max, TCut cut);
-  void getMCEff(double pt_min, double pt_max, double eta_min, double eta_max, TCut tagger, double &eff, double &err);
-
-
-  // build efficiecny basing give data & templates. 
-  void estimate(TCut tagger, 
-		std::vector<std::vector<double> > *eff, 
-		std::vector<std::vector<double> > *b, 
-		std::vector<std::vector<double> > *c,
-		const char *rootfilename = "fit_result.root",
-		const char *filename = "fit_result.dat");
-
 
 
   void makePlot(const char *epsname, TH1 *hist, TF1 *pdf);
@@ -162,20 +163,11 @@ class PtrelSolver : public TObject {
   void makeEffTable(std::vector<std::vector<double> > *eff, const char *filename="eff.table");
   void makeEffHists(std::vector<std::vector<double> > *eff, const char *tag ="run1");
   void makeHistEPS(TObjArray &data, TObjArray &mc);
-  void test(bool sys= false);
+  void test(bool sys = false);
   void make(bool sys = false);
-  void makettbar();
 
 
-  TH1F *getMCeff(TFile *file, const char *hist); 
-  void measure(const char *inputfilename, const char *outputfilename, const char *tag, const char *pthist, const char *etahist, bool sys);
 
-  void measure(const char *inputfilename, const char *tag, const char *pthist="npT", const char *etahist= "nEta", bool sys= false);
-
-  void counting(const char *tag, const char *outfilename, const char *inputfilename, const char *mistagfilename = 0);
-
-  void Fit(TH1F *data, TF1 *pdf, std::vector<double> *num, std::vector<double> *num_err);
-  
 
 
   TGraphErrors *checkLinearity2(TF1 *pdf, int steps, int total_events= 1000, bool verbose = true);
