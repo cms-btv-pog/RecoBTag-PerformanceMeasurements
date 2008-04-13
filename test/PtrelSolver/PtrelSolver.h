@@ -110,6 +110,7 @@ class PtrelSolver : public TObject {
 
   void Fit(TH1F *data, TF1 *pdf, std::vector<double> *num, std::vector<double> *num_err);
 
+  bool locateFile(const char *file); 
 
  public:
 
@@ -135,21 +136,19 @@ class PtrelSolver : public TObject {
   
 
 
+  void makeAllTemplatesPerTag(const char *inputfilename, const char *dir, const char *sampletag, const char *tag, const char *outputdir, const char *versiontag, bool sys = false);
+  void makeTemplates(const char *flavor, const char *sampletag, bool sum, const char *inputfilename, const char *dir, const char *tag, const char *thehist, int pdfbase, const char *outputdir, const char *versiontag="", bool sys=false, bool latex=false);
 
 
   void makeTemplates(int flavor, const char *inputfilename, const char *pdffilename, const char *rootfilename, const char *tag  ="", const char *pthist = "npT", const char *etahist="nEta", bool latex = false);
+
   void readTemplates(const char *filename, std::vector<std::vector<double> > *parameters);
   void buildPdfs(TObjArray *combined, std::vector<std::vector<double> > *b, std::vector<std::vector<double> > *c, const char *tag = 0);
   TF1 *buildAPdf(int ii, std::vector<std::vector<double> > *b, std::vector<std::vector<double> > *c);
 
 
-  void initPdfs(const char *b_pdf = "b_flavor.data", const char *c_pdf = "c_flavor.data");
-  void initPdfs(const char *b_pdf,  const char *c_pdf, TObjArray *combined, const char *tag);
-
-
-
-
-  
+  void initPdfs(const char *b_pdf,  const char *c_pdf, TObjArray  *combined, const char *tag);
+  void initPdfs(const char *b_pdf,  const char *c_pdf, const char *pdftag);
 
 
   void makePlot(const char *epsname, TH1 *hist, TF1 *pdf);
@@ -159,17 +158,16 @@ class PtrelSolver : public TObject {
   void makeHistEPS(TObjArray &data, TObjArray &mc);
 
 
-  void make(bool sys = false);
-
 
   // for fitting
   void   measure(const char *inputfilename, const char *dir, const char *outfilename, const char *tag, const char *histname, int pdf_base, bool sys,  const char *mcfilename=0, const char *mcdir=0);
-    void produceAll(const char *datafile, const char *dir, const char *outputfile, bool sys = false);
+  
+  //  pdf data file: sampletag + favor+"_templates_" + tag + versiontag.
+  bool  initPdfsByTag(const char *sampletag, const char *tag, const char *pdfdir, const char *versiontag, bool sys);
+  void effByAll(const char *inputfilename, const char *dir, const char *outfilename, const char *sampletag, const char *pdfdir, const char *versiontag="", bool sys=false);
 
 
-
-
-
+  // calibration
   TGraphErrors *checkLinearity2(TF1 *pdf, int steps, int total_events= 1000, bool verbose = true);
   TGraphErrors *checkPurity2(TF1 *pdf, int steps, int num_bs, bool verbose);
 

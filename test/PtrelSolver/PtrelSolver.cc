@@ -1,4 +1,4 @@
-
+#include "TSystem.h"
 #include "TFile.h"
 #include "TTree.h"
 #include "TChain.h"
@@ -988,6 +988,287 @@ void PtrelSolver::makeTemplates(int flavor, const char *inputfilename, const cha
 }
 
 
+
+// "b"
+// "cl"
+// thehistname+flavor
+void PtrelSolver::makeTemplates(const char *flavor, const char *sampletag, bool sum, const char *inputfilename, const char *dir, const char *tag, const char *thehist, int pdfbase, const char *outputdir, const char *versiontag, bool sys, bool latex) {
+
+  TString myhist(sampletag); myhist += "_"; myhist += thehist;
+  const char *thehistname = myhist.Data();
+ 
+  TString basename;
+  basename += tag; basename += "_"; basename += thehistname;
+  basename.Insert(0, flavor);
+
+  if (!versiontag) return;
+  std::cout <<"information: " << "make templates for flavor " << flavor 
+	    << " with " << inputfilename
+	    << " [" << tag << "] with indexing from "
+	    << pdfbase 
+	    << std::endl;
+
+  // sampletag + flavor + "_templates_" +tag+ versiontag+"-sys"
+  TString tmp(flavor); tmp.Insert(0, thehistname[0]); tmp += "_templates_"; tmp += tag;
+  tmp.Insert(0, outputdir);
+  tmp += versiontag;
+  if (sys)  tmp += "-sys";
+  file.open(tmp.Data(), ios::app | ios::out);
+
+  tmp += ".root";
+  TFile *inputfile = new TFile(inputfilename, "READ");
+  TFile *rootfile  = new TFile(tmp.Data(),  "UPDATE");
+  if (!inputfile || !rootfile) return;
+
+  
+
+  file << "#";
+  file << setw(8) << "pdf index" << " "
+       << setw(10) << "const_a" << " "
+       << setw(10) << "error" << " "
+       << setw(10) << "const_b" << " "
+       << setw(10) << "error" << " "
+       << setw(10)  << "const_c" << " "
+       << setw(10)  << "error" << " "
+       << setw(10)  << "const_d" << " "
+       << setw(10)  << "error" << " "
+       << std::endl;
+
+  char  hist_name[100];
+  TH1F *hist=0;
+  TH2F *hist2=0;
+  TF1  *thePdf= 0;
+  int   pdf_index;
+  int   nbins;
+  TString histname;
+
+
+
+  // based on the flavor and tag, determine the histgram used to build pdfs.
+  histname += dir;
+  histname += "/";
+  histname += thehistname;
+  histname += "_";
+  histname += flavor;
+  if (tag && strlen(tag) > 0)  {
+    histname.Insert( strlen(dir) +2, "tag" );
+    histname += "_";
+    histname += tag;
+  }
+
+  std::cout << "information: building pdf from " 
+	    << histname.Data() << std::endl;
+
+
+  hist2 = (TH2F *)inputfile->Get(histname.Data());
+  if (!hist2) {
+
+    std::cout << "information: can't access the data set  ... " << std::endl;
+    rootfile->Close();
+    inputfile->Close();
+    file.close();
+    return;
+  }
+
+  nbins = hist2->GetNbinsX();
+  x_min = hist2->GetYaxis()->GetXmin();
+  x_max = hist2->GetYaxis()->GetXmax();
+
+
+  int total_num =(int)( sqrt(nbins *1.));
+  //  std::cout << "information: " << total_num << " ... " << std::endl;
+  TCanvas *c2 = new TCanvas("c2", "", 900, 900);
+  c2->Divide( total_num + 1, total_num+1); 
+
+  // ii = 0 build the total pdf
+  for (int ii = (!sum); ii <= nbins; ii++) {
+
+    c1->cd();
+    pdf_index = ii*pdfbase;
+
+    sprintf(hist_name, "%s_%d", basename.Data(), pdf_index);
+
+
+    if (ii ==0) 
+      hist = (TH1F *)hist2->ProjectionY(hist_name, 1, nbins);
+    else
+      hist = (TH1F *)hist2->ProjectionY(hist_name, ii, ii);
+
+
+    // template thePdftion
+    if (!strcmp(flavor, "b")) {
+
+      thePdf = new TF1("thePdf", pdf1, x_min, x_max, 5); 
+      thePdf->SetParameters(1.30774,-0.51646, 0.00475143, 2.1, 800);
+    } else {
+
+      thePdf = new TF1("thePdf", pdf1, x_min, x_max, 5);
+      thePdf->SetParameters(1.30774,-2.51646, 0.00475143, 1.1, 800);
+    } 
+
+
+    if (!thePdf)  std::cout << "information: can't initialize the pdf for fitting ... " << std::endl;
+    
+    if (pdfbase == PT_BASE)  formatHist1(hist, "p_{T}^{rel} GeV", "Events");
+    if (pdfbase == ETA_BASE) formatHist1(hist, "Pseudorapidity",  "Events");
+
+
+    hist->Fit(thePdf, "Q", "", fit_min, fit_max);
+    std::cout << "information: " << hist->GetName() << " chi2/Ndof =" 
+	      << thePdf->GetChisquare() << "/"
+	      << thePdf->GetNDF()
+	      << std::endl;
+    rootfile->cd();
+    hist->Write(); 
+    
+
+    char text_label[100];
+    if (ii !=0) 
+      sprintf(text_label, "[%3.f, %3.f]", hist2->GetXaxis()->GetBinLowEdge(ii), hist2->GetXaxis()->GetBinLowEdge(ii) + hist2->GetXaxis()->GetBinWidth(ii) );
+    else 
+      sprintf(text_label, "[%3.f, %3.f]", hist2->GetXaxis()->GetBinLowEdge(1), hist2->GetXaxis()->GetBinLowEdge(nbins) + hist2->GetXaxis()->GetBinWidth(nbins) );
+      
+    c2->cd(ii+1); hist->Draw(); label->DrawLatex(0.5, 0.75, text_label);
+    c1->cd();
+
+
+  
+
+    // save fitted parameters into .dat file
+    if (latex) {
+
+      if (ii == 0)
+	file <<"all pt bins&"  << "\t";
+      else {
+
+	file<< fixed<<setprecision(3) << "[" << hist2->GetXaxis()->GetBinLowEdge(ii)
+	    << ", " << hist2->GetXaxis()->GetBinLowEdge(ii) + hist2->GetXaxis()->GetBinWidth(ii) 
+	    <<"] &\t";
+      }
+
+      for (int kk = 0; kk < thePdf->GetNumberFreeParameters()-1; kk ++) {
+	  
+	file << scientific << setprecision(2) << thePdf->GetParameter(kk) << "$\\pm$"
+	     << thePdf->GetParError(kk) << "& "
+	     <<"\t";
+
+      }
+	  
+      file << scientific << setprecision(2) << thePdf->GetParameter(thePdf->GetNumberFreeParameters() -1) 
+	   << "$\\pm$"
+	   << thePdf->GetParError(thePdf->GetNumberFreeParameters()-1 ) 
+	   << "\\\\\\hline";
+
+    } else {
+      file << setw(8)<< pdf_index << " ";
+      for (int kk = 0; kk < thePdf->GetNumberFreeParameters(); kk ++) {
+	
+	file << setw(10)   << thePdf->GetParameter(kk) << " "
+	     << setw(10)   << thePdf->GetParError(kk) << " ";
+
+      }
+    }
+    file << std::endl;
+  }
+
+
+  TString total_plot(basename);
+  total_plot += ".eps";
+  c2->SaveAs(total_plot.Data());
+
+
+  delete c2;
+  rootfile->Write();
+  rootfile->Close();
+  file.close();
+}
+
+void PtrelSolver::makeAllTemplatesPerTag(const char *inputfilename, const char *dir, const char *sampletag, const char *tag, const char *outputdir, const char *versiontag, bool sys) {
+
+  // clean the disk area
+  TString command("rm -rf "); command += outputdir;
+  command += "/";
+  command += "*templates*"; command += tag; 
+  command += "*";           command += versiontag; command += "*";
+  if (sys) command += "sys*";
+  gSystem->Exec(command.Data());
+  std::cout << "information: deleting files " << command.Data() << std::endl;
+
+  this->makeTemplates("b", sampletag, true, inputfilename, dir, tag, "pT", PT_BASE, outputdir, versiontag, sys);
+  this->makeTemplates("cl", sampletag, true, inputfilename, dir, tag, "pT", PT_BASE, outputdir, versiontag, sys);
+
+
+  this->makeTemplates("b", sampletag, false, inputfilename, dir, tag, "eta", ETA_BASE, outputdir, versiontag, sys);
+  this->makeTemplates("cl", sampletag, false, inputfilename, dir, tag, "eta", ETA_BASE, outputdir, versiontag, sys);
+}
+
+
+//  pdf data file: sampletag + favor+"_templates_" + tag + versiontag.
+bool   PtrelSolver::initPdfsByTag(const char *sampletag, const char *tag, const char *pdfdir, const char *versiontag, bool sys) {
+
+
+  TString basename(pdfdir); basename += "/";
+  basename += sampletag;
+  basename += "_templates_";
+
+  Int_t shift = strlen(pdfdir) + strlen(sampletag) +1;
+
+  TString b_pdf(basename), cl_pdf(basename);
+  b_pdf.Insert(  shift, "b");  b_pdf  += versiontag; 
+  if (sys) b_pdf  += "-sys";
+  cl_pdf.Insert( shift, "cl"); cl_pdf += versiontag; 
+  if (sys) cl_pdf += "-sys";
+
+  if ( !locateFile(b_pdf.Data()) || !locateFile(cl_pdf.Data()) ) {
+    std::cout << "information: pdf data file " << b_pdf.Data() << " & "
+	      << cl_pdf.Data() << " dont exist ... "
+	      << std::endl;
+    return 0;
+  }
+
+
+  // initialize
+  if (sys)  this->initPdfs(b_pdf.Data(), cl_pdf.Data(), "sys");
+  else  this->initPdfs(b_pdf.Data(), cl_pdf.Data(), "");
+
+
+  TString b_pdftag(basename), cl_pdftag(basename);
+  b_pdftag.Insert(  shift+1, "b");  b_pdftag  += tag; b_pdftag  += versiontag;
+  cl_pdftag.Insert( shift+1, "cl"); cl_pdftag += tag; cl_pdftag += versiontag; 
+  if (sys) {
+
+    b_pdftag  += "-sys";
+    cl_pdftag += "-sys";
+  }
+  if ( !locateFile(b_pdftag.Data()) || !locateFile(cl_pdftag.Data()) ) {
+    std::cout << "information: pdf data file " << b_pdftag.Data() << " & "
+	      << cl_pdftag.Data() << " dont exist ... "
+	      << std::endl;
+    if (sys)  this->initPdfs(b_pdf.Data(), cl_pdf.Data(), "sys_tag");
+    else  this->initPdfs(b_pdf.Data(), cl_pdf.Data(), "tag");
+    std::cout << "information: initialize tag pdfs with untagged pdfs " << std::endl;
+
+  } else {
+
+    if (sys)  this->initPdfs(b_pdftag.Data(), cl_pdftag.Data(), "sys_tag");
+    else  this->initPdfs(b_pdftag.Data(), cl_pdftag.Data(), "tag");
+  }
+
+  return true;
+}
+
+
+bool PtrelSolver::locateFile(const char *file) {
+
+  TString cmd("ls "); cmd += file;
+  Int_t status = gSystem->Exec(cmd.Data());
+
+  if (!status) return true;
+  return 0;
+}
+
+
+
 /**************************************************************************
  *
  *  read templates/build pdfs. 
@@ -1118,9 +1399,9 @@ TF1 *PtrelSolver::buildAPdf(int ii,
 //  build the 2-components pdf
 //  the constant of b or c component is "Nb" and "Nc"
 void PtrelSolver::buildPdfs(TObjArray *combined, 
-		       std::vector<std::vector<double> > *b, 
-		       std::vector<std::vector<double> > *c,
-		       const char *tag) {
+			    std::vector<std::vector<double> > *b, 
+			    std::vector<std::vector<double> > *c,
+			    const char *tag) {
   
 
 
@@ -1194,20 +1475,27 @@ void PtrelSolver::initPdfs(const char *b_pdf,  const char *c_pdf, TObjArray *com
   delete b;
   delete c;
 }
+void PtrelSolver::initPdfs(const char *b_pdf,  const char *c_pdf, const char *pdftag) {
 
 
-void PtrelSolver::initPdfs(const char *b_pdf, const char *c_pdf) {
+  TObjArray *pdf = 0;
 
+  if ( !strcmp(pdftag, "") )        pdf = &combined_pdfs;
+  if ( !strcmp(pdftag, "tag") )     pdf = &combined_pdfs_tag;
+  if ( !strcmp(pdftag, "sys") )     pdf = &combined_pdfs_sys;
+  if ( !strcmp(pdftag, "sys_tag") ) pdf = &combined_pdfs_sys_tag;
 
-  pdfs_b->clear();
-  pdfs_c->clear();
-  combined_pdfs.Clear();
+  if (!pdf) {
 
-  this->readTemplates(b_pdf, pdfs_b );
-  this->readTemplates(c_pdf, pdfs_c );
+    std::cout << "information: can't build the pdfs ... " << std::endl;
+    return;
+  }
 
-  this->buildPdfs(&combined_pdfs, pdfs_b, pdfs_c);
+  this->initPdfs(b_pdf, c_pdf, pdf, pdftag);
 }
+
+
+
 
 
 /**************************************************************************

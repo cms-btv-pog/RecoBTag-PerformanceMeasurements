@@ -1,3 +1,5 @@
+#include "TSystem.h"
+
 
 #include "TFile.h"
 #include "TTree.h"
@@ -96,8 +98,8 @@ void PtrelSolver::measure(const char *inputfilename, const char *dir, const char
   c2->Divide(total_num_plots, total_num_plots);
 
 
-  for (int ii = 0; ii <= 5; ii++) {
-    //  for (int ii = 0; ii <= nbins; ii++) {
+  //  for (int ii = 0; ii <= 5; ii++) {
+  for (int ii = 1; ii <= nbins; ii++) {
 
     c1->cd();
     thePdf = getPdfByIndex(           pdfbase * ii );
@@ -235,25 +237,28 @@ void PtrelSolver::measure(const char *inputfilename, const char *dir, const char
 
 
 
+void PtrelSolver::effByAll(const char *inputfilename, const char *dir, const char *outfilename, const char *sampletag, const char *pdfdir, const char *versiontag, bool sys) {
 
-void PtrelSolver::make(bool sys) {
-  
+  TString hist(sampletag);
+  if (sys) {
+    if (!  this->initPdfsByTag(sampletag, "TCL", pdfdir, versiontag, sys) ) return;
+  }
+  if (!  this->initPdfsByTag(sampletag, "TCL", pdfdir, versiontag, false) ) return;
+  hist += "_pT";
+  this->measure(inputfilename, dir, outfilename, "TCL", hist.Data(), PT_BASE, sys, inputfilename, dir);
 
-
-
-  makeTemplates(5, "/uscms_data/d1/lpcbtag/yumiceva/PerformanceMeasurements/2007_Oct_9_13X/histogramsV4/results_MuBBbarCCbar_TCL_AwayTCL.root", "b_flavor_notag.data", "b_pdf_notag.root", "no_tag", "ppT", "pEta");
-  // makeTemplates(5, "/uscms_data/d1/lpcbtag/yumiceva/PerformanceMeasurements/2007_Oct_9_13X/histogramsV4/results_MuBBbarCCbar_TCM_AwayTCL.root", "b_flavor_TCM.data", "b_pdf_TCM.root", "TCM", "pcmbpT", "pcmbEta");
-
-  //  makeTemplates(4, "/uscms_data/d1/lpcbtag/yumiceva/PerformanceMeasurements/2007_Oct_9_13X/histogramsV4/results_MuBBbarCCbar_TCL_AwayTCL.root", "c_flavor_notag.data", "c_pdf_notag.root", "no_tag", "ppT", "pEta");
-  //  makeTemplates(4, "/uscms_data/d1/lpcbtag/yumiceva/PerformanceMeasurements/2007_Oct_9_13X/histogramsV4/results_MuBBbarCCbar_TCM_AwayTCL.root", "c_flavor_TCM.data", "c_pdf_TCM.root", "TCM", "pcmbpT", "pcmbEta");
+  hist.Resize(0); hist += sampletag; hist += "_eta";
+  this->measure(inputfilename, dir, outfilename, "TCL", hist.Data(), ETA_BASE, sys, inputfilename, dir);
 }
 
 
+
+/*
 void PtrelSolver::produceAll(const char *datafile, const char *dir, const char *outputfile, bool sys) {
   
 
-  initPdfs("./templates/b_flavor_TCM.data", "./templates/c_flavor_TCM.data");
-  initPdfs("./templates/b_flavor_TCM.data", "./templates/c_flavor_TCM.data", &combined_pdfs_tag,"tag" );
+  //  initPdfs("./templates/b_flavor_TCM.data", "./templates/c_flavor_TCM.data");
+  // initPdfs("./templates/b_flavor_TCM.data", "./templates/c_flavor_TCM.data", &combined_pdfs_tag,"tag" );
 
 
   measure(datafile, dir, outputfile, "TCL",  "n_pT",  PT_BASE,  sys, datafile, dir);
@@ -268,5 +273,5 @@ void PtrelSolver::produceAll(const char *datafile, const char *dir, const char *
   measure(datafile, dir, outputfile, "TCT",  "n_eta", ETA_BASE, sys, datafile, dir);
 
 }
-
+*/
 
