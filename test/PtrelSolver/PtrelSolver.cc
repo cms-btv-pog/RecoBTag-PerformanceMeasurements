@@ -151,8 +151,8 @@ TF1 *PtrelSolver::getPdfByIndex(TObjArray *list, int jj, const char *tag) {
   // build the pdf index name
   char index[100];
   if (tag && strlen(tag) >0 ) sprintf(index, "%s_%d", tag, jj);
-  else sprintf(index, "%d", jj);
-
+  else sprintf(index, "_%d", jj);
+  std::cout << "information: accessing pdf with name " << index << std::endl;
 
   for (int ii = 0; ii <= list->GetLast(); ii ++) {
 
@@ -1188,11 +1188,17 @@ void PtrelSolver::makeAllTemplatesPerTag(const char *inputfilename, const char *
   // clean the disk area
   TString command("rm -rf "); command += outputdir;
   command += "/";
-  command += "*templates*"; command += tag; 
-  command += "*";           command += versiontag; command += "*";
-  if (sys) command += "sys*";
+  command += sampletag;
+  command += "_templates_"; command += tag; 
+  command += versiontag; 
+  if (sys) command += "-sys"; 
   gSystem->Exec(command.Data());
-  std::cout << "information: deleting files " << command.Data() << std::endl;
+  std::cout << "information:   " << command.Data() << std::endl;
+
+  command += ".root";
+  gSystem->Exec(command.Data());
+  std::cout << "information:   " << command.Data() << std::endl;
+
 
   this->makeTemplates("b", sampletag, true, inputfilename, dir, tag, "pT", PT_BASE, outputdir, versiontag, sys);
   this->makeTemplates("cl", sampletag, true, inputfilename, dir, tag, "pT", PT_BASE, outputdir, versiontag, sys);
@@ -1207,11 +1213,13 @@ void PtrelSolver::makeAllTemplatesPerTag(const char *inputfilename, const char *
 bool   PtrelSolver::initPdfsByTag(const char *sampletag, const char *tag, const char *pdfdir, const char *versiontag, bool sys) {
 
 
+  TString count(pdfdir); count += sampletag; 
+
   TString basename(pdfdir); basename += "/";
   basename += sampletag;
   basename += "_templates_";
 
-  Int_t shift = strlen(pdfdir) + strlen(sampletag) +1;
+  Int_t shift = count.Length() +1;
 
   TString b_pdf(basename), cl_pdf(basename);
   b_pdf.Insert(  shift, "b");  b_pdf  += versiontag; 
@@ -1228,19 +1236,23 @@ bool   PtrelSolver::initPdfsByTag(const char *sampletag, const char *tag, const 
 
 
   // initialize
+  std::cout << "information: " << b_pdf.Data() << " & " << cl_pdf.Data() << std::endl;
   if (sys)  this->initPdfs(b_pdf.Data(), cl_pdf.Data(), "sys");
   else  this->initPdfs(b_pdf.Data(), cl_pdf.Data(), "");
 
 
   TString b_pdftag(basename), cl_pdftag(basename);
-  b_pdftag.Insert(  shift+1, "b");  b_pdftag  += tag; b_pdftag  += versiontag;
-  cl_pdftag.Insert( shift+1, "cl"); cl_pdftag += tag; cl_pdftag += versiontag; 
+  b_pdftag.Insert(  shift, "b");  b_pdftag  += tag; b_pdftag  += versiontag;
+  cl_pdftag.Insert( shift, "cl"); cl_pdftag += tag; cl_pdftag += versiontag; 
   if (sys) {
 
     b_pdftag  += "-sys";
     cl_pdftag += "-sys";
   }
+  std::cout << "information: " << b_pdftag.Data() << " & " << cl_pdftag.Data() << std::endl;
+
   if ( !locateFile(b_pdftag.Data()) || !locateFile(cl_pdftag.Data()) ) {
+
     std::cout << "information: pdf data file " << b_pdftag.Data() << " & "
 	      << cl_pdftag.Data() << " dont exist ... "
 	      << std::endl;
@@ -1293,7 +1305,7 @@ void PtrelSolver::readTemplates(const char *filename, std::vector<std::vector<do
 
     cols = 0;
 
-    file.getline(buff, 256, '\n');
+    file.getline(buff, 512, '\n');
     //    std::cout << buff << std::endl;
     TString container(buff);
     if (container.Contains('#')) continue; //skip comments
@@ -1328,11 +1340,11 @@ void PtrelSolver::readTemplates(const char *filename, std::vector<std::vector<do
   // show the decoded results. 
   // for (unsigned int ii = 0; ii < (*parameters).size() ; ii ++) {
 
-  //    for (unsigned int jj = 0; jj < (*parameters)[ii].size(); jj ++) 
-  //  std::cout << setw(10) <<(*parameters)[ii][jj] <<" "; 
+  //   for (unsigned int jj = 0; jj < (*parameters)[ii].size(); jj ++) 
+  //	std::cout << setw(10) <<(*parameters)[ii][jj] <<" "; 
 
-  //    std::cout << std::endl;
-  // }
+  //     std::cout << std::endl;
+  //   }
 
   file.close();
 }
@@ -1423,7 +1435,7 @@ void PtrelSolver::buildPdfs(TObjArray *combined,
     else 
       sprintf(pdf_name, "%d", (int)((*b)[ii][0]));
 
-    //    std::cout << "build pdf " << pdf_name << std::endl;
+    std::cout << "information: build pdf --- " << pdf_name << std::endl;
 
 
     unsigned int shift = 1; // the cols for pt, eta, etc. 

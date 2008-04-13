@@ -135,7 +135,6 @@ class PtrelSolver : public TObject {
 
   
 
-
   void makeAllTemplatesPerTag(const char *inputfilename, const char *dir, const char *sampletag, const char *tag, const char *outputdir, const char *versiontag, bool sys = false);
   void makeTemplates(const char *flavor, const char *sampletag, bool sum, const char *inputfilename, const char *dir, const char *tag, const char *thehist, int pdfbase, const char *outputdir, const char *versiontag="", bool sys=false, bool latex=false);
 
@@ -145,6 +144,7 @@ class PtrelSolver : public TObject {
   void readTemplates(const char *filename, std::vector<std::vector<double> > *parameters);
   void buildPdfs(TObjArray *combined, std::vector<std::vector<double> > *b, std::vector<std::vector<double> > *c, const char *tag = 0);
   TF1 *buildAPdf(int ii, std::vector<std::vector<double> > *b, std::vector<std::vector<double> > *c);
+  void makeAllPerFile(const char *datafile, const char *outputdir, const char *versiontag);
 
 
   void initPdfs(const char *b_pdf,  const char *c_pdf, TObjArray  *combined, const char *tag);
@@ -160,8 +160,8 @@ class PtrelSolver : public TObject {
 
 
   // for fitting
-  void   measure(const char *inputfilename, const char *dir, const char *outfilename, const char *tag, const char *histname, int pdf_base, bool sys,  const char *mcfilename=0, const char *mcdir=0);
-  
+  void measure(const char *sampletag, const char *inputfilename, const char *dir, const char *outfilename, const char *tag, const char *thehistname, int pdfbase, bool sys=false, const char *mcfilename=0, const char *mcdir=0);
+
   //  pdf data file: sampletag + favor+"_templates_" + tag + versiontag.
   bool  initPdfsByTag(const char *sampletag, const char *tag, const char *pdfdir, const char *versiontag, bool sys);
   void effByAll(const char *inputfilename, const char *dir, const char *outfilename, const char *sampletag, const char *pdfdir, const char *versiontag="", bool sys=false);

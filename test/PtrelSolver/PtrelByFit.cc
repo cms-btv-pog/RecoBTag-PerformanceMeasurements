@@ -39,8 +39,8 @@ ClassImp(PtrelSolver)
  *  
  *
  **************************************************************************/
-void PtrelSolver::measure(const char *inputfilename, const char *dir, const char *outfilename, const char *tag, const char *histname, int pdfbase, bool sys,
-			  const char *mcfilename, const char *mcdir) {
+  void PtrelSolver::measure(const char *sampletag, const char *inputfilename, const char *dir, const char *outfilename, const char *tag, const char *thehistname, int pdfbase, bool sys,
+			    const char *mcfilename, const char *mcdir) {
 
   TH1F *hist =0, *hist_tag=0,  *eff_sys=0;
   TH2F *hist2=0, *hist2_tag=0;
@@ -52,7 +52,13 @@ void PtrelSolver::measure(const char *inputfilename, const char *dir, const char
   int   nbins;
   std::vector<double> result, result_sys;
 
-  TString name_base(tag); name_base+="_"; name_base+=histname;
+ 
+
+  TString name_base(sampletag); name_base+="_"; name_base+=thehistname;
+  TString myhist(name_base);
+  const char *histname = myhist.Data();
+
+  name_base += tag;
 
   TString eff_name_sys, eff_name; 
   TString name, tag_name; // to access the tagged histogram
@@ -102,10 +108,10 @@ void PtrelSolver::measure(const char *inputfilename, const char *dir, const char
   for (int ii = 1; ii <= nbins; ii++) {
 
     c1->cd();
-    thePdf = getPdfByIndex(           pdfbase * ii );
-    thePdf_tag = getTaggedPdfByIndex( pdfbase * ii );
+    thePdf = getPdfByIndex(           pdfbase * ii , "");
+    thePdf_tag = getPdfByIndex( pdfbase * ii , "tag");
     if (!thePdf || !thePdf_tag) {
-      std::cout << "can't locate the correct PDF for this data set ..." 
+      std::cout << "information: can't locate the correct PDF for this data set ..." 
 		<< std::endl;
       break;
     } 
@@ -156,7 +162,7 @@ void PtrelSolver::measure(const char *inputfilename, const char *dir, const char
 	eff_sys->SetBinError(ii, result_sys[1]); // only the error is different.
       } else {
 	
-	std::cout << "information: no systematics applied !" << std::endl;
+	std::cout << "information: no systematics applied ! (can't find proper pdfs)" << std::endl;
       }
     }
 
@@ -239,39 +245,44 @@ void PtrelSolver::measure(const char *inputfilename, const char *dir, const char
 
 void PtrelSolver::effByAll(const char *inputfilename, const char *dir, const char *outfilename, const char *sampletag, const char *pdfdir, const char *versiontag, bool sys) {
 
-  TString hist(sampletag);
+
   if (sys) {
     if (!  this->initPdfsByTag(sampletag, "TCL", pdfdir, versiontag, sys) ) return;
   }
   if (!  this->initPdfsByTag(sampletag, "TCL", pdfdir, versiontag, false) ) return;
-  hist += "_pT";
-  this->measure(inputfilename, dir, outfilename, "TCL", hist.Data(), PT_BASE, sys, inputfilename, dir);
 
-  hist.Resize(0); hist += sampletag; hist += "_eta";
-  this->measure(inputfilename, dir, outfilename, "TCL", hist.Data(), ETA_BASE, sys, inputfilename, dir);
+
+  this->measure(sampletag, inputfilename, dir, outfilename, "TCL", "pT",  PT_BASE, sys, inputfilename, dir);
+  this->measure(sampletag, inputfilename, dir, outfilename, "TCL", "eta", ETA_BASE, sys, inputfilename, dir);
 }
 
 
 
-/*
-void PtrelSolver::produceAll(const char *datafile, const char *dir, const char *outputfile, bool sys) {
+
+void PtrelSolver::makeAllPerFile(const char *datafile, const char *outputdir, const char *versiontag) {
   
+  this->makeAllTemplatesPerTag(datafile, "/Histograms/muon_in_jet/", "n", "", "./templates/", versiontag);
 
-  //  initPdfs("./templates/b_flavor_TCM.data", "./templates/c_flavor_TCM.data");
-  // initPdfs("./templates/b_flavor_TCM.data", "./templates/c_flavor_TCM.data", &combined_pdfs_tag,"tag" );
-
-
-  measure(datafile, dir, outputfile, "TCL",  "n_pT",  PT_BASE,  sys, datafile, dir);
-  measure(datafile, dir, outputfile, "TCL",  "n_eta", ETA_BASE, sys, datafile, dir);
-  
-
-  measure(datafile, dir, outputfile, "TCM",  "n_pT",  PT_BASE,  sys, datafile, dir);
-  measure(datafile, dir, outputfile, "TCM",  "n_eta", ETA_BASE, sys, datafile, dir);
+  this->makeAllTemplatesPerTag(datafile, "/Histograms/muon_in_jet/", "n", "TCL", "./templates/", versiontag);
+  this->makeAllTemplatesPerTag(datafile, "/Histograms/muon_in_jet/", "n", "TCM", "./templates/", versiontag);
+  this->makeAllTemplatesPerTag(datafile, "/Histograms/muon_in_jet/", "n", "TCT", "./templates/", versiontag);
 
 
-  measure(datafile, dir, outputfile, "TCT",  "n_pT",  PT_BASE,  sys, datafile, dir);
-  measure(datafile, dir, outputfile, "TCT",  "n_eta", ETA_BASE, sys, datafile, dir);
+  this->makeAllTemplatesPerTag(datafile, "/Histograms/muon_in_jet/", "n", "JPL", "./templates/", versiontag);
+  this->makeAllTemplatesPerTag(datafile, "/Histograms/muon_in_jet/", "n", "JPM", "./templates/", versiontag);
+  this->makeAllTemplatesPerTag(datafile, "/Histograms/muon_in_jet/", "n", "JPT", "./templates/", versiontag);
+
+
+  this->makeAllTemplatesPerTag(datafile, "/Histograms/muon_in_jet/", "p", "", "./templates/", versiontag);
+
+  this->makeAllTemplatesPerTag(datafile, "/Histograms/muon_in_jet/", "p", "TCL", "./templates/", versiontag);
+  this->makeAllTemplatesPerTag(datafile, "/Histograms/muon_in_jet/", "p", "TCM", "./templates/", versiontag);
+  this->makeAllTemplatesPerTag(datafile, "/Histograms/muon_in_jet/", "p", "TCT", "./templates/", versiontag);
+
+  this->makeAllTemplatesPerTag(datafile, "/Histograms/muon_in_jet/", "p", "JPL", "./templates/", versiontag);
+  this->makeAllTemplatesPerTag(datafile, "/Histograms/muon_in_jet/", "p", "JPM", "./templates/", versiontag);
+  this->makeAllTemplatesPerTag(datafile, "/Histograms/muon_in_jet/", "p", "JPT", "./templates/", versiontag);
 
 }
-*/
+
 
