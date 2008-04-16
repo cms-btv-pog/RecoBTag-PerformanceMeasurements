@@ -241,9 +241,7 @@ ClassImp(PtrelSolver)
   inputfile->Close();
 }
 
-
-
-void PtrelSolver::effByAll(const char *inputfilename, const char *dir, const char *outfilename, const char *sampletag, const char *pdfdir, const char *versiontag, bool sys) {
+void PtrelSolver::measureByFit(const char *inputfilename, const char *dir, const char *outfilename, const char *sampletag, const char *pdfdir, const char *versiontag, bool sys) {
 
 
   if (sys) {
@@ -255,9 +253,6 @@ void PtrelSolver::effByAll(const char *inputfilename, const char *dir, const cha
   this->measure(sampletag, inputfilename, dir, outfilename, "TCL", "pT",  PT_BASE, sys, inputfilename, dir);
   this->measure(sampletag, inputfilename, dir, outfilename, "TCL", "eta", ETA_BASE,sys, inputfilename, dir);
 }
-
-
-
 
 void PtrelSolver::makeAllPerFile(const char *datafile, const char *outputdir, const char *versiontag) {
   

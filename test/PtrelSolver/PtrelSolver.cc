@@ -74,8 +74,9 @@ void PtrelSolver::init() {
   pdfs_b_tag   = new std::vector<std::vector<double> >;
   pdfs_c_tag   = new std::vector<std::vector<double> >;
 
-  c1       = new TCanvas("c1", "", 600, 600);
+  gROOT->SetStyle("Plain");
 
+  c1       = new TCanvas("c1", "", 600, 600);
 
   label = new TLatex;
   label->SetNDC();
@@ -1269,7 +1270,6 @@ bool   PtrelSolver::initPdfsByTag(const char *sampletag, const char *tag, const 
   return true;
 }
 
-
 bool PtrelSolver::locateFile(const char *file) {
 
   TString cmd("ls "); cmd += file;
@@ -1953,6 +1953,7 @@ TGraphErrors *PtrelSolver::checkLinearity2(TF1 *pdf, int steps, int total_events
   
   return result;
 }
+
 
 
 

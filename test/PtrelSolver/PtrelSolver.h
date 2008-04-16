@@ -13,11 +13,11 @@
 
 #include "math.h"
 #include "fstream.h"
-#include "iomanip.h"
+#include "iomanip"
 #include "stdio.h"
-#include "string.h"
+#include "string"
 #include "stdlib.h"
-#include "vector.h"
+#include "vector"
 #include "TObject.h"
 #include "TObjArray.h"
 #include "TGraphErrors.h"
@@ -41,7 +41,6 @@ class PtrelSolver : public TObject {
   Int_t pthat_bins;
   Int_t eta_bins;
   
-
   Double_t x_min, x_max;
   Double_t fit_min, fit_max;
   Int_t hist_bins;
@@ -65,16 +64,13 @@ class PtrelSolver : public TObject {
 
   TLatex  *label;
 
-
   std::vector<std::vector<double> > *eff_table;
   std::vector<std::vector<double> > *pdfs_b;
   std::vector<std::vector<double> > *pdfs_c;
   TObjArray                          combined_pdfs;
 
-
   std::vector<std::vector<double> > *pdfs_b_tag;
   std::vector<std::vector<double> > *pdfs_c_tag;
-
 
   TObjArray                          combined_pdfs_tag;
   TObjArray                          combined_pdfs_sys;
@@ -84,12 +80,10 @@ class PtrelSolver : public TObject {
 
   void init();
 
-
   int    getBin(double xx, double *binning);
   int    index( double pt, double eta, double others = 0);
   int    index( int ptnum, int etanum, int others=0);
   double effErr(double N1, double N1_err, double N2, double N2_err);
-
 
   TF1   *getAPdf(int ii);
   TF1   *getAPdf(int pt_bin, int eta_bin);
@@ -97,7 +91,6 @@ class PtrelSolver : public TObject {
   TF1   *getPdfByIndex(int ii); // return the pdf before tagging
   TF1   *getPdfByIndex(int ii, const char *tag); // other methods
   TF1   *getTaggedPdfByIndex(int ii); // return the pdf after tagging
-
 
   // calculate the efficiency with a fit to the ptrel distributions.
   // there are several cases:
@@ -129,11 +122,20 @@ class PtrelSolver : public TObject {
   TH1F  *getMCeff(TFile *file, const char *dir, const char *hist, const char *tagger); 
   TH1F  *getMCeff(const char *filename, const char *dir, const char *hist, const char *tagger); 
 
+  void counting(
+    const char *,
+    const char *,
+    const char *
+  );
 
 
-  void counting(const char *tag, const char *outfilename, const char *inputfilename, const char *mistagfilename = 0);
-
-  
+  void counting(
+    const char *, 
+    const char *,
+    const char *,
+    const char *,
+    const char *    
+  );
 
   void makeAllTemplatesPerTag(const char *inputfilename, const char *dir, const char *sampletag, const char *tag, const char *outputdir, const char *versiontag, bool sys = false);
   void makeTemplates(const char *flavor, const char *sampletag, bool sum, const char *inputfilename, const char *dir, const char *tag, const char *thehist, int pdfbase, const char *outputdir, const char *versiontag="", bool sys=false, bool latex=false);
@@ -161,16 +163,27 @@ class PtrelSolver : public TObject {
 
   // for fitting
   void measure(const char *sampletag, const char *inputfilename, const char *dir, const char *outfilename, const char *tag, const char *thehistname, int pdfbase, bool sys=false, const char *mcfilename=0, const char *mcdir=0);
+  
+  void measureByCounting(
+    const char *,
+    const char *,
+    const char *,
+    const char *,
+    const char *,
+    const char *
+  );
+
 
   //  pdf data file: sampletag + favor+"_templates_" + tag + versiontag.
-  bool  initPdfsByTag(const char *sampletag, const char *tag, const char *pdfdir, const char *versiontag, bool sys);
-  void effByAll(const char *inputfilename, const char *dir, const char *outfilename, const char *sampletag, const char *pdfdir, const char *versiontag="", bool sys=false);
+  bool initPdfsByTag(const char * sampletag, const char * tag, const char * pdfdir, const char *versiontag, bool sys);
+  bool initPdfsByTag(const char * directory, const char * tag, const char * versiontag);
+
+  void measureByFit(const char *inputfilename, const char *dir, const char *outfilename, const char *sampletag, const char *pdfdir, const char *versiontag="", bool sys=false);
 
 
   // calibration
   TGraphErrors *checkLinearity2(TF1 *pdf, int steps, int total_events= 1000, bool verbose = true);
   TGraphErrors *checkPurity2(TF1 *pdf, int steps, int num_bs, bool verbose);
-
 
   ClassDef(PtrelSolver, 1)
 };
