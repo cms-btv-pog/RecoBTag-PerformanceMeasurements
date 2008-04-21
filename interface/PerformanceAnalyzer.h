@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.15 2008/03/21 00:13:08 jindal Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.16 2008/03/23 01:25:49 jandrea Exp $
  *
  */
 
@@ -145,7 +145,12 @@ private:
   BTagHistograms *AwayjetHistos;
   BTagHistograms *TaggedMujetHistos;
   BTagHistograms *TaggedAwayjetHistos;
-
+  BTagHistograms *MujetHistos_mc;
+  BTagHistograms *AwayjetHistos_mc;
+  BTagHistograms *TaggedMujetHistos_mc;
+  BTagHistograms *TaggedAwayjetHistos_mc;
+  
+  
   S8bPerformance fperformanceTC2trk;
   S8bPerformance fperformanceTC3trk;
   S8bPerformance fperformanceTP;
