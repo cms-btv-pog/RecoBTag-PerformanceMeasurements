@@ -257,15 +257,19 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
   AwayjetHistos = new BTagHistograms();
   TaggedMujetHistos   = new BTagHistograms();
   TaggedAwayjetHistos = new BTagHistograms();
-
+  MujetHistos_mc   = new BTagHistograms();
+  AwayjetHistos_mc = new BTagHistograms();
+  TaggedMujetHistos_mc   = new BTagHistograms();
+  TaggedAwayjetHistos_mc = new BTagHistograms();
+  
   EffHistos->Init("efficiencies");
   PtrelHistos->Init("ptrel");
   MujetHistos->Init("n");
   AwayjetHistos->Init("p");
-  MujetHistos->Init("n","b");
-  AwayjetHistos->Init("p","b");
-  MujetHistos->Init("n","cl");
-  AwayjetHistos->Init("p","cl");
+  MujetHistos_mc->Init("n","b");
+  AwayjetHistos_mc->Init("p","b");
+  MujetHistos_mc->Init("n","cl");
+  AwayjetHistos_mc->Init("p","cl");
 	  
   for ( std::map<std::string,float>::const_iterator imap = fOPMap.begin(); imap != fOPMap.end(); ++imap) {
 
@@ -274,10 +278,10 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
 	  
 	  TaggedMujetHistos->Init("ntag",imap->first);
 	  TaggedAwayjetHistos->Init("ptag",imap->first);
-	  TaggedMujetHistos->Init("ntag","b",imap->first);
-	  TaggedAwayjetHistos->Init("ptag","b",imap->first);
-	  TaggedMujetHistos->Init("ntag","cl",imap->first);
-	  TaggedAwayjetHistos->Init("ptag","cl",imap->first);
+	  TaggedMujetHistos_mc->Init("ntag","b",imap->first);
+	  TaggedAwayjetHistos_mc->Init("ptag","b",imap->first);
+	  TaggedMujetHistos_mc->Init("ntag","cl",imap->first);
+	  TaggedAwayjetHistos_mc->Init("ptag","cl",imap->first);
 	  
   }
 
@@ -475,7 +479,12 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
   AwayjetHistos->Save();
   TaggedMujetHistos->Save();
   TaggedAwayjetHistos->Save();
-	
+  topdir->cd("MCtruth");
+  MujetHistos_mc->Save();
+  AwayjetHistos_mc->Save();
+  TaggedMujetHistos_mc->Save();
+  TaggedAwayjetHistos_mc->Save();
+  
   topdir->Write();
 	
   // do anything here that needs to be done at desctruction time
@@ -939,13 +948,13 @@ void PerformanceAnalyzer::FillHistos(std::string type, TLorentzVector p4MuJet, d
 	  MujetHistos->Fill2d(type+"_eta",TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 		if ( JetFlavor == 5 ) {
 			std::string flavor = "b";
-			MujetHistos->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
-			MujetHistos->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);
+			MujetHistos_mc->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
+			MujetHistos_mc->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 		}
 		if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor == 21 ) {
 			std::string flavor = "cl";
-			MujetHistos->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
-			MujetHistos->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);
+			MujetHistos_mc->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
+			MujetHistos_mc->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 		}
 	}
 	else if ( type == "p") {
@@ -954,13 +963,13 @@ void PerformanceAnalyzer::FillHistos(std::string type, TLorentzVector p4MuJet, d
 	  AwayjetHistos->Fill2d(type+"_eta",TMath::Abs(p4MuJet.Eta()),ptrel, weight);
 		if ( JetFlavor == 5 ) {
 			std::string flavor = "b";
-			AwayjetHistos->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
-			AwayjetHistos->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);	
+			AwayjetHistos_mc->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
+			AwayjetHistos_mc->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);	
 		}
 		if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor == 21 ) {
 			std::string flavor = "cl";
-			AwayjetHistos->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
-			AwayjetHistos->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);
+			AwayjetHistos_mc->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
+			AwayjetHistos_mc->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 		}
 	}
 				
@@ -975,13 +984,13 @@ void PerformanceAnalyzer::FillHistos(std::string type, TLorentzVector p4MuJet, d
 				
 				if ( JetFlavor == 5 ) {
 					std::string flavor = "b_";
-					TaggedMujetHistos->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
-					TaggedMujetHistos->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
+					TaggedMujetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
+					TaggedMujetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 				}
 				if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor == 21 ) {
 					std::string flavor = "cl_";
-					TaggedMujetHistos->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
-					TaggedMujetHistos->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
+					TaggedMujetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
+					TaggedMujetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 				}
 			}
 			else if ( type == "p") {
@@ -992,13 +1001,13 @@ void PerformanceAnalyzer::FillHistos(std::string type, TLorentzVector p4MuJet, d
 			
 				if ( JetFlavor == 5 ) {
 					std::string flavor = "b_";
-					TaggedAwayjetHistos->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
-					TaggedAwayjetHistos->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
+					TaggedAwayjetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
+					TaggedAwayjetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 				}
 				if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor == 21 ) {
 					std::string flavor = "cl_";
-					TaggedAwayjetHistos->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
-					TaggedAwayjetHistos->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
+					TaggedAwayjetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
+					TaggedAwayjetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
 				}
 			}
 		}
@@ -1118,9 +1127,24 @@ bool PerformanceAnalyzer::hasLongLived(const TrackHistory & tracer, int pdgid) c
     if( abs(tracer.genParticleTrail()[0]->pdg_id()) == pdgid )
       return true;
   }
-  return false;}
+  return false;
+}
 
-bool PerformanceAnalyzer::hasPhotonConversion(const TrackHistory & tracer) const{  TrackOrigin::SimVertexTrail::const_iterator tvr;  TrackingParticleRefVector sources, daughters;  for (tvr = tracer.simVertexTrail().begin(); tvr != tracer.simVertexTrail().end(); tvr++)  {    sources = (*tvr)->sourceTracks();    daughters = (*tvr)->daughterTracks();    if (sources.size() == 1              &&  // require one source         daughters.size() == 2            &&  //    "    two daughters        sources[0]->pdgId() == 22        &&  //    "    a photon in the source        abs(daughters[0]->pdgId()) == 11 &&  //    "    two electrons        abs(daughters[1]->pdgId()) == 11    ) return true;  }  return false;}
+bool PerformanceAnalyzer::hasPhotonConversion(const TrackHistory & tracer) const{
+	TrackOrigin::SimVertexTrail::const_iterator tvr;
+	TrackingParticleRefVector sources, daughters;
+	for (tvr = tracer.simVertexTrail().begin(); tvr != tracer.simVertexTrail().end(); tvr++) {
+		sources = (*tvr)->sourceTracks();
+		daughters = (*tvr)->daughterTracks();
+		if (sources.size() == 1              &&  // require one source
+			daughters.size() == 2            &&  //    "    two daughters
+			sources[0]->pdgId() == 22        &&  //    "    a photon in the source
+			abs(daughters[0]->pdgId()) == 11 &&  //    "    two electrons
+			abs(daughters[1]->pdgId()) == 11    ) return true;
+	}
+	return false;
+}
+
 
 // ------------ End of Track Categories -----------------------
 
