@@ -241,7 +241,7 @@ ClassImp(PtrelSolver)
   inputfile->Close();
 }
 
-void PtrelSolver::measureByFit(const char *inputfilename, const char *dir, const char *outfilename, const char *sampletag, const char *pdfdir, const char *versiontag, bool sys) {
+void PtrelSolver::allEff(const char *inputfilename, const char *dir, const char *outfilename, const char *sampletag, const char *pdfdir, const char *versiontag, bool sys) {
 
 
   if (sys) {

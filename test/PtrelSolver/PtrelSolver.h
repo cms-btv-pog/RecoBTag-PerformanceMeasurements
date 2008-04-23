@@ -163,6 +163,8 @@ class PtrelSolver : public TObject {
 
   // for fitting
   void measure(const char *sampletag, const char *inputfilename, const char *dir, const char *outfilename, const char *tag, const char *thehistname, int pdfbase, bool sys=false, const char *mcfilename=0, const char *mcdir=0);
+
+
   
   void measureByCounting(
     const char *,
@@ -178,7 +180,7 @@ class PtrelSolver : public TObject {
   bool initPdfsByTag(const char * sampletag, const char * tag, const char * pdfdir, const char *versiontag, bool sys);
   bool initPdfsByTag(const char * directory, const char * tag, const char * versiontag);
 
-  void measureByFit(const char *inputfilename, const char *dir, const char *outfilename, const char *sampletag, const char *pdfdir, const char *versiontag="", bool sys=false);
+  void allEff(const char *inputfilename, const char *dir, const char *outfilename, const char *sampletag, const char *pdfdir, const char *versiontag="", bool sys=false);
 
 
   // calibration
