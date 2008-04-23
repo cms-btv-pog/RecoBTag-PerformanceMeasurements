@@ -56,6 +56,8 @@ class S8Solver {
 			// true efficiency
 			feffTag_b->Write();
 			feffTag_cl->Write();
+			feffmu_b->Write();
+			feffmu_cl->Write();
 			// input
 			fnHisto->Write();
 			fpHisto->Write();
@@ -69,9 +71,13 @@ class S8Solver {
 			fh_kcl->Write();
 			fh_alpha->Write();
 			fh_beta->Write();
+			fh_delta->Write();
+			fh_gamma->Write();
 			// output
 			geffTag_b->Write();
 			gS8effTag_b->Write();
+			geffmu_b->Write();
+			gS8effmu_b->Write();
 				
 			//ofile->Write();
 			ofile->Close();
@@ -139,9 +145,28 @@ class S8Solver {
 		TH1D* feffmu_cl;
 		TH1D* feffTagmu_b;
 		TH1D* feffTagmu_cl;
+
+		TH1D *halljets_b;  
+		TH1D *halljets_cl;  
+		TH1D *htagjets_b ;  
+		TH1D *htagjets_cl;  
+		TH1D *halljets_b_ptrel;  
+		TH1D *halljets_cl_ptrel;  
+		TH1D *htagjets_b_ptrel;  
+		TH1D *htagjets_cl_ptrel;  
+		TH1D *halloppjets_b;  
+		TH1D *halloppjets_cl;  
+		TH1D *halloppjets_b_ptrel;  
+		TH1D *halloppjets_cl_ptrel; 
+		TH1D *htagoppjets_b_ptrel;  
+		TH1D *htagoppjets_cl_ptrel; 
+		TH1D *htagoppjets_b;  
+		TH1D *htagoppjets_cl; 
 		
 		TGraphErrors *geffTag_b;
 		TGraphErrors *gS8effTag_b;
+		TGraphErrors *geffmu_b;
+		TGraphErrors *gS8effmu_b;
 		TGraphErrors *ginput_n;
 		TGraphErrors *ginput_nmu;
 		TGraphErrors *ginput_ntag;

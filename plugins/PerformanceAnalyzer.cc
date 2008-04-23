@@ -1152,6 +1152,20 @@ bool PerformanceAnalyzer::hasPhotonConversion(const TrackHistory & tracer) const
 void
 PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 {
+  
+  // G4 bug, remove bad events
+  bool badEvent = false;
+  if (flavourMatchOptionf == "hepMC" ) {
+    edm::Handle<SimTrackContainer> simTracks;
+    iEvent.getByLabel("g4SimHits",simTracks);
+    SimTrackContainer::const_iterator simTrack;
+    for (simTrack = simTracks->begin(); simTrack != simTracks->end(); ++simTrack){
+      if ((*simTrack).genpartIndex() > 0) {
+	if ((*simTrack).momentum().mag() > 1.8) {badEvent = true; return;}
+      }
+    }
+  }
+
   // Trakcs
   Handle<reco::TrackCollection> recTrks;
   iEvent.getByLabel(recoTrackList_, recTrks);

@@ -63,11 +63,11 @@ void S8Solver::LoadHistos() {
 	//std::cout << " 2D histos loaded " << fcategory << std::endl;
 
 	// get bin for pTrel cut
-	std::cout << "entries fn =" << fnHistoBase->GetEntries() << std::endl;
+	//std::cout << "entries fn =" << fnHistoBase->GetEntries() << std::endl;
 	int ith_ptrel_bin = (int) fnHistoBase->GetYaxis()->FindBin(fminPtrel);
 	int ith_max_bin = -1;
 	if (fMaxPtrel != -1) ith_max_bin = (int) fnHistoBase->GetYaxis()->FindBin(fMaxPtrel);
-	std::cout << " ptrel bin " << ith_max_bin << std::endl;
+	std::cout << " Max. ptrel= " << fMaxPtrel << ", bin = " << ith_max_bin << std::endl;
 	
 	fnHisto = (TH1D*) fnHistoBase->ProjectionX("fnHisto",-1,ith_max_bin,"e");
 	fpHisto = (TH1D*) fpHistoBase->ProjectionX("fpHisto",-1,ith_max_bin,"e");
@@ -79,6 +79,8 @@ void S8Solver::LoadHistos() {
 	fpHistoAll = (TH1D*) fpSvxHistoBase->ProjectionX("fpHistoAll",ith_ptrel_bin, ith_max_bin,"e");
 	
 	std::cout << " got projections" << std::endl;
+	
+	
 	// rebin correlation factors
 	const int ncorrptarray = 6;
 	const int ncorretaarray = 3;
@@ -89,7 +91,7 @@ void S8Solver::LoadHistos() {
 	  
 	// recalculate correlation factors
 	if (frecalculateFactors) {
-		std::cout << "recalculate " << std::endl;
+		std::cout << "recalculate correlation factors " << std::endl;
 		fh_alpha = (TH1D*) fnHisto->Clone("fh_alpha");
 		fh_beta = (TH1D*) fnHisto->Clone("fh_beta");
 		fh_kcl = (TH1D*) fnHisto->Clone("fh_kcl");
@@ -107,7 +109,7 @@ void S8Solver::LoadHistos() {
 		//fh_kcl->Sumw2();
 		//fh_kb->Sumw2();
 		
-		std::cout << "reset1" << std::endl;
+		//std::cout << "reset1" << std::endl;
 		
 		std::map< TString, TH1*> h1;
 		std::map< TString, TH2*> h2;
@@ -120,7 +122,7 @@ void S8Solver::LoadHistos() {
 		finputFile->cd();
 		
 		h2["b_npT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/n_"+fcategory+"_b");
-		std::cout << "got one" << std::endl;
+		//std::cout << "got one" << std::endl;
 		h2["cl_npT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/n_"+fcategory+"_cl");
 		h2["b_ppT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/p_"+fcategory+"_b");
 		h2["cl_ppT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/p_"+fcategory+"_cl");
@@ -130,11 +132,24 @@ void S8Solver::LoadHistos() {
 		h2["cl_pcmbpT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/ptag_"+fcategory+"_cl_"+fthename);
 
 		std::cout << " got initial truth dist." << std::endl;
-		
-		TH1D *halljets_b = h2["b_npT"]->ProjectionX("halljets_b", -1 , ith_max_bin,"e");
-		TH1D *halljets_cl = h2["cl_npT"]->ProjectionX("halljets_cl", -1 , ith_max_bin,"e");
-		TH1D *halloppjets_b = h2["b_ppT"]->ProjectionX("halloppjets_b", -1 , ith_max_bin,"e");
-		TH1D *halloppjets_cl = h2["cl_ppT"]->ProjectionX("halloppjets_cl", -1 , ith_max_bin,"e");
+
+				
+		halljets_b           = h2["b_npT"]->ProjectionX("halljets_b", -1 , ith_max_bin,"e");
+		halljets_cl          = h2["cl_npT"]->ProjectionX("halljets_cl", -1 , ith_max_bin,"e");
+		htagjets_b           = h2["b_ncmbpT"]->ProjectionX("htagjets_b", -1 , ith_max_bin,"e");
+		htagjets_cl          = h2["cl_ncmbpT"]->ProjectionX("htagjets_cl", -1 , ith_max_bin,"e");
+		halljets_b_ptrel     = h2["b_npT"]->ProjectionX("halljets_b_ptrel", ith_ptrel_bin , ith_max_bin,"e");
+		halljets_cl_ptrel    = h2["cl_npT"]->ProjectionX("halljets_cl_ptrel", ith_ptrel_bin , ith_max_bin,"e");
+		htagjets_b_ptrel     = h2["b_ncmbpT"]->ProjectionX("htagjets_b_ptrel", ith_ptrel_bin , ith_max_bin,"e");
+		htagjets_cl_ptrel    = h2["cl_ncmbpT"]->ProjectionX("htagjets_cl_ptrel", ith_ptrel_bin , ith_max_bin,"e");
+		halloppjets_b        = h2["b_ppT"]->ProjectionX("halloppjets_b", -1 , ith_max_bin,"e");
+		halloppjets_cl       = h2["cl_ppT"]->ProjectionX("halloppjets_cl", -1 , ith_max_bin,"e");
+		htagoppjets_b        = h2["b_pcmbpT"]->ProjectionX("htagoppjets_b", -1 , ith_max_bin,"e");
+		htagoppjets_cl       = h2["cl_pcmbpT"]->ProjectionX("htagoppjets_cl", -1 , ith_max_bin,"e");
+		halloppjets_b_ptrel  = h2["b_ppT"]->ProjectionX("halloppjets_b_ptrel", ith_ptrel_bin , ith_max_bin,"e");
+		halloppjets_cl_ptrel = h2["cl_ppT"]->ProjectionX("halloppjets_cl_ptrel", ith_ptrel_bin , ith_max_bin,"e");
+		htagoppjets_b_ptrel  = h2["b_pcmbpT"]->ProjectionX("htagoppjets_b_ptrel", ith_ptrel_bin , ith_max_bin,"e");
+		htagoppjets_cl_ptrel = h2["cl_pcmbpT"]->ProjectionX("htagoppjets_cl_ptrel", ith_ptrel_bin , ith_max_bin,"e");
 		
 		h1["eff_pTrel_b"] = (TH1D*) fnHisto->Clone("eff_pTrel_b");
 		h1["eff_pTrel_cl"] = (TH1D*) fnHisto->Clone("eff_pTrel_cl");
@@ -167,24 +182,34 @@ void S8Solver::LoadHistos() {
 		//h1["eff_TaggedJet_cl"]->Sumw2();  
 		//h1["eff_TaggedBothJets_b"]->Sumw2();
 		//h1["eff_TaggedBothJets_cl"]->Sumw2();
-		std::cout << "reset" << std::endl;
+		//std::cout << "reset" << std::endl;
 		
 		h1["eff_pTrel_b"]->Divide( h2["b_npT"]->ProjectionX("b_halljets_ptrel",ith_ptrel_bin, ith_max_bin ,"e") , halljets_b ,1.,1.,"B");
+		//std::cout << "got projection 1" << std::endl;
 		h1["eff_pTrel_cl"]->Divide( h2["cl_npT"]->ProjectionX("cl_halljets_ptrel", ith_ptrel_bin, ith_max_bin,"e") , halljets_cl ,1.,1.,"B");
+		//std::cout << "got projection 2" << std::endl;
 		h1["eff_TaggedJet_b"]->Divide( h2["b_ncmbpT"]->ProjectionX("b_halljets_tagged", -1 , ith_max_bin,"e") , halljets_b ,1.,1.,"B");
+		//std::cout << "got projection 3" << std::endl;
 		h1["eff_TaggedJet_cl"]->Divide( h2["cl_ncmbpT"]->ProjectionX("cl_halljets_tagged", -1 , ith_max_bin,"e") , halljets_cl ,1.,1.,"B");
+		//std::cout << "got projection 4" << std::endl;
 		h1["eff_pTrel_TaggedJet_b"]->Divide( h2["b_ncmbpT"]->ProjectionX("b_halljets_ptreltagged",ith_ptrel_bin, ith_max_bin ,"e") , halljets_b ,1.,1.,"B");
 		h1["eff_pTrel_TaggedJet_cl"]->Divide( h2["cl_ncmbpT"]->ProjectionX("cl_halljets_ptrelltagged", ith_ptrel_bin, ith_max_bin,"e") , halljets_cl ,1.,1.,"B");
+		//std::cout << "got projection 5" << std::endl;
 		
 		h1["eff_TaggedBothJets_b"]->Divide( h2["b_pcmbpT"]->ProjectionX("b_halloppjets_tagged", -1 , ith_max_bin,"e") , halloppjets_b ,1.,1.,"B");
 		h1["eff_TaggedBothJets_cl"]->Divide( h2["cl_pcmbpT"]->ProjectionX("cl_halloppjets_tagged", -1 , ith_max_bin,"e") , halloppjets_cl ,1.,1.,"B");
+		//std::cout << "got projection 6" << std::endl;
 
 		h1["eff_mu_taggedaway_b"]->Divide( h2["b_ppT"]->ProjectionX("b_hallopppjets_ptrel",ith_ptrel_bin, ith_max_bin ,"e") , halloppjets_b, 1.,1.,"B");
 		h1["eff_mu_taggedaway_cl"]->Divide( h2["cl_ppT"]->ProjectionX("cl_halloppjets_ptrel",ith_ptrel_bin, ith_max_bin ,"e") , halloppjets_cl, 1.,1.,"B");
+		//std::cout << "got projection 7" << std::endl;
 
 		feffTag_b = (TH1D*) h1["eff_TaggedJet_b"]->Clone("feffTag_b"); 
 		feffTag_cl = (TH1D*) h1["eff_TaggedJet_cl"]->Clone("feffTag_cl");
-		std::cout << "clonned" << std::endl;
+
+		feffmu_b = (TH1D*) h1["eff_pTrel_b"]->Clone("feffmu_b"); 
+		feffmu_cl = (TH1D*) h1["eff_pTrel_cl"]->Clone("feffmu_cl");
+		//std::cout << "clonned" << std::endl;
 		
 		if (frebin) {
 			std::cout << "rebinning" << std::endl;
@@ -200,10 +225,10 @@ void S8Solver::LoadHistos() {
 			tmpfh_kcl->Reset();
 			tmpfh_gamma->Reset();
 			tmpfh_delta->Reset();
-			//tmpfh_alpha->Sumw2();
-			//tmpfh_beta->Sumw2();
-			//tmpfh_kb->Sumw2();
-			//tmpfh_kcl->Sumw2();
+			tmpfh_alpha->Sumw2();
+			tmpfh_beta->Sumw2();
+			tmpfh_kb->Sumw2();
+			tmpfh_kcl->Sumw2();
 			
 			tmpfh_alpha->Divide( h1["eff_TaggedBothJets_cl"], h1["eff_TaggedJet_cl"]);
 			tmpfh_beta->Divide( h1["eff_TaggedBothJets_b"], h1["eff_TaggedJet_b"]);
@@ -232,8 +257,8 @@ void S8Solver::LoadHistos() {
 			fh_alpha->Divide( h1["eff_TaggedBothJets_cl"], h1["eff_TaggedJet_cl"]);
 			fh_beta->Divide( h1["eff_TaggedBothJets_b"], h1["eff_TaggedJet_b"]);
 		
-			fh_kb->Divide( h1["eff_pTrel_TaggedJet_b"], h1["eff_pTrel_b"]  );
-			fh_kb->Divide( h1["eff_TaggedJet_b"] );
+			fh_kb->Divide( h1["eff_pTrel_TaggedJet_b"], h1["eff_pTrel_b"]);
+			fh_kb->Divide( h1["eff_TaggedJet_b"]);
 
 			fh_kcl->Divide( h1["eff_pTrel_TaggedJet_cl"], h1["eff_pTrel_cl"] );
 			fh_kcl->Divide(  h1["eff_TaggedJet_cl"] );
@@ -323,15 +348,28 @@ void S8Solver::GetInput() {
 
 	this->LoadHistos();
 	
-	// integrated input
-	TotalInput["n"] = fnHisto->Integral();
-	TotalInput["nMu"] = fnHistoMu->Integral();
-	TotalInput["p"] = fpHisto->Integral();
-	TotalInput["pMu"] = fpHistoMu->Integral();
-	TotalInput["nTag"] = fnHistoSvx->Integral();
-	TotalInput["nMuTag"] = fnHistoAll->Integral();
-	TotalInput["pTag"] = fpHistoSvx->Integral();
-	TotalInput["pMuTag"] = fpHistoAll->Integral();
+// 	// integrated input
+//  	TotalInput["n"] = fnHisto->Integral();
+//  	TotalInput["nMu"] = fnHistoMu->Integral();
+//  	TotalInput["p"] = fpHisto->Integral();
+//  	TotalInput["pMu"] = fpHistoMu->Integral();
+//  	TotalInput["nTag"] = fnHistoSvx->Integral();
+//  	TotalInput["nMuTag"] = fnHistoAll->Integral();
+//  	TotalInput["pTag"] = fpHistoSvx->Integral();
+//  	TotalInput["pMuTag"] = fpHistoAll->Integral();
+
+	TotalInput["n"] = halljets_b->Integral() + halljets_cl->Integral();
+	TotalInput["nMu"] = halljets_b_ptrel->Integral() + halljets_cl_ptrel->Integral();
+	TotalInput["p"] = halloppjets_b->Integral() + halloppjets_cl->Integral() ;
+	TotalInput["pMu"] = halloppjets_b_ptrel->Integral() + halloppjets_cl_ptrel->Integral();
+	TotalInput["nTag"] = htagjets_b->Integral() + htagjets_cl->Integral();
+	TotalInput["nMuTag"] =  htagjets_b_ptrel->Integral() + htagjets_cl_ptrel->Integral();
+	TotalInput["pTag"] = htagoppjets_b->Integral() + htagoppjets_cl->Integral();
+	TotalInput["pMuTag"] =  htagoppjets_b_ptrel->Integral() + htagoppjets_cl_ptrel->Integral();
+
+
+
+
 
 	// asumming parameters fitted to a constant
 	TF1 *Fkb = fh_kb->GetFunction("pol0");
@@ -519,6 +557,7 @@ void S8Solver::Solve() {
 	if (fmethod=="numeric") {
 
 		// average solution
+	        std::cout<< " Starting to find average solution " << std::endl;
 		Double_t inputs[8];
 		inputs[0] = TotalInput["n"];
 		inputs[1] = TotalInput["nMu"];
@@ -532,10 +571,10 @@ void S8Solver::Solve() {
 		S8NumericSolver sol("sol",inputs);
 		//sol.SetCorr(TotalInput["kappa_b"],1.,TotalInput["beta"],
 		//	    TotalInput["kappa_cl"],1.,TotalInput["alpha"]);
-		sol.SetCorr(TotalInput["kappa_b"],TotalInput["beta"],1.,
-			    TotalInput["kappa_cl"],TotalInput["alpha"],1.);
-		//sol.SetCorr(TotalInput["kappa_b"],TotalInput["beta"],TotalInput["delta"],
-		//    TotalInput["kappa_cl"],TotalInput["alpha"],TotalInput["gamma"]);
+		//sol.SetCorr(TotalInput["kappa_b"],TotalInput["beta"],1.,
+		//	    TotalInput["kappa_cl"],TotalInput["alpha"],1.);
+		sol.SetCorr(TotalInput["kappa_b"],TotalInput["beta"],TotalInput["delta"],
+		    TotalInput["kappa_cl"],TotalInput["alpha"],TotalInput["gamma"]);
 
 		sol.SetCorrError(0.,0.,0.,0.,0.,0.);
 		sol.SetError(2);
@@ -559,7 +598,6 @@ void S8Solver::Solve() {
 				
 			}
 		}
-
 		if (converge) {
 			fTotalSolution["n_b"]       = sol.GetResult("na")*TotalInput["n"];
 			fTotalSolution["n_cl"]      = sol.GetResult("nb")*TotalInput["n"];
@@ -579,12 +617,14 @@ void S8Solver::Solve() {
 			fTotalSolutionErr["effTag_cl"] = (sol.GetErrorSup("eb2")+sol.GetErrorInf("eb2"))/2.;
 			fTotalSolutionErr["p_b"]       = (sol.GetErrorSup("ea3")+sol.GetErrorInf("ea3"))/2.;
 			fTotalSolutionErr["p_cl"]      =  (sol.GetErrorSup("eb3")+sol.GetErrorInf("eb3"))/2.;
+		  
 		} else {
 			for( std::map<TString,double>::const_iterator ii=fTotalSolution.begin(); ii!=fTotalSolution.end(); ++ii) {
 				fTotalSolution[ii->first] = 0.;
 				fTotalSolutionErr[ii->first] = 0.;
 			}
 		}
+		std::cout << " Finished with average solution " << std::endl;
 		
 		// binned solutions
 		for( std::map<int,std::map<TString,double> >::const_iterator ibin = BinnedInput.begin(); ibin!=BinnedInput.end(); ++ibin) {
@@ -735,6 +775,8 @@ void S8Solver::Draw(int maxNbins) {
   TArrayD ptarrayErr(nxbins);
   TArrayD s8effTag_b(nxbins);
   TArrayD s8effTag_bErr(nxbins);
+  TArrayD s8effmu_b(nxbins);
+  TArrayD s8effmu_bErr(nxbins);
 
   
   TArrayD effTag_b(nxbins);
@@ -774,6 +816,8 @@ void S8Solver::Draw(int maxNbins) {
 		ptarrayErr[ibin-1] = 0.5 * fnHisto->GetXaxis()->GetBinWidth(ibin);
 		effTag_b[ibin-1] = feffTag_b->GetBinContent(ibin);
 		effTag_bErr[ibin-1] = feffTag_b->GetBinError(ibin);
+		effmu_b[ibin-1] = feffmu_b->GetBinContent(ibin);
+		effmu_bErr[ibin-1] = feffmu_b->GetBinError(ibin);
 		
 	}
 	// fnHisto->GetXaxis()->GetXbins()->GetArray();
@@ -815,6 +859,8 @@ void S8Solver::Draw(int maxNbins) {
 		if (ibin->first <= nxbins) {
 			s8effTag_b[ibin->first -1] = tmpmaps8["effTag_b"];
 			s8effTag_bErr[ibin->first -1] = tmpmaps8err["effTag_b"];
+			s8effmu_b[ibin->first -1] = tmpmaps8["effMu_b"];
+			s8effmu_bErr[ibin->first -1] = tmpmaps8err["effMu_b"];
 		}
 		//for( std::map<TString,double>::const_iterator i = tmpmap.begin(); i!=tmpmap.end(); ++i) {
 			//std::cout << i->first << " = " << i->second << " \\pm " << tmpmaperr[i->first] << std::endl;
@@ -824,12 +870,19 @@ void S8Solver::Draw(int maxNbins) {
 	
 	geffTag_b = new TGraphErrors(nxbins,ptarray.GetArray(),effTag_b.GetArray(),ptarrayErr.GetArray(),effTag_bErr.GetArray());
 	gS8effTag_b = new TGraphErrors(nxbins,ptarray.GetArray(),s8effTag_b.GetArray(),ptarrayErr.GetArray(),s8effTag_bErr.GetArray());
+	geffmu_b = new TGraphErrors(nxbins,ptarray.GetArray(),effmu_b.GetArray(),ptarrayErr.GetArray(),effmu_bErr.GetArray());
+	gS8effmu_b = new TGraphErrors(nxbins,ptarray.GetArray(),s8effmu_b.GetArray(),ptarrayErr.GetArray(),s8effmu_bErr.GetArray());
 
 	geffTag_b->SetTitle("True b-efficiency");
 	gS8effTag_b->SetTitle("System8 Results");
 	geffTag_b->SetName("geffTag_b");
 	gS8effTag_b->SetName("gS8effTag_b");
 	
+	geffmu_b->SetTitle("True b-efficiency");
+	gS8effmu_b->SetTitle("System8 Results");
+	geffmu_b->SetName("geffmu_b");
+	gS8effmu_b->SetName("gS8effmu_b");
+
 	geffTag_b->SetMarkerStyle(8);
 	gS8effTag_b->SetMarkerStyle(8);
 	geffTag_b->SetMarkerColor(1);
@@ -838,6 +891,18 @@ void S8Solver::Draw(int maxNbins) {
 	gS8effTag_b->SetLineColor(2); 
 	geffTag_b->SetMarkerSize(1.5); 
 	gS8effTag_b->SetMarkerSize(1.5); 
+
+
+	geffmu_b->SetMarkerStyle(8);
+	gS8effmu_b->SetMarkerStyle(8);
+	geffmu_b->SetMarkerColor(1);
+	gS8effmu_b->SetMarkerColor(2);
+	geffmu_b->SetLineColor(1); 
+	gS8effmu_b->SetLineColor(2); 
+	geffmu_b->SetMarkerSize(1.5); 
+	gS8effmu_b->SetMarkerSize(1.5); 
+
+
 
 	TString prefix = "effTag_b";	
 	cv_map[prefix+"_"+fthename] = new TCanvas(prefix+"_"+fthename,prefix+"_"+fthename,700,700); 
@@ -856,6 +921,25 @@ void S8Solver::Draw(int maxNbins) {
 	legb->AddEntry(geffTag_b,"True b-efficiency","P");
 	legb->AddEntry(gS8effTag_b,"System8 Results","P");
 	legb->Draw();
+	gPad->SetGrid();
+
+	TString prefix2 = "effmu_b";	
+	cv_map[prefix2+"_"+fthename] = new TCanvas(prefix2+"_"+fthename,prefix2+"_"+fthename,700,700); 
+
+	TMultiGraph *multi_mu_eff_b = new TMultiGraph();
+	multi_mu_eff_b->Add(geffmu_b,"p");
+	multi_mu_eff_b->Add(gS8effmu_b,"p");
+	multi_mu_eff_b->Draw("a");
+	multi_mu_eff_b->GetXaxis()->SetTitle("jet p_{T} [GeV/c]");
+	multi_mu_eff_b->GetYaxis()->SetTitle("b-jet Efficiency");
+	
+	TLegend *legbb = new TLegend(0.57,0.22,0.87,0.38,"","NDC");
+	legbb->SetMargin(0.12);
+	legbb->SetTextSize(0.027);
+	legbb->SetFillColor(10);
+	legbb->AddEntry(geffmu_b,"True b-efficiency","P");
+	legbb->AddEntry(gS8effmu_b,"System8 Results","P");
+	legbb->Draw();
 	gPad->SetGrid();
 
 	TString acvname = "correlations_"+fthename;

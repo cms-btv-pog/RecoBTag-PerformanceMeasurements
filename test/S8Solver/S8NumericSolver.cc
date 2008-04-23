@@ -93,7 +93,7 @@ for(Int_t i=0 ; i<8 ; ++i)
 QQQ= -1. ;
 fAsym[0]= 0;
 fAsym[1]= 1;
-fNpt = 5000;
+ fNpt = 10000;//5000;
 fIter = 10000;
 }
 
@@ -167,15 +167,30 @@ for(Int_t i=0;i<6;++i)
 Int_t S8NumericSolver::Solve()
 {
 Double_t shift[14]={0};
-Double_t res[2];
+Double_t res[5]={0};
 MakeSystem(shift);
 if(!FindSolution(res,SolveSystem(res))) return 0;
+ std::cout << "[S8Numeric] got solutions, now compute errors" << std::endl; 
 ComputeErrors();
 return 1;
 }
 
 Int_t S8NumericSolver::FindSolution(Double_t* res, int n)
 {
+
+	std::cout << "[S8Numeric] now print all solutions:"<< std::endl;
+	for(int j=1; j<= n; ++j) {
+		fNb = res[j-1];
+		std::cout << "solution n= " << j << std::endl;
+		for(int i=0; i<8;++i) {
+			std::cout << " result i=" << i << " " <<  E(i%2,i/2) << std::endl;
+			//if (j==1) {fMapResult[i] = E(i%2,i/2);}
+		}
+		std::cout << "\n";
+	}
+
+
+	
 if(n<=0)
   {
 //  printf("\nNo physics solution.\n");
@@ -373,6 +388,58 @@ if(opt=="All" || opt=="" || opt == "Stat") err+= this->GetValue(fErrorinf_Stat, 
 if(opt=="All" || opt=="" || opt == "Syst") err+= this->GetValue(fErrorinf_Stat, label);
 return sqrt(err);
 }
+
+Double_t S8NumericSolver::GetResultVec(Int_t n)
+{
+// return the system 8 results :
+// n = 0 -> na
+// n = 1 -> nb
+// n = 2 -> ea1
+// n = 3 -> eb1
+// n = 4 -> ea2
+// n = 5 -> eb2
+// n = 6 -> ea3
+// n = 7 -> eb3
+
+  //std::cout << "[S8NumericSolver] GetResultVec " << n << " " << fMapResult[n] << std::endl; 
+if(n>=0 && n<8) return fMapResult[n];
+return 0;
+}
+
+Double_t S8NumericSolver::GetErrorSupVec(Int_t n)
+{
+// return the system 8 results :
+// n = 0 -> na
+// n = 1 -> nb
+// n = 2 -> ea1
+// n = 3 -> eb1
+// n = 4 -> ea2
+// n = 5 -> eb2
+// n = 6 -> ea3
+// n = 7 -> eb3
+
+  //std::cout << "[S8NumericSolver] GetErrorSupVec " << n << " " << fMapErrorSup_Stat[n] << std::endl; 
+if(n>=0 && n<8) return fMapErrorSup_Stat[n];
+return 0;
+}
+Double_t S8NumericSolver::GetErrorInfVec(Int_t n)
+{
+// return the system 8 results :
+// n = 0 -> na
+// n = 1 -> nb
+// n = 2 -> ea1
+// n = 3 -> eb1
+// n = 4 -> ea2
+// n = 5 -> eb2
+// n = 6 -> ea3
+// n = 7 -> eb3
+
+  // std::cout << "[S8NumericSolver] GetErrorInfVec " << n << " " << fMapErrorInf_Stat[n] << std::endl; 
+if(n>=0 && n<8) return fMapErrorInf_Stat[n];
+return 0;
+}
+
+
 
 void S8NumericSolver::SetInitialOrder(Int_t n,Int_t a)
 {
@@ -572,11 +639,13 @@ for(Int_t i=0;i<=fNpt;++i)
     Double_t aa = (f-fold)/(x-xold);
     Double_t bb = f-aa*x;
     res[n] = -bb/aa;
+	// print results
+    std::cout<< "[S8Numeric] n = " << n << " res =" << res[n] << " function f = " << f << std::endl;
     n++;
     }
   fold = f;
   xold = x;
-  if(n==2) break;
+  if(n==5) break;
   }
 return n;
 }

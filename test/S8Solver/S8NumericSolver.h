@@ -21,6 +21,7 @@
 #include <iostream>
 #include <math.h>
 #include <vector>
+#include <map>
 
 class S8NumericSolver : public TNamed
 {
@@ -40,6 +41,10 @@ class S8NumericSolver : public TNamed
    Int_t    kError      ;
 
    Double_t fResult[8];
+   std::map< int, double > fMapResult;
+   std::map< int, double > fMapErrorInf_Stat;
+   std::map< int, double > fMapErrorSup_Stat;
+
    Double_t fNb;
    Double_t fErrorinf_Stat[8] ;
    Double_t fErrorsup_Stat[8] ;
@@ -109,10 +114,14 @@ class S8NumericSolver : public TNamed
    void SetInitialOrder(std::string s1, std::string s2, std::string s3);
 
    Int_t Solve() ;
+   
+   Double_t GetResultVec(Int_t n); 
 
    Double_t GetResult  (Int_t n) ;
    Double_t GetErrorInf(Int_t n, std::string opt="") ;
    Double_t GetErrorSup(Int_t n, std::string opt="") ;
+   Double_t GetErrorInfVec(Int_t n);
+   Double_t GetErrorSupVec(Int_t n);
    Double_t GetResult  (std::string label) ;
    Double_t GetErrorInf(std::string label, std::string opt="") ;
    Double_t GetErrorSup(std::string label, std::string opt="") ;
