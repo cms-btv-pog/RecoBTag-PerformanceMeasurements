@@ -39,7 +39,7 @@ ClassImp(PtrelSolver)
  *  
  *
  **************************************************************************/
-  void PtrelSolver::measure(const char *sampletag, const char *inputfilename, const char *dir, const char *outfilename, const char *tag, const char *thehistname, int pdfbase, bool sys,
+  void PtrelSolver::measure(const char *sampletag, const char *inputfilename, const char *dir, const char *outfilename, const char *tag, const char *thehistname, bool sys,
 			    const char *mcfilename, const char *mcdir) {
 
   TH1F *hist =0, *hist_tag=0,  *eff_sys=0;
@@ -68,6 +68,11 @@ ClassImp(PtrelSolver)
   inputfile = new TFile(inputfilename, "READ");
   outfile   = new TFile(outfilename,   "UPDATE");
   char data_name[100];
+
+
+  int pdfbase;
+  if (!strcmp(thehistname, "pT"))  pdfbase = PT_BASE;
+  if (!strcmp(thehistname, "eta")) pdfbase = ETA_BASE;
 
 
   c1->cd();
@@ -250,8 +255,8 @@ void PtrelSolver::allEff(const char *inputfilename, const char *dir, const char 
   if (!  this->initPdfsByTag(sampletag, "TCL", pdfdir, versiontag, false) ) return;
 
 
-  this->measure(sampletag, inputfilename, dir, outfilename, "TCL", "pT",  PT_BASE, sys, inputfilename, dir);
-  this->measure(sampletag, inputfilename, dir, outfilename, "TCL", "eta", ETA_BASE,sys, inputfilename, dir);
+  this->measure(sampletag, inputfilename, dir, outfilename, "TCL", "pT",  sys, inputfilename, dir);
+  this->measure(sampletag, inputfilename, dir, outfilename, "TCL", "eta", sys, inputfilename, dir);
 }
 
 void PtrelSolver::makeAllPerFile(const char *datafile, const char *outputdir, const char *versiontag) {
