@@ -42,7 +42,7 @@ ClassImp(PtrelSolver)
   void PtrelSolver::measure(const char *sampletag, const char *inputfilename, const char *dir, const char *outfilename, const char *tag, const char *thehistname, bool sys,
 			    const char *mcfilename, const char *mcdir) {
 
-  TH1F *hist =0, *hist_tag=0,  *eff_sys=0;
+  TH1F *hist =0, *hist_tag=0,  *eff_sys=0, *chi2 =0;
   TH2F *hist2=0, *hist2_tag=0;
   TH1F *eff =0;
   TF1  *thePdf= 0;
@@ -57,6 +57,7 @@ ClassImp(PtrelSolver)
   TString name_base(sampletag); name_base+="_"; name_base+=thehistname;
   TString myhist(name_base);
   const char *histname = myhist.Data();
+  TString chi2name(name_base); chi2name += "_chi2";
 
   name_base += tag;
 
@@ -108,7 +109,8 @@ ClassImp(PtrelSolver)
   TCanvas *c2 = new TCanvas("c2", "", 900, 900);
   c2->Divide(total_num_plots, total_num_plots);
 
-
+  chi2 = new TH1F(chi2name.Data(), "", 2 * nbins +1, 0, 2*nbins +1);
+  formatHist1(chi2, "Bin Index", "#chi^{2}");
   //  for (int ii = 0; ii <= 5; ii++) {
   for (int ii = 1; ii <= nbins; ii++) {
 
@@ -139,6 +141,9 @@ ClassImp(PtrelSolver)
       hist_tag = (TH1F *)hist2_tag->ProjectionY(data_name, 1, nbins);
 
     effCal(hist, hist_tag, thePdf, thePdf_tag,  &result);
+
+    chi2->SetBinContent(2*ii+1, result[2]);
+    chi2->SetBinContent(2*ii+2, result[3]);
 
 
     c2->cd(2*ii+1); hist->Draw("HIST");     thePdf->Draw("SAME");
@@ -203,6 +208,7 @@ ClassImp(PtrelSolver)
   }
 
   outfile->cd();
+  chi2->Write();
   eff->Write();
   eff_sys->Write();
   if (eff_mc) {
@@ -217,10 +223,10 @@ ClassImp(PtrelSolver)
     eff->SetMarkerStyle(20);
     eff->SetMinimum(0);
     eff->SetMaximum(1.35);
-    if (pdfbase == PT_BASE) formatHist1(eff, "p_{T} (GeV)", "Efficiency");
+    if (pdfbase == PT_BASE)  formatHist1(eff, "p_{T} (GeV)",    "Efficiency");
     if (pdfbase == ETA_BASE) formatHist1(eff, "Pseudorapidity", "Efficiency");
-    eff_sys->SetLineColor(kBlack);
-    eff_sys->SetMarkerColor(kBlack);
+    eff_mc->SetLineColor(kBlack);
+    eff_mc->SetMarkerColor(kBlack);
 
     const char *tmp = saveAsEPS(c1, eff, "PE1");
 
@@ -262,6 +268,7 @@ void PtrelSolver::allEff(const char *inputfilename, const char *dir, const char 
 void PtrelSolver::makeAllPerFile(const char *datafile, const char *outputdir, const char *versiontag) {
   
   this->makeAllTemplatesPerTag(datafile, "/Histograms/muon_in_jet/", "n", "", "./templates/", versiontag);
+
 
   this->makeAllTemplatesPerTag(datafile, "/Histograms/muon_in_jet/", "n", "TCL", "./templates/", versiontag);
   this->makeAllTemplatesPerTag(datafile, "/Histograms/muon_in_jet/", "n", "TCM", "./templates/", versiontag);

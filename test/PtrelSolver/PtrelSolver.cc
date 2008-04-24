@@ -239,6 +239,10 @@ void PtrelSolver::effCal(TH1F *hist,
   (*eff).push_back( 1.0*Nb_tag[0]/Nb[0] );
   (*eff).push_back( effErr(Nb[0], Nb_err[0], Nb_tag[0], Nb_tag_err[0]));
 
+  // normalized chi2
+  (*eff).push_back( Nb[2] );
+  (*eff).push_back( Nb_tag[2] );
+
   return;
 }
 
@@ -1036,12 +1040,12 @@ void PtrelSolver::makeTemplates(const char *flavor, const char *sampletag, bool 
        << std::endl;
 
   char  hist_name[100];
-  TH1F *hist=0;
+  TH1F *hist=0, *chi2=0;
   TH2F *hist2=0;
   TF1  *thePdf= 0;
   int   pdf_index;
   int   nbins;
-  TString histname;
+  TString histname, chi2name;
 
 
 
@@ -1074,6 +1078,9 @@ void PtrelSolver::makeTemplates(const char *flavor, const char *sampletag, bool 
   nbins = hist2->GetNbinsX();
   x_min = hist2->GetYaxis()->GetXmin();
   x_max = hist2->GetYaxis()->GetXmax();
+  chi2name += basename; chi2name += "_chi2";
+  chi2 = new TH1F(chi2name.Data(), "", nbins+1, 0, nbins+1);
+  formatHist1(chi2, "#chi^{2}", "Bin Index");
 
 
   int total_num =(int)( sqrt(nbins *1.));
@@ -1119,6 +1126,7 @@ void PtrelSolver::makeTemplates(const char *flavor, const char *sampletag, bool 
 	      << thePdf->GetChisquare() << "/"
 	      << thePdf->GetNDF()
 	      << std::endl;
+    chi2->SetBinContent(ii+1,  thePdf->GetChisquare()*1.0/thePdf->GetNDF());
     rootfile->cd();
     hist->Write(); 
     
@@ -1179,6 +1187,8 @@ void PtrelSolver::makeTemplates(const char *flavor, const char *sampletag, bool 
 
 
   delete c2;
+  rootfile->cd();
+  chi2->Write();
   rootfile->Write();
   rootfile->Close();
   file.close();
@@ -1570,6 +1580,9 @@ void PtrelSolver::Fit(TH1F *data,
     (*num)[ii] = (*num)[ii]*scale;
     (*num_err)[ii] = (*num_err)[ii]*scale;
   }
+
+  (*num).push_back( pdf->GetChisquare()*1.0/pdf->GetNDF() );
+
 
   return;
 }
