@@ -54,6 +54,10 @@ class S8NumericSolver : public TNamed
    Int_t fNpt;
    Int_t fIter;
 
+   double fAveRes;
+   bool fverbose;
+   bool fAveResSetup;
+   
    void ComputeErrors() ;
    void MakeSystem(Double_t *shift);
    int SolveSystem(Double_t *res);
@@ -114,6 +118,8 @@ class S8NumericSolver : public TNamed
    void SetInitialOrder(std::string s1, std::string s2, std::string s3);
 
    Int_t Solve() ;
+
+   void SetAverageRes( double n ) { fAveRes = n; fAveResSetup = true; }
    
    Double_t GetResultVec(Int_t n); 
 

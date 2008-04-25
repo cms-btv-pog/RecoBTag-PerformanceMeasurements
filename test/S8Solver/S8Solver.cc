@@ -250,8 +250,41 @@ void S8Solver::LoadHistos() {
 			fh_kcl = (TH1D*)tmpfh_kcl->Rebin(ncorrptarray-1,"fh_kcl",corrptbins);
 			//fh_kcl->Divide( h1["eff_pTrel_TaggedJet_cl"], h1["eff_pTrel_cl"] );
 			//fh_kcl->Divide(  h1["eff_TaggedJet_cl"] );
+
+			fh_delta = (TH1D*) tmpfh_delta->Rebin(ncorrptarray-1,"fh_delta",corrptbins);
+			fh_gamma = (TH1D*) tmpfh_gamma->Rebin(ncorrptarray-1,"fh_gamma",corrptbins);
 			
 			std::cout << "rebinning done" << std::endl;
+
+			/*
+			TH1D* tmpfnHisto = (TH1D*) fnHisto->Rebin(ncorrptarray-1,"tmpfnHisto",corrptbins);
+			TH1D* tmpfpHisto = (TH1D*) fpHisto->Rebin(ncorrptarray-1,"tmpfpHisto",corrptbins);
+			TH1D* tmpfnHistoMu = (TH1D*) fnHistoMu->Rebin(ncorrptarray-1,"tmpfnHistoMu",corrptbins);
+			TH1D* tmpfpHistoMu = (TH1D*) fpHistoMu->Rebin(ncorrptarray-1,"tmpfpHistoMu",corrptbins);
+			TH1D* tmpfnHistoSvx = (TH1D*) fnHistoSvx->Rebin(ncorrptarray-1,"tmpfnHistoSvx",corrptbins);
+			TH1D* tmpfpHistoSvx = (TH1D*) fpHistoSvx->Rebin(ncorrptarray-1,"tmpfpHistoSvx",corrptbins);
+			TH1D* tmpfnHistoAll = (TH1D*) fnHistoAll->Rebin(ncorrptarray-1,"tmpfnHistoAll",corrptbins);
+			TH1D* tmpfpHistoAll = (TH1D*) fpHistoAll->Rebin(ncorrptarray-1,"tmpfpHistoAll",corrptbins);
+			
+			delete fnHisto;
+			delete fpHisto;
+			delete fnHistoMu;
+			delete fpHistoMu;
+			delete fnHistoSvx;
+			delete fpHistoSvx;
+			delete fnHistoAll;
+			delete fpHistoAll;
+			
+			
+			TH1D* fnHisto = (TH1D*) tmpfnHisto->Clone("fnHisto");
+			TH1D* fpHisto = (TH1D*) tmpfpHisto->Clone("fpHisto");
+			TH1D* fnHistoMu = (TH1D*) tmpfnHistoMu->Clone("fnHistoMu");
+			TH1D* fpHistoMu = (TH1D*) tmpfpHistoMu->Clone("fpHistoMu");
+			TH1D* fnHistoSvx = (TH1D*) tmpfnHistoSvx->Clone("fnHistoSvx");
+			TH1D* fpHistoSvx = (TH1D*) tmpfpHistoSvx->Clone("fpHistoSvx");
+			TH1D* fnHistoAll = (TH1D*) tmpfnHistoAll->Clone("fnHistoAll");
+			TH1D* fpHistoAll = (TH1D*) tmpfpHistoAll->Clone("fpHistoAll");
+			*/
 		} else {
 
 			fh_alpha->Divide( h1["eff_TaggedBothJets_cl"], h1["eff_TaggedJet_cl"]);
@@ -277,6 +310,7 @@ void S8Solver::LoadHistos() {
 		fh_gamma->Fit("pol0","0");
 
 	}
+	// should I remove the following loop?
 	else {
 
 		// true efficiency
@@ -349,25 +383,24 @@ void S8Solver::GetInput() {
 	this->LoadHistos();
 	
 // 	// integrated input
-//  	TotalInput["n"] = fnHisto->Integral();
-//  	TotalInput["nMu"] = fnHistoMu->Integral();
-//  	TotalInput["p"] = fpHisto->Integral();
-//  	TotalInput["pMu"] = fpHistoMu->Integral();
-//  	TotalInput["nTag"] = fnHistoSvx->Integral();
-//  	TotalInput["nMuTag"] = fnHistoAll->Integral();
-//  	TotalInput["pTag"] = fpHistoSvx->Integral();
-//  	TotalInput["pMuTag"] = fpHistoAll->Integral();
+  	TotalInput["n"] = fnHisto->Integral();
+  	TotalInput["nMu"] = fnHistoMu->Integral();
+  	TotalInput["p"] = fpHisto->Integral();
+  	TotalInput["pMu"] = fpHistoMu->Integral();
+  	TotalInput["nTag"] = fnHistoSvx->Integral();
+  	TotalInput["nMuTag"] = fnHistoAll->Integral();
+  	TotalInput["pTag"] = fpHistoSvx->Integral();
+  	TotalInput["pMuTag"] = fpHistoAll->Integral();
 
-	TotalInput["n"] = halljets_b->Integral() + halljets_cl->Integral();
-	TotalInput["nMu"] = halljets_b_ptrel->Integral() + halljets_cl_ptrel->Integral();
-	TotalInput["p"] = halloppjets_b->Integral() + halloppjets_cl->Integral() ;
-	TotalInput["pMu"] = halloppjets_b_ptrel->Integral() + halloppjets_cl_ptrel->Integral();
-	TotalInput["nTag"] = htagjets_b->Integral() + htagjets_cl->Integral();
-	TotalInput["nMuTag"] =  htagjets_b_ptrel->Integral() + htagjets_cl_ptrel->Integral();
-	TotalInput["pTag"] = htagoppjets_b->Integral() + htagoppjets_cl->Integral();
-	TotalInput["pMuTag"] =  htagoppjets_b_ptrel->Integral() + htagoppjets_cl_ptrel->Integral();
-
-
+	// cheat and use truth values
+//	TotalInput["n"] = halljets_b->Integral() + halljets_cl->Integral();
+//	TotalInput["nMu"] = halljets_b_ptrel->Integral() + halljets_cl_ptrel->Integral();
+//	TotalInput["p"] = halloppjets_b->Integral() + halloppjets_cl->Integral() ;
+//	TotalInput["pMu"] = halloppjets_b_ptrel->Integral() + halloppjets_cl_ptrel->Integral();
+//	TotalInput["nTag"] = htagjets_b->Integral() + htagjets_cl->Integral();
+//	TotalInput["nMuTag"] =  htagjets_b_ptrel->Integral() + htagjets_cl_ptrel->Integral();
+//	TotalInput["pTag"] = htagoppjets_b->Integral() + htagoppjets_cl->Integral();
+//	TotalInput["pMuTag"] =  htagoppjets_b_ptrel->Integral() + htagoppjets_cl_ptrel->Integral();
 
 
 
@@ -573,17 +606,21 @@ void S8Solver::Solve() {
 		//	    TotalInput["kappa_cl"],1.,TotalInput["alpha"]);
 		//sol.SetCorr(TotalInput["kappa_b"],TotalInput["beta"],1.,
 		//	    TotalInput["kappa_cl"],TotalInput["alpha"],1.);
+		//sol.SetCorr(1.01,1.01,1.01,1.01,1.01,1.01);
 		sol.SetCorr(TotalInput["kappa_b"],TotalInput["beta"],TotalInput["delta"],
-		    TotalInput["kappa_cl"],TotalInput["alpha"],TotalInput["gamma"]);
+					TotalInput["kappa_cl"],TotalInput["alpha"],TotalInput["gamma"]);
 
 		sol.SetCorrError(0.,0.,0.,0.,0.,0.);
 		sol.SetError(2);
 		sol.SetNbErrorIteration(200);
 		sol.SetInitialOrder(1,1);
 		bool converge = true;
-		
+
+		sol.Solve();
+		/*
 		if(!sol.Solve()) {
 			//converge = false;
+			
 			sol.SetInitialOrder(0,-1);   // OK en principe...
 			if(!sol.Solve()) {
 				//converge = false;
@@ -597,8 +634,30 @@ void S8Solver::Solve() {
 				}
 				
 			}
+			
 		}
+			*/
 		if (converge) {
+			fTotalSolution["n_b"]       = sol.GetResultVec(0)*TotalInput["n"];
+			fTotalSolution["n_cl"]      = sol.GetResultVec(1)*TotalInput["n"];
+			fTotalSolution["effMu_b"]   = sol.GetResultVec(2);
+			fTotalSolution["effMu_cl"]  = sol.GetResultVec(3);
+			fTotalSolution["effTag_b"]  = sol.GetResultVec(4);
+			fTotalSolution["effTag_cl"] = sol.GetResultVec(5);
+			fTotalSolution["p_b"]       = sol.GetResultVec(6)*fTotalSolution["n_b"];
+			fTotalSolution["p_cl"]      = sol.GetResultVec(7)*fTotalSolution["n_cl"];
+		
+			// FIX errors
+			fTotalSolutionErr["n_b"]       = (sol.GetErrorSupVec(0)+sol.GetErrorInfVec(0))/2.;
+			fTotalSolutionErr["n_cl"]      = (sol.GetErrorSupVec(1)+sol.GetErrorInfVec(1))/2.;
+			fTotalSolutionErr["effMu_b"]   = (sol.GetErrorSupVec(2)+sol.GetErrorInfVec(2))/2.;
+			fTotalSolutionErr["effMu_cl"]  = (sol.GetErrorSupVec(3)+sol.GetErrorInfVec(3))/2.;
+			fTotalSolutionErr["effTag_b"]  = (sol.GetErrorSupVec(4)+sol.GetErrorInfVec(4))/2.;
+			fTotalSolutionErr["effTag_cl"] = (sol.GetErrorSupVec(5)+sol.GetErrorInfVec(5))/2.;
+			fTotalSolutionErr["p_b"]       = (sol.GetErrorSupVec(6)+sol.GetErrorInfVec(6))/2.;
+			fTotalSolutionErr["p_cl"]      = (sol.GetErrorSupVec(7)+sol.GetErrorInfVec(7))/2.;
+
+			/*
 			fTotalSolution["n_b"]       = sol.GetResult("na")*TotalInput["n"];
 			fTotalSolution["n_cl"]      = sol.GetResult("nb")*TotalInput["n"];
 			fTotalSolution["effMu_b"]   = sol.GetResult("ea1");
@@ -617,6 +676,7 @@ void S8Solver::Solve() {
 			fTotalSolutionErr["effTag_cl"] = (sol.GetErrorSup("eb2")+sol.GetErrorInf("eb2"))/2.;
 			fTotalSolutionErr["p_b"]       = (sol.GetErrorSup("ea3")+sol.GetErrorInf("ea3"))/2.;
 			fTotalSolutionErr["p_cl"]      =  (sol.GetErrorSup("eb3")+sol.GetErrorInf("eb3"))/2.;
+			*/
 		  
 		} else {
 			for( std::map<TString,double>::const_iterator ii=fTotalSolution.begin(); ii!=fTotalSolution.end(); ++ii) {
@@ -654,6 +714,11 @@ void S8Solver::Solve() {
 			solu.SetError(2);
 			solu.SetNbErrorIteration(200);
 			solu.SetInitialOrder(1,1);
+
+			solu.SetAverageRes(sol.GetResultVec(1));
+			
+			solu.Solve();
+			/*
 			if(!solu.Solve()) {
 				//converge = false;
 				solu.SetInitialOrder(0,0);   // OK en principe...
@@ -669,12 +734,31 @@ void S8Solver::Solve() {
 					}
 				}
 			}
-
+			*/
 			std::map<TString,double> tmpsolu;
 			std::map<TString,double> tmpsoluerr;
 				
 			if (converge) {
+				tmpsolu["n_b"]       = solu.GetResultVec(0)*tmpinput["n"];
+				tmpsolu["n_cl"]      = solu.GetResultVec(1)*tmpinput["n"];
+				tmpsolu["effMu_b"]   = solu.GetResultVec(2);
+				tmpsolu["effMu_cl"]  = solu.GetResultVec(3);
+				tmpsolu["effTag_b"]  = solu.GetResultVec(4);
+				tmpsolu["effTag_cl"] = solu.GetResultVec(5);
+				tmpsolu["p_b"]       = solu.GetResultVec(6)*tmpsolu["n_b"];
+				tmpsolu["p_cl"]      = solu.GetResultVec(7)*tmpsolu["n_cl"];
 				
+				// FIX errors
+				tmpsoluerr["n_b"]       = (solu.GetErrorSupVec(0)+solu.GetErrorInfVec(0))/2.;
+				tmpsoluerr["n_cl"]      = (solu.GetErrorSupVec(1)+solu.GetErrorInfVec(1))/2.;
+				tmpsoluerr["effMu_b"]   = (solu.GetErrorSupVec(2)+solu.GetErrorInfVec(2))/2.;
+				tmpsoluerr["effMu_cl"]  = (solu.GetErrorSupVec(3)+solu.GetErrorInfVec(3))/2.;
+				tmpsoluerr["effTag_b"]  = (solu.GetErrorSupVec(4)+solu.GetErrorInfVec(4))/2.;
+				tmpsoluerr["effTag_cl"] = (solu.GetErrorSupVec(5)+solu.GetErrorInfVec(5))/2.;
+				tmpsoluerr["p_b"]       = (solu.GetErrorSupVec(6)+solu.GetErrorInfVec(6))/2.;
+				tmpsoluerr["p_cl"]      = (solu.GetErrorSupVec(7)+solu.GetErrorInfVec(7))/2.;
+
+				/*
 				tmpsolu["n_b"]       = solu.GetResult("na")*tmpinput["n"];
 				tmpsolu["n_cl"]      = solu.GetResult("nb")*tmpinput["n"];
 				tmpsolu["effMu_b"]   = solu.GetResult("ea1");
@@ -692,6 +776,7 @@ void S8Solver::Solve() {
 				tmpsoluerr["effTag_cl"] = (solu.GetErrorSup("eb2")+solu.GetErrorInf("eb2"))/2.;
 				tmpsoluerr["p_b"]       = (solu.GetErrorSup("ea3")+solu.GetErrorInf("ea3"))/2.;
 				tmpsoluerr["p_cl"]      = (solu.GetErrorSup("eb3")+solu.GetErrorInf("eb3"))/2.;
+				*/
 							
 			} else {
 				for( std::map<TString,double>::const_iterator ii=fTotalSolution.begin(); ii!=fTotalSolution.end(); ++ii) {
@@ -701,6 +786,8 @@ void S8Solver::Solve() {
 			}
 			fBinnedSolution[ibin->first] = tmpsolu;
 			fBinnedSolutionErr[ibin->first] = tmpsoluerr;
+
+			std::cout << " solver done with bin " << ibin->first << std::endl;
 
 		}
 	}

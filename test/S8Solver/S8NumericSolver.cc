@@ -93,8 +93,12 @@ for(Int_t i=0 ; i<8 ; ++i)
 QQQ= -1. ;
 fAsym[0]= 0;
 fAsym[1]= 1;
- fNpt = 10000;//5000;
+ fNpt = 20000;//5000;
 fIter = 10000;
+ fAveRes = 0.;
+ fAveResSetup = false;
+ fverbose = false;
+ 
 }
 
 void S8NumericSolver::SetInput(Double_t n, Double_t n1, Double_t n2 , Double_t n3,
@@ -169,27 +173,77 @@ Int_t S8NumericSolver::Solve()
 Double_t shift[14]={0};
 Double_t res[5]={0};
 MakeSystem(shift);
-if(!FindSolution(res,SolveSystem(res))) return 0;
- std::cout << "[S8Numeric] got solutions, now compute errors" << std::endl; 
-ComputeErrors();
+
+ fverbose = true; 
+if(!FindSolution(res,SolveSystem(res))) {
+	std::cout << "[S8Numeric SOLUTIONS NOT FOUND, leaving ...." << std::endl;
+	return 0;
+}
+ std::cout << "[S8Numeric] got solutions, now compute errors" << std::endl;
+ fverbose = false;
+ ComputeErrors();
 return 1;
 }
 
 Int_t S8NumericSolver::FindSolution(Double_t* res, int n)
 {
 
-	std::cout << "[S8Numeric] now print all solutions:"<< std::endl;
+	int npositiveSols = 0;
+	int nphysicalSols = 0;
+	int thesols = -1;
+	int thesols2 = -1;
+	double deltares = 9999999;
+	if (fverbose) std::cout << "[S8Numeric] now print all solutions:"<< std::endl;
 	for(int j=1; j<= n; ++j) {
 		fNb = res[j-1];
-		std::cout << "solution n= " << j << std::endl;
+		if (fverbose) std::cout << "solution n= " << j << std::endl;
+		double tmpsol[8];
+		double totprod=1;
 		for(int i=0; i<8;++i) {
-			std::cout << " result i=" << i << " " <<  E(i%2,i/2) << std::endl;
-			//if (j==1) {fMapResult[i] = E(i%2,i/2);}
+			tmpsol[i] = E(i%2,i/2);
+			if (fverbose) std::cout << " result i=" << i << " " <<  tmpsol[i] << std::endl;
+			totprod=totprod*tmpsol[i];
 		}
-		std::cout << "\n";
+		if (totprod>=0) {
+			npositiveSols++;
+			int tmpcounter = 0;
+			for(int ii=2; ii<=5;++ii) {
+				
+				if (tmpsol[ii]>=0 && tmpsol[ii]<=1.) tmpcounter++;
+			}
+			if (tmpcounter==4) nphysicalSols++;
+			double tmpdeltares = fabs(fAveRes - res[j-1]);
+			if ( nphysicalSols>0 ) {
+				if (fAveResSetup && (deltares>tmpdeltares) ) {thesols = j-1; deltares = tmpdeltares;}
+				else if (!fAveResSetup && tmpcounter==4 ) { 
+				thesols = j-1;}
+				else if (!fAveResSetup && nphysicalSols>1 && tmpcounter==4 ) {
+					if ( tmpsol[4]>0 && tmpsol[4]>tmpsol[5] && tmpsol[2]>tmpsol[3] )				thesols = j-1;
+				}
+			}
+		}
+		if ( tmpsol[4]>0 && tmpsol[4]>tmpsol[5] && tmpsol[2]>tmpsol[3] ) thesols2= j-1;
+		
+		if (fverbose) {
+			std::cout << "\n";
+			std::cout << "# physical solutions = " << nphysicalSols << std::endl;
+		}
 	}
-
-
+		
+	if (nphysicalSols==0) {
+		if ( thesols2 != -1 ) {
+			fNb = res[thesols2];
+			for(int i=0; i<8;++i) fMapResult[i] =  fResult[i] = E(i%2,i/2);
+		}
+		else return 0;
+	}
+	else {
+		std::cout << "the sols = " << thesols << std::endl;
+		fNb = res[thesols];
+		for(int i=0; i<8;++i) fMapResult[i] =  fResult[i] = E(i%2,i/2);
+		return 1;
+	}
+/*
 	
 if(n<=0)
   {
@@ -223,8 +277,10 @@ else if(n>2)
   return 0;
   }
 
-for(int i=0; i<8;++i) fResult[i] = E(i%2,i/2);
-return 1;
+*/
+	
+//for(int i=0; i<8;++i) fResult[i] = E(i%2,i/2);
+//return 1;
 }
 
 
@@ -234,7 +290,7 @@ printf("Start computing errors -> mode : %d\n",kError);
 if(kError==0) return;
 
 Double_t central[8]={0};
-Double_t res[2];
+Double_t res[5];
 for(int i=0;i<8;++i)
   {
   central[i] = fResult[i];
@@ -277,6 +333,8 @@ if(kError==1 || kError==2) // Stat error
     {
     fErrorinf_Stat[i]/=Ninf;
     fErrorsup_Stat[i]/=Nsup;
+	fMapErrorInf_Stat[i]=fErrorinf_Stat[i];
+    fMapErrorSup_Stat[i]=fErrorsup_Stat[i];  
     }
   }
 if(kError==1 || kError==3) // Syst error
@@ -299,9 +357,12 @@ if(kError==1 || kError==3) // Syst error
     {
     fErrorinf_Syst[i]/=Ninf;
     fErrorsup_Syst[i]/=Nsup;
+	fMapErrorInf_Stat[i]=fErrorinf_Stat[i];
+    fMapErrorSup_Stat[i]=fErrorsup_Stat[i];  
     }
   }
-for(int i=0;i<8;++i) fResult[i] = central[i];
+for(int i=0;i<8;++i) fMapResult[i] = fResult[i] = central[i];
+ 
 }
 
 void S8NumericSolver::SetError( Int_t b )
