@@ -256,6 +256,7 @@ void S8Solver::LoadHistos() {
 			
 			std::cout << "rebinning done" << std::endl;
 
+			// regin input data?
 			/*
 			TH1D* tmpfnHisto = (TH1D*) fnHisto->Rebin(ncorrptarray-1,"tmpfnHisto",corrptbins);
 			TH1D* tmpfpHisto = (TH1D*) fpHisto->Rebin(ncorrptarray-1,"tmpfpHisto",corrptbins);
@@ -276,15 +277,16 @@ void S8Solver::LoadHistos() {
 			delete fpHistoAll;
 			
 			
-			TH1D* fnHisto = (TH1D*) tmpfnHisto->Clone("fnHisto");
-			TH1D* fpHisto = (TH1D*) tmpfpHisto->Clone("fpHisto");
-			TH1D* fnHistoMu = (TH1D*) tmpfnHistoMu->Clone("fnHistoMu");
-			TH1D* fpHistoMu = (TH1D*) tmpfpHistoMu->Clone("fpHistoMu");
-			TH1D* fnHistoSvx = (TH1D*) tmpfnHistoSvx->Clone("fnHistoSvx");
-			TH1D* fpHistoSvx = (TH1D*) tmpfpHistoSvx->Clone("fpHistoSvx");
-			TH1D* fnHistoAll = (TH1D*) tmpfnHistoAll->Clone("fnHistoAll");
-			TH1D* fpHistoAll = (TH1D*) tmpfpHistoAll->Clone("fpHistoAll");
+			fnHisto = (TH1D*) tmpfnHisto->Clone("fnHisto");
+			fpHisto = (TH1D*) tmpfpHisto->Clone("fpHisto");
+			fnHistoMu = (TH1D*) tmpfnHistoMu->Clone("fnHistoMu");
+			fpHistoMu = (TH1D*) tmpfpHistoMu->Clone("fpHistoMu");
+			fnHistoSvx = (TH1D*) tmpfnHistoSvx->Clone("fnHistoSvx");
+			fpHistoSvx = (TH1D*) tmpfpHistoSvx->Clone("fpHistoSvx");
+			fnHistoAll = (TH1D*) tmpfnHistoAll->Clone("fnHistoAll");
+			fpHistoAll = (TH1D*) tmpfpHistoAll->Clone("fpHistoAll");
 			*/
+						
 		} else {
 
 			fh_alpha->Divide( h1["eff_TaggedBothJets_cl"], h1["eff_TaggedJet_cl"]);

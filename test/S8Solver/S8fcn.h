@@ -13,11 +13,13 @@ class S8fcn : public FCNBase {
   void SetData(std::vector < double> data){    
     fdata = data;
   };
-  void SetCorr(double kb, double beta, double kcl, double alpha) {
+  void SetCorr(double kb, double beta, double kcl, double alpha, double delta, double gamma) {
     fkb = kb;
     fbeta = beta;
     fkcl = kcl;
     falpha = alpha;
+	fdelta = delta;
+	fgamma = gamma;
   }
   
   virtual double operator() (const std::vector<double>&) const;
@@ -30,6 +32,8 @@ class S8fcn : public FCNBase {
   double fbeta;
   double fkcl;
   double falpha;
+  double fdelta;
+  double fgamma;
 };
 
 #endif
