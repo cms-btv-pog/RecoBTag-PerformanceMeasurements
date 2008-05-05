@@ -11,6 +11,6 @@
  <bin file="TtSemilepJetComb_LRobs.cpp"> </bin>
  <bin file="TtSemilepJetComb_LR.cpp"> </bin>
  <bin file="TtBTagAnalysis.cpp"> </bin>
- <bin file="TtSemilepBTagAnalysis.cpp"> </bin>
+# <bin file="TtSemilepBTagAnalysis.cpp"> </bin>
 # <bin file="RootFileTester.cpp"> </bin>
 </environment>
