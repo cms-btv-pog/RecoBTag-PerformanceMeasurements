@@ -44,7 +44,7 @@ class TtSemilepSolutionFilter : public edm::EDFilter {
     bool debug;
 
     std::string rootFileName;
-    double jetPtCut, leptonPtCut, leptonTriggerPtCut, weight, jetEtCut;
+    double jetPtCut, leptonPtCut, leptonTriggerPtCut, weight, jetEtCut, leptonCaloIsoCut, leptonTrackIsoCut;
     int signal, background, goodSolution, allSolution, B, nonB, tau;
     int bestSol,exception;
     edm::InputTag evtsols;

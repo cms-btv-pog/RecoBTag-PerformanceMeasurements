@@ -54,9 +54,10 @@ class TtSemilepLRObsPlots : public edm::EDAnalyzer {
     bool debug;
 
     std::string rootFileName;
-    std::string leptonFlavour;
+    std::string leptonFlavour; 
+    bool csa;
     double weight;
-    int signal, background, goodSolution, allSolution, B, nonB, tau;
+    float signal, background, allSolution, B, nonB, tau, goodSolution, goodSolution1, goodSolution2;
     int bestSol;
     std::string bTagCutLabel;
     double bCut;

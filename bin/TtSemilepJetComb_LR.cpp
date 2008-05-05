@@ -28,14 +28,14 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //input files
-const TString dir = "/msa1/jmmaes/CMSSW_1_6_9_NOPAT/src/TopQuarkAnalysis/Examples/crab/SanityCheck/rootfiles/";
+const TString dir = "/msa1/jmmaes/CMSSW_1_6_9_NOPAT/src/TopQuarkAnalysis/Examples/crab/CSA07_soups/outputfiles/";
 //const  TString  inputFile    = "plots_lr_tt0j_semimu.root";
 //const  TString  outputFile   = "final_lr_plots_tt0j_semimu.root";
 //const  TString  outputPSfile = "LRplots_tt0j_semimu.ps";
 
-const  TString  inputFile    = "plots_lr_all_semimu.root";
-const  TString  outputFile   = "final_lr_plots_all_semimu.root";
-const  TString  outputPSfile = "LRplots_all_semimu.ps";
+const  TString  inputFile    = "plots_lr_tt_allchowder_100pb_increasedcuts_0pbscen.root";
+const  TString  outputFile   = "final_lr_plots_tt_allchowder_100pb_increasedcuts_0pbscen.root";
+const  TString  outputPSfile = "LRplots_tt_allchowder_100pb_increasedcuts_0pbscen.ps";
 
 //observable histogram variables
 const  int      nrJetCombObs  		= 11;
@@ -43,6 +43,9 @@ const  int      nrJetCombObs  		= 11;
 const  int      JetCombObs[nrJetCombObs] 	= {8,23,29,42,46,48,54,56,62,64,65};
 //const  int      JetCombObs[nrJetCombObs] 	= {1,2,3,4,7,8,9,10,11,12};
 
+int lrBins   = 50;
+double lrMin   = -20.;
+double lrMax   = 10.; 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -68,12 +71,15 @@ int main() {
   for(int j = 0; j < nrJetCombObs; j++){
     obsNrs.push_back(JetCombObs[j]);
   }
-  myLRhelper = new LRHelpFunctions();
+  //myLRhelper = new LRHelpFunctions();
+  myLRhelper = new LRHelpFunctions(lrBins, lrMin, lrMax, "pol4");
+   
   //load plots
-  myLRhelper->readObsHistsAndFits(dir+inputFile, obsNrs, true);
-//  myLRhelper->recreateFitFct(obsNrs, obsFits);
-//  cout << "fit functions loaded\n";
-  
+  myLRhelper->readObsHistsAndFits(dir+inputFile, obsNrs, true); 
+  //myLRhelper->initLRHistsAndFits(lrBins, lrMin, lrMax, "pol4");
+   //myLRhelper->recreateFitFct(obsNrs, obsFits);
+    cout << "fit functions loaded\n";
+
   // produce and fit the S/S+N histograms
   myLRhelper -> makeAndFitPurityHists();
   myLRhelper -> makeAndFitSoverSplusBHists();

@@ -48,10 +48,12 @@ class TtSemilepLRValPlots : public edm::EDAnalyzer {
     // Switch for debug output
     bool debug;
 
-    std::string rootFileName, obsFileName;
+    std::string rootFileName, obsFileName;    
+    bool csa,csaProcID;
     double weight;
     
-    int goodSolution;
+    double goodSolutiontt0j,goodSolutiontt1j,goodSolutiontt2j, goodSolutiontt3j,goodSolutiontt4j,goodSolutiontt0jother,goodSolutiontt1jother,goodSolutiontt2jother, goodSolutiontt3jother,goodSolutiontt4jother,goodSolutionrest;  
+    double goodSolutiontt0jbcut,goodSolutiontt1jbcut,goodSolutiontt2jbcut, goodSolutiontt3jbcut,goodSolutiontt4jbcut,goodSolutiontt0jotherbcut,goodSolutiontt1jotherbcut,goodSolutiontt2jotherbcut, goodSolutiontt3jotherbcut,goodSolutiontt4jotherbcut,goodSolutionrestbcut;
     edm::InputTag evtsols;
     LRHelpFunctions *myLRhelper;
     std::vector<int> obsNrs;

@@ -28,10 +28,10 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //input files
-const TString dir = "/msa1/jmmaes/CMSSW_1_6_9_NOPAT/src/TopQuarkAnalysis/Examples/crab/SanityCheck/rootfiles/";
-const  TString  inputFile    = "plots_obs_all_semimu.root";
-const  TString  outputFile   = "final_obs_plots_all_semimu.root";
-const  TString  outputPSfile = "LRJetCombAllObs_all_semimu.ps";
+const TString dir = "/msa1/jmmaes/CMSSW_1_6_9_NOPAT/src/TopQuarkAnalysis/Examples/crab/CSA07_soups/outputfiles/";
+const  TString  inputFile    = "plots_obs_tt_semimu_100pb_FS.root";
+const  TString  outputFile   = "final_obs_plots_all_semimu_100pb_FS.root";
+const  TString  outputPSfile = "LRJetCombAllObs_all_semimu_100pb_FS.ps";
 
 //const  TString  inputFile    = "plots_obs_tt0j_semimu.root";
 //const  TString  outputFile   = "final_obs_plots_tt0j_semimu.root";
