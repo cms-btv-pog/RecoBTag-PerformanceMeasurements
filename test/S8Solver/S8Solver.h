@@ -47,6 +47,7 @@ class S8Solver {
 		void Solve();
         void Verbose(bool option) { fVerbose = option; };
 		void PrintData(TString option="");
+		void DumpTable(std::string filename="table.txt");
 		void Draw(int maxNbins=0);
 		void Print(TString extension="eps");
 		void Save(TString filename="solver.root") {

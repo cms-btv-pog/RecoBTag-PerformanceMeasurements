@@ -13,6 +13,7 @@
 #include "TLegend.h"
 
 #include<iostream>
+#include<fstream>
 
 ClassImp(S8Solver)
 
@@ -848,6 +849,37 @@ void S8Solver::PrintData(TString option) {
 				std::cout << i->first << " = " << i->second << " \\pm " << tmpmaperr[i->first] << std::endl;
 			}
 		}
+	}
+	
+}
+
+void S8Solver::DumpTable(std::string filename) {
+
+	Int_t nxbins = fBinnedSolution.size();
+	std::string sp = ",";
+
+	std::ofstream ff;
+	ff.open(filename.c_str());
+
+	// header
+	ff <<  "ptMin,ptMax,etaMin,etaMax,bEff,bEffErr,clEff,clEfferr"<< sp << fthename << std::endl;
+
+	for (int ibin = 1; ibin<= nxbins; ++ibin) {
+
+		double ptcenter = fnHisto->GetXaxis()->GetBinCenter(ibin);
+		double ptdelta = 0.5 * fnHisto->GetXaxis()->GetBinWidth(ibin);
+
+		double etamin = 0.;
+		double etamax = 2.5;
+		
+		double beff = feffTag_b->GetBinContent(ibin);
+		double befferr = feffTag_b->GetBinError(ibin);
+		
+		double cleff = feffTag_cl->GetBinContent(ibin);
+		double clefferr = feffTag_cl->GetBinError(ibin);
+
+		ff << ptcenter - ptdelta << sp << ptcenter + ptdelta << sp << etamin << sp << etamax << sp << beff << sp << befferr << sp << cleff << sp << clefferr << std::endl;
+		
 	}
 	
 }

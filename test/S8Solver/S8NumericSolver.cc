@@ -293,11 +293,14 @@ Double_t central[8]={0};
 Double_t res[5];
 for(int i=0;i<8;++i)
   {
-  central[i] = fResult[i];
+	  central[i] = fMapResult[i];//fResult[i];
   fErrorsup_Stat[i] = 0.;
   fErrorinf_Stat[i] = 0.;
   fErrorsup_Syst[i] = 0.;
   fErrorinf_Syst[i] = 0.;
+  fMapErrorInf_Stat[i] = 0;
+  fMapErrorSup_Stat[i] = 0;
+  
   }
 Int_t Nsup = 0;
 Int_t Ninf = 0;
@@ -325,16 +328,18 @@ if(kError==1 || kError==2) // Stat error
     if(!FindSolution(res,SolveSystem(res))) continue;
     for(int j=0;j<8;++j)
       {
-      if(fResult[j]<central[j] && fResult[j]>0) {fErrorinf_Stat[j]+= pow(fResult[j]-central[j],2); Ninf++;}
-      if(fResult[j]>central[j] && fResult[j]<1) {fErrorsup_Stat[j]+= pow(fResult[j]-central[j],2); Nsup++;}
+		  //if(fResult[j]<central[j] && fResult[j]>0) {fErrorinf_Stat[j]+= pow(fResult[j]-central[j],2); Ninf++;}
+		  //if(fResult[j]>central[j] && fResult[j]<1) {fErrorsup_Stat[j]+= pow(fResult[j]-central[j],2); Nsup++;}
+	  if(fMapResult[j]<central[j] && fMapResult[j]>0) {fMapErrorInf_Stat[j]+= pow(fMapResult[j]-central[j],2); Ninf++;}
+      if(fMapResult[j]>central[j] && fMapResult[j]<1) {fMapErrorSup_Stat[j]+= pow(fMapResult[j]-central[j],2); Nsup++;}
       }
     }
   for(int i=0;i<8;++i)
     {
-    fErrorinf_Stat[i]/=Ninf;
-    fErrorsup_Stat[i]/=Nsup;
-	fMapErrorInf_Stat[i]=fErrorinf_Stat[i];
-    fMapErrorSup_Stat[i]=fErrorsup_Stat[i];  
+		//fErrorinf_Stat[i]/=Ninf;
+		//fErrorsup_Stat[i]/=Nsup;
+	fMapErrorInf_Stat[i]/=Ninf;
+    fMapErrorSup_Stat[i]/=Nsup;  
     }
   }
 if(kError==1 || kError==3) // Syst error
@@ -349,16 +354,18 @@ if(kError==1 || kError==3) // Syst error
     if(!FindSolution(res,SolveSystem(res))) continue;
     for(int j=0;j<8;++j)
       {
-      if(fResult[j]<central[j] && fResult[j]>0) {fErrorinf_Syst[j]+= pow(fResult[j]-central[j],2); Ninf++;}
-      if(fResult[j]>central[j] && fResult[j]<1) {fErrorsup_Syst[j]+= pow(fResult[j]-central[j],2); Nsup++;}
+		  //if(fResult[j]<central[j] && fResult[j]>0) {fErrorinf_Syst[j]+= pow(fResult[j]-central[j],2); Ninf++;}
+		  //if(fResult[j]>central[j] && fResult[j]<1) {fErrorsup_Syst[j]+= pow(fResult[j]-central[j],2); Nsup++;}
+	  if(fMapResult[j]<central[j] && fMapResult[j]>0) {fErrorinf_Stat[j]+= pow(fMapResult[j]-central[j],2); Ninf++;}
+      if(fMapResult[j]>central[j] && fMapResult[j]<1) {fErrorsup_Stat[j]+= pow(fMapResult[j]-central[j],2); Nsup++;}
       }
     }
   for(int i=0;i<8;++i)
     {
-    fErrorinf_Syst[i]/=Ninf;
-    fErrorsup_Syst[i]/=Nsup;
-	fMapErrorInf_Stat[i]=fErrorinf_Stat[i];
-    fMapErrorSup_Stat[i]=fErrorsup_Stat[i];  
+		//fErrorinf_Syst[i]/=Ninf;
+		//fErrorsup_Syst[i]/=Nsup;
+	fMapErrorInf_Stat[i]/=Ninf;
+    fMapErrorSup_Stat[i]/=Nsup;
     }
   }
 for(int i=0;i<8;++i) fMapResult[i] = fResult[i] = central[i];
