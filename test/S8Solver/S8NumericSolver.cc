@@ -487,7 +487,7 @@ Double_t S8NumericSolver::GetErrorSupVec(Int_t n)
 // n = 7 -> eb3
 
   //std::cout << "[S8NumericSolver] GetErrorSupVec " << n << " " << fMapErrorSup_Stat[n] << std::endl; 
-if(n>=0 && n<8) return fMapErrorSup_Stat[n];
+if(n>=0 && n<8) return sqrt(fMapErrorSup_Stat[n]);
 return 0;
 }
 Double_t S8NumericSolver::GetErrorInfVec(Int_t n)
@@ -503,7 +503,7 @@ Double_t S8NumericSolver::GetErrorInfVec(Int_t n)
 // n = 7 -> eb3
 
   // std::cout << "[S8NumericSolver] GetErrorInfVec " << n << " " << fMapErrorInf_Stat[n] << std::endl; 
-if(n>=0 && n<8) return fMapErrorInf_Stat[n];
+if(n>=0 && n<8) return sqrt(fMapErrorInf_Stat[n]);
 return 0;
 }
 
