@@ -46,6 +46,16 @@ S8Solver::S8Solver() {
 
 }
 //____________________________________________________________
+void S8Solver::Clear() {
+
+	if (fh_alpha) delete fh_alpha; if (fh_beta) delete fh_beta;
+	if (fh_kb) delete fh_kb; if (fh_kcl) delete fh_kcl;
+	if (fh_delta) delete fh_delta; if (fh_gamma) delete fh_gamma;
+	if (feffTag_b) delete feffTag_b; if (feffTag_cl) delete feffTag_cl;
+	if (feffmu_b) delete feffmu_b; if (feffmu_cl) delete feffmu_cl;
+	
+}
+//____________________________________________________________
 void S8Solver::LoadHistos() {
 
 	//if (finputCorrFile) {
@@ -85,7 +95,7 @@ void S8Solver::LoadHistos() {
 	// rebin correlation factors
 	const int ncorrptarray = 3;
 	const int ncorretaarray = 3;
-	Double_t corrptbins[ncorrptarray] = {30.,230.};
+	Double_t corrptbins[ncorrptarray] = {30., 80.,230.};
 	Double_t corretabins[ncorrptarray] = {0.,1.5,2.5};
 	//if (fcategory=="Eta") {
 	//  ncorrptarray = tmpncorretaarray;
@@ -780,7 +790,7 @@ void S8Solver::Solve() {
 						 (fh_alpha->GetFunction("pol0"))->GetParError(0),
 							  (fh_gamma->GetFunction("pol0"))->GetParError(0));
 			solu.SetError(2);
-			solu.SetNbErrorIteration(100);
+			solu.SetNbErrorIteration(200);
 			solu.SetInitialOrder(1,1);
 
 			solu.SetAverageRes(sol.GetResultVec(1));
@@ -1229,7 +1239,7 @@ void S8Solver::Draw(int maxNbins) {
 	multi_n->Draw("a");
 	multi_n->GetXaxis()->SetTitle("jet p_{T} [GeV/c]");
 	multi_n->GetYaxis()->SetTitle("Events");
-	gPad->SetLogy();
+	//gPad->SetLogy();
 	TLegend *legd = new TLegend(0.79,0.69,0.89,0.86,"","NDC");
 	//legd->SetMargin(0.12);
 	legd->SetTextSize(0.029);
@@ -1251,7 +1261,7 @@ void S8Solver::Draw(int maxNbins) {
 	multi_p->Draw("a");
 	multi_p->GetXaxis()->SetTitle("jet p_{T} [GeV/c]");
 	multi_p->GetYaxis()->SetTitle("Events");
-	gPad->SetLogy();
+	//gPad->SetLogy();
 	TLegend *lege = new TLegend(0.79,0.69,0.89,0.86,"","NDC");
 	//lege->SetMargin(0.12);
 	lege->SetTextSize(0.029);

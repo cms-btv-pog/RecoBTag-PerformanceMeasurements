@@ -21,6 +21,7 @@ class S8Solver {
         S8Solver();
 		//S8Solver(std::string name);
 		virtual ~S8Solver(){};
+		void Clear();
 		void LoadHistos();
 		void SetName(TString value) {fthename= value;}
 		void SetData( TString filename ) { finputFile = new TFile(filename); }
