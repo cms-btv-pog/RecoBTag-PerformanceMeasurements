@@ -28,7 +28,7 @@ class S8Solver {
 		void SetPtrelCut ( double value ) { fminPtrel = value; }
 		void SetPtrelMaxCut ( double value ) { fMaxPtrel = value; }
 		void SetPtFits() { fcategory = "pT"; }
-		void SetEtaFits() { fcategory = "Eta"; }
+		void SetEtaFits() { fcategory = "eta"; }
 		void SetRebin( bool option) { frebin = option; }
 		void SetMinimum( double value ) { fMin = value; }
 		void SetMaximum( double value ) { fMax = value; }
@@ -164,6 +164,18 @@ class S8Solver {
 		TH1D *htagoppjets_b;  
 		TH1D *htagoppjets_cl; 
 		
+		TH1D *b_halljets_ptrel ;       
+		TH1D *cl_halljets_ptrel ;      
+		TH1D *b_halljets_tagged;       
+		TH1D *cl_halljets_tagged ;     
+		TH1D *b_halljets_ptreltagged ; 
+		TH1D *cl_halljets_ptreltagged ;
+		TH1D *b_halloppjets_tagged ;   
+		TH1D *cl_halloppjets_tagged;   
+		TH1D *b_halloppjets_ptrel ;    
+		TH1D *cl_halloppjets_ptrel;    
+
+
 		TGraphErrors *geffTag_b;
 		TGraphErrors *gS8effTag_b;
 		TGraphErrors *geffmu_b;

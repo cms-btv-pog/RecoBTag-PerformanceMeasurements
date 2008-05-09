@@ -25,7 +25,7 @@ S8Solver::S8Solver() {
 //S8Solver::S8Solver(std::string name) {
 
 	fAlphaConst = true;
-	fBetaConst = false;
+	fBetaConst = true;
 	fcategory = "pT";
 	fminPtrel = 0.8;
 	fMaxPtrel = 3.0;//-1;
@@ -39,7 +39,7 @@ S8Solver::S8Solver() {
 	fKappabf = 1.;
 	fKappaclf = 1.;
 	fKappabConst = false;
-	fKappaclConst = true;
+	fKappaclConst = false;
 	fisCorrFile = false;
 	fDeltaConst = false;
 	fGammaConst = false;
@@ -83,9 +83,9 @@ void S8Solver::LoadHistos() {
 	
 	
 	// rebin correlation factors
-	const int ncorrptarray = 6;
+	const int ncorrptarray = 3;
 	const int ncorretaarray = 3;
-	Double_t corrptbins[ncorrptarray] = {30.,40.,60.,80,120,230.};//{30.,40.,60.,80,230.};
+	Double_t corrptbins[ncorrptarray] = {30.,230.};
 	Double_t corretabins[ncorrptarray] = {0.,1.5,2.5};
 	//if (fcategory=="Eta") {
 	//  ncorrptarray = tmpncorretaarray;
@@ -93,18 +93,6 @@ void S8Solver::LoadHistos() {
 	// recalculate correlation factors
 	if (frecalculateFactors) {
 		std::cout << "recalculate correlation factors " << std::endl;
-		fh_alpha = (TH1D*) fnHisto->Clone("fh_alpha");
-		fh_beta = (TH1D*) fnHisto->Clone("fh_beta");
-		fh_kcl = (TH1D*) fnHisto->Clone("fh_kcl");
-		fh_kb = (TH1D*) fnHisto->Clone("fh_kb");
-		fh_delta = (TH1D*) fnHisto->Clone("fh_delta");
-		fh_gamma = (TH1D*) fnHisto->Clone("fh_gamma");
-		fh_alpha->Reset();
-		fh_beta->Reset();
-		fh_kcl->Reset();
-		fh_kb->Reset();
-		fh_delta->Reset();
-		fh_gamma->Reset();
 		//fh_alpha->Sumw2();
 		//fh_beta->Sumw2();
 		//fh_kcl->Sumw2();
@@ -134,6 +122,7 @@ void S8Solver::LoadHistos() {
 
 		std::cout << " got initial truth dist." << std::endl;
 
+
 				
 		halljets_b           = h2["b_npT"]->ProjectionX("halljets_b", -1 , ith_max_bin,"e");
 		halljets_cl          = h2["cl_npT"]->ProjectionX("halljets_cl", -1 , ith_max_bin,"e");
@@ -151,6 +140,144 @@ void S8Solver::LoadHistos() {
 		halloppjets_cl_ptrel = h2["cl_ppT"]->ProjectionX("halloppjets_cl_ptrel", ith_ptrel_bin , ith_max_bin,"e");
 		htagoppjets_b_ptrel  = h2["b_pcmbpT"]->ProjectionX("htagoppjets_b_ptrel", ith_ptrel_bin , ith_max_bin,"e");
 		htagoppjets_cl_ptrel = h2["cl_pcmbpT"]->ProjectionX("htagoppjets_cl_ptrel", ith_ptrel_bin , ith_max_bin,"e");
+		
+		b_halljets_ptrel     = h2["b_npT"]->ProjectionX("b_halljets_ptrel", ith_ptrel_bin , ith_max_bin,"e");
+		cl_halljets_ptrel    = h2["cl_npT"]->ProjectionX("cl_halljets_ptrel", ith_ptrel_bin , ith_max_bin,"e");
+		b_halljets_tagged    = h2["b_ncmbpT"]->ProjectionX("b_halljets_tagged", -1 , ith_max_bin,"e");
+		cl_halljets_tagged   = h2["cl_ncmbpT"]->ProjectionX("cl_halljets_tagged", -1 , ith_max_bin,"e");
+		b_halljets_ptreltagged  = h2["b_ncmbpT"]->ProjectionX("b_halljets_ptreltagged", ith_ptrel_bin , ith_max_bin,"e");
+		cl_halljets_ptreltagged = h2["cl_ncmbpT"]->ProjectionX("cl_halljets_ptreltagged", ith_ptrel_bin , ith_max_bin,"e");
+		b_halloppjets_tagged    = h2["b_pcmbpT"]->ProjectionX("b_halloppjets_tagged", -1 , ith_max_bin,"e");
+		cl_halloppjets_tagged   = h2["cl_pcmbpT"]->ProjectionX("cl_halloppjets_tagged", -1 , ith_max_bin,"e");
+		b_halloppjets_ptrel  = h2["b_ppT"]->ProjectionX("b_halloppjets_ptrel", ith_ptrel_bin , ith_max_bin,"e");
+		cl_halloppjets_ptrel  = h2["cl_ppT"]->ProjectionX("cl_halloppjets_ptrel", ith_ptrel_bin , ith_max_bin,"e");
+
+		if (frebin) {
+
+			// rebin input data
+
+
+            TH1D* tmphalljets_b           = (TH1D*) halljets_b->Rebin(ncorrptarray-1,"tmphalljets_b");          
+			TH1D* tmphalljets_cl          =	(TH1D*) halljets_cl->Rebin(ncorrptarray-1,"tmphalljets_cl");         
+			TH1D* tmphtagjets_b           =	(TH1D*) htagjets_b->Rebin(ncorrptarray-1,"tmphtagjets_b");          
+			TH1D* tmphtagjets_cl          =	(TH1D*) htagjets_cl->Rebin(ncorrptarray-1,"tmphtagjets_cl");         
+			TH1D* tmphalljets_b_ptrel     =	(TH1D*) halljets_b_ptrel->Rebin(ncorrptarray-1,"tmphalljets_b_ptrel");    
+			TH1D* tmphalljets_cl_ptrel    =	(TH1D*) halljets_cl_ptrel->Rebin(ncorrptarray-1,"tmphalljets_cl_ptrel");   
+			TH1D* tmphtagjets_b_ptrel     =	(TH1D*) htagjets_b_ptrel->Rebin(ncorrptarray-1,"tmphtagjets_b_ptrel");    
+			TH1D* tmphtagjets_cl_ptrel    =	(TH1D*) htagjets_cl_ptrel->Rebin(ncorrptarray-1,"tmphtagjets_cl_ptrel");    
+			TH1D* tmphalloppjets_b        =	(TH1D*) halloppjets_b->Rebin(ncorrptarray-1,"tmphalloppjets_b");        
+			TH1D* tmphalloppjets_cl       =	(TH1D*) halloppjets_cl->Rebin(ncorrptarray-1,"tmp halloppjets_cl");       
+			TH1D* tmphtagoppjets_b        =	(TH1D*) htagoppjets_b->Rebin(ncorrptarray-1,"tmphtagoppjets_b");         
+			TH1D* tmphtagoppjets_cl       =	(TH1D*) htagoppjets_cl->Rebin(ncorrptarray-1,"tmphtagoppjets_cl");       
+			TH1D* tmphalloppjets_b_ptrel  =	(TH1D*) halloppjets_b_ptrel->Rebin(ncorrptarray-1,"tmphalloppjets_b_ptrel"); 
+			TH1D* tmphalloppjets_cl_ptrel =	(TH1D*) halloppjets_cl_ptrel->Rebin(ncorrptarray-1,"tmphalloppjets_cl_ptrel");
+			TH1D* tmphtagoppjets_b_ptrel  =	(TH1D*) htagoppjets_b_ptrel->Rebin(ncorrptarray-1,"tmphtagoppjets_b_ptrel"); 
+			TH1D* tmphtagoppjets_cl_ptrel = (TH1D*) htagoppjets_cl_ptrel->Rebin(ncorrptarray-1,"tmphtagoppjets_cl_ptrel");
+
+		
+           	TH1D* tmpb_halljets_ptrel        = (TH1D*) b_halljets_ptrel->Rebin(ncorrptarray-1,"tmpb_halljets_ptrel");
+			TH1D* tmpcl_halljets_ptrel 		 = (TH1D*) cl_halljets_ptrel->Rebin(ncorrptarray-1,"tmpcl_halljets_ptrel");
+			TH1D* tmpb_halljets_tagged 		 = (TH1D*) b_halljets_tagged->Rebin(ncorrptarray-1,"tmpb_halljets_tagged"); 
+		   	TH1D* tmpcl_halljets_tagged		 = (TH1D*) cl_halljets_tagged->Rebin(ncorrptarray-1,"tmpcl_halljets_tagged"); 
+		   	TH1D* tmpb_halljets_ptreltagged  = (TH1D*) b_halljets_ptreltagged->Rebin(ncorrptarray-1,"tmpb_halljets_ptreltagged");	  
+		   	TH1D* tmpcl_halljets_ptreltagged = (TH1D*) cl_halljets_ptreltagged->Rebin(ncorrptarray-1,"tmpcl_halljets_ptreltagged"); 	  
+		   	TH1D* tmpb_halloppjets_tagged    = (TH1D*) b_halloppjets_tagged->Rebin(ncorrptarray-1,"tmpb_halloppjets_tagged");   	  
+		   	TH1D* tmpcl_halloppjets_tagged   = (TH1D*) cl_halloppjets_tagged->Rebin(ncorrptarray-1,"tmpcl_halloppjets_tagged");     	  
+		   	TH1D* tmpb_halloppjets_ptrel  	 = (TH1D*) b_halloppjets_ptrel->Rebin(ncorrptarray-1,"tmpb_halloppjets_ptrel");
+		   	TH1D* tmpcl_halloppjets_ptrel    = (TH1D*) cl_halloppjets_ptrel->Rebin(ncorrptarray-1,"tmpcl_halloppjets_ptrel");
+
+			
+            delete halljets_b;
+		    delete halljets_cl;
+		    delete htagjets_b;
+		    delete htagjets_cl;
+		    delete halljets_b_ptrel;
+		    delete halljets_cl_ptrel;
+		    delete htagjets_b_ptrel;
+		    delete htagjets_cl_ptrel;
+		    delete halloppjets_b;
+		    delete halloppjets_cl;
+		    delete htagoppjets_b;
+		    delete htagoppjets_cl;
+		    delete halloppjets_b_ptrel;
+		    delete halloppjets_cl_ptrel;
+		    delete htagoppjets_b_ptrel;
+		    delete htagoppjets_cl_ptrel;
+
+		
+			delete b_halljets_ptrel;
+			delete cl_halljets_ptrel;
+			delete b_halljets_tagged;
+			delete cl_halljets_tagged;
+			delete b_halljets_ptreltagged;
+			delete cl_halljets_ptreltagged;
+			delete b_halloppjets_tagged;
+			delete cl_halloppjets_tagged;
+			delete b_halloppjets_ptrel;
+			delete cl_halloppjets_ptrel;
+
+
+            halljets_b           =  (TH1D*) tmphalljets_b->Clone("halljets_b");           
+			halljets_cl          =	(TH1D*) tmphalljets_cl->Clone("halljets_cl");      
+			htagjets_b           =	(TH1D*) tmphtagjets_b->Clone("htagjets_b");       
+			htagjets_cl          =	(TH1D*) tmphtagjets_cl->Clone("htagjets_cl");         
+			halljets_b_ptrel     =	(TH1D*) tmphalljets_b_ptrel->Clone("halljets_b_ptrel");    
+			halljets_cl_ptrel    =	(TH1D*) tmphalljets_cl_ptrel->Clone("halljets_cl_ptrel");   
+			htagjets_b_ptrel     =	(TH1D*) tmphtagjets_b_ptrel->Clone("htagjets_b_ptrel");    
+			htagjets_cl_ptrel    =	(TH1D*) tmphtagjets_cl_ptrel->Clone("htagjets_cl_ptrel");   
+			halloppjets_b        =	(TH1D*) tmphalloppjets_b->Clone("halloppjets_b");       
+			halloppjets_cl       =	(TH1D*) tmphalloppjets_cl->Clone("halloppjets_cl");      
+			htagoppjets_b        =	(TH1D*) tmphtagoppjets_b->Clone("htagoppjets_b ");      
+			htagoppjets_cl       =	(TH1D*) tmphtagoppjets_cl->Clone("htagoppjets_cl");      
+			halloppjets_b_ptrel  =	(TH1D*) tmphalloppjets_b_ptrel->Clone("halloppjets_b_ptrel"); 
+			halloppjets_cl_ptrel =	(TH1D*) tmphalloppjets_cl_ptrel->Clone("halloppjets_cl_ptrel");
+			htagoppjets_b_ptrel  =	(TH1D*) tmphtagoppjets_b_ptrel->Clone("htagoppjets_b_ptrel"); 
+			htagoppjets_cl_ptrel =  (TH1D*) tmphtagoppjets_cl_ptrel->Clone("htagoppjets_cl_ptrel");  
+
+		
+           	b_halljets_ptrel        = (TH1D*) tmpb_halljets_ptrel->Clone("b_halljets_ptrel");    
+			cl_halljets_ptrel 	    = (TH1D*) tmpcl_halljets_ptrel->Clone("cl_halljets_ptrel");
+			b_halljets_tagged 	   	= (TH1D*) tmpb_halljets_tagged->Clone("b_halljets_tagged");
+		   	cl_halljets_tagged	   	= (TH1D*) tmpcl_halljets_tagged->Clone("cl_halljets_tagged");
+		   	b_halljets_ptreltagged  = (TH1D*) tmpb_halljets_ptreltagged->Clone("b_halljets_ptreltagged ");
+		   	cl_halljets_ptreltagged = (TH1D*) tmpcl_halljets_ptreltagged->Clone("cl_halljets_ptreltagged");
+		   	b_halloppjets_tagged    = (TH1D*) tmpb_halloppjets_tagged->Clone("b_halloppjets_tagged");
+		   	cl_halloppjets_tagged   = (TH1D*) tmpcl_halloppjets_tagged->Clone("cl_halloppjets_tagged");
+		   	b_halloppjets_ptrel    	= (TH1D*) tmpb_halloppjets_ptrel->Clone("b_halloppjets_ptrel");
+		   	cl_halloppjets_ptrel    = (TH1D*) tmpcl_halloppjets_ptrel->Clone("cl_halloppjets_ptrel");      
+
+
+
+			
+			TH1D* tmpfnHisto = (TH1D*) fnHisto->Rebin(ncorrptarray-1,"tmpfnHisto");
+			TH1D* tmpfpHisto = (TH1D*) fpHisto->Rebin(ncorrptarray-1,"tmpfpHisto");
+			TH1D* tmpfnHistoMu = (TH1D*) fnHistoMu->Rebin(ncorrptarray-1,"tmpfnHistoMu");
+			TH1D* tmpfpHistoMu = (TH1D*) fpHistoMu->Rebin(ncorrptarray-1,"tmpfpHistoMu");
+			TH1D* tmpfnHistoSvx = (TH1D*) fnHistoSvx->Rebin(ncorrptarray-1,"tmpfnHistoSvx");
+			TH1D* tmpfpHistoSvx = (TH1D*) fpHistoSvx->Rebin(ncorrptarray-1,"tmpfpHistoSvx");
+			TH1D* tmpfnHistoAll = (TH1D*) fnHistoAll->Rebin(ncorrptarray-1,"tmpfnHistoAll");
+			TH1D* tmpfpHistoAll = (TH1D*) fpHistoAll->Rebin(ncorrptarray-1,"tmpfpHistoAll");
+
+			delete fnHisto;
+			delete fpHisto;
+			delete fnHistoMu;
+			delete fpHistoMu;
+			delete fnHistoSvx;
+			delete fpHistoSvx;
+			delete fnHistoAll;
+			delete fpHistoAll;
+			
+			
+			fnHisto = (TH1D*) tmpfnHisto->Clone("fnHisto");
+			fpHisto = (TH1D*) tmpfpHisto->Clone("fpHisto");
+			fnHistoMu = (TH1D*) tmpfnHistoMu->Clone("fnHistoMu");
+			fpHistoMu = (TH1D*) tmpfpHistoMu->Clone("fpHistoMu");
+			fnHistoSvx = (TH1D*) tmpfnHistoSvx->Clone("fnHistoSvx");
+			fpHistoSvx = (TH1D*) tmpfpHistoSvx->Clone("fpHistoSvx");
+			fnHistoAll = (TH1D*) tmpfnHistoAll->Clone("fnHistoAll");
+			fpHistoAll = (TH1D*) tmpfpHistoAll->Clone("fpHistoAll");
+		
+		}
 		
 		h1["eff_pTrel_b"] = (TH1D*) fnHisto->Clone("eff_pTrel_b");
 		h1["eff_pTrel_cl"] = (TH1D*) fnHisto->Clone("eff_pTrel_cl");
@@ -185,124 +312,49 @@ void S8Solver::LoadHistos() {
 		//h1["eff_TaggedBothJets_cl"]->Sumw2();
 		//std::cout << "reset" << std::endl;
 		
-		h1["eff_pTrel_b"]->Divide( h2["b_npT"]->ProjectionX("b_halljets_ptrel",ith_ptrel_bin, ith_max_bin ,"e") , halljets_b ,1.,1.,"B");
-		//std::cout << "got projection 1" << std::endl;
-		h1["eff_pTrel_cl"]->Divide( h2["cl_npT"]->ProjectionX("cl_halljets_ptrel", ith_ptrel_bin, ith_max_bin,"e") , halljets_cl ,1.,1.,"B");
-		//std::cout << "got projection 2" << std::endl;
-		h1["eff_TaggedJet_b"]->Divide( h2["b_ncmbpT"]->ProjectionX("b_halljets_tagged", -1 , ith_max_bin,"e") , halljets_b ,1.,1.,"B");
-		//std::cout << "got projection 3" << std::endl;
-		h1["eff_TaggedJet_cl"]->Divide( h2["cl_ncmbpT"]->ProjectionX("cl_halljets_tagged", -1 , ith_max_bin,"e") , halljets_cl ,1.,1.,"B");
-		//std::cout << "got projection 4" << std::endl;
-		h1["eff_pTrel_TaggedJet_b"]->Divide( h2["b_ncmbpT"]->ProjectionX("b_halljets_ptreltagged",ith_ptrel_bin, ith_max_bin ,"e") , halljets_b ,1.,1.,"B");
-		h1["eff_pTrel_TaggedJet_cl"]->Divide( h2["cl_ncmbpT"]->ProjectionX("cl_halljets_ptrelltagged", ith_ptrel_bin, ith_max_bin,"e") , halljets_cl ,1.,1.,"B");
-		//std::cout << "got projection 5" << std::endl;
-		
-		h1["eff_TaggedBothJets_b"]->Divide( h2["b_pcmbpT"]->ProjectionX("b_halloppjets_tagged", -1 , ith_max_bin,"e") , halloppjets_b ,1.,1.,"B");
-		h1["eff_TaggedBothJets_cl"]->Divide( h2["cl_pcmbpT"]->ProjectionX("cl_halloppjets_tagged", -1 , ith_max_bin,"e") , halloppjets_cl ,1.,1.,"B");
-		//std::cout << "got projection 6" << std::endl;
-
-		h1["eff_mu_taggedaway_b"]->Divide( h2["b_ppT"]->ProjectionX("b_hallopppjets_ptrel",ith_ptrel_bin, ith_max_bin ,"e") , halloppjets_b, 1.,1.,"B");
-		h1["eff_mu_taggedaway_cl"]->Divide( h2["cl_ppT"]->ProjectionX("cl_halloppjets_ptrel",ith_ptrel_bin, ith_max_bin ,"e") , halloppjets_cl, 1.,1.,"B");
-		//std::cout << "got projection 7" << std::endl;
+		h1["eff_pTrel_b"]->Divide(b_halljets_ptrel , halljets_b ,1.,1.,"B");
+		h1["eff_pTrel_cl"]->Divide(cl_halljets_ptrel, halljets_cl ,1.,1.,"B");
+		h1["eff_TaggedJet_b"]->Divide(b_halljets_tagged , halljets_b ,1.,1.,"B");
+		h1["eff_TaggedJet_cl"]->Divide(cl_halljets_tagged , halljets_cl ,1.,1.,"B");
+		h1["eff_pTrel_TaggedJet_b"]->Divide(b_halljets_ptreltagged, halljets_b ,1.,1.,"B");
+		h1["eff_pTrel_TaggedJet_cl"]->Divide(cl_halljets_ptreltagged, halljets_cl ,1.,1.,"B");
+		h1["eff_TaggedBothJets_b"]->Divide( b_halloppjets_tagged , halloppjets_b ,1.,1.,"B");
+		h1["eff_TaggedBothJets_cl"]->Divide( cl_halloppjets_tagged , halloppjets_cl ,1.,1.,"B");
+		h1["eff_mu_taggedaway_b"]->Divide(b_halloppjets_ptrel , halloppjets_b, 1.,1.,"B");
+		h1["eff_mu_taggedaway_cl"]->Divide( cl_halloppjets_ptrel, halloppjets_cl, 1.,1.,"B");
 
 		feffTag_b = (TH1D*) h1["eff_TaggedJet_b"]->Clone("feffTag_b"); 
 		feffTag_cl = (TH1D*) h1["eff_TaggedJet_cl"]->Clone("feffTag_cl");
-
 		feffmu_b = (TH1D*) h1["eff_pTrel_b"]->Clone("feffmu_b"); 
 		feffmu_cl = (TH1D*) h1["eff_pTrel_cl"]->Clone("feffmu_cl");
 		//std::cout << "clonned" << std::endl;
 		
-		if (frebin) {
-			std::cout << "rebinning" << std::endl;
-			TH1D* tmpfh_alpha = (TH1D*) fnHisto->Clone("tmpfh_alpha");
-			TH1D* tmpfh_beta = (TH1D*) fnHisto->Clone("tmpfh_beta");
-			TH1D* tmpfh_kb = (TH1D*)  fnHisto->Clone("tmpfh_kb");
-			TH1D* tmpfh_kcl = (TH1D*) fnHisto->Clone("tmpfh_kcl");
-			TH1D* tmpfh_gamma = (TH1D*) fnHisto->Clone("tmpfh_gamma");
-			TH1D* tmpfh_delta = (TH1D*) fnHisto->Clone("tmpfh_delta");
-			tmpfh_alpha->Reset();
-			tmpfh_beta->Reset();
-			tmpfh_kb->Reset();
-			tmpfh_kcl->Reset();
-			tmpfh_gamma->Reset();
-			tmpfh_delta->Reset();
-			tmpfh_alpha->Sumw2();
-			tmpfh_beta->Sumw2();
-			tmpfh_kb->Sumw2();
-			tmpfh_kcl->Sumw2();
-			
-			tmpfh_alpha->Divide( h1["eff_TaggedBothJets_cl"], h1["eff_TaggedJet_cl"]);
-			tmpfh_beta->Divide( h1["eff_TaggedBothJets_b"], h1["eff_TaggedJet_b"]);
 
-			tmpfh_delta->Divide( h1["eff_mu_taggedaway_b"], h1["eff_pTrel_b"]);
-			tmpfh_gamma->Divide( h1["eff_mu_taggedaway_cl"], h1["eff_pTrel_cl"]);
-			
-			tmpfh_kb->Divide( h1["eff_pTrel_TaggedJet_b"], h1["eff_pTrel_b"]  );
-			tmpfh_kb->Divide( h1["eff_TaggedJet_b"] );
+		fh_alpha = (TH1D*) fnHisto->Clone("fh_alpha");
+		fh_beta = (TH1D*) fnHisto->Clone("fh_beta");
+		fh_kcl = (TH1D*) fnHisto->Clone("fh_kcl");
+		fh_kb = (TH1D*) fnHisto->Clone("fh_kb");
+		fh_delta = (TH1D*) fnHisto->Clone("fh_delta");
+		fh_gamma = (TH1D*) fnHisto->Clone("fh_gamma");
+		fh_alpha->Reset();
+		fh_beta->Reset();
+		fh_kcl->Reset();
+		fh_kb->Reset();
+		fh_delta->Reset();
+		fh_gamma->Reset();
 
-			tmpfh_kcl->Divide( h1["eff_pTrel_TaggedJet_cl"], h1["eff_pTrel_cl"] );
-			tmpfh_kcl->Divide(  h1["eff_TaggedJet_cl"] );
-
-			// rebin only beta and kb!!
-			fh_alpha = (TH1D*) tmpfh_alpha->Rebin(ncorrptarray-1,"fh_alpha",corrptbins);
-			//fh_alpha->Divide( h1["eff_TaggedBothJets_cl"], h1["eff_TaggedJet_cl"]);
-			fh_beta = (TH1D*)tmpfh_beta->Rebin(ncorrptarray-1,"fh_beta",corrptbins);
-			fh_kb = (TH1D*)tmpfh_kb->Rebin(ncorrptarray-1,"fh_kb",corrptbins);
-			fh_kcl = (TH1D*)tmpfh_kcl->Rebin(ncorrptarray-1,"fh_kcl",corrptbins);
-			//fh_kcl->Divide( h1["eff_pTrel_TaggedJet_cl"], h1["eff_pTrel_cl"] );
-			//fh_kcl->Divide(  h1["eff_TaggedJet_cl"] );
-
-			fh_delta = (TH1D*) tmpfh_delta->Rebin(ncorrptarray-1,"fh_delta",corrptbins);
-			fh_gamma = (TH1D*) tmpfh_gamma->Rebin(ncorrptarray-1,"fh_gamma",corrptbins);
-			
-			std::cout << "rebinning done" << std::endl;
-
-			// regin input data?
-			/*
-			TH1D* tmpfnHisto = (TH1D*) fnHisto->Rebin(ncorrptarray-1,"tmpfnHisto",corrptbins);
-			TH1D* tmpfpHisto = (TH1D*) fpHisto->Rebin(ncorrptarray-1,"tmpfpHisto",corrptbins);
-			TH1D* tmpfnHistoMu = (TH1D*) fnHistoMu->Rebin(ncorrptarray-1,"tmpfnHistoMu",corrptbins);
-			TH1D* tmpfpHistoMu = (TH1D*) fpHistoMu->Rebin(ncorrptarray-1,"tmpfpHistoMu",corrptbins);
-			TH1D* tmpfnHistoSvx = (TH1D*) fnHistoSvx->Rebin(ncorrptarray-1,"tmpfnHistoSvx",corrptbins);
-			TH1D* tmpfpHistoSvx = (TH1D*) fpHistoSvx->Rebin(ncorrptarray-1,"tmpfpHistoSvx",corrptbins);
-			TH1D* tmpfnHistoAll = (TH1D*) fnHistoAll->Rebin(ncorrptarray-1,"tmpfnHistoAll",corrptbins);
-			TH1D* tmpfpHistoAll = (TH1D*) fpHistoAll->Rebin(ncorrptarray-1,"tmpfpHistoAll",corrptbins);
-			
-			delete fnHisto;
-			delete fpHisto;
-			delete fnHistoMu;
-			delete fpHistoMu;
-			delete fnHistoSvx;
-			delete fpHistoSvx;
-			delete fnHistoAll;
-			delete fpHistoAll;
-			
-			
-			fnHisto = (TH1D*) tmpfnHisto->Clone("fnHisto");
-			fpHisto = (TH1D*) tmpfpHisto->Clone("fpHisto");
-			fnHistoMu = (TH1D*) tmpfnHistoMu->Clone("fnHistoMu");
-			fpHistoMu = (TH1D*) tmpfpHistoMu->Clone("fpHistoMu");
-			fnHistoSvx = (TH1D*) tmpfnHistoSvx->Clone("fnHistoSvx");
-			fpHistoSvx = (TH1D*) tmpfpHistoSvx->Clone("fpHistoSvx");
-			fnHistoAll = (TH1D*) tmpfnHistoAll->Clone("fnHistoAll");
-			fpHistoAll = (TH1D*) tmpfpHistoAll->Clone("fpHistoAll");
-			*/
-						
-		} else {
-
-			fh_alpha->Divide( h1["eff_TaggedBothJets_cl"], h1["eff_TaggedJet_cl"]);
-			fh_beta->Divide( h1["eff_TaggedBothJets_b"], h1["eff_TaggedJet_b"]);
+		fh_alpha->Divide( h1["eff_TaggedBothJets_cl"], h1["eff_TaggedJet_cl"]);
+		fh_beta->Divide( h1["eff_TaggedBothJets_b"], h1["eff_TaggedJet_b"]);
 		
-			fh_kb->Divide( h1["eff_pTrel_TaggedJet_b"], h1["eff_pTrel_b"]);
-			fh_kb->Divide( h1["eff_TaggedJet_b"]);
+		fh_kb->Divide( h1["eff_pTrel_TaggedJet_b"], h1["eff_pTrel_b"]);
+		fh_kb->Divide( h1["eff_TaggedJet_b"]);
 
-			fh_kcl->Divide( h1["eff_pTrel_TaggedJet_cl"], h1["eff_pTrel_cl"] );
-			fh_kcl->Divide(  h1["eff_TaggedJet_cl"] );
+		fh_kcl->Divide( h1["eff_pTrel_TaggedJet_cl"], h1["eff_pTrel_cl"] );
+		fh_kcl->Divide(  h1["eff_TaggedJet_cl"] );
 			
-			fh_delta->Divide( h1["eff_mu_taggedaway_b"], h1["eff_pTrel_b"] );
-			fh_gamma->Divide( h1["eff_mu_taggedaway_cl"], h1["eff_pTrel_cl"] );
+		fh_delta->Divide( h1["eff_mu_taggedaway_b"], h1["eff_pTrel_b"] );
+		fh_gamma->Divide( h1["eff_mu_taggedaway_cl"], h1["eff_pTrel_cl"] );
 
-		}
 			
 		// fit to pol0
 		fh_alpha->Fit("pol0","0");
@@ -441,12 +493,12 @@ void S8Solver::GetInput() {
 	// binned input base in the n samples
 	std::vector< TH1* > HistoList;
 	HistoList.push_back(fnHisto);
-	HistoList.push_back(fpHisto);
 	HistoList.push_back(fnHistoMu);
+	HistoList.push_back(fpHisto);
 	HistoList.push_back(fpHistoMu);
 	HistoList.push_back(fnHistoSvx);
-	HistoList.push_back(fpHistoSvx);
 	HistoList.push_back(fnHistoAll);
+	HistoList.push_back(fpHistoSvx);
 	HistoList.push_back(fpHistoAll);
 	HistoList.push_back(fh_kb);
 	HistoList.push_back(fh_kcl);
@@ -613,9 +665,16 @@ void S8Solver::Solve() {
 		sol.SetCorr(TotalInput["kappa_b"],TotalInput["beta"],TotalInput["delta"],
 					TotalInput["kappa_cl"],TotalInput["alpha"],TotalInput["gamma"]);
 
-		sol.SetCorrError(0.,0.,0.,0.,0.,0.);
+		//sol.SetCorrError(0.,0.,0.,0.,0.,0.);
+		sol.SetCorrError((fh_kb->GetFunction("pol0"))->GetParError(0),
+						 (fh_beta->GetFunction("pol0"))->GetParError(0),
+						 (fh_delta->GetFunction("pol0"))->GetParError(0),
+						 (fh_kcl->GetFunction("pol0"))->GetParError(0),
+						 (fh_alpha->GetFunction("pol0"))->GetParError(0),
+						 (fh_gamma->GetFunction("pol0"))->GetParError(0));
+						 
 		sol.SetError(2);
-		sol.SetNbErrorIteration(200);
+		sol.SetNbErrorIteration(100);
 		sol.SetInitialOrder(1,1);
 		bool converge = true;
 
@@ -713,9 +772,15 @@ void S8Solver::Solve() {
 			solu.SetCorr(tmpinput["kappa_b"],tmpinput["beta"],tmpinput["delta"],
 						 tmpinput["kappa_cl"],tmpinput["alpha"],tmpinput["gamma"]);
 
-			solu.SetCorrError(0.,0.,0.,0.,0.,0.);
+			//solu.SetCorrError(0.,0.,0.,0.,0.,0.);
+			solu.SetCorrError((fh_kb->GetFunction("pol0"))->GetParError(0),
+						 (fh_beta->GetFunction("pol0"))->GetParError(0),
+						 (fh_delta->GetFunction("pol0"))->GetParError(0),
+						 (fh_kcl->GetFunction("pol0"))->GetParError(0),
+						 (fh_alpha->GetFunction("pol0"))->GetParError(0),
+							  (fh_gamma->GetFunction("pol0"))->GetParError(0));
 			solu.SetError(2);
-			solu.SetNbErrorIteration(200);
+			solu.SetNbErrorIteration(100);
 			solu.SetInitialOrder(1,1);
 
 			solu.SetAverageRes(sol.GetResultVec(1));
@@ -1103,7 +1168,7 @@ void S8Solver::Draw(int maxNbins) {
         fh_gamma->SetMarkerColor(2);
         fh_delta->SetLineColor(1);
         fh_gamma->SetLineColor(2);
-	fh_delta->SetMinimum(0.7);
+    	fh_delta->SetMinimum(0.7);
         fh_delta->SetMaximum(1.3);
         fh_delta->Draw("P");
         fh_gamma->Draw("Psame");
