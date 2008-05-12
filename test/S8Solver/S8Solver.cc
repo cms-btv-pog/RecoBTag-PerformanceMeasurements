@@ -25,7 +25,7 @@ S8Solver::S8Solver() {
 //S8Solver::S8Solver(std::string name) {
 
 	fAlphaConst = true;
-	fBetaConst = true;
+	fBetaConst = false;
 	fcategory = "pT";
 	fminPtrel = 0.8;
 	fMaxPtrel = 3.0;//-1;
@@ -39,10 +39,10 @@ S8Solver::S8Solver() {
 	fKappabf = 1.;
 	fKappaclf = 1.;
 	fKappabConst = false;
-	fKappaclConst = false;
+	fKappaclConst = true;
 	fisCorrFile = false;
 	fDeltaConst = false;
-	fGammaConst = false;
+	fGammaConst = true;
 
 }
 //____________________________________________________________
@@ -93,7 +93,7 @@ void S8Solver::LoadHistos() {
 	
 	
 	// rebin correlation factors
-	const int ncorrptarray = 3;
+	const int ncorrptarray = 10;
 	const int ncorretaarray = 3;
 	Double_t corrptbins[ncorrptarray] = {30., 80.,230.};
 	Double_t corretabins[ncorrptarray] = {0.,1.5,2.5};
@@ -368,11 +368,49 @@ void S8Solver::LoadHistos() {
 			
 		// fit to pol0
 		fh_alpha->Fit("pol0","0");
+		std::cout << "Fit to pol0 fh_alpha: Chi2 = " << fh_alpha->GetFunction("pol0")->GetChisquare() << std::endl;
 		fh_beta->Fit("pol0","0");
+		std::cout << "Fit to pol0 fh_beta: Chi2 = " << fh_beta->GetFunction("pol0")->GetChisquare() << std::endl;
 		fh_kb->Fit("pol0","0");
+		std::cout << "Fit to pol0 fh_kb: Chi2 = " << fh_kb->GetFunction("pol0")->GetChisquare() << std::endl;
 		fh_kcl->Fit("pol0","0");
+		std::cout << "Fit to pol0 fh_kcl: Chi2 = " << fh_kcl->GetFunction("pol0")->GetChisquare() << std::endl;
 		fh_delta->Fit("pol0","0");
+		std::cout << "Fit to pol0 fh_delta: Chi2 = " << fh_delta->GetFunction("pol0")->GetChisquare() << std::endl;
 		fh_gamma->Fit("pol0","0");
+		std::cout << "Fit to pol0 fh_gamma: Chi2 = " << fh_gamma->GetFunction("pol0")->GetChisquare() << std::endl;
+
+
+		// fit to pol1
+		fh_alpha->Fit("pol1","0+");
+		std::cout << "Fit to pol1 fh_alpha: Chi2 = " << fh_alpha->GetFunction("pol1")->GetChisquare() << std::endl;
+		fh_beta->Fit("pol1","0+");
+		std::cout << "Fit to pol1 fh_beta: Chi2 = " << fh_beta->GetFunction("pol1")->GetChisquare() << std::endl;
+		fh_kb->Fit("pol1","0+");
+		std::cout << "Fit to pol1 fh_kb: Chi2 = " << fh_kb->GetFunction("pol1")->GetChisquare() << std::endl;
+		fh_kcl->Fit("pol1","0+");
+		std::cout << "Fit to pol1 fh_kcl: Chi2 = " << fh_kcl->GetFunction("pol1")->GetChisquare() << std::endl;
+		fh_delta->Fit("pol1","0+");
+		std::cout << "Fit to pol1 fh_delta: Chi2 = " << fh_delta->GetFunction("pol1")->GetChisquare() << std::endl;
+		fh_gamma->Fit("pol1","0+");
+		std::cout << "Fit to pol1 fh_gamma: Chi2 = " << fh_gamma->GetFunction("pol1")->GetChisquare() << std::endl;
+
+
+		// fit to pol2
+		fh_alpha->Fit("pol2","0+");
+		std::cout << "Fit to pol2 fh_alpha: Chi2 = " << fh_alpha->GetFunction("pol2")->GetChisquare() << std::endl;
+		fh_beta->Fit("pol2","0+");
+		std::cout << "Fit to pol2 fh_beta: Chi2 = " << fh_beta->GetFunction("pol2")->GetChisquare() << std::endl;
+		fh_kb->Fit("pol2","0+");
+		std::cout << "Fit to pol2 fh_kb: Chi2 = " << fh_kb->GetFunction("pol2")->GetChisquare() << std::endl;
+		fh_kcl->Fit("pol2","0+");
+		std::cout << "Fit to pol2 fh_kcl: Chi2 = " << fh_kcl->GetFunction("pol2")->GetChisquare() << std::endl;
+		fh_delta->Fit("pol2","0+");
+		std::cout << "Fit to pol0 fh_delta: Chi2 = " << fh_delta->GetFunction("pol2")->GetChisquare() << std::endl;
+		fh_gamma->Fit("pol2","0+");
+		std::cout << "Fit to pol2 fh_gamma: Chi2 = " << fh_gamma->GetFunction("pol2")->GetChisquare() << std::endl;
+
+
 
 	}
 	// should I remove the following loop?
@@ -439,7 +477,7 @@ void S8Solver::LoadHistos() {
 			}
 		}
 	}
-	//std::cout << " got correlations" << std::endl;
+	std::cout << " got correlations" << std::endl;
 }
 
 
@@ -501,6 +539,14 @@ void S8Solver::GetInput() {
 	*/
 	
 	// binned input base in the n samples
+	TF1 *F_kb = fh_kb->GetFunction("pol1");
+	TF1 *F_kcl = fh_kcl->GetFunction("pol1");
+	TF1 *F_alpha = fh_alpha->GetFunction("pol1");
+	TF1 *F_beta = fh_beta->GetFunction("pol1");
+	TF1 *F_delta = fh_delta->GetFunction("pol1");
+	TF1 *F_gamma = fh_gamma->GetFunction("pol1");
+
+
 	std::vector< TH1* > HistoList;
 	HistoList.push_back(fnHisto);
 	HistoList.push_back(fnHistoMu);
@@ -550,7 +596,8 @@ void S8Solver::GetInput() {
 				if(name[ihisto]=="beta") {
 					if (!fBetaConst) {
 						int abin = htemp->GetXaxis()->FindBin(pt);
-						tmpmap[name[ihisto]] = fBetaf * htemp->GetBinContent(abin);
+						//	tmpmap[name[ihisto]] = fBetaf * htemp->GetBinContent(abin);
+						tmpmap[name[ihisto]] = fBetaf * F_beta->Eval(pt,0,0);
 					} else {
 						tmpmap[name[ihisto]] = fBetaf * TotalInput["beta"];
 					}
@@ -558,7 +605,8 @@ void S8Solver::GetInput() {
 				else if(name[ihisto]=="alpha") { 
 					if (!fAlphaConst) { 
 						int abin = htemp->GetXaxis()->FindBin(pt); 
-						tmpmap[name[ihisto]] = fAlphaf * htemp->GetBinContent(abin); 
+						// tmpmap[name[ihisto]] = fAlphaf * htemp->GetBinContent(abin); 
+						tmpmap[name[ihisto]] = fAlphaf * F_alpha->Eval(pt,0,0);
 					} else { 
 						tmpmap[name[ihisto]] = fAlphaf * TotalInput["alpha"]; 
 					} 
@@ -566,7 +614,8 @@ void S8Solver::GetInput() {
 				else if(name[ihisto]=="kappa_b") {
 				  if (!fKappabConst) {
 				    int abin = htemp->GetXaxis()->FindBin(pt);  
-				    tmpmap[name[ihisto]] = fKappabf * htemp->GetBinContent(abin);  
+				    //tmpmap[name[ihisto]] = fKappabf * htemp->GetBinContent(abin);  
+					tmpmap[name[ihisto]] = fKappabf * F_kb->Eval(pt,0,0);
 				  } else {
 				    tmpmap[name[ihisto]] = fKappabf * TotalInput["kappa_b"]; 
 				  }
@@ -574,7 +623,8 @@ void S8Solver::GetInput() {
 				else if(name[ihisto]=="kappa_cl") {
 				  if (!fKappaclConst) {
 				    int abin = htemp->GetXaxis()->FindBin(pt);  
-				    tmpmap[name[ihisto]] = fKappaclf * htemp->GetBinContent(abin);  
+				    //tmpmap[name[ihisto]] = fKappaclf * htemp->GetBinContent(abin);  
+					tmpmap[name[ihisto]] = fKappaclf * F_kcl->Eval(pt,0,0);  
 				  } else {
 				    tmpmap[name[ihisto]] = fKappaclf * TotalInput["kappa_cl"]; 
 				  }
@@ -582,15 +632,17 @@ void S8Solver::GetInput() {
 				else if(name[ihisto]=="delta") {
                                   if (!fDeltaConst) {
                                     int abin = htemp->GetXaxis()->FindBin(pt);
-                                    tmpmap[name[ihisto]] = htemp->GetBinContent(abin);
-                                  } else {
+                                    //tmpmap[name[ihisto]] = htemp->GetBinContent(abin);
+									tmpmap[name[ihisto]] = F_delta->Eval(pt,0,0);
+                                  }  else {
                                     tmpmap[name[ihisto]] = TotalInput["delta"];
                                   }
                                 }
 				else if(name[ihisto]=="gamma") {
                                   if (!fGammaConst) {
                                     int abin = htemp->GetXaxis()->FindBin(pt);
-                                    tmpmap[name[ihisto]] = htemp->GetBinContent(abin);
+                                    //tmpmap[name[ihisto]] = htemp->GetBinContent(abin);
+									tmpmap[name[ihisto]] = F_gamma->Eval(pt,0,0);
                                   } else {
                                     tmpmap[name[ihisto]] = TotalInput["gamma"];
                                   }
