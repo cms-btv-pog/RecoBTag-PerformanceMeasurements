@@ -42,6 +42,8 @@ class S8Solver {
 		void SetBetaFactor(double value) { fBetaf = value; }
 		void SetKappabFactor(double value) { fKappabf = value; }
 		void SetKappaclFactor(double value) { fKappaclf = value; }
+		void SetDeltaFactor(double value) { fDeltaf = value; }
+		void SetGammaFactor(double value) { fGammaf = value; }
 		void SetDeltaConstant(bool option) { fDeltaConst = option; }
 		void SetGammaConstant(bool option) { fGammaConst = option; }
 		void SetMethod( TString option ) { fmethod = option; };
@@ -110,6 +112,8 @@ class S8Solver {
 		double fBetaf;
 		double fKappabf;
 		double fKappaclf;
+		double fDeltaf;
+		double fGammaf;
 		bool frebin;
 		bool frecalculateFactors;
 		double fminPtrel;

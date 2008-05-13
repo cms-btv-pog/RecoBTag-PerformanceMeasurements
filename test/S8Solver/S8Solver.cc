@@ -25,7 +25,7 @@ S8Solver::S8Solver() {
 //S8Solver::S8Solver(std::string name) {
 
 	fAlphaConst = true;
-	fBetaConst = false;
+	fBetaConst = true;
 	fcategory = "pT";
 	fminPtrel = 0.8;
 	fMaxPtrel = 3.0;//-1;
@@ -38,11 +38,13 @@ S8Solver::S8Solver() {
 	fBetaf = 1.;
 	fKappabf = 1.;
 	fKappaclf = 1.;
+	fDeltaf = 1.;
+	fGammaf = 1.;
 	fKappabConst = false;
 	fKappaclConst = true;
 	fisCorrFile = false;
 	fDeltaConst = false;
-	fGammaConst = true;
+	fGammaConst = false;
 
 }
 //____________________________________________________________
@@ -93,7 +95,7 @@ void S8Solver::LoadHistos() {
 	
 	
 	// rebin correlation factors
-	const int ncorrptarray = 10;
+	const int ncorrptarray = 11;
 	const int ncorretaarray = 3;
 	Double_t corrptbins[ncorrptarray] = {30., 80.,230.};
 	Double_t corretabins[ncorrptarray] = {0.,1.5,2.5};
@@ -519,8 +521,8 @@ void S8Solver::GetInput() {
 	TotalInput["kappa_cl"] = fKappaclf * Fkcl->GetParameter(0);
 	TotalInput["alpha"] = fAlphaf * Falpha->GetParameter(0);
 	TotalInput["beta"] = fBetaf * Fbeta->GetParameter(0);
-	TotalInput["delta"] = Fdelta->GetParameter(0);
-	TotalInput["gamma"] = Fgamma->GetParameter(0);
+	TotalInput["delta"] =fDeltaf * Fdelta->GetParameter(0);
+	TotalInput["gamma"] = fGammaf * Fgamma->GetParameter(0);
 
 	//check
 	/*
@@ -599,7 +601,7 @@ void S8Solver::GetInput() {
 						//	tmpmap[name[ihisto]] = fBetaf * htemp->GetBinContent(abin);
 						tmpmap[name[ihisto]] = fBetaf * F_beta->Eval(pt,0,0);
 					} else {
-						tmpmap[name[ihisto]] = fBetaf * TotalInput["beta"];
+						tmpmap[name[ihisto]] = TotalInput["beta"];
 					}
 				}
 				else if(name[ihisto]=="alpha") { 
@@ -608,7 +610,7 @@ void S8Solver::GetInput() {
 						// tmpmap[name[ihisto]] = fAlphaf * htemp->GetBinContent(abin); 
 						tmpmap[name[ihisto]] = fAlphaf * F_alpha->Eval(pt,0,0);
 					} else { 
-						tmpmap[name[ihisto]] = fAlphaf * TotalInput["alpha"]; 
+						tmpmap[name[ihisto]] = TotalInput["alpha"]; 
 					} 
 				}
 				else if(name[ihisto]=="kappa_b") {
@@ -617,7 +619,7 @@ void S8Solver::GetInput() {
 				    //tmpmap[name[ihisto]] = fKappabf * htemp->GetBinContent(abin);  
 					tmpmap[name[ihisto]] = fKappabf * F_kb->Eval(pt,0,0);
 				  } else {
-				    tmpmap[name[ihisto]] = fKappabf * TotalInput["kappa_b"]; 
+				    tmpmap[name[ihisto]] = TotalInput["kappa_b"]; 
 				  }
 				}
 				else if(name[ihisto]=="kappa_cl") {
@@ -626,14 +628,14 @@ void S8Solver::GetInput() {
 				    //tmpmap[name[ihisto]] = fKappaclf * htemp->GetBinContent(abin);  
 					tmpmap[name[ihisto]] = fKappaclf * F_kcl->Eval(pt,0,0);  
 				  } else {
-				    tmpmap[name[ihisto]] = fKappaclf * TotalInput["kappa_cl"]; 
+				    tmpmap[name[ihisto]] = TotalInput["kappa_cl"]; 
 				  }
 				}
 				else if(name[ihisto]=="delta") {
                                   if (!fDeltaConst) {
                                     int abin = htemp->GetXaxis()->FindBin(pt);
                                     //tmpmap[name[ihisto]] = htemp->GetBinContent(abin);
-									tmpmap[name[ihisto]] = F_delta->Eval(pt,0,0);
+									tmpmap[name[ihisto]] = fDeltaf * F_delta->Eval(pt,0,0);
                                   }  else {
                                     tmpmap[name[ihisto]] = TotalInput["delta"];
                                   }
@@ -642,7 +644,7 @@ void S8Solver::GetInput() {
                                   if (!fGammaConst) {
                                     int abin = htemp->GetXaxis()->FindBin(pt);
                                     //tmpmap[name[ihisto]] = htemp->GetBinContent(abin);
-									tmpmap[name[ihisto]] = F_gamma->Eval(pt,0,0);
+									tmpmap[name[ihisto]] = fGammaf * F_gamma->Eval(pt,0,0);
                                   } else {
                                     tmpmap[name[ihisto]] = TotalInput["gamma"];
                                   }
