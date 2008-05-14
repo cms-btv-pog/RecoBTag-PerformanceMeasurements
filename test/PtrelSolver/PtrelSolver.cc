@@ -644,6 +644,7 @@ void PtrelSolver::makeHistEPS(TObjArray &data, TObjArray &mc) {
  * make templates based on the 2-dimension histograms.
  *
  **************************************************************************/
+/*
 void PtrelSolver::makeTemplates(int flavor, const char *inputfilename, const char *pdffilename, const char *rootfilename, const char *tag, const char *pthist, const char *etahist, bool latex) {
 
 
@@ -991,7 +992,7 @@ void PtrelSolver::makeTemplates(int flavor, const char *inputfilename, const cha
   rootfile->Close();
   file.close();
 }
-
+*/
 
 
 // "b"

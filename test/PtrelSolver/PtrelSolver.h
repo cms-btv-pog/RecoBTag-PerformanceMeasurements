@@ -141,7 +141,7 @@ class PtrelSolver : public TObject {
   void makeTemplates(const char *flavor, const char *sampletag, bool sum, const char *inputfilename, const char *dir, const char *tag, const char *thehist, int pdfbase, const char *outputdir, const char *versiontag="", bool sys=false, bool latex=false);
 
 
-  void makeTemplates(int flavor, const char *inputfilename, const char *pdffilename, const char *rootfilename, const char *tag  ="", const char *pthist = "npT", const char *etahist="nEta", bool latex = false);
+  //  void makeTemplates(int flavor, const char *inputfilename, const char *pdffilename, const char *rootfilename, const char *tag  ="", const char *pthist = "npT", const char *etahist="nEta", bool latex = false);
 
   void readTemplates(const char *filename, std::vector<std::vector<double> > *parameters);
   void buildPdfs(TObjArray *combined, std::vector<std::vector<double> > *b, std::vector<std::vector<double> > *c, const char *tag = 0);
@@ -180,7 +180,7 @@ class PtrelSolver : public TObject {
   bool initPdfsByTag(const char * sampletag, const char * tag, const char * pdfdir, const char *versiontag, bool sys);
   bool initPdfsByTag(const char * directory, const char * tag, const char * versiontag);
 
-  void allEff(const char *inputfilename, const char *dir, const char *outfilename, const char *sampletag, const char *pdfdir, const char *versiontag="", bool sys=false);
+  void allEff(const char *inputfilename, const char *dir, const char *outfilename, const char *sampletag, const char *pdfdir, const char *tagger, const char *versiontag="", bool sys=false);
 
 
   // calibration

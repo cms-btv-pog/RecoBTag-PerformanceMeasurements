@@ -112,7 +112,7 @@ ClassImp(PtrelSolver)
   chi2 = new TH1F(chi2name.Data(), "", 2 * nbins +1, 0, 2*nbins +1);
   formatHist1(chi2, "Bin Index", "#chi^{2}");
   //  for (int ii = 0; ii <= 5; ii++) {
-  for (int ii = 1; ii <= nbins; ii++) {
+  for (int ii = 0; ii <= nbins; ii++) {
 
     c1->cd();
     thePdf = getPdfByIndex(           pdfbase * ii , "");
@@ -252,17 +252,17 @@ ClassImp(PtrelSolver)
   inputfile->Close();
 }
 
-void PtrelSolver::allEff(const char *inputfilename, const char *dir, const char *outfilename, const char *sampletag, const char *pdfdir, const char *versiontag, bool sys) {
+void PtrelSolver::allEff(const char *inputfilename, const char *dir, const char *outfilename, const char *sampletag, const char *pdfdir, const char *tagger, const char *versiontag, bool sys) {
 
 
   if (sys) {
-    if (!  this->initPdfsByTag(sampletag, "TCL", pdfdir, versiontag, sys) ) return;
+    if (!  this->initPdfsByTag(sampletag, tagger, pdfdir, versiontag, sys) ) return;
   }
-  if (!  this->initPdfsByTag(sampletag, "TCL", pdfdir, versiontag, false) ) return;
+  if (!  this->initPdfsByTag(sampletag, tagger, pdfdir, versiontag, false) ) return;
 
 
-  this->measure(sampletag, inputfilename, dir, outfilename, "TCL", "pT",  sys, inputfilename, dir);
-  this->measure(sampletag, inputfilename, dir, outfilename, "TCL", "eta", sys, inputfilename, dir);
+  this->measure(sampletag, inputfilename, dir, outfilename, tagger, "pT",  sys, inputfilename, dir);
+  this->measure(sampletag, inputfilename, dir, outfilename, tagger, "eta", sys, inputfilename, dir);
 }
 
 void PtrelSolver::makeAllPerFile(const char *datafile, const char *outputdir, const char *versiontag) {
