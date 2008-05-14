@@ -985,6 +985,7 @@ void S8Solver::PrintData(TString option) {
 void S8Solver::DumpTable(std::string filename) {
 
 	Int_t nxbins = fBinnedSolution.size();
+	// separator
 	std::string sp = ",";
 
 	std::ofstream ff;
@@ -993,6 +994,8 @@ void S8Solver::DumpTable(std::string filename) {
 	// header
 	ff <<  "ptMin,ptMax,etaMin,etaMax,bEff,bEffErr,clEff,clEfferr"<< sp << fthename << std::endl;
 
+	/*
+	// MC truth
 	for (int ibin = 1; ibin<= nxbins; ++ibin) {
 
 		double ptcenter = fnHisto->GetXaxis()->GetBinCenter(ibin);
@@ -1009,6 +1012,63 @@ void S8Solver::DumpTable(std::string filename) {
 
 		ff << ptcenter - ptdelta << sp << ptcenter + ptdelta << sp << etamin << sp << etamax << sp << beff << sp << befferr << sp << cleff << sp << clefferr << std::endl;
 		
+	}
+	*/
+	int bbin = 1;
+	for( std::map<int,std::map<TString,double> >::const_iterator ibin = fBinnedSolution.begin(); ibin!=fBinnedSolution.end(); ++ibin) {
+
+		if (fcategory == "pT") {
+			
+			double ptcenter = fnHisto->GetXaxis()->GetBinCenter(bbin);
+			double ptdelta = 0.5 * (fnHisto->GetXaxis())->GetBinWidth(bbin);
+
+			double etamin = 0.;
+			double etamax = 2.5;
+			
+			double beff = 0.;
+			double befferr = 0.;
+		
+			double cleff = 0.;
+			double clefferr = 0.;
+			
+			//std::cout << "### bin: " << ibin->first << std::endl;
+			std::map<TString, double> tmpmap = ibin->second;
+			std::map<TString, double> tmpmaperr = fBinnedSolutionErr[ibin->first];
+			for( std::map<TString,double>::const_iterator i = tmpmap.begin(); i!=tmpmap.end(); ++i) {
+
+				if (i->first == "effTag_b") { beff = i->second; befferr = tmpmaperr[i->first]; }
+				if (i->first == "effTag_cl") { cleff = i->second; clefferr = tmpmaperr[i->first]; }
+				
+			}
+			ff << ptcenter - ptdelta << sp << ptcenter + ptdelta << sp << etamin << sp << etamax << sp << beff << sp << befferr << sp << cleff << sp << clefferr << std::endl;
+			bbin++;
+		}
+		if (fcategory == "eta") {
+			
+			double etacenter = fnHisto->GetXaxis()->GetBinCenter(bbin);
+			double etadelta = 0.5 * fnHisto->GetXaxis()->GetBinWidth(bbin);
+
+			double ptmin = 30.;
+			double ptmax = 230.;
+			
+			double beff = 0.;
+			double befferr = 0.;
+		
+			double cleff = 0.;
+			double clefferr = 0.;
+			
+			//std::cout << "### bin: " << ibin->first << std::endl;
+			std::map<TString, double> tmpmap = ibin->second;
+			std::map<TString, double> tmpmaperr = fBinnedSolutionErr[ibin->first];
+			for( std::map<TString,double>::const_iterator i = tmpmap.begin(); i!=tmpmap.end(); ++i) {
+
+				if (i->first == "effTag_b") { beff = i->second; befferr = tmpmaperr[i->first]; }
+				if (i->first == "effTag_cl") { cleff = i->second; clefferr = tmpmaperr[i->first]; }
+				
+			}
+			ff << ptmin << sp << ptmax << sp << etacenter - etadelta << sp << etacenter + etadelta << sp << beff << sp << befferr << sp << cleff << sp << clefferr << std::endl;
+			bbin++;
+		}
 	}
 	
 }
