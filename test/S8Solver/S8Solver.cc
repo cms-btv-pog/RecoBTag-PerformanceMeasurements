@@ -992,7 +992,7 @@ void S8Solver::DumpTable(std::string filename) {
 	ff.open(filename.c_str());
 
 	// header
-	ff <<  "ptMin,ptMax,etaMin,etaMax,bEff,bEffErr,clEff,clEfferr"<< sp << fthename << std::endl;
+	ff <<  "ptMin,ptMax,etaMin,etaMax,bTagEff,bTagEffErr,clTagEff,clTagEfferr,bPtrelEff,bPtrelEffErr,clPtrelEff,clPtrelEfferr"<< sp << fthename << std::endl;
 
 	/*
 	// MC truth
@@ -1031,6 +1031,12 @@ void S8Solver::DumpTable(std::string filename) {
 			double cleff = 0.;
 			double clefferr = 0.;
 			
+			double bPtreleff = 0.;
+			double bPtrelefferr = 0.;
+		
+			double clPtreleff = 0.;
+			double clPtrelefferr = 0.;
+			
 			//std::cout << "### bin: " << ibin->first << std::endl;
 			std::map<TString, double> tmpmap = ibin->second;
 			std::map<TString, double> tmpmaperr = fBinnedSolutionErr[ibin->first];
@@ -1038,9 +1044,14 @@ void S8Solver::DumpTable(std::string filename) {
 
 				if (i->first == "effTag_b") { beff = i->second; befferr = tmpmaperr[i->first]; }
 				if (i->first == "effTag_cl") { cleff = i->second; clefferr = tmpmaperr[i->first]; }
+				if (i->first == "effMu_b") { bPtreleff = i->second; bPtrelefferr = tmpmaperr[i->first]; }
+				if (i->first == "effMu_cl") { clPtreleff = i->second; clPtrelefferr = tmpmaperr[i->first]; }
 				
 			}
-			ff << ptcenter - ptdelta << sp << ptcenter + ptdelta << sp << etamin << sp << etamax << sp << beff << sp << befferr << sp << cleff << sp << clefferr << std::endl;
+			ff << ptcenter - ptdelta << sp << ptcenter + ptdelta << sp << etamin << sp << etamax << sp
+			   << beff << sp << befferr << sp << cleff << sp << clefferr <<sp
+			   << bPtreleff << sp << bPtrelefferr << sp << clPtreleff << sp << clPtrelefferr
+			   << std::endl;
 			bbin++;
 		}
 		if (fcategory == "eta") {
@@ -1056,6 +1067,12 @@ void S8Solver::DumpTable(std::string filename) {
 		
 			double cleff = 0.;
 			double clefferr = 0.;
+
+			double bPtreleff = 0.;
+			double bPtrelefferr = 0.;
+		
+			double clPtreleff = 0.;
+			double clPtrelefferr = 0.;
 			
 			//std::cout << "### bin: " << ibin->first << std::endl;
 			std::map<TString, double> tmpmap = ibin->second;
@@ -1064,9 +1081,15 @@ void S8Solver::DumpTable(std::string filename) {
 
 				if (i->first == "effTag_b") { beff = i->second; befferr = tmpmaperr[i->first]; }
 				if (i->first == "effTag_cl") { cleff = i->second; clefferr = tmpmaperr[i->first]; }
+				if (i->first == "effMu_b") { bPtreleff = i->second; bPtrelefferr = tmpmaperr[i->first]; }
+				if (i->first == "effMu_cl") { clPtreleff = i->second; clPtrelefferr = tmpmaperr[i->first]; }
+				
 				
 			}
-			ff << ptmin << sp << ptmax << sp << etacenter - etadelta << sp << etacenter + etadelta << sp << beff << sp << befferr << sp << cleff << sp << clefferr << std::endl;
+			ff << ptmin << sp << ptmax << sp << etacenter - etadelta << sp << etacenter + etadelta << sp << beff << sp
+			   << befferr << sp << cleff << sp << clefferr << sp
+			   << bPtreleff << sp << bPtrelefferr << sp << clPtreleff << sp << clPtrelefferr
+			   << std::endl;
 			bbin++;
 		}
 	}
