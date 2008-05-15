@@ -45,6 +45,9 @@ class S8NumericSolver : public TNamed
    std::map< int, double > fMapErrorInf_Stat;
    std::map< int, double > fMapErrorSup_Stat;
 
+   bool fForceSol;
+   Int_t fpickSol;
+
    Double_t fNb;
    Double_t fErrorinf_Stat[8] ;
    Double_t fErrorsup_Stat[8] ;
@@ -113,6 +116,11 @@ class S8NumericSolver : public TNamed
    void SetError( Int_t b );
    void SetPrecision( Int_t pr ) {fNpt = pr ;}
    void SetNbErrorIteration( Int_t pr ) {fIter = pr ;}
+   
+   void SetSolution( Int_t asol) {
+     fForceSol = true;
+     fpickSol = asol;
+   }
 
    void SetInitialOrder(Int_t n, Int_t a = 1);
    void SetInitialOrder(std::string s1, std::string s2, std::string s3);

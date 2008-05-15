@@ -48,6 +48,8 @@ class S8Solver {
 		void SetGammaConstant(bool option) { fGammaConst = option; }
 		void SetMethod( TString option ) { fmethod = option; };
 		void Solve();
+		void SetSolution( int bin, int solution) { fPickBin=bin; fPicknSol = solution; }
+
         void Verbose(bool option) { fVerbose = option; };
 		void PrintData(TString option="");
 		void DumpTable(std::string filename="table.txt");
@@ -126,7 +128,9 @@ class S8Solver {
 		std::map< int, std::map< TString, double> > fBinnedSolutionErr;
 
 		std::map<TString, TCanvas*> cv_map;
-		
+
+		int fPickBin; int fPicknSol;
+
 		TH2F* fnHistoBase;
 		TH2F* fpHistoBase;
 		TH2F* fnSvxHistoBase;

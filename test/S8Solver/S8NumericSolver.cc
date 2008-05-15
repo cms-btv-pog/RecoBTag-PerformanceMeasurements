@@ -99,6 +99,9 @@ fIter = 10000;
  fAveResSetup = false;
  fverbose = false;
  
+ fForceSol = false;
+ fpickSol = 0;
+
 }
 
 void S8NumericSolver::SetInput(Double_t n, Double_t n1, Double_t n2 , Double_t n3,
@@ -193,6 +196,14 @@ Int_t S8NumericSolver::FindSolution(Double_t* res, int n)
 	int thesols = -1;
 	int thesols2 = -1;
 	double deltares = 9999999;
+
+	if (fForceSol) {
+	  if (fverbose) std::cout << "[S8Numeric] Solution chosen manually, Force to be solution # " << fpickSol<< std::endl;
+	  fNb = res[fpickSol -1 ];
+	  for(int i=0; i<8;++i) fMapResult[i] =  fResult[i] = E(i%2,i/2);
+	  return 1;
+	}
+
 	if (fverbose) std::cout << "[S8Numeric] now print all solutions:"<< std::endl;
 	for(int j=1; j<= n; ++j) {
 		fNb = res[j-1];

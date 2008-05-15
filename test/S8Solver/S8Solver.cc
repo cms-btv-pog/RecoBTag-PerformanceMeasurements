@@ -45,7 +45,8 @@ S8Solver::S8Solver() {
 	fisCorrFile = false;
 	fDeltaConst = false;
 	fGammaConst = false;
-
+	fPickBin = -1;
+	fPicknSol = -1;
 }
 //____________________________________________________________
 void S8Solver::Clear() {
@@ -741,8 +742,14 @@ void S8Solver::Solve() {
 		sol.SetNbErrorIteration(100);
 		sol.SetInitialOrder(1,1);
 		bool converge = true;
+		
+		// pick solution manually if requested
+		if (fPickBin==0 && fPicknSol!=-1) {
+		  sol.SetSolution( fPicknSol );
+		}
 
 		sol.Solve();
+
 		/*
 		if(!sol.Solve()) {
 			//converge = false;
@@ -848,7 +855,12 @@ void S8Solver::Solve() {
 			solu.SetInitialOrder(1,1);
 
 			solu.SetAverageRes(sol.GetResultVec(1));
-			
+
+			// picksolution manually if requested
+			if (fPickBin>0 && fPicknSol!=-1) {
+			  sol.SetSolution( fPicknSol );
+			}
+
 			solu.Solve();
 			/*
 			if(!solu.Solve()) {
