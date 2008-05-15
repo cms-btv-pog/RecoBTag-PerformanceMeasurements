@@ -32,6 +32,7 @@ S8Solver::S8Solver() {
 	fVerbose = false;
 	fmethod = "numeric";
 	frebin = false;
+	fnbins = -1;
 	frecalculateFactors = true;
 	fthename = "";
 	fAlphaf = 1.;
@@ -96,11 +97,12 @@ void S8Solver::LoadHistos() {
 	
 	
 	// rebin correlation factors
-	const int ncorrptarray = 11;
+	const int ncorrptarray = 3;
 	const int ncorretaarray = 3;
 	Double_t corrptbins[ncorrptarray] = {30., 80.,230.};
 	Double_t corretabins[ncorrptarray] = {0.,1.5,2.5};
-	//if (fcategory=="Eta") {
+
+    //if (fcategory=="Eta") {
 	//  ncorrptarray = tmpncorretaarray;
 	  
 	// recalculate correlation factors
@@ -170,34 +172,34 @@ void S8Solver::LoadHistos() {
 			// rebin input data
 
 
-            TH1D* tmphalljets_b           = (TH1D*) halljets_b->Rebin(ncorrptarray-1,"tmphalljets_b");          
-			TH1D* tmphalljets_cl          =	(TH1D*) halljets_cl->Rebin(ncorrptarray-1,"tmphalljets_cl");         
-			TH1D* tmphtagjets_b           =	(TH1D*) htagjets_b->Rebin(ncorrptarray-1,"tmphtagjets_b");          
-			TH1D* tmphtagjets_cl          =	(TH1D*) htagjets_cl->Rebin(ncorrptarray-1,"tmphtagjets_cl");         
-			TH1D* tmphalljets_b_ptrel     =	(TH1D*) halljets_b_ptrel->Rebin(ncorrptarray-1,"tmphalljets_b_ptrel");    
-			TH1D* tmphalljets_cl_ptrel    =	(TH1D*) halljets_cl_ptrel->Rebin(ncorrptarray-1,"tmphalljets_cl_ptrel");   
-			TH1D* tmphtagjets_b_ptrel     =	(TH1D*) htagjets_b_ptrel->Rebin(ncorrptarray-1,"tmphtagjets_b_ptrel");    
-			TH1D* tmphtagjets_cl_ptrel    =	(TH1D*) htagjets_cl_ptrel->Rebin(ncorrptarray-1,"tmphtagjets_cl_ptrel");    
-			TH1D* tmphalloppjets_b        =	(TH1D*) halloppjets_b->Rebin(ncorrptarray-1,"tmphalloppjets_b");        
-			TH1D* tmphalloppjets_cl       =	(TH1D*) halloppjets_cl->Rebin(ncorrptarray-1,"tmp halloppjets_cl");       
-			TH1D* tmphtagoppjets_b        =	(TH1D*) htagoppjets_b->Rebin(ncorrptarray-1,"tmphtagoppjets_b");         
-			TH1D* tmphtagoppjets_cl       =	(TH1D*) htagoppjets_cl->Rebin(ncorrptarray-1,"tmphtagoppjets_cl");       
-			TH1D* tmphalloppjets_b_ptrel  =	(TH1D*) halloppjets_b_ptrel->Rebin(ncorrptarray-1,"tmphalloppjets_b_ptrel"); 
-			TH1D* tmphalloppjets_cl_ptrel =	(TH1D*) halloppjets_cl_ptrel->Rebin(ncorrptarray-1,"tmphalloppjets_cl_ptrel");
-			TH1D* tmphtagoppjets_b_ptrel  =	(TH1D*) htagoppjets_b_ptrel->Rebin(ncorrptarray-1,"tmphtagoppjets_b_ptrel"); 
-			TH1D* tmphtagoppjets_cl_ptrel = (TH1D*) htagoppjets_cl_ptrel->Rebin(ncorrptarray-1,"tmphtagoppjets_cl_ptrel");
+            TH1D* tmphalljets_b           = (TH1D*) halljets_b->Rebin(fnbins,"tmphalljets_b");          
+			TH1D* tmphalljets_cl          =	(TH1D*) halljets_cl->Rebin(fnbins,"tmphalljets_cl");         
+			TH1D* tmphtagjets_b           =	(TH1D*) htagjets_b->Rebin(fnbins,"tmphtagjets_b");          
+			TH1D* tmphtagjets_cl          =	(TH1D*) htagjets_cl->Rebin(fnbins,"tmphtagjets_cl");         
+			TH1D* tmphalljets_b_ptrel     =	(TH1D*) halljets_b_ptrel->Rebin(fnbins,"tmphalljets_b_ptrel");    
+			TH1D* tmphalljets_cl_ptrel    =	(TH1D*) halljets_cl_ptrel->Rebin(fnbins,"tmphalljets_cl_ptrel");   
+			TH1D* tmphtagjets_b_ptrel     =	(TH1D*) htagjets_b_ptrel->Rebin(fnbins,"tmphtagjets_b_ptrel");    
+			TH1D* tmphtagjets_cl_ptrel    =	(TH1D*) htagjets_cl_ptrel->Rebin(fnbins,"tmphtagjets_cl_ptrel");    
+			TH1D* tmphalloppjets_b        =	(TH1D*) halloppjets_b->Rebin(fnbins,"tmphalloppjets_b");        
+			TH1D* tmphalloppjets_cl       =	(TH1D*) halloppjets_cl->Rebin(fnbins,"tmp halloppjets_cl");       
+			TH1D* tmphtagoppjets_b        =	(TH1D*) htagoppjets_b->Rebin(fnbins,"tmphtagoppjets_b");         
+			TH1D* tmphtagoppjets_cl       =	(TH1D*) htagoppjets_cl->Rebin(fnbins,"tmphtagoppjets_cl");       
+			TH1D* tmphalloppjets_b_ptrel  =	(TH1D*) halloppjets_b_ptrel->Rebin(fnbins,"tmphalloppjets_b_ptrel"); 
+			TH1D* tmphalloppjets_cl_ptrel =	(TH1D*) halloppjets_cl_ptrel->Rebin(fnbins,"tmphalloppjets_cl_ptrel");
+			TH1D* tmphtagoppjets_b_ptrel  =	(TH1D*) htagoppjets_b_ptrel->Rebin(fnbins,"tmphtagoppjets_b_ptrel"); 
+			TH1D* tmphtagoppjets_cl_ptrel = (TH1D*) htagoppjets_cl_ptrel->Rebin(fnbins,"tmphtagoppjets_cl_ptrel");
 
 		
-           	TH1D* tmpb_halljets_ptrel        = (TH1D*) b_halljets_ptrel->Rebin(ncorrptarray-1,"tmpb_halljets_ptrel");
-			TH1D* tmpcl_halljets_ptrel 		 = (TH1D*) cl_halljets_ptrel->Rebin(ncorrptarray-1,"tmpcl_halljets_ptrel");
-			TH1D* tmpb_halljets_tagged 		 = (TH1D*) b_halljets_tagged->Rebin(ncorrptarray-1,"tmpb_halljets_tagged"); 
-		   	TH1D* tmpcl_halljets_tagged		 = (TH1D*) cl_halljets_tagged->Rebin(ncorrptarray-1,"tmpcl_halljets_tagged"); 
-		   	TH1D* tmpb_halljets_ptreltagged  = (TH1D*) b_halljets_ptreltagged->Rebin(ncorrptarray-1,"tmpb_halljets_ptreltagged");	  
-		   	TH1D* tmpcl_halljets_ptreltagged = (TH1D*) cl_halljets_ptreltagged->Rebin(ncorrptarray-1,"tmpcl_halljets_ptreltagged"); 	  
-		   	TH1D* tmpb_halloppjets_tagged    = (TH1D*) b_halloppjets_tagged->Rebin(ncorrptarray-1,"tmpb_halloppjets_tagged");   	  
-		   	TH1D* tmpcl_halloppjets_tagged   = (TH1D*) cl_halloppjets_tagged->Rebin(ncorrptarray-1,"tmpcl_halloppjets_tagged");     	  
-		   	TH1D* tmpb_halloppjets_ptrel  	 = (TH1D*) b_halloppjets_ptrel->Rebin(ncorrptarray-1,"tmpb_halloppjets_ptrel");
-		   	TH1D* tmpcl_halloppjets_ptrel    = (TH1D*) cl_halloppjets_ptrel->Rebin(ncorrptarray-1,"tmpcl_halloppjets_ptrel");
+           	TH1D* tmpb_halljets_ptrel        = (TH1D*) b_halljets_ptrel->Rebin(fnbins,"tmpb_halljets_ptrel");
+			TH1D* tmpcl_halljets_ptrel 		 = (TH1D*) cl_halljets_ptrel->Rebin(fnbins,"tmpcl_halljets_ptrel");
+			TH1D* tmpb_halljets_tagged 		 = (TH1D*) b_halljets_tagged->Rebin(fnbins,"tmpb_halljets_tagged"); 
+		   	TH1D* tmpcl_halljets_tagged		 = (TH1D*) cl_halljets_tagged->Rebin(fnbins,"tmpcl_halljets_tagged"); 
+		   	TH1D* tmpb_halljets_ptreltagged  = (TH1D*) b_halljets_ptreltagged->Rebin(fnbins,"tmpb_halljets_ptreltagged");	  
+		   	TH1D* tmpcl_halljets_ptreltagged = (TH1D*) cl_halljets_ptreltagged->Rebin(fnbins,"tmpcl_halljets_ptreltagged"); 	  
+		   	TH1D* tmpb_halloppjets_tagged    = (TH1D*) b_halloppjets_tagged->Rebin(fnbins,"tmpb_halloppjets_tagged");   	  
+		   	TH1D* tmpcl_halloppjets_tagged   = (TH1D*) cl_halloppjets_tagged->Rebin(fnbins,"tmpcl_halloppjets_tagged");     	  
+		   	TH1D* tmpb_halloppjets_ptrel  	 = (TH1D*) b_halloppjets_ptrel->Rebin(fnbins,"tmpb_halloppjets_ptrel");
+		   	TH1D* tmpcl_halloppjets_ptrel    = (TH1D*) cl_halloppjets_ptrel->Rebin(fnbins,"tmpcl_halloppjets_ptrel");
 
 			
             delete halljets_b;
@@ -262,14 +264,14 @@ void S8Solver::LoadHistos() {
 
 
 			
-			TH1D* tmpfnHisto = (TH1D*) fnHisto->Rebin(ncorrptarray-1,"tmpfnHisto");
-			TH1D* tmpfpHisto = (TH1D*) fpHisto->Rebin(ncorrptarray-1,"tmpfpHisto");
-			TH1D* tmpfnHistoMu = (TH1D*) fnHistoMu->Rebin(ncorrptarray-1,"tmpfnHistoMu");
-			TH1D* tmpfpHistoMu = (TH1D*) fpHistoMu->Rebin(ncorrptarray-1,"tmpfpHistoMu");
-			TH1D* tmpfnHistoSvx = (TH1D*) fnHistoSvx->Rebin(ncorrptarray-1,"tmpfnHistoSvx");
-			TH1D* tmpfpHistoSvx = (TH1D*) fpHistoSvx->Rebin(ncorrptarray-1,"tmpfpHistoSvx");
-			TH1D* tmpfnHistoAll = (TH1D*) fnHistoAll->Rebin(ncorrptarray-1,"tmpfnHistoAll");
-			TH1D* tmpfpHistoAll = (TH1D*) fpHistoAll->Rebin(ncorrptarray-1,"tmpfpHistoAll");
+			TH1D* tmpfnHisto = (TH1D*) fnHisto->Rebin(fnbins,"tmpfnHisto");
+			TH1D* tmpfpHisto = (TH1D*) fpHisto->Rebin(fnbins,"tmpfpHisto");
+			TH1D* tmpfnHistoMu = (TH1D*) fnHistoMu->Rebin(fnbins,"tmpfnHistoMu");
+			TH1D* tmpfpHistoMu = (TH1D*) fpHistoMu->Rebin(fnbins,"tmpfpHistoMu");
+			TH1D* tmpfnHistoSvx = (TH1D*) fnHistoSvx->Rebin(fnbins,"tmpfnHistoSvx");
+			TH1D* tmpfpHistoSvx = (TH1D*) fpHistoSvx->Rebin(fnbins,"tmpfpHistoSvx");
+			TH1D* tmpfnHistoAll = (TH1D*) fnHistoAll->Rebin(fnbins,"tmpfnHistoAll");
+			TH1D* tmpfpHistoAll = (TH1D*) fpHistoAll->Rebin(fnbins,"tmpfpHistoAll");
 
 			delete fnHisto;
 			delete fpHisto;
@@ -439,10 +441,10 @@ void S8Solver::LoadHistos() {
 				//TH1D* tmpfh_gamma = (TH1D*) gDirectory->Get("gamma");
 				//TH1D* tmpfh_delta = (TH1D*) gDirectory->Get("delta");
 				
-				fh_alpha = (TH1D*) tmpfh_alpha->Rebin(ncorrptarray-1,"fh_alpha",corrptbins);
-				fh_beta = (TH1D*)tmpfh_beta->Rebin(ncorrptarray-1,"fh_beta",corrptbins);
-				fh_kb = (TH1D*)tmpfh_kb->Rebin(ncorrptarray-1,"fh_kb",corrptbins);
-				fh_kcl = (TH1D*)tmpfh_kcl->Rebin(ncorrptarray-1,"fh_kcl",corrptbins);
+				fh_alpha = (TH1D*) tmpfh_alpha->Rebin(fnbins,"fh_alpha",corrptbins);
+				fh_beta = (TH1D*)tmpfh_beta->Rebin(fnbins,"fh_beta",corrptbins);
+				fh_kb = (TH1D*)tmpfh_kb->Rebin(fnbins,"fh_kb",corrptbins);
+				fh_kcl = (TH1D*)tmpfh_kcl->Rebin(fnbins,"fh_kcl",corrptbins);
 				// fit to pol0
 				fh_alpha->Fit("pol0","0");
 				fh_beta->Fit("pol0","0");
@@ -858,7 +860,7 @@ void S8Solver::Solve() {
 
 			// picksolution manually if requested
 			if (fPickBin>0 && fPicknSol!=-1) {
-			  sol.SetSolution( fPicknSol );
+			  solu.SetSolution( fPicknSol );
 			}
 
 			solu.Solve();

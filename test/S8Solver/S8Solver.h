@@ -30,7 +30,7 @@ class S8Solver {
 		void SetPtrelMaxCut ( double value ) { fMaxPtrel = value; }
 		void SetPtFits() { fcategory = "pT"; }
 		void SetEtaFits() { fcategory = "eta"; }
-		void SetRebin( bool option) { frebin = option; }
+		void SetRebin( int nbins ) { frebin = true; fnbins = nbins; }
 		void SetMinimum( double value ) { fMin = value; }
 		void SetMaximum( double value ) { fMax = value; }
 		void RecalculateFactors( bool option ) { frecalculateFactors = option;}
@@ -116,7 +116,7 @@ class S8Solver {
 		double fKappaclf;
 		double fDeltaf;
 		double fGammaf;
-		bool frebin;
+		bool frebin; int fnbins;
 		bool frecalculateFactors;
 		double fminPtrel;
 		double fMaxPtrel;
