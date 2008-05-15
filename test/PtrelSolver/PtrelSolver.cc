@@ -1041,8 +1041,8 @@ void PtrelSolver::makeTemplates(const char *flavor, const char *sampletag, bool 
        << std::endl;
 
   char  hist_name[100];
-  TH1F *hist=0, *chi2=0;
-  TH2F *hist2=0;
+  TH1D *hist=0, *chi2=0;
+  TH2D *hist2=0;
   TF1  *thePdf= 0;
   int   pdf_index;
   int   nbins;
@@ -1066,7 +1066,7 @@ void PtrelSolver::makeTemplates(const char *flavor, const char *sampletag, bool 
 	    << histname.Data() << std::endl;
 
 
-  hist2 = (TH2F *)inputfile->Get(histname.Data());
+  hist2 = (TH2D *) inputfile->Get(histname.Data());
   if (!hist2) {
 
     std::cout << "information: can't access the data set  ... " << std::endl;
@@ -1080,9 +1080,8 @@ void PtrelSolver::makeTemplates(const char *flavor, const char *sampletag, bool 
   x_min = hist2->GetYaxis()->GetXmin();
   x_max = hist2->GetYaxis()->GetXmax();
   chi2name += basename; chi2name += "_chi2";
-  chi2 = new TH1F(chi2name.Data(), "", nbins+1, 0, nbins+1);
+  chi2 = new TH1D(chi2name.Data(), "", nbins+1, 0, nbins+1);
   formatHist1(chi2, "#chi^{2}", "Bin Index");
-
 
   int total_num =(int)( sqrt(nbins *1.));
   //  std::cout << "information: " << total_num << " ... " << std::endl;
@@ -1095,14 +1094,15 @@ void PtrelSolver::makeTemplates(const char *flavor, const char *sampletag, bool 
     c1->cd();
     pdf_index = ii*pdfbase;
 
-    sprintf(hist_name, "%s_%d", basename.Data(), pdf_index);
-
-
+    sprintf(hist_name, "template_%s_%d", basename.Data(), pdf_index);
+    
     if (ii ==0) 
-      hist = (TH1F *)hist2->ProjectionY(hist_name, 1, nbins);
+      hist = hist2->ProjectionY(hist_name, 1, nbins, "e");
     else
-      hist = (TH1F *)hist2->ProjectionY(hist_name, ii, ii);
+      hist = hist2->ProjectionY(hist_name, ii, ii, "e");
 
+    std::cout << hist2->GetSumw2N() << std::endl;
+    std::cout << hist->GetSumw2N() << std::endl;
 
     // template thePdftion
     if (!strcmp(flavor, "b")) {
@@ -1121,13 +1121,13 @@ void PtrelSolver::makeTemplates(const char *flavor, const char *sampletag, bool 
     if (pdfbase == PT_BASE)  formatHist1(hist, "p_{T}^{rel} GeV", "Events");
     if (pdfbase == ETA_BASE) formatHist1(hist, "Pseudorapidity",  "Events");
 
-
     hist->Fit(thePdf, "Q", "", fit_min, fit_max);
     std::cout << "information: " << hist->GetName() << " chi2/Ndof =" 
 	      << thePdf->GetChisquare() << "/"
 	      << thePdf->GetNDF()
 	      << std::endl;
-    chi2->SetBinContent(ii+1,  thePdf->GetChisquare()*1.0/thePdf->GetNDF());
+
+     chi2->SetBinContent(ii+1,  thePdf->GetChisquare()*1.0/thePdf->GetNDF());
     rootfile->cd();
     hist->Write(); 
     
@@ -1138,11 +1138,8 @@ void PtrelSolver::makeTemplates(const char *flavor, const char *sampletag, bool 
     else 
       sprintf(text_label, "[%3.f, %3.f]", hist2->GetXaxis()->GetBinLowEdge(1), hist2->GetXaxis()->GetBinLowEdge(nbins) + hist2->GetXaxis()->GetBinWidth(nbins) );
       
-    c2->cd(ii+1); hist->Draw(); label->DrawLatex(0.5, 0.75, text_label);
-    c1->cd();
-
-
-  
+    c2->cd(ii+1); hist->Draw("E"); label->DrawLatex(0.5, 0.75, text_label);
+    // c1->cd();
 
     // save fitted parameters into .dat file
     if (latex) {
@@ -1185,9 +1182,8 @@ void PtrelSolver::makeTemplates(const char *flavor, const char *sampletag, bool 
   TString total_plot(basename);
   total_plot += ".eps";
   c2->SaveAs(total_plot.Data());
-
-
   delete c2;
+
   rootfile->cd();
   chi2->Write();
   rootfile->Write();
@@ -1213,11 +1209,11 @@ void PtrelSolver::makeAllTemplatesPerTag(const char *inputfilename, const char *
 
 
   this->makeTemplates("b", sampletag, true, inputfilename, dir, tag, "pT", PT_BASE, outputdir, versiontag, sys);
-  this->makeTemplates("cl", sampletag, true, inputfilename, dir, tag, "pT", PT_BASE, outputdir, versiontag, sys);
+//  this->makeTemplates("cl", sampletag, true, inputfilename, dir, tag, "pT", PT_BASE, outputdir, versiontag, sys);
 
 
-  this->makeTemplates("b", sampletag, false, inputfilename, dir, tag, "eta", ETA_BASE, outputdir, versiontag, sys);
-  this->makeTemplates("cl", sampletag, false, inputfilename, dir, tag, "eta", ETA_BASE, outputdir, versiontag, sys);
+//  this->makeTemplates("b", sampletag, false, inputfilename, dir, tag, "eta", ETA_BASE, outputdir, versiontag, sys);
+//  this->makeTemplates("cl", sampletag, false, inputfilename, dir, tag, "eta", ETA_BASE, outputdir, versiontag, sys);
 }
 
 
@@ -1566,7 +1562,6 @@ void PtrelSolver::Fit(TH1F *data,
 	    << std::endl;
   double total_events = data->GetEntries();
 
-
   (*num).push_back(pdf->GetParameter("Nb") * area_b);
   (*num).push_back(pdf->GetParameter("Nc") * area_c);
   (*num_err).push_back( pdf->GetParError(pdf->GetParNumber("Nb")) * area_b );
@@ -1581,9 +1576,27 @@ void PtrelSolver::Fit(TH1F *data,
     (*num)[ii] = (*num)[ii]*scale;
     (*num_err)[ii] = (*num_err)[ii]*scale;
   }
+     
+  // REMOVE -----   
+
+  tmp_b = pdf->GetParameter("Nb");
+  tmp_c = pdf->GetParameter("Nc");
+  
+  data->Draw("e1same");  
+
+  TF1 * pdf2 = new TF1(*pdf);
+  
+  pdf->SetLineColor(kBlue);
+  pdf->SetParameter("Nb", tmp_b);
+  pdf->SetParameter("Nc", 0);  	
+  pdf->Draw("same");
+
+  pdf2->SetLineColor(kRed);
+  pdf2->SetParameter("Nb", 0);
+  pdf2->SetParameter("Nc", tmp_c);  	
+  pdf2->Draw("same");
 
   (*num).push_back( pdf->GetChisquare()*1.0/pdf->GetNDF() );
-
 
   return;
 }
