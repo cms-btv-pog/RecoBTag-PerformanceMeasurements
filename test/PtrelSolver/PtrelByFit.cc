@@ -124,21 +124,22 @@ ClassImp(PtrelSolver)
     } 
 
     // before tag
-    sprintf(data_name, "%s_%d", name_base.Data(), ii);
+    sprintf(data_name, "res_%s_%d", name_base.Data(), ii);
     if (ii !=0) {
 
-      hist = (TH1F *)hist2->ProjectionY(data_name, ii, ii);
+      hist = (TH1F *)hist2->ProjectionY(data_name, ii, ii, "e");
     } else 
-      hist = (TH1F *)hist2->ProjectionY(data_name, 1, nbins);
-
+      hist = (TH1F *)hist2->ProjectionY(data_name, 1, nbins, "e");
+    hist->GetSumw2N();
 
     // after tag
-    sprintf(data_name, "%s_%d_tag", name_base.Data(), ii);
+    sprintf(data_name, "res_%s_%d_tag", name_base.Data(), ii);
     if (ii !=0) {
      
       hist_tag = (TH1F *)hist2_tag->ProjectionY(data_name, ii, ii);
     }    else 
       hist_tag = (TH1F *)hist2_tag->ProjectionY(data_name, 1, nbins);
+    hist_tag->GetSumw2N();
 
     effCal(hist, hist_tag, thePdf, thePdf_tag,  &result);
 
