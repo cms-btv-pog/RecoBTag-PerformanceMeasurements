@@ -22,3 +22,10 @@
 <use name=rootminuit2>
 <use name=clhep>
 </library>
+
+<library file=Plotters/*.cc name=Plotters>
+<use name=root>
+</library>
+
+
+

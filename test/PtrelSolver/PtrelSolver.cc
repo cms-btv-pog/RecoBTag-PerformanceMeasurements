@@ -1209,11 +1209,7 @@ void PtrelSolver::makeAllTemplatesPerTag(const char *inputfilename, const char *
 
 
   this->makeTemplates("b", sampletag, true, inputfilename, dir, tag, "pT", PT_BASE, outputdir, versiontag, sys);
-//  this->makeTemplates("cl", sampletag, true, inputfilename, dir, tag, "pT", PT_BASE, outputdir, versiontag, sys);
-
-
-//  this->makeTemplates("b", sampletag, false, inputfilename, dir, tag, "eta", ETA_BASE, outputdir, versiontag, sys);
-//  this->makeTemplates("cl", sampletag, false, inputfilename, dir, tag, "eta", ETA_BASE, outputdir, versiontag, sys);
+  this->makeTemplates("cl", sampletag, true, inputfilename, dir, tag, "pT", PT_BASE, outputdir, versiontag, sys);
 }
 
 

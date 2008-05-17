@@ -422,8 +422,8 @@ void PtrelSolver::measureByCounting(
 )
 {
   if ( !initPdfsByTag(pdfdir, tag, versiontag) ) return;
-//  counting(inputfilename, directory, "pT", tag, outfilename); 
-//  counting(inputfilename, directory, "eta", tag, outfilename);
+  counting(inputfilename, directory, "pT", tag, outfilename); 
+  counting(inputfilename, directory, "eta", tag, outfilename);
   counting(inputfilename, directory, tag);  
 }
 
