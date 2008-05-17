@@ -1209,7 +1209,13 @@ void PtrelSolver::makeAllTemplatesPerTag(const char *inputfilename, const char *
 
 
   this->makeTemplates("b", sampletag, true, inputfilename, dir, tag, "pT", PT_BASE, outputdir, versiontag, sys);
+
   this->makeTemplates("cl", sampletag, true, inputfilename, dir, tag, "pT", PT_BASE, outputdir, versiontag, sys);
+
+
+  this->makeTemplates("b", sampletag, false, inputfilename, dir, tag, "eta", ETA_BASE, outputdir, versiontag, sys);
+  this->makeTemplates("cl", sampletag, false, inputfilename, dir, tag, "eta", ETA_BASE, outputdir, versiontag, sys);
+
 }
 
 
@@ -1551,12 +1557,29 @@ void PtrelSolver::Fit(TH1F *data,
   pdf->SetParameter("Nc", tmp_c);
 
 
-  data->Fit(pdf, "Q", "", fit_min, fit_max);
+  //  double total_events = data->GetEntries();
+  double total_events = data->Integral(x_min, x_max);
+  std::cout << "total events" << data->GetEntries() 
+	    << ": " << total_events << std::endl;
+
+  double chi2 = 10000, b_frac = 0.1;
+  while (chi2 >5 && b_frac < 1.0) {
+
+    std::cout << "information: trying with b fraction of " << b_frac
+	      << std::endl;
+    pdf->SetParameter("Nb", total_events * b_frac /area_b);
+    pdf->SetParameter("Nc", total_events * (1.0 -b_frac) /area_b );
+
+
+    data->Fit(pdf, "Q", "", fit_min, fit_max);
+    chi2 = pdf->GetChisquare()/pdf->GetNDF();
+    b_frac += 0.1;
+  }
+
   std::cout << "information: " << data->GetName() << " fitted with chi2/Ndof =" 
 	    << pdf->GetChisquare() << "//"
 	    << pdf->GetNDF()
 	    << std::endl;
-  double total_events = data->GetEntries();
 
   (*num).push_back(pdf->GetParameter("Nb") * area_b);
   (*num).push_back(pdf->GetParameter("Nc") * area_c);
@@ -1574,7 +1597,7 @@ void PtrelSolver::Fit(TH1F *data,
   }
      
   // REMOVE -----   
-
+  /*
   tmp_b = pdf->GetParameter("Nb");
   tmp_c = pdf->GetParameter("Nc");
   
@@ -1591,6 +1614,7 @@ void PtrelSolver::Fit(TH1F *data,
   pdf2->SetParameter("Nb", 0);
   pdf2->SetParameter("Nc", tmp_c);  	
   pdf2->Draw("same");
+  */
 
   (*num).push_back( pdf->GetChisquare()*1.0/pdf->GetNDF() );
 

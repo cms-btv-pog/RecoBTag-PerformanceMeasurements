@@ -136,9 +136,9 @@ ClassImp(PtrelSolver)
     sprintf(data_name, "res_%s_%d_tag", name_base.Data(), ii);
     if (ii !=0) {
      
-      hist_tag = (TH1F *)hist2_tag->ProjectionY(data_name, ii, ii);
+      hist_tag = (TH1F *)hist2_tag->ProjectionY(data_name, ii, ii, "e");
     }    else 
-      hist_tag = (TH1F *)hist2_tag->ProjectionY(data_name, 1, nbins);
+      hist_tag = (TH1F *)hist2_tag->ProjectionY(data_name, 1, nbins, "e");
     hist_tag->GetSumw2N();
 
     effCal(hist, hist_tag, thePdf, thePdf_tag,  &result);
