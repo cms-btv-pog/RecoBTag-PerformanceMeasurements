@@ -13,7 +13,7 @@ ClassImp(IPSPlotter)
 void IPSPlotter::Book() 
 {
   // Histograms
-  ips_ = new TH1F("ips","Positive and negative tag IPS distribution", 60, -30., 30.);  
+  ips_ = new TH1F("ips","Positive and negative tag IPS distribution", 60, -10., 10.);  
   ipsB_ = new TH1F("ipsB","Positive and negative tag IPS distribution for jet with B tracks", 60, -10., 10.);
   ipsC_ = new TH1F("ipsC","Positive and negative tag IPS distribution for jet with C tracks", 60, -10., 10.);
   ipsKs_ = new TH1F("ipsKs","Positive and negative tag IPS distribution for jet with Ks tracks", 60, -10., 10.);
@@ -58,9 +58,9 @@ void IPSPlotter::Fill(BTagEvent * event)
     else if ( event->btag_TrkCounting_disc3D_2trk_is[i][BTagTrackEvent::Lambda] )
     {
       if ( event->btag_TrkCounting_disc3D_2trk[i] >= 0 )
-        ipsConversion_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
+        ipsLambda_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
       if ( event->btag_NegTag_disc3D_2trk[i] < 0 )
-        ipsConversion_->Fill(event->btag_NegTag_disc3D_2trk[i]);      
+        ipsLambda_->Fill(event->btag_NegTag_disc3D_2trk[i]);      
     }
     else if ( event->btag_TrkCounting_disc3D_2trk_is[i][BTagTrackEvent::Displaced] )
     {
