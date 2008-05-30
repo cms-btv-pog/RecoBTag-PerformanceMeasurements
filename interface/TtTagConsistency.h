@@ -13,7 +13,7 @@
 //
 // Original Author:  Gena Kukartsev, kukarzev@fnal.gov
 //         Created:  Fri Jun 29 14:53:10 CDT 2007
-// $Id: TtTagConsistency.h,v 1.1.2.2 2008/03/21 21:09:17 kukartse Exp $
+// $Id: TtTagConsistency.h,v 1.1.2.1 2008/04/04 23:54:48 kukartse Exp $
 //
 //
 
@@ -68,25 +68,18 @@ private:
   virtual void beginJob(const edm::EventSetup&) ;
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
-  
-  // ----------member data ---------------------------
-  
-  /// histogram list
-  //TList histograms_;
-  /// algorithm 
-  //TopBTagSelectorWorker algo_;
-  
+    
   int findJetMatch( const reco::Jet & theJet, const std::vector<reco::GenJet> & jets, std::vector<int> & jetIndex, double dRCut );
   
   RooGKCounter eventCounter;
   RooGKCounter selectedEvents;
 
-  map< int, map< int, map< int, int > > > Fijk;
-  map< int, map< int, map< int, map< int, int > > > > Fxijk;
+  map< int, map< int, map< int, double > > > Fijk;
+  map< int, map< int, map< int, map< int, double > > > > Fxijk;
 
-  map< double, map< int, int> > Nn; // number of events with n tagged jets
-  map< double, map< int, int> > Nn_2; // number of events with n tagged jets, second tagger
-  map< double, map< int, int> > Nn_3; // number of events with n tagged jets, third tagger
+  map< double, map< int, double> > Nn; // number of events with n tagged jets
+  map< double, map< int, double> > Nn_2; // number of events with n tagged jets, second tagger
+  map< double, map< int, double> > Nn_3; // number of events with n tagged jets, third tagger
 
   double dRCut;
   int nCaloJetsLow;
@@ -96,7 +89,7 @@ private:
   string _dataType;
   bool _lookForGenJetMatch;
   string _jetSource, _electronSource, _muonSource, _METSource;
- string _jetTagSource, _jetTagSource_2, _jetTagSource_3;
+  string _jetTagSource, _jetTagSource_2, _jetTagSource_3;
   string _genJetSource;
   string _outputFileName;
 

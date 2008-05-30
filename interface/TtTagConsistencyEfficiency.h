@@ -13,7 +13,7 @@
 //
 // Original Author:  Gena Kukartsev, kukarzev@fnal.gov
 //         Created:  Fri Jun 29 14:53:10 CDT 2007
-// $Id: TtTagConsistencyEfficiency.h,v 1.1.2.2 2008/03/21 21:09:17 kukartse Exp $
+// $Id: TtTagConsistencyEfficiency.h,v 1.1.2.1 2008/04/04 23:54:48 kukartse Exp $
 //
 //
 
@@ -69,7 +69,11 @@ public:
   } BFormula;
 
   TtTagConsistencyEfficiency();
-  ~TtTagConsistencyEfficiency(){};
+  ~TtTagConsistencyEfficiency();
+
+  // clean all fit quantities
+  void clean(void);
+
   void cleanTable( tableContent & tab );
   void cleanTable( tableLine & tab );
   int readTable( const char * tabFileName, double discr );
@@ -79,6 +83,10 @@ public:
   int updateTable( string tabListFileName, double discr, double weight, tableContent & _tab );
   int updateTable( string tabFileName, double discr, double weight, tableLine & _tab );
   int updateTableFromList( string tabListFileName, double discr, double weight, tableLine & _tab );
+  // for double type table entries
+  int updateTableFromList_d( string tabListFileName, double discr, double weight, tableLine & _tab );
+
+  void dumpFijk_d( void );
 
   int getN( int index );
   int getNb( void );
@@ -91,8 +99,13 @@ public:
   RooFitResult minTest2( int n0, int n1, int n2, int n3, int n4, const char * option = "msh",  double eb = 0.65, double ec = 0.2, double el = 0.02, double xsec_ttbar = 830.0, double bgf = 0.2, double eb_min = 0.0, double eb_max = 1.0, double ec_min = 0.0, double ec_max = 1.0, double el_min = 0.0, double el_max = 1.0, double xsec_ttbar_min = 50.0, double xsec_ttbar_max = 1100.0, double bgf_min = 0.0, double bgf_max = 100.0 );
 
   RooFitResult fit( TtTagConsistencyFitConfig & config );
+  RooFitResult fit_d( TtTagConsistencyFitConfig & config );  // double type numbers of events
   RooFitResult fit_signal( TtTagConsistencyFitConfig & config, TH2F * _contour = NULL );
-  RooFitResult fit_optimized( TtTagConsistencyFitConfig & config );
+
+  // Build and initialize quantities for the fit and toy MC including
+  
+  RooFitResult buildVar( TtTagConsistencyFitConfig & config );  // double type numbers of events
+  RooFitResult fit_test( TtTagConsistencyFitConfig & config );  // double type numbers of events
 
   TtTagConsistencyEfficiency::BFormula getFormula( int i, int j, int k, const char * suffix = "" );
 
@@ -102,6 +115,7 @@ public:
   int readFijk( vector<string> mcFileName, vector<double> weight, string dataType, int minValue = 0 );
   int updateFijk( string mcListFileName, double weight, string dataType, int minValue = 0 );
   int updateFijk2( string mcListFileName, double weight, string dataType, int minValue = 0 );
+  double updateFijk_d( string mcListFileName, double weight, string dataType, double minValue = 0.0 );
   int test( void );
 
   int N[5];
@@ -124,14 +138,67 @@ public:
     int sum;
   };
 
+  typedef struct _Fijk_d
+  {
+    _Fijk_d();
+    vector<int> i;
+    vector<int> j;
+    vector<int> k;
+    std::map<int, std::map<int, std::map<int,double> > > value;
+    double nEntries;
+    double sum;
+  } Fijk_d;
+
   struct Fijk Fijk_sig;
   struct Fijk Fijk_bg;
+
+  Fijk_d Fijk_d_sig; //double instead of integer
+  Fijk_d Fijk_d_bg;
 
 protected:
 
   double _discr;
   bool inputFileRead;
   bool redo_fit_setup;
+
+  // RooFit and other objects needed for the fit and toy MC
+  RooRealVar * nEvt0;
+  RooRealVar * nEvt1;
+  RooRealVar * nEvt2;
+  RooRealVar * nEvt3;
+  RooRealVar * nEvt4;
+  RooRealVar * lumi;
+  RooRealVar * xsec;
+  RooRealVar * eff;
+  RooRealVar * bgFrac0;
+  RooRealVar * bgFrac1;
+  RooRealVar * bgFrac2;
+  RooRealVar * bgFrac3;
+  RooRealVar * bgFrac4;
+  RooRealVar * epsb;
+  RooRealVar * epsc;
+  RooRealVar * epsl;
+  RooArgList lamargs[5];
+  map<int, map<int, map<int, RooRealVar *> > > _varFijk;
+  map<int, map<int, map<int, map<int, RooFormulaVar *> > > > _Fijkn;
+  map<int, map<int, map<int, RooRealVar *> > > _varFijk_bg;
+  map<int, map<int, map<int, map<int, RooFormulaVar *> > > > _Fijkn_bg;
+  string lam1_str;
+  string lam2_str;
+  string lam3_str;
+  RooFormulaVar * lam1;
+  RooFormulaVar * lam2;
+  RooFormulaVar * lam3;
+  RooFormulaVar * poisson1;
+  RooFormulaVar * poisson2;
+  RooFormulaVar * poisson3;
+  RooFormulaVar * LL;
+  RooMinuit * m1;
+  RooFormulaVar * p1;
+  RooFormulaVar * p2;
+  RooFormulaVar * p3;
+  RooFormulaVar * LL2;
+  RooMinuit * m2;
 
 };
 

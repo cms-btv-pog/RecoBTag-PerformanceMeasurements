@@ -5,15 +5,15 @@
 TtTagConsistencyEfficiency::_tableLine::_tableLine()
 {
   discr = 0.0;
-  for ( int i = 0; i < 5; i++ ) N[i] = 0;
-  Nb = 0;
-  Nbtag = 0;
-  Nc = 0;
-  Nctag = 0;
-  Nl = 0;
-  Nltag = 0;
-  Nx = 0;
-  Nxtag = 0;
+  for ( int i = 0; i < 5; i++ ) N[i] = 0.0;
+  Nb = 0.0;
+  Nbtag = 0.0;
+  Nc = 0.0;
+  Nctag = 0.0;
+  Nl = 0.0;
+  Nltag = 0.0;
+  Nx = 0.0;
+  Nxtag = 0.0;
 }
 
 
@@ -21,6 +21,12 @@ TtTagConsistencyEfficiency::Fijk::Fijk()
 {
   nEntries = 0;
   sum = 0;
+}
+
+TtTagConsistencyEfficiency::_Fijk_d::_Fijk_d()
+{
+  nEntries = 0.0;
+  sum = 0.0;
 }
 
 
@@ -42,22 +48,124 @@ void TtTagConsistencyEfficiency::cleanTable( tableLine & tab )
 {
   for (int i = 0; i < 5; i++ )
     {
-      tab . N[i] = 0;
+      tab . N[i] = 0.0;
     }
-  tab . Nb = 0;
-  tab . Nc = 0;
-  tab . Nl = 0;
-  tab . Nx = 0;
-  tab . Nbtag = 0;
-  tab . Nctag = 0;
-  tab . Nltag = 0;
-  tab . Nxtag = 0;
+  tab . Nb = 0.0;
+  tab . Nc = 0.0;
+  tab . Nl = 0.0;
+  tab . Nx = 0.0;
+  tab . Nbtag = 0.0;
+  tab . Nctag = 0.0;
+  tab . Nltag = 0.0;
+  tab . Nxtag = 0.0;
 }
 
 TtTagConsistencyEfficiency::TtTagConsistencyEfficiency( void )
 {
   inputFileRead = false;
+
+  // RooFit and other objects needed for the fit and toy MC
+  nEvt0 = 0;
+  nEvt1 = 0;
+  nEvt2 = 0;
+  nEvt3 = 0;
+  nEvt4 = 0;
+  lumi = 0;
+  xsec = 0;
+  eff = 0;
+  bgFrac0 = 0;
+  bgFrac1 = 0;
+  bgFrac2 = 0;
+  bgFrac3 = 0;
+  bgFrac4 = 0;
+  epsb = 0;
+  epsc = 0;
+  epsl = 0;
+  lam1 = 0;
+  lam2 = 0;
+  lam3 = 0;
+  poisson1 = 0;
+  poisson2 = 0;
+  poisson3 = 0;
+  LL = 0;
+  m1 = 0;
+  p1 = 0;
+  p2 = 0;
+  p3 = 0;
+  LL2 = 0;
+  m2 = 0;
 }
+
+
+TtTagConsistencyEfficiency::~TtTagConsistencyEfficiency( void )
+{
+  clean();
+}
+
+
+void TtTagConsistencyEfficiency::clean( void )
+{
+  // FIXME: add cleaning of the maps *Fijk*
+  delete nEvt0;
+  delete nEvt1;
+  delete nEvt2;
+  delete nEvt3;
+  delete nEvt4;
+  delete lumi;
+  delete xsec;
+  delete eff;
+  delete bgFrac0;
+  delete bgFrac1;
+  delete bgFrac2;
+  delete bgFrac3;
+  delete bgFrac4;
+  delete epsb;
+  delete epsc;
+  delete epsl;
+  delete lam1;
+  delete lam2;
+  delete lam3;
+  delete poisson1;
+  delete poisson2;
+  delete poisson3;
+  delete LL;
+  delete m1;
+  delete p1;
+  delete p2;
+  delete p3;
+  delete LL2;
+  delete m2;
+  nEvt0 = 0;
+  nEvt1 = 0;
+  nEvt2 = 0;
+  nEvt3 = 0;
+  nEvt4 = 0;
+  lumi = 0;
+  xsec = 0;
+  eff = 0;
+  bgFrac0 = 0;
+  bgFrac1 = 0;
+  bgFrac2 = 0;
+  bgFrac3 = 0;
+  bgFrac4 = 0;
+  epsb = 0;
+  epsc = 0;
+  epsl = 0;
+  lam1 = 0;
+  lam2 = 0;
+  lam3 = 0;
+  poisson1 = 0;
+  poisson2 = 0;
+  poisson3 = 0;
+  LL = 0;
+  m1 = 0;
+  p1 = 0;
+  p2 = 0;
+  p3 = 0;
+  LL2 = 0;
+  m2 = 0;
+}
+
 
 int TtTagConsistencyEfficiency::test( void )
 {
@@ -69,6 +177,34 @@ int TtTagConsistencyEfficiency::test( void )
 
   return 0;
 }
+
+
+
+void TtTagConsistencyEfficiency::dumpFijk_d( void )
+{
+  cout << endl << "=============> Fijk_sig dump " << endl << endl;
+  map< int, map< int, map< int, double > > >::const_iterator it_i;  
+  for ( it_i = Fijk_d_sig.value . begin(); it_i != Fijk_d_sig.value . end(); it_i++ )
+    {
+      map< int, map< int, double > > map2 = it_i -> second;        
+      map< int, map< int, double > >::const_iterator it_j;  
+      for ( it_j = map2 . begin(); it_j != map2 . end(); it_j++ )
+	{
+	  map< int, double > map1 = it_j -> second;        
+	  map< int, double >::const_iterator it_k;  
+	  for ( it_k = map1 . begin(); it_k != map1 . end(); it_k++ )
+	    {
+	      int ii = it_i -> first;
+	      int jj = it_j -> first;
+	      int kk = it_k -> first;
+	      cout << "F_" << ii << "_" << jj << "_" << kk << " = " << Fijk_d_sig.value[ii][jj][kk] << endl;
+	    }
+	}
+    } 
+  cout << endl << "================================> " << endl << endl;
+}
+
+
 
 TtTagConsistencyEfficiency::BFormula TtTagConsistencyEfficiency::getFormula( int i, int j, int k, const char * suffix )
 {
@@ -366,6 +502,102 @@ int TtTagConsistencyEfficiency::updateFijk2( string mcListFileName, double weigh
   
   return result;
 }
+
+
+
+// Deals with double Fijk's instead of integer
+double TtTagConsistencyEfficiency::updateFijk_d( string mcListFileName, double weight, string dataType, double minValue )
+{
+  double result = 0.0;
+  string buf;
+  Fijk_d * _fijk = 0;
+  if ( dataType == "signal" ){
+    _fijk = &Fijk_d_sig;
+  }
+  else if ( dataType == "background" ) _fijk = &Fijk_d_bg;
+  else
+    {
+      cout << "Unknown data type, exiting..." << endl;
+      result = -1;
+    }
+  if ( _fijk )
+    {
+      int i,j,k,x;
+      double value = 0.0;
+      const char * _format = "F_%d_%d_%d_%d = %lf";
+
+      // read the .mc file names from the list
+      vector<string> mcFileName;
+      char filename[1024];
+      ifstream inFile( mcListFileName . c_str(), ios::in );
+      if (!inFile)
+	{
+	  cout << " Unable to open list file: " << mcListFileName << endl;
+	  return kFALSE;
+	}
+      else
+	{
+	  cout << "List file opened successfully: " << mcListFileName << endl;
+	}
+      while (inFile >> filename)
+	{
+	  string fullFileName = "";
+	  fullFileName . append( filename );
+	  mcFileName . push_back( fullFileName );
+	}
+      inFile.close();
+
+      // reading files with Fijk
+      vector<string>::const_iterator _filename;
+      for ( _filename = mcFileName . begin(); _filename != mcFileName . end(); _filename++  )
+	{
+
+	  string mc2FileName = *(_filename);
+	  ifstream _mcFile( mc2FileName . c_str() );
+	    
+	  if ( _mcFile . is_open() )
+	    {
+	      while ( getline( _mcFile, buf ) > 0 )
+		{
+		  sscanf( buf . c_str(), _format, &x, &i, &j, &k, &value );
+		  //TEMPORARY... later addition: ...+x must be ok
+		  //if ( value >= minValue )
+		  if ( value >= minValue && (i+j+k+x) >= 4)
+		    {
+		      int _index = -1;
+		      for ( int _i = 0; (_i < _fijk -> nEntries) && _index < 0; _i++ )
+			{
+			  if ( (_fijk->i[_i] == i) &&(_fijk->j[_i] == j) && (_fijk->k[_i] == k+x) ) _index = _i;
+			}
+		      if ( _index < 0 )
+			{
+			  _fijk -> i . push_back( i );
+			  _fijk -> j . push_back( j );
+			  _fijk -> k . push_back( k+x );
+			  _fijk -> value[i][j][k+x] = value * weight;
+			  _fijk -> nEntries+=1.0;
+			}
+		      else
+			{
+			  _fijk -> value[i][j][k+x] += value * weight;
+			}
+		      _fijk -> sum += value * weight;
+		    }
+		}
+	      
+	      cout << "Number of Fijk read: " << _fijk -> nEntries << endl;
+	      
+	      result = _fijk -> nEntries;
+	    }
+	}
+    }
+  
+  return result;
+}
+
+
+
+
 
 int TtTagConsistencyEfficiency::readFijk( vector<string> mcFileName, vector<double> weight, string dataType, int minValue )
 {
@@ -1213,6 +1445,103 @@ int TtTagConsistencyEfficiency::updateTableFromList( string tabListFileName, dou
   return result;  
 }
 
+
+
+
+
+int TtTagConsistencyEfficiency::updateTableFromList_d( string tabListFileName, double discr, double weight, tableLine & _tab )
+{
+
+  int result = 0;
+  string buf;
+  const char * _format = "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf%*[^\n]";
+
+  double _N[5];
+  double _Nb, _Nc, _Nl, _Nx, _Nbtag, _Nctag, _Nltag, _Nxtag;
+
+  for (int i = 0; i < 5; i++ )
+    {
+      _N[i] = 0.0;
+    }
+  _Nb = 0.0;
+  _Nc = 0.0;
+  _Nl = 0.0;
+  _Nx = 0.0;
+  _Nbtag = 0.0;
+  _Nctag = 0.0;
+  _Nltag = 0.0;
+  _Nxtag = 0.0;
+
+  vector<string> tabFileName;
+  char filename[1024];
+  ifstream inFile( tabListFileName . c_str(), ios::in );
+  if (!inFile)
+    {
+      cout << " Unable to open list file: " << tabListFileName << endl;
+      return kFALSE;
+    }
+  else
+    {
+      cout << "List file opened successfully: " << tabListFileName << endl;
+    }
+  while (inFile >> filename)
+    {
+      string fullFileName = "";
+      fullFileName . append( filename );
+      tabFileName . push_back( fullFileName );
+    }
+  inFile.close();
+  
+  vector<string>::const_iterator _filename;
+  for ( _filename = tabFileName . begin(); _filename != tabFileName . end(); _filename++  )
+    {
+      ifstream _tabFile( _filename -> c_str() );
+      double aDiscr = -1.0;
+      
+      if ( _tabFile . is_open() )
+	{
+	  do  // read line by line
+	    {
+	      getline( _tabFile, buf );
+	      sscanf( buf . c_str(), _format, &aDiscr, &_N[0], &_N[1], &_N[2], &_N[3], &_N[4], &_Nb, &_Nbtag, &_Nc, &_Nctag, &_Nl, &_Nltag, &_Nx, &_Nxtag );
+	    } while( fabs(aDiscr - discr) > 0.0001 );
+	  
+	  if ( fabs(aDiscr - discr) < 0.0001 )
+	    {
+	      for (int i = 0; i < 5; i++ ) _tab . N[i] += _N[i] * weight;
+	      _tab . discr = aDiscr;
+	      _tab . Nb += _Nb * weight;
+	      _tab . Nc += _Nc * weight;
+	      _tab . Nl += _Nl * weight;
+	      _tab . Nx += _Nx * weight;
+	      _tab . Nbtag += _Nbtag * weight;
+	      _tab . Nctag += _Nctag * weight;
+	      _tab . Nltag += _Nltag * weight;      
+	      _tab . Nxtag += _Nxtag * weight;      
+	  
+	      result = 0;
+	    }
+	  else
+	    {
+	      cout << "TtTagConsistencyEfficiency::readTable: tagging discriminant doesn't match" << endl;
+	      result = -1;
+	    }
+	}
+      else
+	{
+	  cout << "TtTagConsistencyEfficiency::readTable: cannot open input file" << endl;
+	  result = -1;
+	}
+    }
+  cout << "discr = " << discr << ", N_1 = " << _tab.N[1] << ", N_2 = " << _tab.N[2] << ", N_3= " << _tab.N[3] << endl;
+
+  return result;  
+}
+
+
+
+
+
 RooFitResult TtTagConsistencyEfficiency::minTest2( int n0, int n1, int n2, int n3, int n4, const char * option,  double eb, double ec, double el, double xsec_ttbar, double bgf, double eb_min, double eb_max, double ec_min, double ec_max, double el_min, double el_max, double xsec_ttbar_min, double xsec_ttbar_max, double bgf_min, double bgf_max )
 {
 
@@ -1372,25 +1701,7 @@ RooFitResult TtTagConsistencyEfficiency::minTest2( int n0, int n1, int n2, int n
 
 RooFitResult TtTagConsistencyEfficiency::fit( TtTagConsistencyFitConfig & config )
 {
-  //cout << "DEBUG: n1,2,3 = " << config.n1 << "   " << config . n2 << "   " << config.n3 << endl; 
-
-
-  /*
-  int _temp = Fijk_sig . value[1][0][3];
-  Fijk_sig . value[1][0][3] += _temp * 0.25;
-  Fijk_sig . sum += _temp * 0.25;
-
-  _temp = Fijk_sig . value[1][0][4];
-  Fijk_sig . value[1][0][4] += _temp * 0.25;
-  Fijk_sig . sum += _temp * 0.25;
-
-  _temp = Fijk_sig . value[2][0][3];
-  Fijk_sig . value[2][0][3] += _temp * 0.2;
-  Fijk_sig . sum += _temp * 0.22;
-  */
-
-
-
+  //config . dump();
 
   RooRealVar nEvt1( "nEvt1", "observed number of tags", config . n1, 0.9*config . n1, 1.1*config . n1 ); // number of events with 1 tag
   RooRealVar nEvt2( "nEvt2", "observed number of tags", config . n2, 0.9*config . n2, 1.1*config . n2 );
@@ -1557,6 +1868,184 @@ RooFitResult TtTagConsistencyEfficiency::fit( TtTagConsistencyFitConfig & config
 }
 
 
+
+
+
+
+RooFitResult TtTagConsistencyEfficiency::fit_d( TtTagConsistencyFitConfig & config )
+{
+  //config . dump();
+  //dumpFijk_d();
+  
+  RooRealVar nEvt1( "nEvt1", "observed number of tags", config . n1_d, 0.9*config . n1_d, 1.1*config . n1_d ); // number of events with 1 tag
+  RooRealVar nEvt2( "nEvt2", "observed number of tags", config . n2_d, 0.9*config . n2_d, 1.1*config . n2_d );
+  RooRealVar nEvt3( "nEvt3", "observed number of tags", config . n3_d, 0.9*config . n3_d, 1.1*config . n3_d );
+
+  RooRealVar lumi( "lumi", "Integrated luminocity", config . lumi, 0, 1000 );     // 1/pb
+  RooRealVar xsec( "xsec", "ttbar cross section", config . xsec_ttbar, config . xsec_ttbar_min, config . xsec_ttbar_max );      // pb
+  RooRealVar  eff( "eff",  "Pre-tag efficiency", config . efficiency, 0.0, 1.0 );
+
+  RooRealVar bgFrac0( "bgFrac0",  "Fraction of background in n0 bin", config . bgf0, config . bgf0_min, config . bgf0_max );
+  RooRealVar bgFrac1( "bgFrac1",  "Fraction of background in n1 bin", config . bgf1, config . bgf1_min, config . bgf1_max );
+  RooRealVar bgFrac2( "bgFrac2",  "Fraction of background in n2 bin", config . bgf2, config . bgf2_min, config . bgf2_max );
+  RooRealVar bgFrac3( "bgFrac3",  "Fraction of background in n3 bin", config . bgf3, config . bgf3_min, config . bgf3_max );
+  RooRealVar bgFrac4( "bgFrac4",  "Fraction of background in n4 bin", config . bgf4, config . bgf4_min, config . bgf4_max );
+
+  RooRealVar epsb( "epsb", "b tag efficiency", config . eb,  max(config . eb_min,0.0), min(config . eb_max,1.0) );  // b tagging efficiency
+  RooRealVar epsc( "epsc", "c tag efficiency", config . ec,  max(config . ec_min,0.0), min(config . ec_max,1.0) );  // c tagging efficiency
+  RooRealVar epsl( "epsl", "l tag efficiency", config . el,  max(config . el_min,0.0), min(config . el_max,1.0) );  // light (and gluon) tagging efficiency - from outside !
+
+  RooArgList lamargs[5];
+
+  for ( int m = 0; m < 5; m++ )
+    {
+      lamargs[m] . add(lumi);
+      lamargs[m] . add(xsec);
+      lamargs[m] . add(eff);
+    }
+
+  //
+  // ===> Signal coefficients
+  //
+  map<int, map<int, map<int, RooRealVar *> > > _varFijk;
+  map<int, map<int, map<int, map<int, RooFormulaVar *> > > > _Fijkn;
+  TtTagConsistencyEfficiency::BFormula _f;
+  ostringstream lam_sumFsig[5];
+  for ( int l = 1; l < 4; l++ ) lam_sumFsig[l] << "(";
+  for ( unsigned int ii = 0; ii < Fijk_d_sig.i.size(); ii++ )
+    {
+      int _i = Fijk_d_sig.i[ii];
+      int _j = Fijk_d_sig.j[ii];
+      int _k = Fijk_d_sig.k[ii];
+      _f = getFormula( _i, _j, _k );
+      _varFijk[_i][_j][_k] = new RooRealVar( _f . name . c_str(), _f . title . c_str(), Fijk_d_sig.value[_i][_j][_k]/(double)Fijk_d_sig.sum, 0.0, 1.0 );
+      for ( int l = 1; l < 4; l++ )
+	{
+	  ostringstream _name;
+	  _name . str("");
+	  _name << _f . name . c_str() << "_" << l; 
+	  if ( lam_sumFsig[l] . str() . size() > 1 ) lam_sumFsig[l] << "+";
+	  lam_sumFsig[l] << _name . str();
+	  if ( _i == 0 && _j != 0 && _k != 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], epsc, epsl ) );
+	  if ( _i != 0 && _j == 0 && _k != 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], epsb, epsl ) );
+	  if ( _i != 0 && _j != 0 && _k == 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], epsb, epsc ) );
+	  if ( _i == 0 && _j == 0 && _k != 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], epsl ) );
+	  if ( _i == 0 && _j != 0 && _k == 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], epsc ) );
+	  if ( _i != 0 && _j == 0 && _k == 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], epsb ) );
+	  else _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], epsb, epsc, epsl ) );
+	  lamargs[l] . add( *_Fijkn[_i][_j][_k][l] );
+	  //_Fijkn[_i][_j][_k][l] -> Print();
+	}
+      _varFijk[_i][_j][_k] -> setConstant( kTRUE );
+      //_varFijk[_i][_j][_k] -> Print();
+    }
+  for ( int l = 1; l < 4; l++ ) lam_sumFsig[l] << ")";
+
+  //for ( int m = 0; m < 5; m++ ) lamargs[m] . add(bgFrac);
+  lamargs[0] . add(bgFrac0);
+  lamargs[1] . add(bgFrac1);
+  lamargs[2] . add(bgFrac2);
+  lamargs[3] . add(bgFrac3);
+  lamargs[4] . add(bgFrac4);
+  
+  //
+  // =====> Background coefficients
+  //
+  map<int, map<int, map<int, RooRealVar *> > > _varFijk_bg;
+  map<int, map<int, map<int, map<int, RooFormulaVar *> > > > _Fijkn_bg;
+  ostringstream lam_sumFbg[5];
+  for ( int l = 1; l < 4; l++ ) lam_sumFbg[l] << "(";
+  for ( unsigned int ii = 0; ii < Fijk_d_bg.i.size(); ii++ )
+    {
+      int _i = Fijk_d_bg.i[ii];
+      int _j = Fijk_d_bg.j[ii];
+      int _k = Fijk_d_bg.k[ii];
+      _f = getFormula( _i, _j, _k, "_bg" );
+      _varFijk_bg[_i][_j][_k] = new RooRealVar( _f . name . c_str(), _f . title . c_str(), Fijk_d_bg.value[_i][_j][_k]/(double)Fijk_d_bg.sum, 0.0, 1.0 );
+      for ( int l = 1; l < 4; l++ )
+	{
+	  ostringstream _name;
+	  _name . str("");
+	  _name << _f . name . c_str() << "_" << l; 
+	  if ( lam_sumFbg[l] . str() . size() > 1 ) lam_sumFbg[l] << "+";
+	  lam_sumFbg[l] << _name . str();
+	  if ( _i == 0 && _j != 0 && _k != 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], epsc, epsl ) );
+	  if ( _i != 0 && _j == 0 && _k != 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], epsb, epsl ) );
+	  if ( _i != 0 && _j != 0 && _k == 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], epsb, epsc ) );
+	  if ( _i == 0 && _j == 0 && _k != 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], epsl ) );
+	  if ( _i == 0 && _j != 0 && _k == 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], epsc ) );
+	  if ( _i != 0 && _j == 0 && _k == 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], epsb ) );
+	  else _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], epsb, epsc, epsl ) );
+	  lamargs[l] . add( *_Fijkn_bg[_i][_j][_k][l] );
+	  //_Fijkn_bg[_i][_j][_k][l] -> Print();
+	}
+      _varFijk_bg[_i][_j][_k] -> setConstant( kTRUE );
+      //_varFijk_bg[_i][_j][_k] -> Print();
+    }
+  for ( int l = 1; l < 4; l++ ) lam_sumFbg[l] << ")";
+
+  //
+  // ===========================>
+
+  string lam1_str = "lumi*xsec*eff*(" + lam_sumFsig[1] . str() + "+bgFrac1*" + lam_sumFbg[1] . str() + ")";
+  string lam2_str = "lumi*xsec*eff*(" + lam_sumFsig[2] . str() + "+bgFrac2*" + lam_sumFbg[2] . str() + ")";
+  string lam3_str = "lumi*xsec*eff*(" + lam_sumFsig[3] . str() + "+bgFrac3*" + lam_sumFbg[3] . str() + ")";
+
+  RooFormulaVar lam1( "lam1", lam1_str . c_str(), lamargs[1] );
+  RooFormulaVar lam2( "lam2", lam2_str . c_str(), lamargs[2] );
+  RooFormulaVar lam3( "lam3", lam3_str . c_str(), lamargs[3] );
+
+  //lamargs[1] . Print();
+  //lam1 . Print();
+
+  lumi . setConstant(kTRUE);
+  eff  . setConstant(kTRUE);
+  bgFrac1 . setConstant(kTRUE);
+  bgFrac2 . setConstant(kTRUE);
+  bgFrac3 . setConstant(kTRUE);
+  //epsc . setConstant(kTRUE);
+  epsl . setConstant(kTRUE);
+
+  //xsec . setConstant(kTRUE);
+
+  nEvt1 . setConstant(kTRUE);
+  nEvt2 . setConstant(kTRUE);
+  nEvt3 . setConstant(kTRUE);
+
+  //
+  // ===> minimization
+  //
+  RooFormulaVar poisson1( "poisson1", "exp(-(nEvt1-lam1)*(nEvt1-lam1)/nEvt1/nEvt1)", RooArgList(nEvt1,lam1) );
+  RooFormulaVar poisson2( "poisson2", "exp(-(nEvt2-lam2)*(nEvt2-lam2)/nEvt2/nEvt2)", RooArgList(nEvt2,lam2) );
+  RooFormulaVar poisson3( "poisson3", "exp(-(nEvt3-lam3)*(nEvt3-lam3)/nEvt3/nEvt3)", RooArgList(nEvt3,lam3) );
+
+  RooFormulaVar LL( "LL", "-log(poisson1*poisson2*poisson3)", RooArgList(poisson1,poisson2,poisson3) );  
+
+  RooMinuit m(LL);
+
+  m . fit( "msh" );
+
+  RooFormulaVar p1( "p1", "TMath::Gaus( (nEvt1-lam1)/sqrt(lam1), 0.0, 1.0 )", RooArgList(nEvt1,lam1) );
+  RooFormulaVar p2( "p2", "TMath::Gaus( (nEvt2-lam2)/sqrt(lam2), 0.0, 1.0 )", RooArgList(nEvt2,lam2) );
+  RooFormulaVar p3( "p3", "TMath::Gaus( (nEvt3-lam3)/sqrt(lam3), 0.0, 1.0 )", RooArgList(nEvt3,lam3) );
+
+  RooFormulaVar LL2( "LL2", "-log(p1*p2*p3)", RooArgList(p1,p2,p3) );  
+
+  RooMinuit m2(LL2);
+
+  RooFitResult * result = m2 . fit( config . option );
+
+  //contourBC = m2 . contour( epsb, epsc, 1, 2, 3 );
+  //contourBX = m2 . contour( epsb, xsec, 1, 2, 3 );
+
+  return *result;
+}
+
+
+
+
+
+
 RooFitResult TtTagConsistencyEfficiency::fit_signal( TtTagConsistencyFitConfig & config, TH2F * _contour )
 {
   //cout << "DEBUG: n1,2,3 = " << config.n1 << "   " << config . n2 << "   " << config.n3 << endl; 
@@ -1679,51 +2168,56 @@ RooFitResult TtTagConsistencyEfficiency::fit_signal( TtTagConsistencyFitConfig &
 
 
 
-RooFitResult TtTagConsistencyEfficiency::fit_optimized( TtTagConsistencyFitConfig & config )
+RooFitResult TtTagConsistencyEfficiency::buildVar( TtTagConsistencyFitConfig & config )
 {
+  //config . dump();
+  //dumpFijk_d();
 
-  RooRealVar nEvt1( "nEvt1", "observed number of tags", config . n1, 0.9*config . n1, 1.1*config . n1 ); // number of events with 1 tag
-  RooRealVar nEvt2( "nEvt2", "observed number of tags", config . n2, 0.9*config . n2, 1.1*config . n2 );
-  RooRealVar nEvt3( "nEvt3", "observed number of tags", config . n3, 0.9*config . n3, 1.1*config . n3 );
+  // FIXME: delete is not enough, return all pointers to 0;  
+  clean();
 
-  RooRealVar lumi( "lumi", "Integrated luminocity", config . lumi, 0, 1000 );     // 1/pb
-  RooRealVar xsec( "xsec", "ttbar cross section", config . xsec_ttbar, config . xsec_ttbar_min, config . xsec_ttbar_max );      // pb
-  RooRealVar  eff( "eff",  "Pre-tag efficiency", config . efficiency, 0.0, 1.0 );
+  //nEvt1 = new RooRealVar( "nEvt1", "observed number of tags", config . n1_d, 0.9*config . n1_d, 1.1*config . n1_d ); // number of events with 1 tag
+  //nEvt2 = new RooRealVar( "nEvt2", "observed number of tags", config . n2_d, 0.9*config . n2_d, 1.1*config . n2_d );
+  //nEvt3 = new RooRealVar( "nEvt3", "observed number of tags", config . n3_d, 0.9*config . n3_d, 1.1*config . n3_d );
 
-  RooRealVar bgFrac0( "bgFrac0",  "Fraction of background in n0 bin", config . bgf0, config . bgf0_min, config . bgf0_max );
-  RooRealVar bgFrac1( "bgFrac1",  "Fraction of background in n1 bin", config . bgf1, config . bgf1_min, config . bgf1_max );
-  RooRealVar bgFrac2( "bgFrac2",  "Fraction of background in n2 bin", config . bgf2, config . bgf2_min, config . bgf2_max );
-  RooRealVar bgFrac3( "bgFrac3",  "Fraction of background in n3 bin", config . bgf3, config . bgf3_min, config . bgf3_max );
-  RooRealVar bgFrac4( "bgFrac4",  "Fraction of background in n4 bin", config . bgf4, config . bgf4_min, config . bgf4_max );
+  nEvt1 = new RooRealVar( "nEvt1", "observed number of tags", config . n1_d, 0.0, 1e+10 ); // number of events with 1 tag
+  nEvt2 = new RooRealVar( "nEvt2", "observed number of tags", config . n2_d, 0.0, 1e+10 );
+  nEvt3 = new RooRealVar( "nEvt3", "observed number of tags", config . n3_d, 0.0, 1e+10 );
 
-  RooRealVar epsb( "epsb", "b tag efficiency", config . eb,  max(config . eb_min,0.0), min(config . eb_max,1.0) );  // b tagging efficiency
-  RooRealVar epsc( "epsc", "c tag efficiency", config . ec,  max(config . ec_min,0.0), min(config . ec_max,1.0) );  // c tagging efficiency
-  RooRealVar epsl( "epsl", "l tag efficiency", config . el,  max(config . el_min,0.0), min(config . el_max,1.0) );  // light (and gluon) tagging efficiency - from outside !
+  lumi = new RooRealVar( "lumi", "Integrated luminocity", config . lumi, 0, 1000 );     // 1/pb
+  xsec = new RooRealVar( "xsec", "ttbar cross section", config . xsec_ttbar, config . xsec_ttbar_min, config . xsec_ttbar_max );      // pb
+  eff  = new RooRealVar( "eff",  "Pre-tag efficiency", config . efficiency, 0.0, 1.0 );
 
-  RooArgList lamargs[5];
+  bgFrac0 = new RooRealVar( "bgFrac0",  "Fraction of background in n0 bin", config . bgf0, config . bgf0_min, config . bgf0_max );
+  bgFrac1 = new RooRealVar( "bgFrac1",  "Fraction of background in n1 bin", config . bgf1, config . bgf1_min, config . bgf1_max );
+  bgFrac2 = new RooRealVar( "bgFrac2",  "Fraction of background in n2 bin", config . bgf2, config . bgf2_min, config . bgf2_max );
+  bgFrac3 = new RooRealVar( "bgFrac3",  "Fraction of background in n3 bin", config . bgf3, config . bgf3_min, config . bgf3_max );
+  bgFrac4 = new RooRealVar( "bgFrac4",  "Fraction of background in n4 bin", config . bgf4, config . bgf4_min, config . bgf4_max );
+
+  epsb = new RooRealVar( "epsb", "b tag efficiency", config . eb,  max(config . eb_min,0.0), min(config . eb_max,1.0) );  // b tagging efficiency
+  epsc = new RooRealVar( "epsc", "c tag efficiency", config . ec,  max(config . ec_min,0.0), min(config . ec_max,1.0) );  // c tagging efficiency
+  epsl = new RooRealVar( "epsl", "l tag efficiency", config . el,  max(config . el_min,0.0), min(config . el_max,1.0) );  // light (and gluon) tagging efficiency - from outside !
 
   for ( int m = 0; m < 5; m++ )
     {
-      lamargs[m] . add(lumi);
-      lamargs[m] . add(xsec);
-      lamargs[m] . add(eff);
+      lamargs[m] . add(*lumi);
+      lamargs[m] . add(*xsec);
+      lamargs[m] . add(*eff);
     }
-
+  
   //
   // ===> Signal coefficients
   //
-  map<int, map<int, map<int, RooRealVar *> > > _varFijk;
-  map<int, map<int, map<int, map<int, RooFormulaVar *> > > > _Fijkn;
   TtTagConsistencyEfficiency::BFormula _f;
   ostringstream lam_sumFsig[5];
   for ( int l = 1; l < 4; l++ ) lam_sumFsig[l] << "(";
-  for ( unsigned int ii = 0; ii < Fijk_sig.i.size(); ii++ )
+  for ( unsigned int ii = 0; ii < Fijk_d_sig.i.size(); ii++ )
     {
-      int _i = Fijk_sig.i[ii];
-      int _j = Fijk_sig.j[ii];
-      int _k = Fijk_sig.k[ii];
+      int _i = Fijk_d_sig.i[ii];
+      int _j = Fijk_d_sig.j[ii];
+      int _k = Fijk_d_sig.k[ii];
       _f = getFormula( _i, _j, _k );
-      _varFijk[_i][_j][_k] = new RooRealVar( _f . name . c_str(), _f . title . c_str(), (double)Fijk_sig.value[_i][_j][_k]/(double)Fijk_sig.sum, 0.0, 1.0 );
+      _varFijk[_i][_j][_k] = new RooRealVar( _f . name . c_str(), _f . title . c_str(), Fijk_d_sig.value[_i][_j][_k]/(double)Fijk_d_sig.sum, 0.0, 1.0 );
       for ( int l = 1; l < 4; l++ )
 	{
 	  ostringstream _name;
@@ -1731,13 +2225,13 @@ RooFitResult TtTagConsistencyEfficiency::fit_optimized( TtTagConsistencyFitConfi
 	  _name << _f . name . c_str() << "_" << l; 
 	  if ( lam_sumFsig[l] . str() . size() > 1 ) lam_sumFsig[l] << "+";
 	  lam_sumFsig[l] << _name . str();
-	  if ( _i == 0 && _j != 0 && _k != 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], epsc, epsl ) );
-	  if ( _i != 0 && _j == 0 && _k != 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], epsb, epsl ) );
-	  if ( _i != 0 && _j != 0 && _k == 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], epsb, epsc ) );
-	  if ( _i == 0 && _j == 0 && _k != 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], epsl ) );
-	  if ( _i == 0 && _j != 0 && _k == 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], epsc ) );
-	  if ( _i != 0 && _j == 0 && _k == 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], epsb ) );
-	  else _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], epsb, epsc, epsl ) );
+	  if ( _i == 0 && _j != 0 && _k != 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], *epsc, *epsl ) );
+	  if ( _i != 0 && _j == 0 && _k != 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], *epsb, *epsl ) );
+	  if ( _i != 0 && _j != 0 && _k == 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], *epsb, *epsc ) );
+	  if ( _i == 0 && _j == 0 && _k != 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], *epsl ) );
+	  if ( _i == 0 && _j != 0 && _k == 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], *epsc ) );
+	  if ( _i != 0 && _j == 0 && _k == 0 ) _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], *epsb ) );
+	  else _Fijkn[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk[_i][_j][_k], *epsb, *epsc, *epsl ) );
 	  lamargs[l] . add( *_Fijkn[_i][_j][_k][l] );
 	  //_Fijkn[_i][_j][_k][l] -> Print();
 	}
@@ -1746,27 +2240,25 @@ RooFitResult TtTagConsistencyEfficiency::fit_optimized( TtTagConsistencyFitConfi
     }
   for ( int l = 1; l < 4; l++ ) lam_sumFsig[l] << ")";
 
-  //for ( int m = 0; m < 5; m++ ) lamargs[m] . add(bgFrac);
-  lamargs[0] . add(bgFrac0);
-  lamargs[1] . add(bgFrac1);
-  lamargs[2] . add(bgFrac2);
-  lamargs[3] . add(bgFrac3);
-  lamargs[4] . add(bgFrac4);
+  //for ( int m = 0; m < 5; m++ ) lamargs[m] . add(*bgFrac);
+  lamargs[0] . add(*bgFrac0);
+  lamargs[1] . add(*bgFrac1);
+  lamargs[2] . add(*bgFrac2);
+  lamargs[3] . add(*bgFrac3);
+  lamargs[4] . add(*bgFrac4);
   
   //
   // =====> Background coefficients
   //
-  map<int, map<int, map<int, RooRealVar *> > > _varFijk_bg;
-  map<int, map<int, map<int, map<int, RooFormulaVar *> > > > _Fijkn_bg;
   ostringstream lam_sumFbg[5];
   for ( int l = 1; l < 4; l++ ) lam_sumFbg[l] << "(";
-  for ( unsigned int ii = 0; ii < Fijk_bg.i.size(); ii++ )
+  for ( unsigned int ii = 0; ii < Fijk_d_bg.i.size(); ii++ )
     {
-      int _i = Fijk_bg.i[ii];
-      int _j = Fijk_bg.j[ii];
-      int _k = Fijk_bg.k[ii];
+      int _i = Fijk_d_bg.i[ii];
+      int _j = Fijk_d_bg.j[ii];
+      int _k = Fijk_d_bg.k[ii];
       _f = getFormula( _i, _j, _k, "_bg" );
-      _varFijk_bg[_i][_j][_k] = new RooRealVar( _f . name . c_str(), _f . title . c_str(), (double)Fijk_bg.value[_i][_j][_k]/(double)Fijk_bg.sum, 0.0, 1.0 );
+      _varFijk_bg[_i][_j][_k] = new RooRealVar( _f . name . c_str(), _f . title . c_str(), Fijk_d_bg.value[_i][_j][_k]/(double)Fijk_d_bg.sum, 0.0, 1.0 );
       for ( int l = 1; l < 4; l++ )
 	{
 	  ostringstream _name;
@@ -1774,13 +2266,13 @@ RooFitResult TtTagConsistencyEfficiency::fit_optimized( TtTagConsistencyFitConfi
 	  _name << _f . name . c_str() << "_" << l; 
 	  if ( lam_sumFbg[l] . str() . size() > 1 ) lam_sumFbg[l] << "+";
 	  lam_sumFbg[l] << _name . str();
-	  if ( _i == 0 && _j != 0 && _k != 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], epsc, epsl ) );
-	  if ( _i != 0 && _j == 0 && _k != 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], epsb, epsl ) );
-	  if ( _i != 0 && _j != 0 && _k == 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], epsb, epsc ) );
-	  if ( _i == 0 && _j == 0 && _k != 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], epsl ) );
-	  if ( _i == 0 && _j != 0 && _k == 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], epsc ) );
-	  if ( _i != 0 && _j == 0 && _k == 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], epsb ) );
-	  else _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], epsb, epsc, epsl ) );
+	  if ( _i == 0 && _j != 0 && _k != 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], *epsc, *epsl ) );
+	  if ( _i != 0 && _j == 0 && _k != 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], *epsb, *epsl ) );
+	  if ( _i != 0 && _j != 0 && _k == 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], *epsb, *epsc ) );
+	  if ( _i == 0 && _j == 0 && _k != 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], *epsl ) );
+	  if ( _i == 0 && _j != 0 && _k == 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], *epsc ) );
+	  if ( _i != 0 && _j == 0 && _k == 0 ) _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], *epsb ) );
+	  else _Fijkn_bg[_i][_j][_k][l] = new RooFormulaVar( _name . str() . c_str(), _f . formula[l] . c_str(), RooArgList( *_varFijk_bg[_i][_j][_k], *epsb, *epsc, *epsl ) );
 	  lamargs[l] . add( *_Fijkn_bg[_i][_j][_k][l] );
 	  //_Fijkn_bg[_i][_j][_k][l] -> Print();
 	}
@@ -1792,58 +2284,96 @@ RooFitResult TtTagConsistencyEfficiency::fit_optimized( TtTagConsistencyFitConfi
   //
   // ===========================>
 
-  string lam1_str = "lumi*xsec*eff*(" + lam_sumFsig[1] . str() + "+bgFrac1*" + lam_sumFbg[1] . str() + ")";
-  string lam2_str = "lumi*xsec*eff*(" + lam_sumFsig[2] . str() + "+bgFrac2*" + lam_sumFbg[2] . str() + ")";
-  string lam3_str = "lumi*xsec*eff*(" + lam_sumFsig[3] . str() + "+bgFrac3*" + lam_sumFbg[3] . str() + ")";
+  lam1_str = "lumi*xsec*eff*(" + lam_sumFsig[1] . str() + "+bgFrac1*" + lam_sumFbg[1] . str() + ")";
+  lam2_str = "lumi*xsec*eff*(" + lam_sumFsig[2] . str() + "+bgFrac2*" + lam_sumFbg[2] . str() + ")";
+  lam3_str = "lumi*xsec*eff*(" + lam_sumFsig[3] . str() + "+bgFrac3*" + lam_sumFbg[3] . str() + ")";
 
-  RooFormulaVar lam1( "lam1", lam1_str . c_str(), lamargs[1] );
-  RooFormulaVar lam2( "lam2", lam2_str . c_str(), lamargs[2] );
-  RooFormulaVar lam3( "lam3", lam3_str . c_str(), lamargs[3] );
+  lam1 = new RooFormulaVar( "lam1", lam1_str . c_str(), lamargs[1] );
+  lam2 = new RooFormulaVar( "lam2", lam2_str . c_str(), lamargs[2] );
+  lam3 = new RooFormulaVar( "lam3", lam3_str . c_str(), lamargs[3] );
 
   //lamargs[1] . Print();
   //lam1 . Print();
 
-  lumi . setConstant(kTRUE);
-  eff  . setConstant(kTRUE);
-  bgFrac1 . setConstant(kTRUE);
-  bgFrac2 . setConstant(kTRUE);
-  bgFrac3 . setConstant(kTRUE);
-  epsc . setConstant(kTRUE);
-  epsl . setConstant(kTRUE);
+  lumi -> setConstant(kTRUE);
+  eff  -> setConstant(kTRUE);
+  bgFrac1 -> setConstant(kTRUE);
+  bgFrac2 -> setConstant(kTRUE);
+  bgFrac3 -> setConstant(kTRUE);
+  //epsc -> setConstant(kTRUE);
+  epsl -> setConstant(kTRUE);
 
-  //xsec . setConstant(kTRUE);
+  //xsec -> setConstant(kTRUE);
 
-  nEvt1 . setConstant(kTRUE);
-  nEvt2 . setConstant(kTRUE);
-  nEvt3 . setConstant(kTRUE);
+  nEvt1 -> setConstant(kTRUE);
+  nEvt2 -> setConstant(kTRUE);
+  nEvt3 -> setConstant(kTRUE);
 
   //
   // ===> minimization
   //
-  RooFormulaVar poisson1( "poisson1", "exp(-(nEvt1-lam1)*(nEvt1-lam1)/nEvt1/nEvt1)", RooArgList(nEvt1,lam1) );
-  RooFormulaVar poisson2( "poisson2", "exp(-(nEvt2-lam2)*(nEvt2-lam2)/nEvt2/nEvt2)", RooArgList(nEvt2,lam2) );
-  RooFormulaVar poisson3( "poisson3", "exp(-(nEvt3-lam3)*(nEvt3-lam3)/nEvt3/nEvt3)", RooArgList(nEvt3,lam3) );
+  poisson1 = new RooFormulaVar( "poisson1", "exp(-(nEvt1-lam1)*(nEvt1-lam1)/nEvt1/nEvt1)", RooArgList(*nEvt1,*lam1) );
+  poisson2 = new RooFormulaVar( "poisson2", "exp(-(nEvt2-lam2)*(nEvt2-lam2)/nEvt2/nEvt2)", RooArgList(*nEvt2,*lam2) );
+  poisson3 = new RooFormulaVar( "poisson3", "exp(-(nEvt3-lam3)*(nEvt3-lam3)/nEvt3/nEvt3)", RooArgList(*nEvt3,*lam3) );
 
-  RooFormulaVar LL( "LL", "-log(poisson1*poisson2*poisson3)", RooArgList(poisson1,poisson2,poisson3) );  
+  LL = new RooFormulaVar( "LL", "-log(poisson1*poisson2*poisson3)", RooArgList(*poisson1,*poisson2,*poisson3) );  
 
-  RooMinuit m(LL);
+  m1 = new RooMinuit(*LL);
 
-  m . fit( "msh" );
+  RooFitResult * result = 0;
+  //m1 -> fit( "msh" );
 
-  RooFormulaVar p1( "p1", "TMath::Gaus( (nEvt1-lam1)/sqrt(lam1), 0.0, 1.0 )", RooArgList(nEvt1,lam1) );
-  RooFormulaVar p2( "p2", "TMath::Gaus( (nEvt2-lam2)/sqrt(lam2), 0.0, 1.0 )", RooArgList(nEvt2,lam2) );
-  RooFormulaVar p3( "p3", "TMath::Gaus( (nEvt3-lam3)/sqrt(lam3), 0.0, 1.0 )", RooArgList(nEvt3,lam3) );
+  p1 = new RooFormulaVar( "p1", "TMath::Gaus( (nEvt1-lam1)/sqrt(lam1), 0.0, 1.0 )", RooArgList(*nEvt1,*lam1) );
+  p2 = new RooFormulaVar( "p2", "TMath::Gaus( (nEvt2-lam2)/sqrt(lam2), 0.0, 1.0 )", RooArgList(*nEvt2,*lam2) );
+  p3 = new RooFormulaVar( "p3", "TMath::Gaus( (nEvt3-lam3)/sqrt(lam3), 0.0, 1.0 )", RooArgList(*nEvt3,*lam3) );
 
-  RooFormulaVar LL2( "LL2", "-log(p1*p2*p3)", RooArgList(p1,p2,p3) );  
+  LL2 = new RooFormulaVar( "LL2", "-log(p1*p2*p3)", RooArgList(*p1,*p2,*p3) );  
 
-  RooMinuit m2(LL2);
+  m2 = new RooMinuit(*LL2);
 
-  RooFitResult * result = m2 . fit( config . option );
+  //result = m2 -> fit( config . option );
+
+  //contourBC = m2 . contour( epsb, epsc, 1, 2, 3 );
+  //contourBX = m2 . contour( epsb, xsec, 1, 2, 3 );
+
+  //return 0;
+  return *result;
+}
+
+
+
+RooFitResult TtTagConsistencyEfficiency::fit_test( TtTagConsistencyFitConfig & config )
+{
+  //config . dump();
+  //dumpFijk_d();
+  
+  /*  
+  nEvt1 -> setConstant(kFALSE);
+  nEvt2 -> setConstant(kFALSE);
+  nEvt3 -> setConstant(kFALSE);
+  
+  //*nEvt1 = config . n1_d; // number of events with 1 tag
+  //*nEvt2 = config . n2_d;
+  //*nEvt3 = config . n3_d;
+  
+  nEvt1 -> setConstant(kTRUE);
+  nEvt2 -> setConstant(kTRUE);
+  nEvt3 -> setConstant(kTRUE);
+  */
+
+  config . dump();
+
+  //
+  // ===> minimization
+  //
+
+  RooFitResult * result = 0;
+
+  result = m1 -> fit( "msh" );
+  result = m2 -> fit( config . option );
 
   //contourBC = m2 . contour( epsb, epsc, 1, 2, 3 );
   //contourBX = m2 . contour( epsb, xsec, 1, 2, 3 );
 
   return *result;
 }
-
-

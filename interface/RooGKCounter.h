@@ -23,10 +23,13 @@ class RooGKCounter {
   void setMessage( const char* );
   void count( void );
   unsigned long int getCount( void );
+  double getCountDouble( void );
   void increment( long int _incr );
+  void incrementDouble( double _incr );
 
  private:
   unsigned long int _count;
+  double _count_double_type;
   unsigned long int _firstCount;
   unsigned int _divider;
   bool printCount;

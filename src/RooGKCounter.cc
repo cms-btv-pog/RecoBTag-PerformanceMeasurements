@@ -49,6 +49,7 @@ void RooGKCounter::setMessage( const char *message ){
 
 void RooGKCounter::init( void ){
   _count = 0;
+  _count_double_type = 0.0;
   _firstCount = 0;
   _divider = 1;
   printCount = false;
@@ -115,8 +116,16 @@ unsigned long int RooGKCounter::getCount( void ){
   return _count;
 }
 
+double RooGKCounter::getCountDouble( void ){
+  return _count_double_type;
+}
+
 void RooGKCounter::increment( long int _incr ){
   _count += _incr;
+}
+
+void RooGKCounter::incrementDouble( double _incr ){
+  _count_double_type += _incr;
 }
 
 RooGKCounter::~RooGKCounter(){

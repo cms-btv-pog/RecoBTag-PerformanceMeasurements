@@ -13,7 +13,7 @@
 //
 // Original Author:  Gena Kukartsev, kukarzev@fnal.gov
 //         Created:  Fri Jun 29 14:53:10 CDT 2007
-// $Id: TtTagConsistency.cc,v 1.1.2.1 2008/04/04 23:54:48 kukartse Exp $
+// $Id: TtTagConsistency.cc,v 1.1.2.2 2008/04/05 00:52:30 kukartse Exp $
 //
 //
 
@@ -21,7 +21,7 @@
 
 TtTagConsistency::TtTagConsistency(const edm::ParameterSet& iConfig)
 {
-  
+
   dRCut        = iConfig.getParameter<double>("dRGenJetMatch");
   nCaloJetsLow = iConfig.getParameter<int>("nCaloJetsLow");
   nLeptonLow   = iConfig.getParameter<int>("nLeptonLow");
@@ -52,7 +52,6 @@ TtTagConsistency::TtTagConsistency(const edm::ParameterSet& iConfig)
 
   //_genJetSource    = iConfig.getParameter<string>("genJetSource");
   _outputFileName    = iConfig.getParameter<string>("outputFileName");
-
 }
 
 
@@ -88,8 +87,21 @@ TtTagConsistency::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   iEvent . getByLabel( _electronSource, electrons );
   iEvent . getByLabel( _muonSource, muons );
   iEvent . getByLabel( _METSource, METs );
-  
+
+  Handle< double> weightHandle;
+  double weight = 1.0;
+
+  try{
+    iEvent.getByLabel ("csa07EventWeightProducer","weight", weightHandle);
+    weight = * weightHandle;
+  }
+  catch( edm::Exception ) {
+    cout << "Warning: csa07 soup weight is not available... continuing with weight=1.0" << endl;
+  }
+
+  ////
   eventCounter . count();
+  eventCounter . incrementDouble( weight );
 
   /* 
   //Handle< vector< GenJet > > genJets; //obsolete since CSA07
@@ -103,6 +115,7 @@ TtTagConsistency::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       //iEvent . getByLabel( _genJetSource, genJets );
       iEvent . getByLabel( _genJetSource, genParticleCollection );
       vector<reco::GenJet>::const_iterator gjet;
+
       RooGKCounter nOfGoodGenJets;
       for ( gjet = genJets -> begin(); gjet != genJets -> end(); gjet++ )  // loop over calo jets
 	{
@@ -209,65 +222,6 @@ TtTagConsistency::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	      }
 	  }
 
-	  /* obsolete
-	  // check if the jet is tagged
-	  if ( _theJetTagRef . isNonnull() )
-	    {
-	      const JetTag * theJetTag = &*( cjet -> getBJetTagRef( _jetTagSource ) );
-
-	      cout << "### " << theJetTag->discriminator() << endl;
-
-	      for(double _d = dLow; _d < dHigh+0.0001; _d += dStep) // loop over discriminator values
-		{
-		  if ( theJetTag -> discriminator() > _d )
-		    {
-		      nTaggedJets[_d] . count(); // check the discriminator
-		      
-		      isTagged[_d] = true;
-		    }
-		}
-	    }
-
-	  // check if the jet is tagged (second tagger)
-	  if ( _theJetTagRef_2 . isNonnull() )
-	    {
-	      const JetTag * theJetTag_2 = &*( cjet -> getBJetTagRef( _jetTagSource_2 ) );
-
-	      //DEBUG different taggers' info
-	      //cout << "DEBUG: b-tag discriminator 2 = " << theJetTag_2->discriminator() << endl << endl;
-
-	      //
-	      for(double _d = dLow_2; _d < dHigh_2+0.0001; _d += dStep_2) // loop over discriminator values
-		{
-		  if ( theJetTag_2 -> discriminator() > _d )
-		    {
-		      nTaggedJets_2[_d] . count(); // check the discriminator
-		      
-		      isTagged_2[_d] = true;
-		    }
-		}
-	    }
-
-	  // check if the jet is tagged (third tagger)
-	  if ( _theJetTagRef_3 . isNonnull() )
-	    {
-	      const JetTag * theJetTag_3 = &*( cjet -> getBJetTagRef( _jetTagSource_3 ) );
-
-	      //DEBUG different taggers' info
-	      //cout << "DEBUG: b-tag discriminator 2 = " << theJetTag_3->discriminator() << endl << endl;
-
-	      //
-	      for(double _d = dLow_3; _d < dHigh_3+0.0001; _d += dStep_3) // loop over discriminator values
-		{
-		  if ( theJetTag_3 -> discriminator() > _d )
-		    {
-		      nTaggedJets_3[_d] . count(); // check the discriminator
-		      
-		      isTagged_3[_d] = true;
-		    }
-		}
-	      }
-    obsolete */
 
 
 	  // ---- jet flavor (MC only!!!)
@@ -406,72 +360,44 @@ TtTagConsistency::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     {
       
       selectedEvents . count();
+      selectedEvents . incrementDouble( weight );
 
-      nOfPassedBJets . increment( nOfGoodBJets . getCount() );
-      nOfPassedCJets . increment( nOfGoodCJets . getCount() );
-      nOfPassedLJets . increment( nOfGoodLJets . getCount() );
-      nOfPassedUnknownJets . increment( nOfGoodUnknownJets . getCount() );
+      nOfPassedBJets . incrementDouble( (double)nOfGoodBJets.getCount()*weight );
+      nOfPassedCJets . incrementDouble( (double)nOfGoodCJets.getCount()*weight );
+      nOfPassedLJets . incrementDouble( (double)nOfGoodLJets.getCount()*weight );
+      nOfPassedUnknownJets . incrementDouble( (double)nOfGoodUnknownJets.getCount()*weight );
 
-      Fijk[ (int)nOfGoodBJets.getCount() ][ (int)nOfGoodCJets.getCount() ][ (int)nOfGoodLJets.getCount() ]++;
-      Fxijk[ (int)nOfGoodUnknownJets.getCount() ][ (int)nOfGoodBJets.getCount() ][ (int)nOfGoodCJets.getCount() ][ (int)nOfGoodLJets.getCount() ]++;
+      Fijk[ (int)nOfGoodBJets.getCount() ][ (int)nOfGoodCJets.getCount() ][ (int)nOfGoodLJets.getCount() ]+=weight;
+      Fxijk[ (int)nOfGoodUnknownJets.getCount() ][ (int)nOfGoodBJets.getCount() ][ (int)nOfGoodCJets.getCount() ][ (int)nOfGoodLJets.getCount() ]+=weight;
 
       for(double _d = dLow; _d < dHigh+0.0001; _d += dStep) // loop over discriminator values
 	{
-	  nOfTaggedPassedBJets[_d] . increment( nOfTaggedBJets[_d] . getCount() );
-	  nOfTaggedPassedCJets[_d] . increment( nOfTaggedCJets[_d] . getCount() );
-	  nOfTaggedPassedLJets[_d] . increment( nOfTaggedLJets[_d] . getCount() );
-	  nOfTaggedPassedUnknownJets[_d] . increment( nOfTaggedUnknownJets[_d] . getCount() );
+	  nOfTaggedPassedBJets[_d] . incrementDouble( (double)nOfTaggedBJets[_d] . getCount()*weight );
+	  nOfTaggedPassedCJets[_d] . incrementDouble( (double)nOfTaggedCJets[_d] . getCount()*weight );
+	  nOfTaggedPassedLJets[_d] . incrementDouble( (double)nOfTaggedLJets[_d] . getCount()*weight );
+	  nOfTaggedPassedUnknownJets[_d] . incrementDouble( (double)nOfTaggedUnknownJets[_d] . getCount()*weight );
 
-	  Nn[_d][ nTaggedJets[_d] . getCount() ]++;
+	  Nn[_d][ nTaggedJets[_d] . getCount() ]+=weight;
 	}
       for(double _d = dLow_2; _d < dHigh_2+0.0001; _d += dStep_2) // loop over discriminator values
 	{
-	  nOfTaggedPassedBJets_2[_d] . increment( nOfTaggedBJets_2[_d] . getCount() );
-	  nOfTaggedPassedCJets_2[_d] . increment( nOfTaggedCJets_2[_d] . getCount() );
-	  nOfTaggedPassedLJets_2[_d] . increment( nOfTaggedLJets_2[_d] . getCount() );
-	  nOfTaggedPassedUnknownJets_2[_d] . increment( nOfTaggedUnknownJets_2[_d] . getCount() );
+	  nOfTaggedPassedBJets_2[_d] . incrementDouble( (double)nOfTaggedBJets_2[_d] . getCount()*weight );
+	  nOfTaggedPassedCJets_2[_d] . incrementDouble( (double)nOfTaggedCJets_2[_d] . getCount()*weight );
+	  nOfTaggedPassedLJets_2[_d] . incrementDouble( (double)nOfTaggedLJets_2[_d] . getCount()*weight );
+	  nOfTaggedPassedUnknownJets_2[_d] . incrementDouble( (double)nOfTaggedUnknownJets_2[_d] . getCount()*weight );
 	  
-	  Nn_2[_d][ nTaggedJets_2[_d] . getCount() ]++;
+	  Nn_2[_d][ nTaggedJets_2[_d] . getCount() ]+=weight;
 	}
       for(double _d = dLow_3; _d < dHigh_3+0.0001; _d += dStep_3) // loop over discriminator values
 	{
-	  nOfTaggedPassedBJets_3[_d] . increment( nOfTaggedBJets_3[_d] . getCount() );
-	  nOfTaggedPassedCJets_3[_d] . increment( nOfTaggedCJets_3[_d] . getCount() );
-	  nOfTaggedPassedLJets_3[_d] . increment( nOfTaggedLJets_3[_d] . getCount() );
-	  nOfTaggedPassedUnknownJets_3[_d] . increment( nOfTaggedUnknownJets_3[_d] . getCount() );
+	  nOfTaggedPassedBJets_3[_d] . incrementDouble( (double)nOfTaggedBJets_3[_d] . getCount()*weight );
+	  nOfTaggedPassedCJets_3[_d] . incrementDouble( (double)nOfTaggedCJets_3[_d] . getCount()*weight );
+	  nOfTaggedPassedLJets_3[_d] . incrementDouble( (double)nOfTaggedLJets_3[_d] . getCount()*weight );
+	  nOfTaggedPassedUnknownJets_3[_d] . incrementDouble( (double)nOfTaggedUnknownJets_3[_d] . getCount()*weight );
 	  
-	  Nn_3[_d][ nTaggedJets_3[_d] . getCount() ]++;
+	  Nn_3[_d][ nTaggedJets_3[_d] . getCount() ]+=weight;
 	}
     }  
-
-  // This is probably obsolete. It used to be utilized to get some intermediate results
-  // without interrupting the job.
-  /* commented out on October 16, 2007
-  if ( fmod( (double)(eventCounter . getCount()), (double)_interFreq ) < (1.0/(double)_interFreq))
-    {
-      interCounter . count();
-
-      _outputFile << " ---> Intermediate: after " << interCounter . getCount() * _interFreq << " events" << endl;
-      _outputFile << "Intermediate: Processed events:  " << eventCounter . getCount() << endl;
-      _outputFile << "Intermediate: Selected events:  " << selectedEvents . getCount() << endl;
-      _outputFile << " ---> Intermediate:Number of events with n tagged jets: " << endl;
-      map< int, int >::const_iterator it_n;
-      for( it_n = Nn[dLow] . begin(); it_n != Nn[dLow] . end(); it_n++ )
-	{
-	  _outputFile << " Intermediate: N_" << it_n -> first << " = " << it_n -> second << endl;
-	}
-      
-      if ( _dataType == "MC" )
-	{
-	  _outputFile << " ---> Intermediate: Number of good light jets: " << nOfPassedLJets . getCount() << endl;
-	  _outputFile << " ---> Intermediate: Number of tagged light jets: " << nOfTaggedPassedLJets[dLow] . getCount() << endl;
-	  _outputFile << " ---> Intermediate: Number of good b jets: " << nOfPassedBJets . getCount() << endl;
-	  _outputFile << " ---> Intermediate: Number of tagged b jets: " << nOfTaggedPassedBJets[dLow] . getCount() << endl;
-	  _outputFile << " ---> Intermediate: Number of good c jets: " << nOfPassedCJets . getCount() << endl;
-	  _outputFile << " ---> Intermediate: Number of tagged c jets: " << nOfTaggedPassedCJets[dLow] . getCount() << endl << endl;
-	}
-    }  
-  */
 }
 
 
@@ -504,9 +430,12 @@ TtTagConsistency::beginJob(const edm::EventSetup&)
 
   for(double _d = dLow; _d < dHigh+0.0001; _d += dStep) // loop over discriminator values
     {
-      for (int i=0; i<=4; i++) Nn[_d][i] = 0;
+      for (int i=0; i<=4; i++){
+	Nn[_d][i] = 0.0;
+	Nn_2[_d][i] = 0.0;
+	Nn_3[_d][i] = 0.0;
+      }
     }
-
 }
 
 int TtTagConsistency::findJetMatch( const reco::Jet & theJet, const std::vector<reco::GenJet> & jets, std::vector<int> & jetIndex, double dRCut ) {
@@ -547,36 +476,14 @@ TtTagConsistency::endJob() {
 
   _outputFile << "============= TtTagConsistency summary ================" << endl;
   _outputFile << "Processed events:  " << eventCounter . getCount() << endl;
+  _outputFile << "Processed events (weighed):  " << eventCounter . getCountDouble() << endl;
   _outputFile << "Selected events:  " << selectedEvents . getCount() << endl;
+  _outputFile << "Selected events (weighed):  " << selectedEvents . getCountDouble() << endl;
 
-  map< int, map< int, map< int, map< int, int > > > >::const_iterator it_x;  
-  map< int, map< int, map< int, int > > >::const_iterator it_i;  
-  map< int, map< int, int > >::const_iterator it_j;  
-  map< int, int >::const_iterator it_k;  
-  for(double _d = dLow; _d < dHigh+0.0001; _d += dStep) // loop over discriminator values
-    {
-
-      _outputFile << "###=== Discriminator > " << _d << " ===###---------------------------------" << endl;
-      
-      _outputFile << " ---> Number of events with n tagged jets: " << endl;
-      map< int, int >::const_iterator it_n;
-      for( it_n = Nn[_d] . begin(); it_n != Nn[_d] . end(); it_n++ )
-	{
-	  _outputFile << " N_" << it_n -> first << " = " << it_n -> second << endl;
-	}
-      
-      if ( _dataType == "MC" )
-	{
-	  _outputFile << " ---> Number of good light jets: " << nOfPassedLJets . getCount() << endl;
-	  _outputFile << " ---> Number of tagged light jets: " << nOfTaggedPassedLJets[_d] . getCount() << endl;
-	  _outputFile << " ---> Number of good b jets: " << nOfPassedBJets . getCount() << endl;
-	  _outputFile << " ---> Number of tagged b jets: " << nOfTaggedPassedBJets[_d] . getCount() << endl;
-	  _outputFile << " ---> Number of good c jets: " << nOfPassedCJets . getCount() << endl;
-	  _outputFile << " ---> Number of tagged c jets: " << nOfTaggedPassedCJets[_d] . getCount() << endl;
-	  _outputFile << " ---> Number of good unknown jets: " << nOfPassedUnknownJets . getCount() << endl;
-	  _outputFile << " ---> Number of tagged unknown jets: " << nOfTaggedPassedUnknownJets[_d] . getCount() << endl;
-	}
-    }
+  map< int, map< int, map< int, map< int, double > > > >::const_iterator it_x;  
+  map< int, map< int, map< int, double > > >::const_iterator it_i;  
+  map< int, map< int, double > >::const_iterator it_j;  
+  map< int, double >::const_iterator it_k;  
 
   //===> table
   char buf[10];
@@ -585,35 +492,35 @@ TtTagConsistency::endJob() {
     {
       sprintf( buf, "%10.2f", _d);
       _outputFileTable << buf;
-      sprintf( buf, "%10d", Nn[_d][0]);
+      sprintf( buf, "%10.2f", Nn[_d][0]);
       _outputFileTable << buf;
-      sprintf( buf, "%10d", Nn[_d][1]);
+      sprintf( buf, "%10.2f", Nn[_d][1]);
       _outputFileTable << buf;
-      sprintf( buf, "%10d", Nn[_d][2]);
+      sprintf( buf, "%10.2f", Nn[_d][2]);
       _outputFileTable << buf;
-      sprintf( buf, "%10d", Nn[_d][3]);
+      sprintf( buf, "%10.2f", Nn[_d][3]);
       _outputFileTable << buf;
-      sprintf( buf, "%10d", Nn[_d][4]);
+      sprintf( buf, "%10.2f", Nn[_d][4]);
       _outputFileTable << buf;
 
       if ( _dataType == "MC" )
 	{
-	  sprintf( buf, "%10d", (int)(nOfPassedBJets . getCount()) );
+	  sprintf( buf, "%10.2f", (int)(nOfPassedBJets . getCount()) );
 	  _outputFileTable << buf;
-	  sprintf( buf, "%10d", (int)(nOfTaggedPassedBJets[_d] . getCount()) );
+	  sprintf( buf, "%10.2f", (int)(nOfTaggedPassedBJets[_d] . getCount()) );
 	  _outputFileTable << buf;
-	  sprintf( buf, "%10d", (int)(nOfPassedCJets . getCount()) );
+	  sprintf( buf, "%10.2f", (int)(nOfPassedCJets . getCount()) );
 	  _outputFileTable << buf;
-	  sprintf( buf, "%10d", (int)(nOfTaggedPassedCJets[_d] . getCount()) );
+	  sprintf( buf, "%10.2f", (int)(nOfTaggedPassedCJets[_d] . getCount()) );
 	  _outputFileTable << buf;
-	  sprintf( buf, "%10d", (int)(nOfPassedLJets . getCount()) );
+	  sprintf( buf, "%10.2f", (int)(nOfPassedLJets . getCount()) );
 	  _outputFileTable << buf;
-	  sprintf( buf, "%10d", (int)(nOfTaggedPassedLJets[_d] . getCount()) );
+	  sprintf( buf, "%10.2f", (int)(nOfTaggedPassedLJets[_d] . getCount()) );
 	  _outputFileTable << buf;
 
-	  sprintf( buf, "%10d", (int)(nOfPassedUnknownJets . getCount()) );
+	  sprintf( buf, "%10.2f", (int)(nOfPassedUnknownJets . getCount()) );
 	  _outputFileTable << buf;
-	  sprintf( buf, "%10d", (int)(nOfTaggedPassedUnknownJets[_d] . getCount()) );
+	  sprintf( buf, "%10.2f", (int)(nOfTaggedPassedUnknownJets[_d] . getCount()) );
 	  _outputFileTable << buf << endl;
 
 	}
@@ -621,7 +528,7 @@ TtTagConsistency::endJob() {
 	{
 	  for ( int i = 0; i < 8; i++ )
 	    {
-	      sprintf( buf, "%10d", 0 );
+	      sprintf( buf, "%10.2f", 0.0 );
 	      _outputFileTable << buf;
 	    }
 	  _outputFileTable << endl;
@@ -634,35 +541,35 @@ TtTagConsistency::endJob() {
     {
       sprintf( buf, "%10.2f", _d);
       _outputFileTable_2 << buf;
-      sprintf( buf, "%10d", Nn_2[_d][0]);
+      sprintf( buf, "%10.2f", Nn_2[_d][0]);
       _outputFileTable_2 << buf;
-      sprintf( buf, "%10d", Nn_2[_d][1]);
+      sprintf( buf, "%10.2f", Nn_2[_d][1]);
       _outputFileTable_2 << buf;
-      sprintf( buf, "%10d", Nn_2[_d][2]);
+      sprintf( buf, "%10.2f", Nn_2[_d][2]);
       _outputFileTable_2 << buf;
-      sprintf( buf, "%10d", Nn_2[_d][3]);
+      sprintf( buf, "%10.2f", Nn_2[_d][3]);
       _outputFileTable_2 << buf;
-      sprintf( buf, "%10d", Nn_2[_d][4]);
+      sprintf( buf, "%10.2f", Nn_2[_d][4]);
       _outputFileTable_2 << buf;
 
       if ( _dataType == "MC" )
 	{
-	  sprintf( buf, "%10d", (int)nOfPassedBJets . getCount() );
+	  sprintf( buf, "%10.2f", (int)nOfPassedBJets . getCount() );
 	  _outputFileTable_2 << buf;
-	  sprintf( buf, "%10d", (int)nOfTaggedPassedBJets_2[_d] . getCount() );
+	  sprintf( buf, "%10.2f", (int)nOfTaggedPassedBJets_2[_d] . getCount() );
 	  _outputFileTable_2 << buf;
-	  sprintf( buf, "%10d", (int)nOfPassedCJets . getCount() );
+	  sprintf( buf, "%10.2f", (int)nOfPassedCJets . getCount() );
 	  _outputFileTable_2 << buf;
-	  sprintf( buf, "%10d", (int)nOfTaggedPassedCJets_2[_d] . getCount() );
+	  sprintf( buf, "%10.2f", (int)nOfTaggedPassedCJets_2[_d] . getCount() );
 	  _outputFileTable_2 << buf;
-	  sprintf( buf, "%10d", (int)nOfPassedLJets . getCount() );
+	  sprintf( buf, "%10.2f", (int)nOfPassedLJets . getCount() );
 	  _outputFileTable_2 << buf;
-	  sprintf( buf, "%10d", (int)nOfTaggedPassedLJets_2[_d] . getCount() );
+	  sprintf( buf, "%10.2f", (int)nOfTaggedPassedLJets_2[_d] . getCount() );
 	  _outputFileTable_2 << buf;
 
-	  sprintf( buf, "%10d", (int)nOfPassedUnknownJets . getCount() );
+	  sprintf( buf, "%10.2f", (int)nOfPassedUnknownJets . getCount() );
 	  _outputFileTable_2 << buf;
-	  sprintf( buf, "%10d", (int)nOfTaggedPassedUnknownJets_2[_d] . getCount() );
+	  sprintf( buf, "%10.2f", (int)nOfTaggedPassedUnknownJets_2[_d] . getCount() );
 	  _outputFileTable_2 << buf << endl;
 
 	}
@@ -670,7 +577,7 @@ TtTagConsistency::endJob() {
 	{
 	  for ( int i = 0; i < 8; i++ )
 	    {
-	      sprintf( buf, "%10d", 0 );
+	      sprintf( buf, "%10.2f", 0.0 );
 	      _outputFileTable_2 << buf;
 	    }
 	  _outputFileTable_2 << endl;
@@ -683,35 +590,35 @@ TtTagConsistency::endJob() {
     {
       sprintf( buf, "%10.2f", _d);
       _outputFileTable_3 << buf;
-      sprintf( buf, "%10d", Nn_3[_d][0]);
+      sprintf( buf, "%10.2f", Nn_3[_d][0]);
       _outputFileTable_3 << buf;
-      sprintf( buf, "%10d", Nn_3[_d][1]);
+      sprintf( buf, "%10.2f", Nn_3[_d][1]);
       _outputFileTable_3 << buf;
-      sprintf( buf, "%10d", Nn_3[_d][2]);
+      sprintf( buf, "%10.2f", Nn_3[_d][2]);
       _outputFileTable_3 << buf;
-      sprintf( buf, "%10d", Nn_3[_d][3]);
+      sprintf( buf, "%10.2f", Nn_3[_d][3]);
       _outputFileTable_3 << buf;
-      sprintf( buf, "%10d", Nn_3[_d][4]);
+      sprintf( buf, "%10.2f", Nn_3[_d][4]);
       _outputFileTable_3 << buf;
 
       if ( _dataType == "MC" )
 	{
-	  sprintf( buf, "%10d", (int)nOfPassedBJets . getCount() );
+	  sprintf( buf, "%10.2f", (int)nOfPassedBJets . getCount() );
 	  _outputFileTable_3 << buf;
-	  sprintf( buf, "%10d", (int)nOfTaggedPassedBJets_3[_d] . getCount() );
+	  sprintf( buf, "%10.2f", (int)nOfTaggedPassedBJets_3[_d] . getCount() );
 	  _outputFileTable_3 << buf;
-	  sprintf( buf, "%10d", (int)nOfPassedCJets . getCount() );
+	  sprintf( buf, "%10.2f", (int)nOfPassedCJets . getCount() );
 	  _outputFileTable_3 << buf;
-	  sprintf( buf, "%10d", (int)nOfTaggedPassedCJets_3[_d] . getCount() );
+	  sprintf( buf, "%10.2f", (int)nOfTaggedPassedCJets_3[_d] . getCount() );
 	  _outputFileTable_3 << buf;
-	  sprintf( buf, "%10d", (int)nOfPassedLJets . getCount() );
+	  sprintf( buf, "%10.2f", (int)nOfPassedLJets . getCount() );
 	  _outputFileTable_3 << buf;
-	  sprintf( buf, "%10d", (int)nOfTaggedPassedLJets_3[_d] . getCount() );
+	  sprintf( buf, "%10.2f", (int)nOfTaggedPassedLJets_3[_d] . getCount() );
 	  _outputFileTable_3 << buf;
 
-	  sprintf( buf, "%10d", (int)nOfPassedUnknownJets . getCount() );
+	  sprintf( buf, "%10.2f", (int)nOfPassedUnknownJets . getCount() );
 	  _outputFileTable_3 << buf;
-	  sprintf( buf, "%10d", (int)nOfTaggedPassedUnknownJets_3[_d] . getCount() );
+	  sprintf( buf, "%10.2f", (int)nOfTaggedPassedUnknownJets_3[_d] . getCount() );
 	  _outputFileTable_3 << buf << endl;
 
 	}
@@ -719,7 +626,7 @@ TtTagConsistency::endJob() {
 	{
 	  for ( int i = 0; i < 8; i++ )
 	    {
-	      sprintf( buf, "%10d", 0 );
+	      sprintf( buf, "%10.2f", 0.0 );
 	      _outputFileTable_3 << buf;
 	    }
 	  _outputFileTable_3 << endl;
@@ -731,10 +638,10 @@ TtTagConsistency::endJob() {
     {
       for ( it_i = Fijk . begin(); it_i != Fijk . end(); it_i++ )
 	{
-	  map< int, map< int, int > > map2 = it_i -> second;        
+	  map< int, map< int, double > > map2 = it_i -> second;        
 	  for ( it_j = map2 . begin(); it_j != map2 . end(); it_j++ )
 	    {
-	      map< int, int > map1 = it_j -> second;        
+	      map< int, double > map1 = it_j -> second;        
 	      for ( it_k = map1 . begin(); it_k != map1 . end(); it_k++ )
 		{
 		  int ii = it_i -> first;
@@ -748,13 +655,13 @@ TtTagConsistency::endJob() {
       // dataset flavor structure with undefined flavor jets counted: F_undefined_b_c_light
       for ( it_x = Fxijk . begin(); it_x != Fxijk . end(); it_x++ )
 	{
-	  map< int, map< int, map< int, int > > > map3 = it_x -> second;        
+	  map< int, map< int, map< int, double > > > map3 = it_x -> second;        
 	  for ( it_i = map3 . begin(); it_i != map3 . end(); it_i++ )
 	    {
-	      map< int, map< int, int > > map2 = it_i -> second;        
+	      map< int, map< int, double > > map2 = it_i -> second;        
 	      for ( it_j = map2 . begin(); it_j != map2 . end(); it_j++ )
 		{
-		  map< int, int > map1 = it_j -> second;        
+		  map< int, double > map1 = it_j -> second;        
 		  for ( it_k = map1 . begin(); it_k != map1 . end(); it_k++ )
 		    {
 		      int xx = it_x -> first;
