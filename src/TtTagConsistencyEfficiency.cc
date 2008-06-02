@@ -1874,7 +1874,7 @@ RooFitResult TtTagConsistencyEfficiency::fit( TtTagConsistencyFitConfig & config
 
 RooFitResult TtTagConsistencyEfficiency::fit_d( TtTagConsistencyFitConfig & config )
 {
-  //config . dump();
+  config . dump();
   //dumpFijk_d();
   
   RooRealVar nEvt1( "nEvt1", "observed number of tags", config . n1_d, 0.9*config . n1_d, 1.1*config . n1_d ); // number of events with 1 tag

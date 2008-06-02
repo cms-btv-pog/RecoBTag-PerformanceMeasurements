@@ -10,6 +10,8 @@ int main( int argc, char ** argv )
 {
   string prefix;
   double discr_min, discr_max, discr_step, mistag_min, mistag_max;
+  double frac1, frac2, frac3;
+  bool use_qcd;
   po::options_description general("General options");
   general.add_options()
     ("help", "produce help message")
@@ -23,6 +25,10 @@ int main( int argc, char ** argv )
     ("discr-step", po::value<double>(&discr_step)->default_value(0.1), "b-tagging discriminant scan step")
     ("min-mistag", po::value<double>(&mistag_min)->default_value(0.0), "low limit for the mistagging rate")
     ("max-mistag", po::value<double>(&mistag_max)->default_value(1.0), "high limit for the mistagging rate")
+    ("frac1", po::value<double>(&frac1)->default_value(0.3), "background fraction in bin 1")
+    ("frac2", po::value<double>(&frac2)->default_value(0.024), "background fraction in bin 2")
+    ("frac3", po::value<double>(&frac3)->default_value(0.006), "background fraction in bin 3")
+    ("use-qcd", po::value<bool>(&use_qcd)->default_value(false), "consider QCD background (true/false)")
     ("fwlite", "FWLite test")
     ;
   
@@ -53,7 +59,9 @@ int main( int argc, char ** argv )
     TtTagConsistencyRoot _root;
     _root . scan_plot_d( vm["data-list-file"].as<string>(), vm["prefix"].as<string>(),
 			 vm["min-discr"].as<double>(), vm["max-discr"].as<double>(), vm["discr-step"].as<double>(),
-			 vm["min-mistag"].as<double>(), vm["max-mistag"].as<double>());
+			 vm["min-mistag"].as<double>(), vm["max-mistag"].as<double>(),
+			 vm["frac1"].as<double>(), vm["frac2"].as<double>(), vm["frac3"].as<double>(),
+			 vm["use-qcd"].as<bool>() );
     return 0;
   }
   

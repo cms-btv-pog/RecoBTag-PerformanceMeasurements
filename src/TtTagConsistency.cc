@@ -13,7 +13,7 @@
 //
 // Original Author:  Gena Kukartsev, kukarzev@fnal.gov
 //         Created:  Fri Jun 29 14:53:10 CDT 2007
-// $Id: TtTagConsistency.cc,v 1.1.2.2 2008/04/05 00:52:30 kukartse Exp $
+// $Id: TtTagConsistency.cc,v 1.1.2.3 2008/05/30 13:50:36 kukartse Exp $
 //
 //
 
@@ -505,22 +505,22 @@ TtTagConsistency::endJob() {
 
       if ( _dataType == "MC" )
 	{
-	  sprintf( buf, "%10.2f", (int)(nOfPassedBJets . getCount()) );
+	  sprintf( buf, "%10.2f", nOfPassedBJets . getCountDouble() );
 	  _outputFileTable << buf;
-	  sprintf( buf, "%10.2f", (int)(nOfTaggedPassedBJets[_d] . getCount()) );
+	  sprintf( buf, "%10.2f", nOfTaggedPassedBJets[_d] . getCountDouble() );
 	  _outputFileTable << buf;
-	  sprintf( buf, "%10.2f", (int)(nOfPassedCJets . getCount()) );
+	  sprintf( buf, "%10.2f", nOfPassedCJets . getCountDouble() );
 	  _outputFileTable << buf;
-	  sprintf( buf, "%10.2f", (int)(nOfTaggedPassedCJets[_d] . getCount()) );
+	  sprintf( buf, "%10.2f", nOfTaggedPassedCJets[_d] . getCountDouble() );
 	  _outputFileTable << buf;
-	  sprintf( buf, "%10.2f", (int)(nOfPassedLJets . getCount()) );
+	  sprintf( buf, "%10.2f", nOfPassedLJets . getCountDouble() );
 	  _outputFileTable << buf;
-	  sprintf( buf, "%10.2f", (int)(nOfTaggedPassedLJets[_d] . getCount()) );
+	  sprintf( buf, "%10.2f", nOfTaggedPassedLJets[_d] . getCountDouble() );
 	  _outputFileTable << buf;
 
-	  sprintf( buf, "%10.2f", (int)(nOfPassedUnknownJets . getCount()) );
+	  sprintf( buf, "%10.2f", nOfPassedUnknownJets . getCountDouble() );
 	  _outputFileTable << buf;
-	  sprintf( buf, "%10.2f", (int)(nOfTaggedPassedUnknownJets[_d] . getCount()) );
+	  sprintf( buf, "%10.2f", nOfTaggedPassedUnknownJets[_d] . getCountDouble() );
 	  _outputFileTable << buf << endl;
 
 	}
@@ -554,22 +554,22 @@ TtTagConsistency::endJob() {
 
       if ( _dataType == "MC" )
 	{
-	  sprintf( buf, "%10.2f", (int)nOfPassedBJets . getCount() );
+	  sprintf( buf, "%10.2f", nOfPassedBJets . getCountDouble() );
 	  _outputFileTable_2 << buf;
-	  sprintf( buf, "%10.2f", (int)nOfTaggedPassedBJets_2[_d] . getCount() );
+	  sprintf( buf, "%10.2f", nOfTaggedPassedBJets_2[_d] . getCountDouble() );
 	  _outputFileTable_2 << buf;
-	  sprintf( buf, "%10.2f", (int)nOfPassedCJets . getCount() );
+	  sprintf( buf, "%10.2f", nOfPassedCJets . getCountDouble() );
 	  _outputFileTable_2 << buf;
-	  sprintf( buf, "%10.2f", (int)nOfTaggedPassedCJets_2[_d] . getCount() );
+	  sprintf( buf, "%10.2f", nOfTaggedPassedCJets_2[_d] . getCountDouble() );
 	  _outputFileTable_2 << buf;
-	  sprintf( buf, "%10.2f", (int)nOfPassedLJets . getCount() );
+	  sprintf( buf, "%10.2f", nOfPassedLJets . getCountDouble() );
 	  _outputFileTable_2 << buf;
-	  sprintf( buf, "%10.2f", (int)nOfTaggedPassedLJets_2[_d] . getCount() );
+	  sprintf( buf, "%10.2f", nOfTaggedPassedLJets_2[_d] . getCountDouble() );
 	  _outputFileTable_2 << buf;
 
-	  sprintf( buf, "%10.2f", (int)nOfPassedUnknownJets . getCount() );
+	  sprintf( buf, "%10.2f", nOfPassedUnknownJets . getCountDouble() );
 	  _outputFileTable_2 << buf;
-	  sprintf( buf, "%10.2f", (int)nOfTaggedPassedUnknownJets_2[_d] . getCount() );
+	  sprintf( buf, "%10.2f", nOfTaggedPassedUnknownJets_2[_d] . getCountDouble() );
 	  _outputFileTable_2 << buf << endl;
 
 	}
@@ -603,22 +603,22 @@ TtTagConsistency::endJob() {
 
       if ( _dataType == "MC" )
 	{
-	  sprintf( buf, "%10.2f", (int)nOfPassedBJets . getCount() );
+	  sprintf( buf, "%10.2f", nOfPassedBJets . getCountDouble() );
 	  _outputFileTable_3 << buf;
-	  sprintf( buf, "%10.2f", (int)nOfTaggedPassedBJets_3[_d] . getCount() );
+	  sprintf( buf, "%10.2f", nOfTaggedPassedBJets_3[_d] . getCountDouble() );
 	  _outputFileTable_3 << buf;
-	  sprintf( buf, "%10.2f", (int)nOfPassedCJets . getCount() );
+	  sprintf( buf, "%10.2f", nOfPassedCJets . getCountDouble() );
 	  _outputFileTable_3 << buf;
-	  sprintf( buf, "%10.2f", (int)nOfTaggedPassedCJets_3[_d] . getCount() );
+	  sprintf( buf, "%10.2f", nOfTaggedPassedCJets_3[_d] . getCountDouble() );
 	  _outputFileTable_3 << buf;
-	  sprintf( buf, "%10.2f", (int)nOfPassedLJets . getCount() );
+	  sprintf( buf, "%10.2f", nOfPassedLJets . getCountDouble() );
 	  _outputFileTable_3 << buf;
-	  sprintf( buf, "%10.2f", (int)nOfTaggedPassedLJets_3[_d] . getCount() );
+	  sprintf( buf, "%10.2f", nOfTaggedPassedLJets_3[_d] . getCountDouble() );
 	  _outputFileTable_3 << buf;
 
-	  sprintf( buf, "%10.2f", (int)nOfPassedUnknownJets . getCount() );
+	  sprintf( buf, "%10.2f", nOfPassedUnknownJets . getCountDouble() );
 	  _outputFileTable_3 << buf;
-	  sprintf( buf, "%10.2f", (int)nOfTaggedPassedUnknownJets_3[_d] . getCount() );
+	  sprintf( buf, "%10.2f", nOfTaggedPassedUnknownJets_3[_d] . getCountDouble() );
 	  _outputFileTable_3 << buf << endl;
 
 	}
