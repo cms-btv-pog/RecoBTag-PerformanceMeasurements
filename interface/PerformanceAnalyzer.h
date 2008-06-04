@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.16 2008/03/23 01:25:49 jandrea Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.17 2008/04/21 22:47:00 yumiceva Exp $
  *
  */
 
@@ -168,7 +168,8 @@ private:
   int fnselectors;
   
   int feventcounter;
-
+  int fbadeventscounter;
+  
   TrackAssociatorBase *associatorByChi2;
   TrackAssociatorByHits *associatorByHits;
 

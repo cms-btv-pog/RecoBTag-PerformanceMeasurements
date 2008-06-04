@@ -308,6 +308,7 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
   //simUnit_= 1.;  // apparently not, still need this
 
   feventcounter = 0;
+  fbadeventscounter = 0;
   
 }
 
@@ -530,6 +531,7 @@ void PerformanceAnalyzer::beginJob(edm::EventSetup const& iSetup){
 void PerformanceAnalyzer::endJob() {
 
 	std::cout << analyzer_ << " Total events processed: " << feventcounter << std::endl;
+	std::cout << analyzer_ << " Total bad events rejected: " << fbadeventscounter << std::endl;
 	
 	rootFile_->cd();
 
@@ -1153,7 +1155,7 @@ void
 PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 {
   
-  // G4 bug, remove bad events
+  // G4 bug, remove bad events	
   bool badEvent = false;
   if (flavourMatchOptionf == "hepMC" ) {
     edm::Handle<SimTrackContainer> simTracks;
@@ -1161,11 +1163,12 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
     SimTrackContainer::const_iterator simTrack;
     for (simTrack = simTracks->begin(); simTrack != simTracks->end(); ++simTrack){
       if ((*simTrack).genpartIndex() > 0) {
-	if ((*simTrack).momentum().mag() > 1.8) {badEvent = true; return;}
+	if ((*simTrack).momentum().mag() > 1.8) {badEvent = true; fbadeventscounter++; return;}
       }
     }
   }
-
+	
+	
   // Trakcs
   Handle<reco::TrackCollection> recTrks;
   iEvent.getByLabel(recoTrackList_, recTrks);
