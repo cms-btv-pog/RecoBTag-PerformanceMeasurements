@@ -16,6 +16,9 @@ TtSemilepSolutionFilter::TtSemilepSolutionFilter(const edm::ParameterSet& iConfi
   jetEtCut   = iConfig.getParameter<double> ("jetEtCut");
   leptonPtCut   = iConfig.getParameter<double> ("leptonPtCut");
   leptonTriggerPtCut   = iConfig.getParameter<double> ("leptonTriggerPtCut");
+  leptonTrackIsoCut = iConfig.getParameter<double> ("leptonTrackIsoCut");
+  leptonCaloIsoCut = iConfig.getParameter<double> ("leptonCaloIsoCut");
+
 
   evtsols    = iConfig.getParameter<edm::InputTag> ("EvtSolution");
 
@@ -69,6 +72,12 @@ TtSemilepSolutionFilter::filter(edm::Event& iEvent, edm::EventSetup const & iSet
 
   if (sol.getRecLepm().p4().pt()<leptonPtCut)
 	return false;
+
+  if (sol.getRecLepm().getTrackIso()>leptonTrackIsoCut)
+	return false;
+	
+  if (sol.getRecLepm().getCaloIso()>leptonCaloIsoCut)
+	return false;	
 
   //FIXME: do I need a similar cut? does this use MC info?
   // Check that we have an e-mu event
