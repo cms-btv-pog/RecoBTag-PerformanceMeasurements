@@ -23,5 +23,6 @@
 <use name=RecoBTag/PerformanceMeasurements>
 
 <library file="*.cc" name=RecoBTagPerformanceMeasurementsPlugins>
-	 <flags EDM_PLUGIN = 1 >
+	 <flags EDM_PLUGIN = 1 >	
+	<flags CXXFLAGS="-O0 -g">
 </library>

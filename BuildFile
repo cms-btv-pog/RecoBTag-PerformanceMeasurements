@@ -22,6 +22,7 @@
 <use name=RecoBTag/MCTools>
 <use name=CLHEP>
 <use name=root>
+<flags CXXFLAGS="-O0 -g">
 
 <export>
    <lib name=RecoBTagPerformanceMeasurements>

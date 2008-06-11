@@ -5,12 +5,16 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.cc,v 1.14 2008/03/23 00:54:27 jandrea Exp $
+ version $Id: BTagEvent.cc,v 1.15 2008/03/23 01:25:51 jandrea Exp $
 
 ________________________________________________________________**/
 
 
 #include "RecoBTag/PerformanceMeasurements/interface/BTagEvent.h"
+
+
+#include <math.h>
+
 
 ClassImp(BTagEvent)
 
@@ -22,6 +26,8 @@ BTagEvent::BTagEvent() {
 	this->Reset();
 	
 }
+
+
 
 //_______________________________________________________________
 BTagEvent::~BTagEvent() {

@@ -8,7 +8,7 @@
 
  author: Victor E. Bazterra, UIC (baites@fnal.gov)
 
- version $Id: BTagTrackEvent.h,v 1.1 2008/03/11 21:09:38 bazterra Exp $
+ version $Id: BTagTrackEvent.h,v 1.2 2008/03/17 02:23:03 bazterra Exp $
 ________________________________________________________________**/
 
 #include "RecoBTag/PerformanceMeasurements/interface/BTagBaseTrackEvent.h"
@@ -24,30 +24,6 @@ class BTagTrackEvent : public BTagBaseTrackEvent {
 
 	std::vector<float> ip2d, ip3d, sdl, dta;
 	std::vector<float> ip2dSigma, ip3dSigma, sdlSigma, dtaSigma;
-
-	enum Category {
-		Fake = 0,
-		Bad,
-		SignalEvent,
- 		PV,
- 		SV,
- 		TV,
- 		Displaced,
- 		Ks,
- 		Lambda,
- 		PhotonConversion,
- 		Up,
- 		Down,
- 		Strange,
- 		Charm,
- 		Bottom,
- 		Light,
- 		Unknown
-  	};
-
-        typedef std::vector<bool> Flags;
-
-	std::vector<Flags> is;
 
 	ClassDef(BTagTrackEvent,1);
 };

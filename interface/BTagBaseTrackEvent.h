@@ -9,8 +9,10 @@
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
          Victor E. Bazterra, UIC (baites@fnal.gov)
          
- version $Id: BTagBaseTrackEvent.h,v 1.1 2008/03/11 21:09:38 bazterra Exp $
+ version $Id: BTagBaseTrackEvent.h,v 1.2 2008/03/17 02:23:03 bazterra Exp $
 ________________________________________________________________________________**/
+
+#include <vector>
 
 #include "TObject.h"
 

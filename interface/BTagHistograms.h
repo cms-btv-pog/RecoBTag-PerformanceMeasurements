@@ -6,7 +6,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagHistograms.h,v 1.10 2007/10/31 19:34:56 yumiceva Exp $
+ version $Id: BTagHistograms.h,v 1.1 2008/01/04 16:18:22 yumiceva Exp $
 
 ________________________________________________________________**/
 
@@ -16,6 +16,8 @@ ________________________________________________________________**/
 #include "TH2.h"
 #include "TCanvas.h"
 #include "TFile.h"
+
+#include <map>
 
 class BTagHistograms {
 

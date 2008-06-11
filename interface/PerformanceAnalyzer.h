@@ -1,5 +1,10 @@
 #ifndef PerformanceAnalyzer_h
 #define PerformanceAnalyzer_h
+
+
+
+
+
 /** \class edm::EDAnalyzer PerformanceAnalyzer
  *  
  * Analyzer to select jets together with a muon on it.
@@ -24,16 +29,16 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ParameterSet/interface/InputTag.h"
 
-#include "DataFormats/Candidate/interface/CandMatchMap.h"
+//#include "DataFormats/Candidate/interface/CandMatchMap.h"
 
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 //generator level + CLHEP
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
-#include "CLHEP/HepMC/GenEvent.h"
-#include "CLHEP/HepMC/GenVertex.h"
-#include "CLHEP/HepMC/GenParticle.h"
+//#include "CLHEP/HepMC/GenEvent.h"
+//#include "CLHEP/HepMC/GenVertex.h"
+//#include "CLHEP/HepMC/GenParticle.h"
 
 // vertex stuff
 #include <DataFormats/VertexReco/interface/Vertex.h>
@@ -47,7 +52,7 @@
 
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/JetReco/interface/CaloJet.h"
-#include "DataFormats/BTauReco/interface/JetTagFwd.h"
+#include "DataFormats/BTauReco/interface/JetTag.h"
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 
@@ -56,6 +61,7 @@
 
 #include "SimTracker/TrackAssociation/interface/TrackAssociatorBase.h"
 #include "SimTracker/TrackAssociation/interface/TrackAssociatorByHits.h"
+#include "SimTracker/TrackHistory/interface/TrackCategories.h"
 #include "SimTracker/TrackHistory/interface/TrackOrigin.h"
 
 // Root
@@ -71,9 +77,26 @@
 
 #include "RecoBTag/PerformanceMeasurements/test/S8Tools/S8bPerformance.h"
 
+#include "SimDataFormats/JetMatching/interface/JetFlavourMatching.h"
+
+
+
+struct ltstr{
+  bool operator()(const edm::RefToBase<reco::Jet> s1, edm::RefToBase<reco::Jet> s2) const
+  {
+    if (s1.id() != s2.id()) return s1.id()<s2.id();
+    return s1.key()< s2.key();
+  }
+};
+
+
+
+
 TrackAssociatorBase * associatorByHits;
 
 // class declaration
+
+using BTagMCTools::JetFlavour;
 
 class PerformanceAnalyzer : public edm::EDAnalyzer {
 
@@ -89,17 +112,19 @@ public:
   reco::GenJet GetGenJet(reco::CaloJet calojet, reco::GenJetCollection genJetColl);
   SimTrack GetGenTrk(reco::Track atrack, const edm::SimTrackContainer *simTrkColl, const edm::SimVertexContainer *simVtcs);
   int GetMotherId(const edm::SimVertexContainer *simVtxColl, const edm::SimTrackContainer *simTrkColl, SimTrack muonMC);
-  int TaggedJet(reco::CaloJet calojet, edm::Handle<std::vector<reco::JetTag> > jetTags );
-  std::map< std::string, bool > GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType, double ptrel=0.);
+  int TaggedJet(reco::CaloJet calojet, edm::Handle<reco::JetTagCollection > jetTags );
+  std::map< std::string, bool > GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<reco::JetTagCollection > > jetTags_testManyByType, double ptrel=0.);
   void FillHistos(std::string type, TLorentzVector p4MuJet, double ptrel,
 				  int JetFlavor, std::map<std::string, bool> aMap, double weight);
   void FillEff(TLorentzVector p4MuJet, int JetFlavor, std::map<std::string, bool> aMap, double weight);
   void FillPtrel(double ptrel, int JetFlavor, std::map<std::string, bool> aMap, double weight);
-  void FillPerformance(reco::CaloJet jet, int JetFlavor, std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType);
+  void FillPerformance(reco::CaloJet jet, int JetFlavor, std::vector<edm::Handle<reco::JetTagCollection > > jetTags_testManyByType);
   JetFlavour getMatchedParton(const reco::CaloJet &jet);
 
 private:
- 
+
+  TrackCategories classifier_;
+  TrackOrigin tracer_;
   // ----------member data ---------------------------
   std::string outputFile_;                   // output file
   std::string recoTrackList_; // collection of tracks
@@ -120,8 +145,9 @@ private:
   bool fWeightHistograms;
   bool fStoreWeightsInNtuple;
   bool fStorePtHat;
-  std::map<reco::CaloJetRef, unsigned int> flavoursMapf;
-  edm::Handle<reco::CandMatchMap> theJetPartonMapf;
+  std::map<edm::RefToBase<reco::Jet>, unsigned int, ltstr> flavoursMapf;
+  //  edm::Handle<reco::CandMatchMap> theJetPartonMapf;
+  edm::Handle<reco::JetFlavourMatchingCollection> theJetPartonMapf;
 
   JetFlavourIdentifier jetFlavourIdentifier_;
   //JetFlavourIdentifier jetFlavourIdentifier2_;
@@ -168,8 +194,7 @@ private:
   int fnselectors;
   
   int feventcounter;
-  int fbadeventscounter;
-  
+
   TrackAssociatorBase *associatorByChi2;
   TrackAssociatorByHits *associatorByHits;
 
@@ -183,9 +208,13 @@ private:
     reco::TrackRef, 
     const reco::RecoToSimCollection &, 
     bool bestMatchByMaxValue
-  ) const;
+  );
   
   bool bTagTrackEventFlag_;
+  //  edm::ParameterSet trackHistConfig_ ;
+  int fbadeventscounter;  
+
 };
+
 
 #endif

@@ -4,7 +4,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagHistograms.cc,v 1.4 2008/02/15 23:49:28 yumiceva Exp $
+ version $Id: BTagHistograms.cc,v 1.5 2008/03/18 22:02:58 jindal Exp $
 
 ________________________________________________________________**/
 
@@ -37,79 +37,92 @@ void BTagHistograms::Init(TString type, TString suffix1, TString suffix2) {
 	if (suffix1 != "") suffix1 = "_" + suffix1;
 	if (suffix2 != "") suffix1 += "_" + suffix2;
 
-	if ( type == "efficiencies" ) {
+	  
+	  if ( type == "efficiencies" ) {
+	    
+	    h1["jet_pt"+suffix1] = new TH1D("jet_pt"+suffix1,"Jet p_{T} [GeV/c]",nptarray-1,jetptbins);
+	    h1["jet_pt_b"+suffix1] = new TH1D("jet_pt_b"+suffix1,"Jet p_{T} [GeV/c]",nptarray-1,jetptbins);
+	    h1["jet_pt_c"+suffix1] = new TH1D("jet_pt_c"+suffix1,"Jet p_{T} [GeV/c]",nptarray-1,jetptbins);
+	    h1["jet_pt_udsg"+suffix1] = new TH1D("jet_pt_udsg"+suffix1,"Jet p_{T} [GeV/c]",nptarray-1,jetptbins);
+	    
+	    h1["jet_eta"+suffix1] = new TH1D("jet_eta"+suffix1,"Jet |#eta|",netaarray-1,jetetabins);
+	    h1["jet_eta_b"+suffix1] = new TH1D("jet_eta_b"+suffix1,"Jet |#eta|",netaarray-1,jetetabins);
+	    h1["jet_eta_c"+suffix1] = new TH1D("jet_eta_c"+suffix1,"Jet |#eta|",netaarray-1,jetetabins);
+	    h1["jet_eta_udsg"+suffix1] = new TH1D("jet_eta_udsg"+suffix1,"Jet |#eta|",netaarray-1,jetetabins);
+	    
+	    for(std::map<TString,TH1* >::const_iterator ih=h1.begin(); ih!=h1.end(); ++ih){
+	      TH1 *htemp = ih->second;
+	    }
+	  }
+	  if ( type == "ptrel") {
+	    
+	    h1["jet_ptrel"+suffix1] = new TH1D("jet_ptrel"+suffix1,"p_{Trel} [GeV/c]",50,0.,5.);
+	    h1["jet_ptrel_b"+suffix1] = new TH1D("jet_ptrel_b"+suffix1,"p_{Trel} [GeV/c]",50,0.,5.);
+	    h1["jet_ptrel_c"+suffix1] = new TH1D("jet_ptrel_c"+suffix1,"p_{Trel} [GeV/c]",50,0.,5.);
+	    h1["jet_ptrel_udsg"+suffix1] = new TH1D("jet_ptrel_udsg"+suffix1,"p_{Trel} [GeV/c]",50,0.,5.);
+	    
+	    for(std::map<TString,TH1* >::const_iterator ih=h1.begin(); ih!=h1.end(); ++ih){
+	      TH1 *htemp = ih->second;
+	      try {
+		htemp->Sumw2();}
+	      catch(...){}
+	    }
+	  }
+	  else if ( type == "n") {
+	    
+	    h2["n_pT"+suffix1] = new TH2D("n_pT"+suffix1,"muon-jet+away-jet pT vs pTrel",nptarray-1,jetptbins,50,0.,5.);
+	    h2["n_eta"+suffix1] = new TH2D("n_eta"+suffix1,"muon-jet+away-jet eta vs ptrel",netaarray-1,jetetabins,50,0.,5.);
+	    
+	    for(std::map<TString,TH2* >::const_iterator ih=h2.begin(); ih!=h2.end(); ++ih){
+	      TH2 *htemp = ih->second;
+	      try {
+		htemp->Sumw2();}
+	      catch(...){}
 
-		h1["jet_pt"+suffix1] = new TH1D("jet_pt"+suffix1,"Jet p_{T} [GeV/c]",nptarray-1,jetptbins);
-		h1["jet_pt_b"+suffix1] = new TH1D("jet_pt_b"+suffix1,"Jet p_{T} [GeV/c]",nptarray-1,jetptbins);
-		h1["jet_pt_c"+suffix1] = new TH1D("jet_pt_c"+suffix1,"Jet p_{T} [GeV/c]",nptarray-1,jetptbins);
-		h1["jet_pt_udsg"+suffix1] = new TH1D("jet_pt_udsg"+suffix1,"Jet p_{T} [GeV/c]",nptarray-1,jetptbins);
-		
-		h1["jet_eta"+suffix1] = new TH1D("jet_eta"+suffix1,"Jet |#eta|",netaarray-1,jetetabins);
-		h1["jet_eta_b"+suffix1] = new TH1D("jet_eta_b"+suffix1,"Jet |#eta|",netaarray-1,jetetabins);
-		h1["jet_eta_c"+suffix1] = new TH1D("jet_eta_c"+suffix1,"Jet |#eta|",netaarray-1,jetetabins);
-		h1["jet_eta_udsg"+suffix1] = new TH1D("jet_eta_udsg"+suffix1,"Jet |#eta|",netaarray-1,jetetabins);
+	    }
+	  }
+	  else if ( type == "ntag") {
+	    h2["ntag_pT"+suffix1] = new TH2D("ntag_pT"+suffix1,"tagged muon-jet+away-jet pT vs pTrel",nptarray-1,jetptbins,50,0.,5.);
+	    h2["ntag_eta"+suffix1] = new TH2D("ntag_eta"+suffix1,"tagged muon-jet+away-jet eta vs ptrel",netaarray-1,jetetabins,50,0.,5.);
+	    
+	    for(std::map<TString,TH2* >::const_iterator ih=h2.begin(); ih!=h2.end(); ++ih){
+	      TH2 *htemp = ih->second;
+	      try {
+		htemp->Sumw2();}
+	      catch(...){}
 
-		for(std::map<TString,TH1* >::const_iterator ih=h1.begin(); ih!=h1.end(); ++ih){
-			TH1 *htemp = ih->second;
-			htemp->Sumw2();
-		}
-	}
-	if ( type == "ptrel") {
-		
-		h1["jet_ptrel"+suffix1] = new TH1D("jet_ptrel"+suffix1,"p_{Trel} [GeV/c]",50,0.,5.);
-		h1["jet_ptrel_b"+suffix1] = new TH1D("jet_ptrel_b"+suffix1,"p_{Trel} [GeV/c]",50,0.,5.);
-		h1["jet_ptrel_c"+suffix1] = new TH1D("jet_ptrel_c"+suffix1,"p_{Trel} [GeV/c]",50,0.,5.);
-		h1["jet_ptrel_udsg"+suffix1] = new TH1D("jet_ptrel_udsg"+suffix1,"p_{Trel} [GeV/c]",50,0.,5.);
+	    }
+	  }
+	  else if ( type == "p") {
+	    
+	    h2["p_pT"+suffix1] = new TH2D("p_pT"+suffix1,"muon-jet+tagged-away-jet pT vs pTrel",nptarray-1,jetptbins,50,0.,5.);
+	    h2["p_eta"+suffix1] = new TH2D("p_eta"+suffix1,"muon-jet+tagged-away-jet eta vs ptrel",netaarray-1,jetetabins,50,0.,5.);
+	    
+	    for(std::map<TString,TH2* >::const_iterator ih=h2.begin(); ih!=h2.end(); ++ih){
+	      TH2 *htemp = ih->second;
+	      try {
+		htemp->Sumw2();}
+	      catch(...){}
 
-		for(std::map<TString,TH1* >::const_iterator ih=h1.begin(); ih!=h1.end(); ++ih){
-			TH1 *htemp = ih->second;
-			htemp->Sumw2();
-		}
-	}
-	else if ( type == "n") {
-		
-		h2["n_pT"+suffix1] = new TH2D("n_pT"+suffix1,"muon-jet+away-jet pT vs pTrel",nptarray-1,jetptbins,50,0.,5.);
-		h2["n_eta"+suffix1] = new TH2D("n_eta"+suffix1,"muon-jet+away-jet eta vs ptrel",netaarray-1,jetetabins,50,0.,5.);
-
-		for(std::map<TString,TH2* >::const_iterator ih=h2.begin(); ih!=h2.end(); ++ih){
-			TH2 *htemp = ih->second;
-			htemp->Sumw2();
-		}
-	}
-	else if ( type == "ntag") {
-		h2["ntag_pT"+suffix1] = new TH2D("ntag_pT"+suffix1,"tagged muon-jet+away-jet pT vs pTrel",nptarray-1,jetptbins,50,0.,5.);
-		h2["ntag_eta"+suffix1] = new TH2D("ntag_eta"+suffix1,"tagged muon-jet+away-jet eta vs ptrel",netaarray-1,jetetabins,50,0.,5.);
-
-		for(std::map<TString,TH2* >::const_iterator ih=h2.begin(); ih!=h2.end(); ++ih){
-			TH2 *htemp = ih->second;
-			htemp->Sumw2();
-		}
-	}
-	else if ( type == "p") {
-		
-		h2["p_pT"+suffix1] = new TH2D("p_pT"+suffix1,"muon-jet+tagged-away-jet pT vs pTrel",nptarray-1,jetptbins,50,0.,5.);
-		h2["p_eta"+suffix1] = new TH2D("p_eta"+suffix1,"muon-jet+tagged-away-jet eta vs ptrel",netaarray-1,jetetabins,50,0.,5.);
-
-		for(std::map<TString,TH2* >::const_iterator ih=h2.begin(); ih!=h2.end(); ++ih){
-			TH2 *htemp = ih->second;
-			htemp->Sumw2();
-		}
-	}
-	else if ( type == "ptag") {
-		h2["ptag_pT"+suffix1] = new TH2D("ptag_pT"+suffix1,"tagged muon-jet+tagged-away-jet pT vs pTrel",nptarray-1,jetptbins,50,0.,5.);
-		h2["ptag_eta"+suffix1] = new TH2D("ptag_eta"+suffix1,"tagged muon-jet+tagged-away-jet eta vs pTrel",netaarray-1,jetetabins,50,0.,5.);
-
-		for(std::map<TString,TH2* >::const_iterator ih=h2.begin(); ih!=h2.end(); ++ih){
-			TH2 *htemp = ih->second;
-			htemp->Sumw2();
-		}
-	}
-		
-	for(std::map<TString,TH1* >::const_iterator ih=h1.begin(); ih!=h1.end(); ++ih){
-		TH1 *htemp = ih->second;
-		htemp->SetXTitle( htemp->GetTitle() );
-	}
-	for(std::map<TString,TH2* >::const_iterator ih=h2.begin(); ih!=h2.end(); ++ih){
+	    }
+	  }
+	  else if ( type == "ptag") {
+	    h2["ptag_pT"+suffix1] = new TH2D("ptag_pT"+suffix1,"tagged muon-jet+tagged-away-jet pT vs pTrel",nptarray-1,jetptbins,50,0.,5.);
+	    h2["ptag_eta"+suffix1] = new TH2D("ptag_eta"+suffix1,"tagged muon-jet+tagged-away-jet eta vs pTrel",netaarray-1,jetetabins,50,0.,5.);
+	    
+	    for(std::map<TString,TH2* >::const_iterator ih=h2.begin(); ih!=h2.end(); ++ih){
+	      TH2 *htemp = ih->second;
+	     	      try {
+		htemp->Sumw2();}
+	      catch(...){}
+	    }
+	  }
+	  
+	  for(std::map<TString,TH1* >::const_iterator ih=h1.begin(); ih!=h1.end(); ++ih){
+	    TH1 *htemp = ih->second;
+	    htemp->SetXTitle( htemp->GetTitle() );
+	  }
+	  for(std::map<TString,TH2* >::const_iterator ih=h2.begin(); ih!=h2.end(); ++ih){
 		TH2 *htemp = ih->second;
 		htemp->SetXTitle( htemp->GetTitle() );
 	}

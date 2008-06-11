@@ -1,6 +1,8 @@
 
 #include "S8AnalyticSolver.h"
 
+#include <math.h>
+
 #include<iostream>
 
 //______________________________________________________________________________

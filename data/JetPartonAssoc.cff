@@ -3,7 +3,7 @@ module caloJetCollectionClone = CaloJetShallowCloneProducer {
     InputTag src = iterativeCone5CaloJets
 }
 
-module tagJet = CandJetFlavourIdentifier {
+module tagJet = JetFlavourIdentifier {
     InputTag jets = caloJetCollectionClone
     double coneSizeToAssociate = 0.3
     bool physicsDefinition = false

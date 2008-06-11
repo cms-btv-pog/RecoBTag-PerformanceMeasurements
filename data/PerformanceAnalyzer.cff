@@ -7,7 +7,7 @@ module Performance = PerformanceAnalyzer {
        //InputTag simG4 = g4SimHits
        untracked string outputFile = "results.root"
        string Muons = "muons"
-       string Jets  = "iterativeCone5CaloJets"
+    string Jets  = "iterativeCone5CaloJets"
        untracked string TrackCollection = "ctfWithMaterialTracks"
        untracked string PrimaryVertexCollection = "offlinePrimaryVerticesFromCTFTracks"
        bool StoreTrackProba = false
@@ -16,15 +16,17 @@ module Performance = PerformanceAnalyzer {
     
        // b-tagedd jet collection
        untracked vstring bTaggerList = { 
-         "trackCountingHighEffJetTags",
-	 "trackCountingHighPurJetTags",
-	 "negativeTrackCounting2ndTrck",
-	 "negativeTrackCounting3rdTrck",
-	 "jetProbabilityJetTagsNegativeOnly",
-	 "jetProbabilityJetTagsPositiveOnly",
-	 "jetProbabilityJetTags",
-         "modifiedtrackCountingHighEffJetTags",
-         "modifiedtrackCountingHighPurJetTags"
+         "trackCountingHighEffBJetTags",
+	 "trackCountingHighPurBJetTags",
+	"combinedSecondaryVertexBJetTags",
+#	 "negativeTrackCounting2ndTrck",
+#	 "negativeTrackCounting3rdTrck",
+#	 "jetProbabilityJetTagsNegativeOnly",
+#	 "jetProbabilityJetTagsPositiveOnly",
+	 "jetProbabilityBJetTags",
+	 "jetBProbabilityBJetTags"
+#         "modifiedtrackCountingHighEffJetTags",
+#         "modifiedtrackCountingHighPurJetTags"
        }
 
        // definition of the Operating Points (L,M,T)
@@ -54,11 +56,11 @@ module Performance = PerformanceAnalyzer {
        bool StorePtHat            = false
        bool StoreWeightsInNtuple  = false
  
-       string GenJets= "iterativeCone5GenJetsPt10"
+       string GenJets= "iterativeCone5GenJets"
        string SimTracks = "g4SimHits"
 
-       string flavourMatchOption = "genParticle"
-       InputTag flavourSource    = tagJet
+       string flavourMatchOption = "hepMC"
+       InputTag flavourSource    = IC5byValAlgo
 		
        PSet jetIdParameters = {
 
@@ -81,5 +83,14 @@ module Performance = PerformanceAnalyzer {
        #       bool rejectBCSplitting = true
        #       vstring vetoFlavour = {  }
        #}
+
+#
+# prepare pset for TrackHistory
+#
+    string recoTrackModule = "generalTracks"
+    string trackingParticleModule = "mergedtruth"
+    string trackingParticleProduct = "MergedTrackTruth"
+    string associationModule = "TrackAssociatorByHits"
+    bool   bestMatchByMaxValue = true                
  
 }

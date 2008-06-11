@@ -8,20 +8,26 @@
 #include "TCanvas.h"
 #include "TString.h"
 #include "TH2F.h"
+#include "TROOT.h"
+
 
 #include "math.h"
-#include "iostream.h"
-#include "fstream.h"
-#include "iomanip.h"
+#include <iostream>
+#include <fstream>
+#include <iomanip>
 #include "stdio.h"
 #include "string.h"
 #include "stdlib.h"
-#include "vector.h"
+#include <vector>
 
 #include "PtrelSolver.h"
 #include "analysis.h"
 
 ClassImp(PtrelSolver)
+
+
+
+using namespace std;
 
 
 PtrelSolver::PtrelSolver() { init();}
