@@ -33,28 +33,29 @@ using namespace std;
 //input files
 //const TString dir = "/localscratch/s/speer/top_eff/data/new_skim/plots_xsect_syst/";
 //  const TString dir = "/localscratch/s/speer/top_eff/data/new_skim/plots_smear_minus_3/";
- const TString dir = "/localscratch/s/speer/top_eff/data/new_skim/plots_obs/";
+ const TString dir = "./";
 
 // const  TString  mcFile    = "/localscratch/s/speer/top_eff/data/basic_skim_all/ttj0/plots.root";
 // const  TString  dataFile    = "/localscratch/s/speer/top_eff/data/basic_skim_all/ttj0/plots.root";
 
 // const  TString  mcFile    = "/localscratch/s/speer/top_eff/data/basic_skim_all/plots_obs/raw_btag_plots.root";
 // const  TString  dataFile    = "/localscratch/s/speer/top_eff/data/basic_skim_all/plots_obs/raw_btag_plots.root";
-TString  mcFile    = "/localscratch/s/speer/top_eff/data/new_skim/plots_obs/raw_btag_plots.root";
+TString  mcFile    = "raw_btag_plots.root";
 TString  dataFile    = "raw_btag_plots.root";
 
-TString  outputFile   = "final_BTag_plots.root";
-TString  outputPSfile = "LRplots.ps";
+TString  outputFile   = "final_btag_plots.root";
+TString  outputPSfile = "final_btag_plots.ps";
 
 bool doEps = false;
 TString epsType = "eps";
 
 bool compare = false;
-TString  referenceFile    = "/localscratch/s/speer/top_eff/data/new_skim/plots_obs/final_BTag_plots.root";
+TString  referenceFile    = "/localscratch/s/speer/top_eff/crab_top_data/CSA07_10pb/semiLepton/plots_obs/final_btag_plots.root";
 
-bool useSystFiles = true;
-const int syst = 1;
-const char*     systFiles[syst]= { "/localscratch/s/speer/top_eff/data/new_skim/plots_xsect_syst/final_BTag_plots.root" };
+bool useSystFiles = false;
+const int syst = 2;
+const char*     systFiles[syst]= { "./syst_lumi10pb.root",
+  "/localscratch/s/speer/top_eff/crab_top_data/CSA07_100pb/semiLepton/plots_obs_xsect/syst_xsect.root" };
 
 
 //observable histogram variables
@@ -64,9 +65,9 @@ const  int      SignalSelObs[nrSignalSelObs] 	= {1,2,3,4,5,6,7,8,9,10,11,12,13};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const bool debug = true;
-const int wp = 3;
-const char*     points[wp]= { "trackCountingJetTags_2.3" , "trackCountingJetTags_5.3", "trackCountingJetTags3th_4.8"};
+bool debug = true;
+const int wp = 6;
+const char*     points[wp]= { "TC_loose", "TC_medium", "TC_tight", "JP_loose", "JP_medium", "JP_tight" };
 
 const int lrBins   = 20;
 const double lrMin   = 0.;
@@ -86,7 +87,7 @@ vector<const char*> obsFits;
 
 void compute(TH1F *b_effH, TH1F *tagged_jetsH, TH1F *b_fractionH, TH1F *eff_nonBH);	
 void computeStatError(TH1F *b_eff_errH, TH1F *tagged_jetsH, TH1F *b_fractionH);
-void computeSystError(TH1F *b_eff_errH, TH1F *tagged_jetsH, TH1F *b_fractionH, TH1F *eff_nonBH);
+void computeSystError_nonBtaggingEff(TH1F *b_eff_errH, TH1F *tagged_jetsH, TH1F *b_fractionH, TH1F *eff_nonBH);
 void addSystError(TH1F *b_eff_errH, TH1F *new_systH);
 
 void totalError(TH1F *b_effH, TH1F* b_eff_totH, TH1F *b_eff_statH, TH1F *b_eff_systH);
@@ -98,16 +99,31 @@ int main( int argc, const char* argv[]) {
 
   setTDRStyle();
 
+  dataFile = dir+dataFile;
+  mcFile = dir+mcFile;
+  outputFile = dir + outputFile;
 // Filenames
-  if (argc>=2) {
-    mcFile = dataFile    = argv[1];
-  }
-  if (argc>=3) {
-    outputFile = argv[2];
-  }
 
-  cout << "Input file  : " << mcFile<<endl;
-  cout << "Output file : " << dir<<outputFile<<endl;
+  for (int i=1;i<argc;++i) {
+    if (strncmp(argv[i],"-d",2)==0) dataFile = TString(argv[i+1]);
+    if (strncmp(argv[i],"-m",2)==0) mcFile = TString(argv[i+1]);
+    if (strncmp(argv[i],"-o",2)==0) outputFile = TString(argv[i+1]);
+    if (strncmp(argv[i],"-c",2)==0) {
+      compare = true;
+      referenceFile = TString(argv[i+1]);
+    }
+    if (strncmp(argv[i],"-v",2)==0) debug = true;
+    if (strncmp(argv[i],"-s",2)==0) useSystFiles = true;
+    if (strncmp(argv[i],"-h",2)==0) {
+      cout << " -d datafile -m mcFile -o output_file -c compare_file\n";
+    }
+  }
+  
+
+  cout << "Data file   : " << dataFile<<endl;
+  cout << "MC file     : " << mcFile<<endl;
+  cout << "Output file : " << outputFile<<endl;
+  if (compare) cout << "Comparison with reference (for systematics): " << referenceFile << endl;
 
   gSystem->Load("libFWCoreFWLite");
   AutoLibraryLoader::enable();
@@ -135,10 +151,10 @@ int main( int argc, const char* argv[]) {
 //   etRanges.push_back(250.);
 
 
-  if (debug) cout << "Load Data Plots from file " << dir<<dataFile<<endl;
+  if (debug) cout << "Load Data Plots from file " << dataFile<<endl;
 
 
-  TFile *theFile = new TFile (dir+dataFile) ;
+  TFile *theFile = new TFile (dataFile) ;
   TH1::AddDirectory(kFALSE);
 
   vector<TtEtEtaHistoCollector *> taggedJetsHistos;
@@ -253,7 +269,7 @@ delete theFile;
     }
     for (TtEtEtaHistoCollector::BinHistoMapIter bin = eff_B_syst[iWP]->histoBegin();
 	bin!=eff_B_syst[iWP]->histoEnd(); ++bin) {
-      computeSystError(bin->second, tagged_fraction[iWP]->getHisto(*bin->first),
+      computeSystError_nonBtaggingEff(bin->second, tagged_fraction[iWP]->getHisto(*bin->first),
 	b_fraction->getHisto(*bin->first), eff_nonB[iWP]->getHisto(*bin->first) );
     }
 
@@ -310,12 +326,12 @@ delete theFile;
 
 //////////// Save all histos.
 
-  TFile * theFile2 = new TFile (dir+TString (outputFile) , "RECREATE" ) ;
+  TFile * theFile2 = new TFile (outputFile , "RECREATE" ) ;
   theFile2->cd();
 
   if (debug) cout << "write Histos" << endl;
   allJetsHistos->write();
-  intAllJetsMCHistos->write();
+  //intAllJetsMCHistos->write();
   lrSHistos->write();
   lrBHistos->write();
   allLightHistos->write();
@@ -379,12 +395,12 @@ delete theFile;
 //            epsEff(bin->second, eff_B[1]->getHisto(*bin->first), eff_B[2]->getHisto(*bin->first));
 // 	 }
 
-  TtEtEtaHistoCollector::diffPlotVect diffA = eff_B[0]->getDifferentialPlots();
-  TtEtEtaHistoCollector::diffPlotVect diffB = eff_B[1]->getDifferentialPlots();
-  TtEtEtaHistoCollector::diffPlotVect diffC = eff_B[2]->getDifferentialPlots();
-  TtEtEtaHistoCollector::diffPlotVect diffD = eff_B_MC[0]->getDifferentialPlots();
-  TtEtEtaHistoCollector::diffPlotVect diffE = eff_B_MC[1]->getDifferentialPlots();
-  TtEtEtaHistoCollector::diffPlotVect diffF = eff_B_MC[2]->getDifferentialPlots();
+  TtEtEtaHistoCollector::diffPlotVect diffA = eff_B[3]->getDifferentialPlots();
+  TtEtEtaHistoCollector::diffPlotVect diffB = eff_B[4]->getDifferentialPlots();
+  TtEtEtaHistoCollector::diffPlotVect diffC = eff_B[5]->getDifferentialPlots();
+  TtEtEtaHistoCollector::diffPlotVect diffD = eff_B_MC[3]->getDifferentialPlots();
+  TtEtEtaHistoCollector::diffPlotVect diffE = eff_B_MC[4]->getDifferentialPlots();
+  TtEtEtaHistoCollector::diffPlotVect diffF = eff_B_MC[5]->getDifferentialPlots();
   
   for (unsigned int i = 0; i != diffA.size(); ++i) {
   TLegend* leg = new TLegend(0.7,0.8,0.90,0.93);
@@ -462,12 +478,12 @@ void computeStatError(TH1F *b_eff_errH, TH1F *tagged_jetsH, TH1F *b_fractionH)
   }
 }
 
-void computeSystError(TH1F *b_eff_errH, TH1F *tagged_jetsH, TH1F *b_fractionH, TH1F *eff_nonBH)
+void computeSystError_nonBtaggingEff(TH1F *b_eff_errH, TH1F *tagged_jetsH, TH1F *b_fractionH, TH1F *eff_nonBH)
 {
- cout <<"Enter computeSyst "<<b_eff_errH->GetName()<<endl;
- cout <<"Enter computeSyst "<<tagged_jetsH->GetName()<<endl;
- cout <<"Enter computeSyst "<<b_fractionH->GetName()<<endl;
- cout <<"Enter computeSyst "<<eff_nonBH->GetName()<<endl;
+//  cout <<"Enter computeSyst "<<b_eff_errH->GetName()<<endl;
+//  cout <<"Enter computeSyst "<<tagged_jetsH->GetName()<<endl;
+//  cout <<"Enter computeSyst "<<b_fractionH->GetName()<<endl;
+//  cout <<"Enter computeSyst "<<eff_nonBH->GetName()<<endl;
   int bins = b_eff_errH->GetNbinsX();
   double b_fraction, eff_nonB;
   double eff_nonB_err;
@@ -482,7 +498,7 @@ void computeSystError(TH1F *b_eff_errH, TH1F *tagged_jetsH, TH1F *b_fractionH, T
       systErr+= eff_nonB_err * (1/b_fraction-1);
       b_eff_errH->SetBinContent(bin, systErr);
     }
-      cout << bin <<" "<<eff_nonB<<" "<<systErr<<" "<< b_fraction<<endl;
+//       cout << bin <<" "<<eff_nonB<<" "<<systErr<<" "<< b_fraction<<endl;
   }
 }
 
