@@ -23,9 +23,9 @@
 <use name=clhep>
 </library>
 
-<library file=Plotters/*.cc name=Plotters>
-<use name=root>
-</library>
+<!--<library file=Plotters/*.cc name=Plotters>-->
+<!--<use name=root>-->
+<!--</library>-->
 
 
 
