@@ -11,7 +11,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.17 2008/04/21 22:47:00 yumiceva Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.19 2008/06/11 08:46:58 tboccali Exp $
  *
  */
 
@@ -179,7 +179,9 @@ private:
   
   S8bPerformance fperformanceTC2trk;
   S8bPerformance fperformanceTC3trk;
-  S8bPerformance fperformanceTP;
+  S8bPerformance fperformanceTP
+    //    ,fperformanceBTP 
+    ;
   S8bPerformance fperformanceMTC2trk;
   S8bPerformance fperformanceMTC3trk;
   bool fWritePerformancePlots;
