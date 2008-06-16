@@ -260,6 +260,26 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig) :
     fOPMap["CSVL"] = bTagCutList_[12];
     fOPMap["CSVM"] = bTagCutList_[13];
     fOPMap["CSVT"] = bTagCutList_[14];
+    
+    std::cout <<" Parameter settings "<<std::endl;
+
+    std::cout <<"fOPMap[\"TCL\"] = "<<bTagCutList_[0]<<std::endl;
+     std::cout <<"fOPMap[\"TCM\"] = "<<bTagCutList_[1]<<std::endl;
+     std::cout <<"fOPMap[\"TCT\"] = "<<bTagCutList_[2]<<std::endl;
+     std::cout <<"fOPMap[\"JPL\"] = "<<bTagCutList_[3]<<std::endl;
+     std::cout <<"fOPMap[\"JPM\"] = "<<bTagCutList_[4]<<std::endl;
+     std::cout <<"fOPMap[\"JPT\"] = "<<bTagCutList_[5]<<std::endl;
+     std::cout <<"fOPMap[\"JBPL\"] = "<<bTagCutList_[6]<<std::endl;
+     std::cout <<"fOPMap[\"JBPM\"] = "<<bTagCutList_[7]<<std::endl;
+     std::cout <<"fOPMap[\"JBPT\"] = "<<bTagCutList_[8]<<std::endl;
+     std::cout <<"fOPMap[\"SLT\"] = "<<bTagCutList_[9]<<std::endl;
+     std::cout <<"fOPMap[\"SVM\"] = "<<bTagCutList_[10]<<std::endl;
+     std::cout <<"fOPMap[\"SVT\"] = "<<bTagCutList_[11]<<std::endl;
+     std::cout <<"fOPMap[\"CSVL\"] = "<<bTagCutList_[12]<<std::endl;
+     std::cout <<"fOPMap[\"CSVM\"] = "<<bTagCutList_[13]<<std::endl;
+     std::cout <<"fOPMap[\"CSVT\"] = "<<bTagCutList_[14]<<std::endl;
+
+    
 
   // get tagger for away jet
   fAwayJetTagger = iConfig.getParameter<std::string>("AwayJetTagger");
