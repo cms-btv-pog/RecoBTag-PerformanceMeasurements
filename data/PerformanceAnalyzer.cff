@@ -18,6 +18,7 @@ module Performance = PerformanceAnalyzer {
        untracked vstring bTaggerList = { 
          "trackCountingHighEffBJetTags",
 	 "trackCountingHighPurBJetTags",
+		"simpleSecondaryVertexBJetTags",
 	"combinedSecondaryVertexBJetTags",
 #	 "negativeTrackCounting2ndTrck",
 #	 "negativeTrackCounting3rdTrck",
@@ -30,24 +31,26 @@ module Performance = PerformanceAnalyzer {
        }
 
        // definition of the Operating Points (L,M,T)
-       // cuts estimated using QCD-80-120, 10k events.
-       // sorted as TCL,TCM,TCT,JPL,JPM,JPT,MTCL,MTCM,MTCT
+       // cuts estimated either by thomas on 21X, or using old francisco's ones
+    // sorted as TCL,TCM,TCT,JPL,JPM,JPT,JBPL, JBPM, JBPT, SLT, SVM, SVT, CSVL, CSVM, CSVT
 
        untracked vdouble bTagCutList = {
-          2.0,
-	  4.6,
-	  4.7,
-	  0.26,
-	  0.50,
-	  0.76,
-          2.0,
-	  4.6,
-	  4.7,
-	  0.8,	
-          2.0,
-	  4.6,
-	  4.7
-       }
+          2.0, #TCL
+	  4.6, #TCM
+	  4.7, #TCT
+	  0.26,#JPL
+	  0.50,#JPM
+	  0.76,#JPT
+	1.2,   #JBPL
+	2.3,   #JBPM
+	3.2,   #JBPT
+	0.8,   #SLT
+	2.0,   #SVM
+	3.6,   #SVT
+	0,37,  #CSVL 
+	0.84,  #CSVM 
+	0.96  #CSVT
+    }
 
        string AwayJetTagger = "TCL"
        
