@@ -213,7 +213,12 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig) :
 		  
       moduleLabel_.push_back("combinedSecondaryVertexBJetTags");
 		 
+    }    else if ( *objectName == "simpleSecondaryVertexBJetTags" ) {
+		  
+      moduleLabel_.push_back("simpleSecondaryVertexBJetTags");
+		 
     }
+    
     else if ( *objectName == "modifiedtrackCountingHighPurJetTags" ) {
 		  
       moduleLabel_.push_back("modifiedtrackCountingHighPurJetTags");	 
@@ -243,14 +248,19 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig) :
   fOPMap["JPL"] = bTagCutList_[3];
   fOPMap["JPM"] = bTagCutList_[4];
   fOPMap["JPT"] = bTagCutList_[5];
-  fOPMap["MTCL"] = bTagCutList_[6];     //  Mod. TC Loose
-  fOPMap["MTCM"] = bTagCutList_[7];     //  Mod. TC Medium
-  fOPMap["MTCT"] = bTagCutList_[8];     //  Mod. TC Tight
-  fOPMap["SLT"] = bTagCutList_[9];      // Soft Lepton Tagger
-  fOPMap["SLTMTCL"] = bTagCutList_[10]; // Soft Lepton Tagger + Mod. TC Loose
-  fOPMap["SLTMTCM"] = bTagCutList_[11]; // Soft Lepton Tagger + Mod. TC Medium
-  fOPMap["SLTMTCT"] = bTagCutList_[12]; // Soft Lepton Tagger + Mod. TC Tight
-  
+  fOPMap["JBPL"] = bTagCutList_[6];
+  fOPMap["JBPM"] = bTagCutList_[7];
+  fOPMap["JBPT"] = bTagCutList_[8];
+  fOPMap["SLT"] = bTagCutList_[9];
+
+
+  fOPMap["SVM"] = bTagCutList_[10];
+  fOPMap["SVT"] = bTagCutList_[11];
+
+    fOPMap["CSVL"] = bTagCutList_[12];
+    fOPMap["CSVM"] = bTagCutList_[13];
+    fOPMap["CSVT"] = bTagCutList_[14];
+
   // get tagger for away jet
   fAwayJetTagger = iConfig.getParameter<std::string>("AwayJetTagger");
 
@@ -312,6 +322,7 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig) :
   fperformanceMTC2trk.Set("MTC2trk");
   fperformanceMTC3trk.Set("MTC3trk");
   fperformanceTP.Set("TP");
+  //  fperformanceBTP.Set("BTP");
   fperformanceTC2trk.SetMinDiscriminator(-1);
   fperformanceTC2trk.SetMaxDiscriminator(15);
   fperformanceTC3trk.SetMinDiscriminator(-1);
@@ -322,6 +333,8 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig) :
   fperformanceMTC3trk.SetMaxDiscriminator(15);
   fperformanceTP.SetMinDiscriminator(0);
   fperformanceTP.SetMaxDiscriminator(1);
+  //  fperformanceBTP.SetMinDiscriminator(0);
+  //  fperformanceBTP.SetMaxDiscriminator(10);
 
   //simUnit_= 1.0;  // starting with CMSSW_1_2_x ??
   //if ( (edm::getReleaseVersion()).find("CMSSW_1_1_",0)!=std::string::npos){
@@ -349,6 +362,7 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
     fperformanceMTC2trk.Eval();
     fperformanceMTC3trk.Eval();
     fperformanceTP.Eval();
+    //    fperformanceBTP.Eval();
 		
     TGraphErrors *gTC2_b = new TGraphErrors(fperformanceTC2trk.GetN(),
 					    fperformanceTC2trk.GetArray("b").GetArray(),fperformanceTC2trk.GetArray("b").GetArray(),
@@ -516,6 +530,7 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
 	
   delete fS8evt;
 	
+
   //delete ftree;
   //delete rootFile_;
 }
@@ -647,7 +662,7 @@ SimTrack PerformanceAnalyzer::GetGenTrk(reco::Track atrack, const edm::SimTrackC
 	 ( abs(type)==11 || abs(type)==13 || abs(type)==15 || abs(type)==211 || abs(type)==321 ) ) {
       matchedTrk = *gentrk;
       predelta = delta;
-      HepLorentzVector v = (mysimVtcs)[(*gentrk).vertIndex()].position();
+      math::XYZTLorentzVectorD v = (mysimVtcs)[(*gentrk).vertIndex()].position();
 		  
       //std::cout << "gentrk: vx = " << v.x() << std::endl;
       //std::cout << "rectrk: vx = " << atrack.vx() << std::endl;
@@ -708,14 +723,19 @@ PerformanceAnalyzer::GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<re
   aMap["JPL"] = false;
   aMap["JPM"] = false;
   aMap["JPT"] = false;
-  aMap["MTCL"] = false;
-  aMap["MTCM"] = false;
-  aMap["MTCT"] = false;
+  aMap["JBPL"] = false;
+  aMap["JBPM"] = false;
+  aMap["JBPT"] = false;
   aMap["SLT"] = false;
-  aMap["SLTMTCL"] = false;
-  aMap["SLTMTCM"] = false;
-  aMap["SLTMTCT"] = false;
-	
+  aMap["SVM"] = false;
+  aMap["SVT"] = false;
+  aMap["CSVL"] = false;
+  aMap["CSVM"] = false;
+  aMap["CSVT"] = false;
+
+
+
+
   //start loop over all jetTags
 	
   for (size_t k=0; k<jetTags_testManyByType.size(); k++) {
@@ -773,6 +793,37 @@ PerformanceAnalyzer::GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<re
       if ( (*jetTags)[ith_tagged].second > fOPMap["JPT"] ) aMap["JPT"] = true;
 				
     }
+    //
+    // JET B PROBABILITY
+    //
+    else if ( moduleLabel == "jetBProbabilityBJetTags" ) {
+
+      if ( (*jetTags)[ith_tagged].second > fOPMap["JBPL"] ) aMap["JBPL"] = true;
+      if ( (*jetTags)[ith_tagged].second > fOPMap["JBPM"] ) aMap["JBPM"] = true;
+      if ( (*jetTags)[ith_tagged].second > fOPMap["JBPT"] ) aMap["JBPT"] = true;
+				
+    }
+    //
+    // SIMPLE SECONDARY
+    //
+    else if ( moduleLabel == "simpleSecondaryVertexBJetTags" ) {
+
+      if ( (*jetTags)[ith_tagged].second > fOPMap["SVM"] ) aMap["SVM"] = true;
+      if ( (*jetTags)[ith_tagged].second > fOPMap["SVT"] ) aMap["SVT"] = true;
+				
+    }
+    //
+    // combined SECONDARY
+    //
+    else if ( moduleLabel == "combinedSecondaryVertexBJetTags" ) {
+
+      if ( (*jetTags)[ith_tagged].second > fOPMap["CSVL"] ) aMap["CSVL"] = true;
+      if ( (*jetTags)[ith_tagged].second > fOPMap["CSVM"] ) aMap["CSVM"] = true;
+      if ( (*jetTags)[ith_tagged].second > fOPMap["CSVT"] ) aMap["CSVT"] = true;
+				
+    }
+
+
   }
 		
 
@@ -862,6 +913,14 @@ void PerformanceAnalyzer::FillPerformance(reco::CaloJet jet, int JetFlavor, std:
 
       fperformanceTP.Add( (*jetTags)[ith_tagged].second, JetFlavor );
     }
+    // jetBProbabilityBJetTags
+    else if ( moduleLabel == "jetBProbabilityBJetTags" ) {
+
+      //      fperformanceBTP.Add( (*jetTags)[ith_tagged].second, JetFlavor );
+    }
+
+
+
   }
 }
 	
@@ -1481,9 +1540,9 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	SimTrack genlepton = this->GetGenTrk(muonTrk, simTrks, simVtcs );
 				
 								 
-	leptonEvent.mc_pt.push_back(           genlepton.momentum().perp());
+	leptonEvent.mc_pt.push_back(           genlepton.momentum().rho());
 	leptonEvent.mc_phi.push_back(          genlepton.momentum().phi());
-	leptonEvent.mc_eta.push_back(          genlepton.momentum().pseudoRapidity());
+	leptonEvent.mc_eta.push_back(          genlepton.momentum().eta());
 	leptonEvent.mc_e.push_back(           genlepton.momentum().e());
 	leptonEvent.mc_charge.push_back(       genlepton.charge());
 	leptonEvent.mc_pdgid.push_back(        genlepton.type());

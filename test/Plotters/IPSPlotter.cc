@@ -7,7 +7,7 @@
 #include "TTree.h"
 
 #include "RecoBTag/PerformanceMeasurements/test/Plotters/IPSPlotter.h"
-#include "SimTracker/TrackHistory/interface/TrackCategories.h""
+#include "SimTracker/TrackHistory/interface/TrackCategories.h"
 
 
 ClassImp(IPSPlotter)
