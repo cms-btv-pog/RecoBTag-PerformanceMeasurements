@@ -48,7 +48,10 @@ class S8Solver {
 		void SetGammaConstant(bool option) { fGammaConst = option; }
 		void SetMethod( TString option ) { fmethod = option; };
 		void Solve();
-		void SetSolution( int bin, int solution) { fPickBin=bin; fPicknSol = solution; }
+		void SetSolution( int bin, int solution) {
+			// bin 0 corresponds to average solution
+				fPickSolutionMap[bin] = solution;
+		}
 
         void Verbose(bool option) { fVerbose = option; };
 		void PrintData(TString option="");
@@ -124,12 +127,13 @@ class S8Solver {
 		std::map< int, std::map< TString, double> > BinnedInput;
 		std::map< TString, double > fTotalSolution;
 		std::map< TString, double > fTotalSolutionErr;
+		std::map< int, int > fPickSolutionMap;
 		std::map< int, std::map< TString, double> > fBinnedSolution;
 		std::map< int, std::map< TString, double> > fBinnedSolutionErr;
 
 		std::map<TString, TCanvas*> cv_map;
 
-		int fPickBin; int fPicknSol;
+		//int fPickBin; int fPicknSol;
 
 		TH2F* fnHistoBase;
 		TH2F* fpHistoBase;

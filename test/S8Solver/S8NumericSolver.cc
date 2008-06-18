@@ -719,7 +719,7 @@ for(Int_t i=0;i<=fNpt;++i)
     Double_t bb = f-aa*x;
     res[n] = -bb/aa;
 	// print results
-    std::cout<< "[S8Numeric] n = " << n << " res =" << res[n] << " function f = " << f << std::endl;
+    //std::cout<< "[S8Numeric] n = " << n << " res =" << res[n] << " function f = " << f << std::endl;
     n++;
     }
   fold = f;

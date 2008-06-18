@@ -46,8 +46,8 @@ S8Solver::S8Solver() {
 	fisCorrFile = false;
 	fDeltaConst = false;
 	fGammaConst = false;
-	fPickBin = -1;
-	fPicknSol = -1;
+	//fPickBin = -1;
+	//fPicknSol = -1;
 }
 //____________________________________________________________
 void S8Solver::Clear() {
@@ -125,15 +125,15 @@ void S8Solver::LoadHistos() {
 		}
 		finputFile->cd();
 		
-		h2["b_npT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/n_"+fcategory+"_b");
+		h2["b_npT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/n_"+fcategory+"_b");
 		//std::cout << "got one" << std::endl;
-		h2["cl_npT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/n_"+fcategory+"_cl");
-		h2["b_ppT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/p_"+fcategory+"_b");
-		h2["cl_ppT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/p_"+fcategory+"_cl");
-		h2["b_ncmbpT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/ntag_"+fcategory+"_b_"+fthename);
-		h2["cl_ncmbpT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/ntag_"+fcategory+"_cl_"+fthename);
-		h2["b_pcmbpT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/ptag_"+fcategory+"_b_"+fthename);
-		h2["cl_pcmbpT"] = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/ptag_"+fcategory+"_cl_"+fthename);
+		h2["cl_npT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/n_"+fcategory+"_cl");
+		h2["b_ppT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/p_"+fcategory+"_b");
+		h2["cl_ppT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/p_"+fcategory+"_cl");
+		h2["b_ncmbpT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/ntag_"+fcategory+"_b_"+fthename);
+		h2["cl_ncmbpT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/ntag_"+fcategory+"_cl_"+fthename);
+		h2["b_pcmbpT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/ptag_"+fcategory+"_b_"+fthename);
+		h2["cl_pcmbpT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/ptag_"+fcategory+"_cl_"+fthename);
 
 		std::cout << " got initial truth dist." << std::endl;
 
@@ -600,7 +600,7 @@ void S8Solver::GetInput() {
 
 				if(name[ihisto]=="beta") {
 					if (!fBetaConst) {
-						int abin = htemp->GetXaxis()->FindBin(pt);
+						//int abin = htemp->GetXaxis()->FindBin(pt);
 						//	tmpmap[name[ihisto]] = fBetaf * htemp->GetBinContent(abin);
 						tmpmap[name[ihisto]] = fBetaf * F_beta->Eval(pt,0,0);
 					} else {
@@ -609,7 +609,7 @@ void S8Solver::GetInput() {
 				}
 				else if(name[ihisto]=="alpha") { 
 					if (!fAlphaConst) { 
-						int abin = htemp->GetXaxis()->FindBin(pt); 
+						//int abin = htemp->GetXaxis()->FindBin(pt); 
 						// tmpmap[name[ihisto]] = fAlphaf * htemp->GetBinContent(abin); 
 						tmpmap[name[ihisto]] = fAlphaf * F_alpha->Eval(pt,0,0);
 					} else { 
@@ -618,7 +618,7 @@ void S8Solver::GetInput() {
 				}
 				else if(name[ihisto]=="kappa_b") {
 				  if (!fKappabConst) {
-				    int abin = htemp->GetXaxis()->FindBin(pt);  
+					  //int abin = htemp->GetXaxis()->FindBin(pt);  
 				    //tmpmap[name[ihisto]] = fKappabf * htemp->GetBinContent(abin);  
 					tmpmap[name[ihisto]] = fKappabf * F_kb->Eval(pt,0,0);
 				  } else {
@@ -627,7 +627,7 @@ void S8Solver::GetInput() {
 				}
 				else if(name[ihisto]=="kappa_cl") {
 				  if (!fKappaclConst) {
-				    int abin = htemp->GetXaxis()->FindBin(pt);  
+					  //int abin = htemp->GetXaxis()->FindBin(pt);  
 				    //tmpmap[name[ihisto]] = fKappaclf * htemp->GetBinContent(abin);  
 					tmpmap[name[ihisto]] = fKappaclf * F_kcl->Eval(pt,0,0);  
 				  } else {
@@ -636,7 +636,7 @@ void S8Solver::GetInput() {
 				}
 				else if(name[ihisto]=="delta") {
                                   if (!fDeltaConst) {
-                                    int abin = htemp->GetXaxis()->FindBin(pt);
+									  //int abin = htemp->GetXaxis()->FindBin(pt);
                                     //tmpmap[name[ihisto]] = htemp->GetBinContent(abin);
 									tmpmap[name[ihisto]] = fDeltaf * F_delta->Eval(pt,0,0);
                                   }  else {
@@ -645,7 +645,7 @@ void S8Solver::GetInput() {
                                 }
 				else if(name[ihisto]=="gamma") {
                                   if (!fGammaConst) {
-                                    int abin = htemp->GetXaxis()->FindBin(pt);
+									  //int abin = htemp->GetXaxis()->FindBin(pt);
                                     //tmpmap[name[ihisto]] = htemp->GetBinContent(abin);
 									tmpmap[name[ihisto]] = fGammaf * F_gamma->Eval(pt,0,0);
                                   } else {
@@ -746,9 +746,13 @@ void S8Solver::Solve() {
 		bool converge = true;
 		
 		// pick solution manually if requested
-		if (fPickBin==0 && fPicknSol!=-1) {
-		  sol.SetSolution( fPicknSol );
-		}
+		for (std::map<int, int>::const_iterator ipick = fPickSolutionMap.begin(); ipick!= fPickSolutionMap.end(); ++ipick) {
+			//std::cout << " force solution # " << ipick->second << std::endl;
+			if ( ipick->first == 0 ) sol.SetSolution( ipick->second );
+			}
+		//if (fPickBin==0 && fPicknSol!=-1) {
+		//  sol.SetSolution( fPicknSol );
+		//}
 
 		sol.Solve();
 
@@ -858,10 +862,15 @@ void S8Solver::Solve() {
 
 			solu.SetAverageRes(sol.GetResultVec(1));
 
-			// picksolution manually if requested
-			if (fPickBin>0 && fPicknSol!=-1) {
-			  solu.SetSolution( fPicknSol );
+			// pick solution manually if requested
+			for (std::map<int, int>::const_iterator ipick = fPickSolutionMap.begin(); ipick!= fPickSolutionMap.end(); ++ipick) {
+				std::cout << " force solution # " << ipick->second << std::endl;
+				if ( ipick->first == ibin->first ) solu.SetSolution( ipick->second );
 			}
+			
+			//if (fPickBin>0 && fPicknSol!=-1) {
+			//  solu.SetSolution( fPicknSol );
+			//}
 
 			solu.Solve();
 			/*
