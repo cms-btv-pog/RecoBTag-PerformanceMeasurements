@@ -87,6 +87,10 @@ class S8Solver {
 			gS8effTag_b->Write();
 			geffmu_b->Write();
 			gS8effmu_b->Write();
+			geffTag_cl->Write();
+			gS8effTag_cl->Write();
+			geffmu_cl->Write();
+			gS8effmu_cl->Write();
 				
 			//ofile->Write();
 			ofile->Close();
@@ -193,6 +197,10 @@ class S8Solver {
 		TGraphErrors *gS8effTag_b;
 		TGraphErrors *geffmu_b;
 		TGraphErrors *gS8effmu_b;
+		TGraphErrors *geffTag_cl;
+		TGraphErrors *gS8effTag_cl;
+		TGraphErrors *geffmu_cl;
+		TGraphErrors *gS8effmu_cl;
 		TGraphErrors *ginput_n;
 		TGraphErrors *ginput_nmu;
 		TGraphErrors *ginput_ntag;

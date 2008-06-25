@@ -122,9 +122,9 @@ void S8Solver::LoadHistos() {
 			std::cout << "what" << std::endl;
 			finputCorrFile->cd();
 			std::cout << " another file" << std::endl;
+		} else {
+			finputFile->cd();
 		}
-		finputFile->cd();
-		
 		h2["b_npT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/n_"+fcategory+"_b");
 		//std::cout << "got one" << std::endl;
 		h2["cl_npT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/n_"+fcategory+"_cl");
@@ -1133,6 +1133,10 @@ void S8Solver::Draw(int maxNbins) {
   TArrayD s8effTag_bErr(nxbins);
   TArrayD s8effmu_b(nxbins);
   TArrayD s8effmu_bErr(nxbins);
+  TArrayD s8effTag_cl(nxbins);
+  TArrayD s8effTag_clErr(nxbins);
+  TArrayD s8effmu_cl(nxbins);
+  TArrayD s8effmu_clErr(nxbins);
 
   
   TArrayD effTag_b(nxbins);
@@ -1174,6 +1178,10 @@ void S8Solver::Draw(int maxNbins) {
 		effTag_bErr[ibin-1] = feffTag_b->GetBinError(ibin);
 		effmu_b[ibin-1] = feffmu_b->GetBinContent(ibin);
 		effmu_bErr[ibin-1] = feffmu_b->GetBinError(ibin);
+		effTag_cl[ibin-1] = feffTag_cl->GetBinContent(ibin);
+		effTag_clErr[ibin-1] = feffTag_cl->GetBinError(ibin);
+		effmu_cl[ibin-1] = feffmu_cl->GetBinContent(ibin);
+		effmu_clErr[ibin-1] = feffmu_cl->GetBinError(ibin);
 		
 	}
 	// fnHisto->GetXaxis()->GetXbins()->GetArray();
@@ -1217,6 +1225,10 @@ void S8Solver::Draw(int maxNbins) {
 			s8effTag_bErr[ibin->first -1] = tmpmaps8err["effTag_b"];
 			s8effmu_b[ibin->first -1] = tmpmaps8["effMu_b"];
 			s8effmu_bErr[ibin->first -1] = tmpmaps8err["effMu_b"];
+			s8effTag_cl[ibin->first -1] = tmpmaps8["effTag_cl"];
+			s8effTag_clErr[ibin->first -1] = tmpmaps8err["effTag_cl"];
+			s8effmu_cl[ibin->first -1] = tmpmaps8["effMu_cl"];
+			s8effmu_clErr[ibin->first -1] = tmpmaps8err["effMu_cl"];
 		}
 		//for( std::map<TString,double>::const_iterator i = tmpmap.begin(); i!=tmpmap.end(); ++i) {
 			//std::cout << i->first << " = " << i->second << " \\pm " << tmpmaperr[i->first] << std::endl;
@@ -1229,15 +1241,30 @@ void S8Solver::Draw(int maxNbins) {
 	geffmu_b = new TGraphErrors(nxbins,ptarray.GetArray(),effmu_b.GetArray(),ptarrayErr.GetArray(),effmu_bErr.GetArray());
 	gS8effmu_b = new TGraphErrors(nxbins,ptarray.GetArray(),s8effmu_b.GetArray(),ptarrayErr.GetArray(),s8effmu_bErr.GetArray());
 
+	geffTag_cl = new TGraphErrors(nxbins,ptarray.GetArray(),effTag_cl.GetArray(),ptarrayErr.GetArray(),effTag_clErr.GetArray());
+	gS8effTag_cl = new TGraphErrors(nxbins,ptarray.GetArray(),s8effTag_cl.GetArray(),ptarrayErr.GetArray(),s8effTag_clErr.GetArray());
+	geffmu_cl = new TGraphErrors(nxbins,ptarray.GetArray(),effmu_cl.GetArray(),ptarrayErr.GetArray(),effmu_clErr.GetArray());
+	gS8effmu_cl = new TGraphErrors(nxbins,ptarray.GetArray(),s8effmu_cl.GetArray(),ptarrayErr.GetArray(),s8effmu_clErr.GetArray());
+
 	geffTag_b->SetTitle("True b-efficiency");
 	gS8effTag_b->SetTitle("System8 Results");
 	geffTag_b->SetName("geffTag_b");
 	gS8effTag_b->SetName("gS8effTag_b");
 	
+	geffTag_cl->SetTitle("True cl-efficiency");
+	gS8effTag_cl->SetTitle("System8 Results");
+	geffTag_cl->SetName("geffTag_cl");
+	gS8effTag_cl->SetName("gS8effTag_cl");
+	
 	geffmu_b->SetTitle("True b-efficiency");
 	gS8effmu_b->SetTitle("System8 Results");
 	geffmu_b->SetName("geffmu_b");
 	gS8effmu_b->SetName("gS8effmu_b");
+
+	geffmu_cl->SetTitle("True cl-efficiency");
+	gS8effmu_cl->SetTitle("System8 Results");
+	geffmu_cl->SetName("geffmu_cl");
+	gS8effmu_cl->SetName("gS8effmu_cl");
 
 	geffTag_b->SetMarkerStyle(8);
 	gS8effTag_b->SetMarkerStyle(8);
@@ -1248,6 +1275,15 @@ void S8Solver::Draw(int maxNbins) {
 	geffTag_b->SetMarkerSize(1.5); 
 	gS8effTag_b->SetMarkerSize(1.5); 
 
+	geffTag_cl->SetMarkerStyle(8);
+	gS8effTag_cl->SetMarkerStyle(8);
+	geffTag_cl->SetMarkerColor(1);
+	gS8effTag_cl->SetMarkerColor(2);
+	geffTag_cl->SetLineColor(1); 
+	gS8effTag_cl->SetLineColor(2); 
+	geffTag_cl->SetMarkerSize(1.5); 
+	gS8effTag_cl->SetMarkerSize(1.5); 
+
 
 	geffmu_b->SetMarkerStyle(8);
 	gS8effmu_b->SetMarkerStyle(8);
@@ -1257,6 +1293,16 @@ void S8Solver::Draw(int maxNbins) {
 	gS8effmu_b->SetLineColor(2); 
 	geffmu_b->SetMarkerSize(1.5); 
 	gS8effmu_b->SetMarkerSize(1.5); 
+
+
+	geffmu_cl->SetMarkerStyle(8);
+	gS8effmu_cl->SetMarkerStyle(8);
+	geffmu_cl->SetMarkerColor(1);
+	gS8effmu_cl->SetMarkerColor(2);
+	geffmu_cl->SetLineColor(1); 
+	gS8effmu_cl->SetLineColor(2); 
+	geffmu_cl->SetMarkerSize(1.5); 
+	gS8effmu_cl->SetMarkerSize(1.5); 
 
 
 
@@ -1296,6 +1342,44 @@ void S8Solver::Draw(int maxNbins) {
 	legbb->AddEntry(geffmu_b,"True b-efficiency","P");
 	legbb->AddEntry(gS8effmu_b,"System8 Results","P");
 	legbb->Draw();
+	gPad->SetGrid();
+
+	TString prefix3 = "effTag_cl";	
+	cv_map[prefix3+"_"+fthename] = new TCanvas(prefix3+"_"+fthename,prefix3+"_"+fthename,700,700); 
+
+	TMultiGraph *multi_eff_cl = new TMultiGraph();
+	multi_eff_cl->Add(geffTag_cl,"p");
+	multi_eff_cl->Add(gS8effTag_cl,"p");
+	multi_eff_cl->Draw("a");
+	multi_eff_cl->GetXaxis()->SetTitle("jet p_{T} [GeV/c]");
+	multi_eff_cl->GetYaxis()->SetTitle("b-jet Efficiency");
+	
+	TLegend *legd1 = new TLegend(0.57,0.22,0.87,0.38,"","NDC");
+	legd1->SetMargin(0.12);
+	legd1->SetTextSize(0.027);
+	legd1->SetFillColor(10);
+	legd1->AddEntry(geffTag_cl,"True cl-efficiency","P");
+	legd1->AddEntry(gS8effTag_cl,"System8 Results","P");
+	legd1->Draw();
+	gPad->SetGrid();
+
+	TString prefix4 = "effmu_cl";	
+	cv_map[prefix4+"_"+fthename] = new TCanvas(prefix4+"_"+fthename,prefix4+"_"+fthename,700,700); 
+
+	TMultiGraph *multi_mu_eff_cl = new TMultiGraph();
+	multi_mu_eff_cl->Add(geffmu_cl,"p");
+	multi_mu_eff_cl->Add(gS8effmu_cl,"p");
+	multi_mu_eff_cl->Draw("a");
+	multi_mu_eff_cl->GetXaxis()->SetTitle("jet p_{T} [GeV/c]");
+	multi_mu_eff_cl->GetYaxis()->SetTitle("b-jet Efficiency");
+	
+	TLegend *legdd = new TLegend(0.57,0.22,0.87,0.38,"","NDC");
+	legdd->SetMargin(0.12);
+	legdd->SetTextSize(0.027);
+	legdd->SetFillColor(10);
+	legdd->AddEntry(geffmu_cl,"True cl-efficiency","P");
+	legdd->AddEntry(gS8effmu_cl,"System8 Results","P");
+	legdd->Draw();
 	gPad->SetGrid();
 
 	TString acvname = "correlations_"+fthename;
@@ -1349,7 +1433,7 @@ void S8Solver::Draw(int maxNbins) {
         legcc->SetFillColor(10);
         legcc->AddEntry(fh_delta,"#delta","P");
         legcc->AddEntry(fh_gamma,"#gamma","P");
-	legcc->Draw();
+    	legcc->Draw();
         gPad->SetGrid();
 
 	ginput_n   = new TGraphErrors(nxbins,ptarray.GetArray(),input_n.GetArray(),ptarrayErr.GetArray(),0);
