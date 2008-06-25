@@ -61,6 +61,10 @@ void S8Plotter::Book() {
 	htitle = "muon p_{T} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,80.);
 	
+	hname = "muon_eta"; 
+	htitle = "muon |#eta|";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,-5., 5.);
+
 	htitle = "jet p_{T} [GeV/c]";
 	for( size_t i = 0; i != quark_label.size(); ++i ) {
 		hname = "jet_pt"; 
@@ -90,21 +94,21 @@ void S8Plotter::Book() {
 		h1[hname]->SetLineColor( quark_color[quark_label[i]] );
 	}
 	
-	hname = "jet_deltar"; 
+	hname = "jet_deltaR"; 
 	htitle = "#Delta R";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),60,0.,0.55);
 
-	hname = "jet_deltar_b"; 
+	hname = "jet_deltaR_b"; 
 	htitle = "#Delta R";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),60,0.,0.55);
 	h1[hname]->SetLineColor(quark_color["b"]);
 
-	hname = "jet_deltar_cl"; 
+	hname = "jet_deltaR_c"; 
 	htitle = "#Delta R";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),60,0.,0.55);
 	h1[hname]->SetLineColor(quark_color["c"]);
 
-	hname = "jet_deltar_udsg"; 
+	hname = "jet_deltaR_udsg"; 
 	htitle = "#Delta R";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),60,0.,0.55);
 	h1[hname]->SetLineColor(quark_color["udsg"]);
@@ -118,19 +122,121 @@ void S8Plotter::Book() {
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,3.2);
 	h1[hname]->SetLineColor(quark_color["b"]);
 	
-	hname = "jet_ptrel"; 
+	hname = "jet_pTrel"; 
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
 	
-	hname = "jet_ptrel_b"; 
+	hname = "jet_pTrel_b"; 
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
 	
-	hname = "jet_ptrel_cl"; 
+	hname = "jet_pTrel_c"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+
+	hname = "jet_pTrel_udsg"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+
+	hname = "jet_pTrel_pt50"; 
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
 	
+	hname = "jet_pTrel_pt100"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+
+	hname = "jet_pTrel_pt150"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+
+	hname = "jet_pTrel_b_pt50"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
 	
+	hname = "jet_pTrel_b_pt100"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+
+	hname = "jet_pTrel_b_pt150"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	
+	hname = "jet_pTrel_c_pt50"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	
+	hname = "jet_pTrel_c_pt100"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+
+	hname = "jet_pTrel_c_pt150"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+
+	hname = "jet_pTrel_udsg_pt50"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	
+	hname = "jet_pTrel_udsg_pt100"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+
+	hname = "jet_pTrel_udsg_pt150"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+
+	hname = "jet_pTrel_mupt6"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	
+	hname = "jet_pTrel_mupt10"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+
+	hname = "jet_pTrel_mupt20"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+
+	hname = "jet_pTrel_b_mupt6"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	
+	hname = "jet_pTrel_b_mupt10"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+
+	hname = "jet_pTrel_b_mupt20"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	
+	hname = "jet_pTrel_c_mupt6"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	
+	hname = "jet_pTrel_c_mupt10"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+
+	hname = "jet_pTrel_c_mupt20"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+
+	hname = "jet_pTrel_udsg_mupt6"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	
+	hname = "jet_pTrel_udsg_mupt10"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+
+	hname = "jet_pTrel_udsg_mupt20"; 
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+
+	hname = "jet_ntrks"; 
+	htitle = "jet_ntrks";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),130,0.,260.);
 }
 
 void S8Plotter::Loop()
@@ -302,6 +408,7 @@ void S8Plotter::Loop()
 		for ( int ijet =0; ijet != vec_size; ++ijet) {
 
 			ntagtracks = fS8evt->jet_ntrks[ijet]; //taggability
+			h1["jet_ntrks"]->Fill(fS8evt->jet_ntrks[ijet]);
 			double jetcorr = fS8evt->jetcorrection[ijet];
 						
 			//if ( fS8evt->jet_hasLepton[ijet] == 1 && ntagtracks>=1 ) { // no taggability for the moment
@@ -336,17 +443,118 @@ void S8Plotter::Loop()
 							nmultiple_muons++;
 							
 							if (Muons.pt[imu] > mu_highest_pt ) { mu_highest_pt = Muons.pt[imu]; ith_mu_highest_pt = imu; }
-							
-							//ptrel = Muons.jet_ptrel[imu];
-							//if ( ptrel > 0.8 ) {
+						
+							ptrel = Muons.jet_ptrel[imu];
+							double deltaR = Muons.jet_deltaR[imu];
+							//std::cout << "ptrel and deltaR " << ptrel << " and " << deltaR <<std::endl;
+
+                            //if ( ptrel > 0.8 ) {
 							//	passptrel = true;
 							//	}
 
 							if ( fVerbose) std::cout << " muon " << imu << " pt= " << Muons.pt[imu] << " eta= " << Muons.eta[imu] << " chamber hits= " << Muons.SArechits[imu] << " chi2/ndof = " << Muons.chi2[imu]/Muons.ndof[imu] << " IPS= " << Muons.d0sigma[imu] << " mcpdgid= " << Muons.mc_pdgid[imu] << std::endl;
+					//}
+					}// select only one muon in jet, the one with the highest pt
+					
 							
-							//}
+					h1["muon_pt"]->Fill(Muons.pt[ith_mu_highest_pt]);
+					h1["muon_eta"]->Fill(Muons.eta[ith_mu_highest_pt]);
+					h1["jet_deltaR"]->Fill(Muons.jet_deltaR[ith_mu_highest_pt]);
+					if ( JetFlavor == 5 ) {
+						h1["jet_deltaR_b"]->Fill( Muons.jet_deltaR[ith_mu_highest_pt]);
 					}
-					// select only one muon in jet, the one with the highest pt
+					if ( JetFlavor == 4 ) {
+						h1["jet_deltaR_c"]->Fill( Muons.jet_deltaR[ith_mu_highest_pt]);
+					}
+					if ( (JetFlavor>0 && JetFlavor<4) || JetFlavor==21 ) {
+						h1["jet_deltaR_udsg"]->Fill( Muons.jet_deltaR[ith_mu_highest_pt]);
+					}
+
+					h1["jet_pTrel"]->Fill(Muons.jet_ptrel[ith_mu_highest_pt]);
+					if ( JetFlavor == 5 ) {
+						h1["jet_pTrel_b"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						if ( p4Jet.Pt() > 50 ) {
+							h1["jet_pTrel_b_pt50"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+						if ( p4Jet.Pt() > 100 ) {
+							h1["jet_pTrel_b_pt100"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+						if ( p4Jet.Pt() > 150 ) {
+							h1["jet_pTrel_b_pt150"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+						if ( Muons.pt[ith_mu_highest_pt] > 6 ) {
+							h1["jet_pTrel_b_mupt6"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+						if ( Muons.pt[ith_mu_highest_pt] > 10 ) {
+							h1["jet_pTrel_b_mupt10"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+						if (Muons.pt[ith_mu_highest_pt] > 20 ) {
+							h1["jet_pTrel_b_mupt20"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+					}
+					if ( JetFlavor == 4 ) {
+						h1["jet_pTrel_c"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						if ( p4Jet.Pt() > 50 ) {
+							h1["jet_pTrel_c_pt50"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+						if ( p4Jet.Pt() > 100 ) {
+							h1["jet_pTrel_c_pt100"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+						if ( p4Jet.Pt() > 150 ) {
+							h1["jet_pTrel_c_pt150"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+						if ( Muons.pt[ith_mu_highest_pt] > 6 ) {
+							h1["jet_pTrel_c_mupt6"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+						if ( Muons.pt[ith_mu_highest_pt] > 10 ) {
+							h1["jet_pTrel_c_mupt10"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+						if (Muons.pt[ith_mu_highest_pt] > 20 ) {
+							h1["jet_pTrel_c_mupt20"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+					}
+					if ( (JetFlavor>0 && JetFlavor<4) || JetFlavor==21 ) {
+						h1["jet_pTrel_udsg"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						if ( p4Jet.Pt() > 50 ) {
+							h1["jet_pTrel_udsg_pt50"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+						if ( p4Jet.Pt() > 100 ) {
+							h1["jet_pTrel_udsg_pt100"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+						if ( p4Jet.Pt() > 150 ) {
+							h1["jet_pTrel_udsg_pt150"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+						if ( Muons.pt[ith_mu_highest_pt] > 6 ) {
+							h1["jet_pTrel_udsg_mupt6"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+						if ( Muons.pt[ith_mu_highest_pt] > 10 ) {
+							h1["jet_pTrel_udsg_mupt10"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+						if (Muons.pt[ith_mu_highest_pt] > 20 ) {
+							h1["jet_pTrel_udsg_mupt20"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+						}
+					}
+					if ( p4Jet.Pt() > 50 ) {
+						h1["jet_pTrel_pt50"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+					}
+					if ( p4Jet.Pt() > 100 ) {
+						h1["jet_pTrel_pt100"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+					}
+					if ( p4Jet.Pt() > 150 ) {
+						h1["jet_pTrel_pt150"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+					}
+					if ( Muons.pt[ith_mu_highest_pt] > 6 ) {
+						h1["jet_pTrel_mupt6"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+					}
+					if ( Muons.pt[ith_mu_highest_pt] > 10 ) {
+						h1["jet_pTrel_mupt10"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+					}
+					if (Muons.pt[ith_mu_highest_pt] > 20 ) {
+						h1["jet_pTrel_mupt20"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
+					}	
+					//h1["muon_pt"]->Fill(Muons.pt[ith_mu_highest_pt]);
+					//h1["muon_eta"]->Fill(Muons.eta[ith_mu_highest_pt]);
+					//std::cout << "filled muon_pt and eta " << std::endl;
 					if ( passGoodMuon ) {
 					  p4MuJet.SetPtEtaPhiE(fS8evt->jet_pt[ijet]*fS8evt->jetcorrection[ijet],
 							       fS8evt->jet_eta[ijet], fS8evt->jet_phi[ijet],
