@@ -37,8 +37,7 @@
 
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 
-#include "SimTracker/Records/interface/TrackAssociatorRecord.h"
-#include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
+// #include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
 
 // simulated vertices,..., add <use name=SimDataFormats/Vertex> and <../Track>
 #include <SimDataFormats/Vertex/interface/SimVertex.h>
@@ -54,9 +53,6 @@
 
 // HepPDT // for simtracks
 #include "HepPDT/ParticleID.hh"
-
-//#include "SimGeneral/HepPDT/interface/HepPDTable.h"
-//#include "SimGeneral/HepPDT/interface/HepParticleData.h"
 
 // Root
 #include "TH1.h"
@@ -517,14 +513,6 @@ void PerformanceAnalyzer::beginJob(edm::EventSetup const& iSetup){
   iSetup.get<TrackAssociatorRecord>().get("TrackAssociatorByChi2",theChiAssociator);
   associatorByChi2 = (TrackAssociatorBase *) theChiAssociator.product(); */
   
-  // TrackCategories (only on reco samples)
-  if (flavourMatchOptionf == "hepMC")
-  {
-    edm::ESHandle<TrackAssociatorBase> theHitsAssociator;
-    iSetup.get<TrackAssociatorRecord>().get("TrackAssociatorByHits",theHitsAssociator);
-    associatorByHits = (TrackAssociatorByHits *) theHitsAssociator.product();
-  }
-
 }
 
 
@@ -1057,98 +1045,7 @@ JetFlavour PerformanceAnalyzer::getMatchedParton(const reco::CaloJet &jet)
   return jetFlavour;
 }
 
-// --------------------- TrackCategories ----------------------
 
-BTagTrackEvent::Flags PerformanceAnalyzer::getTrackCategories(
-  reco::TrackRef track, 
-  const reco::RecoToSimCollection & association, 
-  bool bestMatchByMaxValue
-) const
-{
-  BTagTrackEvent::Flags flags(BTagTrackEvent::Unknown+1, false);
-  
-  TrackOrigin tracer(-2);
-	
-  if (tracer.evaluate(track, association, bestMatchByMaxValue))
-  {
-    // Get the simulated particle.
-    const HepMC::GenParticle * particle = tracer.particle();
-  
-    // Get the event id for the initial TP.
-    EncodedEventId eventId = tracer.simParticleTrail()[0]->eventId();
-  
-    // Check for signal events.	
-    if ( !eventId.bunchCrossing() && !eventId.event() )
-    {
-      flags[BTagTrackEvent::SignalEvent] = true;
-      // Check for PV, SV, TV
-      TrackHistory::GenVertexTrail genVertexTrail(tracer.genVertexTrail());
-      if ( genVertexTrail.empty() )
-        flags[BTagTrackEvent::PV] = true;
-      else if ( genVertexTrail.size() == 1 )
-        flags[BTagTrackEvent::SV] = true;
-      else
-        flags[BTagTrackEvent::TV] = true;
-    }
-  
-    // Check for the existence of a simulated vertex (displaced).
-    if ( !tracer.simVertexTrail().empty() )
-      flags[BTagTrackEvent::Displaced] = true;
-		
-    // Checks for long lived particle
-    flags[BTagTrackEvent::Ks] = hasLongLived(tracer, 310);      // Ks
-    flags[BTagTrackEvent::Lambda] = hasLongLived(tracer, 3122); // Lambda 
-  
-    // Check for photon conversion
-    flags[BTagTrackEvent::PhotonConversion] = hasPhotonConversion(tracer);
-    
-    // Check for the initial hadron
-    if (particle)
-    {
-      HepPDT::ParticleID pid(particle->pdg_id());
-      flags[BTagTrackEvent::Up] = pid.hasUp();
-      flags[BTagTrackEvent::Down] = pid.hasDown();
-      flags[BTagTrackEvent::Strange] = pid.hasStrange();
-      flags[BTagTrackEvent::Charm] = pid.hasCharm();
-      flags[BTagTrackEvent::Bottom] = pid.hasBottom();
-      flags[BTagTrackEvent::Light] = !pid.hasCharm() || !pid.hasBottom();
-    }
-    else
-      flags[BTagTrackEvent::Unknown] = true;
-  }
-  else
-    flags[BTagTrackEvent::Fake] = true;
-  
-  return flags;
-}
-
-bool PerformanceAnalyzer::hasLongLived(const TrackHistory & tracer, int pdgid) const
-{
-  if ( !tracer.genParticleTrail().empty() )
-  {
-    if( abs(tracer.genParticleTrail()[0]->pdg_id()) == pdgid )
-      return true;
-  }
-  return false;
-}
-
-bool PerformanceAnalyzer::hasPhotonConversion(const TrackHistory & tracer) const{
-	TrackOrigin::SimVertexTrail::const_iterator tvr;
-	TrackingParticleRefVector sources, daughters;
-	for (tvr = tracer.simVertexTrail().begin(); tvr != tracer.simVertexTrail().end(); tvr++) {
-		sources = (*tvr)->sourceTracks();
-		daughters = (*tvr)->daughterTracks();
-		if (sources.size() == 1              &&  // require one source
-			daughters.size() == 2            &&  //    "    two daughters
-			sources[0]->pdgId() == 22        &&  //    "    a photon in the source
-			abs(daughters[0]->pdgId()) == 11 &&  //    "    two electrons
-			abs(daughters[1]->pdgId()) == 11    ) return true;
-	}
-	return false;
-}
-
-
-// ------------ End of Track Categories -----------------------
 
 // ------------ method called to produce the data  ------------
 void
@@ -1176,9 +1073,6 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
   // initialize flavour identifiers
   edm::Handle<JetFlavourMatchingCollection> jetMC;
 
-  // Used by TrackCategories.
-  reco::RecoToSimCollection association;
-
   if (flavourMatchOptionf == "fastMC") {
     iEvent.getByLabel(flavourSourcef, jetMC);
     for(JetFlavourMatchingCollection::const_iterator iter =
@@ -1187,12 +1081,8 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
   } else if (flavourMatchOptionf == "hepMC") {
     jetFlavourIdentifier_.readEvent(iEvent);
     
-    // ----------- TrackCategories ----------------
-	edm::Handle<TrackingParticleCollection>  TPCollectionH ;
-	iEvent.getByType(TPCollectionH);
-
-    association = associatorByHits->associateRecoToSim ( recTrks, TPCollectionH, &iEvent );
-    // ----------- End of TrackCategories ----------
+    // Preprocessing for TrackCategories
+    classifier_.newEvent(iEvent, iSetup);    
     
   } else if (flavourMatchOptionf == "genParticle") {
     iEvent.getByLabel (flavourSourcef, theJetPartonMapf);
@@ -1691,7 +1581,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 
 			  		// If hepMC exist get the track categories.
 			  		if (flavourMatchOptionf == "hepMC" )
-                		trackEvent.is.push_back( getTrackCategories(track, association, true) );
+                		trackEvent.is.push_back( classifier_.evaluate(track) );
             	} 
 
             	// Add the track event into BTagEvent.
@@ -1714,11 +1604,11 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			    fS8evt->btag_TrkCounting_disc3D_1trk.push_back( iptrack1 );
 			  	// If hepMC exist get the track categories.
 			  	if (flavourMatchOptionf == "hepMC" )
-			      fS8evt->btag_TrkCounting_disc3D_1trk_is.push_back( getTrackCategories(tracks[0], association, true) );
+			      fS8evt->btag_TrkCounting_disc3D_1trk_is.push_back( classifier_.evaluate(tracks[0]) );
 			  }
 			  fS8evt->btag_TrkCounting_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D 
 			  if (flavourMatchOptionf == "hepMC" )
-			    fS8evt->btag_TrkCounting_disc3D_2trk_is.push_back( getTrackCategories(tracks[1], association, true) );
+			    fS8evt->btag_TrkCounting_disc3D_2trk_is.push_back( classifier_.evaluate(tracks[1]) );
 			  gotTCHE = true;
 			}
 			else if ( moduleLabel == "trackCountingHighPurJetTags" )
@@ -1726,7 +1616,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 				fS8evt->btag_TrkCounting_disc3D_3trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 3rd trk, 3D
 			  	// If hepMC exist get the track categories.
 			  	if (flavourMatchOptionf == "hepMC" )
-			      fS8evt->btag_TrkCounting_disc3D_3trk_is.push_back( getTrackCategories(tracks[2], association, true) );
+			      fS8evt->btag_TrkCounting_disc3D_3trk_is.push_back( classifier_.evaluate(tracks[2]) );
 				gotTCHP = true;
 			}
 			else if ( moduleLabel == "modifiedtrackCountingHighEffJetTags" ) 
@@ -1738,11 +1628,11 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			    fS8evt->btag_ModTrkCounting_disc3D_1trk.push_back( iptrack1 );
 			  	// If hepMC exist get the track categories.
 			  	if (flavourMatchOptionf == "hepMC" )
-			      fS8evt->btag_ModTrkCounting_disc3D_1trk_is.push_back( getTrackCategories(tracks[0], association, true) );
+			      fS8evt->btag_ModTrkCounting_disc3D_1trk_is.push_back( classifier_.evaluate(tracks[0]) );
 			  }
 			  fS8evt->btag_ModTrkCounting_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D 
 			  if (flavourMatchOptionf == "hepMC" )
-			    fS8evt->btag_ModTrkCounting_disc3D_2trk_is.push_back( getTrackCategories(tracks[1], association, true) );
+			    fS8evt->btag_ModTrkCounting_disc3D_2trk_is.push_back( classifier_.evaluate(tracks[1]) );
 			  gotMTCHE = true;
 			}
 			else if ( moduleLabel == "modifiedtrackCountingHighPurJetTags" )
@@ -1750,7 +1640,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 				fS8evt->btag_ModTrkCounting_disc3D_3trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 3rd trk, 3D
 			  	// If hepMC exist get the track categories.
 			  	if (flavourMatchOptionf == "hepMC" )
-			      fS8evt->btag_ModTrkCounting_disc3D_3trk_is.push_back( getTrackCategories(tracks[2], association, true) );
+			      fS8evt->btag_ModTrkCounting_disc3D_3trk_is.push_back( classifier_.evaluate(tracks[2]) );
 				gotMTCHP = true;
 			}
 			else if ( moduleLabel == "negativeTrackCounting2ndTrck" )
@@ -1762,12 +1652,12 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			    fS8evt->btag_NegTag_disc3D_1trk.push_back( iptrack1 );
 			    // If hepMC exist get the track categories.
 			  	if (flavourMatchOptionf == "hepMC" )
-			      fS8evt->btag_NegTag_disc3D_1trk_is.push_back( getTrackCategories(tracks[(trackIP).size()-1], association, true) );
+			      fS8evt->btag_NegTag_disc3D_1trk_is.push_back( classifier_.evaluate(tracks[(trackIP).size()-1]) );
 			  }
 			  //std::cout << "discri neg tc " << (*jetTags)[ith_tagged].discriminator() << std::endl;
 			  fS8evt->btag_NegTag_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D
 			  if (flavourMatchOptionf == "hepMC" )
-			    fS8evt->btag_NegTag_disc3D_2trk_is.push_back( getTrackCategories(tracks[(trackIP).size()-2], association, true) );
+			    fS8evt->btag_NegTag_disc3D_2trk_is.push_back( classifier_.evaluate(tracks[(trackIP).size()-2]) );
 			  gotTCHEneg = true;
 			}
 			else if ( moduleLabel == "negativeTrackCounting3rdTrck" )
@@ -1775,7 +1665,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	 		    std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
 				fS8evt->btag_NegTag_disc3D_3trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 3rd trk, 3D
 			  	if (flavourMatchOptionf == "hepMC" )
-			      fS8evt->btag_NegTag_disc3D_3trk_is.push_back( getTrackCategories(tracks[(trackIP).size()-3], association, true) );				
+			      fS8evt->btag_NegTag_disc3D_3trk_is.push_back( classifier_.evaluate(tracks[(trackIP).size()-3]) );				
 				gotTCHPneg = true;
 			}
 

@@ -1,12 +1,13 @@
 #ifndef PerformanceAnalyzer_h
 #define PerformanceAnalyzer_h
+
 /** \class edm::EDAnalyzer PerformanceAnalyzer
  *  
  * Analyzer to select jets together with a muon on it.
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.17 2008/04/21 22:47:00 yumiceva Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.18 2008/06/04 19:39:00 yumiceva Exp $
  *
  */
 
@@ -25,8 +26,8 @@
 #include "FWCore/ParameterSet/interface/InputTag.h"
 
 #include "DataFormats/Candidate/interface/CandMatchMap.h"
-
 #include "DataFormats/TrackReco/interface/Track.h"
+
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 //generator level + CLHEP
@@ -54,9 +55,7 @@
 #include "RecoBTag/MCTools/interface/JetFlavour.h"
 #include "RecoBTag/MCTools/interface/JetFlavourIdentifier.h"
 
-#include "SimTracker/TrackAssociation/interface/TrackAssociatorBase.h"
-#include "SimTracker/TrackAssociation/interface/TrackAssociatorByHits.h"
-#include "SimTracker/TrackHistory/interface/TrackOrigin.h"
+#include "SimTracker/TrackHistory/interface/TrackClassifier.h"
 
 // Root
 #include "TH1.h"
@@ -170,21 +169,10 @@ private:
   int feventcounter;
   int fbadeventscounter;
   
-  TrackAssociatorBase *associatorByChi2;
-  TrackAssociatorByHits *associatorByHits;
+  TrackClassifier classifier_;
 
   std::map< std::string, float > fOPMap;
-  
-  bool hasLongLived(const TrackHistory &, int) const;
-
-  bool hasPhotonConversion(const TrackHistory &) const;
-
-  std::vector<bool> getTrackCategories( 
-    reco::TrackRef, 
-    const reco::RecoToSimCollection &, 
-    bool bestMatchByMaxValue
-  ) const;
-  
+    
   bool bTagTrackEventFlag_;
 };
 
