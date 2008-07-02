@@ -128,9 +128,9 @@ endsw
 ### name of the cfi which has to replace "Configuration/Generator/data/PythiaUESettings.cfi"
 filename:
 if (${syst} == 0) then
-    set cfi=PythiaDefault.cfi
+    set cfi=ttbar_fromScratch_fastsim_PythiaDefault.cfg
 else
-    set cfi=Pythia_${label}_${dir}.cfi
+    set cfi=ttbar_fromScratch_fastsim_Pythia_${label}_${dir}.cfg
 endif
 
 
@@ -138,6 +138,9 @@ endif
 echo "Creating file ${cfi}..."
 if (-f "${cfi}") rm ${cfi}
 cat > ${cfi} <<EOF
+process PROD  = 
+{
+
 source = PythiaSource {
     untracked int32 pythiaPylistVerbosity = 0
     untracked bool pythiaHepMCVerbosity = false
@@ -196,6 +199,104 @@ source = PythiaSource {
 	}
     }
 }
+
+
+    # The number of events to be processed.
+    untracked PSet maxEvents = {untracked int32 input = 830000}
+    
+    service =  RandomNumberGeneratorService {
+	# This is to initialize the random engine of the source
+	untracked uint32 sourceSeed = 123456789
+	# This is to initialize the random engines of Famos
+	PSet moduleSeeds =
+	{
+	    untracked uint32 VtxSmeared = 123456789
+	    untracked uint32 famosPileUp = 918273
+	    untracked uint32 famosSimHits = 13579
+	    untracked uint32 siTrackerGaussianSmearingRecHits = 24680
+	    untracked uint32 caloRecHits = 654321
+	    untracked uint32 paramMuons = 54525
+	}
+    }
+    
+    // If you want to use the (CMS default) CLHEP random, 
+    // set these ones to false
+    replace famosPileUp.UseTRandomEngine = true
+    replace famosSimHits.UseTRandomEngine = true
+    replace siTrackerGaussianSmearingRecHits.UseTRandomEngine = true
+    replace caloRecHits.UseTRandomEngine = true
+    replace paramMuons.UseTRandomEngine = true
+
+   
+    # Famos sequences
+    include "FastSimulation/Configuration/data/FamosSequences.cff"
+    // If you want to turn on/off pile-up
+    replace famosPileUp.PileUpSimulator.averageNumber = 0.0
+    // Parametrized magnetic field
+    replace VolumeBasedMagneticFieldESProducer.useParametrizedTrackerField = true
+    // You may not want to simulate everything for your study
+    replace famosSimHits.SimulateCalorimetry = true
+    replace famosSimHits.SimulateTracking = true
+
+
+    # Tracker MisAlignement 
+    include "FastSimulation/Configuration/data/MisAlignment.cff" 
+    replace misalignedTrackerGeometry.applyAlignment = true
+    replace trackerAlignment.toGet = {
+	{ string record = "TrackerAlignmentRcd" string tag = "Tracker10pbScenario150" },
+	{ string record = "TrackerAlignmentErrorRcd" string tag = "Tracker10pbScenarioErrors150" }
+    }
+
+    # ECAL miscalibration. 
+    # include "FastSimulation/Configuration/data/MisCalibration.cff"
+	 
+    ##replacement for ECAL miscalibration	
+    include "CondCore/DBCommon/data/CondDBSetup.cfi"
+
+    es_source ecalConditions = PoolDBESSource  
+    { 
+        using CondDBSetup
+        VPSet toGet = {
+	    { string record = "EcalIntercalibConstantsRcd"
+	        string tag = "EcalIntercalibConstants_miscalibcsa07"}
+        }
+        string connect = "frontier://cms_conditions_data/CMS_COND_16X_ECAL"
+        untracked bool siteLocalConfig = true
+        string timetype = "runnumber"
+    }
+
+    replace caloRecHits.RecHitsFactory.doMiscalib=true
+    replace ecalConditions.catalog="relationalcatalog_frontier://cms_conditions_data/CMS_COND_16X_FRONTIER"
+	
+    # HCAL miscalibration 
+    # 1) RMS (1.0 means 10% RMS miscalibration, 0.5 means 5%, 2.0 means 20%)
+    # Default is 0.0 (i.e., no miscalibration)
+    replace hcalRecHits.Refactor = 1.0
+    # 2) Bias (1.0 means no bias, 1.1 means 10% positive bias)
+    # Default is 1.0 (i.e., no bias)
+    replace hcalRecHits.Refactor_mean = 0.95	 	
+
+
+    service = Timing { }
+    
+    path p1 = { 
+	famosWithEverything
+    }
+
+    # To write out events (not need: FastSimulation _is_ fast!)
+    include "FastSimulation/Configuration/data/EventContent.cff"
+    module o1 = PoolOutputModule { 
+	using AODSIMEventContent
+	untracked string fileName = "ttbar_default.root" 
+    }
+    endpath outpath = { o1 }
+    
+    # Keep the logging output to a nice level #
+    include "FWCore/MessageService/data/MessageLogger.cfi"
+//    replace MessageLogger.destinations = {"detailedInfo.txt"}
+    
+}		
+
 EOF
 
 #more ${cfi}
