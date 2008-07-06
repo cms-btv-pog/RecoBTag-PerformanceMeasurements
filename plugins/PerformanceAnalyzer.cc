@@ -505,14 +505,7 @@ void PerformanceAnalyzer::beginJob(edm::EventSetup const& iSetup){
 	
 	std::cout << analyzer_ << " begin Job" << std::endl;
 
-	rootFile_->cd();
-  
-  /*
-  // track matching MC
-  edm::ESHandle<TrackAssociatorBase> theChiAssociator;
-  iSetup.get<TrackAssociatorRecord>().get("TrackAssociatorByChi2",theChiAssociator);
-  associatorByChi2 = (TrackAssociatorBase *) theChiAssociator.product(); */
-  
+	rootFile_->cd();  
 }
 
 
@@ -1581,7 +1574,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 
 			  		// If hepMC exist get the track categories.
 			  		if (flavourMatchOptionf == "hepMC" )
-                		trackEvent.is.push_back( classifier_.evaluate(track) );
+                		trackEvent.is.push_back( classifier_.evaluate(track).flags() );
             	} 
 
             	// Add the track event into BTagEvent.
@@ -1602,46 +1595,56 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
               if (!tracks.empty())
               {
                 if ( (trackIP)[0].significance() >= 0 )
-                  fS8evt->btag_TrkCounting_disc3D_1trk_is.push_back( classifier_.evaluate(tracks[0]) );
+                  fS8evt->btag_TrkCounting_disc3D_1trk_is.push_back( classifier_.evaluate(tracks[0]).flags() );
               }
   		      if (tracks.size() > 1)
   		      {
   		      	if ( (trackIP)[1].significance() >= 0 )
-  		          fS8evt->btag_TrkCounting_disc3D_2trk_is.push_back( classifier_.evaluate(tracks[1]) );
+  		          fS8evt->btag_TrkCounting_disc3D_2trk_is.push_back( classifier_.evaluate(tracks[1]).flags() );
   		      }
   		      if (tracks.size() > 2)
   		      {
   		      	if ( (trackIP)[2].significance() >= 0 )  		      	
-  		          fS8evt->btag_TrkCounting_disc3D_3trk_is.push_back( classifier_.evaluate(tracks[2]) ); 
+  		          fS8evt->btag_TrkCounting_disc3D_3trk_is.push_back( classifier_.evaluate(tracks[2]).flags() ); 
   		      } 
               if (!tracks.empty())
               {
   		        if ( (trackIP)[tracks.size()-1].significance() < 0 )  		      	
-                  fS8evt->btag_NegTag_disc3D_1trk_is.push_back( classifier_.evaluate(tracks[tracks.size()-1]) );
+                  fS8evt->btag_NegTag_disc3D_1trk_is.push_back( classifier_.evaluate(tracks[tracks.size()-1]).flags() );
               }
               if (tracks.size() > 1)
               {
   		        if ( (trackIP)[tracks.size()-2].significance() < 0 )              	
-                  fS8evt->btag_NegTag_disc3D_2trk_is.push_back( classifier_.evaluate(tracks[tracks.size()-2]) );
+                  fS8evt->btag_NegTag_disc3D_2trk_is.push_back( classifier_.evaluate(tracks[tracks.size()-2]).flags() );
               }
               if (tracks.size() > 2)
               {
   		        if ( (trackIP)[tracks.size()-3].significance() < 0 )              	
-                  fS8evt->btag_NegTag_disc3D_3trk_is.push_back( classifier_.evaluate(tracks[tracks.size()-3]) );                                
+                  fS8evt->btag_NegTag_disc3D_3trk_is.push_back( classifier_.evaluate(tracks[tracks.size()-3]).flags() );                                
               }
               
-              std::vector<unsigned> counters;
+              std::vector<bool> posFlags, negFlags;
               
               for (std::size_t i = 0; i < tracks.size(); ++i)
               {
-              	std::vector<bool> flags = classifier_.evaluate(tracks[i]);
-                if (!i) counters.resize(flags.size(), 0);
+              	std::vector<bool> const & flags = classifier_.evaluate(tracks[i]).flags();
+                if (!i) 
+                {
+                  posFlags.resize(flags.size(), false);
+                  negFlags.resize(flags.size(), false);
+                }
                 
-                for (std::size_t j = 0; j < counters.size(); ++j)
-                  counters[j] += flags[j];
+                double significance = (trackIP)[i].significance();
+                
+                for (std::size_t j = 0; j < flags.size(); ++j)
+                  if ( significance >= 0.0 )
+                    posFlags[j] = posFlags[j] | flags[j];
+                  else
+                    negFlags[j] = negFlags[j] | flags[j];
               }
               
-              fS8evt->jet_track_categories.push_back(counters);
+              fS8evt->jet_posTrack_categories.push_back(posFlags);
+              fS8evt->jet_negTrack_categories.push_back(negFlags);
             }
 
 			if ( moduleLabel == "trackCountingHighEffJetTags" ) 

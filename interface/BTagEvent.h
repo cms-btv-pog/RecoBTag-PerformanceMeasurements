@@ -8,7 +8,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.h,v 1.16 2008/03/23 01:25:49 jandrea Exp $
+ version $Id: BTagEvent.h,v 1.16.4.1 2008/07/04 13:14:11 bazterra Exp $
 
 ________________________________________________________________**/
 
@@ -79,7 +79,8 @@ class BTagEvent : public TObject {
 	std::vector<std::vector<bool> > btag_ModTrkCounting_disc3D_2trk_is;
 	std::vector<std::vector<bool> > btag_ModTrkCounting_disc3D_3trk_is;
 	
-	std::vector<std::vector<unsigned> > jet_track_categories;
+	std::vector<std::vector<bool> > jet_posTrack_categories;
+	std::vector<std::vector<bool> > jet_negTrack_categories;
 
 	std::vector< float > btag_JetProb_disc3D;
 	std::vector< float > btag_negJetProb_disc3D;

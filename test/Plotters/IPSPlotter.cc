@@ -36,49 +36,52 @@ void IPSPlotter::Fill(BTagEvent * event)
     if ( event->btag_NegTag_disc3D_2trk[i] < 0 )
       ips_->Fill(event->btag_NegTag_disc3D_2trk[i]);
   	  	
-    if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::Bottom] )
+    if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::BWeakDecay] )
     {
       if ( event->btag_TrkCounting_disc3D_2trk[i] >= 0 )
         ipsB_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
       if ( event->btag_NegTag_disc3D_2trk[i] < 0 )
         ipsB_->Fill(event->btag_NegTag_disc3D_2trk[i]);
     } 
-    else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::Ks] )
+    else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::KsDecay] )
     {
       if ( event->btag_TrkCounting_disc3D_2trk[i] >= 0 )
         ipsKs_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
       if ( event->btag_NegTag_disc3D_2trk[i] < 0 )
         ipsKs_->Fill(event->btag_NegTag_disc3D_2trk[i]);
     }
-    else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::PhotonConversion] )
+    else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::Conversion] )
     {
       if ( event->btag_TrkCounting_disc3D_2trk[i] >= 0 )
         ipsConversion_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
       if ( event->btag_NegTag_disc3D_2trk[i] < 0 )
         ipsConversion_->Fill(event->btag_NegTag_disc3D_2trk[i]);      
     }
-    else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::Lambda] )
+    else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::LambdaDecay] )
     {
       if ( event->btag_TrkCounting_disc3D_2trk[i] >= 0 )
         ipsLambda_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
       if ( event->btag_NegTag_disc3D_2trk[i] < 0 )
         ipsLambda_->Fill(event->btag_NegTag_disc3D_2trk[i]);      
     }
-    else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::Displaced] )
+    else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::Interaction] )
     {
       if ( event->btag_TrkCounting_disc3D_2trk[i] >= 0 )
         ipsDisplaced_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
       if ( event->btag_NegTag_disc3D_2trk[i] < 0 )
         ipsDisplaced_->Fill(event->btag_NegTag_disc3D_2trk[i]);      
     }
-    else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::Charm] )
+    else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::CWeakDecay] )
     {
       if ( event->btag_TrkCounting_disc3D_2trk[i] >= 0 )
         ipsC_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
       if ( event->btag_NegTag_disc3D_2trk[i] < 0 )
         ipsC_->Fill(event->btag_NegTag_disc3D_2trk[i]);      
     }
-    else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::Light] )
+    else if (
+      !event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::BWeakDecay] &&
+      !event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::CWeakDecay]
+    )
     {
       if ( event->btag_TrkCounting_disc3D_2trk[i] >= 0 )
         ipsLight_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
