@@ -1590,171 +1590,185 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
             {
               TrackRefVector tracks((*tagInfo)[ith_tagged].selectedTracks());
 
-			  std::vector<Measurement1D> trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
+	      std::vector<Measurement1D> trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
+	      
+	      
 
               if (!tracks.empty())
-              {
-                if ( (trackIP)[0].significance() >= 0 )
-                  fS8evt->btag_TrkCounting_disc3D_1trk_is.push_back( classifier_.evaluate(tracks[0]).flags() );
-              }
-  		      if (tracks.size() > 1)
-  		      {
-  		      	if ( (trackIP)[1].significance() >= 0 )
-  		          fS8evt->btag_TrkCounting_disc3D_2trk_is.push_back( classifier_.evaluate(tracks[1]).flags() );
-  		      }
-  		      if (tracks.size() > 2)
-  		      {
-  		      	if ( (trackIP)[2].significance() >= 0 )  		      	
-  		          fS8evt->btag_TrkCounting_disc3D_3trk_is.push_back( classifier_.evaluate(tracks[2]).flags() ); 
-  		      } 
+		{
+		  if ( (trackIP)[0].significance() >= 0 )
+		  //if(iptrack1 >=0)
+		    fS8evt->btag_TrkCounting_disc3D_1trk_is.push_back( classifier_.evaluate(tracks[0]).flags() );
+		}
+	      if (tracks.size() > 1)
+		{
+		  if ( (trackIP)[1].significance() >= 0 )
+		    fS8evt->btag_TrkCounting_disc3D_2trk_is.push_back( classifier_.evaluate(tracks[1]).flags() );
+		}
+	      if (tracks.size() > 2)
+		{
+		  if ( (trackIP)[2].significance() >= 0 )  		      	
+		    fS8evt->btag_TrkCounting_disc3D_3trk_is.push_back( classifier_.evaluate(tracks[2]).flags() ); 
+		} 
               if (!tracks.empty())
-              {
-  		        if ( (trackIP)[tracks.size()-1].significance() < 0 )  		      	
-                  fS8evt->btag_NegTag_disc3D_1trk_is.push_back( classifier_.evaluate(tracks[tracks.size()-1]).flags() );
-              }
+		{
+		  if ( (trackIP)[tracks.size()-1].significance() < 0 )  		      	
+		    fS8evt->btag_NegTag_disc3D_1trk_is.push_back( classifier_.evaluate(tracks[tracks.size()-1]).flags() );
+		}
               if (tracks.size() > 1)
-              {
-  		        if ( (trackIP)[tracks.size()-2].significance() < 0 )              	
-                  fS8evt->btag_NegTag_disc3D_2trk_is.push_back( classifier_.evaluate(tracks[tracks.size()-2]).flags() );
-              }
+		{
+		  if ( (trackIP)[tracks.size()-2].significance() < 0 )              	
+		    fS8evt->btag_NegTag_disc3D_2trk_is.push_back( classifier_.evaluate(tracks[tracks.size()-2]).flags() );
+		}
               if (tracks.size() > 2)
-              {
-  		        if ( (trackIP)[tracks.size()-3].significance() < 0 )              	
-                  fS8evt->btag_NegTag_disc3D_3trk_is.push_back( classifier_.evaluate(tracks[tracks.size()-3]).flags() );                                
-              }
+		{
+		  if ( (trackIP)[tracks.size()-3].significance() < 0 )              	
+		    fS8evt->btag_NegTag_disc3D_3trk_is.push_back( classifier_.evaluate(tracks[tracks.size()-3]).flags() );                                
+		}
               
               std::vector<bool> posFlags, negFlags;
               
               for (std::size_t i = 0; i < tracks.size(); ++i)
-              {
-              	std::vector<bool> const & flags = classifier_.evaluate(tracks[i]).flags();
-                if (!i) 
-                {
-                  posFlags.resize(flags.size(), false);
-                  negFlags.resize(flags.size(), false);
-                }
-                
-                double significance = (trackIP)[i].significance();
-                
-                for (std::size_t j = 0; j < flags.size(); ++j)
-                  if ( significance >= 0.0 )
-                    posFlags[j] = posFlags[j] | flags[j];
-                  else
-                    negFlags[j] = negFlags[j] | flags[j];
-              }
+		{
+		  std::vector<bool> const & flags = classifier_.evaluate(tracks[i]).flags();
+		  if (!i) 
+		    {
+		      posFlags.resize(flags.size(), false);
+		      negFlags.resize(flags.size(), false);
+		    }
+		  
+		  double significance = (trackIP)[i].significance();
+		  
+		  for (std::size_t j = 0; j < flags.size(); ++j)
+		    if ( significance >= 0.0 )
+		      posFlags[j] = posFlags[j] | flags[j];
+		    else
+		      negFlags[j] = negFlags[j] | flags[j];
+		}
               
               fS8evt->jet_posTrack_categories.push_back(posFlags);
               fS8evt->jet_negTrack_categories.push_back(negFlags);
             }
-
-			if ( moduleLabel == "trackCountingHighEffJetTags" ) 
-			{
-			  std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
-			  if((trackIP).size()>=2)
-			  {
-			    float iptrack1 = (trackIP)[0].significance();
-			    fS8evt->btag_TrkCounting_disc3D_1trk.push_back( iptrack1 );
-			  	// If hepMC exist get the track categories.
-			  }
-			  fS8evt->btag_TrkCounting_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D 
-			  gotTCHE = true;
-			}
-			else if ( moduleLabel == "trackCountingHighPurJetTags" )
-			{
-				fS8evt->btag_TrkCounting_disc3D_3trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 3rd trk, 3D
-			  	// If hepMC exist get the track categories.
-				gotTCHP = true;
-			}
-			else if ( moduleLabel == "modifiedtrackCountingHighEffJetTags" ) 
-			{
-			  std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
-			  if((trackIP).size()>=2)
-			  {
-			    float iptrack1 = (trackIP)[0].significance();
-			    fS8evt->btag_ModTrkCounting_disc3D_1trk.push_back( iptrack1 );
-			  	// If hepMC exist get the track categories.
-			  }
-			  fS8evt->btag_ModTrkCounting_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D 
-			  gotMTCHE = true;
-			}
-			else if ( moduleLabel == "modifiedtrackCountingHighPurJetTags" )
-			{
-				fS8evt->btag_ModTrkCounting_disc3D_3trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 3rd trk, 3D
-				gotMTCHP = true;
-			}
-			else if ( moduleLabel == "negativeTrackCounting2ndTrck" )
-			{
-			  std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
-			  if((trackIP).size()>=2)
-			  {
-			    float iptrack1 = (trackIP)[(trackIP).size()-1].significance();
-			    fS8evt->btag_NegTag_disc3D_1trk.push_back( iptrack1 );
-			  }
-			  //std::cout << "discri neg tc " << (*jetTags)[ith_tagged].discriminator() << std::endl;
-			  fS8evt->btag_NegTag_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D
-			  gotTCHEneg = true;
-			}
-			else if ( moduleLabel == "negativeTrackCounting3rdTrck" )
-			{	
-	 		    std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
+	    
+	    if ( moduleLabel == "trackCountingHighEffJetTags" ) 
+	      {
+		std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
+		double iptrack1 = -1000;
+		for(int i=0; i<(trackIP).size(); i++){
+		  if((trackIP)[i].significance() > iptrack1) iptrack1 = (trackIP)[i].significance();
+		  //std::cout << "(trackIP)["<<i<<"].significance() " << (trackIP)[i].significance() << std::endl;
+		}
+		if((trackIP).size()>=2)
+		  {
+		    //float iptrack1 = (trackIP)[0].significance();
+		    fS8evt->btag_TrkCounting_disc3D_1trk.push_back( iptrack1 );
+		    // If hepMC exist get the track categories.
+		  }
+		fS8evt->btag_TrkCounting_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D 
+		gotTCHE = true;
+	      }
+	    else if ( moduleLabel == "trackCountingHighPurJetTags" )
+	      {
+		fS8evt->btag_TrkCounting_disc3D_3trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 3rd trk, 3D
+		// If hepMC exist get the track categories.
+		gotTCHP = true;
+	      }
+	    else if ( moduleLabel == "modifiedtrackCountingHighEffJetTags" ) 
+	      {
+		std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
+		if((trackIP).size()>=2)
+		  {	
+		    double iptrack1 = -1000;
+		    for(int i=0; i<(trackIP).size(); i++){
+		      if((trackIP)[i].significance() > iptrack1) iptrack1 = (trackIP)[i].significance();
+		      //std::cout << "(trackIP)["<<i<<"].significance() " << (trackIP)[i].significance() << std::endl;
+		    }
+		    
+		    //float iptrack1 = (trackIP)[0].significance();
+		    fS8evt->btag_ModTrkCounting_disc3D_1trk.push_back( iptrack1 );
+		    // If hepMC exist get the track categories.
+		  }
+		fS8evt->btag_ModTrkCounting_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D 
+		gotMTCHE = true;
+	      }
+	    else if ( moduleLabel == "modifiedtrackCountingHighPurJetTags" )
+	      {
+		fS8evt->btag_ModTrkCounting_disc3D_3trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 3rd trk, 3D
+		gotMTCHP = true;
+	      }
+	    else if ( moduleLabel == "negativeTrackCounting2ndTrck" )
+	      {
+		std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
+		if((trackIP).size()>=2)
+		  {
+		    float iptrack1 = (trackIP)[(trackIP).size()-1].significance();
+		    fS8evt->btag_NegTag_disc3D_1trk.push_back( iptrack1 );
+		  }
+		//std::cout << "discri neg tc " << (*jetTags)[ith_tagged].discriminator() << std::endl;
+		fS8evt->btag_NegTag_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D
+		gotTCHEneg = true;
+	      }
+	    else if ( moduleLabel == "negativeTrackCounting3rdTrck" )
+	      {	
+		std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
 				fS8evt->btag_NegTag_disc3D_3trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 3rd trk, 3D
 				gotTCHPneg = true;
-			}
-			//*********************************
-			// Jet Probability taggers
-			//*********************************
-			else if ( moduleLabel == "jetProbabilityJetTags" ) {
-
-				fS8evt->btag_JetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
-				
-				gotJP = true;
-
-				std::string moduleLabel = (jetTags).provenance()->moduleLabel();
-				
-				int NtrksInJet = (*jetTags)[ith_tagged].tracks().size();
-				fS8evt->jet_ntrks.push_back( NtrksInJet );
-				fS8evt->trackProbaVector_Size.push_back((*tagInfo)[ith_tagged].probabilities(0).size());
-				if(StoreTrackProba_){
-				  int i=0;
-				  std::vector< float > track_proba = (*tagInfo)[ith_tagged].probabilities(0) ;
-				  std::vector< float > probabilities;
-				  for(std::vector<float>::const_iterator it = track_proba.begin(); it!=track_proba.end(); ++it, i++){
-				    
-				    double delta  = -2.; 
-				    delta = ROOT::Math::VectorUtil::DeltaR( (*(*jetTags)[ith_tagged].jet()).p4().Vect(), (*(*jetTags)[ith_tagged].tracks()[i]).momentum());
-				    if(delta <0.3) probabilities.push_back((*it));	    
-				    
-				  }
-				  fS8evt->jet_Tracks_Probability.push_back(probabilities);
-				}
-				
-			}
-			else if ( moduleLabel == "jetProbabilityJetTagsNegativeOnly" ) {
-			  
-			  fS8evt->btag_negJetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
-			  
-			  gotJPneg = true;
-			  
-			}
-			else if ( moduleLabel == "jetProbabilityJetTagsPositiveOnly" ) {
-			  
-			  fS8evt->btag_posJetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
-			  
-			  gotJPpos = true;
-			  
-			}
-			//*********************************
-			// SoftLeptons Taggers 
-			//*********************************
-			else if ( moduleLabel == "softMuonJetTags" ) {
-
-				fS8evt->btag_SoftMuon_disc.push_back( (*jetTags)[ith_tagged].discriminator());
-
-				gotSMT = true;
-
-			}			
+	      }
+	    //*********************************
+	    // Jet Probability taggers
+	    //*********************************
+	    else if ( moduleLabel == "jetProbabilityJetTags" ) {
+	      
+	      fS8evt->btag_JetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
+	      
+	      gotJP = true;
+	      
+	      std::string moduleLabel = (jetTags).provenance()->moduleLabel();
+	      
+	      int NtrksInJet = (*jetTags)[ith_tagged].tracks().size();
+	      fS8evt->jet_ntrks.push_back( NtrksInJet );
+	      fS8evt->trackProbaVector_Size.push_back((*tagInfo)[ith_tagged].probabilities(0).size());
+	      if(StoreTrackProba_){
+		int i=0;
+		std::vector< float > track_proba = (*tagInfo)[ith_tagged].probabilities(0) ;
+		std::vector< float > probabilities;
+		for(std::vector<float>::const_iterator it = track_proba.begin(); it!=track_proba.end(); ++it, i++){
+		  
+		  double delta  = -2.; 
+		  delta = ROOT::Math::VectorUtil::DeltaR( (*(*jetTags)[ith_tagged].jet()).p4().Vect(), (*(*jetTags)[ith_tagged].tracks()[i]).momentum());
+		  if(delta <0.3) probabilities.push_back((*it));	    
+		  
 		}
-
+		fS8evt->jet_Tracks_Probability.push_back(probabilities);
+	      }
+	      
+	    }
+	    else if ( moduleLabel == "jetProbabilityJetTagsNegativeOnly" ) {
+	      
+	      fS8evt->btag_negJetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
+	      
+	      gotJPneg = true;
+	      
+	    }
+	    else if ( moduleLabel == "jetProbabilityJetTagsPositiveOnly" ) {
+	      
+	      fS8evt->btag_posJetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
+	      
+	      gotJPpos = true;
+	      
+	    }
+	    //*********************************
+	    // SoftLeptons Taggers 
+	    //*********************************
+	    else if ( moduleLabel == "softMuonJetTags" ) {
+	      
+	      fS8evt->btag_SoftMuon_disc.push_back( (*jetTags)[ith_tagged].discriminator());
+	      
+	      gotSMT = true;
+	      
+	    }			
+		}
+		
 		//FillHistos("n",p4MuJet, ptrel, JetFlavor,isbTaggedJet);
 		
 		if (!gotTCHE)    fS8evt->btag_TrkCounting_disc3D_2trk.push_back( -9999. );
