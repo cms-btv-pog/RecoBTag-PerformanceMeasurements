@@ -53,9 +53,9 @@ bool compare = false;
 TString  referenceFile    = "/localscratch/s/speer/top_eff/crab_top_data/CSA07_10pb/semiLepton/plots_obs/final_btag_plots.root";
 
 bool useSystFiles = false;
-const int syst = 2;
-const char*     systFiles[syst]= { "./syst_lumi10pb.root",
-  "/localscratch/s/speer/top_eff/crab_top_data/CSA07_100pb/semiLepton/plots_obs_xsect/syst_xsect.root" };
+const int syst = 1;
+const char*     systFiles[syst]= { //"./syst_lumi10pb.root",
+  "/localscratch/s/speer/top_eff/crab_top_data/CSA07_10pb/diLepton/L30_J30_robust_xsect/final_btag_xsect.root" };
 
 
 //observable histogram variables
@@ -88,6 +88,7 @@ vector<const char*> obsFits;
 void compute(TH1F *b_effH, TH1F *tagged_jetsH, TH1F *b_fractionH, TH1F *eff_nonBH);	
 void computeStatError(TH1F *b_eff_errH, TH1F *tagged_jetsH, TH1F *b_fractionH);
 void computeSystError_nonBtaggingEff(TH1F *b_eff_errH, TH1F *tagged_jetsH, TH1F *b_fractionH, TH1F *eff_nonBH);
+void computeSystError_purity(TH1F *b_eff_errH, TH1F *tagged_jetsH,  TH1F *b_fractionH, TH1F *eff_nonBH, TH1F *b_frac_errH);
 void addSystError(TH1F *b_eff_errH, TH1F *new_systH);
 
 void totalError(TH1F *b_effH, TH1F* b_eff_totH, TH1F *b_eff_statH, TH1F *b_eff_systH);
@@ -116,6 +117,8 @@ int main( int argc, const char* argv[]) {
     if (strncmp(argv[i],"-s",2)==0) useSystFiles = true;
     if (strncmp(argv[i],"-h",2)==0) {
       cout << " -d datafile -m mcFile -o output_file -c compare_file\n";
+      cout << " -v : verbose \n -s : use systematic files\n";
+      exit(1);
     }
   }
   
@@ -276,39 +279,56 @@ delete theFile;
   }
 ////////////
 
-  vector<TtEtEtaHistoCollector*> difference;	// Difference
+//   vector<TtEtEtaHistoCollector*> difference;	// Difference
+  TtEtEtaHistoCollector* b_fraction_diff;
   if (compare) {
-    vector<TtEtEtaHistoCollector*> eff_B_ref;	// eff_B of reference
+//     vector<TtEtEtaHistoCollector*> eff_B_ref;	// eff_B of reference
     if (debug) cout << "Comparison with reference (for systematics): " << referenceFile << endl;
     theFile = new TFile (referenceFile) ;
-    for (int iWP = 0; iWP != wp; ++iWP) {
-      eff_B_ref.push_back(new TtEtEtaHistoCollector("eff_B_"+bTagger[iWP], etRanges, etaRanges,
-	lrMin, lrMax, lrBins, true) ) ;
-      difference.push_back(eff_B_ref[iWP]->buildDiffCollector(
-		TString("difference_")+bTagger[iWP], *eff_B[iWP]) ) ;
-    }
+    TtEtEtaHistoCollector* b_fraction_ref = new TtEtEtaHistoCollector(TString("B_Purity"),
+      etRanges, etaRanges, lrMin, lrMax, lrBins, true);
+    b_fraction_diff = b_fraction_ref->buildDiffCollector(
+      TString("b_fraction_diff"), *b_fraction);
+    delete b_fraction_ref;
+//     for (int iWP = 0; iWP != wp; ++iWP) {
+//       eff_B_ref.push_back(new TtEtEtaHistoCollector("eff_B_"+bTagger[iWP], etRanges, etaRanges,
+// 	lrMin, lrMax, lrBins, true) ) ;
+//       difference.push_back(eff_B_ref[iWP]->buildDiffCollector(
+// 		TString("difference_")+bTagger[iWP], *eff_B[iWP]) ) ;
+//     }
     theFile->Close();
     delete theFile;
   }
 ////////////
+  TtEtEtaHistoCollector* b_frac_err;
   if (useSystFiles) {
+   b_frac_err = new TtEtEtaHistoCollector("b_frac_err", etRanges, etaRanges,
+      lrMin, lrMax, lrBins, false);
+
     for (int isyst = 0; isyst != syst; ++isyst) {
       if (debug) cout << "Systematics from file: " << systFiles[isyst] << endl;
-      theFile = new TFile (systFiles[isyst]) ;
-      for (int iWP = 0; iWP != wp; ++iWP) {
-	TtEtEtaHistoCollector * diff = new TtEtEtaHistoCollector("difference_"+bTagger[iWP], etRanges, etaRanges,
-	  lrMin, lrMax, lrBins, true);
-	for (TtEtEtaHistoCollector::BinHistoMapIter bin = eff_B_syst[iWP]->histoBegin();
-	    bin!=eff_B_syst[iWP]->histoEnd(); ++bin) {
-          addSystError(bin->second, diff->getHisto(*bin->first));
-	}
-	delete diff;
+      theFile = new TFile (systFiles[isyst]);
+      TtEtEtaHistoCollector* b_fraction_diff =
+        new TtEtEtaHistoCollector("b_fraction_diff", etRanges, etaRanges,
+		lrMin, lrMax, lrBins, true);
+      for (TtEtEtaHistoCollector::BinHistoMapIter bin = b_frac_err->histoBegin();
+	 bin!=b_frac_err->histoEnd(); ++bin) {
+        addSystError(bin->second, b_fraction_diff->getHisto(*bin->first));
       }
       theFile->Close();
+      delete b_fraction_diff;
       delete theFile;
-
+    }
+    for (int iWP = 0; iWP != wp; ++iWP) {
+      for (TtEtEtaHistoCollector::BinHistoMapIter bin = eff_B_syst[iWP]->histoBegin();
+	  bin!=eff_B_syst[iWP]->histoEnd(); ++bin) {
+        computeSystError_purity(bin->second, tagged_fraction[iWP]->getHisto(*bin->first),
+	  b_fraction->getHisto(*bin->first), eff_nonB[iWP]->getHisto(*bin->first),
+	  b_frac_err->getHisto(*bin->first) );
+      }
     }
   }
+  if (debug) cout << "Systematics done\n";
 
 ////////////
   for (int iWP = 0; iWP != wp; ++iWP) {
@@ -341,7 +361,8 @@ delete theFile;
   intLrBHistos->write();
   intAllLightHistos->write();
   b_fraction->write();
-
+  if (compare) b_fraction_diff->write();
+  if (useSystFiles) b_frac_err->write();
 
   for (unsigned int iWP = 0; iWP != bTagger.size(); ++iWP) {
     eff_nonB[iWP]->setLabels(TString("Cut on Combined LR"), TString("Mistag rate"));
@@ -364,7 +385,7 @@ delete theFile;
     eff_B_syst[iWP]->write();
     eff_B_tot[iWP]->write();
     eff_B_MC[iWP]->write();
-    if (compare) difference[iWP]->write();
+//     if (compare) difference[iWP]->write();
     if (doEps) {
       eff_nonB[iWP]->setLabels(TString("Cut on Combined LR"), TString("Mistag rate"));
       eff_nonB[iWP]->eps(epsType);
@@ -502,6 +523,30 @@ void computeSystError_nonBtaggingEff(TH1F *b_eff_errH, TH1F *tagged_jetsH, TH1F 
   }
 }
 
+void computeSystError_purity(TH1F *b_eff_errH, TH1F *tagged_jetsH,  TH1F *b_fractionH, TH1F *eff_nonBH, TH1F *b_frac_errH)
+{
+//  cout <<"Enter computeSyst "<<b_eff_errH->GetName()<<endl;
+//  cout <<"Enter computeSyst "<<tagged_jetsH->GetName()<<endl;
+//  cout <<"Enter computeSyst "<<b_fractionH->GetName()<<endl;
+//  cout <<"Enter computeSyst "<<eff_nonBH->GetName()<<endl;
+  int bins = b_eff_errH->GetNbinsX();
+  double tagged_jets, b_fraction, eff_nonB, b_frac_err;
+  double systErr;
+  for(int bin=0; bin<=bins+1; ++bin){
+    b_fraction = b_fractionH->GetBinContent(bin);
+    eff_nonB = eff_nonBH->GetBinContent(bin);
+    tagged_jets = tagged_jetsH->GetBinContent(bin);
+    b_frac_err = b_frac_errH->GetBinContent(bin);
+    if (b_fraction!=0.) {
+      systErr = sqrt(b_eff_errH->GetBinContent(bin) * b_eff_errH->GetBinContent(bin)
+	+ pow( (eff_nonB - tagged_jets)/b_fraction/b_fraction*b_frac_err, 2) );
+      b_eff_errH->SetBinContent(bin, systErr);
+    }
+//       cout << bin <<" "<<eff_nonB<<" "<<systErr<<" "<< b_fraction<<endl;
+  }
+}
+
+
 void addSystError(TH1F *b_eff_errH, TH1F *new_systH)
 {
   cout <<"Enter addSystError "<<b_eff_errH->GetName()<<endl;
@@ -509,10 +554,11 @@ void addSystError(TH1F *b_eff_errH, TH1F *new_systH)
   int bins = b_eff_errH->GetNbinsX();
   double error;
   for(int bin=0; bin<=bins+1; ++bin){
+//     cout << bin <<" "<<b_eff_errH->GetBinContent(bin)<<" "<< new_systH->GetBinContent(bin)<<" "<< sqrt(b_eff_errH->GetBinContent(bin) * b_eff_errH->GetBinContent(bin)
+// 	+ new_systH->GetBinContent(bin) * new_systH->GetBinContent(bin) )<<endl;
     error = sqrt(b_eff_errH->GetBinContent(bin) * b_eff_errH->GetBinContent(bin)
 	+ new_systH->GetBinContent(bin) * new_systH->GetBinContent(bin) );
     b_eff_errH->SetBinContent(bin, error);
-//       cout << bin <<" "<<eff_nonB<<" "<<systErr<<" "<< b_fraction<<endl;
   }
 }
 
