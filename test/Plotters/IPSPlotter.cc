@@ -22,7 +22,7 @@ void IPSPlotter::Book()
   ipsElse_ = new TH1F("ipsElse","Positive and negative tag IPS distribution for jet with ELSE tracks", 60, -10., 10.);
   ipsLight_ = new TH1F("ipslight","Positive and negative tag IPS distribution for jet with light tracks", 60, -10., 10.);
   ipsLambda_ = new TH1F("ipsLambda","Positive and negative tag IPS distribution for jet with Lambda tracks", 60, -10., 10.);
-  ipsDisplaced_ = new TH1F("ipsDisplaced","Positive and negative tag IPS distribution for jet with displaced tracks", 60, -10., 10.);
+  ipsInteraction_ = new TH1F("ipsInteraction","Positive and negative tag IPS distribution for jet with Interaction tracks", 60, -10., 10.);
   ipsConversion_ = new TH1F("ipsConversion","Positive and negative tag IPS distribution for jet with conversion tracks", 60, -10., 10.);
 }
 
@@ -31,71 +31,56 @@ void IPSPlotter::Fill(BTagEvent * event)
   // Loop over the jets
   for (Int_t i = 0; i<event->njets; ++i)
   {
-    if ( event->btag_TrkCounting_disc3D_2trk[i] >= 0 )
+  	if ( !event->btag_TrkCounting_disc3D_2trk.empty() )
+    {
       ips_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
-    if ( event->btag_NegTag_disc3D_2trk[i] < 0 )
-      ips_->Fill(event->btag_NegTag_disc3D_2trk[i]);
-  	  	
-    if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::BWeakDecay] )
-    {
-      if ( event->btag_TrkCounting_disc3D_2trk[i] >= 0 )
+         
+      if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::BWeakDecay] )
         ipsB_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
-      if ( event->btag_NegTag_disc3D_2trk[i] < 0 )
-        ipsB_->Fill(event->btag_NegTag_disc3D_2trk[i]);
-    } 
-    else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::KsDecay] )
-    {
-      if ( event->btag_TrkCounting_disc3D_2trk[i] >= 0 )
+      else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::KsDecay] )
         ipsKs_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
-      if ( event->btag_NegTag_disc3D_2trk[i] < 0 )
-        ipsKs_->Fill(event->btag_NegTag_disc3D_2trk[i]);
-    }
-    else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::Conversion] )
-    {
-      if ( event->btag_TrkCounting_disc3D_2trk[i] >= 0 )
+      else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::Conversion] )
         ipsConversion_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
-      if ( event->btag_NegTag_disc3D_2trk[i] < 0 )
-        ipsConversion_->Fill(event->btag_NegTag_disc3D_2trk[i]);      
-    }
-    else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::LambdaDecay] )
-    {
-      if ( event->btag_TrkCounting_disc3D_2trk[i] >= 0 )
+      else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::LambdaDecay] )
         ipsLambda_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
-      if ( event->btag_NegTag_disc3D_2trk[i] < 0 )
-        ipsLambda_->Fill(event->btag_NegTag_disc3D_2trk[i]);      
-    }
-    else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::Interaction] )
-    {
-      if ( event->btag_TrkCounting_disc3D_2trk[i] >= 0 )
-        ipsDisplaced_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
-      if ( event->btag_NegTag_disc3D_2trk[i] < 0 )
-        ipsDisplaced_->Fill(event->btag_NegTag_disc3D_2trk[i]);      
-    }
-    else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::CWeakDecay] )
-    {
-      if ( event->btag_TrkCounting_disc3D_2trk[i] >= 0 )
+      else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::Interaction] )
+        ipsInteraction_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
+      else if ( event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::CWeakDecay] )
         ipsC_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
-      if ( event->btag_NegTag_disc3D_2trk[i] < 0 )
-        ipsC_->Fill(event->btag_NegTag_disc3D_2trk[i]);      
-    }
-    else if (
-      !event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::BWeakDecay] &&
-      !event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::CWeakDecay]
-    )
-    {
-      if ( event->btag_TrkCounting_disc3D_2trk[i] >= 0 )
+      else if (
+        !event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::BWeakDecay] &&
+        !event->btag_TrkCounting_disc3D_2trk_is[i][TrackCategories::CWeakDecay]
+      )
         ipsLight_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
-      if ( event->btag_NegTag_disc3D_2trk[i] < 0 )
-        ipsLight_->Fill(event->btag_NegTag_disc3D_2trk[i]);      
-    }
-    else
-    {
-      if ( event->btag_TrkCounting_disc3D_2trk[i] >= 0 )
+      else
         ipsElse_->Fill(event->btag_TrkCounting_disc3D_2trk[i]);
-      if ( event->btag_NegTag_disc3D_2trk[i] < 0 )
-        ipsElse_->Fill(event->btag_NegTag_disc3D_2trk[i]);      
-    }    
-  }
+    }
+
+  	if ( !event->btag_NegTag_disc3D_2trk.empty() )
+    {
+      ips_->Fill(event->btag_NegTag_disc3D_2trk[i]);
+       
+      if ( event->btag_NegTag_disc3D_2trk_is[i][TrackCategories::BWeakDecay] )
+        ipsB_->Fill(event->btag_NegTag_disc3D_2trk[i]);
+      else if ( event->btag_NegTag_disc3D_2trk_is[i][TrackCategories::KsDecay] )
+        ipsKs_->Fill(event->btag_NegTag_disc3D_2trk[i]);
+      else if ( event->btag_NegTag_disc3D_2trk_is[i][TrackCategories::Conversion] )
+        ipsConversion_->Fill(event->btag_NegTag_disc3D_2trk[i]);
+      else if ( event->btag_NegTag_disc3D_2trk_is[i][TrackCategories::LambdaDecay] )
+        ipsLambda_->Fill(event->btag_NegTag_disc3D_2trk[i]);
+      else if ( event->btag_NegTag_disc3D_2trk_is[i][TrackCategories::Interaction] )
+        ipsInteraction_->Fill(event->btag_NegTag_disc3D_2trk[i]);
+      else if ( event->btag_NegTag_disc3D_2trk_is[i][TrackCategories::CWeakDecay] )
+        ipsC_->Fill(event->btag_NegTag_disc3D_2trk[i]);
+      else if (
+        !event->btag_NegTag_disc3D_2trk_is[i][TrackCategories::BWeakDecay] &&
+        !event->btag_NegTag_disc3D_2trk_is[i][TrackCategories::CWeakDecay]
+      )
+        ipsLight_->Fill(event->btag_NegTag_disc3D_2trk[i]);
+      else
+        ipsElse_->Fill(event->btag_NegTag_disc3D_2trk[i]);
+    }
+  }   
 }
 
 void IPSPlotter::Write()
@@ -112,7 +97,7 @@ void IPSPlotter::Write()
   ipsElse_->Write();
   ipsLight_->Write();
   ipsLambda_->Write();
-  ipsDisplaced_->Write();
+  ipsInteraction_->Write();
   ipsConversion_->Write();
 
   // Creating a stack plot with all the contributions
@@ -120,7 +105,8 @@ void IPSPlotter::Write()
   
   // Adding the contributions to the stack
   ipsB_->SetLineColor(kBlue);
-  ipsB_->Scale(1./ipsB_->Integral());  stack->Add(ipsB_);
+  ipsB_->Scale(1./ipsB_->Integral());
+  stack->Add(ipsB_);
 
   ipsKs_->SetLineColor(kMagenta);
   ipsKs_->Scale(1./ipsKs_->Integral());
@@ -134,9 +120,9 @@ void IPSPlotter::Write()
   ipsConversion_->Scale(1./ipsConversion_->Integral());  
   stack->Add(ipsConversion_);
 
-  ipsDisplaced_->SetLineColor(kRed);
-  ipsDisplaced_->Scale(1./ipsDisplaced_->Integral());
-  stack->Add(ipsDisplaced_);
+  ipsInteraction_->SetLineColor(kRed);
+  ipsInteraction_->Scale(1./ipsInteraction_->Integral());
+  stack->Add(ipsInteraction_);
 
   ipsC_->SetLineColor(kGreen);
   ipsC_->Scale(1./ipsC_->Integral());  

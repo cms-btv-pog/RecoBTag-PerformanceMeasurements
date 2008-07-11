@@ -29,7 +29,7 @@ class IPSPlotter : public BasePlotter {
   TH1F * ipsElse_;
   TH1F * ipsLight_;
   TH1F * ipsLambda_;
-  TH1F * ipsDisplaced_;
+  TH1F * ipsInteraction_;
   TH1F * ipsConversion_;
   
 };

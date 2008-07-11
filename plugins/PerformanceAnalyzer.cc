@@ -998,6 +998,7 @@ void PerformanceAnalyzer::FillHistos(std::string type, TLorentzVector p4MuJet, d
 	
 }
 
+
 JetFlavour PerformanceAnalyzer::getMatchedParton(const reco::CaloJet &jet)
 {
   JetFlavour jetFlavour;
@@ -1038,6 +1039,23 @@ JetFlavour PerformanceAnalyzer::getMatchedParton(const reco::CaloJet &jet)
   return jetFlavour;
 }
 
+
+//-----------------
+// Sorting tracks for TrackHistory application based on TrackIPTagInfo 21X_pre7
+static std::vector<std::size_t> sortedIndexes(std::vector<Measurement1D> const & values) 
+{
+  std::multimap<float, std::size_t> sortedIdx;
+  std::vector<std::size_t> result;
+ 
+  for(size_t i = 0; i < values.size(); ++i)
+    sortedIdx.insert( std::pair<float, std::size_t>(values[i].significance(), i) );
+
+  for(std::multimap<float, std::size_t>::reverse_iterator it = sortedIdx.rbegin(); it != sortedIdx.rend(); ++it)
+    result.push_back(it->second);
+
+  return result;
+}
+//-----------------
 
 
 // ------------ method called to produce the data  ------------
@@ -1487,25 +1505,14 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 		
 		// b tagging
 		int ith_tagged = -1;
-		//int isbtagged = 0;
-
-		bool gotTCHE     = false;
-		bool gotTCHEneg  = false;
-		bool gotTCHP     = false;
-		bool gotTCHPneg  = false;
-		bool gotJP       = false;
-		bool gotJPneg    = false;
-		bool gotJPpos    = false;
-		bool gotSMT      = false;
-		bool gotMTCHE     = false;
-		bool gotMTCHP     = false;
 
 		// use calibrated jet
 		TVector3 tmpvec, tmpvecOrg(jet->p4().Vect().X(), jet->p4().Vect().Y(), jet->p4().Vect().Z());
 		tmpvec = jetcorrection * tmpvecOrg;
 
 		//start loop over all jetTags	
-		for (size_t k=0; k<jetTags_testManyByType.size(); k++) {
+		for (size_t k=0; k<jetTags_testManyByType.size(); k++) 
+		{
 			edm::Handle<std::vector<reco::JetTag> > jetTags = jetTags_testManyByType[k];
 			
 			ith_tagged = this->TaggedJet(*jet,jetTags);
@@ -1584,205 +1591,281 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 			//*********************************
 			// Track Counting taggers
 			//*********************************
+            
+            // Value and undefine values
+            double const undefined = -9999.0; 
+            
+            // Get the all track ips
+	        std::vector<Measurement1D> trackIP( (*tagInfo)[ith_tagged].impactParameters(0) );
+	        
+            // Get vector reference to the selected tracks in IPtagInfo	
+            TrackRefVector tracks( (*tagInfo)[ith_tagged].selectedTracks() );
 
-            // Collect track history for the first and last 3 tracks.
-            if (flavourMatchOptionf == "hepMC")
+	        // Get the index sorting them by ips
+	        std::vector<std::size_t> indexes( sortedIndexes(trackIP) );
+
+            // Get the information for the given tag
+            if (
+              moduleLabel == "trackCountingHighEffJetTags" ||
+              moduleLabel == "trackCountingHighPurJetTags" ||             
+              moduleLabel == "modifiedtrackCountingHighEffBJetTags" ||
+              moduleLabel == "modifiedtrackCountingHighPurBJetTags"
+            ) 
             {
-              TrackRefVector tracks((*tagInfo)[ith_tagged].selectedTracks());
-
-	      std::vector<Measurement1D> trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
-	      
-	      
-
+              // Set the initial values	
+              double value = undefined;
+              // Flag vector
+              TrackCategories::Flags flags;
+	
+              // If there is a least one track		
               if (!tracks.empty())
-		{
-		  if ( (trackIP)[0].significance() >= 0 )
-		  //if(iptrack1 >=0)
-		    fS8evt->btag_TrkCounting_disc3D_1trk_is.push_back( classifier_.evaluate(tracks[0]).flags() );
-		}
-	      if (tracks.size() > 1)
-		{
-		  if ( (trackIP)[1].significance() >= 0 )
-		    fS8evt->btag_TrkCounting_disc3D_2trk_is.push_back( classifier_.evaluate(tracks[1]).flags() );
-		}
-	      if (tracks.size() > 2)
-		{
-		  if ( (trackIP)[2].significance() >= 0 )  		      	
-		    fS8evt->btag_TrkCounting_disc3D_3trk_is.push_back( classifier_.evaluate(tracks[2]).flags() ); 
-		} 
-              if (!tracks.empty())
-		{
-		  if ( (trackIP)[tracks.size()-1].significance() < 0 )  		      	
-		    fS8evt->btag_NegTag_disc3D_1trk_is.push_back( classifier_.evaluate(tracks[tracks.size()-1]).flags() );
-		}
+              {
+              	// Get the ips for the track
+		        double tmpvalue = trackIP[indexes[0]].significance();
+		        // Get the value and history of the track
+                if (tmpvalue >= 0)
+                {
+                  value = tmpvalue;	
+ 		          if ( flavourMatchOptionf == "hepMC" )
+		            flags = classifier_.evaluate( tracks[indexes[0]] ).flags();
+                }
+              }
+              
+              // Set the values in the BTagEvent
+              if (
+                moduleLabel == "modifiedtrackCountingHighEffBJetTags" ||
+                moduleLabel == "modifiedtrackCountingHighPurBJetTags"
+              )
+              {
+                fS8evt->btag_ModTrkCounting_disc3D_1trk.push_back(value);
+              	fS8evt->btag_ModTrkCounting_disc3D_1trk_is.push_back(flags);
+              }
+              else
+              {
+                fS8evt->btag_TrkCounting_disc3D_1trk.push_back(value);
+                fS8evt->btag_TrkCounting_disc3D_1trk_is.push_back(flags);
+              }
+ 
+              // Reset the value a flags
+              value = undefined; flags.clear();
+ 
+              // If there is a least one track		
               if (tracks.size() > 1)
-		{
-		  if ( (trackIP)[tracks.size()-2].significance() < 0 )              	
-		    fS8evt->btag_NegTag_disc3D_2trk_is.push_back( classifier_.evaluate(tracks[tracks.size()-2]).flags() );
-		}
-              if (tracks.size() > 2)
-		{
-		  if ( (trackIP)[tracks.size()-3].significance() < 0 )              	
-		    fS8evt->btag_NegTag_disc3D_3trk_is.push_back( classifier_.evaluate(tracks[tracks.size()-3]).flags() );                                
-		}
+              {
+              	// Get the ips for the track
+		        double tmpvalue = trackIP[indexes[1]].significance();
+		        // Get the value and history of the track
+                if (tmpvalue >= 0)
+                {
+                  value = tmpvalue;	
+ 		          if ( flavourMatchOptionf == "hepMC" )
+		            flags = classifier_.evaluate( tracks[indexes[1]] ).flags();
+                }
+              }
+
+              // Set the values in the BTagEvent
+              if (
+                moduleLabel == "modifiedtrackCountingHighEffBJetTags" ||
+                moduleLabel == "modifiedtrackCountingHighPurBJetTags"
+              )
+              {
+                fS8evt->btag_ModTrkCounting_disc3D_2trk.push_back(value);
+              	fS8evt->btag_ModTrkCounting_disc3D_2trk_is.push_back(flags);
+              }
+              else
+              {
+                fS8evt->btag_TrkCounting_disc3D_2trk.push_back(value);
+                fS8evt->btag_TrkCounting_disc3D_2trk_is.push_back(flags);              	
+              }
               
-              std::vector<bool> posFlags, negFlags;
-              
-              for (std::size_t i = 0; i < tracks.size(); ++i)
-		{
-		  std::vector<bool> const & flags = classifier_.evaluate(tracks[i]).flags();
-		  if (!i) 
-		    {
-		      posFlags.resize(flags.size(), false);
-		      negFlags.resize(flags.size(), false);
-		    }
-		  
-		  double significance = (trackIP)[i].significance();
-		  
-		  for (std::size_t j = 0; j < flags.size(); ++j)
-		    if ( significance >= 0.0 )
-		      posFlags[j] = posFlags[j] | flags[j];
-		    else
-		      negFlags[j] = negFlags[j] | flags[j];
-		}
-              
-              fS8evt->jet_posTrack_categories.push_back(posFlags);
-              fS8evt->jet_negTrack_categories.push_back(negFlags);
+              // Add the their track value and history in case of high purity
+              if ( 
+                moduleLabel == "trackCountingHighPurJetTags" ||
+                moduleLabel == "modifiedtrackCountingHighPurBJetTags"  
+              ) 
+              {
+                // Reset the value a flags
+                value = undefined; flags.clear();
+ 
+                // If there is a least one track		
+                if (tracks.size() > 2)
+                {
+              	  // Get the ips for the track
+		          double tmpvalue = trackIP[indexes[2]].significance();
+		          // Get the value and history of the track
+                  if (tmpvalue >= 0)
+                  {
+                    value = tmpvalue;	
+ 		            if ( flavourMatchOptionf == "hepMC" )
+		              flags = classifier_.evaluate( tracks[indexes[2]] ).flags();
+                  }
+                }
+ 
+                // Set the values in the BTagEvent
+                if (moduleLabel == "modifiedtrackCountingHighPurBJetTags")
+                {
+                  fS8evt->btag_ModTrkCounting_disc3D_2trk.push_back(value);
+              	  fS8evt->btag_ModTrkCounting_disc3D_2trk_is.push_back(flags);
+                }
+                else
+                {
+                  fS8evt->btag_TrkCounting_disc3D_2trk.push_back(value);
+                  fS8evt->btag_TrkCounting_disc3D_2trk_is.push_back(flags);              	
+                }
+              }
             }
-	    
-	    if ( moduleLabel == "trackCountingHighEffJetTags" ) 
-	      {
-		std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
-		double iptrack1 = -1000;
-		for(int i=0; i<(trackIP).size(); i++){
-		  if((trackIP)[i].significance() > iptrack1) iptrack1 = (trackIP)[i].significance();
-		  //std::cout << "(trackIP)["<<i<<"].significance() " << (trackIP)[i].significance() << std::endl;
-		}
-		if((trackIP).size()>=2)
-		  {
-		    //float iptrack1 = (trackIP)[0].significance();
-		    fS8evt->btag_TrkCounting_disc3D_1trk.push_back( iptrack1 );
-		    // If hepMC exist get the track categories.
-		  }
-		fS8evt->btag_TrkCounting_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D 
-		gotTCHE = true;
-	      }
-	    else if ( moduleLabel == "trackCountingHighPurJetTags" )
-	      {
-		fS8evt->btag_TrkCounting_disc3D_3trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 3rd trk, 3D
-		// If hepMC exist get the track categories.
-		gotTCHP = true;
-	      }
-	    else if ( moduleLabel == "modifiedtrackCountingHighEffJetTags" ) 
-	      {
-		std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
-		if((trackIP).size()>=2)
-		  {	
-		    double iptrack1 = -1000;
-		    for(int i=0; i<(trackIP).size(); i++){
-		      if((trackIP)[i].significance() > iptrack1) iptrack1 = (trackIP)[i].significance();
-		      //std::cout << "(trackIP)["<<i<<"].significance() " << (trackIP)[i].significance() << std::endl;
-		    }
-		    
-		    //float iptrack1 = (trackIP)[0].significance();
-		    fS8evt->btag_ModTrkCounting_disc3D_1trk.push_back( iptrack1 );
-		    // If hepMC exist get the track categories.
-		  }
-		fS8evt->btag_ModTrkCounting_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D 
-		gotMTCHE = true;
-	      }
-	    else if ( moduleLabel == "modifiedtrackCountingHighPurJetTags" )
-	      {
-		fS8evt->btag_ModTrkCounting_disc3D_3trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 3rd trk, 3D
-		gotMTCHP = true;
-	      }
-	    else if ( moduleLabel == "negativeTrackCounting2ndTrck" )
-	      {
-		std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
-		if((trackIP).size()>=2)
-		  {
-		    float iptrack1 = (trackIP)[(trackIP).size()-1].significance();
-		    fS8evt->btag_NegTag_disc3D_1trk.push_back( iptrack1 );
-		  }
-		//std::cout << "discri neg tc " << (*jetTags)[ith_tagged].discriminator() << std::endl;
-		fS8evt->btag_NegTag_disc3D_2trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 2nd trk, 3D
-		gotTCHEneg = true;
-	      }
-	    else if ( moduleLabel == "negativeTrackCounting3rdTrck" )
-	      {	
-		std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
-				fS8evt->btag_NegTag_disc3D_3trk.push_back( (*jetTags)[ith_tagged].discriminator() ); // 3rd trk, 3D
-				gotTCHPneg = true;
-	      }
-	    //*********************************
-	    // Jet Probability taggers
-	    //*********************************
-	    else if ( moduleLabel == "jetProbabilityJetTags" ) {
-	      
-	      fS8evt->btag_JetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
-	      
-	      gotJP = true;
-	      
-	      std::string moduleLabel = (jetTags).provenance()->moduleLabel();
-	      
-	      int NtrksInJet = (*jetTags)[ith_tagged].tracks().size();
-	      fS8evt->jet_ntrks.push_back( NtrksInJet );
-	      fS8evt->trackProbaVector_Size.push_back((*tagInfo)[ith_tagged].probabilities(0).size());
-	      if(StoreTrackProba_){
-		int i=0;
-		std::vector< float > track_proba = (*tagInfo)[ith_tagged].probabilities(0) ;
-		std::vector< float > probabilities;
-		for(std::vector<float>::const_iterator it = track_proba.begin(); it!=track_proba.end(); ++it, i++){
-		  
-		  double delta  = -2.; 
-		  delta = ROOT::Math::VectorUtil::DeltaR( (*(*jetTags)[ith_tagged].jet()).p4().Vect(), (*(*jetTags)[ith_tagged].tracks()[i]).momentum());
-		  if(delta <0.3) probabilities.push_back((*it));	    
-		  
-		}
-		fS8evt->jet_Tracks_Probability.push_back(probabilities);
-	      }
-	      
-	    }
-	    else if ( moduleLabel == "jetProbabilityJetTagsNegativeOnly" ) {
-	      
-	      fS8evt->btag_negJetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
-	      
-	      gotJPneg = true;
-	      
-	    }
-	    else if ( moduleLabel == "jetProbabilityJetTagsPositiveOnly" ) {
-	      
-	      fS8evt->btag_posJetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
-	      
-	      gotJPpos = true;
-	      
-	    }
-	    //*********************************
-	    // SoftLeptons Taggers 
-	    //*********************************
-	    else if ( moduleLabel == "softMuonJetTags" ) {
-	      
-	      fS8evt->btag_SoftMuon_disc.push_back( (*jetTags)[ith_tagged].discriminator());
-	      
-	      gotSMT = true;
-	      
-	    }			
-		}
+
+            // Get the information for the given tag
+            if ( moduleLabel == "negativeTrackCounting2ndTrck" ) 
+            {
+              // Set the initial values	
+              double value = undefined;
+              // Flag vector
+              TrackCategories::Flags flags;
+	
+              // If there is a least one track		
+              if (!tracks.empty())
+              {
+              	// Get the ips for the track
+		        double tmpvalue = trackIP[indexes[tracks.size()-1]].significance();
+		        // Get the value and history of the track
+                if (tmpvalue < 0)
+                {
+                  value = tmpvalue;	
+ 		          if ( flavourMatchOptionf == "hepMC" )
+		            flags = classifier_.evaluate( tracks[indexes[tracks.size()-1]] ).flags();
+                }
+              }
+              
+              // Set the values in the BTagEvent
+	          fS8evt->btag_NegTag_disc3D_1trk.push_back(value);
+	          fS8evt->btag_NegTag_disc3D_1trk_is.push_back(flags);
+ 
+              // Reset the value a flags
+              value = undefined; flags.clear();
+ 
+              // If there is a least one track		
+              if (tracks.size() > 1)
+              {
+              	// Get the ips for the track
+		        double tmpvalue = trackIP[indexes[tracks.size()-2]].significance();
+		        // Get the value and history of the track
+                if (tmpvalue < 0)
+                {
+                  value = tmpvalue;	
+ 		          if ( flavourMatchOptionf == "hepMC" )
+		            flags = classifier_.evaluate( tracks[indexes[tracks.size()-2]] ).flags();
+                }
+              }
+ 
+              // Set the values in the BTagEvent
+	          fS8evt->btag_NegTag_disc3D_2trk.push_back(value);
+	          fS8evt->btag_NegTag_disc3D_2trk_is.push_back(flags);
+              
+              // Add the their track value and history in case of high purity
+              if ( moduleLabel == "negativeTrackCounting3ndTrck" ) 
+              {
+                // Reset the value a flags
+                value = undefined; flags.clear();
+ 
+                // If there is a least one track		
+                if (tracks.size() > 2)
+                {
+              	  // Get the ips for the track
+		          double tmpvalue = trackIP[indexes[tracks.size()-3]].significance();
+		          // Get the value and history of the track
+                  if (tmpvalue < 0)
+                  {
+                    value = tmpvalue;	
+ 		            if ( flavourMatchOptionf == "hepMC" )
+		              flags = classifier_.evaluate( tracks[indexes[tracks.size()-3]] ).flags();
+                  }
+                }
+ 
+                // Set the values in the BTagEvent
+	            fS8evt->btag_NegTag_disc3D_3trk.push_back(value);
+	            fS8evt->btag_NegTag_disc3D_3trk_is.push_back(flags);
+                
+              }
+            }
+            
+            //*********************************
+            // Jet Probability taggers
+            //*********************************
+         
+            if ( moduleLabel == "jetProbabilityJetTags" )
+            {
+              fS8evt->btag_JetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator() );              
+              std::string moduleLabel = (jetTags).provenance()->moduleLabel();
+              int NtrksInJet = (*jetTags)[ith_tagged].tracks().size();
+              fS8evt->jet_ntrks.push_back( NtrksInJet );
+              
+              fS8evt->trackProbaVector_Size.push_back((*tagInfo)[ith_tagged].probabilities(0).size());
+              
+              if(StoreTrackProba_)
+              {
+                int i=0;
+                std::vector< float > track_proba = (*tagInfo)[ith_tagged].probabilities(0);
+                std::vector< float > probabilities;
+                for(std::vector<float>::const_iterator it = track_proba.begin(); it!=track_proba.end(); ++it, i++)
+                {
+                  double delta  = -2.;
+                  delta = ROOT::Math::VectorUtil::DeltaR( (*(*jetTags)[ith_tagged].jet()).p4().Vect(), (*(*jetTags)[ith_tagged].tracks()[i]).momentum());
+                  if(delta <0.3) probabilities.push_back((*it));
+                }
+                fS8evt->jet_Tracks_Probability.push_back(probabilities);
+              }
+            }
+            
+            if ( moduleLabel == "jetProbabilityJetTagsNegativeOnly" )
+              fS8evt->btag_negJetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator() );
+            
+            if ( moduleLabel == "jetProbabilityJetTagsPositiveOnly" ) 
+              fS8evt->btag_posJetProb_disc3D.push_back( (*jetTags)[ith_tagged].discriminator());
+
+            //*********************************
+            // SoftLeptons Taggers
+            //*********************************
+            
+            if ( moduleLabel == "softMuonJetTags" )
+              fS8evt->btag_SoftMuon_disc.push_back( (*jetTags)[ith_tagged].discriminator());
+
+            //*********************************
+            // Track history of the jet
+            //*********************************
+
+            // Filling up multitrack history flags
+            std::vector<bool> posFlags, negFlags;
+              
+            // Loop over all the tracks in the jet
+            for (std::size_t i = 0; i < tracks.size(); ++i)
+            {
+              // Get the category vector flag
+              std::vector<bool> const & flags = classifier_.evaluate(tracks[i]).flags();
+              	
+              // Select set the initial flag to false
+              if (!i)
+              {
+                posFlags.resize(flags.size(), false);
+                negFlags.resize(flags.size(), false);
+              }
+              
+              // Get the significnace
+              double significance = (trackIP)[i].significance();
+              
+              // Set negative and positive flags by OR assigment
+              for (std::size_t j = 0; j < flags.size(); ++j)
+              	if ( significance >= 0.0 )
+		          posFlags[j] = posFlags[j] | flags[j];
+		        else
+		          negFlags[j] = negFlags[j] | flags[j];
+		    }              
+                        
+            // Set the flags into BTagEvent 
+            fS8evt->jet_posTrack_categories.push_back(posFlags);
+            fS8evt->jet_negTrack_categories.push_back(negFlags);
+		} // end loop over tag jets
 		
-		//FillHistos("n",p4MuJet, ptrel, JetFlavor,isbTaggedJet);
-		
-		if (!gotTCHE)    fS8evt->btag_TrkCounting_disc3D_2trk.push_back( -9999. );
-		if (!gotTCHEneg) fS8evt->btag_NegTag_disc3D_2trk.push_back( -9999. );
-		
-		if (!gotTCHP)    fS8evt->btag_TrkCounting_disc3D_3trk.push_back( -9999. );
-		if (!gotTCHPneg) fS8evt->btag_NegTag_disc3D_3trk.push_back( -9999. );
-		
-		if (!gotJP)      fS8evt->btag_JetProb_disc3D.push_back( -9999. );
-		if (!gotJPneg)   fS8evt->btag_negJetProb_disc3D.push_back( -9999. );
-		if (!gotJPpos)   fS8evt->btag_posJetProb_disc3D.push_back( -9999. );		
-		if (!gotMTCHE)   fS8evt->btag_ModTrkCounting_disc3D_2trk.push_back( -9999. );
-		if (!gotMTCHP)   fS8evt->btag_ModTrkCounting_disc3D_2trk.push_back( -9999. );
-       								   
 		ijet++;
 	} //end loop over reco jets
 
