@@ -57,32 +57,59 @@ void PtrelSolver::counting(
   sprintf(name, "%s/n_%s", directory, dependency);
   TH2F * histogram2D = (TH2F*) inputfile->Get(name);
 
+  if ( !strcmp(dependency,"pT") )
+    histogram2D->RebinX(ptRebin_);
+  else 
+    histogram2D->RebinX(etaRebin_);
+      
+  histogram2D->RebinY(ptrelRebinInData_);
+
   // histogram with x dependency for muon-in-jet-away-jet-tagged sample
   sprintf(name, "%s/p_%s", directory, dependency);
   TH2F * histogram2D_0t = (TH2F*) inputfile->Get(name);
 
+  if ( !strcmp(dependency,"pT") )
+    histogram2D_0t->RebinX(ptRebin_);
+  else
+    histogram2D_0t->RebinX(etaRebin_);
+
+  histogram2D_0t->RebinY(ptrelRebinInData_);
+
   // histogram with x dependency for muon-in-jet-tagged-away-jet-tagged sample
   sprintf(name, "%s/ptag_%s_%s", directory, dependency, tag);
   TH2F * histogram2D_tt = (TH2F*) inputfile->Get(name);
-       
+
+  if ( !strcmp(dependency,"pT") )
+    histogram2D_tt->RebinX(ptRebin_);
+  else
+    histogram2D_tt->RebinX(etaRebin_);
+
+  histogram2D_tt->RebinY(ptrelRebinInData_);
+  
   // histogram base name
   sprintf(basename, "counting_%s_%s", dependency, tag);
 
   // histogram that contains the measure efficiency  
-  TH1F * efficiency = (TH1F*) histogram2D_0t->ProjectionX(basename);
+  TH1F * efficiency = (TH1F*) histogram2D_0t->ProjectionX(basename, -1, -1, "e");
   Int_t nbins = efficiency->GetNbinsX();
 
   // histogram that contains the measure efficiency + systematic
   sprintf(name, "%s_plus", basename);
-  TH1F * efficiencyPlus = (TH1F*) histogram2D_0t->ProjectionX(name);
-
+  TH1F * efficiencyPlus = (TH1F*) histogram2D_0t->ProjectionX(name, -1, -1, "e");
   // histogram that contains the measure efficiency - systematic
   sprintf(name, "%s_minus", basename);
-  TH1F * efficiencyMinus = (TH1F*) histogram2D_0t->ProjectionX(name);
+  TH1F * efficiencyMinus = (TH1F*) histogram2D_0t->ProjectionX(name, -1, -1, "e");
 
   // histogram2D with x dependency for muon-in-jet sample from cl flavor
   sprintf(name, "%s/n_%s_cl", directory, dependency);
   TH2F * histogram2D_cl = (TH2F*) inputfile->Get(name);
+
+  if ( !strcmp(dependency,"pT") )
+    histogram2D_cl->RebinX(ptRebin_);
+  else
+    histogram2D_cl->RebinX(etaRebin_);
+
+  histogram2D_cl->RebinY(ptrelRebinInData_);
 
   // 1D histogram with x dependency for muon-in-jet sample from cl flavor
   sprintf(name, "%s_n_cl", basename);
@@ -92,13 +119,28 @@ void PtrelSolver::counting(
   sprintf(name, "%s/p_%s_b", directory, dependency);
   TH2F * histogram2D_0t_b = (TH2F*) inputfile->Get(name);
 
+  if ( !strcmp(dependency,"pT") )
+    histogram2D_0t_b->RebinX(ptRebin_);
+  else
+    histogram2D_0t_b->RebinX(etaRebin_);
+
+  histogram2D_0t_b->RebinY(ptrelRebinInData_);
+
   // 1D histogram with x dependency for muon-in-jet-away-jet-tagged sample from b flavor  
   sprintf(name, "%s_p_b", basename);
   TH1F * p_b = (TH1F*) histogram2D_0t_b->ProjectionX(name, -1, -1, "e");
-
+  
   // efficiency calculation from mc
   sprintf(name, "%s/ptag_%s_b_%s", directory, dependency, tag);  
-  TH2F * histogram2D_tt_b = (TH2F*) inputfile->Get(name);  
+  TH2F * histogram2D_tt_b = (TH2F*) inputfile->Get(name);
+
+  if ( !strcmp(dependency,"pT") )
+    histogram2D_tt_b->RebinX(ptRebin_);
+  else
+    histogram2D_tt_b->RebinX(etaRebin_);
+
+  histogram2D_tt_b->RebinY(ptrelRebinInData_);  
+  
   sprintf(name, "%s_ptag_b", basename);
   TH1F * ptag_b = (TH1F*) histogram2D_tt_b->ProjectionX(name, -1, -1, "e");
   sprintf(name, "%s_mc", basename);
@@ -108,6 +150,14 @@ void PtrelSolver::counting(
   // mistag rate calculation from mc
   sprintf(name, "%s/p_%s_cl", directory, dependency);
   TH2F * histogram2D_0t_cl = (TH2F*) inputfile->Get(name);
+
+  if ( !strcmp(dependency,"pT") )
+    histogram2D_0t_cl->RebinX(ptRebin_);
+  else
+    histogram2D_0t_cl->RebinX(etaRebin_);
+
+  histogram2D_0t_cl->RebinY(ptrelRebinInData_);
+
   sprintf(name, "%s_mistag", basename);
   TH1F * mistag = (TH1F*) histogram2D_0t_cl->ProjectionX(name, -1, -1, "e");
   mistag->Divide(mistag, n_cl, 1., 1., "e");
@@ -143,23 +193,23 @@ void PtrelSolver::counting(
 
     // 1D histogram with x dependency for muon-in-jet sample
     sprintf(name, "%s_%s_%d", basename, tag, ii);
-    histogram1D = (TH1F*) histogram2D->ProjectionY(name, ii, ii);
+    histogram1D = (TH1F*) histogram2D->ProjectionY(name, ii, ii, "e");
 
     // 1D histogram with x dependency for muon-in-jet-away-jet-tagged sample
     sprintf(name, "%s_%s_%d_0t", basename, tag, ii);
-    histogram1D_0t = (TH1F*) histogram2D_0t->ProjectionY(name, ii, ii);
+    histogram1D_0t = (TH1F*) histogram2D_0t->ProjectionY(name, ii, ii, "e");
     
     // 1D histogram with x dependency for muon-in-jet-tagged-away-jet-tagged sample
     sprintf(name, "%s_%s_%d_tt", basename, tag, ii);
-    histogram1D_tt = (TH1F*) histogram2D_tt->ProjectionY(name, ii, ii);
+    histogram1D_tt = (TH1F*) histogram2D_tt->ProjectionY(name, ii, ii, "e");
 
     // get the b fraction in the muon-in-jet
     Fit(histogram1D, thePdf1, &n, &n_err);
-         
+
     // get the b fraction in the muon-in-jet-tagged-away-jet-tagged
     Fit(histogram1D_tt, thePdf2, &nt, &nt_err);
         
-    Nst = (Double_t) histogram1D_0t->GetEntries();
+    Nst = (Double_t) histogram1D_0t->Integral();
     Mtg = mistag->GetBinContent(ii); 
     MtgErr = mistag->GetBinError(ii); 
     
@@ -186,7 +236,7 @@ void PtrelSolver::counting(
     std::cout << "EffSystErrMinus : " << sqrt(EffSystE2Minus) << std::endl;    
     std::cout << "Mistag          : " << Mtg << " pm " << MtgErr << std::endl;
     std::cout << std::endl;
-    
+
     efficiency->SetBinContent(ii, Eff);
     efficiency->SetBinError(ii, sqrt(EffStatE2));
 
@@ -222,12 +272,15 @@ void PtrelSolver::counting(
   else if (!strcmp(dependency,"eta"))
     formatHist1(efficiencyPlus, "eta", "Efficiency");
 
+  efficiencyPlus->SetTitle("Measure vs mc truth");
   efficiencyPlus->GetYaxis()->SetRangeUser(0.0,1.4);
+  efficiencyPlus->SetLineWidth(2);
   efficiencyPlus->SetFillColor(kBlack);
   efficiencyPlus->SetFillStyle(3005);
   efficiencyPlus->SetLineColor(kWhite);
   
   epsname = saveAsEPS(c1, efficiencyPlus, "BAR");
+  efficiencyMinus->SetLineWidth(2);
   efficiencyMinus->SetLineColor(kWhite);
   efficiencyMinus->Draw("BAR SAME");
   efficiency->Draw("SAME");
@@ -260,59 +313,70 @@ void PtrelSolver::counting(
   inputfile = new TFile(inputfilename, "READ");
  
   char name[255], basename[255];
-    
-  // histogram with x dependency for muon-in-jet sample
+      
+   // histogram with x dependency for muon-in-jet sample
   sprintf(name, "%s/n_pT", directory);
   TH2F * histogram2D = (TH2F*) inputfile->Get(name);
+  histogram2D->RebinY(ptrelRebinInData_);
 
   // histogram with x dependency for muon-in-jet-away-jet-tagged sample
   sprintf(name, "%s/p_pT", directory);
   TH2F * histogram2D_0t = (TH2F*) inputfile->Get(name);
+  histogram2D_0t->RebinY(ptrelRebinInData_);
 
   // histogram with x dependency for muon-in-jet-tagged-away-jet-tagged sample
   sprintf(name, "%s/ptag_pT_%s", directory, tag);
   TH2F * histogram2D_tt = (TH2F*) inputfile->Get(name);
+  histogram2D_tt->RebinY(ptrelRebinInData_);
 
   // 1D histogram with x dependency for muon-in-jet sample
   sprintf(name, "%s_%s_%d", basename, tag, 0);  
-  TH1F * histogram1D = (TH1F*) histogram2D->ProjectionY(name);
+  TH1F * histogram1D = (TH1F*) histogram2D->ProjectionY(name, -1, -1, "e");
 
   // 1D histogram with x dependency for muon-in-jet-away-jet-tagged sample
   sprintf(name, "%s_%s_%d_0t", basename, tag, 0);
-  TH1F * histogram1D_0t = (TH1F*) histogram2D_0t->ProjectionY(name);
+  TH1F * histogram1D_0t = (TH1F*) histogram2D_0t->ProjectionY(name, -1, -1, "e");
     
   // 1D histogram with x dependency for muon-in-jet-tagged-away-jet-tagged sample
   sprintf(name, "%s_%s_%d_tt", basename, tag, 0);
-  TH1F * histogram1D_tt = (TH1F*) histogram2D_tt->ProjectionY(name);
+  TH1F * histogram1D_tt = (TH1F*) histogram2D_tt->ProjectionY(name, -1, -1, "e");
 
   // histogram with x dependency for muon-in-jet-away-jet-tagged sample
   sprintf(name, "%s/p_pT_b", directory);
   TH2F * histogram2D_0t_b = (TH2F*) inputfile->Get(name);
-
+  histogram2D_0t_b->RebinY(ptrelRebinInData_);
   // 1D histogram with x dependency for muon-in-jet-away-jet-tagged sample from b flavor  
   sprintf(name, "%s_p_b", basename);
   TH1F * p_b = (TH1F*) histogram2D_0t_b->ProjectionX(name, -1, -1, "e");
+  double p_b_mc = p_b->Integral();
 
   // histogram2D with x dependency for muon-in-jet sample from cl flavor
   sprintf(name, "%s/n_pT_cl", directory);
   TH2F * histogram2D_cl = (TH2F*) inputfile->Get(name);
-
+  histogram2D_cl->RebinY(ptrelRebinInData_);
   // 1D histogram with x dependency for muon-in-jet sample from cl flavor
   sprintf(name, "%s_n_cl", basename);
   TH1F * n_cl = (TH1F*) histogram2D_cl->ProjectionX(name, -1, -1, "e");
+  // total number of event after weights
+  double n_cl_mc = n_cl->Integral();
 
   // mistag rate calculation from mc
   sprintf(name, "%s/p_pT_cl", directory);
   TH2F * histogram2D_0t_cl = (TH2F*) inputfile->Get(name);
+  histogram2D_0t_cl->RebinY(ptrelRebinInData_);  
   sprintf(name, "%s_p_cl", basename);
   TH1F * p_cl = (TH1F*) histogram2D_0t_cl->ProjectionX(name, -1, -1, "e");
-  
+  // total number of event after weights
+  double p_cl_mc = p_cl->Integral();
+
   // b constent in ptag samples 
   sprintf(name, "%s/ptag_pT_b_%s", directory, tag);  
-  TH2F * histogram2D_tt_b = (TH2F*) inputfile->Get(name);  
+  TH2F * histogram2D_tt_b = (TH2F*) inputfile->Get(name);
+  histogram2D_tt_b->RebinY(ptrelRebinInData_);
   sprintf(name, "%s_ptag_b", basename);
   TH1F * ptag_b = (TH1F*) histogram2D_tt_b->ProjectionX(name, -1, -1, "e");
-   
+  double ptag_b_mc = ptag_b->Integral();
+
   std::vector<double>  n, n_err;
   std::vector<double>  nt, nt_err;
   
@@ -327,15 +391,18 @@ void PtrelSolver::counting(
   // get the b fraction in the muon-in-jet
   Fit(histogram1D, thePdf1, &n, &n_err);
     
-  std::cout << n[0] << " " << n[1] << std::endl;  
-    
-  return;  
-         
+  std::cout << "Total number of B  : " <<  n[0] << " " << n_err[0] << std::endl;  
+  std::cout << "Total number of CL : " <<  n[1] << " " << n_err[1] << std::endl;  
+
   // get the b fraction in the muon-in-jet-tagged-away-jet-tagged
   Fit(histogram1D_tt, thePdf2, &nt, &nt_err);
 
-  Nst = (Double_t) histogram1D_0t->GetEntries();
-  Mtg = p_cl->GetEntries()/n_cl->GetEntries();  	
+  std::cout << "Total number of B  : " <<  nt[0] << " " << nt_err[0] << std::endl;  
+  std::cout << "Total number of CL : " <<  nt[1] << " " << nt_err[1] << std::endl;  
+
+  Nst = (Double_t) histogram1D_0t->Integral();
+
+  Mtg = p_cl_mc/n_cl_mc;  	
   MtgErr = 0;
     
   // efficiencies
@@ -352,10 +419,10 @@ void PtrelSolver::counting(
   EffSystE2Minus = pow(Eff - EffMtgMinus, 2);
 
   std::cout << std::endl << "===============================================================================" << std::endl;
-
-  std::cout << "muon-in-jet (# measure c, # truth c)                        : (" << n[1] << ", " << n_cl->GetEntries() << ")" << std::endl;
-  std::cout << "muon-in-jet-awat-jet-tagged (# measure b, # truth b)        : (" << (Nst - n[1] * Mtg) << ", " << p_b->GetEntries() << ")" << std::endl;
-  std::cout << "muon-in-jet-tagged-awat-jet-tagged (# measure b, # truth b) : (" << nt[0] << ", " << ptag_b->GetEntries() << ")" << std::endl;
+      
+  std::cout << "muon-in-jet (# measure c, # truth c)                        : (" << n[1] << ", " << n_cl_mc << ")" << std::endl;
+  std::cout << "muon-in-jet-awat-jet-tagged (# measure b, # truth b)        : (" << (Nst - n[1] * Mtg) << ", " << p_b_mc << ")" << std::endl;
+  std::cout << "muon-in-jet-tagged-awat-jet-tagged (# measure b, # truth b) : (" << nt[0] << ", " << ptag_b_mc << ")" << std::endl;
     
   std::cout << "Total Eff             : " << Eff << std::endl;
   std::cout << "Total EffStatErr      : " << sqrt(EffStatE2) << std::endl;
@@ -364,6 +431,23 @@ void PtrelSolver::counting(
   std::cout << "Total EffErrPlus      : " << sqrt(EffStatE2+EffSystE2Plus) << std::endl;   
   std::cout << "Total EffErrMinus     : " << sqrt(EffStatE2+EffSystE2Minus) << std::endl;      
   std::cout << "Total Mistag          : " << Mtg << " mc: " << MtgErr << std::endl;
+  
+  // total mc efficiency error
+  Double_t p_bSqIntegralError = 0;
+  for (Int_t i = 0; i < p_b->GetNbinsX(); ++i)
+    p_bSqIntegralError += pow(p_b->GetBinError(i), 2);
+  
+  Double_t ptag_bSqIntegralError = 0;
+  for (Int_t i = 0; i < ptag_b->GetNbinsX(); ++i)
+    ptag_bSqIntegralError += pow(ptag_b->GetBinError(i), 2);
+
+  double_t mcEfficiencyError = sqrt (
+    pow(1./p_b_mc, 2) * ptag_bSqIntegralError + 
+    pow(ptag_b_mc/pow(p_b_mc, 2), 2) * p_bSqIntegralError 
+  );
+    
+  std::cout << "MC Efficiency         : " << (ptag_b_mc/p_b_mc) << std::endl;
+  std::cout << "MC Efficiency error   : " << mcEfficiencyError << std::endl;
 
   std::cout << "===============================================================================" << std::endl << std::endl; 
 }  
@@ -422,7 +506,7 @@ void PtrelSolver::measureByCounting(
 )
 {
   if ( !initPdfsByTag(pdfdir, tag, versiontag) ) return;
-  counting(inputfilename, directory, "pT", tag, outfilename); 
+  counting(inputfilename, directory, "pT", tag, outfilename);
   counting(inputfilename, directory, "eta", tag, outfilename);
   counting(inputfilename, directory, tag);  
 }

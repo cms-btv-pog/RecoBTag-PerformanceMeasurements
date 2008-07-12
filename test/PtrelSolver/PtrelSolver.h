@@ -137,6 +137,46 @@ class PtrelSolver : public TObject {
     const char *    
   );
 
+  /*void ptrelByFit(
+    const char *, 
+    const char *,
+    const char *,
+    const char *,
+    const char *    
+  );*/
+  
+  void measureByCounting(
+    const char *,
+    const char *,
+    const char *,
+    const char *,
+    const char *,
+    const char *
+  );
+  
+  void ptRebinning(int rebin = 1)
+  {
+    ptRebin_ = rebin;
+  }
+
+  void etaRebinning(int rebin = 1)
+  {
+    etaRebin_ = rebin;
+  }
+
+  void ptRelRebinning(int rebin = 1)
+  {
+    ptRelRebin_ = rebin;
+  }
+
+  void ptRelRebinningInData(int rebin = 1)
+  {
+    ptrelRebinInData_ = rebin;
+  }
+
+  int ptRebin_, etaRebin_, ptRelRebin_, ptrelRebinInData_;
+  
+
   void makeAllTemplatesPerTag(const char *inputfilename, const char *dir, const char *sampletag, const char *tag, const char *outputdir, const char *versiontag, bool sys = false);
   void makeTemplates(const char *flavor, const char *sampletag, bool sum, const char *inputfilename, const char *dir, const char *tag, const char *thehist, int pdfbase, const char *outputdir, const char *versiontag="", bool sys=false, bool latex=false);
 
@@ -164,16 +204,6 @@ class PtrelSolver : public TObject {
   // for fitting
   void measure(const char *sampletag, const char *inputfilename, const char *dir, const char *outfilename, const char *tag, const char *thehistname, bool sys=false, const char *mcfilename=0, const char *mcdir=0);
 
-
-  
-  void measureByCounting(
-    const char *,
-    const char *,
-    const char *,
-    const char *,
-    const char *,
-    const char *
-  );
 
 
   //  pdf data file: sampletag + favor+"_templates_" + tag + versiontag.

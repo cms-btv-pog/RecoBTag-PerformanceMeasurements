@@ -43,17 +43,24 @@ PtrelSolver::PtrelSolver(double fitmin, double fitmax, int ptbins, int etabins) 
   pthat_bins = ptbins;
   eta_bins   = etabins;
 }
+
+
 PtrelSolver::~PtrelSolver() {}
 
 
 
 void PtrelSolver::init() {
 
+  ptRebin_ = 3;
+  etaRebin_ = 3;
+  ptRelRebin_ = 2;
+  ptrelRebinInData_ = 1;
+
   x_min = 0; 
-  x_max = 5;
+  x_max = 3.5;
 
   fit_min = 0;
-  fit_max = 5;
+  fit_max = 3.5;
 
   hist_bins  = 50;
   pthat_bins = 0;
@@ -1076,6 +1083,8 @@ void PtrelSolver::makeTemplates(const char *flavor, const char *sampletag, bool 
     return;
   }
 
+  if (ptRebin_) hist2->RebinX(ptRebin_);
+  
   nbins = hist2->GetNbinsX();
   x_min = hist2->GetYaxis()->GetXmin();
   x_max = hist2->GetYaxis()->GetXmax();
@@ -1108,11 +1117,13 @@ void PtrelSolver::makeTemplates(const char *flavor, const char *sampletag, bool 
     if (!strcmp(flavor, "b")) {
 
       thePdf = new TF1("thePdf", pdf1, x_min, x_max, 5); 
-      thePdf->SetParameters(1.30774,-0.51646, 0.00475143, 2.1, 800);
+      // thePdf->SetParameters(1.30774,-0.51646, 0.00475143, 2.1, 800);
+      thePdf->SetParameters(1.7256, -4.19201, .0000207, .849781, 1251050);
     } else {
 
       thePdf = new TF1("thePdf", pdf1, x_min, x_max, 5);
-      thePdf->SetParameters(1.30774,-2.51646, 0.00475143, 1.1, 800);
+      // thePdf->SetParameters(1.30774,-2.51646, 0.00475143, 1.1, 800);
+      thePdf->SetParameters(1.7256, -4.19201, .0000207, .849781, 1251050);
     } 
 
 
@@ -1120,6 +1131,10 @@ void PtrelSolver::makeTemplates(const char *flavor, const char *sampletag, bool 
     
     if (pdfbase == PT_BASE)  formatHist1(hist, "p_{T}^{rel} GeV", "Events");
     if (pdfbase == ETA_BASE) formatHist1(hist, "Pseudorapidity",  "Events");
+
+    std::cout << " Pre rebinning hist bins: " << hist->GetNbinsX() << std::endl;
+    if (ptRelRebin_) hist->Rebin(ptRelRebin_);
+    std::cout << " After rebinning hist bins: " << hist->GetNbinsX() << std::endl;
 
     hist->Fit(thePdf, "Q", "", fit_min, fit_max);
     std::cout << "information: " << hist->GetName() << " chi2/Ndof =" 
@@ -1538,48 +1553,46 @@ void PtrelSolver::Fit(TH1F *data,
   num_err->clear();
 
 
-  x_min = data->GetXaxis()->GetXmin();
-  x_max = data->GetXaxis()->GetXmax();
+  // x_min = data->GetXaxis()->GetXmin();
+  // x_max = data->GetXaxis()->GetXmax();
 
 
   double tmp_b = pdf->GetParameter("Nb");
   double tmp_c = pdf->GetParameter("Nc");
   pdf->SetParameter("Nb", 1);
   pdf->SetParameter("Nc", 0);
-  Double_t area_b = pdf->Integral(x_min, x_max);
+  Double_t area_b = pdf->Integral(fit_min, fit_max);
 
 
   pdf->SetParameter("Nb", 0);
   pdf->SetParameter("Nc", 1);
-  Double_t area_c = pdf->Integral(x_min, x_max);
+  Double_t area_c = pdf->Integral(fit_min, fit_max);
 
   pdf->SetParameter("Nb", tmp_b);
   pdf->SetParameter("Nc", tmp_c);
 
+  // Total number of event including correction because of weights  
+  double total_events = data->Integral();
 
-  //  double total_events = data->GetEntries();
-  double total_events = data->Integral(x_min, x_max);
-  std::cout << "total events" << data->GetEntries() 
-	    << ": " << total_events << std::endl;
+  // Numeric integration of the data (normalization for initial conditions)
+  double area_data = data->Integral(
+    data->FindBin(x_min),
+    data->FindBin(x_min),
+    "width"
+  );
 
-  double chi2 = 10000, b_frac = 0.1;
-  while (chi2 >5 && b_frac < 1.0) {
-
-    std::cout << "information: trying with b fraction of " << b_frac
-	      << std::endl;
-    pdf->SetParameter("Nb", total_events * b_frac /area_b);
-    pdf->SetParameter("Nc", total_events * (1.0 -b_frac) /area_b );
-
-
-    data->Fit(pdf, "Q", "", fit_min, fit_max);
-    chi2 = pdf->GetChisquare()/pdf->GetNDF();
-    b_frac += 0.1;
-  }
+  // Initial fraction of b's
+  double b_frac = 0.2;
+  
+  pdf->SetParameter("Nb", area_data * b_frac / area_b);
+  pdf->SetParameter("Nc", area_data * (1.0 - b_frac) / area_c );
+      
+  std::cout << "information: fitting with initial b fraction of " << b_frac << std::endl;      
+      
+  data->Fit(pdf, "Q", "", fit_min, fit_max);
 
   std::cout << "information: " << data->GetName() << " fitted with chi2/Ndof =" 
-	    << pdf->GetChisquare() << "//"
-	    << pdf->GetNDF()
-	    << std::endl;
+	        << pdf->GetChisquare() << "//" << pdf->GetNDF() << std::endl;
 
   (*num).push_back(pdf->GetParameter("Nb") * area_b);
   (*num).push_back(pdf->GetParameter("Nc") * area_c);
@@ -1590,31 +1603,36 @@ void PtrelSolver::Fit(TH1F *data,
   for (int unsigned ii = 0; ii <  (*num).size(); ii ++) sum += (*num)[ii];
   double scale = total_events / sum;
 
-  for (unsigned int ii = 0; ii <  (*num).size(); ii ++) {
-
+  for (unsigned int ii = 0; ii <  (*num).size(); ii ++)
+  {
     (*num)[ii] = (*num)[ii]*scale;
     (*num_err)[ii] = (*num_err)[ii]*scale;
   }
      
   // REMOVE -----   
-  /*
   tmp_b = pdf->GetParameter("Nb");
   tmp_c = pdf->GetParameter("Nc");
-  
-  data->Draw("e1same");  
 
-  TF1 * pdf2 = new TF1(*pdf);
+  data->Draw("e1same");
   
+  TF1 * pdf2 = new TF1(*pdf);
+
+  TF1 * pdf3 = new TF1(*pdf);
+  
+  pdf3->SetLineColor(kBlack);
+  pdf3->SetParameter("Nb", tmp_b);
+  pdf3->SetParameter("Nc", tmp_c);
+  pdf3->Draw("same");
+
   pdf->SetLineColor(kBlue);
   pdf->SetParameter("Nb", tmp_b);
-  pdf->SetParameter("Nc", 0);  	
+  pdf->SetParameter("Nc", 0);
   pdf->Draw("same");
 
   pdf2->SetLineColor(kRed);
   pdf2->SetParameter("Nb", 0);
-  pdf2->SetParameter("Nc", tmp_c);  	
+  pdf2->SetParameter("Nc", tmp_c);
   pdf2->Draw("same");
-  */
 
   (*num).push_back( pdf->GetChisquare()*1.0/pdf->GetNDF() );
 
