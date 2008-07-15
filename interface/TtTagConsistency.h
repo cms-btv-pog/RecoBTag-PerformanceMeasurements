@@ -13,7 +13,7 @@
 //
 // Original Author:  Gena Kukartsev, kukarzev@fnal.gov
 //         Created:  Fri Jun 29 14:53:10 CDT 2007
-// $Id: TtTagConsistency.h,v 1.1.2.1 2008/04/04 23:54:48 kukartse Exp $
+// $Id: TtTagConsistency.h,v 1.1.2.2 2008/05/30 13:50:36 kukartse Exp $
 //
 //
 
@@ -21,22 +21,16 @@
 #define PerformanceMeasurementsTtTagConsistency
 
 #include <memory>
+#include <fstream>
 
-// user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
-
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-
 #include "RecoBTag/PerformanceMeasurements/interface/RooGKCounter.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/JetReco/interface/CaloJet.h"
-//#include "DataFormats/EgammaCandidates/interface/PixelMatchGsfElectron.h"
-//#include "DataFormats/MuonReco/interface/Muon.h"
-//#include "DataFormats/METReco/interface/CaloMET.h"
 #include "AnalysisDataFormats/TopObjects/interface/TopJet.h"
 #include "AnalysisDataFormats/TopObjects/interface/TopLepton.h"
 #include "AnalysisDataFormats/TopObjects/interface/TopElectron.h"
@@ -44,18 +38,12 @@
 #include "AnalysisDataFormats/TopObjects/interface/TopMET.h"
 #include "DataFormats/BTauReco/interface/JetTag.h"
 #include "DataFormats/BTauReco/interface/JetTagFwd.h"
-
 #include "DataFormats/BTauReco/interface/TrackCountingTagInfo.h"
 #include "DataFormats/BTauReco/interface/TrackCountingTagInfoFwd.h"
 #include "DataFormats/BTauReco/interface/JetTracksAssociation.h"
-
 #include "DataFormats/Common/interface/RefToBase.h"
 
-#include <fstream>
 
-//
-// class decleration
-//
 
 class TtTagConsistency : public edm::EDAnalyzer
 {
@@ -82,20 +70,30 @@ private:
   map< double, map< int, double> > Nn_3; // number of events with n tagged jets, third tagger
 
   double dRCut;
-  int nCaloJetsLow;
-  int nLeptonLow;
+  int nCaloJets_min;
+  int nLepton_min;
+  double jet_pt_min            ;
+  double jet_eta_max           ;
+  double muon_pt_min           ;
+  double muon_eta_max          ;
+  double muon_trackIso_max     ;
+  double muon_caloIso_max      ;
+  double electron_pt_min       ;
+  double electron_eta_max      ;
+  double electron_trackIso_max ;
+  double electron_caloIso_max  ;
+  double met_et_min            ;
 
   int _interFreq;
   string _dataType;
-  bool _lookForGenJetMatch;
   string _jetSource, _electronSource, _muonSource, _METSource;
   string _jetTagSource, _jetTagSource_2, _jetTagSource_3;
   string _genJetSource;
   string _outputFileName;
 
-  double dLow, dHigh, dStep;
-  double dLow_2, dHigh_2, dStep_2;
-  double dLow_3, dHigh_3, dStep_3;
+  double d_min, d_max, d_step;
+  double d_min_2, d_max_2, d_step_2;
+  double d_min_3, d_max_3, d_step_3;
 
   RooGKCounter nOfPassedLJets;
   RooGKCounter nOfPassedBJets;

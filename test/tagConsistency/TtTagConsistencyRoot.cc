@@ -452,7 +452,9 @@ int TtTagConsistencyRoot::scan_plot_d( string data_list_file, string prefix,
   nFijk_bg = b . updateFijk_d( "tagConsistency/w5j.legacy.mc2.list", w5j_weight, "background" );
 
   if (use_qcd){
-    nFijk_bg = b . updateFijk_d( "list_gumbo_mc2.list", 1.0, "background" );
+    cout << "training for QCD..." << endl;
+    double qcd_weight = 1.0;
+    nFijk_bg = b . updateFijk_d( "list_gumbo_mc2.list", qcd_weight, "background" );
   }
 
   TtTagConsistencyEfficiency::tableLine tab;
@@ -563,6 +565,8 @@ int TtTagConsistencyRoot::scan_plot_d( string data_list_file, string prefix,
       _conf . ec = epsc_true[i];
       _conf . el = epsl[i];
 
+      //_conf . eb_min = epsb_true[i]-0.2;
+
       //cout << "DEBUG: n1,2,3 = " << n1[0] << "   " << n2[0] << "   " << n3[0] << endl; 
       //_conf . setConfig( n1[i], n2[i], n3[i], epsb_true[i], epsc_true[i], epsl[i] );
 
@@ -594,7 +598,7 @@ int TtTagConsistencyRoot::scan_plot_d( string data_list_file, string prefix,
 
   //gStyle -> SetOptStat(0);
 
-  TCanvas c1("c1","Tagging efficiencies",200,10,700,595);
+  TCanvas c1("c1","Tagging efficiencies",700,595);
 
   TH2F h( "h", "", 100, discr_min, discr_max, 100, 0.0, 1.0 );
   TH2F h2( "h2", "", 100, 0.0, 1.0, 100, mistag_min, mistag_max ); // eff vs mistag
@@ -607,21 +611,21 @@ int TtTagConsistencyRoot::scan_plot_d( string data_list_file, string prefix,
   //c1->GetFrame()->SetBorderSize(12);
 
   TGraphErrors gr_epsb( n, discr, epsb, discr_err, epsb_err );
-  //TGraphErrors gr_epsc( n, discr, epsc, discr_err, epsc_err );
+  TGraphErrors gr_epsc( n, discr, epsc, discr_err, epsc_err );
   TGraphErrors gr_epsb_mistag_true( n, epsb, mistag_true, epsb_err, mistag_true_err );
 
   TGraphErrors gr_epsl( n, discr, epsl, discr_err, epsl_err );
 
   TGraphErrors gr_epsb_true( n, discr, epsb_true, discr_err, epsb_true_err );
   TGraphErrors gr_epsb_true_mistag_true( n, epsb_true, mistag_true, epsb_true_err, mistag_true_err );
-  //TGraphErrors gr_epsc_true( n, discr, epsc_true, discr_err, epsc_true_err );
+  TGraphErrors gr_epsc_true( n, discr, epsc_true, discr_err, epsc_true_err );
 
   gr_epsb . Draw("LP");
-  //gr_epsc . Draw("LP");
+  gr_epsc . Draw("LP");
   //gr_epsl . Draw("LP");
 
   gr_epsb_true . Draw("LP");
-  //gr_epsc_true . Draw("LP");
+  gr_epsc_true . Draw("LP");
 
 
   gr_epsb . SetLineWidth(2);
@@ -630,9 +634,9 @@ int TtTagConsistencyRoot::scan_plot_d( string data_list_file, string prefix,
   gr_epsb . SetMarkerStyle(kOpenStar);
   gr_epsb . SetMarkerSize(1.5);
 
-  //gr_epsc . SetLineWidth(2);
-  //gr_epsc . SetLineColor(2);
-  //gr_epsc . SetMarkerColor(2);
+  gr_epsc . SetLineWidth(2);
+  gr_epsc . SetLineColor(2);
+  gr_epsc . SetMarkerColor(2);
 
   gr_epsl . SetLineWidth(2);
   gr_epsl . SetLineColor(8);
@@ -646,13 +650,11 @@ int TtTagConsistencyRoot::scan_plot_d( string data_list_file, string prefix,
   gr_epsb_true . SetMarkerStyle(kFullTriangleUp);
   gr_epsb_true . SetMarkerSize(1.5);
 
-  /*
   gr_epsc_true . SetLineWidth(2);
   gr_epsc_true . SetLineColor(1);
   gr_epsc_true . SetLineStyle(7);
   gr_epsc_true . SetMarkerColor(1);
   gr_epsc_true . SetMarkerStyle(1);
-  */
 
   c1 . Modified();
 

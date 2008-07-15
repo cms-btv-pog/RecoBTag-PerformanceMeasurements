@@ -1890,6 +1890,7 @@ RooFitResult TtTagConsistencyEfficiency::fit_d( TtTagConsistencyFitConfig & conf
   RooRealVar bgFrac2( "bgFrac2",  "Fraction of background in n2 bin", config . bgf2, config . bgf2_min, config . bgf2_max );
   RooRealVar bgFrac3( "bgFrac3",  "Fraction of background in n3 bin", config . bgf3, config . bgf3_min, config . bgf3_max );
   RooRealVar bgFrac4( "bgFrac4",  "Fraction of background in n4 bin", config . bgf4, config . bgf4_min, config . bgf4_max );
+  RooRealVar bgFrac_total( "bgFrac_total",  "Separate overall fraction of background", 1.0, 0.0, 10.0 );
 
   RooRealVar epsb( "epsb", "b tag efficiency", config . eb,  max(config . eb_min,0.0), min(config . eb_max,1.0) );  // b tagging efficiency
   RooRealVar epsc( "epsc", "c tag efficiency", config . ec,  max(config . ec_min,0.0), min(config . ec_max,1.0) );  // c tagging efficiency
@@ -1943,10 +1944,15 @@ RooFitResult TtTagConsistencyEfficiency::fit_d( TtTagConsistencyFitConfig & conf
 
   //for ( int m = 0; m < 5; m++ ) lamargs[m] . add(bgFrac);
   lamargs[0] . add(bgFrac0);
+  lamargs[0] . add(bgFrac_total);
   lamargs[1] . add(bgFrac1);
+  lamargs[1] . add(bgFrac_total);
   lamargs[2] . add(bgFrac2);
+  lamargs[2] . add(bgFrac_total);
   lamargs[3] . add(bgFrac3);
+  lamargs[3] . add(bgFrac_total);
   lamargs[4] . add(bgFrac4);
+  lamargs[4] . add(bgFrac_total);
   
   //
   // =====> Background coefficients
@@ -1987,9 +1993,9 @@ RooFitResult TtTagConsistencyEfficiency::fit_d( TtTagConsistencyFitConfig & conf
   //
   // ===========================>
 
-  string lam1_str = "lumi*xsec*eff*(" + lam_sumFsig[1] . str() + "+bgFrac1*" + lam_sumFbg[1] . str() + ")";
-  string lam2_str = "lumi*xsec*eff*(" + lam_sumFsig[2] . str() + "+bgFrac2*" + lam_sumFbg[2] . str() + ")";
-  string lam3_str = "lumi*xsec*eff*(" + lam_sumFsig[3] . str() + "+bgFrac3*" + lam_sumFbg[3] . str() + ")";
+  string lam1_str = "lumi*xsec*eff*(" + lam_sumFsig[1] . str() + "+bgFrac1*bgFrac_total*" + lam_sumFbg[1] . str() + ")";
+  string lam2_str = "lumi*xsec*eff*(" + lam_sumFsig[2] . str() + "+bgFrac2*bgFrac_total*" + lam_sumFbg[2] . str() + ")";
+  string lam3_str = "lumi*xsec*eff*(" + lam_sumFsig[3] . str() + "+bgFrac3*bgFrac_total*" + lam_sumFbg[3] . str() + ")";
 
   RooFormulaVar lam1( "lam1", lam1_str . c_str(), lamargs[1] );
   RooFormulaVar lam2( "lam2", lam2_str . c_str(), lamargs[2] );
@@ -2003,6 +2009,7 @@ RooFitResult TtTagConsistencyEfficiency::fit_d( TtTagConsistencyFitConfig & conf
   bgFrac1 . setConstant(kTRUE);
   bgFrac2 . setConstant(kTRUE);
   bgFrac3 . setConstant(kTRUE);
+  bgFrac_total . setConstant(kTRUE);
   //epsc . setConstant(kTRUE);
   epsl . setConstant(kTRUE);
 
@@ -2352,9 +2359,9 @@ RooFitResult TtTagConsistencyEfficiency::fit_test( TtTagConsistencyFitConfig & c
   nEvt2 -> setConstant(kFALSE);
   nEvt3 -> setConstant(kFALSE);
   
-  //*nEvt1 = config . n1_d; // number of events with 1 tag
-  //*nEvt2 = config . n2_d;
-  //*nEvt3 = config . n3_d;
+  // *nEvt1 = config . n1_d; // number of events with 1 tag
+  // *nEvt2 = config . n2_d;
+  // *nEvt3 = config . n3_d;
   
   nEvt1 -> setConstant(kTRUE);
   nEvt2 -> setConstant(kTRUE);

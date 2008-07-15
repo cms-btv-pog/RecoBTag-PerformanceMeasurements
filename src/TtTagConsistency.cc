@@ -13,7 +13,7 @@
 //
 // Original Author:  Gena Kukartsev, kukarzev@fnal.gov
 //         Created:  Fri Jun 29 14:53:10 CDT 2007
-// $Id: TtTagConsistency.cc,v 1.1.2.3 2008/05/30 13:50:36 kukartse Exp $
+// $Id: TtTagConsistency.cc,v 1.1.2.4 2008/06/02 15:14:38 kukartse Exp $
 //
 //
 
@@ -21,26 +21,57 @@
 
 TtTagConsistency::TtTagConsistency(const edm::ParameterSet& iConfig)
 {
+  nCaloJets_min         = 4;
+  nLepton_min           = 1;
+  jet_pt_min            = 25.0     ;
+  jet_eta_max           = 2.4      ;
+  muon_pt_min           = 20.0     ;
+  muon_eta_max          = 2.4      ;
+  muon_trackIso_max     = 300000.0 ;
+  muon_caloIso_max      = 500000.0 ;
+  electron_pt_min       = 20.0     ;
+  electron_eta_max      = 2.4      ;
+  electron_trackIso_max = 300000.0 ;
+  electron_caloIso_max  = 600000.0 ;
+  met_et_min            = 25.0     ;
+  d_min         = 0.0;
+  d_max         = 10.0;
+  d_step        = 0.1;
+  d_min_2         = 0.0;
+  d_max_2         = 10.0;
+  d_step_2        = 0.1;
+  d_min_3         = 0.0;
+  d_max_3         = 1.0;
+  d_step_3        = 0.01;
 
-  dRCut        = iConfig.getParameter<double>("dRGenJetMatch");
-  nCaloJetsLow = iConfig.getParameter<int>("nCaloJetsLow");
-  nLeptonLow   = iConfig.getParameter<int>("nLeptonLow");
 
-  dLow         = iConfig.getParameter<double>("discriminatorLow");
-  dHigh        = iConfig.getParameter<double>("discriminatorHigh");
-  dStep        = iConfig.getParameter<double>("discriminatorStep");
+  nCaloJets_min         = iConfig.getParameter<int>("nCaloJets_min");
+  nLepton_min           = iConfig.getParameter<int>("nLepton_min");
 
-  dLow_2         = iConfig.getParameter<double>("discriminatorLow_2");
-  dHigh_2        = iConfig.getParameter<double>("discriminatorHigh_2");
-  dStep_2        = iConfig.getParameter<double>("discriminatorStep_2");
-  
-  dLow_3         = iConfig.getParameter<double>("discriminatorLow_3");
-  dHigh_3        = iConfig.getParameter<double>("discriminatorHigh_3");
-  dStep_3        = iConfig.getParameter<double>("discriminatorStep_3");
+  jet_pt_min            = iConfig.getParameter<double>("jet_pt_min");
+  jet_eta_max           = iConfig.getParameter<double>("jet_eta_max");
+  muon_pt_min           = iConfig.getParameter<double>("muon_pt_min");
+  muon_eta_max          = iConfig.getParameter<double>("muon_eta_max");
+  muon_trackIso_max     = iConfig.getParameter<double>("muon_trackIso_max");
+  muon_caloIso_max      = iConfig.getParameter<double>("muon_caloIso_max");
+  electron_pt_min       = iConfig.getParameter<double>("electron_pt_min");
+  electron_eta_max      = iConfig.getParameter<double>("electron_eta_max");
+  electron_trackIso_max = iConfig.getParameter<double>("electron_trackIso_max");
+  electron_caloIso_max  = iConfig.getParameter<double>("electron_caloIso_max");
+  met_et_min            = iConfig.getParameter<double>("met_et_min");
+
+  d_min         = iConfig.getParameter<double>("discriminator_min");
+  d_max        = iConfig.getParameter<double>("discriminator_max");
+  d_step        = iConfig.getParameter<double>("discriminator_step");
+  d_min_2         = iConfig.getParameter<double>("discriminator_min_2");
+  d_max_2        = iConfig.getParameter<double>("discriminator_max_2");
+  d_step_2        = iConfig.getParameter<double>("discriminator_step_2");
+  d_min_3         = iConfig.getParameter<double>("discriminator_min_3");
+  d_max_3        = iConfig.getParameter<double>("discriminator_max_3");
+  d_step_3        = iConfig.getParameter<double>("discriminator_step_3");
   
   _interFreq   = iConfig.getParameter<int>("intermediateResultFrequency");
   _dataType    = iConfig.getParameter<string>("dataType");
-  _lookForGenJetMatch    = iConfig.getParameter<bool>("lookForGenJetMatch");
 
   _jetSource    = iConfig.getParameter<string>("jetSource");
   _electronSource    = iConfig.getParameter<string>("electronSource");
@@ -50,9 +81,9 @@ TtTagConsistency::TtTagConsistency(const edm::ParameterSet& iConfig)
   _jetTagSource_2  = iConfig.getParameter<string>("jetTagSource_2");
   _jetTagSource_3  = iConfig.getParameter<string>("jetTagSource_3");
 
-  //_genJetSource    = iConfig.getParameter<string>("genJetSource");
   _outputFileName    = iConfig.getParameter<string>("outputFileName");
 }
+
 
 
 TtTagConsistency::~TtTagConsistency()
@@ -72,7 +103,6 @@ TtTagConsistency::~TtTagConsistency()
 void
 TtTagConsistency::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-
   using namespace edm;
   
   using namespace reco;
@@ -99,37 +129,8 @@ TtTagConsistency::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     cout << "Warning: csa07 soup weight is not available... continuing with weight=1.0" << endl;
   }
 
-  ////
   eventCounter . count();
   eventCounter . incrementDouble( weight );
-
-  /* 
-  //Handle< vector< GenJet > > genJets; //obsolete since CSA07
-  Handle< vector<genParticle > > genParticleCollection;
-  vector<int> goodGenJetIndex; // indices of the jets that pass quality cuts
-  if ( _dataType == "MC" )
-    {
-      
-      
-      // loop over gen jets
-      //iEvent . getByLabel( _genJetSource, genJets );
-      iEvent . getByLabel( _genJetSource, genParticleCollection );
-      vector<reco::GenJet>::const_iterator gjet;
-
-      RooGKCounter nOfGoodGenJets;
-      for ( gjet = genJets -> begin(); gjet != genJets -> end(); gjet++ )  // loop over calo jets
-	{
-	  if ( ( fabs( (*gjet) . eta() ) < 2.5 ) &&
-	       ( (*gjet) . pt() > 20.0 ) )
-	    {
-	      nOfGoodGenJets . count();
-	      
-	      goodGenJetIndex . push_back( gjet - genJets -> begin() ); // get the iterator index
-	    }
-	  
-	}
-    }
-  */
 
   // loop over jets
   //
@@ -160,202 +161,167 @@ TtTagConsistency::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   vector<int> goodCaloJetIndex; // indices of the jets that pass quality cuts
   vector<int> goodCaloJetFlavorID; // flavor of the good jets
 
-  for ( cjet = caloJets -> begin(); cjet != caloJets -> end(); cjet++ )  // loop over calo jets
-    {
+  // loop over calo jets
+  for ( cjet = caloJets -> begin(); cjet != caloJets -> end(); cjet++ ){
+    if ( 
+	//	  ( fabs( (*cjet) . eta() ) < 2.4 ) &&
+	//	  ( (*cjet) . pt() > 25.0 ) &&
+	( fabs( (*cjet) . eta() ) < jet_eta_max ) &&
+	( (*cjet) . pt() > jet_pt_min ) 
+	){
       
-      bool _foundGenJetMatch = true;
-
-      /*
-      if ( _dataType == "MC" && _lookForGenJetMatch )
-	{
-	  _foundGenJetMatch = ( findJetMatch( (*cjet), *genJets, goodGenJetIndex, dRCut ) > -1 );
+      nOfGoodJets . count();
+      
+      map<double,bool> isTagged;
+      map<double,bool> isTagged_2;
+      map<double,bool> isTagged_3;
+      for(double _d = d_min; _d <= d_max; _d += 0.5) isTagged[_d] = false;
+      for(double _d = d_min_2; _d <= d_max_2; _d += 0.5) isTagged_2[_d] = false;
+      for(double _d = d_min_3; _d <= d_max_3; _d += 0.5) isTagged_3[_d] = false;
+      
+      //cjet -> dumpBTagLabels();
+      
+      double jetBDiscr  = cjet -> getBDiscriminator( _jetTagSource );
+      double jetBDiscr2 = cjet -> getBDiscriminator( _jetTagSource_2 );
+      double jetBDiscr3 = cjet -> getBDiscriminator( _jetTagSource_3 );
+      
+      // loop over discriminator values
+      for(double _d = d_min; _d < d_max+0.0001; _d += d_step){
+	if ( jetBDiscr > _d ){
+	  nTaggedJets[_d] . count(); // check the discriminator
+	  isTagged[_d] = true;
 	}
-      */
-
-      if ( 
-	  ( fabs( (*cjet) . eta() ) < 2.4 ) &&
-	  ( (*cjet) . pt() > 25.0 ) &&
-	  _foundGenJetMatch )
-	{
-	  
-	  nOfGoodJets . count();
-
-	  map<double,bool> isTagged;
-	  map<double,bool> isTagged_2;
-	  map<double,bool> isTagged_3;
-	  for(double _d = dLow; _d <= dHigh; _d += 0.5) isTagged[_d] = false;
-	  for(double _d = dLow_2; _d <= dHigh_2; _d += 0.5) isTagged_2[_d] = false;
-	  for(double _d = dLow_3; _d <= dHigh_3; _d += 0.5) isTagged_3[_d] = false;
-
-	  //JetTagRef _theJetTagRef = cjet -> getBJetTagRef( _jetTagSource );
-	  //JetTagRef _theJetTagRef_2 = cjet -> getBJetTagRef( _jetTagSource_2 );
-	  //JetTagRef _theJetTagRef_3 = cjet -> getBJetTagRef( _jetTagSource_3 );
-
-	  //cjet -> dumpBTagLabels();
-	  //cout << cjet -> getBDiscriminator( _jetTagSource ) << endl;
-	  //cout << cjet -> getBDiscriminator( _jetTagSource_2 ) << endl;
-	  //cout << cjet -> getBDiscriminator( _jetTagSource_3 ) << endl;
-
-	  double jetBDiscr  = cjet -> getBDiscriminator( _jetTagSource );
-	  double jetBDiscr2 = cjet -> getBDiscriminator( _jetTagSource_2 );
-	  double jetBDiscr3 = cjet -> getBDiscriminator( _jetTagSource_3 );
-
+      }
+      for(double _d = d_min_2; _d < d_max_2+0.0001; _d += d_step_2){
+	if ( jetBDiscr2 > _d ){
+	  nTaggedJets_2[_d] . count(); // check the discriminator
+	  isTagged_2[_d] = true;
+	}
+      }
+      for(double _d = d_min_3; _d < d_max_3+0.0001; _d += d_step_3){
+	if ( jetBDiscr3 > _d ){
+	  nTaggedJets_3[_d] . count(); // check the discriminator
+	  isTagged_3[_d] = true;
+	}
+      }
+      
+      
+      // ---- jet flavor (MC only!!!)
+      if ( _dataType == "MC" ){
+	int jetFlavor = cjet -> getPartonFlavour();
+	
+	goodCaloJetFlavorID . push_back( jetFlavor );
+	
+	if ( jetFlavor == 5 ){
+	  //nOfGoodJets . count();
+	  nOfGoodBJets . count();
 	  // loop over discriminator values
-	  for(double _d = dLow; _d < dHigh+0.0001; _d += dStep){
-	      if ( jetBDiscr > _d ){
-		nTaggedJets[_d] . count(); // check the discriminator
-		isTagged[_d] = true;
-	      }
+	  for(double _d = d_min; _d < d_max+0.0001; _d += d_step){
+	    if ( isTagged[_d] ) nOfTaggedBJets[_d] . count();
 	  }
-	  for(double _d = dLow_2; _d < dHigh_2+0.0001; _d += dStep_2){
-	    if ( jetBDiscr2 > _d )
-	      {
-		nTaggedJets_2[_d] . count(); // check the discriminator
-		isTagged_2[_d] = true;
-	      }
+	  for(double _d = d_min_2; _d < d_max_2+0.0001; _d += d_step_2){
+	    if ( isTagged_2[_d] ) nOfTaggedBJets_2[_d] . count();
 	  }
-	  for(double _d = dLow_3; _d < dHigh_3+0.0001; _d += dStep_3){
-	    if ( jetBDiscr3 > _d )
-	      {
-		nTaggedJets_3[_d] . count(); // check the discriminator
-		isTagged_3[_d] = true;
-	      }
+	  for(double _d = d_min_3; _d < d_max_3+0.0001; _d += d_step_3){
+	    if ( isTagged_3[_d] ) nOfTaggedBJets_3[_d] . count();
 	  }
-
-
-
-	  // ---- jet flavor (MC only!!!)
-	  if ( _dataType == "MC" ) 
-	    {
-	      int jetFlavor = cjet -> getPartonFlavour();
-	      
-	      goodCaloJetFlavorID . push_back( jetFlavor );
-	      
-	      if ( jetFlavor == 5 )
-		{
-		  //nOfGoodJets . count();
-		  nOfGoodBJets . count();
-		  for(double _d = dLow; _d < dHigh+0.0001; _d += dStep) // loop over discriminator values
-		    {
-		      if ( isTagged[_d] ) nOfTaggedBJets[_d] . count();
-		    }
-		  for(double _d = dLow_2; _d < dHigh_2+0.0001; _d += dStep_2) // loop over discriminator values
-		    {
-		      if ( isTagged_2[_d] ) nOfTaggedBJets_2[_d] . count();
-		    }
-		  for(double _d = dLow_3; _d < dHigh_3+0.0001; _d += dStep_3) // loop over discriminator values
-		    {
-		      if ( isTagged_3[_d] ) nOfTaggedBJets_3[_d] . count();
-		    }
-		}
-	      else if ( jetFlavor == 4 )
-		{
-		  //nOfGoodJets . count();
-		  nOfGoodCJets . count();
-		  for(double _d = dLow; _d < dHigh+0.0001; _d += dStep) // loop over discriminator values
-		    {
-		      if ( isTagged[_d] ) nOfTaggedCJets[_d] . count();
-		    }
-		  for(double _d = dLow_2; _d < dHigh_2+0.0001; _d += dStep_2) // loop over discriminator values
-		    {
-		      if ( isTagged_2[_d] ) nOfTaggedCJets_2[_d] . count();
-		    }
-		  for(double _d = dLow_3; _d < dHigh_3+0.0001; _d += dStep_3) // loop over discriminator values
-		    {
-		      if ( isTagged_3[_d] ) nOfTaggedCJets_3[_d] . count();
-		    }
-		  
-		}
-	      else if ( jetFlavor == 1 || jetFlavor == 2 || jetFlavor == 3 || jetFlavor == 21 )
-		{
-		  //nOfGoodJets . count();
-		  nOfGoodLJets . count();
-		  for(double _d = dLow; _d < dHigh+0.0001; _d += dStep) // loop over discriminator values
-		    {
-		      if ( isTagged[_d] ) nOfTaggedLJets[_d] . count();
-		    }
-		  for(double _d = dLow_2; _d < dHigh_2+0.0001; _d += dStep_2) // loop over discriminator values
-		    {
-		      if ( isTagged_2[_d] ) nOfTaggedLJets_2[_d] . count();
-		    }
-		  for(double _d = dLow_3; _d < dHigh_3+0.0001; _d += dStep_3) // loop over discriminator values
-		    {
-		      if ( isTagged_3[_d] ) nOfTaggedLJets_3[_d] . count();
-		    }
-		}
-	      else if ( jetFlavor == 0 )
-		{
-		  //nOfGoodJets . count();
-		  nOfGoodUnknownJets . count();
-		  for(double _d = dLow; _d < dHigh+0.0001; _d += dStep) // loop over discriminator values
-		    {
-		      if ( isTagged[_d] ) nOfTaggedUnknownJets[_d] . count();
-		    }
-		  for(double _d = dLow_2; _d < dHigh_2+0.0001; _d += dStep_2) // loop over discriminator values
-		    {
-		      if ( isTagged_2[_d] ) nOfTaggedUnknownJets_2[_d] . count();
-		    }
-		  for(double _d = dLow_3; _d < dHigh_3+0.0001; _d += dStep_3) // loop over discriminator values
-		    {
-		      if ( isTagged_3[_d] ) nOfTaggedUnknownJets_3[_d] . count();
-		    }
-		}
-	      else nOfGoodOtherJets . count();
-
-	    }
-
 	}
+	else if ( jetFlavor == 4 ){
+	  //nOfGoodJets . count();
+	  nOfGoodCJets . count();
+	  for(double _d = d_min; _d < d_max+0.0001; _d += d_step){
+	    if ( isTagged[_d] ) nOfTaggedCJets[_d] . count();
+	  }
+	  for(double _d = d_min_2; _d < d_max_2+0.0001; _d += d_step_2){
+	    if ( isTagged_2[_d] ) nOfTaggedCJets_2[_d] . count();
+	  }
+	  for(double _d = d_min_3; _d < d_max_3+0.0001; _d += d_step_3){
+	    if ( isTagged_3[_d] ) nOfTaggedCJets_3[_d] . count();
+	  }
+	}
+	else if ( jetFlavor == 1 || jetFlavor == 2 || jetFlavor == 3 || jetFlavor == 21 ){
+	  //nOfGoodJets . count();
+	  nOfGoodLJets . count();
+	  for(double _d = d_min; _d < d_max+0.0001; _d += d_step){
+	    if ( isTagged[_d] ) nOfTaggedLJets[_d] . count();
+	  }
+	  for(double _d = d_min_2; _d < d_max_2+0.0001; _d += d_step_2){
+	    if ( isTagged_2[_d] ) nOfTaggedLJets_2[_d] . count();
+	  }
+	  for(double _d = d_min_3; _d < d_max_3+0.0001; _d += d_step_3){
+	    if ( isTagged_3[_d] ) nOfTaggedLJets_3[_d] . count();
+	  }
+	}
+	else if ( jetFlavor == 0 ){
+	  //nOfGoodJets . count();
+	  nOfGoodUnknownJets . count();
+	  for(double _d = d_min; _d < d_max+0.0001; _d += d_step){
+	    if ( isTagged[_d] ) nOfTaggedUnknownJets[_d] . count();
+	  }
+	  for(double _d = d_min_2; _d < d_max_2+0.0001; _d += d_step_2){
+	    if ( isTagged_2[_d] ) nOfTaggedUnknownJets_2[_d] . count();
+	  }
+	  for(double _d = d_min_3; _d < d_max_3+0.0001; _d += d_step_3){
+	    if ( isTagged_3[_d] ) nOfTaggedUnknownJets_3[_d] . count();
+	  }
+	}
+	else nOfGoodOtherJets . count();
+      }
     }
-
-
+  }
+  
   // loop over electrons
   vector<TopElectron>::const_iterator el;
   RooGKCounter nOfGoodElectrons( "" );
-  for ( el = electrons -> begin(); el != electrons -> end(); el++)
-    {
-      if ( ( (*el) . pt() > 20.0 ) &&
-           ( fabs( (*el) . eta() ) < 2.4 ) )
-        {
-	  
-	  nOfGoodElectrons . count();
-
-	}
+  for ( el = electrons -> begin(); el != electrons -> end(); el++){
+    if (
+	//	  (*el) . pt() > 20.0  &&
+	//	  fabs( (*el) . eta() ) < 2.4  
+	(*el) . pt() > electron_pt_min  &&
+	fabs( (*el) . eta() ) < electron_eta_max &&
+	(*el).getTrackIso() < electron_trackIso_max &&
+	(*el).getCaloIso() < electron_caloIso_max
+	){
+      nOfGoodElectrons . count();
     }
+  }
   
   
   // loop over muons
   vector<TopMuon>::const_iterator mu;
   RooGKCounter nOfGoodMuons( "" );
-  for ( mu = muons -> begin(); mu != muons -> end(); mu++)
-    {
-      if ( ( (*mu) . pt() > 20.0 ) &&
-           ( fabs( (*mu) . eta() ) < 2.4 ) )
-        {
-	  
-	  nOfGoodMuons . count();
-	}
+  for ( mu = muons -> begin(); mu != muons -> end(); mu++){
+    if (
+	//	  (*mu) . pt() > 20.0 &&
+	//	  fabs( (*mu) . eta() ) < 2.4 
+	(*mu) . pt() > muon_pt_min &&
+	fabs( (*mu) . eta() ) < muon_eta_max &&
+	(*mu).getTrackIso() < muon_trackIso_max &&
+	(*mu).getCaloIso() < muon_caloIso_max
+	){
+      nOfGoodMuons . count();
     }
-
+  }
+  
   // loop over METs
   vector<TopMET>::const_iterator met;
   RooGKCounter nOfGoodMETs( "" );
-  for ( met = METs -> begin(); met != METs -> end(); met++)
-    {
-      if ( ( (*met) . et() > 25.0 ) )
-        {
-	  
-          nOfGoodMETs . count();
-	  
-        }
+  for ( met = METs -> begin(); met != METs -> end(); met++){
+    if ( 
+	//	  (*met) . et() > 25.0
+	(*met) . et() > met_et_min
+	){
+      nOfGoodMETs . count();
     }
+  }
   
-
+  
   // ====== SELECTION =================
   //
   //
   if ( 
-      (int)nOfGoodJets . getCount() >= nCaloJetsLow &&
-      ( (int)nOfGoodElectrons . getCount() + (int)nOfGoodMuons . getCount() >= nLeptonLow ) &&
+      (int)nOfGoodJets . getCount() >= nCaloJets_min &&
+      ( (int)nOfGoodElectrons . getCount() + (int)nOfGoodMuons . getCount() >= nLepton_min ) &&
       nOfGoodMETs . getCount() > 0 )
     {
       
@@ -370,7 +336,7 @@ TtTagConsistency::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       Fijk[ (int)nOfGoodBJets.getCount() ][ (int)nOfGoodCJets.getCount() ][ (int)nOfGoodLJets.getCount() ]+=weight;
       Fxijk[ (int)nOfGoodUnknownJets.getCount() ][ (int)nOfGoodBJets.getCount() ][ (int)nOfGoodCJets.getCount() ][ (int)nOfGoodLJets.getCount() ]+=weight;
 
-      for(double _d = dLow; _d < dHigh+0.0001; _d += dStep) // loop over discriminator values
+      for(double _d = d_min; _d < d_max+0.0001; _d += d_step) // loop over discriminator values
 	{
 	  nOfTaggedPassedBJets[_d] . incrementDouble( (double)nOfTaggedBJets[_d] . getCount()*weight );
 	  nOfTaggedPassedCJets[_d] . incrementDouble( (double)nOfTaggedCJets[_d] . getCount()*weight );
@@ -379,7 +345,7 @@ TtTagConsistency::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
 	  Nn[_d][ nTaggedJets[_d] . getCount() ]+=weight;
 	}
-      for(double _d = dLow_2; _d < dHigh_2+0.0001; _d += dStep_2) // loop over discriminator values
+      for(double _d = d_min_2; _d < d_max_2+0.0001; _d += d_step_2) // loop over discriminator values
 	{
 	  nOfTaggedPassedBJets_2[_d] . incrementDouble( (double)nOfTaggedBJets_2[_d] . getCount()*weight );
 	  nOfTaggedPassedCJets_2[_d] . incrementDouble( (double)nOfTaggedCJets_2[_d] . getCount()*weight );
@@ -388,7 +354,7 @@ TtTagConsistency::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	  
 	  Nn_2[_d][ nTaggedJets_2[_d] . getCount() ]+=weight;
 	}
-      for(double _d = dLow_3; _d < dHigh_3+0.0001; _d += dStep_3) // loop over discriminator values
+      for(double _d = d_min_3; _d < d_max_3+0.0001; _d += d_step_3) // loop over discriminator values
 	{
 	  nOfTaggedPassedBJets_3[_d] . incrementDouble( (double)nOfTaggedBJets_3[_d] . getCount()*weight );
 	  nOfTaggedPassedCJets_3[_d] . incrementDouble( (double)nOfTaggedCJets_3[_d] . getCount()*weight );
@@ -425,17 +391,25 @@ TtTagConsistency::beginJob(const edm::EventSetup&)
  _outputFileTable_2 . open( _tableFileName_2 . c_str() );
   _outputFileTable_3 . open( _tableFileName_3 . c_str() );
 
-  _outputFileMC . open( _mcFileName . c_str() );
+  // FIXME: obsolete .mc
+  //_outputFileMC . open( _mcFileName . c_str() );
   _outputFileMC2 . open( _mcFileName2 . c_str() );
 
-  for(double _d = dLow; _d < dHigh+0.0001; _d += dStep) // loop over discriminator values
-    {
-      for (int i=0; i<=4; i++){
-	Nn[_d][i] = 0.0;
-	Nn_2[_d][i] = 0.0;
-	Nn_3[_d][i] = 0.0;
-      }
+  for(double _d = d_min; _d < d_max+0.0001; _d += d_step){ // loop over discriminator values
+    for (int i=0; i<=4; i++){
+      Nn[_d][i] = 0.0;
     }
+  }
+  for(double _d = d_min_2; _d < d_max_2+0.0001; _d += d_step_2){ // loop over discriminator values
+    for (int i=0; i<=4; i++){
+      Nn_2[_d][i] = 0.0;
+    }
+  }
+  for(double _d = d_min_3; _d < d_max_3+0.0001; _d += d_step_3){ // loop over discriminator values
+    for (int i=0; i<=4; i++){
+      Nn_3[_d][i] = 0.0;
+    }
+  }
 }
 
 int TtTagConsistency::findJetMatch( const reco::Jet & theJet, const std::vector<reco::GenJet> & jets, std::vector<int> & jetIndex, double dRCut ) {
@@ -488,7 +462,7 @@ TtTagConsistency::endJob() {
   //===> table
   char buf[10];
   _outputFileTable << "     discr       N_0       N_1       N_2       N_3       N_4       N_b N_btagged       N_c N_ctagged       N_l N_ltagged       N_x N_xtagged" << endl;
-  for(double _d = dLow; _d < dHigh+0.0001; _d += dStep) // loop over discriminator values
+  for(double _d = d_min; _d < d_max+0.0001; _d += d_step) // loop over discriminator values
     {
       sprintf( buf, "%10.2f", _d);
       _outputFileTable << buf;
@@ -537,7 +511,7 @@ TtTagConsistency::endJob() {
 
  // table for the second tagger
   _outputFileTable_2 << "     discr       N_0       N_1       N_2       N_3       N_4       N_b N_btagged       N_c N_ctagged       N_l N_ltagged       N_x N_xtagged" << endl;
-  for(double _d = dLow_2; _d < dHigh_2+0.0001; _d += dStep_2) // loop over discriminator values
+  for(double _d = d_min_2; _d < d_max_2+0.0001; _d += d_step_2) // loop over discriminator values
     {
       sprintf( buf, "%10.2f", _d);
       _outputFileTable_2 << buf;
@@ -586,7 +560,7 @@ TtTagConsistency::endJob() {
 
   // table for the third tagger
   _outputFileTable_3 << "     discr       N_0       N_1       N_2       N_3       N_4       N_b N_btagged       N_c N_ctagged       N_l N_ltagged       N_x N_xtagged" << endl;
-  for(double _d = dLow_3; _d < dHigh_3+0.0001; _d += dStep_3) // loop over discriminator values
+  for(double _d = d_min_3; _d < d_max_3+0.0001; _d += d_step_3) // loop over discriminator values
     {
       sprintf( buf, "%10.2f", _d);
       _outputFileTable_3 << buf;
@@ -636,6 +610,7 @@ TtTagConsistency::endJob() {
   
   if ( _dataType == "MC" )
     {
+      /* FIXME: obsolete
       for ( it_i = Fijk . begin(); it_i != Fijk . end(); it_i++ )
 	{
 	  map< int, map< int, double > > map2 = it_i -> second;        
@@ -651,6 +626,7 @@ TtTagConsistency::endJob() {
 		}
 	    }
 	}
+      */
 
       // dataset flavor structure with undefined flavor jets counted: F_undefined_b_c_light
       for ( it_x = Fxijk . begin(); it_x != Fxijk . end(); it_x++ )
@@ -684,8 +660,11 @@ TtTagConsistency::endJob() {
   _outputFileTable_3 . close();
 
 
-  _outputFileMC.close(); 
+  //_outputFileMC.close(); 
   _outputFileMC2.close(); 
 
 }
 
+#include "FWCore/Framework/interface/MakerMacros.h"
+
+DEFINE_FWK_MODULE(TtTagConsistency);

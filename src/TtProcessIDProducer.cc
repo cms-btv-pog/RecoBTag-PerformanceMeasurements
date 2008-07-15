@@ -13,7 +13,7 @@
 //
 // Original Author:  Gena Kukartsev, kukarzev@fnal.gov
 //         Created:  Tue Apr  8 19:00:04 CDT 2008
-// $Id$
+// $Id: TtProcessIDProducer.cc,v 1.1.2.1 2008/05/30 13:50:36 kukartse Exp $
 //
 //
 
@@ -44,7 +44,12 @@ TtProcessIDProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
    std::auto_ptr<int> pOut( new int(1) );
-   (*pOut) = csa07::csa07ProcessId(iEvent);
+  try{
+    (*pOut) = csa07::csa07ProcessId(iEvent);
+  }
+  catch( edm::Exception ) {
+    (*pOut) = 100;
+  }
    iEvent.put(pOut);
 
 /* this is an EventSetup example
