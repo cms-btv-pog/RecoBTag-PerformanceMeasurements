@@ -7,6 +7,8 @@
 
 #include "RecoBTag/PerformanceMeasurements/test/Plotters/Ptrel2DPlotter.h"
 
+#include <cmath>
+
 ClassImp(Ptrel2DPlotter)
 
 
