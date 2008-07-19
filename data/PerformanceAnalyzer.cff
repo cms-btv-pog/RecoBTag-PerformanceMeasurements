@@ -12,7 +12,7 @@ module Performance = PerformanceAnalyzer {
        untracked string PrimaryVertexCollection = "offlinePrimaryVerticesFromCTFTracks"
        bool StoreTrackProba = false
 
-       bool bTagTrackEvent = false
+       string bTagTrackEventIPtagInfos  = "impactParameterTagInfos" 
     
        // b-tagedd jet collection
        untracked vstring bTaggerList = { 

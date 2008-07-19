@@ -5,33 +5,34 @@
 
 #include "RecoBTag/PerformanceMeasurements/test/Plotters/BasePlotter.h"
 
-class IPSPlotter : public BasePlotter {
+class IPSPlotter : public BasePlotter
+{
 
- public:
+public:
 
-  IPSPlotter(TString filename="") : BasePlotter(filename) {}
+    IPSPlotter(TString filename="") : BasePlotter(filename) {}
 
-  void Write();
+    void Write();
 
-  ClassDef(IPSPlotter,1);
+    ClassDef(IPSPlotter,1);
 
- protected:
+protected:
 
-  void Book(); 
-  void Fill(BTagEvent*);
+    void Book();
+    void Fill(BTagEvent*);
 
- private:
+private:
 
-  TH1F * ips_; 
-  TH1F * ipsB_;
-  TH1F * ipsC_;
-  TH1F * ipsKs_;
-  TH1F * ipsElse_;
-  TH1F * ipsLight_;
-  TH1F * ipsLambda_;
-  TH1F * ipsInteraction_;
-  TH1F * ipsConversion_;
-  
+    TH1F * ips_;
+    TH1F * ipsB_;
+    TH1F * ipsC_;
+    TH1F * ipsKs_;
+    TH1F * ipsElse_;
+    TH1F * ipsLight_;
+    TH1F * ipsLambda_;
+    TH1F * ipsInteraction_;
+    TH1F * ipsConversion_;
+
 };
 
 #endif
