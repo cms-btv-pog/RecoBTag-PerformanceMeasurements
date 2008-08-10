@@ -1,4 +1,4 @@
-void MakeTemplatesCSA07_WT_10invpb()
+void MakeTemplatesCSA07_10invpb()
 {
 	// Load the PtrelSolver library
 	gSystem->Load("libPtrelSolver.so");
@@ -7,13 +7,13 @@ void MakeTemplatesCSA07_WT_10invpb()
 	TF1 bTemplate("btemplate", "[4] * (pow(x, [0]) * exp([1] * pow(x, [3])) + [2])", 0., 3.5);
 	
 	// Set the initial parameters
-	bTemplate.SetParameters(1.30774, -0.51646, 0.00475143, 2.1, 800);
+	bTemplate.SetParameters(1.7256, -4.19201, .0000207, .849781, 1251050);
 
 	// Define the template function
 	TF1 clTemplate("cltemplate", "[4] * (pow(x, [0]) * exp([1] * pow(x, [3])) + [2])", 0., 3.5);
 	
 	// Set the initial parameters
-	clTemplate.SetParameters(1.30774, -0.51646, 0.00475143, 2.1, 800);
+	clTemplate.SetParameters(1.7256, -4.19201, .0000207, .849781, 1251050);
 
 	// Create a PtrelTemplateMaker
 	PtrelTemplateMaker maker;
