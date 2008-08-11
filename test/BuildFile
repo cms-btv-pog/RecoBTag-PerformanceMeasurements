@@ -1,6 +1,5 @@
 
 <use name=RecoBTag/PerformanceMeasurements>
-<use name=root>
 
 <library file=Template.cc name=Template>
 </library>
@@ -14,11 +13,9 @@
 <use name=clhep> 
 </library>
 
-<library file=PtrelSolver/PtrelSolver.cc name=PtrelSolver>
-</library>
-
 <library file=PtrelSolver/*.cc name=PtrelSolver>
 <use name=root>
+<use name=rootminuit>>
 <use name=rootminuit2>
 <use name=clhep>
 </library>

@@ -6,7 +6,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagHistograms.h,v 1.1 2008/01/04 16:18:22 yumiceva Exp $
+ version $Id: BTagHistograms.h,v 1.2 2008/06/11 08:46:58 tboccali Exp $
 
 ________________________________________________________________**/
 
@@ -19,37 +19,41 @@ ________________________________________________________________**/
 
 #include <map>
 
-class BTagHistograms {
+class BTagHistograms
+{
 
-  public:
+public:
 
-        BTagHistograms();
-        ~BTagHistograms();
+    BTagHistograms();
+    ~BTagHistograms();
 
-        void Init(TString type, TString suffix1="", TString suffix2="");
-        void Fill1d(TString name, Double_t x , Double_t weight =1);
-        void Fill2d(TString name, Double_t x, Double_t y, Double_t weight=1);
-        void Save();
-        void SaveToFile(TString filename);
-        void Fit(TString name, Double_t mean);
-        void DeleteHisto() {
-          for(std::map<TString,TH1* >::const_iterator ih=h1.begin(); ih!=h1.end(); ++ih){
+    void Init(TString type, TString suffix1="", TString suffix2="");
+    void Fill1d(TString name, Double_t x , Double_t weight =1);
+    void Fill2d(TString name, Double_t x, Double_t y, Double_t weight=1);
+    void Save();
+    void SaveToFile(TString filename);
+    void Fit(TString name, Double_t mean);
+    void DeleteHisto()
+    {
+        for (std::map<TString,TH1* >::const_iterator ih=h1.begin(); ih!=h1.end(); ++ih)
+        {
             TH1 *htemp = ih->second;
             delete htemp;
-          }
-          for(std::map<TString,TH2* >::const_iterator ih=h2.begin(); ih!=h2.end(); ++ih){
+        }
+        for (std::map<TString,TH2* >::const_iterator ih=h2.begin(); ih!=h2.end(); ++ih)
+        {
             TH2 *htemp = ih->second;
             delete htemp;
-          }
-        };
+        }
+    };
 
-  private:
+private:
 
-        std::map<TString, TCanvas*> cv_map;
-        std::map<TString, TH1*> h1;
-        std::map<TString, TH2*> h2;
-        TFile            *ffile;
-        TFile            *foutfile;
+    std::map<TString, TCanvas*> cv_map;
+    std::map<TString, TH1*> h1;
+    std::map<TString, TH2*> h2;
+    TFile            *ffile;
+    TFile            *foutfile;
 
 };
 

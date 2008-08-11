@@ -1,12 +1,12 @@
 /**_________________________________________________________________
    class:   BTagBaseTrackEvent.cc
    package: RecoBTag/PerformanceMeasurements
-   
+
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
          Victor E. Bazterra, UIC (baites@fnal.gov)
 
- version $Id: BTagBaseTrackEvent.cc,v 1.1 2008/03/11 21:09:39 bazterra Exp $
+ version $Id: BTagBaseTrackEvent.cc,v 1.2 2008/03/17 02:23:04 bazterra Exp $
 
 ________________________________________________________________**/
 
@@ -15,7 +15,7 @@ ________________________________________________________________**/
 ClassImp(BTagBaseTrackEvent)
 
 //_______________________________________________________________
-void BTagBaseTrackEvent::Reset() 
+void BTagBaseTrackEvent::Reset()
 {
     pt.clear();
     eta.clear();
@@ -27,5 +27,5 @@ void BTagBaseTrackEvent::Reset()
     d0.clear();
     d0sigma.clear();
     jet_deltaR.clear();
-    jet_ptrel.clear();	
+    jet_ptrel.clear();
 }
