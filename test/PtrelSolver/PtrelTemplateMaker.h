@@ -31,13 +31,13 @@ public:
     void reset()
     {
         rebin_ = std::vector<Int_t>(Dependency::Dimension, 1);
-    	functions_ = std::vector<TF1>(Flavor::Dimension, TF1());
+        functions_ = std::vector<TF1>(Flavor::Dimension, TF1());
     }
 
     //! Set rebinning options
     void function(Dependency::Type dependency, TF1 const & form)
     {
-    	functions_[dependency] = form;
+        functions_[dependency] = form;
     }
 
     //! Set rebinning options

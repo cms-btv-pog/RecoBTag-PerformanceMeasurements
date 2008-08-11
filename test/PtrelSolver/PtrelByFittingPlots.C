@@ -1,12 +1,12 @@
 void PtrelByFittingPlots (const char * mfile, const char * mcfile)
 {
     gROOT->SetStyle("Plain");
-	
+
     TFile * measurement = new TFile(mfile, "READ");
     TFile * mctruth = new TFile(mcfile, "READ");
-    
+
     TCanvas * c1 = new TCanvas("c1", "PtrelByFitting over n sample apply to TC");
-    
+
     c1->Divide(3,2);
 
     c1->cd(1);
@@ -29,7 +29,7 @@ void PtrelByFittingPlots (const char * mfile, const char * mcfile)
 
 
     TCanvas * c2 = new TCanvas("c2", "PtrelByFitting over p sample apply to TP");
-    
+
     c2->Divide(3,2);
 
     c2->cd(1);
@@ -53,7 +53,7 @@ void PtrelByFittingPlots (const char * mfile, const char * mcfile)
 
 
     TCanvas * c3 = new TCanvas("c3", "PtrelByFitting over n sample apply to JP");
-    
+
     c3->Divide(3,2);
 
     c3->cd(1);
@@ -76,7 +76,7 @@ void PtrelByFittingPlots (const char * mfile, const char * mcfile)
 
 
     TCanvas * c4 = new TCanvas("c4", "PtrelByFitting over p sample apply TP");
-    
+
     c4->Divide(3,2);
 
     c4->cd(1);
@@ -101,21 +101,21 @@ void PtrelByFittingPlots (const char * mfile, const char * mcfile)
 
 void plot(TFile * measurement, const char * mname, TFile * mctruth, const char * mcname)
 {
-	TH1D * mHistogram = measurement->Get(mname);
-	TH1D * mcHistogram = mctruth->Get(mcname);
-	
-	mHistogram->GetYaxis()->SetRangeUser(0., 1.2);
-	mcHistogram->GetYaxis()->SetRangeUser(0., 1.2);
-	
-	mHistogram->SetLineWidth(2);
-	mcHistogram->SetLineWidth(2);
-	mcHistogram->SetLineStyle(2);
-	mcHistogram->SetLineColor(kRed);
-	
-	mHistogram->Draw();
-	mcHistogram->Draw("same");
-	
-	TLegend * legend = new TLegend(0.25, 0.77, 0.6, 0.92);
+    TH1D * mHistogram = measurement->Get(mname);
+    TH1D * mcHistogram = mctruth->Get(mcname);
+
+    mHistogram->GetYaxis()->SetRangeUser(0., 1.2);
+    mcHistogram->GetYaxis()->SetRangeUser(0., 1.2);
+
+    mHistogram->SetLineWidth(2);
+    mcHistogram->SetLineWidth(2);
+    mcHistogram->SetLineStyle(2);
+    mcHistogram->SetLineColor(kRed);
+
+    mHistogram->Draw();
+    mcHistogram->Draw("same");
+
+    TLegend * legend = new TLegend(0.25, 0.77, 0.6, 0.92);
     legend->AddEntry(mHistogram, "Measure", "pl");
     legend->AddEntry(mcHistogram, "MCTruth", "l");
     legend->Draw();

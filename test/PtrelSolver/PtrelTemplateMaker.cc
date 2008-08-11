@@ -39,33 +39,34 @@ void PtrelTemplateMaker::make(
     // Make mistag for counting
     CallSafely( makeEfficiencies(input, output, TPRegexp("n_pT_cl"), TPRegexp("p_pT_cl")) )
     CallSafely( makeEfficiencies(input, output, TPRegexp("n_eta_cl"), TPRegexp("p_eta_cl")) )
-    
+
     // Closing the files
-    input->Close(); output->Close();    
+    input->Close();
+    output->Close();
 }
 
 
 TH2* PtrelTemplateMaker::processTH2(TObject * object) const
 {
-	 // Cast the object pointer into 2D histogram
-     TH2 * histogram2D = (TH2*) object;
+    // Cast the object pointer into 2D histogram
+    TH2 * histogram2D = (TH2*) object;
 
-	 // Check for ptrel rebinning
-     if ( rebin_[Dependency::ptrel] != 1 )
-     {
-           Info(__FUNCTION__, "Rebinning ptrel a factor %d in %s", rebin_[Dependency::ptrel], histogram2D->GetName());
-           histogram2D->RebinY( rebin_[Dependency::ptrel] );
-     }
+    // Check for ptrel rebinning
+    if ( rebin_[Dependency::ptrel] != 1 )
+    {
+        Info(__FUNCTION__, "Rebinning ptrel a factor %d in %s", rebin_[Dependency::ptrel], histogram2D->GetName());
+        histogram2D->RebinY( rebin_[Dependency::ptrel] );
+    }
 
-     // Check the histogram dependency and rebin
-     for (Int_t j = 1; j < Dependency::Dimension; ++j)
-         if ( TString(histogram2D->GetName()).Contains(Dependency::Name[j]) && rebin_[j] != 1)
-         {
-               Info(__FUNCTION__, "Rebinning %s a factor %d in %s", Dependency::Name[j], rebin_[j], histogram2D->GetName());
-               histogram2D->RebinX( rebin_[j] );
-         }
-         
-     return histogram2D;
+    // Check the histogram dependency and rebin
+    for (Int_t j = 1; j < Dependency::Dimension; ++j)
+        if ( TString(histogram2D->GetName()).Contains(Dependency::Name[j]) && rebin_[j] != 1)
+        {
+            Info(__FUNCTION__, "Rebinning %s a factor %d in %s", Dependency::Name[j], rebin_[j], histogram2D->GetName());
+            histogram2D->RebinX( rebin_[j] );
+        }
+
+    return histogram2D;
 }
 
 
@@ -95,14 +96,14 @@ bool PtrelTemplateMaker::makeEfficiencies (
 
     while ( keyD = (TKey*)nextkeyD() )
     {
-    	// Select only 2D histograms
+        // Select only 2D histograms
         TObject * objectD = keyD->ReadObj();
         if ( objectD->IsA()->InheritsFrom( "TH2" ) )
-        	// Select those histogram that match the pattern
+            // Select those histogram that match the pattern
             if ( TString(objectD->GetName()).Contains(patternD) )
             {
                 // Information
-                Info(__FUNCTION__, "Selecting as denominator %s", objectD->GetName());                
+                Info(__FUNCTION__, "Selecting as denominator %s", objectD->GetName());
 
                 // Cast the object pointer into 2D histogram
                 TH2D * denominator2D = (TH2D*) processTH2(objectD);
@@ -119,39 +120,39 @@ bool PtrelTemplateMaker::makeEfficiencies (
 
                 while ( keyN = (TKey*)nextkeyN() )
                 {
-                     // Select only 2D histograms
-                     TObject * objectN = keyN->ReadObj();
-                     if ( objectN->IsA()->InheritsFrom( "TH2" ) )
-        	             // Select those histogram that match the pattern
-                         if ( TString(objectN->GetName()).Contains(patternN) )
-                         {
-                             // Information
-                              Info(__FUNCTION__, "Selecting as numerator %s", objectN->GetName());                
+                    // Select only 2D histograms
+                    TObject * objectN = keyN->ReadObj();
+                    if ( objectN->IsA()->InheritsFrom( "TH2" ) )
+                        // Select those histogram that match the pattern
+                        if ( TString(objectN->GetName()).Contains(patternN) )
+                        {
+                            // Information
+                            Info(__FUNCTION__, "Selecting as numerator %s", objectN->GetName());
 
-                              // Cast the object pointer into 2D histogram
-                              TH2D * numerator2D = (TH2D*) processTH2(objectN);
+                            // Cast the object pointer into 2D histogram
+                            TH2D * numerator2D = (TH2D*) processTH2(objectN);
 
-                              // Numerator histogram
-                              sprintf(name, "numerator_%s", denominator2D->GetName());
-                              TH1D * numerator1D = numerator2D->ProjectionX(name, -1, -1, "e");
-                              
-                              // MCTruth efficiencies histogram
-                              sprintf(name, "mctruth_%s_%s", denominator2D->GetName(), numerator2D->GetName());
-                              Info(__FUNCTION__, "Calculating efficiency %s", name);
-                              TH1D * mctruth = (TH1D*) numerator1D->Clone();
-                              mctruth->SetName(name);
-                              mctruth->Divide(numerator1D, denominator1D, 1., 1., "e");
-                              efficiencyHistogramSetup(mctruth);
+                            // Numerator histogram
+                            sprintf(name, "numerator_%s", denominator2D->GetName());
+                            TH1D * numerator1D = numerator2D->ProjectionX(name, -1, -1, "e");
 
-                              // Save the efficiency histogram
-                              output->cd("mctruth");
-                              mctruth->Write();
-                         }
+                            // MCTruth efficiencies histogram
+                            sprintf(name, "mctruth_%s_%s", denominator2D->GetName(), numerator2D->GetName());
+                            Info(__FUNCTION__, "Calculating efficiency %s", name);
+                            TH1D * mctruth = (TH1D*) numerator1D->Clone();
+                            mctruth->SetName(name);
+                            mctruth->Divide(numerator1D, denominator1D, 1., 1., "e");
+                            efficiencyHistogramSetup(mctruth);
+
+                            // Save the efficiency histogram
+                            output->cd("mctruth");
+                            mctruth->Write();
+                        }
                 };
             }
     };
 
-    return true;	
+    return true;
 }
 
 
@@ -162,7 +163,7 @@ bool PtrelTemplateMaker::makeTemplates(
 {
     // Check function form exist
     for (std::size_t i = 0; i < (std::size_t)Flavor::Dimension; ++i)
-        if(functions_[i].GetExpFormula().IsNull())
+        if (functions_[i].GetExpFormula().IsNull())
         {
             Error(__FUNCTION__, "Some or all function forms are not set");
             return false;
@@ -253,6 +254,6 @@ bool PtrelTemplateMaker::makeTemplates(
             sprintf(factor, "%d", rebin_[i]);
             TObjString(factor).Write(Dependency::Name[i]);
         }
- 
+
     return true;
 }

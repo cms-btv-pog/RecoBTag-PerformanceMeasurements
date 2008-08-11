@@ -14,7 +14,7 @@ public:
     //! Measure efficiency
     virtual void solve(char const *, char const *)
     {
-    	Info(__FUNCTION__, "This function in not valid use instead solve(input, mistag, output)");
+        Info(__FUNCTION__, "This function in not valid use instead solve(input, mistag, output)");
     }
 
     //! Measure efficiency
@@ -27,8 +27,8 @@ private:
         TH1 *,
         TH1 *,
         TVectorD const &,
-        ValueVector const &, 
-        CovarianceVector const &, 
+        ValueVector const &,
+        CovarianceVector const &,
         ValueVector const &,
         CovarianceVector const &
     );

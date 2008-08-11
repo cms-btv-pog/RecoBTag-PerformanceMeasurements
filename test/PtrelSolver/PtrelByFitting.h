@@ -20,8 +20,8 @@ private:
     bool compute(
         TH1 *,
         Flavor::Type dependency,
-        ValueVector const &, 
-        CovarianceVector const &, 
+        ValueVector const &,
+        CovarianceVector const &,
         ValueVector const &,
         CovarianceVector const &
     );

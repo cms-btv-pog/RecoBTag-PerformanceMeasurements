@@ -55,11 +55,11 @@ bool PtrelSolver::measure(
     CovarianceMatrix & cMatrix
 )
 {
-	// Clean the containers
-	hVector.clear();
-	vMatrix.clear();
+    // Clean the containers
+    hVector.clear();
+    vMatrix.clear();
     cMatrix.clear();
-	
+
     // Move to the directory with 2d histograms
     input->cd(directory);
 
@@ -77,15 +77,15 @@ bool PtrelSolver::measure(
         if ( object->IsA()->InheritsFrom( "TH2" ) )
             if ( TString(object->GetName() ).Contains(pattern) )
             {
-            	// Temporal container for efficiencies
-            	TH2 * histogram;
-            	ValueVector values;
-            	CovarianceVector covariances;
+                // Temporal container for efficiencies
+                TH2 * histogram;
+                ValueVector values;
+                CovarianceVector covariances;
 
-            	// Process 2D histogram associated to the keyword
+                // Process 2D histogram associated to the keyword
                 GetSafelyZero(histogram, processTH2(object))
 
-            	// Measuring efficiencies
+                // Measuring efficiencies
                 CallSafelyZero( measure(output, histogram, values, covariances) )
 
                 // Appending the results
@@ -101,7 +101,7 @@ bool PtrelSolver::measure(
 
 bool PtrelSolver::measure(
     TFile * output,
-    TH2 * histogram2D,    
+    TH2 * histogram2D,
     ValueVector & vVector,
     CovarianceVector & cVector
 )
@@ -156,7 +156,7 @@ bool PtrelSolver::measure(
 
 TH2 * PtrelSolver::readTH2(TFile * file, const char * name) const
 {
-	CreateSafelyZero(TObject, object, file->Get(name))
+    CreateSafelyZero(TObject, object, file->Get(name))
     CreateSafelyZero(TH2, histogram, processTH2(object))
     return histogram;
 }
@@ -164,7 +164,7 @@ TH2 * PtrelSolver::readTH2(TFile * file, const char * name) const
 
 TH2 * PtrelSolver::processTH2(TObject * object) const
 {
-	// Cast the object pointer into 2D histogram
+    // Cast the object pointer into 2D histogram
     TH2 * histogram = (TH2*) object;
 
     // Rebinning in ptrel
