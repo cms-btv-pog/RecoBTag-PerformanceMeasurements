@@ -1,5 +1,10 @@
+
+// PtrelSolver
+// Author: Victor E. Bazterra, UIC (2008)
+
 #include "PtrelTemplateMaker.h"
 
+#include "TClass.h"
 #include "TDirectory.h"
 #include "TKey.h"
 #include "TH1D.h"
@@ -94,7 +99,7 @@ bool PtrelTemplateMaker::makeEfficiencies (
     // Iterator for the denominators
     TKey * keyD;
 
-    while ( keyD = (TKey*)nextkeyD() )
+    while (( keyD = (TKey*)nextkeyD() ))
     {
         // Select only 2D histograms
         TObject * objectD = keyD->ReadObj();
@@ -118,7 +123,7 @@ bool PtrelTemplateMaker::makeEfficiencies (
                 // Iterator for the numerator
                 TKey * keyN;
 
-                while ( keyN = (TKey*)nextkeyN() )
+                while (( keyN = (TKey*)nextkeyN() ))
                 {
                     // Select only 2D histograms
                     TObject * objectN = keyN->ReadObj();
@@ -187,7 +192,7 @@ bool PtrelTemplateMaker::makeTemplates(
 
     TKey * key;
 
-    while ( key = (TKey*)nextkey() )
+    while (( key = (TKey*)nextkey() ))
     {
         TObject * object = key->ReadObj();
         if ( object->IsA()->InheritsFrom( "TH2" ) )
