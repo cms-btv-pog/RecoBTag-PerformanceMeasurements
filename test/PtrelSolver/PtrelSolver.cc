@@ -71,7 +71,7 @@ bool PtrelSolver::measure(
 
     //char name[256];
 
-    while ( key = (TKey*)nextkey() )
+    while (( key = (TKey*)nextkey() ))
     {
         // Measure those 2D histogram with name fit the pattern
         TObject * object = key->ReadObj();
