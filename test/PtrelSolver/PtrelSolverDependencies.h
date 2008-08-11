@@ -1,3 +1,7 @@
+
+// PtrelSolver
+// Author: Victor E. Bazterra, UIC (2008)
+
 #ifndef PtrelSolverDependencies_h
 #define PtrelSolverDependencies_h
 

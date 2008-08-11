@@ -1,4 +1,7 @@
 
+// PtrelSolver
+// Author: Victor E. Bazterra, UIC (2008)
+
 #ifdef NOSCRAMV
 #include "PtrelSolver.h"
 #include "PtrelByFitting.h"

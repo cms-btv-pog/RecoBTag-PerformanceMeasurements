@@ -1,5 +1,10 @@
+
+// PtrelSolver
+// Author: Victor E. Bazterra, UIC (2008)
+
 #include "PtrelSolver.h"
 
+#include "TClass.h"
 #include "TDirectory.h"
 #include "TKey.h"
 #include "TMinuit.h"
@@ -70,7 +75,7 @@ bool PtrelSolver::measure(
 
     //char name[256];
 
-    while ( key = (TKey*)nextkey() )
+    while (( key = (TKey*)nextkey() ))
     {
         // Measure those 2D histogram with name fit the pattern
         TObject * object = key->ReadObj();
@@ -289,5 +294,5 @@ TF1 * PtrelSolver::combinedFunction(char const * keyword, Int_t bin)
     Info(__FUNCTION__, "Creating combined function %s", name);
 
     // Creating function
-    return new TF1(name, form, xmin, xmax);
+    return new TF1(name, form.Data(), xmin, xmax);
 }

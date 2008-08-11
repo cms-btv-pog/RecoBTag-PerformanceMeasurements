@@ -1,3 +1,7 @@
+
+// PtrelSolver
+// Author: Victor E. Bazterra, UIC (2008)
+
 #ifndef PtrelByCounting_h
 #define PtrelByCounting_h
 
