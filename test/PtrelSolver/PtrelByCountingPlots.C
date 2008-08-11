@@ -54,8 +54,8 @@ void PtrelByCountingPlots (const char * mfile, const char * mcfile)
 
 void plot(TFile * measurement, const char * mname, TFile * mctruth, const char * mcname)
 {
-    TH1D * mHistogram = measurement->Get(mname);
-    TH1D * mcHistogram = mctruth->Get(mcname);
+    TH1D * mHistogram = (TH1D*) measurement->Get(mname);
+    TH1D * mcHistogram = (TH1D*) mctruth->Get(mcname);
 
     mHistogram->GetYaxis()->SetRangeUser(0., 1.2);
     mcHistogram->GetYaxis()->SetRangeUser(0., 1.2);

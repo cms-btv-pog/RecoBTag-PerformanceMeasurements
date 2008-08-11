@@ -1,4 +1,7 @@
 
+// PtrelSolver
+// Author: Victor E. Bazterra, UIC (2008)
+
 #include "PtrelByCounting.h"
 
 #include <math.h>

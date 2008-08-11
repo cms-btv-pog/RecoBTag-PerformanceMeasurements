@@ -27,7 +27,7 @@ all:	$(OBJS)
 
 %Dict.cc: %LinkDef.h
 	@echo "Generating dictionary $@"
-	rootcint -f $@ -c -DNOSCRAMV $(HEADERS) $^
+	@rootcint -f $@ -c -DNOSCRAMV $(HEADERS) $^
 
 clean:        
 	@rm -f $(OBJS) core *~ *.o *.so PtrelSolverDict.*

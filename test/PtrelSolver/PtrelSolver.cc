@@ -1,3 +1,7 @@
+
+// PtrelSolver
+// Author: Victor E. Bazterra, UIC (2008)
+
 #include "PtrelSolver.h"
 
 #include "TClass.h"
