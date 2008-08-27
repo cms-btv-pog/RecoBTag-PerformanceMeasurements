@@ -130,7 +130,7 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig) : classifi
 
     SimTrkCollectionTags_ = iConfig.getParameter<std::string>("SimTracks");
 
-    bTagTrackEventFlag_ = iConfig.getParameter<bool>("bTagTrackEvent");
+    bTagTrackEventIPTagInfos_ = iConfig.getParameter<std::string>("bTagTrackEventIPtagInfos");
 
     //jetFlavourIdentifier_ = JetFlavourIdentifier(iConfig.getParameter<edm::ParameterSet>("jetIdParameters"));
     //jetFlavourIdentifier2_ = JetFlavourIdentifier(iConfig.getParameter<edm::ParameterSet>("jetIdParameters2"));
@@ -682,6 +682,30 @@ int PerformanceAnalyzer::TaggedJet(reco::CaloJet calojet, edm::Handle<reco::JetT
     return result;
 }
 
+
+int PerformanceAnalyzer::TaggedJet(reco::CaloJet const & caloJet, edm::Handle<std::vector<reco::TrackIPTagInfo> > const & trackIPTagInfos )
+{
+    double small = 1.e-5;
+    int result = -1;
+
+    for (size_t t = 0; t < trackIPTagInfos->size(); ++t)
+    {
+        edm::RefToBase<reco::Jet> jet_p = (*trackIPTagInfos)[t].jet();
+        if (jet_p.isNull())
+        {
+            //std::cout << "-----------> TrackIPTagInfos::jet() returned null reference" << std::endl;
+            continue;
+        }
+        //std::cout << "[TaggedJet]  calojet pt = " << calojet.pt() << " tagged jet pt = " << jet_p->pt() << std::endl;
+        if (DeltaR<reco::Candidate>()( caloJet, * jet_p ) < small)
+        {
+            result = (int) t;
+            break;
+        }
+    }
+
+    return result;
+}
 
 
 SimTrack PerformanceAnalyzer::GetGenTrk(reco::Track atrack, const edm::SimTrackContainer *simTrkColl, const edm::SimVertexContainer *simVtcs)
@@ -1344,6 +1368,12 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
     Handle<reco::CaloJetCollection> jetsColl;
     iEvent.getByLabel(CaloJetCollectionTags_, jetsColl);
 
+    // Get the bTagTrackEventIPTagInfo collection
+    Handle<std::vector<reco::TrackIPTagInfo> > bTagTrackEventIPTagInfos;
+
+    if ( !bTagTrackEventIPTagInfos_.empty() )
+        iEvent.getByLabel(bTagTrackEventIPTagInfos_, bTagTrackEventIPTagInfos);
+
     //Handle<reco::CaloJetCollection> jetsCorrColl;
     //iEvent.getByLabel(CorrCaloJetCollectionTags_, jetsCorrColl);
 
@@ -1764,6 +1794,70 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
             //fS8evt->genjet_vz.push_back(-100000);
         }
 
+        //*************************************
+        // TrackEvents
+        // Running only on reco/aod samples
+        // TrackCategories only in reco samples
+        //*************************************
+                
+        if ( bTagTrackEventIPTagInfos.isValid() )
+        {
+            // Associate the jet and jettag
+            // TODO : we need to use a more standard of jet matching
+            int jetIndex = TaggedJet(*jet, bTagTrackEventIPTagInfos);
+            if (jetIndex < 0) continue;
+
+            // Get a vector of reference to the selected tracks in each jet
+            TrackRefVector tracks( (*bTagTrackEventIPTagInfos)[jetIndex].selectedTracks() );
+
+            std::vector<reco::TrackIPTagInfo::TrackIPData> const & ipdata = (*tagInfo)[jetIndex].impactParameterData();
+
+            // Create a new BTagTrackEvent
+            BTagTrackEvent trackEvent;
+
+            for ( size_t index=0; index < tracks.size(); index++ )
+            {
+                TrackRef track = tracks[index];
+
+                // collect reco track data (including their categories)
+                trackEvent.pt.push_back( track->pt() );
+                trackEvent.eta.push_back( track->eta() );
+                trackEvent.phi.push_back( track->phi() );
+                trackEvent.charge.push_back( track->charge() );
+                trackEvent.trkchi2.push_back( track->chi2() );
+                trackEvent.trkndof.push_back( track->ndof() );
+                trackEvent.trkrechits.push_back( track->numberOfValidHits() );
+                trackEvent.d0.push_back( track->d0() );
+                trackEvent.d0sigma.push_back( track->d0Error() );
+
+                // Get the IP information.
+                trackEvent.ip2d.push_back( ipdata[index].ip2d.value() );
+                trackEvent.ip2dSigma.push_back( ipdata[index].ip2d.error() );
+                trackEvent.ip3d.push_back( ipdata[index].ip3d.value() );
+                trackEvent.ip3dSigma.push_back( ipdata[index].ip3d.error() );
+                trackEvent.dta.push_back( ipdata[index].distanceToJetAxis );
+
+                // delta R(muon,jet)
+                trackEvent.jet_deltaR.push_back(
+                    ROOT::Math::VectorUtil::DeltaR(jet->p4().Vect(), track->momentum())
+                );
+
+                // ptrel calculation per track
+                TVector3 trackvec(track->px(), track->py(), track->pz());
+                TVector3 jetvec(jet->p4().Vect().X(),jet->p4().Vect().Y(),  jet->p4().Vect().Z());
+                jetvec = jetcorrection * jetvec;
+                trackEvent.jet_ptrel.push_back(
+                    trackvec.Perp(jetvec + trackvec)
+                );
+
+                // If hepMC exist get the track categories.
+                if (flavourMatchOptionf == "hepMC" )
+                    trackEvent.is.push_back( classifier_.evaluate(track).flags() );
+            }
+
+            // Add the track event into BTagEvent.
+            fS8evt->tracks.push_back( trackEvent );
+        }
 
         // b tagging
         int ith_tagged = -1;
@@ -1795,96 +1889,6 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 
             std::string moduleLabel = (jetTags).provenance()->moduleLabel();
             std::string processName = (jetTags).provenance()->processName();
-
-
-            //*************************************
-            // TrackEvents
-            // Running only on reco/aod samples
-            // TrackCategories only in reco samples
-            //*************************************
-
-            if (bTagTrackEventFlag_)
-            {
-                // Get a vector of reference to the selected tracks in each jet
-                TrackRefVector tracks((*tagInfo)[ith_tagged].selectedTracks());
-
-                std::vector<TrackIPTagInfo::TrackIPData>  ipdata = (*tagInfo)[ith_tagged].impactParameterData();
-
-
-
-                /*		std::vector<Measurement1D> ip3ds( (*tagInfo)[ith_tagged].impactParameters(0) );
-                  	std::vector<Measurement1D> ip2ds( (*tagInfo)[ith_tagged].impactParameters(1) );
-                  	std::vector<Measurement1D> sdls( (*tagInfo)[ith_tagged].decayLengths() );
-                  	std::vector<Measurement1D> dtas( (*tagInfo)[ith_tagged].jetDistances() );
-                */
-
-                std::vector<Measurement1D> ip3ds;
-                std::vector<Measurement1D> ip2ds;
-                std::vector<Measurement1D> sdls;
-                std::vector<Measurement1D> dtas;
-
-
-                for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
-                        itipdata != ipdata.end(); itipdata++)
-                {
-                    ip3ds.push_back((*itipdata).ip3d );
-                    ip2ds.push_back((*itipdata).ip2d );
-                    // what here? TOM
-                    // just fake now
-                    sdls.push_back(Measurement1D(-1,-1) );
-                    dtas.push_back(Measurement1D(-1,-1) );
-                }
-
-
-                // Create a new BTagTrackEvent
-                BTagTrackEvent trackEvent;
-
-                for ( size_t index=0; index < tracks.size(); index++ )
-                {
-                    TrackRef track = tracks[index];
-
-                    // collect reco track data (including their categories)
-                    trackEvent.pt.push_back( track->pt() );
-                    trackEvent.eta.push_back( track->eta() );
-                    trackEvent.phi.push_back( track->phi() );
-                    trackEvent.charge.push_back( track->charge() );
-                    trackEvent.trkchi2.push_back( track->chi2() );
-                    trackEvent.trkndof.push_back( track->ndof() );
-                    trackEvent.trkrechits.push_back( track->numberOfValidHits() );
-                    trackEvent.d0.push_back( track->d0() );
-                    trackEvent.d0sigma.push_back( track->d0Error() );
-
-                    // Get the IP information.
-                    trackEvent.ip2d.push_back( ip2ds[index].value() );
-                    trackEvent.ip2dSigma.push_back( ip2ds[index].error() );
-                    trackEvent.ip3d.push_back( ip3ds[index].value() );
-                    trackEvent.ip3dSigma.push_back( ip3ds[index].error() );
-                    trackEvent.sdl.push_back( sdls[index].value() );
-                    trackEvent.sdlSigma.push_back( sdls[index].error() );
-                    trackEvent.dta.push_back( dtas[index].value() );
-                    trackEvent.dtaSigma.push_back( dtas[index].error() );
-
-                    // delta R(muon,jet)
-                    trackEvent.jet_deltaR.push_back(
-                        ROOT::Math::VectorUtil::DeltaR(jet->p4().Vect(), track->momentum())
-                    );
-
-                    // ptrel calculation per track
-                    // find pTrel
-                    TVector3 trackvec(track->px(), track->py(), track->pz());
-                    trackEvent.jet_ptrel.push_back(
-                        trackvec.Perp(tmpvec + trackvec)
-                    );
-
-                    // If hepMC exist get the track categories.
-                    //	      if (flavourMatchOptionf == "hepMC" )
-                    // TOM
-                    //		trackEvent.is.push_back( classifier_.flags() );
-                }
-
-                // Add the track event into BTagEvent.
-                fS8evt->tracks.push_back( trackEvent );
-            }
 
             //*********************************
             // Track Counting taggers

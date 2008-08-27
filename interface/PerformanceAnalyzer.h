@@ -11,7 +11,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.19 2008/06/11 08:46:58 tboccali Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.20 2008/08/11 06:06:21 bazterra Exp $
  *
  */
 
@@ -53,6 +53,7 @@
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/JetReco/interface/CaloJet.h"
 #include "DataFormats/BTauReco/interface/JetTag.h"
+#include "DataFormats/BTauReco/interface/TrackIPTagInfo.h"
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 
@@ -111,7 +112,10 @@ public:
     reco::GenJet GetGenJet(reco::CaloJet calojet, reco::GenJetCollection genJetColl);
     SimTrack GetGenTrk(reco::Track atrack, const edm::SimTrackContainer *simTrkColl, const edm::SimVertexContainer *simVtcs);
     int GetMotherId(const edm::SimVertexContainer *simVtxColl, const edm::SimTrackContainer *simTrkColl, SimTrack muonMC);
+
     int TaggedJet(reco::CaloJet calojet, edm::Handle<reco::JetTagCollection > jetTags );
+    int TaggedJet(reco::CaloJet const &, edm::Handle<std::vector<reco::TrackIPTagInfo> > const &);
+    
     std::map< std::string, bool > GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<reco::JetTagCollection > > jetTags_testManyByType, double ptrel=0.);
     void FillHistos(std::string type, TLorentzVector p4MuJet, double ptrel,
                     int JetFlavor, std::map<std::string, bool> aMap, double weight);
@@ -196,7 +200,8 @@ private:
 
     std::map< std::string, float > fOPMap;
 
-    bool bTagTrackEventFlag_;
+    std::string bTagTrackEventIPTagInfos_;
+
     //  edm::ParameterSet trackHistConfig_ ;
     int fbadeventscounter;
 

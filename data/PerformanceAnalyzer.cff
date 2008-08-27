@@ -12,7 +12,7 @@ module Performance = PerformanceAnalyzer {
        untracked string PrimaryVertexCollection = "offlinePrimaryVerticesFromCTFTracks"
        bool StoreTrackProba = false
 
-       bool bTagTrackEvent = false
+       string bTagTrackEventIPtagInfos  = "" 
     
        // b-tagedd jet collection
        untracked vstring bTaggerList = { 
@@ -87,13 +87,7 @@ module Performance = PerformanceAnalyzer {
        #       vstring vetoFlavour = {  }
        #}
 
-#
-# prepare pset for TrackHistory
-#
-    string recoTrackModule = "generalTracks"
-    string trackingParticleModule = "mergedtruth"
-    string trackingParticleProduct = "MergedTrackTruth"
-    string associationModule = "TrackAssociatorByHits"
-    bool   bestMatchByMaxValue = true                
+    # Setting up TrackCategories
+    using TrackCategories
  
 }
