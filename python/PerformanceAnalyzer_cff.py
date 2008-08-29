@@ -38,9 +38,9 @@ Performance = cms.EDAnalyzer("PerformanceAnalyzer",
         fillPartons = cms.bool(True),
         mcSource = cms.string('source')
     ),
-    associationModule = cms.string('TrackAssociatorByHits'),
+    trackAssociator =  cms.untracked.string('TrackAssociatorByHits'),
     Muons = cms.string('muons'),
-    bestMatchByMaxValue = cms.bool(True),
+    bestMatchByMaxValue = cms.untracked.bool(True),
     StoreTrackProba = cms.bool(False),
     #PSet jetIdParameters2 = {
     #       string mcSource = "source"
@@ -55,17 +55,23 @@ Performance = cms.EDAnalyzer("PerformanceAnalyzer",
     #
     # prepare pset for TrackHistory
     #
-    recoTrackModule = cms.string('generalTracks'),
+    trackProducer     = cms.untracked.InputTag('generalTracks'),                     
     jetcuts = cms.PSet(
         MaxEta = cms.double(2.5),
         MinDeltaR = cms.double(0.4),
         MinPt = cms.double(20.0),
         MinPtRel = cms.double(-1.0)
     ),
-    trackingParticleModule = cms.string('mergedtruth'),
+    trackingTruth = cms.untracked.InputTag('mergedtruth:MergedTrackTruth'),
+    bTagTrackEventIPtagInfos = cms.string(''),
+
     flavourMatchOption = cms.string('hepMC'),
     WeightHistograms = cms.bool(False),
     TrackCollection = cms.untracked.string('ctfWithMaterialTracks'),
+
+    longLivedDecayLenght  = cms.untracked.double(1e-14) ,
+    badD0Pull = cms.untracked.double(3) ,
+    vertexClusteringDistance = cms.untracked.double(0.0001)  ,
     GenJets = cms.string('iterativeCone5GenJets'),
     Jets = cms.string('iterativeCone5CaloJets'),
     bTagTrackEvent = cms.bool(False),
@@ -75,7 +81,6 @@ Performance = cms.EDAnalyzer("PerformanceAnalyzer",
     SimTracks = cms.string('g4SimHits'),
     AwayJetTagger = cms.string('TCL'),
     flavourSource = cms.InputTag("IC5byValAlgo"),
-    trackingParticleProduct = cms.string('MergedTrackTruth'),
     StoreWeightsInNtuple = cms.bool(False),
     # b-tagedd jet collection
     bTaggerList = cms.untracked.vstring('trackCountingHighEffBJetTags', 
