@@ -12,9 +12,13 @@
 #CSVL 
 #CSVM 
 #CSVT
+
 import FWCore.ParameterSet.Config as cms
 
+from SimTracker.TrackHistory.TrackClassifier_cff import *
+
 Performance = cms.EDAnalyzer("PerformanceAnalyzer",
+    trackClassifier,
     # definition of the Operating Points (L,M,T)
     # cuts estimated either by thomas on 21X, or using old francisco's ones
     # sorted as TCL,TCM,TCT,JPL,JPM,JPT,JBPL, JBPM, JBPT, SLT, SVM, SVT, CSVL, CSVM, CSVT
@@ -38,9 +42,7 @@ Performance = cms.EDAnalyzer("PerformanceAnalyzer",
         fillPartons = cms.bool(True),
         mcSource = cms.string('source')
     ),
-    trackAssociator =  cms.untracked.string('TrackAssociatorByHits'),
     Muons = cms.string('muons'),
-    bestMatchByMaxValue = cms.untracked.bool(True),
     StoreTrackProba = cms.bool(False),
     #PSet jetIdParameters2 = {
     #       string mcSource = "source"
@@ -55,23 +57,17 @@ Performance = cms.EDAnalyzer("PerformanceAnalyzer",
     #
     # prepare pset for TrackHistory
     #
-    trackProducer     = cms.untracked.InputTag('generalTracks'),                     
     jetcuts = cms.PSet(
         MaxEta = cms.double(2.5),
         MinDeltaR = cms.double(0.4),
         MinPt = cms.double(20.0),
         MinPtRel = cms.double(-1.0)
     ),
-    trackingTruth = cms.untracked.InputTag('mergedtruth:MergedTrackTruth'),
     bTagTrackEventIPtagInfos = cms.string(''),
-
+    # bTagTrackEventIPtagInfos = cms.string('impactParameterTagInfos'),
     flavourMatchOption = cms.string('hepMC'),
     WeightHistograms = cms.bool(False),
-    TrackCollection = cms.untracked.string('ctfWithMaterialTracks'),
-
-    longLivedDecayLenght  = cms.untracked.double(1e-14) ,
-    badD0Pull = cms.untracked.double(3) ,
-    vertexClusteringDistance = cms.untracked.double(0.0001)  ,
+    TrackCollection = cms.untracked.string('generalTracks'),
     GenJets = cms.string('iterativeCone5GenJets'),
     Jets = cms.string('iterativeCone5CaloJets'),
     bTagTrackEvent = cms.bool(False),
