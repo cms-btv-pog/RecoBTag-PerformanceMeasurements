@@ -11,7 +11,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.20 2008/08/11 06:06:21 bazterra Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.21 2008/08/27 20:13:14 bazterra Exp $
  *
  */
 
@@ -205,6 +205,11 @@ private:
     //  edm::ParameterSet trackHistConfig_ ;
     int fbadeventscounter;
 
+    //
+    // jet corrections
+    //
+    std::string jetCorrLabel_;
+      bool useJetCorr_;
 };
 
 

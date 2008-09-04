@@ -4,10 +4,13 @@ process = cms.Process("analysis")
 #keep the logging output to a nice level
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 
-process.load("JetMETCorrections.MCJet.MCJetCorrections_cff")
+#process.load("JetMETCorrections.MCJet.MCJetCorrections_cff")
+#############   Include the jet corrections ##########
+process.load("JetMETCorrections.Configuration.L2L3Corrections_iCSA08_S156_cff")
+# set the record's IOV. Must be defined once. Choose ANY correction service. #
+process.prefer("L2L3JetCorrectorIcone5") 
 
-#  include "RecoBTag/PerformanceMeasurements/data/JetPartonAssoc.cff"
-#  sequence jetPartonAssoc = {caloJetCollectionClone, tagJet}
+
 process.load("PhysicsTools.JetMCAlgos.CaloJetsMCFlavour_cfi")
 
 process.load("SimTracker.TrackAssociation.TrackAssociatorByChi2_cfi")
@@ -24,17 +27,17 @@ process.load("Configuration.StandardSequences.FakeConditions_cff")
 
 process.load("RecoBTag.PerformanceMeasurements.PerformanceAnalyzer_cff")
 
-process.prefer("MCJetCorrectorIcone5")
-
+process.maxEvents = cms.untracked.PSet(
+    input = cms.untracked.int32(-1)
+)
 process.out = cms.OutputModule("PoolOutputModule",
     outputCommands = cms.untracked.vstring('drop *', 
         'keep recoJetTags_*_*_*'),
-    fileName = cms.untracked.string('testtt.root')
+    fileName = cms.untracked.string('test-tt.root')
 )
 
 process.p = cms.Path(process.caloJetMCFlavour*process.Performance)
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2000) )
 readFiles = cms.untracked.vstring()
 process.source = cms.Source ("PoolSource", fileNames = readFiles)
 readFiles.extend( ( 
@@ -109,5 +112,5 @@ readFiles.extend( (
        '/store/relval/CMSSW_2_1_4/RelValQCD_Pt_80_120/GEN-SIM-DIGI-RAW-HLTDEBUG-RECO/IDEAL_V6_v1/0005/D4D99637-836C-DD11-BCED-000423D9A2AE.root',
        '/store/relval/CMSSW_2_1_4/RelValQCD_Pt_80_120/GEN-SIM-DIGI-RAW-HLTDEBUG-RECO/IDEAL_V6_v1/0005/E8EABF1A-846C-DD11-80C0-000423D6CA02.root',
        '/store/relval/CMSSW_2_1_4/RelValQCD_Pt_80_120/GEN-SIM-DIGI-RAW-HLTDEBUG-RECO/IDEAL_V6_v1/0005/F08D9509-836C-DD11-B64F-000423D98634.root',
-       '/store/relval/CMSSW_2_1_4/RelValQCD_Pt_80_120/GEN-SIM-DIGI-RAW-HLTDEBUG-RECO/IDEAL_V6_v1/0005/F83136B0-856C-DD11-8D5A-000423D985E4.root') );
+       '/store/relval/CMSSW_2_1_4/RelValQCD_Pt_80_120/GEN-SIM-DIGI-RAW-HLTDEBUG-RECO/IDEAL_V6_v1/0005/F83136B0-856C-DD11-8D5A-000423D985E4.root'))
 

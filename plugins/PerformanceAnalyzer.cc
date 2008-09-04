@@ -149,6 +149,20 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig) : classifi
     MaxMuonChi2_ = iConfig.getParameter<edm::ParameterSet>("muoncuts").getParameter<double>("MaxMuonChi2");
     MinMuonNHits_ = iConfig.getParameter<edm::ParameterSet>("muoncuts").getParameter<int>("MinNHits");
 
+    //
+    // ue jetcorrections or not, and in cae which label to use
+    //
+    useJetCorr_ = iConfig.getParameter<bool>("useJetCorrections");
+    if (useJetCorr_ == true){
+      jetCorrLabel_ =  iConfig.getParameter<std::string>("jetCorrectionsLabel");
+      std::cout<<" Use JetCorrections with Label "<<jetCorrLabel_ <<std::endl;
+    }else{
+      jetCorrLabel_  = "Fake"; 
+      std::cout<<" Do NOT use JetCorrections."<<std::endl;
+    }
+    
+
+
     // get list of taggers
     bTaggerList_ = iConfig.getUntrackedParameter<std::vector<std::string> >("bTaggerList");
     fnselectors= bTaggerList_.size();
@@ -1378,8 +1392,11 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
     //iEvent.getByLabel(CorrCaloJetCollectionTags_, jetsCorrColl);
 
     // initialize jet corrector
-    const JetCorrector *acorrector = JetCorrector::getJetCorrector("MCJetCorrectorIcone5",iSetup);
-
+    const JetCorrector *acorrector = 0;
+    if (useJetCorr_ == true){
+      acorrector = JetCorrector::getJetCorrector(jetCorrLabel_,iSetup);
+    }
+    
 
     Handle<reco::GenJetCollection> genjetsColl;
     iEvent.getByLabel(GenJetCollectionTags_, genjetsColl);
@@ -1517,7 +1534,10 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
     {
 
         // get jet corrections
-        double jetcorrection =  acorrector->correction(*jet, iEvent, iSetup);
+      double jetcorrection = 1.;
+      if (useJetCorr_ == true){
+	jetcorrection =  acorrector->correction(*jet, iEvent, iSetup);
+      }
         // Jet quality cuts
         if ( (jet->pt() * jetcorrection ) <= MinJetPt_ || std::abs( jet->eta() ) >= MaxJetEta_ ) continue;
         // get MC flavor of jet
@@ -1662,10 +1682,14 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 
             TLorentzVector p4AwayJet;
             p4AwayJet.SetPtEtaPhiE(awayjet->pt(), awayjet->eta(), awayjet->phi(), awayjet->energy() );
-            p4AwayJet = p4AwayJet * ( acorrector->correction(*awayjet, iEvent, iSetup) );
+	    double jetcorrectionAway_ = 1.;
+	    if (useJetCorr_ == true){
+	      jetcorrectionAway_ =   acorrector->correction(*awayjet, iEvent, iSetup);
+	    }
+	    p4AwayJet = p4AwayJet *jetcorrectionAway_;
 
             // Jet quality cuts
-            if ( (awayjet->pt() * ( acorrector->correction(*awayjet, iEvent, iSetup) ) ) <= MinJetPt_ || std::abs( awayjet->eta() ) >= MaxJetEta_ ) continue;
+            if ( (awayjet->pt() * jetcorrectionAway_ )  <= MinJetPt_ || std::abs( awayjet->eta() ) >= MaxJetEta_ ) continue;
 
             // skip muon in jet
             if ( p4AwayJet == p4MuJet ) continue;
