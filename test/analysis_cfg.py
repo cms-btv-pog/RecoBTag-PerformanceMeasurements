@@ -28,7 +28,7 @@ process.load("Configuration.StandardSequences.FakeConditions_cff")
 process.load("RecoBTag.PerformanceMeasurements.PerformanceAnalyzer_cff")
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(2000)
 )
 process.out = cms.OutputModule("PoolOutputModule",
     outputCommands = cms.untracked.vstring('drop *', 

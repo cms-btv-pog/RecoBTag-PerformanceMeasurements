@@ -60,6 +60,9 @@ bool PtrelSolver::measure(
     CovarianceMatrix & cMatrix
 )
 {
+	  // Return status
+	  bool status = false;  
+	
     // Clean the containers
     hVector.clear();
     vMatrix.clear();
@@ -81,7 +84,10 @@ bool PtrelSolver::measure(
         TObject * object = key->ReadObj();
         if ( object->IsA()->InheritsFrom( "TH2" ) )
             if ( TString(object->GetName() ).Contains(pattern) )
-            {
+            { 
+							  // Update status
+							status = true;
+							
                 // Temporal container for efficiencies
                 TH2 * histogram;
                 ValueVector values;
@@ -100,7 +106,9 @@ bool PtrelSolver::measure(
             }
     };
 
-    return true;
+		if (!status) Error(__FUNCTION__, "Non matching histograms were found");
+					
+    return status;
 }
 
 

@@ -16,7 +16,7 @@
 ClassImp(PtrelTemplateMaker)
 
 
-char const * PtrelTemplateMaker::directory = "/Histograms/muon_in_jet";
+char const * PtrelTemplateMaker::directory = "/Histograms/MCtruth";
 
 
 void PtrelTemplateMaker::make(
@@ -84,6 +84,9 @@ bool PtrelTemplateMaker::makeEfficiencies (
 {
     char name[256];
 
+	  // Return value
+	  bool status = false;
+	
     // Information
     Info(__FUNCTION__, "Starting making efficiencies");
 
@@ -107,6 +110,9 @@ bool PtrelTemplateMaker::makeEfficiencies (
             // Select those histogram that match the pattern
             if ( TString(objectD->GetName()).Contains(patternD) )
             {
+							  // Updating status
+							  status = true;  
+							
                 // Information
                 Info(__FUNCTION__, "Selecting as denominator %s", objectD->GetName());
 
@@ -157,7 +163,9 @@ bool PtrelTemplateMaker::makeEfficiencies (
             }
     };
 
-    return true;
+		if (!status) Error(__FUNCTION__, "Non matching histograms were found");
+			
+    return status;
 }
 
 
