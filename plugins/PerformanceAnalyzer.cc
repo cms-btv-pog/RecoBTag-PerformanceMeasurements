@@ -1146,11 +1146,8 @@ void PerformanceAnalyzer::FillPtrel(double ptrel, int JetFlavor, std::map<std::s
 void PerformanceAnalyzer::FillHistos(std::string type, TLorentzVector p4MuJet, double ptrel,
                                      int JetFlavor, std::map<std::string, bool> aMap, double weight)
 {
-
     if ( type == "n")
     {
-
-
         MujetHistos->Fill2d(type+"_pT",p4MuJet.Pt(),ptrel,weight);
         MujetHistos->Fill2d(type+"_eta",TMath::Abs(p4MuJet.Eta()),ptrel,weight);
         if ( JetFlavor == 5 )
@@ -1542,7 +1539,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
         if ( (jet->pt() * jetcorrection ) <= MinJetPt_ || std::abs( jet->eta() ) >= MaxJetEta_ ) continue;
         // get MC flavor of jet
         //int JetFlavor = jetFlavourIdentifier_.identifyBasedOnPartons(*jet).flavour();
-        int JetFlavor = getMatchedParton(*jet).flavour();
+        int JetFlavor = abs(getMatchedParton(*jet).flavour());
         p4Jet.SetPtEtaPhiE(jet->pt(), jet->eta(), jet->phi(), jet->energy() );
         p4Jet = jetcorrection * p4Jet;
         int hasLepton = 0;
