@@ -15,10 +15,7 @@
 
 import FWCore.ParameterSet.Config as cms
 
-from SimTracker.TrackHistory.TrackClassifier_cff import *
-
 Performance = cms.EDAnalyzer("PerformanceAnalyzer",
-    trackClassifier,
     # definition of the Operating Points (L,M,T)
     # cuts estimated either by thomas on 21X, or using old francisco's ones
     # sorted as TCL,TCM,TCT,JPL,JPM,JPT,JBPL, JBPM, JBPT, SLT, SVM, SVT, CSVL, CSVM, CSVT

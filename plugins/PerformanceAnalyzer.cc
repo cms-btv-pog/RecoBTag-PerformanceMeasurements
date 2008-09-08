@@ -90,7 +90,7 @@ using namespace BTagMCTools;
 //
 // constructors and destructor
 //
-PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig) : classifier_(iConfig)
+PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
 {
 
     fbadeventscounter = 0;
@@ -1305,9 +1305,6 @@ void
 PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 {
 
-    if (flavourMatchOptionf == "hepMC" )
-        classifier_.newEvent(iEvent,iSetup);
-
     // G4 bug, remove bad events
     bool badEvent = false;
     if (flavourMatchOptionf == "hepMC" )
@@ -1870,10 +1867,6 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
                 trackEvent.jet_ptrel.push_back(
                     trackvec.Perp(jetvec + trackvec)
                 );
-
-                // If hepMC exist get the track categories.
-                if (flavourMatchOptionf == "hepMC" )
-                    trackEvent.is.push_back( classifier_.evaluate(track).flags() );
             }
 
             // Add the track event into BTagEvent.
@@ -1936,39 +1929,14 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
                 {
                     float iptrack1 = (trackIP)[0].significance();
                     fS8evt->btag_TrkCounting_disc3D_1trk.push_back( iptrack1 );
-                    // If hepMC exist get the track categories.
-                    if (flavourMatchOptionf == "hepMC" )
-                    {
-                        //
-                        // TOM what to do here
-                        //
-
-
-                        classifier_.evaluate(tracks[0]);
-                        fS8evt->btag_TrkCounting_disc3D_1trk_is.push_back( classifier_.flags() );
-                    }
                 }
                 fS8evt->btag_TrkCounting_disc3D_2trk.push_back( (*jetTags)[ith_tagged].second ); // 2nd trk, 3D
-                if (flavourMatchOptionf == "hepMC" )
-                {
-                    classifier_.evaluate(tracks[1]);
-
-                    fS8evt->btag_TrkCounting_disc3D_2trk_is.push_back( classifier_.flags() );
-                }
                 gotTCHE = true;
             }
             else if ( moduleLabel == "trackCountingHighPurBJetTags" && tracks.size()>2)
             {
 
                 fS8evt->btag_TrkCounting_disc3D_3trk.push_back( (*jetTags)[ith_tagged].second ); // 3rd trk, 3D
-                // If hepMC exist get the track categories.
-                if (flavourMatchOptionf == "hepMC" )
-                {
-                    classifier_.evaluate(tracks[2]);
-
-                    fS8evt->btag_TrkCounting_disc3D_3trk_is.push_back( classifier_.flags() );
-
-                }
                 gotTCHP = true;
             }
             else if ( moduleLabel == "modifiedtrackCountingHighEffBJetTags" )
@@ -1988,32 +1956,13 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
                 {
                     float iptrack1 = (trackIP)[0].significance();
                     fS8evt->btag_ModTrkCounting_disc3D_1trk.push_back( iptrack1 );
-                    // If hepMC exist get the track categories.
-                    if (flavourMatchOptionf == "hepMC" )
-                    {
-                        classifier_.evaluate(tracks[0]);
-                        fS8evt->btag_ModTrkCounting_disc3D_1trk_is.push_back( classifier_.flags() );
-                    }
                 }
                 fS8evt->btag_ModTrkCounting_disc3D_2trk.push_back( (*jetTags)[ith_tagged].second ); // 2nd trk, 3D
-                if (flavourMatchOptionf == "hepMC" )
-                {
-                    classifier_.evaluate(tracks[1]);
-
-                    fS8evt->btag_ModTrkCounting_disc3D_2trk_is.push_back( classifier_.flags() );
-                }
                 gotMTCHE = true;
             }
             else if ( moduleLabel == "modifiedtrackCountingHighPurJetTags" )
             {
                 fS8evt->btag_ModTrkCounting_disc3D_3trk.push_back( (*jetTags)[ith_tagged].second ); // 3rd trk, 3D
-                // If hepMC exist get the track categories.
-                if (flavourMatchOptionf == "hepMC" )
-                {
-                    classifier_.evaluate(tracks[2]);
-
-                    fS8evt->btag_ModTrkCounting_disc3D_3trk_is.push_back( classifier_.flags() );
-                }
                 gotMTCHP = true;
             }
             else if ( moduleLabel == "negativeTrackCounting2ndTrck" )
@@ -2033,21 +1982,9 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
                 {
                     float iptrack1 = (trackIP)[(trackIP).size()-1].significance();
                     fS8evt->btag_NegTag_disc3D_1trk.push_back( iptrack1 );
-                    // If hepMC exist get the track categories.
-                    if (flavourMatchOptionf == "hepMC" )
-                    {
-                        classifier_.evaluate(tracks[(trackIP).size()-1]);
-                        fS8evt->btag_NegTag_disc3D_1trk_is.push_back(classifier_.flags());
-                    }
                 }
                 //std::cout << "discri neg tc " << (*jetTags)[ith_tagged].second << std::endl;
                 fS8evt->btag_NegTag_disc3D_2trk.push_back( (*jetTags)[ith_tagged].second ); // 2nd trk, 3D
-                if (flavourMatchOptionf == "hepMC" )
-                {
-                    classifier_.evaluate(tracks[(trackIP).size()-2]);
-
-                    fS8evt->btag_NegTag_disc3D_2trk_is.push_back(classifier_.flags() );
-                }
                 gotTCHEneg = true;
             }
             else if ( moduleLabel == "negativeTrackCounting3rdTrck" )
@@ -2064,16 +2001,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
                     trackIP.push_back((*itipdata).ip3d );
                 }
 
-
-
                 fS8evt->btag_NegTag_disc3D_3trk.push_back( (*jetTags)[ith_tagged].second ); // 3rd trk, 3D
-                if (flavourMatchOptionf == "hepMC" )
-                {
-                    classifier_.evaluate(tracks[(trackIP).size()-3]);
-
-
-                    fS8evt->btag_NegTag_disc3D_3trk_is.push_back( classifier_.flags());
-                }
                 gotTCHPneg = true;
             }
 

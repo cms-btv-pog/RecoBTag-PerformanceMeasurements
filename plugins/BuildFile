@@ -15,13 +15,9 @@
 <use name=SimGeneral/HepPDTRecord>
 <use name=SimTracker/TrackAssociation>
 <use name=SimTracker/Records>
-<use name=rootrflx>
 <use name=DataFormats/Math>
 <use name=RecoBTag/MCTools>
-<use name=CLHEP>
-<use name=root>
 <use name=RecoBTag/PerformanceMeasurements>
-
 <library file="*.cc" name=RecoBTagPerformanceMeasurementsPlugins>
 	 <flags EDM_PLUGIN = 1 >	
 	<flags CXXFLAGS="-O0 -g">

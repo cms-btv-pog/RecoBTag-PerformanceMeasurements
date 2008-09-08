@@ -9,13 +9,14 @@
 
 <library file=S8Solver/*.cc name=S8Solver>
 <use name=root>
+<use name=boost>
 <use name=rootminuit2> 
 <use name=clhep> 
 </library>
 
 <library file=PtrelSolver/*.cc name=PtrelSolver>
 <use name=root>
-<use name=rootminuit>>
+<use name=rootminuit>
 <use name=rootminuit2>
 <use name=clhep>
 </library>

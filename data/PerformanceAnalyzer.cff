@@ -86,8 +86,4 @@ module Performance = PerformanceAnalyzer {
        #       bool rejectBCSplitting = true
        #       vstring vetoFlavour = {  }
        #}
-
-    # Setting up TrackCategories
-    using TrackCategories
- 
 }

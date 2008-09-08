@@ -1,8 +1,13 @@
+<use name=rootcore>
+<use name=roottmva>
+<use name=boost>
+<use name=root>
+<use name=clhep>
+
 <use name=FWCore/Framework>
 <use name=FWCore/Utilities>
 <use name=FWCore/PluginManager>
 <use name=FWCore/ParameterSet>
-<use name=FWCore/ServiceRegistry>
 <use name=DataFormats/Common>
 <use name=RecoBTag/BTagTools>
 <use name=DataFormats/TrackReco>
@@ -15,13 +20,10 @@
 <use name=SimDataFormats/Track>
 <use name=SimDataFormats/JetMatching>
 <use name=SimTracker/TrackAssociation>
-<use name=SimTracker/TrackHistory>
 <use name=SimTracker/Records>
-<use name=rootrflx>
 <use name=DataFormats/Math>
 <use name=RecoBTag/MCTools>
-<use name=CLHEP>
-<use name=root>
+
 <flags CXXFLAGS="-O0 -g">
 
 <export>

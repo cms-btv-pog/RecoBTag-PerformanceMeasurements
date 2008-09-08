@@ -5,7 +5,7 @@
 
  author: Victor E. Bazterra, UIC (baites@fnal.gov)
 
- version $Id: BTagTrackEvent.cc,v 1.3 2008/08/11 06:06:22 bazterra Exp $
+ version $Id: BTagTrackEvent.cc,v 1.4 2008/08/27 20:13:14 bazterra Exp $
 
 ________________________________________________________________**/
 
@@ -19,11 +19,9 @@ ClassImp(BTagTrackEvent)
 //_______________________________________________________________
 void BTagTrackEvent::Reset()
 {
-    //	is.clear();
     ip2d.clear();
     ip3d.clear();
     dta.clear();
     ip2dSigma.clear();
     ip3dSigma.clear();
-    is.clear();
 }

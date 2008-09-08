@@ -11,7 +11,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.21 2008/08/27 20:13:14 bazterra Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.22 2008/09/04 12:26:57 tboccali Exp $
  *
  */
 
@@ -60,8 +60,6 @@
 #include "RecoBTag/MCTools/interface/JetFlavour.h"
 #include "RecoBTag/MCTools/interface/JetFlavourIdentifier.h"
 
-#include "SimTracker/TrackHistory/interface/TrackClassifier.h"
-
 // Root
 #include "TH1.h"
 #include "TFile.h"
@@ -88,10 +86,6 @@ struct ltstr
     }
 };
 
-
-
-
-TrackAssociatorBase * associatorByHits;
 
 // class declaration
 
@@ -125,8 +119,6 @@ public:
     JetFlavour getMatchedParton(const reco::CaloJet &jet);
 
 private:
-
-    TrackClassifier classifier_;
 
     // ----------member data ---------------------------
     std::string outputFile_;                   // output file
