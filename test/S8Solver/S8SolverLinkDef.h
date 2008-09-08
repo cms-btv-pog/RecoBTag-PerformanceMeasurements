@@ -1,6 +1,13 @@
+
+#ifdef NOSCRAMV
+#include "S8Solver.h"
+#include "S8AnalyticSolver.h"
+//#include "RecoBTag/PerformanceMeasurements/test/S8Solver/S8NumericSolver.h"
+#else
 #include "RecoBTag/PerformanceMeasurements/test/S8Solver/S8Solver.h"
 #include "RecoBTag/PerformanceMeasurements/test/S8Solver/S8AnalyticSolver.h"
 //#include "RecoBTag/PerformanceMeasurements/test/S8Solver/S8NumericSolver.h"
+#endif
 
 #ifdef __CINT__
 #pragma link off all globals;

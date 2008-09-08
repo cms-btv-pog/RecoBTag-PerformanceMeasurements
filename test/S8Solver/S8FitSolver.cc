@@ -6,7 +6,6 @@
 #include "Minuit2/MnPrint.h"
 #include "Minuit2/MnMigrad.h"
 #include "Minuit2/MnUserParameterState.h"
-#include "CLHEP/config/CLHEP.h"
 
 #include<iostream>
 #include<cmath>
