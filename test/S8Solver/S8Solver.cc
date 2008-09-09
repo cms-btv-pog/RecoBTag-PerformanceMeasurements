@@ -1007,7 +1007,7 @@ void S8Solver::PrintData(TString option) {
 
 void S8Solver::DumpTable(std::string filename) {
 
-	Int_t nxbins = fBinnedSolution.size();
+	// Int_t nxbins = fBinnedSolution.size();
 	// separator
 	std::string sp = ",";
 

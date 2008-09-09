@@ -254,6 +254,8 @@ Int_t S8NumericSolver::FindSolution(Double_t* res, int n)
 		for(int i=0; i<8;++i) fMapResult[i] =  fResult[i] = E(i%2,i/2);
 		return 1;
 	}
+
+        return 1;
 /*
 	
 if(n<=0)

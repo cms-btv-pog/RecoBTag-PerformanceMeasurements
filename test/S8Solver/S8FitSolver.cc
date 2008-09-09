@@ -54,7 +54,7 @@ void S8FitSolver::Solve(std::map< TString, double > input) {
   // check if init values are posite otherwise zero
   for( std::map<TString,double>::const_iterator im = finitmap.begin(); im != finitmap.end(); ++ im) {
 	  if (im->second < 0 ) finitmap[im->first] = 0.;
-	  if (isnan(im->second) || isinf(im->second) ) finitmap[im->first] = 0.;
+	  if (isnan(im->second) || std::isinf(im->second) ) finitmap[im->first] = 0.;
 	  if ( ( (im->first == "effMu_b") || (im->first == "effTag_b") ) &&
 		   ( im->second > 1 || im->second <0) ) finitmap[im->first] = 0.6;
 	  if ( ( (im->first == "effMu_cl") || (im->first == "effTag_cl")) &&
