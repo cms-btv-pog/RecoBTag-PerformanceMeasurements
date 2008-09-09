@@ -15,7 +15,7 @@ LD_LIBRARY_PATH:= $(ROOTSYS)/lib/:$(LD_LIBRARY_PATH)
 INCLUDEDIR    = -I$(ROOTSYS)/include -I./ 
 
 HEADERS       = S8AnalyticSolver.h S8fcn.h S8FitSolver.h S8NumericSolver.h S8Solver.h  
-OBJS          = S8AnalyticSolver.o S8fcn.o S8FitSolver.o S8NumericSolver.o S8Solver.o 
+OBJS          = S8AnalyticSolver.o S8fcn.o S8FitSolver.o S8NumericSolver.o S8Solver.o S8SolverDict.o 
 
 all:	$(OBJS)
 	$(CXX) -shared  -o libS8Solver.so  $(LDFLAGS) $(OBJS) $(LIBS)
