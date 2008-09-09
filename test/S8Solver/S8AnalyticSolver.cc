@@ -163,7 +163,7 @@ void S8AnalyticSolver::Solve(std::map< TString, double > input) {
 
 
   double Rmu1 = Rsvx1*Emu1*(-nall+Esvx1*nmu)/(-nall*Esvx1+Emu1*Esvx1*nsvx-Rsvx1*Emu1*nsvx+Esvx1*Rsvx1*nmu);
-  double Rmu2 = Rsvx2*Emu2*(-nall+Esvx2*nmu)/(-nall*Esvx2+Emu2*Esvx2*nsvx-Rsvx2*Emu2*nsvx+Esvx2*Rsvx2*nmu);
+  // double Rmu2 = Rsvx2*Emu2*(-nall+Esvx2*nmu)/(-nall*Esvx2+Emu2*Esvx2*nsvx-Rsvx2*Emu2*nsvx+Esvx2*Rsvx2*nmu);
 
 
   double Rmu1err=sqr(Emu1*(-nall+Esvx1*nmu)/(-nall*Esvx1+Emu1*Esvx1*nsvx+Esvx1*nmu*Rsvx1-Rsvx1*Emu1*nsvx)-Rsvx1*Emu1*(-nall+Esvx1*nmu)/sqr(-nall*Esvx1+Emu1*Esvx1*nsvx+Esvx1*nmu*Rsvx1-Rsvx1*Emu1*nsvx)*(Esvx1*nmu-Emu1*nsvx))*sqr(Rsvx1err);
@@ -184,33 +184,33 @@ void S8AnalyticSolver::Solve(std::map< TString, double > input) {
 
 
   double nb1 = -(-nall+Rsvx1*nmu)/Emu1/(Esvx1-Rsvx1);
-  double nb2 = -(-nall+Rsvx2*nmu)/Emu2/(Esvx2-Rsvx2);
+  // double nb2 = -(-nall+Rsvx2*nmu)/Emu2/(Esvx2-Rsvx2);
 
   double nb1err=sqrt(1./sqr(Emu1*(Esvx1-Rsvx1))*nall*(1-nall/n) + sqr((nmu*Emu1*(Esvx1-Rsvx1)-(-nall+Rsvx1*nmu)*Emu1)/sqr(Emu1*(Esvx1-Rsvx1)))*sqr(Rsvx1err) + 1./sqr(Emu1*(Esvx1-Rsvx1))*nmu*(1-nmu/n) + sqr((-nall+Rsvx1*nmu)/(sqr(Emu1)*(Esvx1-Rsvx1)))*sqr(Emu1err) + sqr((-nall+Rsvx1*nmu)*Emu1/sqr(Emu1*Esvx1+Emu1*Rsvx1))*sqr(Esvx1err));
-  double nb2err=sqrt(1./sqr(Emu2*(Esvx2-Rsvx2))*nall*(1-nall/n) + sqr((nmu*Emu2*(Esvx2-Rsvx2)-(-nall+Rsvx2*nmu)*Emu2)/sqr(Emu2*(Esvx2-Rsvx2)))*sqr(Rsvx2err) + 1./sqr(Emu2*(Esvx2-Rsvx2))*nmu*(1-nmu/n) + sqr((-nall+Rsvx2*nmu)/(sqr(Emu2)*(Esvx2-Rsvx2)))*sqr(Emu2err) + sqr((-nall+Rsvx2*nmu)*Emu2/sqr(Emu2*Esvx2+Emu2*Rsvx2))*sqr(Esvx2err));
+  // double nb2err=sqrt(1./sqr(Emu2*(Esvx2-Rsvx2))*nall*(1-nall/n) + sqr((nmu*Emu2*(Esvx2-Rsvx2)-(-nall+Rsvx2*nmu)*Emu2)/sqr(Emu2*(Esvx2-Rsvx2)))*sqr(Rsvx2err) + 1./sqr(Emu2*(Esvx2-Rsvx2))*nmu*(1-nmu/n) + sqr((-nall+Rsvx2*nmu)/(sqr(Emu2)*(Esvx2-Rsvx2)))*sqr(Emu2err) + sqr((-nall+Rsvx2*nmu)*Emu2/sqr(Emu2*Esvx2+Emu2*Rsvx2))*sqr(Esvx2err));
 
 
   double pb1 = -(-pall+Rmu1*Rsvx1*p)/(Emu1*Esvx1-Rmu1*Rsvx1);
-  double pb2 = -(-pall+Rmu2*Rsvx2*p)/(Emu2*Esvx2-Rmu2*Rsvx2);
+  // double pb2 = -(-pall+Rmu2*Rsvx2*p)/(Emu2*Esvx2-Rmu2*Rsvx2);
 
   double pb1err=sqrt(sqr(1./(Emu1*Esvx1-Rmu1*Rsvx1))*pall*(1-pall/p) + sqr((-Rsvx1*p*(Emu1*Esvx1-Rmu1*Rsvx1)+(pall-Rmu1*Rsvx1*p)*Rsvx1)/sqr(Emu1*Esvx1-Rmu1*Rsvx1))*sqr(Rmu1) + sqr((-Rmu1*p*(Emu1*Esvx1-Rmu1*Rsvx1)+(pall-Rmu1*Rsvx1*p)*Rmu1)/sqr(Emu1*Esvx1-Rmu1*Rsvx1))*sqr(Rsvx1) + sqr((Rmu1*Rsvx1)/(Emu1*Esvx1-Rmu1*Rsvx1))*p + sqr((-pall+Rmu1*Rsvx1*p)*Esvx1/sqr(Emu1*Esvx1-Rmu1*Rsvx1))*sqr(Emu1err) + sqr((-pall+Rmu1*Rsvx1*p)*Emu1/sqr(Emu1*Esvx1-Rmu1*Rsvx1))*sqr(Esvx1err));
 
-  double pb2err=sqrt(sqr(1./(Emu2*Esvx2-Rmu2*Rsvx2))*pall*(1-pall/p) + sqr((-Rsvx2*p*(Emu2*Esvx2-Rmu2*Rsvx2)+(pall-Rmu2*Rsvx2*p)*Rsvx2)/sqr(Emu2*Esvx2-Rmu2*Rsvx2))*sqr(Rmu2) + sqr((-Rmu2*p*(Emu2*Esvx2-Rmu2*Rsvx2)+(pall-Rmu2*Rsvx2*p)*Rmu2)/sqr(Emu2*Esvx2-Rmu2*Rsvx2))*sqr(Rsvx2) + sqr((Rmu2*Rsvx2)/(Emu2*Esvx2-Rmu2*Rsvx2))*p + sqr((-pall+Rmu2*Rsvx2*p)*Esvx2/sqr(Emu2*Esvx2-Rmu2*Rsvx2))*sqr(Emu2err) + sqr((-pall+Rmu2*Rsvx2*p)*Emu2/sqr(Emu2*Esvx2-Rmu2*Rsvx2))*sqr(Esvx2err));
+  // double pb2err=sqrt(sqr(1./(Emu2*Esvx2-Rmu2*Rsvx2))*pall*(1-pall/p) + sqr((-Rsvx2*p*(Emu2*Esvx2-Rmu2*Rsvx2)+(pall-Rmu2*Rsvx2*p)*Rsvx2)/sqr(Emu2*Esvx2-Rmu2*Rsvx2))*sqr(Rmu2) + sqr((-Rmu2*p*(Emu2*Esvx2-Rmu2*Rsvx2)+(pall-Rmu2*Rsvx2*p)*Rmu2)/sqr(Emu2*Esvx2-Rmu2*Rsvx2))*sqr(Rsvx2) + sqr((Rmu2*Rsvx2)/(Emu2*Esvx2-Rmu2*Rsvx2))*p + sqr((-pall+Rmu2*Rsvx2*p)*Esvx2/sqr(Emu2*Esvx2-Rmu2*Rsvx2))*sqr(Emu2err) + sqr((-pall+Rmu2*Rsvx2*p)*Emu2/sqr(Emu2*Esvx2-Rmu2*Rsvx2))*sqr(Esvx2err));
 
 
   double nq1 = n-nb1;
-  double nq2 = n-nb2;
+  // double nq2 = n-nb2;
 
   double nq1err=sqrt(n+sqr(nb1err));
-  double nq2err=sqrt(n+sqr(nb2err));
+  // double nq2err=sqrt(n+sqr(nb2err));
 
 
 
   double pq1 = p-pb1;
-  double pq2 = p-pb2;
+  // double pq2 = p-pb2;
 
   double pq1err=sqrt(p+sqr(pb1err));
-  double pq2err=sqrt(p+sqr(pb2err));
+  // double pq2err=sqrt(p+sqr(pb2err));
 
   //std::cout << "First solution:" << std::endl;
   //std::cout << "Esvx=" << Esvx1 << " Emu=" << Emu1 << " Rsvx=" << Rsvx1 << " Rmu=" << Rmu1 

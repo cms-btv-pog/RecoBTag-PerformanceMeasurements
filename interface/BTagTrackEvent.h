@@ -8,12 +8,10 @@
 
  author: Victor E. Bazterra, UIC (baites@fnal.gov)
 
- version $Id: BTagTrackEvent.h,v 1.5 2008/08/27 20:13:14 bazterra Exp $
+ version $Id: BTagTrackEvent.h,v 1.6 2008/09/08 19:06:23 bazterra Exp $
 ________________________________________________________________**/
 
 #include "RecoBTag/PerformanceMeasurements/interface/BTagBaseTrackEvent.h"
-
-#include "SimTracker/TrackHistory/interface/TrackCategories.h"
 
 class BTagTrackEvent : public BTagBaseTrackEvent
 {

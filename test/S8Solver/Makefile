@@ -2,7 +2,7 @@
 ROOTLIBS      = $(shell root-config --libs)
 ROOTGLIBS     = $(shell root-config --glibs)
 
-LIBS          = $(ROOTLIBS) -l -lMinuit2
+LIBS          = $(ROOTLIBS) -lMinuit2
 GLIBS         = $(ROOTGLIBS) -L/usr/X11R6/lib -lXext -lX11
 
 CXX           = gcc

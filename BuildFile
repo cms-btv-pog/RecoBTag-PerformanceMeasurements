@@ -1,28 +1,27 @@
+<use name=boost>
+<use name=clhep>
+<use name=root>
 <use name=rootcore>
 <use name=roottmva>
-<use name=boost>
-<use name=root>
-<use name=clhep>
-
+<use name=DataFormats/Common>
+<use name=DataFormats/Candidate>
+<use name=DataFormats/JetReco>
+<use name=DataFormats/Math>
+<use name=DataFormats/MuonReco>
+<use name=DataFormats/TrackReco>
 <use name=FWCore/Framework>
-<use name=FWCore/Utilities>
 <use name=FWCore/PluginManager>
 <use name=FWCore/ParameterSet>
-<use name=DataFormats/Common>
-<use name=RecoBTag/BTagTools>
-<use name=DataFormats/TrackReco>
-<use name=DataFormats/JetReco>
-<use name=DataFormats/MuonReco>
-<use name=DataFormats/Candidate>
+<use name=FWCore/Utilities>
 <use name=JetMETCorrections/Objects>
+<use name=RecoBTag/BTagTools>
+<use name=RecoBTag/MCTools>
 <use name=RecoMuon/TrackingTools>
-<use name=TrackingTools/TransientTrack>
 <use name=SimDataFormats/Track>
 <use name=SimDataFormats/JetMatching>
 <use name=SimTracker/TrackAssociation>
 <use name=SimTracker/Records>
-<use name=DataFormats/Math>
-<use name=RecoBTag/MCTools>
+<use name=TrackingTools/TransientTrack>
 
 <flags CXXFLAGS="-O0 -g">
 

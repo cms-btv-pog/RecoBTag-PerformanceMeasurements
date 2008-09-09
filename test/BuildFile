@@ -12,13 +12,14 @@
 <use name=boost>
 <use name=rootminuit2> 
 <use name=clhep> 
+<use name=rootrflx>
 </library>
 
 <library file=PtrelSolver/*.cc name=PtrelSolver>
 <use name=root>
 <use name=rootminuit>
-<use name=rootminuit2>
 <use name=clhep>
+<use name=rootrflx>
 </library>
 
 <library file=Plotters/*.cc name=Plotters>

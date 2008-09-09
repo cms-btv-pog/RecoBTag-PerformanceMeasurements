@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8Plotter.h,v 1.12 2007/10/30 19:35:10 yumiceva Exp $
+ * \version $Id: S8Plotter.h,v 1.13 2008/02/20 19:47:21 jindal Exp $
  *
  */
 
@@ -148,7 +148,7 @@ class S8Plotter {
 	void PrintInfo();
 	void PrintBins(TString option="Pt") {
 	  if (option =="Pt" || option =="Eta") {
-	    const Double_t *ax;
+	    const Double_t *ax = 0;
 	    int nbins = 0;
 	    if (option=="Pt") { 
 	      ax = (fJetPtAxis.GetXbins())->GetArray();

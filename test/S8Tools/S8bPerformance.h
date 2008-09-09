@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8bPerformance.h,v 1.3 2007/10/18 05:13:21 yumiceva Exp $
+ * \version $Id: S8bPerformance.h,v 1.4 2008/01/08 18:05:39 yumiceva Exp $
  *
  */
 
@@ -108,6 +108,7 @@ class S8bPerformance {
 	  if (option=="cErr") return c_effErr;
 	  if (option=="udsgErr") return udsg_effErr;
 	  if (option=="discriminator") return disc_map;
+          return std::map<int,double>();
 	  //return NULL;
 	};
 

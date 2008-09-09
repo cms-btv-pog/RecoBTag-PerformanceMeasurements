@@ -252,10 +252,10 @@ void S8Plotter::Loop()
 	const Double_t *jetptbins = (fJetPtAxis.GetXbins())->GetArray();
 	int netabins = fJetEtaAxis.GetNbins();
 	const Double_t *jetetabins = (fJetEtaAxis.GetXbins())->GetArray();
-	int ncorrptbins = fCorrPtAxis.GetNbins();
-	const Double_t *corrptbins = (fCorrPtAxis.GetXbins())->GetArray();
-	int ncorretabins = fCorrEtaAxis.GetNbins();
-	const Double_t *corretabins = (fCorrEtaAxis.GetXbins())->GetArray();
+	// int ncorrptbins = fCorrPtAxis.GetNbins();
+	// const Double_t *corrptbins = (fCorrPtAxis.GetXbins())->GetArray();
+	// int ncorretabins = fCorrEtaAxis.GetNbins();
+	// const Double_t *corretabins = (fCorrEtaAxis.GetXbins())->GetArray();
 	
 	h2["npT"] = new TH2F("npT","MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["ppT"] = new TH2F("ppT","MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
@@ -445,7 +445,7 @@ void S8Plotter::Loop()
 							if (Muons.pt[imu] > mu_highest_pt ) { mu_highest_pt = Muons.pt[imu]; ith_mu_highest_pt = imu; }
 						
 							ptrel = Muons.jet_ptrel[imu];
-							double deltaR = Muons.jet_deltaR[imu];
+							// double deltaR = Muons.jet_deltaR[imu];
 							//std::cout << "ptrel and deltaR " << ptrel << " and " << deltaR <<std::endl;
 
                             //if ( ptrel > 0.8 ) {
