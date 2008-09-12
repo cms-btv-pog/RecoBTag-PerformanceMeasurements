@@ -18,8 +18,8 @@ HEADERS       = S8bPerformance.h S8Plotter.h
 OBJS          = S8Plotter.o S8PlotterDict.o
 
 all:	$(OBJS)
-	$(CXX) -dynamiclib -o libS8Plotters.dylib $(LDFLAGS) $(OBJS) $(LIBS)
-	@cp libS8Plotters.dylib libS8Plotters.so
+	$(CXX) -dynamiclib -o libS8Tools.dylib $(LDFLAGS) $(OBJS) $(LIBS)
+	@cp libS8Tools.dylib libS8Tools.so
 
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDEDIR)
