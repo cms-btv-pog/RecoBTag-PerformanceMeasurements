@@ -18,7 +18,8 @@ HEADERS       = BasePlotter.h Ptrel2DPlotter.h
 OBJS          = BasePlotter.o Ptrel2DPlotter.o PlottersDict.o 
 
 all:	$(OBJS)
-	$(CXX) -dynamiclib -o libPlotters.so $(LDFLAGS) $(OBJS) $(LIBS)
+	$(CXX) -dynamiclib -o libPlotters.dylib $(LDFLAGS) $(OBJS) $(LIBS)
+	@cp libPlotters.dylib libPlotters.so
 
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDEDIR)

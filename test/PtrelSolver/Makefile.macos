@@ -18,7 +18,8 @@ HEADERS       = PtrelByCounting.h PtrelByFitting.h PtrelSolver.h PtrelSolverDepe
 OBJS          = PtrelByCounting.o PtrelByFitting.o PtrelSolver.o PtrelSolverDependencies.o PtrelTemplateMaker.o PtrelUtils.o PtrelSolverDict.o
 
 all:	$(OBJS)
-	$(CXX) -dynamiclib -o libPtrelSolver.so $(LDFLAGS) $(OBJS) $(LIBS)
+	$(CXX) -dynamiclib -o libPtrelSolver.dylib $(LDFLAGS) $(OBJS) $(LIBS)
+	@cp libPtrelSolver.dylib libPtrelSolver.so
 
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDEDIR)
