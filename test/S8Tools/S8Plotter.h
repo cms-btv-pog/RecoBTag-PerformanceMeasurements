@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8Plotter.h,v 1.13 2008/02/20 19:47:21 jindal Exp $
+ * \version $Id: S8Plotter.h,v 1.14 2008/09/09 17:04:50 bazterra Exp $
  *
  */
 
@@ -28,9 +28,15 @@
 #include <string>
 #include <map>
 
+#ifdef NOSCRAMV
+#include "BTagEvent.h"
+#include "BTagLeptonEvent.h"
+#include "S8bPerformance.h"
+#else
 #include "RecoBTag/PerformanceMeasurements/interface/BTagEvent.h"
 #include "RecoBTag/PerformanceMeasurements/interface/BTagLeptonEvent.h"
 #include "S8bPerformance.h"
+#endif
 
 
 class S8Plotter {

@@ -6,11 +6,15 @@
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
          Victor E. Bazterra, UIC (baites@fnal.gov)
 
- version $Id: BTagBaseTrackEvent.cc,v 1.2 2008/03/17 02:23:04 bazterra Exp $
+ version $Id: BTagBaseTrackEvent.cc,v 1.3 2008/08/11 06:06:22 bazterra Exp $
 
 ________________________________________________________________**/
 
+#ifdef NOSCRAMV
+#include "BTagBaseTrackEvent.h"
+#else
 #include "RecoBTag/PerformanceMeasurements/interface/BTagBaseTrackEvent.h"
+#endif
 
 ClassImp(BTagBaseTrackEvent)
 

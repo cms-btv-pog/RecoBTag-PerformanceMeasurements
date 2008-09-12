@@ -5,12 +5,15 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagLeptonEvent.cc,v 1.5 2008/03/11 21:09:39 bazterra Exp $
+ version $Id: BTagLeptonEvent.cc,v 1.6 2008/08/11 06:06:22 bazterra Exp $
 
 ________________________________________________________________**/
 
-
+#ifdef NOSCRAMV
+#include "BTagLeptonEvent.h"
+#else
 #include "RecoBTag/PerformanceMeasurements/interface/BTagLeptonEvent.h"
+#endif
 
 ClassImp(BTagLeptonEvent)
 

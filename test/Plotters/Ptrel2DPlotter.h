@@ -3,7 +3,7 @@
 
 #include "TH2F.h"
 
-#include "RecoBTag/PerformanceMeasurements/test/Plotters/BasePlotter.h"
+#include "BasePlotter.h"
 
 class Ptrel2DPlotter : public BasePlotter {
 

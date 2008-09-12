@@ -5,7 +5,7 @@
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  * \author Victor E. Bazterra, UIC
  *
- * \version $Id: S8Plotter.h,v 1.13 2008/02/20 19:47:21 jindal Exp $
+ * \version $Id: BasePlotter.h,v 1.1 2008/05/17 11:06:19 bazterra Exp $
  *
  */
 
@@ -17,7 +17,11 @@
 #include "TObject.h"
 #include "TString.h"
 
+#ifdef NOSCRAMV
+#include "BTagEvent.h"
+#else
 #include "RecoBTag/PerformanceMeasurements/interface/BTagEvent.h"
+#endif
 
 class BasePlotter : public TObject {
 

@@ -8,18 +8,27 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.h,v 1.16 2008/03/23 01:25:49 jandrea Exp $
+ version $Id: BTagEvent.h,v 1.17 2008/08/11 06:06:21 bazterra Exp $
 
 ________________________________________________________________**/
 
 
 // C++ standard
 
+#include <vector>
+
 // ROOT
 #include "TObject.h"
 #include "TMatrixDSym.h"
+
+#ifdef NOSCRAMV
+#include "BTagTrackEvent.h"
+#include "BTagLeptonEvent.h"
+#else
 #include "RecoBTag/PerformanceMeasurements/interface/BTagTrackEvent.h"
 #include "RecoBTag/PerformanceMeasurements/interface/BTagLeptonEvent.h"
+#endif
+
 
 class BTagEvent : public TObject
 {

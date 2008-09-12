@@ -4,12 +4,17 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagHistograms.cc,v 1.6 2008/06/11 08:46:58 tboccali Exp $
+ version $Id: BTagHistograms.cc,v 1.7 2008/08/11 06:06:22 bazterra Exp $
 
 ________________________________________________________________**/
 
 
+#ifdef NOSCRAMV
+#include "BTagHistograms.h"
+#else
 #include "RecoBTag/PerformanceMeasurements/interface/BTagHistograms.h"
+#endif
+
 #include "TF1.h"
 
 #include<iostream>
@@ -54,10 +59,11 @@ void BTagHistograms::Init(TString type, TString suffix1, TString suffix2)
         h1["jet_eta_c"+suffix1] = new TH1D("jet_eta_c"+suffix1,"Jet |#eta|",netaarray-1,jetetabins);
         h1["jet_eta_udsg"+suffix1] = new TH1D("jet_eta_udsg"+suffix1,"Jet |#eta|",netaarray-1,jetetabins);
 
-        for (std::map<TString,TH1* >::const_iterator ih=h1.begin(); ih!=h1.end(); ++ih)
-        {
-            TH1 *htemp = ih->second;
-        }
+        // WHAT THE HECK ??
+        // for (std::map<TString,TH1* >::const_iterator ih=h1.begin(); ih!=h1.end(); ++ih)
+        // {
+        //     TH1 *htemp = ih->second;
+        // }
     }
     if ( type == "ptrel")
     {

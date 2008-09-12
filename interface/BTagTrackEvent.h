@@ -8,10 +8,14 @@
 
  author: Victor E. Bazterra, UIC (baites@fnal.gov)
 
- version $Id: BTagTrackEvent.h,v 1.6 2008/09/08 19:06:23 bazterra Exp $
+ version $Id: BTagTrackEvent.h,v 1.7 2008/09/09 17:04:50 bazterra Exp $
 ________________________________________________________________**/
 
+#ifdef NOSCRAMV
+#include "BTagBaseTrackEvent.h"
+#else
 #include "RecoBTag/PerformanceMeasurements/interface/BTagBaseTrackEvent.h"
+#endif
 
 class BTagTrackEvent : public BTagBaseTrackEvent
 {

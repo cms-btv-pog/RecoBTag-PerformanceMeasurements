@@ -1,7 +1,13 @@
 
+#ifdef NOSCRAMV
+#include "BTagEvent.h"
+#include "BTagTrackEvent.h"
+#include "BTagLeptonEvent.h"
+#else
 #include "RecoBTag/PerformanceMeasurements/interface/BTagEvent.h"
 #include "RecoBTag/PerformanceMeasurements/interface/BTagTrackEvent.h"
 #include "RecoBTag/PerformanceMeasurements/interface/BTagLeptonEvent.h"
+#endif
  
 #ifdef __CINT__
  

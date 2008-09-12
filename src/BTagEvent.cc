@@ -5,16 +5,17 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.cc,v 1.16 2008/06/11 08:46:58 tboccali Exp $
+ version $Id: BTagEvent.cc,v 1.17 2008/08/11 06:06:22 bazterra Exp $
 
 ________________________________________________________________**/
 
-
+#ifdef NOSCRAMV
+#include "BTagEvent.h"
+#else
 #include "RecoBTag/PerformanceMeasurements/interface/BTagEvent.h"
-
+#endif
 
 #include <math.h>
-
 
 ClassImp(BTagEvent)
 

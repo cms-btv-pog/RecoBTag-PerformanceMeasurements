@@ -1,7 +1,7 @@
 
 #include <iostream>
 
-#include "RecoBTag/PerformanceMeasurements/test/Plotters/BasePlotter.h"
+#include "BasePlotter.h"
 
 
 ClassImp(BasePlotter)

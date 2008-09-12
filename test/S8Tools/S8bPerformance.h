@@ -6,9 +6,11 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8bPerformance.h,v 1.4 2008/01/08 18:05:39 yumiceva Exp $
+ * \version $Id: S8bPerformance.h,v 1.5 2008/09/09 17:04:50 bazterra Exp $
  *
  */
+
+#include <map>
 
 #include "TGraph.h"
 #include "TArrayD.h"

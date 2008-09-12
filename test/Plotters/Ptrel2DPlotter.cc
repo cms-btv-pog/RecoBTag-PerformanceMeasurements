@@ -5,7 +5,7 @@
 #include "THStack.h"
 #include "TTree.h"
 
-#include "RecoBTag/PerformanceMeasurements/test/Plotters/Ptrel2DPlotter.h"
+#include "Ptrel2DPlotter.h"
 
 #include <cmath>
 
