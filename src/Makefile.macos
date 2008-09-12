@@ -18,14 +18,14 @@ HEADERS       = BTagBaseTrackEvent.h BTagEvent.h BTagHistograms.h BTagLeptonEven
 OBJS          = BTagBaseTrackEvent.o BTagEvent.o BTagHistograms.o BTagLeptonEvent.o BTagTrackEvent.o BTagEventDict.o
 
 all:	$(OBJS)
-	$(CXX) -dynamiclib -o libPlotters.so $(LDFLAGS) $(OBJS) $(LIBS)
+	$(CXX) -dynamiclib -o libBTagEvent.dylib $(LDFLAGS) $(OBJS) $(LIBS)
 
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDEDIR)
 
 %Dict.cc: %LinkDef.h
 	@echo "Generating dictionary $@"
-	@rootcint -f $@ -c -DNOSCRAMV $(HEADERS) $^
+	@rootcint -f $@ -c -I../interface -DNOSCRAMV $(HEADERS) $^
 
 clean:
 	@rm -f $(OBJS) core *~ *.o *.so 

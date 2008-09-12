@@ -2,7 +2,7 @@
 ROOTLIBS      = $(shell root-config --libs)
 ROOTGLIBS     = $(shell root-config --glibs)
 
-LIBS          = $(ROOTLIBS)
+LIBS          = -L../../src -lBTagEvent $(ROOTLIBS)
 GLIBS         = $(ROOTGLIBS) -L/usr/X11R6/lib -lXext -lX11
 
 CXX           = g++
@@ -18,7 +18,7 @@ HEADERS       = BasePlotter.h Ptrel2DPlotter.h
 OBJS          = BasePlotter.o Ptrel2DPlotter.o PlottersDict.o 
 
 all:	$(OBJS)
-	$(CXX) -dynamiclib -o libPlotters.so $(LDFLAGS) $(OBJS) $(LIBS)
+	$(CXX) -dynamiclib -o libPlotters.dylib $(LDFLAGS) $(OBJS) $(LIBS)
 
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDEDIR)
