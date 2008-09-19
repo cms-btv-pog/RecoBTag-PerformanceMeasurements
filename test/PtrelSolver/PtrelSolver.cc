@@ -30,9 +30,12 @@ void PtrelSolver::templates(const char * filename)
     for (Int_t i = 0; i < Dependency::Dimension; ++i)
     {
         sprintf(name, "/parameters/%s", Dependency::Name[i]);
-        CreateSafely(TObjString, value, templates_->Get(name))
-        rebin_[i] = value->String().Atoi();
-        Info(__FUNCTION__, "Loading rebinning factor %d for %s", rebin_[i], Dependency::Name[i]);
+        TObjString * value = (TObjString *) templates_->Get(name);
+        if (value)
+        {
+            rebin_[i] = value->String().Atoi();
+            Info(__FUNCTION__, "Loading rebinning factor %d for %s", rebin_[i], Dependency::Name[i]);
+        }
     }
 }
 
