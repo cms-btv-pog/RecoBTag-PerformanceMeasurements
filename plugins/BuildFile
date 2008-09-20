@@ -11,6 +11,8 @@
 <use name=JetMETCorrections/Objects>
 <use name=RecoMuon/TrackingTools>
 <use name=TrackingTools/TransientTrack>
+<use name=SimTracker/TrackAssociation>
+<use name=SimTracker/TrackHistory>
 <use name=SimDataFormats/Track>
 <use name=SimGeneral/HepPDTRecord>
 <use name=SimTracker/TrackAssociation>
