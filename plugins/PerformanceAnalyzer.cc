@@ -33,7 +33,7 @@
 
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 
-#include "PhysicsTools/Utilities/interface/DeltaR.h"
+#include "PhysicsTools/Utilities/interface/deltaR.h"
 
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 
@@ -731,8 +731,10 @@ SimTrack PerformanceAnalyzer::GetGenTrk(reco::Track atrack, const edm::SimTrackC
     double predelta = 99999.;
     for (SimTrackContainer::const_iterator gentrk = simTrkColl->begin(); gentrk != simTrkColl->end(); ++gentrk)
     {
+        // VEB
+        // double delta  = ROOT::Math::VectorUtil::DeltaR( TVector3((*gentrk).momentum().x(),(*gentrk).momentum().y(),(*gentrk).momentum().z()) , atrack.momentum() );
+        double delta = reco::deltaR( (*gentrk).momentum(), atrack.momentum() );
 
-        double delta  = ROOT::Math::VectorUtil::DeltaR( TVector3((*gentrk).momentum().x(),(*gentrk).momentum().y(),(*gentrk).momentum().z()) , atrack.momentum() );
         int type = (*gentrk).type();
         if ( delta < 0.2 && delta<predelta && ((*gentrk).charge() == atrack.charge() ) &&
                 ( abs(type)==11 || abs(type)==13 || abs(type)==15 || abs(type)==211 || abs(type)==321 ) )
