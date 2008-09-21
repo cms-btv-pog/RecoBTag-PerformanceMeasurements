@@ -1,29 +1,49 @@
-void TemplatePlots(const char * filename, Int_t nbins)
+void TemplatePlots(const char * filename, Int_t nbins, Int_t columns)
 {
     gROOT->SetStyle("Plain");
 
     TFile * file = new TFile(filename);
 
-    MakePlots(file, "n", nbins);
+    MakePlots(file, "n", nbins, columns);
 
-    MakePlots(file, "ntag", nbins, "TCL");
-    MakePlots(file, "ntag", nbins, "TCM");
-    MakePlots(file, "ntag", nbins, "TCT");
+    MakePlots(file, "ntag", nbins, columns, "TCL");
+    MakePlots(file, "ntag", nbins, columns, "TCM");
+    MakePlots(file, "ntag", nbins, columns, "TCT");
 
-    MakePlots(file, "p", nbins);
+    MakePlots(file, "ntag", nbins, columns, "JPL");
+    MakePlots(file, "ntag", nbins, columns, "JPM");
+    MakePlots(file, "ntag", nbins, columns, "JPT");
 
-    MakePlots(file, "ptag", nbins, "JPL");
-    MakePlots(file, "ptag", nbins, "JPM");
-    MakePlots(file, "ptag", nbins, "JPT");
+    MakePlots(file, "p", nbins, columns);
+
+    MakePlots(file, "ptag", nbins, columns, "TCL");
+    MakePlots(file, "ptag", nbins, columns, "TCM");
+    MakePlots(file, "ptag", nbins, columns, "TCT");
+
+    MakePlots(file, "ptag", nbins, columns, "JPL");
+    MakePlots(file, "ptag", nbins, columns, "JPM");
+    MakePlots(file, "ptag", nbins, columns, "JPT");
+
 }
 
 
-void MakePlots(TFile * file, const char * sample, Int_t nbins, char * tag = 0, Int_t columns = 3)
+void MakePlots(TFile * file, const char * sample, Int_t nbins, Int_t columns = 3, char * tag = 0)
 {
     char hName[256], clName[256], bName[256];
 
-    sprintf(bName, "%s_%s", sample, tag);
-    sprintf(hName, "TemplatePlots %s-sample %s-tag", sample, tag);   
+    if (tag)
+    {
+        sprintf(bName, "%s_%s", sample, tag);
+        sprintf(hName, "TemplatePlots_%s_%s", sample, tag);    
+    }
+    else
+    {
+        sprintf(bName, "%s", sample);
+        sprintf(hName, "TemplatePlots_%s", sample);
+    }
+
+    char pName[256];
+    sprintf(pName, "%s_tt216.png", hName);
 
     TCanvas * c1 = new TCanvas(bName, hName);
 
@@ -46,6 +66,10 @@ void MakePlots(TFile * file, const char * sample, Int_t nbins, char * tag = 0, I
         SetName(bName, sample, "eta_b", tag, i+1);
         MakePlot(file, hName, clName, bName);
     }
+
+    TImage *img = TImage::Create();
+    img->FromPad(c1);
+    img->WriteImage(pName);
 }
 
 
