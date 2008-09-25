@@ -67,9 +67,9 @@ protected:
 
     static char const * directory;
 
-private:
-
     TFile * templates_;
+
+private:
 
     std::vector<Int_t> rebin_;
 

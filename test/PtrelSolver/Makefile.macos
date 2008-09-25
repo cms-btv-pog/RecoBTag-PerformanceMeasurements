@@ -14,8 +14,8 @@ LD_LIBRARY_PATH:= $(ROOTSYS)/lib/:$(LD_LIBRARY_PATH)
 
 INCLUDEDIR    = -I$(ROOTSYS)/include -I.
 
-HEADERS       = PtrelByCounting.h PtrelByFitting.h PtrelSolver.h PtrelSolverDependencies.h PtrelTemplateMaker.h PtrelUtils.h
-OBJS          = PtrelByCounting.o PtrelByFitting.o PtrelSolver.o PtrelSolverDependencies.o PtrelTemplateMaker.o PtrelUtils.o PtrelSolverDict.o
+HEADERS       = PtrelByCounting.h PtrelByFitting.h PtrelBySystem4.h PtrelSolver.h PtrelSolverDependencies.h PtrelTemplateMaker.h PtrelUtils.h
+OBJS          = PtrelByCounting.o PtrelByFitting.o PtrelBySystem4.o PtrelSolver.o PtrelSolverDependencies.o PtrelTemplateMaker.o PtrelUtils.o PtrelSolverDict.o
 
 all:	$(OBJS)
 	$(CXX) -dynamiclib -o libPtrelSolver.dylib $(LDFLAGS) $(OBJS) $(LIBS)
