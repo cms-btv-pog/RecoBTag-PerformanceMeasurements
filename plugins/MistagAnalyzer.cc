@@ -612,7 +612,6 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   classifier_.newEvent(iEvent, iSetup);
   
   const JetCorrector *acorrector = JetCorrector::getJetCorrector("MCJetCorrectorIcone5",iSetup);
-  
   // Calo Jets
   Handle<reco::CaloJetCollection> jetsColl;
   iEvent.getByLabel(CaloJetCollectionTags_, jetsColl);
@@ -633,7 +632,6 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.getByLabel("secondaryVertexNegativeTagInfos", tagInfoNegSVx);
   
   
-  //std::cout << "line  1055" << endl;
   
   //------------------------------------------------------
   //Jet Probability tagger
@@ -721,13 +719,12 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   
   for( jet = recoJets.begin(); jet != recoJets.end(); ++jet ) {
     
-    //std::cout << "line  1134" << endl;
     
     int ith_tagged = -1;      
     //$$$$
     float Flavour  ;    
     int flavour    ; 
-    if(!isData_){
+    if(isData_!=0){
       Flavour  = getMatchedParton(*jet).flavour();    
        flavour    = int(TMath::Abs( Flavour ));    
     //$$$$
@@ -765,7 +762,6 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     ith_tagged = this->TaggedJet(*jet,jetTags_NegJP);
     float ProbaN = (*jetTags_NegJP)[ith_tagged].second;
     
-    //std::cout << "ProbaP  " <<  ProbaP  << " Proba " << Proba << std::endl;
     
     //ith_tagged              = this->TaggedJet(*jet,jetTags_CombinedSvtx);
     //float   CombinedSvtx    = (*jetTags_CombinedSvtx)[ith_tagged].second;
@@ -792,7 +788,7 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     TrackCategories::Flags flags2N;
     TrackCategories::Flags flags3N;
     int idSize = 0;
-    if(useTrackHistory_ && indexes.size() != 0 && !isData_){
+    if(useTrackHistory_ && indexes.size() != 0 && isData_!=0){
       idSize = indexes.size();
       flags1P = classifier_.evaluate( tracks[indexes[0]] ).flags();
       if(idSize > 1) flags2P = classifier_.evaluate( tracks[indexes[1]] ).flags();
@@ -809,7 +805,7 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     int CategoryJetP = 0;
     int CategoryJetN = 0;
     
-    if(useTrackHistory_ && !isData_){
+    if(useTrackHistory_ && isData_!=0){
       ith_tagged = this->TaggedJet(*jet,jetTags_PosJP);
       TrackRefVector jetProbTracks( (*tagInfo)[ith_tagged].selectedTracks() );  
       
@@ -851,7 +847,7 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     int CategorySVxN = 0;
     
     
-    if(useTrackHistory_ && !isData_){
+    if(useTrackHistory_ && isData_!=0){
       ith_tagged =    this->TaggedJet(*jet,jetTags_Svtx);
       TrackRefVector  svxPostracks( (*tagInfoSVx)[ith_tagged].vertexTracks(0) );
       for(unsigned int i=0; i<svxPostracks.size(); i++){
@@ -970,7 +966,7 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     //*****************************************************************
     
     // Track history
-    if (useTrackHistory_ && indexes.size()!=0 && isData_) {
+    if (useTrackHistory_ && indexes.size()!=0 && isData_!=0) {
       flags1P[TrackCategories::Conversion] ;
       if ( flags1P[TrackCategories::Conversion] )  cat1P = 1; 
       else if ( flags1P[TrackCategories::KsDecay] )     cat1P = 2; 
@@ -1091,7 +1087,6 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     
     
     
-    
     //*****************************************************************
     //fill the ntuple
     //*****************************************************************
@@ -1117,6 +1112,7 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     
     
     
+    
     hData_All_NTracks->Fill( ntagtracks ) ;
     hData_All_JetPt->Fill( ptjet );
     hData_All_JetEta->Fill( etajet );
@@ -1126,7 +1122,7 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     hAllFlav_All_JetEta->Fill( etajet );
     hAllFlav_All_Flavour->Fill( flavour );
     
-    if(!isData_){
+    if(isData_!=0){
       if (flavour == 1 || flavour == 21  ) {
 	hLightFlav_All_NTracks->Fill( ntagtracks );
 	hLightFlav_All_JetPt->Fill( ptjet );
@@ -1164,7 +1160,7 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     hData_JetPt->Fill( ptjet );
     hData_JetEta->Fill( etajet );
     
-    if(!isData_){
+    if(isData_!=0){
       hAllFlav_NTracks->Fill( ntagtracks ) ;
       hAllFlav_JetPt->Fill( ptjet );
       hAllFlav_JetEta->Fill( etajet );
@@ -1255,7 +1251,7 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       hData_Tagger->Fill( varpos );
       hData_Veto_Tagger->Fill( varpos );
     }
-    if(!isData_){
+    if(isData_!=0){
       if ( TagNeg ) {
 	hAllFlav_NegTag_NTracks->Fill( ntagtracks );
 	hAllFlav_NegTag_JetPt->Fill( ptjet );
@@ -1445,7 +1441,7 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     hData_Veto_JetEta->Fill( etajet );
     if ( varneg > 0 ) hData_Veto_Tagger->Fill(-varneg );
     
-    if(!isData_){
+    if(isData_!=0){
       hAllFlav_Veto_NTracks->Fill( ntagtracks ) ;
       hAllFlav_Veto_JetPt->Fill( ptjet );
       hAllFlav_Veto_JetEta->Fill( etajet );
@@ -1500,7 +1496,7 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     hData_Veto_NegTag_JetPt->Fill( ptjet );
     hData_Veto_NegTag_JetEta->Fill( etajet );
     
-    if(!isData_){
+    if(isData_!=0){
       hAllFlav_Veto_NegTag_NTracks->Fill( ntagtracks ) ;
       hAllFlav_Veto_NegTag_JetPt->Fill( ptjet );
       hAllFlav_Veto_NegTag_JetEta->Fill( etajet );
@@ -1558,7 +1554,7 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   hData_All_NJets->Fill( njets );
   hData_NJets->Fill( numjet );
   
-  if(!isData_){
+  if(isData_!=0){
     hAllFlav_All_NJets->Fill( njets );
     hAllFlav_NJets->Fill( numjet );
   }
