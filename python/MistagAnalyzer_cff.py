@@ -15,7 +15,7 @@ mistag = cms.EDAnalyzer("MistagAnalyzer",
     tagCut                   = cms.double(5.3),
     MinPt                    = cms.double(30.0),
     vetoPos                  = cms.double(4.0),
-    isdata                   = cms.bool(True),
+    isData                   = cms.bool(True),
     Jets                     = cms.string('iterativeCone5CaloJets'),
     
     vertexClusteringDistance = cms.untracked.double(0.0001),
