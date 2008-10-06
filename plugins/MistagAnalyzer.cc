@@ -53,6 +53,9 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   svtxModuleName_       = iConfig.getParameter<std::string>("svtxModuleName");
   svtxNegModuleName_    = iConfig.getParameter<std::string>("svtxNegModuleName");
   
+  softMuonModuleName_       = iConfig.getParameter<std::string>("softMuonModuleName");
+  softMuonNegModuleName_    = iConfig.getParameter<std::string>("softMuonNegModuleName");
+  softMuonTagInfoName_      = iConfig.getParameter<std::string>("softMuonTagInfoName");
   
   
   
@@ -312,7 +315,11 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   hBFlav_Veto_Tagger         = new TH1F("hBFlav_Veto_Tagger","Tagger",100,-50.,50.);
   
   nTuplesJets =  new TNtuple("Jets","All Jets",			     
-			     "Njets:Ijet:Flavour:Ntagtracks:Ptjet:Etajet:Phijet:Pxjet:Pyjet:Pzjet:Ejet:Ip1N:Ip1P:Ip2N:Ip2P:Ip3N:Ip3P:ProbaN:ProbaP:Proba:Svtx:SvtxN:CategoryN:CategoryP:CategoryJetN:CategoryJetP:CategorySVxN:CategorySVxP");
+  
+"Njets:Ijet:Flavour:Ntagtracks:Ptjet:Etajet:Phijet:Pxjet:Pyjet:Pzjet:Ejet:Ip1N:Ip1P:Ip2N:Ip2P:Ip3N:Ip3P:ProbaN:ProbaP:Proba:Svtx:SvtxN:SoftM:SoftMN:CategoryN:CategoryP:CategoryJetN:CategoryJetP:CategorySVxN:CategorySVxP:CategorySoftMuonN:CategorySoftMuonP");   
+			    
+//"Njets:Ijet:Flavour:Ntagtracks:Ptjet:Etajet:Phijet:Pxjet:Pyjet:Pzjet:Ejet:Ip1N:Ip1P:Ip2N:Ip2P:Ip3N:Ip3P:ProbaN:ProbaP:Proba:Svtx:SvtxN:CombinedSvtx:CombinedSvtxN:SoftM:SoftMN:CategoryN:CategoryP:CategoryJetN:CategoryJetP:CategorySVxN:CategorySVxP");
+  
   
 }
 
@@ -672,6 +679,17 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.getByLabel(svtxNegModuleName_, jetTags_negSvtx);
   
   
+  //------------------------------------------------------
+  //Soft muon tagger
+  //------------------------------------------------------
+  
+  edm::Handle<reco::JetTagCollection> jetTags_softM;
+  iEvent.getByLabel(softMuonModuleName_, jetTags_softM);
+  edm::Handle<reco::JetTagCollection> jetTags_softMneg;
+  iEvent.getByLabel(softMuonNegModuleName_, jetTags_softMneg);
+  
+  edm::Handle<reco::SoftLeptonTagInfoCollection> tagInos_softmuon;
+  iEvent.getByLabel(softMuonTagInfoName_, tagInos_softmuon);
   
   
   
@@ -766,12 +784,19 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     //ith_tagged              = this->TaggedJet(*jet,jetTags_CombinedSvtx);
     //float   CombinedSvtx    = (*jetTags_CombinedSvtx)[ith_tagged].second;
     //ith_tagged              = this->TaggedJet(*jet,jetTags_negCombinedSvtx);
-    //float   CombinedSvtxN = (*jetTags_negCombinedSvtx)[ith_tagged].second;
+    //float   CombinedSvtxN   = (*jetTags_negCombinedSvtx)[ith_tagged].second;
     
     ith_tagged            = this->TaggedJet(*jet,jetTags_Svtx);
-    float   Svtx    = (*jetTags_Svtx)[ith_tagged].second;
+    float   Svtx          = (*jetTags_Svtx)[ith_tagged].second;
     ith_tagged            = this->TaggedJet(*jet,jetTags_negSvtx);
-    float   SvtxN = (*jetTags_negSvtx)[ith_tagged].second;
+    float   SvtxN         = (*jetTags_negSvtx)[ith_tagged].second;
+    
+    
+    ith_tagged            = this->TaggedJet(*jet,jetTags_softM);
+    float   SoftM         = (*jetTags_Svtx)[ith_tagged].second;
+    ith_tagged            = this->TaggedJet(*jet,jetTags_softMneg);
+    float   SoftMN        = (*jetTags_negSvtx)[ith_tagged].second;
+    
     
     
     
@@ -880,6 +905,43 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
     }
     
+     
+    
+     //*****************************************************************
+    //get track histories of the muon (SoftMuon tagger)
+    //*****************************************************************
+    int CategorySoftMuonP   = 0;
+    int CategorySoftMuonN   = 0;
+    if(useTrackHistory_ && isData_!=0){
+     ith_tagged = this->TaggedJet(*jet,jetTags_softM);
+     
+     if(  SoftM > 0 && (*tagInos_softmuon)[ith_tagged].leptons()!=0 ){
+      TrackCategories::Flags theFlagP = classifier_.evaluate( (*tagInos_softmuon)[ith_tagged].lepton(0) ).flags();
+      if      ( theFlagP[TrackCategories::Conversion] )   CategorySoftMuonP += int(pow(10., -1 + 1)); 
+      else if ( theFlagP[TrackCategories::KsDecay] )      CategorySoftMuonP += int(pow(10., -1 + 2)); 
+      else if ( theFlagP[TrackCategories::LambdaDecay] )  CategorySoftMuonP += int(pow(10., -1 + 3)); 
+      else if ( theFlagP[TrackCategories::BWeakDecay] )   CategorySoftMuonP += int(pow(10., -1 + 4)); 
+      else if ( theFlagP[TrackCategories::CWeakDecay] )   CategorySoftMuonP += int(pow(10., -1 + 5)); 
+      else if ( theFlagP[TrackCategories::TauDecay] )     CategorySoftMuonP += int(pow(10., -1 + 6)); 
+      else if ( theFlagP[TrackCategories::Interaction] )  CategorySoftMuonP += int(pow(10., -1 + 7)); 
+      else if ( theFlagP[TrackCategories::Fake] )         CategorySoftMuonP += int(pow(10., -1 + 8)); 
+      else if ( theFlagP[TrackCategories::Bad] )          CategorySoftMuonP += int(pow(10., -1 + 9)); 
+     }
+     ith_tagged            = this->TaggedJet(*jet,jetTags_softMneg);
+     if(   -SoftMN > 1 && (*tagInos_softmuon)[ith_tagged].leptons()!=0  ){
+      TrackCategories::Flags theFlagN = classifier_.evaluate( (*tagInos_softmuon)[ith_tagged].lepton(0) ).flags();
+      if      ( theFlagN[TrackCategories::Conversion] )   CategorySoftMuonN += int(pow(10., -1 + 1)); 
+      else if ( theFlagN[TrackCategories::KsDecay] )      CategorySoftMuonN += int(pow(10., -1 + 2)); 
+      else if ( theFlagN[TrackCategories::LambdaDecay] )  CategorySoftMuonN += int(pow(10., -1 + 3)); 
+      else if ( theFlagN[TrackCategories::BWeakDecay] )   CategorySoftMuonN += int(pow(10., -1 + 4)); 
+      else if ( theFlagN[TrackCategories::CWeakDecay] )   CategorySoftMuonN += int(pow(10., -1 + 5)); 
+      else if ( theFlagN[TrackCategories::TauDecay] )     CategorySoftMuonN += int(pow(10., -1 + 6)); 
+      else if ( theFlagN[TrackCategories::Interaction] )  CategorySoftMuonN += int(pow(10., -1 + 7)); 
+      else if ( theFlagN[TrackCategories::Fake] )         CategorySoftMuonN += int(pow(10., -1 + 8)); 
+      else if ( theFlagN[TrackCategories::Bad] )          CategorySoftMuonN += int(pow(10., -1 + 9)); 
+     }
+    }
+    
     
     float Ip1P   = -1000;
     float Ip1N   = 1000;
@@ -947,9 +1009,22 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       if ( Svtx  > tagCut_ ) TagPos = true;
       if (-SvtxN > tagCut_ ) TagNeg = true; 
     }
-    //else if ( selTagger_ == 5 ) {    // SV comboned
+    /*else if ( selTagger_ == 5 ) {    // SV combined
     //  if  (CombinedSvtx > 0) varpos = CombinedSvtx;
-    //  if  (CombinedSvtx < 0) varpos = CombinedSvtxN;   // }
+    //  if  (CombinedSvtx < 0) varpos = CombinedSvtxN; 
+      if  (CombinedSvtx > 0) varpos = CombinedSvtx;
+      if  (CombinedSvtx < 0) varneg = CombinedSvtxN;
+      if ( CombinedSvtx  > tagCut_ ) TagPos = true;
+      if (-CombinedSvtxN > tagCut_ ) TagNeg = true;   
+    }*/
+    else if ( selTagger_ == 6 ) {    // SV combined
+    //  if  (CombinedSvtx > 0) varpos = CombinedSvtx;
+    //  if  (CombinedSvtx < 0) varpos = CombinedSvtxN; 
+      if  ( SoftM  > 0) varpos = 5*SoftM;
+      if  ( SoftMN < 0) varneg = 5*SoftM;
+      if  (  SoftM > tagCut_ ) TagPos = true;
+      if  (- SoftMN> tagCut_ ) TagNeg = true;   
+    }
     
     
     
@@ -1091,16 +1166,18 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     //fill the ntuple
     //*****************************************************************
     
-    float jet_input[28] =
+    float jet_input[32] =
       {Njets, Ijet, Flavour, Ntagtracks, ptjet, (*jet).eta(), phijet, 
        (*jet).px() * JES, (*jet).py() * JES, (*jet).pz() * JES, ejet,
        //$$$$
        Ip1N, Ip1P, Ip2N, Ip2P, Ip3N, Ip3P, ProbaN, ProbaP, Proba,
        //Svtx, SvtxN, CombinedSvtx, CombinedSvtxN,
        Svtx, SvtxN,
+       SoftM, SoftMN,
        CategoryN, CategoryP,
        CategoryJetN, CategoryJetP,
-       CategorySVxN, CategorySVxP
+       CategorySVxN, CategorySVxP,
+       CategorySoftMuonN, CategorySoftMuonP
       };
     
     
@@ -1559,6 +1636,18 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     hAllFlav_NJets->Fill( numjet );
   }
 }
+
+
+float 
+MistagAnalyzer::calculPtRel()
+{
+  float threturn = 0;
+  
+  
+  return threturn;
+
+}
+
 
 
 // ------------ method called once each job just before starting event loop  ------------

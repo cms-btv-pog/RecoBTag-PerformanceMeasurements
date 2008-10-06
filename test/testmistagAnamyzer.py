@@ -225,6 +225,8 @@ process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
 process.load("RecoBTau.JetTagComputer.jetTagRecord_cfi")
 
 process.load("SimTracker.TrackHistory.TrackHistory_cff")
+
+# for Impact Parameter based taggers
 process.load("RecoBTag.ImpactParameter.negativeOnlyJetProbabilityComputer_cfi")
 process.load("RecoBTag.ImpactParameter.positiveOnlyJetProbabilityComputer_cfi")
 process.load("RecoBTag.ImpactParameter.negativeTrackCounting3D2ndComputer_cfi")
@@ -237,28 +239,30 @@ process.load("RecoBTag.ImpactParameter.negativeTrackCountingHighEffJetTags_cfi")
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.load("JetMETCorrections.Configuration.MCJetCorrections152_cff")
 
-process.load("RecoBTau.JetTagComputer.jetTagRecord_cfi")
-process.load("JetMETCorrections.Configuration.JetCorrectionsRecord_cfi")
-process.load("RecoBTag.ImpactParameter.negativeOnlyJetProbabilityComputer_cfi")
-process.load("RecoBTag.ImpactParameter.positiveOnlyJetProbabilityComputer_cfi")
-process.load("RecoBTag.ImpactParameter.negativeTrackCounting3D2ndComputer_cfi")
-process.load("RecoBTag.ImpactParameter.negativeTrackCounting3D3rdComputer_cfi")
-
-process.load("RecoBTag.ImpactParameter.negativeOnlyJetProbabilityJetTags_cfi")
-process.load("RecoBTag.ImpactParameter.positiveOnlyJetProbabilityJetTags_cfi")
-process.load("RecoBTag.ImpactParameter.negativeTrackCountingHighPur_cfi")
-process.load("RecoBTag.ImpactParameter.negativeTrackCountingHighEffJetTags_cfi")
 
 process.load("RecoBTag.ImpactParameter.jetProbabilityBJetTags_cfi")
 
+#for Secondary Vertex taggers
 process.load("RecoBTag.SecondaryVertex.secondaryVertexNegativeTagInfos_cfi")
 process.load("RecoBTag.SecondaryVertex.simpleSecondaryVertexNegativeBJetTags_cfi")
+
+
+#For Soft Muon tagger
+
+process.load("RecoBTag.SoftLepton.negativeSoftMuonES_cfi")
+process.load("RecoBTag.SoftLepton.positiveSoftMuonES_cfi")
+process.load("RecoBTag.SoftLepton.negativeSoftMuonBJetTags_cfi")
+process.load("RecoBTag.SoftLepton.positiveSoftMuonBJetTags_cfi")
+
+
 
 process.load("PhysicsTools.JetMCAlgos.CaloJetsMCFlavour_cfi")
 
 # process.load("SimTracker.TrackHistory.TrackHistory_cff")
 
 # process.load("SimGeneral.TrackingAnalysis.trackingParticles_cfi")
+
+
 
 process.load("SimTracker.TrackHistory.TrackClassifier_cff")
 process.load("RecoBTag.PerformanceMeasurements.MistagAnalyzer_cff")
@@ -279,8 +283,10 @@ process.out = cms.OutputModule("PoolOutputModule",
 #process.p = cms.Path(process.positiveOnlyJetProbabilityJetTags*process.negativeOnlyJetProbabilityJetTags*process.negativeTrackCountingHigEffJetTags*process.negativeTrackCountingHigPur*process.mistag)
 
 process.p = cms.Path(process.mcAlgoJetFlavour*process.positiveOnlyJetProbabilityJetTags*process.negativeOnlyJetProbabilityJetTags
-	*process.negativeTrackCountingHighEffJetTags*process.secondaryVertexNegativeTagInfos*process.simpleSecondaryVertexNegativeBJetTags*
-	process.negativeTrackCountingHighPur*process.jetProbabilityBJetTags*process.mistag
+	*process.negativeTrackCountingHighEffJetTags*process.negativeTrackCountingHighPur
+	*process.secondaryVertexNegativeTagInfos*process.simpleSecondaryVertexNegativeBJetTags
+	*process.negativeSoftMuonBJetTags*process.positiveSoftMuonBJetTags	
+	*process.jetProbabilityBJetTags*process.mistag
 	)
 
 

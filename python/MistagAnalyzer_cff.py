@@ -48,5 +48,8 @@ mistag = cms.EDAnalyzer("MistagAnalyzer",
     combinedSvtxModuleName    = cms.string(''),
     combinedSvtxNegModuleName = cms.string(''),
     svtxModuleName            = cms.string('simpleSecondaryVertexBJetTags'),
-    svtxNegModuleName         = cms.string('simpleSecondaryVertexNegativeBJetTags')  
+    svtxNegModuleName         = cms.string('simpleSecondaryVertexNegativeBJetTags'),
+    softMuonModuleName        = cms.string('positiveSoftMuonBJetTags'),
+    softMuonNegModuleName     = cms.string('negativeSoftMuonBJetTags'),
+    softMuonTagInfoName       = cms.string('softMuonTagInfos')
 )

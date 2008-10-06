@@ -18,7 +18,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.1 2008/09/20 21:44:17 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.2 2008/09/21 11:02:49 bazterra Exp $
 //
 //
 
@@ -82,6 +82,7 @@ Implementation:
 #include "SimTracker/TrackHistory/interface/TrackCategories.h"
 #include "SimTracker/TrackHistory/interface/TrackClassifier.h"
 
+#include "DataFormats/BTauReco/interface/SoftLeptonTagInfo.h"
 
 struct ltstr{
  bool operator()(const edm::RefToBase<reco::Jet> s1, edm::RefToBase<reco::Jet> s2) const
@@ -120,6 +121,8 @@ class MistagAnalyzer : public edm::EDAnalyzer {
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
   
+  float calculPtRel();
+  
   BTagMCTools::JetFlavour getMatchedParton(const reco::CaloJet &jet);
   // ----------member data ---------------------------
   std::string outputFile_;
@@ -147,6 +150,10 @@ class MistagAnalyzer : public edm::EDAnalyzer {
   
   std::string svtxModuleName_;
   std::string svtxNegModuleName_;
+  
+  std::string softMuonModuleName_;
+  std::string softMuonNegModuleName_;
+  std::string softMuonTagInfoName_;
   
   
   bool useTrackHistory_;
