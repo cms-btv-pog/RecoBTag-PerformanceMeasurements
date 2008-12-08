@@ -6,7 +6,7 @@
 #JBPL
 #JBPM
 #JBPT
-#SLT
+#SMT
 #SVM
 #SVT
 #CSVL 
@@ -18,7 +18,7 @@ import FWCore.ParameterSet.Config as cms
 Performance = cms.EDAnalyzer("PerformanceAnalyzer",
     # definition of the Operating Points (L,M,T)
     # cuts estimated either by thomas on 21X, or using old francisco's ones
-    # sorted as TCL,TCM,TCT,JPL,JPM,JPT,JBPL, JBPM, JBPT, SLT, SVM, SVT, CSVL, CSVM, CSVT
+    # sorted as TCL,TCM,TCT,JPL,JPM,JPT,JBPL, JBPM, JBPT, SMT, SVM, SVT, CSVL, CSVM, CSVT
     bTagCutList = cms.untracked.vdouble(2.0, 4.6, 4.7, 0.26, 0.5, 
         0.76, 1.2, 2.3, 3.2, 0.8, 
         2.0, 3.6, 0.0, 37.0, 0.84, 
@@ -86,7 +86,8 @@ Performance = cms.EDAnalyzer("PerformanceAnalyzer",
         'simpleSecondaryVertexBJetTags', 
         'combinedSecondaryVertexBJetTags', 
         'jetProbabilityBJetTags', 
-        'jetBProbabilityBJetTags'),
+        'jetBProbabilityBJetTags',
+        'softMuonBJetTags'),
     PrimaryVertexCollection = cms.untracked.string('offlinePrimaryVerticesFromCTFTracks'),
     WritePerformancePlots = cms.bool(True)
 )
