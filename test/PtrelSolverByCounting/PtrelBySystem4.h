@@ -7,7 +7,7 @@
 
 #include <vector>
 
-#include "PtrelSolver.h"
+#include "../PtrelSolver/PtrelSolver.h"
 
 class PtrelBySystem4 : public PtrelSolver
 {

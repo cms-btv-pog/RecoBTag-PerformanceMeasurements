@@ -13,7 +13,7 @@
 #include "TFile.h"
 #include "TPRegexp.h"
 
-#include "PtrelUtils.h"
+#include "../PtrelSolver/PtrelUtils.h"
 
 ClassImp(PtrelBySystem4)
 

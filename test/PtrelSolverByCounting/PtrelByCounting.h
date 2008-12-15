@@ -5,7 +5,7 @@
 #ifndef PtrelByCounting_h
 #define PtrelByCounting_h
 
-#include "PtrelSolver.h"
+#include "../PtrelSolver/PtrelSolver.h"
 
 class PtrelByCounting : public PtrelSolver
 {
