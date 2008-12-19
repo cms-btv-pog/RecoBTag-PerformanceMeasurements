@@ -11,7 +11,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.23 2008/09/08 19:06:23 bazterra Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.24 2008/12/08 13:09:05 jindal Exp $
  *
  */
 
@@ -34,12 +34,6 @@
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
-//generator level + CLHEP
-#include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
-//#include "CLHEP/HepMC/GenEvent.h"
-//#include "CLHEP/HepMC/GenVertex.h"
-//#include "CLHEP/HepMC/GenParticle.h"
-
 // vertex stuff
 #include <DataFormats/VertexReco/interface/Vertex.h>
 #include "RecoVertex/VertexPrimitives/interface/TransientVertex.h"
@@ -57,8 +51,6 @@
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 
-#include "RecoBTag/MCTools/interface/JetFlavour.h"
-#include "RecoBTag/MCTools/interface/JetFlavourIdentifier.h"
 
 // Root
 #include "TH1.h"
@@ -74,6 +66,22 @@
 #include "RecoBTag/PerformanceMeasurements/test/S8Tools/S8bPerformance.h"
 
 #include "SimDataFormats/JetMatching/interface/JetFlavourMatching.h"
+#include "SimDataFormats/JetMatching/interface/JetFlavour.h"
+
+
+class WorkingPoint{
+ public:
+  WorkingPoint(edm::InputTag t,  std::string n,   double c) : it(t), name_(n), cut_(c) {}
+  float cut() const {return cut_;}
+  edm::InputTag inputTag() const {return it;}
+  std::string name () const {return name_;}
+  void print () const ;
+ private:
+  edm::InputTag it;
+  std::string name_;
+  double cut_;
+};
+
 
 
 
@@ -89,7 +97,6 @@ struct ltstr
 
 // class declaration
 
-using BTagMCTools::JetFlavour;
 
 class PerformanceAnalyzer : public edm::EDAnalyzer
 {
@@ -110,13 +117,13 @@ public:
     int TaggedJet(reco::CaloJet calojet, edm::Handle<reco::JetTagCollection > jetTags );
     int TaggedJet(reco::CaloJet const &, edm::Handle<std::vector<reco::TrackIPTagInfo> > const &);
     
-    std::map< std::string, bool > GetBTaggingMap(reco::CaloJet jet,std::vector<edm::Handle<reco::JetTagCollection > > jetTags_testManyByType, double ptrel=0.);
+    std::map< std::string, bool > GetBTaggingMap(reco::CaloJet jet, const edm::Event&, double ptrel=0.);
     void FillHistos(std::string type, TLorentzVector p4MuJet, double ptrel,
                     int JetFlavor, std::map<std::string, bool> aMap, double weight);
     void FillEff(TLorentzVector p4MuJet, int JetFlavor, std::map<std::string, bool> aMap, double weight);
     void FillPtrel(double ptrel, int JetFlavor, std::map<std::string, bool> aMap, double weight);
-    void FillPerformance(reco::CaloJet jet, int JetFlavor, std::vector<edm::Handle<reco::JetTagCollection > > jetTags_testManyByType);
-    JetFlavour getMatchedParton(const reco::CaloJet &jet);
+    void FillPerformance(reco::CaloJet jet, int JetFlavor, const edm::Event&);
+    reco::JetFlavour getMatchedParton(const reco::CaloJet &jet);
 
 private:
 
@@ -124,9 +131,10 @@ private:
     std::string outputFile_;                   // output file
     std::string recoTrackList_; // collection of tracks
     std::string recoVtxList_;   // collection of vertices
-    std::vector< std::string > bTaggerList_;    // list of b-tagggers
-    std::vector< double > bTagCutList_;
-    std::vector< std::string > moduleLabel_;
+    //    std::vector< std::string > bTaggerList_;    // list of b-tagggers
+    //    std::vector< double > bTagCutList_;
+    //    std::vector< std::string > moduleLabel_;
+    std::vector<WorkingPoint> wp;
     //std::string JetTrackAssociatorTags_;
     std::string MuonCollectionTags_;
     std::string CaloJetCollectionTags_;
@@ -144,7 +152,6 @@ private:
     //  edm::Handle<reco::CandMatchMap> theJetPartonMapf;
     edm::Handle<reco::JetFlavourMatchingCollection> theJetPartonMapf;
 
-    JetFlavourIdentifier jetFlavourIdentifier_;
     //JetFlavourIdentifier jetFlavourIdentifier2_;
     bool StoreTrackProba_;
     double MinJetPt_;
@@ -206,7 +213,7 @@ private:
     // jet corrections
     //
     std::string jetCorrLabel_;
-      bool useJetCorr_;
+    bool useJetCorr_;
 };
 
 
