@@ -230,7 +230,10 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
     AwayjetHistos_mc->Init("p","b");
     MujetHistos_mc->Init("n","cl");
     AwayjetHistos_mc->Init("p","cl");
-
+    MujetHistos_mc->Init("n","c");
+    AwayjetHistos_mc->Init("p","c");
+    MujetHistos_mc->Init("n","l");
+    AwayjetHistos_mc->Init("p","l");
     for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it!=wp.end(); ++it){
       
       EffHistos->Init("efficiencies",(*it).name());
@@ -242,6 +245,10 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
       TaggedAwayjetHistos_mc->Init("ptag","b",(*it).name());
       TaggedMujetHistos_mc->Init("ntag","cl",(*it).name());
       TaggedAwayjetHistos_mc->Init("ptag","cl",(*it).name());
+      TaggedMujetHistos_mc->Init("ntag","c",(*it).name());
+      TaggedAwayjetHistos_mc->Init("ptag","c",(*it).name());
+      TaggedMujetHistos_mc->Init("ntag","l",(*it).name());
+      TaggedAwayjetHistos_mc->Init("ptag","l",(*it).name());
 
     }
 
@@ -473,19 +480,19 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
         dTC2_udsg->SetName("discTC2_udsg");
         dTC3_udsg->SetName("discTC3_udsg");
         dTP_udsg->SetName("discTP_udsg");
-		dJBP_udsg->SetName("discJBP_udsg");
-		dSMT_udsg->SetName("discSMT_udsg");
-		dSSV_udsg->SetName("discSSV_udsg");
-		dCSV_udsg->SetName("discCSV_udsg");
+	dJBP_udsg->SetName("discJBP_udsg");
+	dSMT_udsg->SetName("discSMT_udsg");
+	dSSV_udsg->SetName("discSSV_udsg");
+	dCSV_udsg->SetName("discCSV_udsg");
         dMTC2_udsg->SetName("discMTC2_udsg");
         dMTC3_udsg->SetName("discMTC3_udsg");
         dTC2_udsg->SetTitle("TC2trk discriminator vs udsg-mistagging");
         dTC3_udsg->SetTitle("TC3trk discriminator vs udsg-mistagging");
         dTP_udsg->SetTitle("TP discriminator vs udsg-mistagging");
-		dJBP_udsg->SetTitle("JBP discriminator vs udsg-mistagging");
-		dSMT_udsg->SetTitle("SMT discriminator vs udsg-mistagging");
-		dSSV_udsg->SetTitle("SSV discriminator vs udsg-mistagging");
-		dCSV_udsg->SetTitle("CSV discriminator vs udsg-mistagging");
+	dJBP_udsg->SetTitle("JBP discriminator vs udsg-mistagging");
+	dSMT_udsg->SetTitle("SMT discriminator vs udsg-mistagging");
+	dSSV_udsg->SetTitle("SSV discriminator vs udsg-mistagging");
+	dCSV_udsg->SetTitle("CSV discriminator vs udsg-mistagging");
         dMTC2_udsg->SetTitle("MTC2trk discriminator vs udsg-mistagging");
         dMTC3_udsg->SetTitle("MTC3trk discriminator vs udsg-mistagging");
 
@@ -498,16 +505,16 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
         gTP_b->SetTitle("Jet b-efficiency");
         gTP_c->SetTitle("Jet c-mistagging");
         gTP_udsg->SetTitle("Jet udsg-mistagging");
-		gJBP_b->SetTitle("Jet b-efficiency");
+	gJBP_b->SetTitle("Jet b-efficiency");
         gJBP_c->SetTitle("Jet c-mistagging");
         gJBP_udsg->SetTitle("Jet udsg-mistagging");
-		gSMT_b->SetTitle("Jet b-efficiency");
+	gSMT_b->SetTitle("Jet b-efficiency");
         gSMT_c->SetTitle("Jet c-mistagging");
         gSMT_udsg->SetTitle("Jet udsg-mistagging");
-		gSSV_b->SetTitle("Jet b-efficiency");
+	gSSV_b->SetTitle("Jet b-efficiency");
         gSSV_c->SetTitle("Jet c-mistagging");
         gSSV_udsg->SetTitle("Jet udsg-mistagging");
-		gCSV_b->SetTitle("Jet b-efficiency");
+	gCSV_b->SetTitle("Jet b-efficiency");
         gCSV_c->SetTitle("Jet c-mistagging");
         gCSV_udsg->SetTitle("Jet udsg-mistagging");
         gMTC2_b->SetTitle("Jet b-efficiency");
@@ -526,16 +533,16 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
         gTP_b->Write();
         gTP_c->Write();
         gTP_udsg->Write();
-		gJBP_b->Write();
+	gJBP_b->Write();
         gJBP_c->Write();
         gJBP_udsg->Write();
-		gSMT_b->Write();
+	gSMT_b->Write();
         gSMT_c->Write();
         gSMT_udsg->Write();
-		gSSV_b->Write();
+	gSSV_b->Write();
         gSSV_c->Write();
         gSSV_udsg->Write();
-		gCSV_b->Write();
+	gCSV_b->Write();
         gCSV_c->Write();
         gCSV_udsg->Write();
         gMTC2_b->Write();
@@ -551,9 +558,9 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
         dTP_udsg->Write();
         dJBP_udsg->Write();
         dSMT_udsg->Write();
-		dSSV_udsg->Write();
-		dCSV_udsg->Write();
-		dMTC2_udsg->Write();
+	dSSV_udsg->Write();
+	dCSV_udsg->Write();
+	dMTC2_udsg->Write();
         dMTC3_udsg->Write();
 
     }
@@ -1041,7 +1048,19 @@ void PerformanceAnalyzer::FillHistos(std::string type, TLorentzVector p4MuJet, d
             MujetHistos_mc->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
             MujetHistos_mc->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);
         }
-    }
+          if ( JetFlavor == 4 )
+        {
+            std::string flavor = "c";
+            MujetHistos_mc->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
+            MujetHistos_mc->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);
+        }
+        if ( (JetFlavor>0 && JetFlavor<4) || JetFlavor == 21 )
+        {
+            std::string flavor = "l";
+            MujetHistos_mc->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
+            MujetHistos_mc->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);
+        }
+  }
     else if ( type == "p")
     {
 
@@ -1056,6 +1075,18 @@ void PerformanceAnalyzer::FillHistos(std::string type, TLorentzVector p4MuJet, d
         if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor == 21 )
         {
             std::string flavor = "cl";
+            AwayjetHistos_mc->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
+            AwayjetHistos_mc->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);
+        }
+        if ( JetFlavor == 4 )
+        {
+            std::string flavor = "c";
+            AwayjetHistos_mc->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
+            AwayjetHistos_mc->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);
+        }
+        if ( (JetFlavor>0 && JetFlavor<4) || JetFlavor == 21 )
+        {
+            std::string flavor = "l";
             AwayjetHistos_mc->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
             AwayjetHistos_mc->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);
         }
@@ -1085,6 +1116,18 @@ void PerformanceAnalyzer::FillHistos(std::string type, TLorentzVector p4MuJet, d
                     TaggedMujetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
                     TaggedMujetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
                 }
+                if ( JetFlavor == 4 )
+                {
+                    std::string flavor = "c_";
+                    TaggedMujetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
+                    TaggedMujetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
+                }
+                if ( (JetFlavor>0 && JetFlavor<4) || JetFlavor == 21 )
+                {
+                    std::string flavor = "l_";
+                    TaggedMujetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
+                    TaggedMujetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
+                }
             }
             else if ( type == "p")
             {
@@ -1102,6 +1145,18 @@ void PerformanceAnalyzer::FillHistos(std::string type, TLorentzVector p4MuJet, d
                 if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor == 21 )
                 {
                     std::string flavor = "cl_";
+                    TaggedAwayjetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
+                    TaggedAwayjetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
+                }
+                if ( JetFlavor == 4 )
+                {
+                    std::string flavor = "c_";
+                    TaggedAwayjetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
+                    TaggedAwayjetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
+                }
+                if ( (JetFlavor>0 && JetFlavor<4) || JetFlavor == 21 )
+                {
+                    std::string flavor = "l_";
                     TaggedAwayjetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
                     TaggedAwayjetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
                 }
