@@ -158,10 +158,10 @@ void TtDifferentialPlot::setVariableName ()
   }
 
   //edm::LogInfo("Info") 
-   cout << "====>>>> TtDifferentialPlot::setVariableName() : set const/diffVariableName to : "
-     << constVariableName << " / " << diffVariableName << endl
-     << "====>>>>                                            constant value interval : "
-     << constVariableValue.first  << " - " << constVariableValue.second << endl ;
+//    cout << "====>>>> TtDifferentialPlot::setVariableName() : set const/diffVariableName to : "
+//      << constVariableName << " / " << diffVariableName << endl
+//      << "====>>>>                                            constant value interval : "
+//      << constVariableValue.first  << " - " << constVariableValue.second << endl ;
 }
 
 

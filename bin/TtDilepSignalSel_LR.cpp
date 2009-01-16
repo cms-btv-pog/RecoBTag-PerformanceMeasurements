@@ -28,14 +28,14 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //input files
-const TString dir = "/localscratch/s/speer/top_eff/data/new_skim/plots_obs/";
-const  TString  inputFile    = "raw_lr_plots.root";
-const  TString  outputFile   = "final_lr_plots.root";
-const  TString  outputPSfile = "LRplots.ps";
+TString dir = "";
+TString  inputFile    = "raw_lr_plots.root";
+TString  outputFile   = "final_lr_plots.root";
+TString  outputPSfile = "final_lr_plots.ps";
 
 //observable histogram variables
-const  int      nrSignalSelObs  		= 13;
-const  int      SignalSelObs[nrSignalSelObs] 	= {1,2,3,4,5,6,7,8,9,10,11,12,13};
+const  int      nrSignalSelObs  		= 14;
+const  int      SignalSelObs[nrSignalSelObs] 	= {1,2,3,4,5,6,7,8,9,10,11,12,13,15};
 //const  int      SignalSelObs[nrSignalSelObs] 	= {1,2,3,4,7,8,9,10,11,12};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,10 +53,23 @@ vector<const char*> obsFits;
 // Main analysis
 //
 
-int main() { 
+int main(int argc, const char* argv[]) { 
   gSystem->Load("libFWCoreFWLite");
   AutoLibraryLoader::enable();
-  
+
+  inputFile = dir+inputFile;
+  outputPSfile = dir+outputPSfile;
+  outputFile = dir + outputFile;
+
+  // Filenames
+  if (argc>=2) {
+    inputFile = TString(argv[1]);
+  }
+  if (argc>=3) {
+    outputFile = TString(argv[2])+TString(".root");
+    outputPSfile = TString(argv[2])+TString(".ps");
+  }
+
   
   // define all histograms & fit functions
   //to replace with something more elegant
@@ -65,7 +78,7 @@ int main() {
   }
   myLRhelper = new LRHelpFunctions();
   //load plots
-  myLRhelper->readObsHistsAndFits(dir+inputFile, obsNrs, true);
+  myLRhelper->readObsHistsAndFits(inputFile, obsNrs, true);
 //  myLRhelper->recreateFitFct(obsNrs, obsFits);
 //  cout << "fit functions loaded\n";
   
@@ -75,14 +88,11 @@ int main() {
      cout << "make\n";
 
   // store histograms and fits in root-file
-  myLRhelper -> storeToROOTfile(dir+outputFile);
+  myLRhelper -> storeToROOTfile(outputFile);
 
   // make some control plots and put them in a .ps file
-  myLRhelper -> storeControlPlots(dir+outputPSfile);
-//  myLRhelper->purityPlot("lh","eps");
-//   pair<double, double> match = myLRhelper->getBnumbers();
-//   cout << "Matched B jets   : " <<match.first <<endl;
-//   cout << "Non-matched jets : "<<match.second<<endl;
-//   cout << "Purity           : "<< match.first/(match.first+match.second)<<endl;
+  myLRhelper -> storeControlPlots(outputPSfile);
+  myLRhelper->purityPlot("lh","eps");
+  myLRhelper->getBnumbersFromLRC(0.8);
 }
 

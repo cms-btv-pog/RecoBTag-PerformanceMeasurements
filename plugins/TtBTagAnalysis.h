@@ -43,7 +43,7 @@ class TtBTagAnalysis : public edm::EDAnalyzer {
   private: 
 
     void writePlotter(TtEtEtaHistoCollector* plotter);
-    void analyzeJet(const TopJet& jet, double lr, double weight, bool matchB);
+    void analyzeJet(const pat::Jet& jet, double lr, double weight, bool matchB);
 
     // The file which will store the histos
     TFile *theFile;
@@ -52,7 +52,6 @@ class TtBTagAnalysis : public edm::EDAnalyzer {
     bool debug, mcMode;
 
     std::string rootFileName, obsFileName;
-    bool csa;
     double weight;
     
 

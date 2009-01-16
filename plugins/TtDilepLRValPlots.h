@@ -49,7 +49,6 @@ class TtDilepLRValPlots : public edm::EDAnalyzer {
     bool debug;
 
     std::string rootFileName, obsFileName;
-    bool csa;
     double weight;
     
 

@@ -1,7 +1,7 @@
 #ifndef TopJetSelection_H
 #define TopJetSelection_H
 
-#include "AnalysisDataFormats/TopObjects/interface/TopJet.h" 
+#include "DataFormats/PatCandidates/interface/Jet.h"
 
 /** \class TopJetSelection
  *
@@ -14,7 +14,7 @@ class TopJetSelection {
  public:
   TopJetSelection();
   /// Returns true if jet and associated parton satisfy kinematic cuts.
-  bool operator() (const TopJet & jet) const;
+  bool operator() (const pat::Jet & jet) const;
 
   /// Set cut parameters
   void setEtaMin ( double d ) { etaMin  = d ; } 

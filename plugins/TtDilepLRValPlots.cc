@@ -1,9 +1,8 @@
 #include "RecoBTag/PerformanceMeasurements/plugins/TtDilepLRValPlots.h"
 
 #include "FWCore/Framework/interface/MakerMacros.h"
-#include "PhysicsTools/Utilities/interface/DeltaR.h"
+#include "PhysicsTools/Utilities/interface/deltaR.h"
 #include "AnalysisDataFormats/TopObjects/interface/TtGenEvent.h"
-#include "CSA07EffAnalyser/CSA07EffAnalyser/interface/CSA07ProcessId.h"
 
 using namespace std;
 using namespace reco;
@@ -18,10 +17,7 @@ TtDilepLRValPlots::TtDilepLRValPlots(const edm::ParameterSet& iConfig)
   debug = iConfig.getParameter<bool> ("debug");
   rootFileName      = iConfig.getParameter<string> ("rootFileName");
   obsFileName      = iConfig.getParameter<string> ("obsFileName");
-  csa = iConfig.getParameter< bool > ("CSA");
-  if (!csa) {
-    weight = iConfig.getParameter< double > ("weight");
-  }
+  weight = iConfig.getParameter< double > ("weight");
 
   nrSignalSelObs   = iConfig.getParameter<int> ("nrSignalSelObs");
   obsNrs	   = iConfig.getParameter< vector<int> > ("SignalSelObs");
@@ -71,16 +67,6 @@ TtDilepLRValPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   if(sols.size()== 2) {
 
-    if (csa) {
-      edm::Handle< double> weightHandle;
-      iEvent.getByLabel ("csa07EventWeightProducer","weight", weightHandle);
-      weight = * weightHandle;
-      int procID = csa07::csa07ProcessId(iEvent);
-      if (debug) cout << "processID: " << procID
-	<< " - name: " << csa07::csa07ProcessName(procID) 
-	<< " - weight: "<< weight << endl;
-    }
-
     vector < double > lr;
     int bestSol=-1;
     //double highestLR = -10000000000000.;
@@ -109,8 +95,8 @@ TtDilepLRValPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     //if (debug)
 //     if (lr[bestSol] < -10) 
 //     cout << "Best Solution:" <<lr[0] << " - "<<lr[1]<< " = "
-//     <<bestSol<<" = "<<sols[bestSol].getJetB().getPartonFlavour()<<
-//     sols[bestSol].getJetBbar().getPartonFlavour()<< endl;
+//     <<bestSol<<" = "<<sols[bestSol].getJetB().partonFlavour()<<
+//     sols[bestSol].getJetBbar().partonFlavour()<< endl;
 
   bool matchB = false;
   bool matchBbar = false;
@@ -124,9 +110,9 @@ TtDilepLRValPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     if (genEvent->numberOfBQuarks()>1) {
       dr1 = DeltaR<reco::Particle>()(sols[bestSol].getCalJetB(), *(genEvent->b()));
       dr2 = DeltaR<reco::Particle>()(sols[bestSol].getCalJetB(), *(genEvent->bBar()));
-//       matchB = ( (solution.getJetB().getPartonFlavour()==5) && (dr<0.4) );
+//       matchB = ( (solution.getJetB().partonFlavour()==5) && (dr<0.4) );
 //       matchB = ( (dr1<0.4) || (dr2<0.4));
-      matchB = ( (dr1<0.4) || (dr2<0.4) || (sols[bestSol].getCalJetB().getPartonFlavour()==5));
+      matchB = ( (dr1<0.4) || (dr2<0.4) || (sols[bestSol].getCalJetB().partonFlavour()==5));
 
 //       cout <<"test "<< matchB <<" "<< DeltaR<reco::Particle>()(sols[bestSol].getCalJetB(), *(genEvent->b())) 
 //       <<" "<< DeltaR<reco::Particle>()(sols[0].getCalJetB(), *(genEvent->b())) 
@@ -134,8 +120,8 @@ TtDilepLRValPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
       dr1 = DeltaR<reco::Particle>()(sols[bestSol].getCalJetBbar(), *(genEvent->b()));
       dr2 = DeltaR<reco::Particle>()(sols[bestSol].getCalJetBbar(), *(genEvent->bBar()));
-      matchBbar = ( ( (dr1<0.4) || (dr2<0.4) || (sols[bestSol].getCalJetBbar().getPartonFlavour()==5)) );
-//        matchBbar = ( (solution.getJetBbar().getPartonFlavour()==5) && (dr<0.4) );
+      matchBbar = ( ( (dr1<0.4) || (dr2<0.4) || (sols[bestSol].getCalJetBbar().partonFlavour()==5)) );
+//        matchBbar = ( (solution.getJetBbar().partonFlavour()==5) && (dr<0.4) );
 //       matchBbar = ( ( (dr1<0.4) || (dr2<0.4)) );
     }
   } catch (...){cout << "Exception\n";}

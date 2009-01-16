@@ -2,7 +2,7 @@
 #define EtaEtBin_H
 
 #include "TString.h"
-#include "AnalysisDataFormats/TopObjects/interface/TopJet.h" 
+#include "DataFormats/PatCandidates/interface/Jet.h"
 
 /** \class EtaEtBin
  *
@@ -35,7 +35,7 @@ class EtaEtBin {
 
   /// Check if jet/parton are within rapidity/et cuts.
   bool inBin(const double & eta , const double & et) const;
-  bool inBin(const TopJet & jet) const;
+  bool inBin(const pat::Jet & jet) const;
 
   bool operator==(const EtaEtBin & other) const;
   EtaEtBin* clone() const;

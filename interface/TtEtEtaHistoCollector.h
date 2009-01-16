@@ -1,7 +1,7 @@
 #ifndef TtEtEtaHistoCollector_H
 #define TtEtEtaHistoCollector_H
 
-#include "AnalysisDataFormats/TopObjects/interface/TopJet.h" 
+#include "DataFormats/PatCandidates/interface/Jet.h"
 #include "RecoBTag/PerformanceMeasurements/interface/EtaEtBin.h"
 #include "RecoBTag/PerformanceMeasurements/interface/TtDifferentialPlot.h"
 
@@ -43,7 +43,7 @@ public:
    */
   void Sumw2();
   
-  void analyze(const TopJet & jet, double lhr, const double weight);
+  void analyze(const pat::Jet & jet, double lhr, const double weight);
 
   void write();
 

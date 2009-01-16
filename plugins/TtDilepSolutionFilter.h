@@ -7,11 +7,12 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ParameterSet/interface/InputTag.h"
 
-#include "AnalysisDataFormats/TopObjects/interface/TopLepton.h" 
-#include "AnalysisDataFormats/TopObjects/interface/TopObject.h" 
-#include "AnalysisDataFormats/TopObjects/interface/TopParticle.h" 
-#include "AnalysisDataFormats/TopObjects/interface/TopMET.h" 
-#include "AnalysisDataFormats/TopObjects/interface/TopJet.h" 
+#include "DataFormats/PatCandidates/interface/Particle.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/Tau.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
 #include "AnalysisDataFormats/TopObjects/interface/TtGenEvent.h" 
 #include "AnalysisDataFormats/TopObjects/interface/TtDilepEvtSolution.h" 
 
@@ -40,11 +41,10 @@ class TtDilepSolutionFilter : public edm::EDFilter {
 
   private: 
 
-    bool checkElectron (const TopElectron & electron) const;
+    bool checkElectron (const pat::Electron & electron) const;
 
     // Switch for debug output
     bool debug;
-    bool csa;
     TString rootFileName;
 
     // The file which will store the histos, if any

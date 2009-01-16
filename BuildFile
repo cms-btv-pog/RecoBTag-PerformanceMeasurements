@@ -1,4 +1,3 @@
-<use name=FWCore/FWLite>
 <use name=FWCore/Framework>
 <use name=FWCore/Utilities>
 <use name=FWCore/PluginManager>
@@ -21,9 +20,8 @@
 <use name=DataFormats/Math>
 <use name=RecoBTag/MCTools>
 <use name=CLHEP>
-<use name=root>
-<lib name=RooFit>
 <use name=AnalysisDataFormats/TopObjects>
+<use name=TopQuarkAnalysis/TopTools>
 
 <export>
    <lib name=RecoBTagPerformanceMeasurements>

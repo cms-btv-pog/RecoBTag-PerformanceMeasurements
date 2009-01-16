@@ -7,11 +7,13 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ParameterSet/interface/InputTag.h"
 
-#include "AnalysisDataFormats/TopObjects/interface/TopLepton.h" 
-#include "AnalysisDataFormats/TopObjects/interface/TopObject.h" 
-#include "AnalysisDataFormats/TopObjects/interface/TopParticle.h" 
-#include "AnalysisDataFormats/TopObjects/interface/TopMET.h" 
-#include "AnalysisDataFormats/TopObjects/interface/TopJet.h" 
+#include "DataFormats/PatCandidates/interface/Particle.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/Tau.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
+
 #include "AnalysisDataFormats/TopObjects/interface/TtGenEvent.h" 
 #include "AnalysisDataFormats/TopObjects/interface/TtDilepEvtSolution.h" 
 #include "TopQuarkAnalysis/TopEventSelection/interface/TtDilepLRSignalSelObservables.h"
@@ -55,7 +57,6 @@ class TtDilepLRObsPlots : public edm::EDAnalyzer {
 
     std::string rootFileName;
     std::string leptonFlavour;
-    bool csa;
     double weight;
     float signal, background, goodSolution, allSolution, B, nonB, tau;
     int bestSol;

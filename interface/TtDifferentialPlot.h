@@ -4,9 +4,9 @@
 #include "TH1F.h"
 #include "TString.h"
 #include "TCanvas.h"
+#include "TPad.h"
 
 #include <vector>
-using namespace std ;
 
 #include "RecoBTag/PerformanceMeasurements/interface/EtaEtBin.h"
 #include "DataFormats/GeometryCommonDetAlgo/interface/Measurement1D.h"
@@ -73,7 +73,7 @@ class TtDifferentialPlot {
   TString diffVariableName ;
 
   // value of the constant variable (lower/upper edge of interval)
-  pair<double,double> constVariableValue ;
+  std::pair<double,double> constVariableValue ;
 
   // the common name to describe histograms
   TString commonName ;

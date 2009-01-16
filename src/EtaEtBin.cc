@@ -54,7 +54,7 @@ TString EtaEtBin::getDescriptionString() const
   return descr;
 }
 
-bool EtaEtBin::inBin(const TopJet & jet) const
+bool EtaEtBin::inBin(const pat::Jet & jet) const
 {
   return inBin(jet.eta(), jet.et());
 }

@@ -16,7 +16,7 @@ TopJetSelection::TopJetSelection()
 // 'global' event selection based on basic variables
 
 
-bool TopJetSelection::operator() (const TopJet & jet) const
+bool TopJetSelection::operator() (const pat::Jet & jet) const
 {
 
   bool accept = true;

@@ -1,5 +1,4 @@
 #include "RecoBTag/PerformanceMeasurements/plugins/TtDilepSolutionFilter.h"
-#include "CSA07EffAnalyser/CSA07EffAnalyser/interface/CSA07ProcessId.h"
 
 
 using namespace std;
@@ -31,11 +30,7 @@ TtDilepSolutionFilter::TtDilepSolutionFilter(const edm::ParameterSet& iConfig)
   procBem = new TH1F("ProcessesBeforeEM", "Processes before filter e-mu", 75, -1., 74.);
   procBmm = new TH1F("ProcessesBeforeMM", "Processes before filter mu-mu", 75, -1., 74.);
 
-  csa = iConfig.getParameter< bool > ("CSA");
-
-  if (!csa) {
-    weight = iConfig.getParameter< double > ("weight");
-  }
+  weight = iConfig.getParameter< double > ("weight");
 
   allSolution = 0;
   goodSolution = 0;
@@ -49,22 +44,17 @@ TtDilepSolutionFilter::~TtDilepSolutionFilter()
 
 void TtDilepSolutionFilter::endJob()
 {
-   cout << "TtDilepSolutionFilter: All events " << allSolution <<" , "<< goodSolution <<" emu - "
-   		   << B << " "<<nonB<<endl;
-
    cout << "TtDilepSolutionFilter: Events per fb-1 " << allSolution <<" , "<< goodSolution <<" emu - "
    		   << B << " "<<nonB<<" ; tau "<<tau
 		   <<" , "<< exception<<endl;
 
   if (debug) cout << "TtDilepSolutionFilter: Store files" << endl;
   theFile->cd();
-  for (int i = 0; i<71; ++i) {
-    procA->GetXaxis()->SetBinLabel(i+2,csa07::csa07ProcessName(i));
-    procB->GetXaxis()->SetBinLabel(i+2,csa07::csa07ProcessName(i));
-    procBee->GetXaxis()->SetBinLabel(i+2,csa07::csa07ProcessName(i));
-    procBem->GetXaxis()->SetBinLabel(i+2,csa07::csa07ProcessName(i));
-    procBmm->GetXaxis()->SetBinLabel(i+2,csa07::csa07ProcessName(i));
-  }
+    procA->GetXaxis()->SetBinLabel(1,"Other");
+    procB->GetXaxis()->SetBinLabel(1,"Other");
+    procBee->GetXaxis()->SetBinLabel(1,"Other");
+    procBem->GetXaxis()->SetBinLabel(1,"Other");
+    procBmm->GetXaxis()->SetBinLabel(1,"Other");
   procA->Write();
   procB->Write();
   procBee->Write();
@@ -92,14 +82,6 @@ TtDilepSolutionFilter::filter(edm::Event& iEvent, edm::EventSetup const & iSetup
 
   if (debug) cout << "TtDilepSolutionFilter: Found "<< sols.size()  << " dilepton soutions.\n";
   int procID = -1;
-  if (csa) {
-    Handle< double> weightHandle;
-    iEvent.getByLabel ("csa07EventWeightProducer","weight", weightHandle);
-    weight = * weightHandle;
-    procID = csa07::csa07ProcessId(iEvent);
-    if (debug) cout << "processID: " << procID << " - name: " << csa07::csa07ProcessName(procID) 
-	<< " - weight: "<< weight << endl;
-  }
 //cout << "a\n";
   procB->Fill(procID, weight);
   if ((sol.getWpDecay()=="electron")&&(sol.getWmDecay()=="electron"))
@@ -111,7 +93,10 @@ TtDilepSolutionFilter::filter(edm::Event& iEvent, edm::EventSetup const & iSetup
     procBem->Fill(procID, weight);
 
   allSolution += weight;
- 
+  
+  //cout << "mass in filter " << sol.getLRSignalEvtObsVal(13)<< endl;
+  if ( (sol.getLRSignalEvtObsVal(13) < 100.)&&(sol.getLRSignalEvtObsVal(13) > 83.)) return false;
+
   if ((sol.getCalJetB().pt()<jetPtCut) || (sol.getCalJetBbar().pt()<jetPtCut))
       return false;
 
@@ -129,9 +114,9 @@ TtDilepSolutionFilter::filter(edm::Event& iEvent, edm::EventSetup const & iSetup
 
   // Check that we have an e-mu event
 
-  if ( ((sol.getWpDecay()!="muon")&&(sol.getWmDecay()!="muon")) ||
-	((sol.getWpDecay()!="electron")&& (sol.getWmDecay()!="electron")) )
-	return false;
+//   if ( ((sol.getWpDecay()!="muon")&&(sol.getWmDecay()!="muon")) ||
+// 	((sol.getWpDecay()!="electron")&& (sol.getWmDecay()!="electron")) )
+// 	return false;
 
 //   if ( (sol.getWpDecay()=="electron")&&( !checkElectron(sol.getElectronp()) ) )
 //      return false;
@@ -146,9 +131,9 @@ TtDilepSolutionFilter::filter(edm::Event& iEvent, edm::EventSetup const & iSetup
     } catch (...){exception++;}
 
 
-    if (sols[0].getJetB().getPartonFlavour()==5) B+= weight;
+    if (sols[0].getJetB().partonFlavour()==5) B+= weight;
       else nonB+= weight;
-    if (sols[0].getJetBbar().getPartonFlavour()==5) B+= weight;
+    if (sols[0].getJetBbar().partonFlavour()==5) B+= weight;
       else nonB+= weight;
 
   if (debug) cout <<" ============================ End TtDilepSolutionFilter ============================" <<endl;
@@ -159,7 +144,7 @@ TtDilepSolutionFilter::filter(edm::Event& iEvent, edm::EventSetup const & iSetup
 }
 
 
-bool TtDilepSolutionFilter::checkElectron (const TopElectron & electron) const
+bool TtDilepSolutionFilter::checkElectron (const pat::Electron & electron) const
 {
   if ( (electron.hadronicOverEm() > 0.1) ||
   	(electron.eSuperClusterOverP() > 3.) ||

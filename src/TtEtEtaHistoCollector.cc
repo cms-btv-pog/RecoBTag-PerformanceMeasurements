@@ -90,7 +90,9 @@ TtEtEtaHistoCollector::TtEtEtaHistoCollector(const TString & baseName,
 	histo = new TH1F ( name, name, bins , lowerBound , upperBound );
 	histo->Sumw2() ; 
       } else {
+      //cout <<"Load "<<etaEtBin->getDescriptionString()<<endl;
         histo   = (TH1F*) gDirectory->Get(name) ; 
+	//cout << histo->GetBinContent(1)<< " B\n"; 
       }
       binHistoMap[etaEtBin] = histo;
 
@@ -198,7 +200,7 @@ void TtEtEtaHistoCollector::Sumw2()
   }
 }
 
-void TtEtEtaHistoCollector::analyze(const TopJet & jet, const double lhr,
+void TtEtEtaHistoCollector::analyze(const pat::Jet & jet, const double lhr,
 	const double weight)
 {
   for (BinHistoMap::iterator iBin = binHistoMap.begin();
@@ -214,7 +216,7 @@ void TtEtEtaHistoCollector::write()
   gFile->cd();
   gFile->mkdir(baseName_);
   gFile->cd(baseName_);
-    cout << "write :"<<baseName_<<endl;
+//     cout << "write :"<<baseName_<<endl;
 
 //   setTDRStyle();
   for (BinHistoMap::iterator iBin = binHistoMap.begin();
@@ -291,13 +293,22 @@ TtEtEtaHistoCollector * TtEtEtaHistoCollector::buildRatioCollector(const TString
 TtEtEtaHistoCollector * TtEtEtaHistoCollector::buildDiffCollector(const TString& name,
 			TtEtEtaHistoCollector & otherColl)
 {
+// cout << "buildDiffCollector A name "<<otherColl.baseName() <<endl;
+// cout << "buildDiffCollector B  name "<<baseName() <<endl;
   TtEtEtaHistoCollector * newColl = new TtEtEtaHistoCollector(name, etRanges_, etaRanges_,
 	lowerBound_, upperBound_, bins_, false);
+// cout << "buildDiffCollector new name "<<newColl->baseName() <<endl;
     for (BinHistoMap::iterator iBin = binHistoMap.begin();
 	iBin != binHistoMap.end(); ++iBin) {
+// cout << "bin name "<<iBin->first->getDescriptionString() <<endl;
+// 	cout << iBin->second->GetTitle()<< " B\n"; 
+// 	cout << otherColl.getHisto(*(iBin->first))->GetBinContent(1)<< " A\n"; 
+// 	cout << iBin->second->GetBinContent(1)<< " B\n"; 
       newColl->getHisto(*(iBin->first))->Add(iBin->second, 
 	otherColl.getHisto(*(iBin->first)), -1.);
+	cout << newColl->getHisto(*(iBin->first))->GetBinContent(1)<< " C\n"; 
     }
+//     cout <<endl;
   return newColl;
 }
 

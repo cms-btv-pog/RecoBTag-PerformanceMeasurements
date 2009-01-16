@@ -1,6 +1,5 @@
 #include "RecoBTag/PerformanceMeasurements/plugins/TtDilepLRObsPlots.h"
-#include "CSA07EffAnalyser/CSA07EffAnalyser/interface/CSA07ProcessId.h"
-#include "PhysicsTools/Utilities/interface/DeltaR.h"
+#include "PhysicsTools/Utilities/interface/deltaR.h"
 
 using namespace std;
 using namespace reco;
@@ -14,10 +13,7 @@ TtDilepLRObsPlots::TtDilepLRObsPlots(const edm::ParameterSet& iConfig)
    //now do what ever initialization is needed
   debug = iConfig.getParameter<bool> ("debug");
   rootFileName      = iConfig.getParameter<string> ("rootFileName");
-  csa = iConfig.getParameter< bool > ("CSA");
-  if (!csa) {
-    weight = iConfig.getParameter< double > ("weight");
-  }
+  weight = iConfig.getParameter< double > ("weight");
 
   nrSignalSelObs   = iConfig.getParameter<int> ("nrSignalSelObs");
   obsNrs	   = iConfig.getParameter< vector<int> > ("SignalSelObs");
@@ -78,16 +74,6 @@ TtDilepLRObsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   if(sols.size()== 2) {
 
-    if (csa) {
-      edm::Handle< double> weightHandle;
-      iEvent.getByLabel ("csa07EventWeightProducer","weight", weightHandle);
-      weight = * weightHandle;
-      int procID = csa07::csa07ProcessId(iEvent);
-      if (debug) cout << "processID: " << procID
-	<< " - name: " << csa07::csa07ProcessName(procID) 
-	<< " - weight: "<< weight << endl;
-    }
-
     goodSolution += weight;
 
     vector < vector< TtDilepLRSignalSelObservables::IntBoolPair > > obsMatch;
@@ -143,8 +129,8 @@ TtDilepLRObsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     nonB+=(!obsMatch[bestSol][0].second);
     nonB+=(!obsMatch[bestSol][1].second);
 //  cout<< B<<nonB<< obsMatch[bestSol][0].second<<obsMatch[bestSol][1].second<<endl;
-    if (sols[bestSol].getJetB().getPartonFlavour()==5) ++tau;
-    if (sols[bestSol].getJetBbar().getPartonFlavour()==5) ++tau;
+    if (sols[bestSol].getJetB().partonFlavour()==5) ++tau;
+    if (sols[bestSol].getJetBbar().partonFlavour()==5) ++tau;
 
   }
   if (debug) cout <<" ============================ End TtDilepLRObsPlots ============================" <<endl;
@@ -154,7 +140,7 @@ TtDilepLRObsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 bool TtDilepLRObsPlots::allMatch(const TtDilepEvtSolution & sol) 
 {
   if (debug) cout<<"match test " << endl;
-  if (debug) cout << sol.getJetB().getPartonFlavour()<< " "<<sol.getJetBbar().getPartonFlavour()<< " ";
+  if (debug) cout << sol.getJetB().partonFlavour()<< " "<<sol.getJetBbar().partonFlavour()<< " ";
   if (debug) cout << sol.getWpDecay() << " "<<sol.getWmDecay()<<endl;
 // cout << sol.getCalJetB().et()<< " " << sol.getCalJetBbar().et()<<endl;
 // cout << sol.getGenB()->et()<< " " << sol.getGenBbar()->et()<<endl;
@@ -171,8 +157,8 @@ bool TtDilepLRObsPlots::allMatch(const TtDilepEvtSolution & sol)
 //   if (DeltaR<reco::Particle>()(sol.getCalJetB(), *(sol.getGenB()))>0.5) return false;
 //   if (DeltaR<reco::Particle>()(sol.getCalJetBbar(), *(sol.getGenBbar()))>0.5) return false;
 
- if ((sol.getJetB().getPartonFlavour()!=5) || 
- (sol.getJetBbar().getPartonFlavour()!=5)) return false;
+ if ((sol.getJetB().partonFlavour()!=5) || 
+ (sol.getJetBbar().partonFlavour()!=5)) return false;
 
   if (debug) cout <<"getGenLepp() "<<	 sol.getGenEvent()->leptonBar()->pdgId()
 		  <<" - getGenLepm() "<< sol.getGenEvent()->lepton()->pdgId()<<endl;

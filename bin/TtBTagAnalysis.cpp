@@ -55,8 +55,11 @@ TString  referenceFile    = "/localscratch/s/speer/top_eff/crab_top_data/CSA07_1
 bool useSystFiles = false;
 const int syst = 1;
 const char*     systFiles[syst]= { //"./syst_lumi10pb.root",
-  "/localscratch/s/speer/top_eff/crab_top_data/CSA07_10pb/diLepton/L30_J30_robust_xsect/final_btag_xsect.root" };
-
+"/localscratch/s/speer/top_eff/crab_top_data/CSA07_10pb/diLepton/L30_J30_robust_xsect/final_btag_xsect.root",
+// "/localscratch/s/speer/top_eff/crab_top_data/fastsim/test_2/ue_syst.root",
+// "/localscratch/s/speer/top_eff/crab_top_data/fastsim/test_2/frag_syst.root",
+// "/localscratch/s/speer/top_eff/crab_top_data/fastsim/test_2/isr_syst.root"
+};
 
 //observable histogram variables
 const  int      nrSignalSelObs  		= 13;
@@ -288,7 +291,7 @@ delete theFile;
     TtEtEtaHistoCollector* b_fraction_ref = new TtEtEtaHistoCollector(TString("B_Purity"),
       etRanges, etaRanges, lrMin, lrMax, lrBins, true);
     b_fraction_diff = b_fraction_ref->buildDiffCollector(
-      TString("b_fraction_diff"), *b_fraction);
+      TString("B_Purity_syst"), *b_fraction);
     delete b_fraction_ref;
 //     for (int iWP = 0; iWP != wp; ++iWP) {
 //       eff_B_ref.push_back(new TtEtEtaHistoCollector("eff_B_"+bTagger[iWP], etRanges, etaRanges,
@@ -309,7 +312,7 @@ delete theFile;
       if (debug) cout << "Systematics from file: " << systFiles[isyst] << endl;
       theFile = new TFile (systFiles[isyst]);
       TtEtEtaHistoCollector* b_fraction_diff =
-        new TtEtEtaHistoCollector("b_fraction_diff", etRanges, etaRanges,
+        new TtEtEtaHistoCollector("B_Purity_syst", etRanges, etaRanges,
 		lrMin, lrMax, lrBins, true);
       for (TtEtEtaHistoCollector::BinHistoMapIter bin = b_frac_err->histoBegin();
 	 bin!=b_frac_err->histoEnd(); ++bin) {
@@ -424,7 +427,7 @@ delete theFile;
   TtEtEtaHistoCollector::diffPlotVect diffF = eff_B_MC[5]->getDifferentialPlots();
   
   for (unsigned int i = 0; i != diffA.size(); ++i) {
-  TLegend* leg = new TLegend(0.7,0.8,0.90,0.93);
+  TLegend* leg = new TLegend(0.65,0.7,0.90,0.93);
   leg->AddEntry(diffA[i]->getHisto(),"Loose","p");
   leg->AddEntry(diffB[i]->getHisto(),"Medium","p");
   leg->AddEntry(diffC[i]->getHisto(),"Tight","p");
@@ -602,7 +605,7 @@ void epsEff(vector<TH1F *> histV, TLegend* leg)
   TCanvas c2("c2","",600,600);
 
   for (vector<TH1F *>::iterator i = histV.begin(); i!=histV.end(); ++i){
-  (*i)->GetYaxis()->SetRangeUser(0.2,1.01);
+  (*i)->GetYaxis()->SetRangeUser(0.1,1.01);
   (*i)->SetMarkerColor(1+ (i - histV.begin()));
   (*i)->SetMarkerStyle(20+ (i - histV.begin()));
   (*i)->SetMarkerSize(1.);

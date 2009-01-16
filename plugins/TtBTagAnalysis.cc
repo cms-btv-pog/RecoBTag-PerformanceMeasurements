@@ -1,9 +1,8 @@
 #include "RecoBTag/PerformanceMeasurements/plugins/TtBTagAnalysis.h"
 
 #include "FWCore/Framework/interface/MakerMacros.h"
-#include "PhysicsTools/Utilities/interface/DeltaR.h"
+#include "PhysicsTools/Utilities/interface/deltaR.h"
 #include "AnalysisDataFormats/TopObjects/interface/TtGenEvent.h"
-#include "CSA07EffAnalyser/CSA07EffAnalyser/interface/CSA07ProcessId.h"
 
 using namespace std;
 using namespace reco;
@@ -27,10 +26,7 @@ TtBTagAnalysis::TtBTagAnalysis(const edm::ParameterSet& iConfig)
   evtsols           = iConfig.getParameter<edm::InputTag> ("EvtSolution");
   weight = iConfig.getParameter< double > ("weight");
 
-  csa = iConfig.getParameter< bool > ("CSA");
-  if (!csa) {
-    weight = iConfig.getParameter< double > ("weight");
-  }
+  weight = iConfig.getParameter< double > ("weight");
 
 
   bool update = iConfig.getParameter<bool>( "update" );
@@ -226,18 +222,6 @@ TtBTagAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   if(sols.size()== 2) {
 
-
-    if (csa) {
-      edm::Handle< double> weightHandle;
-      iEvent.getByLabel ("csa07EventWeightProducer","weight", weightHandle);
-      weight = * weightHandle;
-      int procID = csa07::csa07ProcessId(iEvent);
-      if (debug) cout << "processID: " << procID
-	<< " - name: " << csa07::csa07ProcessName(procID) 
-	<< " - weight: "<< weight << endl;
-    }
-
-
     vector < double > lr;
     int bestSol=-1;
 
@@ -270,21 +254,21 @@ TtBTagAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       dr1 = DeltaR<reco::Particle>()(sols[bestSol].getCalJetB(), *(genEvent->b()));
       dr2 = DeltaR<reco::Particle>()(sols[bestSol].getCalJetB(), *(genEvent->bBar()));
 //       matchB = ( (dr1<0.4) || (dr2<0.4) );
-//       matchB = ( (sols[bestSol].getCalJetB().getPartonFlavour()==5));
-      matchB = ( (dr1<0.4) || (dr2<0.4) || (sols[bestSol].getCalJetB().getPartonFlavour()==5));
+//       matchB = ( (sols[bestSol].getCalJetB().partonFlavour()==5));
+      matchB = ( (dr1<0.4) || (dr2<0.4) || (sols[bestSol].getCalJetB().partonFlavour()==5));
 
-      if (debug)  if ((!matchB)|| (sols[bestSol].getCalJetB().getPartonFlavour()!=5))
-      cout <<"test "<< matchB<<" "<<sols[bestSol].getCalJetB().getPartonFlavour() <<" "<< DeltaR<reco::Particle>()(sols[bestSol].getCalJetB(), *(genEvent->b())) 
+      if (debug)  if ((!matchB)|| (sols[bestSol].getCalJetB().partonFlavour()!=5))
+      cout <<"test "<< matchB<<" "<<sols[bestSol].getCalJetB().partonFlavour() <<" "<< DeltaR<reco::Particle>()(sols[bestSol].getCalJetB(), *(genEvent->b())) 
       <<" "<< dr1 <<" "<< dr2 <<endl;
 
       dr1 = DeltaR<reco::Particle>()(sols[bestSol].getCalJetBbar(), *(genEvent->b()));
       dr2 = DeltaR<reco::Particle>()(sols[bestSol].getCalJetBbar(), *(genEvent->bBar()));
-      matchBbar = ( ( (dr1<0.4) || (dr2<0.4) || (sols[bestSol].getCalJetBbar().getPartonFlavour()==5)) );
+      matchBbar = ( ( (dr1<0.4) || (dr2<0.4) || (sols[bestSol].getCalJetBbar().partonFlavour()==5)) );
 //       matchBbar = ( (dr1<0.4) || (dr2<0.4) );
-//       matchBbar = sols[bestSol].getCalJetBbar().getPartonFlavour()==5;
+//       matchBbar = sols[bestSol].getCalJetBbar().partonFlavour()==5;
 
-      if (debug) if ((!matchBbar)|| (sols[bestSol].getCalJetBbar().getPartonFlavour()!=5))
-      cout <<"test "<< matchBbar<<" "<< sols[bestSol].getCalJetBbar().getPartonFlavour() <<" "<< DeltaR<reco::Particle>()(sols[bestSol].getCalJetBbar(), *(genEvent->bBar())) 
+      if (debug) if ((!matchBbar)|| (sols[bestSol].getCalJetBbar().partonFlavour()!=5))
+      cout <<"test "<< matchBbar<<" "<< sols[bestSol].getCalJetBbar().partonFlavour() <<" "<< DeltaR<reco::Particle>()(sols[bestSol].getCalJetBbar(), *(genEvent->bBar())) 
       <<" "<< dr1 <<" "<< dr2 <<endl;
     }
   } catch (...){cout << "Exception\n";}
@@ -296,9 +280,9 @@ TtBTagAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
 }
 
-void TtBTagAnalysis::analyzeJet(const TopJet& jet, double lr, double weight, bool matchB)
+void TtBTagAnalysis::analyzeJet(const pat::Jet& jet, double lr, double weight, bool matchB)
 {
-//   int flavour = jet.getPartonFlavour();
+//   int flavour = jet.partonFlavour`();
 //   matchB = flavour==5;
 
   allJetsHistos->analyze(jet, lr, weight);
@@ -308,13 +292,14 @@ void TtBTagAnalysis::analyzeJet(const TopJet& jet, double lr, double weight, boo
       else lrBHistos->analyze(jet, lr, weight);
     if (!matchB) {
       allLightHistos->analyze(jet, lr, weight);
-      if (debug) cout << "Light: " <<jet.getPartonFlavour()<<" ";
+      if (debug) cout << "Light: " <<jet.partonFlavour()<<" ";
     }
   }
 
   for (unsigned int iWP = 0; iWP != bTagger.size(); ++iWP) {
-    if (debug) cout << "B-Jet: " << bTagger[iWP].first<< " -> " << jet.getBDiscriminator(bTagger[iWP].first) <<endl;
-    if (jet.getBDiscriminator(bTagger[iWP].first) > bTagger[iWP].second ) {
+    if (debug) cout << "B-Jet: " << bTagger[iWP].first<< " -> " << jet.bDiscriminator(bTagger[iWP].first) <<endl;
+   if (jet.bDiscriminator(bTagger[iWP].first) > bTagger[iWP].second ) {
+//cout << "Warning, b-tagging called\n";
       taggedJetsHistos[iWP]->analyze(jet, lr, weight);
       if (mcMode) {
 	if (!matchB) taggedLightJetsHistos[iWP]->analyze(jet, lr, weight);
@@ -322,7 +307,7 @@ void TtBTagAnalysis::analyzeJet(const TopJet& jet, double lr, double weight, boo
       }
     }
     if (debug) if (!matchB) {
-      if (jet.getBDiscriminator(bTagger[iWP].first) > bTagger[iWP].second ) cout <<"tagged\n";
+      if (jet.bDiscriminator(bTagger[iWP].first) > bTagger[iWP].second ) cout <<"tagged\n";
       else cout <<"NOT\n";
     }
   }
