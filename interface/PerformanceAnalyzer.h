@@ -11,7 +11,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.24 2008/12/08 13:09:05 jindal Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.25 2008/12/19 10:17:04 tboccali Exp $
  *
  */
 
@@ -166,6 +166,8 @@ private:
     TFile*  rootFile_;
     TDirectory *topdir;
     bool fverbose;
+
+    TH1I *histcounterf;
 
     BTagHistograms *EffHistos;
     BTagHistograms *PtrelHistos;

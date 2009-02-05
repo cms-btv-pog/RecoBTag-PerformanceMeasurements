@@ -208,8 +208,10 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
     topdir->cd();
     topdir->mkdir("muon_in_jet");
     topdir->cd();
+    histcounterf = new TH1I("histcounterf","counter",5,0,5);
+    histcounterf->SetBit(TH1::kCanRebin);
     rootFile_->cd();
-
+    
     // initialize histograms
     EffHistos     = new BTagHistograms();
     PtrelHistos   = new BTagHistograms();
@@ -577,6 +579,9 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
     AwayjetHistos_mc->Save();
     TaggedMujetHistos_mc->Save();
     TaggedAwayjetHistos_mc->Save();
+
+    topdir->cd("Histograms");
+    histcounterf->Write();
 
     topdir->Write();
 
@@ -1236,8 +1241,13 @@ void
 PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 {
   
-  // G4 bug, remove bad events
-  
+  // count
+  histcounterf->Fill("Processed", 1);
+  bool NjetsCut = false;
+  bool NmuCut = false;
+  bool Nmu_in_jetCut = false;
+  bool Nmu_in_jet_away_taggedCut = false;
+
   // Trakcs
   Handle<reco::TrackCollection> recTrks;
   iEvent.getByLabel(recoTrackList_, recTrks);
@@ -1375,6 +1385,9 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
       }
       // Jet quality cuts
       if ( (jet->pt() * jetcorrection ) <= MinJetPt_ || std::abs( jet->eta() ) >= MaxJetEta_ ) continue;
+      
+      if ( !NjetsCut ) { histcounterf->Fill("jets", 2 ); NjetsCut = true; }
+      
       // get MC flavor of jet
       //int JetFlavor = jetFlavourIdentifier_.identifyBasedOnPartons(*jet).flavour();
       int JetFlavor = abs(getMatchedParton(*jet).getFlavour());
@@ -1405,6 +1418,9 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	  // muon cuts
 	  double normChi2 = (*(muon->combinedMuon())).normalizedChi2();//(*(muon->combinedMuon())).chi2() / (*(muon->combinedMuon())).ndof();// use global fit
 	  if ( (nhit <= MinMuonNHits_ ) || (muon->pt()<= MinMuonPt_) || (normChi2 >= MaxMuonChi2_ ) ) continue;
+	  
+	  if ( !NmuCut ) { histcounterf->Fill("N muons", 3 ); NmuCut = true; } 
+
 	  // delta R(muon,jet)
 	  double deltaR  = ROOT::Math::VectorUtil::DeltaR(jet->p4().Vect(), muon->p4().Vect() );
 	  TVector3 tmpvecOrg(jet->p4().Vect().X(),jet->p4().Vect().Y(),  jet->p4().Vect().Z());
@@ -1419,6 +1435,9 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	  // muon in jet cuts
 	  if ( (deltaR >= MinDeltaR_ ) || (ptrel <= MinPtRel_ ) ) continue;
 	  // now we have a good muon in a jet
+
+	  if ( !Nmu_in_jetCut ) { histcounterf->Fill("N muon-in-jet", 4 ); Nmu_in_jetCut = true; }
+
 	  total_nmuons++;
 	  hasLepton = 1;
 	  tmptotmuon++;
@@ -1531,11 +1550,15 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
                     {
 
                         AwayTaggedJet = true;
+
+			if ( ! Nmu_in_jet_away_taggedCut ) { histcounterf->Fill("N mu-in-jet-away-tagged-jet", 5 ); Nmu_in_jet_away_taggedCut = true; }
                     }
 
                 }
 
             }
+
+	  
 
             // find an away muon in jet
             if ( !AwayMuonJet )
