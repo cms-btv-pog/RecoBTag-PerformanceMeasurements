@@ -82,6 +82,11 @@ Performance = cms.EDAnalyzer("PerformanceAnalyzer",
     ),
     cms.PSet(
     collection = cms.untracked.InputTag('simpleSecondaryVertexBJetTags'),
+    cut = cms.untracked.double(1.3),
+    name = cms.untracked.string('SVL')
+    ),
+    cms.PSet(
+    collection = cms.untracked.InputTag('simpleSecondaryVertexBJetTags'),
     cut = cms.untracked.double(2.1),
     name = cms.untracked.string('SVM')
     ),
