@@ -838,7 +838,7 @@ void PerformanceAnalyzer::FillPerformance(reco::CaloJet jet, int JetFlavor, cons
       
       mymap[moduleLabel] == true;
       
-      std::cout <<" ECCO "<< jetTags->size()<<std::endl;
+      //std::cout <<" ECCO "<< jetTags->size()<<std::endl;
       
       ith_tagged = this->TaggedJet(jet,jetTags);
       
