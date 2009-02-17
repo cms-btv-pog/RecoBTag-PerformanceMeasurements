@@ -1,4 +1,4 @@
-void MakeTemplatesCSA07_10invpb()
+void MakeTemplatesSummer2008()
 {
     // Load the PtrelSolver library
     gSystem->Load("libPtrelSolver.so");
@@ -28,5 +28,5 @@ void MakeTemplatesCSA07_10invpb()
     maker.function(Flavor::cl, clTemplate);
 
     // Make templates
-    maker.make("/uscmst1b_scratch/lpc1/lpcbtag/pratima/Mar-19-2008/results_QCD_WT_10pb.root", "templates_qcd_WT_10invpb.root");
+    maker.make("/uscms/home/pratima/PerformanceMeasurements/CMSSW_2_2_2/src/RecoBTag/PerformanceMeasurements/test/results_InclusiveMu5Pt50.root", "templates_InclusiveMu5Pt50.root");
 }
