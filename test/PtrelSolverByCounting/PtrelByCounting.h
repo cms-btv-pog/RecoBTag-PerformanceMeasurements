@@ -1,7 +1,4 @@
 
-// PtrelSolver
-// Author: Victor E. Bazterra, UIC (2008)
-
 #ifndef PtrelByCounting_h
 #define PtrelByCounting_h
 
@@ -13,7 +10,7 @@ class PtrelByCounting : public PtrelSolver
 public:
 
     //! Default constructor.
-    explicit PtrelByCounting(char const * filename) : PtrelSolver(filename) {}
+    explicit PtrelByCounting(char const * filename, Fit::Type fittype) : PtrelSolver(filename, fittype) {}
 
     //! Measure efficiency
     virtual void solve(char const *, char const *)
@@ -32,9 +29,9 @@ private:
         TH1 *,
         TVectorD const &,
         ValueVector const &,
-        CovarianceVector const &,
         ValueVector const &,
-        CovarianceVector const &
+        ValueVector const &,
+        ValueVector const &
     );
 
 public:

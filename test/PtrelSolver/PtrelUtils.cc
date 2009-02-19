@@ -1,7 +1,4 @@
 
-// PtrelSolver
-// Author: Victor E. Bazterra, UIC (2008)
-
 #include "PtrelUtils.h"
 
 #include "PtrelSolverDependencies.h"

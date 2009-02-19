@@ -1,7 +1,4 @@
 
-// PtrelSolver
-// Author: Victor E. Bazterra, UIC (2008)
-
 #ifndef PtrelUtils_h
 #define PtrelUtils_h
 

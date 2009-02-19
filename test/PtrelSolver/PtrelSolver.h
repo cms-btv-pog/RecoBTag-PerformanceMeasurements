@@ -1,7 +1,4 @@
 
-// PtrelSolver
-// Author: Victor E. Bazterra, UIC (2008)
-
 #ifndef PtrelSolver_h
 #define PtrelSolver_h
 
@@ -13,6 +10,7 @@
 #include "TH2.h"
 #include "TMatrixD.h"
 #include "TObject.h"
+#include "TObjArray.h"
 #include "TPRegexp.h"
 #include "TString.h"
 #include "TVectorD.h"
@@ -25,9 +23,10 @@ class PtrelSolver : public TObject
 public:
 
     //! Default constructor.
-    explicit PtrelSolver(char const * filename)
+    explicit PtrelSolver(char const * filename, Fit::Type fittype)
     {
         reset();
+        fittype_ = fittype;
         templates(filename);
     }
 
@@ -51,16 +50,13 @@ protected:
 
     typedef std::vector<TString> StringVector;
     typedef std::vector<TVectorD> ValueVector;
-    typedef std::vector<TMatrixD> CovarianceVector;
-
     typedef std::vector<std::vector<TVectorD> > ValueMatrix;
-    typedef std::vector<std::vector<TMatrixD> > CovarianceMatrix;
 
     //! Measure the flavor content for a given sample
-    bool measure(TFile *, TFile *, char const *, ValueVector &, CovarianceVector &);
+    bool measure(TFile *, TFile *, char const *, ValueVector &, ValueVector &);
 
     //! Measure the flavor content for samples matching a pattern
-    bool measure(TFile *, TFile *, TPRegexp, StringVector &, ValueMatrix &, CovarianceMatrix &);
+    bool measure(TFile *, TFile *, TPRegexp, StringVector &, ValueMatrix &, ValueMatrix &);
 
     //! Process 2D histogram and rebinning if it is needed
     TH2 * readTH2(TFile *, const char *) const;
@@ -71,19 +67,27 @@ protected:
 
 private:
 
+    Fit::Type fittype_;
+
     std::vector<Int_t> rebin_;
 
-    //! Measure the flavor content for a samples
-    bool measure(TFile *, TH2 *, ValueVector &, CovarianceVector &);
+    //! Measure the flavor content for a sample
+    bool measure(TFile *, TH2 *, ValueVector &, ValueVector &);
 
     //! Process 2D histogram and rebinning if it is needed
     TH2 * processTH2(TObject *) const;
 
-    //! Ptrel fit of a given sample
-    bool fit(TH1 *, TF1 *, TVectorD &, TMatrixD &);
+    //! Ptrel fit (by function) of a given sample
+    bool fit(TH1 *, TF1 *, TVectorD &, TVectorD &);
+
+    //! Ptrel fit (by histograms) of a given sample
+    bool fit(TH1 *, TObjArray *, TH1 *, TVectorD &, TVectorD &);
 
     //! Return a combined function by given the sample name and bin number
     TF1 * combinedFunction(const char *, Int_t);
+
+    //! Return a set of histograms by given the sample name and bin number
+    TObjArray * combinedHistograms(const char *, Int_t);
 
 public:
 

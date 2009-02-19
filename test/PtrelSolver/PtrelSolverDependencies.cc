@@ -1,8 +1,11 @@
 
-// PtrelSolver
-// Author: Victor E. Bazterra, UIC (2008)
-
 #include "PtrelSolverDependencies.h"
+
+ClassImp(Fit)
+
+const char * Fit::Label[] = { "Functions(TMinuit)", "Histograms(TFractionFitter)" };
+const char * Fit::Name[] = { "functions", "histograms" };
+const long   Fit::Dimension = 2;
 
 ClassImp(Dependency)
 
@@ -12,6 +15,6 @@ const long   Dependency::Dimension = 3;
 
 ClassImp(Flavor)
 
-const char * Flavor::Label[] = {"b", "Non-b"};
-const char * Flavor::Name[] = { "b", "cl" };
+const char * Flavor::Label[] = {"Non-b", "b"};
+const char * Flavor::Name[] = { "cl", "b"};
 const long   Flavor::Dimension = 2;

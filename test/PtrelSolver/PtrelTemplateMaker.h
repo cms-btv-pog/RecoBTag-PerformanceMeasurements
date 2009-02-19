@@ -1,7 +1,4 @@
 
-// PtrelSolver
-// Author: Victor E. Bazterra, UIC (2008)
-
 #ifndef PtrelTemplateMaker_h
 #define PtrelTemplateMaker_h
 

@@ -15,7 +15,7 @@ class PtrelBySystem4 : public PtrelSolver
 public:
 
     //! Default constructor.
-    explicit PtrelBySystem4(char const * filename) : PtrelSolver(filename) {}
+    explicit PtrelBySystem4(char const * filename,  Fit::Type fittype) : PtrelSolver(filename, fittype) {}
 
     //! Measure efficiency
     virtual void solve(char const *, char const *);

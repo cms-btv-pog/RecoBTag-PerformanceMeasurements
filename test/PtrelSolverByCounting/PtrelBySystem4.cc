@@ -36,23 +36,23 @@ void PtrelBySystem4::solve(char const * inputfile, char const * outputfile)
     {
         // Collection of flavor content n in sample
         ValueVector nValues;
-        CovarianceVector nCovariances;
+        ValueVector nErrors;
 
         // Name for the n sample : n_(pT|eta)
         sprintf(name, "%s/n_%s", directory, Dependency::Name[i]);
         sprintf(nsample, "n_%s", Dependency::Name[i]);
         // Measure the flavor content in n sample
-        CallSafely( measure(input, output, name, nValues, nCovariances) )
+        CallSafely( measure(input, output, name, nValues, nErrors) )
 
         // Collection of flavor content n in sample
         ValueVector pValues;
-        CovarianceVector pCovariances;
+        ValueVector pErrors;
 
         // Name for the p sample
         sprintf(name, "%s/p_%s", directory, Dependency::Name[i]);
         sprintf(nsample, "p_%s", Dependency::Name[i]);
         // Measure the flavor content in n sample
-        CallSafely( measure(input, output, name, pValues, pCovariances) )
+        CallSafely( measure(input, output, name, pValues, pErrors) )
   
         // Evauluate the coefficients between b-efficiencies from p and n samples
         sprintf(name, "mctruth_n_%s_b_ntag_%s_b_[A-Z]*$", Dependency::Name[i], Dependency::Name[i]);
@@ -91,7 +91,7 @@ void PtrelBySystem4::solve(char const * inputfile, char const * outputfile)
             efficiencyHistogramSetup(histogram1D);
 
             // Calculate b-efficiencies
-            CallSafely( compute(histogram1D, mistag1D, pValues, nValues, nCovariances, ptagValues[j], ptagCovariances[j]) )
+            CallSafely( compute(histogram1D, mistag1D, pValues, nValues, nErrors, ptagValues[j], ptagCovariances[j]) )
 
             // Saving the histogram
             output->cd();
@@ -195,9 +195,9 @@ bool PtrelBySystem4::makeCoefficients (
     TVectorD const & ntagCounters,
     TVectorD const & ptagCounters,
     ValueVector const & nValues,
-    CovarianceVector const & nCovariance,
+    ValueVector const & nCovariance,
     ValueVector const & pValues,
-    CovarianceVector const & pCovariance
+    ValueVector const & pCovariance
 )
 {
     // Loop over different bins

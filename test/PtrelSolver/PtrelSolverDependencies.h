@@ -1,16 +1,23 @@
 
-// PtrelSolver
-// Author: Victor E. Bazterra, UIC (2008)
-
 #ifndef PtrelSolverDependencies_h
 #define PtrelSolverDependencies_h
 
 #include "TObject.h"
 
 //! Define the set of dependencies
+struct Fit : public TObject
+{
+    enum Type {functions = 0, histograms };
+    static const char * Label[];
+    static const char * Name[];
+    static const long Dimension;
+    ClassDef(Fit, 1)
+};
+
+//! Define the set of dependencies
 struct Dependency : public TObject
 {
-    enum Type { ptrel = 0, pT, eta};
+    enum Type {ptrel = 0, pT, eta};
     static const char * Label[];
     static const char * Name[];
     static const long Dimension;
@@ -20,7 +27,7 @@ struct Dependency : public TObject
 //! Define the set of dependencies
 struct Flavor : public TObject
 {
-    enum Type { b = 0, cl};
+    enum Type {cl = 0, b};
     static const char * Label[];
     static const char * Name[];
     static const long Dimension;

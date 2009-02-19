@@ -19,8 +19,10 @@ void MakeTemplatesSummer2008()
     PtrelTemplateMaker maker;
 
     // Set rebinning options
-    maker.rebin(Dependency::pT, 3);
-    maker.rebin(Dependency::eta, 3);
+    // maker.rebin(Dependency::pT, 3);
+    // maker.rebin(Dependency::eta, 3);
+    maker.rebin(Dependency::pT, 9);
+    maker.rebin(Dependency::eta, 9);
     maker.rebin(Dependency::ptrel, 2);
 
     // Setting up the template function forms

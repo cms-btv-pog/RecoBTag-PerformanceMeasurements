@@ -1,7 +1,4 @@
 
-// PtrelSolver
-// Author: Victor E. Bazterra, UIC (2008)
-
 #include "PtrelByCounting.h"
 
 #include <math.h>
@@ -36,22 +33,22 @@ void PtrelByCounting::solve(char const * inputfile, char const * mistagfile, cha
     {
         // Collection of flavor content n in sample
         ValueVector nValues;
-        CovarianceVector nCovariances;
+        ValueVector nErrors;
 
         // Name for the n sample : n_(pT|eta)
         sprintf(name, "%s/n_%s", directory, Dependency::Name[i]);
         sprintf(nsample, "n_%s", Dependency::Name[i]);
         // Measure the flavor content in n sample
-        CallSafely( measure(input, output, name, nValues, nCovariances) )
+        CallSafely( measure(input, output, name, nValues, nErrors) )
 
         // Collection of flavor content ptag in samples
         ValueMatrix ptagValues;
-        CovarianceMatrix ptagCovariances;
+        ValueMatrix ptagErrors;
         StringVector ptagHistograms;
 
         // Measure the flavor content in ptag samples
         sprintf(name, "ptag_%s_[A-Z]*$", Dependency::Name[i]);
-        CallSafely( measure(input, output, TPRegexp(name), ptagHistograms, ptagValues, ptagCovariances) )
+        CallSafely( measure(input, output, TPRegexp(name), ptagHistograms, ptagValues, ptagErrors) )
 
         // HACK to force reading the objets from file
         // Close output
@@ -92,7 +89,7 @@ void PtrelByCounting::solve(char const * inputfile, char const * mistagfile, cha
             efficiencyHistogramSetup(histogram1D);
 
             // Calculate b-efficiencies
-            CallSafely( compute(histogram1D, mistag1D, pValues, nValues, nCovariances, ptagValues[j], ptagCovariances[j]) )
+            CallSafely( compute(histogram1D, mistag1D, pValues, nValues, nErrors, ptagValues[j], ptagErrors[j]) )
 
             // Saving the histogram
             output->cd();
@@ -111,9 +108,9 @@ bool PtrelByCounting::compute(
     TH1 * mistag,
     TVectorD const & pValues,
     ValueVector const & nValues,
-    CovarianceVector const & nCovariance,
+    ValueVector const & nErrors,
     ValueVector const & ptagValues,
-    CovarianceVector const & ptagCovariance
+    ValueVector const & ptagErrors
 )
 {
     // Loop over different bins
@@ -122,8 +119,8 @@ bool PtrelByCounting::compute(
         Double_t n_cl = nValues[i](Flavor::cl);
         Double_t ptag_b = ptagValues[i](Flavor::b);
 
-        Double_t n_cl_error = nCovariance[i](Flavor::cl, Flavor::cl);
-        Double_t ptag_b_error = ptagCovariance[i](Flavor::b, Flavor::b);
+        Double_t n_cl_error = nErrors[i](Flavor::cl);
+        Double_t ptag_b_error = ptagErrors[i](Flavor::b);
 
         Double_t m = mistag->GetBinContent(i+1);
         Double_t p = pValues(i);
@@ -131,7 +128,7 @@ bool PtrelByCounting::compute(
         histogram->SetBinContent(i+1, ptag_b/(p - m * n_cl));
         histogram->SetBinError(i+1,
                                sqrt(
-                                   ptag_b_error/pow(p - m * n_cl, 2) + n_cl_error*pow(ptag_b*m/pow(p - m * n_cl, 2), 2)
+                                   pow(ptag_b_error,2)/pow(p - m * n_cl, 2) + pow(n_cl_error,2)*pow(ptag_b*m/pow(p - m * n_cl, 2), 2)
                                )
                               );
     }
