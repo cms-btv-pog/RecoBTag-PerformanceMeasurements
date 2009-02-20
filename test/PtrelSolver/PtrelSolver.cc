@@ -154,24 +154,14 @@ bool PtrelSolver::measure(
           TH1D * histogram1D = histogram2D->ProjectionY(name, i, i, "e");
           
           // Temporal container with the results
-          TH1 * prediction = 0;
           TVectorD values, errors;
 
           // Fitting the histogram
-          CallSafelyZero(fit(histogram1D, templates, prediction, values, errors))
-
-          // Set histogram name by the formula = fit_x_bin
-          sprintf(name, "fit_%s_%d", histogram2D->GetName(), i);
-          // prediction->SetName(name);
+          CallSafelyZero(fit(output, histogram1D, templates, values, errors))
         
           // Collecting the results
           vVector.push_back(values);
           eVector.push_back(errors);
-
-          // Saving the fitting.
-          // output->cd();
-          // output->cd("fits");
-          // prediction->Write();
         }
         else
         {
@@ -313,7 +303,7 @@ bool PtrelSolver::fit(TH1 * histogram, TF1 * function, TVectorD & values, TVecto
 }
 
 
-bool PtrelSolver::fit(TH1 * histogram, TObjArray * templates, TH1 * prediction, TVectorD & values, TVectorD & errors)
+bool PtrelSolver::fit(TFile * output, TH1 * histogram, TObjArray * templates, TVectorD & values, TVectorD & errors)
 {
     // Creating a fraction fitter object
     TFractionFitter fit(histogram, templates);
@@ -356,9 +346,14 @@ bool PtrelSolver::fit(TH1 * histogram, TObjArray * templates, TH1 * prediction, 
     	values(i) = numberEvents * value;
     	errors(i) = numberEvents * error;
     }
-    
-    prediction = (TH1*) fit.GetPlot()->Clone();  
 
+    // Saving the fitting.
+    output->cd();
+    output->cd("fits");
+    TH1 * result = fit.GetPlot();
+    ptrelHistogramSetup(result);
+    result->Write();
+    
     return true;
 }
 

@@ -81,7 +81,7 @@ private:
     bool fit(TH1 *, TF1 *, TVectorD &, TVectorD &);
 
     //! Ptrel fit (by histograms) of a given sample
-    bool fit(TH1 *, TObjArray *, TH1 *, TVectorD &, TVectorD &);
+    bool fit(TFile *, TH1 *, TObjArray *, TVectorD &, TVectorD &);
 
     //! Return a combined function by given the sample name and bin number
     TF1 * combinedFunction(const char *, Int_t);
