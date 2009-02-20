@@ -88,8 +88,8 @@ bool PtrelSolver::measure(
         if ( object->IsA()->InheritsFrom( "TH2" ) )
             if ( TString(object->GetName() ).Contains(pattern) )
             { 
-				// Update status
-			    status = true;
+	        // Update status
+	        status = true;
 							
                 // Temporal container for efficiencies
                 TH2 * histogram;
@@ -99,7 +99,11 @@ bool PtrelSolver::measure(
                 GetSafelyZero(histogram, processTH2(object))
 
                 // Measuring efficiencies
-                CallSafelyZero(measure(output, histogram, values, errors))
+                if (!measure(output, histogram, values, errors))
+                {
+                    Warning(__FUNCTION__, "Measure failed skipping it");
+                    continue;
+                }
 
                 // Appending the results
                 hVector.push_back(TString(histogram->GetName()));

@@ -14,6 +14,19 @@ void TemplatePlots(const char * filename, Int_t nbins, Int_t columns)
     MakePlots(file, "ntag", nbins, columns, "JPM");
     MakePlots(file, "ntag", nbins, columns, "JPT");
 
+    MakePlots(file, "ntag", nbins, columns, "JBPL");
+    MakePlots(file, "ntag", nbins, columns, "JBPM");
+    MakePlots(file, "ntag", nbins, columns, "JBPT");
+
+    MakePlots(file, "ntag", nbins, columns, "SVM");
+    MakePlots(file, "ntag", nbins, columns, "SVT");
+
+    MakePlots(file, "ntag", nbins, columns, "CSVL");
+    MakePlots(file, "ntag", nbins, columns, "CSVM");
+    MakePlots(file, "ntag", nbins, columns, "CSVT");
+
+    // MakePlots(file, "ntag", nbins, columns, "SMT");
+
     MakePlots(file, "p", nbins, columns);
 
     MakePlots(file, "ptag", nbins, columns, "TCL");
@@ -23,6 +36,19 @@ void TemplatePlots(const char * filename, Int_t nbins, Int_t columns)
     MakePlots(file, "ptag", nbins, columns, "JPL");
     MakePlots(file, "ptag", nbins, columns, "JPM");
     MakePlots(file, "ptag", nbins, columns, "JPT");
+
+    MakePlots(file, "ptag", nbins, columns, "JBPL");
+    MakePlots(file, "ptag", nbins, columns, "JBPM");
+    MakePlots(file, "ptag", nbins, columns, "JBPT");
+
+    MakePlots(file, "ptag", nbins, columns, "SVM");
+    MakePlots(file, "ptag", nbins, columns, "SVT");
+
+    MakePlots(file, "ptag", nbins, columns, "CSVL");
+    MakePlots(file, "ptag", nbins, columns, "CSVM");
+    MakePlots(file, "ptag", nbins, columns, "CSVT");
+
+    // MakePlots(file, "ptag", nbins, columns, "SMT");
 
 }
 
@@ -43,7 +69,7 @@ void MakePlots(TFile * file, const char * sample, Int_t nbins, Int_t columns = 3
     }
 
     char pName[256];
-    sprintf(pName, "%s_tt216.png", hName);
+    sprintf(pName, "%s_InclusiveMu5Pt50.png", hName);
 
     TCanvas * c1 = new TCanvas(bName, hName);
 
@@ -98,6 +124,12 @@ void MakePlot(TFile * file, const char * hName, const char * clName, const char 
     sprintf(name, "template_%s", bName);
     TH1D * bTemplate = (TH1D*) gDirectory->Get(name);
 
+    if (!clTemplate || !bTemplate)
+    {
+        printf("Warning template %s or %s do not exit", clName, bName);
+        return;
+    }
+
     Double_t clNorm = clTemplate->Integral();
     Double_t bNorm = bTemplate->Integral();
 
@@ -123,6 +155,5 @@ void MakePlot(TFile * file, const char * hName, const char * clName, const char 
     bFunction->SetLineColor(kBlue);
     bFunction->Scale(1./bNorm);
     bFunction->Draw("csame");
-
 }
 

@@ -107,8 +107,8 @@ bool PtrelTemplateMaker::makeEfficiencies (
             // Select those histogram that match the pattern
             if ( TString(objectD->GetName()).Contains(patternD) )
             {
-							  // Updating status
-							  status = true;  
+	        // Updating status
+                status = true;  
 							
                 // Information
                 Info(__FUNCTION__, "Selecting as denominator %s", objectD->GetName());
@@ -220,6 +220,7 @@ bool PtrelTemplateMaker::makeTemplates(
                         sprintf(name, "template_%s_%d", histogram2D->GetName(), j);
                         // Project histogram
                         TH1D * histogram1D = histogram2D->ProjectionY(name, j, j, "e");
+                        
                         // Setup histogram
                         ptrelHistogramSetup(histogram1D);
 

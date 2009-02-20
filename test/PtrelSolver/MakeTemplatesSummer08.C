@@ -19,10 +19,8 @@ void MakeTemplatesSummer2008()
     PtrelTemplateMaker maker;
 
     // Set rebinning options
-    // maker.rebin(Dependency::pT, 3);
-    // maker.rebin(Dependency::eta, 3);
-    maker.rebin(Dependency::pT, 9);
-    maker.rebin(Dependency::eta, 9);
+    maker.rebin(Dependency::pT, 3);
+    maker.rebin(Dependency::eta, 3);
     maker.rebin(Dependency::ptrel, 2);
 
     // Setting up the template function forms
@@ -30,5 +28,8 @@ void MakeTemplatesSummer2008()
     maker.function(Flavor::cl, clTemplate);
 
     // Make templates
-    maker.make("/uscms/home/pratima/PerformanceMeasurements/CMSSW_2_2_2/src/RecoBTag/PerformanceMeasurements/test/results_InclusiveMu5Pt50.root", "templates_InclusiveMu5Pt50.root");
+    maker.make(
+        "/uscmst1b_scratch/lpc1/lpcbtag/pratima/Summer08/Jan_20_2009/InclusiveMu5Pt50_Summer08_IDEAL_V9_v1_GEN-SIM-RECO/Results/results_InclusiveMu5Pt50.root",
+        "rebin_templates_InclusiveMu5Pt50.root"
+    );
 }
