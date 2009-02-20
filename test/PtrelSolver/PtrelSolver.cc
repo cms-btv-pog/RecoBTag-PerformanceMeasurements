@@ -325,11 +325,17 @@ bool PtrelSolver::fit(TH1 * histogram, TObjArray * templates, TH1 * prediction, 
     // Running the fitter
     Int_t status = fit.Fit();
 
+    // Resizing error vector
+    values.ResizeTo(Flavor::Dimension);
+    errors.ResizeTo(Flavor::Dimension);
+
+    // Warning if the fit do not converge
     if (status)
     {
-        // Information
         Warning(__FUNCTION__, "Fitting do not converge (status code %d)", status);
-        return true;    	
+        values.Zero();
+        errors.Zero();
+        return true;
     }
 
     // Information

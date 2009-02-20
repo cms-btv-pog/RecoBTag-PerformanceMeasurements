@@ -97,7 +97,6 @@ void PtrelByCounting::solve(char const * inputfile, char const * mistagfile, cha
             histogram1D->Write();
         }
     }
-
     input->Close();
     output->Close();
 }
@@ -125,12 +124,21 @@ bool PtrelByCounting::compute(
         Double_t m = mistag->GetBinContent(i+1);
         Double_t p = pValues(i);
 
-        histogram->SetBinContent(i+1, ptag_b/(p - m * n_cl));
-        histogram->SetBinError(i+1,
-                               sqrt(
-                                   pow(ptag_b_error,2)/pow(p - m * n_cl, 2) + pow(n_cl_error,2)*pow(ptag_b*m/pow(p - m * n_cl, 2), 2)
-                               )
-                              );
+        Double_t efficiency, error;
+
+        if (n_cl != 0. && ptag_b != 0.)
+        {
+             efficiency = ptag_b/(p - m * n_cl);
+             error = sqrt(pow(ptag_b_error,2)/pow(p - m * n_cl, 2) + pow(n_cl_error,2)*pow(ptag_b*m/pow(p - m * n_cl, 2), 2));
+        }
+        else
+        {
+            efficiency = 0.;
+            error = 0.;
+        }
+
+        histogram->SetBinContent(i+1, efficiency);
+        histogram->SetBinError(i+1, error);
     }
     return true;
 }

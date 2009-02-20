@@ -4,12 +4,12 @@ void PtrelByCountingSummer08()
     gSystem->Load("libPtrelSolverByCounting.so");
 
     // Create a PtrelSolver by Counting
-    PtrelByCounting solver("templates_InclusiveMu5Pt50.root", Fit::functions);
+    PtrelByCounting solver("rebin_templates_InclusiveMu5Pt50.root", Fit::histograms);
 
     // Measure the efficiencies
     solver.solve(
         "/uscmst1b_scratch/lpc1/lpcbtag/pratima/Summer08/Jan_20_2009/QCDpt30_Summer08_IDEAL_V9_v4_GEN-SIM-RECO/Results/results_QCDpt30.root", 
-        "templates_QCDpt30.root",    
+        "rebin_templates_QCDpt30.root",
         "counting_QCDpt30.root"
     );
 }
