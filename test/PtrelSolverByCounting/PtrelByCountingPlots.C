@@ -1,11 +1,14 @@
 void PtrelByCountingPlots (const char * mfile, const char * mcfile)
 {
+    char name[256];
+
     gROOT->SetStyle("Plain");
 
     TFile * measurement = new TFile(mfile, "READ");
     TFile * mctruth = new TFile(mcfile, "READ");
 
     TCanvas * c1 = new TCanvas("c1", "PtrelByCounting apply to TC");
+    TImage *img = TImage::Create();
 
     c1->Divide(3,2);
 
@@ -27,6 +30,9 @@ void PtrelByCountingPlots (const char * mfile, const char * mcfile)
     c1->cd(6);
     plot(measurement, "/measurements/measurement_n_eta_ptag_eta_TCT", mctruth, "/mctruth/mctruth_p_eta_b_ptag_eta_b_TCT");
 
+    sprintf(name, "%s.TC.png", mfile);
+    img->FromPad(c1);
+    img->WriteImage(name);
 
     TCanvas * c2 = new TCanvas("c2", "PtrelByFitting apply to JP");
 
@@ -49,6 +55,82 @@ void PtrelByCountingPlots (const char * mfile, const char * mcfile)
 
     c2->cd(6);
     plot(measurement, "/measurements/measurement_n_eta_ptag_eta_JPT", mctruth, "/mctruth/mctruth_p_eta_b_ptag_eta_b_JPT");
+
+    sprintf(name, "%s.JP.png", mfile);
+    img->FromPad(c2);
+    img->WriteImage(name);
+
+    TCanvas * c3 = new TCanvas("c3", "PtrelByFitting apply to SV");
+
+    c3->Divide(2,2);
+
+    c3->cd(1);
+    plot(measurement, "/measurements/measurement_n_pT_ptag_pT_SVM", mctruth, "/mctruth/mctruth_p_pT_b_ptag_pT_b_SVM");
+
+    c3->cd(2);
+    plot(measurement, "/measurements/measurement_n_pT_ptag_pT_SVT", mctruth, "/mctruth/mctruth_p_pT_b_ptag_pT_b_SVT");
+
+    c3->cd(3);
+    plot(measurement, "/measurements/measurement_n_eta_ptag_eta_SVM", mctruth, "/mctruth/mctruth_p_eta_b_ptag_eta_b_SVM");
+
+    c3->cd(4);
+    plot(measurement, "/measurements/measurement_n_eta_ptag_eta_SVT", mctruth, "/mctruth/mctruth_p_eta_b_ptag_eta_b_SVT");
+
+    sprintf(name, "%s.SV.png", mfile);
+    img->FromPad(c3);
+    img->WriteImage(name);
+
+    TCanvas * c4 = new TCanvas("c4", "PtrelByFitting apply to CSV");
+
+    c4->Divide(3,2);
+
+    c4->cd(1);
+    plot(measurement, "/measurements/measurement_n_pT_ptag_pT_CSVL", mctruth, "/mctruth/mctruth_p_pT_b_ptag_pT_b_CSVL");
+
+    c4->cd(2);
+    plot(measurement, "/measurements/measurement_n_pT_ptag_pT_CSVM", mctruth, "/mctruth/mctruth_p_pT_b_ptag_pT_b_CSVM");
+
+    c4->cd(3);
+    plot(measurement, "/measurements/measurement_n_pT_ptag_pT_CSVT", mctruth, "/mctruth/mctruth_p_pT_b_ptag_pT_b_CSVT");
+
+    c4->cd(4);
+    plot(measurement, "/measurements/measurement_n_eta_ptag_eta_CSVL", mctruth, "/mctruth/mctruth_p_eta_b_ptag_eta_b_CSVL");
+
+    c4->cd(5);
+    plot(measurement, "/measurements/measurement_n_eta_ptag_eta_CSVM", mctruth, "/mctruth/mctruth_p_eta_b_ptag_eta_b_CSVM");
+
+    c4->cd(6);
+    plot(measurement, "/measurements/measurement_n_eta_ptag_eta_CSVT", mctruth, "/mctruth/mctruth_p_eta_b_ptag_eta_b_CSVT");
+
+    sprintf(name, "%s.CSV.png", mfile);
+    img->FromPad(c4);
+    img->WriteImage(name);
+
+    TCanvas * c5 = new TCanvas("c5", "PtrelByFitting apply to JBP");
+
+    c5->Divide(3,2);
+
+    c5->cd(1);
+    plot(measurement, "/measurements/measurement_n_pT_ptag_pT_JBPL", mctruth, "/mctruth/mctruth_p_pT_b_ptag_pT_b_JBPL");
+
+    c5->cd(2);
+    plot(measurement, "/measurements/measurement_n_pT_ptag_pT_JBPM", mctruth, "/mctruth/mctruth_p_pT_b_ptag_pT_b_JBPM");
+
+    c5->cd(3);
+    plot(measurement, "/measurements/measurement_n_pT_ptag_pT_JBPT", mctruth, "/mctruth/mctruth_p_pT_b_ptag_pT_b_JBPT");
+
+    c5->cd(4);
+    plot(measurement, "/measurements/measurement_n_eta_ptag_eta_JBPL", mctruth, "/mctruth/mctruth_p_eta_b_ptag_eta_b_JBPL");
+
+    c5->cd(5);
+    plot(measurement, "/measurements/measurement_n_eta_ptag_eta_JBPM", mctruth, "/mctruth/mctruth_p_eta_b_ptag_eta_b_JBPM");
+
+    c5->cd(6);
+    plot(measurement, "/measurements/measurement_n_eta_ptag_eta_JBPT", mctruth, "/mctruth/mctruth_p_eta_b_ptag_eta_b_JBPT");
+
+    sprintf(name, "%s.JBP.png", mfile);
+    img->FromPad(c5);
+    img->WriteImage(name);
 
 }
 
