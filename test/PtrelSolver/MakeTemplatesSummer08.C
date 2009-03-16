@@ -18,10 +18,10 @@ void MakeTemplatesSummer08()
     // Create a PtrelTemplateMaker
     PtrelTemplateMaker maker;
 
-    // Set rebinning options
-    maker.rebin(Dependency::pT, 9);
-    maker.rebin(Dependency::eta, 9);
-    maker.rebin(Dependency::ptrel, 2);
+    // Uncomment for setting rebinning options
+    // maker.rebin(Dependency::pT, 9);
+    // maker.rebin(Dependency::eta, 9);
+    // maker.rebin(Dependency::ptrel, 2);
 
     // Setting up the template function forms
     maker.function(Flavor::b, bTemplate);
@@ -29,7 +29,7 @@ void MakeTemplatesSummer08()
 
     // Make templates
     maker.make(
-        "/uscmst1b_scratch/lpc1/lpcbtag/pratima/Summer08/Jan_20_2009/QCDpt30_Summer08_IDEAL_V9_v4_GEN-SIM-RECO/Results/results_QCDpt30.root",
-        "onebin_templates_QCDpt30.root"
+        "/uscmst1b_scratch/lpc1/lpcbtag/pratima/Summer08/Jan_20_2009/InclusiveMu5Pt50_Summer08_IDEAL_V9_v1_GEN-SIM-RECO/Results/results_InclusiveMu5Pt50.root",
+        "templates_InclusiveMu5Pt50.root"
     );
 }

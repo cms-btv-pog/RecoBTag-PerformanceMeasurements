@@ -63,9 +63,9 @@ bool PtrelSolver::measure(
     ValueMatrix & eMatrix
 )
 {
-	  // Return status
-	  bool status = false;  
-	
+    // Return status
+    bool status = false;
+
     // Clean the containers
     hVector.clear();
     vMatrix.clear();
@@ -87,10 +87,10 @@ bool PtrelSolver::measure(
         TObject * object = key->ReadObj();
         if ( object->IsA()->InheritsFrom( "TH2" ) )
             if ( TString(object->GetName() ).Contains(pattern) )
-            { 
-	        // Update status
-	        status = true;
-							
+            {
+                // Update status
+                status = true;
+
                 // Temporal container for efficiencies
                 TH2 * histogram;
                 ValueVector values, errors;
@@ -113,7 +113,7 @@ bool PtrelSolver::measure(
     };
 
     if (!status) Error(__FUNCTION__, "Non matching histograms were found");
-					
+
     return status;
 }
 
@@ -145,50 +145,50 @@ bool PtrelSolver::measure(
 
         if (fittype_ == Fit::histograms)
         {
-          // Get the proper set of histograms
-          CreateSafelyZero(TObjArray, templates, combinedHistograms(histogram2D->GetName(), i))
+            // Get the proper set of histograms
+            CreateSafelyZero(TObjArray, templates, combinedHistograms(histogram2D->GetName(), i))
 
-          // Set histogram name by the formula = data_x_bin (transient)
-          sprintf(name, "data_%s_%d", histogram2D->GetName(), i);
-          // Project histogram
-          TH1D * histogram1D = histogram2D->ProjectionY(name, i, i, "e");
-          
-          // Temporal container with the results
-          TVectorD values, errors;
+            // Set histogram name by the formula = data_x_bin (transient)
+            sprintf(name, "data_%s_%d", histogram2D->GetName(), i);
+            // Project histogram
+            TH1D * histogram1D = histogram2D->ProjectionY(name, i, i, "e");
 
-          // Fitting the histogram
-          CallSafelyZero(fit(output, histogram1D, templates, values, errors))
-        
-          // Collecting the results
-          vVector.push_back(values);
-          eVector.push_back(errors);
+            // Temporal container with the results
+            TVectorD values, errors;
+
+            // Fitting the histogram
+            CallSafelyZero(fit(output, histogram1D, templates, values, errors))
+
+            // Collecting the results
+            vVector.push_back(values);
+            eVector.push_back(errors);
         }
         else
         {
-          // Get the proper combined function
-          CreateSafelyZero(TF1, templates, combinedFunction(histogram2D->GetName(), i))
+            // Get the proper combined function
+            CreateSafelyZero(TF1, templates, combinedFunction(histogram2D->GetName(), i))
 
-          // Set histogram name by the formula = fit_x_bin
-          sprintf(name, "fit_%s_%d", histogram2D->GetName(), i);
-          // Project histogram
-          TH1D * histogram1D = histogram2D->ProjectionY(name, i, i, "e");
-          // Basic setup
-          ptrelHistogramSetup(histogram1D);
+            // Set histogram name by the formula = fit_x_bin
+            sprintf(name, "fit_%s_%d", histogram2D->GetName(), i);
+            // Project histogram
+            TH1D * histogram1D = histogram2D->ProjectionY(name, i, i, "e");
+            // Basic setup
+            ptrelHistogramSetup(histogram1D);
 
-          // Temporal container with the results
-          TVectorD values, errors;
+            // Temporal container with the results
+            TVectorD values, errors;
 
-          // Fitting the histogram
-          CallSafelyZero(fit(histogram1D, templates, values, errors))
+            // Fitting the histogram
+            CallSafelyZero(fit(histogram1D, templates, values, errors))
 
-          // Collecting the results
-          vVector.push_back(values);
-          eVector.push_back(errors);
+            // Collecting the results
+            vVector.push_back(values);
+            eVector.push_back(errors);
 
-          // Saving the fitting.
-          output->cd();
-          output->cd("fits");
-          histogram1D->Write();
+            // Saving the fitting.
+            output->cd();
+            output->cd("fits");
+            histogram1D->Write();
         }
     }
     return true;
@@ -235,16 +235,16 @@ bool PtrelSolver::fit(TH1 * histogram, TF1 * function, TVectorD & values, TVecto
         Warning(__FUNCTION__, "Inconsistent dimension for initial values using default");
         values.ResizeTo(Flavor::Dimension);
         values.Zero();
-        values(Flavor::b) = 0.1; 
+        values(Flavor::b) = 0.1;
         values(Flavor::cl) = 0.9;
     }
 
     // Numerical integration of data histogram in the interval of the function
     Double_t integral = histogram->Integral(
-        histogram->FindBin(function->GetXmin()),
-        histogram->FindBin(function->GetXmax()),
-        "width"
-    );
+                            histogram->FindBin(function->GetXmin()),
+                            histogram->FindBin(function->GetXmax()),
+                            "width"
+                        );
 
     // Calculation of normalization parameters
     for (Int_t i = 0; i < Flavor::Dimension; ++i)
@@ -270,48 +270,55 @@ bool PtrelSolver::fit(TH1 * histogram, TF1 * function, TVectorD & values, TVecto
 
     // Copy semantics for the values
     values = values_;
-         
+
     // Total number of event including correction because of weights
     Double_t numberEvents = histogram->Integral();
 
     // Sum of the x values
     Double_t sumx = values.Sum();
-    
+
     // Derivative matrix for error computation
     TMatrixD derivative(Flavor::Dimension, Flavor::Dimension);
     for (Int_t i = 0; i < Flavor::Dimension; ++i)
         for (Int_t j = 0; j < Flavor::Dimension; ++j)
         {
-        	if (i == j)
-        	    derivative(j,i) = numberEvents/sumx - numberEvents*values(i)/(sumx*sumx);
-        	else
-        	    derivative(j,i) = - numberEvents*values(i)/(sumx*sumx);        	    
+            if (i == j)
+                derivative(j,i) = numberEvents/sumx - numberEvents*values(i)/(sumx*sumx);
+            else
+                derivative(j,i) = - numberEvents*values(i)/(sumx*sumx);
         }
 
     // Scaling to the number of events
     values *= numberEvents/sumx;
 
-    // Error computation        
-    TMatrixD covariance (covariance_, TMatrixD::kMult, derivative);
-    covariance.Mult(derivative.T(), covariance);
-    
+    // Error computation
+    TMatrixD temporal (covariance_, TMatrixD::kMult, derivative);
+    TMatrixD covariance (derivative.T(), TMatrixD::kMult, temporal);
+
     errors.ResizeTo(Flavor::Dimension);
-    for (Int_t i = 0; i < Flavor::Dimension; ++i)    
+    for (Int_t i = 0; i < Flavor::Dimension; ++i)
         errors = sqrt(covariance(i,i));
-    
+
     return true;
 }
 
 
 bool PtrelSolver::fit(TFile * output, TH1 * histogram, TObjArray * templates, TVectorD & values, TVectorD & errors)
 {
+    // Check if dta histogram is empty
+    if (!histogram->GetEntries())
+    {
+        Warning(__FUNCTION__, "Empty data histogram !");
+        return false;
+    }
+
     // Creating a fraction fitter object
     TFractionFitter fit(histogram, templates);
-  
+
     // Set the constrains for all fraction values
     for (Int_t i = 0; i < Flavor::Dimension; ++i)
         fit.Constrain(i, 0.0, 1.0);
-    
+
     // Running the fitter
     Int_t status = fit.Fit();
 
@@ -334,17 +341,17 @@ bool PtrelSolver::fit(TFile * output, TH1 * histogram, TObjArray * templates, TV
     // Resizing error vector
     values.ResizeTo(Flavor::Dimension);
     errors.ResizeTo(Flavor::Dimension);
-    
+
     // Total number of event including correction because of weights
     Double_t numberEvents = histogram->Integral();
-    
-    // Getting the results and scaling up to the number of events   
+
+    // Getting the results and scaling up to the number of events
     for (Int_t i = 0; i < Flavor::Dimension; ++i)
     {
-    	Double_t value, error;
-    	fit.GetResult(i, value, error);
-    	values(i) = numberEvents * value;
-    	errors(i) = numberEvents * error;
+        Double_t value, error;
+        fit.GetResult(i, value, error);
+        values(i) = numberEvents * value;
+        errors(i) = numberEvents * error;
     }
 
     // Saving the fitting.
@@ -353,7 +360,7 @@ bool PtrelSolver::fit(TFile * output, TH1 * histogram, TObjArray * templates, TV
     TH1 * result = fit.GetPlot();
     ptrelHistogramSetup(result);
     result->Write();
-    
+
     return true;
 }
 

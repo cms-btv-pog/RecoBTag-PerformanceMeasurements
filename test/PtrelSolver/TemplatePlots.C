@@ -60,7 +60,7 @@ void MakePlots(TFile * file, const char * sample, Int_t nbins, Int_t columns = 3
     if (tag)
     {
         sprintf(bName, "%s_%s", sample, tag);
-        sprintf(hName, "TemplatePlots_%s_%s", sample, tag);    
+        sprintf(hName, "TemplatePlots_%s_%s", sample, tag);
     }
     else
     {

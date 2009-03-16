@@ -26,11 +26,3 @@
 <use name=rootrflx>
 </library>
 
-<library file=PtrelSolverByCounting/*.cc name=PtrelSolverByCounting>
-<use name=root>
-<use name=rootminuit>
-<use name=clhep>
-<use name=rootrflx>
-<flags LDFLAGS="-L tmp/slc4_ia32_gcc345/src/RecoBTag/PerformanceMeasurements/test/PtrelSolver -lPtrelSolver">
-</library>
-
