@@ -18,10 +18,16 @@ void MakeTemplatesSummer08()
     // Create a PtrelTemplateMaker
     PtrelTemplateMaker maker;
 
-    // Uncomment for setting rebinning options
+    // Uncomment for running three bins approach
+    // maker.rebin(Dependency::pT, 3);
+    // maker.rebin(Dependency::eta, 3);
+
+    // Uncomment for running one bin approach
     // maker.rebin(Dependency::pT, 9);
     // maker.rebin(Dependency::eta, 9);
-    // maker.rebin(Dependency::ptrel, 2);
+
+    // Rebinning a factor to ptrel histograms
+    maker.rebin(Dependency::ptrel, 2);
 
     // Setting up the template function forms
     maker.function(Flavor::b, bTemplate);

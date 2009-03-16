@@ -1,4 +1,4 @@
-void DumpPtrelMeasurements (const char * mfile, const char * tfile)
+void DumpPtrelByFittingMeasurements (const char * mfile, const char * tfile)
 {
     char name[256];
 
@@ -8,12 +8,11 @@ void DumpPtrelMeasurements (const char * mfile, const char * tfile)
 
     std::ostringstream tables;
 
-
     PtrelMeasurementTable(
         tables,
         measurement,
-        "/measurements/measurement_n_pT_ptag_pT_TCL",
-        "/measurements/measurement_n_eta_ptag_eta_TCL",
+        "/measurements/measurement_n_pT_ntag_pT_TCL_b",
+        "/measurements/measurement_n_eta_ntag_eta_TCL_b",
         "TrackCountingHighEff_Loose",
         2.0
     );
@@ -21,8 +20,8 @@ void DumpPtrelMeasurements (const char * mfile, const char * tfile)
     PtrelMeasurementTable(
         tables,
         measurement,
-        "/measurements/measurement_n_pT_ptag_pT_TCM",
-        "/measurements/measurement_n_eta_ptag_eta_TCM",
+        "/measurements/measurement_n_pT_ntag_pT_TCM_b",
+        "/measurements/measurement_n_eta_ntag_eta_TCM_b",
         "TrackCountingHighEff_Medium",
         4.2
     );
@@ -30,18 +29,17 @@ void DumpPtrelMeasurements (const char * mfile, const char * tfile)
     PtrelMeasurementTable(
         tables,
         measurement,
-        "/measurements/measurement_n_pT_ptag_pT_TCT",
-        "/measurements/measurement_n_eta_ptag_eta_TCT",
+        "/measurements/measurement_n_pT_ntag_pT_TCT_b",
+        "/measurements/measurement_n_eta_ntag_eta_TCT_b",
         "TrackCountingHighPur_Tight",
         4.1
     );
 
-
     PtrelMeasurementTable(
         tables,
         measurement,
-        "/measurements/measurement_n_pT_ptag_pT_JPL",
-        "/measurements/measurement_n_eta_ptag_eta_JPL",
+        "/measurements/measurement_n_pT_ntag_pT_JPL_b",
+        "/measurements/measurement_n_eta_ntag_eta_JPL_b",
         "JetProbability_Loose",
         0.24
     );
@@ -49,8 +47,8 @@ void DumpPtrelMeasurements (const char * mfile, const char * tfile)
     PtrelMeasurementTable(
         tables,
         measurement,
-        "/measurements/measurement_n_pT_ptag_pT_JPM",
-        "/measurements/measurement_n_eta_ptag_eta_JPM",
+        "/measurements/measurement_n_pT_ntag_pT_JPM_b",
+        "/measurements/measurement_n_eta_ntag_eta_JPM_b",
         "JetProbability_Medium",
         0.49
     );
@@ -58,8 +56,8 @@ void DumpPtrelMeasurements (const char * mfile, const char * tfile)
     PtrelMeasurementTable(
         tables,
         measurement,
-        "/measurements/measurement_n_pT_ptag_pT_JPT",
-        "/measurements/measurement_n_eta_ptag_eta_JPT",
+        "/measurements/measurement_n_pT_ntag_pT_JPT_b",
+        "/measurements/measurement_n_eta_ntag_eta_JPT_b",
         "JetProbability_Tight",
         0.74
     );
@@ -67,8 +65,8 @@ void DumpPtrelMeasurements (const char * mfile, const char * tfile)
     PtrelMeasurementTable(
         tables,
         measurement,
-        "/measurements/measurement_n_pT_ptag_pT_SVM",
-        "/measurements/measurement_n_eta_ptag_eta_SVM",
+        "/measurements/measurement_n_pT_ntag_pT_SVM_b",
+        "/measurements/measurement_n_eta_ntag_eta_SVM_b",
         "SimpleSecondaryVertex_Medium",
         2.1
     );
@@ -76,8 +74,8 @@ void DumpPtrelMeasurements (const char * mfile, const char * tfile)
     PtrelMeasurementTable(
         tables,
         measurement,
-        "/measurements/measurement_n_pT_ptag_pT_SVT",
-        "/measurements/measurement_n_eta_ptag_eta_SVT",
+        "/measurements/measurement_n_pT_ntag_pT_SVT_b",
+        "/measurements/measurement_n_eta_ntag_eta_SVT_b",
         "SimpleSecondaryVertex_Tight",
         3.6
     );
@@ -86,8 +84,8 @@ void DumpPtrelMeasurements (const char * mfile, const char * tfile)
     PtrelMeasurementTable(
         tables,
         measurement,
-        "/measurements/measurement_n_pT_ptag_pT_CSVL",
-        "/measurements/measurement_n_eta_ptag_eta_CSVL",
+        "/measurements/measurement_n_pT_ntag_pT_CSVL_b",
+        "/measurements/measurement_n_eta_ntag_eta_CSVL_b",
         "CombinedSecondaryVertex_Loose",
         0.39
     );
@@ -95,8 +93,8 @@ void DumpPtrelMeasurements (const char * mfile, const char * tfile)
     PtrelMeasurementTable(
         tables,
         measurement,
-        "/measurements/measurement_n_pT_ptag_pT_CSVM",
-        "/measurements/measurement_n_eta_ptag_eta_CSVM",
+        "/measurements/measurement_n_pT_ntag_pT_CSVM_b",
+        "/measurements/measurement_n_eta_ntag_eta_CSVM_b",
         "CombinedSecondaryVertex_Medium",
         0.84
     );
@@ -104,8 +102,8 @@ void DumpPtrelMeasurements (const char * mfile, const char * tfile)
     PtrelMeasurementTable(
         tables,
         measurement,
-        "/measurements/measurement_n_pT_ptag_pT_CSVT",
-        "/measurements/measurement_n_eta_ptag_eta_CSVT",
+        "/measurements/measurement_n_pT_ntag_pT_CSVT_b",
+        "/measurements/measurement_n_eta_ntag_eta_CSVT_b",
         "CombinedSecondaryVertex_Tight",
         0.95
     );
