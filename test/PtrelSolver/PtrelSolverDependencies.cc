@@ -15,6 +15,6 @@ const long   Dependency::Dimension = 3;
 
 ClassImp(Flavor)
 
-const char * Flavor::Label[] = {"Non-b", "b"};
-const char * Flavor::Name[] = { "cl", "b"};
-const long   Flavor::Dimension = 2;
+const char * Flavor::Label[] = { "b", "c", "l", "cl" };
+const char * Flavor::Name[] = { "b", "c", "l", "cl" };
+const long   Flavor::Dimension = 4;

@@ -217,7 +217,7 @@ TH2 * PtrelSolver::processTH2(TObject * object) const
 
     // Check the histogram dependency and rebin
     for (Int_t i = 1; i < Dependency::Dimension; ++i)
-        if ( TString(histogram->GetName()).Contains(Dependency::Name[i]) && rebin_[i] != 1)
+        if ( containsIdentifier(histogram->GetName(),Dependency::Name[i]) && rebin_[i] != 1)
         {
             Info(__FUNCTION__, "Rebinning %s a factor %d in %s", Dependency::Name[i], rebin_[i], histogram->GetName());
             histogram->RebinX(rebin_[i]);
@@ -230,13 +230,13 @@ TH2 * PtrelSolver::processTH2(TObject * object) const
 bool PtrelSolver::fit(TH1 * histogram, TF1 * function, TVectorD & values, TVectorD & errors)
 {
     // Check for initial values (otherwise using default)
-    if (values.GetNoElements() != Flavor::Dimension)
+    if (values.GetNoElements() != fitFlavors_.size())
     {
         Warning(__FUNCTION__, "Inconsistent dimension for initial values using default");
-        values.ResizeTo(Flavor::Dimension);
+        values.ResizeTo(fitFlavors_.size());
         values.Zero();
-        values(Flavor::b) = 0.1;
-        values(Flavor::cl) = 0.9;
+        //values(Flavor::b) = 0.1;
+        //values(Flavor::cl) = 0.9;
     }
 
     // Numerical integration of data histogram in the interval of the function
@@ -247,10 +247,10 @@ bool PtrelSolver::fit(TH1 * histogram, TF1 * function, TVectorD & values, TVecto
                         );
 
     // Calculation of normalization parameters
-    for (Int_t i = 0; i < Flavor::Dimension; ++i)
+    for (Int_t i = 0; i < fitFlavors_.size(); ++i)
     {
         function->SetParameter(i, integral * values(i));
-        Info(__FUNCTION__, "Fitting with initial fraction %f for %s", values(i), Flavor::Name[i]);
+        Info(__FUNCTION__, "Fitting with initial fraction %f for %s", values(i), Flavor::Name[fitFlavors_[i]]);
     }
 
     // Fitting combined function against data
@@ -260,13 +260,13 @@ bool PtrelSolver::fit(TH1 * histogram, TF1 * function, TVectorD & values, TVecto
     Info(__FUNCTION__, "Fitting %s chi2/ndf = (%f/%d)", histogram->GetName(), function->GetChisquare(), function->GetNDF());
 
     // Temporal containers for the results
-    TVectorD values_(Flavor::Dimension);
-    TMatrixD covariance_(Flavor::Dimension, Flavor::Dimension);
+    TVectorD values_(fitFlavors_.size());
+    TMatrixD covariance_(fitFlavors_.size(), fitFlavors_.size());
 
     // Getting the results for the fitting
     function->GetParameters(values_.GetMatrixArray());
     // Get the covariance matrix of parameter errors
-    gMinuit->mnemat(covariance_.GetMatrixArray(), Flavor::Dimension);
+    gMinuit->mnemat(covariance_.GetMatrixArray(), fitFlavors_.size());
 
     // Copy semantics for the values
     values = values_;
@@ -278,9 +278,9 @@ bool PtrelSolver::fit(TH1 * histogram, TF1 * function, TVectorD & values, TVecto
     Double_t sumx = values.Sum();
 
     // Derivative matrix for error computation
-    TMatrixD derivative(Flavor::Dimension, Flavor::Dimension);
-    for (Int_t i = 0; i < Flavor::Dimension; ++i)
-        for (Int_t j = 0; j < Flavor::Dimension; ++j)
+    TMatrixD derivative(fitFlavors_.size(), fitFlavors_.size());
+    for (Int_t i = 0; i < fitFlavors_.size(); ++i)
+        for (Int_t j = 0; j < fitFlavors_.size(); ++j)
         {
             if (i == j)
                 derivative(j,i) = numberEvents/sumx - numberEvents*values(i)/(sumx*sumx);
@@ -295,8 +295,8 @@ bool PtrelSolver::fit(TH1 * histogram, TF1 * function, TVectorD & values, TVecto
     TMatrixD temporal (covariance_, TMatrixD::kMult, derivative);
     TMatrixD covariance (derivative.T(), TMatrixD::kMult, temporal);
 
-    errors.ResizeTo(Flavor::Dimension);
-    for (Int_t i = 0; i < Flavor::Dimension; ++i)
+    errors.ResizeTo(fitFlavors_.size());
+    for (Int_t i = 0; i < fitFlavors_.size(); ++i)
         errors = sqrt(covariance(i,i));
 
     return true;
@@ -305,7 +305,7 @@ bool PtrelSolver::fit(TH1 * histogram, TF1 * function, TVectorD & values, TVecto
 
 bool PtrelSolver::fit(TFile * output, TH1 * histogram, TObjArray * templates, TVectorD & values, TVectorD & errors)
 {
-    // Check if dta histogram is empty
+    // Check if data histogram is empty
     if (!histogram->GetEntries())
     {
         Warning(__FUNCTION__, "Empty data histogram !");
@@ -315,16 +315,16 @@ bool PtrelSolver::fit(TFile * output, TH1 * histogram, TObjArray * templates, TV
     // Creating a fraction fitter object
     TFractionFitter fit(histogram, templates);
 
-    // Set the constrains for all fraction values
-    for (Int_t i = 0; i < Flavor::Dimension; ++i)
-        fit.Constrain(i, 0.0, 1.0);
+    // Set the constrains for all fraction values. 
+    for (Int_t i = 0; i < fitFlavors_.size(); ++i)
+        fit.Constrain(i, -1.0, 2.0);
 
     // Running the fitter
     Int_t status = fit.Fit();
 
     // Resizing error vector
-    values.ResizeTo(Flavor::Dimension);
-    errors.ResizeTo(Flavor::Dimension);
+    values.ResizeTo(fitFlavors_.size());
+    errors.ResizeTo(fitFlavors_.size());
 
     // Warning if the fit do not converge
     if (status)
@@ -339,14 +339,14 @@ bool PtrelSolver::fit(TFile * output, TH1 * histogram, TObjArray * templates, TV
     Info(__FUNCTION__, "Fitting %s chi2/ndf = (%f/%d)", histogram->GetName(), fit.GetChisquare(), fit.GetNDF());
 
     // Resizing error vector
-    values.ResizeTo(Flavor::Dimension);
-    errors.ResizeTo(Flavor::Dimension);
+    values.ResizeTo(fitFlavors_.size());
+    errors.ResizeTo(fitFlavors_.size());
 
     // Total number of event including correction because of weights
     Double_t numberEvents = histogram->Integral();
 
     // Getting the results and scaling up to the number of events
-    for (Int_t i = 0; i < Flavor::Dimension; ++i)
+    for (Int_t i = 0; i < fitFlavors_.size(); ++i)
     {
         Double_t value, error;
         fit.GetResult(i, value, error);
@@ -373,7 +373,7 @@ TF1 * PtrelSolver::combinedFunction(char const * keyword, Int_t bin)
     Double_t xmax = 0;
 
     // Look over the flavor functions and creating
-    for (Int_t i = 0; i < Flavor::Dimension; ++i)
+    for (Int_t i = 0; i < fitFlavors_.size(); ++i)
     {
         // HACK to solve the problem of naming conventio
         TPRegexp p("[A-Z]{3,}$");
@@ -385,10 +385,10 @@ TF1 * PtrelSolver::combinedFunction(char const * keyword, Int_t bin)
             std::string tag(tmp.substr(inx, tmp.size()));
             std::string core(tmp.substr(0, inx-1));
             // Read the function from the file
-            sprintf(name, "/functions/function_%s_%s_%s_%d", core.c_str(), Flavor::Name[i], tag.c_str(), bin);
+            sprintf(name, "/functions/function_%s_%s_%s_%d", core.c_str(), Flavor::Name[fitFlavors_[i]], tag.c_str(), bin);
         }  // END HACK
         else
-            sprintf(name, "/functions/function_%s_%s_%d", keyword, Flavor::Name[i], bin);
+            sprintf(name, "/functions/function_%s_%s_%d", keyword, Flavor::Name[fitFlavors_[i]], bin);
 
         Info(__FUNCTION__, "Loading %s", name);
         CreateSafelyZero(TF1, function, templates_->Get(name))
@@ -425,10 +425,10 @@ TObjArray * PtrelSolver::combinedHistograms(char const * keyword, Int_t bin)
     char name[256];
     TString form;
 
-    TObjArray * histograms = new TObjArray(Flavor::Dimension);
+    TObjArray * histograms = new TObjArray(fitFlavors_.size());
 
     // Look over the flavor functions and creating
-    for (Int_t i = 0; i < Flavor::Dimension; ++i)
+    for (Int_t i = 0; i < fitFlavors_.size(); ++i)
     {
         // HACK to solve the problem of naming convention
         TPRegexp p("[A-Z]{3,}$");
@@ -440,10 +440,10 @@ TObjArray * PtrelSolver::combinedHistograms(char const * keyword, Int_t bin)
             std::string tag(tmp.substr(inx, tmp.size()));
             std::string core(tmp.substr(0, inx-1));
             // Read the function from the file
-            sprintf(name, "/templates/template_%s_%s_%s_%d", core.c_str(), Flavor::Name[i], tag.c_str(), bin);
+            sprintf(name, "/templates/template_%s_%s_%s_%d", core.c_str(), Flavor::Name[fitFlavors_[i]], tag.c_str(), bin);
         }  // END HACK
         else
-            sprintf(name, "/templates/template_%s_%s_%d", keyword, Flavor::Name[i], bin);
+            sprintf(name, "/templates/template_%s_%s_%d", keyword, Flavor::Name[fitFlavors_[i]], bin);
 
         Info(__FUNCTION__, "Loading %s", name);
         CreateSafelyZero(TH1, histogram, templates_->Get(name))
@@ -452,4 +452,9 @@ TObjArray * PtrelSolver::combinedHistograms(char const * keyword, Int_t bin)
 
     // Return the collection of histograms
     return histograms;
+}
+
+// Use the 'flav' template when doing Ptrel fit
+void PtrelSolver::setFitFlavor(Flavor::Type flav) {
+	fitFlavors_.push_back(flav);
 }

@@ -204,7 +204,7 @@ bool PtrelTemplateMaker::makeTemplates(
         {
             // Look over the flavor histograms
             for (Int_t i = 0; i < Flavor::Dimension; ++i)
-                if ( TString(object->GetName()).Contains(Flavor::Name[i]) )
+                if ( containsIdentifier(object->GetName(),Flavor::Name[i]))
                 {
                     // Cast the object pointer into 2D histogram
                     TH2D * histogram2D = (TH2D*) processTH2(object);

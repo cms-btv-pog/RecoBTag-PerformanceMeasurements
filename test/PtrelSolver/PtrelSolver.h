@@ -29,6 +29,9 @@ public:
         fittype_ = fittype;
         templates(filename);
     }
+    
+    // Use the 'flav' template when doing Ptrel fit
+    void setFitFlavor(Flavor::Type flav);
 
     //! Destructor.
     virtual ~PtrelSolver() {}
@@ -51,7 +54,7 @@ protected:
     typedef std::vector<TString> StringVector;
     typedef std::vector<TVectorD> ValueVector;
     typedef std::vector<std::vector<TVectorD> > ValueMatrix;
-
+    
     //! Measure the flavor content for a given sample
     bool measure(TFile *, TFile *, char const *, ValueVector &, ValueVector &);
 
@@ -66,6 +69,8 @@ protected:
     TFile * templates_;
 
 private:
+
+	 std::vector<Flavor::Type> fitFlavors_;
 
     Fit::Type fittype_;
 
