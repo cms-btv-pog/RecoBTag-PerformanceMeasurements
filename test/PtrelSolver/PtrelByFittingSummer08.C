@@ -4,8 +4,8 @@ void PtrelByFittingSummer08()
     gSystem->Load("libPtrelSolver.so");
 
     // Create a PtrelSolver by Counting
-    PtrelByFitting solver("templates_InclusiveMu5Pt50.root",Fit::histograms);
-    
+    PtrelByFitting solver("rebin_templates_InclusiveMu5Pt50.root", Fit::functions);
+
     // Choose which templates to use for fitting
     solver.setFitFlavor(Flavor::b);
     //solver.setFitFlavor(Flavor::cl);
@@ -14,8 +14,8 @@ void PtrelByFittingSummer08()
 
     // Measure the efficiencies
     solver.solve(
-        "results_InclusiveMu5Pt50.root",
-        "fitting_InclusiveMu5Pt50.root"
+        "/uscmst1b_scratch/lpc1/lpcbtag/pratima/Summer08/Jan_20_2009/InclusiveMu5Pt50_Summer08_IDEAL_V9_v1_GEN-SIM-RECO_2/Results/results_InclusiveMu5Pt50.root",
+        "rebin_fitting_InclusiveMu5Pt50.root"
     );
 }
 

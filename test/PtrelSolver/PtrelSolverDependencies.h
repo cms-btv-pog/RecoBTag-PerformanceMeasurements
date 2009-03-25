@@ -27,7 +27,7 @@ struct Dependency : public TObject
 //! Define the set of dependencies
 struct Flavor : public TObject
 {
-    enum Type { b = 0, c, l, cl};
+    enum Type {b = 0, c, l, cl};
     static const char * Label[];
     static const char * Name[];
     static const long Dimension;

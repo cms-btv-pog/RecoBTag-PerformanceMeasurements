@@ -133,27 +133,47 @@ void MakePlot(TFile * file, const char * hName, const char * clName, const char 
     Double_t clNorm = clTemplate->Integral();
     Double_t bNorm = bTemplate->Integral();
 
-    clTemplate->GetListOfFunctions()->Delete();
-    clTemplate->SetTitle(hName);
-    clTemplate->SetStats(false);
-    clTemplate->DrawNormalized();
-    bTemplate->GetListOfFunctions()->Delete();
-    bTemplate->DrawNormalized("same");
+    if ( clNorm > 0. )
+    {
+        clTemplate->GetListOfFunctions()->Delete();
+        clTemplate->SetTitle(hName);
+        clTemplate->SetStats(false);
+        clTemplate->DrawNormalized();
+    }
+    else
+        printf("Warning template light+c norm <= 0\n");
+
+    if ( bNorm > 0. )
+    {
+        bTemplate->SetTitle(hName);
+        bTemplate->SetStats(false);
+        bTemplate->GetListOfFunctions()->Delete();
+        bTemplate->DrawNormalized("same");
+    }
+    else
+        printf("Warning template b norm <= 0\n");
 
     file->cd("functions");
 
-    sprintf(name, "function_%s", clName);
-    TF1 * function = (TF1*) gDirectory->Get(name);
-    TH1 * clFunction = function->GetHistogram();
-    clFunction->SetLineColor(kRed);
-    clFunction->Scale(1./clNorm);
-    clFunction->Draw("csame");
+    if ( clNorm > 0. )
+    {
+        sprintf(name, "function_%s", clName);
+        TF1 * function = (TF1*) gDirectory->Get(name);
+        TH1 * clFunction = function->GetHistogram();
+        clFunction->SetLineColor(kRed);
+        clFunction->Scale(1./clNorm);
+        clFunction->Draw("csame");
+    }
 
-    sprintf(name, "function_%s", bName);
-    TF1 * function = (TF1*) gDirectory->Get(name);
-    TH1 * bFunction = function->GetHistogram();
-    bFunction->SetLineColor(kBlue);
-    bFunction->Scale(1./bNorm);
-    bFunction->Draw("csame");
+
+    if ( bNorm > 0. )
+    {
+        sprintf(name, "function_%s", bName);
+        TF1 * function = (TF1*) gDirectory->Get(name);
+        TH1 * bFunction = function->GetHistogram();
+        bFunction->SetLineColor(kBlue);
+        bFunction->Scale(1./bNorm);
+        bFunction->Draw("csame");
+    }
 }
 

@@ -37,7 +37,8 @@ void efficiencyHistogramSetup(TH1 * histogram)
 }
 
 // Look for an identifier in histogram name
-bool containsIdentifier(const char* objName_, const char* id_) {
+bool containsIdentifier(const char* objName_, const char* id_)
+{
     bool ret=false;
     TString objName(objName_);
     TString id(id_);
@@ -51,7 +52,7 @@ bool containsIdentifier(const char* objName_, const char* id_) {
     p2+="$";
     TPRegexp reg1(p1);
     TPRegexp reg2(p2);
-    if(objName.Contains(reg1) || objName.Contains(reg2)) ret=true;
+    if (objName.Contains(reg1) || objName.Contains(reg2)) ret=true;
     return ret;
 }
 

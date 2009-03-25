@@ -5,7 +5,7 @@ void MakeTemplatesSummer08()
 
     // Define the template functions
     TF1 bTemplate("btemplate", "[4] * (pow(x, [0]) * exp([1] * pow(x, [3])) + [2])", 0., 3.5);
-    TF1 clTemplate("cltemplate", "[4] * (pow(x, [0]) * exp([1] * pow(x, [3])) + [2])", 0., 3.5);  
+    TF1 clTemplate("cltemplate", "[4] * (pow(x, [0]) * exp([1] * pow(x, [3])) + [2])", 0., 3.5);
     TF1 cTemplate("ctemplate", "[4] * (pow(x, [0]) * exp([1] * pow(x, [3])) + [2])", 0., 3.5);
     TF1 lTemplate("ltemplate", "[4] * (pow(x, [0]) * exp([1] * pow(x, [3])) + [2])", 0., 3.5);
 
@@ -19,8 +19,8 @@ void MakeTemplatesSummer08()
     PtrelTemplateMaker maker;
 
     // Uncomment for running three bins approach
-     maker.rebin(Dependency::pT, 3);
-     maker.rebin(Dependency::eta, 3);
+    // maker.rebin(Dependency::pT, 3);
+    // maker.rebin(Dependency::eta, 3);
 
     // Uncomment for running one bin approach
     // maker.rebin(Dependency::pT, 9);
@@ -32,12 +32,12 @@ void MakeTemplatesSummer08()
     // Setting up the template function forms
     maker.function(Flavor::b, bTemplate);
     maker.function(Flavor::cl, clTemplate);
-    maker.function(Flavor::c, cTemplate);	
+    maker.function(Flavor::c, cTemplate);
     maker.function(Flavor::l, lTemplate);
 
     // Make templates
     maker.make(
-        "results_InclusiveMu5Pt50.root",
+        "/uscmst1b_scratch/lpc1/lpcbtag/pratima/Summer08/Jan_20_2009/InclusiveMu5Pt50_Summer08_IDEAL_V9_v1_GEN-SIM-RECO_2/Results/results_InclusiveMu5Pt50.root",
         "templates_InclusiveMu5Pt50.root"
     );
 }
