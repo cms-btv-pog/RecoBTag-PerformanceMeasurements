@@ -28,10 +28,8 @@ public:
         reset();
         fittype_ = fittype;
         templates(filename);
+        noTaggedLightTemplate_ = false;
     }
-
-    // Use the 'flav' template when doing Ptrel fit
-    void setFitFlavor(Flavor::Type flav);
 
     //! Destructor.
     virtual ~PtrelSolver() {}
@@ -41,6 +39,15 @@ public:
     {
         templates_ = 0;
         rebin_ = std::vector<Int_t>(Dependency::Dimension, 1);
+    }
+
+    //! Define a 'flavor' template for ptrel fit
+    void setFitFlavor(Flavor::Type);
+
+    //! Set the use of tagged light templates
+    void setTaggedLightTemplate(bool flag = true)
+    {
+        noTaggedLightTemplate_ = flag;
     }
 
     //! Load templates
@@ -70,11 +77,13 @@ protected:
 
 private:
 
-    std::vector<Flavor::Type> fitFlavors_;
-
     Fit::Type fittype_;
 
     std::vector<Int_t> rebin_;
+
+    bool noTaggedLightTemplate_;
+
+    std::vector<Flavor::Type> fitFlavors_;
 
     //! Measure the flavor content for a sample
     bool measure(TFile *, TH2 *, ValueVector &, ValueVector &);

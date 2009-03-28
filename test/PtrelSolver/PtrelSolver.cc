@@ -389,7 +389,7 @@ TF1 * PtrelSolver::combinedFunction(char const * keyword, Int_t bin)
     // Look over the flavor functions and creating
     for (Int_t i = 0; i < (Int_t) fitFlavors_.size(); ++i)
     {
-        // HACK to solve the problem of naming conventio
+        // Reading tagged template funtions
         TPRegexp p("[A-Z]{3,}$");
         if (TString(keyword).Contains(p))
         {
@@ -398,9 +398,18 @@ TF1 * PtrelSolver::combinedFunction(char const * keyword, Int_t bin)
             std::string tmp(keyword);
             std::string tag(tmp.substr(inx, tmp.size()));
             std::string core(tmp.substr(0, inx-1));
-            // Read the function from the file
-            sprintf(name, "/functions/function_%s_%s_%s_%d", core.c_str(), Flavor::Name[fitFlavors_[i]], tag.c_str(), bin);
-        }  // END HACK
+
+            // Function name to be got from the file
+            if (noTaggedLightTemplate_ && fitFlavors_[i] == Flavor::l)
+            {
+                TPRegexp p("tag");
+                inx = TString(core).Index(p);
+                std::string dependency(core.substr(inx+4,core.size()));
+                sprintf(name, "/functions/function_n_%s_%s_%d", dependency.c_str(), Flavor::Name[fitFlavors_[i]], bin);
+            }
+            else
+                sprintf(name, "/functions/function_%s_%s_%s_%d", core.c_str(), Flavor::Name[fitFlavors_[i]], tag.c_str(), bin);
+        }
         else
             sprintf(name, "/functions/function_%s_%s_%d", keyword, Flavor::Name[fitFlavors_[i]], bin);
 
@@ -444,7 +453,7 @@ TObjArray * PtrelSolver::combinedHistograms(char const * keyword, Int_t bin)
     // Look over the flavor functions and creating
     for (Int_t i = 0; i < (Int_t) fitFlavors_.size(); ++i)
     {
-        // HACK to solve the problem of naming convention
+        // Reading tagged template funtions
         TPRegexp p("[A-Z]{3,}$");
         if (TString(keyword).Contains(p))
         {
@@ -453,14 +462,27 @@ TObjArray * PtrelSolver::combinedHistograms(char const * keyword, Int_t bin)
             std::string tmp(keyword);
             std::string tag(tmp.substr(inx, tmp.size()));
             std::string core(tmp.substr(0, inx-1));
-            // Read the function from the file
-            sprintf(name, "/templates/template_%s_%s_%s_%d", core.c_str(), Flavor::Name[fitFlavors_[i]], tag.c_str(), bin);
-        }  // END HACK
+            // Function name to be got from the file
+            if (noTaggedLightTemplate_ && fitFlavors_[i] == Flavor::l)
+            {
+                TPRegexp p("tag");
+                inx = TString(core).Index(p);
+                std::string dependency(core.substr(inx+4,core.size()));
+                sprintf(name, "/templates/template_n_%s_%s_%d", dependency.c_str(), Flavor::Name[fitFlavors_[i]], bin);
+            }
+            else
+                sprintf(name, "/templates/template_%s_%s_%s_%d", core.c_str(), Flavor::Name[fitFlavors_[i]], tag.c_str(), bin);
+        }
         else
             sprintf(name, "/templates/template_%s_%s_%d", keyword, Flavor::Name[fitFlavors_[i]], bin);
 
         Info(__FUNCTION__, "Loading %s", name);
         CreateSafelyZero(TH1, histogram, templates_->Get(name))
+        if (histogram->GetEntries() == 0)
+        {
+            Error(__FUNCTION__, "Empty histogram %s", name);
+            return 0;
+        }
         histograms->Add(histogram);
     }
 
