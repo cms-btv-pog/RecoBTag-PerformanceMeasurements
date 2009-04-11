@@ -28,7 +28,8 @@ public:
         reset();
         fittype_ = fittype;
         templates(filename);
-        noTaggedLightTemplate_ = false;
+        useTwoTemplates();
+        taggedLightTemplate_ = true;
     }
 
     //! Destructor.
@@ -41,13 +42,29 @@ public:
         rebin_ = std::vector<Int_t>(Dependency::Dimension, 1);
     }
 
-    //! Define a 'flavor' template for ptrel fit
-    void setFitFlavor(Flavor::Type);
+    //! Set the fitter for using three templates
+    void useTwoTemplates()
+    {
+    	Info(__FUNCTION__, "Using two templates for ptrel fitting.");
+        fitFlavors_.clear();
+        fitFlavors_.push_back(Flavor::b);
+        fitFlavors_.push_back(Flavor::cl);
+    }
+
+    //! Set the fitter for using three templates
+    void useThreeTemplates()
+    {
+    	Info(__FUNCTION__, "Using three templates for ptrel fitting.");
+        fitFlavors_.clear();
+        fitFlavors_.push_back(Flavor::b);
+        fitFlavors_.push_back(Flavor::c);
+        fitFlavors_.push_back(Flavor::l);
+    }
 
     //! Set the use of tagged light templates
     void setTaggedLightTemplate(bool flag = true)
     {
-        noTaggedLightTemplate_ = flag;
+        taggedLightTemplate_ = flag;
     }
 
     //! Load templates
@@ -71,6 +88,9 @@ protected:
     //! Process 2D histogram and rebinning if it is needed
     TH2 * readTH2(TFile *, const char *) const;
 
+    //! Process 2D histogram and rebinning if it is needed
+    TH2 * processTH2(TObject *) const;
+
     static char const * directory;
 
     TFile * templates_;
@@ -81,15 +101,12 @@ private:
 
     std::vector<Int_t> rebin_;
 
-    bool noTaggedLightTemplate_;
+    bool taggedLightTemplate_;
 
     std::vector<Flavor::Type> fitFlavors_;
-
+    
     //! Measure the flavor content for a sample
     bool measure(TFile *, TH2 *, ValueVector &, ValueVector &);
-
-    //! Process 2D histogram and rebinning if it is needed
-    TH2 * processTH2(TObject *) const;
 
     //! Ptrel fit (by function) of a given sample
     bool fit(TH1 *, TF1 *, TVectorD &, TVectorD &);
@@ -97,11 +114,12 @@ private:
     //! Ptrel fit (by histograms) of a given sample
     bool fit(TFile *, TH1 *, TObjArray *, TVectorD &, TVectorD &);
 
-    //! Return a combined function by given the sample name and bin number
-    TF1 * combinedFunction(const char *, Int_t);
+    TF1 * combinedFunctions_;
 
-    //! Return a set of histograms by given the sample name and bin number
-    TObjArray * combinedHistograms(const char *, Int_t);
+    TObjArray * combinedHistograms_;
+
+    //! Return a combined function by given the sample name and bin number
+    bool combinedTemplates(const char *, Int_t);
 
 public:
 

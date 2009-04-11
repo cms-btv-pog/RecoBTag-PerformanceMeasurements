@@ -99,12 +99,8 @@ bool PtrelSolver::measure(
                 GetSafelyZero(histogram, processTH2(object))
 
                 // Measuring efficiencies
-                if (!measure(output, histogram, values, errors))
-                {
-                    Warning(__FUNCTION__, "Measure failed skipping it");
-                    continue;
-                }
-
+                CallSafelyZero( measure(output, histogram, values, errors) )
+                
                 // Appending the results
                 hVector.push_back(TString(histogram->GetName()));
                 vMatrix.push_back(values);
@@ -143,53 +139,42 @@ bool PtrelSolver::measure(
         // Information
         Info(__FUNCTION__, "Measuring flavor content using fit option %s in bin %d", Fit::Label[fittype_], i);
 
+        // Get the proper set of histograms
+        CallSafelyZero( combinedTemplates(histogram2D->GetName(), i) )
+
+        // Temporal container with the results
+        TVectorD values, errors;
+
         if (fittype_ == Fit::histograms)
         {
-            // Get the proper set of histograms
-            CreateSafelyZero(TObjArray, templates, combinedHistograms(histogram2D->GetName(), i))
-
             // Set histogram name by the formula = data_x_bin (transient)
             sprintf(name, "data_%s_%d", histogram2D->GetName(), i);
             // Project histogram
             TH1D * histogram1D = histogram2D->ProjectionY(name, i, i, "e");
 
-            // Temporal container with the results
-            TVectorD values, errors;
-
             // Fitting the histogram
-            CallSafelyZero(fit(output, histogram1D, templates, values, errors))
-
-            // Collecting the results
-            vVector.push_back(values);
-            eVector.push_back(errors);
+            CallSafelyZero(fit(output, histogram1D, combinedHistograms_, values, errors))
         }
         else
         {
-            // Get the proper combined function
-            CreateSafelyZero(TF1, templates, combinedFunction(histogram2D->GetName(), i))
-
             // Set histogram name by the formula = fit_x_bin
             sprintf(name, "fit_%s_%d", histogram2D->GetName(), i);
             // Project histogram
             TH1D * histogram1D = histogram2D->ProjectionY(name, i, i, "e");
             // Basic setup
             ptrelHistogramSetup(histogram1D);
-
-            // Temporal container with the results
-            TVectorD values, errors;
-
+            
             // Fitting the histogram
-            CallSafelyZero(fit(histogram1D, templates, values, errors))
-
-            // Collecting the results
-            vVector.push_back(values);
-            eVector.push_back(errors);
+            CallSafelyZero(fit(histogram1D, combinedFunctions_, values, errors))
 
             // Saving the fitting.
             output->cd();
             output->cd("fits");
             histogram1D->Write();
-        }
+        }    
+                    // Collecting the results
+            vVector.push_back(values);
+            eVector.push_back(errors);
     }
     return true;
 }
@@ -304,7 +289,7 @@ bool PtrelSolver::fit(TH1 * histogram, TF1 * function, TVectorD & values, TVecto
 
     errors.ResizeTo(fitFlavors_.size());
     for (Int_t i = 0; i < (Int_t) fitFlavors_.size(); ++i)
-        errors = sqrt(covariance(i,i));
+        errors(i) = sqrt( covariance(i,i) + numberEvents/(sumx*sumx) );
 
     return true;
 }
@@ -365,7 +350,7 @@ bool PtrelSolver::fit(TFile * output, TH1 * histogram, TObjArray * templates, TV
         Double_t value, error;
         fit.GetResult(i, value, error);
         values(i) = numberEvents * value;
-        errors(i) = numberEvents * error;
+        errors(i) = sqrt( numberEvents*value*value + numberEvents*numberEvents*error*error );
     }
 
     // Saving the fitting.
@@ -379,12 +364,15 @@ bool PtrelSolver::fit(TFile * output, TH1 * histogram, TObjArray * templates, TV
 }
 
 
-TF1 * PtrelSolver::combinedFunction(char const * keyword, Int_t bin)
+bool PtrelSolver::combinedTemplates(char const * keyword, Int_t bin)
 {
-    char name[256];
+    char functionName[256]; char templateName[256];
+    
     TString form;
     Double_t xmin = 0;
     Double_t xmax = 0;
+
+    combinedHistograms_ = new TObjArray(fitFlavors_.size());
 
     // Look over the flavor functions and creating
     for (Int_t i = 0; i < (Int_t) fitFlavors_.size(); ++i)
@@ -400,28 +388,44 @@ TF1 * PtrelSolver::combinedFunction(char const * keyword, Int_t bin)
             std::string core(tmp.substr(0, inx-1));
 
             // Function name to be got from the file
-            if (noTaggedLightTemplate_ && fitFlavors_[i] == Flavor::l)
+            if (!taggedLightTemplate_ && fitFlavors_[i] == Flavor::l)
             {
                 TPRegexp p("tag");
                 inx = TString(core).Index(p);
                 std::string dependency(core.substr(inx+4,core.size()));
-                sprintf(name, "/functions/function_n_%s_%s_%d", dependency.c_str(), Flavor::Name[fitFlavors_[i]], bin);
+                sprintf(functionName, "/functions/function_n_%s_%s_%d", dependency.c_str(), Flavor::Name[fitFlavors_[i]], bin);
+                sprintf(templateName, "/templates/template_n_%s_%s_%d", dependency.c_str(), Flavor::Name[fitFlavors_[i]], bin);
             }
             else
-                sprintf(name, "/functions/function_%s_%s_%s_%d", core.c_str(), Flavor::Name[fitFlavors_[i]], tag.c_str(), bin);
+            {
+                sprintf(functionName, "/functions/function_%s_%s_%s_%d", core.c_str(), Flavor::Name[fitFlavors_[i]], tag.c_str(), bin);
+                sprintf(templateName, "/templates/template_%s_%s_%s_%d", core.c_str(), Flavor::Name[fitFlavors_[i]], tag.c_str(), bin);
+            }
         }
         else
-            sprintf(name, "/functions/function_%s_%s_%d", keyword, Flavor::Name[fitFlavors_[i]], bin);
+        {
+            sprintf(functionName, "/functions/function_%s_%s_%d", keyword, Flavor::Name[fitFlavors_[i]], bin);
+            sprintf(templateName, "/templates/template_%s_%s_%d", keyword, Flavor::Name[fitFlavors_[i]], bin);
+        }
 
-        Info(__FUNCTION__, "Loading %s", name);
-        CreateSafelyZero(TF1, function, templates_->Get(name))
+        Info(__FUNCTION__, "Loading %s", functionName);
+        CreateSafelyZero(TF1, function, templates_->Get(functionName))
 
+        Info(__FUNCTION__, "Loading %s", templateName);
+        CreateSafelyZero(TH1, histogram, templates_->Get(templateName))
+        
         // Collect minimal and maximal values
         xmin = function->GetXmin();
         xmax = function->GetXmax();
 
-        // Calculate the integral
-        Double_t scale = 1./function->Integral(xmin, xmax);
+        Double_t sum = 0;
+
+        // Sum of the function over the bin centers
+        for (Int_t j=1; j<= histogram->GetNbinsX(); ++j)
+        	sum += function->Eval(histogram->GetBinCenter(j));
+        
+        // Scale the function to sum = 1
+        Double_t scale = 1./sum;
 
         // Create the funcion form for combined function
         if (i != 0) form += '+';
@@ -432,66 +436,23 @@ TF1 * PtrelSolver::combinedFunction(char const * keyword, Int_t bin)
         form += "*(";
         form += function->GetExpFormula("p");
         form += ')';
+        
+        // Add the histograms 
+        if (histogram->GetEntries() == 0)
+        {
+            Error(__FUNCTION__, "Empty histogram %s", templateName);
+            return false;
+        }
+        combinedHistograms_->Add(histogram);
     }
 
     // Information
-    sprintf(name, "combined_%s_%d", keyword, bin);
-    Info(__FUNCTION__, "Creating combined function %s defined as %s", name, form.Data());
+    sprintf(functionName, "combined_%s_%d", keyword, bin);
+    Info(__FUNCTION__, "Creating combined function %s defined as %s", functionName, form.Data());
 
     // Creating function
-    return new TF1(name, form.Data(), xmin, xmax);
+    combinedFunctions_ = new TF1(functionName, form.Data(), xmin, xmax);
+    
+    return true;
 }
 
-
-TObjArray * PtrelSolver::combinedHistograms(char const * keyword, Int_t bin)
-{
-    char name[256];
-    TString form;
-
-    TObjArray * histograms = new TObjArray(fitFlavors_.size());
-
-    // Look over the flavor functions and creating
-    for (Int_t i = 0; i < (Int_t) fitFlavors_.size(); ++i)
-    {
-        // Reading tagged template funtions
-        TPRegexp p("[A-Z]{3,}$");
-        if (TString(keyword).Contains(p))
-        {
-            TPRegexp t("[A-Z]{3,}");
-            Int_t inx = TString(keyword).Index(t);
-            std::string tmp(keyword);
-            std::string tag(tmp.substr(inx, tmp.size()));
-            std::string core(tmp.substr(0, inx-1));
-            // Function name to be got from the file
-            if (noTaggedLightTemplate_ && fitFlavors_[i] == Flavor::l)
-            {
-                TPRegexp p("tag");
-                inx = TString(core).Index(p);
-                std::string dependency(core.substr(inx+4,core.size()));
-                sprintf(name, "/templates/template_n_%s_%s_%d", dependency.c_str(), Flavor::Name[fitFlavors_[i]], bin);
-            }
-            else
-                sprintf(name, "/templates/template_%s_%s_%s_%d", core.c_str(), Flavor::Name[fitFlavors_[i]], tag.c_str(), bin);
-        }
-        else
-            sprintf(name, "/templates/template_%s_%s_%d", keyword, Flavor::Name[fitFlavors_[i]], bin);
-
-        Info(__FUNCTION__, "Loading %s", name);
-        CreateSafelyZero(TH1, histogram, templates_->Get(name))
-        if (histogram->GetEntries() == 0)
-        {
-            Error(__FUNCTION__, "Empty histogram %s", name);
-            return 0;
-        }
-        histograms->Add(histogram);
-    }
-
-    // Return the collection of histograms
-    return histograms;
-}
-
-// Use the 'flavor' template when doing Ptrel fit
-void PtrelSolver::setFitFlavor(Flavor::Type flavor)
-{
-    fitFlavors_.push_back(flavor);
-}

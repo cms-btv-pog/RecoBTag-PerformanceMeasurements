@@ -66,6 +66,9 @@ private:
     //! Implementation for creating efficiencies
     bool makeEfficiencies (TFile *, TFile *, TPRegexp, TPRegexp) const;
 
+    //! Implementation for creating coefficiencies between efficiencies
+    bool makeCoefficients (TFile *, TPRegexp, TPRegexp) const;
+
 public:
 
     ClassDef(PtrelTemplateMaker, 1)

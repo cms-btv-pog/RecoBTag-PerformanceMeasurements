@@ -45,7 +45,7 @@ void PtrelByFitting::solve(char const * inputfile, char const * outputfile)
             ValueMatrix nValues;
             ValueMatrix nErrors;
 
-            sprintf(name, "%stag_%s_[A-Z]*$", methods[m], Dependency::Name[i]);
+            sprintf(name, "%stag_%s_(?!SMT)[A-Z]*$", methods[m], Dependency::Name[i]);
             CallSafely( measure(input, output, TPRegexp(name), nHistograms, nValues, nErrors) )
 
             // HACK to force reading the objets from file

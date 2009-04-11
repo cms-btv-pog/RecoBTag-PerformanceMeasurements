@@ -19,8 +19,8 @@ void MakeTemplatesSummer08()
     PtrelTemplateMaker maker;
 
     // Uncomment for running three bins approach
-    // maker.rebin(Dependency::pT, 3);
-    // maker.rebin(Dependency::eta, 3);
+    maker.rebin(Dependency::pT, 3);
+    maker.rebin(Dependency::eta, 3);
 
     // Uncomment for running one bin approach
     // maker.rebin(Dependency::pT, 9);
@@ -38,6 +38,6 @@ void MakeTemplatesSummer08()
     // Make templates
     maker.make(
         "/uscmst1b_scratch/lpc1/lpcbtag/pratima/Summer08/Jan_20_2009/InclusiveMu5Pt50_Summer08_IDEAL_V9_v1_GEN-SIM-RECO_2/Results/results_InclusiveMu5Pt50.root",
-        "templates_InclusiveMu5Pt50.root"
+        "rebin_templates_InclusiveMu5Pt50.root"
     );
 }

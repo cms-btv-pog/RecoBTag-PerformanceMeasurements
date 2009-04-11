@@ -33,14 +33,45 @@ void PtrelTemplateMaker::make(
     // Make templates
     CallSafely( makeTemplates(input, output) )
 
-    // Make effciencies
-    CallSafely( makeEfficiencies(input, output, TPRegexp("n_pT_b"), TPRegexp("ntag_pT_b_[A-Z]*$")) )
-    CallSafely( makeEfficiencies(input, output, TPRegexp("n_eta_b"), TPRegexp("ntag_eta_b_[A-Z]*$")) )
-    CallSafely( makeEfficiencies(input, output, TPRegexp("p_pT_b"), TPRegexp("ptag_pT_b_[A-Z]*$")) )
-    CallSafely( makeEfficiencies(input, output, TPRegexp("p_eta_b"), TPRegexp("ptag_eta_b_[A-Z]*$")) )
-    // Make mistag for counting
-    CallSafely( makeEfficiencies(input, output, TPRegexp("n_pT_cl"), TPRegexp("p_pT_cl")) )
-    CallSafely( makeEfficiencies(input, output, TPRegexp("n_eta_cl"), TPRegexp("p_eta_cl")) )
+    char dName[256], nName[256];
+
+    for (long i = 1; i < Dependency::Dimension; ++i)
+    {
+        // Make n-effciencies
+        sprintf(dName, "n_%s_b", Dependency::Name[i]);
+        sprintf(nName, "ntag_%s_b_[A-Z]*$", Dependency::Name[i]);
+        CallSafely( makeEfficiencies(input, output, TPRegexp(dName), TPRegexp(nName)) )
+
+        // Make p-efficiencies
+        sprintf(dName, "p_%s_b", Dependency::Name[i]);
+        sprintf(nName, "ptag_%s_b_[A-Z]*$", Dependency::Name[i]);
+        CallSafely( makeEfficiencies(input, output, TPRegexp(dName), TPRegexp(nName)) )
+
+        // Make n-cl-effciencies
+        sprintf(dName, "n_%s_cl", Dependency::Name[i]);
+        sprintf(nName, "ntag_%s_cl_[A-Z]*$", Dependency::Name[i]);
+        CallSafely( makeEfficiencies(input, output, TPRegexp(dName), TPRegexp(nName)) )
+
+        // Make p-cl-efficiencies
+        sprintf(dName, "p_%s_cl", Dependency::Name[i]);
+        sprintf(nName, "ptag_%s_cl_[A-Z]*$", Dependency::Name[i]);
+        CallSafely( makeEfficiencies(input, output, TPRegexp(dName), TPRegexp(nName)) )
+
+        // Make mistag for counting
+        sprintf(dName, "n_%s_cl", Dependency::Name[i]);
+        sprintf(nName, "p_%s_cl", Dependency::Name[i]);
+        CallSafely( makeEfficiencies(input, output, TPRegexp(dName), TPRegexp(nName)) )
+
+        // Evaluate the coefficients between b-efficiencies from p and n samples
+        sprintf(dName, "mctruth_n_%s_b_ntag_%s_b_[A-Z]*$", Dependency::Name[i], Dependency::Name[i]);
+        sprintf(nName, "mctruth_p_%s_b_ptag_%s_b_[A-Z]*$", Dependency::Name[i], Dependency::Name[i]);
+        CallSafely( makeCoefficients(output, TPRegexp(dName), TPRegexp(nName)) )
+
+        // Evaluate the coefficients between cl-efficiencies from p and n samples
+        sprintf(dName, "mctruth_n_%s_cl_ntag_%s_cl_[A-Z]*$", Dependency::Name[i], Dependency::Name[i]);
+        sprintf(nName, "mctruth_p_%s_cl_ptag_%s_cl_[A-Z]*$", Dependency::Name[i], Dependency::Name[i]);
+        CallSafely( makeCoefficients(output, TPRegexp(dName), TPRegexp(nName)) )
+    }
 
     // Closing the files
     input->Close();
@@ -69,6 +100,90 @@ TH2* PtrelTemplateMaker::processTH2(TObject * object) const
         }
 
     return histogram2D;
+}
+
+
+bool PtrelTemplateMaker::makeCoefficients (
+    TFile * output,
+    TPRegexp patternD,
+    TPRegexp patternN
+) const
+{
+    char name[256];
+
+    // Return status
+    bool status = false;
+
+    // Information
+    Info(__FUNCTION__, "Starting making coefficients");
+
+    // Creating sub directory for coefficients between mctruth efficiencies
+    if (!output->FindKey("coefficients")) output->mkdir("coefficients");
+
+    // Move to the directory with 2d histograms
+    output->cd("/mctruth");
+
+    // Loop over all denominator keys in this directory
+    TIter nextkeyD( gDirectory->GetListOfKeys() );
+
+    // Loop over all numerator keys in this directory
+    TIter nextkeyN( gDirectory->GetListOfKeys() );
+
+    // Iterator for the denominators
+    TKey * keyD;
+    TKey * keyN;
+
+    while (( keyD = (TKey*)nextkeyD() ))
+    {
+        // Select only 2D histograms
+        TObject * objectD = keyD->ReadObj();
+        if ( objectD->IsA()->InheritsFrom( "TH1" ) )
+            // Select those histogram that match the pattern
+            if ( TString(objectD->GetName()).Contains(patternD) )
+            {
+                // Information
+                Info(__FUNCTION__, "Selecting as denominator %s", objectD->GetName());
+
+                // Cast the object pointer into 2D histogram
+                TH1D * denominator = (TH1D*) objectD;
+
+                while (( keyN = (TKey*)nextkeyN() ))
+                {
+                    // Select only 2D histograms
+                    TObject * objectN = keyN->ReadObj();
+                    if ( objectN->IsA()->InheritsFrom( "TH1" ) )
+                        // Select those histogram that match the pattern
+                        if ( TString(objectN->GetName()).Contains(patternN) )
+                        {
+                            // Update status
+                            status = true;
+
+                            // Information
+                            Info(__FUNCTION__, "Selecting as numerator %s", objectN->GetName());
+
+                            // Cast the object pointer into 2D histogram
+                            TH1D * numerator = (TH1D*) objectN;
+
+                            // MCTruth efficiencies histogram
+                            sprintf(name, "coefficient_%s_%s", denominator->GetName(), numerator->GetName());
+                            Info(__FUNCTION__, "Calculating coefficient %s", name);
+                            TH1D * coefficient = (TH1D*) numerator->Clone();
+                            coefficient->SetName(name);
+                            coefficient->Divide(numerator, denominator, 1., 1., "e");
+                            efficiencyHistogramSetup(coefficient);
+
+                            // Save the beta coefficient histogram
+                            output->cd("coefficients");
+                            coefficient->Write();
+                            break;
+                        }
+                };
+            }
+    };
+
+    if (!status) Error(__FUNCTION__, "Non matching histograms were found");
+
+    return status;
 }
 
 
@@ -235,10 +350,13 @@ bool PtrelTemplateMaker::makeTemplates(
                         if (j != 1) function->SetParameters(lastParameters);
 
                         // Fit the histogram
-                        histogram1D->Fit(function, "Q", "", function->GetXmin(), function->GetXmax());
-
-                        // Information
-                        Info(__FUNCTION__, "Fitting %s chi2/ndf = (%f/%d)", histogram1D->GetName(), function->GetChisquare(), function->GetNDF());
+                        Int_t fitStatus = histogram1D->Fit(function, "V", "", function->GetXmin(), function->GetXmax());
+       
+                        // Check the status of the fitting                 
+                        if( fitStatus )
+                            Warning(__FUNCTION__, "Fitting problem returning status %d", fitStatus);
+                        else
+                            Info(__FUNCTION__, "Fitting %s chi2/ndf = (%f/%d)", histogram1D->GetName(), function->GetChisquare(), function->GetNDF());
 
                         // Get the parameter of the last optiomization
                         lastParameters = function->GetParameters();
