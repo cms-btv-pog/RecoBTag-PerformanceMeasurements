@@ -4,13 +4,19 @@ void PtrelByCountingSummer08()
     gSystem->Load("libPtrelSolver.so");
 
     // Create a PtrelSolver by Counting
-    PtrelByCounting solver("templates_InclusiveMu5Pt50.root", Fit::histograms);
+    PtrelByCounting solver("rebin_templates_InclusiveMu5Pt50.root", Fit::histograms);
+
+    // Uncomment when using three templates for fitting
+    // solver.useThreeTemplates();
+    
+    // Uncomment when using untagged light templates
+    // solver.setTaggedLightTemplate(false);
 
     // Measure the efficiencies
     solver.solve(
-        "/uscmst1b_scratch/lpc1/lpcbtag/pratima/Summer08/Jan_20_2009/InclusiveMu5Pt50_Summer08_IDEAL_V9_v1_GEN-SIM-RECO/Results/results_InclusiveMu5Pt50.root",
-        "templates_InclusiveMu5Pt50.root",
-        "counting_InclusiveMu5Pt50.root"
+        "/uscmst1b_scratch/lpc1/lpcbtag/pratima/Summer08/Jan_20_2009/InclusiveMu5Pt50_Summer08_IDEAL_V9_v1_GEN-SIM-RECO_2/Results/results_InclusiveMu5Pt50.root",
+        "rebin_templates_InclusiveMu5Pt50.root",
+        "rebin_counting_InclusiveMu5Pt50.root"
     );
 }
 

@@ -47,7 +47,7 @@ void PtrelByCounting::solve(char const * inputfile, char const * mistagfile, cha
         StringVector ptagHistograms;
 
         // Measure the flavor content in ptag samples
-        sprintf(name, "ptag_%s_[A-Z]*$", Dependency::Name[i]);
+        sprintf(name, "ptag_%s_(?!SMT)[A-Z]*$", Dependency::Name[i]);
         CallSafely( measure(input, output, TPRegexp(name), ptagHistograms, ptagValues, ptagErrors) )
 
         // HACK to force reading the objets from file
@@ -115,21 +115,24 @@ bool PtrelByCounting::compute(
     // Loop over different bins
     for (std::size_t i = 0; i < nValues.size(); ++i)
     {
-        Double_t n_cl = nValues[i](Flavor::cl);
-        Double_t ptag_b = ptagValues[i](Flavor::b);
-
-        Double_t n_cl_error = nErrors[i](Flavor::cl);
-        Double_t ptag_b_error = ptagErrors[i](Flavor::b);
-
+        Double_t ptagb = ptagValues[i](Flavor::b);
+        Double_t ptagbError = ptagErrors[i](Flavor::b);
+ 
+        Double_t nb = nValues[i](Flavor::b);
+        Double_t nbError = nErrors[i](Flavor::b);
+        
+        Double_t ncl = nValues[i].Sum() - nb;   
+        Double_t nclError = sqrt( nValues[i].Sum() + nbError * nbError );
+       
         Double_t m = mistag->GetBinContent(i+1);
         Double_t p = pValues(i);
 
         Double_t efficiency, error;
 
-        if (n_cl != 0. && ptag_b != 0.)
+        if (ncl != 0. && ptagb != 0.)
         {
-            efficiency = ptag_b/(p - m * n_cl);
-            error = sqrt(pow(ptag_b_error,2)/pow(p - m * n_cl, 2) + pow(n_cl_error,2)*pow(ptag_b*m/pow(p - m * n_cl, 2), 2));
+            efficiency = ptagb/(p - m * ncl);
+            error = sqrt(pow(ptagbError,2)/pow(p - m * ncl, 2) + pow(nclError,2)*pow(ptagb*m/pow(p - m * ncl, 2), 2));
         }
         else
         {
