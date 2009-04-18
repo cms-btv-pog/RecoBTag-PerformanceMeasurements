@@ -404,8 +404,21 @@ bool PtrelSolver::combinedTemplates(char const * keyword, Int_t bin)
         }
         else
         {
-            sprintf(functionName, "/functions/function_%s_%s_%d", keyword, Flavor::Name[fitFlavors_[i]], bin);
-            sprintf(templateName, "/templates/template_%s_%s_%d", keyword, Flavor::Name[fitFlavors_[i]], bin);
+            // Function name to be got from the file
+            if (!taggedLightTemplate_ && fitFlavors_[i] == Flavor::l)
+            {
+            	TPRegexp p("(n|p)_");
+                Int_t inx = TString(keyword).Index(p);
+                std::string tmp(keyword);
+                std::string dependency(tmp.substr(inx+2, tmp.size()));
+                sprintf(functionName, "/functions/function_n_%s_%s_%d", dependency.c_str(), Flavor::Name[fitFlavors_[i]], bin);
+                sprintf(templateName, "/templates/template_n_%s_%s_%d", dependency.c_str(), Flavor::Name[fitFlavors_[i]], bin);            	
+            }
+            else
+            {
+                sprintf(functionName, "/functions/function_%s_%s_%d", keyword, Flavor::Name[fitFlavors_[i]], bin);
+                sprintf(templateName, "/templates/template_%s_%s_%d", keyword, Flavor::Name[fitFlavors_[i]], bin);
+            }
         }
 
         Info(__FUNCTION__, "Loading %s", functionName);

@@ -164,24 +164,32 @@ bool PtrelBySystem4::compute(
     for (std::size_t i = 0; i < nValues.size(); ++i)
     {
         Double_t nb = nValues[i](Flavor::b);
-        Double_t nbError = nErrors[i](Flavor::b);
-        Double_t ncl = nValues[i].Sum() - nb;   
-        Double_t nclError = sqrt( nValues[i].Sum() + nErrors[i](Flavor::b) * nErrors[i](Flavor::b) );
-               
+        Double_t nbError = nErrors[i](Flavor::b);                
+        Double_t n  = nValues[i].Sum();
+        Double_t fnb = nb/n;
+        Double_t fnbError = (n*nbError*nbError - nb*nb)/(n*n*n);
+                             
         Double_t pb = pValues[i](Flavor::b);
         Double_t pbError = pErrors[i](Flavor::b);        
-        Double_t pcl = pValues[i].Sum() - pb;
-        Double_t pclError = sqrt( pValues[i].Sum() + pErrors[i](Flavor::b) * pErrors[i](Flavor::b) );                    
+        Double_t p = pValues[i].Sum();
+        Double_t fpb = pb/p;
+        Double_t fpbError = (p*pbError*pbError - pb*pb)/(p*p*p);
                                 
-        std::cout << "nb: " << nb << " +- " << nbError << " " << "ncl: " << ncl << " +- " << nclError << std::endl;        
-        std::cout << "pb: " << pb << " +- " << pbError << " " << "pcl: " << pcl << " +- " << pclError << std::endl;        
+        std::cout << "nb  : " << nb << " +- " << nbError << std::endl;        
+        std::cout << "pb  : " << pb << " +- " << pbError << std::endl;        
+        std::cout << "fnb : " << fnb << " +- " << sqrt(fnbError) << std::endl;        
+        std::cout << "fpb : " << fpb << " +- " << sqrt(fpbError) << std::endl;        
                 
     	Double_t ntag = ntagValues(i);
-    	Double_t ntagError = ntagErrors(i);
+    	Double_t epsntag = ntag/n;
+    	Double_t epsntagError = epsntag*(1-epsntag)/n;
+    	
     	Double_t ptag = ptagValues(i);
-    	Double_t ptagError = ptagErrors(i);
-
-        std::cout << "ntag: " << ntag << " " << "ptag: " << ptag << std::endl;        
+    	Double_t epsptag = ptag/p;
+    	Double_t epsptagError = epsptag*(1-epsptag)/p;
+    	
+        std::cout << "epsntag: " << epsntag << " +- " << sqrt(epsntagError) << std::endl; 
+        std::cout << "epsptag: " << epsptag << " +- " << sqrt(epsptagError) << std::endl;        
 
         Double_t alpha = alfaHistogram->GetBinContent(i+1);
         Double_t alphaError = alfaHistogram->GetBinError(i+1);
@@ -190,20 +198,25 @@ bool PtrelBySystem4::compute(
 
         std::cout << "alfa: " << alpha << " " << "beta: " << beta << std::endl;        
 
-        Double_t deltab = alpha*ntag*pcl - ptag*ncl;
-        Double_t delta  = alpha*nb*pcl - beta*ncl*pb;
+        Double_t deltab = alpha*epsntag*(1.0-fpb) - epsptag*(1.0-fnb);
+        Double_t delta  = alpha*fnb*(1.0-fpb) - beta*(1.0-fnb)*fpb;
+        
+        if ( delta == 0.0 )
+        {
+        	histogram->SetBinContent(i+1, 0.);
+            histogram->SetBinError(i+1, 0.);
+            return true;
+        }
         
         Double_t efficiency = deltab/delta;
         
         Double_t error = sqrt (
-            pow((ntag*pcl/delta - deltab*nb*pcl/pow(delta,2)) * alphaError, 2) +
-            pow((deltab*ncl*pb/pow(delta,2)) * betaError, 2) +
-            pow((ptag/delta - deltab*beta*pb/pow(delta,2)) * nclError, 2) +
-            pow((deltab*alpha*pcl/pow(delta,2)) * nbError, 2) +
-            pow((alpha*ntag/delta - deltab*alpha*nb/pow(delta,2)) * pclError, 2) +
-            pow((deltab*beta*ncl/pow(delta,2)) * pbError, 2) +
-            pow((alpha*pcl/delta) * ntagError, 2) +
-            pow((ncl/delta) * ptagError, 2)           
+            pow(epsptag/delta - deltab*(alpha*(1-fpb)+beta*fpb)/pow(delta, 2), 2) * fnbError +
+            pow(alpha*epsntag/delta - deltab*(alpha*fnb+beta*(1-fnb)/pow(delta, 2)), 2) * fpbError +
+            pow(alpha*(1-fpb)/delta, 2) * epsntagError +
+            pow((1-fnb)/delta, 2) * epsptagError +
+            pow((epsntag*(1-fpb)/delta - deltab*fnb*(1-fpb)/pow(delta,2)) * alphaError, 2) +
+            pow((deltab*(1-fnb)*fpb/pow(delta,2)) * betaError, 2) 
         );
        
         std::cout << "eff.: " << efficiency << " +- " << error << std::endl; 
