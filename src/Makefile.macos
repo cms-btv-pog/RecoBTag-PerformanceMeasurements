@@ -14,8 +14,8 @@ LD_LIBRARY_PATH:= $(ROOTSYS)/lib/:$(LD_LIBRARY_PATH)
 
 INCLUDEDIR    = -I$(ROOTSYS)/include -I../interface
 
-HEADERS       = BTagBaseTrackEvent.h BTagEvent.h BTagHistograms.h BTagLeptonEvent.h BTagTrackEvent.h
-OBJS          = BTagBaseTrackEvent.o BTagEvent.o BTagHistograms.o BTagLeptonEvent.o BTagTrackEvent.o BTagEventDict.o
+HEADERS       = BTagBaseTrackEvent.h BTagEvent.h BTagHistograms.h BTagLeptonEvent.h BTagTrackEvent.h CFractionFitter.h
+OBJS          = BTagBaseTrackEvent.o BTagEvent.o BTagHistograms.o BTagLeptonEvent.o BTagTrackEvent.o BTagEventDict.o CFractionFitter.o
 
 all:	$(OBJS)
 	$(CXX) -dynamiclib -o libBTagEvent.dylib $(LDFLAGS) $(OBJS) $(LIBS)

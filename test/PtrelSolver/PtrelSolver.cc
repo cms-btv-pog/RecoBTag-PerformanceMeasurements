@@ -5,7 +5,7 @@
 
 #include "TClass.h"
 #include "TDirectory.h"
-#include "TFractionFitter.h"
+#include "RecoBTag/PerformanceMeasurements/interface/CFractionFitter.h"
 #include "TKey.h"
 #include "TMinuit.h"
 #include "TObjString.h"
@@ -312,7 +312,7 @@ bool PtrelSolver::fit(TFile * output, TH1 * histogram, TObjArray * templates, TV
     }
 
     // Creating a fraction fitter object
-    TFractionFitter fit(histogram, templates);
+    CFractionFitter fit(histogram, templates);
 
     // Set the constrains for all fraction values.
     for (Int_t i = 0; i < (Int_t) fitFlavors_.size(); ++i)

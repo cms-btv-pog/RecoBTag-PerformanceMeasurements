@@ -102,12 +102,17 @@ bool PtrelByFitting::compute(
         Double_t de = dErrors[i](flavor);
         Double_t ne = nErrors[i](flavor);
 
-        histogram->SetBinContent(i+1, n/d);
-        histogram->SetBinError(i+1,
+        if(d!=0) {
+        		histogram->SetBinContent(i+1, n/d);
+       		histogram->SetBinError(i+1,
                                sqrt(
                                    pow(ne,2)/(d*d) + pow(de,2)*n*n/(d*d*d*d)
                                )
                               );
+        } else {
+        		histogram->SetBinContent(i+1,0);
+        		histogram->SetBinError(i+1,0);
+        }
     }
     return true;
 }
