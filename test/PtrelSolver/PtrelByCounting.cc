@@ -117,13 +117,13 @@ bool PtrelByCounting::compute(
     {
         Double_t ptagb = ptagValues[i](Flavor::b);
         Double_t ptagbError = ptagErrors[i](Flavor::b);
- 
+
         Double_t nb = nValues[i](Flavor::b);
         Double_t nbError = nErrors[i](Flavor::b);
-        
-        Double_t ncl = nValues[i].Sum() - nb;   
+
+        Double_t ncl = nValues[i].Sum() - nb;
         Double_t nclError = sqrt( nValues[i].Sum() + nbError * nbError );
-       
+
         Double_t m = mistag->GetBinContent(i+1);
         Double_t p = pValues(i);
 

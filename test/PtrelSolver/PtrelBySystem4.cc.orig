@@ -58,7 +58,7 @@ void PtrelBySystem4::solve(char const * inputfile, char const * outputfile)
         ValueVector ntagErrors;
 
         // Name for the ntag samples : ntag_(pT|eta)_[A-Z]*$
-        sprintf(name, "ntag_%s_[A-Z]*$", Dependency::Name[i]);
+        sprintf(name, "ntag_%s_(?!SMT$)[A-Z]*$", Dependency::Name[i]);
         // Count the number of entries in ntag samples
         CallSafely( count(input, output, TPRegexp(name), ntagNames, ntagValues, ntagErrors) )
 
@@ -68,7 +68,7 @@ void PtrelBySystem4::solve(char const * inputfile, char const * outputfile)
         ValueVector ptagErrors;
 
         // Name for the ptag samples : ptag_(pT|eta)_[A-Z]*$
-        sprintf(name, "ptag_%s_[A-Z]*$", Dependency::Name[i]);
+        sprintf(name, "ptag_%s_(?!SMT$)[A-Z]*$", Dependency::Name[i]);
         // Count the number of entries in ptag samples
         CallSafely( count(input, output, TPRegexp(name), ptagNames, ptagValues, ptagErrors) )
 
@@ -82,44 +82,149 @@ void PtrelBySystem4::solve(char const * inputfile, char const * outputfile)
         // Get a 2D histogram to produce a place holder for the results later
         sprintf(name, "%s/n_%s", directory, Dependency::Name[i]);
         CreateSafely(TH2D, histogram2D, readTH2(input, name))
-        
+
         for (std::size_t j = 0; j < ptagNames.size(); ++j)
-                {   
-                	// Collect the tag names
-      	            TPRegexp t("[A-Z]{3,}");
+        {
+            // Collect the tag names
+            TPRegexp t("[A-Z]{3,}");
+
+            Int_t inx = ntagNames[j].Index(t);
+            std::string tmp(ntagNames[j].Data());
+            std::string tagA(tmp.substr(inx, tmp.size()));
+
+            inx = ptagNames[j].Index(t);
+            tmp = ptagNames[j].Data();
+            std::string tagB(tmp.substr(inx, tmp.size()));
+
+            // Read the beta coefficients
+            sprintf(
+                name, "coefficients/coefficient_mctruth_n_%s_b_ntag_%s_b_%s_mctruth_p_%s_b_ptag_%s_b_%s",
+                Dependency::Name[i], Dependency::Name[i], tagA.c_str(), Dependency::Name[i], Dependency::Name[i], tagB.c_str()
+            );
+
+            std::cout << name << std::endl;
+
+            CreateSafely( TH1D, betaHistogram, templates_->Get(name) )
+
+            // Read the beta coefficients
+            sprintf(
+                name, "coefficients/coefficient_mctruth_n_%s_cl_ntag_%s_cl_%s_mctruth_p_%s_cl_ptag_%s_cl_%s",
+                Dependency::Name[i], Dependency::Name[i], tagA.c_str(), Dependency::Name[i], Dependency::Name[i], tagB.c_str()
+            );
+
+            std::cout << name << std::endl;
+
+            CreateSafely( TH1D, alfaHistogram, templates_->Get(name) )
+
+            // Measure efficiencies histogram
+            sprintf(name, "measurement_%s_%s_%s", ntagNames[j].Data(), ptagNames[j].Data(), Flavor::Name[Flavor::b]);
+            Info(__FUNCTION__, "Computing efficiency %s", name);
             
-                    Int_t inx = ntagNames[j].Index(t);
-                    std::string tmp(ntagNames[j].Data());
-                    std::string tagA(tmp.substr(inx, tmp.size()));
+            // This projection is just to get a place holder for the efficiencies
+            TH1D * histogram1D = histogram2D->ProjectionX(name, -1, -1, "e");
+            efficiencyHistogramSetup(histogram1D);
 
-                    inx = ptagNames[j].Index(t);
-                    tmp = ptagNames[j].Data();
-                    std::string tagB(tmp.substr(inx, tmp.size()));
-                	             	
-                	// Read the beta coefficients
-        	        sprintf(
-        	                name, "coefficients/coefficient_mctruth_n_%s_b_ntag_%s_b_%s_mctruth_p_%s_b_ptag_%s_b_%s", 
-        	                Dependency::Name[i], Dependency::Name[i], tagA.c_str(), Dependency::Name[i], Dependency::Name[i], tagB.c_str()
-        	        );
-        	        
-        	        std::cout << name << std::endl;
-        	    
-                	CreateSafely( TH1D, betaHistogram, templates_->Get(name) )
-
-                	// Read the beta coefficients
-        	        sprintf(
-        	                name, "coefficients/coefficient_mctruth_n_%s_b_ntag_%s_b_%s_mctruth_p_%s_b_ptag_%s_b_%s", 
-        	                Dependency::Name[i], Dependency::Name[i], tagA.c_str(), Dependency::Name[i], Dependency::Name[i], tagB.c_str()
-        	        );
-                	CreateSafely( TH1D, alfaHistogram, templates_->Get(name) )
-
-                }                	
-
-
+            CallSafely(
+                compute(
+                    histogram1D, nValues, nErrors, 
+                                 pValues, pErrors,
+                                 ntagValues[j], ntagErrors[j],
+                                 ptagValues[j], ptagErrors[j],
+                                 alfaHistogram, betaHistogram
+                )
+            )
+            
+            // Saving the histogram
+            output->cd();
+            output->cd("measurements");
+            histogram1D->Write();
+        }
     }
 
     input->Close();
     output->Close();
+}
+
+
+bool PtrelBySystem4::compute(
+    TH1 * histogram,
+    ValueVector const & nValues,
+    ValueVector const & nErrors,
+    ValueVector const & pValues,
+    ValueVector const & pErrors,
+    TVectorD const & ntagValues,
+    TVectorD const & ntagErrors,
+    TVectorD const & ptagValues,
+    TVectorD const & ptagErrors,
+    TH1 * alfaHistogram,
+    TH1 * betaHistogram
+)
+{
+    // Loop over different bins
+    for (std::size_t i = 0; i < nValues.size(); ++i)
+    {
+        Double_t nb = nValues[i](Flavor::b);
+        Double_t nbError = nErrors[i](Flavor::b);                
+        Double_t n  = nValues[i].Sum();
+        Double_t fnb = nb/n;
+        Double_t fnbError = (n*nbError*nbError - nb*nb)/(n*n*n);
+                             
+        Double_t pb = pValues[i](Flavor::b);
+        Double_t pbError = pErrors[i](Flavor::b);        
+        Double_t p = pValues[i].Sum();
+        Double_t fpb = pb/p;
+        Double_t fpbError = (p*pbError*pbError - pb*pb)/(p*p*p);
+                                
+        std::cout << "nb  : " << nb << " +- " << nbError << std::endl;        
+        std::cout << "pb  : " << pb << " +- " << pbError << std::endl;        
+        std::cout << "fnb : " << fnb << " +- " << sqrt(fnbError) << std::endl;        
+        std::cout << "fpb : " << fpb << " +- " << sqrt(fpbError) << std::endl;        
+                
+    	Double_t ntag = ntagValues(i);
+    	Double_t epsntag = ntag/n;
+    	Double_t epsntagError = epsntag*(1-epsntag)/n;
+    	
+    	Double_t ptag = ptagValues(i);
+    	Double_t epsptag = ptag/p;
+    	Double_t epsptagError = epsptag*(1-epsptag)/p;
+    	
+        std::cout << "epsntag: " << epsntag << " +- " << sqrt(epsntagError) << std::endl; 
+        std::cout << "epsptag: " << epsptag << " +- " << sqrt(epsptagError) << std::endl;        
+
+        Double_t alpha = alfaHistogram->GetBinContent(i+1);
+        Double_t alphaError = alfaHistogram->GetBinError(i+1);
+        Double_t beta = betaHistogram->GetBinContent(i+1);
+        Double_t betaError = alfaHistogram->GetBinError(i+1);
+
+        std::cout << "alfa: " << alpha << " " << "beta: " << beta << std::endl;        
+
+        Double_t deltab = alpha*epsntag*(1.0-fpb) - epsptag*(1.0-fnb);
+        Double_t delta  = alpha*fnb*(1.0-fpb) - beta*(1.0-fnb)*fpb;
+        
+        if ( delta == 0.0 )
+        {
+        	histogram->SetBinContent(i+1, 0.);
+            histogram->SetBinError(i+1, 0.);
+            return true;
+        }
+        
+        Double_t efficiency = deltab/delta;
+        
+        Double_t error = sqrt (
+            pow(epsptag/delta - deltab*(alpha*(1-fpb)+beta*fpb)/pow(delta, 2), 2) * fnbError +
+            pow(alpha*epsntag/delta - deltab*(alpha*fnb+beta*(1-fnb)/pow(delta, 2)), 2) * fpbError +
+            pow(alpha*(1-fpb)/delta, 2) * epsntagError +
+            pow((1-fnb)/delta, 2) * epsptagError +
+            pow((epsntag*(1-fpb)/delta - deltab*fnb*(1-fpb)/pow(delta,2)) * alphaError, 2) +
+            pow((deltab*(1-fnb)*fpb/pow(delta,2)) * betaError, 2) 
+        );
+       
+        std::cout << "eff.: " << efficiency << " +- " << error << std::endl; 
+
+        histogram->SetBinContent(i+1, efficiency);
+        histogram->SetBinError(i+1, error);
+    }
+    return true;
 }
 
 
@@ -171,10 +276,10 @@ bool PtrelBySystem4::count(
 
                 // Temporal container with the results
                 TVectorD values(nbins), errors(nbins);
-          
+
                 // Info
                 Info(__FUNCTION__, "Counting the number of events in %s", histogram2D->GetName());
-                
+
                 // Loop over the bins
                 for (Int_t i = 1; i <= nbins; ++i)
                 {
@@ -182,11 +287,10 @@ bool PtrelBySystem4::count(
                     sprintf(name, "count_%s_%d", histogram2D->GetName(), i);
                     // Project histogram
                     TH1D * histogram1D = histogram2D->ProjectionY(name, i, i, "e");
-
                     // Appending the results
                     values(i-1) = histogram1D->Integral();
-                    errors(i-1) = 0.0;
-                }   
+                    errors(i-1) = sqrt(values(i-1));
+                }
                 hVector.push_back(TString(histogram2D->GetName()));
                 vVector.push_back(values);
                 eVector.push_back(errors);
@@ -198,36 +302,3 @@ bool PtrelBySystem4::count(
     return status;
 }
 
-
-/*bool PtrelBySystem4::compute(
-    TH1 * histogram,
-    ValueVector const & factors,
-    TVectorD const & ntagCounters,
-    TVectorD const & ptagCounters,
-    ValueVector const & nValues,
-    ValueVector const & nCovariance,
-    ValueVector const & pValues,
-    ValueVector const & pCovariance
-)
-{
-    // Loop over different bins
-    for (std::size_t i = 0; i < nValues.size(); ++i)
-    {
-    	Double_t n_tag = ntagCounters[i];
-        Double_t n_b = nValues[i](Flavor::b);
-        Double_t n_cl = nValues[i](Flavor::cl);
-    	Double_t p_tag = ptagCounters[i];
-        Double_t p_b = ptagValues[i](Flavor::b);
-        Double_t p_cl = ptagValues[i](Flavor::cl);
-
-        // Double_t n_cl_error = nCovariance[i](Flavor::cl, Flavor::cl);
-        // Double_t p_b_error = ptagCovariance[i](Flavor::b, Flavor::b);
-
-        Double_t alfa = factors[i][Flavor::cl];
-        Double_t beta = factors[i][Flavor::b];
-
-        histogram->SetBinContent(i+1, (alfa*n_tag*p_cl - p_tag*n_cl)/(alfa*n_b*p_cl - beta*n_cl*p_b));
-    }
-    return true;
-}
-*/

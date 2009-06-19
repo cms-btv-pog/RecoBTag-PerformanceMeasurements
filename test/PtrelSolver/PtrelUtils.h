@@ -61,4 +61,61 @@ void efficiencyHistogramSetup(TH1*);
 
 bool containsIdentifier(const char* objName_, const char* id_);
 
+#include "TVectorD.h"
+#include "TMatrixD.h"
+
+class ErrorPropagator
+{
+public:
+
+    ErrorPropagator() : removeCorrelations_(false) {}
+
+    ErrorPropagator(const TMatrixD & matrix) : removeCorrelations_(false)
+    {
+        errorKernel(matrix);
+    }
+
+    ErrorPropagator(Int_t size, const Double_t * matrix) : removeCorrelations_(false)
+    {
+        errorKernel( TMatrixD(size, size, matrix) );
+    }
+
+    void errorKernel(TMatrixD const &);
+
+    void errorKernel(Int_t size, const Double_t * matrix)
+    {
+        errorKernel( TMatrixD(size, size, matrix) );
+    }
+
+    TVectorD const & correctedErrors(TVectorD const &);
+
+    Double_t operator()(TVectorD const &, TVectorD const &);
+
+    void removeCorrelations(bool flag = true)
+    {
+        removeCorrelations_ = flag;
+    }
+
+    TMatrixD const & matrix()
+    {
+        return matrix_;
+    }
+
+    TMatrixD const & fadamard()
+    {
+        return hadamard_;
+    }
+
+    TMatrixD const & invHadamard()
+    {
+        return inverseHadamard_;
+    }
+
+private:
+
+    bool removeCorrelations_;
+    TVectorD correctedErrors_;
+    TMatrixD matrix_, hadamard_, inverseHadamard_;
+};
+
 #endif

@@ -100,7 +100,7 @@ bool PtrelSolver::measure(
 
                 // Measuring efficiencies
                 CallSafelyZero( measure(output, histogram, values, errors) )
-                
+
                 // Appending the results
                 hVector.push_back(TString(histogram->GetName()));
                 vMatrix.push_back(values);
@@ -163,7 +163,7 @@ bool PtrelSolver::measure(
             TH1D * histogram1D = histogram2D->ProjectionY(name, i, i, "e");
             // Basic setup
             ptrelHistogramSetup(histogram1D);
-            
+
             // Fitting the histogram
             CallSafelyZero(fit(histogram1D, combinedFunctions_, values, errors))
 
@@ -171,10 +171,10 @@ bool PtrelSolver::measure(
             output->cd();
             output->cd("fits");
             histogram1D->Write();
-        }    
-                    // Collecting the results
-            vVector.push_back(values);
-            eVector.push_back(errors);
+        }
+        // Collecting the results
+        vVector.push_back(values);
+        eVector.push_back(errors);
     }
     return true;
 }
@@ -275,13 +275,10 @@ bool PtrelSolver::fit(TH1 * histogram, TF1 * function, TVectorD & values, TVecto
         for (Int_t j = 0; j < (Int_t) fitFlavors_.size(); ++j)
         {
             if (i == j)
-                derivative(j,i) = numberEvents/sumx - numberEvents*values(i)/(sumx*sumx);
+                derivative(j,i) = 1./sumx - values(i)/(sumx*sumx);
             else
-                derivative(j,i) = - numberEvents*values(i)/(sumx*sumx);
+                derivative(j,i) = - values(i)/(sumx*sumx);
         }
-
-    // Scaling to the number of events
-    values *= numberEvents/sumx;
 
     // Error computation
     TMatrixD temporal (covariance_, TMatrixD::kMult, derivative);
@@ -289,7 +286,10 @@ bool PtrelSolver::fit(TH1 * histogram, TF1 * function, TVectorD & values, TVecto
 
     errors.ResizeTo(fitFlavors_.size());
     for (Int_t i = 0; i < (Int_t) fitFlavors_.size(); ++i)
-        errors(i) = sqrt( covariance(i,i) + numberEvents/(sumx*sumx) );
+        errors(i) = sqrt( numberEvents*numberEvents*covariance(i,i) + numberEvents*values(i)*values(i)/(sumx*sumx) );
+
+    // Scaling to the number of events
+    values *= numberEvents/sumx;
 
     return true;
 }
@@ -366,8 +366,9 @@ bool PtrelSolver::fit(TFile * output, TH1 * histogram, TObjArray * templates, TV
 
 bool PtrelSolver::combinedTemplates(char const * keyword, Int_t bin)
 {
-    char functionName[256]; char templateName[256];
-    
+    char functionName[256];
+    char templateName[256];
+
     TString form;
     Double_t xmin = 0;
     Double_t xmax = 0;
@@ -407,12 +408,12 @@ bool PtrelSolver::combinedTemplates(char const * keyword, Int_t bin)
             // Function name to be got from the file
             if (!taggedLightTemplate_ && fitFlavors_[i] == Flavor::l)
             {
-            	TPRegexp p("(n|p)_");
+                TPRegexp p("(n|p)_");
                 Int_t inx = TString(keyword).Index(p);
                 std::string tmp(keyword);
                 std::string dependency(tmp.substr(inx+2, tmp.size()));
                 sprintf(functionName, "/functions/function_n_%s_%s_%d", dependency.c_str(), Flavor::Name[fitFlavors_[i]], bin);
-                sprintf(templateName, "/templates/template_n_%s_%s_%d", dependency.c_str(), Flavor::Name[fitFlavors_[i]], bin);            	
+                sprintf(templateName, "/templates/template_n_%s_%s_%d", dependency.c_str(), Flavor::Name[fitFlavors_[i]], bin);
             }
             else
             {
@@ -426,7 +427,7 @@ bool PtrelSolver::combinedTemplates(char const * keyword, Int_t bin)
 
         Info(__FUNCTION__, "Loading %s", templateName);
         CreateSafelyZero(TH1, histogram, templates_->Get(templateName))
-        
+
         // Collect minimal and maximal values
         xmin = function->GetXmin();
         xmax = function->GetXmax();
@@ -435,8 +436,8 @@ bool PtrelSolver::combinedTemplates(char const * keyword, Int_t bin)
 
         // Sum of the function over the bin centers
         for (Int_t j=1; j<= histogram->GetNbinsX(); ++j)
-        	sum += function->Eval(histogram->GetBinCenter(j));
-        
+            sum += function->Eval(histogram->GetBinCenter(j));
+
         // Scale the function to sum = 1
         Double_t scale = 1./sum;
 
@@ -449,8 +450,8 @@ bool PtrelSolver::combinedTemplates(char const * keyword, Int_t bin)
         form += "*(";
         form += function->GetExpFormula("p");
         form += ')';
-        
-        // Add the histograms 
+
+        // Add the histograms
         if (histogram->GetEntries() == 0)
         {
             Error(__FUNCTION__, "Empty histogram %s", templateName);
@@ -465,7 +466,7 @@ bool PtrelSolver::combinedTemplates(char const * keyword, Int_t bin)
 
     // Creating function
     combinedFunctions_ = new TF1(functionName, form.Data(), xmin, xmax);
-    
+
     return true;
 }
 

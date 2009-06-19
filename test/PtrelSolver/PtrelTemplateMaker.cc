@@ -351,9 +351,9 @@ bool PtrelTemplateMaker::makeTemplates(
 
                         // Fit the histogram
                         Int_t fitStatus = histogram1D->Fit(function, "V", "", function->GetXmin(), function->GetXmax());
-       
-                        // Check the status of the fitting                 
-                        if( fitStatus )
+
+                        // Check the status of the fitting
+                        if ( fitStatus )
                             Warning(__FUNCTION__, "Fitting problem returning status %d", fitStatus);
                         else
                             Info(__FUNCTION__, "Fitting %s chi2/ndf = (%f/%d)", histogram1D->GetName(), function->GetChisquare(), function->GetNDF());

@@ -45,7 +45,7 @@ public:
     //! Set the fitter for using three templates
     void useTwoTemplates()
     {
-    	Info(__FUNCTION__, "Using two templates for ptrel fitting.");
+        Info(__FUNCTION__, "Using two templates for ptrel fitting.");
         fitFlavors_.clear();
         fitFlavors_.push_back(Flavor::b);
         fitFlavors_.push_back(Flavor::cl);
@@ -54,7 +54,7 @@ public:
     //! Set the fitter for using three templates
     void useThreeTemplates()
     {
-    	Info(__FUNCTION__, "Using three templates for ptrel fitting.");
+        Info(__FUNCTION__, "Using three templates for ptrel fitting.");
         fitFlavors_.clear();
         fitFlavors_.push_back(Flavor::b);
         fitFlavors_.push_back(Flavor::c);
@@ -104,7 +104,7 @@ private:
     bool taggedLightTemplate_;
 
     std::vector<Flavor::Type> fitFlavors_;
-    
+
     //! Measure the flavor content for a sample
     bool measure(TFile *, TH2 *, ValueVector &, ValueVector &);
 

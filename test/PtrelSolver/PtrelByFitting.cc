@@ -84,7 +84,6 @@ void PtrelByFitting::solve(char const * inputfile, char const * outputfile)
     output->Close();
 }
 
-
 bool PtrelByFitting::compute(
     TH1 * histogram,
     Flavor::Type flavor,
@@ -99,19 +98,24 @@ bool PtrelByFitting::compute(
     {
         Double_t d = dValues[i](flavor);
         Double_t n = nValues[i](flavor);
-        Double_t de = dErrors[i](flavor);
-        Double_t ne = nErrors[i](flavor);
 
-        if(d!=0) {
-        		histogram->SetBinContent(i+1, n/d);
-       		histogram->SetBinError(i+1,
-                               sqrt(
-                                   pow(ne,2)/(d*d) + pow(de,2)*n*n/(d*d*d*d)
-                               )
-                              );
-        } else {
-        		histogram->SetBinContent(i+1,0);
-        		histogram->SetBinError(i+1,0);
+        TVectorD errors(2);
+        errors(0) = dErrors[i](flavor);
+        errors(1) = nErrors[i](flavor);
+
+        TVectorD derivatives(2);
+        derivatives(0) = - n/(d*d);
+        derivatives(1) = 1./n;
+
+        if (d!=0)
+        {
+            histogram->SetBinContent(i+1, n/d);
+            histogram->SetBinError(i+1, kernel_(derivatives, errors));
+        }
+        else
+        {
+            histogram->SetBinContent(i+1,0);
+            histogram->SetBinError(i+1,0);
         }
     }
     return true;

@@ -15,7 +15,6 @@
 <use name=SimTracker/TrackHistory>
 <use name=SimDataFormats/Track>
 <use name=SimGeneral/HepPDTRecord>
-<use name=SimTracker/TrackAssociation>
 <use name=SimTracker/Records>
 <use name=DataFormats/Math>
 <use name=RecoBTag/MCTools>
