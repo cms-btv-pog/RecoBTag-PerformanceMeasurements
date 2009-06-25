@@ -59,7 +59,7 @@ bool containsIdentifier(const char* objName_, const char* id_)
 }
 
 
-void ErrorPropagator::errorKernel(const TMatrixD & matrix)
+void ErrorPropagator::transformation(const TMatrixD & matrix)
 {
     // Save the matrix
     matrix_.ResizeTo(matrix);

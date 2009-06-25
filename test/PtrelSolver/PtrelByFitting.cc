@@ -107,6 +107,8 @@ bool PtrelByFitting::compute(
         derivatives(0) = - n/(d*d);
         derivatives(1) = 1./n;
 
+        kernel_.removeCorrelations();
+
         if (d!=0)
         {
             histogram->SetBinContent(i+1, n/d);

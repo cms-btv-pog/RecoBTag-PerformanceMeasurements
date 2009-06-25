@@ -72,19 +72,19 @@ public:
 
     ErrorPropagator(const TMatrixD & matrix) : removeCorrelations_(false)
     {
-        errorKernel(matrix);
+        transformation(matrix);
     }
 
     ErrorPropagator(Int_t size, const Double_t * matrix) : removeCorrelations_(false)
     {
-        errorKernel( TMatrixD(size, size, matrix) );
+        transformation( TMatrixD(size, size, matrix) );
     }
 
-    void errorKernel(TMatrixD const &);
+    void transformation(TMatrixD const &);
 
-    void errorKernel(Int_t size, const Double_t * matrix)
+    void transformation(Int_t size, const Double_t * matrix)
     {
-        errorKernel( TMatrixD(size, size, matrix) );
+        transformation( TMatrixD(size, size, matrix) );
     }
 
     TVectorD const & correctedErrors(TVectorD const &);

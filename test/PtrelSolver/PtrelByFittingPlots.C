@@ -62,18 +62,24 @@ void PtrelByFittingPlots (const char * mfile, const char * mcfile)
 
     TCanvas * c3 = new TCanvas("c3", "PtrelSolver apply to SV");
 
-    c3->Divide(2,2);
+    c3->Divide(3,2);
 
     c3->cd(1);
-    plot(measurement, "/measurements/measurement_n_pT_ntag_pT_SVM_b", mctruth, "/mctruth/mctruth_n_pT_b_ntag_pT_b_SVM");
+    plot(measurement, "/measurements/measurement_n_pT_ntag_pT_SVL_b", mctruth, "/mctruth/mctruth_n_pT_b_ntag_pT_b_SVL");
 
     c3->cd(2);
-    plot(measurement, "/measurements/measurement_n_pT_ntag_pT_SVT_b", mctruth, "/mctruth/mctruth_n_pT_b_ntag_pT_b_SVT");
+    plot(measurement, "/measurements/measurement_n_pT_ntag_pT_SVM_b", mctruth, "/mctruth/mctruth_n_pT_b_ntag_pT_b_SVM");
 
     c3->cd(3);
-    plot(measurement, "/measurements/measurement_n_eta_ntag_eta_SVM_b", mctruth, "/mctruth/mctruth_n_eta_b_ntag_eta_b_SVM");
+    plot(measurement, "/measurements/measurement_n_pT_ntag_pT_SVT_b", mctruth, "/mctruth/mctruth_n_pT_b_ntag_pT_b_SVT");
 
     c3->cd(4);
+    plot(measurement, "/measurements/measurement_n_eta_ntag_eta_SVL_b", mctruth, "/mctruth/mctruth_n_eta_b_ntag_eta_b_SVL");
+
+    c3->cd(5);
+    plot(measurement, "/measurements/measurement_n_eta_ntag_eta_SVM_b", mctruth, "/mctruth/mctruth_n_eta_b_ntag_eta_b_SVM");
+
+    c3->cd(6);
     plot(measurement, "/measurements/measurement_n_eta_ntag_eta_SVT_b", mctruth, "/mctruth/mctruth_n_eta_b_ntag_eta_b_SVT");
 
     sprintf(name, "%s.SV.png", mfile);

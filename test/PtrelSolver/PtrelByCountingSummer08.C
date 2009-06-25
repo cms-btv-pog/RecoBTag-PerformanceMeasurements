@@ -4,7 +4,7 @@ void PtrelByCountingSummer08()
     gSystem->Load("libPtrelSolver.so");
 
     // Create a PtrelSolver by Counting
-    PtrelByCounting solver("rebin_templates_InclusiveMu5Pt50.root", Fit::histograms);
+    PtrelByCounting solver("rebin_templates_InclusiveMu5Pt50.root", Fit::functions);
 
     // Uncomment when using three templates for fitting
     // solver.useThreeTemplates();

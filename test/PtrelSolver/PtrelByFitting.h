@@ -20,7 +20,7 @@ public:
             0., 1.
         };
 
-        kernel_.errorKernel(2, matrix);
+        kernel_.transformation(2, matrix);
     }
 
     //! Measure efficiency
