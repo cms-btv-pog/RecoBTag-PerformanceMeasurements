@@ -15,8 +15,6 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   flavourMatchOptionf = iConfig.getParameter<std::string>( "flavourMatchOption" );
   if (flavourMatchOptionf == "fastMC") {
     flavourSourcef = iConfig.getParameter<edm::InputTag>("flavourSource");
-  } else if (flavourMatchOptionf == "hepMC") {
-    jetFlavourIdentifier_ = JetFlavourIdentifier(iConfig.getParameter<edm::ParameterSet>("jetIdParameters"));
   } else if (flavourMatchOptionf == "genParticle") {
     flavourSourcef = iConfig.getParameter<edm::InputTag> ("flavourSource");
   }
@@ -701,8 +699,6 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     for(JetFlavourMatchingCollection::const_iterator iter =
 	  jetMC->begin(); iter != jetMC->end(); iter++)
       flavoursMapf.insert(std::pair <const edm::RefToBase<reco::Jet>, unsigned int>((*iter).first, (unsigned int)((*iter).second).getFlavour()));
-  } else if (flavourMatchOptionf == "hepMC") {
-    jetFlavourIdentifier_.readEvent(iEvent);
   } else if (flavourMatchOptionf == "genParticle") {
     iEvent.getByLabel (flavourSourcef, theJetPartonMapf);
   }
@@ -743,10 +739,11 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     float Flavour  ;    
     int flavour    ; 
     if(isData_!=0){
-      Flavour  = getMatchedParton(*jet).flavour();    
-       flavour    = int(TMath::Abs( Flavour ));    
-    //$$$$
-    //$$$$  int flavour    = getMatchedParton(*jet).flavour();     
+      //      Flavour  = getMatchedParton(*jet).flavour();    
+      //       flavour    = int(TMath::Abs( Flavour ));    
+      flavour = abs(getMatchedParton(*jet).getFlavour());
+      //$$$$
+      //$$$$  int flavour    = getMatchedParton(*jet).flavour();     
       if ( flavour >= 1 && flavour <= 3 ) flavour = 1;  
     }
     
@@ -1660,17 +1657,16 @@ MistagAnalyzer::beginJob(const edm::EventSetup&)
 void
 MistagAnalyzer::endJob() {
 }
-BTagMCTools::JetFlavour MistagAnalyzer::getMatchedParton(const reco::CaloJet &jet)
+reco::JetFlavour MistagAnalyzer::getMatchedParton(const reco::CaloJet &jet)
 {
-  BTagMCTools::JetFlavour jetFlavour;
+  reco::JetFlavour jetFlavour;
   
   if (flavourMatchOptionf == "fastMC") {
     
-    jetFlavour.underlyingParton4Vec(jet.p4());
-    
-  } else if (flavourMatchOptionf == "hepMC") {
-    
-    jetFlavour = jetFlavourIdentifier_.identifyBasedOnPartons(jet);
+    //    jetFlavour.underlyingParton4Vec(jet.p4());
+
+    // DISABLED
+
     
   } else if (flavourMatchOptionf == "genParticle") {
     for ( JetFlavourMatchingCollection::const_iterator j  = theJetPartonMapf->begin();
@@ -1679,7 +1675,8 @@ BTagMCTools::JetFlavour MistagAnalyzer::getMatchedParton(const reco::CaloJet &je
       RefToBase<Jet> aJet  = (*j).first;       //      const JetFlavour aFlav = (*j).second;
       if ( fabs(aJet->phi() - jet.phi()) < 1.e-5 && fabs(aJet->eta() - jet.eta())< 1.e-5 ){
 	// matched
-	jetFlavour.flavour((*j).second.getFlavour());
+		jetFlavour = reco::JetFlavour (aJet->p4(), math::XYZPoint(0,0,0), (*j).second.getFlavour());
+		//	jetFlavour.flavour((*j).second.getFlavour());
       }
     }
     

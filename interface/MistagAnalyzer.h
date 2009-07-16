@@ -18,7 +18,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.3 2008/10/06 15:59:13 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.4 2009/07/16 00:47:42 jindal Exp $
 //
 //
 
@@ -42,8 +42,8 @@ Implementation:
 #include "DataFormats/Math/interface/deltaR.h"
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 
-#include "RecoBTag/MCTools/interface/JetFlavour.h"
-#include "RecoBTag/MCTools/interface/JetFlavourIdentifier.h"
+//#include "RecoBTag/MCTools/interface/JetFlavour.h"
+//#include "RecoBTag/MCTools/interface/JetFlavourIdentifier.h"
 
 
 #include "SimTracker/Records/interface/TrackAssociatorRecord.h"
@@ -73,8 +73,8 @@ Implementation:
 #include "TNtuple.h"
 
 #include "DataFormats/BTauReco/interface/SecondaryVertexTagInfo.h"
-#include "RecoBTag/MCTools/interface/JetFlavour.h"
-#include "RecoBTag/MCTools/interface/JetFlavourIdentifier.h"
+//#include "RecoBTag/MCTools/interface/JetFlavour.h"
+//#include "RecoBTag/MCTools/interface/JetFlavourIdentifier.h"
 #include "SimDataFormats/JetMatching/interface/JetFlavourMatching.h"
 
 #include "SimTracker/TrackAssociation/interface/TrackAssociatorBase.h"
@@ -105,10 +105,10 @@ struct ltstr{
 //
 // class decleration
 //
-using BTagMCTools::JetFlavour;
+//using BTagMCTools::JetFlavour;
 using namespace edm;
 using namespace reco;
-using namespace BTagMCTools;
+//using namespace BTagMCTools;
 
 class MistagAnalyzer : public edm::EDAnalyzer {
  public:
@@ -123,7 +123,7 @@ class MistagAnalyzer : public edm::EDAnalyzer {
   
   float calculPtRel();
   
-  BTagMCTools::JetFlavour getMatchedParton(const reco::CaloJet &jet);
+  reco::JetFlavour getMatchedParton(const reco::CaloJet &jet);
   // ----------member data ---------------------------
   std::string outputFile_;
   //std::vector< std::string > moduleLabel_;
@@ -131,7 +131,7 @@ class MistagAnalyzer : public edm::EDAnalyzer {
   
   std::string flavourMatchOptionf;
   edm::InputTag flavourSourcef;
-  JetFlavourIdentifier jetFlavourIdentifier_;
+  //  JetFlavourIdentifier jetFlavourIdentifier_;
   
   std::string CaloJetCollectionTags_;
   
