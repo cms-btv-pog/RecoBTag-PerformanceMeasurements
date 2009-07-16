@@ -5,7 +5,7 @@ process = cms.Process("analysis")
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 
 
-process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer08_cff")
+process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer08Redigi_cff")
 # set the record's IOV. Must be defined once. Choose ANY correction service. #
 process.prefer("L2L3JetCorrectorIC5Calo") 
 
@@ -22,12 +22,12 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
-process.load("Configuration.StandardSequences.FakeConditions_cff")
+#process.load("Configuration.StandardSequences.FakeConditions_cff")
 
 process.load("RecoBTag.PerformanceMeasurements.PerformanceAnalyzer_cff")
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(2000)
+    input = cms.untracked.int32(500)
 )
 process.out = cms.OutputModule("PoolOutputModule",
     outputCommands = cms.untracked.vstring('drop *', 
@@ -41,12 +41,14 @@ process.p = cms.Path(process.caloJetMCFlavour*process.Performance)
 readFiles = cms.untracked.vstring()
 process.source = cms.Source ("PoolSource", fileNames = readFiles)
 readFiles.extend( (
-    
-            '/store/relval/CMSSW_2_2_1/RelValTTbar/GEN-SIM-RECO/IDEAL_V9_v2/0002/00E9B0FB-98C4-DD11-AF51-0030487A322E.root',
-        '/store/relval/CMSSW_2_2_1/RelValTTbar/GEN-SIM-RECO/IDEAL_V9_v2/0002/28E6A7DA-98C4-DD11-AE6E-001D09F2512C.root',
-        '/store/relval/CMSSW_2_2_1/RelValTTbar/GEN-SIM-RECO/IDEAL_V9_v2/0002/3802DDF4-9FC4-DD11-A9AC-001D09F24600.root',
-        '/store/relval/CMSSW_2_2_1/RelValTTbar/GEN-SIM-RECO/IDEAL_V9_v2/0002/5CA764F6-98C4-DD11-A05F-001D09F241B4.root',
-        '/store/relval/CMSSW_2_2_1/RelValTTbar/GEN-SIM-RECO/IDEAL_V9_v2/0002/A6D75ADB-98C4-DD11-B05E-0019B9F704D6.root',
-        '/store/relval/CMSSW_2_2_1/RelValTTbar/GEN-SIM-RECO/IDEAL_V9_v2/0003/72C99195-FDC4-DD11-8F03-001617C3B79A.root'
+        '/store/mc/Summer09/TTbar/GEN-SIM-RECO/MC_31X_V2_preproduction_311-v1/0009/9885EAE5-876D-DE11-A0EE-001A9243D640.root',
+        '/store/mc/Summer09/TTbar/GEN-SIM-RECO/MC_31X_V2_preproduction_311-v1/0006/DCAE7AE1-2A6D-DE11-9A56-001A9254460C.root',
+        '/store/mc/Summer09/TTbar/GEN-SIM-RECO/MC_31X_V2_preproduction_311-v1/0006/D2FE0B42-2F6D-DE11-9FF3-001A9227D383.root',
+        '/store/mc/Summer09/TTbar/GEN-SIM-RECO/MC_31X_V2_preproduction_311-v1/0006/C2F0B1DF-2C6D-DE11-8849-001A9243D62A.root',
+        '/store/mc/Summer09/TTbar/GEN-SIM-RECO/MC_31X_V2_preproduction_311-v1/0006/9CC08AE1-2A6D-DE11-96C9-001E8CCCE140.root',
+        '/store/mc/Summer09/TTbar/GEN-SIM-RECO/MC_31X_V2_preproduction_311-v1/0005/E893E3BA-246D-DE11-9C26-001A9227D32D.root',
+        '/store/mc/Summer09/TTbar/GEN-SIM-RECO/MC_31X_V2_preproduction_311-v1/0005/E04DD0BC-246D-DE11-A774-001E8CCCE148.root',
+        '/store/mc/Summer09/TTbar/GEN-SIM-RECO/MC_31X_V2_preproduction_311-v1/0005/CC6C4DC1-246D-DE11-8DDB-00304858A675.root',
+        '/store/mc/Summer09/TTbar/GEN-SIM-RECO/MC_31X_V2_preproduction_311-v1/0005/C671B2AB-266D-DE11-9849-001A925444DA.root'
 )
 )

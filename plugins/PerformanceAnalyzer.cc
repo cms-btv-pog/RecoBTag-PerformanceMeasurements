@@ -28,8 +28,8 @@
 
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 
-#include "PhysicsTools/Utilities/interface/deltaR.h"
-
+//#include "PhysicsTools/Utilities/interface/deltaR.h"
+ #include "DataFormats/Math/interface/deltaR.h"
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 
 #include "SimTracker/Records/interface/TrackAssociatorRecord.h"
@@ -863,12 +863,12 @@ void PerformanceAnalyzer::FillPerformance(reco::CaloJet jet, int JetFlavor, cons
       //*********************************
       // Modified Track Counting taggers
       //*********************************
-      if ( moduleLabel == "modifiedtrackCountingHighEffJetTags" )
+      if ( moduleLabel == "modifiedtrackCountingHighEffBJetTags" )
         {
 	  
 	  fperformanceMTC2trk.Add( (*jetTags)[ith_tagged].second, JetFlavor );
         }
-      else if ( moduleLabel == "modifiedtrackCountingHighPurJetTags" )
+      else if ( moduleLabel == "modifiedtrackCountingHighPurBJetTags" )
         {
 	  
 	  fperformanceMTC3trk.Add( (*jetTags)[ith_tagged].second, JetFlavor );
@@ -1433,7 +1433,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	  tmpvec += leptonvec;
 	  ptreltmp = leptonvec.Perp(tmpvec);
 	  // muon in jet cuts
-	  if ( (deltaR >= MinDeltaR_ ) || (ptrel <= MinPtRel_ ) ) continue;
+	  if ( (deltaR >= MinDeltaR_ ) || (ptreltmp <= MinPtRel_ ) ) continue;
 	  // now we have a good muon in a jet
 
 	  if ( !Nmu_in_jetCut ) { histcounterf->Fill("N muon-in-jet", 4 ); Nmu_in_jetCut = true; }
@@ -1458,6 +1458,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	  
 	  // collect muon data
 	  leptonEvent.pdgid.push_back( 13 ); // muon only for the moment
+	  std::cout << "Muon energy " << muon->energy() <<std::endl;
 	  leptonEvent.e.push_back( muon->energy());
 	  leptonEvent.pt.push_back( muonTrk.pt());
 	  leptonEvent.eta.push_back( muonTrk.eta());
@@ -1706,7 +1707,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
                 trackEvent.ip2dSigma.push_back( ipdata[index].ip2d.error() );
                 trackEvent.ip3d.push_back( ipdata[index].ip3d.value() );
                 trackEvent.ip3dSigma.push_back( ipdata[index].ip3d.error() );
-                trackEvent.dta.push_back( ipdata[index].distanceToJetAxis );
+		//               trackEvent.dta.push_back( ipdata[index].distanceToJetAxis );
 
                 // delta R(muon,jet)
                 trackEvent.jet_deltaR.push_back(
@@ -1772,7 +1773,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	  // Get a vector of reference to the selected tracks in each jet
 	  TrackRefVector tracks((*tagInfo)[ith_tagged].selectedTracks());
 	  
-	  if ( moduleLabel == "trackCountingHighEffJetTags" )
+	  if ( moduleLabel == "trackCountingHighEffBJetTags" )
             {
 	      //			  std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
                 std::vector< Measurement1D  > trackIP;
@@ -1821,7 +1822,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
                 fS8evt->btag_ModTrkCounting_disc3D_2trk.push_back( (*jetTags)[ith_tagged].second ); // 2nd trk, 3D
                 gotMTCHE = true;
             }
-            else if ( moduleLabel == "modifiedtrackCountingHighPurJetTags" )
+            else if ( moduleLabel == "modifiedtrackCountingHighPurBJetTags" )
             {
                 fS8evt->btag_ModTrkCounting_disc3D_3trk.push_back( (*jetTags)[ith_tagged].second ); // 3rd trk, 3D
                 gotMTCHP = true;
