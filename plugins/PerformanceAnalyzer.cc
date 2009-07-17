@@ -1707,7 +1707,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
                 trackEvent.ip2dSigma.push_back( ipdata[index].ip2d.error() );
                 trackEvent.ip3d.push_back( ipdata[index].ip3d.value() );
                 trackEvent.ip3dSigma.push_back( ipdata[index].ip3d.error() );
-		//               trackEvent.dta.push_back( ipdata[index].distanceToJetAxis );
+				trackEvent.dta.push_back( ipdata[index].distanceToJetAxis.value() );
 
                 // delta R(muon,jet)
                 trackEvent.jet_deltaR.push_back(
