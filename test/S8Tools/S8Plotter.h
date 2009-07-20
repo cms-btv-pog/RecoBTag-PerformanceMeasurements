@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8Plotter.h,v 1.14 2008/09/09 17:04:50 bazterra Exp $
+ * \version $Id: S8Plotter.h,v 1.15 2008/09/12 16:41:32 bazterra Exp $
  *
  */
 
@@ -263,20 +263,28 @@ S8Plotter::S8Plotter(TString filename)
 	fAwaylevel = "Loose";
 
 	fTrackCountingMap["Loose"]  = 2.0; // use TC2:high eff.
-	fTrackCountingMap["Medium"] = 4.6; // use TC2:high eff.
-	fTrackCountingMap["Tight"]  = 4.7;// use TC3:high purity
+	fTrackCountingMap["Medium"] = 4.2; // use TC2:high eff.
+	fTrackCountingMap["Tight"]  = 4.1;// use TC3:high purity
  
-	fTrackProbabilityMap["Loose"] = 0.26;
-	fTrackProbabilityMap["Medium"] = 0.50;
-	fTrackProbabilityMap["Tight"] = 0.76;
+	fTrackProbabilityMap["Loose"] = 0.24;
+	fTrackProbabilityMap["Medium"] = 0.49;
+	fTrackProbabilityMap["Tight"] = 0.74;
 
 	// default Binning
-	const int nptarray = 12;
+//	const int nptarray = 11;
+//	const int nptarray = 6;
+//	const int nptarray = 2;
+	const int nptarray = 4;
 	const int netaarray = 10;
 	const int ncorrptarray = 5;
 	const int ncorretaarray = 5;
-	Double_t jetptbins[nptarray] = {20.,30., 40., 50., 60., 70., 80, 90., 100., 120., 140., 230.};
+//	Double_t jetptbins[nptarray] = {20.,30., 40., 50., 60., 70., 80, 90., 100., 120., 140., 230.};
 //{20.,30., 40., 50., 60., 70., 80, 90., 100., 120., 140., 160., 180., 230.};
+//	Double_t jetptbins[nptarray] = {30., 40., 50., 60., 70., 80, 90., 100., 120., 140., 230.};
+//	Double_t jetptbins[nptarray] = {30., 50., 70., 90., 120., 230.};
+	Double_t jetptbins[nptarray] = {30., 70., 120.,230.};
+//	Double_t jetptbins[nptarray] = {30., 230.};
+
 	Double_t jetetabins[netaarray] = {0.0,0.25,0.5,0.75,1.0,1.25,1.5,1.75,2.0,2.5};
 	Double_t corrptbins[ncorrptarray] = {20.,40.,60.,80.,230.};
 	Double_t corretabins[ncorrptarray] = {0.,0.5,1.,1.5,2.5};

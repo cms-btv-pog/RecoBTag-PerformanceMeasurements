@@ -25,7 +25,7 @@ S8Solver::S8Solver() {
 //S8Solver::S8Solver(std::string name) {
 
 	fAlphaConst = true;
-	fBetaConst = true;
+	fBetaConst = false;
 	fcategory = "pT";
 	fminPtrel = 0.8;
 	fMaxPtrel = 3.0;//-1;
@@ -45,7 +45,7 @@ S8Solver::S8Solver() {
 	fKappaclConst = true;
 	fisCorrFile = false;
 	fDeltaConst = false;
-	fGammaConst = false;
+	fGammaConst = true;
 	//fPickBin = -1;
 	//fPicknSol = -1;
 }
@@ -69,12 +69,22 @@ void S8Solver::LoadHistos() {
 	
 	finputFile->cd();
 	
-	
+/*
+  //  for analyzer
 	fnHistoBase = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/n_"+fcategory);
 	fpHistoBase = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/p_"+fcategory);
 	fnSvxHistoBase = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/ntag_"+fcategory+"_"+fthename);
 	fpSvxHistoBase = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/ptag_"+fcategory+"_"+fthename);
+*/
 
+	
+	//   for plotter
+	fnHistoBase = (TH2F*) gDirectory->Get("n"+fcategory);
+	fpHistoBase = (TH2F*) gDirectory->Get("p"+fcategory);
+	fnSvxHistoBase = (TH2F*) gDirectory->Get("ncmb"+fcategory);
+	fpSvxHistoBase = (TH2F*) gDirectory->Get("pcmb"+fcategory);
+
+	
 	//std::cout << " 2D histos loaded " << fcategory << std::endl;
 
 	// get bin for pTrel cut
@@ -102,6 +112,10 @@ void S8Solver::LoadHistos() {
 	Double_t corrptbins[ncorrptarray] = {30., 80.,230.};
 	Double_t corretabins[ncorrptarray] = {0.,1.5,2.5};
 
+//	const int ncorrptarray = 6;
+//	const int ncorretaarray = 3;
+//	Double_t corrptbins[ncorrptarray] = {30.,40.,60.,80,120,230.};//{30.,40.,60.,80,230.};
+//	Double_t corretabins[ncorrptarray] = {0.,1.5,2.5};
     //if (fcategory=="Eta") {
 	//  ncorrptarray = tmpncorretaarray;
 	  
@@ -125,6 +139,9 @@ void S8Solver::LoadHistos() {
 		} else {
 			finputFile->cd();
 		}
+
+/*
+  // for analyzer
 		h2["b_npT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/n_"+fcategory+"_b");
 		//std::cout << "got one" << std::endl;
 		h2["cl_npT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/n_"+fcategory+"_cl");
@@ -134,7 +151,20 @@ void S8Solver::LoadHistos() {
 		h2["cl_ncmbpT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/ntag_"+fcategory+"_cl_"+fthename);
 		h2["b_pcmbpT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/ptag_"+fcategory+"_b_"+fthename);
 		h2["cl_pcmbpT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/ptag_"+fcategory+"_cl_"+fthename);
+*/
 
+  // for plotter
+		h2["b_npT"] = (TH2F*) gDirectory->Get("b_n"+fcategory);
+		std::cout << "got one" << std::endl;
+		h2["cl_npT"] = (TH2F*) gDirectory->Get("cl_n"+fcategory);
+		h2["b_ppT"] = (TH2F*) gDirectory->Get("b_p"+fcategory);
+		h2["cl_ppT"] = (TH2F*) gDirectory->Get("cl_p"+fcategory);
+		h2["b_ncmbpT"] = (TH2F*) gDirectory->Get("b_ncmb"+fcategory);
+		h2["cl_ncmbpT"] = (TH2F*) gDirectory->Get("cl_ncmb"+fcategory);
+		h2["b_pcmbpT"] = (TH2F*) gDirectory->Get("b_pcmb"+fcategory);
+		h2["cl_pcmbpT"] = (TH2F*) gDirectory->Get("cl_pcmb"+fcategory);
+
+		
 		std::cout << " got initial truth dist." << std::endl;
 
 

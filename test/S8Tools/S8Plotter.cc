@@ -124,115 +124,115 @@ void S8Plotter::Book() {
 	
 	hname = "jet_pTrel"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 	
 	hname = "jet_pTrel_b"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 	
 	hname = "jet_pTrel_c"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
 	hname = "jet_pTrel_udsg"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
 	hname = "jet_pTrel_pt50"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 	
 	hname = "jet_pTrel_pt100"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
 	hname = "jet_pTrel_pt150"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
 	hname = "jet_pTrel_b_pt50"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 	
 	hname = "jet_pTrel_b_pt100"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
 	hname = "jet_pTrel_b_pt150"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 	
 	hname = "jet_pTrel_c_pt50"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 	
 	hname = "jet_pTrel_c_pt100"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
 	hname = "jet_pTrel_c_pt150"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
 	hname = "jet_pTrel_udsg_pt50"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 	
 	hname = "jet_pTrel_udsg_pt100"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
 	hname = "jet_pTrel_udsg_pt150"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
 	hname = "jet_pTrel_mupt6"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 	
 	hname = "jet_pTrel_mupt10"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
 	hname = "jet_pTrel_mupt20"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
 	hname = "jet_pTrel_b_mupt6"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 	
 	hname = "jet_pTrel_b_mupt10"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
 	hname = "jet_pTrel_b_mupt20"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 	
 	hname = "jet_pTrel_c_mupt6"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 	
 	hname = "jet_pTrel_c_mupt10"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
 	hname = "jet_pTrel_c_mupt20"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
 	hname = "jet_pTrel_udsg_mupt6"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 	
 	hname = "jet_pTrel_udsg_mupt10"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
 	hname = "jet_pTrel_udsg_mupt20"; 
 	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),30,0.,4.);
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
 	hname = "jet_ntrks"; 
 	htitle = "jet_ntrks";
@@ -314,15 +314,24 @@ void S8Plotter::Loop()
 	h2["cl_qEta"] = new TH2F("cl_qEta","other MuTag pT vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["cl_qcmbEta"] = new TH2F("cl_qcmbEta","other MuTag && Tagger pT vs pTrel",netabins,jetetabins,50,0.,5.);
 	
+	h2["ptVsEta"] = new TH2F("ptVsEta","pt vs Eta",fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() );
+	h2["ptVsEta_b"] = new TH2F("ptVsEta_b","pt vs Eta",fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() );
+	h2["taggedjet_ptVsEta"] = new TH2F("taggedjet_ptVsEta","taggedjet pt vs Eta",fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() );
+	h2["taggedjet_ptVsEta_b"] = new TH2F("taggedjet_ptVsEta_b","taggedjet pt vs Eta",fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() );
+
 	h1["alpha"] = new TH1D("alpha","alpha",nptbins,jetptbins);
 	h1["beta"] = new TH1D("beta","beta",nptbins,jetptbins);
 	h1["kappa_cl"] = new TH1D("kappa_cl","kappa_cl",nptbins,jetptbins);
 	h1["kappa_b"] = new TH1D("kappa_b","kappa_b",nptbins,jetptbins);
+	h1["delta"] = new TH1D("delta","delta",nptbins,jetptbins);
+	h1["gamma"] = new TH1D("gamma","gamma",nptbins,jetptbins);
 
 	h1["alpha_eta"] = new TH1D("alpha_eta","alpha_eta",netabins,jetetabins);
 	h1["beta_eta"] = new TH1D("beta_eta","beta_eta",netabins,jetetabins);
 	h1["kappa_eta_cl"] = new TH1D("kappa_eta_cl","kappa_eta_cl",netabins,jetetabins);
 	h1["kappa_eta_b"] = new TH1D("kappa_eta_b","kappa_eta_b",netabins,jetetabins);
+	h1["delta_eta"] = new TH1D("delta_eta","delta_eta",netabins,jetetabins);
+	h1["gamma_eta"] = new TH1D("gamma_eta","gamma_eta",netabins,jetetabins);
 /*
 	h1["alpha"] = new TH1D("alpha","alpha",ncorrptbins,corrptbins);
 	h1["beta"] = new TH1D("beta","beta",ncorrptbins,corrptbins);
@@ -420,7 +429,6 @@ void S8Plotter::Loop()
 
 			//// Jet Selection /////
 			if ( p4Jet.Pt() <= 20.|| TMath::Abs( p4Jet.Eta() ) >= 2.5 ) continue;
-			
 			// get MC flavor of jet
 			JetFlavor = fS8evt->jet_flavour[ijet];
 
@@ -692,10 +700,12 @@ void S8Plotter::Loop()
 			// Fill histograms for all jets
 			h1["jet_pt"]->Fill( p4Jet.Pt() );
 			h1["jet_eta"]->Fill( p4Jet.Eta() );
+			h2["ptVsEta"]->Fill( p4Jet.Pt(), p4Jet.Eta());
 			if ( JetFlavor == 5 ) {
 			  totalJets["b"]++;
 			  h1["jet_pt_b"]->Fill( p4Jet.Pt() );
 			  h1["jet_eta_b"]->Fill( p4Jet.Eta() );
+			  h2["ptVsEta_b"]->Fill( p4Jet.Pt(), p4Jet.Eta());
 			}
 			if ( JetFlavor == 4 ) {
 			  totalJets["c"]++;
@@ -728,10 +738,12 @@ void S8Plotter::Loop()
 			if (ataggedjet) {
 			  h1["taggedjet_pt"]->Fill( p4Jet.Pt() );
 			  h1["taggedjet_eta"]->Fill( p4Jet.Eta() );
-			  if ( JetFlavor == 5 ) {
+			  h2["taggedjet_ptVsEta"]->Fill( p4Jet.Pt(), p4Jet.Eta());
+		  if ( JetFlavor == 5 ) {
 			    totalTagged["b"]++;
 			    h1["taggedjet_pt_b"]->Fill( p4Jet.Pt() );
 				h1["taggedjet_eta_b"]->Fill( p4Jet.Eta() );
+			    h2["taggedjet_ptVsEta_b"]->Fill( p4Jet.Pt(), p4Jet.Eta());
 			  }
 			  if ( JetFlavor == 4 ) {
 			    totalTagged["c"]++;
@@ -958,6 +970,9 @@ void S8Plotter::Loop()
 	h1["eff_pTrel_TaggedBothJets_b"] = new TH1D("eff_pTrel_TaggedBothJets_b","eff_pTrel_TaggedBothJets_b",nptbins,jetptbins);
 	h1["eff_pTrel_TaggedBothJets_cl"] = new TH1D("eff_pTrel_TaggedBothJets_cl","eff_pTrel_TaggedBothJets_cl",nptbins,jetptbins);
 
+	h1["eff_mu_taggedaway"]    = new TH1D("eff_mu_taggedaway",   "eff_mu_taggedaway",nptbins,jetptbins);
+	h1["eff_mu_taggedaway_b"]  = new TH1D("eff_mu_taggedaway_b", "eff_mu_taggedaway_b",nptbins,jetptbins);
+	h1["eff_mu_taggedaway_cl"] = new TH1D("eff_mu_taggedaway_cl","eff_mu_taggedaway_cl",nptbins,jetptbins);
 	// Booking for eta dependencyjetetabins
 
         h1["eff_pTrel_eta"] = new TH1D("eff_pTrel_eta","eff_pTrel_eta",netabins,jetetabins);
@@ -991,6 +1006,9 @@ void S8Plotter::Loop()
         h1["eff_pTrel_TaggedBothJets_eta_b"] = new TH1D("eff_pTrel_TaggedBothJets_eta_b","eff_pTrel_TaggedBothJets_eta_b",netabins,jetetabins);
         h1["eff_pTrel_TaggedBothJets_eta_cl"] = new TH1D("eff_pTrel_TaggedBothJets_eta_cl","eff_pTrel_TaggedBothJets_eta_cl",netabins,jetetabins);
 
+//	h1["eff_mu_taggedaway_eta"]    = new TH1D("eff_mu_taggedaway_eta",   "eff_mu_taggedaway_eta",netabins,jetetabins);
+//	h1["eff_mu_taggedaway_eta_b"]  = new TH1D("eff_mu_taggedaway_eta_b", "eff_mu_taggedaway_eta_b",netabins,jetetabins);
+//	h1["eff_mu_taggedawa_etay_cl"] = new TH1D("eff_mu_taggedaway_eta_cl","eff_mu_taggedaway_eta_cl",netabins,jetetabins);
 	//TH1D *halljets = (TH1D*) h1["eff_pTrel"]->Clone("halljets");
 	TH1D *halljets = h2["npT"]->ProjectionX("halljets", -1 , -1,"e");
 	TH1D *halljets_b = h2["b_npT"]->ProjectionX("halljets_b", -1 , -1,"e");
@@ -1054,7 +1072,13 @@ void S8Plotter::Loop()
 	h1["eff_TaggedBothJets"]->Divide( h2["pcmbpT"]->ProjectionX("halloppjets_tagged", -1 , -1,"e") , halloppjets ,1.,1.,"B");
 	h1["eff_TaggedBothJets_b"]->Divide( h2["b_pcmbpT"]->ProjectionX("b_halloppjets_tagged", -1 , -1,"e") , halloppjets_b ,1.,1.,"B");
 	h1["eff_TaggedBothJets_cl"]->Divide( h2["cl_pcmbpT"]->ProjectionX("cl_halloppjets_tagged", -1 , -1,"e") , halloppjets_cl ,1.,1.,"B");
+	h1["eff_mu_taggedaway"]->Divide( h2["ppT"]->ProjectionX("halloppjets_ptrel", 9 , -1,"e"), halloppjets, 1.,1.,"B");
+	h1["eff_mu_taggedaway_b"]->Divide( h2["b_ppT"]->ProjectionX("b_halloppjets_ptrel", 9 , -1,"e"), halloppjets_b, 1.,1.,"B");
+	h1["eff_mu_taggedaway_cl"]->Divide(h2["cl_ppT"]->ProjectionX("cl_halloppjets_ptrel", 9, -1,"e"), halloppjets_cl, 1.,1.,"B");
 
+//i am here
+//	h1["eff_mu_taggedaway_eta_b"]->Divide( h2["b_ppT"]->ProjectionX("b_halloppjetseta_ptrel", 9 , -1,"e"), halloppjets_eta_b, 1.,1.,"B");
+//	h1["eff_mu_taggedaway_eta_cl"]->Divide(h2["cl_ppT"]->ProjectionX("cl_halloppjetseta_ptrel", 9, -1,"e"), halloppjets_eta_cl, 1.,1.,"B");
 		
 	// alpha
 	h1["alpha"]->Divide( h1["eff_TaggedBothJets_cl"], h1["eff_TaggedJet_cl"]);
@@ -1071,6 +1095,8 @@ void S8Plotter::Loop()
 	h1["kappa_cl"]->Divide( h1["eff_pTrel_TaggedJet_cl"], h1["eff_pTrel_cl"] );
 	h1["kappa_cl"]->Divide(  h1["eff_TaggedJet_cl"] );
 	
+	h1["delta"]->Divide( h1["eff_mu_taggedaway_b"], h1["eff_pTrel_b"] );
+	h1["gamma"]->Divide( h1["eff_mu_taggedaway_cl"], h1["eff_pTrel_cl"] );
 	        // eta dependency for the correlations
 
         // alpha
@@ -1087,6 +1113,8 @@ void S8Plotter::Loop()
         h1["kappa_eta_cl"]->Divide( h1["eff_pTrel_TaggedJet_eta_cl"], h1["eff_pTrel_eta_cl"] );
         h1["kappa_eta_cl"]->Divide(  h1["eff_TaggedJet_eta_cl"] );
 
+//		h1["delta_eta"]->Divide( h1["eff_mu_taggedaway_eta_b"], h1["eff_pTrel_eta_b"] );
+//		h1["gamma_eta"]->Divide( h1["eff_mu_taggedaway_eta_cl"], h1["eff_pTrel_eta_cl"] );
 	
 	//______________________________________________________
 
