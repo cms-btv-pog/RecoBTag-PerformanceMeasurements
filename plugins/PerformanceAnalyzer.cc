@@ -28,8 +28,7 @@
 
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 
-//#include "PhysicsTools/Utilities/interface/deltaR.h"
- #include "DataFormats/Math/interface/deltaR.h"
+#include "DataFormats/Math/interface/deltaR.h"
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 
 #include "SimTracker/Records/interface/TrackAssociatorRecord.h"
@@ -1458,7 +1457,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 	  
 	  // collect muon data
 	  leptonEvent.pdgid.push_back( 13 ); // muon only for the moment
-	  std::cout << "Muon energy " << muon->energy() <<std::endl;
+	  //  std::cout << "Muon energy " << muon->energy() <<std::endl;
 	  leptonEvent.e.push_back( muon->energy());
 	  leptonEvent.pt.push_back( muonTrk.pt());
 	  leptonEvent.eta.push_back( muonTrk.eta());
