@@ -6,14 +6,16 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8bPerformance.h,v 1.5 2008/09/09 17:04:50 bazterra Exp $
+ * \version $Id: S8bPerformance.h,v 1.6 2008/09/12 16:41:32 bazterra Exp $
  *
  */
 
 #include <map>
 
 #include "TGraph.h"
+#include "TGraphErrors.h"
 #include "TArrayD.h"
+#include "TAxis.h"
 
 class S8bPerformance {
 
@@ -127,6 +129,71 @@ class S8bPerformance {
 
 	int GetN() { return fNcuts; };
 
+	TGraphErrors *EfficiencyGraph(TString option="b") {
+
+		TGraphErrors *gT;
+		TString alias = fname;
+		TString title = "";
+		TString xtitle = "";
+		TString ytitle = "";
+		
+		if (option=="b") {
+			gT = new TGraphErrors( fNcuts, GetArray(option).GetArray(),
+								   GetArray(option).GetArray(),
+								   GetArray(option+"Err").GetArray(),
+								   GetArray(option+"Err").GetArray());
+
+			alias = alias + "_b";
+			title = "jet b-efficiency";
+			xtitle = title;
+			ytitle = title;
+		}
+		else {
+			gT = new TGraphErrors( fNcuts, GetArray("b").GetArray(),
+								   GetArray(option).GetArray(),
+								   GetArray("bErr").GetArray(),
+								   GetArray(option+"Err").GetArray());
+
+			alias = alias + "_"+option;
+			title = "jet "+option+"-mistagging";
+			xtitle = "jet b-efficiency";
+			ytitle = "jet "+option+" mistagging";
+		}
+		
+		gT->SetName(alias);
+		gT->SetTitle(title);
+		gT->GetXaxis()->SetTitle(xtitle);
+		gT->GetYaxis()->SetTitle(ytitle);
+
+		return gT;
+	};
+
+	TGraph *DiscriminatorGraph(TString option="b") {
+
+		TGraph *gT;
+		TString alias = fname+"_discriminator";
+		TString title = "";
+		TString xtitle = "";
+		TString ytitle = "";
+		TString effstr = "efficiency";
+		
+		gT = new TGraph( fNcuts, GetArray(option).GetArray(),
+						 GetArray("discriminator").GetArray());
+
+		alias = alias + "_"+option;
+		if (option != "b") effstr = "mistagging";
+		title = "jet "+option+"-"+effstr+" vs discriminator";
+		ytitle = "discriminator";
+		xtitle = "jet "+option+"-"+effstr;
+				
+		gT->SetName(alias);
+		gT->SetTitle(title);
+		gT->GetXaxis()->SetTitle(xtitle);
+		gT->GetYaxis()->SetTitle(ytitle);
+
+		return gT;
+	};
+	
   private:
 	Double_t *farray;
 	double fdisc;
