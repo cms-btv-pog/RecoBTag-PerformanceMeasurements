@@ -10,7 +10,7 @@
 	 Author: Francisco Yumiceva, Fermilab
 */
 //
-// $Id: Taggability.c,v 1.0 2009/07/13 15:13:36 yumiceva Exp $
+// $Id: Taggability.cc,v 1.1 2009/08/17 22:25:30 yumiceva Exp $
 //
 //
 
@@ -96,13 +96,13 @@ bool Taggability::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 			
 		}
 
-		if (NgoodTrks <= MinNtrksInJet_ ) { jetIndex++; continue; }
+		if (NgoodTrks < MinNtrksInJet_ ) { jetIndex++; continue; }
 
 		jetIndex++;
 		Njets++; // good jets
 	}
 
-	if ( jetIndex > MinNjets_ ) pass = true;
+	if ( jetIndex >= MinNjets_ ) pass = true;
 	else return false;
 
 	// primary vertices
@@ -120,7 +120,7 @@ bool Taggability::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
      return pass;
 	}
 
-	if ( (int)thePV.size() <= MinNPV_ ) pass = false;
+	if ( (int)thePV.size() < MinNPV_ ) pass = false;
 
 	return pass;
 

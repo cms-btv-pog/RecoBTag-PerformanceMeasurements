@@ -33,6 +33,7 @@
 
 class WorkingPoint{
  public:
+	WorkingPoint() {}
   WorkingPoint(edm::InputTag t,  std::string n, double min, double max, std::map< std::string, double> list) : intag_(t), alias_(n), min_(min), max_(max), wpmap_(list) {}
 
 	std::map<std::string, double > list() {return wpmap_;}
@@ -71,6 +72,7 @@ private:
 
 	std::string outputFile_;                   // output file
 	std::vector<WorkingPoint> wp;
+	std::map< std::string, WorkingPoint > wp_map;
     std::string CaloJetCollectionTags_;
 	edm::InputTag flavourSourcef;
     edm::Handle<reco::JetFlavourMatchingCollection> theJetPartonMapf;

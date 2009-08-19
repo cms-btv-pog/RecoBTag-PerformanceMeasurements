@@ -46,7 +46,7 @@ OperatingPoints = cms.EDAnalyzer("OperatingPoints",
 	    collection = cms.untracked.InputTag('jetProbabilityBJetTags'),
 	    alias = cms.untracked.string('JP'),
 	    MinimumDiscriminator = cms.untracked.double(0),
-	    MaximumDiscriminator = cms.untracked.double(1),
+	    MaximumDiscriminator = cms.untracked.double(1.5),
 	    OperatingPoints = cms.untracked.VPSet(
 		cms.PSet(
 		    cut = cms.untracked.double(0.1),
@@ -60,8 +60,67 @@ OperatingPoints = cms.EDAnalyzer("OperatingPoints",
 		    cut = cms.untracked.double(0.001),
 		    name = cms.untracked.string('JPT')
 		    )
-		) 
-	    ),
+		) ),
+        cms.PSet(
+                collection = cms.untracked.InputTag('jetBProbabilityBJetTags'),
+                            alias = cms.untracked.string('JBP'),
+                            MinimumDiscriminator = cms.untracked.double(0),
+                            MaximumDiscriminator = cms.untracked.double(1.5),
+                            OperatingPoints = cms.untracked.VPSet(
+    cms.PSet(
+                        cut = cms.untracked.double(0.1),
+                                            name = cms.untracked.string('JBPL')
+                                            ),
+                                    cms.PSet(
+                        cut = cms.untracked.double(0.01),
+                                            name = cms.untracked.string('JBPM')
+                                            ),
+                                    cms.PSet(
+                        cut = cms.untracked.double(0.001),
+                                            name = cms.untracked.string('JBPT')
+                                            )
+                                    ) ),
+    
+    cms.PSet(
+                collection = cms.untracked.InputTag('simpleSecondaryVertexBJetTags'),
+                alias = cms.untracked.string('SSV'),
+                MinimumDiscriminator = cms.untracked.double(0),
+                MaximumDiscriminator = cms.untracked.double(7),
+                OperatingPoints = cms.untracked.VPSet(
+    cms.PSet(
+    cut = cms.untracked.double(0.1),
+    name = cms.untracked.string('SSVL')
+    ),
+    cms.PSet(
+    cut = cms.untracked.double(0.01),
+    name = cms.untracked.string('SSVM')
+    ),
+    cms.PSet(
+    cut = cms.untracked.double(0.001),
+    name = cms.untracked.string('SSVT')
+    )
+    ) ),
+    cms.PSet(
+    collection = cms.untracked.InputTag('combinedSecondaryVertexBJetTags'),
+                            alias = cms.untracked.string('CSV'),
+                            MinimumDiscriminator = cms.untracked.double(0),
+                            MaximumDiscriminator = cms.untracked.double(1),
+                            OperatingPoints = cms.untracked.VPSet(
+                    cms.PSet(
+                        cut = cms.untracked.double(0.1),
+                                            name = cms.untracked.string('CSVL')
+                                            ),
+                                    cms.PSet(
+                        cut = cms.untracked.double(0.01),
+                                            name = cms.untracked.string('CSVM')
+                                            ),
+                                    cms.PSet(
+                        cut = cms.untracked.double(0.001),
+                                            name = cms.untracked.string('CSVT')
+                                            )
+                                    ) ),
+    
+    
     ),
                     OperatingPointsbyMistagRate = cms.bool (True),
                     ApplyJetCorrections = cms.bool (True),
@@ -77,7 +136,7 @@ OperatingPoints = cms.EDAnalyzer("OperatingPoints",
                     Jets = cms.string('iterativeCone5CaloJets'),
                     bTagTrackEventIPtagInfos = cms.string('impactParameterTagInfos'),
                     outputFile = cms.untracked.string('OperatingPoints.root'),
-                    debug = cms.untracked.bool (True)
+                    debug = cms.untracked.bool (False)
 
                     )
 
