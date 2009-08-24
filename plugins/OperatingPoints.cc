@@ -11,7 +11,7 @@
  Author: Francisco Yumiceva
 */
 //
-// $Id: OperatingPoints.cc,v 1.1 2009/08/17 22:25:30 yumiceva Exp $
+// $Id: OperatingPoints.cc,v 1.2 2009/08/19 04:39:02 yumiceva Exp $
 //
 //
 
@@ -22,20 +22,21 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
 
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
 #include "DataFormats/JetReco/interface/CaloJet.h"
 #include "DataFormats/JetReco/interface/Jet.h"
 #include "DataFormats/BTauReco/interface/JetTag.h"
-
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
-
 #include "PhysicsTools/Utilities/interface/deltaR.h"
 // ROOT
 #include "TGraphErrors.h"
 
 using namespace edm;
 using namespace reco;
+using namespace std;
 
 //
 // constructors and destructors
@@ -122,8 +123,8 @@ OperatingPoints::~OperatingPoints()
 
 	if ( OPbyMistagRate_ ) {
 
-			std::cout << " b-tagging Operating Points estimated by udsg-mistagging rate " << std::endl;
-			std::cout << "==============================================================/n" << std::endl;
+			cout << "\n b-tagging Operating Points estimated by udsg-mistagging rate " << endl;
+			cout << "==============================================================\n" << endl;
 	}
 	
 	for (std::map<std::string, S8bPerformance>::const_iterator iperf = TaggerPerformances_.begin(); iperf!= TaggerPerformances_.end(); ++iperf ) {
@@ -141,6 +142,7 @@ OperatingPoints::~OperatingPoints()
 		gVector.push_back( gTl );
 
 		TGraph *discTl = Perf.DiscriminatorGraph("udsg");
+		discTl->Sort();
 		gVector.push_back( discTl );
 
 		if ( OPbyMistagRate_ ) {
@@ -149,24 +151,40 @@ OperatingPoints::~OperatingPoints()
 			// reverse axis of graph
 			TGraphErrors *g_reverse = new TGraphErrors(gTl->GetN(),gTl->GetY(),gTl->GetX(),gTl->GetEY(),gTl->GetEX());
 			g_reverse->Sort();
-
+			
+			
 			// get operating point cuts
 			WorkingPoint apt = wp_map[iperf->first];
-
-			std::cout << " Tagger Name: " << apt.inputTag().label() << ", Alias: " << apt.alias() << std::endl;
+			
+			cout << " Tagger Name: " << apt.inputTag().label() << ", Alias: " << apt.alias() << endl;
 			
 			std::map<std::string, double > list_cuts = apt.list();
-			
+
+			double *xarr = new double[ (int)list_cuts.size() ];
+			double *yarr = new double[ (int)list_cuts.size() ];
+			int ii = 0;
 			for(std::map<std::string, double >::const_iterator icut = list_cuts.begin(); icut != list_cuts.end(); ++icut) {
 
 				double disc_cut = discTl->Eval( icut->second );
 				double b_eff = g_reverse->Eval( icut->second );
 
-				std::cout << icut->first << " (" << icut->second << ") b-efficiency = " << b_eff << ", discriminator cut = " << disc_cut << std::endl;
-				
+				cout << icut->first << " : udsg-mistagging = " << setprecision(3) << icut->second << ", b-efficiency = " << setprecision(3) << b_eff << ", discriminator cut = " << setprecision(3) << disc_cut << endl;
+				xarr[ii] = icut->second;
+				yarr[ii] = b_eff;
+				ii++;
 			}
-			delete g_reverse;
+			cout << endl;
+
+			TGraph *g_results = new TGraph( (int)list_cuts.size(), xarr, yarr );
+			g_results->SetTitle( TString(apt.alias() + "_OP") );
+			g_results->SetName( TString(apt.alias() + "_OP") );
+			g_results->GetXaxis()->SetTitle("udsg-mistagging");
+			g_results->GetYaxis()->SetTitle("b-efficiency");
+			gVector.push_back( g_results );
 			
+			delete g_reverse;
+			delete xarr;
+			delete yarr;
 		}
 	}
 	for (std::vector< TGraph* >::const_iterator iv = gVector.begin();

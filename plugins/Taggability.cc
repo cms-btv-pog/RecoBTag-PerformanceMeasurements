@@ -10,7 +10,7 @@
 	 Author: Francisco Yumiceva, Fermilab
 */
 //
-// $Id: Taggability.cc,v 1.1 2009/08/17 22:25:30 yumiceva Exp $
+// $Id: Taggability.cc,v 1.2 2009/08/19 04:39:02 yumiceva Exp $
 //
 //
 
@@ -25,6 +25,8 @@
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "DataFormats/BTauReco/interface/TrackIPTagInfo.h"
 #include "DataFormats/TrackReco/interface/Track.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
 
 using namespace edm;
 using namespace std;
@@ -42,6 +44,11 @@ Taggability::Taggability(const edm::ParameterSet &iConfig) {
 	PVCollection_  = iConfig.getParameter<edm::InputTag>("PrimaryVertexCollection");
 	MinNPV_        = iConfig.getParameter<int>("MinNPrimaryVertices");
 	bTagTrackEventIPTagInfos_ = iConfig.getParameter<std::string>("bTagTrackEventIPtagInfos");
+	writeHistos_   = iConfig.getParameter<bool>("WriteHistograms");
+
+	edm::Service<TFileService> fs;
+	h2_in  = fs->make<TH2F>("h2_in" ,"Jets without filter",10, MinJetPt_ , 150, 5, 0, MaxJetEta_ );
+	h2_out = fs->make<TH2F>("h2_out","Taggability applied to jets",10, MinJetPt_ , 150, 5, 0, MaxJetEta_ );
 
 }
 
@@ -51,6 +58,24 @@ Taggability::~Taggability() {}
 bool Taggability::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
 	bool pass = false;
+
+	// primary vertices
+	Handle< View<reco::Vertex> > PVColl;
+	iEvent.getByLabel(PVCollection_, PVColl);
+
+	const View< reco::Vertex > &thePV = *PVColl;
+	
+	if (PVColl.isValid() == false ) {
+		edm::LogWarning("Taggability")
+			<<" Some products not available in the event: VertexCollection "
+			<< PVCollection_<<" " 
+			<< PVColl.isValid();
+     return pass;
+	}
+
+	if ( (int)thePV.size() >= MinNPV_ ) pass = true;
+	else return false;
+
 	
 	// Calo Jets
 	Handle< View<reco::CaloJet> > jetsColl;
@@ -70,6 +95,9 @@ bool Taggability::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	
 	int jetIndex = 0;
 	int Njets = 0;
+
+	double jetpt = 0;
+	double jeteta= 0;
 	
 	for(edm::View<reco::CaloJet>::const_iterator jet = theJets.begin(); jet!=theJets.end(); ++jet)
     {
@@ -79,10 +107,14 @@ bool Taggability::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 		if (useJetCorr_ == true){
 			jetcorrection =  acorrector->correction(*jet, iEvent, iSetup);
 		}
+		jetpt = (jet->pt() * jetcorrection );
+		jeteta = std::abs( jet->eta() );
 		
 		// Jet quality cuts
-		if ( (jet->pt() * jetcorrection ) <= MinJetPt_ || std::abs( jet->eta() ) >= MaxJetEta_ ) { jetIndex++; continue; }
+		if ( jetpt <= MinJetPt_ || jeteta >= MaxJetEta_ ) { jetIndex++; continue; }
 
+		h2_in->Fill( jetpt, jeteta );
+		
 		// Get a vector of reference to the selected tracks in each jet
 		reco::TrackRefVector tracks( (*bTagTrackEventIPTagInfos)[jetIndex].selectedTracks() );
 
@@ -100,30 +132,14 @@ bool Taggability::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
 		jetIndex++;
 		Njets++; // good jets
+
+		h2_out->Fill( jetpt, jeteta );
 	}
 
-	if ( jetIndex >= MinNjets_ ) pass = true;
-	else return false;
-
-	// primary vertices
-	// Calo Jets
-	Handle< View<reco::Vertex> > PVColl;
-	iEvent.getByLabel(PVCollection_, PVColl);
-
-	const View< reco::Vertex > &thePV = *PVColl;
-	
-	if (PVColl.isValid() == false ) {
-		edm::LogWarning("Taggability")
-			<<" Some products not available in the event: VertexCollection "
-			<< PVCollection_<<" " 
-			<< PVColl.isValid();
-     return pass;
-	}
-
-	if ( (int)thePV.size() < MinNPV_ ) pass = false;
+	if ( Njets >= MinNjets_ ) pass = true;
+	else pass = false;
 
 	return pass;
-
 }
 
 //define this as a plug-in

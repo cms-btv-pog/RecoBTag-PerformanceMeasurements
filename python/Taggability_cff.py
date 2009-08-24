@@ -11,7 +11,8 @@ Taggability = cms.EDFilter("Taggability",
                            MinTrkPt = cms.double(1),
                            MinNjets = cms.int32(1),
                            PrimaryVertexCollection = cms.InputTag('offlinePrimaryVertices'),
-                           MinNPrimaryVertices = cms.int32(0)
+                           MinNPrimaryVertices = cms.int32(0),
+			   WriteHistograms = cms.bool(True)
                            )
 
 

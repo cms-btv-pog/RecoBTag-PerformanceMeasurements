@@ -10,7 +10,7 @@
 	 Author: Francisco Yumiceva, Fermilab
 */
 //
-// $Id: Taggability.h,v 1.0 2009/07/13 15:13:36 yumiceva Exp $
+// $Id: Taggability.h,v 1.1 2009/08/17 22:25:29 yumiceva Exp $
 //
 //
 
@@ -22,6 +22,8 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+
+#include "TH2F.h"
 
 class Taggability : public edm::EDFilter {
 
@@ -43,9 +45,11 @@ class Taggability : public edm::EDFilter {
 	edm::InputTag PVCollection_;
 	int MinNPV_;
 	std::string bTagTrackEventIPTagInfos_;
-	
-	
+	bool writeHistos_;	
 
+	TH2F *h2_in;
+	TH2F *h2_out;
+	
 };
 
 #endif
