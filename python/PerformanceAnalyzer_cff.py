@@ -116,7 +116,7 @@ Performance = cms.EDAnalyzer("PerformanceAnalyzer",
                              #
                              # use jet corrections
                              #
-                             useJetCorrections = cms.bool (False),
+                             useJetCorrections = cms.bool (True),
                              jetCorrectionsLabel = cms.string("L2L3JetCorrectorIcone5"),                     
     muoncuts = cms.PSet(
         MinNHits = cms.int32(7),

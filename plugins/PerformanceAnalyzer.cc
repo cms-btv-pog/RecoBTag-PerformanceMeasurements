@@ -835,7 +835,7 @@ void PerformanceAnalyzer::FillPerformance(reco::CaloJet jet, int JetFlavor, cons
       std::string moduleLabel = (jetTags).provenance()->moduleLabel();
       if (mymap.find(moduleLabel) != mymap.end()) continue;
       
-      mymap[moduleLabel] == true;
+      mymap[moduleLabel] = true;
       
       //std::cout <<" ECCO "<< jetTags->size()<<std::endl;
       
