@@ -15,7 +15,6 @@
 <use name=FWCore/Utilities>
 <use name=JetMETCorrections/Objects>
 <use name=RecoBTag/BTagTools>
-<use name=RecoBTag/MCTools>
 <use name=RecoMuon/TrackingTools>
 <use name=SimDataFormats/Track>
 <use name=SimDataFormats/JetMatching>

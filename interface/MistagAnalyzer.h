@@ -18,7 +18,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.4 2009/07/16 00:47:42 jindal Exp $
+// $Id: MistagAnalyzer.h,v 1.5 2009/07/16 10:40:28 tboccali Exp $
 //
 //
 
@@ -38,7 +38,6 @@ Implementation:
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/JetReco/interface/JetTracksAssociation.h"
 #include "DataFormats/BTauReco/interface/TrackIPTagInfo.h"
-//#include "PhysicsTools/Utilities/interface/deltaR.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 
