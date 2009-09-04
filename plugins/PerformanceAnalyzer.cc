@@ -7,7 +7,6 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 // reco track and vertex
-#include "DataFormats/JetReco/interface/CaloJetCollection.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "RecoVertex/VertexPrimitives/interface/TransientVertex.h"
@@ -42,7 +41,7 @@
 #include "SimDataFormats/JetMatching/interface/JetFlavourMatching.h"
 
 
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h" 
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 
 // HepPDT // for simtracks
@@ -93,8 +92,8 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
 
     analyzer_ = "PerformanceAnalyzer"; // name of this analyzer
 
-	if (fdebug) std::cout << "[PerformanceAnalyzer] call constructor" << std::endl;
-	
+    if (fdebug) std::cout << "[PerformanceAnalyzer] call constructor" << std::endl;
+
     //now do whatever initialization is needed
     //simG4_=iConfig.getParameter<edm::InputTag>( "simG4" );
 
@@ -149,14 +148,17 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
     // ue jetcorrections or not, and in cae which label to use
     //
     useJetCorr_ = iConfig.getParameter<bool>("useJetCorrections");
-    if (useJetCorr_ == true){
-		jetCorrLabel_ =  iConfig.getParameter<std::string>("jetCorrectionsLabel");
-		std::cout<<" Use JetCorrections with Label "<<jetCorrLabel_ <<std::endl;
-    }else{
-		jetCorrLabel_  = "Fake"; 
-		std::cout<<" Do NOT use JetCorrections."<<std::endl;
+    if (useJetCorr_ == true)
+    {
+        jetCorrLabel_ =  iConfig.getParameter<std::string>("jetCorrectionsLabel");
+        std::cout<<" Use JetCorrections with Label "<<jetCorrLabel_ <<std::endl;
     }
-    
+    else
+    {
+        jetCorrLabel_  = "Fake";
+        std::cout<<" Do NOT use JetCorrections."<<std::endl;
+    }
+
 
 
     // get list of taggers
@@ -175,23 +177,24 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
 
     //
     // get operating points
-	
+
     std::vector<edm::ParameterSet> config = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet > >("bTagCutList");
-	if (fdebug) std::cout << " get operating points, total: " << config.size() << std::endl;
-	int tmpii=0;
-    for (std::vector<edm::ParameterSet>::const_iterator it = config.begin(); it != config.end() ; ++it){
-		//std::cout << tmpii << std::endl;
-		std::string aname = (*it).getUntrackedParameter<std::string> ("name");
-		//std::cout << aname << std::endl;
-		edm::InputTag atag = (*it).getUntrackedParameter<edm::InputTag> ("collection");
-		//std::cout << atag << std::endl;
-		double acut = (*it).getUntrackedParameter<double> ("cut");
-		//std::cout << acut << std::endl;
-		WorkingPoint tmp(atag,aname,acut);
-		wp.push_back( tmp );
-		//std::cout << "done" << std::endl;
-	  if (fdebug) (wp.end()-1)->print();
-	  tmpii++;
+    if (fdebug) std::cout << " get operating points, total: " << config.size() << std::endl;
+    int tmpii=0;
+    for (std::vector<edm::ParameterSet>::const_iterator it = config.begin(); it != config.end() ; ++it)
+    {
+        //std::cout << tmpii << std::endl;
+        std::string aname = (*it).getUntrackedParameter<std::string> ("name");
+        //std::cout << aname << std::endl;
+        edm::InputTag atag = (*it).getUntrackedParameter<edm::InputTag> ("collection");
+        //std::cout << atag << std::endl;
+        double acut = (*it).getUntrackedParameter<double> ("cut");
+        //std::cout << acut << std::endl;
+        WorkingPoint tmp(atag, aname, acut);
+        wp.push_back( tmp );
+        //std::cout << "done" << std::endl;
+        if (fdebug) (wp.end()-1)->print();
+        tmpii++;
     }
 
 
@@ -199,15 +202,15 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
 
     // get tagger for away jet
     fAwayJetTagger = iConfig.getParameter<std::string>("AwayJetTagger");
-    
+
     // write performance plots?
     fWritePerformancePlots = iConfig.getParameter< bool > ("WritePerformancePlots");
-    
+
     // include weights?
     fWeightHistograms = iConfig.getParameter< bool > ("WeightHistograms");
     fStoreWeightsInNtuple = iConfig.getParameter< bool > ("StoreWeightsInNtuple");
     fStorePtHat = iConfig.getParameter< bool > ("StorePtHat");
-    
+
     topdir = rootFile_->mkdir("Histograms");
     topdir->cd();
     topdir->mkdir("ptrel");
@@ -219,7 +222,7 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
     histcounterf = new TH1I("histcounterf","counter",5,0,5);
     histcounterf->SetBit(TH1::kCanRebin);
     rootFile_->cd();
-    
+
     // initialize histograms
     EffHistos     = new BTagHistograms();
     PtrelHistos   = new BTagHistograms();
@@ -244,21 +247,22 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
     AwayjetHistos_mc->Init("p","c");
     MujetHistos_mc->Init("n","l");
     AwayjetHistos_mc->Init("p","l");
-    for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it!=wp.end(); ++it){
-      
-      EffHistos->Init("efficiencies",(*it).name());
-      PtrelHistos->Init("ptrel",(*it).name());
-      
-      TaggedMujetHistos->Init("ntag",(*it).name());
-      TaggedAwayjetHistos->Init("ptag",(*it).name());
-      TaggedMujetHistos_mc->Init("ntag","b",(*it).name());
-      TaggedAwayjetHistos_mc->Init("ptag","b",(*it).name());
-      TaggedMujetHistos_mc->Init("ntag","cl",(*it).name());
-      TaggedAwayjetHistos_mc->Init("ptag","cl",(*it).name());
-      TaggedMujetHistos_mc->Init("ntag","c",(*it).name());
-      TaggedAwayjetHistos_mc->Init("ptag","c",(*it).name());
-      TaggedMujetHistos_mc->Init("ntag","l",(*it).name());
-      TaggedAwayjetHistos_mc->Init("ptag","l",(*it).name());
+    for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it!=wp.end(); ++it)
+    {
+
+        EffHistos->Init("efficiencies",(*it).name());
+        PtrelHistos->Init("ptrel",(*it).name());
+
+        TaggedMujetHistos->Init("ntag",(*it).name());
+        TaggedAwayjetHistos->Init("ptag",(*it).name());
+        TaggedMujetHistos_mc->Init("ntag","b",(*it).name());
+        TaggedAwayjetHistos_mc->Init("ptag","b",(*it).name());
+        TaggedMujetHistos_mc->Init("ntag","cl",(*it).name());
+        TaggedAwayjetHistos_mc->Init("ptag","cl",(*it).name());
+        TaggedMujetHistos_mc->Init("ntag","c",(*it).name());
+        TaggedAwayjetHistos_mc->Init("ptag","c",(*it).name());
+        TaggedMujetHistos_mc->Init("ntag","l",(*it).name());
+        TaggedAwayjetHistos_mc->Init("ptag","l",(*it).name());
 
     }
 
@@ -271,7 +275,7 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
     fperformanceSMT.Set("SMT");
     fperformanceSSV.Set("SSV");
     fperformanceCSV.Set("CSV");
-    
+
     fperformanceTC2trk.SetMinDiscriminator(-1);
     fperformanceTC2trk.SetMaxDiscriminator(15);
     fperformanceTC3trk.SetMinDiscriminator(-1);
@@ -290,7 +294,7 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
     fperformanceSSV.SetMaxDiscriminator(10);
     fperformanceCSV.SetMinDiscriminator(0);
     fperformanceCSV.SetMaxDiscriminator(1);
-    
+
 
     feventcounter = 0;
 
@@ -314,9 +318,9 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
         fperformanceMTC3trk.Eval();
         fperformanceTP.Eval();
         fperformanceJBP.Eval();
-		fperformanceSMT.Eval();
-		fperformanceSSV.Eval();
-		fperformanceCSV.Eval();
+        fperformanceSMT.Eval();
+        fperformanceSSV.Eval();
+        fperformanceCSV.Eval();
 
         TGraphErrors *gTC2_b = new TGraphErrors(fperformanceTC2trk.GetN(),
                                                 fperformanceTC2trk.GetArray("b").GetArray(),fperformanceTC2trk.GetArray("b").GetArray(),
@@ -327,8 +331,8 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
                                                 fperformanceTC2trk.GetArray("bErr").GetArray(),fperformanceTC2trk.GetArray("cErr").GetArray());
 
         TGraphErrors *gTC2_udsg = new TGraphErrors(fperformanceTC2trk.GetN(),
-												   fperformanceTC2trk.GetArray("b").GetArray(),fperformanceTC2trk.GetArray("udsg").GetArray(),
-												   fperformanceTC2trk.GetArray("bErr").GetArray(),fperformanceTC2trk.GetArray("udsgErr").GetArray());
+                fperformanceTC2trk.GetArray("b").GetArray(),fperformanceTC2trk.GetArray("udsg").GetArray(),
+                fperformanceTC2trk.GetArray("bErr").GetArray(),fperformanceTC2trk.GetArray("udsgErr").GetArray());
         TGraph *dTC2_udsg = new TGraph(fperformanceTC2trk.GetN(),
                                        fperformanceTC2trk.GetArray("udsg").GetArray(),
                                        fperformanceTC2trk.GetArray("discriminator").GetArray());
@@ -342,8 +346,8 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
                                                 fperformanceTC3trk.GetArray("bErr").GetArray(),fperformanceTC3trk.GetArray("cErr").GetArray());
 
         TGraphErrors *gTC3_udsg = new TGraphErrors(fperformanceTC3trk.GetN(),
-												   fperformanceTC3trk.GetArray("b").GetArray(),fperformanceTC3trk.GetArray("udsg").GetArray(),
-												   fperformanceTC3trk.GetArray("bErr").GetArray(),fperformanceTC3trk.GetArray("udsgErr").GetArray());
+                fperformanceTC3trk.GetArray("b").GetArray(),fperformanceTC3trk.GetArray("udsg").GetArray(),
+                fperformanceTC3trk.GetArray("bErr").GetArray(),fperformanceTC3trk.GetArray("udsgErr").GetArray());
         TGraph *dTC3_udsg = new TGraph(fperformanceTC3trk.GetN(),
                                        fperformanceTC3trk.GetArray("udsg").GetArray(),
                                        fperformanceTC3trk.GetArray("discriminator").GetArray());
@@ -357,102 +361,102 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
                                                fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("cErr").GetArray());
 
         TGraphErrors *gTP_udsg = new TGraphErrors(fperformanceTP.GetN(),
-												  fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("udsg").GetArray(),
-												  fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("udsgErr").GetArray());
+                fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("udsg").GetArray(),
+                fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("udsgErr").GetArray());
         TGraph *dTP_udsg = new TGraph(fperformanceTP.GetN(),
                                       fperformanceTP.GetArray("udsg").GetArray(),
                                       fperformanceTP.GetArray("discriminator").GetArray());
 
-		TGraphErrors *gJBP_b = new TGraphErrors(fperformanceJBP.GetN(),
-												fperformanceJBP.GetArray("b").GetArray(),fperformanceJBP.GetArray("b").GetArray(),
-												fperformanceJBP.GetArray("bErr").GetArray(),fperformanceJBP.GetArray("bErr").GetArray());
+        TGraphErrors *gJBP_b = new TGraphErrors(fperformanceJBP.GetN(),
+                                                fperformanceJBP.GetArray("b").GetArray(),fperformanceJBP.GetArray("b").GetArray(),
+                                                fperformanceJBP.GetArray("bErr").GetArray(),fperformanceJBP.GetArray("bErr").GetArray());
 
         TGraphErrors *gJBP_c = new TGraphErrors(fperformanceJBP.GetN(),
-												fperformanceJBP.GetArray("b").GetArray(),fperformanceJBP.GetArray("c").GetArray(),
-												fperformanceJBP.GetArray("bErr").GetArray(),fperformanceJBP.GetArray("cErr").GetArray());
+                                                fperformanceJBP.GetArray("b").GetArray(),fperformanceJBP.GetArray("c").GetArray(),
+                                                fperformanceJBP.GetArray("bErr").GetArray(),fperformanceJBP.GetArray("cErr").GetArray());
 
         TGraphErrors *gJBP_udsg = new TGraphErrors(fperformanceJBP.GetN(),
-												   fperformanceJBP.GetArray("b").GetArray(),fperformanceJBP.GetArray("udsg").GetArray(),
-												   fperformanceJBP.GetArray("bErr").GetArray(),fperformanceJBP.GetArray("udsgErr").GetArray());
+                fperformanceJBP.GetArray("b").GetArray(),fperformanceJBP.GetArray("udsg").GetArray(),
+                fperformanceJBP.GetArray("bErr").GetArray(),fperformanceJBP.GetArray("udsgErr").GetArray());
         TGraph *dJBP_udsg = new TGraph(fperformanceJBP.GetN(),
-									   fperformanceJBP.GetArray("udsg").GetArray(),
-									   fperformanceJBP.GetArray("discriminator").GetArray());
+                                       fperformanceJBP.GetArray("udsg").GetArray(),
+                                       fperformanceJBP.GetArray("discriminator").GetArray());
 
 
-		TGraphErrors *gSMT_b = new TGraphErrors(fperformanceSMT.GetN(),
-												fperformanceSMT.GetArray("b").GetArray(),fperformanceSMT.GetArray("b").GetArray(),
-												fperformanceSMT.GetArray("bErr").GetArray(),fperformanceSMT.GetArray("bErr").GetArray());
+        TGraphErrors *gSMT_b = new TGraphErrors(fperformanceSMT.GetN(),
+                                                fperformanceSMT.GetArray("b").GetArray(),fperformanceSMT.GetArray("b").GetArray(),
+                                                fperformanceSMT.GetArray("bErr").GetArray(),fperformanceSMT.GetArray("bErr").GetArray());
 
         TGraphErrors *gSMT_c = new TGraphErrors(fperformanceSMT.GetN(),
-												fperformanceSMT.GetArray("b").GetArray(),fperformanceSMT.GetArray("c").GetArray(),
-												fperformanceSMT.GetArray("bErr").GetArray(),fperformanceSMT.GetArray("cErr").GetArray());
+                                                fperformanceSMT.GetArray("b").GetArray(),fperformanceSMT.GetArray("c").GetArray(),
+                                                fperformanceSMT.GetArray("bErr").GetArray(),fperformanceSMT.GetArray("cErr").GetArray());
 
         TGraphErrors *gSMT_udsg = new TGraphErrors(fperformanceSMT.GetN(),
-												   fperformanceSMT.GetArray("b").GetArray(),fperformanceSMT.GetArray("udsg").GetArray(),
-												   fperformanceSMT.GetArray("bErr").GetArray(),fperformanceSMT.GetArray("udsgErr").GetArray());
+                fperformanceSMT.GetArray("b").GetArray(),fperformanceSMT.GetArray("udsg").GetArray(),
+                fperformanceSMT.GetArray("bErr").GetArray(),fperformanceSMT.GetArray("udsgErr").GetArray());
         TGraph *dSMT_udsg = new TGraph(fperformanceSMT.GetN(),
-									   fperformanceSMT.GetArray("udsg").GetArray(),
-									   fperformanceSMT.GetArray("discriminator").GetArray());
+                                       fperformanceSMT.GetArray("udsg").GetArray(),
+                                       fperformanceSMT.GetArray("discriminator").GetArray());
 
-		TGraphErrors *gSSV_b = new TGraphErrors(fperformanceSSV.GetN(),
-												fperformanceSSV.GetArray("b").GetArray(),fperformanceSSV.GetArray("b").GetArray(),
-												fperformanceSSV.GetArray("bErr").GetArray(),fperformanceSSV.GetArray("bErr").GetArray());
+        TGraphErrors *gSSV_b = new TGraphErrors(fperformanceSSV.GetN(),
+                                                fperformanceSSV.GetArray("b").GetArray(),fperformanceSSV.GetArray("b").GetArray(),
+                                                fperformanceSSV.GetArray("bErr").GetArray(),fperformanceSSV.GetArray("bErr").GetArray());
 
         TGraphErrors *gSSV_c = new TGraphErrors(fperformanceSSV.GetN(),
-												fperformanceSSV.GetArray("b").GetArray(),fperformanceSSV.GetArray("c").GetArray(),
-												fperformanceSSV.GetArray("bErr").GetArray(),fperformanceSSV.GetArray("cErr").GetArray());
+                                                fperformanceSSV.GetArray("b").GetArray(),fperformanceSSV.GetArray("c").GetArray(),
+                                                fperformanceSSV.GetArray("bErr").GetArray(),fperformanceSSV.GetArray("cErr").GetArray());
 
         TGraphErrors *gSSV_udsg = new TGraphErrors(fperformanceSSV.GetN(),
-												   fperformanceSSV.GetArray("b").GetArray(),fperformanceSSV.GetArray("udsg").GetArray(),
-												   fperformanceSSV.GetArray("bErr").GetArray(),fperformanceSSV.GetArray("udsgErr").GetArray());
+                fperformanceSSV.GetArray("b").GetArray(),fperformanceSSV.GetArray("udsg").GetArray(),
+                fperformanceSSV.GetArray("bErr").GetArray(),fperformanceSSV.GetArray("udsgErr").GetArray());
         TGraph *dSSV_udsg = new TGraph(fperformanceSSV.GetN(),
-									   fperformanceSSV.GetArray("udsg").GetArray(),
-									   fperformanceSSV.GetArray("discriminator").GetArray());	
+                                       fperformanceSSV.GetArray("udsg").GetArray(),
+                                       fperformanceSSV.GetArray("discriminator").GetArray());
 
-		TGraphErrors *gCSV_b = new TGraphErrors(fperformanceCSV.GetN(),
-												fperformanceCSV.GetArray("b").GetArray(),fperformanceCSV.GetArray("b").GetArray(),
-												fperformanceCSV.GetArray("bErr").GetArray(),fperformanceCSV.GetArray("bErr").GetArray());
+        TGraphErrors *gCSV_b = new TGraphErrors(fperformanceCSV.GetN(),
+                                                fperformanceCSV.GetArray("b").GetArray(),fperformanceCSV.GetArray("b").GetArray(),
+                                                fperformanceCSV.GetArray("bErr").GetArray(),fperformanceCSV.GetArray("bErr").GetArray());
 
         TGraphErrors *gCSV_c = new TGraphErrors(fperformanceCSV.GetN(),
-												fperformanceCSV.GetArray("b").GetArray(),fperformanceCSV.GetArray("c").GetArray(),
-												fperformanceCSV.GetArray("bErr").GetArray(),fperformanceCSV.GetArray("cErr").GetArray());
+                                                fperformanceCSV.GetArray("b").GetArray(),fperformanceCSV.GetArray("c").GetArray(),
+                                                fperformanceCSV.GetArray("bErr").GetArray(),fperformanceCSV.GetArray("cErr").GetArray());
 
         TGraphErrors *gCSV_udsg = new TGraphErrors(fperformanceCSV.GetN(),
-												   fperformanceCSV.GetArray("b").GetArray(),fperformanceCSV.GetArray("udsg").GetArray(),
-												   fperformanceCSV.GetArray("bErr").GetArray(),fperformanceCSV.GetArray("udsgErr").GetArray());
+                fperformanceCSV.GetArray("b").GetArray(),fperformanceCSV.GetArray("udsg").GetArray(),
+                fperformanceCSV.GetArray("bErr").GetArray(),fperformanceCSV.GetArray("udsgErr").GetArray());
         TGraph *dCSV_udsg = new TGraph(fperformanceCSV.GetN(),
-									   fperformanceCSV.GetArray("udsg").GetArray(),
-									   fperformanceCSV.GetArray("discriminator").GetArray());
+                                       fperformanceCSV.GetArray("udsg").GetArray(),
+                                       fperformanceCSV.GetArray("discriminator").GetArray());
 
 
 
 
         TGraphErrors *gMTC2_b = new TGraphErrors(fperformanceMTC2trk.GetN(),
-												 fperformanceMTC2trk.GetArray("b").GetArray(),fperformanceMTC2trk.GetArray("b").GetArray(),
-												 fperformanceMTC2trk.GetArray("bErr").GetArray(),fperformanceMTC2trk.GetArray("bErr").GetArray());
+                fperformanceMTC2trk.GetArray("b").GetArray(),fperformanceMTC2trk.GetArray("b").GetArray(),
+                fperformanceMTC2trk.GetArray("bErr").GetArray(),fperformanceMTC2trk.GetArray("bErr").GetArray());
 
         TGraphErrors *gMTC2_c = new TGraphErrors(fperformanceMTC2trk.GetN(),
-												 fperformanceMTC2trk.GetArray("b").GetArray(),fperformanceMTC2trk.GetArray("c").GetArray(),
-												 fperformanceMTC2trk.GetArray("bErr").GetArray(),fperformanceMTC2trk.GetArray("cErr").GetArray());
+                fperformanceMTC2trk.GetArray("b").GetArray(),fperformanceMTC2trk.GetArray("c").GetArray(),
+                fperformanceMTC2trk.GetArray("bErr").GetArray(),fperformanceMTC2trk.GetArray("cErr").GetArray());
 
         TGraphErrors *gMTC2_udsg = new TGraphErrors(fperformanceMTC2trk.GetN(),
-													fperformanceMTC2trk.GetArray("b").GetArray(),fperformanceMTC2trk.GetArray("udsg").GetArray(),
-													fperformanceMTC2trk.GetArray("bErr").GetArray(),fperformanceMTC2trk.GetArray("udsgErr").GetArray());
+                fperformanceMTC2trk.GetArray("b").GetArray(),fperformanceMTC2trk.GetArray("udsg").GetArray(),
+                fperformanceMTC2trk.GetArray("bErr").GetArray(),fperformanceMTC2trk.GetArray("udsgErr").GetArray());
         TGraph *dMTC2_udsg = new TGraph(fperformanceMTC2trk.GetN(),
                                         fperformanceMTC2trk.GetArray("udsg").GetArray(),
                                         fperformanceMTC2trk.GetArray("discriminator").GetArray());
 
         TGraphErrors *gMTC3_b = new TGraphErrors(fperformanceMTC3trk.GetN(),
-												 fperformanceMTC3trk.GetArray("b").GetArray(),fperformanceMTC3trk.GetArray("b").GetArray(),
-												 fperformanceMTC3trk.GetArray("bErr").GetArray(),fperformanceMTC3trk.GetArray("bErr").GetArray());
+                fperformanceMTC3trk.GetArray("b").GetArray(),fperformanceMTC3trk.GetArray("b").GetArray(),
+                fperformanceMTC3trk.GetArray("bErr").GetArray(),fperformanceMTC3trk.GetArray("bErr").GetArray());
 
         TGraphErrors *gMTC3_c = new TGraphErrors(fperformanceMTC3trk.GetN(),
-												 fperformanceMTC3trk.GetArray("b").GetArray(),fperformanceMTC3trk.GetArray("c").GetArray(),
-												 fperformanceMTC3trk.GetArray("bErr").GetArray(),fperformanceMTC3trk.GetArray("cErr").GetArray());
+                fperformanceMTC3trk.GetArray("b").GetArray(),fperformanceMTC3trk.GetArray("c").GetArray(),
+                fperformanceMTC3trk.GetArray("bErr").GetArray(),fperformanceMTC3trk.GetArray("cErr").GetArray());
 
         TGraphErrors *gMTC3_udsg = new TGraphErrors(fperformanceMTC3trk.GetN(),
-													fperformanceMTC3trk.GetArray("b").GetArray(),fperformanceMTC3trk.GetArray("udsg").GetArray(),
-													fperformanceMTC3trk.GetArray("bErr").GetArray(),fperformanceMTC3trk.GetArray("udsgErr").GetArray());
+                fperformanceMTC3trk.GetArray("b").GetArray(),fperformanceMTC3trk.GetArray("udsg").GetArray(),
+                fperformanceMTC3trk.GetArray("bErr").GetArray(),fperformanceMTC3trk.GetArray("udsgErr").GetArray());
         TGraph *dMTC3_udsg = new TGraph(fperformanceMTC3trk.GetN(),
                                         fperformanceMTC3trk.GetArray("udsg").GetArray(),
                                         fperformanceMTC3trk.GetArray("discriminator").GetArray());
@@ -467,16 +471,16 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
         gTP_b->SetName("gTP_b");
         gTP_c->SetName("gTP_c");
         gTP_udsg->SetName("gTP_udsg");
-		gJBP_b->SetName("gJBP_b");
+        gJBP_b->SetName("gJBP_b");
         gJBP_c->SetName("gJBP_c");
         gJBP_udsg->SetName("gJBP_udsg");
-		gSMT_b->SetName("gSMT_b");
+        gSMT_b->SetName("gSMT_b");
         gSMT_c->SetName("gSMT_c");
         gSMT_udsg->SetName("gSMT_udsg");
-		gSSV_b->SetName("gSSV_b");
+        gSSV_b->SetName("gSSV_b");
         gSSV_c->SetName("gSSV_c");
         gSSV_udsg->SetName("gSSV_udsg");
- 		gCSV_b->SetName("gCSV_b");
+        gCSV_b->SetName("gCSV_b");
         gCSV_c->SetName("gCSV_c");
         gCSV_udsg->SetName("gCSV_udsg");
         gMTC2_b->SetName("gMTC2_b");
@@ -490,19 +494,19 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
         dTC2_udsg->SetName("discTC2_udsg");
         dTC3_udsg->SetName("discTC3_udsg");
         dTP_udsg->SetName("discTP_udsg");
-	dJBP_udsg->SetName("discJBP_udsg");
-	dSMT_udsg->SetName("discSMT_udsg");
-	dSSV_udsg->SetName("discSSV_udsg");
-	dCSV_udsg->SetName("discCSV_udsg");
+        dJBP_udsg->SetName("discJBP_udsg");
+        dSMT_udsg->SetName("discSMT_udsg");
+        dSSV_udsg->SetName("discSSV_udsg");
+        dCSV_udsg->SetName("discCSV_udsg");
         dMTC2_udsg->SetName("discMTC2_udsg");
         dMTC3_udsg->SetName("discMTC3_udsg");
         dTC2_udsg->SetTitle("TC2trk discriminator vs udsg-mistagging");
         dTC3_udsg->SetTitle("TC3trk discriminator vs udsg-mistagging");
         dTP_udsg->SetTitle("TP discriminator vs udsg-mistagging");
-	dJBP_udsg->SetTitle("JBP discriminator vs udsg-mistagging");
-	dSMT_udsg->SetTitle("SMT discriminator vs udsg-mistagging");
-	dSSV_udsg->SetTitle("SSV discriminator vs udsg-mistagging");
-	dCSV_udsg->SetTitle("CSV discriminator vs udsg-mistagging");
+        dJBP_udsg->SetTitle("JBP discriminator vs udsg-mistagging");
+        dSMT_udsg->SetTitle("SMT discriminator vs udsg-mistagging");
+        dSSV_udsg->SetTitle("SSV discriminator vs udsg-mistagging");
+        dCSV_udsg->SetTitle("CSV discriminator vs udsg-mistagging");
         dMTC2_udsg->SetTitle("MTC2trk discriminator vs udsg-mistagging");
         dMTC3_udsg->SetTitle("MTC3trk discriminator vs udsg-mistagging");
 
@@ -515,16 +519,16 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
         gTP_b->SetTitle("Jet b-efficiency");
         gTP_c->SetTitle("Jet c-mistagging");
         gTP_udsg->SetTitle("Jet udsg-mistagging");
-	gJBP_b->SetTitle("Jet b-efficiency");
+        gJBP_b->SetTitle("Jet b-efficiency");
         gJBP_c->SetTitle("Jet c-mistagging");
         gJBP_udsg->SetTitle("Jet udsg-mistagging");
-	gSMT_b->SetTitle("Jet b-efficiency");
+        gSMT_b->SetTitle("Jet b-efficiency");
         gSMT_c->SetTitle("Jet c-mistagging");
         gSMT_udsg->SetTitle("Jet udsg-mistagging");
-	gSSV_b->SetTitle("Jet b-efficiency");
+        gSSV_b->SetTitle("Jet b-efficiency");
         gSSV_c->SetTitle("Jet c-mistagging");
         gSSV_udsg->SetTitle("Jet udsg-mistagging");
-	gCSV_b->SetTitle("Jet b-efficiency");
+        gCSV_b->SetTitle("Jet b-efficiency");
         gCSV_c->SetTitle("Jet c-mistagging");
         gCSV_udsg->SetTitle("Jet udsg-mistagging");
         gMTC2_b->SetTitle("Jet b-efficiency");
@@ -543,16 +547,16 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
         gTP_b->Write();
         gTP_c->Write();
         gTP_udsg->Write();
-	gJBP_b->Write();
+        gJBP_b->Write();
         gJBP_c->Write();
         gJBP_udsg->Write();
-	gSMT_b->Write();
+        gSMT_b->Write();
         gSMT_c->Write();
         gSMT_udsg->Write();
-	gSSV_b->Write();
+        gSSV_b->Write();
         gSSV_c->Write();
         gSSV_udsg->Write();
-	gCSV_b->Write();
+        gCSV_b->Write();
         gCSV_c->Write();
         gCSV_udsg->Write();
         gMTC2_b->Write();
@@ -568,9 +572,9 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
         dTP_udsg->Write();
         dJBP_udsg->Write();
         dSMT_udsg->Write();
-	dSSV_udsg->Write();
-	dCSV_udsg->Write();
-	dMTC2_udsg->Write();
+        dSSV_udsg->Write();
+        dCSV_udsg->Write();
+        dMTC2_udsg->Write();
         dMTC3_udsg->Write();
 
     }
@@ -620,34 +624,9 @@ void PerformanceAnalyzer::beginJob(edm::EventSetup const& iSetup)
 
 void PerformanceAnalyzer::endJob()
 {
-
     std::cout << analyzer_ << " Total events processed: " << feventcounter << std::endl;
-
     rootFile_->cd();
-
 }
-
-reco::GenJet PerformanceAnalyzer::GetGenJet(reco::CaloJet calojet, reco::GenJetCollection genJetColl)
-{
-
-    reco::GenJet matchedJet;
-
-    double predelta = 99999.;
-    for (GenJetCollection::const_iterator genjet = genJetColl.begin(); genjet != genJetColl.end(); ++genjet)
-    {
-
-        double delta  = ROOT::Math::VectorUtil::DeltaR(genjet->p4().Vect(), calojet.p4().Vect() );
-
-        if ( delta < 0.2 && delta<predelta )
-        {
-            matchedJet = *genjet;
-            predelta = delta;
-        }
-    }
-
-    return matchedJet;
-}
-
 
 int PerformanceAnalyzer::TaggedJet(reco::CaloJet calojet,edm::Handle<reco::JetTagCollection > jetTags )
 {
@@ -727,7 +706,7 @@ SimTrack PerformanceAnalyzer::GetGenTrk(reco::Track atrack, const edm::SimTrackC
 
         int type = (*gentrk).type();
         if ( delta < 0.2 && delta<predelta && ((*gentrk).charge() == atrack.charge() ) &&
-			 ( abs(type)==11 || abs(type)==13 || abs(type)==15 || abs(type)==211 || abs(type)==321 ) )
+                ( abs(type)==11 || abs(type)==13 || abs(type)==15 || abs(type)==211 || abs(type)==321 ) )
         {
             matchedTrk = *gentrk;
             predelta = delta;
@@ -769,7 +748,7 @@ PerformanceAnalyzer::GetMotherId(const edm::SimVertexContainer *simVtxColl, cons
         // geant id of the mother
         unsigned motherGeandId =   vertex.parentIndex();
         std::map<unsigned, unsigned >::iterator association
-			= geantToIndex.find( motherGeandId );
+        = geantToIndex.find( motherGeandId );
         if (association != geantToIndex.end() )
             motherId = association->second;
     }
@@ -791,35 +770,39 @@ PerformanceAnalyzer::GetBTaggingMap(reco::CaloJet jet, const Event& event, doubl
     int ith_tagged = -1;
 
 
-    for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it != wp.end(); ++it){
-      
-      //start loop over all jetTags
-      
-      //    for (size_t k=0; k<jetTags_testManyByType.size(); k++)
-      //    {
-      
-      edm::Handle<reco::JetTagCollection > jetTags;
-      event.getByLabel((*it).inputTag(),jetTags);
-      
-      
-      ith_tagged = this->TaggedJet(jet,jetTags);
-      
-      if (ith_tagged == -1) continue;
-      
-      //*********************************
-      // Track Counting taggers
-      //*********************************
-      
-      
-      if ((*jetTags)[ith_tagged].second > (*it).cut()) {
-	aMap[(*it).name()] = true;
-      }else{
-	aMap[(*it).name()] = false;
-      }
-      
+    for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it != wp.end(); ++it)
+    {
+
+        //start loop over all jetTags
+
+        //    for (size_t k=0; k<jetTags_testManyByType.size(); k++)
+        //    {
+
+        edm::Handle<reco::JetTagCollection > jetTags;
+        event.getByLabel((*it).inputTag(),jetTags);
+
+
+        ith_tagged = this->TaggedJet(jet,jetTags);
+
+        if (ith_tagged == -1) continue;
+
+        //*********************************
+        // Track Counting taggers
+        //*********************************
+
+
+        if ((*jetTags)[ith_tagged].second > (*it).cut())
+        {
+            aMap[(*it).name()] = true;
+        }
+        else
+        {
+            aMap[(*it).name()] = false;
+        }
+
     }
-    
-    
+
+
     return aMap;
 }
 
@@ -832,97 +815,98 @@ void PerformanceAnalyzer::FillPerformance(reco::CaloJet jet, int JetFlavor, cons
 
     std::map<std::string, bool> mymap;
 
-    for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it != wp.end(); ++it){
-      //    for (size_t k=0; k<jetTags_testManyByType.size(); k++)
-      //    {
-      
-      
-      
-      edm::Handle<reco::JetTagCollection > jetTags;
-      //      std::cout <<" Asking for "<< (*it).inputTag()<<std::endl;
-      event.getByLabel((*it).inputTag(),jetTags);
-      std::string moduleLabel = (jetTags).provenance()->moduleLabel();
-      if (mymap.find(moduleLabel) != mymap.end()) continue;
-      
-      mymap[moduleLabel] = true;
-      
-      //std::cout <<" ECCO "<< jetTags->size()<<std::endl;
-      
-      ith_tagged = this->TaggedJet(jet,jetTags);
-      
-      
-      if (ith_tagged == -1) continue;
-      
-      
-      //*********************************
-      // Track Counting taggers
-      //*********************************
-      if ( moduleLabel == "trackCountingHighEffBJetTags" )
+    for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it != wp.end(); ++it)
+    {
+        //    for (size_t k=0; k<jetTags_testManyByType.size(); k++)
+        //    {
+
+
+
+        edm::Handle<reco::JetTagCollection > jetTags;
+        //      std::cout <<" Asking for "<< (*it).inputTag()<<std::endl;
+        event.getByLabel((*it).inputTag(),jetTags);
+        std::string moduleLabel = (jetTags).provenance()->moduleLabel();
+        if (mymap.find(moduleLabel) != mymap.end()) continue;
+
+        mymap[moduleLabel] = true;
+
+        //std::cout <<" ECCO "<< jetTags->size()<<std::endl;
+
+        ith_tagged = this->TaggedJet(jet,jetTags);
+
+
+        if (ith_tagged == -1) continue;
+
+
+        //*********************************
+        // Track Counting taggers
+        //*********************************
+        if ( moduleLabel == "trackCountingHighEffBJetTags" )
         {
-	  
-	  fperformanceTC2trk.Add( (*jetTags)[ith_tagged].second, JetFlavor );
+
+            fperformanceTC2trk.Add( (*jetTags)[ith_tagged].second, JetFlavor );
         }
-      else if ( moduleLabel == "trackCountingHighPurBJetTags" )
+        else if ( moduleLabel == "trackCountingHighPurBJetTags" )
         {
-	  
-	  fperformanceTC3trk.Add( (*jetTags)[ith_tagged].second, JetFlavor );
+
+            fperformanceTC3trk.Add( (*jetTags)[ith_tagged].second, JetFlavor );
         }
-      
-      //*********************************
-      // Modified Track Counting taggers
-      //*********************************
-      if ( moduleLabel == "modifiedtrackCountingHighEffBJetTags" )
+
+        //*********************************
+        // Modified Track Counting taggers
+        //*********************************
+        if ( moduleLabel == "modifiedtrackCountingHighEffBJetTags" )
         {
-	  
-	  fperformanceMTC2trk.Add( (*jetTags)[ith_tagged].second, JetFlavor );
+
+            fperformanceMTC2trk.Add( (*jetTags)[ith_tagged].second, JetFlavor );
         }
-      else if ( moduleLabel == "modifiedtrackCountingHighPurBJetTags" )
+        else if ( moduleLabel == "modifiedtrackCountingHighPurBJetTags" )
         {
-	  
-	  fperformanceMTC3trk.Add( (*jetTags)[ith_tagged].second, JetFlavor );
+
+            fperformanceMTC3trk.Add( (*jetTags)[ith_tagged].second, JetFlavor );
         }
-      
-      //*********************************
-      // Jet Probability taggers
-      //*********************************
-      else if ( moduleLabel == "jetProbabilityBJetTags" )
+
+        //*********************************
+        // Jet Probability taggers
+        //*********************************
+        else if ( moduleLabel == "jetProbabilityBJetTags" )
         {
-	  
-	  fperformanceTP.Add( (*jetTags)[ith_tagged].second, JetFlavor );
+
+            fperformanceTP.Add( (*jetTags)[ith_tagged].second, JetFlavor );
         }
-      // jetBProbabilityBJetTags
-      else if ( moduleLabel == "jetBProbabilityBJetTags" )
+        // jetBProbabilityBJetTags
+        else if ( moduleLabel == "jetBProbabilityBJetTags" )
         {
-	  
-	  fperformanceJBP.Add( (*jetTags)[ith_tagged].second, JetFlavor );
+
+            fperformanceJBP.Add( (*jetTags)[ith_tagged].second, JetFlavor );
         }
-      
-      //*********************************
-      // Soft Muon Tagger
-      //*********************************
-      else if ( moduleLabel == "softMuonBJetTags" )
+
+        //*********************************
+        // Soft Muon Tagger
+        //*********************************
+        else if ( moduleLabel == "softMuonBJetTags" )
         {
-	  
-	  fperformanceSMT.Add( (*jetTags)[ith_tagged].second, JetFlavor );
+
+            fperformanceSMT.Add( (*jetTags)[ith_tagged].second, JetFlavor );
         }
-      
-      //*********************************
-      // Secondary Vertex Tagger
-      //*********************************
-      else if ( moduleLabel == "simpleSecondaryVertexBJetTags" )
+
+        //*********************************
+        // Secondary Vertex Tagger
+        //*********************************
+        else if ( moduleLabel == "simpleSecondaryVertexBJetTags" )
         {
-	  
-	  fperformanceSSV.Add( (*jetTags)[ith_tagged].second, JetFlavor );
+
+            fperformanceSSV.Add( (*jetTags)[ith_tagged].second, JetFlavor );
         }
-      else if ( moduleLabel == "combinedSecondaryVertexBJetTags" )
+        else if ( moduleLabel == "combinedSecondaryVertexBJetTags" )
         {
-	  
-	  fperformanceCSV.Add( (*jetTags)[ith_tagged].second, JetFlavor );
+
+            fperformanceCSV.Add( (*jetTags)[ith_tagged].second, JetFlavor );
         }
-      
+
     }
-    
-    
+
+
 }
 
 //______________________________________________________________________________________________________________________
@@ -1061,7 +1045,7 @@ void PerformanceAnalyzer::FillHistos(std::string type, TLorentzVector p4MuJet, d
             MujetHistos_mc->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
             MujetHistos_mc->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);
         }
-          if ( JetFlavor == 4 )
+        if ( JetFlavor == 4 )
         {
             std::string flavor = "c";
             MujetHistos_mc->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
@@ -1073,7 +1057,7 @@ void PerformanceAnalyzer::FillHistos(std::string type, TLorentzVector p4MuJet, d
             MujetHistos_mc->Fill2d(type+"_pT_"+flavor,p4MuJet.Pt(),ptrel,weight);
             MujetHistos_mc->Fill2d(type+"_eta_"+flavor,TMath::Abs(p4MuJet.Eta()),ptrel,weight);
         }
-  }
+    }
     else if ( type == "p")
     {
 
@@ -1185,11 +1169,11 @@ reco::JetFlavour PerformanceAnalyzer::getMatchedParton(const reco::CaloJet &jet)
 
     if (flavourMatchOptionf == "fastMC")
     {
-      //
-      // disabled
-      //
+        //
+        // disabled
+        //
 
-      //        jetFlavour.underlyingParton4Vec(jet.p4());
+        //        jetFlavour.underlyingParton4Vec(jet.p4());
         //const edm::RefToBase<reco::Jet> & caloRefTB = jetTag.jet();
         //const reco::CaloJetRef & caloRef = jet.castTo<reco::CaloJetRef>();
         //jetFlavour.flavour(flavoursMapf[caloRef]);
@@ -1205,37 +1189,37 @@ reco::JetFlavour PerformanceAnalyzer::getMatchedParton(const reco::CaloJet &jet)
         //    RefToBase<Jet> testJet(jet);
 
         for ( JetFlavourMatchingCollection::const_iterator j  = theJetPartonMapf->begin();
-			  j != theJetPartonMapf->end();
-			  j ++ )
+                j != theJetPartonMapf->end();
+                j ++ )
         {
             RefToBase<Jet> aJet  = (*j).first;
             //      const JetFlavour aFlav = (*j).second;
             if ( fabs(aJet->phi() - jet.phi()) < 1.e-5 && fabs(aJet->eta() - jet.eta())< 1.e-5 )
             {
                 // matched
-		jetFlavour = reco::JetFlavour (aJet->p4(), math::XYZPoint(0,0,0), (*j).second.getFlavour());
+                jetFlavour = reco::JetFlavour (aJet->p4(), math::XYZPoint(0,0,0), (*j).second.getFlavour());
             }
         }
 
         return jetFlavour;
 
         /*    for( reco::CandMatchMap::const_iterator f  = theJetPartonMapf->begin();
-			  f != theJetPartonMapf->end(); f++) {
-			  const reco::Candidate *theJetInTheMatchMap = &*(f->key);
-			  const reco::Candidate *theMatchedParton    = &*(f->val);
-			  if(theJetInTheMatchMap->hasMasterClone ()) {
-			  const reco::CaloJet* theMasterClone = dynamic_cast<const reco::CaloJet*>(theJetInTheMatchMap->masterClone().get());
-			  //std::cout << " masterclone pt = " << theMasterClone->pt() << " calo jet pt = " << jet.pt() << std::endl;
-			  // FIXME, compare pointers rather than values:
-			  //if ( fabs( theMasterClone->pt() - jet.pt() ) < 1.e-5 ) {
-			  if ( fabs(theMasterClone->phi() - jet.phi()) < 1.e-5 && fabs(theMasterClone->eta() - jet.eta())< 1.e-5 ){
-			  //std::cout << " it matches! " << std::endl;
-			  jetFlavour.flavour(abs(theMatchedParton->pdgId()));
-			  jetFlavour.underlyingParton4Vec(theMatchedParton->p4());
-			  return jetFlavour;
-			  }
-			  }
-			  }
+        	  f != theJetPartonMapf->end(); f++) {
+        	  const reco::Candidate *theJetInTheMatchMap = &*(f->key);
+        	  const reco::Candidate *theMatchedParton    = &*(f->val);
+        	  if(theJetInTheMatchMap->hasMasterClone ()) {
+        	  const reco::CaloJet* theMasterClone = dynamic_cast<const reco::CaloJet*>(theJetInTheMatchMap->masterClone().get());
+        	  //std::cout << " masterclone pt = " << theMasterClone->pt() << " calo jet pt = " << jet.pt() << std::endl;
+        	  // FIXME, compare pointers rather than values:
+        	  //if ( fabs( theMasterClone->pt() - jet.pt() ) < 1.e-5 ) {
+        	  if ( fabs(theMasterClone->phi() - jet.phi()) < 1.e-5 && fabs(theMasterClone->eta() - jet.eta())< 1.e-5 ){
+        	  //std::cout << " it matches! " << std::endl;
+        	  jetFlavour.flavour(abs(theMatchedParton->pdgId()));
+        	  jetFlavour.underlyingParton4Vec(theMatchedParton->p4());
+        	  return jetFlavour;
+        	  }
+        	  }
+        	  }
         */
 
     }
@@ -1248,326 +1232,345 @@ reco::JetFlavour PerformanceAnalyzer::getMatchedParton(const reco::CaloJet &jet)
 void
 PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 {
-  
-  // count
-  histcounterf->Fill("Processed", 1);
-  bool NjetsCut = false;
-  bool NmuCut = false;
-  bool Nmu_in_jetCut = false;
-  bool Nmu_in_jet_away_taggedCut = false;
 
-  // Trakcs
-  Handle<reco::TrackCollection> recTrks;
-  iEvent.getByLabel(recoTrackList_, recTrks);
-  
-  // initialize flavour identifiers
-  edm::Handle<JetFlavourMatchingCollection> jetMC;
-  
-  if (flavourMatchOptionf == "fastMC")
+    // count
+    histcounterf->Fill("Processed", 1);
+    bool NjetsCut = false;
+    bool NmuCut = false;
+    bool Nmu_in_jetCut = false;
+    bool Nmu_in_jet_away_taggedCut = false;
+
+    // Trakcs
+    Handle<reco::TrackCollection> recTrks;
+    iEvent.getByLabel(recoTrackList_, recTrks);
+
+    // initialize flavour identifiers
+    edm::Handle<JetFlavourMatchingCollection> jetMC;
+
+    if (flavourMatchOptionf == "fastMC")
     {
-      iEvent.getByLabel(flavourSourcef, jetMC);
-      for (JetFlavourMatchingCollection::const_iterator iter =
-	     jetMC->begin(); iter != jetMC->end(); iter++)
-	flavoursMapf.insert(std::pair <const edm::RefToBase<reco::Jet>, unsigned int>((*iter).first, (unsigned int)((*iter).second).getFlavour()));
-      //      flavoursMapf[(*iter).first]= (unsigned int)((*iter).second).getFlavour();
+        iEvent.getByLabel(flavourSourcef, jetMC);
+        for (JetFlavourMatchingCollection::const_iterator iter =
+                    jetMC->begin(); iter != jetMC->end(); iter++)
+            flavoursMapf.insert(std::pair <const edm::RefToBase<reco::Jet>, unsigned int>((*iter).first, (unsigned int)((*iter).second).getFlavour()));
+        //      flavoursMapf[(*iter).first]= (unsigned int)((*iter).second).getFlavour();
     }
-  else if (flavourMatchOptionf == "genParticle")
+    else if (flavourMatchOptionf == "genParticle")
     {
-      iEvent.getByLabel (flavourSourcef, theJetPartonMapf);
+        iEvent.getByLabel (flavourSourcef, theJetPartonMapf);
     }
-  
-  
-  // generator candidates
-  Handle<GenParticleCollection> genParticles;
-  iEvent.getByLabel("genParticles", genParticles);
-  
-  //
-  
-  // Muons
-  Handle<reco::MuonCollection> muonsColl;
-  iEvent.getByLabel(MuonCollectionTags_, muonsColl);
-  
-  // Calo Jets
-  Handle<reco::CaloJetCollection> jetsColl;
-  iEvent.getByLabel(CaloJetCollectionTags_, jetsColl);
-  
-  // Get the bTagTrackEventIPTagInfo collection
-  Handle<std::vector<reco::TrackIPTagInfo> > bTagTrackEventIPTagInfos;
-  
-  if ( !bTagTrackEventIPTagInfos_.empty() )
-    iEvent.getByLabel(bTagTrackEventIPTagInfos_, bTagTrackEventIPTagInfos);
-  
-  
-  // initialize jet corrector
-  const JetCorrector *acorrector = 0;
-  if (useJetCorr_ == true){
-    acorrector = JetCorrector::getJetCorrector(jetCorrLabel_,iSetup);
-  }
-  
-  
-  Handle<reco::GenJetCollection> genjetsColl;
-  iEvent.getByLabel(GenJetCollectionTags_, genjetsColl);
-  
-  
-  const reco::CaloJetCollection recoJets =   *(jetsColl.product());
-  const reco::GenJetCollection  genJets  =   *(genjetsColl.product());
-  const reco::MuonCollection    recoMuons =  *(muonsColl.product());
-  
-  //const reco::VertexCollection recoPV = *(recVtxs.product());
-  
-  // MC
-  
-  //Handle<SimTrackContainer> simTrks;
-  //iEvent.getByLabel( simG4_, simTrks);
-  
-  Handle<std::vector<reco::TrackIPTagInfo> > tagInfo;
-  iEvent.getByLabel("impactParameterTagInfos", tagInfo);
-  // WEIGHTS
-  double weight = 1.;
-  
-  Handle< double> weightHandle;
-  
-  if (fWeightHistograms || fStoreWeightsInNtuple)
+
+
+    // generator candidates
+    Handle<GenParticleCollection> genParticles;
+    iEvent.getByLabel("genParticles", genParticles);
+
+    //
+
+    // Muons
+    Handle<reco::MuonCollection> muonsColl;
+    iEvent.getByLabel(MuonCollectionTags_, muonsColl);
+
+    // Calo Jets
+    Handle<reco::CaloJetCollection> jetsColl;
+    iEvent.getByLabel(CaloJetCollectionTags_, jetsColl);
+
+    // Get the bTagTrackEventIPTagInfo collection
+    Handle<std::vector<reco::TrackIPTagInfo> > bTagTrackEventIPTagInfos;
+
+    if ( !bTagTrackEventIPTagInfos_.empty() )
+        iEvent.getByLabel(bTagTrackEventIPTagInfos_, bTagTrackEventIPTagInfos);
+
+
+    // initialize jet corrector
+    const JetCorrector *acorrector = 0;
+    if (useJetCorr_ == true)
     {
-      
-      iEvent.getByLabel ("csaweightproducer","weight", weightHandle);
-      
+        acorrector = JetCorrector::getJetCorrector(jetCorrLabel_,iSetup);
     }
-  
-  if (fWeightHistograms) weight = *weightHandle;
-  
-  if (fStoreWeightsInNtuple) fS8evt->evt_weight =  (*weightHandle);
-  else fS8evt->evt_weight = 1.;
-  
-  
-  if (fStorePtHat)
+
+
+    Handle<reco::GenJetCollection> genjetsColl;
+    iEvent.getByLabel(GenJetCollectionTags_, genjetsColl);
+
+
+    const reco::CaloJetCollection recoJets =   *(jetsColl.product());
+    const reco::GenJetCollection  genJets  =   *(genjetsColl.product());
+    const reco::MuonCollection    recoMuons =  *(muonsColl.product());
+
+    //const reco::VertexCollection recoPV = *(recVtxs.product());
+
+    // MC
+
+    //Handle<SimTrackContainer> simTrks;
+    //iEvent.getByLabel( simG4_, simTrks);
+
+    Handle<std::vector<reco::TrackIPTagInfo> > tagInfo;
+    iEvent.getByLabel("impactParameterTagInfos", tagInfo);
+    // WEIGHTS
+    double weight = 1.;
+
+    Handle< double> weightHandle;
+
+    if (fWeightHistograms || fStoreWeightsInNtuple)
     {
-      edm::Handle<int> genProcessID;
-      iEvent.getByLabel( "genEventProcID", genProcessID );
-      double processID = *genProcessID;
-      edm::Handle<double> genEventScale;
-      iEvent.getByLabel( "genEventScale", genEventScale );
-      double pthat = *genEventScale;
-      
-      if (processID == 11 || processID == 12 || processID == 13
-	  || processID == 28 || processID == 68 || processID == 53) fS8evt->ptHat = pthat;
-      else fS8evt->ptHat = -99;
+
+        iEvent.getByLabel ("csaweightproducer","weight", weightHandle);
+
     }
-  
-  
-  fS8evt->Reset();
-  
-  fS8evt->event = iEvent.id().event();
-  fS8evt->run = iEvent.id().run();
-  fS8evt->evt_weight = weight ;
-  //fS8evt->njets = recoJets.size();
-  //fS8evt->nmuons = recoMuons.size();
-  int total_nmuons = 0;
-  fS8evt->ngenjets = genJets.size();
-  //fS8evt->nvertices = recoPV.size();
-  
-  CaloJetCollection::const_iterator jet;
-  CaloJetCollection::const_iterator awayjet;
-  //GenJetCollection::const_iterator genjet;
-  reco::MuonCollection::const_iterator muon;
-  
-  //reco::JetTagCollection::iterator btagite;
-  //std::vector< BTagLeptonEvent > LeptonEvtVector;
-  
-  ///////////////////////////////
-  // begin loop over jets
-  //////////////////////////////
-  TLorentzVector p4Jet;
-  TLorentzVector p4MuJet;
-  TLorentzVector p4OppJet;
-  TLorentzVector p4Muon;
-  int ijet = 0;
-  
-  for ( jet = recoJets.begin(); jet != recoJets.end(); ++jet )
+
+    if (fWeightHistograms) weight = *weightHandle;
+
+    if (fStoreWeightsInNtuple) fS8evt->evt_weight =  (*weightHandle);
+    else fS8evt->evt_weight = 1.;
+
+
+    if (fStorePtHat)
     {
-      
-      // get jet corrections
-      double jetcorrection = 1.;
-      if (useJetCorr_ == true){
-	jetcorrection =  acorrector->correction(*jet, iEvent, iSetup);
-      }
-      // Jet quality cuts
-      if ( (jet->pt() * jetcorrection ) <= MinJetPt_ || std::abs( jet->eta() ) >= MaxJetEta_ ) continue;
-      
-      if ( !NjetsCut ) { histcounterf->Fill("jets", 2 ); NjetsCut = true; }
-      
-      // get MC flavor of jet
-      //int JetFlavor = jetFlavourIdentifier_.identifyBasedOnPartons(*jet).flavour();
-      int JetFlavor = abs(getMatchedParton(*jet).getFlavour());
-      p4Jet.SetPtEtaPhiE(jet->pt(), jet->eta(), jet->phi(), jet->energy() );
-      p4Jet = jetcorrection * p4Jet;
-      int hasLepton = 0;
-      int tmptotmuon = 0;
-      BTagLeptonEvent leptonEvent;
-      
-      /////////////////////////////////
-      // begin loop over muons
-      ////////////////////////////////
-      double mu_highest_pt = 0;
-      double ptrel = 0;
-      double ptreltmp = 0;
-      
-      for ( muon = recoMuons.begin(); muon != recoMuons.end(); ++muon)
+        edm::Handle<int> genProcessID;
+        iEvent.getByLabel( "genEventProcID", genProcessID );
+        double processID = *genProcessID;
+        edm::Handle<double> genEventScale;
+        iEvent.getByLabel( "genEventScale", genEventScale );
+        double pthat = *genEventScale;
+
+        if (processID == 11 || processID == 12 || processID == 13
+                || processID == 28 || processID == 68 || processID == 53) fS8evt->ptHat = pthat;
+        else fS8evt->ptHat = -99;
+    }
+
+
+    fS8evt->Reset();
+
+    fS8evt->event = iEvent.id().event();
+    fS8evt->run = iEvent.id().run();
+    fS8evt->evt_weight = weight ;
+    //fS8evt->njets = recoJets.size();
+    //fS8evt->nmuons = recoMuons.size();
+    int total_nmuons = 0;
+    fS8evt->ngenjets = genJets.size();
+    //fS8evt->nvertices = recoPV.size();
+
+    CaloJetCollection::const_iterator jet;
+    CaloJetCollection::const_iterator awayjet;
+    //GenJetCollection::const_iterator genjet;
+    reco::MuonCollection::const_iterator muon;
+
+    //reco::JetTagCollection::iterator btagite;
+    //std::vector< BTagLeptonEvent > LeptonEvtVector;
+
+    ///////////////////////////////
+    // begin loop over jets
+    //////////////////////////////
+    TLorentzVector p4Jet;
+    TLorentzVector p4MuJet;
+    TLorentzVector p4OppJet;
+    TLorentzVector p4Muon;
+    int ijet = 0;
+
+    for ( jet = recoJets.begin(); jet != recoJets.end(); ++jet )
+    {
+
+        // get jet corrections
+        double jetcorrection = 1.;
+        if (useJetCorr_ == true)
         {
-	  //      if (muon->track().isNull() || muon->standAloneMuon().isNull() || muon->combinedMuon().isNull()) continue;
-	  if (muon->isGlobalMuon() == false) continue;
-	  //      std::cout <<" DEREF " <<muon->track().isValid()<<std::endl;
-	  //      std::cout <<" is the ref valid??? "<<muon->track()<<std::endl;
-	  TrackRef mt = muon->track();
-	  Track muonTrk = *muon->track();
-	  //TrackingParticleRef TrueHitsTrk;
-	  Track muonSA = *muon->standAloneMuon();
-	  int nhit = muonTrk.numberOfValidHits();//muonTrk.recHitsSize();
-	  // muon cuts
-	  double normChi2 = (*(muon->combinedMuon())).normalizedChi2();//(*(muon->combinedMuon())).chi2() / (*(muon->combinedMuon())).ndof();// use global fit
-	  if ( (nhit <= MinMuonNHits_ ) || (muon->pt()<= MinMuonPt_) || (normChi2 >= MaxMuonChi2_ ) ) continue;
-	  
-	  if ( !NmuCut ) { histcounterf->Fill("N muons", 3 ); NmuCut = true; } 
-
-	  // delta R(muon,jet)
-	  double deltaR  = ROOT::Math::VectorUtil::DeltaR(jet->p4().Vect(), muon->p4().Vect() );
-	  TVector3 tmpvecOrg(jet->p4().Vect().X(),jet->p4().Vect().Y(),  jet->p4().Vect().Z());
-	  TVector3 tmpvec;
-	  // use calibrated jet
-	  tmpvec = jetcorrection * tmpvecOrg;
-	  // find pTrel
-	  //TVector3 leptonvec(muonTrk.momentum().X(), muonTrk.momentum().Y(),muonTrk.momentum().Z());
-	  TVector3 leptonvec(muon->px(), muon->py(),muon->pz());
-	  tmpvec += leptonvec;
-	  ptreltmp = leptonvec.Perp(tmpvec);
-	  // muon in jet cuts
-	  if ( (deltaR >= MinDeltaR_ ) || (ptreltmp <= MinPtRel_ ) ) continue;
-	  // now we have a good muon in a jet
-
-	  if ( !Nmu_in_jetCut ) { histcounterf->Fill("N muon-in-jet", 4 ); Nmu_in_jetCut = true; }
-
-	  total_nmuons++;
-	  hasLepton = 1;
-	  tmptotmuon++;
-	  // pick the leading muon inside the jet
-	  if ( muon->pt() > mu_highest_pt )
-            {
-	      mu_highest_pt = muon->pt();
-	      p4Muon.SetPtEtaPhiE(muon->pt(),
-				  muon->eta(),
-				  muon->phi(),
-				  muon->energy());
-	      // recalculate pTrel
-	      tmpvec = jetcorrection * tmpvecOrg;
-	      leptonvec.SetXYZ(muon->px(), muon->py(),muon->pz());
-	      tmpvec += leptonvec;
-	      ptrel = leptonvec.Perp(tmpvec);  // maximum
-            }
-	  
-	  // collect muon data
-	  leptonEvent.pdgid.push_back( 13 ); // muon only for the moment
-	  //  std::cout << "Muon energy " << muon->energy() <<std::endl;
-	  leptonEvent.e.push_back( muon->energy());
-	  leptonEvent.pt.push_back( muonTrk.pt());
-	  leptonEvent.eta.push_back( muonTrk.eta());
-	  leptonEvent.phi.push_back( muonTrk.phi());
-	  leptonEvent.charge.push_back( muonTrk.charge());
-	  
-	  leptonEvent.trkchi2.push_back( muonTrk.chi2());
-	  leptonEvent.trkndof.push_back( muonTrk.ndof());
-	  leptonEvent.chi2.push_back(    (*(muon->combinedMuon())).chi2() );
-	  leptonEvent.ndof.push_back(    (*(muon->combinedMuon())).ndof() );
-	  leptonEvent.SArechits.push_back(  muonSA.numberOfValidHits() );
-	  leptonEvent.trkrechits.push_back( muonTrk.numberOfValidHits() );
-	  leptonEvent.d0.push_back(         muonTrk.d0());
-	  leptonEvent.d0sigma.push_back(    muonTrk.d0Error());
-	  
-	  leptonEvent.jet_ptrel.push_back( ptreltmp);
-	  leptonEvent.jet_deltaR.push_back( deltaR);
-	  
-	  
-	  // find a sim track
-	  if (flavourMatchOptionf == "genParticle")
-            {
-	      
-	      for (size_t i = 0; i < genParticles->size(); ++ i)
-                {
-		  const GenParticle & p = (*genParticles)[i];
-		  
-		  if ( abs(p.pdgId()) == 13 && p.status()==2 )
-                    {
-		      
-		      leptonEvent.mc_pt.push_back(           p.pt() );
-		      leptonEvent.mc_phi.push_back(          p.phi() );
-		      leptonEvent.mc_eta.push_back(          p.eta() );
-		      leptonEvent.mc_e.push_back(            p.energy() );
-		      leptonEvent.mc_charge.push_back(       p.charge() );
-		      leptonEvent.mc_pdgid.push_back(        p.pdgId() );
-		      leptonEvent.mc_mother_pdgid.push_back( p.mother()->pdgId() );
-		      
-                    }
-		  
-                }
-	      
-            }
-	  
-        } //close loop over muons
-      
-      
-      if ( hasLepton == 1 )
-        {
-	  p4MuJet.SetPtEtaPhiE(jet->pt(), jet->eta(), jet->phi(), jet->energy() );
-	  p4MuJet = jetcorrection * p4MuJet;
+            jetcorrection =  acorrector->correction(*jet, iEvent, iSetup);
         }
-      
-      
-      /////////////////////////////
-      // find away jet
-      ////////////////////////////
-      bool AwayTaggedJet = false;
-      bool AwayMuonJet = false;
-      TLorentzVector p4AwayMuon;
-      
-      for ( awayjet = recoJets.begin(); awayjet != recoJets.end(); ++awayjet )
+        // Jet quality cuts
+        if ( (jet->pt() * jetcorrection ) <= MinJetPt_ || std::abs( jet->eta() ) >= MaxJetEta_ ) continue;
+
+        if ( !NjetsCut )
         {
-	  if ( hasLepton == 0 ) continue;
-	  
-	  TLorentzVector p4AwayJet;
-	  p4AwayJet.SetPtEtaPhiE(awayjet->pt(), awayjet->eta(), awayjet->phi(), awayjet->energy() );
-	  double jetcorrectionAway_ = 1.;
-	  if (useJetCorr_ == true){
-	    jetcorrectionAway_ =   acorrector->correction(*awayjet, iEvent, iSetup);
-	  }
-	  p4AwayJet = p4AwayJet *jetcorrectionAway_;
-	  
-	  // Jet quality cuts
-	  if ( (awayjet->pt() * jetcorrectionAway_ )  <= MinJetPt_ || std::abs( awayjet->eta() ) >= MaxJetEta_ ) continue;
-	  
-	  // skip muon in jet
-	  if ( p4AwayJet == p4MuJet ) continue;
-	  
-	  // now we have an away jet
-	  
-	  // find an away tagged jet
-	  if ( !AwayTaggedJet )
+            histcounterf->Fill("jets", 2 );
+            NjetsCut = true;
+        }
+
+        // get MC flavor of jet
+        //int JetFlavor = jetFlavourIdentifier_.identifyBasedOnPartons(*jet).flavour();
+        int JetFlavor = abs(getMatchedParton(*jet).getFlavour());
+        p4Jet.SetPtEtaPhiE(jet->pt(), jet->eta(), jet->phi(), jet->energy() );
+        p4Jet = jetcorrection * p4Jet;
+        int hasLepton = 0;
+        int tmptotmuon = 0;
+        BTagLeptonEvent leptonEvent;
+
+        /////////////////////////////////
+        // begin loop over muons
+        ////////////////////////////////
+        double mu_highest_pt = 0;
+        double ptrel = 0;
+        double ptreltmp = 0;
+
+        for ( muon = recoMuons.begin(); muon != recoMuons.end(); ++muon)
+        {
+            //      if (muon->track().isNull() || muon->standAloneMuon().isNull() || muon->combinedMuon().isNull()) continue;
+            if (muon->isGlobalMuon() == false) continue;
+            //      std::cout <<" DEREF " <<muon->track().isValid()<<std::endl;
+            //      std::cout <<" is the ref valid??? "<<muon->track()<<std::endl;
+            TrackRef mt = muon->track();
+            Track muonTrk = *muon->track();
+            //TrackingParticleRef TrueHitsTrk;
+            Track muonSA = *muon->standAloneMuon();
+            int nhit = muonTrk.numberOfValidHits();//muonTrk.recHitsSize();
+            // muon cuts
+            double normChi2 = (*(muon->combinedMuon())).normalizedChi2();//(*(muon->combinedMuon())).chi2() / (*(muon->combinedMuon())).ndof();// use global fit
+            if ( (nhit <= MinMuonNHits_ ) || (muon->pt()<= MinMuonPt_) || (normChi2 >= MaxMuonChi2_ ) ) continue;
+
+            if ( !NmuCut )
             {
-	      
-	      std::map< std::string, bool > aBmap = this->GetBTaggingMap(*awayjet,iEvent);
-	      for (std::map<std::string,bool>::const_iterator imap = aBmap.begin(); imap != aBmap.end(); ++imap )
+                histcounterf->Fill("N muons", 3 );
+                NmuCut = true;
+            }
+
+            // delta R(muon,jet)
+            double deltaR  = ROOT::Math::VectorUtil::DeltaR(jet->p4().Vect(), muon->p4().Vect() );
+            TVector3 tmpvecOrg(jet->p4().Vect().X(),jet->p4().Vect().Y(),  jet->p4().Vect().Z());
+            TVector3 tmpvec;
+            // use calibrated jet
+            tmpvec = jetcorrection * tmpvecOrg;
+            // find pTrel
+            //TVector3 leptonvec(muonTrk.momentum().X(), muonTrk.momentum().Y(),muonTrk.momentum().Z());
+            TVector3 leptonvec(muon->px(), muon->py(),muon->pz());
+            tmpvec += leptonvec;
+            ptreltmp = leptonvec.Perp(tmpvec);
+            // muon in jet cuts
+            if ( (deltaR >= MinDeltaR_ ) || (ptreltmp <= MinPtRel_ ) ) continue;
+            // now we have a good muon in a jet
+
+            if ( !Nmu_in_jetCut )
+            {
+                histcounterf->Fill("N muon-in-jet", 4 );
+                Nmu_in_jetCut = true;
+            }
+
+            total_nmuons++;
+            hasLepton = 1;
+            tmptotmuon++;
+            // pick the leading muon inside the jet
+            if ( muon->pt() > mu_highest_pt )
+            {
+                mu_highest_pt = muon->pt();
+                p4Muon.SetPtEtaPhiE(muon->pt(),
+                                    muon->eta(),
+                                    muon->phi(),
+                                    muon->energy());
+                // recalculate pTrel
+                tmpvec = jetcorrection * tmpvecOrg;
+                leptonvec.SetXYZ(muon->px(), muon->py(),muon->pz());
+                tmpvec += leptonvec;
+                ptrel = leptonvec.Perp(tmpvec);  // maximum
+            }
+
+            // collect muon data
+            leptonEvent.pdgid.push_back( 13 ); // muon only for the moment
+            //  std::cout << "Muon energy " << muon->energy() <<std::endl;
+            leptonEvent.e.push_back( muon->energy());
+            leptonEvent.pt.push_back( muonTrk.pt());
+            leptonEvent.eta.push_back( muonTrk.eta());
+            leptonEvent.phi.push_back( muonTrk.phi());
+            leptonEvent.charge.push_back( muonTrk.charge());
+
+            leptonEvent.trkchi2.push_back( muonTrk.chi2());
+            leptonEvent.trkndof.push_back( muonTrk.ndof());
+            leptonEvent.chi2.push_back(    (*(muon->combinedMuon())).chi2() );
+            leptonEvent.ndof.push_back(    (*(muon->combinedMuon())).ndof() );
+            leptonEvent.SArechits.push_back(  muonSA.numberOfValidHits() );
+            leptonEvent.trkrechits.push_back( muonTrk.numberOfValidHits() );
+            leptonEvent.d0.push_back(         muonTrk.d0());
+            leptonEvent.d0sigma.push_back(    muonTrk.d0Error());
+
+            leptonEvent.jet_ptrel.push_back( ptreltmp);
+            leptonEvent.jet_deltaR.push_back( deltaR);
+
+
+            // find a sim track
+            if (flavourMatchOptionf == "genParticle")
+            {
+
+                for (size_t i = 0; i < genParticles->size(); ++ i)
+                {
+                    const GenParticle & p = (*genParticles)[i];
+
+                    if ( abs(p.pdgId()) == 13 && p.status()==2 )
+                    {
+
+                        leptonEvent.mc_pt.push_back(           p.pt() );
+                        leptonEvent.mc_phi.push_back(          p.phi() );
+                        leptonEvent.mc_eta.push_back(          p.eta() );
+                        leptonEvent.mc_e.push_back(            p.energy() );
+                        leptonEvent.mc_charge.push_back(       p.charge() );
+                        leptonEvent.mc_pdgid.push_back(        p.pdgId() );
+                        leptonEvent.mc_mother_pdgid.push_back( p.mother()->pdgId() );
+
+                    }
+
+                }
+
+            }
+
+        } //close loop over muons
+
+
+        if ( hasLepton == 1 )
+        {
+            p4MuJet.SetPtEtaPhiE(jet->pt(), jet->eta(), jet->phi(), jet->energy() );
+            p4MuJet = jetcorrection * p4MuJet;
+        }
+
+
+        /////////////////////////////
+        // find away jet
+        ////////////////////////////
+        bool AwayTaggedJet = false;
+        bool AwayMuonJet = false;
+        TLorentzVector p4AwayMuon;
+
+        for ( awayjet = recoJets.begin(); awayjet != recoJets.end(); ++awayjet )
+        {
+            if ( hasLepton == 0 ) continue;
+
+            TLorentzVector p4AwayJet;
+            p4AwayJet.SetPtEtaPhiE(awayjet->pt(), awayjet->eta(), awayjet->phi(), awayjet->energy() );
+            double jetcorrectionAway_ = 1.;
+            if (useJetCorr_ == true)
+            {
+                jetcorrectionAway_ =   acorrector->correction(*awayjet, iEvent, iSetup);
+            }
+            p4AwayJet = p4AwayJet *jetcorrectionAway_;
+
+            // Jet quality cuts
+            if ( (awayjet->pt() * jetcorrectionAway_ )  <= MinJetPt_ || std::abs( awayjet->eta() ) >= MaxJetEta_ ) continue;
+
+            // skip muon in jet
+            if ( p4AwayJet == p4MuJet ) continue;
+
+            // now we have an away jet
+
+            // find an away tagged jet
+            if ( !AwayTaggedJet )
+            {
+
+                std::map< std::string, bool > aBmap = this->GetBTaggingMap(*awayjet,iEvent);
+                for (std::map<std::string,bool>::const_iterator imap = aBmap.begin(); imap != aBmap.end(); ++imap )
                 {
                     if ( imap->first == fAwayJetTagger && imap->second )
                     {
 
                         AwayTaggedJet = true;
 
-			if ( ! Nmu_in_jet_away_taggedCut ) { histcounterf->Fill("N mu-in-jet-away-tagged-jet", 5 ); Nmu_in_jet_away_taggedCut = true; }
+                        if ( ! Nmu_in_jet_away_taggedCut )
+                        {
+                            histcounterf->Fill("N mu-in-jet-away-tagged-jet", 5 );
+                            Nmu_in_jet_away_taggedCut = true;
+                        }
                     }
 
                 }
 
             }
 
-	  
+
 
             // find an away muon in jet
             if ( !AwayMuonJet )
@@ -1650,7 +1653,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
         fS8evt->jetcorrection.push_back( jetcorrection );
 
         // find generated jet
-        reco::GenJet genjet = this->GetGenJet(*jet,genJets);
+        reco::GenJet genjet = PFTools::GetGenJet(*jet, genJets);
         if ( genjet.p() > 0 )
         {
             //fS8evt->genjet_p.push_back(genjet.p());
@@ -1679,7 +1682,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
         // Running only on reco/aod samples
         // TrackCategories only in reco samples
         //*************************************
-                
+
         if ( bTagTrackEventIPTagInfos.isValid() )
         {
             // Associate the jet and jettag
@@ -1715,12 +1718,12 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
                 trackEvent.ip2dSigma.push_back( ipdata[index].ip2d.error() );
                 trackEvent.ip3d.push_back( ipdata[index].ip3d.value() );
                 trackEvent.ip3dSigma.push_back( ipdata[index].ip3d.error() );
-				trackEvent.dta.push_back( ipdata[index].distanceToJetAxis.value() );
+                trackEvent.dta.push_back( ipdata[index].distanceToJetAxis.value() );
 
                 // delta R(muon,jet)
                 trackEvent.jet_deltaR.push_back(
                     ROOT::Math::VectorUtil::DeltaR(jet->p4().Vect(), track->momentum())
-					);
+                );
 
                 // ptrel calculation per track
                 TVector3 trackvec(track->px(), track->py(), track->pz());
@@ -1728,7 +1731,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
                 jetvec = jetcorrection * jetvec;
                 trackEvent.jet_ptrel.push_back(
                     trackvec.Perp(jetvec + trackvec)
-					);
+                );
             }
 
             // Add the track event into BTagEvent.
@@ -1755,41 +1758,42 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
         tmpvec = jetcorrection * tmpvecOrg;
 
 
-	std::map<std::string, bool> mymap;
-	
-	for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it != wp.end(); ++it){
-	  //    for (size_t k=0; k<jetTags_testManyByType.size(); k++)
-	  //    {
-	  
+        std::map<std::string, bool> mymap;
 
-	  edm::Handle<reco::JetTagCollection > jetTags;
-	  //	  std::cout <<" Asking for "<< (*it).inputTag()<<std::endl;
-	  iEvent.getByLabel((*it).inputTag(),jetTags);
-	  std::string moduleLabel = (jetTags).provenance()->moduleLabel();
-	  if (mymap.find(moduleLabel) != mymap.end()) continue;
-	  mymap[moduleLabel] == true;
-	  
-	  ith_tagged = this->TaggedJet(*jet,jetTags);
-	  
-	  if (ith_tagged == -1) continue;
-	  
-	  
-	  //*********************************
-	  // Track Counting taggers
-	  //*********************************
-	  
-	  // Get a vector of reference to the selected tracks in each jet
-	  TrackRefVector tracks((*tagInfo)[ith_tagged].selectedTracks());
-	  
-	  if ( moduleLabel == "trackCountingHighEffBJetTags" )
+        for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it != wp.end(); ++it)
+        {
+            //    for (size_t k=0; k<jetTags_testManyByType.size(); k++)
+            //    {
+
+
+            edm::Handle<reco::JetTagCollection > jetTags;
+            //	  std::cout <<" Asking for "<< (*it).inputTag()<<std::endl;
+            iEvent.getByLabel((*it).inputTag(),jetTags);
+            std::string moduleLabel = (jetTags).provenance()->moduleLabel();
+            if (mymap.find(moduleLabel) != mymap.end()) continue;
+            mymap[moduleLabel] == true;
+
+            ith_tagged = this->TaggedJet(*jet,jetTags);
+
+            if (ith_tagged == -1) continue;
+
+
+            //*********************************
+            // Track Counting taggers
+            //*********************************
+
+            // Get a vector of reference to the selected tracks in each jet
+            TrackRefVector tracks((*tagInfo)[ith_tagged].selectedTracks());
+
+            if ( moduleLabel == "trackCountingHighEffBJetTags" )
             {
-	      //			  std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
+                //			  std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
                 std::vector< Measurement1D  > trackIP;
 
                 std::vector<TrackIPTagInfo::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
 
                 for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
-					 itipdata != ipdata.end(); itipdata++)
+                        itipdata != ipdata.end(); itipdata++)
                 {
                     trackIP.push_back((*itipdata).ip3d );
                 }
@@ -1816,7 +1820,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
                 std::vector<TrackIPTagInfo::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
 
                 for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
-					 itipdata != ipdata.end(); itipdata++)
+                        itipdata != ipdata.end(); itipdata++)
                 {
                     trackIP.push_back((*itipdata).ip3d );
                 }
@@ -1842,7 +1846,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
                 std::vector<TrackIPTagInfo::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
 
                 for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
-					 itipdata != ipdata.end(); itipdata++)
+                        itipdata != ipdata.end(); itipdata++)
                 {
                     trackIP.push_back((*itipdata).ip3d );
                 }
@@ -1866,7 +1870,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
                 std::vector<TrackIPTagInfo::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
 
                 for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
-					 itipdata != ipdata.end(); itipdata++)
+                        itipdata != ipdata.end(); itipdata++)
                 {
                     trackIP.push_back((*itipdata).ip3d );
                 }
@@ -1942,33 +1946,33 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 
         }
 
-	
-	//FillHistos("n",p4MuJet, ptrel, JetFlavor,isbTaggedJet);
-	
-	if (!gotTCHE)    fS8evt->btag_TrkCounting_disc3D_2trk.push_back( -9999. );
-	if (!gotTCHEneg) fS8evt->btag_NegTag_disc3D_2trk.push_back( -9999. );
-	
-	if (!gotTCHP)    fS8evt->btag_TrkCounting_disc3D_3trk.push_back( -9999. );
-	if (!gotTCHPneg) fS8evt->btag_NegTag_disc3D_3trk.push_back( -9999. );
-	
-	if (!gotJP)      fS8evt->btag_JetProb_disc3D.push_back( -9999. );
-	if (!gotJPneg)   fS8evt->btag_negJetProb_disc3D.push_back( -9999. );
-	if (!gotJPpos)   fS8evt->btag_posJetProb_disc3D.push_back( -9999. );
-	if (!gotMTCHE)   fS8evt->btag_ModTrkCounting_disc3D_2trk.push_back( -9999. );
-	if (!gotMTCHP)   fS8evt->btag_ModTrkCounting_disc3D_2trk.push_back( -9999. );
-	
-	ijet++;
-} //end loop over reco jets
 
-fS8evt->njets = fS8evt->jet_pt.size();
-fS8evt->nmuons = total_nmuons;
+        //FillHistos("n",p4MuJet, ptrel, JetFlavor,isbTaggedJet);
+
+        if (!gotTCHE)    fS8evt->btag_TrkCounting_disc3D_2trk.push_back( -9999. );
+        if (!gotTCHEneg) fS8evt->btag_NegTag_disc3D_2trk.push_back( -9999. );
+
+        if (!gotTCHP)    fS8evt->btag_TrkCounting_disc3D_3trk.push_back( -9999. );
+        if (!gotTCHPneg) fS8evt->btag_NegTag_disc3D_3trk.push_back( -9999. );
+
+        if (!gotJP)      fS8evt->btag_JetProb_disc3D.push_back( -9999. );
+        if (!gotJPneg)   fS8evt->btag_negJetProb_disc3D.push_back( -9999. );
+        if (!gotJPpos)   fS8evt->btag_posJetProb_disc3D.push_back( -9999. );
+        if (!gotMTCHE)   fS8evt->btag_ModTrkCounting_disc3D_2trk.push_back( -9999. );
+        if (!gotMTCHP)   fS8evt->btag_ModTrkCounting_disc3D_2trk.push_back( -9999. );
+
+        ijet++;
+    } //end loop over reco jets
+
+    fS8evt->njets = fS8evt->jet_pt.size();
+    fS8evt->nmuons = total_nmuons;
 
 // fill tree
 
-ftree->Fill();
+    ftree->Fill();
 
-feventcounter++;
-  
+    feventcounter++;
+
 }
 
 //define this as a plug-in

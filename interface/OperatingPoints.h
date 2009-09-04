@@ -38,43 +38,42 @@
 
 class OperatingPoints : public edm::EDAnalyzer
 {
-
-
 public:
+ 
     explicit OperatingPoints(const edm::ParameterSet&);
+ 
     ~OperatingPoints();
 
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
     virtual void beginJob(edm::EventSetup const&);
     virtual void endJob();
 
-	int TaggedJet(reco::CaloJet calojet, edm::Handle<reco::JetTagCollection > jetTags );
+    int TaggedJet(reco::CaloJet calojet, edm::Handle<reco::JetTagCollection > jetTags );
     reco::JetFlavour getMatchedParton(const reco::CaloJet &jet);
 
 private:
 
-	std::string outputFile_;                   // output file
-	std::vector<WorkingPoint> wp;
-	std::map< std::string, WorkingPoint > wp_map;
+    std::string outputFile_;                   // output file
+    std::vector<WorkingPoint> wp;
+    std::map<std::string, WorkingPoint> wp_map;
     std::string CaloJetCollectionTags_;
-	edm::InputTag flavourSourcef;
+    edm::InputTag flavourSourcef;
     edm::Handle<reco::JetFlavourMatchingCollection> theJetPartonMapf;
-	std::string bTagTrackEventIPTagInfos_;
+    std::string bTagTrackEventIPTagInfos_;
 
     double MinJetPt_;
     double MaxJetEta_;
-	int MinNtrksInJet_;
-	double MinTrkPtInJet_;
-	int MinNjets_;
-	bool debug_;
-	bool useJetCorr_;
-	std::string jetCorrLabel_;
-	bool OPbyMistagRate_;
+    int MinNtrksInJet_;
+    double MinTrkPtInJet_;
+    int MinNjets_;
+    bool debug_;
+    bool useJetCorr_;
+    std::string jetCorrLabel_;
+    bool OPbyMistagRate_;
     TFile*  rootFile_;
 
-	std::map< std::string , S8bPerformance > TaggerPerformances_;
-	std::map< std::string , std::string > TaggerAlias_;
-	
+    std::map< std::string , S8bPerformance > TaggerPerformances_;
+    std::map< std::string , std::string > TaggerAlias_;
 };
 
 #endif

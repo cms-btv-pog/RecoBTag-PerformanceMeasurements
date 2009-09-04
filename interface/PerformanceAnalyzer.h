@@ -11,7 +11,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.26 2009/02/05 00:50:24 yumiceva Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.27 2009/09/04 17:18:47 yumiceva Exp $
  *
  */
 
@@ -113,13 +113,12 @@ public:
     virtual void beginJob(edm::EventSetup const&);
     virtual void endJob();
 
-    reco::GenJet GetGenJet(reco::CaloJet calojet, reco::GenJetCollection genJetColl);
     SimTrack GetGenTrk(reco::Track atrack, const edm::SimTrackContainer *simTrkColl, const edm::SimVertexContainer *simVtcs);
     int GetMotherId(const edm::SimVertexContainer *simVtxColl, const edm::SimTrackContainer *simTrkColl, SimTrack muonMC);
 
     int TaggedJet(reco::CaloJet calojet, edm::Handle<reco::JetTagCollection > jetTags );
     int TaggedJet(reco::CaloJet const &, edm::Handle<std::vector<reco::TrackIPTagInfo> > const &);
-    
+
     std::map< std::string, bool > GetBTaggingMap(reco::CaloJet jet, const edm::Event&, double ptrel=0.);
     void FillHistos(std::string type, TLorentzVector p4MuJet, double ptrel,
                     int JetFlavor, std::map<std::string, bool> aMap, double weight);
@@ -187,11 +186,11 @@ private:
     S8bPerformance fperformanceTC2trk;
     S8bPerformance fperformanceTC3trk;
     S8bPerformance fperformanceTP;
-	S8bPerformance fperformanceJBP;
+    S8bPerformance fperformanceJBP;
     S8bPerformance fperformanceSMT;
-	S8bPerformance fperformanceSSV;
-	S8bPerformance fperformanceCSV;
-	
+    S8bPerformance fperformanceSSV;
+    S8bPerformance fperformanceCSV;
+
     S8bPerformance fperformanceMTC2trk;
     S8bPerformance fperformanceMTC3trk;
     bool fWritePerformancePlots;

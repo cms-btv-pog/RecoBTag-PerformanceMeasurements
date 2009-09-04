@@ -2,7 +2,7 @@
 //
 // Package:    RecoBTag/PerformanceMeasurements
 // Class:      Taggability
-// 
+//
 /**\class PerformanceMeasurements/Taggability
 
  Description:
@@ -10,7 +10,7 @@
 	 Author: Francisco Yumiceva, Fermilab
 */
 //
-// $Id: Taggability.h,v 1.1 2009/08/17 22:25:29 yumiceva Exp $
+// $Id: Taggability.h,v 1.2 2009/08/24 20:37:42 yumiceva Exp $
 //
 //
 
@@ -25,31 +25,32 @@
 
 #include "TH2F.h"
 
-class Taggability : public edm::EDFilter {
+class Taggability : public edm::EDFilter
+{
 
-  public:
-	explicit Taggability(const edm::ParameterSet &);
-	virtual ~Taggability();
-	virtual bool filter(edm::Event& , const edm::EventSetup & );
+public:
+    explicit Taggability(const edm::ParameterSet &);
+    virtual ~Taggability();
+    virtual bool filter(edm::Event& , const edm::EventSetup & );
 
-  private:
+private:
 
-	edm::InputTag JetCollection_;
-	bool useJetCorr_;
-	std::string jetCorrLabel_;
-	double MinJetPt_;
-	double MaxJetEta_;
-	int MinNtrksInJet_;
-	double MinTrkPtInJet_;
-	int MinNjets_;
-	edm::InputTag PVCollection_;
-	int MinNPV_;
-	std::string bTagTrackEventIPTagInfos_;
-	bool writeHistos_;	
+    edm::InputTag JetCollection_;
+    bool useJetCorr_;
+    std::string jetCorrLabel_;
+    double MinJetPt_;
+    double MaxJetEta_;
+    int MinNtrksInJet_;
+    double MinTrkPtInJet_;
+    int MinNjets_;
+    edm::InputTag PVCollection_;
+    int MinNPV_;
+    std::string bTagTrackEventIPTagInfos_;
+    bool writeHistos_;
 
-	TH2F *h2_in;
-	TH2F *h2_out;
-	
+    TH2F *h2_in;
+    TH2F *h2_out;
+
 };
 
 #endif

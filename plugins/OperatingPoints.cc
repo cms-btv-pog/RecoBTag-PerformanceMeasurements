@@ -3,7 +3,7 @@
 //
 // Package:    RecoBTag/PerformanceMeasurements
 // Class:      OperatingPoints
-// 
+//
 /**\class PerformanceMeasurements/OperatingPoints
 
  Description:
@@ -11,7 +11,7 @@
  Author: Francisco Yumiceva
 */
 //
-// $Id: OperatingPoints.cc,v 1.4 2009/08/28 20:09:20 bazterra Exp $
+// $Id: OperatingPoints.cc,v 1.5 2009/09/04 17:18:47 yumiceva Exp $
 //
 //
 
@@ -44,157 +44,155 @@ using namespace std;
 OperatingPoints::OperatingPoints(const ParameterSet& iConfig)
 {
 
-CaloJetCollectionTags_ = iConfig.getParameter<std::string>("Jets");
+    CaloJetCollectionTags_ = iConfig.getParameter<std::string>("Jets");
 
-// jet cuts
-MinJetPt_ = iConfig.getParameter<edm::ParameterSet>("jetcuts").getParameter<double>("MinPt");
-MaxJetEta_ = iConfig.getParameter<edm::ParameterSet>("jetcuts").getParameter<double>("MaxEta");
-MinNtrksInJet_ = iConfig.getParameter<edm::ParameterSet>("jetcuts").getParameter<int>("MinNtracks");
-MinTrkPtInJet_ = iConfig.getParameter<edm::ParameterSet>("jetcuts").getParameter<double>("MinTrkPt");
-MinNjets_ = iConfig.getParameter<edm::ParameterSet>("jetcuts").getParameter<int>("MinNjets");
+    // jet cuts
+    MinJetPt_ = iConfig.getParameter<edm::ParameterSet>("jetcuts").getParameter<double>("MinPt");
+    MaxJetEta_ = iConfig.getParameter<edm::ParameterSet>("jetcuts").getParameter<double>("MaxEta");
+    MinNtrksInJet_ = iConfig.getParameter<edm::ParameterSet>("jetcuts").getParameter<int>("MinNtracks");
+    MinTrkPtInJet_ = iConfig.getParameter<edm::ParameterSet>("jetcuts").getParameter<double>("MinTrkPt");
+    MinNjets_ = iConfig.getParameter<edm::ParameterSet>("jetcuts").getParameter<int>("MinNjets");
 
-useJetCorr_ = iConfig.getParameter<bool>("ApplyJetCorrections");
-jetCorrLabel_ =  iConfig.getParameter<std::string>("jetCorrectionsLabel");
-std::cout<<" Use JetCorrections with Label "<<jetCorrLabel_ <<std::endl;
+    useJetCorr_ = iConfig.getParameter<bool>("ApplyJetCorrections");
+    jetCorrLabel_ =  iConfig.getParameter<std::string>("jetCorrectionsLabel");
+    std::cout<<" Use JetCorrections with Label "<<jetCorrLabel_ <<std::endl;
 
-// Flavour identification
-flavourSourcef = iConfig.getParameter<edm::InputTag>("flavourSource");
+    // Flavour identification
+    flavourSourcef = iConfig.getParameter<edm::InputTag>("flavourSource");
 
-bTagTrackEventIPTagInfos_ = iConfig.getParameter<std::string>("bTagTrackEventIPtagInfos");
+    bTagTrackEventIPTagInfos_ = iConfig.getParameter<std::string>("bTagTrackEventIPtagInfos");
 
-//
-// get operating points
+    //
+    // get operating points
 
-std::vector<edm::ParameterSet> config = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet > >("bTagCutList");
+    std::vector<edm::ParameterSet> config = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet > >("bTagCutList");
 
-// type of operating points
-OPbyMistagRate_ = iConfig.getParameter<bool>("OperatingPointsbyMistagRate");
+    // type of operating points
+    OPbyMistagRate_ = iConfig.getParameter<bool>("OperatingPointsbyMistagRate");
 
-for (std::vector<edm::ParameterSet>::const_iterator it = config.begin(); it != config.end() ; ++it){
+    for (std::vector<edm::ParameterSet>::const_iterator it = config.begin(); it != config.end() ; ++it)
+    {
 
-	std::string alias = (*it).getUntrackedParameter<std::string> ("alias");
-	std::vector<edm::ParameterSet> avec = (*it).getUntrackedParameter<std::vector<edm::ParameterSet> >("OperatingPoints");
-	double min = (*it).getUntrackedParameter<double> ("MinimumDiscriminator");
-	double max = (*it).getUntrackedParameter<double> ("MaximumDiscriminator");
+        std::string alias = (*it).getUntrackedParameter<std::string> ("alias");
+        std::vector<edm::ParameterSet> avec = (*it).getUntrackedParameter<std::vector<edm::ParameterSet> >("OperatingPoints");
+        double min = (*it).getUntrackedParameter<double> ("MinimumDiscriminator");
+        double max = (*it).getUntrackedParameter<double> ("MaximumDiscriminator");
 
-	std::map< std::string, double > mapOP;
-	for (std::vector<edm::ParameterSet>::const_iterator imapOP = avec.begin(); imapOP != avec.end(); ++imapOP) {
+        std::map< std::string, double > mapOP;
+        for (std::vector<edm::ParameterSet>::const_iterator imapOP = avec.begin(); imapOP != avec.end(); ++imapOP)
+        {
 
-		mapOP[(*imapOP).getUntrackedParameter<std::string> ("name")] =
-			(*imapOP).getUntrackedParameter<double> ("cut");
-	}
+            mapOP[(*imapOP).getUntrackedParameter<std::string> ("name")] =
+                (*imapOP).getUntrackedParameter<double> ("cut");
+        }
 
-	WorkingPoint tmpwp((*it).getUntrackedParameter<edm::InputTag> ("collection"),
-					   alias,
-					   min,
-					   max,
-					   mapOP );
-	
-	wp.push_back(tmpwp);
-	//(wp.end()-1)->print();
+        WorkingPoint tmpwp((*it).getUntrackedParameter<edm::InputTag> ("collection"),
+                           alias,
+                           min,
+                           max,
+                           mapOP );
 
-	wp_map[alias] = tmpwp;
+        wp.push_back(tmpwp);
+        //(wp.end()-1)->print();
 
-	
-	TaggerPerformances_[alias].Set(alias);
-	TaggerPerformances_[alias].SetMinDiscriminator(min);
-	TaggerPerformances_[alias].SetMaxDiscriminator(max);
-	
-}
-
-// open output file to store results
-outputFile_  = iConfig.getUntrackedParameter<std::string>("outputFile");
-
-// create or update output root file
-rootFile_ = TFile::Open(outputFile_.c_str(),"RECREATE");
-
-// verbose std output
-debug_ = iConfig.getUntrackedParameter<bool>("debug", false);
+        wp_map[alias] = tmpwp;
 
 
+        TaggerPerformances_[alias].Set(alias);
+        TaggerPerformances_[alias].SetMinDiscriminator(min);
+        TaggerPerformances_[alias].SetMaxDiscriminator(max);
+    }
+
+    // open output file to store results
+    outputFile_  = iConfig.getUntrackedParameter<std::string>("outputFile");
+
+    // create or update output root file
+    rootFile_ = TFile::Open(outputFile_.c_str(),"RECREATE");
+
+    // verbose std output
+    debug_ = iConfig.getUntrackedParameter<bool>("debug", false);
 }
 
 OperatingPoints::~OperatingPoints()
 {
 
-	rootFile_->cd();
+    rootFile_->cd();
 
-	std::vector< TGraph* > gVector;
+    std::vector< TGraph* > gVector;
 
-	if ( OPbyMistagRate_ ) {
+    if ( OPbyMistagRate_ )
+    {
 
-			cout << "\n b-tagging Operating Points estimated by udsg-mistagging rate " << endl;
-			cout << "==============================================================\n" << endl;
-	}
-	
-	for (std::map<std::string, S8bPerformance>::const_iterator iperf = TaggerPerformances_.begin(); iperf!= TaggerPerformances_.end(); ++iperf ) {
+        cout << "\n b-tagging Operating Points estimated by udsg-mistagging rate " << endl;
+        cout << "==============================================================\n" << endl;
+    }
 
-		S8bPerformance Perf = iperf->second;
+    for (std::map<std::string, S8bPerformance>::const_iterator iperf = TaggerPerformances_.begin(); iperf!= TaggerPerformances_.end(); ++iperf )
+    {
 
-		Perf.Eval();
+        S8bPerformance Perf = iperf->second;
 
-		
-		TGraphErrors *gTb = Perf.EfficiencyGraph("b");
-		TGraphErrors *gTc = Perf.EfficiencyGraph("c");
-		TGraphErrors *gTl = Perf.EfficiencyGraph("udsg");
-		gVector.push_back( gTb );
-		gVector.push_back( gTc );
-		gVector.push_back( gTl );
+        Perf.Eval();
 
-		TGraph *discTl = Perf.DiscriminatorGraph("udsg");
-		discTl->Sort();
-		gVector.push_back( discTl );
 
-		if ( OPbyMistagRate_ ) {
+        TGraphErrors *gTb = Perf.EfficiencyGraph("b");
+        TGraphErrors *gTc = Perf.EfficiencyGraph("c");
+        TGraphErrors *gTl = Perf.EfficiencyGraph("udsg");
+        gVector.push_back( gTb );
+        gVector.push_back( gTc );
+        gVector.push_back( gTl );
 
-			
-			// reverse axis of graph
-			TGraphErrors *g_reverse = new TGraphErrors(gTl->GetN(),gTl->GetY(),gTl->GetX(),gTl->GetEY(),gTl->GetEX());
-			g_reverse->Sort();
-			
-			
-			// get operating point cuts
-			WorkingPoint apt = wp_map[iperf->first];
-			
-			cout << " Tagger Name: " << apt.inputTag().label() << ", Alias: " << apt.alias() << endl;
-			
-			std::map<std::string, double > list_cuts = apt.list();
+        TGraph *discTl = Perf.DiscriminatorGraph("udsg");
+        discTl->Sort();
+        gVector.push_back( discTl );
 
-			double *xarr = new double[ (int)list_cuts.size() ];
-			double *yarr = new double[ (int)list_cuts.size() ];
-			int ii = 0;
-			for(std::map<std::string, double >::const_iterator icut = list_cuts.begin(); icut != list_cuts.end(); ++icut) {
+        if ( OPbyMistagRate_ )
+        {
+            // reverse axis of graph
+            TGraphErrors *g_reverse = new TGraphErrors(gTl->GetN(),gTl->GetY(),gTl->GetX(),gTl->GetEY(),gTl->GetEX());
+            g_reverse->Sort();
 
-				double disc_cut = discTl->Eval( icut->second );
-				double b_eff = g_reverse->Eval( icut->second );
 
-				cout << icut->first << " : udsg-mistagging = " << setprecision(3) << icut->second << ", b-efficiency = " << setprecision(3) << b_eff << ", discriminator cut = " << setprecision(3) << disc_cut << endl;
-				xarr[ii] = icut->second;
-				yarr[ii] = b_eff;
-				ii++;
-			}
-			cout << endl;
+            // get operating point cuts
+            WorkingPoint apt = wp_map[iperf->first];
 
-			TGraph *g_results = new TGraph( (int)list_cuts.size(), xarr, yarr );
-			g_results->SetTitle( TString(apt.alias() + "_OP") );
-			g_results->SetName( TString(apt.alias() + "_OP") );
-			g_results->GetXaxis()->SetTitle("udsg-mistagging");
-			g_results->GetYaxis()->SetTitle("b-efficiency");
-			gVector.push_back( g_results );
-			
-			delete g_reverse;
-			delete xarr;
-			delete yarr;
-		}
-	}
-	for (std::vector< TGraph* >::const_iterator iv = gVector.begin();
-		 iv != gVector.end(); ++iv ) {
+            cout << " Tagger Name: " << apt.inputTag().label() << ", Alias: " << apt.alias() << endl;
 
-		(*iv)->Write();
-	}
-	
-	rootFile_->Close();
+            std::map<std::string, double > list_cuts = apt.list();
 
+            double *xarr = new double[ (int)list_cuts.size() ];
+            double *yarr = new double[ (int)list_cuts.size() ];
+            int ii = 0;
+            for (std::map<std::string, double >::const_iterator icut = list_cuts.begin(); icut != list_cuts.end(); ++icut)
+            {
+
+                double disc_cut = discTl->Eval( icut->second );
+                double b_eff = g_reverse->Eval( icut->second );
+
+                cout << icut->first << " : udsg-mistagging = " << setprecision(3) << icut->second << ", b-efficiency = " << setprecision(3) << b_eff << ", discriminator cut = " << setprecision(3) << disc_cut << endl;
+                xarr[ii] = icut->second;
+                yarr[ii] = b_eff;
+                ii++;
+            }
+            cout << endl;
+
+            TGraph *g_results = new TGraph( (int)list_cuts.size(), xarr, yarr );
+            g_results->SetTitle( TString(apt.alias() + "_OP") );
+            g_results->SetName( TString(apt.alias() + "_OP") );
+            g_results->GetXaxis()->SetTitle("udsg-mistagging");
+            g_results->GetYaxis()->SetTitle("b-efficiency");
+            gVector.push_back( g_results );
+
+            delete g_reverse;
+            delete xarr;
+            delete yarr;
+        }
+    }
+    for (std::vector< TGraph* >::const_iterator iv = gVector.begin(); iv != gVector.end(); ++iv )
+    {
+    	(*iv)->Write();
+    }
+    rootFile_->Close();
 }
 
 
@@ -206,14 +204,10 @@ void OperatingPoints::beginJob(edm::EventSetup const& iSetup)
     std::cout << "OperatingPoints: begin Job" << std::endl;
 }
 
-void OperatingPoints::endJob()
-{
-
-}
+void OperatingPoints::endJob() {}
 
 int OperatingPoints::TaggedJet(reco::CaloJet calojet,edm::Handle<reco::JetTagCollection > jetTags )
 {
-
     double small = 1.e-5;
     int result = -1; // no tagged
     //int ith = -1;
@@ -226,7 +220,6 @@ int OperatingPoints::TaggedJet(reco::CaloJet calojet,edm::Handle<reco::JetTagCol
 
 
     //    std::cout <<" ECCO " << jetTags.product()<< std::endl;
-
 
     for (size_t t = 0; t < jetTags->size(); ++t)
     {
@@ -248,113 +241,118 @@ int OperatingPoints::TaggedJet(reco::CaloJet calojet,edm::Handle<reco::JetTagCol
     return result;
 }
 
+
 reco::JetFlavour OperatingPoints::getMatchedParton(const reco::CaloJet &jet)
 {
     reco::JetFlavour jetFlavour;
 
-	for ( JetFlavourMatchingCollection::const_iterator j  = theJetPartonMapf->begin();
-		  j != theJetPartonMapf->end();
-		  j ++ )
-	{
-		RefToBase<Jet> aJet  = (*j).first;
-		//      const JetFlavour aFlav = (*j).second;
-		if ( (aJet->phi() - jet.phi())*(aJet->phi() - jet.phi())+
-			 (aJet->eta() - jet.eta())*(aJet->eta() - jet.eta()) < 1.e-5 )
-		{
-			// matched
-			jetFlavour = reco::JetFlavour (aJet->p4(), math::XYZPoint(0,0,0), (*j).second.getFlavour());
-		}
-	}
+    for ( JetFlavourMatchingCollection::const_iterator j = theJetPartonMapf->begin();
+          j != theJetPartonMapf->end();
+          j ++ )
+    {
+        RefToBase<Jet> aJet  = (*j).first;
+        //      const JetFlavour aFlav = (*j).second;
+        if ( (aJet->phi() - jet.phi())*(aJet->phi() - jet.phi())+
+                (aJet->eta() - jet.eta())*(aJet->eta() - jet.eta()) < 1.e-5 )
+        {
+            // matched
+            jetFlavour = reco::JetFlavour (aJet->p4(), math::XYZPoint(0,0,0), (*j).second.getFlavour());
+        }
+    }
 
-	return jetFlavour;
-
+    return jetFlavour;
 }
 
+
 // ------------ method called to produce the data  ------------
-void
-OperatingPoints::analyze(const Event& iEvent, const EventSetup& iSetup)
+void OperatingPoints::analyze(const Event& iEvent, const EventSetup& iSetup)
 {
 
-	iEvent.getByLabel (flavourSourcef, theJetPartonMapf);
+    iEvent.getByLabel (flavourSourcef, theJetPartonMapf);
 
-	// Calo Jets
-	Handle< View<reco::CaloJet> > jetsColl;
-	iEvent.getByLabel(CaloJetCollectionTags_, jetsColl);
-  
-	// Get the bTagTrackEventIPTagInfo collection
-	Handle<std::vector<reco::TrackIPTagInfo> > bTagTrackEventIPTagInfos;
-	iEvent.getByLabel(bTagTrackEventIPTagInfos_, bTagTrackEventIPTagInfos);
-	
-	//Handle<std::vector<reco::TrackIPTagInfo> > tagInfo;
-	//iEvent.getByLabel("impactParameterTagInfos", tagInfo);
+    // Calo Jets
+    Handle< View<reco::CaloJet> > jetsColl;
+    iEvent.getByLabel(CaloJetCollectionTags_, jetsColl);
 
-	
-	// initialize jet corrector
-	const JetCorrector *acorrector = 0;
-	if (useJetCorr_ == true){
-		acorrector = JetCorrector::getJetCorrector(jetCorrLabel_,iSetup);
-	}
-	
-	const View< reco::CaloJet > &theJets = *jetsColl;
-	if (debug_) std::cout << "got jet collection" << std::endl;
+    // Get the bTagTrackEventIPTagInfo collection
+    Handle<std::vector<reco::TrackIPTagInfo> > bTagTrackEventIPTagInfos;
+    iEvent.getByLabel(bTagTrackEventIPTagInfos_, bTagTrackEventIPTagInfos);
 
-	int jetIndex = 0;
-	
-	for(edm::View<reco::CaloJet>::const_iterator jet = theJets.begin(); jet!=theJets.end(); ++jet)
+    //Handle<std::vector<reco::TrackIPTagInfo> > tagInfo;
+    //iEvent.getByLabel("impactParameterTagInfos", tagInfo);
+
+
+    // initialize jet corrector
+    const JetCorrector *acorrector = 0;
+    if (useJetCorr_ == true)
     {
-		
-		// get jet corrections
-		double jetcorrection = 1.;
-		if (useJetCorr_ == true){
-			jetcorrection =  acorrector->correction(*jet, iEvent, iSetup);
-		}
-		
-		// Jet quality cuts part 1
-		if ( (jet->pt() * jetcorrection ) <= MinJetPt_ || std::abs( jet->eta() ) >= MaxJetEta_ ) { jetIndex++; continue;}
+        acorrector = JetCorrector::getJetCorrector(jetCorrLabel_,iSetup);
+    }
 
-		// Get a vector of reference to the selected tracks in each jet
-		TrackRefVector tracks( (*bTagTrackEventIPTagInfos)[jetIndex].selectedTracks() );
+    const View< reco::CaloJet > &theJets = *jetsColl;
+    if (debug_) std::cout << "got jet collection" << std::endl;
 
-		for ( size_t index=0; index < tracks.size(); index++ )
-		{
-			TrackRef track = tracks[index];
-			if (debug_) { std::cout << " track: pt= "<<track->pt() << " eta=" << track->eta() << std::endl;
-			}
-		}
-			
-		
-		if (debug_) std::cout << " jet correction = " << jetcorrection << std::endl;
+    int jetIndex = 0;
 
-		if (debug_) std::cout << "jet pt=" << jet->pt() << " eta= " << jet->eta() << " phi= " << jet->phi() << std::endl;
+    for (edm::View<reco::CaloJet>::const_iterator jet = theJets.begin(); jet!=theJets.end(); ++jet)
+    {
 
-		// jet flavor
-		int JetFlavor = abs(getMatchedParton(*jet).getFlavour());
-		if (debug_) std::cout << " jet flavor = " << JetFlavor << std::endl;
+        // get jet corrections
+        double jetcorrection = 1.;
+        if (useJetCorr_ == true)
+        {
+            jetcorrection =  acorrector->correction(*jet, iEvent, iSetup);
+        }
 
-		std::map<std::string, bool> mymap;
-		int ith_tagged = -1;
+        // Jet quality cuts part 1
+        if ( (jet->pt() * jetcorrection ) <= MinJetPt_ || std::abs( jet->eta() ) >= MaxJetEta_ )
+        {
+            jetIndex++;
+            continue;
+        }
 
-		for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it != wp.end(); ++it){
-			
-			edm::Handle<reco::JetTagCollection > jetTags;
-			iEvent.getByLabel((*it).inputTag(),jetTags);
-			std::string alias = (*it).alias();
-			
-			std::string moduleLabel = (jetTags).provenance()->moduleLabel();
-			if (mymap.find(moduleLabel) != mymap.end()) continue;
-			mymap[moduleLabel] = true;
-	  
-			ith_tagged = TaggedJet(*jet,jetTags);
-	  
-			if (ith_tagged == -1) continue;
+        // Get a vector of reference to the selected tracks in each jet
+        TrackRefVector tracks( (*bTagTrackEventIPTagInfos)[jetIndex].selectedTracks() );
 
-			TaggerPerformances_[alias].Add( (*jetTags)[ith_tagged].second, JetFlavor );
-						
-		}
-	  
+        for ( size_t index=0; index < tracks.size(); index++ )
+        {
+            TrackRef track = tracks[index];
+            if (debug_)
+            {
+                std::cout << " track: pt= "<<track->pt() << " eta=" << track->eta() << std::endl;
+            }
+        }
 
-		jetIndex++;
-	}
+
+        if (debug_) std::cout << " jet correction = " << jetcorrection << std::endl;
+
+        if (debug_) std::cout << "jet pt=" << jet->pt() << " eta= " << jet->eta() << " phi= " << jet->phi() << std::endl;
+
+        // jet flavor
+        int JetFlavor = abs(getMatchedParton(*jet).getFlavour());
+        if (debug_) std::cout << " jet flavor = " << JetFlavor << std::endl;
+
+        std::map<std::string, bool> mymap;
+        int ith_tagged = -1;
+
+        for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it != wp.end(); ++it)
+        {
+            edm::Handle<reco::JetTagCollection > jetTags;
+            iEvent.getByLabel((*it).inputTag(),jetTags);
+            std::string alias = (*it).alias();
+
+            std::string moduleLabel = (jetTags).provenance()->moduleLabel();
+            if (mymap.find(moduleLabel) != mymap.end()) continue;
+            mymap[moduleLabel] = true;
+
+            ith_tagged = TaggedJet(*jet,jetTags);
+
+            if (ith_tagged == -1) continue;
+
+            TaggerPerformances_[alias].Add( (*jetTags)[ith_tagged].second, JetFlavor );
+        }
+        jetIndex++;
+    }
 
 }
 
