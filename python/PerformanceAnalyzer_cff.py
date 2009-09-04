@@ -38,13 +38,11 @@ Performance = cms.EDAnalyzer("PerformanceAnalyzer",
     cut = cms.untracked.double(4.2),
     name = cms.untracked.string('TCM')
     ),
-    
     cms.PSet(
     collection = cms.untracked.InputTag('trackCountingHighPurBJetTags'),
     cut = cms.untracked.double(4.1),
     name = cms.untracked.string('TCT')
     ),
-    
     cms.PSet(
     collection = cms.untracked.InputTag('jetProbabilityBJetTags'),
     cut = cms.untracked.double(0.24),
@@ -109,7 +107,7 @@ Performance = cms.EDAnalyzer("PerformanceAnalyzer",
     collection = cms.untracked.InputTag('combinedSecondaryVertexBJetTags'),
     cut = cms.untracked.double(0.95),
     name = cms.untracked.string('CSVT')
-    ),
+    )
     ),
                              
                              
@@ -117,7 +115,7 @@ Performance = cms.EDAnalyzer("PerformanceAnalyzer",
                              # use jet corrections
                              #
                              useJetCorrections = cms.bool (True),
-                             jetCorrectionsLabel = cms.string("L2L3JetCorrectorIcone5"),                     
+                             jetCorrectionsLabel = cms.string("L2L3JetCorrectorIC5Calo"),                     
     muoncuts = cms.PSet(
         MinNHits = cms.int32(7),
         MinMuonPt = cms.double(6.0),
@@ -171,7 +169,8 @@ Performance = cms.EDAnalyzer("PerformanceAnalyzer",
     flavourSource = cms.InputTag("IC5byValAlgo"),
     StoreWeightsInNtuple = cms.bool(False),
     PrimaryVertexCollection = cms.untracked.string('offlinePrimaryVerticesFromCTFTracks'),
-    WritePerformancePlots = cms.bool(True)
+    WritePerformancePlots = cms.bool(True),
+    debug = cms.untracked.bool(False)
 )
 
 

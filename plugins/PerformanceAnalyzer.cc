@@ -67,10 +67,11 @@
 using namespace edm;
 using namespace reco;
 
-
-void WorkingPoint::print() const {
+/*
+void WorkingPointP::print() const {
   std::cout <<" Working point "<<name()<<" Input Tag "<<inputTag()<<" Cut "<< cut()<<std::endl;
 }
+*/
 
 
 
@@ -92,6 +93,8 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
 
     analyzer_ = "PerformanceAnalyzer"; // name of this analyzer
 
+	if (fdebug) std::cout << "[PerformanceAnalyzer] call constructor" << std::endl;
+	
     //now do whatever initialization is needed
     //simG4_=iConfig.getParameter<edm::InputTag>( "simG4" );
 
@@ -100,7 +103,7 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
     // create or update output root file
     rootFile_ = TFile::Open(outputFile_.c_str(),"RECREATE");
     // verbose std output
-    fverbose= iConfig.getUntrackedParameter<bool>("verbose", false);
+    fdebug = iConfig.getUntrackedParameter<bool>("debug", false);
     // default tree
     ftree = new TTree("summary","summary");
     ftree->AutoSave();
@@ -172,17 +175,23 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
 
     //
     // get operating points
-
+	
     std::vector<edm::ParameterSet> config = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet > >("bTagCutList");
+	if (fdebug) std::cout << " get operating points, total: " << config.size() << std::endl;
+	int tmpii=0;
     for (std::vector<edm::ParameterSet>::const_iterator it = config.begin(); it != config.end() ; ++it){
-      wp.push_back(WorkingPoint(
-				(*it).getUntrackedParameter<edm::InputTag> ("collection"),
-				(*it).getUntrackedParameter<std::string> ("name"),
-				(*it).getUntrackedParameter<double> ("cut")
-				)
-		   );
-     		   (wp.end()-1)->print();
- 
+		//std::cout << tmpii << std::endl;
+		std::string aname = (*it).getUntrackedParameter<std::string> ("name");
+		//std::cout << aname << std::endl;
+		edm::InputTag atag = (*it).getUntrackedParameter<edm::InputTag> ("collection");
+		//std::cout << atag << std::endl;
+		double acut = (*it).getUntrackedParameter<double> ("cut");
+		//std::cout << acut << std::endl;
+		WorkingPoint tmp(atag,aname,acut);
+		wp.push_back( tmp );
+		//std::cout << "done" << std::endl;
+	  if (fdebug) (wp.end()-1)->print();
+	  tmpii++;
     }
 
 

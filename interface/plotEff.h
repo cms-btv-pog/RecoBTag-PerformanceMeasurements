@@ -31,7 +31,9 @@
 #include "TH1.h"
 
 #include "RecoBTag/PerformanceMeasurements/test/S8Tools/S8bPerformance.h"
+#include "RecoBTag/PerformanceMeasurements/interface/PFTools.h"
 
+/*
 class WorkingPoint{
  public:
 	WorkingPoint() {}
@@ -42,7 +44,7 @@ class WorkingPoint{
 	std::string alias () const {return alias_;}
 	double Minimum() const { return min_;}
 	double Maximum() const { return max_;}
-	void print () const ;
+	//void print () const ;
  private:
   edm::InputTag intag_;
   std::string alias_;
@@ -50,6 +52,8 @@ class WorkingPoint{
   double max_;
   std::map< std::string, double > wpmap_;
 };
+*/
+
 
 // class declaration
 

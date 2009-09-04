@@ -11,7 +11,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.25 2008/12/19 10:17:04 tboccali Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.26 2009/02/05 00:50:24 yumiceva Exp $
  *
  */
 
@@ -68,10 +68,13 @@
 #include "SimDataFormats/JetMatching/interface/JetFlavourMatching.h"
 #include "SimDataFormats/JetMatching/interface/JetFlavour.h"
 
+#include "RecoBTag/PerformanceMeasurements/interface/PFTools.h"
 
-class WorkingPoint{
+/*
+class WorkingPointP{
  public:
-  WorkingPoint(edm::InputTag t,  std::string n,   double c) : it(t), name_(n), cut_(c) {}
+	WorkingPointP() {}
+  WorkingPointP(edm::InputTag t,  std::string n,   double c) : it(t), name_(n), cut_(c) {}
   float cut() const {return cut_;}
   edm::InputTag inputTag() const {return it;}
   std::string name () const {return name_;}
@@ -82,7 +85,7 @@ class WorkingPoint{
   double cut_;
 };
 
-
+*/
 
 
 struct ltstr
@@ -165,7 +168,7 @@ private:
 
     TFile*  rootFile_;
     TDirectory *topdir;
-    bool fverbose;
+    bool fdebug;
 
     TH1I *histcounterf;
 

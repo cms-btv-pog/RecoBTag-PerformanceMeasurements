@@ -11,7 +11,7 @@
  Author: Francisco Yumiceva
 */
 //
-// $Id: plotEff.cc,v 1.1 2009/08/24 20:40:58 yumiceva Exp $
+// $Id: plotEff.cc,v 1.2 2009/08/28 20:09:20 bazterra Exp $
 //
 //
 
@@ -110,7 +110,7 @@ for (std::vector<edm::ParameterSet>::const_iterator it = config.begin(); it != c
 					   mapOP );
 	
 	wp.push_back(tmpwp);
-	(wp.end()-1)->print();
+	//(wp.end()-1)->print();
 
 	wp_map[alias] = tmpwp;
 

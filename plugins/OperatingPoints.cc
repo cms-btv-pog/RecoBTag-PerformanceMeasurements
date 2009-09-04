@@ -11,7 +11,7 @@
  Author: Francisco Yumiceva
 */
 //
-// $Id: OperatingPoints.cc,v 1.3 2009/08/24 20:37:43 yumiceva Exp $
+// $Id: OperatingPoints.cc,v 1.4 2009/08/28 20:09:20 bazterra Exp $
 //
 //
 
@@ -91,7 +91,7 @@ for (std::vector<edm::ParameterSet>::const_iterator it = config.begin(); it != c
 					   mapOP );
 	
 	wp.push_back(tmpwp);
-	(wp.end()-1)->print();
+	//(wp.end()-1)->print();
 
 	wp_map[alias] = tmpwp;
 

@@ -30,25 +30,8 @@
 #include "TTree.h"
 
 #include "RecoBTag/PerformanceMeasurements/test/S8Tools/S8bPerformance.h"
+#include "RecoBTag/PerformanceMeasurements/interface/PFTools.h"
 
-class WorkingPoint{
- public:
-	WorkingPoint() {}
-  WorkingPoint(edm::InputTag t,  std::string n, double min, double max, std::map< std::string, double> list) : intag_(t), alias_(n), min_(min), max_(max), wpmap_(list) {}
-
-	std::map<std::string, double > list() {return wpmap_;}
-	edm::InputTag inputTag() const {return intag_;}
-	std::string alias () const {return alias_;}
-	double Minimum() const { return min_;}
-	double Maximum() const { return max_;}
-	void print () const ;
- private:
-  edm::InputTag intag_;
-  std::string alias_;
-  double min_;
-  double max_;
-  std::map< std::string, double > wpmap_;
-};
 
 // class declaration
 
