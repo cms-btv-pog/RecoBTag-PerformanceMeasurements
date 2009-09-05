@@ -628,183 +628,7 @@ void PerformanceAnalyzer::endJob()
     rootFile_->cd();
 }
 
-int PerformanceAnalyzer::TaggedJet(reco::CaloJet calojet,edm::Handle<reco::JetTagCollection > jetTags )
-{
 
-    double small = 1.e-5;
-    int result = -1; // no tagged
-    //int ith = -1;
-
-    //std::cout << "calo jet: pz = " << calojet.pz() << " pt = " << calojet.pt() << std::endl;
-    //for (size_t k=0; k<jetTags_testManyByType.size(); k++) {
-    //  edm::Handle<std::vector<reco::JetTag> > jetTags = jetTags_testManyByType[k];
-
-    //get label and module names
-
-
-    //    std::cout <<" ECCO " << jetTags.product()<< std::endl;
-
-
-    for (size_t t = 0; t < jetTags->size(); ++t)
-    {
-        edm::RefToBase<reco::Jet> jet_p = (*jetTags)[t].first;
-        if (jet_p.isNull())
-        {
-            //std::cout << "-----------> JetTag::jet() returned null reference" << std::endl;
-            continue;
-        }
-        //std::cout << "[TaggedJet]  calojet pt = " << calojet.pt() << " tagged jet pt = " << jet_p->pt() << std::endl;
-        if (DeltaR<reco::Candidate>()( calojet, *jet_p ) < small)
-        {
-
-            result = (int) t;
-
-        }
-    }
-
-    return result;
-}
-
-
-int PerformanceAnalyzer::TaggedJet(reco::CaloJet const & caloJet, edm::Handle<std::vector<reco::TrackIPTagInfo> > const & trackIPTagInfos )
-{
-    double small = 1.e-5;
-    int result = -1;
-
-    for (size_t t = 0; t < trackIPTagInfos->size(); ++t)
-    {
-        edm::RefToBase<reco::Jet> jet_p = (*trackIPTagInfos)[t].jet();
-        if (jet_p.isNull())
-        {
-            //std::cout << "-----------> TrackIPTagInfos::jet() returned null reference" << std::endl;
-            continue;
-        }
-        //std::cout << "[TaggedJet]  calojet pt = " << calojet.pt() << " tagged jet pt = " << jet_p->pt() << std::endl;
-        if (DeltaR<reco::Candidate>()( caloJet, * jet_p ) < small)
-        {
-            result = (int) t;
-            break;
-        }
-    }
-
-    return result;
-}
-
-
-SimTrack PerformanceAnalyzer::GetGenTrk(reco::Track atrack, const edm::SimTrackContainer *simTrkColl, const edm::SimVertexContainer *simVtcs)
-{
-
-    SimTrack matchedTrk;
-    edm::SimVertexContainer mysimVtcs = *simVtcs;
-
-    double predelta = 99999.;
-    for (SimTrackContainer::const_iterator gentrk = simTrkColl->begin(); gentrk != simTrkColl->end(); ++gentrk)
-    {
-        // VEB
-        // double delta  = ROOT::Math::VectorUtil::DeltaR( TVector3((*gentrk).momentum().x(),(*gentrk).momentum().y(),(*gentrk).momentum().z()) , atrack.momentum() );
-        double delta = reco::deltaR( (*gentrk).momentum(), atrack.momentum() );
-
-        int type = (*gentrk).type();
-        if ( delta < 0.2 && delta<predelta && ((*gentrk).charge() == atrack.charge() ) &&
-                ( abs(type)==11 || abs(type)==13 || abs(type)==15 || abs(type)==211 || abs(type)==321 ) )
-        {
-            matchedTrk = *gentrk;
-            predelta = delta;
-            math::XYZTLorentzVectorD v = (mysimVtcs)[(*gentrk).vertIndex()].position();
-
-            //std::cout << "gentrk: vx = " << v.x() << std::endl;
-            //std::cout << "rectrk: vx = " << atrack.vx() << std::endl;
-
-        }
-    }
-
-    return matchedTrk;
-}
-
-int
-PerformanceAnalyzer::GetMotherId(const edm::SimVertexContainer *simVtxColl, const edm::SimTrackContainer *simTrkColl, SimTrack muonMC)
-{
-
-    edm::SimVertexContainer mysimVtxColl = *simVtxColl;
-
-    edm::SimTrackContainer mysimTrkColl = *simTrkColl;
-
-    // fill map of simtracks
-    std::map<unsigned, unsigned> geantToIndex;
-    for ( unsigned it=0; it< mysimTrkColl.size(); ++it )
-    {
-        geantToIndex[ mysimTrkColl[it].trackId() ] = it;
-    }
-
-    // The origin vertex
-    int vertexId = muonMC.vertIndex();
-    SimVertex vertex = mysimVtxColl[vertexId];
-
-    // The mother track
-    int motherId = -1;
-    if ( vertex.parentIndex() )  // there is a parent to this vertex
-    {
-
-        // geant id of the mother
-        unsigned motherGeandId =   vertex.parentIndex();
-        std::map<unsigned, unsigned >::iterator association
-        = geantToIndex.find( motherGeandId );
-        if (association != geantToIndex.end() )
-            motherId = association->second;
-    }
-
-
-    int motherType = motherId == -1 ? 0 : mysimTrkColl[motherId].type();
-
-    return motherType;
-
-}
-
-//______________________________________________________________________________________________________________________
-std::map< std::string, bool >
-PerformanceAnalyzer::GetBTaggingMap(reco::CaloJet jet, const Event& event, double ptrel )
-{
-
-    std::map< std::string, bool > aMap;
-
-    int ith_tagged = -1;
-
-
-    for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it != wp.end(); ++it)
-    {
-
-        //start loop over all jetTags
-
-        //    for (size_t k=0; k<jetTags_testManyByType.size(); k++)
-        //    {
-
-        edm::Handle<reco::JetTagCollection > jetTags;
-        event.getByLabel((*it).inputTag(),jetTags);
-
-
-        ith_tagged = this->TaggedJet(jet,jetTags);
-
-        if (ith_tagged == -1) continue;
-
-        //*********************************
-        // Track Counting taggers
-        //*********************************
-
-
-        if ((*jetTags)[ith_tagged].second > (*it).cut())
-        {
-            aMap[(*it).name()] = true;
-        }
-        else
-        {
-            aMap[(*it).name()] = false;
-        }
-
-    }
-
-
-    return aMap;
-}
 
 //______________________________________________________________________________________________________________________
 void PerformanceAnalyzer::FillPerformance(reco::CaloJet jet, int JetFlavor, const edm::Event& event)
@@ -832,7 +656,7 @@ void PerformanceAnalyzer::FillPerformance(reco::CaloJet jet, int JetFlavor, cons
 
         //std::cout <<" ECCO "<< jetTags->size()<<std::endl;
 
-        ith_tagged = this->TaggedJet(jet,jetTags);
+        ith_tagged = PFTools::TaggedJet(jet,jetTags);
 
 
         if (ith_tagged == -1) continue;
@@ -1551,7 +1375,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
             if ( !AwayTaggedJet )
             {
 
-                std::map< std::string, bool > aBmap = this->GetBTaggingMap(*awayjet,iEvent);
+                std::map< std::string, bool > aBmap = PFTools::GetBTaggingMap(wp, *awayjet, iEvent);
                 for (std::map<std::string,bool>::const_iterator imap = aBmap.begin(); imap != aBmap.end(); ++imap )
                 {
                     if ( imap->first == fAwayJetTagger && imap->second )
@@ -1624,7 +1448,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 
         } // close away jet loop
 
-        std::map< std::string, bool > thebtaggingmap = this->GetBTaggingMap(*jet,iEvent, ptrel);
+        std::map<std::string, bool> thebtaggingmap = PFTools::GetBTaggingMap(wp, *jet, iEvent, ptrel);
         FillEff(p4Jet, JetFlavor, thebtaggingmap, weight );
         FillPerformance(*jet, JetFlavor, iEvent );
 
@@ -1687,7 +1511,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
         {
             // Associate the jet and jettag
             // TODO : we need to use a more standard of jet matching
-            int jetIndex = TaggedJet(*jet, bTagTrackEventIPTagInfos);
+            int jetIndex = PFTools::TaggedJet(*jet, bTagTrackEventIPTagInfos);
             if (jetIndex < 0) continue;
 
             // Get a vector of reference to the selected tracks in each jet
@@ -1773,7 +1597,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
             if (mymap.find(moduleLabel) != mymap.end()) continue;
             mymap[moduleLabel] == true;
 
-            ith_tagged = this->TaggedJet(*jet,jetTags);
+            ith_tagged = PFTools::TaggedJet(*jet,jetTags);
 
             if (ith_tagged == -1) continue;
 

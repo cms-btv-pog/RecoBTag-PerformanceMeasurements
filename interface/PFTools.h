@@ -6,7 +6,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: PFTools.h,v 1.1 2009/09/04 17:19:02 yumiceva Exp $
+ version $Id: PFTools.h,v 1.2 2009/09/04 20:56:03 bazterra Exp $
 
 ________________________________________________________________**/
 
@@ -70,7 +70,7 @@ public:
 
     void print () const
     {
-        std::cout <<" Working point "<<name()<<" Input Tag "<<inputTag()<<" Cut "<< cut()<<std::endl;
+        std::cout << " Working point " << name() << " Input Tag " << inputTag() << " Cut " << cut() << std::endl;
     }
 
 private:
@@ -84,14 +84,26 @@ private:
 };
 
 
+#include "DataFormats/BTauReco/interface/TrackIPTagInfo.h"
 #include "DataFormats/JetReco/interface/CaloJet.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
+
+#include "FWCore/Framework/interface/Event.h"
 
 namespace PFTools 
 {
 
     reco::GenJet GetGenJet(reco::CaloJet, reco::GenJetCollection);
+
+    int TaggedJet(reco::CaloJet const &, edm::Handle<reco::JetTagCollection> const &);
+    
+    int TaggedJet(reco::CaloJet const &, edm::Handle<std::vector<reco::TrackIPTagInfo> > const &);
+
+    std::map<std::string, bool> GetBTaggingMap(std::vector<WorkingPoint> const &, reco::CaloJet const &, edm::Event const &, double ptrel = 0);
+
+    // THis function seems to not be use, if that the case please remove it !!!
+    // SimTrack GetGenTrk(reco::Track const &, edm::SimTrackContainer const *, edm::SimVertexContainer const *);
 
 }
 

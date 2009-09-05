@@ -11,7 +11,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.27 2009/09/04 17:18:47 yumiceva Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.28 2009/09/04 20:56:03 bazterra Exp $
  *
  */
 
@@ -70,23 +70,6 @@
 
 #include "RecoBTag/PerformanceMeasurements/interface/PFTools.h"
 
-/*
-class WorkingPointP{
- public:
-	WorkingPointP() {}
-  WorkingPointP(edm::InputTag t,  std::string n,   double c) : it(t), name_(n), cut_(c) {}
-  float cut() const {return cut_;}
-  edm::InputTag inputTag() const {return it;}
-  std::string name () const {return name_;}
-  void print () const ;
- private:
-  edm::InputTag it;
-  std::string name_;
-  double cut_;
-};
-
-*/
-
 
 struct ltstr
 {
@@ -113,13 +96,8 @@ public:
     virtual void beginJob(edm::EventSetup const&);
     virtual void endJob();
 
-    SimTrack GetGenTrk(reco::Track atrack, const edm::SimTrackContainer *simTrkColl, const edm::SimVertexContainer *simVtcs);
     int GetMotherId(const edm::SimVertexContainer *simVtxColl, const edm::SimTrackContainer *simTrkColl, SimTrack muonMC);
 
-    int TaggedJet(reco::CaloJet calojet, edm::Handle<reco::JetTagCollection > jetTags );
-    int TaggedJet(reco::CaloJet const &, edm::Handle<std::vector<reco::TrackIPTagInfo> > const &);
-
-    std::map< std::string, bool > GetBTaggingMap(reco::CaloJet jet, const edm::Event&, double ptrel=0.);
     void FillHistos(std::string type, TLorentzVector p4MuJet, double ptrel,
                     int JetFlavor, std::map<std::string, bool> aMap, double weight);
     void FillEff(TLorentzVector p4MuJet, int JetFlavor, std::map<std::string, bool> aMap, double weight);
