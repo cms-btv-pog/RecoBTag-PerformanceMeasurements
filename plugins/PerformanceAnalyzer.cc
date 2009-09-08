@@ -66,22 +66,6 @@
 using namespace edm;
 using namespace reco;
 
-/*
-void WorkingPointP::print() const {
-  std::cout <<" Working point "<<name()<<" Input Tag "<<inputTag()<<" Cut "<< cut()<<std::endl;
-}
-*/
-
-
-
-//
-// constants, enums and typedefs
-//
-
-//
-// static data member definitions
-//
-
 //
 // constructors and destructor
 //
@@ -180,21 +164,14 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
 
     std::vector<edm::ParameterSet> config = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet > >("bTagCutList");
     if (fdebug) std::cout << " get operating points, total: " << config.size() << std::endl;
-    int tmpii=0;
     for (std::vector<edm::ParameterSet>::const_iterator it = config.begin(); it != config.end() ; ++it)
     {
-        //std::cout << tmpii << std::endl;
         std::string aname = (*it).getUntrackedParameter<std::string> ("name");
-        //std::cout << aname << std::endl;
-        edm::InputTag atag = (*it).getUntrackedParameter<edm::InputTag> ("collection");
-        //std::cout << atag << std::endl;
-        double acut = (*it).getUntrackedParameter<double> ("cut");
-        //std::cout << acut << std::endl;
-        WorkingPoint tmp(atag, aname, acut);
+		edm::InputTag atag = (*it).getUntrackedParameter<edm::InputTag> ("collection");
+		double acut = (*it).getUntrackedParameter<double> ("cut");
+		WorkingPoint tmp(atag, aname, acut);
         wp.push_back( tmp );
-        //std::cout << "done" << std::endl;
         if (fdebug) (wp.end()-1)->print();
-        tmpii++;
     }
 
 
@@ -1026,25 +1003,7 @@ reco::JetFlavour PerformanceAnalyzer::getMatchedParton(const reco::CaloJet &jet)
         }
 
         return jetFlavour;
-
-        /*    for( reco::CandMatchMap::const_iterator f  = theJetPartonMapf->begin();
-        	  f != theJetPartonMapf->end(); f++) {
-        	  const reco::Candidate *theJetInTheMatchMap = &*(f->key);
-        	  const reco::Candidate *theMatchedParton    = &*(f->val);
-        	  if(theJetInTheMatchMap->hasMasterClone ()) {
-        	  const reco::CaloJet* theMasterClone = dynamic_cast<const reco::CaloJet*>(theJetInTheMatchMap->masterClone().get());
-        	  //std::cout << " masterclone pt = " << theMasterClone->pt() << " calo jet pt = " << jet.pt() << std::endl;
-        	  // FIXME, compare pointers rather than values:
-        	  //if ( fabs( theMasterClone->pt() - jet.pt() ) < 1.e-5 ) {
-        	  if ( fabs(theMasterClone->phi() - jet.phi()) < 1.e-5 && fabs(theMasterClone->eta() - jet.eta())< 1.e-5 ){
-        	  //std::cout << " it matches! " << std::endl;
-        	  jetFlavour.flavour(abs(theMatchedParton->pdgId()));
-        	  jetFlavour.underlyingParton4Vec(theMatchedParton->p4());
-        	  return jetFlavour;
-        	  }
-        	  }
-        	  }
-        */
+   
 
     }
 
