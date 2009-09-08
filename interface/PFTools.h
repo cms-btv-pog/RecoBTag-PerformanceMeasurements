@@ -6,7 +6,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: PFTools.h,v 1.2 2009/09/04 20:56:03 bazterra Exp $
+ version $Id: PFTools.h,v 1.3 2009/09/05 02:34:44 bazterra Exp $
 
 ________________________________________________________________**/
 
@@ -48,10 +48,10 @@ public:
         return alias_;
     }
 
-    std::string name () const
-    {
-        return alias_;
-    }
+    //std::string name () const
+    //{
+    //    return alias_;
+    //}
 
     double cut() const
     {
@@ -70,7 +70,12 @@ public:
 
     void print () const
     {
-        std::cout << " Working point " << name() << " Input Tag " << inputTag() << " Cut " << cut() << std::endl;
+        std::cout << " Working point: collection: " << inputTag() << " alias: " << alias() << " discriminator min: " << Minimum() << " max: " << Maximum() << std::endl;
+		for(std::map<std::string, double >::const_iterator icut = wpmap_.begin(); icut != wpmap_.end(); ++icut) {
+			std::string aalias = icut->first;
+			double cut = icut->second;
+			std::cout << "       name: " << aalias << " cut: " << cut << std::endl;
+		}
     }
 
 private:

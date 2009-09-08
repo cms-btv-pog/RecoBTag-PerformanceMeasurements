@@ -11,7 +11,7 @@
  Author: Francisco Yumiceva
 */
 //
-// $Id: OperatingPoints.cc,v 1.5 2009/09/04 17:18:47 yumiceva Exp $
+// $Id: OperatingPoints.cc,v 1.6 2009/09/04 20:56:03 bazterra Exp $
 //
 //
 
@@ -65,7 +65,7 @@ OperatingPoints::OperatingPoints(const ParameterSet& iConfig)
     //
     // get operating points
 
-    std::vector<edm::ParameterSet> config = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet > >("bTagCutList");
+    std::vector<edm::ParameterSet> config = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet > >("OperatingPointsList");
 
     // type of operating points
     OPbyMistagRate_ = iConfig.getParameter<bool>("OperatingPointsbyMistagRate");

@@ -161,17 +161,41 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
 
     //
     // get operating points
-
-    std::vector<edm::ParameterSet> config = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet > >("bTagCutList");
-    if (fdebug) std::cout << " get operating points, total: " << config.size() << std::endl;
+    std::vector<edm::ParameterSet> config = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet > >("OperatingPointsList");
+    if (fdebug) std::cout << " get operating points, total list: " << config.size() << std::endl;
+	
     for (std::vector<edm::ParameterSet>::const_iterator it = config.begin(); it != config.end() ; ++it)
     {
-        std::string aname = (*it).getUntrackedParameter<std::string> ("name");
+        std::string aalias = (*it).getUntrackedParameter<std::string> ("alias");
 		edm::InputTag atag = (*it).getUntrackedParameter<edm::InputTag> ("collection");
-		double acut = (*it).getUntrackedParameter<double> ("cut");
-		WorkingPoint tmp(atag, aname, acut);
-        wp.push_back( tmp );
-        if (fdebug) (wp.end()-1)->print();
+        double min = (*it).getUntrackedParameter<double> ("MinimumDiscriminator");
+        double max = (*it).getUntrackedParameter<double> ("MaximumDiscriminator");
+		std::vector<edm::ParameterSet> avec = (*it).getUntrackedParameter<std::vector<edm::ParameterSet> >("OperatingPoints");
+		std::map< std::string, double > mapOP;
+        for (std::vector<edm::ParameterSet>::const_iterator imapOP = avec.begin(); imapOP != avec.end(); ++imapOP)
+        {
+			 mapOP[(*imapOP).getUntrackedParameter<std::string> ("name")] =
+                (*imapOP).getUntrackedParameter<double> ("cut");
+        }
+
+		WorkingPoint tmpwp((*it).getUntrackedParameter<edm::InputTag> ("collection"),
+                           aalias,
+                           min,
+                           max,
+                           mapOP );
+
+		wp.push_back(tmpwp);
+		if (fdebug) (wp.end()-1)->print();
+		//wp_map[alias] = tmpwp;
+
+		TaggerPerformances_[aalias].Set(aalias);
+        TaggerPerformances_[aalias].SetMinDiscriminator(min);
+        TaggerPerformances_[aalias].SetMaxDiscriminator(max);
+		
+		//double acut = (*it).getUntrackedParameter<double> ("cut");
+		//WorkingPoint tmp(atag, aname, acut);
+        //wp.push_back( tmp );
+        //if (fdebug) (wp.end()-1)->print();
     }
 
 
@@ -196,6 +220,8 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
     topdir->cd();
     topdir->mkdir("muon_in_jet");
     topdir->cd();
+	if (fdebug) std::cout<< " ROOT directories created." << std::endl;
+	
     histcounterf = new TH1I("histcounterf","counter",5,0,5);
     histcounterf->SetBit(TH1::kCanRebin);
     rootFile_->cd();
@@ -226,23 +252,29 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
     AwayjetHistos_mc->Init("p","l");
     for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it!=wp.end(); ++it)
     {
+		std::map<std::string, double > list_cuts = (*it).list();
 
-        EffHistos->Init("efficiencies",(*it).name());
-        PtrelHistos->Init("ptrel",(*it).name());
-
-        TaggedMujetHistos->Init("ntag",(*it).name());
-        TaggedAwayjetHistos->Init("ptag",(*it).name());
-        TaggedMujetHistos_mc->Init("ntag","b",(*it).name());
-        TaggedAwayjetHistos_mc->Init("ptag","b",(*it).name());
-        TaggedMujetHistos_mc->Init("ntag","cl",(*it).name());
-        TaggedAwayjetHistos_mc->Init("ptag","cl",(*it).name());
-        TaggedMujetHistos_mc->Init("ntag","c",(*it).name());
-        TaggedAwayjetHistos_mc->Init("ptag","c",(*it).name());
-        TaggedMujetHistos_mc->Init("ntag","l",(*it).name());
-        TaggedAwayjetHistos_mc->Init("ptag","l",(*it).name());
-
+		for(std::map<std::string, double >::const_iterator icut = list_cuts.begin(); icut != list_cuts.end(); ++icut) {
+			std::string aalias = icut->first;
+			EffHistos->Init("efficiencies",aalias);
+			PtrelHistos->Init("ptrel",aalias);
+			
+			TaggedMujetHistos->Init("ntag",aalias);
+			TaggedAwayjetHistos->Init("ptag",aalias);
+			TaggedMujetHistos_mc->Init("ntag","b",aalias);
+			TaggedAwayjetHistos_mc->Init("ptag","b",aalias);
+			TaggedMujetHistos_mc->Init("ntag","cl",aalias);
+			TaggedAwayjetHistos_mc->Init("ptag","cl",aalias);
+			TaggedMujetHistos_mc->Init("ntag","c",aalias);
+			TaggedAwayjetHistos_mc->Init("ptag","c",aalias);
+			TaggedMujetHistos_mc->Init("ntag","l",aalias);
+			TaggedAwayjetHistos_mc->Init("ptag","l",aalias);
+		}
     }
-
+	
+	if (fdebug) std::cout << "Histograms initialized" << std::endl;
+		
+	/*
     fperformanceTC2trk.Set("TC2trk");
     fperformanceTC3trk.Set("TC3trk");
     fperformanceMTC2trk.Set("MTC2trk");
@@ -271,7 +303,7 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
     fperformanceSSV.SetMaxDiscriminator(10);
     fperformanceCSV.SetMinDiscriminator(0);
     fperformanceCSV.SetMaxDiscriminator(1);
-
+	*/
 
     feventcounter = 0;
 
@@ -286,276 +318,42 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
     topdir->cd();
     topdir->cd("MCtruth");
     EffHistos->Save();
+	std::vector< TGraph* > gVector;
     if (fWritePerformancePlots)
     {
 
-        fperformanceTC2trk.Eval();
-        fperformanceTC3trk.Eval();
-        fperformanceMTC2trk.Eval();
-        fperformanceMTC3trk.Eval();
-        fperformanceTP.Eval();
-        fperformanceJBP.Eval();
-        fperformanceSMT.Eval();
-        fperformanceSSV.Eval();
-        fperformanceCSV.Eval();
 
-        TGraphErrors *gTC2_b = new TGraphErrors(fperformanceTC2trk.GetN(),
-                                                fperformanceTC2trk.GetArray("b").GetArray(),fperformanceTC2trk.GetArray("b").GetArray(),
-                                                fperformanceTC2trk.GetArray("bErr").GetArray(),fperformanceTC2trk.GetArray("bErr").GetArray());
+		for (std::map<std::string, S8bPerformance>::const_iterator iperf = TaggerPerformances_.begin(); iperf!= TaggerPerformances_.end(); ++iperf )
+    {
 
-        TGraphErrors *gTC2_c = new TGraphErrors(fperformanceTC2trk.GetN(),
-                                                fperformanceTC2trk.GetArray("b").GetArray(),fperformanceTC2trk.GetArray("c").GetArray(),
-                                                fperformanceTC2trk.GetArray("bErr").GetArray(),fperformanceTC2trk.GetArray("cErr").GetArray());
+        S8bPerformance Perf = iperf->second;
 
-        TGraphErrors *gTC2_udsg = new TGraphErrors(fperformanceTC2trk.GetN(),
-                fperformanceTC2trk.GetArray("b").GetArray(),fperformanceTC2trk.GetArray("udsg").GetArray(),
-                fperformanceTC2trk.GetArray("bErr").GetArray(),fperformanceTC2trk.GetArray("udsgErr").GetArray());
-        TGraph *dTC2_udsg = new TGraph(fperformanceTC2trk.GetN(),
-                                       fperformanceTC2trk.GetArray("udsg").GetArray(),
-                                       fperformanceTC2trk.GetArray("discriminator").GetArray());
-
-        TGraphErrors *gTC3_b = new TGraphErrors(fperformanceTC3trk.GetN(),
-                                                fperformanceTC3trk.GetArray("b").GetArray(),fperformanceTC3trk.GetArray("b").GetArray(),
-                                                fperformanceTC3trk.GetArray("bErr").GetArray(),fperformanceTC3trk.GetArray("bErr").GetArray());
-
-        TGraphErrors *gTC3_c = new TGraphErrors(fperformanceTC3trk.GetN(),
-                                                fperformanceTC3trk.GetArray("b").GetArray(),fperformanceTC3trk.GetArray("c").GetArray(),
-                                                fperformanceTC3trk.GetArray("bErr").GetArray(),fperformanceTC3trk.GetArray("cErr").GetArray());
-
-        TGraphErrors *gTC3_udsg = new TGraphErrors(fperformanceTC3trk.GetN(),
-                fperformanceTC3trk.GetArray("b").GetArray(),fperformanceTC3trk.GetArray("udsg").GetArray(),
-                fperformanceTC3trk.GetArray("bErr").GetArray(),fperformanceTC3trk.GetArray("udsgErr").GetArray());
-        TGraph *dTC3_udsg = new TGraph(fperformanceTC3trk.GetN(),
-                                       fperformanceTC3trk.GetArray("udsg").GetArray(),
-                                       fperformanceTC3trk.GetArray("discriminator").GetArray());
-
-        TGraphErrors *gTP_b = new TGraphErrors(fperformanceTP.GetN(),
-                                               fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("b").GetArray(),
-                                               fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("bErr").GetArray());
-
-        TGraphErrors *gTP_c = new TGraphErrors(fperformanceTP.GetN(),
-                                               fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("c").GetArray(),
-                                               fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("cErr").GetArray());
-
-        TGraphErrors *gTP_udsg = new TGraphErrors(fperformanceTP.GetN(),
-                fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("udsg").GetArray(),
-                fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("udsgErr").GetArray());
-        TGraph *dTP_udsg = new TGraph(fperformanceTP.GetN(),
-                                      fperformanceTP.GetArray("udsg").GetArray(),
-                                      fperformanceTP.GetArray("discriminator").GetArray());
-
-        TGraphErrors *gJBP_b = new TGraphErrors(fperformanceJBP.GetN(),
-                                                fperformanceJBP.GetArray("b").GetArray(),fperformanceJBP.GetArray("b").GetArray(),
-                                                fperformanceJBP.GetArray("bErr").GetArray(),fperformanceJBP.GetArray("bErr").GetArray());
-
-        TGraphErrors *gJBP_c = new TGraphErrors(fperformanceJBP.GetN(),
-                                                fperformanceJBP.GetArray("b").GetArray(),fperformanceJBP.GetArray("c").GetArray(),
-                                                fperformanceJBP.GetArray("bErr").GetArray(),fperformanceJBP.GetArray("cErr").GetArray());
-
-        TGraphErrors *gJBP_udsg = new TGraphErrors(fperformanceJBP.GetN(),
-                fperformanceJBP.GetArray("b").GetArray(),fperformanceJBP.GetArray("udsg").GetArray(),
-                fperformanceJBP.GetArray("bErr").GetArray(),fperformanceJBP.GetArray("udsgErr").GetArray());
-        TGraph *dJBP_udsg = new TGraph(fperformanceJBP.GetN(),
-                                       fperformanceJBP.GetArray("udsg").GetArray(),
-                                       fperformanceJBP.GetArray("discriminator").GetArray());
+        Perf.Eval();
 
 
-        TGraphErrors *gSMT_b = new TGraphErrors(fperformanceSMT.GetN(),
-                                                fperformanceSMT.GetArray("b").GetArray(),fperformanceSMT.GetArray("b").GetArray(),
-                                                fperformanceSMT.GetArray("bErr").GetArray(),fperformanceSMT.GetArray("bErr").GetArray());
+        TGraphErrors *gTb = Perf.EfficiencyGraph("b");
+        TGraphErrors *gTc = Perf.EfficiencyGraph("c");
+        TGraphErrors *gTl = Perf.EfficiencyGraph("udsg");
+        gVector.push_back( gTb );
+        gVector.push_back( gTc );
+        gVector.push_back( gTl );
 
-        TGraphErrors *gSMT_c = new TGraphErrors(fperformanceSMT.GetN(),
-                                                fperformanceSMT.GetArray("b").GetArray(),fperformanceSMT.GetArray("c").GetArray(),
-                                                fperformanceSMT.GetArray("bErr").GetArray(),fperformanceSMT.GetArray("cErr").GetArray());
+		TGraph *discTl = Perf.DiscriminatorGraph("udsg");
+        discTl->Sort();
+        gVector.push_back( discTl );
 
-        TGraphErrors *gSMT_udsg = new TGraphErrors(fperformanceSMT.GetN(),
-                fperformanceSMT.GetArray("b").GetArray(),fperformanceSMT.GetArray("udsg").GetArray(),
-                fperformanceSMT.GetArray("bErr").GetArray(),fperformanceSMT.GetArray("udsgErr").GetArray());
-        TGraph *dSMT_udsg = new TGraph(fperformanceSMT.GetN(),
-                                       fperformanceSMT.GetArray("udsg").GetArray(),
-                                       fperformanceSMT.GetArray("discriminator").GetArray());
-
-        TGraphErrors *gSSV_b = new TGraphErrors(fperformanceSSV.GetN(),
-                                                fperformanceSSV.GetArray("b").GetArray(),fperformanceSSV.GetArray("b").GetArray(),
-                                                fperformanceSSV.GetArray("bErr").GetArray(),fperformanceSSV.GetArray("bErr").GetArray());
-
-        TGraphErrors *gSSV_c = new TGraphErrors(fperformanceSSV.GetN(),
-                                                fperformanceSSV.GetArray("b").GetArray(),fperformanceSSV.GetArray("c").GetArray(),
-                                                fperformanceSSV.GetArray("bErr").GetArray(),fperformanceSSV.GetArray("cErr").GetArray());
-
-        TGraphErrors *gSSV_udsg = new TGraphErrors(fperformanceSSV.GetN(),
-                fperformanceSSV.GetArray("b").GetArray(),fperformanceSSV.GetArray("udsg").GetArray(),
-                fperformanceSSV.GetArray("bErr").GetArray(),fperformanceSSV.GetArray("udsgErr").GetArray());
-        TGraph *dSSV_udsg = new TGraph(fperformanceSSV.GetN(),
-                                       fperformanceSSV.GetArray("udsg").GetArray(),
-                                       fperformanceSSV.GetArray("discriminator").GetArray());
-
-        TGraphErrors *gCSV_b = new TGraphErrors(fperformanceCSV.GetN(),
-                                                fperformanceCSV.GetArray("b").GetArray(),fperformanceCSV.GetArray("b").GetArray(),
-                                                fperformanceCSV.GetArray("bErr").GetArray(),fperformanceCSV.GetArray("bErr").GetArray());
-
-        TGraphErrors *gCSV_c = new TGraphErrors(fperformanceCSV.GetN(),
-                                                fperformanceCSV.GetArray("b").GetArray(),fperformanceCSV.GetArray("c").GetArray(),
-                                                fperformanceCSV.GetArray("bErr").GetArray(),fperformanceCSV.GetArray("cErr").GetArray());
-
-        TGraphErrors *gCSV_udsg = new TGraphErrors(fperformanceCSV.GetN(),
-                fperformanceCSV.GetArray("b").GetArray(),fperformanceCSV.GetArray("udsg").GetArray(),
-                fperformanceCSV.GetArray("bErr").GetArray(),fperformanceCSV.GetArray("udsgErr").GetArray());
-        TGraph *dCSV_udsg = new TGraph(fperformanceCSV.GetN(),
-                                       fperformanceCSV.GetArray("udsg").GetArray(),
-                                       fperformanceCSV.GetArray("discriminator").GetArray());
-
-
-
-
-        TGraphErrors *gMTC2_b = new TGraphErrors(fperformanceMTC2trk.GetN(),
-                fperformanceMTC2trk.GetArray("b").GetArray(),fperformanceMTC2trk.GetArray("b").GetArray(),
-                fperformanceMTC2trk.GetArray("bErr").GetArray(),fperformanceMTC2trk.GetArray("bErr").GetArray());
-
-        TGraphErrors *gMTC2_c = new TGraphErrors(fperformanceMTC2trk.GetN(),
-                fperformanceMTC2trk.GetArray("b").GetArray(),fperformanceMTC2trk.GetArray("c").GetArray(),
-                fperformanceMTC2trk.GetArray("bErr").GetArray(),fperformanceMTC2trk.GetArray("cErr").GetArray());
-
-        TGraphErrors *gMTC2_udsg = new TGraphErrors(fperformanceMTC2trk.GetN(),
-                fperformanceMTC2trk.GetArray("b").GetArray(),fperformanceMTC2trk.GetArray("udsg").GetArray(),
-                fperformanceMTC2trk.GetArray("bErr").GetArray(),fperformanceMTC2trk.GetArray("udsgErr").GetArray());
-        TGraph *dMTC2_udsg = new TGraph(fperformanceMTC2trk.GetN(),
-                                        fperformanceMTC2trk.GetArray("udsg").GetArray(),
-                                        fperformanceMTC2trk.GetArray("discriminator").GetArray());
-
-        TGraphErrors *gMTC3_b = new TGraphErrors(fperformanceMTC3trk.GetN(),
-                fperformanceMTC3trk.GetArray("b").GetArray(),fperformanceMTC3trk.GetArray("b").GetArray(),
-                fperformanceMTC3trk.GetArray("bErr").GetArray(),fperformanceMTC3trk.GetArray("bErr").GetArray());
-
-        TGraphErrors *gMTC3_c = new TGraphErrors(fperformanceMTC3trk.GetN(),
-                fperformanceMTC3trk.GetArray("b").GetArray(),fperformanceMTC3trk.GetArray("c").GetArray(),
-                fperformanceMTC3trk.GetArray("bErr").GetArray(),fperformanceMTC3trk.GetArray("cErr").GetArray());
-
-        TGraphErrors *gMTC3_udsg = new TGraphErrors(fperformanceMTC3trk.GetN(),
-                fperformanceMTC3trk.GetArray("b").GetArray(),fperformanceMTC3trk.GetArray("udsg").GetArray(),
-                fperformanceMTC3trk.GetArray("bErr").GetArray(),fperformanceMTC3trk.GetArray("udsgErr").GetArray());
-        TGraph *dMTC3_udsg = new TGraph(fperformanceMTC3trk.GetN(),
-                                        fperformanceMTC3trk.GetArray("udsg").GetArray(),
-                                        fperformanceMTC3trk.GetArray("discriminator").GetArray());
-
-
-        gTC2_b->SetName("gTC2_b");
-        gTC2_c->SetName("gTC2_c");
-        gTC2_udsg->SetName("gTC2_udsg");
-        gTC3_b->SetName("gTC3_b");
-        gTC3_c->SetName("gTC3_c");
-        gTC3_udsg->SetName("gTC3_udsg");
-        gTP_b->SetName("gTP_b");
-        gTP_c->SetName("gTP_c");
-        gTP_udsg->SetName("gTP_udsg");
-        gJBP_b->SetName("gJBP_b");
-        gJBP_c->SetName("gJBP_c");
-        gJBP_udsg->SetName("gJBP_udsg");
-        gSMT_b->SetName("gSMT_b");
-        gSMT_c->SetName("gSMT_c");
-        gSMT_udsg->SetName("gSMT_udsg");
-        gSSV_b->SetName("gSSV_b");
-        gSSV_c->SetName("gSSV_c");
-        gSSV_udsg->SetName("gSSV_udsg");
-        gCSV_b->SetName("gCSV_b");
-        gCSV_c->SetName("gCSV_c");
-        gCSV_udsg->SetName("gCSV_udsg");
-        gMTC2_b->SetName("gMTC2_b");
-        gMTC2_c->SetName("gMTC2_c");
-        gMTC2_udsg->SetName("gMTC2_udsg");
-        gMTC3_b->SetName("gMTC3_b");
-        gMTC3_c->SetName("gMTC3_c");
-        gMTC3_udsg->SetName("gMTC3_udsg");
-
-
-        dTC2_udsg->SetName("discTC2_udsg");
-        dTC3_udsg->SetName("discTC3_udsg");
-        dTP_udsg->SetName("discTP_udsg");
-        dJBP_udsg->SetName("discJBP_udsg");
-        dSMT_udsg->SetName("discSMT_udsg");
-        dSSV_udsg->SetName("discSSV_udsg");
-        dCSV_udsg->SetName("discCSV_udsg");
-        dMTC2_udsg->SetName("discMTC2_udsg");
-        dMTC3_udsg->SetName("discMTC3_udsg");
-        dTC2_udsg->SetTitle("TC2trk discriminator vs udsg-mistagging");
-        dTC3_udsg->SetTitle("TC3trk discriminator vs udsg-mistagging");
-        dTP_udsg->SetTitle("TP discriminator vs udsg-mistagging");
-        dJBP_udsg->SetTitle("JBP discriminator vs udsg-mistagging");
-        dSMT_udsg->SetTitle("SMT discriminator vs udsg-mistagging");
-        dSSV_udsg->SetTitle("SSV discriminator vs udsg-mistagging");
-        dCSV_udsg->SetTitle("CSV discriminator vs udsg-mistagging");
-        dMTC2_udsg->SetTitle("MTC2trk discriminator vs udsg-mistagging");
-        dMTC3_udsg->SetTitle("MTC3trk discriminator vs udsg-mistagging");
-
-        gTC2_b->SetTitle("Jet b-efficiency");
-        gTC2_c->SetTitle("Jet c-mistagging");
-        gTC2_udsg->SetTitle("Jet udsg-mistagging");
-        gTC3_b->SetTitle("Jet b-efficiency");
-        gTC3_c->SetTitle("Jet c-mistagging");
-        gTC3_udsg->SetTitle("Jet udsg-mistagging");
-        gTP_b->SetTitle("Jet b-efficiency");
-        gTP_c->SetTitle("Jet c-mistagging");
-        gTP_udsg->SetTitle("Jet udsg-mistagging");
-        gJBP_b->SetTitle("Jet b-efficiency");
-        gJBP_c->SetTitle("Jet c-mistagging");
-        gJBP_udsg->SetTitle("Jet udsg-mistagging");
-        gSMT_b->SetTitle("Jet b-efficiency");
-        gSMT_c->SetTitle("Jet c-mistagging");
-        gSMT_udsg->SetTitle("Jet udsg-mistagging");
-        gSSV_b->SetTitle("Jet b-efficiency");
-        gSSV_c->SetTitle("Jet c-mistagging");
-        gSSV_udsg->SetTitle("Jet udsg-mistagging");
-        gCSV_b->SetTitle("Jet b-efficiency");
-        gCSV_c->SetTitle("Jet c-mistagging");
-        gCSV_udsg->SetTitle("Jet udsg-mistagging");
-        gMTC2_b->SetTitle("Jet b-efficiency");
-        gMTC2_c->SetTitle("Jet c-mistagging");
-        gMTC2_udsg->SetTitle("Jet udsg-mistagging");
-        gMTC3_b->SetTitle("Jet b-efficiency");
-        gMTC3_c->SetTitle("Jet c-mistagging");
-        gMTC3_udsg->SetTitle("Jet udsg-mistagging");
-
-        gTC2_b->Write();
-        gTC2_c->Write();
-        gTC2_udsg->Write();
-        gTC3_b->Write();
-        gTC3_c->Write();
-        gTC3_udsg->Write();
-        gTP_b->Write();
-        gTP_c->Write();
-        gTP_udsg->Write();
-        gJBP_b->Write();
-        gJBP_c->Write();
-        gJBP_udsg->Write();
-        gSMT_b->Write();
-        gSMT_c->Write();
-        gSMT_udsg->Write();
-        gSSV_b->Write();
-        gSSV_c->Write();
-        gSSV_udsg->Write();
-        gCSV_b->Write();
-        gCSV_c->Write();
-        gCSV_udsg->Write();
-        gMTC2_b->Write();
-        gMTC2_c->Write();
-        gMTC2_udsg->Write();
-        gMTC3_b->Write();
-        gMTC3_c->Write();
-        gMTC3_udsg->Write();
-
-
-        dTC2_udsg->Write();
-        dTC3_udsg->Write();
-        dTP_udsg->Write();
-        dJBP_udsg->Write();
-        dSMT_udsg->Write();
-        dSSV_udsg->Write();
-        dCSV_udsg->Write();
-        dMTC2_udsg->Write();
-        dMTC3_udsg->Write();
+	}
 
     }
 
+	if (fWritePerformancePlots)
+    {
+		for (std::vector< TGraph* >::const_iterator iv = gVector.begin(); iv != gVector.end(); ++iv )
+		{
+			(*iv)->Write();
+		}
+	}
+	
     topdir->cd("ptrel");
     PtrelHistos->Save();
     topdir->cd("muon_in_jet");
@@ -569,6 +367,7 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
     TaggedMujetHistos_mc->Save();
     TaggedAwayjetHistos_mc->Save();
 
+	topdir->cd();
     topdir->cd("Histograms");
     histcounterf->Write();
 
@@ -618,21 +417,31 @@ void PerformanceAnalyzer::FillPerformance(reco::CaloJet jet, int JetFlavor, cons
 
     for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it != wp.end(); ++it)
     {
-        //    for (size_t k=0; k<jetTags_testManyByType.size(); k++)
-        //    {
 
-
-
+		edm::Handle<reco::JetTagCollection > jetTags;
+		event.getByLabel((*it).inputTag(),jetTags);
+		std::string alias = (*it).alias();
+		
+		std::string moduleLabel = (jetTags).provenance()->moduleLabel();
+		if (mymap.find(moduleLabel) != mymap.end()) continue;
+		mymap[moduleLabel] = true;
+		
+		ith_tagged = PFTools::TaggedJet(jet,jetTags);
+		
+		if (ith_tagged == -1) continue;
+		
+		TaggerPerformances_[alias].Add( (*jetTags)[ith_tagged].second, JetFlavor );
+			
+		/*
         edm::Handle<reco::JetTagCollection > jetTags;
-        //      std::cout <<" Asking for "<< (*it).inputTag()<<std::endl;
+        
         event.getByLabel((*it).inputTag(),jetTags);
         std::string moduleLabel = (jetTags).provenance()->moduleLabel();
         if (mymap.find(moduleLabel) != mymap.end()) continue;
 
         mymap[moduleLabel] = true;
 
-        //std::cout <<" ECCO "<< jetTags->size()<<std::endl;
-
+        
         ith_tagged = PFTools::TaggedJet(jet,jetTags);
 
 
@@ -704,6 +513,8 @@ void PerformanceAnalyzer::FillPerformance(reco::CaloJet jet, int JetFlavor, cons
 
             fperformanceCSV.Add( (*jetTags)[ith_tagged].second, JetFlavor );
         }
+
+		*/
 
     }
 
@@ -1048,8 +859,6 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
     Handle<GenParticleCollection> genParticles;
     iEvent.getByLabel("genParticles", genParticles);
 
-    //
-
     // Muons
     Handle<reco::MuonCollection> muonsColl;
     iEvent.getByLabel(MuonCollectionTags_, muonsColl);
@@ -1151,6 +960,8 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
     TLorentzVector p4Muon;
     int ijet = 0;
 
+	if (fdebug) std::cout << " begin loop over jets" << std::endl;
+	
     for ( jet = recoJets.begin(); jet != recoJets.end(); ++jet )
     {
 
@@ -1331,6 +1142,8 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
             // now we have an away jet
 
             // find an away tagged jet
+			if (fdebug) std::cout << " find an away tagged jet" << std::endl;
+			
             if ( !AwayTaggedJet )
             {
 
@@ -1406,11 +1219,13 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
             }
 
         } // close away jet loop
-
+		if (fdebug) std::cout << " get b-tagging to fill efficiency and performance plots" << std::endl;
         std::map<std::string, bool> thebtaggingmap = PFTools::GetBTaggingMap(wp, *jet, iEvent, ptrel);
         FillEff(p4Jet, JetFlavor, thebtaggingmap, weight );
+		if (fdebug) std::cout << " done efficiency plots" << std::endl;
         FillPerformance(*jet, JetFlavor, iEvent );
-
+		if (fdebug) std::cout << " done performance plots" << std::endl;
+		
         if ( hasLepton == 1 )
         {
             p4MuJet.SetPtEtaPhiE(jet->pt(), jet->eta(), jet->phi(), jet->energy() );
@@ -1543,6 +1358,8 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 
         std::map<std::string, bool> mymap;
 
+		if (fdebug) std::cout << " btag operating points" << std::endl;
+		
         for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it != wp.end(); ++it)
         {
             //    for (size_t k=0; k<jetTags_testManyByType.size(); k++)

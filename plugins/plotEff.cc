@@ -11,7 +11,7 @@
  Author: Francisco Yumiceva
 */
 //
-// $Id: plotEff.cc,v 1.3 2009/09/04 17:18:47 yumiceva Exp $
+// $Id: plotEff.cc,v 1.4 2009/09/04 20:56:04 bazterra Exp $
 //
 //
 
@@ -66,7 +66,7 @@ plotEff::plotEff(const ParameterSet& iConfig)
 //
 // get operating points
 
-    std::vector<edm::ParameterSet> config = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet > >("bTagCutList");
+    std::vector<edm::ParameterSet> config = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet > >("OperatingPointsList");
 
 // type of operating points
     OPbyMistagRate_ = iConfig.getParameter<bool>("plotEffbyMistagRate");

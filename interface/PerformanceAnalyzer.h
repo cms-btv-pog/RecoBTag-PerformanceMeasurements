@@ -11,7 +11,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzer.h,v 1.28 2009/09/04 20:56:03 bazterra Exp $
+ * \version $Id: PerformanceAnalyzer.h,v 1.29 2009/09/05 02:34:44 bazterra Exp $
  *
  */
 
@@ -196,6 +196,8 @@ private:
     //
     std::string jetCorrLabel_;
     bool useJetCorr_;
+	std::map< std::string , S8bPerformance > TaggerPerformances_;
+	
 };
 
 

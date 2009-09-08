@@ -30,7 +30,7 @@ process.TagLsequence = cms.Sequence( process.TagL )
 process.TagMsequence = cms.Sequence( process.TagM )
 
 process.load("PhysicsTools.JetMCAlgos.CaloJetsMCFlavour_cfi")
-process.load("RecoBTag.PerformanceMeasurements.OperatingPoints")
+process.load("RecoBTag.PerformanceMeasurements.OperatingPointsAnalyzer")
 process.defaultsequence = cms.Sequence( process.Taggability+process.caloJetMCFlavour * process.OperatingPoints )
 
 #process.load("RecoBTag.PerformanceMeasurements.plotEff")
