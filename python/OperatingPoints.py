@@ -222,7 +222,12 @@ EstimateByMistagRate = cms.untracked.PSet(
 ####################################################################################
 # Operating Points for 31X
 # where cut is applied to default discriminator
-
+#
+# operating points are estimated applying a loose taggability requirement,
+# for 31X, we use the following samples:
+# InclusiveMu5_Pt50 for the soft muon taggers
+# QCD_Pt30 for the rest of taggers
+#
 OperatingPoints31X = cms.untracked.PSet(
 
     OperatingPointsList = cms.untracked.VPSet(
