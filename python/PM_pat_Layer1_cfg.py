@@ -23,6 +23,7 @@ addJetCollection(process,cms.InputTag('antikt5CaloJets'),
                  doBTagging   = True,
                  jetCorrLabel = ('AK5','Calo'),
                  doType1MET   = True,
+		 doL1Counters = True,
                  genJetCollection=cms.InputTag("antikt5GenJets")
                  )
 
@@ -38,7 +39,9 @@ addJetCollection(process,cms.InputTag('antikt5CaloJets'),
 
 process.selectedLayer1Muons.cut      = cms.string('pt > 5. & abs(eta) < 2.4')
 process.selectedLayer1Jets.cut = 'pt > 30. & abs(eta) < 2.4'
+process.selectedLayer1JetsAK5.cut = 'pt > 30. & abs(eta) < 2.4'
 process.countLayer1Jets.minNumber = cms.uint32(2)
+process.countLayer1JetsAK5.minNumber = cms.uint32(2)
 process.countLayer1Muons.minNumber = cms.uint32(1)
 
 #from BTag algorithm note

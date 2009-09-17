@@ -8,6 +8,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
  
 #-- Message Logger ------------------------------------------------------------
 process.MessageLogger.categories.append('PATSummaryTables')
+process.MessageLogger.cerr.FwkReport.reportEvery=100
 process.MessageLogger.cerr = cms.untracked.PSet(
     default          = cms.untracked.PSet( limit = cms.untracked.int32(-1)  ),
     PATSummaryTables = cms.untracked.PSet( limit = cms.untracked.int32(-1) )
@@ -40,8 +41,8 @@ process.out.outputCommands = [ 'drop *' ]
 
 # Explicit list of collections to keep (basis is default PAT event content)
 process.out.outputCommands.extend( [ # PAT Objects
-                                     'keep *_cleanLayer1Muons_*_*',
-                                     'keep *_cleanLayer1Jets*_*_*',       # All Jets
+                                     'keep *_selectedLayer1Muons_*_*',
+                                     'keep *_selectedLayer1Jets*_*_*',       # All Jets
                                      # Generator information
                                      'keep GenEventInfoProduct_generator_*_*',
                                      # Generator particles/jets/MET
@@ -50,13 +51,14 @@ process.out.outputCommands.extend( [ # PAT Objects
                                      'keep recoGenJets_antikt5GenJets_*_*',
                                      # Trigger information
                                      'keep edmTriggerResults_TriggerResults_*_HLT',
-                                     'keep *_hltTriggerSummaryAOD_*_*',
-                                     'keep L1GlobalTriggerObjectMapRecord_*_*_*',
+                                     #'keep *_hltTriggerSummaryAOD_*_*',
+                                     #'keep L1GlobalTriggerObjectMapRecord_*_*_*',
                                      # Others
                                      'keep *_offlinePrimaryVertices_*_*',
                                      'keep *_offlineBeamSpot_*_*',
-#                                     'keep *_towerMaker_*_*',                 #
-                                     'keep recoTracks_generalTracks_*_*',
+#                                    'keep *_towerMaker_*_*',                 #
+                                     #'keep recoTracks_generalTracks_*_*',
+				     'keep *_jetTrackAssociatorAtVertex*_*_*',
                                      'keep HcalNoiseSummary_*_*_*'
                                      ] )
 
