@@ -30,6 +30,20 @@ process.maxEvents.input = 1000
 #-- load pat sequence ----
 process.load("RecoBTag.PerformanceMeasurements.PM_pat_Layer1_cfg")
 
+# Full path
+#process.p = cms.Path( process.patDefaultSequence*process.patTrigger*process.patTriggerEvent )
+
+# clean up jet filters in path
+process.PM_tuple.remove(process.cleanLayer1JetsAK5)
+process.PM_tuple.remove(process.countLayer1JetsAK5)
+process.PM_tuple.remove(process.cleanLayer1Jets)
+process.PM_tuple.remove(process.countLayer1Jets)
+process.PM_tuple.remove(process.cleanLayer1Hemispheres)
+
+process.p1 = cms.Path( process.PM_tuple*process.cleanLayer1Jets*process.countLayer1Jets*process.DeltaRCut )
+process.p2 = cms.Path( process.PM_tuple*process.cleanLayer1JetsAK5*process.countLayer1JetsAK5*process.DeltaRCutAK5 ) # for AK5 jets
+
+
 #-- Output module configuration -----------------------------------------------
 from PhysicsTools.PatAlgos.patEventContent_cff import patEventContent
 
@@ -38,6 +52,10 @@ process.out.splitLevel = cms.untracked.int32(99)  # Turn on split level (smaller
 process.out.overrideInputFileSplitLevels = cms.untracked.bool(True)
 process.out.dropMetaData = cms.untracked.string('DROPPED')   # Get rid of metadata related to dropped collections
 process.out.outputCommands = [ 'drop *' ]
+
+process.out.SelectEvents = cms.untracked.PSet(
+    SelectEvents = cms.vstring('p1','p2')
+)
 
 # Explicit list of collections to keep (basis is default PAT event content)
 process.out.outputCommands.extend( [ # PAT Objects
@@ -62,8 +80,4 @@ process.out.outputCommands.extend( [ # PAT Objects
                                      'keep HcalNoiseSummary_*_*_*'
                                      ] )
 
-
-# Full path
-#process.p = cms.Path( process.patDefaultSequence*process.patTrigger*process.patTriggerEvent )
-process.p = cms.Path( process.PM_tuple )
 

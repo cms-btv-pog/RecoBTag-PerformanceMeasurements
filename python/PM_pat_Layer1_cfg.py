@@ -23,7 +23,7 @@ addJetCollection(process,cms.InputTag('antikt5CaloJets'),
                  doBTagging   = True,
                  jetCorrLabel = ('AK5','Calo'),
                  doType1MET   = True,
-		 doL1Counters = True,
+		 doL1Counters = True, # NOTE, you need to create two paths and treat carefully the counters
                  genJetCollection=cms.InputTag("antikt5GenJets")
                  )
 
@@ -54,12 +54,25 @@ process.jetPartonMatch.maxDPtRel  = cms.double(99999999999)
 process.jetGenJetMatch.maxDeltaR  = cms.double(0.5)
 process.jetGenJetMatch.maxDPtRel  = cms.double(99999999999)
 
+# deltaR cut filters
+DeltaRCut = cms.EDFilter("PMDeltaRFilter",
+     Jets = cms.InputTag("selectedLayer1Jets"),
+     Muons = cms.InputTag("selectedLayer1Muons"),
+     MaxDeltaR = cms.double(0.4)
+)
+
+DeltaRCutAK5 = cms.EDFilter("PMDeltaRFilter",
+     Jets = cms.InputTag("selectedLayer1JetsAK5"),
+     Muons = cms.InputTag("selectedLayer1Muons"),
+     MaxDeltaR = cms.double(0.4)
+)
+ 
 
 #-- Trigger matching ----------------------------------------------------------
-from PhysicsTools.PatAlgos.tools.trigTools import *
-switchOnTrigger( process )
-process.patTriggerSequence.remove( process.patTriggerMatcher )
-process.patTriggerEvent.patTriggerMatches  = ()
+#from PhysicsTools.PatAlgos.tools.trigTools import *
+#switchOnTrigger( process )
+#process.patTriggerSequence.remove( process.patTriggerMatcher )
+#process.patTriggerEvent.patTriggerMatches  = ()
 
 
 #for jets in ( 'SC5' ):
