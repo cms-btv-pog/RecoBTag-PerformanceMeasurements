@@ -30,6 +30,11 @@ process.maxEvents.input = 1000
 #-- load pat sequence ----
 process.load("RecoBTag.PerformanceMeasurements.PM_pat_Layer1_cfg")
 
+####### A O D ############
+# If we are running in AOD, use the following switch
+#
+#restrictInputToAOD(process)
+ 
 # Full path
 #process.p = cms.Path( process.patDefaultSequence*process.patTrigger*process.patTriggerEvent )
 

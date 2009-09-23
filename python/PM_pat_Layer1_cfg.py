@@ -89,9 +89,12 @@ process.countLayer1Muons.minNumber = cms.uint32(1)
 #0.3 from BTag note. CHECK DO WE REALLY NEED THIS?
 process.jetPartonMatch.maxDeltaR  = cms.double(0.3) 
 process.jetPartonMatch.maxDPtRel  = cms.double(99999999999)
-
 process.jetGenJetMatch.maxDeltaR  = cms.double(0.5)
 process.jetGenJetMatch.maxDPtRel  = cms.double(99999999999)
+process.jetPartonMatchAK5.maxDeltaR  = cms.double(0.3) 
+process.jetPartonMatchAK5.maxDPtRel  = cms.double(99999999999)
+process.jetGenJetMatchAK5.maxDeltaR  = cms.double(0.5)
+process.jetGenJetMatchAK5.maxDPtRel  = cms.double(99999999999)
 
 
 # deltaR cut filters
