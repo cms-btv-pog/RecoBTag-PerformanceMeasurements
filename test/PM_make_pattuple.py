@@ -40,8 +40,9 @@ process.PM_tuple.remove(process.cleanLayer1Jets)
 process.PM_tuple.remove(process.countLayer1Jets)
 process.PM_tuple.remove(process.cleanLayer1Hemispheres)
 
-process.p1 = cms.Path( process.PM_tuple*process.cleanLayer1Jets*process.countLayer1Jets*process.DeltaRCut )
-process.p2 = cms.Path( process.PM_tuple*process.cleanLayer1JetsAK5*process.countLayer1JetsAK5*process.DeltaRCutAK5 ) # for AK5 jets
+# disable for the moment deltaR filters
+process.p1 = cms.Path( process.PM_tuple*process.cleanLayer1Jets*process.countLayer1Jets) #*process.DeltaRCut )
+process.p2 = cms.Path( process.PM_tuple*process.cleanLayer1JetsAK5*process.countLayer1JetsAK5) #*process.DeltaRCutAK5 ) # for AK5 jets
 
 
 #-- Output module configuration -----------------------------------------------
@@ -75,8 +76,8 @@ process.out.outputCommands.extend( [ # PAT Objects
                                      'keep *_offlinePrimaryVertices_*_*',
                                      'keep *_offlineBeamSpot_*_*',
 #                                    'keep *_towerMaker_*_*',                 #
-                                     #'keep recoTracks_generalTracks_*_*',
-				     'keep *_jetTrackAssociatorAtVertex*_*_*',
+                                     'keep recoTracks_generalTracks_*_*',
+				     #'keep *_*JetTrackAssociatorAtVertex*_*_*'
                                      'keep HcalNoiseSummary_*_*_*'
                                      ] )
 
