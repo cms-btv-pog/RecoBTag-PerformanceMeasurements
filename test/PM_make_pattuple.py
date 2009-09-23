@@ -11,7 +11,11 @@ process.MessageLogger.categories.append('PATSummaryTables')
 process.MessageLogger.cerr.FwkReport.reportEvery=100
 process.MessageLogger.cerr = cms.untracked.PSet(
     default          = cms.untracked.PSet( limit = cms.untracked.int32(-1)  ),
-    PATSummaryTables = cms.untracked.PSet( limit = cms.untracked.int32(-1) )
+    PATSummaryTables = cms.untracked.PSet( limit = cms.untracked.int32(-1) ),
+    FwkReport = cms.untracked.PSet(
+	reportEvery = cms.untracked.int32(100)
+    )
+
 )
 #process.MessageLogger.cerr.FwkReport.reportEvery=100
 
@@ -74,7 +78,7 @@ process.out.outputCommands.extend( [ # PAT Objects
                                      'keep recoGenJets_iterativeCone5GenJets_*_*',
                                      'keep recoGenJets_antikt5GenJets_*_*',
                                      # Trigger information
-                                     'keep edmTriggerResults_TriggerResults_*_HLT',
+                                     'keep edmTriggerResults_TriggerResults_*_*',
                                      #'keep *_hltTriggerSummaryAOD_*_*',
                                      #'keep L1GlobalTriggerObjectMapRecord_*_*_*',
                                      # Others
