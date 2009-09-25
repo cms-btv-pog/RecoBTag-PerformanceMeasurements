@@ -11,8 +11,12 @@
 #include <SimDataFormats/Vertex/interface/SimVertexContainer.h>
 #include <SimDataFormats/Track/interface/SimTrack.h>
 #include <SimDataFormats/Track/interface/SimTrackContainer.h>
+//#include "RecoBTag/PerformanceMeasurements/bin/PMHistograms.h"
 
 // ROOT includes
+#include "TAxis.h"
+#include "TH2F.h"
+#include "TString.h"
 #include "TFile.h"
 #include "TVector3.h"
 #include "TLorentzVector.h"
@@ -47,10 +51,143 @@ int main (int argc, char* argv[])
 
   // use this histogram manager for the moment
   // we will change it to use FY or SK managers
-  eventCont.add( new TH1F( "jet_pt", "jet pt", 30, 0, 150) );
-  eventCont.add( new TH1F( "muon_pt", "muon pt", 300, 0, 50) );
-  eventCont.add( new TH1F( "ptRel", "ptRel", 100, 0, 10) );
+  //PMHistograms pmhistos( eventCont );
+  //pmhistos.Add();
+    
+  std::map<std::string, int>  quark_color;
+  quark_color[""] = 1;
+  quark_color["b"] = 2;
+  quark_color["c"] = 3;
+  quark_color["uds"] = 4;
+  quark_color["g"] = 6;
 
+  TString           ftagger;
+  TString           flevel;
+  TString           fAwaytagger;
+  TString           fAwaylevel;
+  std::map< TString, float > fTrackCountingMap;
+  TAxis             fJetPtAxis;
+  TAxis             fJetEtaAxis;
+  TAxis             fCorrPtAxis;
+  TAxis             fCorrEtaAxis;
+
+  ftagger = "TrackCounting";
+  flevel  = "Loose";
+  fAwaytagger = "TrackCounting";
+  fAwaylevel = "Loose";
+  
+  fTrackCountingMap["Loose"]  = 2.0; // use TC2:high eff.
+  fTrackCountingMap["Medium"] = 4.2; // use TC2:high eff.
+  fTrackCountingMap["Tight"]  = 4.1;
+  
+  const int nptarray = 4;
+  const int netaarray = 10;
+  const int ncorrptarray = 5;
+  const int ncorretaarray = 5;
+  Double_t jetptbins[nptarray] = {30., 70., 120.,230.};
+  Double_t jetetabins[netaarray] = {0.0,0.25,0.5,0.75,1.0,1.25,1.5,1.75,2.0,2.5};
+  Double_t corrptbins[ncorrptarray] = {20.,40.,60.,80.,230.};
+  Double_t corretabins[ncorrptarray] = {0.,0.5,1.,1.5,2.5};
+  
+  int nptbins = fJetPtAxis.GetNbins();;
+  //const Double_t *jetptbins = (fJetPtAxis.GetXbins())->GetArray();
+  int netabins = fJetEtaAxis.GetNbins();
+  //const Double_t *jetetabins = (fJetEtaAxis.GetXbins())->GetArray();
+	// int ncorrptbins = fCorrPtAxis.GetNbins();
+	// const Double_t *corrptbins = (fCorrPtAxis.GetXbins())->GetArray();
+	// int ncorretabins = fCorrEtaAxis.GetNbins();
+	// const Double_t *corretabins = (fCorrEtaAxis.GetXbins())->GetArray();
+	
+	eventCont.add( new TH2F("npT","MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	eventCont.add( new TH2F("ppT","MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	eventCont.add( new TH2F("ncmbpT","opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	eventCont.add( new TH2F("pcmbpT","opp tag MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+
+	eventCont.add( new TH2F("qpT","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	eventCont.add( new TH2F("qcmbpT","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	
+	
+	eventCont.add( new TH2F("nEta","MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.) );
+	eventCont.add( new TH2F("pEta","MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.) );
+	eventCont.add( new TH2F("ncmbEta","opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.) );
+	eventCont.add( new TH2F("pcmbEta","opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.) );
+
+	eventCont.add( new TH2F("qEta","other MuTag pT vs pTrel",netabins,jetetabins,50,0.,5.) );
+	eventCont.add( new TH2F("qcmbEta","other MuTag && Tagger pT vs pTrel",netabins,jetetabins,50,0.,5.) );
+	
+	eventCont.add( new TH2F("b_npT","b MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	eventCont.add( new TH2F("b_ppT","b MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	eventCont.add( new TH2F("b_ncmbpT","b opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	eventCont.add( new TH2F("b_pcmbpT","b opp tag MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+
+	eventCont.add( new TH2F("b_qpT","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	eventCont.add( new TH2F("b_qcmbpT","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	
+	eventCont.add( new TH2F("b_nEta","b MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.) );
+	eventCont.add( new TH2F("b_pEta","b MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.) );
+	eventCont.add( new TH2F("b_ncmbEta","b opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.) );
+	eventCont.add( new TH2F("b_pcmbEta","b opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.) );
+
+	eventCont.add( new TH2F("b_qEta","other MuTag pT vs pTrel",netabins,jetetabins,50,0.,5.) );
+	eventCont.add( new TH2F("b_qcmbEta","other MuTag && Tagger pT vs pTrel",netabins,jetetabins,50,0.,5.) );
+	
+	
+	eventCont.add( new TH2F("cl_npT","cl MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	eventCont.add( new TH2F("cl_ppT","cl MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	eventCont.add( new TH2F("cl_ncmbpT","cl opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	eventCont.add( new TH2F("cl_pcmbpT","cl opp tag MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+
+	eventCont.add( new TH2F("cl_qpT","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	eventCont.add( new TH2F("cl_qcmbpT","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	
+	eventCont.add( new TH2F("c_npT","c MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	eventCont.add( new TH2F("c_ncmbpT","c opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	eventCont.add( new TH2F("g_npT","g MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	eventCont.add( new TH2F("g_ncmbpT","g opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	eventCont.add( new TH2F("uds_npT","uds MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+	eventCont.add( new TH2F("uds_ncmbpT","uds opp tag MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.) );
+
+	eventCont.add( new TH2F("cl_nEta","cl MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.) );
+	eventCont.add( new TH2F("cl_pEta","cl MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.) );
+	eventCont.add( new TH2F("cl_ncmbEta","cl opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.) );
+	eventCont.add( new TH2F("cl_pcmbEta","cl opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.) );
+
+	eventCont.add( new TH2F("cl_qEta","other MuTag pT vs pTrel",netabins,jetetabins,50,0.,5.) );
+	eventCont.add( new TH2F("cl_qcmbEta","other MuTag && Tagger pT vs pTrel",netabins,jetetabins,50,0.,5.) );
+	
+	eventCont.add( new TH2F("ptVsEta","pt vs Eta",fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() ) );
+	eventCont.add( new TH2F("ptVsEta_b","pt vs Eta",fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() ) );
+	eventCont.add( new TH2F("taggedjet_ptVsEta","taggedjet pt vs Eta",fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() ) );
+	eventCont.add( new TH2F("taggedjet_ptVsEta_b","taggedjet pt vs Eta",fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() ) );
+
+	eventCont.add( new TH1D("alpha","alpha",nptbins,jetptbins) );
+	eventCont.add( new TH1D("beta","beta",nptbins,jetptbins) );
+	eventCont.add( new TH1D("kappa_cl","kappa_cl",nptbins,jetptbins) );
+	eventCont.add( new TH1D("kappa_b","kappa_b",nptbins,jetptbins) );
+	eventCont.add( new TH1D("delta","delta",nptbins,jetptbins) );
+	eventCont.add( new TH1D("gamma","gamma",nptbins,jetptbins) );
+
+	eventCont.add( new TH1D("alpha_eta","alpha_eta",netabins,jetetabins) );
+	eventCont.add( new TH1D("beta_eta","beta_eta",netabins,jetetabins) );
+	eventCont.add( new TH1D("kappa_eta_cl","kappa_eta_cl",netabins,jetetabins) );
+	eventCont.add( new TH1D("kappa_eta_b","kappa_eta_b",netabins,jetetabins) );
+	eventCont.add( new TH1D("delta_eta","delta_eta",netabins,jetetabins) );
+	eventCont.add( new TH1D("gamma_eta","gamma_eta",netabins,jetetabins) );
+
+	eventCont.add( new TH1D("jet_deltaR","#Delta R",60,0.,0.55) );
+	eventCont.add( new TH1D("jet_deltaR_b","#Delta R",60,0.,0.55) );
+	eventCont.add( new TH1D("jet_deltaR_c","#Delta R",60,0.,0.55) );
+	eventCont.add( new TH1D("jet_deltaR_udsg","#Delta R",60,0.,0.55) );
+	// change colors
+	eventCont.add( new TH1D("jet_pTrel","p_{Trel} [GeV/c]" , 50, 0, 5 ) );
+	eventCont.add( new TH1D("jet_pTrel_b","p_{Trel} [GeV/c]" , 50, 0, 5 ) );
+	eventCont.add( new TH1D("jet_pTrel_c","p_{Trel} [GeV/c]" , 50, 0, 5 ) );
+	eventCont.add( new TH1D("jet_pTrel_udsg","p_{Trel} [GeV/c]" , 50, 0, 5 ) );
+	
+	eventCont.add( new TH1F( "jet_pt", "jet pt", 30, 0, 150) );
+	eventCont.add( new TH1F( "muon_pt", "muon pt", 300, 0, 50) );
+	eventCont.add( new TH1F( "ptRel", "ptRel", 100, 0, 10) );
+	
   // //////////////// //
   // // Event Loop // //
   // //////////////// //
@@ -81,7 +218,7 @@ int main (int argc, char* argv[])
 	      eventCont.hist("jet_pt")->Fill (jetIter->pt()); // just for testing
         // get MC flavor of jet
 		  
-//		  int JetFlavor = abs(getMatchedParton(*jetIter).getFlavour());
+		  int JetFlavor = jetIter->partonFlavour();
 		  p4Jet.SetPtEtaPhiE(jetIter->pt(), jetIter->eta(), jetIter->phi(), jetIter->energy() );
 		  int hasLepton = 0;
 		  int tmptotmuon = 0;
@@ -128,13 +265,41 @@ int main (int argc, char* argv[])
 			      tmpvec += leptonvec;
 			      ptrel = leptonvec.Perp(tmpvec);  // maximum
 			    }
-			  eventCont.hist("ptRel")->Fill (ptrel);
+			  eventCont.hist("jet_pTrel")->Fill (ptrel);
+			  eventCont.hist("jet_deltaR")->Fill (deltaR);
+			  if ( JetFlavor == 5 ) {
+				  eventCont.hist("jet_deltaR_b")->Fill (deltaR);
+				  eventCont.hist("jet_pTrel_b")->Fill (ptrel);
+			  }
+			  if ( JetFlavor == 4 ) {
+				  eventCont.hist("jet_deltaR_c")->Fill (deltaR);
+				  eventCont.hist("jet_pTrel_c")->Fill (ptrel);
+			  }
+			  if ( (JetFlavor>0 && JetFlavor<4) || JetFlavor==21 ) {
+				  eventCont.hist("jet_deltaR_udsg")->Fill (deltaR);
+				  eventCont.hist("jet_pTrel_udsg")->Fill (ptrel);
+			  }
+
 			  
 		  }//muons
 		  if ( hasLepton == 1 )
 		    {
 		      p4MuJet.SetPtEtaPhiE(jetIter->pt(), jetIter->eta(), jetIter->phi(), jetIter->energy() );
-		    }		  
+		    }
+
+		  
+		  eventCont.hist("npT")->Fill( p4Jet.Pt() , ptrel );
+		  eventCont.hist("nEta")->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
+		  if ( JetFlavor == 5 ) {
+			  eventCont.hist("b_npT")->Fill( p4Jet.Pt() , ptrel );
+			  eventCont.hist("b_nEta")->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
+		  }
+		  if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor==21 ) {
+			  eventCont.hist("c_npT")->Fill( p4Jet.Pt() , ptrel );
+			  eventCont.hist("c_nEta")->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
+		  }
+		  
+
 		  // find away jet
 		  ////////////////////////////
 		  bool AwayTaggedJet = false;
