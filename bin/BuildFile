@@ -6,5 +6,6 @@
  <use name=DataFormats/FWLite>
  <use name=DataFormats/PatCandidates>
  <use name=PhysicsTools/FWLite>
+ <use name=RecoBTag/PerformanceMeasurements>
 </bin>
 
