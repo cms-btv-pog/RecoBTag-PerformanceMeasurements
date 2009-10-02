@@ -186,33 +186,51 @@ void PMHistograms::FillHistos(std::string type, TLorentzVector p4MuJet, double p
 	if ( JetFlavor == 5 )
 	{
 		flavor = "b";
+		fstore->hist(type+"_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
+		fstore->hist(type+"_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
+		if (tagged) {
+			fstore->hist(type+"tag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
+			fstore->hist(type+"tag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
+		}
 	}
 	if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor == 21 )
 	{
 		flavor = "cl";
+		fstore->hist(type+"_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
+		fstore->hist(type+"_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
+		if (tagged) {
+			fstore->hist(type+"tag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
+			fstore->hist(type+"tag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
+		}
 	}
 	if ( JetFlavor == 4 )
 	{
 		flavor = "c";
+		fstore->hist(type+"_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
+		fstore->hist(type+"_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
+		if (tagged) {
+			fstore->hist(type+"tag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
+			fstore->hist(type+"tag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
+		}
 	}
 	if ( (JetFlavor>0 && JetFlavor<4) || JetFlavor == 21 )
 	{
 		flavor = "l";
+		fstore->hist(type+"_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
+		fstore->hist(type+"_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
+		if (tagged) {
+			fstore->hist(type+"tag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
+			fstore->hist(type+"tag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
+		}
 	}
 
 	// avoid jets with flavor = 0
-	if ( JetFlavor > 0 ) {
-		fstore->hist(type+"_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-		fstore->hist(type+"_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-	}
+	
 	if (tagged) {
 
 		fstore->hist(type+"tag_pT")->Fill(p4MuJet.Pt(),ptrel);
 		fstore->hist(type+"tag_eta")->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-		if ( JetFlavor > 0 ) {
-			fstore->hist(type+"tag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-			fstore->hist(type+"tag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-		}
+		
 	}
 	
 }
