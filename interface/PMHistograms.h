@@ -10,7 +10,7 @@
          Author: Francisco Yumiceva, Fermilab
 */
 //
-// $Id: PM_Histogrmas,v 1.1 2009/09/22 02:45:37 yumiceva Exp $
+// $Id: PMHistograms.h,v 1.1 2009/10/02 22:09:03 yumiceva Exp $
 //
 //
 
@@ -18,7 +18,7 @@
 #ifndef PMHistograms_H
 #define PMHistograms_H
 
-#include "PhysicsTools/FWLite/interface/TH1Store.h"
+#include "RecoBTag/PerformanceMeasurements/interface/TH1Store.h"
 #include "TH2F.h"
 #include "TString.h"
 #include "TLorentzVector.h"
