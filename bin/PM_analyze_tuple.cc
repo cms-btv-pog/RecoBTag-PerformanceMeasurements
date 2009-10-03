@@ -65,11 +65,18 @@ int main (int argc, char* argv[])
     //fwlite::EventBase *eventBase = & events;
 
     // for now
-    std::string Tagger =  parser.stringValue( "Tagger" );
-    std::string awayTagger = parser.stringValue( "AwayTagger" );
+    std::map< std::string, std::string > btagMap;
+    btagMap["TCHE"] = "trackCountingHighEffBJetTags";
+    btagMap["TCHP"] = "trackCountingHighPurBJetTags";
+    btagMap["JP"] = "jetProbabilityBJetTags";
+    btagMap["SSV"] = "simpleSecondaryVertexBJetTags";
+    
+    std::string Tagger =  btagMap.find( parser.stringValue( "Tagger" ) )->second;
+    std::string awayTagger = btagMap.find(parser.stringValue( "AwayTagger" ) )->second; 
     double btag_cut_Tagger = parser.doubleValue( "TaggerCut" );
     double btag_cut_awayTagger = parser.doubleValue( "AwayTaggerCut" );
 
+    
     //__________________
     // Histogram manager
 
