@@ -38,6 +38,21 @@ int main (int argc, char* argv[])
   
   optutl::CommandLineParser parser ("Plots Jet Pt");
   parser.stringValue ("outputFile") = "PM_results"; // .root added automatically
+
+  parser.addOption ("Tagger",   optutl::CommandLineParser::kString, 
+		    "b tagger alias (TCHE,TCHP,JP,SSV)",
+		    "trackCountingHighPurBJetTags");
+  parser.addOption ("TaggerCut",   optutl::CommandLineParser::kDouble,
+                    "b tag discriminator cut",
+		    2.17);
+  parser.addOption ("AwayTagger",   optutl::CommandLineParser::kString,
+                    "b tagger alias (TCHE,TCHP,JP,SSV)",
+		    "trackCountingHighPurBJetTags");
+  parser.addOption ("AwayTaggerCut",   optutl::CommandLineParser::kDouble,
+                    "b tag discriminator cut",
+		    1.34);
+
+
   // Parse the command line arguments
   parser.parseArguments (argc, argv);
 
@@ -50,10 +65,11 @@ int main (int argc, char* argv[])
   //fwlite::EventBase *eventBase = & events;
 
   // for now
-  std::string Tagger =  "trackCountingHighPurBJetTags";
-  std::string awayTagger = "trackCountingHighPurBJetTags";
-  double btag_cut_Tagger = 1.9;//loose
-  double btag_cut_awayTagger = 3.99; //medium
+  std::string Tagger =  parser.stringValue( "Tagger" ); 
+  std::string awayTagger = parser.stringValue( "AwayTagger" );
+  double btag_cut_Tagger = parser.doubleValue( "TaggerCut" );
+  double btag_cut_awayTagger = parser.doubleValue( "AwayTaggerCut" );
+
   //__________________
   // Histogram manager
 
