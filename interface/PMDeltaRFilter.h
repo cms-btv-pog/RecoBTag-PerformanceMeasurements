@@ -10,7 +10,7 @@
 	 Author: Francisco Yumiceva, Fermilab
 */
 //
-// $Id: PMDeltaRFilter.h,v 1.3 2009/09/04 20:56:03 yumiceva Exp $
+// $Id: PMDeltaRFilter.h,v 1.1 2009/09/22 02:45:37 yumiceva Exp $
 //
 //
 
@@ -33,9 +33,9 @@ public:
     virtual bool filter(edm::Event& iEvent , const edm::EventSetup & iSetup );
 
 private:
-	edm::InputTag jets_;
-	edm::InputTag muons_;
-	double MaxDeltaR_;
+    edm::InputTag jets_;
+    edm::InputTag muons_;
+    double MaxDeltaR_;
 
 };
 

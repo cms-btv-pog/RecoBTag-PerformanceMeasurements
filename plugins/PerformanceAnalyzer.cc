@@ -163,37 +163,37 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
     // get operating points
     std::vector<edm::ParameterSet> config = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet > >("OperatingPointsList");
     if (fdebug) std::cout << " get operating points, total list: " << config.size() << std::endl;
-	
+
     for (std::vector<edm::ParameterSet>::const_iterator it = config.begin(); it != config.end() ; ++it)
     {
         std::string aalias = (*it).getUntrackedParameter<std::string> ("alias");
-		edm::InputTag atag = (*it).getUntrackedParameter<edm::InputTag> ("collection");
+        edm::InputTag atag = (*it).getUntrackedParameter<edm::InputTag> ("collection");
         double min = (*it).getUntrackedParameter<double> ("MinimumDiscriminator");
         double max = (*it).getUntrackedParameter<double> ("MaximumDiscriminator");
-		std::vector<edm::ParameterSet> avec = (*it).getUntrackedParameter<std::vector<edm::ParameterSet> >("OperatingPoints");
-		std::map< std::string, double > mapOP;
+        std::vector<edm::ParameterSet> avec = (*it).getUntrackedParameter<std::vector<edm::ParameterSet> >("OperatingPoints");
+        std::map< std::string, double > mapOP;
         for (std::vector<edm::ParameterSet>::const_iterator imapOP = avec.begin(); imapOP != avec.end(); ++imapOP)
         {
-			 mapOP[(*imapOP).getUntrackedParameter<std::string> ("name")] =
+            mapOP[(*imapOP).getUntrackedParameter<std::string> ("name")] =
                 (*imapOP).getUntrackedParameter<double> ("cut");
         }
 
-		WorkingPoint tmpwp((*it).getUntrackedParameter<edm::InputTag> ("collection"),
+        WorkingPoint tmpwp((*it).getUntrackedParameter<edm::InputTag> ("collection"),
                            aalias,
                            min,
                            max,
                            mapOP );
 
-		wp.push_back(tmpwp);
-		if (fdebug) (wp.end()-1)->print();
-		//wp_map[alias] = tmpwp;
+        wp.push_back(tmpwp);
+        if (fdebug) (wp.end()-1)->print();
+        //wp_map[alias] = tmpwp;
 
-		TaggerPerformances_[aalias].Set(aalias);
+        TaggerPerformances_[aalias].Set(aalias);
         TaggerPerformances_[aalias].SetMinDiscriminator(min);
         TaggerPerformances_[aalias].SetMaxDiscriminator(max);
-		
-		//double acut = (*it).getUntrackedParameter<double> ("cut");
-		//WorkingPoint tmp(atag, aname, acut);
+
+        //double acut = (*it).getUntrackedParameter<double> ("cut");
+        //WorkingPoint tmp(atag, aname, acut);
         //wp.push_back( tmp );
         //if (fdebug) (wp.end()-1)->print();
     }
@@ -220,8 +220,8 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
     topdir->cd();
     topdir->mkdir("muon_in_jet");
     topdir->cd();
-	if (fdebug) std::cout<< " ROOT directories created." << std::endl;
-	
+    if (fdebug) std::cout<< " ROOT directories created." << std::endl;
+
     histcounterf = new TH1I("histcounterf","counter",5,0,5);
     histcounterf->SetBit(TH1::kCanRebin);
     rootFile_->cd();
@@ -252,29 +252,30 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
     AwayjetHistos_mc->Init("p","l");
     for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it!=wp.end(); ++it)
     {
-		std::map<std::string, double > list_cuts = (*it).list();
+        std::map<std::string, double > list_cuts = (*it).list();
 
-		for(std::map<std::string, double >::const_iterator icut = list_cuts.begin(); icut != list_cuts.end(); ++icut) {
-			std::string aalias = icut->first;
-			EffHistos->Init("efficiencies",aalias);
-			PtrelHistos->Init("ptrel",aalias);
-			
-			TaggedMujetHistos->Init("ntag",aalias);
-			TaggedAwayjetHistos->Init("ptag",aalias);
-			TaggedMujetHistos_mc->Init("ntag","b",aalias);
-			TaggedAwayjetHistos_mc->Init("ptag","b",aalias);
-			TaggedMujetHistos_mc->Init("ntag","cl",aalias);
-			TaggedAwayjetHistos_mc->Init("ptag","cl",aalias);
-			TaggedMujetHistos_mc->Init("ntag","c",aalias);
-			TaggedAwayjetHistos_mc->Init("ptag","c",aalias);
-			TaggedMujetHistos_mc->Init("ntag","l",aalias);
-			TaggedAwayjetHistos_mc->Init("ptag","l",aalias);
-		}
+        for (std::map<std::string, double >::const_iterator icut = list_cuts.begin(); icut != list_cuts.end(); ++icut)
+        {
+            std::string aalias = icut->first;
+            EffHistos->Init("efficiencies",aalias);
+            PtrelHistos->Init("ptrel",aalias);
+
+            TaggedMujetHistos->Init("ntag",aalias);
+            TaggedAwayjetHistos->Init("ptag",aalias);
+            TaggedMujetHistos_mc->Init("ntag","b",aalias);
+            TaggedAwayjetHistos_mc->Init("ptag","b",aalias);
+            TaggedMujetHistos_mc->Init("ntag","cl",aalias);
+            TaggedAwayjetHistos_mc->Init("ptag","cl",aalias);
+            TaggedMujetHistos_mc->Init("ntag","c",aalias);
+            TaggedAwayjetHistos_mc->Init("ptag","c",aalias);
+            TaggedMujetHistos_mc->Init("ntag","l",aalias);
+            TaggedAwayjetHistos_mc->Init("ptag","l",aalias);
+        }
     }
-	
-	if (fdebug) std::cout << "Histograms initialized" << std::endl;
-		
-	/*
+
+    if (fdebug) std::cout << "Histograms initialized" << std::endl;
+
+    /*
     fperformanceTC2trk.Set("TC2trk");
     fperformanceTC3trk.Set("TC3trk");
     fperformanceMTC2trk.Set("MTC2trk");
@@ -303,7 +304,7 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
     fperformanceSSV.SetMaxDiscriminator(10);
     fperformanceCSV.SetMinDiscriminator(0);
     fperformanceCSV.SetMaxDiscriminator(1);
-	*/
+    */
 
     feventcounter = 0;
 
@@ -318,42 +319,42 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
     topdir->cd();
     topdir->cd("MCtruth");
     EffHistos->Save();
-	std::vector< TGraph* > gVector;
+    std::vector< TGraph* > gVector;
     if (fWritePerformancePlots)
     {
 
 
-		for (std::map<std::string, S8bPerformance>::const_iterator iperf = TaggerPerformances_.begin(); iperf!= TaggerPerformances_.end(); ++iperf )
-    {
+        for (std::map<std::string, S8bPerformance>::const_iterator iperf = TaggerPerformances_.begin(); iperf!= TaggerPerformances_.end(); ++iperf )
+        {
 
-        S8bPerformance Perf = iperf->second;
+            S8bPerformance Perf = iperf->second;
 
-        Perf.Eval();
+            Perf.Eval();
 
 
-        TGraphErrors *gTb = Perf.EfficiencyGraph("b");
-        TGraphErrors *gTc = Perf.EfficiencyGraph("c");
-        TGraphErrors *gTl = Perf.EfficiencyGraph("udsg");
-        gVector.push_back( gTb );
-        gVector.push_back( gTc );
-        gVector.push_back( gTl );
+            TGraphErrors *gTb = Perf.EfficiencyGraph("b");
+            TGraphErrors *gTc = Perf.EfficiencyGraph("c");
+            TGraphErrors *gTl = Perf.EfficiencyGraph("udsg");
+            gVector.push_back( gTb );
+            gVector.push_back( gTc );
+            gVector.push_back( gTl );
 
-		TGraph *discTl = Perf.DiscriminatorGraph("udsg");
-        discTl->Sort();
-        gVector.push_back( discTl );
+            TGraph *discTl = Perf.DiscriminatorGraph("udsg");
+            discTl->Sort();
+            gVector.push_back( discTl );
 
-	}
+        }
 
     }
 
-	if (fWritePerformancePlots)
+    if (fWritePerformancePlots)
     {
-		for (std::vector< TGraph* >::const_iterator iv = gVector.begin(); iv != gVector.end(); ++iv )
-		{
-			(*iv)->Write();
-		}
-	}
-	
+        for (std::vector< TGraph* >::const_iterator iv = gVector.begin(); iv != gVector.end(); ++iv )
+        {
+            (*iv)->Write();
+        }
+    }
+
     topdir->cd("ptrel");
     PtrelHistos->Save();
     topdir->cd("muon_in_jet");
@@ -367,7 +368,7 @@ PerformanceAnalyzer::~PerformanceAnalyzer()
     TaggedMujetHistos_mc->Save();
     TaggedAwayjetHistos_mc->Save();
 
-	topdir->cd();
+    topdir->cd();
     topdir->cd("Histograms");
     histcounterf->Write();
 
@@ -418,20 +419,20 @@ void PerformanceAnalyzer::FillPerformance(reco::CaloJet jet, int JetFlavor, cons
     for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it != wp.end(); ++it)
     {
 
-		edm::Handle<reco::JetTagCollection > jetTags;
-		event.getByLabel((*it).inputTag(),jetTags);
-		std::string alias = (*it).alias();
-		
-		std::string moduleLabel = (jetTags).provenance()->moduleLabel();
-		if (mymap.find(moduleLabel) != mymap.end()) continue;
-		mymap[moduleLabel] = true;
-		
-		ith_tagged = PFTools::TaggedJet(jet,jetTags);
-		
-		if (ith_tagged == -1) continue;
-		
-		TaggerPerformances_[alias].Add( (*jetTags)[ith_tagged].second, JetFlavor );
-	
+        edm::Handle<reco::JetTagCollection > jetTags;
+        event.getByLabel((*it).inputTag(),jetTags);
+        std::string alias = (*it).alias();
+
+        std::string moduleLabel = (jetTags).provenance()->moduleLabel();
+        if (mymap.find(moduleLabel) != mymap.end()) continue;
+        mymap[moduleLabel] = true;
+
+        ith_tagged = PFTools::TaggedJet(jet,jetTags);
+
+        if (ith_tagged == -1) continue;
+
+        TaggerPerformances_[alias].Add( (*jetTags)[ith_tagged].second, JetFlavor );
+
     }
 
 
@@ -730,7 +731,7 @@ reco::JetFlavour PerformanceAnalyzer::getMatchedParton(const reco::CaloJet &jet)
         }
 
         return jetFlavour;
-   
+
 
     }
 
@@ -876,8 +877,8 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
     TLorentzVector p4Muon;
     int ijet = 0;
 
-	if (fdebug) std::cout << " begin loop over jets" << std::endl;
-	
+    if (fdebug) std::cout << " begin loop over jets" << std::endl;
+
     for ( jet = recoJets.begin(); jet != recoJets.end(); ++jet )
     {
 
@@ -1058,8 +1059,8 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
             // now we have an away jet
 
             // find an away tagged jet
-			if (fdebug) std::cout << " find an away tagged jet" << std::endl;
-			
+            if (fdebug) std::cout << " find an away tagged jet" << std::endl;
+
             if ( !AwayTaggedJet )
             {
 
@@ -1135,13 +1136,13 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
             }
 
         } // close away jet loop
-		if (fdebug) std::cout << " get b-tagging to fill efficiency and performance plots" << std::endl;
+        if (fdebug) std::cout << " get b-tagging to fill efficiency and performance plots" << std::endl;
         std::map<std::string, bool> thebtaggingmap = PFTools::GetBTaggingMap(wp, *jet, iEvent, ptrel);
         FillEff(p4Jet, JetFlavor, thebtaggingmap, weight );
-		if (fdebug) std::cout << " done efficiency plots" << std::endl;
+        if (fdebug) std::cout << " done efficiency plots" << std::endl;
         FillPerformance(*jet, JetFlavor, iEvent );
-		if (fdebug) std::cout << " done performance plots" << std::endl;
-		
+        if (fdebug) std::cout << " done performance plots" << std::endl;
+
         if ( hasLepton == 1 )
         {
             p4MuJet.SetPtEtaPhiE(jet->pt(), jet->eta(), jet->phi(), jet->energy() );
@@ -1274,8 +1275,8 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
 
         std::map<std::string, bool> mymap;
 
-		if (fdebug) std::cout << " btag operating points" << std::endl;
-		
+        if (fdebug) std::cout << " btag operating points" << std::endl;
+
         for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it != wp.end(); ++it)
         {
             //    for (size_t k=0; k<jetTags_testManyByType.size(); k++)

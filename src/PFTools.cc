@@ -7,7 +7,8 @@
 #include "RecoBTag/PerformanceMeasurements/interface/PFTools.h"
 
 
-namespace PFTools {
+namespace PFTools
+{
 
 
 reco::GenJet GetGenJet(reco::CaloJet calojet, reco::GenJetCollection genJetColl)
@@ -102,29 +103,29 @@ std::map<std::string, bool> GetBTaggingMap(std::vector<WorkingPoint> const & wp,
     for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it != wp.end(); ++it)
     {
 
-		edm::Handle<reco::JetTagCollection > jetTags;
-		event.getByLabel((*it).inputTag(),jetTags);
-				
-		//std::string moduleLabel = (jetTags).provenance()->moduleLabel();
-		//if (mymap.find(moduleLabel) != mymap.end()) continue;
-		//mymap[moduleLabel] = true;
-		
-		ith_tagged = TaggedJet(jet,jetTags);
-		
-		if (ith_tagged == -1) continue;
+        edm::Handle<reco::JetTagCollection > jetTags;
+        event.getByLabel((*it).inputTag(),jetTags);
 
-		std::map<std::string, double > list_cuts = (*it).list();
+        //std::string moduleLabel = (jetTags).provenance()->moduleLabel();
+        //if (mymap.find(moduleLabel) != mymap.end()) continue;
+        //mymap[moduleLabel] = true;
 
-		for (std::map<std::string, double >::const_iterator icut = list_cuts.begin(); icut != list_cuts.end();++icut)
-		{
-			std::string alabel = icut->first;
-			if ( (*jetTags)[ith_tagged].second > icut->second ) aMap[alabel] = true;
-			else aMap[alabel] = false;
-			
-		}
+        ith_tagged = TaggedJet(jet,jetTags);
 
-		//here
-		/*
+        if (ith_tagged == -1) continue;
+
+        std::map<std::string, double > list_cuts = (*it).list();
+
+        for (std::map<std::string, double >::const_iterator icut = list_cuts.begin(); icut != list_cuts.end(); ++icut)
+        {
+            std::string alabel = icut->first;
+            if ( (*jetTags)[ith_tagged].second > icut->second ) aMap[alabel] = true;
+            else aMap[alabel] = false;
+
+        }
+
+        //here
+        /*
         edm::Handle<reco::JetTagCollection> jetTags;
         event.getByLabel((*it).inputTag(), jetTags);
 
@@ -141,7 +142,7 @@ std::map<std::string, bool> GetBTaggingMap(std::vector<WorkingPoint> const & wp,
         {
             aMap[(*it).name()] = false;
         }
-		*/
+        */
 
     }
 

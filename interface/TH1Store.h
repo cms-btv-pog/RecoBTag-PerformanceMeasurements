@@ -1,4 +1,4 @@
-// 
+//
 // Original code taken from
 // PhysicsTools/FWLite package
 // it has benn modified for our needs. FXY
@@ -16,98 +16,106 @@
 
 class TH1Store
 {
-   public:
+public:
 
-      //////////////////////
-      // Public Constants //
-      //////////////////////
+    //////////////////////
+    // Public Constants //
+    //////////////////////
 
-      typedef std::vector< std::string >    SVec;
-      typedef std::map< std::string, TH1* > STH1PtrMap;
-      typedef STH1PtrMap::iterator          STH1PtrMapIter;
-      typedef STH1PtrMap::const_iterator    STH1PtrMapConstIter;
-  typedef std::map< std::string, std::string > HistDirMap;
-  typedef HistDirMap::iterator HistDirMapIter;
-  typedef HistDirMap::const_iterator HistDirMapConstIter;
+    typedef std::vector< std::string >    SVec;
+    typedef std::map< std::string, TH1* > STH1PtrMap;
+    typedef STH1PtrMap::iterator          STH1PtrMapIter;
+    typedef STH1PtrMap::const_iterator    STH1PtrMapConstIter;
+    typedef std::map< std::string, std::string > HistDirMap;
+    typedef HistDirMap::iterator HistDirMapIter;
+    typedef HistDirMap::const_iterator HistDirMapConstIter;
 
-      static const SVec kEmptyVec;
+    static const SVec kEmptyVec;
 
-      /////////////
-      // friends //
-      /////////////
-      // tells particle data how to print itself out
-      friend std::ostream& operator<< (std::ostream& o_stream, 
-                                       const TH1Store &rhs);
+    /////////////
+    // friends //
+    /////////////
+    // tells particle data how to print itself out
+    friend std::ostream& operator<< (std::ostream& o_stream,
+                                     const TH1Store &rhs);
 
-      //////////////////////////
-      //            _         //
-      // |\/|      |_         //
-      // |  |EMBER | UNCTIONS //
-      //                      //
-      //////////////////////////
+    //////////////////////////
+    //            _         //
+    // |\/|      |_         //
+    // |  |EMBER | UNCTIONS //
+    //                      //
+    //////////////////////////
 
-      /////////////////////////////////
-      // Constructors and Destructor //
-      /////////////////////////////////
-      TH1Store();
-      ~TH1Store();
+    /////////////////////////////////
+    // Constructors and Destructor //
+    /////////////////////////////////
+    TH1Store();
+    ~TH1Store();
 
-       ////////////////
-      // One Liners //
-      ////////////////
-      // Whether or not to delete histogram pointers on destruction
-      void setDeleteOnDestruction (bool deleteOnDestruction = true) 
-      { m_deleteOnDestruction = deleteOnDestruction; }
+    ////////////////
+    // One Liners //
+    ////////////////
+    // Whether or not to delete histogram pointers on destruction
+    void setDeleteOnDestruction (bool deleteOnDestruction = true)
+    {
+        m_deleteOnDestruction = deleteOnDestruction;
+    }
 
-      //////////////////////////////
-      // Regular Member Functions //
-      //////////////////////////////
+    //////////////////////////////
+    // Regular Member Functions //
+    //////////////////////////////
 
-      // adds a histogram pointer to the map
-      void add (TH1 *histPtr);
+    // adds a histogram pointer to the map
+    void add (TH1 *histPtr);
 
-	/// add directory
-	void add ( TH1 *histPtr, const std::string &name );
-	
-      // given a string, returns corresponding histogram pointer
-      TH1* hist (const std::string &name);
-      TH1* hist (const char* name)    
-      { return hist( (const std::string) name ); }
-      TH1* hist (const TString &name) 
-      { return hist( (const char*) name ); }
+    /// add directory
+    void add ( TH1 *histPtr, const std::string &name );
 
-      // write all histograms to a root file
-      void write (const std::string &filename, 
-                  const SVec &argsVec = kEmptyVec, 
-                  const SVec &inputFilesVec = kEmptyVec) const;
-      void write (TFile *filePtr, 
-                  const SVec &argsVec = kEmptyVec, 
-                  const SVec &inputFilesVec = kEmptyVec) const;
+    // given a string, returns corresponding histogram pointer
+    TH1* hist (const std::string &name);
+    TH1* hist (const char* name)
+    {
+        return hist( (const std::string) name );
+    }
+    TH1* hist (const TString &name)
+    {
+        return hist( (const char*) name );
+    }
 
-      /////////////////////////////
-      // Static Member Functions //
-      /////////////////////////////
+    // write all histograms to a root file
+    void write (const std::string &filename,
+                const SVec &argsVec = kEmptyVec,
+                const SVec &inputFilesVec = kEmptyVec) const;
+    void write (TFile *filePtr,
+                const SVec &argsVec = kEmptyVec,
+                const SVec &inputFilesVec = kEmptyVec) const;
 
-      // turn on verbose messages (e.g., printing out histogram names
-      // when being made)
-      static void setVerbose (bool verbose = true)
-      { sm_verbose = verbose; }
+    /////////////////////////////
+    // Static Member Functions //
+    /////////////////////////////
 
-  private:
+    // turn on verbose messages (e.g., printing out histogram names
+    // when being made)
+    static void setVerbose (bool verbose = true)
+    {
+        sm_verbose = verbose;
+    }
 
-      /////////////////////////
-      // Private Member Data //
-      /////////////////////////
+private:
 
-	bool       m_deleteOnDestruction;
-	STH1PtrMap m_ptrMap;
-	HistDirMap m_dirMap;
+    /////////////////////////
+    // Private Member Data //
+    /////////////////////////
 
-      ////////////////////////////////
-      // Private Static Member Data //
-      ////////////////////////////////
+    bool       m_deleteOnDestruction;
+    STH1PtrMap m_ptrMap;
+    HistDirMap m_dirMap;
 
-	static bool sm_verbose;
+    ////////////////////////////////
+    // Private Static Member Data //
+    ////////////////////////////////
+
+    static bool sm_verbose;
 
 };
 

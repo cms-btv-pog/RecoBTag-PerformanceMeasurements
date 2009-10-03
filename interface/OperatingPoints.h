@@ -39,9 +39,9 @@
 class OperatingPoints : public edm::EDAnalyzer
 {
 public:
- 
+
     explicit OperatingPoints(const edm::ParameterSet&);
- 
+
     ~OperatingPoints();
 
     virtual void analyze(const edm::Event&, const edm::EventSetup&);

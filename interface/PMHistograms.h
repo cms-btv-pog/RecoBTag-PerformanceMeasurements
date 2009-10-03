@@ -10,7 +10,7 @@
          Author: Francisco Yumiceva, Fermilab
 */
 //
-// $Id: PMHistograms.h,v 1.1 2009/10/02 22:09:03 yumiceva Exp $
+// $Id: PMHistograms.h,v 1.2 2009/10/03 19:09:27 yumiceva Exp $
 //
 //
 
@@ -26,21 +26,22 @@
 class PMHistograms
 {
 
-  public:
+public:
 
-		//PMHistograms() {}
-	PMHistograms( TH1Store *hstore ) {
-		fstore = hstore;
-	}
-	~PMHistograms() { }
+    //PMHistograms() {}
+    PMHistograms( TH1Store *hstore )
+    {
+        fstore = hstore;
+    }
+    ~PMHistograms() { }
 
-	void Add();
-	void FillHistos(std::string type, TLorentzVector p4MuJet, double ptrel,
-					int JetFlavor, bool tagged=false);
-	
-  private:
+    void Add();
+    void FillHistos(std::string type, TLorentzVector p4MuJet, double ptrel,
+                    int JetFlavor, bool tagged=false);
 
-	TH1Store *fstore;
+private:
+
+    TH1Store *fstore;
 
 };
 

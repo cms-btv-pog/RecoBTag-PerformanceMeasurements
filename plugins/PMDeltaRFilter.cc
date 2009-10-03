@@ -10,7 +10,7 @@
 	 Author: Francisco Yumiceva, Fermilab
 */
 //
-// $Id: PMDeltaRFilter.cc,v 1.3 2009/09/04 20:56:03 yumiceva Exp $
+// $Id: PMDeltaRFilter.cc,v 1.1 2009/09/22 02:45:37 yumiceva Exp $
 //
 //
 
@@ -24,42 +24,45 @@
 using namespace edm;
 using namespace std;
 
-PMDeltaRFilter::PMDeltaRFilter(const edm::ParameterSet &iConfig) {
-		jets_ = iConfig.getParameter<edm::InputTag>("Jets");
-		muons_ = iConfig.getParameter<edm::InputTag>("Muons");
-		MaxDeltaR_ = iConfig.getParameter<double>("MaxDeltaR");
+PMDeltaRFilter::PMDeltaRFilter(const edm::ParameterSet &iConfig)
+{
+    jets_ = iConfig.getParameter<edm::InputTag>("Jets");
+    muons_ = iConfig.getParameter<edm::InputTag>("Muons");
+    MaxDeltaR_ = iConfig.getParameter<double>("MaxDeltaR");
 
 }
 
-bool PMDeltaRFilter::filter(edm::Event& iEvent , const edm::EventSetup & iSetup ) {
+bool PMDeltaRFilter::filter(edm::Event& iEvent , const edm::EventSetup & iSetup )
+{
 
-		bool answer = false;
-		
-		Handle< View<pat::Jet> > jetHandle;
-		iEvent.getByLabel(jets_, jetHandle);
+    bool answer = false;
 
-		Handle< View<pat::Muon> > muonHandle;
-		iEvent.getByLabel(muons_, muonHandle);
+    Handle< View<pat::Jet> > jetHandle;
+    iEvent.getByLabel(jets_, jetHandle);
 
-		for (View< pat::Muon >::const_iterator muonIter = muonHandle->begin();
-			 muonIter != muonHandle->end(); ++muonIter) 
-		{
+    Handle< View<pat::Muon> > muonHandle;
+    iEvent.getByLabel(muons_, muonHandle);
 
-			if (answer) break;
-			
-			for (View< pat::Jet >::const_iterator jetIter = jetHandle->begin();
-				 jetIter != jetHandle->end(); ++jetIter)
-			{
+    for (View< pat::Muon >::const_iterator muonIter = muonHandle->begin();
+            muonIter != muonHandle->end(); ++muonIter)
+    {
 
-				if ( DeltaR<reco::Candidate>()( *muonIter, *jetIter ) < MaxDeltaR_ ) {
-					answer = true;
-					break;
-				}
+        if (answer) break;
 
-			}
+        for (View< pat::Jet >::const_iterator jetIter = jetHandle->begin();
+                jetIter != jetHandle->end(); ++jetIter)
+        {
 
-		}
-		return answer;
+            if ( DeltaR<reco::Candidate>()( *muonIter, *jetIter ) < MaxDeltaR_ )
+            {
+                answer = true;
+                break;
+            }
+
+        }
+
+    }
+    return answer;
 }
 
 //define this as a plug-in

@@ -18,7 +18,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.3 2008/10/06 15:59:13 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.8 2009/09/25 12:04:05 jandrea Exp $
 //
 //
 
@@ -90,16 +90,17 @@ Implementation:
 //for triggers
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "FWCore/Framework/interface/TriggerNamesService.h"
-#include "FWCore/ServiceRegistry/interface/Service.h" 
+#include "FWCore/ServiceRegistry/interface/Service.h"
 
 
 
-struct ltstr{
- bool operator()(const edm::RefToBase<reco::Jet> s1, edm::RefToBase<reco::Jet> s2) const
- {
-   if (s1.id() != s2.id()) return s1.id()<s2.id();
-   return s1.key()< s2.key();
- }
+struct ltstr
+{
+    bool operator()(const edm::RefToBase<reco::Jet> s1, edm::RefToBase<reco::Jet> s2) const
+    {
+        if (s1.id() != s2.id()) return s1.id()<s2.id();
+        return s1.key()< s2.key();
+    }
 };
 
 
@@ -120,114 +121,115 @@ using namespace edm;
 using namespace reco;
 //using namespace BTagMCTools;
 
-class MistagAnalyzer : public edm::EDAnalyzer {
- public:
-  explicit MistagAnalyzer(const edm::ParameterSet&);
-  ~MistagAnalyzer();
-  
-  
- private:
-  virtual void beginJob(const edm::EventSetup&) ;
-  virtual void analyze(const edm::Event&, const edm::EventSetup&);
-  virtual void endJob() ;
-  
-  float calculPtRel();
-  
-  reco::JetFlavour getMatchedParton(const reco::CaloJet &jet);
-  float calculPtRel(reco::Track theMuon, reco::Jet theJet, double JES );
-  // ----------member data ---------------------------
-  std::string outputFile_;
-  //std::vector< std::string > moduleLabel_;
-  
-  
-  std::string flavourMatchOptionf;
-  edm::InputTag flavourSourcef;
-  //JetFlavourIdentifier jetFlavourIdentifier_;
-  
-  std::string CaloJetCollectionTags_;
-  std::string jetCorrector_;
-  std::string jetPModuleName_;
-  std::string jetPPosModuleName_;
-  std::string jetPNegModuleName_;
-  
-  std::string trackCHEModuleName_;
-  std::string trackCNegHEModuleName_;
+class MistagAnalyzer : public edm::EDAnalyzer
+{
+public:
+    explicit MistagAnalyzer(const edm::ParameterSet&);
+    ~MistagAnalyzer();
 
-  std::string trackCHPModuleName_;
-  std::string trackCNegHPModuleName_;
-  
-  std::string combinedSvtxModuleName_;
-  std::string combinedSvtxNegModuleName_;
-  
-  std::string svtxModuleName_;
-  std::string svtxNegModuleName_;
-  
-  std::string softMuonModuleName_;
-  std::string softMuonNegModuleName_;
-  std::string softMuonTagInfoName_;
-  
-  
-  bool useTrackHistory_;
-  TFile*  rootFile_;
-  double minJetPt_;
-  double maxJetEta_;
-  
-  int selTagger_;
-  double tagCut_;
-  double vetoPos_;
-  int ntrackMin_;
-  bool isData_;
-  
-  
-  //trigger list
-  std::vector<std::string> triggernames_;
-  bool          TriggerInfo_;
-  
-  std::map<edm::RefToBase<reco::Jet>, unsigned int, ltstr> flavoursMapf;
-  edm::Handle<reco::JetFlavourMatchingCollection> theJetPartonMapf;
-  int TaggedJet(reco::CaloJet , edm::Handle<reco::JetTagCollection >  );
-  
-  TNtuple* nTuplesJets;
-  TrackClassifier classifier_;
-  
+
+private:
+    virtual void beginJob(const edm::EventSetup&) ;
+    virtual void analyze(const edm::Event&, const edm::EventSetup&);
+    virtual void endJob() ;
+
+    float calculPtRel();
+
+    reco::JetFlavour getMatchedParton(const reco::CaloJet &jet);
+    float calculPtRel(reco::Track theMuon, reco::Jet theJet, double JES );
+    // ----------member data ---------------------------
+    std::string outputFile_;
+    //std::vector< std::string > moduleLabel_;
+
+
+    std::string flavourMatchOptionf;
+    edm::InputTag flavourSourcef;
+    //JetFlavourIdentifier jetFlavourIdentifier_;
+
+    std::string CaloJetCollectionTags_;
+    std::string jetCorrector_;
+    std::string jetPModuleName_;
+    std::string jetPPosModuleName_;
+    std::string jetPNegModuleName_;
+
+    std::string trackCHEModuleName_;
+    std::string trackCNegHEModuleName_;
+
+    std::string trackCHPModuleName_;
+    std::string trackCNegHPModuleName_;
+
+    std::string combinedSvtxModuleName_;
+    std::string combinedSvtxNegModuleName_;
+
+    std::string svtxModuleName_;
+    std::string svtxNegModuleName_;
+
+    std::string softMuonModuleName_;
+    std::string softMuonNegModuleName_;
+    std::string softMuonTagInfoName_;
+
+
+    bool useTrackHistory_;
+    TFile*  rootFile_;
+    double minJetPt_;
+    double maxJetEta_;
+
+    int selTagger_;
+    double tagCut_;
+    double vetoPos_;
+    int ntrackMin_;
+    bool isData_;
+
+
+    //trigger list
+    std::vector<std::string> triggernames_;
+    bool          TriggerInfo_;
+
+    std::map<edm::RefToBase<reco::Jet>, unsigned int, ltstr> flavoursMapf;
+    edm::Handle<reco::JetFlavourMatchingCollection> theJetPartonMapf;
+    int TaggedJet(reco::CaloJet , edm::Handle<reco::JetTagCollection >  );
+
+    TNtuple* nTuplesJets;
+    TrackClassifier classifier_;
+
 ///////////////
 // Some Histograms
 
-  TH1F* hData_All_NJets       ;
-  TH1F* hData_All_NTracks     ;
-  TH1F* hData_All_JetPt       ;
-  TH1F* hData_All_JetEta      ;
-  TH1F* hData_NJets           ;
-  TH1F* hData_NTracks         ;
-  TH1F* hData_JetPt           ;
-  TH1F* hData_JetEta          ;
-  TH1F* hData_Tagger          ;
-  TH1F* hData_Tagger_TCHE     ;
-  TH1F* hData_Tagger_TCHP     ;
-  TH1F* hData_Tagger_JP	      ;
-  TH1F* hData_Tagger_SSV      ;
-  TH1F* hData_Tagger_CSV      ;
-  TH1F* hData_Tagger_MU	      ;
-  
-  TH1F* hAllFlav_Flavour         ;
-  TH1F* hAllFlav_Tagger          ;
-  TH1F* hAllFlav_Tagger_Gam      ;
-  TH1F* hAllFlav_Tagger_K0s      ;
-  TH1F* hAllFlav_Tagger_Lam      ;
-  TH1F* hAllFlav_Tagger_Bwd      ;
-  TH1F* hAllFlav_Tagger_Cwd      ;
-  TH1F* hAllFlav_Tagger_Tau      ;
-  TH1F* hAllFlav_Tagger_Int      ;
-  TH1F* hAllFlav_Tagger_Fak      ;
-  TH1F* hAllFlav_Tagger_Bad      ;
-  TH1F* hAllFlav_Tagger_Oth      ;
-  
-  TH1F* hLightFlav_Tagger         ;
-  TH1F* hGluonFlav_Tagger          ;
-  TH1F* hUDSFlav_Tagger         ;
-  TH1F* hCFlav_Tagger             ;
-  TH1F* hBFlav_Tagger             ;
-  
+    TH1F* hData_All_NJets       ;
+    TH1F* hData_All_NTracks     ;
+    TH1F* hData_All_JetPt       ;
+    TH1F* hData_All_JetEta      ;
+    TH1F* hData_NJets           ;
+    TH1F* hData_NTracks         ;
+    TH1F* hData_JetPt           ;
+    TH1F* hData_JetEta          ;
+    TH1F* hData_Tagger          ;
+    TH1F* hData_Tagger_TCHE     ;
+    TH1F* hData_Tagger_TCHP     ;
+    TH1F* hData_Tagger_JP	      ;
+    TH1F* hData_Tagger_SSV      ;
+    TH1F* hData_Tagger_CSV      ;
+    TH1F* hData_Tagger_MU	      ;
+
+    TH1F* hAllFlav_Flavour         ;
+    TH1F* hAllFlav_Tagger          ;
+    TH1F* hAllFlav_Tagger_Gam      ;
+    TH1F* hAllFlav_Tagger_K0s      ;
+    TH1F* hAllFlav_Tagger_Lam      ;
+    TH1F* hAllFlav_Tagger_Bwd      ;
+    TH1F* hAllFlav_Tagger_Cwd      ;
+    TH1F* hAllFlav_Tagger_Tau      ;
+    TH1F* hAllFlav_Tagger_Int      ;
+    TH1F* hAllFlav_Tagger_Fak      ;
+    TH1F* hAllFlav_Tagger_Bad      ;
+    TH1F* hAllFlav_Tagger_Oth      ;
+
+    TH1F* hLightFlav_Tagger         ;
+    TH1F* hGluonFlav_Tagger          ;
+    TH1F* hUDSFlav_Tagger         ;
+    TH1F* hCFlav_Tagger             ;
+    TH1F* hBFlav_Tagger             ;
+
 };
 
 #endif

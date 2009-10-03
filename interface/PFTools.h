@@ -6,7 +6,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: PFTools.h,v 1.3 2009/09/05 02:34:44 bazterra Exp $
+ version $Id: PFTools.h,v 1.4 2009/09/08 21:01:29 yumiceva Exp $
 
 ________________________________________________________________**/
 
@@ -19,7 +19,7 @@ ________________________________________________________________**/
 class WorkingPoint
 {
 public:
-    
+
     WorkingPoint() {}
 
     WorkingPoint(
@@ -27,7 +27,7 @@ public:
     ) : intag_(t), alias_(n), min_(min), max_(max) {}
 
     WorkingPoint(
-        edm::InputTag t, std::string n, double min, double max = 0, std::map<std::string, double> const & list	
+        edm::InputTag t, std::string n, double min, double max = 0, std::map<std::string, double> const & list
     ) : intag_(t), alias_(n), min_(min), max_(max)
     {
         if ( !list.empty() ) wpmap_ = list;
@@ -37,7 +37,7 @@ public:
     {
         return wpmap_;
     }
-    
+
     edm::InputTag inputTag() const
     {
         return intag_;
@@ -71,11 +71,12 @@ public:
     void print () const
     {
         std::cout << " Working point: collection: " << inputTag() << " alias: " << alias() << " discriminator min: " << Minimum() << " max: " << Maximum() << std::endl;
-		for(std::map<std::string, double >::const_iterator icut = wpmap_.begin(); icut != wpmap_.end(); ++icut) {
-			std::string aalias = icut->first;
-			double cut = icut->second;
-			std::cout << "       name: " << aalias << " cut: " << cut << std::endl;
-		}
+        for (std::map<std::string, double >::const_iterator icut = wpmap_.begin(); icut != wpmap_.end(); ++icut)
+        {
+            std::string aalias = icut->first;
+            double cut = icut->second;
+            std::cout << "       name: " << aalias << " cut: " << cut << std::endl;
+        }
     }
 
 private:
@@ -96,19 +97,19 @@ private:
 
 #include "FWCore/Framework/interface/Event.h"
 
-namespace PFTools 
+namespace PFTools
 {
 
-    reco::GenJet GetGenJet(reco::CaloJet, reco::GenJetCollection);
+reco::GenJet GetGenJet(reco::CaloJet, reco::GenJetCollection);
 
-    int TaggedJet(reco::CaloJet const &, edm::Handle<reco::JetTagCollection> const &);
-    
-    int TaggedJet(reco::CaloJet const &, edm::Handle<std::vector<reco::TrackIPTagInfo> > const &);
+int TaggedJet(reco::CaloJet const &, edm::Handle<reco::JetTagCollection> const &);
 
-    std::map<std::string, bool> GetBTaggingMap(std::vector<WorkingPoint> const &, reco::CaloJet const &, edm::Event const &, double ptrel = 0);
+int TaggedJet(reco::CaloJet const &, edm::Handle<std::vector<reco::TrackIPTagInfo> > const &);
 
-    // THis function seems to not be use, if that the case please remove it !!!
-    // SimTrack GetGenTrk(reco::Track const &, edm::SimTrackContainer const *, edm::SimVertexContainer const *);
+std::map<std::string, bool> GetBTaggingMap(std::vector<WorkingPoint> const &, reco::CaloJet const &, edm::Event const &, double ptrel = 0);
+
+// THis function seems to not be use, if that the case please remove it !!!
+// SimTrack GetGenTrk(reco::Track const &, edm::SimTrackContainer const *, edm::SimVertexContainer const *);
 
 }
 

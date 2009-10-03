@@ -11,7 +11,7 @@
  Author: Francisco Yumiceva
 */
 //
-// $Id: OperatingPoints.cc,v 1.7 2009/09/08 21:01:29 yumiceva Exp $
+// $Id: OperatingPoints.cc,v 1.8 2009/10/02 22:08:24 yumiceva Exp $
 //
 //
 
@@ -126,12 +126,12 @@ OperatingPoints::~OperatingPoints()
         cout << "\n b-tagging Operating Points estimated by udsg-mistagging rate " << endl;
         cout << "==============================================================\n" << endl;
 
-		
-		//cout << "\\begin{table}[btp]" << endl;
-		//cout << "\\begin{center}" << endl;
-		cout << "\\begin{tabular}{|c|c|c|c|} \\hline" << endl;
 
-			
+        //cout << "\\begin{table}[btp]" << endl;
+        //cout << "\\begin{center}" << endl;
+        cout << "\\begin{tabular}{|c|c|c|c|} \\hline" << endl;
+
+
     }
 
     for (std::map<std::string, S8bPerformance>::const_iterator iperf = TaggerPerformances_.begin(); iperf!= TaggerPerformances_.end(); ++iperf )
@@ -163,9 +163,9 @@ OperatingPoints::~OperatingPoints()
             // get operating point cuts
             WorkingPoint apt = wp_map[iperf->first];
 
-			cout << "\\multicolumn{1}{|c|}{ " << apt.inputTag().label() << " ( " << apt.alias() << " ) }\\hline" << endl; 
-				
-				//cout << " Tagger Name: " << apt.inputTag().label() << ", Alias: " << apt.alias() << endl;
+            cout << "\\multicolumn{1}{|c|}{ " << apt.inputTag().label() << " ( " << apt.alias() << " ) }\\hline" << endl;
+
+            //cout << " Tagger Name: " << apt.inputTag().label() << ", Alias: " << apt.alias() << endl;
 
             std::map<std::string, double > list_cuts = apt.list();
 
@@ -173,20 +173,20 @@ OperatingPoints::~OperatingPoints()
             double *yarr = new double[ (int)list_cuts.size() ];
             int ii = 0;
 
-			cout << " OP Alias   &   udsg-mistagging   &   b-efficiency   &   discriminator cut \\hline" << endl;
-			
+            cout << " OP Alias   &   udsg-mistagging   &   b-efficiency   &   discriminator cut \\hline" << endl;
+
             for (std::map<std::string, double >::const_iterator icut = list_cuts.begin(); icut != list_cuts.end(); ++icut)
             {
 
                 double disc_cut = discTl->Eval( icut->second );
                 double b_eff = g_reverse->Eval( icut->second );
 
-				// alias, udsg-mistagging, b-efficiency
-				cout <<  icut->first << " & "
-					 << setprecision(3) << icut->second << " & "
-					 << setprecision(3) << b_eff << " & "
-					 << setprecision(3) << disc_cut << " \\" << endl;
-				
+                // alias, udsg-mistagging, b-efficiency
+                cout <<  icut->first << " & "
+                     << setprecision(3) << icut->second << " & "
+                     << setprecision(3) << b_eff << " & "
+                     << setprecision(3) << disc_cut << " \\" << endl;
+
                 //cout << icut->first << " : udsg-mistagging = " << setprecision(3) << icut->second << ", b-efficiency = " << setprecision(3) << b_eff << ", discriminator cut = " << setprecision(3) << disc_cut << endl;
                 xarr[ii] = icut->second;
                 yarr[ii] = b_eff;
@@ -206,13 +206,13 @@ OperatingPoints::~OperatingPoints()
             delete yarr;
         }
 
-		cout << "\\hline" << endl;
-		cout << "\\end{tabular}" << endl;
+        cout << "\\hline" << endl;
+        cout << "\\end{tabular}" << endl;
 
     }
     for (std::vector< TGraph* >::const_iterator iv = gVector.begin(); iv != gVector.end(); ++iv )
     {
-    	(*iv)->Write();
+        (*iv)->Write();
     }
     rootFile_->Close();
 }
@@ -269,8 +269,8 @@ reco::JetFlavour OperatingPoints::getMatchedParton(const reco::CaloJet &jet)
     reco::JetFlavour jetFlavour;
 
     for ( JetFlavourMatchingCollection::const_iterator j = theJetPartonMapf->begin();
-          j != theJetPartonMapf->end();
-          j ++ )
+            j != theJetPartonMapf->end();
+            j ++ )
     {
         RefToBase<Jet> aJet  = (*j).first;
         //      const JetFlavour aFlav = (*j).second;
