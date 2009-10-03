@@ -41,13 +41,13 @@ int main (int argc, char* argv[])
 
     parser.addOption ("Tagger",   optutl::CommandLineParser::kString,
                       "b tagger alias (TCHE,TCHP,JP,SSV)",
-                      "trackCountingHighPurBJetTags");
+                      "TCHP");
     parser.addOption ("TaggerCut",   optutl::CommandLineParser::kDouble,
                       "b tag discriminator cut",
                       2.17);
     parser.addOption ("AwayTagger",   optutl::CommandLineParser::kString,
                       "b tagger alias (TCHE,TCHP,JP,SSV)",
-                      "trackCountingHighPurBJetTags");
+                      "TCHP");
     parser.addOption ("AwayTaggerCut",   optutl::CommandLineParser::kDouble,
                       "b tag discriminator cut",
                       1.34);

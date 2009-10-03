@@ -216,8 +216,8 @@ void PMHistograms::FillHistos(std::string type, TLorentzVector p4MuJet, double p
         else
         {
 
-            fstore->hist(type+"notTag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-            fstore->hist(type+"notTag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
+            fstore->hist(type+"noTag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
+            fstore->hist(type+"noTag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
         }
 
     }
@@ -234,8 +234,8 @@ void PMHistograms::FillHistos(std::string type, TLorentzVector p4MuJet, double p
         else
         {
 
-            fstore->hist(type+"notTag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-            fstore->hist(type+"notTag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
+            fstore->hist(type+"noTag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
+            fstore->hist(type+"noTag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
         }
 
     }
@@ -252,8 +252,8 @@ void PMHistograms::FillHistos(std::string type, TLorentzVector p4MuJet, double p
         else
         {
 
-            fstore->hist(type+"notTag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-            fstore->hist(type+"notTag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
+            fstore->hist(type+"noTag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
+            fstore->hist(type+"noTag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
         }
 
     }
@@ -270,8 +270,8 @@ void PMHistograms::FillHistos(std::string type, TLorentzVector p4MuJet, double p
         else
         {
 
-            fstore->hist(type+"notTag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-            fstore->hist(type+"notTag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
+            fstore->hist(type+"noTag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
+            fstore->hist(type+"noTag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
         }
 
     }
@@ -287,8 +287,8 @@ void PMHistograms::FillHistos(std::string type, TLorentzVector p4MuJet, double p
     else
     {
 
-        fstore->hist(type+"notTag_pT")->Fill(p4MuJet.Pt(),ptrel);
-        fstore->hist(type+"notTag_eta")->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
+        fstore->hist(type+"noTag_pT")->Fill(p4MuJet.Pt(),ptrel);
+        fstore->hist(type+"noTag_eta")->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
     }
 
 
