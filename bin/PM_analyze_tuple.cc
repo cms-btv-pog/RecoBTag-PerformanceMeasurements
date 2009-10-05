@@ -137,7 +137,7 @@ int main (int argc, char* argv[])
         nentry++;
         // load object collections
         fwlite::Handle< vector< pat::Jet > > jetHandle;
-        jetHandle.getByLabel ( events, "selectedLayer1Jets");
+        jetHandle.getByLabel ( events, "selectedLayer1JetsAK5");
         assert ( jetHandle.isValid() );
 
         fwlite::Handle< vector< pat::Muon > > muonHandle;
