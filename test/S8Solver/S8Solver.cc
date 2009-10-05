@@ -69,21 +69,22 @@ void S8Solver::LoadHistos() {
 	
 	finputFile->cd();
 	
-/*
+
   //  for analyzer
-	fnHistoBase = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/n_"+fcategory);
-	fpHistoBase = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/p_"+fcategory);
-	fnSvxHistoBase = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/ntag_"+fcategory+"_"+fthename);
-	fpSvxHistoBase = (TH2F*) gDirectory->Get("Histograms/muon_in_jet/ptag_"+fcategory+"_"+fthename);
-*/
+	fnHistoBase = (TH2F*) gDirectory->Get("muon_in_jet/n_"+fcategory);
+	fpHistoBase = (TH2F*) gDirectory->Get("muon_in_jet/p_"+fcategory);
+	fnSvxHistoBase = (TH2F*) gDirectory->Get("muon_in_jet/ntag_"+fcategory);//+"_"+fthename);
+	fpSvxHistoBase = (TH2F*) gDirectory->Get("muon_in_jet/ptag_"+fcategory);//+"_"+fthename);
+
 
 	
 	//   for plotter
+	/*
 	fnHistoBase = (TH2F*) gDirectory->Get("n"+fcategory);
 	fpHistoBase = (TH2F*) gDirectory->Get("p"+fcategory);
 	fnSvxHistoBase = (TH2F*) gDirectory->Get("ncmb"+fcategory);
 	fpSvxHistoBase = (TH2F*) gDirectory->Get("pcmb"+fcategory);
-
+	*/
 	
 	//std::cout << " 2D histos loaded " << fcategory << std::endl;
 
@@ -121,7 +122,7 @@ void S8Solver::LoadHistos() {
 	  
 	// recalculate correlation factors
 	if (frecalculateFactors) {
-		std::cout << "recalculate correlation factors " << std::endl;
+		std::cout << " recalculate correlation factors " << std::endl;
 		//fh_alpha->Sumw2();
 		//fh_beta->Sumw2();
 		//fh_kcl->Sumw2();
@@ -140,20 +141,21 @@ void S8Solver::LoadHistos() {
 			finputFile->cd();
 		}
 
-/*
+
   // for analyzer
-		h2["b_npT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/n_"+fcategory+"_b");
+		h2["b_npT"] = (TH2F*) gDirectory->Get("MCTruth/n_"+fcategory+"_b");
 		//std::cout << "got one" << std::endl;
-		h2["cl_npT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/n_"+fcategory+"_cl");
-		h2["b_ppT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/p_"+fcategory+"_b");
-		h2["cl_ppT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/p_"+fcategory+"_cl");
-		h2["b_ncmbpT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/ntag_"+fcategory+"_b_"+fthename);
-		h2["cl_ncmbpT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/ntag_"+fcategory+"_cl_"+fthename);
-		h2["b_pcmbpT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/ptag_"+fcategory+"_b_"+fthename);
-		h2["cl_pcmbpT"] = (TH2F*) gDirectory->Get("Histograms/MCtruth/ptag_"+fcategory+"_cl_"+fthename);
-*/
+		h2["cl_npT"] = (TH2F*) gDirectory->Get("MCTruth/n_"+fcategory+"_cl");
+		h2["b_ppT"] = (TH2F*) gDirectory->Get("MCTruth/p_"+fcategory+"_b");
+		h2["cl_ppT"] = (TH2F*) gDirectory->Get("MCTruth/p_"+fcategory+"_cl");
+		h2["b_ncmbpT"] = (TH2F*) gDirectory->Get("MCTruth/ntag_"+fcategory+"_b");//_"+fthename);
+		h2["cl_ncmbpT"] = (TH2F*) gDirectory->Get("MCTruth/ntag_"+fcategory+"_cl");//_"+fthename);
+		h2["b_pcmbpT"] = (TH2F*) gDirectory->Get("MCTruth/ptag_"+fcategory+"_b");//_"+fthename);
+		h2["cl_pcmbpT"] = (TH2F*) gDirectory->Get("MCTruth/ptag_"+fcategory+"_cl");//_"+fthename);
+
 
   // for plotter
+		/*
 		h2["b_npT"] = (TH2F*) gDirectory->Get("b_n"+fcategory);
 		std::cout << "got one" << std::endl;
 		h2["cl_npT"] = (TH2F*) gDirectory->Get("cl_n"+fcategory);
@@ -163,7 +165,7 @@ void S8Solver::LoadHistos() {
 		h2["cl_ncmbpT"] = (TH2F*) gDirectory->Get("cl_ncmb"+fcategory);
 		h2["b_pcmbpT"] = (TH2F*) gDirectory->Get("b_pcmb"+fcategory);
 		h2["cl_pcmbpT"] = (TH2F*) gDirectory->Get("cl_pcmb"+fcategory);
-
+		*/
 		
 		std::cout << " got initial truth dist." << std::endl;
 
@@ -197,8 +199,11 @@ void S8Solver::LoadHistos() {
 		b_halloppjets_ptrel  = h2["b_ppT"]->ProjectionX("b_halloppjets_ptrel", ith_ptrel_bin , ith_max_bin,"e");
 		cl_halloppjets_ptrel  = h2["cl_ppT"]->ProjectionX("cl_halloppjets_ptrel", ith_ptrel_bin , ith_max_bin,"e");
 
+		std::cout << " got projections" << std::endl;
+		
 		if (frebin) {
 
+			std::cout << " Rebin distributions" << std::endl;
 			// rebin input data
 
 
