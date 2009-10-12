@@ -32,13 +32,19 @@ process.maxEvents.input = 1000
 #process.GlobalTag.globaltag = 'MC31X_V5::All'
 
 #-- load pat sequence ----
+process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer09_7TeV_cff")
 process.load("RecoBTag.PerformanceMeasurements.PM_pat_Layer1_cfg")
+from PhysicsTools.PatAlgos.tools.jetTools import *
+switchJECSet(process, newName='Summer09_7TeV', oldName='Summer09')
+switchJECSet_(process.jetCorrFactorsAK5,newName='Summer09_7TeV', oldName='Summer09')
 
 ####### A O D ############
 # If we are running in AOD, use the following switch
 #
 #restrictInputToAOD(process)
- 
+process.allLayer1Jets.addJetID = False
+process.allLayer1JetsAK5.addJetID = False
+
 # Full path
 #process.p = cms.Path( process.patDefaultSequence*process.patTrigger*process.patTriggerEvent )
 
