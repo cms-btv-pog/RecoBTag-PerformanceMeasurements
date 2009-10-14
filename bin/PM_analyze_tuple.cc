@@ -77,7 +77,8 @@ int main (int argc, char* argv[])
     double btag_cut_awayTagger = parser.doubleValue( "AwayTaggerCut" );
 
     int outputEvery = parser.integerValue ( "outputEvery" );
-	
+    cout << "outputEvery = " << outputEvery << endl;
+
     //__________________
     // Histogram manager
 
@@ -134,10 +135,13 @@ int main (int argc, char* argv[])
     for (events.toBegin(); ! events.atEnd(); ++events)
     {
 		nentry++;
-        if ( nentry % outputEvery == 0 ) 
+        if ( outputEvery!=0 && (nentry % outputEvery) == 0 ) 
 		{
 			cout << "Processing Event: " << nentry << endl;
 		}
+		if ( outputEvery == 0 )
+			cout << "Processing Event: " << nentry << endl;
+		
 
         // load object collections
         fwlite::Handle< vector< pat::Jet > > jetHandle;
