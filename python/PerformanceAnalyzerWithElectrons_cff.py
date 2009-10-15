@@ -27,7 +27,7 @@ Performance = cms.EDAnalyzer("PerformanceAnalyzerWithElectrons",
         fillPartons = cms.bool(True),
         mcSource = cms.string('source')
     ),
-    Electrons = cms.string('gsfElectrons'),
+    Electrons = cms.string('softPFElectrons'),
     StoreTrackProba = cms.bool(False),
     #PSet jetIdParameters2 = {
     #       string mcSource = "source"
