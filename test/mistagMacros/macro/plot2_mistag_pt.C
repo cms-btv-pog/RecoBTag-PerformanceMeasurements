@@ -5,11 +5,37 @@
 plot()
 {
 // DATA
- TFile *f0 = new TFile("../output/QCDpt30_SDJet50U_etaLT07_JPM.root");
+ TFile *f0 = new TFile("../output/QCD_Pt30-80_7TeV_SD_Jet50U_SSVT.root");
 // Primary MC sample
- TFile *f1 = new TFile("../output/QCDpt80_etaLT07_JPM.root");
+ TFile *f1 = new TFile("../output/QCD_Pt30-80_SD_Jet50U_SSVT.root");
 // MC with Track History
- TFile *f2 = new TFile("../output/QCDpt300_preprod_etaLT07_JPM.root");
+ TFile *f2 = new TFile("../output/QCD_Pt80-170_7TeV_SSVT.root");
+
+// *****************************************************************************
+
+ char* xtitle = "p_{T}(jet) (GeV)";
+ int nbin = 20;
+ float binw = 10., bini = 30.;
+
+ float EtaMin = 0., EtaMax = 2.4;
+//  float EtaMin = 0., EtaMax = 0.7;
+//  float EtaMin = 0.7, EtaMax = 1.4;
+//  float EtaMin = 1.4, EtaMax = 2.4;
+
+//  string TaggerName = "jetProbabilityBJetTags";
+//  string TaggerName = "trackCountingHighEffBJetTags";
+//  string TaggerName = "trackCountingHighPurBJetTags";
+ string TaggerName = "simpleSecondaryVertexBJetTags";
+
+//  float wp = 1.90; // TCHEL
+//  float wp = 3.99; // TCHEM
+//  float wp = 2.17; // TCHPM
+//  float wp = 4.31; // TCHPT
+//  float wp = .230; // JPL
+//  float wp = .495; // JPM
+//  float wp = .700; // JPT
+//  float wp = 2.02; // SSVM
+ float wp = 3.40; // SSVT
 
 // *****************************************************************************
 
@@ -106,11 +132,6 @@ gStyle->SetStatH(0.3);
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 // Initialise Histograms
-
- int nbin = 20;
- float binw = 10., bini = 30.;
- float EtaMin = 0., EtaMax = 0.7;
- char* xtitle = "p_{T}(jet) (GeV)";
 
        f1->cd();
  TH1F* g00 = (TH1F*)gROOT->FindObject("hAllFlav_JetPt");   // all
@@ -401,12 +422,15 @@ gStyle->SetStatH(0.3);
 // Mistag in Data = all neg data * Rlight
 
  TF1 *Fun = new TF1("Fun","[0]+[1]*x+[2]*x*x",bini,bini+nbin*binw);
+//  TF1 *Fun = new TF1("Fun","[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x",bini,bini+nbin*binw);
       Fun->SetLineColor(1);
       Fun->SetLineStyle(1);
  TF1 *Gun = new TF1("Gun","[0]+[1]*x+[2]*x*x",bini,bini+nbin*binw);
+//  TF1 *Gun = new TF1("Gun","[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x",bini,bini+nbin*binw);
       Gun->SetLineColor(1);
       Gun->SetLineStyle(2);
  TF1 *Hun = new TF1("Hun","[0]+[1]*x+[2]*x*x",bini,bini+nbin*binw);
+//  TF1 *Hun = new TF1("Hun","[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x",bini,bini+nbin*binw);
       Hun->SetLineColor(1);
       Hun->SetLineStyle(2);
 
@@ -448,10 +472,10 @@ gStyle->SetStatH(0.3);
        Mistag->GetXaxis()->SetTitleSize(0.06);
        Mistag->GetXaxis()->SetTitle(xtitle);
        Mistag->GetXaxis()->SetTitleColor(1);
-//        Mistag->SetMinimum(0.01); Mistag->SetMaximum(1.00); // Loose
-//        Mistag->SetMinimum(0.001); Mistag->SetMaximum(0.2); // Medium
-//        Mistag->SetMinimum(0.0001); Mistag->SetMaximum(0.02); // Tight
-       Mistag->SetMinimum(0.0001); Mistag->SetMaximum(1.00); // Tight
+//        Mistag->SetMinimum(0.04); Mistag->SetMaximum(0.4); // Loose
+//        Mistag->SetMinimum(0.002); Mistag->SetMaximum(0.05); // Medium
+       Mistag->SetMinimum(0.0001); Mistag->SetMaximum(0.02); // Tight
+//        Mistag->SetMinimum(0.0001); Mistag->SetMaximum(1.00);
        Mistag->GetXaxis()->SetNdivisions(509);
        Mistag->GetYaxis()->SetNdivisions(509);
        Mistag->Draw("Esame"); 
@@ -495,7 +519,7 @@ gStyle->SetStatH(0.3);
 	LeffErr[i] = (LeffMax[i] - LeffMin[i]) / 2.;
 //$$
     cout << BinMin[i] << " " << BinMax[i] << " " 
-         << " Light Eff " << Leff[i] << " +_ " << LeffErr[i] << endl;
+         << " Light Eff " << int(Leff[i]*1e6)/1e6 << " +_ " << int(LeffErr[i]*1e6)/1e6 << endl;
 //$$
        }
 
@@ -511,10 +535,10 @@ gStyle->SetStatH(0.3);
  TF1 *FUn = new TF1("FUn","[0]",bini,bini+nbin*binw);
       FUn->SetLineColor(1);
       FUn->SetLineStyle(1);
- TF1 *GUn = new TF1("GUn","[0]",bini,bini+nbin*binw);
+ TF1 *GUn = new TF1("GUn","[0]+[1]*x+[2]*x*x",bini,bini+nbin*binw);
       GUn->SetLineColor(1);
       GUn->SetLineStyle(2);
- TF1 *HUn = new TF1("HUn","[0]",bini,bini+nbin*binw);
+ TF1 *HUn = new TF1("HUn","[0]+[1]*x+[2]*x*x",bini,bini+nbin*binw);
       HUn->SetLineColor(1);
       HUn->SetLineStyle(2);
 
@@ -546,20 +570,16 @@ gStyle->SetStatH(0.3);
 	float y = SFlight->GetBinContent(i);
 	float ey = SFlight->GetBinError(i);
 	float syst = y * tot->GetBinContent(i);
-        float stat = FUn->IntegralError(bini+(i-1)*binw,bini+i*binw) / binw;
-        float eror = TMath::Sqrt( syst*syst + stat*stat);
-	SFmax->SetBinContent(i,y + eror);
+        float eror = TMath::Sqrt( syst*syst + ey*ey);
+        float yfit = FUn->Integral(bini+(i-1)*binw,bini+i*binw) / binw;
+	SFmax->SetBinContent(i,yfit + eror);
 	SFmax->SetBinError(i,ey);
-	SFmin->SetBinContent(i,y - eror);
+	SFmin->SetBinContent(i,yfit - eror);
 	SFmin->SetBinError(i,ey);
-	if ( y > 0. ) {
-	  SFmax->SetBinError(i,ey * (1. + eror/y ));
-	  SFmin->SetBinError(i,ey * (1. - eror/y ));
-	}
 //$$
-    cout << i << " SF " << y << " syst " << syst << " stat " << stat << endl;
+//$$    cout << i << " SF " << y << " syst " << syst << " stat " << stat << endl;
 //$$
-	Lsf[i] = FUn->Integral(BinMin[i],BinMax[i]) / binw;;
+	Lsf[i] = FUn->Integral(BinMin[i],BinMax[i]) / binw;
        }
 
        SFmax->Fit("GUn","rvee0");
@@ -575,7 +595,7 @@ gStyle->SetStatH(0.3);
 	LsfErr[i] = (LsfMax[i] - LsfMin[i]) / 2.;
 //$$
     cout << BinMin[i] << " " << BinMax[i] << " " 
-         << " Light SF " << Lsf[i] << " +_ " << LsfErr[i] << endl;
+         << " Light SF " << int(Lsf[i]*1e6)/1e6 << " +_ " << int(LsfErr[i]*1e6)/1e6 << endl;
 //$$
        }
 
@@ -587,25 +607,54 @@ gStyle->SetStatH(0.3);
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 // Write the ascii file
 
-       string blabla_file = "Mistag_pt.txt";
+       string blabla_file = "Mistag.txt";
 
        ofstream out_txt(blabla_file.c_str(), ios::out);
 
-       out_txt << "jetProbabilityBJetTags" << endl; // < ---the tagger name
-//        out_txt << "trackCountingHighEffBJetTags" << endl;
-//        out_txt << "trackCountingHighPurBJetTags" << endl;
-//        out_txt << "simpleSecondaryVertexBJetTags" << endl;
-       out_txt << 0.50 << endl; // <---- the WP cut on the discriminator
+       out_txt << TaggerName << endl; // < ---the tagger name
+       out_txt << wp << endl; // <---- the WP cut on the discriminator
        out_txt << "PerformancePayloadFromTable" << endl;
        out_txt << 4 << endl; // <---- # of results, lighteff and lightefferr
        out_txt << 2 << endl; // <---- # of variables to bin (eta and pt)
        out_txt << "1005 1006 1013 1014" << endl; // <----- results are light eff +_ error, light SF +_ error
-       out_txt << "1 2" << endl; // <----- binning is eta/pt
+       out_txt << "5 2" << endl; // <----- binning is |eta| / pt
        for (int i=1; i<nbin+1; i++) { // <----- eta and Et ranges, light eff +_ error, light SF +_ error
-        out_txt << EtaMin    << "     " << EtaMax     << "     " 
-                << BinMin[i] << "     " << BinMax[i]  << "     " 
-	        << Leff[i]   << "     " << LeffErr[i] << "     " 
-	        << Lsf[i]    << "     " << LsfErr[i]  << "     " << endl;
+        if (EtaMin == 0 && BinMin[i] < 100 && BinMax[i] < 100) {  
+          out_txt << EtaMin    << "       " << EtaMax     << "      " 
+                  << BinMin[i] << "      " << BinMax[i]  << "     " 
+	          << int(Leff[i]*1e6)/1e6   << "     " << int(LeffErr[i]*1e6)/1e6 << "     " 
+	          << int(Lsf[i]*1e6)/1e6    << "     " << int(LsfErr[i]*1e6)/1e6  << endl;
+	}
+        else if (EtaMin == 0 && BinMin[i] < 100) {  
+          out_txt << EtaMin    << "       " << EtaMax     << "      " 
+                  << BinMin[i] << "     " << BinMax[i]  << "     " 
+	          << int(Leff[i]*1e6)/1e6   << "     " << int(LeffErr[i]*1e6)/1e6 << "     " 
+	          << int(Lsf[i]*1e6)/1e6    << "     " << int(LsfErr[i]*1e6)/1e6  << endl;
+	}
+        else if (EtaMin == 0) {  
+          out_txt << EtaMin    << "       " << EtaMax     << "     " 
+                  << BinMin[i] << "     " << BinMax[i]  << "     " 
+	          << int(Leff[i]*1e6)/1e6   << "     " << int(LeffErr[i]*1e6)/1e6 << "     " 
+	          << int(Lsf[i]*1e6)/1e6    << "     " << int(LsfErr[i]*1e6)/1e6  << endl;
+	}
+        else if (BinMin[i] < 100 && BinMax[i] < 100) {  
+          out_txt << EtaMin    << "     " << EtaMax     << "      " 
+                  << BinMin[i] << "      " << BinMax[i]  << "     " 
+	          << int(Leff[i]*1e6)/1e6   << "     " << int(LeffErr[i]*1e6)/1e6 << "     " 
+	          << int(Lsf[i]*1e6)/1e6    << "     " << int(LsfErr[i]*1e6)/1e6  << endl;
+	}
+        else if (BinMin[i] < 100) {  
+          out_txt << EtaMin    << "     " << EtaMax     << "      " 
+                  << BinMin[i] << "     " << BinMax[i]  << "     " 
+	          << int(Leff[i]*1e6)/1e6   << "     " << int(LeffErr[i]*1e6)/1e6 << "     " 
+	          << int(Lsf[i]*1e6)/1e6    << "     " << int(LsfErr[i]*1e6)/1e6  << endl;
+	}
+        else {  
+          out_txt << EtaMin    << "     " << EtaMax     << "     " 
+                  << BinMin[i] << "     " << BinMax[i]  << "     " 
+	          << int(Leff[i]*1e6)/1e6   << "     " << int(LeffErr[i]*1e6)/1e6 << "     " 
+	          << int(Lsf[i]*1e6)/1e6    << "     " << int(LsfErr[i]*1e6)/1e6  << endl;
+	}
        }
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

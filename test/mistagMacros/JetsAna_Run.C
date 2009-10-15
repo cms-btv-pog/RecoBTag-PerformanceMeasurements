@@ -11,82 +11,66 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
- c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_skimHLT_Jet50U_1.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt30_7TeV_SD_Jet50U_1.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_1.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_2.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_3.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_4.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_5.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_6.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_7.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_8.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_9.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_10.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_11.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_12.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_14.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_13.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_14.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_15.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_16.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_17.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_18.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_19.root");
+ c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_7TeV_SD_Jet50U_20.root");
 
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/NtupTkHist_QCDpt300_preprod_1.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/NtupTkHist_QCDpt300_preprod_2.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/NtupTkHist_QCDpt300_preprod_3.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/NtupTkHist_QCDpt300_preprod_4.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/NtupTkHist_QCDpt300_preprod_5.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/NtupTkHist_QCDpt300_preprod_6.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/NtupTkHist_QCDpt300_preprod_7.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt30_SD_Jet50U_1.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_SD_Jet50U_1.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_SD_Jet50U_2.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_SD_Jet50U_3.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_SD_Jet50U_4.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_SD_Jet50U_5.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_SD_Jet50U_6.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_SD_Jet50U_7.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_SD_Jet50U_8.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_SD_Jet50U_9.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_SD_Jet50U_10.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_SD_Jet50U_11.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_SD_Jet50U_12.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_SD_Jet50U_13.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/Ntup_QCD_Pt80_SD_Jet50U_14.root");
 
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_1.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_2.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_3.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_4.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_5.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_6.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_7.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_8.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_9.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_10.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_11.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_12.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_13.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_14.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_15.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_16.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_17.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_18.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_19.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_20.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_21.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_22.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_23.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_24.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_25.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_26.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_27.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_28.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_29.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_30.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_31.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_32.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_33.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_34.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_35.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_36.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_37.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_38.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt30_39.root");
-
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_2.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_3.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_4.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_5.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_7.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_8.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_9.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_10.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_11.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_13.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_14.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_15.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_16.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_17.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_18.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_19.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_20.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_21.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_22.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_24.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_25.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_26.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_27.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_28.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_29.root");
-//  c.Add("~/NTUPLES/CMSSW_3_1_2/Ntup_QCDpt80_30.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt80_7TeV_1.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt80_7TeV_2.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt80_7TeV_3.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt80_7TeV_4.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt80_7TeV_5.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt80_7TeV_6.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt80_7TeV_7.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt80_7TeV_8.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt80_7TeV_9.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt80_7TeV_10.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt80_7TeV_11.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt80_7TeV_12.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt170_7TeV_1.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt170_7TeV_2.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt170_7TeV_3.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt170_7TeV_4.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt170_7TeV_5.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt170_7TeV_6.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt170_7TeV_7.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt170_7TeV_8.root");
+//  c.Add("../NTUPLES/CMSSW_3_1_4/NtupTkHist_QCDpt170_7TeV_9.root");
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -94,15 +78,56 @@
 
 //  t->Loop(0,0.50,30.,999.,0.,2.4,1000.,"output.root");
 
- t->Loop(0,.230,30.,999.,0.,0.7,1000.,"output/QCDpt30_SDJet50U_etaLT07_JPL.root");
- t->Loop(0,.495,30.,999.,0.,0.7,1000.,"output/QCDpt30_SDJet50U_etaLT07_JPM.root");
- t->Loop(0,.700,30.,999.,0.,0.7,1000.,"output/QCDpt30_SDJet50U_etaLT07_JPT.root");
- t->Loop(2,1.90,30.,999.,0.,0.7,1000.,"output/QCDpt30_SDJet50U_etaLT07_TCHEL.root");
- t->Loop(2,3.99,30.,999.,0.,0.7,1000.,"output/QCDpt30_SDJet50U_etaLT07_TCHEM.root");
- t->Loop(3,2.17,30.,999.,0.,0.7,1000.,"output/QCDpt30_SDJet50U_etaLT07_TCHPM.root");
- t->Loop(3,4.31,30.,999.,0.,0.7,1000.,"output/QCDpt30_SDJet50U_etaLT07_TCHPT.root");
- t->Loop(4,2.02,30.,999.,0.,0.7,1000.,"output/QCDpt30_SDJet50U_etaLT07_SSVM.root");
- t->Loop(4,3.40,30.,999.,0.,0.7,1000.,"output/QCDpt30_SDJet50U_etaLT07_SSVT.root");
+ t->Loop(0,.230,30.,999.,0.0,0.7,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_etaLT07_JPL.root");
+ t->Loop(0,.230,30.,999.,0.7,1.4,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_07eta14_JPL.root");
+ t->Loop(0,.230,30.,999.,1.4,2.4,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_14eta24_JPL.root");
+ t->Loop(0,.230,30.,999.,0.0,0.7,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_etaLT07_JPL_veto.root");
+ t->Loop(0,.230,30.,999.,0.7,1.4,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_07eta14_JPL_veto.root");
+ t->Loop(0,.230,30.,999.,1.4,2.4,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_14eta24_JPL_veto.root");
+
+ t->Loop(0,.495,30.,999.,0.0,0.7,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_etaLT07_JPM.root");
+ t->Loop(0,.495,30.,999.,0.7,1.4,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_07eta14_JPM.root");
+ t->Loop(0,.495,30.,999.,1.4,2.4,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_14eta24_JPM.root");
+ t->Loop(0,.495,30.,999.,0.0,0.7,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_etaLT07_JPM_veto.root");
+ t->Loop(0,.495,30.,999.,0.7,1.4,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_07eta14_JPM_veto.root");
+ t->Loop(0,.495,30.,999.,1.4,2.4,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_14eta24_JPM_veto.root");
+
+ t->Loop(0,.700,30.,999.,0.0,2.4,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_JPT.root");
+ t->Loop(0,.700,30.,999.,0.0,2.4,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_JPT_veto.root");
+
+ t->Loop(2,1.90,30.,999.,0.0,0.7,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_etaLT07_TCHEL.root");
+ t->Loop(2,1.90,30.,999.,0.7,1.4,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_07eta14_TCHEL.root");
+ t->Loop(2,1.90,30.,999.,1.4,2.4,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_14eta24_TCHEL.root");
+ t->Loop(2,1.90,30.,999.,0.0,0.7,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_etaLT07_TCHEL_veto.root");
+ t->Loop(2,1.90,30.,999.,0.7,1.4,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_07eta14_TCHEL_veto.root");
+ t->Loop(2,1.90,30.,999.,1.4,2.4,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_14eta24_TCHEL_veto.root");
+
+ t->Loop(2,3.99,30.,999.,0.0,0.7,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_etaLT07_TCHEM.root");
+ t->Loop(2,3.99,30.,999.,0.7,1.4,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_07eta14_TCHEM.root");
+ t->Loop(2,3.99,30.,999.,1.4,2.4,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_14eta24_TCHEM.root");
+ t->Loop(2,3.99,30.,999.,0.0,0.7,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_etaLT07_TCHEM_veto.root");
+ t->Loop(2,3.99,30.,999.,0.7,1.4,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_07eta14_TCHEM_veto.root");
+ t->Loop(2,3.99,30.,999.,1.4,2.4,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_14eta24_TCHEM_veto.root");
+
+ t->Loop(3,2.17,30.,999.,0.0,0.7,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_etaLT07_TCHPM.root");
+ t->Loop(3,2.17,30.,999.,0.7,1.4,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_07eta14_TCHPM.root");
+ t->Loop(3,2.17,30.,999.,1.4,2.4,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_14eta24_TCHPM.root");
+ t->Loop(3,2.17,30.,999.,0.0,0.7,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_etaLT07_TCHPM_veto.root");
+ t->Loop(3,2.17,30.,999.,0.7,1.4,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_07eta14_TCHPM_veto.root");
+ t->Loop(3,2.17,30.,999.,1.4,2.4,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_14eta24_TCHPM_veto.root");
+
+ t->Loop(3,4.31,30.,999.,0.0,2.4,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_TCHPT.root");
+ t->Loop(3,4.31,30.,999.,0.0,2.4,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_TCHPT_veto.root");
+
+ t->Loop(4,2.02,30.,999.,0.0,0.7,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_etaLT07_SSVM.root");
+ t->Loop(4,2.02,30.,999.,0.7,1.4,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_07eta14_SSVM.root");
+ t->Loop(4,2.02,30.,999.,1.4,2.4,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_14eta24_SSVM.root");
+ t->Loop(4,2.02,30.,999.,0.0,0.7,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_etaLT07_SSVM_veto.root");
+ t->Loop(4,2.02,30.,999.,0.7,1.4,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_07eta14_SSVM_veto.root");
+ t->Loop(4,2.02,30.,999.,1.4,2.4,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_14eta24_SSVM_veto.root");
+
+ t->Loop(4,3.40,30.,999.,0.0,2.4,1000.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_SSVT.root");
+ t->Loop(4,3.40,30.,999.,0.0,2.4,20.,"output/QCD_Pt30-80_7TeV_SD_Jet50U_SSVT_veto.root");
 
  gSystem->Exec("kill -9 "+TString(Form("%d",gSystem->GetPid())));
 

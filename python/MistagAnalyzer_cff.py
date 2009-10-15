@@ -4,10 +4,11 @@ from SimTracker.TrackHistory.TrackClassifier_cff import *
 
 mistag = cms.EDAnalyzer("MistagAnalyzer",
     trackClassifier, 
-    useTrackHistory          = cms.bool(True),
+    useTrackHistory          = cms.bool(False),
     #jetCorrector             = cms.string('L2L3JetCorrectorIcone5'),
-    jetCorrector             = cms.string('L2L3JetCorrectorIC5Calo'),
-    outputFile               = cms.untracked.string('results.root'),
+    #jetCorrector             = cms.string('L2L3JetCorrectorIC5Calo'),
+    jetCorrector             = cms.string('L2L3JetCorrectorAK5Calo'),
+    outputFile               = cms.untracked.string('Ntuple.root'),
     longLivedDecayLenght     = cms.untracked.double(1e-14),
     
     ntrackMin                = cms.int32(0),
@@ -17,14 +18,16 @@ mistag = cms.EDAnalyzer("MistagAnalyzer",
     MinPt                    = cms.double(30.0),
     vetoPos                  = cms.double(4.0),
     isData                   = cms.bool(True),
-    Jets                     = cms.string('iterativeCone5CaloJets'),
+    #Jets                     = cms.string('iterativeCone5CaloJets'),
+    Jets                     = cms.string('antikt5CaloJets'),
     
     #vertexClusteringDistance = cms.untracked.double(0.0001),
     #trackProducer            = cms.untracked.InputTag("generalTracks"),
     #badD0Pull                = cms.untracked.double(3.0),
     #trackAssociator          = cms.untracked.string('TrackAssociatorByHits'),
     flavourMatchOption       = cms.string('genParticle'),
-    flavourSource            = cms.InputTag("IC5byValAlgo"),
+    #flavourSource            = cms.InputTag("IC5byValAlgo"),
+    flavourSource            = cms.InputTag("AK5byValAlgo"),
     
     jetIdParameters         = cms.PSet(
         vetoFlavour         = cms.vstring(),
