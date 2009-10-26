@@ -1042,7 +1042,7 @@ void S8Solver::PrintData(TString option) {
 
 void S8Solver::DumpTable(std::string filename) {
 
-	// Int_t nxbins = fBinnedSolution.size();
+	Int_t nxbins = fBinnedSolution.size();
 	// separator
 	std::string sp = ",";
 
@@ -1052,7 +1052,6 @@ void S8Solver::DumpTable(std::string filename) {
 	// header
 	ff <<  "ptMin,ptMax,etaMin,etaMax,bTagEff,bTagEffErr,clTagEff,clTagEfferr,bPtrelEff,bPtrelEffErr,clPtrelEff,clPtrelEfferr"<< sp << fthename << std::endl;
 
-	/*
 	// MC truth
 	for (int ibin = 1; ibin<= nxbins; ++ibin) {
 
@@ -1071,7 +1070,7 @@ void S8Solver::DumpTable(std::string filename) {
 		ff << ptcenter - ptdelta << sp << ptcenter + ptdelta << sp << etamin << sp << etamax << sp << beff << sp << befferr << sp << cleff << sp << clefferr << std::endl;
 		
 	}
-	*/
+
 	int bbin = 1;
 	for( std::map<int,std::map<TString,double> >::const_iterator ibin = fBinnedSolution.begin(); ibin!=fBinnedSolution.end(); ++ibin) {
 
