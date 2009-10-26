@@ -5,7 +5,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.cc,v 1.17 2008/08/11 06:06:22 bazterra Exp $
+ version $Id: BTagEvent.cc,v 1.18 2008/09/12 16:41:30 bazterra Exp $
 
 ________________________________________________________________**/
 
@@ -48,6 +48,7 @@ void BTagEvent::Reset()
     // reco
     njets      = -1;
     nmuons     = -1;
+    nelectrons = -1;
 
     nvertices  = -1;
     ngenjets   = -1;
@@ -101,6 +102,7 @@ void BTagEvent::Reset()
     btag_NegTag_disc3D_3trk_is.clear();
 
     btag_SoftMuon_disc.clear();
+    btag_SoftElectron_disc.clear();
 
     lepton.clear();
     tracks.clear();

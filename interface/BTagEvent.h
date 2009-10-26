@@ -8,7 +8,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: BTagEvent.h,v 1.17 2008/08/11 06:06:21 bazterra Exp $
+ version $Id: BTagEvent.h,v 1.18 2008/09/12 16:41:30 bazterra Exp $
 
 ________________________________________________________________**/
 
@@ -50,6 +50,7 @@ public:
     // reco
     Int_t njets;       // number of jets
     Int_t nmuons;      // number of muons
+    Int_t nelectrons;  // number of electrons
     Int_t nvertices;   // number of vertices
     Int_t ngenjets;    // number of generated jets
     std::vector< Int_t > trackProbaVector_Size;  // size of the vector of tracks
@@ -102,6 +103,7 @@ public:
     std::vector<std::vector<bool> > btag_NegTag_disc3D_3trk_is;
 
     std::vector< float > btag_SoftMuon_disc;
+    std::vector< float > btag_SoftElectron_disc;
 
     std::vector< BTagTrackEvent > tracks;
     std::vector< BTagLeptonEvent > lepton;
