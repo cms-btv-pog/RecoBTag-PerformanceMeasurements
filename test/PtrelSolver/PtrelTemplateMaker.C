@@ -1,4 +1,4 @@
-void MakeTemplatesSummer08()
+void PtrelTemplateMaker()
 {
     // Load the PtrelSolver library
     gSystem->Load("libPtrelSolver.so");
@@ -37,7 +37,7 @@ void MakeTemplatesSummer08()
 
     // Make templates
     maker.make(
-        "/uscmst1b_scratch/lpc1/lpcbtag/pratima/Summer08/Jan_20_2009/InclusiveMu5Pt50_Summer08_IDEAL_V9_v1_GEN-SIM-RECO_2/Results/results_InclusiveMu5Pt50.root",
-        "templates_InclusiveMu5Pt50.root"
+        "/uscms_data/d2/pratima/PM_results/ThreeBin/results_Pt50_SSVL.root",
+        "templates_InclusiveMu5Pt50_SSVL.root"
     );
 }

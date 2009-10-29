@@ -4,7 +4,7 @@ void PtrelByFitting()
     gSystem->Load("libPtrelSolver.so");
 
     // Create a PtrelSolver by Counting
-    PtrelByFitting solver("templates_InclusiveMu5Pt50_SSVL.root", Fit::functions);
+    PtrelByFitting solver("templates_InclusiveMu5Pt50_SSVL.root", Fit::histograms);
 
     // Choose which templates to use for fitting
     // solver.useThreeTemplates();
