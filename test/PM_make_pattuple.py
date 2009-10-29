@@ -26,7 +26,7 @@ process.source.fileNames = [
     '/store/mc/Summer09/InclusiveMu5_Pt50/GEN-SIM-RECO/MC_31X_V3-v1/0022/FAB061EC-078D-DE11-9473-001E0B470AC2.root',
     '/store/mc/Summer09/InclusiveMu5_Pt50/GEN-SIM-RECO/MC_31X_V3-v1/0022/F899160A-088D-DE11-A3AC-001CC4A6FB3A.root'
     ]
-process.maxEvents.input = 1000
+process.maxEvents.input = 10
 
 #-- Calibration tag -----------------------------------------------------------
 #process.GlobalTag.globaltag = 'MC31X_V5::All'
@@ -35,8 +35,8 @@ process.maxEvents.input = 1000
 process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer09_7TeV_cff")
 process.load("RecoBTag.PerformanceMeasurements.PM_pat_Layer1_cfg")
 from PhysicsTools.PatAlgos.tools.jetTools import *
-switchJECSet(process, newName='Summer09_7TeV', oldName='Summer09')
-switchJECSet_(process.jetCorrFactorsAK5,newName='Summer09_7TeV', oldName='Summer09')
+#switchJECSet(process, newName='Summer09_7TeV', oldName='Summer09')
+#switchJECSet_(process.jetCorrFactorsAK5,newName='Summer09_7TeV', oldName='Summer09')
 
 ####### A O D ############
 # If we are running in AOD, use the following switch
