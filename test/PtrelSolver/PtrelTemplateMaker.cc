@@ -13,7 +13,7 @@
 ClassImp(PtrelTemplateMaker)
 
 
-char const * PtrelTemplateMaker::directory = "/Histograms/MCtruth";
+char const * PtrelTemplateMaker::directory = "/MCTruth";
 
 
 void PtrelTemplateMaker::make(
@@ -39,22 +39,22 @@ void PtrelTemplateMaker::make(
     {
         // Make n-effciencies
         sprintf(dName, "n_%s_b", Dependency::Name[i]);
-        sprintf(nName, "ntag_%s_b_[A-Z]*$", Dependency::Name[i]);
+        sprintf(nName, "ntag_%s_b$", Dependency::Name[i]);
         CallSafely( makeEfficiencies(input, output, TPRegexp(dName), TPRegexp(nName)) )
 
         // Make p-efficiencies
         sprintf(dName, "p_%s_b", Dependency::Name[i]);
-        sprintf(nName, "ptag_%s_b_[A-Z]*$", Dependency::Name[i]);
+        sprintf(nName, "ptag_%s_b$", Dependency::Name[i]);
         CallSafely( makeEfficiencies(input, output, TPRegexp(dName), TPRegexp(nName)) )
 
         // Make n-cl-effciencies
         sprintf(dName, "n_%s_cl", Dependency::Name[i]);
-        sprintf(nName, "ntag_%s_cl_[A-Z]*$", Dependency::Name[i]);
+        sprintf(nName, "ntag_%s_cl", Dependency::Name[i]);
         CallSafely( makeEfficiencies(input, output, TPRegexp(dName), TPRegexp(nName)) )
 
         // Make p-cl-efficiencies
         sprintf(dName, "p_%s_cl", Dependency::Name[i]);
-        sprintf(nName, "ptag_%s_cl_[A-Z]*$", Dependency::Name[i]);
+        sprintf(nName, "ptag_%s_cl", Dependency::Name[i]);
         CallSafely( makeEfficiencies(input, output, TPRegexp(dName), TPRegexp(nName)) )
 
         // Make mistag for counting
@@ -63,13 +63,13 @@ void PtrelTemplateMaker::make(
         CallSafely( makeEfficiencies(input, output, TPRegexp(dName), TPRegexp(nName)) )
 
         // Evaluate the coefficients between b-efficiencies from p and n samples
-        sprintf(dName, "mctruth_n_%s_b_ntag_%s_b_[A-Z]*$", Dependency::Name[i], Dependency::Name[i]);
-        sprintf(nName, "mctruth_p_%s_b_ptag_%s_b_[A-Z]*$", Dependency::Name[i], Dependency::Name[i]);
+        sprintf(dName, "mctruth_n_%s_b_ntag_%s_b", Dependency::Name[i], Dependency::Name[i]);
+        sprintf(nName, "mctruth_p_%s_b_ptag_%s_b", Dependency::Name[i], Dependency::Name[i]);
         CallSafely( makeCoefficients(output, TPRegexp(dName), TPRegexp(nName)) )
 
         // Evaluate the coefficients between cl-efficiencies from p and n samples
-        sprintf(dName, "mctruth_n_%s_cl_ntag_%s_cl_[A-Z]*$", Dependency::Name[i], Dependency::Name[i]);
-        sprintf(nName, "mctruth_p_%s_cl_ptag_%s_cl_[A-Z]*$", Dependency::Name[i], Dependency::Name[i]);
+        sprintf(dName, "mctruth_n_%s_cl_ntag_%s", Dependency::Name[i], Dependency::Name[i]);
+        sprintf(nName, "mctruth_p_%s_cl_ptag_%s", Dependency::Name[i], Dependency::Name[i]);
         CallSafely( makeCoefficients(output, TPRegexp(dName), TPRegexp(nName)) )
     }
 

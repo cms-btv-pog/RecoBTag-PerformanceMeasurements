@@ -37,7 +37,7 @@ void PtrelByFitting::solve(char const * inputfile, char const * outputfile)
             ValueMatrix dValues;
             ValueMatrix dErrors;
 
-            sprintf(name, "%s_%s$", methods[m], Dependency::Name[i]);
+            sprintf(name, "%s_%s", methods[m], Dependency::Name[i]);
             CallSafely( measure(input, output, TPRegexp(name), dHistograms, dValues, dErrors) )
 
             // Collection of flavor content mesurements for making the numerators
@@ -45,7 +45,7 @@ void PtrelByFitting::solve(char const * inputfile, char const * outputfile)
             ValueMatrix nValues;
             ValueMatrix nErrors;
 
-            sprintf(name, "%stag_%s_(?!SMT)[A-Z]*$", methods[m], Dependency::Name[i]);
+            sprintf(name, "%stag_%s", methods[m], Dependency::Name[i]);
             CallSafely( measure(input, output, TPRegexp(name), nHistograms, nValues, nErrors) )
 
             // HACK to force reading the objets from file

@@ -5,8 +5,10 @@ void ThreeTemplatePlots(const char * filename, Int_t nbins, Int_t columns)
     TFile * file = new TFile(filename);
 
     MakePlots(file, "n", nbins, columns);
+    MakePlots(file, "ntag", nbins, columns);
+    MakePlots(file, "nnoTag", nbins, columns);
 
-    MakePlots(file, "ntag", nbins, columns, "TCL");
+    /*MakePlots(file, "ntag", nbins, columns, "TCL");
     MakePlots(file, "ntag", nbins, columns, "TCM");
     MakePlots(file, "ntag", nbins, columns, "TCT");
 
@@ -23,13 +25,15 @@ void ThreeTemplatePlots(const char * filename, Int_t nbins, Int_t columns)
 
     MakePlots(file, "ntag", nbins, columns, "CSVL");
     MakePlots(file, "ntag", nbins, columns, "CSVM");
-    MakePlots(file, "ntag", nbins, columns, "CSVT");
+    MakePlots(file, "ntag", nbins, columns, "CSVT");*/
 
     // MakePlots(file, "ntag", nbins, columns, "SMT");
 
     MakePlots(file, "p", nbins, columns);
+    MakePlots(file, "ptag", nbins, columns);
+    MakePlots(file, "pnoTag", nbins, columns);
 
-    MakePlots(file, "ptag", nbins, columns, "TCL");
+    /*MakePlots(file, "ptag", nbins, columns, "TCL");
     MakePlots(file, "ptag", nbins, columns, "TCM");
     MakePlots(file, "ptag", nbins, columns, "TCT");
 
@@ -46,7 +50,7 @@ void ThreeTemplatePlots(const char * filename, Int_t nbins, Int_t columns)
 
     MakePlots(file, "ptag", nbins, columns, "CSVL");
     MakePlots(file, "ptag", nbins, columns, "CSVM");
-    MakePlots(file, "ptag", nbins, columns, "CSVT");
+    MakePlots(file, "ptag", nbins, columns, "CSVT");*/
 
     // MakePlots(file, "ptag", nbins, columns, "SMT");
 

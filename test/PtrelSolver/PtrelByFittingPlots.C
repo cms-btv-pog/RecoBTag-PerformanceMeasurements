@@ -7,12 +7,28 @@ void PtrelByFittingPlots (const char * mfile, const char * mcfile)
     TFile * measurement = new TFile(mfile, "READ");
     TFile * mctruth = new TFile(mcfile, "READ");
 
-    TCanvas * c1 = new TCanvas("c1", "PtrelSolver apply to TC");
+    TCanvas * c1 = new TCanvas("c1", "PtrelSolver apply to ?");
     TImage *img = TImage::Create();
 
-    c1->Divide(3,2);
+    c1->Divide(2,2);
 
     c1->cd(1);
+    plot(measurement, "/measurements/measurement_n_pT_ntag_pT_b", mctruth, "/mctruth/mctruth_n_pT_b_ntag_pT_b");
+
+    c1->cd(2);
+    plot(measurement, "/measurements/measurement_n_eta_ntag_eta_b", mctruth, "/mctruth/mctruth_n_eta_b_ntag_eta_b");
+
+    c1->cd(3);
+    plot(measurement, "/measurements/measurement_p_pT_ptag_pT_b", mctruth, "/mctruth/mctruth_p_pT_b_ptag_pT_b");
+
+    c1->cd(4);
+    plot(measurement, "/measurements/measurement_p_eta_ptag_eta_b", mctruth, "/mctruth/mctruth_p_eta_b_ptag_eta_b");
+
+    sprintf(name, "%s.comparisons.png", mfile);
+    img->FromPad(c1);
+    img->WriteImage(name);
+
+    /* c1->cd(1);
     plot(measurement, "/measurements/measurement_n_pT_ntag_pT_TCL_b", mctruth, "/mctruth/mctruth_n_pT_b_ntag_pT_b_TCL");
 
     c1->cd(2);
@@ -136,7 +152,7 @@ void PtrelByFittingPlots (const char * mfile, const char * mcfile)
 
     sprintf(name, "%s.JBP.png", mfile);
     img->FromPad(c5);
-    img->WriteImage(name);
+    img->WriteImage(name);*/
 
 }
 

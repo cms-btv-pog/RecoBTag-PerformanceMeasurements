@@ -5,10 +5,11 @@
 
 #include "TClass.h"
 #include "TDirectory.h"
-#include "RecoBTag/PerformanceMeasurements/interface/CFractionFitter.h"
 #include "TKey.h"
 #include "TMinuit.h"
 #include "TObjString.h"
+
+#include "RecoBTag/PerformanceMeasurements/interface/CFractionFitter.h"
 
 #include "PtrelUtils.h"
 
@@ -16,7 +17,7 @@
 ClassImp(PtrelSolver)
 
 
-char const * PtrelSolver::directory = "/Histograms/muon_in_jet";
+char const * PtrelSolver::directory = "/muon_in_jet";
 
 
 void PtrelSolver::templates(const char * filename)
