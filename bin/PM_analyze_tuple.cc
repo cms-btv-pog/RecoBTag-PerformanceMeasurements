@@ -187,22 +187,29 @@ int main (int argc, char* argv[])
                 //std::cout << " muon pt " << muonIter->pt() << std::endl;
 
                 if (muonIter->isGlobalMuon() == false) continue;
+
+				reco::TrackRef trackMuon = muonIter->innerTrack();
+				math::XYZTLorentzVector trackMuonP4(trackMuon->px(),
+										  trackMuon->py(),
+										  trackMuon->pz(),
+										  sqrt(trackMuon->p() * trackMuon->p() + 0.1057*0.1057));
                 //int nhit =  (*(muonIter->innerTrack())).numberOfValidHits();
 
                 // muon cuts
                 double normChi2 = (*(muonIter->combinedMuon())).normalizedChi2();
                 //if ( (nhit <= 7 ) || (muonIter->pt()<= 5.0) || (normChi2 >= 5.0 ) ) continue;
-                if ( (muonIter->pt()<= 5.0) || (normChi2 >= 5.0 ) ) continue;
+                if ( trackMuon->pt() <= 5.0 || (normChi2 >= 5.0 ) ) continue;
 
-                hstore->hist("muon_pt")->Fill (muonIter->pt());
+                hstore->hist("muon_pt")->Fill (trackMuon->pt());
 
                 // find a muon in a jet
                 //check deltar
-                double deltaR  = ROOT::Math::VectorUtil::DeltaR(jetIter->p4().Vect(), muonIter->p4().Vect() );
+                double deltaR  = ROOT::Math::VectorUtil::DeltaR(jetIter->p4().Vect(),
+																trackMuonP4.Vect() );
                 TVector3 tmpvecOrg(jetIter->p4().Vect().X(),jetIter->p4().Vect().Y(),  jetIter->p4().Vect().Z());
                 TVector3 tmpvec;
                 tmpvec = tmpvecOrg;
-                TVector3 leptonvec(muonIter->px(), muonIter->py(),muonIter->pz());
+                TVector3 leptonvec(trackMuon->px(), trackMuon->py(),trackMuon->pz());
                 tmpvec += leptonvec;
                 ptreltmp = leptonvec.Perp(tmpvec);
                 // muon in jet cuts
@@ -311,16 +318,21 @@ int main (int argc, char* argv[])
                             //int nhit =  (*(muonIter->innerTrack())).numberOfValidHits();
                             // muon cuts
                             double normChi2 = (*(muonIter->combinedMuon())).normalizedChi2();
+							reco::TrackRef trackMuon = muonIter->innerTrack();
+							math::XYZTLorentzVector trackMuonP4(trackMuon->px(),
+										  trackMuon->py(),
+										  trackMuon->pz(),
+										  sqrt(trackMuon->p() * trackMuon->p() + 0.1057*0.1057));
                             //if ( (nhit <= 7 ) || (muonIter->pt()<= 5.0) || (normChi2 >= 5.0 ) ) continue;
-                            if ( (muonIter->pt()<= 5.0) || (normChi2 >= 5.0 ) ) continue;
+                            if ( (trackMuon->pt()<= 5.0) || (normChi2 >= 5.0 ) ) continue;
 
                             // find a muon in a jet
                             //check deltar
-                            double deltaR  = ROOT::Math::VectorUtil::DeltaR(jetIter->p4().Vect(), muonIter->p4().Vect() );
+                            double deltaR  = ROOT::Math::VectorUtil::DeltaR(jetIter->p4().Vect(), trackMuonP4.Vect() );
                             TVector3 tmpvecOrg(awayjetIter->p4().Vect().X(),awayjetIter->p4().Vect().Y(),  awayjetIter->p4().Vect().Z());
                             TVector3 tmpvec;
                             tmpvec = tmpvecOrg;
-                            TVector3 leptonvec(muonIter->px(), muonIter->py(),muonIter->pz());
+                            TVector3 leptonvec(trackMuon->px(), trackMuon->py(),trackMuon->pz());
                             tmpvec += leptonvec;
                             double awayptrel = leptonvec.Perp(tmpvec);
                             // muon in jet cuts
@@ -328,16 +340,16 @@ int main (int argc, char* argv[])
                             // now we have a good muon in a jet
                             AwayMuonJet = true;
                             // pick the leading muon inside the jet
-                            if ( muonIter->pt() > mu_highest_pt )
+                            if ( trackMuon->pt() > mu_highest_pt )
                             {
                                 mu_highest_pt = muonIter->pt();
-                                p4AwayMuon.SetPtEtaPhiE(muonIter->pt(),
-                                                        muonIter->eta(),
-                                                        muonIter->phi(),
-                                                        muonIter->energy());
+                                p4AwayMuon.SetPtEtaPhiE(trackMuon->pt(),
+                                                        trackMuon->eta(),
+                                                        trackMuon->phi(),
+                                                        sqrt(trackMuon->p() * trackMuon->p() + 0.1057*0.1057));
                                 // recalculate pTrel
                                 tmpvec = tmpvecOrg;
-                                leptonvec.SetXYZ(muonIter->px(), muonIter->py(),muonIter->pz());
+                                leptonvec.SetXYZ(trackMuon->px(), trackMuon->py(),trackMuon->pz());
                                 tmpvec += leptonvec;
                                 awayptrel = leptonvec.Perp(tmpvec);
                             }
