@@ -357,9 +357,10 @@ int main (int argc, char* argv[])
                     } // away muon jet
                 } // close away jet loop
 
-                if (AwayTaggedJet)
+                if (AwayTaggedJet) {
                     histos.FillHistos("p", p4MuJet, ptrel, JetFlavor, TaggedJet );
-
+					hstore->hist("deltaPhi")->Fill (p4AwayJet.Phi() - p4MuJet.Phi() );
+				}
             }// muon in jet
 
         }//jets

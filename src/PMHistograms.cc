@@ -2,6 +2,7 @@
 
 #include "TH2F.h"
 #include "TString.h"
+#include "TH3F.h"
 
 //______________
 void PMHistograms::Add()
@@ -34,17 +35,31 @@ void PMHistograms::Add()
     fTrackCountingMap["Tight"]  = 4.1;
 
     const int nptarray = 4;
-    const int netaarray = 5;
-    const int ncorrptarray = 5;
-    const int ncorretaarray = 5;
-    Double_t jetptbins[nptarray] = {50., 80., 120.,230.};
-    Double_t jetetabins[netaarray] = {0.0,0.5,1.0,1.5,2.5};
-    Double_t corrptbins[ncorrptarray] = {20.,40.,60.,80.,230.};
-    Double_t corretabins[ncorrptarray] = {0.,0.5,1.,1.5,2.5};
+    const int netaarray = 4;
+	const int nptrelarray = 51;
+    //const int ncorrptarray = 3;
+    //const int ncorretaarray = 5;
+    Double_t jetptbins[nptarray] = {50., 60, 80., 230.};
+    Double_t jetetabins[netaarray] = {0.0,1.0,1.5,2.5};
+	Double_t ptrelbins[nptrelarray] = {0.,0.1,0.2,0.3,0.4,
+									   0.5,0.6,0.7,0.8,0.9,
+									   1.0,1.1,1.2,1.3,1.4,
+									   1.5,1.6,1.7,1.8,1.9,
+									   2.0,2.1,2.2,2.3,2.4,
+									   2.5,2.6,2.7,2.8,2.9,
+									   3.0,3.1,3.2,3.3,3.4,
+									   3.5,3.6,3.7,3.8,3.9,
+									   4.0,4.1,4.2,4.3,4.4,
+									   4.5,4.6,4.7,4.8,4.9,
+									   5.0};
+	
+    //Double_t corrptbins[ncorrptarray] = {20.,40.,60.,80.,230.};
+    //Double_t corretabins[ncorrptarray] = {0.,0.5,1.,1.5,2.5};
 
     int nptbins = nptarray -1;
     //const Double_t *jetptbins = (fJetPtAxis.GetXbins())->GetArray();
     int netabins = netaarray -1;
+    int nptrelbins = nptrelarray -1;
     //const Double_t *jetetabins = (fJetEtaAxis.GetXbins())->GetArray();
     // int ncorrptbins = fCorrPtAxis.GetNbins();
     // const Double_t *corrptbins = (fCorrPtAxis.GetXbins())->GetArray();
@@ -52,7 +67,9 @@ void PMHistograms::Add()
     // const Double_t *corretabins = (fCorrEtaAxis.GetXbins())->GetArray();
 
 
-
+	//test
+	fstore->add( new TH3F("n3_pT","MuTag pT,eta vs pTrel",nptbins,jetptbins,nptrelbins,ptrelbins,netabins,jetetabins), "muon_in_jet" );
+	//
     fstore->add( new TH2F("n_pT","MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "muon_in_jet" );
     fstore->add( new TH2F("p_pT","MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "muon_in_jet" );
     fstore->add( new TH2F("ntag_pT","opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "muon_in_jet" );
@@ -188,7 +205,7 @@ void PMHistograms::Add()
     fstore->add( new TH1F( "jet_pt", "jet pt", 30, 0, 150) );
     fstore->add( new TH1F( "muon_pt", "muon pt", 300, 0, 50) );
     fstore->add( new TH1F( "ptRel", "ptRel", 100, 0, 10) );
-
+    fstore->add( new TH1F( "deltaPhi","deltaPhi",80,-3.15,3.15) );
 
 }
 

@@ -136,11 +136,11 @@ TH1Store::write (TFile *filePtr,
     // write out command line arguments
     if (argsVec.size())
     {
-        filePtr->WriteObject (&argsVec, "argsVec");
+      //filePtr->WriteObject (&argsVec, "argsVec");
     }
     if (inputFilesVec.size())
     {
-        filePtr->WriteObject (&inputFilesVec, "inputFiles");
+      //filePtr->WriteObject (&inputFilesVec, "inputFiles");
     }
     cout << "TH1Store::write(): Successfully written to '"
          << filePtr->GetName() << "'." << endl;
