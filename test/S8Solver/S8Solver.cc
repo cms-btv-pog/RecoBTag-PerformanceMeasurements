@@ -153,7 +153,7 @@ void S8Solver::LoadHistos() {
 		h2["b_pcmbpT"] = (TH2F*) gDirectory->Get("MCTruth/ptag_"+fcategory+"_b");//_"+fthename);
 		h2["cl_pcmbpT"] = (TH2F*) gDirectory->Get("MCTruth/ptag_"+fcategory+"_cl");//_"+fthename);
 
-
+		
   // for plotter
 		/*
 		h2["b_npT"] = (TH2F*) gDirectory->Get("b_n"+fcategory);
@@ -361,7 +361,13 @@ void S8Solver::LoadHistos() {
 		//h1["eff_TaggedBothJets_b"]->Sumw2();
 		//h1["eff_TaggedBothJets_cl"]->Sumw2();
 		//std::cout << "reset" << std::endl;
+		std::cout << " get MC truth input: " << std::endl;
+		halljets_b->Print("all");
+		halljets_cl->Print("all");
+		halloppjets_b->Print("all");
+		halloppjets_cl->Print("all");
 		
+			
 		h1["eff_pTrel_b"]->Divide(b_halljets_ptrel , halljets_b ,1.,1.,"B");
 		h1["eff_pTrel_cl"]->Divide(cl_halljets_ptrel, halljets_cl ,1.,1.,"B");
 		h1["eff_TaggedJet_b"]->Divide(b_halljets_tagged , halljets_b ,1.,1.,"B");

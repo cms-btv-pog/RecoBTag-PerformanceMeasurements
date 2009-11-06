@@ -75,8 +75,11 @@ int main (int argc, char* argv[])
     std::string awayTagger = btagMap.find(parser.stringValue( "AwayTagger" ) )->second; 
     double btag_cut_Tagger = parser.doubleValue( "TaggerCut" );
     double btag_cut_awayTagger = parser.doubleValue( "AwayTaggerCut" );
-
+	double min_jet_pt = 50.;
+	
     int outputEvery = parser.integerValue ( "outputEvery" );
+	int maxNevents = parser.integerValue ( "maxevents" );
+	
     cout << "outputEvery = " << outputEvery << endl;
 
     //__________________
@@ -134,6 +137,7 @@ int main (int argc, char* argv[])
 
     for (events.toBegin(); ! events.atEnd(); ++events)
     {
+		if ( nentry > maxNevents && maxNevents!=0 ) break;
 		nentry++;
         if ( outputEvery!=0 && (nentry % outputEvery) == 0 ) 
 		{
@@ -164,7 +168,7 @@ int main (int argc, char* argv[])
             //std::cout << " jet pt " << jetIter->pt() << std::endl;
             bool TaggedJet = false;
             // select a good jet
-            if ( jetIter->pt() <= 30.|| std::abs( jetIter->eta() ) >= 2.4 ) continue;
+            if ( jetIter->pt() <= min_jet_pt || std::abs( jetIter->eta() ) >= 2.4 ) continue;
 
             //std::cout << " jet pt= " << jetIter->pt() << std::endl;
 
@@ -174,7 +178,7 @@ int main (int argc, char* argv[])
             int JetFlavor = abs( jetIter->partonFlavour() );
             p4Jet.SetPtEtaPhiE(jetIter->pt(), jetIter->eta(), jetIter->phi(), jetIter->energy() );
             int hasLepton = 0;
-            int tmptotmuon = 0;
+            //int tmptotmuon = 0;
             // loop over muons
             ////////////////////////////////
             double mu_highest_pt = 0;
@@ -186,7 +190,7 @@ int main (int argc, char* argv[])
             {
                 //std::cout << " muon pt " << muonIter->pt() << std::endl;
 
-                if (muonIter->isGlobalMuon() == false) continue;
+                if (muonIter->isGlobalMuon() == false || muonIter->isTrackerMuon() == false) continue;
 
 				reco::TrackRef trackMuon = muonIter->innerTrack();
 				math::XYZTLorentzVector trackMuonP4(trackMuon->px(),
@@ -214,6 +218,7 @@ int main (int argc, char* argv[])
                 ptreltmp = leptonvec.Perp(tmpvec);
                 // muon in jet cuts
                 if ( (deltaR >= 0.4) || (ptreltmp <= -1.0) ) continue;
+				if ( deltaR < 0.01 ) continue;
                 hasLepton = 1;
                 if ( muonIter->pt() > mu_highest_pt )
                 {
@@ -279,15 +284,16 @@ int main (int argc, char* argv[])
                 bool AwayTaggedJet = false;
                 bool AwayMuonJet = false;
                 TLorentzVector p4AwayMuon;
+				TLorentzVector p4AwayTagged;
+				
                 for (vector< pat::Jet >::const_iterator awayjetIter = jetHandle->begin();
                         awayjetIter != jetHandle->end(); ++awayjetIter)
                 {
                     if ( hasLepton == 0 ) continue;
-
-                    TLorentzVector p4AwayJet;
+					
                     p4AwayJet.SetPtEtaPhiE(awayjetIter->pt(), awayjetIter->eta(), awayjetIter->phi(), awayjetIter->energy() );
                     // Jet quality cuts
-                    if ( (awayjetIter->pt())  <= 30 || std::abs( awayjetIter->eta() ) >= 2.4 ) continue;
+                    if ( (awayjetIter->pt())  <= min_jet_pt || std::abs( awayjetIter->eta() ) >= 2.4 ) continue;
 
                     // skip muon in jet
                     if ( p4AwayJet == p4MuJet ) continue;
@@ -303,6 +309,7 @@ int main (int argc, char* argv[])
                         if ( btag > btag_cut_awayTagger) //loose operating point
                         {
                             AwayTaggedJet = true;
+							p4AwayTagged = p4AwayJet;
                         }
 
                     }
@@ -359,7 +366,23 @@ int main (int argc, char* argv[])
 
                 if (AwayTaggedJet) {
                     histos.FillHistos("p", p4MuJet, ptrel, JetFlavor, TaggedJet );
-					hstore->hist("deltaPhi")->Fill (p4AwayJet.Phi() - p4MuJet.Phi() );
+					hstore->hist("deltaRnearjet")->Fill ( p4MuJet.DeltaR( p4AwayTagged ) );
+					hstore->hist("deltaPhi")->Fill (p4AwayTagged.Phi() - p4MuJet.Phi() );
+					if ( JetFlavor == 5 )
+					{
+						hstore->hist("deltaPhi_b")->Fill (p4AwayTagged.Phi() - p4MuJet.Phi() );
+					}
+					if ( JetFlavor == 4 )
+					{
+						hstore->hist("deltaPhi_c")->Fill (p4AwayTagged.Phi() - p4MuJet.Phi() );
+					}
+					if ( JetFlavor>0 && JetFlavor<4 ) {
+						hstore->hist("deltaPhi_l")->Fill (p4AwayTagged.Phi() - p4MuJet.Phi() );
+					}
+					if ( JetFlavor == 21 )
+					{
+						hstore->hist("deltaPhi_g")->Fill (p4AwayTagged.Phi() - p4MuJet.Phi() );
+					}
 				}
             }// muon in jet
 

@@ -196,6 +196,8 @@ void PMHistograms::Add()
     fstore->add( new TH1D("jet_deltaR_b","#Delta R",60,0.,0.55) );
     fstore->add( new TH1D("jet_deltaR_c","#Delta R",60,0.,0.55) );
     fstore->add( new TH1D("jet_deltaR_udsg","#Delta R",60,0.,0.55) );
+	fstore->add( new TH1D("deltaRnearjet","#Delta R",60,0.,2.0) );
+	
     // pending change colors
     fstore->add( new TH1D("jet_pTrel","p_{Trel} [GeV/c]" , 50, 0, 5 ) );
     fstore->add( new TH1D("jet_pTrel_b","p_{Trel} [GeV/c]" , 50, 0, 5 ) );
@@ -206,6 +208,10 @@ void PMHistograms::Add()
     fstore->add( new TH1F( "muon_pt", "muon pt", 300, 0, 50) );
     fstore->add( new TH1F( "ptRel", "ptRel", 100, 0, 10) );
     fstore->add( new TH1F( "deltaPhi","deltaPhi",80,-3.15,3.15) );
+	fstore->add( new TH1F( "deltaPhi_b","deltaPhi_b",80,-3.15,3.15) );
+	fstore->add( new TH1F( "deltaPhi_c","deltaPhi_c",80,-3.15,3.15) );
+	fstore->add( new TH1F( "deltaPhi_l","deltaPhi_l",80,-3.15,3.15) );
+	fstore->add( new TH1F( "deltaPhi_g","deltaPhi_g",80,-3.15,3.15) );
 
 }
 

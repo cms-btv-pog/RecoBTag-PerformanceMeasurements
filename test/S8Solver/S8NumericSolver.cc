@@ -179,7 +179,7 @@ MakeSystem(shift);
 
  fverbose = true; 
 if(!FindSolution(res,SolveSystem(res))) {
-	std::cout << "[S8Numeric SOLUTIONS NOT FOUND, leaving ...." << std::endl;
+	std::cout << "[S8Numeric] SOLUTION NOT FOUND, leaving ...." << std::endl;
 	return 0;
 }
  std::cout << "[S8Numeric] got solutions, now compute errors" << std::endl;
@@ -207,12 +207,12 @@ Int_t S8NumericSolver::FindSolution(Double_t* res, int n)
 	if (fverbose) std::cout << "[S8Numeric] now print all solutions:"<< std::endl;
 	for(int j=1; j<= n; ++j) {
 		fNb = res[j-1];
-		if (fverbose) std::cout << "solution n= " << j << std::endl;
+		if (fverbose) std::cout << " solution # " << j << std::endl;
 		double tmpsol[8];
 		double totprod=1;
 		for(int i=0; i<8;++i) {
 			tmpsol[i] = E(i%2,i/2);
-			if (fverbose) std::cout << " result i=" << i << " " <<  tmpsol[i] << std::endl;
+			if (fverbose) std::cout << " result i = " << i << " " <<  tmpsol[i] << std::endl;
 			totprod=totprod*tmpsol[i];
 		}
 		if (totprod>=0) {
@@ -237,7 +237,7 @@ Int_t S8NumericSolver::FindSolution(Double_t* res, int n)
 		
 		if (fverbose) {
 			std::cout << "\n";
-			std::cout << "# physical solutions = " << nphysicalSols << std::endl;
+			std::cout << "  number of physical solutions = " << nphysicalSols << std::endl;
 		}
 	}
 		
