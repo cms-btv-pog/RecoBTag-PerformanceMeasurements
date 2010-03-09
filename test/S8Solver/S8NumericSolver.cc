@@ -533,7 +533,7 @@ void S8NumericSolver::SetInitialOrder(Int_t n,Int_t a)
 // n=3 -> ea3, eb3
 // If not called, default is na > nb.
 Int_t b = 1;
-if(a) b=a/abs(a);
+if(a) b=a/fabs(a);
 fAsym[0] = n;
 fAsym[1] = b;
 }

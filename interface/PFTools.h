@@ -6,7 +6,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: PFTools.h,v 1.4 2009/09/08 21:01:29 yumiceva Exp $
+ version $Id: PFTools.h,v 1.5 2009/10/03 20:00:33 yumiceva Exp $
 
 ________________________________________________________________**/
 
@@ -27,7 +27,7 @@ public:
     ) : intag_(t), alias_(n), min_(min), max_(max) {}
 
     WorkingPoint(
-        edm::InputTag t, std::string n, double min, double max = 0, std::map<std::string, double> const & list
+        edm::InputTag t, std::string n, double min, double max , std::map<std::string, double> const & list
     ) : intag_(t), alias_(n), min_(min), max_(max)
     {
         if ( !list.empty() ) wpmap_ = list;
