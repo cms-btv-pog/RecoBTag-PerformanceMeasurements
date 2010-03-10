@@ -3,11 +3,7 @@
 
 MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfig)  
 {
-  outputFile_  = iConfig.getUntrackedParameter<std::string>("outputFile");
-  rootFile_ = new TFile(outputFile_.c_str(),"RECREATE");
-  
-  rootFile_->cd();
-  
+    
   //now do what ever initialization is needed
   // Flavour identification
   flavourMatchOptionf = iConfig.getParameter<std::string>( "flavourMatchOption" );
@@ -24,6 +20,11 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   vetoPos_   = iConfig.getParameter<double>("vetoPos");
   ntrackMin_ = iConfig.getParameter<int>("ntrackMin");
   isData_    = iConfig.getParameter<bool>("isData");
+  
+  produceJetProbaTree_ = iConfig.getParameter<bool>("produceJetProbaTree");
+  
+  
+  
   
   //svComputer = new CombinedSVComputer(iConfig.getParameter<edm::ParameterSet>("csvComputerPSet"));
   //svComputer(iConfig.getParameter<edm::ParameterSet>("csvComputerPSet"));
@@ -55,52 +56,173 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
 ///////////////
 // Some Histograms
 
-  hData_All_NJets       = new TH1F("hData_All_NJets","nb. of jets",21,-0.5,20.5);
-  hData_All_NTracks     = new TH1F("hData_All_NTracks","nb. of tracks",20,0.5,20.5);
-  hData_All_JetPt       = new TH1F("hData_All_JetPt","pt(jet)",21,20.,230.);
-  hData_All_JetEta      = new TH1F("hData_All_JetEta","|#eta(jet)|",25,0.,2.5);
-  hData_NJets           = new TH1F("hData_NJets","nb. of jets",21,-0.5,20.5);
-  hData_NTracks         = new TH1F("hData_NTracks","nb. of tracks",20,0.5,20.5);
-  hData_JetPt           = new TH1F("hData_JetPt","pt(jet)",21,20.,230.);
-  hData_JetEta          = new TH1F("hData_JetEta","|#eta(jet)|",25,0.,2.5);
-  hData_Tagger          = new TH1F("hData_Tagger","Tagger",100,-50.,50.);
-  hData_Tagger_TCHE     = new TH1F("hData_Tagger_TCHE","Tagger_TCHE",100,-50.,50.);
-  hData_Tagger_TCHP     = new TH1F("hData_Tagger_TCHP","Tagger_TCHP",100,-50.,50.);
-  hData_Tagger_JP       = new TH1F("hData_Tagger_JP","Tagger_JP",100,-50.,50.);
-  hData_Tagger_SSV      = new TH1F("hData_Tagger_SSV","Tagger_SSV",100,-50.,50.);
-  hData_Tagger_CSV      = new TH1F("hData_Tagger_CSV","Tagger_CSV",100,-50.,50.);
-  hData_Tagger_MU       = new TH1F("hData_Tagger_MU","Tagger_MU",100,-50.,50.);
+  //fs->make<TH1F>(
+
+  hData_All_NJets       = fs->make<TH1F>("hData_All_NJets","nb. of jets",21,-0.5,20.5);
+  hData_All_NTracks     = fs->make<TH1F>("hData_All_NTracks","nb. of tracks",20,0.5,20.5);
+  hData_All_JetPt       = fs->make<TH1F>("hData_All_JetPt","pt(jet)",21,20.,230.);
+  hData_All_JetEta      = fs->make<TH1F>("hData_All_JetEta","|#eta(jet)|",25,0.,2.5);
+  hData_NJets           = fs->make<TH1F>("hData_NJets","nb. of jets",21,-0.5,20.5);
+  hData_NTracks         = fs->make<TH1F>("hData_NTracks","nb. of tracks",20,0.5,20.5);
+  hData_JetPt           = fs->make<TH1F>("hData_JetPt","pt(jet)",21,20.,230.);
+  hData_JetEta          = fs->make<TH1F>("hData_JetEta","|#eta(jet)|",25,0.,2.5);
+  hData_Tagger          = fs->make<TH1F>("hData_Tagger","Tagger",100,-50.,50.);
+  hData_Tagger_TCHE     = fs->make<TH1F>("hData_Tagger_TCHE","Tagger_TCHE",100,-50.,50.);
+  hData_Tagger_TCHP     = fs->make<TH1F>("hData_Tagger_TCHP","Tagger_TCHP",100,-50.,50.);
+  hData_Tagger_JP       = fs->make<TH1F>("hData_Tagger_JP","Tagger_JP",100,-50.,50.);
+  hData_Tagger_SSV      = fs->make<TH1F>("hData_Tagger_SSV","Tagger_SSV",100,-50.,50.);
+  hData_Tagger_CSV      = fs->make<TH1F>("hData_Tagger_CSV","Tagger_CSV",100,-50.,50.);
+  hData_Tagger_MU       = fs->make<TH1F>("hData_Tagger_MU","Tagger_MU",100,-50.,50.);
   
-  hAllFlav_Flavour         = new TH1F("hAllFlav_Flavour","Flavour",22,-0.5,21.5);
-  hAllFlav_Tagger          = new TH1F("hAllFlav_Tagger","Tagger",100,-50.,50.);
-  hAllFlav_Tagger_Gam      = new TH1F("hAllFlav_Tagger_Gam","Tagger",100,-50.,50.);
-  hAllFlav_Tagger_K0s      = new TH1F("hAllFlav_Tagger_K0s","Tagger",100,-50.,50.);
-  hAllFlav_Tagger_Lam      = new TH1F("hAllFlav_Tagger_Lam","Tagger",100,-50.,50.);
-  hAllFlav_Tagger_Bwd      = new TH1F("hAllFlav_Tagger_Bwd","Tagger",100,-50.,50.);
-  hAllFlav_Tagger_Cwd      = new TH1F("hAllFlav_Tagger_Cwd","Tagger",100,-50.,50.);
-  hAllFlav_Tagger_Tau      = new TH1F("hAllFlav_Tagger_Tau","Tagger",100,-50.,50.);
-  hAllFlav_Tagger_Int      = new TH1F("hAllFlav_Tagger_Int","Tagger",100,-50.,50.);
-  hAllFlav_Tagger_Fak      = new TH1F("hAllFlav_Tagger_Fak","Tagger",100,-50.,50.);
-  hAllFlav_Tagger_Bad      = new TH1F("hAllFlav_Tagger_Bad","Tagger",100,-50.,50.);
-  hAllFlav_Tagger_Oth      = new TH1F("hAllFlav_Tagger_Oth","Tagger",100,-50.,50.);
+  hAllFlav_Flavour         = fs->make<TH1F>("hAllFlav_Flavour","Flavour",22,-0.5,21.5);
+  hAllFlav_Tagger          = fs->make<TH1F>("hAllFlav_Tagger","Tagger",100,-50.,50.);
+  hAllFlav_Tagger_Gam      = fs->make<TH1F>("hAllFlav_Tagger_Gam","Tagger",100,-50.,50.);
+  hAllFlav_Tagger_K0s      = fs->make<TH1F>("hAllFlav_Tagger_K0s","Tagger",100,-50.,50.);
+  hAllFlav_Tagger_Lam      = fs->make<TH1F>("hAllFlav_Tagger_Lam","Tagger",100,-50.,50.);
+  hAllFlav_Tagger_Bwd      = fs->make<TH1F>("hAllFlav_Tagger_Bwd","Tagger",100,-50.,50.);
+  hAllFlav_Tagger_Cwd      = fs->make<TH1F>("hAllFlav_Tagger_Cwd","Tagger",100,-50.,50.);
+  hAllFlav_Tagger_Tau      = fs->make<TH1F>("hAllFlav_Tagger_Tau","Tagger",100,-50.,50.);
+  hAllFlav_Tagger_Int      = fs->make<TH1F>("hAllFlav_Tagger_Int","Tagger",100,-50.,50.);
+  hAllFlav_Tagger_Fak      = fs->make<TH1F>("hAllFlav_Tagger_Fak","Tagger",100,-50.,50.);
+  hAllFlav_Tagger_Bad      = fs->make<TH1F>("hAllFlav_Tagger_Bad","Tagger",100,-50.,50.);
+  hAllFlav_Tagger_Oth      = fs->make<TH1F>("hAllFlav_Tagger_Oth","Tagger",100,-50.,50.);
   
-  hLightFlav_Tagger        = new TH1F("hLightFlav_Tagger","Tagger",100,-50.,50.);
-  hGluonFlav_Tagger        = new TH1F("hGluonFlav_Tagger","Tagger",100,-50.,50.);
-  hUDSFlav_Tagger          = new TH1F("hUDSFlav_Tagger","Tagger",100,-50.,50.);
-  hCFlav_Tagger            = new TH1F("hCFlav_Tagger","Tagger",100,-50.,50.);
-  hBFlav_Tagger            = new TH1F("hBFlav_Tagger","Tagger",100,-50.,50.);
- 
-  nTuplesJets =  new TNtuple("Jets","All Jets",
-  "Event_Njets:Event_Trig:Jet_Number:Jet_Flavour:Jet_Ntracks:Jet_Pt:Jet_Eta:Jet_Phi:TagN_TC1:TagP_TC1:TagN_TC2:TagP_TC2:TagN_TC3:TagP_TC3:TagN_JP:TagP_JP:Tag_JP:TagN_SSV:TagP_SSV:TagN_CSV:TagP_CSV:TagN_MU:TagP_MU:Cat_TC1:Cat_TC2:Cat_TC3:Cat_JP:Cat_SSV:Cat_MU:Muon_hits:Muon_chi2:Muon_d0:Muon_Pt:Muon_PtRel");
+  hLightFlav_Tagger        = fs->make<TH1F>("hLightFlav_Tagger","Tagger",100,-50.,50.);
+  hGluonFlav_Tagger        = fs->make<TH1F>("hGluonFlav_Tagger","Tagger",100,-50.,50.);
+  hUDSFlav_Tagger          = fs->make<TH1F>("hUDSFlav_Tagger","Tagger",100,-50.,50.);
+  hCFlav_Tagger            = fs->make<TH1F>("hCFlav_Tagger","Tagger",100,-50.,50.);
+  hBFlav_Tagger            = fs->make<TH1F>("hBFlav_Tagger","Tagger",100,-50.,50.);
+  
+  
+  
+  
+  
+  smalltree    = fs->make<TTree>("ttree", "ttree");
+  
+  
+  smalltree->Branch("BitTrigger"          ,&BitTrigger          ,"BitTrigger/I");
+  smalltree->Branch("nSelJets"            ,&nSelJets            ,"nSelJets/I");
+  smalltree->Branch("nJetCand"            ,&nJetCand            ,"nJetCand/I");
+  
+  
+  
+  if(produceJetProbaTree_){
+     
+    //--------------------------------------
+    //tracks information 
+    //--------------------------------------
+    
+    
+    
+    smalltree->Branch("nTrackCand"                        ,&nTrackCand                       ,"nTrackCand/I");
+    smalltree->Branch("TrackCand_p"                       ,TrackCand_p                       ,"TrackCand_p[nTrackCand]/F");
+    smalltree->Branch("TrackCand_dz"                      ,TrackCand_dz                      ,"TrackCand_dz[nTrackCand]/F");
+    smalltree->Branch("TrackCand_d0"                      ,TrackCand_d0                      ,"TrackCand_d0[nTrackCand]/F");
+    smalltree->Branch("TrackCand_pt"                      ,TrackCand_pt                      ,"TrackCand_pt[nTrackCand]/F");
+    smalltree->Branch("TrackCand_eta"                     ,TrackCand_eta                     ,"TrackCand_eta[nTrackCand]/F");
+    smalltree->Branch("TrackCand_e"                       ,TrackCand_e                       ,"TrackCand_e[nTrackCand]/F");
+    smalltree->Branch("TrackCand_phi"                     ,TrackCand_phi                     ,"TrackCand_phi[nTrackCand]/F");
+    
+    
+    smalltree->Branch("TrackCand_charge"                  ,TrackCand_charge,                  "TrackCand_charge[nTrackCand]/F");
+    smalltree->Branch("TrackCand_chi2"                    ,TrackCand_chi2,                    "TrackCand_chi2[nTrackCand]/F");
+    smalltree->Branch("TrackCand_Normchi2"                ,TrackCand_Normchi2,                "TrackCand_Normchi2[nTrackCand]/F");
+    smalltree->Branch("TrackCand_IPsignificance"          ,TrackCand_IPsignificance,          "TrackCand_IPsignificance[nTrackCand]/F");
+    smalltree->Branch("TrackCand_TransverseIPsignificance",TrackCand_TransverseIPsignificance,"TrackCand_TransverseIPsignificance[nTrackCand]/F");
+    smalltree->Branch("TrackCand_TransverseIP"            ,TrackCand_TransverseIP            ,"TrackCand_TransverseIP[nTrackCand]/F");
+    smalltree->Branch("TrackCand_Proba"                   ,TrackCand_Proba                   ,"TrackCand_[nTrackCand]Proba/F");
+    smalltree->Branch("TrackCand_nHitPixel"               ,TrackCand_nHitPixel,               "TrackCand_nHitPixel[nTrackCand]/I");
+    smalltree->Branch("TrackCand_nHitTOB"                 ,TrackCand_nHitTOB,                 "TrackCand_nHitTOB[nTrackCand]/I");
+    smalltree->Branch("TrackCand_nHitTIB"                 ,TrackCand_nHitTIB,                 "TrackCand_nHitTIB[nTrackCand]/I");
+    smalltree->Branch("TrackCand_nHitTID"                 ,TrackCand_nHitTID,                 "TrackCand_nHitTID[nTrackCand]/I");
+    smalltree->Branch("TrackCand_nHitTEC"                 ,TrackCand_nHitTEC,                 "TrackCand_nHitTEC[nTrackCand]/I");
+    smalltree->Branch("TrackCand_nHitTracker"             ,TrackCand_nHitTracker,             "TrackCand_nHitTracker[nTrackCand]/I");
+    //smalltree->Branch("TrackCand_isHitL1"                 ,TrackCand_isHitL1,                 "TrackCand_isHitL1[nTrackCand]/I");
+    smalltree->Branch("TrackCand_nHitPixelEC"             ,TrackCand_nHitPixelEC,             "TrackCand_nHitPixelEC[nTrackCand]/I");
+    smalltree->Branch("TrackCand_nHitPixelBL"             ,TrackCand_nHitPixelBL,             "TrackCand_nHitPixelBL[nTrackCand]/I");
+    
+    
+    smalltree->Branch("TrackCand_nHitPixelBL"             ,TrackCand_nHitPixelBL,             "TrackCand_nHitPixelBL[nTrackCand]/I");
+    smalltree->Branch("JetCand_nFirstTrack",               JetCand_nFirstTrack               ,"JetCand_nFirstTrack[nJetCand]/I");
+    smalltree->Branch("JetCand_nLastTrack",                JetCand_nLastTrack                ,"JetCand_nLastTrack[nJetCand]/I"); 
+    smalltree->Branch("Ntagtracks",                        Ntagtracks                        ,"Ntagtracks[nJetCand]/I"); 
+    
+    
+    //--------------------------------------
+    //secondary vertex information 
+    //--------------------------------------
+    smalltree->Branch("nSecondaryV"            ,&nSecondaryV           ,"nSecondaryV/I");
+    smalltree->Branch("SecondaryV_x"           ,SecondaryV_x           ,"SecondaryV_x[nSecondaryV]/F");
+    smalltree->Branch("SecondaryV_y"           ,SecondaryV_y           ,"SecondaryV_y[nSecondaryV]/F");
+    smalltree->Branch("SecondaryV_z"           ,SecondaryV_z           ,"SecondaryV_z[nSecondaryV]/F");
+    smalltree->Branch("SecondaryV_ex"          ,SecondaryV_ex          ,"SecondaryV_ex[nSecondaryV]/F");
+    smalltree->Branch("SecondaryV_ey"          ,SecondaryV_ey          ,"SecondaryV_ey[nSecondaryV]/F");
+    smalltree->Branch("SecondaryV_ez"          ,SecondaryV_ez          ,"SecondaryV_ez[nSecondaryV]/F");
+    smalltree->Branch("SecondaryV_chi2"        ,SecondaryV_chi2        ,"SecondaryV_chi2[nSecondaryV]/F");
+    smalltree->Branch("SecondaryV_ndf"         ,SecondaryV_ndf         ,"SecondaryV_ndf[nSecondaryV]/F");
+    smalltree->Branch("SecondaryV_flightDistance"         ,SecondaryV_flightDistance         ,"SecondaryV_flightDistance[nSecondaryV]/F");
+    smalltree->Branch("SecondaryV_flightDistanceError"    ,SecondaryV_flightDistanceError    ,"SecondaryV_flightDistanceError[nSecondaryV]/F");
+
   }
+    
+
+  
+    
+  
+  smalltree->Branch("JetCand_pt",               JetCand_pt               ,"JetCand_pt[nJetCand]/F");
+  smalltree->Branch("JetCand_jes",              JetCand_jes              ,"JetCand_jes[nJetCand]/F");
+  smalltree->Branch("JetCand_eta",              JetCand_eta              ,"JetCand_eta[nJetCand]/F");
+  smalltree->Branch("JetCand_phi",              JetCand_phi              ,"JetCand_phi[nJetCand]/F");
+  smalltree->Branch("JetCand_multiplicity",     JetCand_multiplicity     ,"JetCand_multiplicity[nJetCand]/I");
+  smalltree->Branch("JetCand_flavor",           JetCand_flavor           ,"JetCand_flavor[nJetCand]/I");
+  smalltree->Branch("JetCand_nFirstTrack",      JetCand_nFirstTrack      ,"JetCand_nFirstTrack[nJetCand]/I");
+  smalltree->Branch("JetCand_nLastTrack",       JetCand_nLastTrack       ,"JetCand_nLastTrack[nJetCand]/I"); 
+  smalltree->Branch("JetCand_nFirstSV"         ,JetCand_nFirstSV         ,"JetCand_nFirstSV[nJetCand]/I");
+  smalltree->Branch("JetCand_nLastSV"          ,JetCand_nLastSV          ,"JetCand_nLastSV[nJetCand]/I");
+  smalltree->Branch("JetCand_Ip1N",             JetCand_Ip1N             ,"JetCand_Ip1N[nJetCand]/F");
+  smalltree->Branch("JetCand_Ip1P",             JetCand_Ip1P             ,"JetCand_Ip1P[nJetCand]/F");
+  smalltree->Branch("JetCand_Ip2N",             JetCand_Ip2N             ,"JetCand_Ip2N[nJetCand]/F");
+  smalltree->Branch("JetCand_Ip2P",             JetCand_Ip2P             ,"JetCand_Ip2P[nJetCand]/F");
+  smalltree->Branch("JetCand_Ip3N",             JetCand_Ip3N             ,"JetCand_Ip3N[nJetCand]/F");
+  smalltree->Branch("JetCand_Ip3P",             JetCand_Ip3P             ,"JetCand_Ip3P[nJetCand]/F");
+  smalltree->Branch("JetCand_ProbaN",           JetCand_ProbaN           ,"JetCand_ProbaN[nJetCand]/F");
+  smalltree->Branch("JetCand_ProbaP",           JetCand_ProbaP           ,"JetCand_ProbaP[nJetCand]/F");
+  smalltree->Branch("JetCand_Proba",            JetCand_Proba            ,"JetCand_Proba[nJetCand]/F");
+  smalltree->Branch("JetCand_SvtxN",            JetCand_SvtxN            ,"JetCand_SvtxN[nJetCand]/F");
+  smalltree->Branch("JetCand_Svtx",             JetCand_Svtx             ,"JetCand_Svtx[nJetCand]/F");
+  smalltree->Branch("JetCand_CombinedSvtxN",    JetCand_CombinedSvtxN    ,"JetCand_CombinedSvtxN[nJetCand]/F");
+  smalltree->Branch("JetCand_CombinedSvtx",     JetCand_CombinedSvtx     ,"JetCand_CombinedSvtx[nJetCand]/F");
+  smalltree->Branch("JetCand_SoftMN",           JetCand_SoftMN           ,"JetCand_SoftMN[nJetCand]/F");
+  smalltree->Branch("JetCand_SoftM",            JetCand_SoftM            ,"JetCand_SoftM[nJetCand]/F");
+  smalltree->Branch("JetCand_Category1",        JetCand_Category1        ,"JetCand_Category1[nJetCand]/F");
+  smalltree->Branch("JetCand_Category2",        JetCand_Category2        ,"JetCand_Category2[nJetCand]/F");
+  smalltree->Branch("JetCand_Category3",        JetCand_Category3        ,"JetCand_Category3[nJetCand]/F");
+  smalltree->Branch("JetCand_CategoryJet",      JetCand_CategoryJet      ,"JetCand_CategoryJet[nJetCand]/F");
+  smalltree->Branch("JetCand_CategorySVx",      JetCand_CategorySVx      ,"JetCand_CategorySVx[nJetCand]/F");
+  smalltree->Branch("JetCand_CategoryMuon",     JetCand_CategoryMuon     ,"JetCand_CategoryMuon[nJetCand]/F");
+  smalltree->Branch("JetCand_mu_NHits_tracker", JetCand_mu_NHits_tracker ,"JetCand_mu_NHits_tracker[nJetCand]/F");
+  smalltree->Branch("JetCand_mu_Chi2",          JetCand_mu_Chi2          ,"JetCand_mu_Chi2[nJetCand]/F");
+  smalltree->Branch("JetCand_mu_pT",            JetCand_mu_pT            ,"JetCand_mu_pT[nJetCand]/F");
+  smalltree->Branch("JetCand_mu_d0",            JetCand_mu_d0            ,"JetCand_mu_d0[nJetCand]/F");
+  smalltree->Branch("JetCand_ptRel",            JetCand_ptRel            ,"JetCand_ptRel[nJetCand]/F");
+  
+  
+  /*Njets, BitTrigger, 
+       Ijet, Flavour, Ntagtracks, ptjet, (*jet).eta(), phijet, 
+       Ip1N, Ip1P, Ip2N, Ip2P, Ip3N, Ip3P, ProbaN, ProbaP, Proba,
+       SvtxN, Svtx, CombinedSvtxN, CombinedSvtx, SoftMN, SoftM, 
+       Category1, Category2, Category3, CategoryJet, CategorySVx, CategoryMuon,
+       mu_NHits_tracker,mu_Chi2,mu_d0,mu_pT,ptRel*/
+
+}
 
  
 MistagAnalyzer::~MistagAnalyzer()
  
 {
-  rootFile_->cd();
+ 
 
-  hData_All_NJets       ->Write();
+  /*hData_All_NJets       ->Write();
   hData_All_NTracks     ->Write();
   hData_All_JetPt       ->Write();
   hData_All_JetEta      ->Write();
@@ -134,10 +256,7 @@ MistagAnalyzer::~MistagAnalyzer()
   hUDSFlav_Tagger          ->Write();
   hCFlav_Tagger            ->Write();
   hBFlav_Tagger            ->Write();
- 
-  rootFile_->Write();
- 
-  //rootFile_->Close();
+  smalltree->Write();*/
 }
 
 
@@ -166,6 +285,11 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   using namespace edm;
   using namespace std;
+  
+  
+  
+  
+  
   // Tag Jets
   if(useTrackHistory_) classifier_.newEvent(iEvent, iSetup);
   
@@ -239,13 +363,19 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.getByLabel(softMuonTagInfoName_, tagInos_softmuon);
   
 
+  nTrackCand  = 0;
+  nSecondaryV = 0; 
+    
+    
+    
   //------------------------------------------------------
   //Trigger info
   //------------------------------------------------------
   
   TriggerResults tr;
   Handle<TriggerResults> h_trigRes;
-  iEvent.getByLabel(InputTag("TriggerResults::HLT8E29"), h_trigRes);
+  //iEvent.getByLabel(InputTag("TriggerResults::HLT8E29"), h_trigRes);
+  iEvent.getByLabel(InputTag("TriggerResults::HLT"), h_trigRes);
   tr = *h_trigRes;
   int BitTrigger = 0;
 
@@ -317,8 +447,9 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
     
   int numjet = 0;
+  nJetCand = 0;
   for ( jet = recoJets.begin(); jet != recoJets.end(); ++jet ) {
-
+    
     int ith_tagged = -1;      
     float Flavour  ;    
     int flavour    ; 
@@ -330,8 +461,18 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       Flavour = flavour;
       //Jet_Flavour = flavour;
     }
-
+    
+    
+    JetCand_flavor[nJetCand] = Flavour;
+    JetCand_eta[nJetCand]    = (*jet).eta();
+    JetCand_phi[nJetCand]    = (*jet).phi();
+    JetCand_pt[nJetCand]     = (*jet).pt();
+    
+    
+    
+    
     double JES     =  acorrector->correction(*jet, iEvent, iSetup);
+    JetCand_jes[nJetCand]     = JES;
 
     double jetpt =   (*jet).pt()  ;
     double jeteta=   (*jet).eta() ;
@@ -352,6 +493,62 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     ith_tagged = this->TaggedJet(*jet,jetTags_JP);
     
     int ntagtracks = (*tagInfo)[ith_tagged].probabilities(0).size();
+    JetCand_nFirstTrack[nJetCand]  = nTrackCand;
+    const edm::RefVector<reco::TrackCollection> & assotracks((*tagInfo)[ith_tagged].selectedTracks());
+    if(produceJetProbaTree_){
+      
+      for(unsigned int trackIdx=0; trackIdx < assotracks.size(); trackIdx++){
+	//(*tagInfo)[ith_tagged].probability(trackIdx,0);
+	
+	
+	TrackCand_p[nTrackCand]              = (assotracks[trackIdx])->p();
+	TrackCand_d0[nTrackCand]             = (assotracks[trackIdx])->d0();
+	TrackCand_dz[nTrackCand]             = (assotracks[trackIdx])->dz();
+	TrackCand_pt[nTrackCand]             = (assotracks[trackIdx])->pt();
+	TrackCand_phi[nTrackCand]            = (assotracks[trackIdx])->phi();
+	TrackCand_eta[nTrackCand]            = (assotracks[trackIdx])->eta();
+	TrackCand_charge[nTrackCand]         = (assotracks[trackIdx])->charge();
+	TrackCand_chi2[nTrackCand]           = (assotracks[trackIdx])->chi2();    
+	TrackCand_Normchi2[nTrackCand]       = (assotracks[trackIdx])->normalizedChi2();   
+	TrackCand_zIP[nTrackCand]            = (assotracks[trackIdx])->dz();//-(*pv).z();        
+	
+	
+	TrackCand_nHitTracker[nTrackCand]          = (assotracks[trackIdx])->hitPattern().numberOfValidStripHits();
+	TrackCand_nHitPixel[nTrackCand]            = (assotracks[trackIdx])->hitPattern().numberOfValidPixelHits();
+	
+	
+	
+	TrackCand_nHitTOB[nTrackCand] = (assotracks[trackIdx])->hitPattern().numberOfValidStripTOBHits();
+	TrackCand_nHitTIB[nTrackCand] = (assotracks[trackIdx])->hitPattern().numberOfValidStripTIBHits();
+	TrackCand_nHitTEC[nTrackCand] = (assotracks[trackIdx])->hitPattern().numberOfValidStripTECHits();
+	TrackCand_nHitTID[nTrackCand] = (assotracks[trackIdx])->hitPattern().numberOfValidStripTIDHits();
+	
+	
+	TrackCand_nHitPixelEC[nTrackCand] = (assotracks[trackIdx])->hitPattern().numberOfValidPixelEndcapHits();
+	TrackCand_nHitPixelBL[nTrackCand] = (assotracks[trackIdx])->hitPattern().numberOfValidPixelBarrelHits();
+       
+	
+	nTrackCand++;
+	
+      }
+    }
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    JetCand_nLastTrack[nJetCand]   = nTrackCand;
+    
     float Proba  = (*jetTags_JP)[ith_tagged].second;
     
     ith_tagged = this->TaggedJet(*jet,jetTags_PosJP);
@@ -372,6 +569,15 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     ith_tagged            = this->TaggedJet(*jet,jetTags_Svtx);
     float   Svtx          = (*jetTags_Svtx)[ith_tagged].second;
+    
+    
+ 
+    
+    
+    
+    
+    
+    
     ith_tagged            = this->TaggedJet(*jet,jetTags_negSvtx);
     float   SvtxN         = (*jetTags_negSvtx)[ith_tagged].second;
     
@@ -381,8 +587,24 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     ith_tagged            = this->TaggedJet(*jet,jetTags_softMu);
     if( (*jetTags_softMu)[ith_tagged].second     > -100000 )   SoftM     = (*jetTags_softMu)[ith_tagged].second;
     ith_tagged            = this->TaggedJet(*jet,jetTags_softMuneg);
-    if( (*jetTags_softMuneg)[ith_tagged].second  > -100000 )  SoftMN     = ((*jetTags_softMuneg)[ith_tagged].second);
+    if( (*jetTags_softMuneg)[ith_tagged].second  > -100000 )   SoftMN    = ((*jetTags_softMuneg)[ith_tagged].second);
     if(SoftMN > 0) SoftMN = -1*SoftMN;
+    
+    
+              
+    JetCand_ProbaN[nJetCand]        = ProbaN;         
+    JetCand_ProbaP[nJetCand]        = ProbaP;          
+    JetCand_Proba[nJetCand]         = Proba;         
+    JetCand_SvtxN[nJetCand]         = SvtxN;        
+    JetCand_Svtx[nJetCand]          = Svtx;         
+    JetCand_CombinedSvtxN[nJetCand] = CombinedSvtxN;
+    JetCand_CombinedSvtx[nJetCand]  = CombinedSvtx;  
+    JetCand_SoftMN[nJetCand]        = SoftMN;         
+    JetCand_SoftM[nJetCand]         = SoftM;          
+ 
+    
+    
+    
     
     ith_tagged = this->TaggedJet(*jet,jetTags_TCHighEff);
     std::vector<TrackIPTagInfo::TrackIPData>  ipdata = (*tagInfo)[ith_tagged].impactParameterData();
@@ -396,6 +618,19 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     TrackCategories::Flags flags2N;
     TrackCategories::Flags flags3N;
     int idSize = 0;
+    
+    
+    
+    
+    
+   
+    
+    
+    
+    
+    
+    
+    
     if(useTrackHistory_ && indexes.size() != 0 && isData_!=0){
       
       idSize = indexes.size();
@@ -407,106 +642,118 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       if(idSize > 2) flags3N = classifier_.evaluate( tracks[indexes[idSize-3]] ).flags();
     }
     
-    float Ip1P   = -1000;
-    float Ip1N   = 1000;
+    JetCand_Ip1P[nJetCand]   = -1000;
+    JetCand_Ip1N[nJetCand]  =  1000;
     int index = 0;
     for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
 	 itipdata != ipdata.end(); itipdata++){
       double ip3D = (*itipdata).ip3d.significance() ;
       //negatif tracks
-      if( ip3D > Ip1P  ) Ip1P = ip3D;         
-      if( ip3D < Ip1N  ) Ip1N = ip3D;
+      if( ip3D > JetCand_Ip1P[nJetCand]  ) JetCand_Ip1P[nJetCand] = ip3D;         
+      if( ip3D < JetCand_Ip1N[nJetCand]  ) JetCand_Ip1N[nJetCand] = ip3D;
       index++;
     }
     
-    Ip1N = -Ip1N;
+    JetCand_Ip1N[nJetCand] = -JetCand_Ip1N[nJetCand];
     ith_tagged = this->TaggedJet(*jet,jetTags_TCHighEff);
-    float Ip2P   = (*jetTags_TCHighEff)[ith_tagged].second;
+    JetCand_Ip2P[nJetCand]   = (*jetTags_TCHighEff)[ith_tagged].second;
     ith_tagged = this->TaggedJet(*jet,jetTags_TCHighPur);
-    float Ip3P   = (*jetTags_TCHighPur)[ith_tagged].second;
+    JetCand_Ip3P[nJetCand]   = (*jetTags_TCHighPur)[ith_tagged].second;
     ith_tagged = this->TaggedJet(*jet,jetTags_NegTCHighEff);
-    float Ip2N   = (*jetTags_NegTCHighEff)[ith_tagged].second;
+    JetCand_Ip2N[nJetCand]   = (*jetTags_NegTCHighEff)[ith_tagged].second;
     ith_tagged = this->TaggedJet(*jet,jetTags_NegTCHighPur);
-    float Ip3N   = (*jetTags_NegTCHighPur)[ith_tagged].second;
+    JetCand_Ip3N[nJetCand]   = (*jetTags_NegTCHighPur)[ith_tagged].second;
     
     //*****************************************************************
     //get track histories for 1st, 2nd and 3rd track (TC)
     //*****************************************************************
-    int Category1 = 0,  Category2 = 0, Category3 = 0;
+    JetCand_Category1[nJetCand] = 0;
+    JetCand_Category2[nJetCand] = 0;
+    JetCand_Category3[nJetCand] = 0;
     
     // Track history
     if (useTrackHistory_ && indexes.size()!=0 && isData_!=0) {
-//$$ ????
+      //$$ ????
       flags1P[TrackCategories::Conversion] ;
-//$$ ????
-      if ( flags1P[TrackCategories::BWeakDecay] )  Category1 += int(pow(10., -1 + 1)); 
-      if ( flags1P[TrackCategories::CWeakDecay] )  Category1 += int(pow(10., -1 + 2)); 
-      if ( flags1P[TrackCategories::TauDecay] )    Category1 += int(pow(10., -1 + 3)); 
-      if ( flags1P[TrackCategories::Conversion] )  Category1 += int(pow(10., -1 + 4)); 
-      if ( flags1P[TrackCategories::KsDecay] )     Category1 += int(pow(10., -1 + 5)); 
-      if ( flags1P[TrackCategories::LambdaDecay] ) Category1 += int(pow(10., -1 + 6)); 
-      if ( flags1P[TrackCategories::Interaction] ) Category1 += int(pow(10., -1 + 7)); 
-      if ( flags1P[TrackCategories::Fake] )	   Category1 += int(pow(10., -1 + 8)); 
-      if ( flags1P[TrackCategories::Bad] )	   Category1 += int(pow(10., -1 + 9)); 
+      //$$ ????
+      if ( flags1P[TrackCategories::BWeakDecay] )  JetCand_Category1[nJetCand] += int(pow(10., -1 + 1)); 
+      if ( flags1P[TrackCategories::CWeakDecay] )  JetCand_Category1[nJetCand] += int(pow(10., -1 + 2)); 
+      if ( flags1P[TrackCategories::TauDecay] )    JetCand_Category1[nJetCand] += int(pow(10., -1 + 3)); 
+      if ( flags1P[TrackCategories::Conversion] )  JetCand_Category1[nJetCand] += int(pow(10., -1 + 4)); 
+      if ( flags1P[TrackCategories::KsDecay] )     JetCand_Category1[nJetCand] += int(pow(10., -1 + 5)); 
+      if ( flags1P[TrackCategories::LambdaDecay] ) JetCand_Category1[nJetCand] += int(pow(10., -1 + 6)); 
+      if ( flags1P[TrackCategories::Interaction] ) JetCand_Category1[nJetCand] += int(pow(10., -1 + 7)); 
+      if ( flags1P[TrackCategories::Fake] )	   JetCand_Category1[nJetCand] += int(pow(10., -1 + 8)); 
+      if ( flags1P[TrackCategories::Bad] )	   JetCand_Category1[nJetCand] += int(pow(10., -1 + 9)); 
       if ( idSize > 1 ) {
-        if ( flags2P[TrackCategories::BWeakDecay] )  Category2 += int(pow(10., -1 + 1)); 
-        if ( flags2P[TrackCategories::CWeakDecay] )  Category2 += int(pow(10., -1 + 2)); 
-        if ( flags2P[TrackCategories::TauDecay] )    Category2 += int(pow(10., -1 + 3)); 
-        if ( flags2P[TrackCategories::Conversion] )  Category2 += int(pow(10., -1 + 4)); 
-        if ( flags2P[TrackCategories::KsDecay] )     Category2 += int(pow(10., -1 + 5)); 
-        if ( flags2P[TrackCategories::LambdaDecay] ) Category2 += int(pow(10., -1 + 6)); 
-        if ( flags2P[TrackCategories::Interaction] ) Category2 += int(pow(10., -1 + 7)); 
-        if ( flags2P[TrackCategories::Fake] )	     Category2 += int(pow(10., -1 + 8)); 
-        if ( flags2P[TrackCategories::Bad] )	     Category2 += int(pow(10., -1 + 9)); 
+        if ( flags2P[TrackCategories::BWeakDecay] )  JetCand_Category2[nJetCand] += int(pow(10., -1 + 1)); 
+        if ( flags2P[TrackCategories::CWeakDecay] )  JetCand_Category2[nJetCand] += int(pow(10., -1 + 2)); 
+        if ( flags2P[TrackCategories::TauDecay] )    JetCand_Category2[nJetCand] += int(pow(10., -1 + 3)); 
+        if ( flags2P[TrackCategories::Conversion] )  JetCand_Category2[nJetCand] += int(pow(10., -1 + 4)); 
+        if ( flags2P[TrackCategories::KsDecay] )     JetCand_Category2[nJetCand] += int(pow(10., -1 + 5)); 
+        if ( flags2P[TrackCategories::LambdaDecay] ) JetCand_Category2[nJetCand] += int(pow(10., -1 + 6)); 
+        if ( flags2P[TrackCategories::Interaction] ) JetCand_Category2[nJetCand] += int(pow(10., -1 + 7)); 
+        if ( flags2P[TrackCategories::Fake] )	     JetCand_Category2[nJetCand] += int(pow(10., -1 + 8)); 
+        if ( flags2P[TrackCategories::Bad] )	     JetCand_Category2[nJetCand] += int(pow(10., -1 + 9)); 
       }
       if ( idSize > 2 ) {
-        if ( flags3P[TrackCategories::BWeakDecay] )  Category3 += int(pow(10., -1 + 1)); 
-        if ( flags3P[TrackCategories::CWeakDecay] )  Category3 += int(pow(10., -1 + 2)); 
-        if ( flags3P[TrackCategories::TauDecay] )    Category3 += int(pow(10., -1 + 3)); 
-        if ( flags3P[TrackCategories::Conversion] )  Category3 += int(pow(10., -1 + 4)); 
-        if ( flags3P[TrackCategories::KsDecay] )     Category3 += int(pow(10., -1 + 5)); 
-        if ( flags3P[TrackCategories::LambdaDecay] ) Category3 += int(pow(10., -1 + 6)); 
-        if ( flags3P[TrackCategories::Interaction] ) Category3 += int(pow(10., -1 + 7)); 
-        if ( flags3P[TrackCategories::Fake] )	     Category3 += int(pow(10., -1 + 8)); 
-        if ( flags3P[TrackCategories::Bad] )	     Category3 += int(pow(10., -1 + 9)); 
+        if ( flags3P[TrackCategories::BWeakDecay] )  JetCand_Category3[nJetCand] += int(pow(10., -1 + 1)); 
+        if ( flags3P[TrackCategories::CWeakDecay] )  JetCand_Category3[nJetCand] += int(pow(10., -1 + 2)); 
+        if ( flags3P[TrackCategories::TauDecay] )    JetCand_Category3[nJetCand] += int(pow(10., -1 + 3)); 
+        if ( flags3P[TrackCategories::Conversion] )  JetCand_Category3[nJetCand] += int(pow(10., -1 + 4)); 
+        if ( flags3P[TrackCategories::KsDecay] )     JetCand_Category3[nJetCand] += int(pow(10., -1 + 5)); 
+        if ( flags3P[TrackCategories::LambdaDecay] ) JetCand_Category3[nJetCand] += int(pow(10., -1 + 6)); 
+        if ( flags3P[TrackCategories::Interaction] ) JetCand_Category3[nJetCand] += int(pow(10., -1 + 7)); 
+        if ( flags3P[TrackCategories::Fake] )	     JetCand_Category3[nJetCand] += int(pow(10., -1 + 8)); 
+        if ( flags3P[TrackCategories::Bad] )	     JetCand_Category3[nJetCand] += int(pow(10., -1 + 9)); 
       }
-      if ( flags1N[TrackCategories::BWeakDecay] )  Category1 += 2*int(pow(10., -1 + 1)); 
-      if ( flags1N[TrackCategories::CWeakDecay] )  Category1 += 2*int(pow(10., -1 + 2)); 
-      if ( flags1N[TrackCategories::TauDecay] )    Category1 += 2*int(pow(10., -1 + 3)); 
-      if ( flags1N[TrackCategories::Conversion] )  Category1 += 2*int(pow(10., -1 + 4)); 
-      if ( flags1N[TrackCategories::KsDecay] )     Category1 += 2*int(pow(10., -1 + 5)); 
-      if ( flags1N[TrackCategories::LambdaDecay] ) Category1 += 2*int(pow(10., -1 + 6)); 
-      if ( flags1N[TrackCategories::Interaction] ) Category1 += 2*int(pow(10., -1 + 7)); 
-      if ( flags1N[TrackCategories::Fake] )	   Category1 += 2*int(pow(10., -1 + 8)); 
-      if ( flags1N[TrackCategories::Bad] )	   Category1 += 2*int(pow(10., -1 + 9)); 
+      if ( flags1N[TrackCategories::BWeakDecay] )  JetCand_Category1[nJetCand] += 2*int(pow(10., -1 + 1)); 
+      if ( flags1N[TrackCategories::CWeakDecay] )  JetCand_Category1[nJetCand] += 2*int(pow(10., -1 + 2)); 
+      if ( flags1N[TrackCategories::TauDecay] )    JetCand_Category1[nJetCand] += 2*int(pow(10., -1 + 3)); 
+      if ( flags1N[TrackCategories::Conversion] )  JetCand_Category1[nJetCand] += 2*int(pow(10., -1 + 4)); 
+      if ( flags1N[TrackCategories::KsDecay] )     JetCand_Category1[nJetCand] += 2*int(pow(10., -1 + 5)); 
+      if ( flags1N[TrackCategories::LambdaDecay] ) JetCand_Category1[nJetCand] += 2*int(pow(10., -1 + 6)); 
+      if ( flags1N[TrackCategories::Interaction] ) JetCand_Category1[nJetCand] += 2*int(pow(10., -1 + 7)); 
+      if ( flags1N[TrackCategories::Fake] )	   JetCand_Category1[nJetCand] += 2*int(pow(10., -1 + 8)); 
+      if ( flags1N[TrackCategories::Bad] )	   JetCand_Category1[nJetCand] += 2*int(pow(10., -1 + 9)); 
       if ( idSize > 1 ) {
-        if ( flags2N[TrackCategories::BWeakDecay] )  Category2 += 2*int(pow(10., -1 + 1)); 
-        if ( flags2N[TrackCategories::CWeakDecay] )  Category2 += 2*int(pow(10., -1 + 2)); 
-        if ( flags2N[TrackCategories::TauDecay] )    Category2 += 2*int(pow(10., -1 + 3)); 
-        if ( flags2N[TrackCategories::Conversion] )  Category2 += 2*int(pow(10., -1 + 4)); 
-        if ( flags2N[TrackCategories::KsDecay] )     Category2 += 2*int(pow(10., -1 + 5)); 
-        if ( flags2N[TrackCategories::LambdaDecay] ) Category2 += 2*int(pow(10., -1 + 6)); 
-        if ( flags2N[TrackCategories::Interaction] ) Category2 += 2*int(pow(10., -1 + 7)); 
-        if ( flags2N[TrackCategories::Fake] )	     Category2 += 2*int(pow(10., -1 + 8)); 
-        if ( flags2N[TrackCategories::Bad] )	     Category2 += 2*int(pow(10., -1 + 9)); 
+        if ( flags2N[TrackCategories::BWeakDecay] )  JetCand_Category2[nJetCand] += 2*int(pow(10., -1 + 1)); 
+        if ( flags2N[TrackCategories::CWeakDecay] )  JetCand_Category2[nJetCand] += 2*int(pow(10., -1 + 2)); 
+        if ( flags2N[TrackCategories::TauDecay] )    JetCand_Category2[nJetCand] += 2*int(pow(10., -1 + 3)); 
+        if ( flags2N[TrackCategories::Conversion] )  JetCand_Category2[nJetCand] += 2*int(pow(10., -1 + 4)); 
+        if ( flags2N[TrackCategories::KsDecay] )     JetCand_Category2[nJetCand] += 2*int(pow(10., -1 + 5)); 
+        if ( flags2N[TrackCategories::LambdaDecay] ) JetCand_Category2[nJetCand] += 2*int(pow(10., -1 + 6)); 
+        if ( flags2N[TrackCategories::Interaction] ) JetCand_Category2[nJetCand] += 2*int(pow(10., -1 + 7)); 
+        if ( flags2N[TrackCategories::Fake] )	     JetCand_Category2[nJetCand] += 2*int(pow(10., -1 + 8)); 
+        if ( flags2N[TrackCategories::Bad] )	     JetCand_Category2[nJetCand] += 2*int(pow(10., -1 + 9)); 
       }
       if ( idSize > 2 ) {
-        if ( flags3N[TrackCategories::BWeakDecay] )  Category3 += 2*int(pow(10., -1 + 1)); 
-        if ( flags3N[TrackCategories::CWeakDecay] )  Category3 += 2*int(pow(10., -1 + 2)); 
-        if ( flags3N[TrackCategories::TauDecay] )    Category3 += 2*int(pow(10., -1 + 3)); 
-        if ( flags3N[TrackCategories::Conversion] )  Category3 += 2*int(pow(10., -1 + 4)); 
-        if ( flags3N[TrackCategories::KsDecay] )     Category3 += 2*int(pow(10., -1 + 5)); 
-        if ( flags3N[TrackCategories::LambdaDecay] ) Category3 += 2*int(pow(10., -1 + 6)); 
-        if ( flags3N[TrackCategories::Interaction] ) Category3 += 2*int(pow(10., -1 + 7)); 
-        if ( flags3N[TrackCategories::Fake] )	     Category3 += 2*int(pow(10., -1 + 8)); 
-        if ( flags3N[TrackCategories::Bad] )	     Category3 += 2*int(pow(10., -1 + 9)); 
+        if ( flags3N[TrackCategories::BWeakDecay] )  JetCand_Category3[nJetCand] += 2*int(pow(10., -1 + 1)); 
+        if ( flags3N[TrackCategories::CWeakDecay] )  JetCand_Category3[nJetCand] += 2*int(pow(10., -1 + 2)); 
+        if ( flags3N[TrackCategories::TauDecay] )    JetCand_Category3[nJetCand] += 2*int(pow(10., -1 + 3)); 
+        if ( flags3N[TrackCategories::Conversion] )  JetCand_Category3[nJetCand] += 2*int(pow(10., -1 + 4)); 
+        if ( flags3N[TrackCategories::KsDecay] )     JetCand_Category3[nJetCand] += 2*int(pow(10., -1 + 5)); 
+        if ( flags3N[TrackCategories::LambdaDecay] ) JetCand_Category3[nJetCand] += 2*int(pow(10., -1 + 6)); 
+        if ( flags3N[TrackCategories::Interaction] ) JetCand_Category3[nJetCand] += 2*int(pow(10., -1 + 7)); 
+        if ( flags3N[TrackCategories::Fake] )	     JetCand_Category3[nJetCand] += 2*int(pow(10., -1 + 8)); 
+        if ( flags3N[TrackCategories::Bad] )	     JetCand_Category3[nJetCand] += 2*int(pow(10., -1 + 9)); 
       }
     }
-      
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     //*****************************************************************
     //get track histories of tracks in jets (for Jet Proba) 
     //*****************************************************************
-    int CategoryJet = 0;
+    JetCand_CategoryJet[nJetCand] = 0;
     
     if(useTrackHistory_ && isData_!=0){
       ith_tagged = this->TaggedJet(*jet,jetTags_PosJP);
@@ -543,7 +790,7 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  if ( theFlag[TrackCategories::Bad] )  	can8 = 2; 
 	}
       }
-      CategoryJet =  cap0+can0           + (cap1+can1)*10    + (cap2+can2)*100 
+      JetCand_CategoryJet[nJetCand] =  cap0+can0           + (cap1+can1)*10    + (cap2+can2)*100 
                   + (cap3+can3)*1000     + (cap4+can4)*10000 
                   + (cap5+can5)*100000   + (cap6+can6)*1000000 
 		  + (cap7+can7)*10000000 + (cap8+can8)*100000000;
@@ -552,11 +799,42 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     //*****************************************************************
     //get track histories  associated to sec. vertex (for simple SV)
     //*****************************************************************
-    int CategorySVx = 0;
+    JetCand_CategorySVx[nJetCand] = 0;
+    
+    JetCand_nFirstSV[nJetCand]  = nSecondaryV;
+    
+    
+    
+    ith_tagged =    this->TaggedJet(*jet,jetTags_Svtx);
+    TrackRefVector  svxPostracks( (*tagInfoSVx)[ith_tagged].vertexTracks(0) );
+    
+    if(produceJetProbaTree_){
+      
+      
+      SecondaryV_x[nSecondaryV]    = (*tagInfoSVx)[ith_tagged].secondaryVertex(0).x();
+	SecondaryV_y[nSecondaryV]    = (*tagInfoSVx)[ith_tagged].secondaryVertex(0).y();
+	SecondaryV_z[nSecondaryV]    = (*tagInfoSVx)[ith_tagged].secondaryVertex(0).z();
+	SecondaryV_ex[nSecondaryV]   = (*tagInfoSVx)[ith_tagged].secondaryVertex(0).xError();
+	SecondaryV_ey[nSecondaryV]   = (*tagInfoSVx)[ith_tagged].secondaryVertex(0).yError();
+	SecondaryV_ez[nSecondaryV]   = (*tagInfoSVx)[ith_tagged].secondaryVertex(0).zError();
+	SecondaryV_chi2[nSecondaryV] = (*tagInfoSVx)[ith_tagged].secondaryVertex(0).chi2();
+	SecondaryV_ndf[nSecondaryV]  = (*tagInfoSVx)[ith_tagged].secondaryVertex(0).ndof();
+	
+	SecondaryV_flightDistance[nSecondaryV]      = (*tagInfoSVx)[ith_tagged].flightDistance(0).value();
+	SecondaryV_flightDistanceError[nSecondaryV] = (*tagInfoSVx)[ith_tagged].flightDistance(0).error();
+	
+	nSecondaryV++;
+    }
+    
+    
+    
+    
+    
     
     if(useTrackHistory_ && isData_!=0) {
-      ith_tagged =    this->TaggedJet(*jet,jetTags_Svtx);
-      TrackRefVector  svxPostracks( (*tagInfoSVx)[ith_tagged].vertexTracks(0) );
+      
+      
+      
       
       cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0; 
       can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0; 
@@ -587,64 +865,68 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	if ( theFlag[TrackCategories::Fake] )	      can7 = 2; 
 	if ( theFlag[TrackCategories::Bad] )	      can8 = 2; 
       }
-      CategorySVx =  cap0+can0           + (cap1+can1)*10    + (cap2+can2)*100 
+      JetCand_CategorySVx[nJetCand] =  cap0+can0           + (cap1+can1)*10    + (cap2+can2)*100 
                   + (cap3+can3)*1000     + (cap4+can4)*10000 
                   + (cap5+can5)*100000   + (cap6+can6)*1000000 
 		  + (cap7+can7)*10000000 + (cap8+can8)*100000000;
     }
     
-    float mu_NHits_tracker  = -10000;
-    float mu_Chi2           = -10000;
-    float mu_d0             = -10000;
-    float mu_pT             = -10000;
-    float ptRel             = -10000;
+    
+    JetCand_nLastSV[nJetCand]   = nSecondaryV;
+    JetCand_mu_NHits_tracker[nJetCand]  = -10000;
+    JetCand_mu_Chi2[nJetCand]           = -10000;
+    JetCand_mu_d0[nJetCand]             = -10000;
+    JetCand_mu_pT[nJetCand]             = -10000;
+    JetCand_ptRel[nJetCand]             = -10000;
+    
+    
     //*****************************************************************
     //get track histories of the muon (SoftMuon tagger)
     //*****************************************************************
-    int CategoryMuon = 0;
+    JetCand_CategoryMuon[nJetCand] = 0;
 
     ith_tagged = this->TaggedJet(*jet,jetTags_softMu);
     if( (*tagInos_softmuon)[ith_tagged].leptons()!=0 ) {
-      ptRel =  calculPtRel( (*(*tagInos_softmuon)[ith_tagged].lepton(0)), *jet, JES);
-      mu_NHits_tracker  = (*tagInos_softmuon)[ith_tagged].lepton(0)->hitPattern().numberOfValidHits();
-      mu_Chi2           = (*tagInos_softmuon)[ith_tagged].lepton(0)->normalizedChi2()                ;
-      mu_d0             = (*tagInos_softmuon)[ith_tagged].lepton(0)->d0()                            ;
-      mu_pT             = (*tagInos_softmuon)[ith_tagged].lepton(0)->pt()                            ;
+      JetCand_ptRel[nJetCand]             = calculPtRel( (*(*tagInos_softmuon)[ith_tagged].lepton(0)), *jet, JES);
+      JetCand_mu_NHits_tracker[nJetCand]  = (*tagInos_softmuon)[ith_tagged].lepton(0)->hitPattern().numberOfValidHits();
+      JetCand_mu_Chi2[nJetCand]           = (*tagInos_softmuon)[ith_tagged].lepton(0)->normalizedChi2()                ;
+      JetCand_mu_d0[nJetCand]             = (*tagInos_softmuon)[ith_tagged].lepton(0)->d0()                            ;
+      JetCand_mu_pT[nJetCand]             = (*tagInos_softmuon)[ith_tagged].lepton(0)->pt()                            ;
     }
     if(  SoftM > 0 && (*tagInos_softmuon)[ith_tagged].leptons()!=0 ){
       if ( useTrackHistory_ && isData_!=0 ) {     
         TrackCategories::Flags theFlagP = classifier_.evaluate( (*tagInos_softmuon)[ith_tagged].lepton(0) ).flags();
-        if ( theFlagP[TrackCategories::BWeakDecay] )   CategoryMuon += int(pow(10., -1 + 1)); 
-        if ( theFlagP[TrackCategories::CWeakDecay] )   CategoryMuon += int(pow(10., -1 + 2)); 
-        if ( theFlagP[TrackCategories::TauDecay] )     CategoryMuon += int(pow(10., -1 + 3));  
-        if ( theFlagP[TrackCategories::Conversion] )   CategoryMuon += int(pow(10., -1 + 4)); 
-        if ( theFlagP[TrackCategories::KsDecay] )      CategoryMuon += int(pow(10., -1 + 5)); 
-        if ( theFlagP[TrackCategories::LambdaDecay] )  CategoryMuon += int(pow(10., -1 + 6)); 
-        if ( theFlagP[TrackCategories::Interaction] )  CategoryMuon += int(pow(10., -1 + 7)); 
-        if ( theFlagP[TrackCategories::Fake] )	       CategoryMuon += int(pow(10., -1 + 8)); 
-        if ( theFlagP[TrackCategories::Bad] )	       CategoryMuon += int(pow(10., -1 + 9)); 
+        if ( theFlagP[TrackCategories::BWeakDecay] )   JetCand_CategoryMuon[nJetCand] += int(pow(10., -1 + 1)); 
+        if ( theFlagP[TrackCategories::CWeakDecay] )   JetCand_CategoryMuon[nJetCand] += int(pow(10., -1 + 2)); 
+        if ( theFlagP[TrackCategories::TauDecay] )     JetCand_CategoryMuon[nJetCand] += int(pow(10., -1 + 3));  
+        if ( theFlagP[TrackCategories::Conversion] )   JetCand_CategoryMuon[nJetCand] += int(pow(10., -1 + 4)); 
+        if ( theFlagP[TrackCategories::KsDecay] )      JetCand_CategoryMuon[nJetCand] += int(pow(10., -1 + 5)); 
+        if ( theFlagP[TrackCategories::LambdaDecay] )  JetCand_CategoryMuon[nJetCand] += int(pow(10., -1 + 6)); 
+        if ( theFlagP[TrackCategories::Interaction] )  JetCand_CategoryMuon[nJetCand] += int(pow(10., -1 + 7)); 
+        if ( theFlagP[TrackCategories::Fake] )	       JetCand_CategoryMuon[nJetCand] += int(pow(10., -1 + 8)); 
+        if ( theFlagP[TrackCategories::Bad] )	       JetCand_CategoryMuon[nJetCand] += int(pow(10., -1 + 9)); 
       }
     }
 
     ith_tagged = this->TaggedJet(*jet,jetTags_softMuneg);
      //std::cout << "SoftMN " << SoftMN << std::endl;
     if ( SoftMN < 0 && (*tagInos_softmuon)[ith_tagged].leptons()!=0 ) {
-      ptRel =  calculPtRel( (*(*tagInos_softmuon)[ith_tagged].lepton(0)), *jet, JES);
-      mu_NHits_tracker  = (*tagInos_softmuon)[ith_tagged].lepton(0)->hitPattern().numberOfValidHits();
-      mu_Chi2           = (*tagInos_softmuon)[ith_tagged].lepton(0)->normalizedChi2()                ;
-      mu_d0             = (*tagInos_softmuon)[ith_tagged].lepton(0)->d0()                            ;
-      mu_pT             = (*tagInos_softmuon)[ith_tagged].lepton(0)->pt()                            ;
+      JetCand_ptRel[nJetCand] =  calculPtRel( (*(*tagInos_softmuon)[ith_tagged].lepton(0)), *jet, JES);
+      JetCand_mu_NHits_tracker[nJetCand]  = (*tagInos_softmuon)[ith_tagged].lepton(0)->hitPattern().numberOfValidHits();
+      JetCand_mu_Chi2[nJetCand]           = (*tagInos_softmuon)[ith_tagged].lepton(0)->normalizedChi2()                ;
+      JetCand_mu_d0[nJetCand]             = (*tagInos_softmuon)[ith_tagged].lepton(0)->d0()                            ;
+      JetCand_mu_pT[nJetCand]             = (*tagInos_softmuon)[ith_tagged].lepton(0)->pt()                            ;
       if ( useTrackHistory_ && isData_!=0 ) {     
         TrackCategories::Flags theFlagN = classifier_.evaluate( (*tagInos_softmuon)[ith_tagged].lepton(0) ).flags();
-        if ( theFlagN[TrackCategories::BWeakDecay] )   CategoryMuon += 2*int(pow(10., -1 + 1)); 
-        if ( theFlagN[TrackCategories::CWeakDecay] )   CategoryMuon += 2*int(pow(10., -1 + 2)); 
-        if ( theFlagN[TrackCategories::TauDecay] )     CategoryMuon += 2*int(pow(10., -1 + 3));  
-        if ( theFlagN[TrackCategories::Conversion] )   CategoryMuon += 2*int(pow(10., -1 + 4)); 
-        if ( theFlagN[TrackCategories::KsDecay] )      CategoryMuon += 2*int(pow(10., -1 + 5)); 
-        if ( theFlagN[TrackCategories::LambdaDecay] )  CategoryMuon += 2*int(pow(10., -1 + 6)); 
-        if ( theFlagN[TrackCategories::Interaction] )  CategoryMuon += 2*int(pow(10., -1 + 7)); 
-        if ( theFlagN[TrackCategories::Fake] )	       CategoryMuon += 2*int(pow(10., -1 + 8)); 
-        if ( theFlagN[TrackCategories::Bad] )	       CategoryMuon += 2*int(pow(10., -1 + 9)); 
+        if ( theFlagN[TrackCategories::BWeakDecay] )   JetCand_CategoryMuon[nJetCand] += 2*int(pow(10., -1 + 1)); 
+        if ( theFlagN[TrackCategories::CWeakDecay] )   JetCand_CategoryMuon[nJetCand] += 2*int(pow(10., -1 + 2)); 
+        if ( theFlagN[TrackCategories::TauDecay] )     JetCand_CategoryMuon[nJetCand] += 2*int(pow(10., -1 + 3));  
+        if ( theFlagN[TrackCategories::Conversion] )   JetCand_CategoryMuon[nJetCand] += 2*int(pow(10., -1 + 4)); 
+        if ( theFlagN[TrackCategories::KsDecay] )      JetCand_CategoryMuon[nJetCand] += 2*int(pow(10., -1 + 5)); 
+        if ( theFlagN[TrackCategories::LambdaDecay] )  JetCand_CategoryMuon[nJetCand] += 2*int(pow(10., -1 + 6)); 
+        if ( theFlagN[TrackCategories::Interaction] )  JetCand_CategoryMuon[nJetCand] += 2*int(pow(10., -1 + 7)); 
+        if ( theFlagN[TrackCategories::Fake] )	       JetCand_CategoryMuon[nJetCand] += 2*int(pow(10., -1 + 8)); 
+        if ( theFlagN[TrackCategories::Bad] )	       JetCand_CategoryMuon[nJetCand] += 2*int(pow(10., -1 + 9)); 
       }
     }
         
@@ -653,8 +935,7 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     
     if ( (jetpt * JES) <= minJetPt_ || std::fabs( jeteta ) >= maxJetEta_ ) continue;
     numjet++;
-    
-    float Ijet =       numjet;
+    nSelJets    =       numjet;
     float Ntagtracks = ntagtracks;
     
     
@@ -668,17 +949,17 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      //Cat_TC1:Cat_TC2:Cat_TC3:Cat_JP:Cat_SSV:Cat_MU:
      //Muon_hits:Muon_chi2:Muon_d0:Muon_Pt:Muon_PtRel");
  
-    float jet_input[34] =
+    /*float jet_input[34] =
       {Njets, BitTrigger, 
        Ijet, Flavour, Ntagtracks, ptjet, (*jet).eta(), phijet, 
        Ip1N, Ip1P, Ip2N, Ip2P, Ip3N, Ip3P, ProbaN, ProbaP, Proba,
        SvtxN, Svtx, CombinedSvtxN, CombinedSvtx, SoftMN, SoftM, 
        Category1, Category2, Category3, CategoryJet, CategorySVx, CategoryMuon,
        mu_NHits_tracker,mu_Chi2,mu_d0,mu_pT,ptRel
-      };
+       };*/
     
     
-    nTuplesJets->Fill(jet_input);
+    // nTuplesJets->Fill(jet_input);
     
     //*****************************************************************
     //define positive and negative tags
@@ -689,53 +970,53 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     if ( selTagger_ == 0 ) {       // jet proba
       if ( ProbaP > 0 ) varpos = 20.*ProbaP;
       if ( ProbaN > 0 ) varneg = 20.*ProbaN;
-//       if ( ProbaP > tagCut_ ) TagPos = true;
-//       if ( ProbaN > tagCut_ ) TagNeg = true;
+      //       if ( ProbaP > tagCut_ ) TagPos = true;
+      //       if ( ProbaN > tagCut_ ) TagNeg = true;
     }
     else if ( selTagger_ == 1 ) {     // jet fisrt track
-      if ( Ip1P > 0. ) varpos = Ip1P;
-      if ( Ip1N > 0. ) varneg = Ip1N;
+      if ( JetCand_Ip1P[nJetCand] > 0. ) varpos = JetCand_Ip1P[nJetCand];
+      if ( JetCand_Ip1N[nJetCand] > 0. ) varneg = JetCand_Ip1N[nJetCand];
     }
     else if ( selTagger_ == 2 ) {     // TC High Eff.
-      if ( Ip2P > 0. ) varpos = Ip2P;
-      if ( Ip2N > 0. ) varneg = Ip2N;
+      if ( JetCand_Ip2P[nJetCand] > 0. ) varpos = JetCand_Ip2P[nJetCand];
+      if ( JetCand_Ip2N[nJetCand] > 0. ) varneg = JetCand_Ip2N[nJetCand];
     }
     else if ( selTagger_ == 3 ) {     // TC High Pure.
-      if ( Ip3P > 0. ) varpos = Ip3P;
-      if ( Ip3N > 0. ) varneg = Ip3N;
+      if ( JetCand_Ip3P[nJetCand] > 0. ) varpos = JetCand_Ip3P[nJetCand];
+      if ( JetCand_Ip3N[nJetCand] > 0. ) varneg = JetCand_Ip3N[nJetCand];
     }
     else if ( selTagger_ == 4 ) {    // SV simple
-      if  (Svtx > 1)   varpos =  10.*Svtx - 10.;
-      if  (SvtxN < -1) varneg = -10.*SvtxN - 10.;
-//       if ( Svtx  > tagCut_ ) TagPos = true;
-//       if (-SvtxN > tagCut_ ) TagNeg = true; 
+      if  (JetCand_Svtx[nJetCand] > 1)   varpos =  10.*JetCand_Svtx[nJetCand] - 10.;
+      if  (JetCand_SvtxN[nJetCand] < -1) varneg = -10.*JetCand_SvtxN[nJetCand] - 10.;
+      //       if ( Svtx  > tagCut_ ) TagPos = true;
+      //       if (-SvtxN > tagCut_ ) TagNeg = true; 
     }
     else if ( selTagger_ == 5 ) {    // SV combined
-      if  (CombinedSvtx > 0)  varpos = 50.*CombinedSvtx;
-      if  (CombinedSvtxN > 0) varneg = 50.*CombinedSvtxN;
-//       if ( CombinedSvtx  > tagCut_ ) TagPos = true;
-//       if (-CombinedSvtxN > tagCut_ ) TagNeg = true;   
+      if  (JetCand_CombinedSvtx[nJetCand] > 0)  varpos = 50.*JetCand_CombinedSvtx[nJetCand];
+      if  (JetCand_CombinedSvtxN[nJetCand] > 0) varneg = 50.*JetCand_CombinedSvtxN[nJetCand];
+      //       if ( CombinedSvtx  > tagCut_ ) TagPos = true;
+      //       if (-CombinedSvtxN > tagCut_ ) TagNeg = true;   
     }
     else if ( selTagger_ == 6 ) {    // soft muon ptrel
-      if  ( SoftM  > 0) varpos =  5*SoftM;
-      if  ( SoftMN < 0) varneg = -5*SoftMN;
-//       if  (  SoftM > tagCut_ ) TagPos = true;
-//       if  (  SoftMN> tagCut_ ) TagNeg = true;   
+      if  ( JetCand_SoftM[nJetCand]  > 0) varpos =  5*JetCand_SoftM[nJetCand];
+      if  ( JetCand_SoftMN[nJetCand] < 0) varneg = -5*JetCand_SoftMN[nJetCand];
+      //       if  (  SoftM > tagCut_ ) TagPos = true;
+      //       if  (  SoftMN> tagCut_ ) TagNeg = true;   
     }
     
-//     if ( selTagger_ >= 1 && selTagger_ <= 3) {
-//       if ( varpos > tagCut_ ) TagPos = true;
-//       if ( varneg > tagCut_ ) TagNeg = true;
-//     }
+    //     if ( selTagger_ >= 1 && selTagger_ <= 3) {
+    //       if ( varpos > tagCut_ ) TagPos = true;
+    //       if ( varneg > tagCut_ ) TagNeg = true;
+    //     }
     
-//     // veto on positive tag
-//     if ( Ip1P < vetoPos_ ) Veto = true;
+    //     // veto on positive tag
+    //     if ( JetCand_Ip1P[nJetCand] < vetoPos_ ) Veto = true;
     
     //***************************
     
     int cat1P = 0, cat2P = 0, cat3P = 0, catP = 0;
     int cat1N = 0, cat2N = 0, cat3N = 0, catN = 0;
-
+    
     // Track history
     if (useTrackHistory_ && indexes.size()!=0 && isData_!=0) {
       flags1P[TrackCategories::Conversion] ;
@@ -844,18 +1125,18 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     if ( varneg > 0 ) hData_Tagger->Fill(-varneg );
     if ( varpos > 0 ) hData_Tagger->Fill( varpos );
 
-    if ( Ip2P > 0 )   hData_Tagger_TCHE->Fill( Ip2P );
-    if ( Ip2N > 0 )   hData_Tagger_TCHE->Fill(-Ip2N );
-    if ( Ip3P > 0 )   hData_Tagger_TCHP->Fill( Ip3P );
-    if ( Ip3N > 0 )   hData_Tagger_TCHP->Fill(-Ip3N );
-    if ( ProbaP > 0 ) hData_Tagger_JP->Fill( 20.*ProbaP );
-    if ( ProbaN > 0 ) hData_Tagger_JP->Fill(-20.*ProbaN );
-    if ( Svtx  >  1 ) hData_Tagger_SSV->Fill( 10.*Svtx - 10 );
-    if ( SvtxN < -1 ) hData_Tagger_SSV->Fill( 10*SvtxN + 10 );
-    if  (CombinedSvtx > 0 )  hData_Tagger_CSV->Fill( 50.*CombinedSvtx );
-    if ( CombinedSvtxN > 0 ) hData_Tagger_CSV->Fill(-50.*CombinedSvtxN );
-    if  ( SoftM  > 0)  hData_Tagger_MU->Fill( 5*SoftM );
-    if  ( SoftMN < 0 ) hData_Tagger_MU->Fill( 5*SoftMN );
+    if ( JetCand_Ip2P[nJetCand] > 0 )   hData_Tagger_TCHE->Fill( JetCand_Ip2P[nJetCand] );
+    if ( JetCand_Ip2N[nJetCand] > 0 )   hData_Tagger_TCHE->Fill(-JetCand_Ip2N[nJetCand] );
+    if ( JetCand_Ip3P[nJetCand] > 0 )   hData_Tagger_TCHP->Fill( JetCand_Ip3P[nJetCand] );
+    if ( JetCand_Ip3N[nJetCand] > 0 )   hData_Tagger_TCHP->Fill(-JetCand_Ip3N[nJetCand] );
+    if ( JetCand_ProbaP[nJetCand] > 0 ) hData_Tagger_JP->Fill( 20.*JetCand_ProbaP[nJetCand] );
+    if ( JetCand_ProbaN[nJetCand] > 0 ) hData_Tagger_JP->Fill(-20.*JetCand_ProbaN[nJetCand] );
+    if ( JetCand_Svtx[nJetCand]  >  1 ) hData_Tagger_SSV->Fill( 10.*JetCand_Svtx[nJetCand] - 10 );
+    if ( JetCand_SvtxN[nJetCand] < -1 ) hData_Tagger_SSV->Fill( 10*JetCand_SvtxN[nJetCand] + 10 );
+    if ( JetCand_CombinedSvtx[nJetCand] > 0  )  hData_Tagger_CSV->Fill( 50.*JetCand_CombinedSvtx[nJetCand] );
+    if ( JetCand_CombinedSvtxN[nJetCand] > 0 )  hData_Tagger_CSV->Fill(-50.*JetCand_CombinedSvtxN[nJetCand] );
+    if ( JetCand_SoftM[nJetCand]  > 0        )  hData_Tagger_MU->Fill( 5*JetCand_SoftM[nJetCand] );
+    if ( JetCand_SoftMN[nJetCand] < 0        )  hData_Tagger_MU->Fill( 5*JetCand_SoftMN[nJetCand] );
 
     if ( isData_ != 0 ) {
       if ( varneg > 0 ) hAllFlav_Tagger->Fill(-varneg );
@@ -912,8 +1193,12 @@ MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       } // b jets
     }
     
-  } // end loop on jet
-  
+    
+    
+    nJetCand++;
+    
+  }// end loop on jet
+  smalltree->Fill();
   hData_All_NJets->Fill( Njets );
   hData_NJets->Fill( numjet );
 }

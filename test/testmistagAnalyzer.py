@@ -13,18 +13,19 @@ process.source = cms.Source(
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(   
 
-"rfio:/dpm/in2p3.fr/home/cms/phedex//store/mc/Summer09/QCD_Pt300/GEN-SIM-RECO/MC_31X_V3_preproduction_312-v1/0009/2A086352-CD79-DE11-87CC-0030483355A8.root",
-"rfio:/dpm/in2p3.fr/home/cms/phedex//store/mc/Summer09/QCD_Pt300/GEN-SIM-RECO/MC_31X_V3_preproduction_312-v1/0009/404A7C0C-CF79-DE11-98E6-0030487D07BA.root",
-"rfio:/dpm/in2p3.fr/home/cms/phedex//store/mc/Summer09/QCD_Pt300/GEN-SIM-RECO/MC_31X_V3_preproduction_312-v1/0009/58967C0C-CF79-DE11-8482-0030487D07BA.root",
-"rfio:/dpm/in2p3.fr/home/cms/phedex//store/mc/Summer09/QCD_Pt300/GEN-SIM-RECO/MC_31X_V3_preproduction_312-v1/0009/641CDA82-D279-DE11-A1DE-0030483355A8.root",
-"rfio:/dpm/in2p3.fr/home/cms/phedex//store/mc/Summer09/QCD_Pt300/GEN-SIM-RECO/MC_31X_V3_preproduction_312-v1/0009/6C71CF38-B07A-DE11-A7ED-00304867FE3C.root"
-
+    '/store/relval/CMSSW_3_3_6/RelValProdTTbar/GEN-SIM-RECO/MC_3XY_V9A-v1/0009/1494FC68-55E4-DE11-887E-002618943868.root',
+    '/store/relval/CMSSW_3_3_6/RelValProdTTbar/GEN-SIM-RECO/MC_3XY_V9A-v1/0008/FC1767AF-38E4-DE11-8318-0030486791C6.root',
+    '/store/relval/CMSSW_3_3_6/RelValProdTTbar/GEN-SIM-RECO/MC_3XY_V9A-v1/0008/EA75AAA1-39E4-DE11-91C7-003048D15E2C.root',
+    '/store/relval/CMSSW_3_3_6/RelValProdTTbar/GEN-SIM-RECO/MC_3XY_V9A-v1/0008/AC85ED21-3BE4-DE11-9FC2-003048679168.root',
+    '/store/relval/CMSSW_3_3_6/RelValProdTTbar/GEN-SIM-RECO/MC_3XY_V9A-v1/0008/8A4849FE-39E4-DE11-A517-003048678C62.root',
+    '/store/relval/CMSSW_3_3_6/RelValProdTTbar/GEN-SIM-RECO/MC_3XY_V9A-v1/0008/607B428A-38E4-DE11-BFF8-003048678BE8.root'
+    
     )
 )
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)
+    input = cms.untracked.int32(10000)
 )
 
 
@@ -106,6 +107,11 @@ process.load("RecoBTag.PerformanceMeasurements.MistagAnalyzer_cff")
 #     process.IC5byValAlgo
 # )
 
+
+
+
+process.TFileService = cms.Service("TFileService", fileName = cms.string("analyzerTree.root") )
+ 
 
 process.out = cms.OutputModule("PoolOutputModule",
     outputCommands = cms.untracked.vstring('keep *', 

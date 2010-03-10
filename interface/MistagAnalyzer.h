@@ -18,7 +18,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.8 2009/09/25 12:04:05 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.9 2009/10/03 20:00:33 yumiceva Exp $
 //
 //
 
@@ -91,6 +91,7 @@ Implementation:
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "FWCore/Framework/interface/TriggerNamesService.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
 
 
 
@@ -179,6 +180,7 @@ private:
     double vetoPos_;
     int ntrackMin_;
     bool isData_;
+    bool produceJetProbaTree_;
 
 
     //trigger list
@@ -192,8 +194,10 @@ private:
     TNtuple* nTuplesJets;
     TrackClassifier classifier_;
 
-///////////////
-// Some Histograms
+    ///////////////
+    // Some Histograms
+    
+    edm::Service<TFileService> fs;
 
     TH1F* hData_All_NJets       ;
     TH1F* hData_All_NTracks     ;
@@ -230,6 +234,129 @@ private:
     TH1F* hCFlav_Tagger             ;
     TH1F* hBFlav_Tagger             ;
 
+    TTree *smalltree;
+    
+    
+    
+    
+    int   nTrackCand;
+    float TrackCand_phi[10000];
+    float TrackCand_eta[10000];
+    float TrackCand_e[10000];
+    float TrackCand_p[10000];
+    float TrackCand_charge[10000];
+    float TrackCand_dz[10000];
+    float TrackCand_d0[10000];
+    float TrackCand_pt[10000];
+    float TrackCand_chi2[10000];
+    float TrackCand_Normchi2[10000];
+    
+    
+      
+    float TrackCand_IPsignificance[10000];
+    float TrackCand_TransverseIPsignificance[10000];
+    float TrackCand_TransverseIP[10000];
+    float TrackCand_Proba[10000];
+    float TrackCand_DecayLength[10000];
+    float TrackCand_DistJetAxis[10000];
+    float TrackCand_zIP[10000];
+    int   TrackCand_isHitL1[10000];
+    int   TrackCand_nHitPixel[10000];
+    int   TrackCand_nHitTracker[10000];
+    int   TrackCand_nHitTOB[10000];
+    int   TrackCand_nHitTIB[10000];
+    int   TrackCand_nHitTEC[10000];
+    int   TrackCand_nHitTID[10000];
+    int   TrackCand_nHitPixelEC[10000];
+    int   TrackCand_nHitPixelBL[10000];
+    float TrackCand_SharedMuSimHits[10000];
+    float TrackCand_MatchSimTrackID[10000];
+  
+    
+    
+    
+    int nJetCand;
+    float Ntagtracks[10000];
+    float JetCand_pt[10000];
+    float JetCand_jes[10000];
+    float JetCand_eta[10000];
+    float JetCand_phi[10000];
+    int   JetCand_multiplicity[10000];
+    int   JetCand_flavor[10000];
+    int   JetCand_nFirstTrack[10000];
+    int   JetCand_nLastTrack[10000]; 
+    float JetCand_Ip1N[10000];
+    float JetCand_Ip1P[10000];
+    float JetCand_Ip2N[10000];
+    float JetCand_Ip2P[10000];
+    float JetCand_Ip3N[10000];
+    float JetCand_Ip3P[10000];
+    float JetCand_ProbaN[10000];
+    float JetCand_ProbaP[10000];
+    float JetCand_Proba[10000];
+    float JetCand_SvtxN[10000];
+    float JetCand_Svtx[10000];
+    float JetCand_CombinedSvtxN[10000];
+    float JetCand_CombinedSvtx[10000];
+    float JetCand_SoftMN[10000];
+    float JetCand_SoftM[10000];
+    float JetCand_Category1[10000];
+    float JetCand_Category2[10000];
+    float JetCand_Category3[10000];
+    float JetCand_CategoryJet[10000];
+    float JetCand_CategorySVx[10000];
+    float JetCand_CategoryMuon[10000];
+    float JetCand_mu_NHits_tracker[10000];
+    float JetCand_mu_Chi2[10000];
+    float JetCand_mu_pT[10000];
+    float JetCand_mu_d0[10000];
+    float JetCand_ptRel[10000];
+    int   JetCand_nFirstSV[10000];
+    int   JetCand_nLastSV[10000];
+    
+    
+    
+  
+    int nPrimaryV;
+    float PrimaryV_x[10000];
+    float PrimaryV_y[10000];
+    float PrimaryV_z[10000];
+    float PrimaryV_ex[10000];
+    float PrimaryV_ey[10000];
+    float PrimaryV_ez[10000];
+    float PrimaryV_chi2[10000];
+    float PrimaryV_ndf[10000];
+    int   PrimaryV_isgood[10000];
+    int   PrimaryV_isfake[10000];
+    
+    
+    
+    
+     
+    int nSecondaryV;
+    float SecondaryV_x[10000];
+    float SecondaryV_y[10000];
+    float SecondaryV_z[10000];
+    float SecondaryV_ex[10000];
+    float SecondaryV_ey[10000];
+    float SecondaryV_ez[10000];
+    float SecondaryV_chi2[10000];
+    float SecondaryV_ndf[10000];
+    float SecondaryV_flightDistance[10000];
+    float SecondaryV_flightDistanceError[10000];
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    int nSelJets;
+    int BitTrigger;
+    
+    
 };
 
 #endif
