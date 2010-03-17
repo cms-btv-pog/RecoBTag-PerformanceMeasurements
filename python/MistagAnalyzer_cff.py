@@ -10,7 +10,7 @@ mistag = cms.EDAnalyzer("MistagAnalyzer",
     #jetCorrector             = cms.string('L2L3JetCorrectorIC5Calo'),
     jetCorrector             = cms.string('L2L3JetCorrectorAK5Calo'),
     longLivedDecayLenght     = cms.untracked.double(1e-14),
-    
+    primaryVertexColl        = cms.string('offlinePrimaryVertices'),
     ntrackMin                = cms.int32(0),
     selTagger                = cms.int32(2),
     MaxEta                   = cms.double(2.5),
