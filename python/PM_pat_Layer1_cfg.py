@@ -92,11 +92,11 @@ DeltaRCut = cms.EDFilter("PMDeltaRFilter",
      MaxDeltaR = cms.double(0.4)
 )
 
-DeltaRCutAK5 = cms.EDFilter("PMDeltaRFilter",
-     Jets = cms.InputTag("selectedLayer1JetsAK5"),
-     Muons = cms.InputTag("selectedLayer1Muons"),
-     MaxDeltaR = cms.double(0.4)
-)
+#DeltaRCutAK5 = cms.EDFilter("PMDeltaRFilter",
+#     Jets = cms.InputTag("selectedLayer1JetsAK5"),
+#     Muons = cms.InputTag("selectedLayer1Muons"),
+#     MaxDeltaR = cms.double(0.4)
+#)
  
 
 #-- Trigger matching ----------------------------------------------------------
@@ -115,16 +115,51 @@ DeltaRCutAK5 = cms.EDFilter("PMDeltaRFilter",
 # add new jet collections at the end (in order to copy all modifications
 #   to the default jet collection)
 #
+#addJetCollection(process,
+#		 cms.InputTag('antikt5CaloJets'),
+#                 'AK5',
+#                 doJTA        = True,
+#                 doBTagging   = True,
+#                 jetCorrLabel = ('AK5','Calo'),
+#                 doType1MET   = True,
+#		 doL1Cleaning = True,
+#		 doL1Counters = True, # NOTE, you need to create two paths and treat carefully the counters
+#                genJetCollection=cms.InputTag("antikt5GenJets")
+#                 )
+
+#
+# Track-Jet Sequence
+#
+from RecoJets.JetProducers.ak5TrackJets_cfi import ak5TrackJets
+from CommonTools.RecoAlgos.TrackWithVertexRefSelector_cfi import *
+from RecoJets.JetProducers.TracksForJets_cff import *
+
+ak7TrackJets = ak5TrackJets.clone( rParam = 0.7 )
+
+from RecoJets.Configuration.GenJetParticles_cff import genParticlesForJets
+from RecoJets.JetProducers.ak5GenJets_cfi import ak5GenJets
+ak7GenJets   = ak5GenJets.clone( rParam = 0.7 )
+
+recoTrackJets   = cms.Sequence(genParticlesForJets * ak5GenJets +
+                               trackWithVertexRefSelector+
+                               trackRefsForJets+
+                               ak5TrackJets #ak7TrackJets
+                               )
+
+
+from PhysicsTools.PatAlgos.tools.jetTools import *
 addJetCollection(process,
-		 cms.InputTag('antikt5CaloJets'),
-                 'AK5',
+                 cms.InputTag('ak5TrackJets'),
+                 'AKT5',
                  doJTA        = True,
                  doBTagging   = True,
-                 jetCorrLabel = ('AK5','Calo'),
+                 jetCorrLabel = None,
                  doType1MET   = True,
-		 doL1Cleaning = True,
-		 doL1Counters = True, # NOTE, you need to create two paths and treat carefully the counters
-                 genJetCollection=cms.InputTag("antikt5GenJets")
+                 doL1Cleaning = True,
+                 doL1Counters = False,
+                 genJetCollection=cms.InputTag("ak5GenJets"),
+                 doJetID      = True,
+                 jetIdLabel   = "ak5"
                  )
 
 
@@ -133,5 +168,6 @@ addJetCollection(process,
 #process.p = cms.Path( process.patDefaultSequence*process.patTrigger*process.patTriggerEvent )
 
 
-PM_tuple = cms.Sequence( process.patDefaultSequence )
+PM_tuple = cms.Sequence( recoTrackJets *
+                         process.patDefaultSequence )
 

@@ -38,26 +38,36 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 #switchJECSet(process, newName='Summer09_7TeV', oldName='Summer09')
 #switchJECSet_(process.jetCorrFactorsAK5,newName='Summer09_7TeV', oldName='Summer09')
 
+# run the 3.3.x software on Summer 09 MC from 3.1.x:
+#   - change the name from "ak" (3.3.x) to "antikt) (3.1.x)
+#   - run jet ID (not run in 3.1.x)
+from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
+ 
+run33xOn31xMC( process,
+               jetSrc = cms.InputTag("antikt5CaloJets"),
+               jetIdTag = "antikt5"
+               )
+
 ####### A O D ############
 # If we are running in AOD, use the following switch
 #
 #restrictInputToAOD(process)
 process.allLayer1Jets.addJetID = False
-process.allLayer1JetsAK5.addJetID = False
+#process.allLayer1JetsAK5.addJetID = False
 
 # Full path
 #process.p = cms.Path( process.patDefaultSequence*process.patTrigger*process.patTriggerEvent )
 
 # clean up jet filters in path
-process.PM_tuple.remove(process.cleanLayer1JetsAK5)
-process.PM_tuple.remove(process.countLayer1JetsAK5)
+#process.PM_tuple.remove(process.cleanLayer1JetsAK5)
+#process.PM_tuple.remove(process.countLayer1JetsAK5)
 process.PM_tuple.remove(process.cleanLayer1Jets)
 process.PM_tuple.remove(process.countLayer1Jets)
 process.PM_tuple.remove(process.cleanLayer1Hemispheres)
 
 # disable for the moment deltaR filters
-process.p1 = cms.Path( process.PM_tuple*process.cleanLayer1Jets*process.countLayer1Jets) #*process.DeltaRCut )
-process.p2 = cms.Path( process.PM_tuple*process.cleanLayer1JetsAK5*process.countLayer1JetsAK5) #*process.DeltaRCutAK5 ) # for AK5 jets
+process.p = cms.Path( process.PM_tuple*process.cleanLayer1Jets*process.countLayer1Jets) #*process.DeltaRCut )
+#process.p2 = cms.Path( process.PM_tuple*process.cleanLayer1JetsAK5*process.countLayer1JetsAK5) #*process.DeltaRCutAK5 ) # for AK5 jets
 
 
 #-- Output module configuration -----------------------------------------------
@@ -69,9 +79,9 @@ process.out.overrideInputFileSplitLevels = cms.untracked.bool(True)
 process.out.dropMetaData = cms.untracked.string('DROPPED')   # Get rid of metadata related to dropped collections
 process.out.outputCommands = [ 'drop *' ]
 
-process.out.SelectEvents = cms.untracked.PSet(
-    SelectEvents = cms.vstring('p1','p2')
-)
+#process.out.SelectEvents = cms.untracked.PSet(
+#    SelectEvents = cms.vstring('p1','p2')
+#)
 
 # Explicit list of collections to keep (basis is default PAT event content)
 process.out.outputCommands.extend( [ # PAT Objects
@@ -91,6 +101,7 @@ process.out.outputCommands.extend( [ # PAT Objects
                                      'keep *_offlinePrimaryVertices_*_*',
                                      'keep *_offlineBeamSpot_*_*',
 #                                    'keep *_towerMaker_*_*',                 #
+                                     'keep recoRecoChargedRefCandidates_trackRefsForJets_*_*',
                                      'keep recoTracks_generalTracks_*_*',
 				     #'keep *_*JetTrackAssociatorAtVertex*_*_*'
                                      'keep HcalNoiseSummary_*_*_*'
