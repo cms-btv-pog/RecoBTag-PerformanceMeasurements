@@ -35,6 +35,13 @@ process.maxEvents.input = 10
 process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer09_7TeV_cff")
 process.load("RecoBTag.PerformanceMeasurements.PM_pat_Layer1_cfg")
 from PhysicsTools.PatAlgos.tools.jetTools import *
+
+#####JEC for the 31X sample
+process.jetCorrFactors.corrSample = 'Summer09_7TeV'
+
+#####JEC To use initially while waiting the derived from MC truth from the CMSSW_3_5_5 sample
+#process.jetCorrFactors.corrSample = 'Summer09_7TeV_ReReco332'
+
 #switchJECSet(process, newName='Summer09_7TeV', oldName='Summer09')
 #switchJECSet_(process.jetCorrFactorsAK5,newName='Summer09_7TeV', oldName='Summer09')
 
@@ -89,12 +96,13 @@ process.out.outputCommands.extend( [ # PAT Objects
                                      'keep *_selectedLayer1Jets*_*_*',       # All Jets
                                      # Generator information
                                      'keep GenEventInfoProduct_generator_*_*',
+                                     'keep GenRunInfoProduct_generator_*_*',
                                      # Generator particles/jets/MET
                                      'keep recoGenParticles_genParticles_*_*',
-                                     'keep recoGenJets_iterativeCone5GenJets_*_*',
+                                     #'keep recoGenJets_iterativeCone5GenJets_*_*',
                                      'keep recoGenJets_antikt5GenJets_*_*',
                                      # Trigger information
-                                     'keep edmTriggerResults_TriggerResults_*_*',
+				     'keep edmTriggerResults_TriggerResults_*_HLT*',
                                      #'keep *_hltTriggerSummaryAOD_*_*',
                                      #'keep L1GlobalTriggerObjectMapRecord_*_*_*',
                                      # Others
