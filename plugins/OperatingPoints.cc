@@ -11,7 +11,7 @@
  Author: Francisco Yumiceva
 */
 //
-// $Id: OperatingPoints.cc,v 1.8 2009/10/02 22:08:24 yumiceva Exp $
+// $Id: OperatingPoints.cc,v 1.9 2009/10/03 20:00:34 yumiceva Exp $
 //
 //
 
@@ -23,7 +23,7 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
-#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"

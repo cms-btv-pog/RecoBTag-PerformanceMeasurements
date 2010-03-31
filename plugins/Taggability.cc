@@ -10,7 +10,7 @@
 	 Author: Francisco Yumiceva, Fermilab
 */
 //
-// $Id: Taggability.cc,v 1.3 2009/08/24 20:37:43 yumiceva Exp $
+// $Id: Taggability.cc,v 1.4 2009/09/04 20:56:03 bazterra Exp $
 //
 //
 
@@ -26,7 +26,7 @@
 #include "DataFormats/BTauReco/interface/TrackIPTagInfo.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
-#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 using namespace edm;
 using namespace std;

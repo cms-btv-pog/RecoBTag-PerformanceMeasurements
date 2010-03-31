@@ -6,7 +6,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: S8Plotter.h,v 1.15 2008/09/12 16:41:32 bazterra Exp $
+ * \version $Id: S8Plotter.h,v 1.16 2009/07/20 16:51:33 jindal Exp $
  *
  */
 
@@ -341,7 +341,7 @@ std::string itoa(int i) {
 
 std::string ftoa(float i, const char *format="0") {
   char temp[20];
-  if ( format == "0" ) sprintf(temp,"%.2f",i);
+  if ( format = "0" ) sprintf(temp,"%.2f",i);
   else sprintf(temp,format,i);
   
   return((std::string)temp);

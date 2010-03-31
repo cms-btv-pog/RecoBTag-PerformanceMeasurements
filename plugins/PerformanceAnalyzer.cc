@@ -1288,7 +1288,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
             iEvent.getByLabel((*it).inputTag(),jetTags);
             std::string moduleLabel = (jetTags).provenance()->moduleLabel();
             if (mymap.find(moduleLabel) != mymap.end()) continue;
-            mymap[moduleLabel] == true;
+            mymap[moduleLabel] = true;
 
             ith_tagged = PFTools::TaggedJet(*jet,jetTags);
 
