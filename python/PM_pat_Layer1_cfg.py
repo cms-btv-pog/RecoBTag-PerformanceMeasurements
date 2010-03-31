@@ -130,35 +130,39 @@ DeltaRCut = cms.EDFilter("PMDeltaRFilter",
 #
 # Track-Jet Sequence
 #
-from RecoJets.JetProducers.ak5TrackJets_cfi import ak5TrackJets
-from CommonTools.RecoAlgos.TrackWithVertexRefSelector_cfi import *
-from RecoJets.JetProducers.TracksForJets_cff import *
+#from RecoJets.JetProducers.ak5TrackJets_cfi import ak5TrackJets
+#from CommonTools.RecoAlgos.TrackWithVertexRefSelector_cfi import *
+#from RecoJets.JetProducers.TracksForJets_cff import *
 
-ak7TrackJets = ak5TrackJets.clone( rParam = 0.7 )
+#ak7TrackJets = ak5TrackJets.clone( rParam = 0.7 )
+
+process.load('RecoJets.Configuration.RecoTrackJets_cff')
 
 from RecoJets.Configuration.GenJetParticles_cff import genParticlesForJets
 from RecoJets.JetProducers.ak5GenJets_cfi import ak5GenJets
 ak7GenJets   = ak5GenJets.clone( rParam = 0.7 )
 
-recoTrackJets   = cms.Sequence(genParticlesForJets * ak5GenJets +
-                               trackWithVertexRefSelector+
-                               trackRefsForJets+
-                               ak5TrackJets #ak7TrackJets
-                               )
+recoTrackJets   = cms.Sequence(genParticlesForJets * ak5GenJets )
+
+#recoTrackJets   = cms.Sequence(genParticlesForJets * ak5GenJets +
+#                               trackWithVertexRefSelector+
+#                               trackRefsForJets+
+#                               ak5TrackJets #ak7TrackJets
+#                               )
 
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
 addJetCollection(process,
                  cms.InputTag('ak5TrackJets'),
                  'AKT5',
-                 doJTA        = True,
+                 doJTA        = False,
                  doBTagging   = True,
                  jetCorrLabel = None,
                  doType1MET   = True,
-                 doL1Cleaning = True,
+                 doL1Cleaning = False,
                  doL1Counters = False,
                  genJetCollection=cms.InputTag("ak5GenJets"),
-                 doJetID      = True,
+                 doJetID      = False,
                  jetIdLabel   = "ak5"
                  )
 
@@ -167,7 +171,6 @@ addJetCollection(process,
 # Sequence
 #process.p = cms.Path( process.patDefaultSequence*process.patTrigger*process.patTriggerEvent )
 
-
-PM_tuple = cms.Sequence( recoTrackJets *
+PM_tuple = cms.Sequence( process.recoTrackJets *
                          process.patDefaultSequence )
 
