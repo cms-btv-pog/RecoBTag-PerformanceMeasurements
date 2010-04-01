@@ -59,6 +59,7 @@ addJetCollection(process, cms.InputTag('ak5TrackJets'),
                  jetCorrLabel = None,
                  doType1MET   = False,
                  doL1Cleaning = False,                 
+                 doL1Counters = False,
                  genJetCollection=cms.InputTag("ak5GenJets"),
                  doJetID      = False
                  )
