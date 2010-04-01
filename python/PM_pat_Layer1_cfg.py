@@ -50,71 +50,16 @@ process.patJets.discriminatorSources = cms.VInputTag(
 from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
 switchOnTrigger( process )
 
-<<<<<<< PM_pat_Layer1_cfg.py
-=======
-#
-# add new jet collections at the end (in order to copy all modifications
-#   to the default jet collection)
-#
-#addJetCollection(process,
-#		 cms.InputTag('antikt5CaloJets'),
-#                 'AK5',
-#                 doJTA        = True,
-#                 doBTagging   = True,
-#                 jetCorrLabel = ('AK5','Calo'),
-#                 doType1MET   = True,
-#		 doL1Cleaning = True,
-#		 doL1Counters = True, # NOTE, you need to create two paths and treat carefully the counters
-#                genJetCollection=cms.InputTag("antikt5GenJets")
-#                 )
-
-#
-# Track-Jet Sequence
-#
-#from RecoJets.JetProducers.ak5TrackJets_cfi import ak5TrackJets
-#from CommonTools.RecoAlgos.TrackWithVertexRefSelector_cfi import *
-#from RecoJets.JetProducers.TracksForJets_cff import *
-
-#ak7TrackJets = ak5TrackJets.clone( rParam = 0.7 )
-
-process.load('RecoJets.Configuration.RecoTrackJets_cff')
-
-from RecoJets.Configuration.GenJetParticles_cff import genParticlesForJets
-from RecoJets.JetProducers.ak5GenJets_cfi import ak5GenJets
-ak7GenJets   = ak5GenJets.clone( rParam = 0.7 )
-
-recoTrackJets   = cms.Sequence(genParticlesForJets * ak5GenJets )
-
-#recoTrackJets   = cms.Sequence(genParticlesForJets * ak5GenJets +
-#                               trackWithVertexRefSelector+
-#                               trackRefsForJets+
-#                               ak5TrackJets #ak7TrackJets
-#                               )
->>>>>>> 1.9
-
 #----------------- Add other jet collection  ----------------------------------------------------------
 
-addJetCollection(process,
-                 cms.InputTag('ak5TrackJets'),
-<<<<<<< PM_pat_Layer1_cfg.py
+addJetCollection(process, cms.InputTag('ak5TrackJets'),
                  'AK5', 'Track',
-                 doJTA        = False,
-=======
-                 'AKT5',
-                 doJTA        = False,
->>>>>>> 1.9
+                 doJTA = False,
                  doBTagging   = True,
                  jetCorrLabel = None,
-<<<<<<< PM_pat_Layer1_cfg.py
                  doType1MET   = False,
                  doL1Cleaning = False,                 
-=======
-                 doType1MET   = True,
-                 doL1Cleaning = False,
->>>>>>> 1.9
-                 doL1Counters = False,
                  genJetCollection=cms.InputTag("ak5GenJets"),
-<<<<<<< PM_pat_Layer1_cfg.py
                  doJetID      = False
                  )
 
@@ -127,22 +72,18 @@ addJetCollection(process,
                  doType1MET   = False,
                  doL1Cleaning = False,                 
                  doL1Counters = False,
-                genJetCollection=cms.InputTag("ak5GenJets"),
+                 genJetCollection=cms.InputTag("ak5GenJets"),
                  doJetID      = False
-=======
-                 doJetID      = False,
-                 jetIdLabel   = "ak5"
->>>>>>> 1.9
                  )
 
 #-----------------------------------------------------  Pre-selection ----------------------------------------------------------
 
 # ususally pt(caloJet)> 30 and pt(muon)>5. Now lowered at the beginning
-process.selectedPatMuons.cut      = cms.string('pt > 3. & abs(eta) < 2.4 & isGlobalMuon() & innerTrack().numberOfValidHits()> 7')
+process.selectedPatMuons.cut= cms.string('pt > 3. & abs(eta) < 2.4 & isGlobalMuon() & innerTrack().numberOfValidHits()> 7')
 
-process.selectedPatJets.cut = 'pt > 10. & abs(eta) < 2.4'
-process.selectedPatJetsAK5PF.cut = 'pt > 8. & abs(eta) < 2.4'
-process.selectedPatJetsAK5Track.cut = 'pt > 8. & abs(eta) < 2.4'
+process.selectedPatJets.cut = cms.string('pt > 10. & abs(eta) < 2.4')
+process.selectedPatJetsAK5PF.cut = cms.string('pt > 8. & abs(eta) < 2.4')
+process.selectedPatJetsAK5Track.cut = cms.string('pt > 8. & abs(eta) < 2.4')
 
 #process.countPatMuons.minNumber = cms.uint32(1)
 #process.countPatJets.minNumber = cms.uint32(2) # commented to avoid bias against other jet collections
@@ -164,12 +105,5 @@ process.selectedPatJetsAK5Track.cut = 'pt > 8. & abs(eta) < 2.4'
 # Sequence
 #process.p = cms.Path( process.patDefaultSequence*process.patTrigger*process.patTriggerEvent )
 
-<<<<<<< PM_pat_Layer1_cfg.py
-
 PM_tuple = cms.Sequence( process.patDefaultSequence )
-
-=======
-PM_tuple = cms.Sequence( process.recoTrackJets *
-                         process.patDefaultSequence )
->>>>>>> 1.9
 
