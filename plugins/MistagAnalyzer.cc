@@ -360,52 +360,55 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   tr = *h_trigRes;
   int BitTrigger = 0;
 
-//   if ( TriggerInfo_ ) { 
-//     vector<string> triggerList;
-//     Service<service::TriggerNamesService> tns;
-//     bool foundNames = tns->getTrigPaths(tr,triggerList);
-//     if (!foundNames) cout << "Could not get trigger names!\n";
-//     if (tr.size()!=triggerList.size()) cout << "ERROR: length of names and paths not the same: " << triggerList.size() << "," << tr.size() << endl;
-// // dump trigger list at first event
-// //   std::cout << "*********************" << std::endl;
-//     for (unsigned int i=0; i< tr.size(); i++) {
-//     if ( !tr[i].accept() == 1 ) continue;
-//       //std::cout << "trigger list " << triggerList[i] << std::endl;
-// // Trigger table 10**31
-// //       if( triggerList[i] == "HLT_Jet110"                     ) BitTrigger +=1 ;
-// //       if( triggerList[i] == "HLT_Jet180"                     ) BitTrigger +=2 ;   
-// //       if( triggerList[i] == "HLT_Jet250"                     ) BitTrigger +=4 ;   
-// //       if( triggerList[i] == "HLT_DiJetAve30"                 ) BitTrigger +=10 ;   
-// //       if( triggerList[i] == "HLT_DiJetAve50"                 ) BitTrigger +=20 ;   
-// //       if( triggerList[i] == "HLT_DiJetAve70"                 ) BitTrigger +=40 ;   
-// //       if( triggerList[i] == "HLT_TripleJet85"                ) BitTrigger +=100 ;   
-// //       if( triggerList[i] == "HLT_QuadJet30"                  ) BitTrigger +=200 ;   
-// //       if( triggerList[i] == "HLT_QuadJet60"                  ) BitTrigger +=400 ;   
-// //       if( triggerList[i] == "HLT_BTagMu_DoubleJet60_Relaxed" ) BitTrigger +=1000 ;	      
-// //       if( triggerList[i] == "HLT_BTagMu_TripleJet40_Relaxed" ) BitTrigger +=2000 ;         
-// //       if( triggerList[i] == "HLT_BTagMu_QuadJet30_Relaxed" )   BitTrigger +=4000 ;         
-// //       if( triggerList[i] == "HLT_Ele15_SW_L1R" ) BitTrigger +=10000 ;		
-// //       if( triggerList[i] == "HLT_Ele15_LW_L1R" ) BitTrigger +=20000 ;		
-// //       if( triggerList[i] == "HLT_Mu9" )          BitTrigger +=40000 ;		
-// // Trigger table 10**29
-//       if( triggerList[i] == "HLT_Jet15U"  		     ) BitTrigger +=1 ;
-//       if( triggerList[i] == "HLT_Jet30U"                     ) BitTrigger +=2 ;   
-//       if( triggerList[i] == "HLT_Jet50U"                     ) BitTrigger +=4 ;   
-//       if( triggerList[i] == "HLT_DiJetAve15U"                ) BitTrigger +=10 ;   
-//       if( triggerList[i] == "HLT_DiJetAve30U"                ) BitTrigger +=20 ;   
-//       if( triggerList[i] == "HLT_QuadJet15U"                 ) BitTrigger +=100 ;   
-//       if( triggerList[i] == "HLT_HT100U"                     ) BitTrigger +=200 ;   
-//       if( triggerList[i] == "HLT_BTagMu_Jet10U"              ) BitTrigger +=1000 ;	      
-// //      std::cout << "trigger list " << triggerList[i]  <<  endl;
-//     }
-//   }
+  if ( TriggerInfo_ ) { 
+    vector<string> triggerList;
+    Service<service::TriggerNamesService> tns;
+    bool foundNames = tns->getTrigPaths(tr,triggerList);
+    if (!foundNames) cout << "Could not get trigger names!\n";
+    if (tr.size()!=triggerList.size()) cout << "ERROR: length of names and paths not the same: " << triggerList.size() << "," << tr.size() << endl;
+    // dump trigger list at first event
+    //   std::cout << "*********************" << std::endl;
+    for (unsigned int i=0; i< tr.size(); i++) {
+      if ( !tr[i].accept() == 1 ) continue;
+      //std::cout << "trigger list " << triggerList[i] << std::endl;
+      // Trigger table 10**31
+      //       if( triggerList[i] == "HLT_Jet110"                     ) BitTrigger +=1 ;
+      //       if( triggerList[i] == "HLT_Jet180"                     ) BitTrigger +=2 ;   
+      //       if( triggerList[i] == "HLT_Jet250"                     ) BitTrigger +=4 ;   
+      //       if( triggerList[i] == "HLT_DiJetAve30"                 ) BitTrigger +=10 ;   
+      //       if( triggerList[i] == "HLT_DiJetAve50"                 ) BitTrigger +=20 ;   
+      //       if( triggerList[i] == "HLT_DiJetAve70"                 ) BitTrigger +=40 ;   
+      //       if( triggerList[i] == "HLT_TripleJet85"                ) BitTrigger +=100 ;   
+      //       if( triggerList[i] == "HLT_QuadJet30"                  ) BitTrigger +=200 ;   
+      //       if( triggerList[i] == "HLT_QuadJet60"                  ) BitTrigger +=400 ;   
+      //       if( triggerList[i] == "HLT_BTagMu_DoubleJet60_Relaxed" ) BitTrigger +=1000 ;	      
+      //       if( triggerList[i] == "HLT_BTagMu_TripleJet40_Relaxed" ) BitTrigger +=2000 ;         
+      //       if( triggerList[i] == "HLT_BTagMu_QuadJet30_Relaxed" )   BitTrigger +=4000 ;         
+      //       if( triggerList[i] == "HLT_Ele15_SW_L1R" ) BitTrigger +=10000 ;		
+      //       if( triggerList[i] == "HLT_Ele15_LW_L1R" ) BitTrigger +=20000 ;		
+      //       if( triggerList[i] == "HLT_Mu9" )          BitTrigger +=40000 ;		
+      // Trigger table 10**29
+      if( triggerList[i] == "HLT_Jet15U"  		     ) BitTrigger +=1 ;
+      if( triggerList[i] == "HLT_Jet30U"                     ) BitTrigger +=2 ;   
+      if( triggerList[i] == "HLT_Jet50U"                     ) BitTrigger +=4 ;   
+      if( triggerList[i] == "HLT_DiJetAve15U"                ) BitTrigger +=10 ;   
+      if( triggerList[i] == "HLT_DiJetAve30U"                ) BitTrigger +=20 ;   
+      if( triggerList[i] == "HLT_QuadJet15U"                 ) BitTrigger +=100 ;   
+      if( triggerList[i] == "HLT_HT100U"                     ) BitTrigger +=200 ;   
+      if( triggerList[i] == "HLT_BTagMu_Jet10U"              ) BitTrigger +=1000 ;
+      if( triggerList[i] == "HLT_MinBiasBSC"                 ) BitTrigger +=10000;	      
+      //std::cout << "trigger list " << triggerList[i]  <<  endl;
+    }
+  }
   
-  if (flavourMatchOptionf == "fastMC" && isData_) {
+  
+  
+  if (flavourMatchOptionf == "fastMC" && !isData_) {
     iEvent.getByLabel(flavourSourcef, jetMC);
     for(JetFlavourMatchingCollection::const_iterator iter =
 	  jetMC->begin(); iter != jetMC->end(); iter++)
       flavoursMapf.insert(std::pair <const edm::RefToBase<reco::Jet>, unsigned int>((*iter).first, (unsigned int)((*iter).second).getFlavour()));
-  } else if (flavourMatchOptionf == "genParticle") {
+  } else if (flavourMatchOptionf == "genParticle" && !isData_) {
     iEvent.getByLabel (flavourSourcef, theJetPartonMapf);
   }
   
@@ -414,7 +417,6 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
   nTrack  = 0;
   nSV = 0; 
-    
   //*********************************
   // Loop over the jets
   
@@ -435,9 +437,9 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   for ( jet = recoJets.begin(); jet != recoJets.end(); ++jet ) {
     
     int ith_tagged = -1;      
-    float Flavour  ;    
-    int flavour    ; 
-    if ( isData_ != 0 ) {
+    float Flavour  =-1;    
+    int flavour  =-1  ; 
+    if ( isData_ != 1 ) {
       //Flavour  = getMatchedParton(*jet).flavour();    
       //flavour    = int(TMath::Abs( Flavour )); 
       flavour = abs(getMatchedParton(*jet).getFlavour());   
@@ -619,24 +621,24 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     Jet_hist3[nJet] = 0;
     
     // Track history
-    if (useTrackHistory_ && indexes.size()!=0 && isData_!=0) {
+    if (useTrackHistory_ && indexes.size()!=0 && isData_!=1) {
       if ( flags1P[TrackCategories::BWeakDecay] )  Jet_hist1[nJet] += int(pow(10., -1 + 1)); 
       if ( flags1P[TrackCategories::CWeakDecay] )  Jet_hist1[nJet] += int(pow(10., -1 + 2)); 
       if ( flags1P[TrackCategories::TauDecay] )    Jet_hist1[nJet] += int(pow(10., -1 + 3)); 
-      if ( flags1P[TrackCategories::Conversion] )  Jet_hist1[nJet] += int(pow(10., -1 + 4)); 
+      //if ( flags1P[TrackCategories::Conversion] )  Jet_hist1[nJet] += int(pow(10., -1 + 4)); 
       if ( flags1P[TrackCategories::KsDecay] )     Jet_hist1[nJet] += int(pow(10., -1 + 5)); 
       if ( flags1P[TrackCategories::LambdaDecay] ) Jet_hist1[nJet] += int(pow(10., -1 + 6)); 
-      if ( flags1P[TrackCategories::Interaction] ) Jet_hist1[nJet] += int(pow(10., -1 + 7)); 
+      //if ( flags1P[TrackCategories::Interaction] ) Jet_hist1[nJet] += int(pow(10., -1 + 7)); 
       if ( flags1P[TrackCategories::Fake] )	   Jet_hist1[nJet] += int(pow(10., -1 + 8)); 
       if ( flags1P[TrackCategories::Bad] )	   Jet_hist1[nJet] += int(pow(10., -1 + 9)); 
       if ( idSize > 1 ) {
         if ( flags2P[TrackCategories::BWeakDecay] )  Jet_hist2[nJet] += int(pow(10., -1 + 1)); 
         if ( flags2P[TrackCategories::CWeakDecay] )  Jet_hist2[nJet] += int(pow(10., -1 + 2)); 
         if ( flags2P[TrackCategories::TauDecay] )    Jet_hist2[nJet] += int(pow(10., -1 + 3)); 
-        if ( flags2P[TrackCategories::Conversion] )  Jet_hist2[nJet] += int(pow(10., -1 + 4)); 
+	// if ( flags2P[TrackCategories::Conversion] )  Jet_hist2[nJet] += int(pow(10., -1 + 4)); 
         if ( flags2P[TrackCategories::KsDecay] )     Jet_hist2[nJet] += int(pow(10., -1 + 5)); 
         if ( flags2P[TrackCategories::LambdaDecay] ) Jet_hist2[nJet] += int(pow(10., -1 + 6)); 
-        if ( flags2P[TrackCategories::Interaction] ) Jet_hist2[nJet] += int(pow(10., -1 + 7)); 
+        //if ( flags2P[TrackCategories::Interaction] ) Jet_hist2[nJet] += int(pow(10., -1 + 7)); 
         if ( flags2P[TrackCategories::Fake] )	     Jet_hist2[nJet] += int(pow(10., -1 + 8)); 
         if ( flags2P[TrackCategories::Bad] )	     Jet_hist2[nJet] += int(pow(10., -1 + 9)); 
       }
@@ -644,30 +646,30 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         if ( flags3P[TrackCategories::BWeakDecay] )  Jet_hist3[nJet] += int(pow(10., -1 + 1)); 
         if ( flags3P[TrackCategories::CWeakDecay] )  Jet_hist3[nJet] += int(pow(10., -1 + 2)); 
         if ( flags3P[TrackCategories::TauDecay] )    Jet_hist3[nJet] += int(pow(10., -1 + 3)); 
-        if ( flags3P[TrackCategories::Conversion] )  Jet_hist3[nJet] += int(pow(10., -1 + 4)); 
+        //if ( flags3P[TrackCategories::Conversion] )  Jet_hist3[nJet] += int(pow(10., -1 + 4)); 
         if ( flags3P[TrackCategories::KsDecay] )     Jet_hist3[nJet] += int(pow(10., -1 + 5)); 
         if ( flags3P[TrackCategories::LambdaDecay] ) Jet_hist3[nJet] += int(pow(10., -1 + 6)); 
-        if ( flags3P[TrackCategories::Interaction] ) Jet_hist3[nJet] += int(pow(10., -1 + 7)); 
+        //if ( flags3P[TrackCategories::Interaction] ) Jet_hist3[nJet] += int(pow(10., -1 + 7)); 
         if ( flags3P[TrackCategories::Fake] )	     Jet_hist3[nJet] += int(pow(10., -1 + 8)); 
         if ( flags3P[TrackCategories::Bad] )	     Jet_hist3[nJet] += int(pow(10., -1 + 9)); 
       }
       if ( flags1N[TrackCategories::BWeakDecay] )  Jet_hist1[nJet] += 2*int(pow(10., -1 + 1)); 
       if ( flags1N[TrackCategories::CWeakDecay] )  Jet_hist1[nJet] += 2*int(pow(10., -1 + 2)); 
       if ( flags1N[TrackCategories::TauDecay] )    Jet_hist1[nJet] += 2*int(pow(10., -1 + 3)); 
-      if ( flags1N[TrackCategories::Conversion] )  Jet_hist1[nJet] += 2*int(pow(10., -1 + 4)); 
+      //if ( flags1N[TrackCategories::Conversion] )  Jet_hist1[nJet] += 2*int(pow(10., -1 + 4)); 
       if ( flags1N[TrackCategories::KsDecay] )     Jet_hist1[nJet] += 2*int(pow(10., -1 + 5)); 
       if ( flags1N[TrackCategories::LambdaDecay] ) Jet_hist1[nJet] += 2*int(pow(10., -1 + 6)); 
-      if ( flags1N[TrackCategories::Interaction] ) Jet_hist1[nJet] += 2*int(pow(10., -1 + 7)); 
+      //if ( flags1N[TrackCategories::Interaction] ) Jet_hist1[nJet] += 2*int(pow(10., -1 + 7)); 
       if ( flags1N[TrackCategories::Fake] )	   Jet_hist1[nJet] += 2*int(pow(10., -1 + 8)); 
       if ( flags1N[TrackCategories::Bad] )	   Jet_hist1[nJet] += 2*int(pow(10., -1 + 9)); 
       if ( idSize > 1 ) {
         if ( flags2N[TrackCategories::BWeakDecay] )  Jet_hist2[nJet] += 2*int(pow(10., -1 + 1)); 
         if ( flags2N[TrackCategories::CWeakDecay] )  Jet_hist2[nJet] += 2*int(pow(10., -1 + 2)); 
         if ( flags2N[TrackCategories::TauDecay] )    Jet_hist2[nJet] += 2*int(pow(10., -1 + 3)); 
-        if ( flags2N[TrackCategories::Conversion] )  Jet_hist2[nJet] += 2*int(pow(10., -1 + 4)); 
+        //if ( flags2N[TrackCategories::Conversion] )  Jet_hist2[nJet] += 2*int(pow(10., -1 + 4)); 
         if ( flags2N[TrackCategories::KsDecay] )     Jet_hist2[nJet] += 2*int(pow(10., -1 + 5)); 
         if ( flags2N[TrackCategories::LambdaDecay] ) Jet_hist2[nJet] += 2*int(pow(10., -1 + 6)); 
-        if ( flags2N[TrackCategories::Interaction] ) Jet_hist2[nJet] += 2*int(pow(10., -1 + 7)); 
+        //if ( flags2N[TrackCategories::Interaction] ) Jet_hist2[nJet] += 2*int(pow(10., -1 + 7)); 
         if ( flags2N[TrackCategories::Fake] )	     Jet_hist2[nJet] += 2*int(pow(10., -1 + 8)); 
         if ( flags2N[TrackCategories::Bad] )	     Jet_hist2[nJet] += 2*int(pow(10., -1 + 9)); 
       }
@@ -675,10 +677,10 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         if ( flags3N[TrackCategories::BWeakDecay] )  Jet_hist3[nJet] += 2*int(pow(10., -1 + 1)); 
         if ( flags3N[TrackCategories::CWeakDecay] )  Jet_hist3[nJet] += 2*int(pow(10., -1 + 2)); 
         if ( flags3N[TrackCategories::TauDecay] )    Jet_hist3[nJet] += 2*int(pow(10., -1 + 3)); 
-        if ( flags3N[TrackCategories::Conversion] )  Jet_hist3[nJet] += 2*int(pow(10., -1 + 4)); 
+        //if ( flags3N[TrackCategories::Conversion] )  Jet_hist3[nJet] += 2*int(pow(10., -1 + 4)); 
         if ( flags3N[TrackCategories::KsDecay] )     Jet_hist3[nJet] += 2*int(pow(10., -1 + 5)); 
         if ( flags3N[TrackCategories::LambdaDecay] ) Jet_hist3[nJet] += 2*int(pow(10., -1 + 6)); 
-        if ( flags3N[TrackCategories::Interaction] ) Jet_hist3[nJet] += 2*int(pow(10., -1 + 7)); 
+        //if ( flags3N[TrackCategories::Interaction] ) Jet_hist3[nJet] += 2*int(pow(10., -1 + 7)); 
         if ( flags3N[TrackCategories::Fake] )	     Jet_hist3[nJet] += 2*int(pow(10., -1 + 8)); 
         if ( flags3N[TrackCategories::Bad] )	     Jet_hist3[nJet] += 2*int(pow(10., -1 + 9)); 
       }
@@ -689,7 +691,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     //*****************************************************************
     Jet_histJet[nJet] = 0;
     
-    if(useTrackHistory_ && isData_!=0){
+    if(useTrackHistory_ && isData_!=1){
       ith_tagged = this->TaggedJet(*jet,jetTags_PosJP);
       TrackRefVector jetProbTracks( (*tagInfo)[ith_tagged].selectedTracks() );  
       
@@ -704,10 +706,10 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	  if ( theFlag[TrackCategories::BWeakDecay] )	cap0 = 1; 
 	  if ( theFlag[TrackCategories::CWeakDecay] )	cap1 = 1; 
 	  if ( theFlag[TrackCategories::TauDecay] )	cap2 = 1;  
-	  if ( theFlag[TrackCategories::Conversion] )   cap3 = 1; 
+	  // if ( theFlag[TrackCategories::Conversion] )   cap3 = 1; 
 	  if ( theFlag[TrackCategories::KsDecay] )	cap4 = 1; 
 	  if ( theFlag[TrackCategories::LambdaDecay] )  cap5 = 1; 
-	  if ( theFlag[TrackCategories::Interaction] )  cap6 = 1; 
+	  //if ( theFlag[TrackCategories::Interaction] )  cap6 = 1; 
 	  if ( theFlag[TrackCategories::Fake] ) 	cap7 = 1; 
 	  if ( theFlag[TrackCategories::Bad] )  	cap8 = 1; 
 	}
@@ -716,10 +718,10 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	  if ( theFlag[TrackCategories::BWeakDecay] )	can0 = 2; 
 	  if ( theFlag[TrackCategories::CWeakDecay] )	can1 = 2; 
 	  if ( theFlag[TrackCategories::TauDecay] )	can2 = 2;  
-	  if ( theFlag[TrackCategories::Conversion] )   can3 = 2; 
+	  //if ( theFlag[TrackCategories::Conversion] )   can3 = 2; 
 	  if ( theFlag[TrackCategories::KsDecay] )	can4 = 2; 
 	  if ( theFlag[TrackCategories::LambdaDecay] )  can5 = 2; 
-	  if ( theFlag[TrackCategories::Interaction] )  can6 = 2; 
+	  //if ( theFlag[TrackCategories::Interaction] )  can6 = 2; 
 	  if ( theFlag[TrackCategories::Fake] ) 	can7 = 2; 
 	  if ( theFlag[TrackCategories::Bad] )  	can8 = 2; 
 	}
@@ -737,9 +739,8 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     Jet_nFirstSV[nJet]  = nSV;
     
     ith_tagged =    this->TaggedJet(*jet,jetTags_Svtx);
-    TrackRefVector  svxPostracks( (*tagInfoSVx)[ith_tagged].vertexTracks(0) );
     
-    if ( produceJetProbaTree_ ) {
+    if ( produceJetProbaTree_  && (*tagInfoSVx)[ith_tagged].nVertices() > 0) {
       SV_x[nSV]    = (*tagInfoSVx)[ith_tagged].secondaryVertex(0).x();
       SV_y[nSV]    = (*tagInfoSVx)[ith_tagged].secondaryVertex(0).y();
       SV_z[nSV]    = (*tagInfoSVx)[ith_tagged].secondaryVertex(0).z();
@@ -753,20 +754,21 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       nSV++;
     }
     
-    if (useTrackHistory_ && isData_!=0) {
+    if (useTrackHistory_ && isData_!=1) {
       
       cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0; 
       can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0; 
 
+      TrackRefVector  svxPostracks( (*tagInfoSVx)[ith_tagged].vertexTracks(0) );
       for(unsigned int i=0; i<svxPostracks.size(); i++){
 	TrackCategories::Flags theFlag = classifier_.evaluate( svxPostracks[i] ).flags();
 	if ( theFlag[TrackCategories::BWeakDecay] )   cap0 = 1; 
 	if ( theFlag[TrackCategories::CWeakDecay] )   cap1 = 1; 
 	if ( theFlag[TrackCategories::TauDecay] )     cap2 = 1;  
-	if ( theFlag[TrackCategories::Conversion] )   cap3 = 1; 
+	//if ( theFlag[TrackCategories::Conversion] )   cap3 = 1; 
 	if ( theFlag[TrackCategories::KsDecay] )      cap4 = 1; 
 	if ( theFlag[TrackCategories::LambdaDecay] )  cap5 = 1; 
-	if ( theFlag[TrackCategories::Interaction] )  cap6 = 1; 
+	//if ( theFlag[TrackCategories::Interaction] )  cap6 = 1; 
 	if ( theFlag[TrackCategories::Fake] )	      cap7 = 1; 
 	if ( theFlag[TrackCategories::Bad] )	      cap8 = 1; 
       }
@@ -777,10 +779,10 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	if ( theFlag[TrackCategories::BWeakDecay] )   can0 = 2; 
 	if ( theFlag[TrackCategories::CWeakDecay] )   can1 = 2; 
 	if ( theFlag[TrackCategories::TauDecay] )     can2 = 2;  
-	if ( theFlag[TrackCategories::Conversion] )   can3 = 2; 
+	//if ( theFlag[TrackCategories::Conversion] )   can3 = 2; 
 	if ( theFlag[TrackCategories::KsDecay] )      can4 = 2; 
 	if ( theFlag[TrackCategories::LambdaDecay] )  can5 = 2; 
-	if ( theFlag[TrackCategories::Interaction] )  can6 = 2; 
+	//if ( theFlag[TrackCategories::Interaction] )  can6 = 2; 
 	if ( theFlag[TrackCategories::Fake] )	      can7 = 2; 
 	if ( theFlag[TrackCategories::Bad] )	      can8 = 2; 
       }
@@ -810,15 +812,15 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       Jet_mu_pt[nJet]    = (*tagInos_softmuon)[ith_tagged].lepton(0)->pt()			      ;
     }
     if(  SoftM > 0 && (*tagInos_softmuon)[ith_tagged].leptons()!=0 ){
-      if ( useTrackHistory_ && isData_!=0 ) {     
+      if ( useTrackHistory_ && isData_!=1 ) {     
         TrackCategories::Flags theFlagP = classifier_.evaluate( (*tagInos_softmuon)[ith_tagged].lepton(0) ).flags();
         if ( theFlagP[TrackCategories::BWeakDecay] )   Jet_histMuon[nJet] += int(pow(10., -1 + 1)); 
         if ( theFlagP[TrackCategories::CWeakDecay] )   Jet_histMuon[nJet] += int(pow(10., -1 + 2)); 
         if ( theFlagP[TrackCategories::TauDecay] )     Jet_histMuon[nJet] += int(pow(10., -1 + 3));  
-        if ( theFlagP[TrackCategories::Conversion] )   Jet_histMuon[nJet] += int(pow(10., -1 + 4)); 
+        //if ( theFlagP[TrackCategories::Conversion] )   Jet_histMuon[nJet] += int(pow(10., -1 + 4)); 
         if ( theFlagP[TrackCategories::KsDecay] )      Jet_histMuon[nJet] += int(pow(10., -1 + 5)); 
         if ( theFlagP[TrackCategories::LambdaDecay] )  Jet_histMuon[nJet] += int(pow(10., -1 + 6)); 
-        if ( theFlagP[TrackCategories::Interaction] )  Jet_histMuon[nJet] += int(pow(10., -1 + 7)); 
+        //if ( theFlagP[TrackCategories::Interaction] )  Jet_histMuon[nJet] += int(pow(10., -1 + 7)); 
         if ( theFlagP[TrackCategories::Fake] )	       Jet_histMuon[nJet] += int(pow(10., -1 + 8)); 
         if ( theFlagP[TrackCategories::Bad] )	       Jet_histMuon[nJet] += int(pow(10., -1 + 9)); 
       }
@@ -831,15 +833,15 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       Jet_mu_nHit[nJet]  = (*tagInos_softmuon)[ith_tagged].lepton(0)->hitPattern().numberOfValidHits();
       Jet_mu_chi2[nJet]           = (*tagInos_softmuon)[ith_tagged].lepton(0)->normalizedChi2()                ;
       Jet_mu_pt[nJet]             = (*tagInos_softmuon)[ith_tagged].lepton(0)->pt()                            ;
-      if ( useTrackHistory_ && isData_!=0 ) {     
+      if ( useTrackHistory_ && isData_!=1 ) {     
         TrackCategories::Flags theFlagN = classifier_.evaluate( (*tagInos_softmuon)[ith_tagged].lepton(0) ).flags();
         if ( theFlagN[TrackCategories::BWeakDecay] )   Jet_histMuon[nJet] += 2*int(pow(10., -1 + 1)); 
         if ( theFlagN[TrackCategories::CWeakDecay] )   Jet_histMuon[nJet] += 2*int(pow(10., -1 + 2)); 
         if ( theFlagN[TrackCategories::TauDecay] )     Jet_histMuon[nJet] += 2*int(pow(10., -1 + 3));  
-        if ( theFlagN[TrackCategories::Conversion] )   Jet_histMuon[nJet] += 2*int(pow(10., -1 + 4)); 
+        //if ( theFlagN[TrackCategories::Conversion] )   Jet_histMuon[nJet] += 2*int(pow(10., -1 + 4)); 
         if ( theFlagN[TrackCategories::KsDecay] )      Jet_histMuon[nJet] += 2*int(pow(10., -1 + 5)); 
         if ( theFlagN[TrackCategories::LambdaDecay] )  Jet_histMuon[nJet] += 2*int(pow(10., -1 + 6)); 
-        if ( theFlagN[TrackCategories::Interaction] )  Jet_histMuon[nJet] += 2*int(pow(10., -1 + 7)); 
+        //if ( theFlagN[TrackCategories::Interaction] )  Jet_histMuon[nJet] += 2*int(pow(10., -1 + 7)); 
         if ( theFlagN[TrackCategories::Fake] )	       Jet_histMuon[nJet] += 2*int(pow(10., -1 + 8)); 
         if ( theFlagN[TrackCategories::Bad] )	       Jet_histMuon[nJet] += 2*int(pow(10., -1 + 9)); 
       }
@@ -908,25 +910,25 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     int cat1N = 0, cat2N = 0, cat3N = 0, catN = 0;
     
     // Track history
-    if (useTrackHistory_ && indexes.size()!=0 && isData_!=0) {
-      flags1P[TrackCategories::Conversion] ;
+    if (useTrackHistory_ && indexes.size()!=0 && isData_!=1) {
+      // flags1P[TrackCategories::Conversion] ;
            if ( flags1P[TrackCategories::BWeakDecay] )  cat1P = 1; 
       else if ( flags1P[TrackCategories::CWeakDecay] )  cat1P = 2; 
       else if ( flags1P[TrackCategories::TauDecay] )    cat1P = 3; 
-      else if ( flags1P[TrackCategories::Conversion] )  cat1P = 4; 
+	   //else if ( flags1P[TrackCategories::Conversion] )  cat1P = 4; 
       else if ( flags1P[TrackCategories::KsDecay] )     cat1P = 5; 
       else if ( flags1P[TrackCategories::LambdaDecay] ) cat1P = 6; 
-      else if ( flags1P[TrackCategories::Interaction] ) cat1P = 7; 
+	   //else if ( flags1P[TrackCategories::Interaction] ) cat1P = 7; 
       else if ( flags1P[TrackCategories::Fake] )        cat1P = 8; 
       else if ( flags1P[TrackCategories::Bad] )         cat1P = 9; 
       if(idSize > 1){
 	     if ( flags2P[TrackCategories::BWeakDecay] )  cat2P = 1;
 	else if ( flags2P[TrackCategories::CWeakDecay] )  cat2P = 2;
 	else if ( flags2P[TrackCategories::TauDecay] )    cat2P = 3;
-	else if ( flags2P[TrackCategories::Conversion] )  cat2P = 4;
+	     //else if ( flags2P[TrackCategories::Conversion] )  cat2P = 4;
 	else if ( flags2P[TrackCategories::KsDecay] )     cat2P = 5;
 	else if ( flags2P[TrackCategories::LambdaDecay] ) cat2P = 6;
-	else if ( flags2P[TrackCategories::Interaction] ) cat2P = 7;
+	     //else if ( flags2P[TrackCategories::Interaction] ) cat2P = 7;
 	else if ( flags2P[TrackCategories::Fake] )        cat2P = 8;
 	else if ( flags2P[TrackCategories::Bad] )         cat2P = 9;
       }
@@ -934,30 +936,30 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	     if ( flags3P[TrackCategories::BWeakDecay] )  cat3P = 1;
 	else if ( flags3P[TrackCategories::CWeakDecay] )  cat3P = 2;
 	else if ( flags3P[TrackCategories::TauDecay] )    cat3P = 3;
-	else if ( flags3P[TrackCategories::Conversion] )  cat3P = 4;
+	     //else if ( flags3P[TrackCategories::Conversion] )  cat3P = 4;
 	else if ( flags3P[TrackCategories::KsDecay] )     cat3P = 5;
 	else if ( flags3P[TrackCategories::LambdaDecay] ) cat3P = 6;
-	else if ( flags3P[TrackCategories::Interaction] ) cat3P = 7;
+	     //else if ( flags3P[TrackCategories::Interaction] ) cat3P = 7;
 	else if ( flags3P[TrackCategories::Fake] )        cat3P = 8;
 	else if ( flags3P[TrackCategories::Bad] )         cat3P = 9;
       }
            if ( flags1N[TrackCategories::BWeakDecay] )  cat1N = 1;
       else if ( flags1N[TrackCategories::CWeakDecay] )  cat1N = 2;
       else if ( flags1N[TrackCategories::TauDecay] )    cat1N = 3;
-      else if ( flags1N[TrackCategories::Conversion] )  cat1N = 4;
+	   //else if ( flags1N[TrackCategories::Conversion] )  cat1N = 4;
       else if ( flags1N[TrackCategories::KsDecay] )     cat1N = 5;
       else if ( flags1N[TrackCategories::LambdaDecay] ) cat1N = 6;
-      else if ( flags1N[TrackCategories::Interaction] ) cat1N = 7;
+	   //else if ( flags1N[TrackCategories::Interaction] ) cat1N = 7;
       else if ( flags1N[TrackCategories::Fake] )        cat1N = 8;
       else if ( flags1N[TrackCategories::Bad] )         cat1N = 9;
       if(idSize > 1){
 	     if ( flags2N[TrackCategories::BWeakDecay] )  cat2N = 1;
 	else if ( flags2N[TrackCategories::CWeakDecay] )  cat2N = 2;
 	else if ( flags2N[TrackCategories::TauDecay] )    cat2N = 3;
-	else if ( flags2N[TrackCategories::Conversion] )  cat2N = 4;
+	     //else if ( flags2N[TrackCategories::Conversion] )  cat2N = 4;
 	else if ( flags2N[TrackCategories::KsDecay] )     cat2N = 5;
 	else if ( flags2N[TrackCategories::LambdaDecay] ) cat2N = 6;
-	else if ( flags2N[TrackCategories::Interaction] ) cat2N = 7;
+	     //else if ( flags2N[TrackCategories::Interaction] ) cat2N = 7;
 	else if ( flags2N[TrackCategories::Fake] )        cat2N = 8;
 	else if ( flags2N[TrackCategories::Bad] )         cat2N = 9;
       }
@@ -965,10 +967,10 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	     if ( flags3N[TrackCategories::BWeakDecay] )  cat3N = 1;
 	else if ( flags3N[TrackCategories::CWeakDecay] )  cat3N = 2;
 	else if ( flags3N[TrackCategories::TauDecay] )    cat3N = 3;
-	else if ( flags3N[TrackCategories::Conversion] )  cat3N = 4;
+	     //else if ( flags3N[TrackCategories::Conversion] )  cat3N = 4;
 	else if ( flags3N[TrackCategories::KsDecay] )     cat3N = 5;
 	else if ( flags3N[TrackCategories::LambdaDecay] ) cat3N = 6;
-	else if ( flags3N[TrackCategories::Interaction] ) cat3N = 7;
+	     //else if ( flags3N[TrackCategories::Interaction] ) cat3N = 7;
 	else if ( flags3N[TrackCategories::Fake] )        cat3N = 8;
 	else if ( flags3N[TrackCategories::Bad] )         cat3N = 9;
       }
@@ -1005,7 +1007,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     hData_JetPt->Fill( ptjet );
     hData_JetEta->Fill( etajet );
     
-    if ( isData_ != 0 ) {
+    if ( isData_ != 1 ) {
       hAllFlav_Flavour->Fill( flavour );
     }
 
@@ -1028,7 +1030,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     if ( Jet_SoftMu[nJet]  > 0        )  hData_Tagger_MU->Fill( 5*Jet_SoftMu[nJet] );
     if ( Jet_SoftMuN[nJet] < 0        )  hData_Tagger_MU->Fill( 5*Jet_SoftMuN[nJet] );
 
-    if ( isData_ != 0 ) {
+    if ( isData_ != 1 ) {
       if ( varneg > 0 ) hAllFlav_Tagger->Fill(-varneg );
       if ( varpos > 0 ) hAllFlav_Tagger->Fill( varpos );
       
@@ -1120,7 +1122,7 @@ MistagAnalyzer::calculPtRel(reco::Track theMuon, reco::Jet theJet, double JES )
 
 // ------------ method called once each job just before starting event loop  ------------
 void
-MistagAnalyzer::beginJob(const edm::EventSetup&)
+MistagAnalyzer::beginJob()
 {
 }
 

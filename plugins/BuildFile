@@ -18,6 +18,7 @@
 <use name=SimTracker/Records>
 <use name=DataFormats/Math>
 <use name=PhysicsTools/UtilAlgos>
+<use name=CommonTools/UtilAlgos>
 <use name=RecoBTag/PerformanceMeasurements>
 <library file="*.cc" name=RecoBTagPerformanceMeasurementsPlugins>
 	 <flags EDM_PLUGIN = 1 >	

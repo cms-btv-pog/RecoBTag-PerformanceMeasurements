@@ -16,7 +16,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.10 2010/03/10 16:49:38 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.11 2010/03/17 09:25:08 jandrea Exp $
 //
 //
 
@@ -86,8 +86,7 @@ Implementation:
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "FWCore/Framework/interface/TriggerNamesService.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
-#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
-
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 struct ltstr
 {
@@ -115,7 +114,7 @@ public:
 
 
 private:
-    virtual void beginJob(const edm::EventSetup&) ;
+    virtual void beginJob() ;
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
     virtual void endJob() ;
 
