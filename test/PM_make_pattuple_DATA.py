@@ -130,6 +130,8 @@ process.out.outputCommands.extend( [ # PAT Objects
                                      # Generator particles/jets/MET
                                      'keep recoGenParticles_genParticles_*_*',
                                      'keep recoGenJets_ak5GenJets_*_*',
+                                     # Luminosity information
+                                     'keep edmMergeableCounter_eventCountProducer_*_*',
                                      # Trigger information
 				     'keep edmTriggerResults_TriggerResults_*_HLT*',
                                      #'keep *_hltTriggerSummaryAOD_*_*',

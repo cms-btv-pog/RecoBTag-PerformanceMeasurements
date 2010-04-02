@@ -37,6 +37,10 @@ noScraping= cms.EDFilter("FilterOutScraping",
     thresh = cms.untracked.double(0.25)
 )
 
-getEventDATA = cms.Sequence(noScraping*oneGoodVertexFilter*physDecl*bit40)
-getEventMC = cms.Sequence(noScraping*oneGoodVertexFilter)
+##########Counter for the number of processed events
+eventCountProducer = cms.EDProducer("EventCountProducer")
+
+
+getEventDATA = cms.Sequence(noScraping*oneGoodVertexFilter*physDecl*bit40*eventCountProducer)
+getEventMC = cms.Sequence(noScraping*oneGoodVertexFilter*eventCountProducer)
 
