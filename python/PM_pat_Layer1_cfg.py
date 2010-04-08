@@ -29,30 +29,14 @@ process.patJetGenJetMatch.maxDPtRel  = cms.double(99999999999)
 #process.electronMatch.checkCharge = False
 #process.muonMatch.checkCharge = False
 
-# remove the complex tagger at the beginnig to save space: for example remove softelectronTagInfos and combinedSV
-
-process.patJets.tagInfoSources = cms.VInputTag(
-cms.InputTag("secondaryVertexTagInfos"), 
-cms.InputTag("softMuonTagInfos"), 
-cms.InputTag("impactParameterTagInfos")) 
-
-process.patJets.discriminatorSources = cms.VInputTag(
-    cms.InputTag("jetProbabilityBJetTags"), 
-    cms.InputTag("simpleSecondaryVertexBJetTags"),
-    cms.InputTag("softMuonBJetTags"), 
-    cms.InputTag("softMuonByPtBJetTags"), 
-    cms.InputTag("softMuonByIP3dBJetTags"), 
-    cms.InputTag("trackCountingHighEffBJetTags"), 
-    cms.InputTag("trackCountingHighPurBJetTags")
-    )
-
 #----------------- Trigger matching ----------------------------------------------------------
 from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
 switchOnTrigger( process )
 
 #----------------- Add other jet collection  ----------------------------------------------------------
 
-addJetCollection(process, cms.InputTag('ak5TrackJets'),
+addJetCollection(process, 
+                 cms.InputTag('ak5TrackJets'),
                  'AK5', 'Track',
                  doJTA = False,
                  doBTagging   = True,
@@ -76,6 +60,32 @@ addJetCollection(process,
                  genJetCollection=cms.InputTag("ak5GenJets"),
                  doJetID      = False
                  )
+
+#-----------------------------------------------------  slim objects ----------------------------------------------------------
+
+# remove the complex tagger at the beginnig to save space: for example remove softelectronTagInfos and combinedSV, jetBProb
+
+theJetNames = ['','AK5PF','AK5Track']
+
+for jetName in theJetNames:
+   module = getattr(process,'patJets'+jetName)
+
+   module.tagInfoSources = cms.VInputTag(
+    cms.InputTag("impactParameterTagInfos"+jetName),
+    cms.InputTag("secondaryVertexTagInfos"+jetName),
+    cms.InputTag("softMuonTagInfos"+jetName), 
+   ) 
+
+   module.discriminatorSources = cms.VInputTag(
+    cms.InputTag("jetProbabilityBJetTags"+jetName), 
+    cms.InputTag("simpleSecondaryVertexBJetTags"+jetName),
+    cms.InputTag("softMuonBJetTags"+jetName), 
+    cms.InputTag("softMuonByPtBJetTags"+jetName), 
+    cms.InputTag("softMuonByIP3dBJetTags"+jetName), 
+    cms.InputTag("trackCountingHighEffBJetTags"+jetName), 
+    cms.InputTag("trackCountingHighPurBJetTags"+jetName)
+   )
+
 
 #-----------------------------------------------------  Pre-selection ----------------------------------------------------------
 
@@ -106,5 +116,5 @@ process.selectedPatJetsAK5Track.cut = cms.string('pt > 8. & abs(eta) < 2.4')
 # Sequence
 #process.p = cms.Path( process.patDefaultSequence*process.patTrigger*process.patTriggerEvent )
 
-PM_tuple = cms.Sequence( process.patDefaultSequence )
+process.PM_tuple = cms.Sequence( process.patDefaultSequence )
 

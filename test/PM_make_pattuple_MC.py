@@ -1,7 +1,5 @@
-#
-# see also this example  
-# http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/PhysicsTools/PatExamples/test/patLayer1_fromRECO_7TeV_firstdata_cfg.py?revision=1.1.2.2&view=markup&pathrev=V00-02-16
-#
+# # see also this example # 
+##http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/PhysicsTools/PatExamples/test/patLayer1_fromRECO_7TeV_firstdata_cfg.py?revision=1.1.2.2&view=markup&pathrev=V00-02-16 #
 
 import FWCore.ParameterSet.Config as cms
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
@@ -13,32 +11,30 @@ process.MessageLogger.cerr = cms.untracked.PSet(
     default          = cms.untracked.PSet( limit = cms.untracked.int32(-1)  ),
     PATSummaryTables = cms.untracked.PSet( limit = cms.untracked.int32(-1) ),
     FwkReport = cms.untracked.PSet(
-	reportEvery = cms.untracked.int32(100)
+	reportEvery = cms.untracked.int32(1000)
     )
 
 )
 
+
 #-- Input Source --------------------------------------------------------------
+
+#process.load("RecoBTag.PerformanceMeasurements.mcFiles_cff")
+
 process.source.fileNames = [
-
-#'/store/mc/Spring10/MinBias/GEN-SIM-RECO/START3X_V25B_356ReReco-v1/0007/FCDD5B7A-233C-DF11-AB79-002618943926.root',
-#'/store/mc/Spring10/MinBias/GEN-SIM-RECO/START3X_V25B_356ReReco-v1/0007/FC5FDFDD-233C-DF11-9FC5-002618943964.root',
-#'/store/mc/Spring10/MinBias/GEN-SIM-RECO/START3X_V25B_356ReReco-v1/0007/FA77A575-233C-DF11-9D9A-00248C55CC62.root',
-#'/store/mc/Spring10/MinBias/GEN-SIM-RECO/START3X_V25B_356ReReco-v1/0007/FA7205B6-233C-DF11-9BC2-002618943932.root',
-#'/store/mc/Spring10/MinBias/GEN-SIM-RECO/START3X_V25B_356ReReco-v1/0007/F850EA9F-233C-DF11-8D05-00261894383C.root'
-     
-'file:/pcussitrk002/data1/dalfonso/MC132440/FCDD5B7A-233C-DF11-AB79-002618943926.root',
-'file:/pcussitrk002/data1/dalfonso/MC132440/FC5FDFDD-233C-DF11-9FC5-002618943964.root',
-'file:/pcussitrk002/data1/dalfonso/MC132440/FA77A575-233C-DF11-9D9A-00248C55CC62.root'
-
+'/store/mc/Spring10/MinBias/GEN-SIM-RECO/START3X_V26A_356ReReco-v1/0009/FEFC70B6-F53D-DF11-B57E-003048679150.root',
+'/store/mc/Spring10/MinBias/GEN-SIM-RECO/START3X_V26A_356ReReco-v1/0009/FED8673E-F53D-DF11-9E58-0026189437EB.root',
+'/store/mc/Spring10/MinBias/GEN-SIM-RECO/START3X_V26A_356ReReco-v1/0009/FEBF7874-EF3D-DF11-910D-002354EF3BDF.root',
+'/store/mc/Spring10/MinBias/GEN-SIM-RECO/START3X_V26A_356ReReco-v1/0009/FEA8ECD8-F13D-DF11-8EBD-00304867BFAE.root'
     ]
-process.maxEvents.input = -1
+
+process.maxEvents.input = 10000
 
 #-- Select good events -----------------------------------------------------------
 process.load("RecoBTag.PerformanceMeasurements.getEvent_cff")
 
 #-- Calibration tag -----------------------------------------------------------
-process.GlobalTag.globaltag = cms.string('START3X_V25B::All')
+process.GlobalTag.globaltag = cms.string('START3X_V26A::All')
 
 #-------------------- TO RUN DATA -----------------
 
@@ -67,13 +63,13 @@ switchJECSet( process, "Summer09_7TeV_ReReco332")
 #----------- load pat sequence -------------------------------------
 # load as last so every setting will be applyed to all jets collection added
 
-process.load("RecoBTag.PerformanceMeasurements.PM_pat_Layer1_cfg")
+from RecoBTag.PerformanceMeasurements.PM_pat_Layer1_cfg import * 
+
 from PhysicsTools.PatAlgos.tools.jetTools import *
 
-#-------------------- TO RUN ON DATA -----------------
+#-------------------- PATH TO RUN  -----------------
 
 process.p = cms.Path( process.getEventMC*process.PM_tuple)
-
 
 #-------- OUTPUT MODULE configuration -----------------------------------------------
 
