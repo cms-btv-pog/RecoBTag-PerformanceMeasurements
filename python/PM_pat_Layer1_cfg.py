@@ -11,6 +11,7 @@ process.load("PhysicsTools.PatAlgos.patSequences_cff")
 #-- Extra Jet/MET collections -------------------------------------------------
 from PhysicsTools.PatAlgos.tools.jetTools import *
 from PhysicsTools.PatAlgos.tools.metTools import *
+addPfMET(process, 'PF')
 
 #-----------------------------------------------------  Tune content ----------------------------------------------------------
 
@@ -94,7 +95,7 @@ process.selectedPatMuons.cut= cms.string('pt > 3. & abs(eta) < 2.4 & isGlobalMuo
 
 process.selectedPatJets.cut = cms.string('pt > 10. & abs(eta) < 2.4')
 process.selectedPatJetsAK5PF.cut = cms.string('pt > 8. & abs(eta) < 2.4')
-process.selectedPatJetsAK5Track.cut = cms.string('pt > 8. & abs(eta) < 2.4')
+process.selectedPatJetsAK5Track.cut = cms.string('pt > 5. & abs(eta) < 2.4')
 
 #process.countPatMuons.minNumber = cms.uint32(1)
 #process.countPatJets.minNumber = cms.uint32(2) # commented to avoid bias against other jet collections
