@@ -16,7 +16,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.11 2010/03/17 09:25:08 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.12 2010/04/01 11:46:51 jandrea Exp $
 //
 //
 
@@ -99,7 +99,7 @@ struct ltstr
 
 
 //
-// class decleration
+// class declaration
 //
 //using BTagMCTools::JetFlavour;
 using namespace edm;
@@ -120,8 +120,11 @@ private:
 
     float calculPtRel();
 
-    reco::JetFlavour getMatchedParton(const reco::CaloJet &jet);
+    reco::JetFlavour getMatchedParton(const reco::Jet &jet);
     float calculPtRel(reco::Track theMuon, reco::Jet theJet, double JES );
+//$$
+    void setTracksPV( const reco::Vertex *pv, bool isPV );
+//$$
 
     // ----------member data ---------------------------
     std::string outputFile_;
@@ -174,7 +177,7 @@ private:
 
     std::map<edm::RefToBase<reco::Jet>, unsigned int, ltstr> flavoursMapf;
     edm::Handle<reco::JetFlavourMatchingCollection> theJetPartonMapf;
-    int TaggedJet(reco::CaloJet , edm::Handle<reco::JetTagCollection >  );
+    int TaggedJet(reco::Jet , edm::Handle<reco::JetTagCollection >  );
 
     TNtuple* nTuplesJets;
     TrackClassifier classifier_;
@@ -222,31 +225,43 @@ private:
     TTree *smalltree;
     
     int   nTrack;
+    float Track_dxy[10000];
     float Track_dz[10000];
     float Track_zIP[10000];
-    float Track_dxy[10000];
+//$$
+    float Track_length[10000];
+    float Track_dist[10000];
+//$$
+    float Track_IP2D[10000];
+//$$    float Track_IP2Dsig[10000];
+//$$
+    float Track_IP[10000];
+//$$
+    float Track_IPsig[10000];
+    float Track_Proba[10000];
     float Track_pt[10000];
     float Track_eta[10000];
     float Track_phi[10000];
-    float Track_charge[10000];
     float Track_chi2[10000];
-    float Track_IPsig[10000];
-    float Track_IP2D[10000];
-    float Track_IP2Dsig[10000];
-    float Track_Proba[10000];
+    float Track_charge[10000];
+//$$
+    float Track_PVweight[10000];
+    float Track_SVweight[10000];
 
-    float Track_DecayLength[10000];
-    float Track_DistJetAxis[10000];
-
+    int   Track_history[10000];
+    int   Track_category[10000];
+    int   Track_PV[10000];
+    int   Track_SV[10000];
+//$$
     int   Track_nHitStrip[10000];
     int   Track_nHitPixel[10000];
     int   Track_nHitAll[10000];
-    int   Track_nHitTOB[10000];
     int   Track_nHitTIB[10000];
     int   Track_nHitTID[10000];
+    int   Track_nHitTOB[10000];
     int   Track_nHitTEC[10000];
-    int   Track_nHitPXF[10000];
     int   Track_nHitPXB[10000];
+    int   Track_nHitPXF[10000];
     int   Track_isHitL1[10000];
 
     float Track_SharedMuSimHits[10000];
@@ -257,10 +272,6 @@ private:
     float Jet_jes[10000];
     float Jet_eta[10000];
     float Jet_phi[10000];
-    int   Jet_ntracks[10000];
-    int   Jet_flavour[10000];
-    int   Jet_nFirstTrack[10000];
-    int   Jet_nLastTrack[10000]; 
     float Jet_Ip1N[10000];
     float Jet_Ip1P[10000];
     float Jet_Ip2N[10000];
@@ -286,6 +297,10 @@ private:
     float Jet_mu_chi2[10000];
     float Jet_mu_pt[10000];
     float Jet_mu_ptrel[10000];
+    int   Jet_ntracks[10000];
+    int   Jet_flavour[10000];
+    int   Jet_nFirstTrack[10000];
+    int   Jet_nLastTrack[10000]; 
     int   Jet_nFirstSV[10000];
     int   Jet_nLastSV[10000];
     
@@ -313,8 +328,12 @@ private:
     float SV_flight[10000];
     float SV_flightErr[10000];
     
-    int nSelJets;
+//$$    int nSelJets;
     int BitTrigger;
+    int Run;
+    int Evt;
+    int LumiBlock;
+//$$
 };
 
 #endif
