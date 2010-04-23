@@ -18,7 +18,7 @@ bit40data = hltLevel1GTSeed.clone(L1TechTriggerSeeding = cms.bool(True),
                                    )
 
 bit40MC = hltLevel1GTSeed.clone(L1TechTriggerSeeding = cms.bool(True),
-                                 L1SeedsLogicalExpression = cms.string('0 AND (40 OR 41) AND NOT (36 OR 37 OR 38 OR 39) AND NOT ((42 AND NOT 43) OR (43 AND NOT 42))')
+                                 L1SeedsLogicalExpression = cms.string('(40 OR 41) AND NOT (36 OR 37 OR 38 OR 39) AND NOT ((42 AND NOT 43) OR (43 AND NOT 42))')
                                  )
 
 ###### Physics declared trigger bit
