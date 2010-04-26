@@ -78,7 +78,7 @@ for jetName in theJetNames:
    ) 
 
    module.discriminatorSources = cms.VInputTag(
-    cms.InputTag("jetProbabilityBJetTags"+jetName), 
+#    cms.InputTag("jetProbabilityBJetTags"+jetName), 
     cms.InputTag("simpleSecondaryVertexBJetTags"+jetName),
     cms.InputTag("softMuonBJetTags"+jetName), 
     cms.InputTag("softMuonByPtBJetTags"+jetName), 
@@ -93,9 +93,10 @@ for jetName in theJetNames:
 # ususally pt(caloJet)> 30 and pt(muon)>5. Now lowered at the beginning
 process.selectedPatMuons.cut= cms.string('pt > 3. & abs(eta) < 2.4 & isGlobalMuon() & innerTrack().numberOfValidHits()> 7')
 
-process.selectedPatJets.cut = cms.string('pt > 10. & abs(eta) < 2.4')
-process.selectedPatJetsAK5PF.cut = cms.string('pt > 8. & abs(eta) < 2.4')
-process.selectedPatJetsAK5Track.cut = cms.string('pt > 5. & abs(eta) < 2.4')
+process.selectedPatJets.cut = cms.string('pt > 15. & abs(eta) < 2.4 & emEnergyFraction() >0.01 & jetID().n90Hits>1 & jetID().fHPD < 0.98  ')
+#process.selectedPatJetsAK5PF.cut = cms.string('pt > 15. & abs(eta) < 2.4 & neutralHadronEnergyFraction() < 1.0 & neutralEmEnergyFraction() < 1.0 & nConstituents() > 1 & chargedHadronEnergyFraction() > 0.0 & chargedMultiplicity() > 0.0 & chargedEmEnergyFraction() < 1.0')
+process.selectedPatJetsAK5PF.cut = cms.string('pt > 15. & abs(eta) < 2.4')
+process.selectedPatJetsAK5Track.cut = cms.string('pt > 10. & abs(eta) < 2.4')
 
 #process.countPatMuons.minNumber = cms.uint32(1)
 #process.countPatJets.minNumber = cms.uint32(2) # commented to avoid bias against other jet collections
