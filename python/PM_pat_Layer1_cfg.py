@@ -1,7 +1,5 @@
 #
-#  
 #
-
 # load PAT
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
@@ -35,7 +33,6 @@ from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
 switchOnTrigger( process )
 
 #----------------- Add other jet collection  ----------------------------------------------------------
-
 addJetCollection(process, 
                  cms.InputTag('ak5TrackJets'),
                  'AK5', 'Track',
@@ -62,13 +59,25 @@ addJetCollection(process,
                  doJetID      = False
                  )
 
+
 #-----------------------------------------------------  slim objects ----------------------------------------------------------
+
+#-----------------------------------------------------  B-tagging ----------------------------------------------------------
+
+process.load("RecoBTag.SecondaryVertex.simpleSecondaryVertex3TrkES_cfi")
+process.load("RecoBTag.SecondaryVertex.simpleSecondaryVertexHighPurBJetTags_cfi")
 
 # remove the complex tagger at the beginnig to save space: for example remove softelectronTagInfos and combinedSV, jetBProb
 
 theJetNames = ['','AK5PF','AK5Track']
 
 for jetName in theJetNames:
+
+###### needed temporarily for the Secondary vertex backporting
+
+   module = setattr( process, 'simpleSecondaryVertexHighPurBJetTags'+jetName, process.simpleSecondaryVertexHighPurBJetTags.clone(tagInfos = cms.VInputTag("secondaryVertexTagInfos"+jetName)) )
+
+###### to slim the tagInfo
    module = getattr(process,'patJets'+jetName)
 
    module.tagInfoSources = cms.VInputTag(
@@ -80,13 +89,13 @@ for jetName in theJetNames:
    module.discriminatorSources = cms.VInputTag(
 #    cms.InputTag("jetProbabilityBJetTags"+jetName), 
     cms.InputTag("simpleSecondaryVertexBJetTags"+jetName),
+    cms.InputTag("simpleSecondaryVertexHighPurBJetTags"+jetName),
     cms.InputTag("softMuonBJetTags"+jetName), 
     cms.InputTag("softMuonByPtBJetTags"+jetName), 
     cms.InputTag("softMuonByIP3dBJetTags"+jetName), 
     cms.InputTag("trackCountingHighEffBJetTags"+jetName), 
     cms.InputTag("trackCountingHighPurBJetTags"+jetName)
    )
-
 
 #-----------------------------------------------------  Pre-selection ----------------------------------------------------------
 
@@ -118,5 +127,8 @@ process.selectedPatJetsAK5Track.cut = cms.string('pt > 10. & abs(eta) < 2.4')
 # Sequence
 #process.p = cms.Path( process.patDefaultSequence*process.patTrigger*process.patTriggerEvent )
 
-process.PM_tuple = cms.Sequence( process.patDefaultSequence )
+process.PM_tuple = cms.Sequence( process.simpleSecondaryVertexHighPurBJetTags*process.patDefaultSequence )
+
+process.PM_tuple.replace(process.simpleSecondaryVertexBJetTagsAK5PF, process.simpleSecondaryVertexBJetTagsAK5PF*process.simpleSecondaryVertexHighPurBJetTagsAK5PF)
+process.PM_tuple.replace(process.simpleSecondaryVertexBJetTagsAK5Track, process.simpleSecondaryVertexBJetTagsAK5Track*process.simpleSecondaryVertexHighPurBJetTagsAK5Track)
 
