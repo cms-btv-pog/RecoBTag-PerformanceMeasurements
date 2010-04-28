@@ -107,7 +107,7 @@ process.selectedPatJets.cut = cms.string('pt > 15. & abs(eta) < 2.4 & emEnergyFr
 process.selectedPatJetsAK5PF.cut = cms.string('pt > 15. & abs(eta) < 2.4')
 process.selectedPatJetsAK5Track.cut = cms.string('pt > 10. & abs(eta) < 2.4')
 
-#process.countPatMuons.minNumber = cms.uint32(1)
+process.countPatMuons.minNumber = cms.uint32(1)
 #process.countPatJets.minNumber = cms.uint32(2) # commented to avoid bias against other jet collections
 
 # deltaR cut filters

@@ -81,9 +81,9 @@ process.out.fileName = 'PM_pattuple_MC.root'
 process.out.dropMetaData = cms.untracked.string('DROPPED')   # Get rid of metadata related to dropped collections
 process.out.outputCommands = [ 'drop *' ]
 
-#process.out.SelectEvents = cms.untracked.PSet(
-#    SelectEvents = cms.vstring('p1','p2')
-#)
+process.out.SelectEvents = cms.untracked.PSet(
+    SelectEvents = cms.vstring('p')
+)
 
 # Explicit list of collections to keep (basis is default PAT event content)
 process.out.outputCommands.extend( [ # PAT Objects
@@ -95,6 +95,9 @@ process.out.outputCommands.extend( [ # PAT Objects
                                      # Generator particles/jets/MET
                                      'keep recoGenParticles_genParticles_*_*',
                                      'keep recoGenJets_ak5GenJets_*_*',
+                                     # MET information
+	                             'keep recoGenMETs_*_*_*',
+                                     'keep *_patMETs*_*_*',            # All METs
                                      # Luminosity information
                                      'keep edmMergeableCounter_eventCountProducer_*_*',
                                      # Trigger information

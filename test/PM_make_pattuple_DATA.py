@@ -59,42 +59,6 @@ process.source.fileNames = [
 
     ]
 
-#process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange('132569:222-132569:582','132654:1-132654:268','132599:381-132599:538','132599:1-132599:379','132606:1-132606:37','132648:1-132648:78','132605:831-132605:968','132605:624-132605:829','132605:446-132605:622','132605:1-132605:444','132602:1-132602:83','132601:261-132601:1131','132601:209-132601:259','132601:1-132601:207','132646:7-132646:79','132440:157-132440:401','132440:141-132440:156','132440:86-132440:138','132440:85-132440:85','132597:1-132597:48','132572:58-132572:68','132572:1-132572:56','132596:382-132596:453','132658:1-132658:177','132471:148-132471:361','132471:143-132471:147','132471:132-132471:142','132473:1-132473:29','132716:593-132716:640','132716:220-132716:591','132650:146-132650:180','132650:1-132650:144','132653:1-132653:87','132652:1-132652:160','132478:1-132478:155','132598:1-132598:188','132656:1-132656:140')
-
-process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange(
-	'132440:85-132440:138',
-	'132440:141-132440:401',
-	'132473:1-132473:29',
-	'132476:23-132476:28',
-	'132476:54-132476:57',
-	'132477:1-132477:5',
-	'132477:34-132477:35',
-	'132477:63-132477:64',
-	'132477:90-132477:93',
-	'132477:118-132477:121',
-	'132477:148-132477:149',
-	'132477:176-132477:179',
-	'132477:225-132477:236',
-	'132477:368-132477:384',
-	'132477:517-132477:520',
-	'132569:222-132569:224',
-	'132569:310-132569:310',
-	'132569:411-132569:419',
-	'132569:529-132569:582',
-	'132596:382-132596:383',
-	'132596:447-132596:453',
-	'132598:80-132598:82',
-	'132598:174-132598:188',
-	'132599:1-132599:74',
-	'132601:261-132601:1131',
-	'132602:1-132602:83',
-	'132605:1-132605:444',
-	'132605:446-132605:622',
-	'132605:624-132605:829',
-	'132605:831-132605:968',
-	'132606:1-132606:37',
-)
-
 #-- EndImput Source -----------------------------------------------------------
 
 process.maxEvents.input = -1
@@ -104,7 +68,8 @@ process.load("RecoBTag.PerformanceMeasurements.getEvent_cff")
 
 #-- Calibration tag -----------------------------------------------------------
 #process.GlobalTag.globaltag = cms.string('GR10_P_V4::All')  # for the /MinimumBias/Commissioning10-GOODCOLL-v8/RAW-RECO (run 132514-today)
-process.GlobalTag.globaltag = cms.string('GR_R_35X_V6::All') # for the /MinimumBias/Commissioning10-Apr1Skim_GOODCOLL-v1/RAW-RECO (run 132440-132513)
+#process.GlobalTag.globaltag = cms.string('GR_R_35X_V6::All') # for the /MinimumBias/Commissioning10-Apr1Skim_GOODCOLL-v1/RAW-RECO (run 132440-132513)
+process.GlobalTag.globaltag = cms.string('GR_R_35X_V7A::All') # for the /MinimumBias/Commissioning10-Apr20Skim_GOODCOLL-v1/RAW-RECO
 
 #-------------------- TO RUN DATA -----------------
 
@@ -148,9 +113,9 @@ process.out.fileName = 'PM_pattuple_DATA.root'
 process.out.dropMetaData = cms.untracked.string('DROPPED')   # Get rid of metadata related to dropped collections
 process.out.outputCommands = [ 'drop *' ]
 
-#process.out.SelectEvents = cms.untracked.PSet(
-#    SelectEvents = cms.vstring('p1','p2')
-#)
+process.out.SelectEvents = cms.untracked.PSet(
+    SelectEvents = cms.vstring('p')
+)
 
 # Explicit list of collections to keep (basis is default PAT event content)
 process.out.outputCommands.extend( [ # PAT Objects
@@ -162,6 +127,9 @@ process.out.outputCommands.extend( [ # PAT Objects
                                      # Generator particles/jets/MET
                                      'keep recoGenParticles_genParticles_*_*',
                                      'keep recoGenJets_ak5GenJets_*_*',
+                                     # MET information
+                                     'keep *_patMETs*_*_*',            # All METs
+                                     'keep recoGenMETs_*_*_*',
                                      # Luminosity information
                                      'keep edmMergeableCounter_eventCountProducer_*_*',
                                      # Trigger information
