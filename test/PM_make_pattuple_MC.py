@@ -34,7 +34,7 @@ process.maxEvents.input = 10000
 process.load("RecoBTag.PerformanceMeasurements.getEvent_cff")
 
 #-- Calibration tag -----------------------------------------------------------
-process.GlobalTag.globaltag = cms.string('START3X_V26A::All')
+process.GlobalTag.globaltag = cms.string('START3X_V26::All')
 
 #-------------------- TO RUN DATA -----------------
 
@@ -67,9 +67,15 @@ from RecoBTag.PerformanceMeasurements.PM_pat_Layer1_cfg import *
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
 
+#----------- recover genJets for Spring10 reprocessed samples
+process.load('RecoJets.Configuration.GenJetParticles_cff')
+process.load('RecoJets.Configuration.RecoGenJets_cff')
+
 #-------------------- PATH TO RUN  -----------------
 
-process.p = cms.Path( process.getEventMC*process.PM_tuple)
+process.p = cms.Path( process.getEventMC*
+                      process.genParticlesForJets*process.ak5GenJets*
+                      process.PM_tuple)
 
 #-------- OUTPUT MODULE configuration -----------------------------------------------
 
