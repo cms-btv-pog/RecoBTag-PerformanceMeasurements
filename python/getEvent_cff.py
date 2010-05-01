@@ -47,6 +47,9 @@ noScraping= cms.EDFilter("FilterOutScraping",
 eventCountProducer = cms.EDProducer("EventCountProducer")
 
 
-getEventDATA = cms.Sequence(bit40data*eventCountProducer*physDecl*noScraping*oneGoodVertexFilter)
-getEventMC = cms.Sequence(bit40MC*eventCountProducer*noScraping*oneGoodVertexFilter)
+getEventDATA = cms.Sequence(#bit40data*
+    eventCountProducer* #physDecl*
+    noScraping*oneGoodVertexFilter)
+getEventMC = cms.Sequence(#bit40MC*
+    eventCountProducer*noScraping*oneGoodVertexFilter)
 
