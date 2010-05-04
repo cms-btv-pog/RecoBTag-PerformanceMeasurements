@@ -30,16 +30,16 @@ void PMHistograms::Add()
     fAwaytagger = "TrackCounting";
     fAwaylevel = "Loose";
 
-    fTrackCountingMap["Loose"]  = 2.0; // use TC2:high eff.
-    fTrackCountingMap["Medium"] = 4.2; // use TC2:high eff.
-    fTrackCountingMap["Tight"]  = 4.1;
+    fTrackCountingMap["Loose"]  = 1.7; // use TC2:high eff.
+    fTrackCountingMap["Medium"] = 3.3; // use TC2:high eff.
+    fTrackCountingMap["Tight"]  = 3.4;
 
-    const int nptarray = 4;
+    const int nptarray = 7;
     const int netaarray = 4;
 	const int nptrelarray = 51;
     //const int ncorrptarray = 3;
     //const int ncorretaarray = 5;
-    Double_t jetptbins[nptarray] = {50., 60, 80., 230.};
+    Double_t jetptbins[nptarray] = {10.,20.,30.,50., 70, 100., 230.};
     Double_t jetetabins[netaarray] = {0.0,1.0,1.5,2.5};
 	Double_t ptrelbins[nptrelarray] = {0.,0.1,0.2,0.3,0.4,
 									   0.5,0.6,0.7,0.8,0.9,
@@ -205,6 +205,7 @@ void PMHistograms::Add()
     fstore->add( new TH1D("jet_pTrel_udsg","p_{Trel} [GeV/c]" , 50, 0, 5 ) );
 
     fstore->add( new TH1F( "jet_pt", "jet pt", 30, 0, 150) );
+    fstore->add( new TH1F( "awayjet_pt", "jet pt", 30, 0, 150) );
     fstore->add( new TH1F( "muon_pt", "muon pt", 300, 0, 50) );
     fstore->add( new TH1F( "ptRel", "ptRel", 100, 0, 10) );
     fstore->add( new TH1F( "deltaPhi","deltaPhi",80,-3.15,3.15) );
