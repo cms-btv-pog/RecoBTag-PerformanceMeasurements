@@ -41,16 +41,16 @@ int main (int argc, char* argv[])
 
     parser.addOption ("Tagger",   optutl::CommandLineParser::kString,
                       "b tagger alias (TCHE,TCHP,JP,SSV)",
-                      "TCHP");
+                      "TCHE");
     parser.addOption ("TaggerCut",   optutl::CommandLineParser::kDouble,
                       "b tag discriminator cut",
-                      2.17);
+                      3.3);
     parser.addOption ("AwayTagger",   optutl::CommandLineParser::kString,
                       "b tagger alias (TCHE,TCHP,JP,SSV)",
                       "TCHP");
     parser.addOption ("AwayTaggerCut",   optutl::CommandLineParser::kDouble,
                       "b tag discriminator cut",
-                      1.34);
+                      1.19);
 
 
     // Parse the command line arguments
@@ -75,10 +75,10 @@ int main (int argc, char* argv[])
     std::string awayTagger = btagMap.find(parser.stringValue( "AwayTagger" ) )->second; 
     double btag_cut_Tagger = parser.doubleValue( "TaggerCut" );
     double btag_cut_awayTagger = parser.doubleValue( "AwayTaggerCut" );
-	double min_jet_pt = 50.;
+    double min_jet_pt = 15.;
 	
     int outputEvery = parser.integerValue ( "outputEvery" );
-	int maxNevents = parser.integerValue ( "maxevents" );
+    int maxNevents = parser.integerValue ( "maxevents" );
 	
     cout << "outputEvery = " << outputEvery << endl;
 
@@ -149,11 +149,13 @@ int main (int argc, char* argv[])
 
         // load object collections
         fwlite::Handle< vector< pat::Jet > > jetHandle;
-        jetHandle.getByLabel ( events, "selectedLayer1JetsAK5");
+//        jetHandle.getByLabel ( events, "selectedPatJetsAK5Track");
+//        jetHandle.getByLabel ( events, "selectedPatJetsAK5PF");
+        jetHandle.getByLabel ( events, "selectedPatJets");
         assert ( jetHandle.isValid() );
 
         fwlite::Handle< vector< pat::Muon > > muonHandle;
-        muonHandle.getByLabel ( events, "selectedLayer1Muons");
+        muonHandle.getByLabel ( events, "selectedPatMuons");
         assert ( muonHandle.isValid() ); // we should always have muons because of the pre-selections
 
         TLorentzVector p4Jet;
@@ -297,6 +299,7 @@ int main (int argc, char* argv[])
 
                     // skip muon in jet
                     if ( p4AwayJet == p4MuJet ) continue;
+					hstore->hist("awayjet_pt")->Fill (awayjetIter->pt()); // just for testing
 
                     // now we have an away jet
                     // find an away tagged jet
