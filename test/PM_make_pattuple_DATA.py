@@ -67,9 +67,7 @@ process.maxEvents.input = -1
 process.load("RecoBTag.PerformanceMeasurements.getEvent_cff")
 
 #-- Calibration tag -----------------------------------------------------------
-#process.GlobalTag.globaltag = cms.string('GR10_P_V4::All')  # for the /MinimumBias/Commissioning10-GOODCOLL-v8/RAW-RECO (run 132514-today)
-#process.GlobalTag.globaltag = cms.string('GR_R_35X_V6::All') # for the /MinimumBias/Commissioning10-Apr1Skim_GOODCOLL-v1/RAW-RECO (run 132440-132513)
-process.GlobalTag.globaltag = cms.string('GR_R_35X_V7A::All') # for the /MinimumBias/Commissioning10-Apr20Skim_GOODCOLL-v1/RAW-RECO
+process.GlobalTag.globaltag = cms.string('GR_R_35X_V8B::All') 
 
 #-------------------- TO RUN DATA -----------------
 
@@ -84,7 +82,8 @@ removeMCMatching(process,['All'])
 
 #------------------------ JEC -----------------------
 from PhysicsTools.PatAlgos.tools.jetTools import *
-switchJECSet( process, "Summer09_7TeV_ReReco332")
+##switchJECSet( process, "Summer09_7TeV_ReReco332")
+switchJECSet( process, "Spring10")
 
 #----------- clean up jet filters in path -------------------------------------
 #need to check if we need this clean up jet filters in path
@@ -133,7 +132,7 @@ process.out.outputCommands.extend( [ # PAT Objects
                                      # Luminosity information
                                      'keep edmMergeableCounter_eventCountProducer_*_*',
                                      # Trigger information
-				     'keep edmTriggerResults_TriggerResults_*_HLT*',
+				     'keep edmTriggerResults_TriggerResults_*_*',
                                      #'keep *_hltTriggerSummaryAOD_*_*',
                                      #'keep L1GlobalTriggerObjectMapRecord_*_*_*',
                                      # Others

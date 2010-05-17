@@ -34,7 +34,8 @@ process.maxEvents.input = 10000
 process.load("RecoBTag.PerformanceMeasurements.getEvent_cff")
 
 #-- Calibration tag -----------------------------------------------------------
-process.GlobalTag.globaltag = cms.string('START3X_V26::All')
+#process.GlobalTag.globaltag = cms.string('START3X_V26::All')
+process.GlobalTag.globaltag = cms.string('START36_V7::All')
 
 #-------------------- TO RUN DATA -----------------
 
@@ -49,8 +50,8 @@ process.GlobalTag.globaltag = cms.string('START3X_V26::All')
 #------------------------ JEC -----------------------
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
-switchJECSet( process, "Summer09_7TeV_ReReco332")
-
+#switchJECSet( process, "Summer09_7TeV_ReReco332")
+switchJECSet( process, "Spring10")
 
 #----------- clean up jet filters in path -------------------------------------
 #need to check if we need this clean up jet filters in path
@@ -107,7 +108,7 @@ process.out.outputCommands.extend( [ # PAT Objects
                                      # Luminosity information
                                      'keep edmMergeableCounter_eventCountProducer_*_*',
                                      # Trigger information
-				     'keep edmTriggerResults_TriggerResults_*_HLT*',
+				     'keep edmTriggerResults_TriggerResults_*_*',
                                      #'keep *_hltTriggerSummaryAOD_*_*',
                                      #'keep L1GlobalTriggerObjectMapRecord_*_*_*',
                                      # Others
