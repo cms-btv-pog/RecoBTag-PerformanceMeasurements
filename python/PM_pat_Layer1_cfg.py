@@ -62,10 +62,12 @@ addJetCollection(process,
 
 #-----------------------------------------------------  slim objects ----------------------------------------------------------
 
+#process.patJetsAK5PF.embedPFCandidates = False # this is 80% of the PF jets. is default for now. .
+
 #-----------------------------------------------------  B-tagging ----------------------------------------------------------
 
-process.load("RecoBTag.SecondaryVertex.simpleSecondaryVertex3TrkES_cfi")
-process.load("RecoBTag.SecondaryVertex.simpleSecondaryVertexHighPurBJetTags_cfi")
+#process.load("RecoBTag.SecondaryVertex.simpleSecondaryVertex3TrkES_cfi")
+#process.load("RecoBTag.SecondaryVertex.simpleSecondaryVertexHighPurBJetTags_cfi")
 
 # remove the complex tagger at the beginnig to save space: for example remove softelectronTagInfos and combinedSV, jetBProb
 
@@ -75,7 +77,7 @@ for jetName in theJetNames:
 
 ###### needed temporarily for the Secondary vertex backporting
 
-   module = setattr( process, 'simpleSecondaryVertexHighPurBJetTags'+jetName, process.simpleSecondaryVertexHighPurBJetTags.clone(tagInfos = cms.VInputTag("secondaryVertexTagInfos"+jetName)) )
+#   module = setattr( process, 'simpleSecondaryVertexHighPurBJetTags'+jetName, process.simpleSecondaryVertexHighPurBJetTags.clone(tagInfos = cms.VInputTag("secondaryVertexTagInfos"+jetName)) )
 
 ###### to slim the tagInfo
    module = getattr(process,'patJets'+jetName)
@@ -103,21 +105,21 @@ for jetName in theJetNames:
 process.selectedPatMuons.cut= cms.string('pt > 3. & abs(eta) < 2.4 & isGlobalMuon() & innerTrack().numberOfValidHits()> 7')
 
 process.selectedPatJets.cut = cms.string('pt > 15. & abs(eta) < 2.4 & emEnergyFraction() >0.01 & jetID().n90Hits>1 & jetID().fHPD < 0.98  ')
-#process.selectedPatJetsAK5PF.cut = cms.string('pt > 15. & abs(eta) < 2.4 & neutralHadronEnergyFraction() < 1.0 & neutralEmEnergyFraction() < 1.0 & nConstituents() > 1 & chargedHadronEnergyFraction() > 0.0 & chargedMultiplicity() > 0.0 & chargedEmEnergyFraction() < 1.0')
-process.selectedPatJetsAK5PF.cut = cms.string('pt > 15. & abs(eta) < 2.4')
+process.selectedPatJetsAK5PF.cut = cms.string('pt > 15. & abs(eta) < 2.4 & neutralHadronEnergyFraction() < 1.0 & neutralEmEnergyFraction() < 1.0 & nConstituents() > 1 & chargedHadronEnergyFraction() > 0.0 & chargedMultiplicity() > 0.0 & chargedEmEnergyFraction() < 1.0')
+#process.selectedPatJetsAK5PF.cut = cms.string('pt > 15. & abs(eta) < 2.4')
 process.selectedPatJetsAK5Track.cut = cms.string('pt > 10. & abs(eta) < 2.4')
 
 process.countPatMuons.minNumber = cms.uint32(1)
 #process.countPatJets.minNumber = cms.uint32(2) # commented to avoid bias against other jet collections
 
 # deltaR cut filters
-#DeltaRCut = cms.EDFilter("PMDeltaRFilter",
+# DeltaRCut = cms.EDFilter("PMDeltaRFilter",
 #     Jets = cms.InputTag("selectedPatJets"),
 #     Muons = cms.InputTag("selectedPatMuons"),
 #     MaxDeltaR = cms.double(0.4)
 #)
 
-#DeltaRCutAK5 = cms.EDFilter("PMDeltaRFilter",
+# DeltaRCutAK5 = cms.EDFilter("PMDeltaRFilter",
 #     Jets = cms.InputTag("selectedPatJetsAK5"),
 #     Muons = cms.InputTag("selectedPatMuons"),
 #     MaxDeltaR = cms.double(0.4)
@@ -127,8 +129,9 @@ process.countPatMuons.minNumber = cms.uint32(1)
 # Sequence
 #process.p = cms.Path( process.patDefaultSequence*process.patTrigger*process.patTriggerEvent )
 
-process.PM_tuple = cms.Sequence( process.simpleSecondaryVertexHighPurBJetTags*process.patDefaultSequence )
+#process.PM_tuple = cms.Sequence( process.simpleSecondaryVertexHighPurBJetTags*process.patDefaultSequence )
+process.PM_tuple = cms.Sequence( process.patDefaultSequence )
 
-process.PM_tuple.replace(process.simpleSecondaryVertexBJetTagsAK5PF, process.simpleSecondaryVertexBJetTagsAK5PF*process.simpleSecondaryVertexHighPurBJetTagsAK5PF)
-process.PM_tuple.replace(process.simpleSecondaryVertexBJetTagsAK5Track, process.simpleSecondaryVertexBJetTagsAK5Track*process.simpleSecondaryVertexHighPurBJetTagsAK5Track)
+#process.PM_tuple.replace(process.simpleSecondaryVertexBJetTagsAK5PF, process.simpleSecondaryVertexBJetTagsAK5PF*process.simpleSecondaryVertexHighPurBJetTagsAK5PF)
+#process.PM_tuple.replace(process.simpleSecondaryVertexBJetTagsAK5Track, process.simpleSecondaryVertexBJetTagsAK5Track*process.simpleSecondaryVertexHighPurBJetTagsAK5Track)
 
