@@ -90,7 +90,7 @@ for jetName in theJetNames:
 
    module.discriminatorSources = cms.VInputTag(
 #    cms.InputTag("jetProbabilityBJetTags"+jetName), 
-    cms.InputTag("simpleSecondaryVertexBJetTags"+jetName),
+    cms.InputTag("simpleSecondaryVertexHighEffBJetTags"+jetName),
     cms.InputTag("simpleSecondaryVertexHighPurBJetTags"+jetName),
     cms.InputTag("softMuonBJetTags"+jetName), 
     cms.InputTag("softMuonByPtBJetTags"+jetName), 
@@ -98,6 +98,7 @@ for jetName in theJetNames:
     cms.InputTag("trackCountingHighEffBJetTags"+jetName), 
     cms.InputTag("trackCountingHighPurBJetTags"+jetName)
    )
+
 
 #-----------------------------------------------------  Pre-selection ----------------------------------------------------------
 
@@ -125,7 +126,6 @@ process.countPatMuons.minNumber = cms.uint32(1)
 #     MaxDeltaR = cms.double(0.4)
 #)
  
-
 # Sequence
 #process.p = cms.Path( process.patDefaultSequence*process.patTrigger*process.patTriggerEvent )
 
