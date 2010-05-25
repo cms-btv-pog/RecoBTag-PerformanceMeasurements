@@ -11,7 +11,7 @@
  Author: Francisco Yumiceva
 */
 //
-// $Id: OperatingPoints.cc,v 1.9 2009/10/03 20:00:34 yumiceva Exp $
+// $Id: OperatingPoints.cc,v 1.10 2010/03/31 23:29:36 jindal Exp $
 //
 //
 
@@ -323,7 +323,7 @@ void OperatingPoints::analyze(const Event& iEvent, const EventSetup& iSetup)
         double jetcorrection = 1.;
         if (useJetCorr_ == true)
         {
-            jetcorrection =  acorrector->correction(*jet, iEvent, iSetup);
+            jetcorrection =  acorrector->correction(*jet);
         }
 
         // Jet quality cuts part 1

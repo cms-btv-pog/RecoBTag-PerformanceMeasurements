@@ -11,7 +11,7 @@
  Author: Francisco Yumiceva
 */
 //
-// $Id: plotEff.cc,v 1.5 2009/09/08 21:01:30 yumiceva Exp $
+// $Id: plotEff.cc,v 1.6 2010/03/31 23:31:36 jindal Exp $
 //
 //
 
@@ -334,7 +334,7 @@ plotEff::analyze(const Event& iEvent, const EventSetup& iSetup)
         double jetcorrection = 1.;
         if (useJetCorr_ == true)
         {
-            jetcorrection =  acorrector->correction(*jet, iEvent, iSetup);
+            jetcorrection =  acorrector->correction(*jet);
         }
 
         // Jet quality cuts part 1

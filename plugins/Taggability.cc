@@ -10,7 +10,7 @@
 	 Author: Francisco Yumiceva, Fermilab
 */
 //
-// $Id: Taggability.cc,v 1.4 2009/09/04 20:56:03 bazterra Exp $
+// $Id: Taggability.cc,v 1.5 2010/03/31 23:31:15 jindal Exp $
 //
 //
 
@@ -110,7 +110,7 @@ bool Taggability::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
         double jetcorrection = 1.;
         if (useJetCorr_ == true)
         {
-            jetcorrection =  acorrector->correction(*jet, iEvent, iSetup);
+            jetcorrection =  acorrector->correction(*jet);
         }
         jetpt = (jet->pt() * jetcorrection );
         jeteta = std::abs( jet->eta() );

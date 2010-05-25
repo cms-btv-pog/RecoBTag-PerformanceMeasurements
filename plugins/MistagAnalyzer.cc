@@ -458,7 +458,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       
   for ( unsigned int ijet = 0; ijet < jetsColl.size(); ijet++) {
     
-    double JES = acorrector->correction(jetsColl.at(ijet), iEvent, iSetup);
+    double JES = acorrector->correction(jetsColl.at(ijet) );
     double jetpt  = (jetsColl.at(ijet)).pt()  ;
     double jeteta = (jetsColl.at(ijet)).eta() ;
     double ptjet  = jetpt* JES;

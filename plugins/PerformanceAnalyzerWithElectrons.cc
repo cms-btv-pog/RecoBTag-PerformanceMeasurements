@@ -979,7 +979,7 @@ PerformanceAnalyzerWithElectrons::analyze(const Event& iEvent, const EventSetup&
         double jetcorrection = 1.;
         if (useJetCorr_ == true)
         {
-            jetcorrection =  acorrector->correction(*jet, iEvent, iSetup);
+            jetcorrection =  acorrector->correction(*jet);
         }
         // Jet quality cuts
         if ( (jet->pt() * jetcorrection ) <= MinJetPt_ || std::abs( jet->eta() ) >= MaxJetEta_ || jet->emEnergyFraction() < MinEmFraction_ || jet->emEnergyFraction() > MaxEmFraction_ ) continue;
@@ -1143,7 +1143,7 @@ PerformanceAnalyzerWithElectrons::analyze(const Event& iEvent, const EventSetup&
             double jetcorrectionAway_ = 1.;
             if (useJetCorr_ == true)
             {
-                jetcorrectionAway_ =   acorrector->correction(*awayjet, iEvent, iSetup);
+                jetcorrectionAway_ =   acorrector->correction(*awayjet);
             }
             p4AwayJet = p4AwayJet *jetcorrectionAway_;
 
