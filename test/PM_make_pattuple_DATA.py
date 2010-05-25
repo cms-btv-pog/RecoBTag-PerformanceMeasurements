@@ -26,36 +26,9 @@ process.MessageLogger.cerr = cms.untracked.PSet(
 #-- Input Source --------------------------------------------------------------
 process.source.fileNames = [
 
-########  run=132440 #######
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0139/3ADE63D6-923E-DF11-B92A-001A92971BD8.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0133/6E74370E-6D3E-DF11-890B-0018F3D09684.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0132/C851858F-613E-DF11-A403-00261894387E.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0132/C0938B90-613E-DF11-8F45-00261894386D.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0132/9A9D3396-613E-DF11-8643-00261894398B.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0132/02CA6895-613E-DF11-A4F0-003048678B92.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0131/E024013C-5D3E-DF11-8F34-0018F3D09682.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0131/DE499234-603E-DF11-94A6-003048678B06.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0131/BAFFF7F1-5A3E-DF11-9F13-00248C0BE018.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0131/A8F6AE35-5D3E-DF11-8601-002354EF3BE0.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0131/8C884021-5B3E-DF11-9D5E-003048678ADA.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0131/7AA74636-603E-DF11-A5DE-003048678F8A.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0131/62DE6421-5B3E-DF11-B53B-003048678FA6.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0131/58C598F2-5A3E-DF11-9B89-00304867BEE4.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0131/40EA1340-5D3E-DF11-B49E-0026189438D7.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0130/FAED0412-5A3E-DF11-B5B7-002618943870.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0130/EC8E3A0D-5A3E-DF11-A4CC-002618943900.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0130/D2DB4C0A-593E-DF11-97AE-00304867902C.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0130/C82F420B-5A3E-DF11-B9FD-002618943948.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0130/BED9F431-593E-DF11-925F-003048D15E24.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0130/98FEF80A-5A3E-DF11-B1AF-00248C0BE018.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0130/7CF5670C-5A3E-DF11-8C52-003048678F1C.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0130/5AAA5A6D-553E-DF11-AEE5-002354EF3BE6.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0130/50BFA301-593E-DF11-9B2E-00304867918E.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0130/50178414-593E-DF11-851A-0030486790B0.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0130/14C3AF58-563E-DF11-B19B-00261894396F.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0130/1092AD71-973E-DF11-8F4E-0018F3D096D8.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0129/58274A60-523E-DF11-A311-0030486792F0.root',
-'/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0129/322D2491-533E-DF11-9711-003048679000.root'
+ '/store/data/Run2010A/Mu/RECO/v2/000/136/089/D802058C-6E67-DF11-B721-000423D98634.root',
+ '/store/data/Run2010A/Mu/RECO/v2/000/136/087/F63A8D4C-6167-DF11-BD3A-000423D944F8.root',
+ '/store/data/Run2010A/Mu/RECO/v2/000/136/087/7AE9EF4A-7D67-DF11-97EC-0030487CD7CA.root'
 
     ]
 
@@ -67,7 +40,7 @@ process.maxEvents.input = -1
 process.load("RecoBTag.PerformanceMeasurements.getEvent_cff")
 
 #-- Calibration tag -----------------------------------------------------------
-process.GlobalTag.globaltag = cms.string('GR_R_35X_V8B::All') 
+process.GlobalTag.globaltag = cms.string('GR10_P_V5::All')
 
 #-------------------- TO RUN DATA -----------------
 
