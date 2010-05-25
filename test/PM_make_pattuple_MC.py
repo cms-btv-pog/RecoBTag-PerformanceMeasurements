@@ -34,8 +34,7 @@ process.maxEvents.input = 10000
 process.load("RecoBTag.PerformanceMeasurements.getEvent_cff")
 
 #-- Calibration tag -----------------------------------------------------------
-#process.GlobalTag.globaltag = cms.string('START3X_V26::All')
-process.GlobalTag.globaltag = cms.string('START36_V7::All')
+process.GlobalTag.globaltag = cms.string('START36_V4::All')
 
 #-------------------- TO RUN DATA -----------------
 
