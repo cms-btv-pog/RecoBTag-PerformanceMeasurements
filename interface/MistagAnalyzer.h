@@ -16,7 +16,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.12 2010/04/01 11:46:51 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.13 2010/04/11 20:16:23 jandrea Exp $
 //
 //
 
@@ -151,8 +151,10 @@ private:
     std::string combinedSvtxModuleName_;
     std::string combinedSvtxNegModuleName_;
 
-    std::string svtxModuleName_;
-    std::string svtxNegModuleName_;
+    std::string svtxModuleNameHighPur_;
+    std::string svtxNegModuleNameHighPur_;
+    std::string svtxModuleNameHighEff_;
+    std::string svtxNegModuleNameHighEff_;
 
     std::string softMuonModuleName_;
     std::string softMuonNegModuleName_;
@@ -199,7 +201,8 @@ private:
     TH1F* hData_Tagger_TCHE     ;
     TH1F* hData_Tagger_TCHP     ;
     TH1F* hData_Tagger_JP	;
-    TH1F* hData_Tagger_SSV      ;
+    TH1F* hData_Tagger_SSVHE    ;
+    TH1F* hData_Tagger_SSVHP    ;
     TH1F* hData_Tagger_CSV      ;
     TH1F* hData_Tagger_MU	;
 
@@ -281,8 +284,10 @@ private:
     float Jet_ProbaN[10000];
     float Jet_ProbaP[10000];
     float Jet_Proba[10000];
-    float Jet_SvxN[10000];
-    float Jet_Svx[10000];
+    float Jet_SvxNHE[10000];
+    float Jet_SvxHE[10000];
+    float Jet_SvxNHP[10000];
+    float Jet_SvxHP[10000];
     float Jet_CombSvxN[10000];
     float Jet_CombSvx[10000];
     float Jet_SoftMuN[10000];

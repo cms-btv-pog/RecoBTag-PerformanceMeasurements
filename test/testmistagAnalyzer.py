@@ -2,9 +2,8 @@ import FWCore.ParameterSet.Config as cms
 
 from SimTracker.TrackAssociation.TrackAssociatorByChi2_cfi import *
 from SimTracker.TrackAssociation.TrackAssociatorByHits_cfi import *
-from JetMETCorrections.Configuration.JetCorrectionsRecord_cfi import *
 from RecoBTag.ImpactParameter.impactParameter_cfi import *
-from RecoJets.JetAssociationProducers.ak5JTA_cff import *
+
 process = cms.Process("Demo")
 
 
@@ -13,14 +12,17 @@ process.source = cms.Source(
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(   
 
-    '/store/data/Commissioning10/MinimumBias/RECO/v7/000/132/440/F4C92A98-163C-DF11-9788-0030487C7392.root',
-    '/store/data/Commissioning10/MinimumBias/RECO/v7/000/132/440/F427D642-173C-DF11-A909-0030487C60AE.root',
-    '/store/data/Commissioning10/MinimumBias/RECO/v7/000/132/440/E27821C3-0C3C-DF11-9BD9-0030487CD718.root',
-    '/store/data/Commissioning10/MinimumBias/RECO/v7/000/132/440/D87D5469-2E3C-DF11-A470-000423D99896.root',
-    '/store/data/Commissioning10/MinimumBias/RECO/v7/000/132/440/B647CAD9-0E3C-DF11-886F-0030487CD716.root',
-    '/store/data/Commissioning10/MinimumBias/RECO/v7/000/132/440/A860D55E-193C-DF11-BE29-0030487C60AE.root',
-    '/store/data/Commissioning10/MinimumBias/RECO/v7/000/132/440/9884BC11-0C3C-DF11-8F9C-000423D986C4.root',
-    '/store/data/Commissioning10/MinimumBias/RECO/v7/000/132/440/92684831-233C-DF11-ABA0-0030487CD16E.root'
+    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/FE6E09F4-8439-DF11-B704-001A928116CC.root',
+    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/F02962F3-8439-DF11-9CAE-001BFCDBD176.root',
+    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/C4976FEF-8439-DF11-B754-002618943986.root',
+    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/C23B14EF-8439-DF11-B4C9-002618943865.root',
+    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/A4799EEF-8439-DF11-83E6-003048678AFA.root',
+    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/A017DAF1-8439-DF11-8D10-0026189437FD.root',
+    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/963EF3F2-8439-DF11-8492-00304867C1BA.root',
+    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/9001B3F3-8439-DF11-A139-001A928116F2.root',
+    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/8CF5C4F1-8439-DF11-99DD-0018F3D09614.root'
+    
+    
     
     )
 )
@@ -34,8 +36,8 @@ process.maxEvents = cms.untracked.PSet(
 #process.load("Configuration.StandardSequences.FakeConditions_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 #process.GlobalTag.globaltag = "MC_31X_V5::All" # use a valid global tag here!
-process.GlobalTag.globaltag = "GR10_P_V4::All" # use a valid global tag here!
-#process.GlobalTag.globaltag = "START3X_V25B::All" # use a valid global tag here!
+#process.GlobalTag.globaltag = "GR10_P_V4::All" # use a valid global tag here!
+process.GlobalTag.globaltag = "START36_V8::All" # use a valid global tag here!
 
 
 process.load("Configuration.StandardSequences.Reconstruction_cff")
@@ -70,8 +72,12 @@ process.load("RecoBTag.ImpactParameter.jetProbabilityBJetTags_cfi")
 
 
 #for Secondary Vertex taggers
+process.load("RecoBTag.SecondaryVertex.secondaryVertexTagInfos_cfi")
 process.load("RecoBTag.SecondaryVertex.secondaryVertexNegativeTagInfos_cfi")
-process.load("RecoBTag.SecondaryVertex.simpleSecondaryVertexNegativeBJetTags_cfi")
+process.load("RecoBTag.SecondaryVertex.simpleSecondaryVertexHighEffBJetTags_cfi")
+process.load("RecoBTag.SecondaryVertex.simpleSecondaryVertexHighPurBJetTags_cfi")
+process.load("RecoBTag.SecondaryVertex.simpleSecondaryVertexNegativeHighEffBJetTags_cfi")
+process.load("RecoBTag.SecondaryVertex.simpleSecondaryVertexNegativeHighPurBJetTags_cfi")
 process.load("RecoBTag.SecondaryVertex.combinedSecondaryVertexNegativeBJetTags_cfi")
 process.load("RecoBTag.SecondaryVertex.combinedSecondaryVertexNegativeES_cfi")
 
@@ -101,10 +107,12 @@ process.load("RecoBTag.SoftLepton.positiveSoftMuonByPtBJetTags_cfi")
 process.load("PhysicsTools.JetMCAlgos.CaloJetsMCFlavour_cfi")  
 
 #############   Include the jet corrections ##########
-process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer09_7TeV_cff")
+#process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer09_7TeV_cff")
 # set the record's IOV. Must be defined once. Choose ANY correction service. #
 #process.prefer("L2L3JetCorrectorIC5Calo") 
-process.prefer("L2L3JetCorrectorAK5PF") 
+#process.prefer("L2L3JetCorrectorAK5PF") 
+process.load("JetMETCorrections.Configuration.DefaultJEC_cff")
+#process.prefer("ak5CaloJetsL2L3") 
 
 
 
@@ -143,19 +151,21 @@ process.out = cms.OutputModule("PoolOutputModule",
 process.mistag.isData = True
 process.mistag.useTrackHistory = False
 process.mistag.Jets = 'ak5PFJets'
-process.mistag.jetCorrector = cms.string('L2L3JetCorrectorAK5PF')
+process.mistag.jetCorrector = cms.string('ak5PFL2L3')
 process.ak5JetTracksAssociatorAtVertex.jets = "ak5PFJets"
-
 process.softMuonTagInfos.jets = "ak5PFJets"
 
 
 process.p = cms.Path(
         #*process.myPartons*process.AK5Flavour
-	process.ak5JetTracksAssociatorAtVertex
+        process.ak5PFJetsL2L3
+	*process.ak5JetTracksAssociatorAtVertex
 	*process.btagging*process.positiveOnlyJetProbabilityJetTags
 	*process.negativeOnlyJetProbabilityJetTags
 	*process.negativeTrackCountingHighEffJetTags*process.negativeTrackCountingHighPur
-	*process.secondaryVertexNegativeTagInfos*process.simpleSecondaryVertexNegativeBJetTags*process.combinedSecondaryVertexNegativeBJetTags
+	*process.secondaryVertexTagInfos*process.simpleSecondaryVertexHighEffBJetTags*process.simpleSecondaryVertexHighPurBJetTags
+	*process.secondaryVertexNegativeTagInfos*process.simpleSecondaryVertexNegativeHighEffBJetTags*process.simpleSecondaryVertexNegativeHighPurBJetTags
+        *process.combinedSecondaryVertexNegativeBJetTags
 	#*process.negativeSoftMuonBJetTags*process.positiveSoftMuonBJetTags	
 	*process.negativeSoftLeptonByPtBJetTags*process.positiveSoftLeptonByPtBJetTags	
 	*process.jetProbabilityBJetTags
