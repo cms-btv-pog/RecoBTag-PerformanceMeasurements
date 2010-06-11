@@ -16,7 +16,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.13 2010/04/11 20:16:23 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.14 2010/05/26 19:08:08 jandrea Exp $
 //
 //
 
@@ -45,6 +45,9 @@ Implementation:
 #include "SimTracker/Records/interface/TrackAssociatorRecord.h"
 #include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
 
+//$$
+#include "RecoBTag/PerformanceMeasurements/interface/CategoryFinder.h"
+//$$
 
 // reco track and vertex
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
@@ -120,11 +123,17 @@ private:
 
     float calculPtRel();
 
+//$$
+    bool findCat(const reco::Track* ,CategoryFinder& );
+    std::vector< float > getTrackProbabilies(std::vector< float > , int );
+    double calculProbability(std::vector< float > );
+//$$
+
     reco::JetFlavour getMatchedParton(const reco::Jet &jet);
     float calculPtRel(reco::Track theMuon, reco::Jet theJet, double JES );
-//$$
+
     void setTracksPV( const reco::Vertex *pv, bool isPV );
-//$$
+
 
     // ----------member data ---------------------------
     std::string outputFile_;
@@ -133,8 +142,6 @@ private:
     std::string flavourMatchOptionf;
     edm::InputTag flavourSourcef;
     //JetFlavourIdentifier jetFlavourIdentifier_;
-
-//$$    std::string primaryVertexColl_;
 
     std::string CaloJetCollectionTags_;
     std::string jetCorrector_;
@@ -225,37 +232,67 @@ private:
     TH1F* hCFlav_Tagger            ;
     TH1F* hBFlav_Tagger            ;
 
+//$$    
+    TH1F*  IPSign_cat0  ;
+    TH1F*  IPSign_cat1  ;
+    TH1F*  IPSign_cat2  ;
+    TH1F*  IPSign_cat3  ;
+    TH1F*  IPSign_cat4  ;
+    TH1F*  IPSign_cat5  ;
+    TH1F*  IPSign_cat6  ;
+    TH1F*  IPSign_cat7  ;
+    TH1F*  IPSign_cat8  ;
+    TH1F*  IPSign_cat9  ;
+    TH1F*  TrackProbaNeg ;
+    TH1F*  TrackProbaNeg_Cat0 ;
+    TH1F*  TrackProbaNeg_Cat1 ;
+    TH1F*  TrackProbaNeg_Cat2 ;
+    TH1F*  TrackProbaNeg_Cat3 ;
+    TH1F*  TrackProbaNeg_Cat4 ;
+    TH1F*  TrackProbaNeg_Cat5 ;
+    TH1F*  TrackProbaNeg_Cat6 ;
+    TH1F*  TrackProbaNeg_Cat7 ;
+    TH1F*  TrackProbaNeg_Cat8 ;
+    TH1F*  TrackProbaNeg_Cat9 ;
+
+    CategoryFinder cat0;
+    CategoryFinder cat1;
+    CategoryFinder cat2;
+    CategoryFinder cat3;
+    CategoryFinder cat4;
+    CategoryFinder cat5;
+    CategoryFinder cat6;
+    CategoryFinder cat7;
+    CategoryFinder cat8;
+    CategoryFinder cat9;
+//$$
+
     TTree *smalltree;
-    
+
     int   nTrack;
     float Track_dxy[10000];
     float Track_dz[10000];
     float Track_zIP[10000];
-//$$
     float Track_length[10000];
     float Track_dist[10000];
-//$$
     float Track_IP2D[10000];
-//$$    float Track_IP2Dsig[10000];
+//$$
+    float Track_IP2Dsig[10000];
 //$$
     float Track_IP[10000];
-//$$
     float Track_IPsig[10000];
     float Track_Proba[10000];
+
+//$$
+    float Track_p[10000];
+//$$
     float Track_pt[10000];
     float Track_eta[10000];
     float Track_phi[10000];
     float Track_chi2[10000];
-    float Track_charge[10000];
-//$$
-    float Track_PVweight[10000];
-    float Track_SVweight[10000];
-
+    int   Track_charge[10000];
     int   Track_history[10000];
-    int   Track_category[10000];
-    int   Track_PV[10000];
-    int   Track_SV[10000];
-//$$
+
     int   Track_nHitStrip[10000];
     int   Track_nHitPixel[10000];
     int   Track_nHitAll[10000];
@@ -267,9 +304,13 @@ private:
     int   Track_nHitPXF[10000];
     int   Track_isHitL1[10000];
 
-    float Track_SharedMuSimHits[10000];
-    float Track_MatchSimTrackID[10000];
-  
+    int   Track_PV[10000];
+    int   Track_SV[10000];
+    float Track_PVweight[10000];
+    float Track_SVweight[10000];
+
+    int   Track_category[10000];
+
     int nJet;
     float Jet_pt[10000];
     float Jet_jes[10000];
@@ -284,21 +325,28 @@ private:
     float Jet_ProbaN[10000];
     float Jet_ProbaP[10000];
     float Jet_Proba[10000];
-    float Jet_SvxNHE[10000];
-    float Jet_SvxHE[10000];
+//$$
+    float Jet_TkProba[10000];
+    float Jet_TkProbaP[10000];
+    float Jet_TkProbaN[10000];
+//$$
+    float Jet_SvxN[10000];
+    float Jet_Svx[10000];
+    int   Jet_SvxNTracks[10000];
+    int   Jet_SvxTracks[10000];
     float Jet_SvxNHP[10000];
     float Jet_SvxHP[10000];
     float Jet_CombSvxN[10000];
     float Jet_CombSvx[10000];
     float Jet_SoftMuN[10000];
     float Jet_SoftMu[10000];
-    float Jet_hist1[10000];
-    float Jet_hist2[10000];
-    float Jet_hist3[10000];
-    float Jet_histJet[10000];
-    float Jet_histSvx[10000];
-    float Jet_histMuon[10000];
-    float Jet_mu_nHit[10000];
+    int   Jet_hist1[10000];
+    int   Jet_hist2[10000];
+    int   Jet_hist3[10000];
+    int   Jet_histJet[10000];
+    int   Jet_histSvx[10000];
+    int   Jet_histMuon[10000];
+    int   Jet_mu_nHit[10000];
     float Jet_mu_chi2[10000];
     float Jet_mu_pt[10000];
     float Jet_mu_ptrel[10000];
@@ -333,12 +381,10 @@ private:
     float SV_flight[10000];
     float SV_flightErr[10000];
     
-//$$    int nSelJets;
     int BitTrigger;
     int Run;
     int Evt;
     int LumiBlock;
-//$$
 };
 
 #endif
