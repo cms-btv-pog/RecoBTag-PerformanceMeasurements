@@ -10,6 +10,9 @@
 #include "RecoBTag/PerformanceMeasurements/interface/PMHistograms.h"
 #include "RecoBTag/PerformanceMeasurements/interface/BTagHistograms.h"
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
+#include "PhysicsTools/SelectorUtils/interface/JetIDSelectionFunctor.h"
+#include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
+#include "PhysicsTools/SelectorUtils/interface/Selector.h"
 
 // ROOT includes
 #include "TAxis.h"
@@ -40,17 +43,20 @@ int main (int argc, char* argv[])
     parser.stringValue ("outputFile") = "PM_results"; // .root added automatically
 
     parser.addOption ("Tagger",   optutl::CommandLineParser::kString,
-                      "b tagger alias (TCHE,TCHP,JP,SSV)",
+                      "b tagger alias (TCHE,TCHP,JP,SSV, SSVHP, SSVHE)",
                       "TCHE");
     parser.addOption ("TaggerCut",   optutl::CommandLineParser::kDouble,
                       "b tag discriminator cut",
                       3.3);
     parser.addOption ("AwayTagger",   optutl::CommandLineParser::kString,
-                      "b tagger alias (TCHE,TCHP,JP,SSV)",
+                      "b tagger alias (TCHE,TCHP,JP,SSV, SSVHP, SSVHE)",
                       "TCHP");
     parser.addOption ("AwayTaggerCut",   optutl::CommandLineParser::kDouble,
                       "b tag discriminator cut",
                       1.19);
+    parser.addOption ("JetCollection",   optutl::CommandLineParser::kString,
+                      "jet collection to use selectedPatJets,selectedPatJetsAK5PF, selectedPatJetsAK5Track)",
+                      "selectedPatJets");
 
 
     // Parse the command line arguments
@@ -70,12 +76,22 @@ int main (int argc, char* argv[])
     btagMap["TCHP"] = "trackCountingHighPurBJetTags";
     btagMap["JP"] = "jetProbabilityBJetTags";
     btagMap["SSV"] = "simpleSecondaryVertexBJetTags";
+    btagMap["SSVHP"] = "simpleSecondaryVertexHighPurBJetTags";
+    btagMap["SSVHE"] = "simpleSecondaryVertexHighEffBJetTags";
     
     std::string Tagger =  btagMap.find( parser.stringValue( "Tagger" ) )->second;
     std::string awayTagger = btagMap.find(parser.stringValue( "AwayTagger" ) )->second; 
     double btag_cut_Tagger = parser.doubleValue( "TaggerCut" );
     double btag_cut_awayTagger = parser.doubleValue( "AwayTaggerCut" );
-    double min_jet_pt = 15.;
+    std::string jetCollection = parser.stringValue( "JetCollection" ) ; 
+
+    double min_jet_pt;
+	if (jetCollection == "selectedPatJetsAK5Track"){
+		min_jet_pt = 10;}
+	else if (jetCollection == "selectedPatJetsAK5PF"){
+		min_jet_pt = 15;}
+	else{
+		min_jet_pt = 20;}
 	
     int outputEvery = parser.integerValue ( "outputEvery" );
     int maxNevents = parser.integerValue ( "maxevents" );
@@ -148,10 +164,16 @@ int main (int argc, char* argv[])
 		
 
         // load object collections
-        fwlite::Handle< vector< pat::Jet > > jetHandle;
-//        jetHandle.getByLabel ( events, "selectedPatJetsAK5Track");
+		fwlite::Handle< vector< pat::Jet > > jetHandle;
+		//       jetHandle.getByLabel ( events, "selectedPatJetsAK5Track");
 //        jetHandle.getByLabel ( events, "selectedPatJetsAK5PF");
-        jetHandle.getByLabel ( events, "selectedPatJets");
+//        jetHandle.getByLabel ( events, "selectedPatJets");
+		if (jetCollection == "selectedPatJetsAK5Track"){
+			jetHandle.getByLabel ( events, "selectedPatJetsAK5Track");}
+		else if (jetCollection == "selectedPatJetsAK5PF"){
+			jetHandle.getByLabel ( events, "selectedPatJetsAK5PF");}
+		else{
+			jetHandle.getByLabel ( events, "selectedPatJets");}
         assert ( jetHandle.isValid() );
 
         fwlite::Handle< vector< pat::Muon > > muonHandle;
@@ -165,14 +187,20 @@ int main (int argc, char* argv[])
 
         // Loop over jets
         for (vector< pat::Jet >::const_iterator jetIter = jetHandle->begin();
-                jetIter != jetHandle->end(); ++jetIter)
+		   jetIter != jetHandle->end(); ++jetIter)
         {
             //std::cout << " jet pt " << jetIter->pt() << std::endl;
             bool TaggedJet = false;
+			double n90 = jetIter->jetID().n90Hits;
+			double fHPD = jetIter->jetID().fHPD;
             // select a good jet
-            if ( jetIter->pt() <= min_jet_pt || std::abs( jetIter->eta() ) >= 2.4 ) continue;
-
-            //std::cout << " jet pt= " << jetIter->pt() << std::endl;
+    		if (jetCollection == "selectedPatJets"){
+				if ( jetIter->pt() <= min_jet_pt || std::abs( jetIter->eta() ) >= 2.4  || n90 <= 1 || jetIter->emEnergyFraction() <= 0.01 || fHPD >= 0.98 ) continue;}
+			else{
+				if ( jetIter->pt() <= min_jet_pt || std::abs( jetIter->eta() ) >= 2.4)  continue;
+				}
+			
+			std::cout << " jet pt= " << jetIter->pt() << std::endl;
 
             hstore->hist("jet_pt")->Fill (jetIter->pt()); // just for testing
             // get MC flavor of jet
@@ -185,13 +213,53 @@ int main (int argc, char* argv[])
             ////////////////////////////////
             double mu_highest_pt = 0;
             double ptrel = 0;
+			double muPt_= 5;
+			double numHit_=11;
+			double numPxHit_=2;
+			double chi2_= 10;
+			double ipCut_= 1;
+			double outHits_=2;
             double ptreltmp = 0;
 
             for (vector< pat::Muon >::const_iterator muonIter = muonHandle->begin();
                     muonIter != muonHandle->end(); ++muonIter)
             {
                 //std::cout << " muon pt " << muonIter->pt() << std::endl;
+                //from Maria
 
+				    if((muonIter->isGlobalMuon() == 0)) continue;
+
+					if( muonIter->innerTrack()->pt() < muPt_ ) continue;
+					
+					double muonHits= muonIter->globalTrack()->hitPattern().numberOfValidMuonHits();
+		
+					if(muonHits==0)continue;
+					
+					double normChi2 = muonIter->globalTrack()->normalizedChi2();     
+					
+					if ( normChi2 >= chi2_ ) continue;
+   
+					if ((!(muonIter->innerTrack()->quality(reco::TrackBase::highPurity)))) continue;
+					
+					int muPxHit = muonIter->innerTrack()->hitPattern().numberOfValidPixelHits();
+					if ( muPxHit < numPxHit_ ) continue;      
+					
+					if ( muonIter->innerTrack()->trackerExpectedHitsOuter().numberOfHits() > outHits_) continue;
+			
+					int muHit = muonIter->innerTrack()->numberOfValidHits();
+			
+					if ( muHit < numHit_ ) continue;     
+   
+			
+					double normTkChi2 = muonIter->innerTrack()->normalizedChi2();
+
+					if (normTkChi2 >= chi2_ ) continue;
+					hstore->hist("muon_pt")->Fill (muonIter->innerTrack()->pt());
+
+//	??????????????????????????????????????????           end
+				
+
+/*             Comment out our old selection				
                 if (muonIter->isGlobalMuon() == false || muonIter->isTrackerMuon() == false) continue;
 
 				reco::TrackRef trackMuon = muonIter->innerTrack();
@@ -199,7 +267,7 @@ int main (int argc, char* argv[])
 										  trackMuon->py(),
 										  trackMuon->pz(),
 										  sqrt(trackMuon->p() * trackMuon->p() + 0.1057*0.1057));
-                //int nhit =  (*(muonIter->innerTrack())).numberOfValidHits();
+                int nhit =  (*(muonIter->innerTrack())).numberOfValidHits();
 
                 // muon cuts
                 double normChi2 = (*(muonIter->combinedMuon())).normalizedChi2();
@@ -207,7 +275,13 @@ int main (int argc, char* argv[])
                 if ( trackMuon->pt() <= 5.0 || (normChi2 >= 5.0 ) ) continue;
 
                 hstore->hist("muon_pt")->Fill (trackMuon->pt());
-
+*/
+				reco::TrackRef trackMuon = muonIter->innerTrack();
+				math::XYZTLorentzVector trackMuonP4(trackMuon->px(),
+										  trackMuon->py(),
+										  trackMuon->pz(),
+										  sqrt(trackMuon->p() * trackMuon->p() + 0.1057*0.1057));
+					
                 // find a muon in a jet
                 //check deltar
                 double deltaR  = ROOT::Math::VectorUtil::DeltaR(jetIter->p4().Vect(),
@@ -295,7 +369,16 @@ int main (int argc, char* argv[])
 					
                     p4AwayJet.SetPtEtaPhiE(awayjetIter->pt(), awayjetIter->eta(), awayjetIter->phi(), awayjetIter->energy() );
                     // Jet quality cuts
-                    if ( (awayjetIter->pt())  <= min_jet_pt || std::abs( awayjetIter->eta() ) >= 2.4 ) continue;
+					double awayn90 = awayjetIter->jetID().n90Hits;
+					double awayfHPD = awayjetIter->jetID().fHPD;
+
+					if (jetCollection == "selectedPatJets"){
+						if ( awayjetIter->pt() <= min_jet_pt || std::abs( awayjetIter->eta() ) >= 2.4  || awayn90 <= 1 || awayjetIter->emEnergyFraction() <= 0.01 || awayfHPD >= 0.98 ) continue;}
+						else{
+							if ( (awayjetIter->pt())  <= min_jet_pt || std::abs( awayjetIter->eta() ) >= 2.4 ) continue;
+						}
+
+
 
                     // skip muon in jet
                     if ( p4AwayJet == p4MuJet ) continue;
@@ -317,13 +400,53 @@ int main (int argc, char* argv[])
 
                     }
                     // find an away muon in jet
-                    if ( !AwayMuonJet )
+					double muPt_= 5;
+					double numHit_=11;
+					double numPxHit_=2;
+					double chi2_= 10;
+					double ipCut_= 1;
+					double outHits_=2;
+					if ( !AwayMuonJet )
                     {
                         mu_highest_pt = 0;
                         for (vector< pat::Muon >::const_iterator muonIter = muonHandle->begin();
                                 muonIter != muonHandle->end(); ++muonIter)
                         {
-                            if (muonIter->isGlobalMuon() == false) continue;
+                 //from Maria
+
+							if((muonIter->isGlobalMuon() == 0)) continue;
+							
+							if( muonIter->innerTrack()->pt() < muPt_ ) continue;
+					
+							double muonHits= muonIter->globalTrack()->hitPattern().numberOfValidMuonHits();
+		
+							if(muonHits==0)continue;
+					
+							double normChi2 = muonIter->globalTrack()->normalizedChi2();     
+					
+							if ( normChi2 >= chi2_ ) continue;
+   
+							if ((!(muonIter->innerTrack()->quality(reco::TrackBase::highPurity)))) continue;
+					
+							int muPxHit = muonIter->innerTrack()->hitPattern().numberOfValidPixelHits();
+							if ( muPxHit < numPxHit_ ) continue;      
+					
+							if ( muonIter->innerTrack()->trackerExpectedHitsOuter().numberOfHits() > outHits_) continue;
+			
+							int muHit = muonIter->innerTrack()->numberOfValidHits();
+			
+							if ( muHit < numHit_ ) continue;     
+   
+			
+							double normTkChi2 = muonIter->innerTrack()->normalizedChi2();
+
+							if (normTkChi2 >= chi2_ ) continue;
+							hstore->hist("muon_pt")->Fill (muonIter->innerTrack()->pt());
+
+//	??????????????????????????????????????????           end
+/* comment out our old selection
+   
+							if (muonIter->isGlobalMuon() == false) continue;
                             //int nhit = muonIter->numberOfValidHits();
                             //int nhit =  (*(muonIter->innerTrack())).numberOfValidHits();
                             // muon cuts
@@ -335,9 +458,15 @@ int main (int argc, char* argv[])
 										  sqrt(trackMuon->p() * trackMuon->p() + 0.1057*0.1057));
                             //if ( (nhit <= 7 ) || (muonIter->pt()<= 5.0) || (normChi2 >= 5.0 ) ) continue;
                             if ( (trackMuon->pt()<= 5.0) || (normChi2 >= 5.0 ) ) continue;
+*/
 
                             // find a muon in a jet
                             //check deltar
+							reco::TrackRef trackMuon = muonIter->innerTrack();
+							math::XYZTLorentzVector trackMuonP4(trackMuon->px(),
+										  trackMuon->py(),
+										  trackMuon->pz(),
+										  sqrt(trackMuon->p() * trackMuon->p() + 0.1057*0.1057));
                             double deltaR  = ROOT::Math::VectorUtil::DeltaR(jetIter->p4().Vect(), trackMuonP4.Vect() );
                             TVector3 tmpvecOrg(awayjetIter->p4().Vect().X(),awayjetIter->p4().Vect().Y(),  awayjetIter->p4().Vect().Z());
                             TVector3 tmpvec;

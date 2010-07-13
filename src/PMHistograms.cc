@@ -1,3 +1,4 @@
+
 #include "RecoBTag/PerformanceMeasurements/interface/PMHistograms.h"
 
 #include "TH2F.h"
@@ -34,12 +35,14 @@ void PMHistograms::Add()
     fTrackCountingMap["Medium"] = 3.3; // use TC2:high eff.
     fTrackCountingMap["Tight"]  = 3.4;
 
-    const int nptarray = 7;
+	// const int nptarray = 7;
+	 const int nptarray = 2;
     const int netaarray = 4;
 	const int nptrelarray = 51;
     //const int ncorrptarray = 3;
     //const int ncorretaarray = 5;
-    Double_t jetptbins[nptarray] = {10.,20.,30.,50., 70, 100., 230.};
+//    Double_t jetptbins[nptarray] = {10.,20.,30.,50., 70, 100., 230.};
+    Double_t jetptbins[nptarray] = {10., 230.};
     Double_t jetetabins[netaarray] = {0.0,1.0,1.5,2.5};
 	Double_t ptrelbins[nptrelarray] = {0.,0.1,0.2,0.3,0.4,
 									   0.5,0.6,0.7,0.8,0.9,
