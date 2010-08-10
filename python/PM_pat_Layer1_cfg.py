@@ -102,16 +102,26 @@ for jetName in theJetNames:
 
 #-----------------------------------------------------  Pre-selection ----------------------------------------------------------
 
-# ususally pt(caloJet)> 30 and pt(muon)>5. Now lowered at the beginning
 process.selectedPatMuons.cut= cms.string('pt > 3. & abs(eta) < 2.4 & isGlobalMuon() & innerTrack().numberOfValidHits()> 7')
+
+process.selectedPatMuonsForPtRel= cms.EDFilter("PATMuonSelector",
+    src = cms.InputTag("patMuons"),
+    cut = cms.string('pt > 5. & abs(eta) < 2.4 & isGlobalMuon() & globalTrack().hitPattern().numberOfValidMuonHits() > 0 & numberOfMatches() > 1 & innerTrack().numberOfValidHits()> 10 & innerTrack().hitPattern().numberOfValidPixelHits()>1 & innerTrack().trackerExpectedHitsOuter().numberOfHits() <3 & innerTrack().normalizedChi2() < 10 & globalTrack().normalizedChi2() < 10 ')
+)
+
+
+# ususally pt(caloJet)> 30. Now lowered at the beginning. For the PF added the loose jetID
 
 process.selectedPatJets.cut = cms.string('pt > 15. & abs(eta) < 2.4 & emEnergyFraction() >0.01 & jetID().n90Hits>1 & jetID().fHPD < 0.98  ')
 process.selectedPatJetsAK5PF.cut = cms.string('pt > 15. & abs(eta) < 2.4 & neutralHadronEnergyFraction() < 1.0 & neutralEmEnergyFraction() < 1.0 & nConstituents() > 1 & chargedHadronEnergyFraction() > 0.0 & chargedMultiplicity() > 0.0 & chargedEmEnergyFraction() < 1.0')
-#process.selectedPatJetsAK5PF.cut = cms.string('pt > 15. & abs(eta) < 2.4')
 process.selectedPatJetsAK5Track.cut = cms.string('pt > 10. & abs(eta) < 2.4')
 
 process.countPatMuons.minNumber = cms.uint32(1)
 #process.countPatJets.minNumber = cms.uint32(2) # commented to avoid bias against other jet collections
+
+#process.countPatJets.src = cms.InputTag("selectedPatJets")
+#process.countPatJetsAK5PF.src = cms.InputTag("selectedPatJetsAK5PF")
+#process.countPatJetsAK5Track.src = cms.InputTag("selectedPatJetsAK5Track")
 
 # deltaR cut filters
 # DeltaRCut = cms.EDFilter("PMDeltaRFilter",
@@ -130,7 +140,9 @@ process.countPatMuons.minNumber = cms.uint32(1)
 #process.p = cms.Path( process.patDefaultSequence*process.patTrigger*process.patTriggerEvent )
 
 #process.PM_tuple = cms.Sequence( process.simpleSecondaryVertexHighPurBJetTags*process.patDefaultSequence )
-process.PM_tuple = cms.Sequence( process.patDefaultSequence )
+
+process.PM_tuple = cms.Sequence( process.patDefaultSequence*process.selectedPatMuonsForPtRel )
+###process.PM_tuple = cms.Sequence( process.patDefaultSequence )
 
 #process.PM_tuple.replace(process.simpleSecondaryVertexBJetTagsAK5PF, process.simpleSecondaryVertexBJetTagsAK5PF*process.simpleSecondaryVertexHighPurBJetTagsAK5PF)
 #process.PM_tuple.replace(process.simpleSecondaryVertexBJetTagsAK5Track, process.simpleSecondaryVertexBJetTagsAK5Track*process.simpleSecondaryVertexHighPurBJetTagsAK5Track)
