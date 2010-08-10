@@ -26,9 +26,9 @@ process.MessageLogger.cerr = cms.untracked.PSet(
 #-- Input Source --------------------------------------------------------------
 process.source.fileNames = [
 
- '/store/data/Run2010A/Mu/RECO/v2/000/136/089/D802058C-6E67-DF11-B721-000423D98634.root',
- '/store/data/Run2010A/Mu/RECO/v2/000/136/087/F63A8D4C-6167-DF11-BD3A-000423D944F8.root',
- '/store/data/Run2010A/Mu/RECO/v2/000/136/087/7AE9EF4A-7D67-DF11-97EC-0030487CD7CA.root'
+ '/store/data/Run2010A/Mu/RECO/Jun14thReReco_v1/0000/FE7AAFE8-A878-DF11-A8CF-0017A4770824.root',
+ '/store/data/Run2010A/Mu/RECO/Jun14thReReco_v1/0000/FE86F550-8479-DF11-B056-00237DF345D6.root',
+ '/store/data/Run2010A/Mu/RECO/Jun14thReReco_v1/0000/FEFAF52B-AE78-DF11-878C-0017A477103C.root'
 
     ]
 
@@ -92,6 +92,7 @@ process.out.SelectEvents = cms.untracked.PSet(
 # Explicit list of collections to keep (basis is default PAT event content)
 process.out.outputCommands.extend( [ # PAT Objects
                                      'keep *_selectedPatMuons_*_*',
+	                             'keep *_selectedPatMuonsForPtRel_*_*',
                                      'keep *_selectedPatJets*_*_*',       # All Jets
                                      # Generator information
                                      'keep GenEventInfoProduct_generator_*_*',
@@ -106,6 +107,7 @@ process.out.outputCommands.extend( [ # PAT Objects
                                      'keep edmMergeableCounter_eventCountProducer_*_*',
                                      # Trigger information
 				     'keep edmTriggerResults_TriggerResults_*_*',
+				     'keep L1GlobalTriggerReadoutRecord_gtDigis_*_*',
                                      #'keep *_hltTriggerSummaryAOD_*_*',
                                      #'keep L1GlobalTriggerObjectMapRecord_*_*_*',
                                      # Others
