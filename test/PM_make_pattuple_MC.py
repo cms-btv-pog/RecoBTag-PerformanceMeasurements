@@ -94,6 +94,7 @@ process.out.SelectEvents = cms.untracked.PSet(
 # Explicit list of collections to keep (basis is default PAT event content)
 process.out.outputCommands.extend( [ # PAT Objects
                                      'keep *_selectedPatMuons_*_*',
+                                     'keep *_selectedPatMuonsForPtRel_*_*',
                                      'keep *_selectedPatJets*_*_*',       # All Jets
                                      # Generator information
                                      'keep GenEventInfoProduct_generator_*_*',
@@ -108,6 +109,7 @@ process.out.outputCommands.extend( [ # PAT Objects
                                      'keep edmMergeableCounter_eventCountProducer_*_*',
                                      # Trigger information
 				     'keep edmTriggerResults_TriggerResults_*_*',
+                                     'keep L1GlobalTriggerReadoutRecord_gtDigis_*_*',
                                      #'keep *_hltTriggerSummaryAOD_*_*',
                                      #'keep L1GlobalTriggerObjectMapRecord_*_*_*',
                                      # Others
