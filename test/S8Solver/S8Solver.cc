@@ -18,7 +18,9 @@
 ClassImp(S8Solver)
 
 //____________________________________________________________
-S8Solver::S8Solver() {
+S8Solver::S8Solver()
+    : _doCheat(false)
+{
 	
 //}
 //____________________________________________________________
@@ -43,7 +45,7 @@ S8Solver::S8Solver() {
 	fGammaf = 1.;
 	fKappabConst = false;
 	fKappaclConst = true;
-	fisCorrFile = false;
+	fisCorrFile = true;
 	fDeltaConst = false;
 	fGammaConst = true;
 	//fPickBin = -1;
@@ -532,26 +534,28 @@ void S8Solver::GetInput() {
 	this->LoadHistos();
 	
 // 	// integrated input
-  	TotalInput["n"] = fnHisto->Integral();
-  	TotalInput["nMu"] = fnHistoMu->Integral();
-  	TotalInput["p"] = fpHisto->Integral();
-  	TotalInput["pMu"] = fpHistoMu->Integral();
-  	TotalInput["nTag"] = fnHistoSvx->Integral();
-  	TotalInput["nMuTag"] = fnHistoAll->Integral();
-  	TotalInput["pTag"] = fpHistoSvx->Integral();
-  	TotalInput["pMuTag"] = fpHistoAll->Integral();
-
-	// cheat and use truth values
-//	TotalInput["n"] = halljets_b->Integral() + halljets_cl->Integral();
-//	TotalInput["nMu"] = halljets_b_ptrel->Integral() + halljets_cl_ptrel->Integral();
-//	TotalInput["p"] = halloppjets_b->Integral() + halloppjets_cl->Integral() ;
-//	TotalInput["pMu"] = halloppjets_b_ptrel->Integral() + halloppjets_cl_ptrel->Integral();
-//	TotalInput["nTag"] = htagjets_b->Integral() + htagjets_cl->Integral();
-//	TotalInput["nMuTag"] =  htagjets_b_ptrel->Integral() + htagjets_cl_ptrel->Integral();
-//	TotalInput["pTag"] = htagoppjets_b->Integral() + htagoppjets_cl->Integral();
-//	TotalInput["pMuTag"] =  htagoppjets_b_ptrel->Integral() + htagoppjets_cl_ptrel->Integral();
-
-
+    if (_doCheat)
+    {
+        TotalInput["n"] = halljets_b->Integral() + halljets_cl->Integral();
+        TotalInput["nMu"] = halljets_b_ptrel->Integral() + halljets_cl_ptrel->Integral();
+        TotalInput["p"] = halloppjets_b->Integral() + halloppjets_cl->Integral() ;
+        TotalInput["pMu"] = halloppjets_b_ptrel->Integral() + halloppjets_cl_ptrel->Integral();
+        TotalInput["nTag"] = htagjets_b->Integral() + htagjets_cl->Integral();
+        TotalInput["nMuTag"] =  htagjets_b_ptrel->Integral() + htagjets_cl_ptrel->Integral();
+        TotalInput["pTag"] = htagoppjets_b->Integral() + htagoppjets_cl->Integral();
+        TotalInput["pMuTag"] =  htagoppjets_b_ptrel->Integral() + htagoppjets_cl_ptrel->Integral();
+    }
+    else
+    {
+        TotalInput["n"] = fnHisto->Integral();
+        TotalInput["nMu"] = fnHistoMu->Integral();
+        TotalInput["p"] = fpHisto->Integral();
+        TotalInput["pMu"] = fpHistoMu->Integral();
+        TotalInput["nTag"] = fnHistoSvx->Integral();
+        TotalInput["nMuTag"] = fnHistoAll->Integral();
+        TotalInput["pTag"] = fpHistoSvx->Integral();
+        TotalInput["pMuTag"] = fpHistoAll->Integral();
+    }
 
 	// asumming parameters fitted to a constant
 	TF1 *Fkb = fh_kb->GetFunction("pol0");

@@ -53,6 +53,8 @@ class S8Solver {
 				fPickSolutionMap[bin] = solution;
 		}
 
+        void setDoCheat(const bool &value);
+
         void Verbose(bool option) { fVerbose = option; };
 		void PrintData(TString option="");
 		void DumpTable(std::string filename="table.txt");
@@ -117,6 +119,8 @@ class S8Solver {
 		bool fDeltaConst;
 		bool fGammaConst;
 		bool fisCorrFile;
+        bool _doCheat;
+
 		double fAlphaf;
 		double fBetaf;
 		double fKappabf;
@@ -211,8 +215,11 @@ class S8Solver {
 		TGraphErrors *ginput_ptagmu; 
 		
 		ClassDef(S8Solver,1);
-
-
 };
+
+inline void S8Solver::setDoCheat(const bool &value)
+{
+    _doCheat = value;
+}
 
 #endif
