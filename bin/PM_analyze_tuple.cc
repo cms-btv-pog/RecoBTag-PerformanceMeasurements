@@ -1,15 +1,19 @@
 
 // CMS includes
 #include "DataFormats/FWLite/interface/Handle.h"
+#include "DataFormats/Provenance/interface/LuminosityBlockRange.h"
+#include "DataFormats/Provenance/interface/LuminosityBlockID.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/FWLite/interface/Event.h"
+#include "FWCore/PythonParameterSet/interface/PythonProcessDesc.h"
+#include "FWCore/FWLite/interface/AutoLibraryLoader.h"
+#include "FWCore/ParameterSet/interface/ProcessDesc.h"
 #include "RecoBTag/PerformanceMeasurements/interface/TH1Store.h"
 #include "PhysicsTools/FWLite/interface/CommandLineParser.h"
 #include "RecoBTag/PerformanceMeasurements/interface/PMHistograms.h"
 #include "RecoBTag/PerformanceMeasurements/interface/BTagHistograms.h"
-#include "FWCore/FWLite/interface/AutoLibraryLoader.h"
 #include "PhysicsTools/SelectorUtils/interface/JetIDSelectionFunctor.h"
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 #include "PhysicsTools/SelectorUtils/interface/Selector.h"
@@ -31,6 +35,26 @@
 #include <iostream>
 
 using namespace std;
+
+bool jsonContainsEvent (const std::vector< edm::LuminosityBlockRange > &jsonVec,
+                        const edm::EventBase &event)
+{
+    // if the jsonVec is empty, then no JSON file was provided so all
+    // events should pass
+    if (jsonVec.empty())
+        return true;
+
+    bool (*funcPtr)(edm::LuminosityBlockRange const &,
+                    edm::LuminosityBlockID const &) = &edm::contains;
+                    edm::LuminosityBlockID lumiID (event.id().run(), 
+                    event.id().luminosityBlock());
+
+    std::vector< edm::LuminosityBlockRange >::const_iterator iter = 
+        std::find_if(jsonVec.begin(), jsonVec.end(),
+                     boost::bind(funcPtr, _1, lumiID) );
+
+    return jsonVec.end() != iter;
+}
 
 int main (int argc, char* argv[])
 {
@@ -58,9 +82,51 @@ int main (int argc, char* argv[])
                       "jet collection to use selectedPatJets,selectedPatJetsAK5PF, selectedPatJetsAK5Track)",
                       "selectedPatJets");
 
+    parser.addOption ("config", optutl::CommandLineParser::kString,
+                      "python configuration file with JSON.",
+                      "CONFIG");
+
+
+    cout << __FILE__ << ':' << __LINE__ << endl;
 
     // Parse the command line arguments
     parser.parseArguments (argc, argv);
+
+    cout << __FILE__ << ':' << __LINE__ << endl;
+
+    // Python Config file
+    std::vector<edm::LuminosityBlockRange> lumiVector;
+    if (parser.stringValue("config").size() &&
+        "CONFIG" != parser.stringValue("config"))
+    {
+        cout << __FILE__ << ':' << __LINE__ << endl;
+        cout << "Config: " << parser.stringValue("config") << endl;
+        cout << __FILE__ << ':' << __LINE__ << endl;
+
+        PythonProcessDesc builder(parser.stringValue("config"));
+
+        cout << __FILE__ << ':' << __LINE__ << endl;
+
+        const edm::ParameterSet &inputs =
+             builder.processDesc()->getProcessPSet()->getParameter<edm::ParameterSet>("inputs");
+
+        cout << __FILE__ << ':' << __LINE__ << endl;
+
+        if ( inputs.exists("lumisToProcess") )
+        {
+            const std::vector<edm::LuminosityBlockRange> &jsonVector =
+                inputs.getUntrackedParameter<std::vector<edm::LuminosityBlockRange> >("lumisToProcess");
+
+            cout << __FILE__ << ':' << __LINE__ << endl;
+
+            lumiVector.resize(jsonVector.size());
+            std::copy(jsonVector.begin(), jsonVector.end(), lumiVector.begin());
+        }
+
+        cout << __FILE__ << ':' << __LINE__ << endl;
+    }
+
+    cout << __FILE__ << ':' << __LINE__ << endl;
 
     //___________________
     // FWLite setup
@@ -153,8 +219,14 @@ int main (int argc, char* argv[])
 
     for (events.toBegin(); ! events.atEnd(); ++events)
     {
+        if (!jsonContainsEvent (lumiVector, events) )
+            continue;
+
+        // Event is allowed. Process it normally
 		if ( nentry > maxNevents && maxNevents!=0 ) break;
+
 		nentry++;
+
         if ( outputEvery!=0 && (nentry % outputEvery) == 0 ) 
 		{
 			cout << "Processing Event: " << nentry << endl;
@@ -195,9 +267,9 @@ int main (int argc, char* argv[])
 			double fHPD = jetIter->jetID().fHPD;
             // select a good jet
     		if (jetCollection == "selectedPatJets"){
-				if ( jetIter->pt() <= min_jet_pt || std::abs( jetIter->eta() ) >= 2.4  || n90 <= 1 || jetIter->emEnergyFraction() <= 0.01 || fHPD >= 0.98 ) continue;}
+				if ( jetIter->pt() <= min_jet_pt || std::abs( jetIter->eta() ) >= 2.0  || n90 <= 1 || jetIter->emEnergyFraction() <= 0.01 || fHPD >= 0.98 ) continue;}
 			else{
-				if ( jetIter->pt() <= min_jet_pt || std::abs( jetIter->eta() ) >= 2.4)  continue;
+				if ( jetIter->pt() <= min_jet_pt || std::abs( jetIter->eta() ) >= 2.0)  continue;
 				}
 			
 			std::cout << " jet pt= " << jetIter->pt() << std::endl;
@@ -373,9 +445,9 @@ int main (int argc, char* argv[])
 					double awayfHPD = awayjetIter->jetID().fHPD;
 
 					if (jetCollection == "selectedPatJets"){
-						if ( awayjetIter->pt() <= min_jet_pt || std::abs( awayjetIter->eta() ) >= 2.4  || awayn90 <= 1 || awayjetIter->emEnergyFraction() <= 0.01 || awayfHPD >= 0.98 ) continue;}
+						if ( awayjetIter->pt() <= min_jet_pt || std::abs( awayjetIter->eta() ) >= 2.0  || awayn90 <= 1 || awayjetIter->emEnergyFraction() <= 0.01 || awayfHPD >= 0.98 ) continue;}
 						else{
-							if ( (awayjetIter->pt())  <= min_jet_pt || std::abs( awayjetIter->eta() ) >= 2.4 ) continue;
+							if ( (awayjetIter->pt())  <= min_jet_pt || std::abs( awayjetIter->eta() ) >= 2.0 ) continue;
 						}
 
 
