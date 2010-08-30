@@ -158,14 +158,14 @@ int main (int argc, char* argv[])
     std::string jetCollection = parser.stringValue( "JetCollection" ) ; 
     std::string triggername = parser.stringValue( "TriggerName" ) ; 
 
-    double min_jet_pt;
+	/*   double min_jet_pt;
 	if (jetCollection == "selectedPatJetsAK5Track"){
 		min_jet_pt = 10;}
 	else if (jetCollection == "selectedPatJetsAK5PF"){
 		min_jet_pt = 15;}
 	else{
 		min_jet_pt = 20;}
-	
+	*/	
     int outputEvery = parser.integerValue ( "outputEvery" );
     int maxNevents = parser.integerValue ( "maxevents" );
 	
@@ -257,7 +257,7 @@ int main (int argc, char* argv[])
         assert ( jetHandle.isValid() );
 
         fwlite::Handle< vector< pat::Muon > > muonHandle;
-        muonHandle.getByLabel ( events, "selectedPatMuons");
+        muonHandle.getByLabel ( events, "selectedPatMuonsForPtRel");
         assert ( muonHandle.isValid() ); // we should always have muons because of the pre-selections
 
 	    fwlite::Handle<edm::TriggerResults> triggerResults ;
@@ -286,17 +286,17 @@ int main (int argc, char* argv[])
 			{
 				//std::cout << " jet pt " << jetIter->pt() << std::endl;
 				bool TaggedJet = false;
-				double n90 = jetIter->jetID().n90Hits;
-				double fHPD = jetIter->jetID().fHPD;
+//				double n90 = jetIter->jetID().n90Hits;
+//				double fHPD = jetIter->jetID().fHPD;
 				// select a good jet
-				if (jetCollection == "selectedPatJets"){
+/*				if (jetCollection == "selectedPatJets"){
 					if ( jetIter->pt() <= min_jet_pt || std::abs( jetIter->eta() ) >= 2.0  || n90 <= 1 || jetIter->emEnergyFraction() <= 0.01 || fHPD >= 0.98 ) continue;}
 				else{
 					if ( jetIter->pt() <= min_jet_pt || std::abs( jetIter->eta() ) >= 2.0)  continue;
 				}
 			
 				std::cout << " jet pt= " << jetIter->pt() << std::endl;
-
+*/
 				hstore->hist("jet_pt")->Fill (jetIter->pt()); // just for testing
 				// get MC flavor of jet
 
@@ -308,12 +308,12 @@ int main (int argc, char* argv[])
 				////////////////////////////////
 				double mu_highest_pt = 0;
 				double ptrel = 0;
-				double muPt_= 5;
-				double numHit_=11;
-				double numPxHit_=2;
-				double chi2_= 10;
-				double ipCut_= 1;
-				double outHits_=2;
+//				double muPt_= 5;
+//				double numHit_=11;
+//				double numPxHit_=2;
+//				double chi2_= 10;
+//				double ipCut_= 1;
+//				double outHits_=2;
 				double ptreltmp = 0;
 
 				for (vector< pat::Muon >::const_iterator muonIter = muonHandle->begin();
@@ -322,33 +322,33 @@ int main (int argc, char* argv[])
 					//std::cout << " muon pt " << muonIter->pt() << std::endl;
 					//from Maria
 
-				    if((muonIter->isGlobalMuon() == 0)) continue;
+//				    if((muonIter->isGlobalMuon() == 0)) continue;
 
-					if( muonIter->innerTrack()->pt() < muPt_ ) continue;
+//					if( muonIter->innerTrack()->pt() < muPt_ ) continue;
 					
-					double muonHits= muonIter->globalTrack()->hitPattern().numberOfValidMuonHits();
+//					double muonHits= muonIter->globalTrack()->hitPattern().numberOfValidMuonHits();
 		
-					if(muonHits==0)continue;
+//					if(muonHits==0)continue;
 					
-					double normChi2 = muonIter->globalTrack()->normalizedChi2();     
+//					double normChi2 = muonIter->globalTrack()->normalizedChi2();     
 					
-					if ( normChi2 >= chi2_ ) continue;
+//					if ( normChi2 >= chi2_ ) continue;
    
-					if ((!(muonIter->innerTrack()->quality(reco::TrackBase::highPurity)))) continue;
+//					if ((!(muonIter->innerTrack()->quality(reco::TrackBase::highPurity)))) continue;
 					
-					int muPxHit = muonIter->innerTrack()->hitPattern().numberOfValidPixelHits();
-					if ( muPxHit < numPxHit_ ) continue;      
+//					int muPxHit = muonIter->innerTrack()->hitPattern().numberOfValidPixelHits();
+//					if ( muPxHit < numPxHit_ ) continue;      
 					
-					if ( muonIter->innerTrack()->trackerExpectedHitsOuter().numberOfHits() > outHits_) continue;
+//					if ( muonIter->innerTrack()->trackerExpectedHitsOuter().numberOfHits() > outHits_) continue;
 			
-					int muHit = muonIter->innerTrack()->numberOfValidHits();
-			
-					if ( muHit < numHit_ ) continue;     
+//					int muHit = muonIter->innerTrack()->numberOfValidHits();
+//			
+//					if ( muHit < numHit_ ) continue;     
    
 			
-					double normTkChi2 = muonIter->innerTrack()->normalizedChi2();
+//					double normTkChi2 = muonIter->innerTrack()->normalizedChi2();
 
-					if (normTkChi2 >= chi2_ ) continue;
+//					if (normTkChi2 >= chi2_ ) continue;
 					hstore->hist("muon_pt")->Fill (muonIter->innerTrack()->pt());
 
 //	??????????????????????????????????????????           end
@@ -464,14 +464,14 @@ int main (int argc, char* argv[])
 					
 						p4AwayJet.SetPtEtaPhiE(awayjetIter->pt(), awayjetIter->eta(), awayjetIter->phi(), awayjetIter->energy() );
 						// Jet quality cuts
-						double awayn90 = awayjetIter->jetID().n90Hits;
-						double awayfHPD = awayjetIter->jetID().fHPD;
+//						double awayn90 = awayjetIter->jetID().n90Hits;
+//						double awayfHPD = awayjetIter->jetID().fHPD;
 
-						if (jetCollection == "selectedPatJets"){
-							if ( awayjetIter->pt() <= min_jet_pt || std::abs( awayjetIter->eta() ) >= 2.0  || awayn90 <= 1 || awayjetIter->emEnergyFraction() <= 0.01 || awayfHPD >= 0.98 ) continue;}
-						else{
-							if ( (awayjetIter->pt())  <= min_jet_pt || std::abs( awayjetIter->eta() ) >= 2.0 ) continue;
-						}
+//						if (jetCollection == "selectedPatJets"){
+//						if ( awayjetIter->pt() <= min_jet_pt || std::abs( awayjetIter->eta() ) >= 2.0  || awayn90 <= 1 || awayjetIter->emEnergyFraction() <= 0.01 || awayfHPD >= 0.98 ) continue;}
+//						else{
+//							if ( (awayjetIter->pt())  <= min_jet_pt || std::abs( awayjetIter->eta() ) >= 2.0 ) continue;
+//						}
 
 
 
@@ -495,12 +495,12 @@ int main (int argc, char* argv[])
 
 						}
 						// find an away muon in jet
-						double muPt_= 5;
-						double numHit_=11;
-						double numPxHit_=2;
-						double chi2_= 10;
-						double ipCut_= 1;
-						double outHits_=2;
+//						double muPt_= 5;
+//						double numHit_=11;
+//						double numPxHit_=2;
+//						double chi2_= 10;
+//						double ipCut_= 1;
+//						double outHits_=2;
 						if ( !AwayMuonJet )
 						{
 							mu_highest_pt = 0;
@@ -509,33 +509,33 @@ int main (int argc, char* argv[])
 							{
 								//from Maria
 
-								if((muonIter->isGlobalMuon() == 0)) continue;
+//								if((muonIter->isGlobalMuon() == 0)) continue;
 							
-								if( muonIter->innerTrack()->pt() < muPt_ ) continue;
+//								if( muonIter->innerTrack()->pt() < muPt_ ) continue;
 					
-								double muonHits= muonIter->globalTrack()->hitPattern().numberOfValidMuonHits();
+//								double muonHits= muonIter->globalTrack()->hitPattern().numberOfValidMuonHits();
 		
-								if(muonHits==0)continue;
+//								if(muonHits==0)continue;
 					
-								double normChi2 = muonIter->globalTrack()->normalizedChi2();     
+//								double normChi2 = muonIter->globalTrack()->normalizedChi2();     
 					
-								if ( normChi2 >= chi2_ ) continue;
+//								if ( normChi2 >= chi2_ ) continue;
    
-								if ((!(muonIter->innerTrack()->quality(reco::TrackBase::highPurity)))) continue;
+//								if ((!(muonIter->innerTrack()->quality(reco::TrackBase::highPurity)))) continue;
 					
-								int muPxHit = muonIter->innerTrack()->hitPattern().numberOfValidPixelHits();
-								if ( muPxHit < numPxHit_ ) continue;      
+//								int muPxHit = muonIter->innerTrack()->hitPattern().numberOfValidPixelHits();
+//								if ( muPxHit < numPxHit_ ) continue;      
 					
-								if ( muonIter->innerTrack()->trackerExpectedHitsOuter().numberOfHits() > outHits_) continue;
+//								if ( muonIter->innerTrack()->trackerExpectedHitsOuter().numberOfHits() > outHits_) continue;
 			
-								int muHit = muonIter->innerTrack()->numberOfValidHits();
+//								int muHit = muonIter->innerTrack()->numberOfValidHits();
 			
-								if ( muHit < numHit_ ) continue;     
+//								if ( muHit < numHit_ ) continue;     
    
 			
-								double normTkChi2 = muonIter->innerTrack()->normalizedChi2();
+//								double normTkChi2 = muonIter->innerTrack()->normalizedChi2();
 
-								if (normTkChi2 >= chi2_ ) continue;
+//								if (normTkChi2 >= chi2_ ) continue;
 								hstore->hist("muon_pt")->Fill (muonIter->innerTrack()->pt());
 
 //	??????????????????????????????????????????           end
