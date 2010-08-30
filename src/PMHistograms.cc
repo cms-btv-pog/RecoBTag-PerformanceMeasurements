@@ -36,14 +36,14 @@ void PMHistograms::Add()
     fTrackCountingMap["Tight"]  = 3.4;
 
 	// const int nptarray = 7;
-	 const int nptarray = 2;
-    const int netaarray = 4;
+	 const int nptarray = 4;
+    const int netaarray = 5;
 	const int nptrelarray = 51;
     //const int ncorrptarray = 3;
     //const int ncorretaarray = 5;
 //    Double_t jetptbins[nptarray] = {10.,20.,30.,50., 70, 100., 230.};
-    Double_t jetptbins[nptarray] = {10., 230.};
-    Double_t jetetabins[netaarray] = {0.0,1.0,1.5,2.5};
+    Double_t jetptbins[nptarray] = {30.,50.,80.,230.};
+    Double_t jetetabins[netaarray] = {0.0,0.5,1.0,1.5,2.5};
 	Double_t ptrelbins[nptrelarray] = {0.,0.1,0.2,0.3,0.4,
 									   0.5,0.6,0.7,0.8,0.9,
 									   1.0,1.1,1.2,1.3,1.4,
