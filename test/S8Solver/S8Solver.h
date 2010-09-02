@@ -46,14 +46,14 @@ class S8Solver {
 		void SetGammaFactor(double value) { fGammaf = value; }
 		void SetDeltaConstant(bool option) { fDeltaConst = option; }
 		void SetGammaConstant(bool option) { fGammaConst = option; }
-		void SetMethod( TString option ) { fmethod = option; };
+		void SetMethod( TString option ) { fmethod = option; }
+		void UseMCTrue(bool option) { fusemctrue = option; }
 		void Solve();
 		void SetSolution( int bin, int solution) {
 			// bin 0 corresponds to average solution
 				fPickSolutionMap[bin] = solution;
 		}
 
-        void setDoCheat(const bool &value);
 
         void Verbose(bool option) { fVerbose = option; };
 		void PrintData(TString option="");
@@ -119,7 +119,7 @@ class S8Solver {
 		bool fDeltaConst;
 		bool fGammaConst;
 		bool fisCorrFile;
-        bool _doCheat;
+        bool fusemctrue;
 
 		double fAlphaf;
 		double fBetaf;
@@ -217,9 +217,5 @@ class S8Solver {
 		ClassDef(S8Solver,1);
 };
 
-inline void S8Solver::setDoCheat(const bool &value)
-{
-    _doCheat = value;
-}
 
 #endif

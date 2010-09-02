@@ -19,7 +19,6 @@ ClassImp(S8Solver)
 
 //____________________________________________________________
 S8Solver::S8Solver()
-    : _doCheat(false)
 {
 	
 //}
@@ -48,6 +47,7 @@ S8Solver::S8Solver()
 	fisCorrFile = true;
 	fDeltaConst = false;
 	fGammaConst = true;
+	fusemctrue = false;
 	//fPickBin = -1;
 	//fPicknSol = -1;
 }
@@ -534,27 +534,27 @@ void S8Solver::GetInput() {
 	this->LoadHistos();
 	
 // 	// integrated input
-    if (_doCheat)
+    if (fusemctrue)
     {
-        TotalInput["n"] = halljets_b->Integral() + halljets_cl->Integral();
-        TotalInput["nMu"] = halljets_b_ptrel->Integral() + halljets_cl_ptrel->Integral();
-        TotalInput["p"] = halloppjets_b->Integral() + halloppjets_cl->Integral() ;
-        TotalInput["pMu"] = halloppjets_b_ptrel->Integral() + halloppjets_cl_ptrel->Integral();
-        TotalInput["nTag"] = htagjets_b->Integral() + htagjets_cl->Integral();
-        TotalInput["nMuTag"] =  htagjets_b_ptrel->Integral() + htagjets_cl_ptrel->Integral();
-        TotalInput["pTag"] = htagoppjets_b->Integral() + htagoppjets_cl->Integral();
-        TotalInput["pMuTag"] =  htagoppjets_b_ptrel->Integral() + htagoppjets_cl_ptrel->Integral();
+        TotalInput["n"] = halljets_b->GetEntries() + halljets_cl->GetEntries();
+        TotalInput["nMu"] = halljets_b_ptrel->GetEntries() + halljets_cl_ptrel->GetEntries();
+        TotalInput["p"] = halloppjets_b->GetEntries() + halloppjets_cl->GetEntries() ;
+        TotalInput["pMu"] = halloppjets_b_ptrel->GetEntries() + halloppjets_cl_ptrel->GetEntries();
+        TotalInput["nTag"] = htagjets_b->GetEntries() + htagjets_cl->GetEntries();
+        TotalInput["nMuTag"] =  htagjets_b_ptrel->GetEntries() + htagjets_cl_ptrel->GetEntries();
+        TotalInput["pTag"] = htagoppjets_b->GetEntries() + htagoppjets_cl->GetEntries();
+        TotalInput["pMuTag"] =  htagoppjets_b_ptrel->GetEntries() + htagoppjets_cl_ptrel->GetEntries();
     }
     else
     {
-        TotalInput["n"] = fnHisto->Integral();
-        TotalInput["nMu"] = fnHistoMu->Integral();
-        TotalInput["p"] = fpHisto->Integral();
-        TotalInput["pMu"] = fpHistoMu->Integral();
-        TotalInput["nTag"] = fnHistoSvx->Integral();
-        TotalInput["nMuTag"] = fnHistoAll->Integral();
-        TotalInput["pTag"] = fpHistoSvx->Integral();
-        TotalInput["pMuTag"] = fpHistoAll->Integral();
+        TotalInput["n"] = fnHisto->GetEntries();
+        TotalInput["nMu"] = fnHistoMu->GetEntries();
+        TotalInput["p"] = fpHisto->GetEntries();
+        TotalInput["pMu"] = fpHistoMu->GetEntries();
+        TotalInput["nTag"] = fnHistoSvx->GetEntries();
+        TotalInput["nMuTag"] = fnHistoAll->GetEntries();
+        TotalInput["pTag"] = fpHistoSvx->GetEntries();
+        TotalInput["pMuTag"] = fpHistoAll->GetEntries();
     }
 
 	// asumming parameters fitted to a constant
@@ -571,6 +571,13 @@ void S8Solver::GetInput() {
 	TotalInput["beta"] = fBetaf * Fbeta->GetParameter(0);
 	TotalInput["delta"] =fDeltaf * Fdelta->GetParameter(0);
 	TotalInput["gamma"] = fGammaf * Fgamma->GetParameter(0);
+
+//	TotalInput["kappa_b"] =  1.0;
+//	TotalInput["kappa_cl"] = 1.0;
+//	TotalInput["alpha"] =    1.0;
+//	TotalInput["beta"] =     1.0;
+//	TotalInput["delta"] =    1.0;
+//	TotalInput["gamma"] =     1.0;
 
 	//check
 	/*
