@@ -536,25 +536,25 @@ void S8Solver::GetInput() {
 // 	// integrated input
     if (fusemctrue)
     {
-        TotalInput["n"] = halljets_b->GetEntries() + halljets_cl->GetEntries();
-        TotalInput["nMu"] = halljets_b_ptrel->GetEntries() + halljets_cl_ptrel->GetEntries();
-        TotalInput["p"] = halloppjets_b->GetEntries() + halloppjets_cl->GetEntries() ;
-        TotalInput["pMu"] = halloppjets_b_ptrel->GetEntries() + halloppjets_cl_ptrel->GetEntries();
-        TotalInput["nTag"] = htagjets_b->GetEntries() + htagjets_cl->GetEntries();
-        TotalInput["nMuTag"] =  htagjets_b_ptrel->GetEntries() + htagjets_cl_ptrel->GetEntries();
-        TotalInput["pTag"] = htagoppjets_b->GetEntries() + htagoppjets_cl->GetEntries();
-        TotalInput["pMuTag"] =  htagoppjets_b_ptrel->GetEntries() + htagoppjets_cl_ptrel->GetEntries();
+        TotalInput["n"] = halljets_b->Integral(1,halljets_b->GetNbinsX()+1) + halljets_cl->Integral(1,halljets_cl->GetNbinsX()+1);
+        TotalInput["nMu"] = halljets_b_ptrel->Integral(1,halljets_b_ptrel->GetNbinsX()+1) + halljets_cl_ptrel->Integral(1,halljets_cl_ptrel->GetNbinsX()+1);
+        TotalInput["p"] = halloppjets_b->Integral(1,halloppjets_b->GetNbinsX()+1) + halloppjets_cl->Integral(1,halloppjets_cl->GetNbinsX()+1) ;
+        TotalInput["pMu"] = halloppjets_b_ptrel->Integral(1,halloppjets_b_ptrel->GetNbinsX()+1) + halloppjets_cl_ptrel->Integral(1,halloppjets_cl_ptrel->GetNbinsX()+1);
+        TotalInput["nTag"] = htagjets_b->Integral(1,htagjets_b->GetNbinsX()+1) + htagjets_cl->Integral(1,htagjets_cl->GetNbinsX()+1);
+        TotalInput["nMuTag"] =  htagjets_b_ptrel->Integral(1,htagjets_b_ptrel->GetNbinsX()+1) + htagjets_cl_ptrel->Integral(1,htagjets_cl_ptrel->GetNbinsX()+1);
+        TotalInput["pTag"] = htagoppjets_b->Integral(1,htagoppjets_b->GetNbinsX()+1) + htagoppjets_cl->Integral(1,htagoppjets_cl->GetNbinsX()+1);
+        TotalInput["pMuTag"] =  htagoppjets_b_ptrel->Integral(1,htagoppjets_b_ptrel->GetNbinsX()+1) + htagoppjets_cl_ptrel->Integral(1,htagoppjets_cl_ptrel->GetNbinsX()+1);
     }
     else
     {
-        TotalInput["n"] = fnHisto->GetEntries();
-        TotalInput["nMu"] = fnHistoMu->GetEntries();
-        TotalInput["p"] = fpHisto->GetEntries();
-        TotalInput["pMu"] = fpHistoMu->GetEntries();
-        TotalInput["nTag"] = fnHistoSvx->GetEntries();
-        TotalInput["nMuTag"] = fnHistoAll->GetEntries();
-        TotalInput["pTag"] = fpHistoSvx->GetEntries();
-        TotalInput["pMuTag"] = fpHistoAll->GetEntries();
+        TotalInput["n"] = fnHisto->Integral(1, fnHisto->GetNbinsX()+1);
+        TotalInput["nMu"] = fnHistoMu->Integral(1,fnHistoMu->GetNbinsX()+1);
+        TotalInput["p"] = fpHisto->Integral(1,fpHisto->GetNbinsX()+1);
+        TotalInput["pMu"] = fpHistoMu->Integral(1,fpHistoMu->GetNbinsX()+1);
+        TotalInput["nTag"] = fnHistoSvx->Integral(1,fnHistoSvx->GetNbinsX()+1);
+        TotalInput["nMuTag"] = fnHistoAll->Integral(1,fnHistoAll->GetNbinsX()+1);
+        TotalInput["pTag"] = fpHistoSvx->Integral(1,fpHistoSvx->GetNbinsX()+1);
+        TotalInput["pMuTag"] = fpHistoAll->Integral(1,fpHistoAll->GetNbinsX()+1);
     }
 
 	// asumming parameters fitted to a constant
