@@ -215,6 +215,9 @@ int main (int argc, char* argv[])
     int nentry = 0;
     string hlt_path = parser.stringValue("hlt_path");
 
+    if (!hlt_path.size())
+        cout << "[warning] HLT Trigger won't be used." << endl;
+
     for (events.toBegin(); ! events.atEnd(); ++events)
     {
         if (!jsonContainsEvent (lumiVector, events) )
