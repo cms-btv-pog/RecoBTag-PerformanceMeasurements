@@ -428,7 +428,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   
   TriggerResults tr;
   Handle<TriggerResults> h_trigRes;
-  iEvent.getByLabel(InputTag("TriggerResults::HLT"), h_trigRes);
+  iEvent.getByLabel(InputTag("TriggerResults::RECO"), h_trigRes);
   tr = *h_trigRes;
 
   BitTrigger = 0;
@@ -601,7 +601,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	  Track_history[nTrack] = 0;
           if ( useTrackHistory_ && !isData_ ) {
             TrackCategories::Flags theFlag = classifier_.evaluate( (*tagInfo)[ith_tagged].selectedTracks()[k] ).flags();
-	
+	    //cout << classifier_ << endl;
 	    if      ( theFlag[TrackCategories::BWeakDecay] )         Track_history[nTrack] += pow(10, -1 + 1); 
 	    else if ( theFlag[TrackCategories::CWeakDecay] )         Track_history[nTrack] += pow(10, -1 + 2); 
 	    else if ( theFlag[TrackCategories::TauDecay] )           Track_history[nTrack] += pow(10, -1 + 3); 
@@ -611,6 +611,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	    else if ( theFlag[TrackCategories::HadronicProcess] )    Track_history[nTrack] += pow(10, -1 + 7); 
 	    else if ( theFlag[TrackCategories::Fake] )               Track_history[nTrack] += pow(10, -1 + 8); 
 	    else if ( theFlag[TrackCategories::SharedInnerHits] )    Track_history[nTrack] += pow(10, -1 + 9); 
+	    //cout << "track Hist value " << Track_history[nTrack] << endl;
           }
 
 //$$

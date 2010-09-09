@@ -12,17 +12,9 @@ process.source = cms.Source(
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(   
 
-    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/FE6E09F4-8439-DF11-B704-001A928116CC.root',
-    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/F02962F3-8439-DF11-9CAE-001BFCDBD176.root',
-    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/C4976FEF-8439-DF11-B754-002618943986.root',
-    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/C23B14EF-8439-DF11-B4C9-002618943865.root',
-    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/A4799EEF-8439-DF11-83E6-003048678AFA.root',
-    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/A017DAF1-8439-DF11-8D10-0026189437FD.root',
-    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/963EF3F2-8439-DF11-8492-00304867C1BA.root',
-    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/9001B3F3-8439-DF11-A139-001A928116F2.root',
-    '/store/relval/CMSSW_3_5_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/START3X_V25-v1/0009/8CF5C4F1-8439-DF11-99DD-0018F3D09614.root'
-    
-    
+     
+    "rfio:/castor/cern.ch/user/f/fabstoec/MinBias_REDIGI_RECODEBUG.root"
+   
     
     )
 )
@@ -37,7 +29,7 @@ process.maxEvents = cms.untracked.PSet(
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 #process.GlobalTag.globaltag = "MC_31X_V5::All" # use a valid global tag here!
 #process.GlobalTag.globaltag = "GR10_P_V4::All" # use a valid global tag here!
-process.GlobalTag.globaltag = "START36_V8::All" # use a valid global tag here!
+process.GlobalTag.globaltag = "MC_38Y_V10::All" # use a valid global tag here!
 
 
 process.load("Configuration.StandardSequences.Reconstruction_cff")
@@ -148,8 +140,8 @@ process.out = cms.OutputModule("PoolOutputModule",
 #	*process.jetProbabilityBJetTags*process.mistag
 #	)
 
-process.mistag.isData = True
-process.mistag.useTrackHistory = False
+process.mistag.isData = False
+process.mistag.useTrackHistory = True
 process.mistag.Jets = 'ak5PFJets'
 process.mistag.jetCorrector = cms.string('ak5PFL2L3')
 process.ak5JetTracksAssociatorAtVertex.jets = "ak5PFJets"
@@ -157,8 +149,8 @@ process.softMuonTagInfos.jets = "ak5PFJets"
 
 
 process.p = cms.Path(
-        #*process.myPartons*process.AK5Flavour
-        process.ak5PFJetsL2L3
+        process.myPartons*process.AK5Flavour
+        *process.ak5PFJetsL2L3
 	*process.ak5JetTracksAssociatorAtVertex
 	*process.btagging*process.positiveOnlyJetProbabilityJetTags
 	*process.negativeOnlyJetProbabilityJetTags

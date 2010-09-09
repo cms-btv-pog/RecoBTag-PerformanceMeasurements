@@ -10,7 +10,7 @@
 	 Author: Francisco Yumiceva, Fermilab
 */
 //
-// $Id: PMDeltaRFilter.h,v 1.1 2009/09/22 02:45:37 yumiceva Exp $
+// $Id: PMDeltaRFilter.h,v 1.2 2009/10/03 20:00:33 yumiceva Exp $
 //
 //
 
@@ -22,7 +22,8 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/ParameterSet/interface/InputTag.h"
+//#include "FWCore/ParameterSet/interface/InputTag.h"
+#include "FWCore/Utilities/interface/InputTag.h"
 
 class PMDeltaRFilter : public edm::EDFilter
 {

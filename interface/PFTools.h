@@ -6,7 +6,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: PFTools.h,v 1.5 2009/10/03 20:00:33 yumiceva Exp $
+ version $Id: PFTools.h,v 1.6 2010/03/09 16:50:43 jindal Exp $
 
 ________________________________________________________________**/
 
@@ -14,7 +14,9 @@ ________________________________________________________________**/
 #include <map>
 #include <string>
 
-#include "FWCore/ParameterSet/interface/InputTag.h"
+//#include "FWCore/ParameterSet/interface/InputTag.h"
+#include "FWCore/Utilities/interface/InputTag.h"
+
 
 class WorkingPoint
 {

@@ -11,7 +11,7 @@
  *
  * \author Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
  *
- * \version $Id: PerformanceAnalyzerWithElectrons.h,v 1.30 2009/09/08 21:01:29 yumiceva Exp $
+ * \version $Id: PerformanceAnalyzerWithElectrons.h,v 1.1 2009/10/15 16:30:06 kellerjd Exp $
  *
  */
 
@@ -27,7 +27,8 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/ParameterSet/interface/InputTag.h"
+//#include "FWCore/ParameterSet/interface/InputTag.h"
+#include "FWCore/Utilities/interface/InputTag.h"
 
 //#include "DataFormats/Candidate/interface/CandMatchMap.h"
 
