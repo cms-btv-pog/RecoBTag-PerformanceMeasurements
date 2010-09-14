@@ -159,18 +159,20 @@ int main (int argc, char* argv[])
     int nentry = 0;
     for(events.toBegin(); ! events.atEnd(); ++events)
     {
+        // Event is allowed. Process it normally
+        //
+        if (maxNevents && nentry > maxNevents) break;
+
+        // Test if event is among the ones, specified in JSON file
+        //
         if (!jsonContainsEvent (lumiVector, events) )
             continue;
-
-        // Event is allowed. Process it normally
-        if (maxNevents && nentry > maxNevents) break;
 
         ++nentry;
 
         if ( outputEvery!=0 && (nentry % outputEvery) == 0 ) 
-        {
             cout << "Processing Event: " << nentry << endl;
-        }
+
         if ( outputEvery == 0 )
             cout << "Processing Event: " << nentry << endl;
 
@@ -206,9 +208,10 @@ int main (int argc, char* argv[])
             if (triggerNames.end() == trigger)
                 // Trigger failed
                 continue;
-        }
+        } // end processing Trigger
 
         // load object collections
+        //
         fwlite::Handle< vector< pat::Jet > > jetHandle;
 
         if (jetCollection == "selectedPatJetsAK5Track")
@@ -235,19 +238,40 @@ int main (int argc, char* argv[])
             break;
         }
 
-        TLorentzVector p4Jet;
-        TLorentzVector p4MuJet;
-        TLorentzVector p4Muon;
-        TLorentzVector p4AwayJet;
+        // Create All Muons plots
+        //
+        hstore->hist("all_muon_number")->Fill(muonHandle->size());
+        for (vector<pat::Muon>::const_iterator muon = muonHandle->begin();
+             muonHandle->end() != muon;
+             ++muon)
+        {
+            hstore->hist("all_muon_pt")->Fill(muon->pt());
+            hstore->hist("all_muon_eta")->Fill(muon->eta());
+            hstore->hist("all_muon_phi")->Fill(muon->phi());
+        }
 
+        hstore->hist("all_jet_number")->Fill(jetHandle->size());
         // Loop over jets
+        //
         for (vector< pat::Jet >::const_iterator jetIter = jetHandle->begin();
              jetIter != jetHandle->end(); ++jetIter)
         {
+            TLorentzVector p4Jet;
+            TLorentzVector p4MuJet;
+            TLorentzVector p4Muon;
+            TLorentzVector p4AwayJet;
+
             bool TaggedJet = false;
             hstore->hist("jet_pt")->Fill (jetIter->pt()); // just for testing
 
+            // All jet plots
+            //
+            hstore->hist("all_jet_pt")->Fill(jetIter->pt());
+            hstore->hist("all_jet_eta")->Fill(jetIter->eta());
+            hstore->hist("all_jet_phi")->Fill(jetIter->phi());
+
             // get MC flavor of jet
+            //
             int JetFlavor = abs( jetIter->partonFlavour() );
 
             p4Jet.SetPtEtaPhiE(jetIter->pt(), jetIter->eta(), jetIter->phi(), jetIter->energy() );
@@ -260,10 +284,14 @@ int main (int argc, char* argv[])
             double ptrel = 0;
             double ptreltmp = 0;
 
-            // Loop over muons
+            // Attempt to find muon inside the jet
+            //
             for (vector< pat::Muon >::const_iterator muonIter = muonHandle->begin();
                  muonIter != muonHandle->end(); ++muonIter)
             {
+                // {samvel} loop over jets -> loop over muons and plot Pt of
+                //          each muon. What is the expected result???
+                //
                 hstore->hist("muon_pt")->Fill (muonIter->innerTrack()->pt());
 
                 reco::TrackRef trackMuon = muonIter->innerTrack();
@@ -289,6 +317,9 @@ int main (int argc, char* argv[])
 
                 hasLepton = true;
 
+                // It may turn out that another muon was found so far. Then
+                // pick the one with highest pT.
+                //
                 if ( muonIter->pt() > mu_highest_pt )
                 {
                     mu_highest_pt = muonIter->pt();
@@ -297,38 +328,67 @@ int main (int argc, char* argv[])
                                         muonIter->phi(),
                                         muonIter->energy());
                     // recalculate pTrel
+                    // {samvel} Why??? pTrel is already available at: ptreltmp
+                    //
                     tmpvec = tmpvecOrg;
                     leptonvec.SetXYZ(muonIter->px(), muonIter->py(),muonIter->pz());
                     tmpvec += leptonvec;
                     ptrel = leptonvec.Perp(tmpvec);  // maximum
                 }
+
                 hstore->hist("jet_pTrel")->Fill (ptrel);
                 hstore->hist("jet_deltaR")->Fill (deltaR);
 
-                string suffix;
-                switch(JetFlavor)
+                // b-jet
+                //
+                if (5 == JetFlavor)
                 {
-                    case 5: suffix = "_b";
-                            break;
-
-                    case 4: suffix = "_c";
-                            break;
-
-                    case 21: // fall through
-                    case 3 : // fall through
-                    case 2 : // fall through
-                    case 1 : // fall through
-                             suffix = "_udsg";
-                             break;
+                    hstore->hist("jet_pTrel_b")->Fill(ptrel);
+                    hstore->hist("jet_deltaR_b")->Fill(deltaR);
                 }
 
-                if (suffix.length())
+                // c-jet
+                //
+                if (4 == JetFlavor)
                 {
-                    hstore->hist("jet_deltaR" + suffix)->Fill(deltaR);
-                    hstore->hist("jet_deltaR" + suffix)->Fill(ptrel);
+                    hstore->hist("jet_pTrel_c")->Fill(ptrel);
+                    hstore->hist("jet_deltaR_c")->Fill(deltaR);
+
+                    hstore->hist("jet_pTrel_cl")->Fill(ptrel);
+                    hstore->hist("jet_deltaR_cl")->Fill(deltaR);
+                }
+
+                // uds-jet
+                //
+                if (4 > JetFlavor && 0 < JetFlavor)
+                {
+                    hstore->hist("jet_pTrel_l")->Fill(ptrel);
+                    hstore->hist("jet_deltaR_l")->Fill(deltaR);
+
+                    hstore->hist("jet_pTrel_cl")->Fill(ptrel);
+                    hstore->hist("jet_deltaR_cl")->Fill(deltaR);
+
+                    hstore->hist("jet_pTrel_uds")->Fill(ptrel);
+                    hstore->hist("jet_deltaR_uds")->Fill(deltaR);
+                }
+
+                // gluon
+                //
+                if (21 == JetFlavor)
+                {
+                    hstore->hist("jet_pTrel_g")->Fill(ptrel);
+                    hstore->hist("jet_deltaR_g")->Fill(deltaR);
+
+                    hstore->hist("jet_pTrel_cl")->Fill(ptrel);
+                    hstore->hist("jet_deltaR_cl")->Fill(deltaR);
+
+                    hstore->hist("jet_pTrel_l")->Fill(ptrel);
+                    hstore->hist("jet_deltaR_l")->Fill(deltaR);
                 }
             }//muons
 
+            // Proceed if Jet contains lepton otherwise go to next jet.
+            //
             if (!hasLepton)
                 continue;
 
@@ -355,6 +415,9 @@ int main (int argc, char* argv[])
                 // skip muon in jet
                 if ( p4AwayJet == p4MuJet ) continue;
 
+                // {samvel} what is this? For each jet we plot awayjet. So, for
+                // 5 jets with 2 jet with muon 4^2 = 16 entries will be added.
+                //
                 hstore->hist("awayjet_pt")->Fill (awayjetIter->pt()); // just for testing
 
                 if ( !AwayTaggedJet )
@@ -369,50 +432,52 @@ int main (int argc, char* argv[])
 
                 }
 
-                if ( !AwayMuonJet )
-                {
-                    mu_highest_pt = 0;
-                    for (vector< pat::Muon >::const_iterator muonIter = muonHandle->begin();
-                         muonIter != muonHandle->end(); ++muonIter)
-                    {
-                        hstore->hist("muon_pt")->Fill (muonIter->innerTrack()->pt());
+                // Skip muon search in the away jet if one was found so far.
+                if ( AwayMuonJet )
+                    continue;
 
-                        // find a muon in a jet
-                        //check deltar
-                        reco::TrackRef trackMuon = muonIter->innerTrack();
-                        math::XYZTLorentzVector trackMuonP4(trackMuon->px(),
-                                                            trackMuon->py(),
-                                                            trackMuon->pz(),
-                                                            sqrt(trackMuon->p() * trackMuon->p() + 0.1057*0.1057));
-                        double deltaR  = ROOT::Math::VectorUtil::DeltaR(jetIter->p4().Vect(), trackMuonP4.Vect() );
-                        TVector3 tmpvecOrg(awayjetIter->p4().Vect().X(),awayjetIter->p4().Vect().Y(),  awayjetIter->p4().Vect().Z());
-                        TVector3 tmpvec;
+                mu_highest_pt = 0;
+                for (vector< pat::Muon >::const_iterator muonIter = muonHandle->begin();
+                     muonIter != muonHandle->end(); ++muonIter)
+                {
+                    hstore->hist("muon_pt")->Fill (muonIter->innerTrack()->pt());
+
+                    // find a muon in a jet
+                    //check deltar
+                    reco::TrackRef trackMuon = muonIter->innerTrack();
+                    math::XYZTLorentzVector trackMuonP4(trackMuon->px(),
+                                                        trackMuon->py(),
+                                                        trackMuon->pz(),
+                                                        sqrt(trackMuon->p() * trackMuon->p() + 0.1057*0.1057));
+                    double deltaR  = ROOT::Math::VectorUtil::DeltaR(jetIter->p4().Vect(), trackMuonP4.Vect() );
+                    TVector3 tmpvecOrg(awayjetIter->p4().Vect().X(),awayjetIter->p4().Vect().Y(),  awayjetIter->p4().Vect().Z());
+                    TVector3 tmpvec;
+                    tmpvec = tmpvecOrg;
+                    TVector3 leptonvec(trackMuon->px(), trackMuon->py(),trackMuon->pz());
+                    tmpvec += leptonvec;
+                    double awayptrel = leptonvec.Perp(tmpvec);
+                    // muon in jet cuts
+                    if ( (deltaR >= 0.4) || (ptreltmp <= -1.0) ) continue;
+                    // now we have a good muon in a jet
+                    AwayMuonJet = true;
+                    // pick the leading muon inside the jet
+                    if ( trackMuon->pt() > mu_highest_pt )
+                    {
+                        mu_highest_pt = muonIter->pt();
+                        p4AwayMuon.SetPtEtaPhiE(trackMuon->pt(),
+                                                trackMuon->eta(),
+                                                trackMuon->phi(),
+                                                sqrt(trackMuon->p() * trackMuon->p() + 0.1057*0.1057));
+                        // recalculate pTrel
                         tmpvec = tmpvecOrg;
-                        TVector3 leptonvec(trackMuon->px(), trackMuon->py(),trackMuon->pz());
+                        leptonvec.SetXYZ(trackMuon->px(), trackMuon->py(),trackMuon->pz());
                         tmpvec += leptonvec;
-                        double awayptrel = leptonvec.Perp(tmpvec);
-                        // muon in jet cuts
-                        if ( (deltaR >= 0.4) || (ptreltmp <= -1.0) ) continue;
-                        // now we have a good muon in a jet
-                        AwayMuonJet = true;
-                        // pick the leading muon inside the jet
-                        if ( trackMuon->pt() > mu_highest_pt )
-                        {
-                            mu_highest_pt = muonIter->pt();
-                            p4AwayMuon.SetPtEtaPhiE(trackMuon->pt(),
-                                                    trackMuon->eta(),
-                                                    trackMuon->phi(),
-                                                    sqrt(trackMuon->p() * trackMuon->p() + 0.1057*0.1057));
-                            // recalculate pTrel
-                            tmpvec = tmpvecOrg;
-                            leptonvec.SetXYZ(trackMuon->px(), trackMuon->py(),trackMuon->pz());
-                            tmpvec += leptonvec;
-                            awayptrel = leptonvec.Perp(tmpvec);
-                        }
+                        awayptrel = leptonvec.Perp(tmpvec);
                     }
-                } // away muon jet
+                }
             } // close away jet loop
 
+            // Skip if away tagged jet is not found
             if (!AwayTaggedJet)
                 continue;
 
@@ -420,28 +485,38 @@ int main (int argc, char* argv[])
             hstore->hist("deltaRnearjet")->Fill ( p4MuJet.DeltaR( p4AwayTagged ) );
             hstore->hist("deltaPhi")->Fill (p4AwayTagged.Phi() - p4MuJet.Phi() );
 
-            string suffix;
-            switch(JetFlavor)
+            if (5 == JetFlavor)
+                hstore->hist("deltaPhi_b")->Fill (p4AwayTagged.Phi() - p4MuJet.Phi() );
+
+            // c-jet
+            //
+            if (4 == JetFlavor)
             {
-                case 5: suffix = "_b";
-                        break;
+                hstore->hist("deltaPhi_c")->Fill (p4AwayTagged.Phi() - p4MuJet.Phi() );
 
-                case 4: suffix = "_c";
-                        break;
-
-                case 21: suffix = "_g";
-                         break;
-
-                case 3 : // fall through
-                case 2 : // fall through
-                case 1 : // fall through
-                         suffix = "_l";
-                         break;
+                hstore->hist("deltaPhi_cl")->Fill (p4AwayTagged.Phi() - p4MuJet.Phi() );
             }
 
-            if (suffix.length())
+            // uds-jet
+            //
+            if (4 > JetFlavor && 0 < JetFlavor)
             {
-                hstore->hist("deltaPhi" + suffix)->Fill(p4AwayTagged.Phi() - p4MuJet.Phi());
+                hstore->hist("deltaPhi_l")->Fill (p4AwayTagged.Phi() - p4MuJet.Phi() );
+
+                hstore->hist("deltaPhi_cl")->Fill (p4AwayTagged.Phi() - p4MuJet.Phi() );
+
+                hstore->hist("deltaPhi_uds")->Fill (p4AwayTagged.Phi() - p4MuJet.Phi() );
+            }
+
+            // gluon
+            //
+            if (21 == JetFlavor)
+            {
+                hstore->hist("deltaPhi_g")->Fill (p4AwayTagged.Phi() - p4MuJet.Phi() );
+
+                hstore->hist("deltaPhi_l")->Fill (p4AwayTagged.Phi() - p4MuJet.Phi() );
+
+                hstore->hist("deltaPhi_cl")->Fill (p4AwayTagged.Phi() - p4MuJet.Phi() );
             }
         }//jets
     }//events
