@@ -1,3 +1,6 @@
+#include <map>
+#include <vector>
+#include <string>
 
 #include "RecoBTag/PerformanceMeasurements/interface/PMHistograms.h"
 
@@ -5,10 +8,11 @@
 #include "TString.h"
 #include "TH3F.h"
 
+using std::string;
+
 //______________
 void PMHistograms::Add()
 {
-
     std::map<std::string, int>  quark_color;
     quark_color[""] = 1;
     quark_color["b"] = 2;
@@ -36,14 +40,16 @@ void PMHistograms::Add()
     fTrackCountingMap["Tight"]  = 3.4;
 
 	// const int nptarray = 7;
-	 const int nptarray = 4;
+	const int nptarray = 4;
     const int netaarray = 5;
+    const int nphiarray = 8;
 	const int nptrelarray = 51;
     //const int ncorrptarray = 3;
     //const int ncorretaarray = 5;
 //    Double_t jetptbins[nptarray] = {10.,20.,30.,50., 70, 100., 230.};
     Double_t jetptbins[nptarray] = {30.,50.,80.,230.};
     Double_t jetetabins[netaarray] = {0.0,0.5,1.0,1.5,2.5};
+    Double_t jetphibins[nphiarray] = {0.0,0.5,1.0,1.5,2.0,2.5,3.0,3.5};
 	Double_t ptrelbins[nptrelarray] = {0.,0.1,0.2,0.3,0.4,
 									   0.5,0.6,0.7,0.8,0.9,
 									   1.0,1.1,1.2,1.3,1.4,
@@ -62,6 +68,7 @@ void PMHistograms::Add()
     int nptbins = nptarray -1;
     //const Double_t *jetptbins = (fJetPtAxis.GetXbins())->GetArray();
     int netabins = netaarray -1;
+    int nphibins = nphiarray - 1;
     int nptrelbins = nptrelarray -1;
     //const Double_t *jetetabins = (fJetEtaAxis.GetXbins())->GetArray();
     // int ncorrptbins = fCorrPtAxis.GetNbins();
@@ -70,9 +77,94 @@ void PMHistograms::Add()
     // const Double_t *corretabins = (fCorrEtaAxis.GetXbins())->GetArray();
 
 
-	//test
+	// Pt
 	fstore->add( new TH3F("n3_pT","MuTag pT,eta vs pTrel",nptbins,jetptbins,nptrelbins,ptrelbins,netabins,jetetabins), "muon_in_jet" );
-	//
+
+    using std::vector;
+    using std::map;
+
+    typedef vector<string> Flavors;
+    typedef map<string, string> Plots;
+
+    Flavors flavors;
+    flavors.push_back("");
+    flavors.push_back("b");
+    flavors.push_back("c");
+    flavors.push_back("uds");
+    flavors.push_back("g");
+    flavors.push_back("cl");
+    flavors.push_back("l");
+
+    Plots plots;
+    plots["q"] ="other MuTag";
+    plots["qtag"] ="other MuTag && Tagger";
+    plots["n"] ="MuTag";
+    plots["p"] ="MuTag && CMBtag";
+    plots["ntag"] ="opp tag: MuTag";
+    plots["ptag"] ="opp tag MuTag && CMBtag";
+    plots["nnoTag"] ="opp tag: MuTag";
+    plots["pnoTag"] ="opp tag MuTag && CMBtag";
+
+    for(Flavors::const_iterator flavor = flavors.begin();
+        flavors.end() != flavor;
+        ++flavor)
+    {
+        fstore->add( new TH1D(("jet_deltaR" + (flavor->size() ? "_" + *flavor : "")).c_str(),"#Delta R",60,0.,0.55) );
+        fstore->add( new TH1D(("jet_pTrel" + (flavor->size() ? "_" + *flavor : "")).c_str(),"p_{Trel} [GeV/c]" , 50, 0, 5 ) );
+        fstore->add( new TH1F(("deltaPhi" + (flavor->size() ? "_" + *flavor : "")).c_str() ,"#Delta #phi",80,-3.15,3.15) );
+	
+        // Loop over different plot types: pT, Eta, etc.
+        for(int i = 0; 3 > i; ++i)
+        {
+            string suffix;
+            int nbins;
+            Double_t *bins;
+
+            switch(i)
+            {
+                case 0: suffix = "_pT";
+                        nbins = nptbins;
+                        bins = jetptbins;
+                        break;
+
+                case 1: suffix = "_eta";
+                        nbins = netabins;
+                        bins = jetetabins;
+                        break;
+
+                case 2: suffix = "_phi";
+                        nbins = nphibins;
+                        bins = jetphibins;
+                        break;
+            }
+
+            for(Plots::const_iterator plot = plots.begin();
+                plots.end() != plot;
+                ++plot)
+            {
+                fstore->add( new TH2F((plot->first + suffix + (flavor->length() ? ("_" + *flavor) : "")).c_str(),
+                                          (*flavor + suffix + plot->second).c_str(),
+                                          nbins, bins, 50, 0., 5.),
+                                      flavor->length() ? "MCTruth" : "muon_in_jet");
+            }
+        } // end loop over plot types
+    } // End loop over flavors
+
+    // Add All muon histograms
+    //
+    fstore->add( new TH1I( "all_muon_number", "All muons", 50, 0, 50) );
+    fstore->add( new TH1F( "all_muon_pt", "All muon pt", 300, 0, 50) );
+    fstore->add( new TH1F( "all_muon_phi", "All muon phi", 70, -3.5, 3.5) );
+    fstore->add( new TH1F( "all_muon_eta", "All muon eta", 60, -3, 3) );
+
+    // Add All jet histograms
+    //
+    fstore->add( new TH1I( "all_jet_number", "All jets", 50, 0, 50) );
+    fstore->add( new TH1F( "all_jet_pt", "All jet pt", 300, 0, 50) );
+    fstore->add( new TH1F( "all_jet_phi", "All jet phi", 70, -3.5, 3.5) );
+    fstore->add( new TH1F( "all_jet_eta", "All jet eta", 60, -3, 3) );
+
+/*
     fstore->add( new TH2F("n_pT","MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "muon_in_jet" );
     fstore->add( new TH2F("p_pT","MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "muon_in_jet" );
     fstore->add( new TH2F("ntag_pT","opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "muon_in_jet" );
@@ -83,9 +175,10 @@ void PMHistograms::Add()
     fstore->add( new TH2F("q_pT","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "muon_in_jet" );
     fstore->add( new TH2F("qtag_pT","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.), "muon_in_jet" );
 
-
+    // Eta
     fstore->add( new TH2F("n_eta","MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "muon_in_jet" );
     fstore->add( new TH2F("p_eta","MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "muon_in_jet" );
+
     fstore->add( new TH2F("ntag_eta","opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "muon_in_jet" );
     fstore->add( new TH2F("ptag_eta","opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "muon_in_jet" );
     fstore->add( new TH2F("nnoTag_eta","opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "muon_in_jet" );
@@ -93,6 +186,7 @@ void PMHistograms::Add()
 
     fstore->add( new TH2F("q_eta","other MuTag pT vs pTrel",netabins,jetetabins,50,0.,5.), "muon_in_jet" );
     fstore->add( new TH2F("qtag_eta","other MuTag && Tagger pT vs pTrel",netabins,jetetabins,50,0.,5.), "muon_in_jet" );
+
 //
     fstore->add( new TH2F("n_pT_b","b MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
     fstore->add( new TH2F("p_pT_b","b MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
@@ -170,230 +264,99 @@ void PMHistograms::Add()
     fstore->add( new TH2F("ptag_eta_l","l opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
     fstore->add( new TH2F("nnoTag_eta_l","l opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
     fstore->add( new TH2F("pnoTag_eta_l","l opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-
     fstore->add( new TH2F("q_eta_l","other MuTag pT vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
     fstore->add( new TH2F("qtag_eta_l","other MuTag && Tagger pT vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
+    */
 
-
-    /*
-    	fstore->add( new TH2F("ptVsEta","pt vs Eta",fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() ) );
-    	fstore->add( new TH2F("ptVsEta_b","pt vs Eta",fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() ) );
-    	fstore->add( new TH2F("taggedjet_ptVsEta","taggedjet pt vs Eta",fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() ) );
-    	fstore->add( new TH2F("taggedjet_ptVsEta_b","taggedjet pt vs Eta",fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() ) );
-
-    	fstore->add( new TH1D("alpha","alpha",nptbins,jetptbins), "MCTruth" );
-    	fstore->add( new TH1D("beta","beta",nptbins,jetptbins), "MCTruth" );
-    	fstore->add( new TH1D("kappa_cl","kappa_cl",nptbins,jetptbins), "MCTruth" );
-    	fstore->add( new TH1D("kappa_b","kappa_b",nptbins,jetptbins), "MCTruth" );
-    	fstore->add( new TH1D("delta","delta",nptbins,jetptbins), "MCTruth" );
-    	fstore->add( new TH1D("gamma","gamma",nptbins,jetptbins), "MCTruth" );
-
-    	fstore->add( new TH1D("alpha_eta","alpha_eta",netabins,jetetabins), "MCTruth" );
-    	fstore->add( new TH1D("beta_eta","beta_eta",netabins,jetetabins), "MCTruth" );
-    	fstore->add( new TH1D("kappa_eta_cl","kappa_eta_cl",netabins,jetetabins), "MCTruth" );
-    	fstore->add( new TH1D("kappa_eta_b","kappa_eta_b",netabins,jetetabins), "MCTruth" );
-    	fstore->add( new TH1D("delta_eta","delta_eta",netabins,jetetabins), "MCTruth" );
-    	fstore->add( new TH1D("gamma_eta","gamma_eta",netabins,jetetabins), "MCTruth" );
-    	*/
+        /*
     fstore->add( new TH1D("jet_deltaR","#Delta R",60,0.,0.55) );
     fstore->add( new TH1D("jet_deltaR_b","#Delta R",60,0.,0.55) );
     fstore->add( new TH1D("jet_deltaR_c","#Delta R",60,0.,0.55) );
+    */
     fstore->add( new TH1D("jet_deltaR_udsg","#Delta R",60,0.,0.55) );
 	fstore->add( new TH1D("deltaRnearjet","#Delta R",60,0.,2.0) );
 	
     // pending change colors
+    /*
     fstore->add( new TH1D("jet_pTrel","p_{Trel} [GeV/c]" , 50, 0, 5 ) );
     fstore->add( new TH1D("jet_pTrel_b","p_{Trel} [GeV/c]" , 50, 0, 5 ) );
     fstore->add( new TH1D("jet_pTrel_c","p_{Trel} [GeV/c]" , 50, 0, 5 ) );
+    */
     fstore->add( new TH1D("jet_pTrel_udsg","p_{Trel} [GeV/c]" , 50, 0, 5 ) );
 
     fstore->add( new TH1F( "jet_pt", "jet pt", 30, 0, 150) );
     fstore->add( new TH1F( "awayjet_pt", "jet pt", 30, 0, 150) );
     fstore->add( new TH1F( "muon_pt", "muon pt", 300, 0, 50) );
     fstore->add( new TH1F( "ptRel", "ptRel", 100, 0, 10) );
+
+    /*
     fstore->add( new TH1F( "deltaPhi","deltaPhi",80,-3.15,3.15) );
 	fstore->add( new TH1F( "deltaPhi_b","deltaPhi_b",80,-3.15,3.15) );
 	fstore->add( new TH1F( "deltaPhi_c","deltaPhi_c",80,-3.15,3.15) );
 	fstore->add( new TH1F( "deltaPhi_l","deltaPhi_l",80,-3.15,3.15) );
 	fstore->add( new TH1F( "deltaPhi_g","deltaPhi_g",80,-3.15,3.15) );
-
+    */
 }
 
 //______________________________________________________________________________________________________________________
 //void PMHistograms::FillHistos(std::string type, TLorentzVector p4MuJet, double ptrel,
 //			      int JetFlavor, std::map<std::string, bool> aMap)
-void PMHistograms::FillHistos(std::string type, TLorentzVector p4MuJet, double ptrel,
+void PMHistograms::FillHistos(const std::string &type, const TLorentzVector &p4MuJet, const double &ptrel,
                               int JetFlavor, bool tagged)
 {
-    //type == "n", "p"
+    // All jets
+    //
+    FillHisto("", type, p4MuJet, ptrel, tagged);
 
-    fstore->hist(type+"_pT")->Fill(p4MuJet.Pt(),ptrel);
-    fstore->hist(type+"_eta")->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-    std::string flavor;
+    // b jets
+    //
     if ( JetFlavor == 5 )
-    {
-        flavor = "b";
-        fstore->hist(type+"_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-        fstore->hist(type+"_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-        if (tagged)
-        {
-            fstore->hist(type+"tag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-            fstore->hist(type+"tag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-        }
-        else
-        {
+        FillHisto("b", type, p4MuJet, ptrel, tagged);
 
-            fstore->hist(type+"noTag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-            fstore->hist(type+"noTag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-        }
-
-    }
-    if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor == 21 )
-    {
-        flavor = "cl";
-        fstore->hist(type+"_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-        fstore->hist(type+"_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-        if (tagged)
-        {
-            fstore->hist(type+"tag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-            fstore->hist(type+"tag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-        }
-        else
-        {
-
-            fstore->hist(type+"noTag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-            fstore->hist(type+"noTag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-        }
-
-    }
+    // c jets
     if ( JetFlavor == 4 )
-    {
-        flavor = "c";
-        fstore->hist(type+"_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-        fstore->hist(type+"_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-        if (tagged)
-        {
-            fstore->hist(type+"tag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-            fstore->hist(type+"tag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-        }
-        else
-        {
+        FillHisto("c", type, p4MuJet, ptrel, tagged);
 
-            fstore->hist(type+"noTag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-            fstore->hist(type+"noTag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-        }
+    // uds jets
+    //
+    if ((JetFlavor > 0 && JetFlavor < 4))
+        FillHisto("uds", type, p4MuJet, ptrel, tagged);
 
-    }
+    // g jets
+    if ( JetFlavor == 21 )
+        FillHisto("g", type, p4MuJet, ptrel, tagged);
+
+    // c + uds + g
+    //
+    if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor == 21 )
+        FillHisto("cl", type, p4MuJet, ptrel, tagged);
+
+    // uds + g
+    //
     if ( (JetFlavor>0 && JetFlavor<4) || JetFlavor == 21 )
-    {
-        flavor = "l";
-        fstore->hist(type+"_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-        fstore->hist(type+"_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-        if (tagged)
-        {
-            fstore->hist(type+"tag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-            fstore->hist(type+"tag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-        }
-        else
-        {
-
-            fstore->hist(type+"noTag_pT_"+flavor)->Fill(p4MuJet.Pt(),ptrel);
-            fstore->hist(type+"noTag_eta_"+flavor)->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-        }
-
-    }
-
-    // avoid jets with flavor = 0
-
-    if (tagged)
-    {
-
-        fstore->hist(type+"tag_pT")->Fill(p4MuJet.Pt(),ptrel);
-        fstore->hist(type+"tag_eta")->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-    }
-    else
-    {
-
-        fstore->hist(type+"noTag_pT")->Fill(p4MuJet.Pt(),ptrel);
-        fstore->hist(type+"noTag_eta")->Fill(TMath::Abs(p4MuJet.Eta()),ptrel);
-    }
-
-
+        FillHisto("l", type, p4MuJet, ptrel, tagged);
 }
 
-/*
+void PMHistograms::FillHisto(const std::string &flavor,
+                             const std::string &type,
+                             const TLorentzVector &p4,
+                             const double &ptrel,
+                             const bool &tagged)
+{
+    string flvr = flavor.size()
+                  ? "_" + flavor
+                  : flavor;
 
-  for (std::map<std::string,bool>::const_iterator imap = aMap.begin(); imap != aMap.end(); ++imap )
-    {
+    Fill(type, flvr, p4, ptrel);
+    Fill(type + (tagged ? "tag" : "noTag"), flvr, p4, ptrel);
+}
 
-      if ( imap->second )
-        {
-
-	  if ( type == "n")
-            {
-
-	      TaggedMujetHistos->Fill2d(type+"tag_pT_"+(imap->first),p4MuJet.Pt(),ptrel,weight);
-	      TaggedMujetHistos->Fill2d(type+"tag_eta_"+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
-
-	      if ( JetFlavor == 5 )
-                {
-		  std::string flavor = "b_";
-		  TaggedMujetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
-		  TaggedMujetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
-                }
-	      if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor == 21 )
-                {
-		  std::string flavor = "cl_";
-		  TaggedMujetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
-		  TaggedMujetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
-                }
-	      if ( JetFlavor == 4 )
-                {
-		  std::string flavor = "c_";
-		  TaggedMujetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
-		  TaggedMujetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
-                }
-	      if ( (JetFlavor>0 && JetFlavor<4) || JetFlavor == 21 )
-                {
-		  std::string flavor = "l_";
-		  TaggedMujetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
-		  TaggedMujetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
-                }
-            }
-	  else if ( type == "p")
-            {
-
-
-	      TaggedAwayjetHistos->Fill2d(type+"tag_pT_"+(imap->first),p4MuJet.Pt(),ptrel,weight);
-	      TaggedAwayjetHistos->Fill2d(type+"tag_eta_"+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
-
-	      if ( JetFlavor == 5 )
-                {
-		  std::string flavor = "b_";
-		  TaggedAwayjetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
-		  TaggedAwayjetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
-                }
-	      if ( (JetFlavor>0 && JetFlavor<5) || JetFlavor == 21 )
-                {
-		  std::string flavor = "cl_";
-		  TaggedAwayjetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
-		  TaggedAwayjetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
-                }
-	      if ( JetFlavor == 4 )
-                {
-		  std::string flavor = "c_";
-		  TaggedAwayjetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
-		  TaggedAwayjetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
-                }
-	      if ( (JetFlavor>0 && JetFlavor<4) || JetFlavor == 21 )
-                {
-		  std::string flavor = "l_";
-		  TaggedAwayjetHistos_mc->Fill2d(type+"tag_pT_"+flavor+(imap->first),p4MuJet.Pt(),ptrel,weight);
-		  TaggedAwayjetHistos_mc->Fill2d(type+"tag_eta_"+flavor+(imap->first),TMath::Abs(p4MuJet.Eta()),ptrel,weight);
-                }
-            }
-        }
-    }
-*/
-
-
+void PMHistograms::Fill(const std::string &prefix,
+                        const std::string &suffix,
+                        const TLorentzVector &p4,
+                        const double &ptrel)
+{
+    fstore->hist(prefix + "_pT" + suffix)->Fill(p4.Pt(),ptrel);
+    fstore->hist(prefix + "_eta" + suffix)->Fill(TMath::Abs(p4.Eta()), ptrel);
+    fstore->hist(prefix + "_phi" + suffix)->Fill(TMath::Abs(p4.Phi()), ptrel);
+}

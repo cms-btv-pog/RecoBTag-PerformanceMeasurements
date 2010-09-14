@@ -1,4 +1,3 @@
-
 //
 //
 // Package:    RecoBTag/PerformanceMeasurements
@@ -11,7 +10,7 @@
          Author: Francisco Yumiceva, Fermilab
 */
 //
-// $Id: PMHistograms.h,v 1.3 2009/10/03 20:00:33 yumiceva Exp $
+// $Id: PMHistograms.h,v 1.4 2010/07/13 18:41:04 jindal Exp $
 //
 //
 
@@ -26,7 +25,6 @@
 
 class PMHistograms
 {
-
 public:
 
     //PMHistograms() {}
@@ -37,10 +35,20 @@ public:
     ~PMHistograms() { }
 
     void Add();
-    void FillHistos(std::string type, TLorentzVector p4MuJet, double ptrel,
+    void FillHistos(const std::string &type, const TLorentzVector &p4MuJet, const double &ptrel,
                     int JetFlavor, bool tagged=false);
 
 private:
+    void FillHisto(const std::string &flavor,
+                   const std::string &type,
+                   const TLorentzVector &p4,
+                   const double &ptrel,
+                   const bool &tagged);
+
+    void Fill(const std::string &prefix,
+              const std::string &suffix,
+              const TLorentzVector &p4,
+              const double &ptrel);
 
     TH1Store *fstore;
 
