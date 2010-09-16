@@ -22,6 +22,7 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "FWCore/Common/interface/TriggerResultsByName.h"
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
@@ -36,6 +37,7 @@
 #include "RecoBTag/PerformanceMeasurements/interface/TH1Store.h"
 
 using namespace std;
+using reco::Vertex;
 
 bool jsonContainsEvent (const std::vector< edm::LuminosityBlockRange > &jsonVec,
                         const edm::EventBase &event)
@@ -238,16 +240,43 @@ int main (int argc, char* argv[])
             break;
         }
 
+        typedef vector<Vertex> PVCollection;
+        fwlite::Handle<PVCollection> primaryVertices;
+        primaryVertices.getByLabel(events, "offlinePrimaryVertices");
+
+        if (!primaryVertices.isValid() ||
+            !primaryVertices->size())
+        {
+            cerr << "Failed to extract primary vertices or collection is empty." << endl;
+
+            break;
+        }
+
+        const Vertex &primaryVertex = primaryVertices->at(0);
+
         // Create All Muons plots
         //
-        hstore->hist("all_muon_number")->Fill(muonHandle->size());
-        for (vector<pat::Muon>::const_iterator muon = muonHandle->begin();
-             muonHandle->end() != muon;
-             ++muon)
         {
-            hstore->hist("all_muon_pt")->Fill(muon->pt());
-            hstore->hist("all_muon_eta")->Fill(muon->eta());
-            hstore->hist("all_muon_phi")->Fill(muon->phi());
+            int muons = 0;
+            for (vector<pat::Muon>::const_iterator muon = muonHandle->begin();
+                 muonHandle->end() != muon;
+                 ++muon)
+            {
+                if (1 < muon->numberOfMatches())
+                {
+                    const double dz = abs(muon->vz() - primaryVertex.z());
+
+                    hstore->hist("all_mu_pt")->Fill(muon->pt());
+                    hstore->hist("all_mu_phi")->Fill(muon->phi());
+                    hstore->hist("all_mu_eta")->Fill(muon->eta());
+                    hstore->hist("all_mu_charge")->Fill(muon->charge());
+                    hstore->hist("all_mu_dz")->Fill(dz);
+                    hstore->hist("all_mu_ip")->Fill(muon->dB());
+
+                    ++muons;
+                }
+            }
+            hstore->hist("all_mu_number")->Fill(muons);
         }
 
         hstore->hist("all_jet_number")->Fill(jetHandle->size());
@@ -283,6 +312,9 @@ int main (int argc, char* argv[])
             double mu_highest_pt = 0;
             double ptrel = 0;
             double ptreltmp = 0;
+            double mu_ip = 0;
+            double mu_dz = 0;
+            double mu_charge = 0;
 
             // Attempt to find muon inside the jet
             //
@@ -334,6 +366,10 @@ int main (int argc, char* argv[])
                     leptonvec.SetXYZ(muonIter->px(), muonIter->py(),muonIter->pz());
                     tmpvec += leptonvec;
                     ptrel = leptonvec.Perp(tmpvec);  // maximum
+
+                    mu_ip = muonIter->dB();
+                    mu_dz = abs(muonIter->vz() - primaryVertex.z());
+                    mu_charge = muonIter->charge();
                 }
 
                 hstore->hist("jet_pTrel")->Fill (ptrel);
@@ -397,6 +433,13 @@ int main (int argc, char* argv[])
             double btag   = jetIter -> bDiscriminator( Tagger );
 
             if (btag > btag_cut_Tagger ) TaggedJet = true;
+
+            hstore->hist("mu_injet_pt")->Fill(p4Muon.Pt());
+            hstore->hist("mu_injet_phi")->Fill(p4Muon.Phi());
+            hstore->hist("mu_injet_eta")->Fill(p4Muon.Eta());
+            hstore->hist("mu_injet_ip")->Fill(mu_ip);
+            hstore->hist("mu_injet_dz")->Fill(mu_dz);
+            hstore->hist("mu_injet_charge")->Fill(mu_charge);
 
             histos.FillHistos("n", p4MuJet, ptrel, JetFlavor, TaggedJet );
 

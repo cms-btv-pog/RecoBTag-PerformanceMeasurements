@@ -122,17 +122,17 @@ void PMHistograms::Add()
 
             switch(i)
             {
-                case 0: suffix = "_pT";
+                case 0: suffix = "pT";
                         nbins = nptbins;
                         bins = jetptbins;
                         break;
 
-                case 1: suffix = "_eta";
+                case 1: suffix = "eta";
                         nbins = netabins;
                         bins = jetetabins;
                         break;
 
-                case 2: suffix = "_phi";
+                case 2: suffix = "phi";
                         nbins = nphibins;
                         bins = jetphibins;
                         break;
@@ -142,8 +142,8 @@ void PMHistograms::Add()
                 plots.end() != plot;
                 ++plot)
             {
-                fstore->add( new TH2F((plot->first + suffix + (flavor->length() ? ("_" + *flavor) : "")).c_str(),
-                                          (*flavor + suffix + plot->second).c_str(),
+                fstore->add( new TH2F((plot->first + "_" + suffix + (flavor->length() ? ("_" + *flavor) : "")).c_str(),
+                                          ((flavor->length() ? (" " + *flavor) : "") + suffix + plot->second).c_str(),
                                           nbins, bins, 50, 0., 5.),
                                       flavor->length() ? "MCTruth" : "muon_in_jet");
             }
@@ -152,10 +152,20 @@ void PMHistograms::Add()
 
     // Add All muon histograms
     //
-    fstore->add( new TH1I( "all_muon_number", "All muons", 50, 0, 50) );
-    fstore->add( new TH1F( "all_muon_pt", "All muon pt", 300, 0, 50) );
-    fstore->add( new TH1F( "all_muon_phi", "All muon phi", 70, -3.5, 3.5) );
-    fstore->add( new TH1F( "all_muon_eta", "All muon eta", 60, -3, 3) );
+    fstore->add( new TH1I( "all_mu_number", "All #mu", 50, 0, 50) );
+    fstore->add( new TH1F( "all_mu_pt", "All #mu pt", 50, 0, 100) );
+    fstore->add( new TH1F( "all_mu_phi", "All #mu phi", 70, -3.5, 3.5) );
+    fstore->add( new TH1F( "all_mu_eta", "All #mu eta", 60, -3, 3) );
+    fstore->add( new TH1F( "all_mu_ip", "All #mu IP", 100, -5., 5));
+    fstore->add( new TH1F( "all_mu_dz", "All #mu dz", 50, 0., 5) );
+    fstore->add( new TH1F( "all_mu_charge", "All #mu charge", 10, -5., 5.) );
+
+    fstore->add(new TH1F("mu_injet_pt", "#mu in jet p_{T}", 50, 0, 100));
+    fstore->add(new TH1F("mu_injet_phi", "#mu in jet #phi", 70, -3.5, 3.5));
+    fstore->add(new TH1F("mu_injet_eta", "#mu in jet #eta", 60, -3, 3));
+    fstore->add(new TH1F("mu_injet_ip", "#mu in jet IP", 100, -5., 5));
+    fstore->add(new TH1F("mu_injet_dz", "#mu in jet dz", 50, 0., 5));
+    fstore->add(new TH1F("mu_injet_charge", "#mu in jet charge", 10, -5., 5.));
 
     // Add All jet histograms
     //
@@ -164,138 +174,16 @@ void PMHistograms::Add()
     fstore->add( new TH1F( "all_jet_phi", "All jet phi", 70, -3.5, 3.5) );
     fstore->add( new TH1F( "all_jet_eta", "All jet eta", 60, -3, 3) );
 
-/*
-    fstore->add( new TH2F("n_pT","MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "muon_in_jet" );
-    fstore->add( new TH2F("p_pT","MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "muon_in_jet" );
-    fstore->add( new TH2F("ntag_pT","opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "muon_in_jet" );
-    fstore->add( new TH2F("ptag_pT","opp tag MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "muon_in_jet" );
-    fstore->add( new TH2F("nnoTag_pT","opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "muon_in_jet" );
-    fstore->add( new TH2F("pnoTag_pT","opp tag MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "muon_in_jet" );
-
-    fstore->add( new TH2F("q_pT","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "muon_in_jet" );
-    fstore->add( new TH2F("qtag_pT","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.), "muon_in_jet" );
-
-    // Eta
-    fstore->add( new TH2F("n_eta","MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "muon_in_jet" );
-    fstore->add( new TH2F("p_eta","MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "muon_in_jet" );
-
-    fstore->add( new TH2F("ntag_eta","opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "muon_in_jet" );
-    fstore->add( new TH2F("ptag_eta","opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "muon_in_jet" );
-    fstore->add( new TH2F("nnoTag_eta","opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "muon_in_jet" );
-    fstore->add( new TH2F("pnoTag_eta","opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "muon_in_jet" );
-
-    fstore->add( new TH2F("q_eta","other MuTag pT vs pTrel",netabins,jetetabins,50,0.,5.), "muon_in_jet" );
-    fstore->add( new TH2F("qtag_eta","other MuTag && Tagger pT vs pTrel",netabins,jetetabins,50,0.,5.), "muon_in_jet" );
-
-//
-    fstore->add( new TH2F("n_pT_b","b MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("p_pT_b","b MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("ntag_pT_b","b opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("ptag_pT_b","b opp tag MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("nnoTag_pT_b","b opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("pnoTag_pT_b","b opp tag MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-
-    fstore->add( new TH2F("q_pT_b","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("qtag_pT_b","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-
-    fstore->add( new TH2F("n_eta_b","b MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("p_eta_b","b MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("ntag_eta_b","b opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("ptag_eta_b","b opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("nnoTag_eta_b","b opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("pnoTag_eta_b","b opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-
-    fstore->add( new TH2F("q_eta_b","other MuTag pT vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("qtag_eta_b","other MuTag && Tagger pT vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-//
-    fstore->add( new TH2F("n_pT_cl","cl MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("p_pT_cl","cl MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("ntag_pT_cl","cl opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("ptag_pT_cl","cl opp tag MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("nnoTag_pT_cl","cl opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("pnoTag_pT_cl","cl opp tag MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-
-    fstore->add( new TH2F("q_pT_cl","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("qtag_pT_cl","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-
-    fstore->add( new TH2F("n_eta_cl","cl MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("p_eta_cl","cl MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("ntag_eta_cl","cl opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("ptag_eta_cl","cl opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("nnoTag_eta_cl","cl opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("pnoTag_eta_cl","cl opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-
-    fstore->add( new TH2F("q_eta_cl","other MuTag pT vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("qtag_eta_cl","other MuTag && Tagger pT vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-//
-    fstore->add( new TH2F("n_pT_c","c MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("p_pT_c","c MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("ntag_pT_c","c opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("ptag_pT_c","c opp tag MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("nnoTag_pT_c","c opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("pnoTag_pT_c","c opp tag MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-
-    fstore->add( new TH2F("q_pT_c","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("qtag_pT_c","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-
-    fstore->add( new TH2F("n_eta_c","c MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("p_eta_c","c MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("ntag_eta_c","c opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("ptag_eta_c","c opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("nnoTag_eta_c","c opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("pnoTag_eta_c","c opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-
-    fstore->add( new TH2F("q_eta_c","other MuTag pT vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("qtag_eta_c","other MuTag && Tagger pT vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-//
-    fstore->add( new TH2F("n_pT_l","l MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("p_pT_l","l MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("ntag_pT_l","l opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("ptag_pT_l","l opp tag MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("nnoTag_pT_l","l opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("pnoTag_pT_l","l opp tag MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-
-    fstore->add( new TH2F("q_pT_l","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("qtag_pT_l","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.), "MCTruth" );
-
-    fstore->add( new TH2F("n_eta_l","l MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("p_eta_l","l MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("ntag_eta_l","l opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("ptag_eta_l","l opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("nnoTag_eta_l","l opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("pnoTag_eta_l","l opp tag MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("q_eta_l","other MuTag pT vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    fstore->add( new TH2F("qtag_eta_l","other MuTag && Tagger pT vs pTrel",netabins,jetetabins,50,0.,5.), "MCTruth" );
-    */
-
-        /*
-    fstore->add( new TH1D("jet_deltaR","#Delta R",60,0.,0.55) );
-    fstore->add( new TH1D("jet_deltaR_b","#Delta R",60,0.,0.55) );
-    fstore->add( new TH1D("jet_deltaR_c","#Delta R",60,0.,0.55) );
-    */
     fstore->add( new TH1D("jet_deltaR_udsg","#Delta R",60,0.,0.55) );
 	fstore->add( new TH1D("deltaRnearjet","#Delta R",60,0.,2.0) );
 	
     // pending change colors
-    /*
-    fstore->add( new TH1D("jet_pTrel","p_{Trel} [GeV/c]" , 50, 0, 5 ) );
-    fstore->add( new TH1D("jet_pTrel_b","p_{Trel} [GeV/c]" , 50, 0, 5 ) );
-    fstore->add( new TH1D("jet_pTrel_c","p_{Trel} [GeV/c]" , 50, 0, 5 ) );
-    */
     fstore->add( new TH1D("jet_pTrel_udsg","p_{Trel} [GeV/c]" , 50, 0, 5 ) );
 
     fstore->add( new TH1F( "jet_pt", "jet pt", 30, 0, 150) );
     fstore->add( new TH1F( "awayjet_pt", "jet pt", 30, 0, 150) );
     fstore->add( new TH1F( "muon_pt", "muon pt", 300, 0, 50) );
     fstore->add( new TH1F( "ptRel", "ptRel", 100, 0, 10) );
-
-    /*
-    fstore->add( new TH1F( "deltaPhi","deltaPhi",80,-3.15,3.15) );
-	fstore->add( new TH1F( "deltaPhi_b","deltaPhi_b",80,-3.15,3.15) );
-	fstore->add( new TH1F( "deltaPhi_c","deltaPhi_c",80,-3.15,3.15) );
-	fstore->add( new TH1F( "deltaPhi_l","deltaPhi_l",80,-3.15,3.15) );
-	fstore->add( new TH1F( "deltaPhi_g","deltaPhi_g",80,-3.15,3.15) );
-    */
 }
 
 //______________________________________________________________________________________________________________________
