@@ -160,6 +160,7 @@ void PMHistograms::Add()
     fstore->add( new TH1F( "all_mu_dz", "All #mu dz", 50, 0., 5) );
     fstore->add( new TH1F( "all_mu_charge", "All #mu charge", 10, -5., 5.) );
 
+    fstore->add(new TH1F("mu_injet", "Number of #mu in jet", 15, 0, 15));
     fstore->add(new TH1F("mu_injet_pt", "#mu in jet p_{T}", 50, 0, 100));
     fstore->add(new TH1F("mu_injet_phi", "#mu in jet #phi", 70, -3.5, 3.5));
     fstore->add(new TH1F("mu_injet_eta", "#mu in jet #eta", 60, -3, 3));
