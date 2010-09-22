@@ -262,10 +262,11 @@ int main (int argc, char* argv[])
                  muonHandle->end() != muon;
                  ++muon)
             {
-                if (1 < muon->numberOfMatches())
-                {
-                    const double dz = abs(muon->vz() - primaryVertex.z());
+                const double dz = muon->vz() - primaryVertex.z();
 
+                if (1 < muon->numberOfMatches() &&
+                    abs(dz) < 2)
+                {
                     hstore->hist("all_mu_pt")->Fill(muon->pt());
                     hstore->hist("all_mu_phi")->Fill(muon->phi());
                     hstore->hist("all_mu_eta")->Fill(muon->eta());
@@ -276,6 +277,7 @@ int main (int argc, char* argv[])
                     ++muons;
                 }
             }
+
             hstore->hist("all_mu_number")->Fill(muons);
         }
 
@@ -315,6 +317,7 @@ int main (int argc, char* argv[])
             double mu_ip = 0;
             double mu_dz = 0;
             double mu_charge = 0;
+            int muonsInJet = 0;
 
             // Attempt to find muon inside the jet
             //
@@ -325,6 +328,12 @@ int main (int argc, char* argv[])
                 //          each muon. What is the expected result???
                 //
                 hstore->hist("muon_pt")->Fill (muonIter->innerTrack()->pt());
+
+                const double dz = muonIter->vz() - primaryVertex.z();
+                if (1 >= muonIter->numberOfMatches() ||
+                    abs(dz) >= 2 )
+
+                    continue;
 
                 reco::TrackRef trackMuon = muonIter->innerTrack();
                 math::XYZTLorentzVector trackMuonP4(trackMuon->px(),
@@ -345,9 +354,15 @@ int main (int argc, char* argv[])
                 ptreltmp = leptonvec.Perp(tmpvec);
 
                 // muon in jet cuts
-                if ( deltaR >= 0.4 || deltaR < 0.01 || ptreltmp <= -1.0 ) continue;
+                //
+                if (deltaR >= 0.4 || deltaR < 0.01 ||
+                    ptreltmp <= -1.0)
+
+                    continue;
 
                 hasLepton = true;
+
+                ++muonsInJet;
 
                 // It may turn out that another muon was found so far. Then
                 // pick the one with highest pT.
@@ -432,7 +447,8 @@ int main (int argc, char* argv[])
 
             double btag   = jetIter -> bDiscriminator( Tagger );
 
-            if (btag > btag_cut_Tagger ) TaggedJet = true;
+            if (btag > btag_cut_Tagger )
+                TaggedJet = true;
 
             hstore->hist("mu_injet_pt")->Fill(p4Muon.Pt());
             hstore->hist("mu_injet_phi")->Fill(p4Muon.Phi());
@@ -440,6 +456,7 @@ int main (int argc, char* argv[])
             hstore->hist("mu_injet_ip")->Fill(mu_ip);
             hstore->hist("mu_injet_dz")->Fill(mu_dz);
             hstore->hist("mu_injet_charge")->Fill(mu_charge);
+            hstore->hist("mu_injet")->Fill(muonsInJet);
 
             histos.FillHistos("n", p4MuJet, ptrel, JetFlavor, TaggedJet );
 
@@ -456,6 +473,7 @@ int main (int argc, char* argv[])
                 p4AwayJet.SetPtEtaPhiE(awayjetIter->pt(), awayjetIter->eta(), awayjetIter->phi(), awayjetIter->energy() );
 
                 // skip muon in jet
+                //
                 if ( p4AwayJet == p4MuJet ) continue;
 
                 // {samvel} what is this? For each jet we plot awayjet. So, for
@@ -473,50 +491,6 @@ int main (int argc, char* argv[])
                         p4AwayTagged = p4AwayJet;
                     }
 
-                }
-
-                // Skip muon search in the away jet if one was found so far.
-                if ( AwayMuonJet )
-                    continue;
-
-                mu_highest_pt = 0;
-                for (vector< pat::Muon >::const_iterator muonIter = muonHandle->begin();
-                     muonIter != muonHandle->end(); ++muonIter)
-                {
-                    hstore->hist("muon_pt")->Fill (muonIter->innerTrack()->pt());
-
-                    // find a muon in a jet
-                    //check deltar
-                    reco::TrackRef trackMuon = muonIter->innerTrack();
-                    math::XYZTLorentzVector trackMuonP4(trackMuon->px(),
-                                                        trackMuon->py(),
-                                                        trackMuon->pz(),
-                                                        sqrt(trackMuon->p() * trackMuon->p() + 0.1057*0.1057));
-                    double deltaR  = ROOT::Math::VectorUtil::DeltaR(jetIter->p4().Vect(), trackMuonP4.Vect() );
-                    TVector3 tmpvecOrg(awayjetIter->p4().Vect().X(),awayjetIter->p4().Vect().Y(),  awayjetIter->p4().Vect().Z());
-                    TVector3 tmpvec;
-                    tmpvec = tmpvecOrg;
-                    TVector3 leptonvec(trackMuon->px(), trackMuon->py(),trackMuon->pz());
-                    tmpvec += leptonvec;
-                    double awayptrel = leptonvec.Perp(tmpvec);
-                    // muon in jet cuts
-                    if ( (deltaR >= 0.4) || (ptreltmp <= -1.0) ) continue;
-                    // now we have a good muon in a jet
-                    AwayMuonJet = true;
-                    // pick the leading muon inside the jet
-                    if ( trackMuon->pt() > mu_highest_pt )
-                    {
-                        mu_highest_pt = muonIter->pt();
-                        p4AwayMuon.SetPtEtaPhiE(trackMuon->pt(),
-                                                trackMuon->eta(),
-                                                trackMuon->phi(),
-                                                sqrt(trackMuon->p() * trackMuon->p() + 0.1057*0.1057));
-                        // recalculate pTrel
-                        tmpvec = tmpvecOrg;
-                        leptonvec.SetXYZ(trackMuon->px(), trackMuon->py(),trackMuon->pz());
-                        tmpvec += leptonvec;
-                        awayptrel = leptonvec.Perp(tmpvec);
-                    }
                 }
             } // close away jet loop
 
