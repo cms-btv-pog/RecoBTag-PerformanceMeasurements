@@ -41,10 +41,6 @@ namespace s8
             TVector3        _vertex;
     };
 
-    inline GenParticle::GenParticle() throw()
-    {
-    }
-
     inline int GenParticle::id() const
     {
         return _id;

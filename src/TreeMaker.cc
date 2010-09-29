@@ -181,7 +181,7 @@ void TreeMaker::analyze(const edm::Event &event, const edm::EventSetup &)
 
         if (muon->genLepton())
         {
-            s8::GenParticle s8GenParticle;
+            s8::GenParticle &s8GenParticle = s8Muon.genParticle();
 
             setP4(s8GenParticle.p4(), muon->genLepton()->p4());
             setVertex(s8GenParticle.vertex(), muon->genLepton()->vertex());
@@ -189,7 +189,6 @@ void TreeMaker::analyze(const edm::Event &event, const edm::EventSetup &)
             s8GenParticle.setId(muon->genLepton()->pdgId());
             if (muon->genLepton()->mother())
                 s8GenParticle.setParentId(muon->genLepton()->mother()->pdgId());
-
         }
 
         _event->muons().push_back(s8Muon);

@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-TreeMaker = cms.EDFilter(
+TreeMaker = cms.EDAnalyzer(
     'TreeMaker',
 
     primaryVertices = cms.string("offlinePrimaryVertices"),
