@@ -14,6 +14,12 @@ using std::runtime_error;
 
 using s8::PrimaryVertex;
 
+PrimaryVertex::PrimaryVertex() throw():
+    _ndof(0),
+    _rho(0)
+{
+}
+
 void PrimaryVertex::setNdof(const int &ndof)
 {
     if (0 > ndof)

@@ -36,10 +36,6 @@ namespace s8
             double   _rho;
     };
 
-    inline PrimaryVertex::PrimaryVertex() throw()
-    {
-    }
-
     inline TVector3 &PrimaryVertex::vertex()
     {
         return _vertex;

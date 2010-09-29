@@ -14,6 +14,13 @@ using std::runtime_error;
 
 using s8::EventID;
 
+EventID::EventID() throw():
+    _run(0),
+    _lumiBlock(0),
+    _event(0)
+{
+}
+
 void EventID::setRun(const int &run)
 {
     if (run < 0)

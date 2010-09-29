@@ -32,10 +32,6 @@ namespace s8
             int _event;
     };
 
-    inline EventID::EventID() throw()
-    {
-    }
-
     inline int EventID::run() const
     {
         return _run;
