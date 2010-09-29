@@ -51,13 +51,6 @@ namespace s8
             BTagCollection _btag;
     };
 
-    inline Jet::Jet() throw():
-        _flavour(0),
-        _tracks(0),
-        _btag(Jet::BTAGS)
-    {
-    }
-
     inline int Jet::flavour() const
     {
         return _flavour;

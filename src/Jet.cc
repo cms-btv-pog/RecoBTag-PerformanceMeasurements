@@ -14,6 +14,13 @@ using std::runtime_error;
 
 using s8::Jet;
 
+Jet::Jet() throw():
+    _flavour(0),
+    _tracks(0),
+    _btag(Jet::BTAGS)
+{
+}
+
 void Jet::setTracks(const int &tracks)
 {
     if (0 > tracks)
