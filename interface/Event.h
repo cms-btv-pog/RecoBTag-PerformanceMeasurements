@@ -9,6 +9,7 @@
 #ifndef S8_EVENT
 #define S8_EVENT
 
+#include "RecoBTag/PerformanceMeasurements/interface/EventID.h"
 #include "RecoBTag/PerformanceMeasurements/interface/Jet.h"
 #include "RecoBTag/PerformanceMeasurements/interface/Muon.h"
 #include "RecoBTag/PerformanceMeasurements/interface/PrimaryVertex.h"
