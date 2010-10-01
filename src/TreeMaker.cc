@@ -151,6 +151,9 @@ void TreeMaker::analyze(const edm::Event &event, const edm::EventSetup &)
         primaryVertices->end() != vertex;
         ++vertex)
     {
+        if (!isGoodPrimaryVertex(*vertex, event.isRealData()))
+            continue;
+
         s8::PrimaryVertex s8Vertex;
 
         setVertex(s8Vertex.vertex(), vertex->position());
@@ -232,6 +235,15 @@ void TreeMaker::analyze(const edm::Event &event, const edm::EventSetup &)
     }
 
     _tree->Fill();
+}
+
+bool TreeMaker::isGoodPrimaryVertex(const Vertex &vertex,
+                                    const bool &isData)
+{
+    return !vertex.isFake() &&
+            4 <= vertex.ndof() &&
+            (isData ? 24 : 15) >= fabs(vertex.z()) &&
+            2 >= fabs(vertex.position().Rho());
 }
 
 DEFINE_FWK_MODULE(TreeMaker);

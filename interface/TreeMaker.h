@@ -21,6 +21,11 @@
 
 class TTree;
 
+namespace reco
+{
+    class Vertex;
+}
+
 class TreeMaker : public edm::EDAnalyzer
 {
     /*
@@ -34,6 +39,8 @@ class TreeMaker : public edm::EDAnalyzer
     virtual void beginJob();
     virtual void analyze(const edm::Event &, const edm::EventSetup &);
     virtual void endJob();
+
+    bool isGoodPrimaryVertex(const reco::Vertex &, const bool & = false); 
 
     std::auto_ptr<s8::Event>  _event;
     TTree                    *_tree;
