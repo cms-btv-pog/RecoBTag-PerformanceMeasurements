@@ -20,7 +20,7 @@ PrimaryVertex::PrimaryVertex() throw():
 {
 }
 
-void PrimaryVertex::setNdof(const int &ndof)
+void PrimaryVertex::setNdof(const double &ndof)
 {
     if (0 > ndof)
         throw runtime_error("[PrimaryVertex] Wrong number of NDOF supplied.");

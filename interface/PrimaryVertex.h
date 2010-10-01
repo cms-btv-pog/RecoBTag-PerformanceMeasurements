@@ -21,18 +21,18 @@ namespace s8
             TVector3 &vertex();
             const TVector3 &vertex() const;
 
-            int ndof() const;
+            double ndof() const;
             double rho() const;
 
 
 
-            void setNdof(const int &);
+            void setNdof(const double &);
             void setRho(const double &);
 
         private:
             TVector3 _vertex;
 
-            int      _ndof;
+            double   _ndof;
             double   _rho;
     };
 
@@ -46,7 +46,7 @@ namespace s8
         return _vertex;
     }
 
-    inline int PrimaryVertex::ndof() const
+    inline double PrimaryVertex::ndof() const
     {
         return _ndof;
     }
