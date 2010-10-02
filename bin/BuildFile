@@ -1,3 +1,6 @@
+<bin name=s8input file=S8Input.cc>
+    <use name=RecoBTag/PerformanceMeasurements>
+</bin>
 
 <bin name=PM_analyze file=PM_analyze_tuple.cc>
  <use name=root>
