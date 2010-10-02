@@ -28,15 +28,28 @@ namespace s8
             Converter() throw();
             ~Converter() throw();
 
-            bool run(const int argc, char *argv[]);
+            bool run(const int &argc, char **argv);
 
         private:
-            void process(const std::string &file);
+            bool parseArguments(const int &argc, char **);
+
+            void process();
             void analyze(const s8::Event *);
 
-            struct Plots {
-                Plots(const std::string &, const std::string &);
-                ~Plots();
+            struct Config
+            {
+                int         events;
+                bool        isData;
+                std::string tag;
+                std::string output;
+                std::string input;
+            };
+
+            Config         _config;
+
+            struct PlotGroup {
+                PlotGroup(const std::string &, const std::string & = "");
+                ~PlotGroup();
 
                 void setOperatingPoint(const OperatingPoint &);
 
@@ -52,21 +65,40 @@ namespace s8
                     double _operatingPoint;
             };
 
-            struct FlavouredPlots {
-                FlavouredPlots(const std::string &);
+            struct Plots
+            {
+                virtual ~Plots();
 
-                void setOperatingPoint(const OperatingPoint &);
-
-                void fill(const s8::Muon *, const s8::Jet *);
-
-                void save() const;
-
-                Plots b;
-                Plots cl;
+                virtual void setOperatingPoint(const OperatingPoint &) = 0;
+                virtual void fill(const s8::Muon *, const s8::Jet *) = 0;
+                virtual void save() const = 0;
             };
 
-            FlavouredPlots _n;
-            FlavouredPlots _p;
+            struct NonFlavouredPlots : public Plots
+            {
+                NonFlavouredPlots(const std::string &);
+
+                virtual void setOperatingPoint(const OperatingPoint &);
+                virtual void fill(const s8::Muon *, const s8::Jet *);
+                virtual void save() const;
+
+                PlotGroup plots;
+            };
+
+            struct FlavouredPlots : public Plots
+            {
+                FlavouredPlots(const std::string &);
+
+                virtual void setOperatingPoint(const OperatingPoint &);
+                virtual void fill(const s8::Muon *, const s8::Jet *);
+                virtual void save() const;
+
+                PlotGroup b;
+                PlotGroup cl;
+            };
+
+            Plots *_n;
+            Plots *_p;
     };
 }
 

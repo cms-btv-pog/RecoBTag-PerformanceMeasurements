@@ -1,4 +1,5 @@
 <use name=boost>
+<use name=boost_program_options>
 <use name=clhep>
 <use name=root>
 <use name=rootcore>
