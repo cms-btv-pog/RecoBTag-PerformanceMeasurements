@@ -1,6 +1,6 @@
 /**
  * Converter
- * 
+ * s8
  *
  * Created by Samvel Khalatian on Oct 1, 2010
  * Copyright 2010, All rights reserved
@@ -19,6 +19,7 @@ namespace s8
     class Muon;
     class Jet;
     class OperatingPoint;
+    class Plots;
 
     // Generate S8Solver input histograms from S8Tuple
     //
@@ -46,56 +47,6 @@ namespace s8
             };
 
             Config         _config;
-
-            struct PlotGroup {
-                PlotGroup(const std::string &, const std::string & = "");
-                ~PlotGroup();
-
-                void setOperatingPoint(const OperatingPoint &);
-
-                void fill(const s8::Muon *, const s8::Jet *);
-
-                void save() const;
-
-                TH2 *all;
-                TH2 *tag;
-
-                private:
-                    bool   _isInitializationFailed;
-                    double _operatingPoint;
-            };
-
-            struct Plots
-            {
-                virtual ~Plots();
-
-                virtual void setOperatingPoint(const OperatingPoint &) = 0;
-                virtual void fill(const s8::Muon *, const s8::Jet *) = 0;
-                virtual void save() const = 0;
-            };
-
-            struct NonFlavouredPlots : public Plots
-            {
-                NonFlavouredPlots(const std::string &);
-
-                virtual void setOperatingPoint(const OperatingPoint &);
-                virtual void fill(const s8::Muon *, const s8::Jet *);
-                virtual void save() const;
-
-                PlotGroup plots;
-            };
-
-            struct FlavouredPlots : public Plots
-            {
-                FlavouredPlots(const std::string &);
-
-                virtual void setOperatingPoint(const OperatingPoint &);
-                virtual void fill(const s8::Muon *, const s8::Jet *);
-                virtual void save() const;
-
-                PlotGroup b;
-                PlotGroup cl;
-            };
 
             Plots *_n;
             Plots *_p;

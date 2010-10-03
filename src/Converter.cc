@@ -20,6 +20,7 @@
 
 #include "RecoBTag/PerformanceMeasurements/interface/Event.h"
 #include "RecoBTag/PerformanceMeasurements/interface/OperatingPoint.h"
+#include "RecoBTag/PerformanceMeasurements/interface/Plots.h"
 
 #include "RecoBTag/PerformanceMeasurements/interface/Converter.h"
 
@@ -39,137 +40,6 @@ using s8::Muon;
 using s8::Converter;
 
 namespace po = boost::program_options;
-
-Converter::PlotGroup::PlotGroup(const string &prefix,
-                                const string &suffix)
-try
-    :_isInitializationFailed(false),
-     _operatingPoint(0)
-{
-    // Pt bins
-    //
-    const int nbins = 3;
-    const double bins[] = {30, 50, 80, 230};
-
-    const string newSuffix = suffix.empty() ?
-        "_pT" :
-        "_pT_" + suffix;
-
-    all = new TH2F((prefix + newSuffix).c_str(),
-                    (prefix + " p_{T}^rel vs p_{T} " +
-                     suffix).c_str(),
-                    nbins, bins,
-                    50, 0, 5);
-
-    tag = new TH2F((prefix + "tag" + newSuffix).c_str(),
-                   (prefix + " tag p_{T}^rel vs p_{T} " +
-                    suffix).c_str(),
-                   nbins, bins,
-                   50, 0, 5);
-}
-catch(const std::exception &error)
-{
-    cerr << "[error] " << error.what() << endl;
-
-    if (all)
-        delete all;
-
-    if (tag)
-        delete tag;
-
-    _isInitializationFailed = true;
-}
-
-Converter::PlotGroup::~PlotGroup()
-{
-    delete tag;
-    delete all;
-}
-
-void Converter::PlotGroup::setOperatingPoint(const OperatingPoint &op)
-{
-    _operatingPoint = op;
-}
-
-void Converter::PlotGroup::fill(const Muon *muon, const Jet *jet)
-{
-    if (_isInitializationFailed)
-        throw runtime_error("Plots initialization failed.");
-
-    all->Fill(jet->p4().Pt(),
-              muon->p4().Vect().Perp(jet->p4().Vect()));
-
-    if (_operatingPoint < jet->btag(Jet::TCHE))
-        tag->Fill(jet->p4().Pt(),
-                  muon->p4().Vect().Perp(jet->p4().Vect()));
-}
-
-void Converter::PlotGroup::save() const
-{
-    if (_isInitializationFailed)
-        throw runtime_error("Plots initialization failed.");
-
-    all->Write();
-    tag->Write();
-}
-
-Converter::Plots::~Plots()
-{
-}
-
-Converter::NonFlavouredPlots::NonFlavouredPlots(const string &prefix):
-    plots(prefix)
-{
-}
-
-void Converter::NonFlavouredPlots::setOperatingPoint(const OperatingPoint &op)
-{
-    plots.setOperatingPoint(op);
-}
-
-void Converter::NonFlavouredPlots::fill(const Muon *muon, const Jet *jet)
-{
-    plots.fill(muon, jet);
-}
-
-void Converter::NonFlavouredPlots::save() const
-{
-    plots.save();
-}
-
-Converter::FlavouredPlots::FlavouredPlots(const string &prefix):
-    b(prefix, "b"),
-    cl(prefix, "cl")
-{
-}
-
-void Converter::FlavouredPlots::setOperatingPoint(const OperatingPoint &op)
-{
-    b.setOperatingPoint(op);
-    cl.setOperatingPoint(op);
-}
-
-void Converter::FlavouredPlots::fill(const Muon *muon, const Jet *jet)
-{
-    switch(jet->flavour())
-    {
-        case 5:  b.fill(muon, jet);
-                 break;
-
-        case 4: // Fall through
-        case 3: // Fall through
-        case 2: // Fall through
-        case 1: // Fall through
-        case 21: cl.fill(muon, jet);
-                 break;
-    }
-}
-
-void Converter::FlavouredPlots::save() const
-{
-    b.save();
-    cl.save();
-}
 
 Converter::Converter() throw()
 {
@@ -201,8 +71,8 @@ bool Converter::run(const int &argc, char **argv)
     }
     else
     {
-        _n = new FlavouredPlots("n");
-        _p = new FlavouredPlots("p");
+        _n = new CombinedPlots("n");
+        _p = new CombinedPlots("p");
     }
 
     _n->setOperatingPoint(op);
@@ -298,7 +168,9 @@ void Converter::process()
     chain->SetBranchAddress("event", &event);
 
     int entries = chain->GetEntries();
-    if (entries > _config.events)
+    if (_config.events &&
+        entries > _config.events)
+
         entries = _config.events;
 
     const int fractions = 10;
@@ -329,15 +201,8 @@ void Converter::process()
     if (!output->IsOpen())
         throw runtime_error("failed to open output file. Results are not saved.");
 
-    const std::string subdir = _config.isData ? "muon_in_jet" : "MCTruth";
-    TDirectory *dir = output->mkdir(subdir.c_str());
-    if (!dir)
-        throw runtime_error("failed to create subfolder: muon_in_jet.");
-
-    dir->cd();
-
-    _n->save();
-    _p->save();
+    _n->save(output.get());
+    _p->save(output.get());
 }
 
 void Converter::analyze(const Event *event)
