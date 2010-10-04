@@ -16,17 +16,17 @@ process.source = cms.Source(
     "PoolSource",
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(   
-#         '/store/mc/Spring10/QCD_Pt-15_7TeV-pythia6/GEN-SIM-RECO/START3X_V26B-v1/0051/FA72BA34-555E-DF11-AB7E-00304865C2D0.root',
-#         '/store/mc/Spring10/QCD_Pt-15_7TeV-pythia6/GEN-SIM-RECO/START3X_V26B-v1/0051/FA5BD634-555E-DF11-82DD-00304865C254.root',
-#         '/store/mc/Spring10/QCD_Pt-15_7TeV-pythia6/GEN-SIM-RECO/START3X_V26B-v1/0051/F6CD800A-585E-DF11-A249-00304865C32A.root',
-#         '/store/mc/Spring10/QCD_Pt-15_7TeV-pythia6/GEN-SIM-RECO/START3X_V26B-v1/0051/F2CBB657-6C5E-DF11-9B87-00238BCE4648.root',
-#         '/store/mc/Spring10/QCD_Pt-15_7TeV-pythia6/GEN-SIM-RECO/START3X_V26B-v1/0051/F2799596-695E-DF11-AA90-A4BADB1E6796.root'
+      '/store/mc/Summer10/QCD_Pt30/GEN-SIM-RECODEBUG/START36_V9_S09-v1/0116/FE0124D0-3E7D-DF11-9E61-90E6BA19A24C.root',
+      '/store/mc/Summer10/QCD_Pt30/GEN-SIM-RECODEBUG/START36_V9_S09-v1/0116/F2C764D0-3E7D-DF11-8926-0030487CDA4C.root',
+      '/store/mc/Summer10/QCD_Pt30/GEN-SIM-RECODEBUG/START36_V9_S09-v1/0116/ECB690E1-317D-DF11-9C9A-90E6BA19A1FE.root',
+      '/store/mc/Summer10/QCD_Pt30/GEN-SIM-RECODEBUG/START36_V9_S09-v1/0116/E4AF42E6-3E7D-DF11-8319-E0CB4E19F96D.root',
+      '/store/mc/Summer10/QCD_Pt30/GEN-SIM-RECODEBUG/START36_V9_S09-v1/0116/C41A8932-3E7D-DF11-8111-001EC9D8C67A.root'
 
-        '/store/mc/Spring10/QCD_Pt-80_7TeV-pythia6/GEN-SIM-RECO/START3X_V26_TP-v1/0001/FCD0203D-6160-DF11-A971-003048C56E40.root',
-        '/store/mc/Spring10/QCD_Pt-80_7TeV-pythia6/GEN-SIM-RECO/START3X_V26_TP-v1/0001/FA4E4E82-5960-DF11-A9C4-003048976E04.root',
-        '/store/mc/Spring10/QCD_Pt-80_7TeV-pythia6/GEN-SIM-RECO/START3X_V26_TP-v1/0001/F8B56F21-1660-DF11-885E-003048C5734E.root',
-        '/store/mc/Spring10/QCD_Pt-80_7TeV-pythia6/GEN-SIM-RECO/START3X_V26_TP-v1/0001/F663962F-5860-DF11-9B18-0030489453EC.root',
-        '/store/mc/Spring10/QCD_Pt-80_7TeV-pythia6/GEN-SIM-RECO/START3X_V26_TP-v1/0001/F653F226-E35F-DF11-A5E6-00E08145ED8F.root'
+#         '/store/mc/Summer10/QCD_Pt-20to30_7TeV-pythia8/GEN-SIM-RECO/START36_V10_S09-v1/0001/FE2E4705-2184-DF11-A225-00261834B5A7.root',
+#         '/store/mc/Summer10/QCD_Pt-20to30_7TeV-pythia8/GEN-SIM-RECO/START36_V10_S09-v1/0001/FC768463-2184-DF11-A1B7-E0CB4E1A117D.root',
+#         '/store/mc/Summer10/QCD_Pt-20to30_7TeV-pythia8/GEN-SIM-RECO/START36_V10_S09-v1/0001/FAE5C229-2884-DF11-8D5C-90E6BA442F0A.root',
+#         '/store/mc/Summer10/QCD_Pt-20to30_7TeV-pythia8/GEN-SIM-RECO/START36_V10_S09-v1/0001/FAB026B7-2084-DF11-9A17-90E6BA442EEC.root',
+#         '/store/mc/Summer10/QCD_Pt-20to30_7TeV-pythia8/GEN-SIM-RECO/START36_V10_S09-v1/0001/F8E21342-2384-DF11-9952-00261834B561.root'
     )
 )
 
@@ -38,6 +38,7 @@ process.maxEvents = cms.untracked.PSet(
 #process.load("Configuration.StandardSequences.FakeConditions_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = "START36_V9::All" # use a valid global tag here!
+# process.GlobalTag.globaltag = "START36_V10::All" # use a valid global tag here!
 
 
 process.load("Configuration.StandardSequences.Reconstruction_cff")
@@ -53,17 +54,20 @@ process.load("SimTracker.TrackHistory.TrackHistory_cff")
 
 
 # for Impact Parameter based taggers
+process.load("RecoBTag.ImpactParameter.negativeOnlyJetBProbabilityComputer_cfi")
 process.load("RecoBTag.ImpactParameter.negativeOnlyJetProbabilityComputer_cfi")
 process.load("RecoBTag.ImpactParameter.positiveOnlyJetProbabilityComputer_cfi")
 process.load("RecoBTag.ImpactParameter.negativeTrackCounting3D2ndComputer_cfi")
 process.load("RecoBTag.ImpactParameter.negativeTrackCounting3D3rdComputer_cfi")
 process.load("RecoBTag.Configuration.RecoBTag_cff")
 process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
+process.load("RecoBTag.ImpactParameter.negativeOnlyJetBProbabilityJetTags_cfi")
 process.load("RecoBTag.ImpactParameter.negativeOnlyJetProbabilityJetTags_cfi")
 process.load("RecoBTag.ImpactParameter.positiveOnlyJetProbabilityJetTags_cfi")
 process.load("RecoBTag.ImpactParameter.negativeTrackCountingHighPur_cfi")
 process.load("RecoBTag.ImpactParameter.negativeTrackCountingHighEffJetTags_cfi")
 process.load("RecoBTag.ImpactParameter.jetProbabilityBJetTags_cfi")
+process.load("RecoBTag.ImpactParameter.jetBProbabilityBJetTags_cfi")
 
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 #process.load("JetMETCorrections.Configuration.MCJetCorrections152_cff")
@@ -117,7 +121,7 @@ process.load("RecoBTag.PerformanceMeasurements.MistagAnalyzer_cff")
 
 
 # process.TFileService = cms.Service("TFileService", fileName = cms.string("TrackTree.root") )
-process.TFileService = cms.Service("TFileService", fileName = cms.string("JetTree.root") )
+process.TFileService = cms.Service("TFileService", fileName = cms.string("JetTree_EXT.root") )
  
 process.out = cms.OutputModule("PoolOutputModule",
     outputCommands = cms.untracked.vstring('keep *', 
@@ -150,9 +154,21 @@ process.noscraping = cms.EDFilter("FilterOutScraping",
 process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
                       vertexCollection = cms.InputTag('offlinePrimaryVertices'),
                       minimumNDOF = cms.uint32(4) ,
- 		      maxAbsZ = cms.double(15), 
+# 		      maxAbsZ = cms.double(15), 
+ 		      maxAbsZ = cms.double(24), 
  		      maxd0 = cms.double(2)	
                      )
+
+
+### from Cristina: calibration JetProb
+process.GlobalTag.toGet = cms.VPSet(
+  cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
+       tag = cms.string("TrackProbabilityCalibration_2D_MCQpt30"),
+       connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU")),
+  cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
+       tag = cms.string("TrackProbabilityCalibration_3D_MCQpt30"),
+       connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"))
+)
 
 
 process.mistag.isData = False
@@ -190,6 +206,7 @@ process.p = cms.Path(
 	#*process.negativeSoftMuonBJetTags*process.positiveSoftMuonBJetTags	
 	*process.negativeSoftLeptonByPtBJetTags*process.positiveSoftLeptonByPtBJetTags	
 	*process.jetProbabilityBJetTags
+	*process.jetBProbabilityBJetTags*process.negativeOnlyJetBProbabilityJetTags
 	*process.mistag
 	)
 

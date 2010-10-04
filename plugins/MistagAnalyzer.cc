@@ -40,6 +40,11 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   jetPModuleName_        = iConfig.getParameter<std::string>("jetPModuleName");
   jetPPosModuleName_     = iConfig.getParameter<std::string>("jetPPosModuleName");
   jetPNegModuleName_     = iConfig.getParameter<std::string>("jetPNegModuleName");
+  
+//$$
+  jetBModuleName_        = iConfig.getParameter<std::string>("jetBModuleName");
+  jetBNegModuleName_     = iConfig.getParameter<std::string>("jetBNegModuleName");
+//$$
  
   svtxModuleNameHighEff_       = iConfig.getParameter<std::string>("svtxModuleNameHighEff");
   svtxNegModuleNameHighEff_    = iConfig.getParameter<std::string>("svtxNegModuleNameHighEff");
@@ -53,6 +58,12 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   softMuonModuleName_       = iConfig.getParameter<std::string>("softMuonModuleName");
   softMuonNegModuleName_    = iConfig.getParameter<std::string>("softMuonNegModuleName");
   softMuonTagInfoName_      = iConfig.getParameter<std::string>("softMuonTagInfoName");
+  
+  
+  muonCollectionName_       = iConfig.getParameter<edm::InputTag>("muonCollectionName");
+  triggerTable_              = iConfig.getParameter<edm::InputTag>("triggerTable");
+  
+  
   
 ///////////////
 // Some Histograms
@@ -127,6 +138,11 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("Run",&Run,"Run/I");
   smalltree->Branch("Evt",&Evt,"Evt/I");
   smalltree->Branch("LumiBlock",&LumiBlock,"LumiBlock/I");
+//$$
+  smalltree->Branch("nPV",&nPV,"nPV/I");
+  smalltree->Branch("PVz",&PVz,"PVz/F");
+  smalltree->Branch("pthat",&pthat,"pthat/F");
+//$$
   
   if ( produceJetProbaTree_ ) {
      
@@ -179,7 +195,7 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   //--------------------------------------
   //primary vertex information 
   //--------------------------------------
-  smalltree->Branch("nPV"	   ,&nPV	 ,"nPV/I");
+//$$  smalltree->Branch("nPV"	   ,&nPV	 ,"nPV/I");
   smalltree->Branch("PV_x"	   ,PV_x	 ,"PV_x[nPV]/F");
   smalltree->Branch("PV_y"	   ,PV_y	 ,"PV_y[nPV]/F");
   smalltree->Branch("PV_z"	   ,PV_z	 ,"PV_z[nPV]/F");
@@ -226,9 +242,11 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("Jet_ProbaP",      Jet_ProbaP      ,"Jet_ProbaP[nJet]/F");
   smalltree->Branch("Jet_Proba",       Jet_Proba       ,"Jet_Proba[nJet]/F");
 //$$
-//   smalltree->Branch("Jet_TkProba",     Jet_TkProba     ,"Jet_TkProba[nJet]/F"); // these are the distribution of JetProba computed by track information
-//   smalltree->Branch("Jet_TkProbaN",    Jet_TkProbaN    ,"Jet_TkProbaN[nJet]/F");
-//   smalltree->Branch("Jet_TkProbaP",    Jet_TkProbaP    ,"Jet_TkProbaP[nJet]/F");
+  smalltree->Branch("Jet_BprobN",      Jet_BprobN      ,"Jet_BprobN[nJet]/F");
+  smalltree->Branch("Jet_Bprob",       Jet_Bprob       ,"Jet_Bprob[nJet]/F");
+//$$  smalltree->Branch("Jet_TkProba",     Jet_TkProba     ,"Jet_TkProba[nJet]/F"); // these are the distribution of JetProba computed by track information
+//$$  smalltree->Branch("Jet_TkProbaN",    Jet_TkProbaN    ,"Jet_TkProbaN[nJet]/F");
+//$$  smalltree->Branch("Jet_TkProbaP",    Jet_TkProbaP    ,"Jet_TkProbaP[nJet]/F");
 //$$
   smalltree->Branch("Jet_SvxN",        Jet_SvxN        ,"Jet_SvxN[nJet]/F");
   smalltree->Branch("Jet_Svx",         Jet_Svx         ,"Jet_Svx[nJet]/F");
@@ -246,10 +264,21 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("Jet_histJet",     Jet_histJet     ,"Jet_histJet[nJet]/I");
   smalltree->Branch("Jet_histSvx",     Jet_histSvx     ,"Jet_histSvx[nJet]/I");
   smalltree->Branch("Jet_histMuon",    Jet_histMuon    ,"Jet_histMuon[nJet]/I");
-  smalltree->Branch("Jet_mu_nHit",     Jet_mu_nHit     ,"Jet_mu_nHit[nJet]/I");
+  
+  smalltree->Branch("Jet_mu_nMuHit",   Jet_mu_nMuHit   ,"Jet_mu_nMuHit[nJet]/I");
+  smalltree->Branch("Jet_mu_nTkHit",   Jet_mu_nTkHit   ,"Jet_mu_nTkHit[nJet]/I");
+  smalltree->Branch("Jet_mu_nPixHit",  Jet_mu_nPixHit  ,"Jet_mu_nPixHit[nJet]/I");
+  smalltree->Branch("Jet_mu_nOutHit",  Jet_mu_nOutHit  ,"Jet_mu_nOutHit[nJet]/I");
+  smalltree->Branch("Jet_mu_isGlobal", Jet_mu_isGlobal ,"Jet_mu_isGlobal[nJet]/I");
+  smalltree->Branch("Jet_mu_nMatched", Jet_mu_nMatched ,"Jet_mu_nMatched[nJet]/I");
+  
   smalltree->Branch("Jet_mu_chi2",     Jet_mu_chi2     ,"Jet_mu_chi2[nJet]/F");
+  smalltree->Branch("Jet_mu_chi2Tk",   Jet_mu_chi2Tk   ,"Jet_mu_chi2Tk[nJet]/F");
   smalltree->Branch("Jet_mu_pt",       Jet_mu_pt       ,"Jet_mu_pt[nJet]/F");
+  smalltree->Branch("Jet_mu_eta",      Jet_mu_eta      ,"Jet_mu_eta[nJet]/F");
   smalltree->Branch("Jet_mu_ptrel",    Jet_mu_ptrel    ,"Jet_mu_ptrel[nJet]/F");
+  smalltree->Branch("Jet_mu_vz",       Jet_mu_vz       ,"Jet_mu_vz[nJet]/F");
+  
   smalltree->Branch("Jet_nFirstTrack", Jet_nFirstTrack ,"Jet_nFirstTrack[nJet]/I");
   smalltree->Branch("Jet_nLastTrack",  Jet_nLastTrack  ,"Jet_nLastTrack[nJet]/I"); 
   smalltree->Branch("Jet_nFirstSV",    Jet_nFirstSV    ,"Jet_nFirstSV[nJet]/I");
@@ -311,11 +340,27 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   iEvent.getByLabel (CaloJetCollectionTags_, jetsCollHandle);
   edm::View<reco::Jet> jetsColl = *jetsCollHandle;
 
-
   // initialize flavour identifiers
   edm::Handle<JetFlavourMatchingCollection> jetMC;
+
+//$$
+  // pthat for MC
+  pthat = -1.;
+  if ( !isData_ ) {
+    edm::Handle<GenEventInfoProduct> geninfos;
+    iEvent.getByLabel( "generator",geninfos );
+    if ( geninfos->binningValues().size()>0 ) 
+      pthat = geninfos->binningValues()[0];
+  }
+//$$
  
- 
+  //------------------------------------------------------
+  //get muons
+  //------------------------------------------------------
+   edm::Handle<edm::View<reco::Muon> >  muonsHandle; 
+   iEvent.getByLabel(muonCollectionName_,muonsHandle);
+   edm::View<reco::Muon> muons = *muonsHandle;
+  
   //------------------------------------------------------
   //TrackCounting taggers
   //------------------------------------------------------
@@ -343,6 +388,14 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   
   edm::Handle<reco::JetTagCollection> jetTags_NegJP;
   iEvent.getByLabel(jetPNegModuleName_, jetTags_NegJP);
+  
+//$$
+  edm::Handle<reco::JetTagCollection> jetTags_JB;
+  iEvent.getByLabel(jetBModuleName_, jetTags_JB);
+
+  edm::Handle<reco::JetTagCollection> jetTags_NegJB;
+  iEvent.getByLabel(jetBNegModuleName_, jetTags_NegJB);
+//$$
   
   //------------------------------------------------------
   //Secondary vertex taggers
@@ -404,19 +457,22 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     newvertex = true;
   }
   GlobalPoint Pv_point = GlobalPoint((*pv).x(), (*pv).y(), (*pv).z());
+//$$
+  PVz = (*primaryVertex)[0].z();
+//$$
   
   nPV=0;
-  for(unsigned int i = 0; i< primaryVertex->size() ; i++){
-    PV_x[nPV]    = (*primaryVertex)[i].x();
-    PV_y[nPV]    = (*primaryVertex)[i].y();
-    PV_z[nPV]    = (*primaryVertex)[i].z();
-    PV_ex[nPV]   = (*primaryVertex)[i].xError();
-    PV_ey[nPV]   = (*primaryVertex)[i].yError();
-    PV_ez[nPV]   = (*primaryVertex)[i].zError();
+  for (unsigned int i = 0; i< primaryVertex->size() ; i++) {
+    PV_x[nPV]      = (*primaryVertex)[i].x();
+    PV_y[nPV]      = (*primaryVertex)[i].y();
+    PV_z[nPV]      = (*primaryVertex)[i].z();
+    PV_ex[nPV]     = (*primaryVertex)[i].xError();
+    PV_ey[nPV]     = (*primaryVertex)[i].yError();
+    PV_ez[nPV]     = (*primaryVertex)[i].zError();
     PV_chi2[nPV]   = (*primaryVertex)[i].normalizedChi2();
-    PV_ndf[nPV]  = (*primaryVertex)[i].ndof();
-    PV_isgood[nPV]    = (*primaryVertex)[i].isValid();
-    PV_isfake[nPV]    = (*primaryVertex)[i].isFake();
+    PV_ndf[nPV]    = (*primaryVertex)[i].ndof();
+    PV_isgood[nPV] = (*primaryVertex)[i].isValid();
+    PV_isfake[nPV] = (*primaryVertex)[i].isFake();
     
     nPV++;
   }
@@ -428,7 +484,10 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   
   TriggerResults tr;
   Handle<TriggerResults> h_trigRes;
-  iEvent.getByLabel(InputTag("TriggerResults::RECO"), h_trigRes);
+  //iEvent.getByLabel(InputTag("TriggerResults::HLT"), h_trigRes); // for Spring09
+  iEvent.getByLabel(triggerTable_, h_trigRes); // for Spring09
+//$$  iEvent.getByLabel(InputTag("TriggerResults::REDIGI36X"), h_trigRes); // for Summer10
+
   tr = *h_trigRes;
 
   BitTrigger = 0;
@@ -443,22 +502,24 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     for (unsigned int i=0; i< tr.size(); i++) {
     if ( !tr[i].accept() == 1 ) continue;
 // Trigger table 2010
-      if ( triggerList[i] == "HLT_L1Jet6U"  	    ) BitTrigger +=1 ;
-      if ( triggerList[i] == "HLT_L1Jet10U"  	    ) BitTrigger +=2 ;
-      if ( triggerList[i] == "HLT_Jet15U"  	    ) BitTrigger +=10 ;	
-      if ( triggerList[i] == "HLT_Jet30U"  	    ) BitTrigger +=20 ;	
-      if ( triggerList[i] == "HLT_Jet50U"           ) BitTrigger +=40 ;   
-      if ( triggerList[i] == "HLT_DiJetAve15U_8E29" ) BitTrigger +=100 ;   
-      if ( triggerList[i] == "HLT_DiJetAve30U_8E29" ) BitTrigger +=200 ;   
-      if ( triggerList[i] == "HLT_L1MuOpen" ) BitTrigger +=1000 ;   
-      if ( triggerList[i] == "HLT_L1Mu"     ) BitTrigger +=2000 ;   
-      if ( triggerList[i] == "HLT_L1Mu20"   ) BitTrigger +=4000 ;   
-      if ( triggerList[i] == "HLT_L2Mu0"    ) BitTrigger +=10000 ;   
-      if ( triggerList[i] == "HLT_L2Mu3"    ) BitTrigger +=20000 ;   
-      if ( triggerList[i] == "HLT_L2Mu9"    ) BitTrigger +=40000 ;   
-      if ( triggerList[i] == "HLT_Mu3"      ) BitTrigger +=100000 ;   
-      if ( triggerList[i] == "HLT_Mu5"      ) BitTrigger +=200000 ;   
-      if ( triggerList[i] == "HLT_Mu9"      ) BitTrigger +=400000 ;   
+      if ( triggerList[i] == "HLT_L1Jet6U"   ) BitTrigger +=1 ;
+      if ( triggerList[i] == "HLT_L1Jet10U"  ) BitTrigger +=2 ;
+      if ( triggerList[i] == "HLT_Jet15U"    ) BitTrigger +=10 ; 
+      if ( triggerList[i] == "HLT_Jet30U"    ) BitTrigger +=20 ; 
+      if ( triggerList[i] == "HLT_Jet50U"    ) BitTrigger +=40 ;   
+      if ( triggerList[i] == "HLT_Jet70U"    ) BitTrigger +=100 ;	 
+      if ( triggerList[i] == "HLT_Jet100U"   ) BitTrigger +=200 ;   
+      if ( triggerList[i] == "HLT_DiJetAve15U_8E29" ) BitTrigger +=1000 ;   
+      if ( triggerList[i] == "HLT_DiJetAve30U_8E29" ) BitTrigger +=2000 ;   
+      if ( triggerList[i] == "HLT_DiJetAve50U_8E29" ) BitTrigger +=4000 ;   
+      if ( triggerList[i] == "HLT_DiJetAve15U" ) BitTrigger +=1000 ;   
+      if ( triggerList[i] == "HLT_DiJetAve30U" ) BitTrigger +=2000 ;   
+      if ( triggerList[i] == "HLT_DiJetAve50U" ) BitTrigger +=4000 ;   
+      if ( triggerList[i] == "HLT_Mu3"       ) BitTrigger +=10000 ;   
+      if ( triggerList[i] == "HLT_Mu5"       ) BitTrigger +=20000 ;   
+      if ( triggerList[i] == "HLT_Mu7"       ) BitTrigger +=40000 ;   
+      if ( triggerList[i] == "HLT_DoubleMu0" ) BitTrigger +=100000 ;   
+      if ( triggerList[i] == "HLT_DoubleMu3" ) BitTrigger +=200000 ;   
 // std::cout << " Run Evt " << Run << " " << Evt << " trigger list " << triggerList[i] << std::endl;
     }
 // std::cout << " Run Evt " << Run << " " << Evt << " bit trigger " << BitTrigger << std::endl;
@@ -497,7 +558,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     double ptjet  = jetpt* JES;
     
 //$$
-    if ( jetpt*JES < 10. || std::fabs( jeteta ) > 2.5 ) continue;
+    if ( jetpt*JES < 20. || std::fabs( jeteta ) > 2.5 ) continue;
 //$$
     if ( jetpt*JES > minJetPt_ && std::fabs( jeteta ) < maxJetEta_ ) Njets++; 
 
@@ -601,7 +662,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	  Track_history[nTrack] = 0;
           if ( useTrackHistory_ && !isData_ ) {
             TrackCategories::Flags theFlag = classifier_.evaluate( (*tagInfo)[ith_tagged].selectedTracks()[k] ).flags();
-	    //cout << classifier_ << endl;
+	
 	    if      ( theFlag[TrackCategories::BWeakDecay] )         Track_history[nTrack] += pow(10, -1 + 1); 
 	    else if ( theFlag[TrackCategories::CWeakDecay] )         Track_history[nTrack] += pow(10, -1 + 2); 
 	    else if ( theFlag[TrackCategories::TauDecay] )           Track_history[nTrack] += pow(10, -1 + 3); 
@@ -611,7 +672,6 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	    else if ( theFlag[TrackCategories::HadronicProcess] )    Track_history[nTrack] += pow(10, -1 + 7); 
 	    else if ( theFlag[TrackCategories::Fake] )               Track_history[nTrack] += pow(10, -1 + 8); 
 	    else if ( theFlag[TrackCategories::SharedInnerHits] )    Track_history[nTrack] += pow(10, -1 + 9); 
-	    //cout << "track Hist value " << Track_history[nTrack] << endl;
           }
 
 //$$
@@ -721,7 +781,14 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     float ProbaP = (*jetTags_PosJP)[ith_tagged].second;
     ith_tagged   = this->TaggedJet(jetsColl.at(ijet),jetTags_NegJP);
     float ProbaN = (*jetTags_NegJP)[ith_tagged].second;
-    
+
+//$$    
+    ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_JB);
+    float Bprob  = (*jetTags_JB)[ith_tagged].second;
+    ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_NegJB);
+    float BprobN = (*jetTags_NegJB)[ith_tagged].second;
+//$$    
+
     ith_tagged          = this->TaggedJet(jetsColl.at(ijet),jetTags_CombinedSvtx);
     float CombinedSvtx  = (*jetTags_CombinedSvtx)[ith_tagged].second;
     ith_tagged          = this->TaggedJet(jetsColl.at(ijet),jetTags_negCombinedSvtx);
@@ -755,6 +822,10 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     Jet_ProbaN[nJet]   = ProbaN;	 
     Jet_ProbaP[nJet]   = ProbaP;	  
     Jet_Proba[nJet]    = Proba; 	
+//$$
+    Jet_BprobN[nJet]   = BprobN;	 
+    Jet_Bprob[nJet]    = Bprob;	  
+//$$
     Jet_SvxN[nJet]     = SvtxN;        
     Jet_Svx[nJet]      = Svtx;        
     Jet_SvxNHP[nJet]   = SvtxNHP;        
@@ -1003,19 +1074,46 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    
     //*****************************************************************
     //get track histories of the muon (SoftMuon tagger)
-    //*****************************************************************
-    Jet_mu_nHit[nJet]  = -1;
-    Jet_mu_chi2[nJet]  = -1;
-    Jet_mu_pt[nJet]    = -1;
-    Jet_mu_ptrel[nJet] = -1;
-    Jet_histMuon[nJet] = 0;
-
+    //*****************************************************************  
+    Jet_mu_nMuHit[nJet]   = -10000;
+    Jet_mu_nTkHit[nJet]   = -10000;
+    Jet_mu_nPixHit[nJet]  = -10000;
+    Jet_mu_nOutHit[nJet]  = -10000;
+    Jet_mu_isGlobal[nJet] = -10000;
+    Jet_mu_nMatched[nJet] = -10000;
+    Jet_mu_chi2[nJet]     = -10000;
+    Jet_mu_chi2Tk[nJet]   = -10000;
+    Jet_mu_pt[nJet]       = -10000;
+    Jet_mu_ptrel[nJet]    = -10000;
+    Jet_mu_vz[nJet]       = -10000;
+    Jet_histMuon[nJet]  = 0;
+    
     ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_softMu);
     if ( (*tagInos_softmuon)[ith_tagged].leptons() !=0 ) {
-      Jet_mu_ptrel[nJet] = calculPtRel( (*(*tagInos_softmuon)[ith_tagged].lepton(0)), jetsColl.at(ijet), JES);
-      Jet_mu_nHit[nJet]  = (*tagInos_softmuon)[ith_tagged].lepton(0)->hitPattern().numberOfValidHits();
-      Jet_mu_chi2[nJet]  = (*tagInos_softmuon)[ith_tagged].lepton(0)->normalizedChi2()  	      ;
-      Jet_mu_pt[nJet]    = (*tagInos_softmuon)[ith_tagged].lepton(0)->pt()			      ;
+      int muIdx      = matchMuon( (*tagInos_softmuon)[ith_tagged].lepton(0), muons );
+      
+      if(muIdx != -1){
+        Jet_mu_ptrel[nJet]   = calculPtRel( (*(*tagInos_softmuon)[ith_tagged].lepton(0)), jetsColl.at(ijet), JES, CaloJetCollectionTags_);
+        
+        Jet_mu_nTkHit[nJet]    = muons[muIdx].innerTrack()->hitPattern().numberOfValidHits();
+        Jet_mu_nPixHit[nJet]   = muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits();
+        Jet_mu_nMuHit[nJet]    = muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits();
+        Jet_mu_nOutHit[nJet]   = muons[muIdx].innerTrack()->trackerExpectedHitsOuter().numberOfHits();
+      
+      
+        Jet_mu_chi2[nJet]    = muons[muIdx].globalTrack()->normalizedChi2() ;
+        Jet_mu_chi2Tk[nJet]  = muons[muIdx].innerTrack()->normalizedChi2()  ;
+        
+        Jet_mu_pt[nJet]      = muons[muIdx].pt()			      ;
+        Jet_mu_eta[nJet]     = muons[muIdx].eta()			      ;
+      
+      
+        Jet_mu_isGlobal[nJet] = muons[muIdx].isGlobalMuon()			      ;
+        Jet_mu_nMatched[nJet] = muons[muIdx].numberOfMatches() ;
+        Jet_mu_vz[nJet]       = muons[muIdx].vz();
+      }
+      
+      
     }
     if ( SoftM > 0 && (*tagInos_softmuon)[ith_tagged].leptons()!=0 ) {
       if ( useTrackHistory_ && !isData_ ) {     
@@ -1035,10 +1133,33 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_softMuneg);
      //std::cout << "SoftMN " << SoftMN << std::endl;
     if ( SoftMN < 0 && (*tagInos_softmuon)[ith_tagged].leptons()!=0 ) {
-      Jet_mu_ptrel[nJet] =  calculPtRel( (*(*tagInos_softmuon)[ith_tagged].lepton(0)), jetsColl.at(ijet), JES);
-      Jet_mu_nHit[nJet]  = (*tagInos_softmuon)[ith_tagged].lepton(0)->hitPattern().numberOfValidHits();
-      Jet_mu_chi2[nJet]           = (*tagInos_softmuon)[ith_tagged].lepton(0)->normalizedChi2()                ;
-      Jet_mu_pt[nJet]             = (*tagInos_softmuon)[ith_tagged].lepton(0)->pt()                            ;
+    
+      
+      int muIdx      = matchMuon( (*tagInos_softmuon)[ith_tagged].lepton(0), muons );
+      
+      if(muIdx != -1){
+        Jet_mu_ptrel[nJet]   = calculPtRel( (*(*tagInos_softmuon)[ith_tagged].lepton(0)), jetsColl.at(ijet), JES, CaloJetCollectionTags_);
+        
+        Jet_mu_nTkHit[nJet]    = muons[muIdx].innerTrack()->hitPattern().numberOfValidHits();
+        Jet_mu_nPixHit[nJet]   = muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits();
+        Jet_mu_nMuHit[nJet]    = muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits();
+        Jet_mu_nOutHit[nJet]   = muons[muIdx].innerTrack()->trackerExpectedHitsOuter().numberOfHits();
+      
+      
+        Jet_mu_chi2[nJet]    = muons[muIdx].globalTrack()->normalizedChi2() ;
+        Jet_mu_chi2Tk[nJet]  = muons[muIdx].innerTrack()->normalizedChi2()  ;
+        Jet_mu_pt[nJet]      = muons[muIdx].pt()			      ;
+        Jet_mu_eta[nJet]     = muons[muIdx].eta()			      ;
+      
+      
+        Jet_mu_isGlobal[nJet] = muons[muIdx].isGlobalMuon()			      ;
+        Jet_mu_nMatched[nJet] = muons[muIdx].numberOfMatches() ;
+        Jet_mu_vz[nJet]       = muons[muIdx].vz();
+      }
+      
+      
+      
+      
       if ( useTrackHistory_ && !isData_ ) {     
         TrackCategories::Flags theFlagN = classifier_.evaluate( (*tagInos_softmuon)[ith_tagged].lepton(0) ).flags();
         if ( theFlagN[TrackCategories::BWeakDecay] )         Jet_histMuon[nJet] += 2*int(pow(10., -1 + 1)); 
@@ -1314,17 +1435,24 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 }
 
 
-float MistagAnalyzer::calculPtRel(reco::Track theMuon, reco::Jet theJet, double JES )
+float MistagAnalyzer::calculPtRel(reco::Track theMuon, reco::Jet theJet, double JES, string jetcoll )
 {
   double pmu = TMath::Sqrt( theMuon.px()*theMuon.px() + theMuon.py()*theMuon.py()  + theMuon.pz()*theMuon.pz() );
 
-//$$  double jetpx = theJet.px() * JES + theMuon.px();
-//$$  double jetpy = theJet.py() * JES + theMuon.py();
-//$$  double jetpz = theJet.pz() * JES + theMuon.pz();
-
-  double jetpx = theJet.px() * JES ;
-  double jetpy = theJet.py() * JES ;
-  double jetpz = theJet.pz() * JES ;
+  double jetpx = 0 ;
+  double jetpy = 0 ;
+  double jetpz = 0 ;
+  
+  if(jetcoll == "ak5CaloJets"){
+    jetpx = theJet.px() * JES + theMuon.px();
+    jetpy = theJet.py() * JES + theMuon.py();
+    jetpz = theJet.pz() * JES + theMuon.pz();
+  }else{
+    jetpx = theJet.px() * JES ;
+    jetpy = theJet.py() * JES ;
+    jetpz = theJet.pz() * JES ;
+  }
+  
   double jetp = TMath::Sqrt(jetpx*jetpx + jetpy*jetpy + jetpz*jetpz);
 
   double ptrel  = ( jetpx * theMuon.px()  + jetpy * theMuon.py() + jetpz * theMuon.pz() ) / jetp;
@@ -1626,6 +1754,28 @@ int MistagAnalyzer::TaggedJet(reco::Jet calojet, edm::Handle<reco::JetTagCollect
   }
   return result;
 }
+
+
+int MistagAnalyzer::matchMuon(const edm::RefToBase<reco::Track>& theMuon, edm::View<reco::Muon>& muons ){
+ double small = 1.e-3;
+ 
+  int matchedMu = -1;
+  for(unsigned int i=0; i<muons.size(); i++){
+     double muonpt = -10000;
+     if( muons[i].isGlobalMuon() )                               muonpt = muons[i].globalTrack()->pt() ;
+     if(!muons[i].isGlobalMuon() &&  muons[i].isTrackerMuon())   muonpt = muons[i].innerTrack()->pt() ;
+     
+     if ( fabs(theMuon->pt() - muonpt )  < small  ){ matchedMu = i; }
+    
+  }
+  
+  
+  return matchedMu;
+
+
+}
+
+
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(MistagAnalyzer);

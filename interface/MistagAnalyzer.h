@@ -46,7 +46,8 @@ Implementation:
 #include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
 
 //$$
-#include "RecoBTag/PerformanceMeasurements/interface/CategoryFinder.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "CategoryFinder.h"
 //$$
 
 // reco track and vertex
@@ -83,6 +84,7 @@ Implementation:
 #include "SimTracker/TrackHistory/interface/TrackClassifier.h"
 
 #include "DataFormats/BTauReco/interface/SoftLeptonTagInfo.h"
+#include "DataFormats/MuonReco/interface/Muon.h"
 
 
 // trigger
@@ -130,7 +132,10 @@ private:
 //$$
 
     reco::JetFlavour getMatchedParton(const reco::Jet &jet);
-    float calculPtRel(reco::Track theMuon, reco::Jet theJet, double JES );
+    float calculPtRel(reco::Track theMuon, reco::Jet theJet, double JES , string jetcoll );
+    
+    
+    int matchMuon(const edm::RefToBase<reco::Track>& theMuon, edm::View<reco::Muon>& muons);
 
     void setTracksPV( const reco::Vertex *pv, bool isPV );
 
@@ -141,13 +146,20 @@ private:
 
     std::string flavourMatchOptionf;
     edm::InputTag flavourSourcef;
+    edm::InputTag muonCollectionName_;
+    edm::InputTag triggerTable_;
     //JetFlavourIdentifier jetFlavourIdentifier_;
 
     std::string CaloJetCollectionTags_;
     std::string jetCorrector_;
+
     std::string jetPModuleName_;
     std::string jetPPosModuleName_;
     std::string jetPNegModuleName_;
+//$$
+    std::string jetBModuleName_;
+    std::string jetBNegModuleName_;
+//$$
 
     std::string trackCHEModuleName_;
     std::string trackCNegHEModuleName_;
@@ -180,9 +192,10 @@ private:
     int ntrackMin_;
     bool isData_;
     bool produceJetProbaTree_;
+
     // trigger list
     std::vector<std::string> triggernames_;
-    bool          TriggerInfo_;
+    bool TriggerInfo_;
 
     std::map<edm::RefToBase<reco::Jet>, unsigned int, ltstr> flavoursMapf;
     edm::Handle<reco::JetFlavourMatchingCollection> theJetPartonMapf;
@@ -326,6 +339,8 @@ private:
     float Jet_ProbaP[10000];
     float Jet_Proba[10000];
 //$$
+    float Jet_BprobN[10000];
+    float Jet_Bprob[10000];
     float Jet_TkProba[10000];
     float Jet_TkProbaP[10000];
     float Jet_TkProbaN[10000];
@@ -346,10 +361,22 @@ private:
     int   Jet_histJet[10000];
     int   Jet_histSvx[10000];
     int   Jet_histMuon[10000];
-    int   Jet_mu_nHit[10000];
+    
+    int   Jet_mu_nMuHit[10000];
+    int   Jet_mu_nTkHit[10000];
+    int   Jet_mu_nPixHit[10000];
+    int   Jet_mu_nOutHit[10000];
+    int   Jet_mu_isGlobal[10000];
+    int   Jet_mu_nMatched[10000];
     float Jet_mu_chi2[10000];
+    float Jet_mu_chi2Tk[10000];
     float Jet_mu_pt[10000];
+    float Jet_mu_eta[10000];
     float Jet_mu_ptrel[10000];
+    float Jet_mu_vz[10000];
+    
+    
+    
     int   Jet_ntracks[10000];
     int   Jet_flavour[10000];
     int   Jet_nFirstTrack[10000];
@@ -368,6 +395,11 @@ private:
     float PV_ndf[10000];
     int   PV_isgood[10000];
     int   PV_isfake[10000];
+//$$
+    float PVz;
+
+    float pthat;
+//$$
     
     int nSV;
     float SV_x[10000];
