@@ -102,7 +102,7 @@ for jetName in theJetNames:
 
 #-----------------------------------------------------  Pre-selection ----------------------------------------------------------
 
-process.selectedPatMuons.cut= cms.string('pt > 3. & abs(eta) < 2.4 & isGlobalMuon() & innerTrack().numberOfValidHits()> 7')
+process.selectedPatMuons.cut= cms.string('pt > 5. & abs(eta) < 2.4 & isGlobalMuon() & innerTrack().numberOfValidHits()> 7')
 
 process.selectedPatMuonsForPtRel= cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuons"),
@@ -112,8 +112,8 @@ process.selectedPatMuonsForPtRel= cms.EDFilter("PATMuonSelector",
 
 # ususally pt(caloJet)> 30. Now lowered at the beginning. For the PF added the loose jetID
 
-process.selectedPatJets.cut = cms.string('pt > 20. & abs(eta) < 2.4 & emEnergyFraction() >0.01 & jetID().n90Hits>1 & jetID().fHPD < 0.98  ')
-process.selectedPatJetsAK5PF.cut = cms.string('pt > 20. & abs(eta) < 2.4 & neutralHadronEnergyFraction() < 1.0 & neutralEmEnergyFraction() < 1.0 & nConstituents() > 1 & chargedHadronEnergyFraction() > 0.0 & chargedMultiplicity() > 0.0 & chargedEmEnergyFraction() < 1.0')
+process.selectedPatJets.cut = cms.string('pt > 20. & abs(eta) < 2.4')
+process.selectedPatJetsAK5PF.cut = cms.string('pt > 20. & abs(eta) < 2.4')
 process.selectedPatJetsAK5Track.cut = cms.string('pt > 10. & abs(eta) < 2.4')
 
 process.countPatMuons.minNumber = cms.uint32(1)

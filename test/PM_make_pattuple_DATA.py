@@ -39,8 +39,9 @@ process.maxEvents.input = -1
 #-- Select good events -----------------------------------------------------------
 process.load("RecoBTag.PerformanceMeasurements.getEvent_cff")
 
+
 #-- Calibration tag -----------------------------------------------------------
-process.GlobalTag.globaltag = cms.string('GR10_P_V5::All')
+process.GlobalTag.globaltag = cms.string('GR_R_38X_V13::All')
 
 #-------------------- TO RUN DATA -----------------
 
@@ -73,7 +74,9 @@ from RecoBTag.PerformanceMeasurements.PM_pat_Layer1_cfg import *
 from PhysicsTools.PatAlgos.tools.jetTools import *
 
 #-------------------- TO RUN ON DATA -----------------
-process.p = cms.Path( process.getEventDATA*process.PM_tuple)
+process.p = cms.Path(
+    process.getEventDATA*
+    process.PM_tuple)
 
 #-------- OUTPUT MODULE configuration -----------------------------------------------
 

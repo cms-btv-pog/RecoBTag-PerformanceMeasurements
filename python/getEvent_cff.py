@@ -8,23 +8,8 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("SKIM")
 
-###### BSC trigger bit
-
-from L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff import *
-from HLTrigger.HLTfilters.hltLevel1GTSeed_cfi import hltLevel1GTSeed
-
-bit40data = hltLevel1GTSeed.clone(L1TechTriggerSeeding = cms.bool(True),
-                                   L1SeedsLogicalExpression = cms.string('0 AND (40 OR 41) AND NOT (36 OR 37 OR 38 OR 39) AND NOT ((42 AND NOT 43) OR (43 AND NOT 42))')
-                                   )
-
-bit40MC = hltLevel1GTSeed.clone(L1TechTriggerSeeding = cms.bool(True),
-                                 L1SeedsLogicalExpression = cms.string('(40 OR 41) AND NOT (36 OR 37 OR 38 OR 39) AND NOT ((42 AND NOT 43) OR (43 AND NOT 42))')
-                                 )
-
-###### Physics declared trigger bit
-
-from HLTrigger.special.hltPhysicsDeclared_cfi import hltPhysicsDeclared
-physDecl = hltPhysicsDeclared.clone( L1GtReadoutRecordTag = cms.InputTag('gtDigis') )
+### Remove events with anomalous HCAL noise ###
+process.load('CommonTools/RecoAlgos/HBHENoiseFilter_cfi')
 
 ###### One primary vertex
 
@@ -33,6 +18,13 @@ oneGoodVertexFilter = cms.EDFilter("VertexSelector",
    cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2"), # tracksSize() > 3 for the older cut
    filter = cms.bool(True),   # otherwise it won't filter the events, just produce an empty vertex collection.
 )
+
+oneGoodVertexFilterMC = cms.EDFilter("VertexSelector",
+   src = cms.InputTag("offlinePrimaryVertices"),
+   cut = cms.string("!isFake && ndof > 4 && abs(z) <= 15 && position.Rho <= 2"), # tracksSize() > 3 for the older cut
+   filter = cms.bool(True),   # otherwise it won't filter the events, just produce an empty vertex collection.
+)
+
 
 ###### No scraping
 
@@ -47,9 +39,11 @@ noScraping= cms.EDFilter("FilterOutScraping",
 eventCountProducer = cms.EDProducer("EventCountProducer")
 
 
-getEventDATA = cms.Sequence(#bit40data*
-    eventCountProducer* #physDecl*
+getEventDATA = cms.Sequence(
+    eventCountProducer*
+    process.HBHENoiseFilter*
     noScraping*oneGoodVertexFilter)
-getEventMC = cms.Sequence(#bit40MC*
-    eventCountProducer*noScraping*oneGoodVertexFilter)
+
+getEventMC = cms.Sequence(
+    eventCountProducer*noScraping*oneGoodVertexFilterMC)
 
