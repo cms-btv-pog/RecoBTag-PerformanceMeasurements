@@ -16,11 +16,18 @@ process.source = cms.Source(
     "PoolSource",
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(   
-        '/store/data/Run2010A/JetMET/RECO/v4/000/143/193/E2686140-2CAB-DF11-AAB9-000423D94908.root',
-        '/store/data/Run2010A/JetMET/RECO/v4/000/143/193/C0D6B836-33AB-DF11-BC87-0030487CD906.root',
-        '/store/data/Run2010A/JetMET/RECO/v4/000/143/193/0E856940-2CAB-DF11-A2A9-0030487CD6DA.root',
-        '/store/data/Run2010A/JetMET/RECO/v4/000/143/192/12F92A25-31AB-DF11-8655-003048F118AA.root',
-        '/store/data/Run2010A/JetMET/RECO/v4/000/143/191/E626B382-2BAB-DF11-8C8D-0030487CD178.root'
+        '/store/data/Run2010A/JetMETTau/RECO/Jul23ReReco_PreProd_v1/0160/B249DC90-2798-DF11-96D3-001A92811728.root',
+        '/store/data/Run2010A/JetMETTau/RECO/Jul23ReReco_PreProd_v1/0157/FACE6E6F-B297-DF11-8C03-002618FDA21D.root',
+        '/store/data/Run2010A/JetMETTau/RECO/Jul23ReReco_PreProd_v1/0157/FABF5E30-E897-DF11-8249-002618943836.root',
+        '/store/data/Run2010A/JetMETTau/RECO/Jul23ReReco_PreProd_v1/0157/FA906A3C-AA97-DF11-B010-002618943946.root',
+        '/store/data/Run2010A/JetMETTau/RECO/Jul23ReReco_PreProd_v1/0157/F650EB46-D697-DF11-A374-00261894396E.root',
+        '/store/data/Run2010A/JetMETTau/RECO/Jul23ReReco_PreProd_v1/0157/ECE61B70-B497-DF11-953A-002618943949.root',
+        '/store/data/Run2010A/JetMETTau/RECO/Jul23ReReco_PreProd_v1/0157/EA5216EA-AD97-DF11-B7D2-002618943860.root',
+        '/store/data/Run2010A/JetMETTau/RECO/Jul23ReReco_PreProd_v1/0157/E86D8349-A597-DF11-92FE-002618943946.root',
+        '/store/data/Run2010A/JetMETTau/RECO/Jul23ReReco_PreProd_v1/0157/E868BC6C-E497-DF11-B07C-002618943967.root',
+        '/store/data/Run2010A/JetMETTau/RECO/Jul23ReReco_PreProd_v1/0157/E6D0EE42-A897-DF11-AB1E-002618943946.root',
+        '/store/data/Run2010A/JetMETTau/RECO/Jul23ReReco_PreProd_v1/0157/E2F27541-AA97-DF11-AFD3-00304867BFB0.root', 
+    
     )
 )
 
@@ -30,7 +37,7 @@ process.maxEvents = cms.untracked.PSet(
 
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = "GR_R_36X_V12::All" # global tag rereco Jun14th
+process.GlobalTag.globaltag = "GR_R_38X_V12::All" # global tag rereco Jun14th
 # process.GlobalTag.globaltag = "GR_R_36X_V12B::All" # global tag rereco Jul16th
 # process.GlobalTag.globaltag = "GR10_P_V7::All" # global tag prompt reco
 
