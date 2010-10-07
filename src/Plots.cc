@@ -41,44 +41,80 @@ try
     :_isInitializationFailed(false),
      _operatingPoint(0)
 {
-    _all = 0;
-    _tag = 0;
+    _allPt = 0;
+    _tagPt = 0;
+
+    _allEta = 0;
+    _tagEta = 0;
 
     // Pt bins
     //
-    const int nbins = 3;
-    const double bins[] = {30, 50, 80, 230};
+    const int nPtBins = 3;
+    const double ptBins[] = {30, 50, 80, 230};
 
-    const string newSuffix = suffix.empty() ?
+    // Eta bins
+    //
+    const int nEtaBins = 4;
+    const double etaBins[] = {0.0, 0.5, 1.0, 1.5, 2.5};
+
+    string newSuffix = suffix.empty() ?
         "_pT" :
         "_pT_" + suffix;
 
-    _all = new TH2F((prefix + newSuffix).c_str(),
-                    (prefix + " p_{T}^rel vs p_{T} " +
-                        suffix).c_str(),
-                    nbins, bins,
-                    50, 0, 5);
+    _allPt = new TH2F((prefix + newSuffix).c_str(),
+                        (prefix + " p_{T}^rel vs p_{T} " +
+                            suffix).c_str(),
+                        nPtBins, ptBins,
+                        50, 0, 5);
 
-    _tag = new TH2F((prefix + "tag" + newSuffix).c_str(),
-                    (prefix + " tag p_{T}^rel vs p_{T} " +
-                        suffix).c_str(),
-                    nbins, bins,
-                    50, 0, 5);
+    _tagPt = new TH2F((prefix + "tag" + newSuffix).c_str(),
+                        (prefix + " tag p_{T}^rel vs p_{T} " +
+                            suffix).c_str(),
+                        nPtBins, ptBins,
+                        50, 0, 5);
+
+    newSuffix = suffix.empty() ?
+        "_eta" :
+        "_eta_" + suffix;
+
+    _allEta = new TH2F((prefix + newSuffix).c_str(),
+                        (prefix + " p_{T}^rel vs #eta " +
+                            suffix).c_str(),
+                        nEtaBins, etaBins,
+                        50, 0, 5);
+
+    _tagEta = new TH2F((prefix + "tag" + newSuffix).c_str(),
+                        (prefix + " tag p_{T}^rel vs #eta " +
+                            suffix).c_str(),
+                        nEtaBins, etaBins,
+                        50, 0, 5);
 }
 catch(const std::exception &error)
 {
     cerr << "[error] " << error.what() << endl;
 
-    if (_all)
+    if (_allPt)
     {
-        delete _all;
-        _all = 0;
+        delete _allPt;
+        _allPt = 0;
     }
 
-    if (_tag)
+    if (_tagPt)
     {
-        delete _tag;
-        _tag = 0;
+        delete _tagPt;
+        _tagPt = 0;
+    }
+
+    if (_allEta)
+    {
+        delete _allEta;
+        _allEta = 0;
+    }
+
+    if (_tagEta)
+    {
+        delete _tagEta;
+        _tagEta = 0;
     }
 
     _isInitializationFailed = true;
@@ -89,8 +125,11 @@ PlotGroup::~PlotGroup()
     if (_isInitializationFailed)
         return;
 
-    delete _tag;
-    delete _all;
+    delete _tagEta;
+    delete _allEta;
+
+    delete _tagPt;
+    delete _allPt;
 }
 
 void PlotGroup::setOperatingPoint(const OperatingPoint &op)
@@ -103,12 +142,22 @@ void PlotGroup::fill(const Muon *muon, const Jet *jet)
     if (_isInitializationFailed)
         throw runtime_error("Plots initialization failed.");
 
-    _all->Fill(jet->p4().Pt(),
-               muon->p4().Vect().Perp(jet->p4().Vect()));
+    _allPt->Fill(jet->p4().Pt(),
+               muon->p4().Vect().Perp(jet->p4().Vect() + muon->p4().Vect()));
+
+    _allEta->Fill(jet->p4().Eta(),
+                  muon->p4().Vect().Perp(jet->p4().Vect() + muon->p4().Vect()));
 
     if (_operatingPoint < jet->btag(Jet::TCHE))
-        _tag->Fill(jet->p4().Pt(),
-                   muon->p4().Vect().Perp(jet->p4().Vect()));
+    {
+        _tagPt->Fill(jet->p4().Pt(),
+                   muon->p4().Vect().Perp(jet->p4().Vect() +
+                                          muon->p4().Vect()));
+
+        _tagEta->Fill(jet->p4().Eta(),
+                   muon->p4().Vect().Perp(jet->p4().Vect() +
+                                          muon->p4().Vect()));
+    }
 }
 
 void PlotGroup::save(TDirectory *dir) const
@@ -116,8 +165,11 @@ void PlotGroup::save(TDirectory *dir) const
     if (_isInitializationFailed)
         throw runtime_error("Plots initialization failed.");
 
-    _all->Write();
-    _tag->Write();
+    _allPt->Write();
+    _tagPt->Write();
+
+    _allEta->Write();
+    _tagEta->Write();
 }
 
 

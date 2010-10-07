@@ -43,8 +43,11 @@ namespace s8
             bool   _isInitializationFailed;
             double _operatingPoint;
 
-            TH2 *_all;
-            TH2 *_tag;
+            TH2 *_allPt;
+            TH2 *_tagPt;
+
+            TH2 *_allEta;
+            TH2 *_tagEta;
     };
 
     class NonFlavouredPlots : public Plots
