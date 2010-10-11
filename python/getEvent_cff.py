@@ -9,7 +9,8 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("SKIM")
 
 ### Remove events with anomalous HCAL noise ###
-process.load('CommonTools/RecoAlgos/HBHENoiseFilter_cfi')
+#process.load('CommonTools/RecoAlgos/HBHENoiseFilter_cfi')
+from CommonTools.RecoAlgos.HBHENoiseFilter_cfi import *
 
 ###### One primary vertex
 
@@ -41,7 +42,7 @@ eventCountProducer = cms.EDProducer("EventCountProducer")
 
 getEventDATA = cms.Sequence(
     eventCountProducer*
-    process.HBHENoiseFilter*
+    HBHENoiseFilter*
     noScraping*oneGoodVertexFilter)
 
 getEventMC = cms.Sequence(
