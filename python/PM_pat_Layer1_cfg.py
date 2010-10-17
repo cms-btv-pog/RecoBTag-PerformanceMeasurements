@@ -89,7 +89,8 @@ for jetName in theJetNames:
    ) 
 
    module.discriminatorSources = cms.VInputTag(
-#    cms.InputTag("jetProbabilityBJetTags"+jetName), 
+    cms.InputTag("jetProbabilityBJetTags"+jetName), 
+    cms.InputTag("jetBProbabilityBJetTags"+jetName), 
     cms.InputTag("simpleSecondaryVertexHighEffBJetTags"+jetName),
     cms.InputTag("simpleSecondaryVertexHighPurBJetTags"+jetName),
     cms.InputTag("softMuonBJetTags"+jetName), 
