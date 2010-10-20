@@ -110,6 +110,15 @@ process.selectedPatMuonsForPtRel= cms.EDFilter("PATMuonSelector",
     cut = cms.string('pt > 5. & abs(eta) < 2.4 & isGlobalMuon() & globalTrack().hitPattern().numberOfValidMuonHits() > 0 & numberOfMatches() > 1 & innerTrack().numberOfValidHits()> 10 & innerTrack().hitPattern().numberOfValidPixelHits()>1 & innerTrack().trackerExpectedHitsOuter().numberOfHits() <3 & innerTrack().normalizedChi2() < 10 & globalTrack().normalizedChi2() < 10 ')
 )
 
+process.patElectrons.electronIDSources = cms.PSet(
+  softElectronCands = cms.InputTag("softElectronCands")
+)
+
+process.selectedPatElectrons.cut= cms.string('pt > 5. && abs(eta) < 2.4 && trackerDrivenSeed() && gsfTrack().numberOfValidHits()> 7 && electronID("softElectronCands")')
+
+process.selectedPatElectronsForS8= cms.EDFilter("PATElectronSelector",
+    src = cms.InputTag("patElectrons"),
+    cut = cms.string('pt > 5. && abs(eta) < 2.4 && trackerDrivenSeed() && gsfTrack().numberOfValidHits() > 10 && gsfTrack().hitPattern().numberOfValidPixelHits() > 1 && gsfTrack().normalizedChi2() < 10 && electronID("softElectronCands") ')
 
 # ususally pt(caloJet)> 30. Now lowered at the beginning. For the PF added the loose jetID
 
@@ -117,7 +126,7 @@ process.selectedPatJets.cut = cms.string('pt > 20. & abs(eta) < 2.4')
 process.selectedPatJetsAK5PF.cut = cms.string('pt > 20. & abs(eta) < 2.4')
 process.selectedPatJetsAK5Track.cut = cms.string('pt > 10. & abs(eta) < 2.4')
 
-process.countPatMuons.minNumber = cms.uint32(1)
+process.countPatLeptons.minNumber = cms.uint32(1)
 #process.countPatJets.minNumber = cms.uint32(2) # commented to avoid bias against other jet collections
 
 #process.countPatJets.src = cms.InputTag("selectedPatJets")
@@ -142,7 +151,13 @@ process.countPatMuons.minNumber = cms.uint32(1)
 
 #process.PM_tuple = cms.Sequence( process.simpleSecondaryVertexHighPurBJetTags*process.patDefaultSequence )
 
-process.PM_tuple = cms.Sequence( process.patDefaultSequence*process.selectedPatMuonsForPtRel )
+process.PM_tuple = cms.Sequence( 
+  process.patDefaultSequence *
+  (
+    process.selectedPatMuonsForPtRel +
+    process.selectedPatElectronsForS8
+  ) 
+)
 ###process.PM_tuple = cms.Sequence( process.patDefaultSequence )
 
 #process.PM_tuple.replace(process.simpleSecondaryVertexBJetTagsAK5PF, process.simpleSecondaryVertexBJetTagsAK5PF*process.simpleSecondaryVertexHighPurBJetTagsAK5PF)
