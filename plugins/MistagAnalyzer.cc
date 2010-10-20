@@ -263,21 +263,25 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("Jet_hist3",       Jet_hist3       ,"Jet_hist3[nJet]/I");
   smalltree->Branch("Jet_histJet",     Jet_histJet     ,"Jet_histJet[nJet]/I");
   smalltree->Branch("Jet_histSvx",     Jet_histSvx     ,"Jet_histSvx[nJet]/I");
-  smalltree->Branch("Jet_histMuon",    Jet_histMuon    ,"Jet_histMuon[nJet]/I");
   
-  smalltree->Branch("Jet_mu_nMuHit",   Jet_mu_nMuHit   ,"Jet_mu_nMuHit[nJet]/I");
-  smalltree->Branch("Jet_mu_nTkHit",   Jet_mu_nTkHit   ,"Jet_mu_nTkHit[nJet]/I");
-  smalltree->Branch("Jet_mu_nPixHit",  Jet_mu_nPixHit  ,"Jet_mu_nPixHit[nJet]/I");
-  smalltree->Branch("Jet_mu_nOutHit",  Jet_mu_nOutHit  ,"Jet_mu_nOutHit[nJet]/I");
-  smalltree->Branch("Jet_mu_isGlobal", Jet_mu_isGlobal ,"Jet_mu_isGlobal[nJet]/I");
-  smalltree->Branch("Jet_mu_nMatched", Jet_mu_nMatched ,"Jet_mu_nMatched[nJet]/I");
   
-  smalltree->Branch("Jet_mu_chi2",     Jet_mu_chi2     ,"Jet_mu_chi2[nJet]/F");
-  smalltree->Branch("Jet_mu_chi2Tk",   Jet_mu_chi2Tk   ,"Jet_mu_chi2Tk[nJet]/F");
-  smalltree->Branch("Jet_mu_pt",       Jet_mu_pt       ,"Jet_mu_pt[nJet]/F");
-  smalltree->Branch("Jet_mu_eta",      Jet_mu_eta      ,"Jet_mu_eta[nJet]/F");
-  smalltree->Branch("Jet_mu_ptrel",    Jet_mu_ptrel    ,"Jet_mu_ptrel[nJet]/F");
-  smalltree->Branch("Jet_mu_vz",       Jet_mu_vz       ,"Jet_mu_vz[nJet]/F");
+  
+  smalltree->Branch("nMuon"	   ,&nMuon	 ,"nMuon/I");
+  smalltree->Branch("Muon_IdxJet",   Muon_IdxJet   ,"Muon_IdxJet[nMuon]/I");
+  smalltree->Branch("Muon_nMuHit",   Muon_nMuHit   ,"Muon_nMuHit[nMuon]/I");
+  smalltree->Branch("Muon_nTkHit",   Muon_nTkHit   ,"Muon_nTkHit[nMuon]/I");
+  smalltree->Branch("Muon_nPixHit",  Muon_nPixHit  ,"Muon_nPixHit[nMuon]/I");
+  smalltree->Branch("Muon_nOutHit",  Muon_nOutHit  ,"Muon_nOutHit[nMuon]/I");
+  smalltree->Branch("Muon_isGlobal", Muon_isGlobal ,"Muon_isGlobal[nMuon]/I");
+  smalltree->Branch("Muon_nMatched", Muon_nMatched ,"Muon_nMatched[nMuon]/I");
+  
+  smalltree->Branch("Muon_chi2",     Muon_chi2     ,"Muon_chi2[nMuon]/F");
+  smalltree->Branch("Muon_chi2Tk",   Muon_chi2Tk   ,"Muon_chi2Tk[nMuon]/F");
+  smalltree->Branch("Muon_pt",       Muon_pt       ,"Muon_pt[nMuon]/F");
+  smalltree->Branch("Muon_eta",      Muon_eta      ,"Muon_eta[nMuon]/F");
+  smalltree->Branch("Muon_ptrel",    Muon_ptrel    ,"Muon_ptrel[nMuon]/F");
+  smalltree->Branch("Muon_vz",       Muon_vz       ,"Muon_vz[nMuon]/F");
+  smalltree->Branch("Muon_hist",     Muon_hist     ,"Muon_hist[nMuon]/I");
   
   smalltree->Branch("Jet_nFirstTrack", Jet_nFirstTrack ,"Jet_nFirstTrack[nJet]/I");
   smalltree->Branch("Jet_nLastTrack",  Jet_nLastTrack  ,"Jet_nLastTrack[nJet]/I"); 
@@ -544,6 +548,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   int Njets = 0;
   int numjet = 0;
   nJet = 0;
+  nMuon = 0;
 
   //*********************************
   // Loop over the jets
@@ -812,12 +817,84 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     float SoftM  = 0;
     float SoftMN = 0;
     ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_softMu);
+    int itagjetMuon = ith_tagged;
     if ( (*jetTags_softMu)[ith_tagged].second     > -100000 )   
       SoftM  = (*jetTags_softMu)[ith_tagged].second;
     ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_softMuneg);
     if ( (*jetTags_softMuneg)[ith_tagged].second  > -100000 )   
       SoftMN = ((*jetTags_softMuneg)[ith_tagged].second);
     if ( SoftMN > 0 ) SoftMN = -SoftMN;
+    
+    //add muon information
+    
+    
+    
+    ith_tagged = itagjetMuon;
+    for(unsigned int leptIdx = 0; leptIdx < (*tagInos_softmuon)[ith_tagged].leptons(); leptIdx++){
+     
+      int muIdx      = matchMuon( (*tagInos_softmuon)[ith_tagged].lepton(leptIdx), muons );
+      
+      if(muIdx != -1){
+        Muon_IdxJet[nMuon] = nJet;
+        Muon_ptrel[nMuon]   = calculPtRel( (*(*tagInos_softmuon)[ith_tagged].lepton(leptIdx)), jetsColl.at(ijet), JES, CaloJetCollectionTags_);
+        
+        Muon_nTkHit[nMuon]    = muons[muIdx].innerTrack()->hitPattern().numberOfValidHits();
+        Muon_nPixHit[nMuon]   = muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits();
+        Muon_nMuHit[nMuon]    = muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits();
+        Muon_nOutHit[nMuon]   = muons[muIdx].innerTrack()->trackerExpectedHitsOuter().numberOfHits();
+      
+      
+        Muon_chi2[nMuon]    = muons[muIdx].globalTrack()->normalizedChi2() ;
+        Muon_chi2Tk[nMuon]  = muons[muIdx].innerTrack()->normalizedChi2()  ;
+        
+        Muon_pt[nMuon]      = muons[muIdx].pt()			      ;
+        Muon_eta[nMuon]     = muons[muIdx].eta()			      ;
+      
+      
+        Muon_isGlobal[nMuon] = muons[muIdx].isGlobalMuon()			      ;
+        Muon_nMatched[nMuon] = muons[muIdx].numberOfMatches() ;
+        Muon_vz[nMuon]       = muons[muIdx].vz();
+      
+     
+        Muon_hist[nMuon] = 0; 
+        Muon_hist[nMuon] = 0; 
+        Muon_hist[nMuon] = 0;  
+        Muon_hist[nMuon] = 0; 
+        Muon_hist[nMuon] = 0; 
+        Muon_hist[nMuon] = 0; 
+        Muon_hist[nMuon] = 0; 
+        Muon_hist[nMuon] = 0; 
+        Muon_hist[nMuon] = 0; 
+      
+        if ( useTrackHistory_ && !isData_ ) {     
+          TrackCategories::Flags theFlagP = classifier_.evaluate( (*tagInos_softmuon)[ith_tagged].lepton(leptIdx) ).flags();
+          if ( theFlagP[TrackCategories::BWeakDecay] )         Muon_hist[nMuon] += int(pow(10., -1 + 1)); 
+          if ( theFlagP[TrackCategories::CWeakDecay] )         Muon_hist[nMuon] += int(pow(10., -1 + 2)); 
+          if ( theFlagP[TrackCategories::TauDecay] )           Muon_hist[nMuon] += int(pow(10., -1 + 3));  
+          if ( theFlagP[TrackCategories::ConversionsProcess] ) Muon_hist[nMuon] += int(pow(10., -1 + 4)); 
+          if ( theFlagP[TrackCategories::KsDecay] )            Muon_hist[nMuon] += int(pow(10., -1 + 5)); 
+          if ( theFlagP[TrackCategories::LambdaDecay] )        Muon_hist[nMuon] += int(pow(10., -1 + 6)); 
+          if ( theFlagP[TrackCategories::HadronicProcess] )    Muon_hist[nMuon] += int(pow(10., -1 + 7)); 
+          if ( theFlagP[TrackCategories::Fake] )	       Muon_hist[nMuon] += int(pow(10., -1 + 8)); 
+          if ( theFlagP[TrackCategories::SharedInnerHits] )    Muon_hist[nMuon] += int(pow(10., -1 + 9)); 
+        }
+	nMuon++;
+      }
+      
+     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     Jet_ProbaN[nJet]   = ProbaN;	 
     Jet_ProbaP[nJet]   = ProbaP;	  
@@ -1075,104 +1152,10 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     //*****************************************************************
     //get track histories of the muon (SoftMuon tagger)
     //*****************************************************************  
-    Jet_mu_nMuHit[nJet]   = -10000;
-    Jet_mu_nTkHit[nJet]   = -10000;
-    Jet_mu_nPixHit[nJet]  = -10000;
-    Jet_mu_nOutHit[nJet]  = -10000;
-    Jet_mu_isGlobal[nJet] = -10000;
-    Jet_mu_nMatched[nJet] = -10000;
-    Jet_mu_chi2[nJet]     = -10000;
-    Jet_mu_chi2Tk[nJet]   = -10000;
-    Jet_mu_pt[nJet]       = -10000;
-    Jet_mu_ptrel[nJet]    = -10000;
-    Jet_mu_vz[nJet]       = -10000;
-    Jet_histMuon[nJet]  = 0;
+   
+     
     
-    ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_softMu);
-    if ( (*tagInos_softmuon)[ith_tagged].leptons() !=0 ) {
-      int muIdx      = matchMuon( (*tagInos_softmuon)[ith_tagged].lepton(0), muons );
-      
-      if(muIdx != -1){
-        Jet_mu_ptrel[nJet]   = calculPtRel( (*(*tagInos_softmuon)[ith_tagged].lepton(0)), jetsColl.at(ijet), JES, CaloJetCollectionTags_);
-        
-        Jet_mu_nTkHit[nJet]    = muons[muIdx].innerTrack()->hitPattern().numberOfValidHits();
-        Jet_mu_nPixHit[nJet]   = muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits();
-        Jet_mu_nMuHit[nJet]    = muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits();
-        Jet_mu_nOutHit[nJet]   = muons[muIdx].innerTrack()->trackerExpectedHitsOuter().numberOfHits();
-      
-      
-        Jet_mu_chi2[nJet]    = muons[muIdx].globalTrack()->normalizedChi2() ;
-        Jet_mu_chi2Tk[nJet]  = muons[muIdx].innerTrack()->normalizedChi2()  ;
-        
-        Jet_mu_pt[nJet]      = muons[muIdx].pt()			      ;
-        Jet_mu_eta[nJet]     = muons[muIdx].eta()			      ;
-      
-      
-        Jet_mu_isGlobal[nJet] = muons[muIdx].isGlobalMuon()			      ;
-        Jet_mu_nMatched[nJet] = muons[muIdx].numberOfMatches() ;
-        Jet_mu_vz[nJet]       = muons[muIdx].vz();
-      }
-      
-      
-    }
-    if ( SoftM > 0 && (*tagInos_softmuon)[ith_tagged].leptons()!=0 ) {
-      if ( useTrackHistory_ && !isData_ ) {     
-        TrackCategories::Flags theFlagP = classifier_.evaluate( (*tagInos_softmuon)[ith_tagged].lepton(0) ).flags();
-        if ( theFlagP[TrackCategories::BWeakDecay] )         Jet_histMuon[nJet] += int(pow(10., -1 + 1)); 
-        if ( theFlagP[TrackCategories::CWeakDecay] )         Jet_histMuon[nJet] += int(pow(10., -1 + 2)); 
-        if ( theFlagP[TrackCategories::TauDecay] )           Jet_histMuon[nJet] += int(pow(10., -1 + 3));  
-        if ( theFlagP[TrackCategories::ConversionsProcess] ) Jet_histMuon[nJet] += int(pow(10., -1 + 4)); 
-        if ( theFlagP[TrackCategories::KsDecay] )            Jet_histMuon[nJet] += int(pow(10., -1 + 5)); 
-        if ( theFlagP[TrackCategories::LambdaDecay] )        Jet_histMuon[nJet] += int(pow(10., -1 + 6)); 
-        if ( theFlagP[TrackCategories::HadronicProcess] )    Jet_histMuon[nJet] += int(pow(10., -1 + 7)); 
-        if ( theFlagP[TrackCategories::Fake] )	             Jet_histMuon[nJet] += int(pow(10., -1 + 8)); 
-        if ( theFlagP[TrackCategories::SharedInnerHits] )    Jet_histMuon[nJet] += int(pow(10., -1 + 9)); 
-      }
-    }
-
-    ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_softMuneg);
-     //std::cout << "SoftMN " << SoftMN << std::endl;
-    if ( SoftMN < 0 && (*tagInos_softmuon)[ith_tagged].leptons()!=0 ) {
     
-      
-      int muIdx      = matchMuon( (*tagInos_softmuon)[ith_tagged].lepton(0), muons );
-      
-      if(muIdx != -1){
-        Jet_mu_ptrel[nJet]   = calculPtRel( (*(*tagInos_softmuon)[ith_tagged].lepton(0)), jetsColl.at(ijet), JES, CaloJetCollectionTags_);
-        
-        Jet_mu_nTkHit[nJet]    = muons[muIdx].innerTrack()->hitPattern().numberOfValidHits();
-        Jet_mu_nPixHit[nJet]   = muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits();
-        Jet_mu_nMuHit[nJet]    = muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits();
-        Jet_mu_nOutHit[nJet]   = muons[muIdx].innerTrack()->trackerExpectedHitsOuter().numberOfHits();
-      
-      
-        Jet_mu_chi2[nJet]    = muons[muIdx].globalTrack()->normalizedChi2() ;
-        Jet_mu_chi2Tk[nJet]  = muons[muIdx].innerTrack()->normalizedChi2()  ;
-        Jet_mu_pt[nJet]      = muons[muIdx].pt()			      ;
-        Jet_mu_eta[nJet]     = muons[muIdx].eta()			      ;
-      
-      
-        Jet_mu_isGlobal[nJet] = muons[muIdx].isGlobalMuon()			      ;
-        Jet_mu_nMatched[nJet] = muons[muIdx].numberOfMatches() ;
-        Jet_mu_vz[nJet]       = muons[muIdx].vz();
-      }
-      
-      
-      
-      
-      if ( useTrackHistory_ && !isData_ ) {     
-        TrackCategories::Flags theFlagN = classifier_.evaluate( (*tagInos_softmuon)[ith_tagged].lepton(0) ).flags();
-        if ( theFlagN[TrackCategories::BWeakDecay] )         Jet_histMuon[nJet] += 2*int(pow(10., -1 + 1)); 
-        if ( theFlagN[TrackCategories::CWeakDecay] )         Jet_histMuon[nJet] += 2*int(pow(10., -1 + 2)); 
-        if ( theFlagN[TrackCategories::TauDecay] )           Jet_histMuon[nJet] += 2*int(pow(10., -1 + 3));  
-        if ( theFlagN[TrackCategories::ConversionsProcess] ) Jet_histMuon[nJet] += 2*int(pow(10., -1 + 4)); 
-        if ( theFlagN[TrackCategories::KsDecay] )            Jet_histMuon[nJet] += 2*int(pow(10., -1 + 5)); 
-        if ( theFlagN[TrackCategories::LambdaDecay] )        Jet_histMuon[nJet] += 2*int(pow(10., -1 + 6)); 
-        if ( theFlagN[TrackCategories::HadronicProcess] )    Jet_histMuon[nJet] += 2*int(pow(10., -1 + 7)); 
-        if ( theFlagN[TrackCategories::Fake] )	             Jet_histMuon[nJet] += 2*int(pow(10., -1 + 8)); 
-        if ( theFlagN[TrackCategories::SharedInnerHits] )    Jet_histMuon[nJet] += 2*int(pow(10., -1 + 9)); 
-      }
-    }
         
 //$$    
     nJet++;

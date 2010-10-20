@@ -16,7 +16,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.14 2010/05/26 19:08:08 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.16 2010/10/04 17:17:04 jandrea Exp $
 //
 //
 
@@ -360,20 +360,22 @@ private:
     int   Jet_hist3[10000];
     int   Jet_histJet[10000];
     int   Jet_histSvx[10000];
-    int   Jet_histMuon[10000];
     
-    int   Jet_mu_nMuHit[10000];
-    int   Jet_mu_nTkHit[10000];
-    int   Jet_mu_nPixHit[10000];
-    int   Jet_mu_nOutHit[10000];
-    int   Jet_mu_isGlobal[10000];
-    int   Jet_mu_nMatched[10000];
-    float Jet_mu_chi2[10000];
-    float Jet_mu_chi2Tk[10000];
-    float Jet_mu_pt[10000];
-    float Jet_mu_eta[10000];
-    float Jet_mu_ptrel[10000];
-    float Jet_mu_vz[10000];
+    int   nMuon;
+    int   Muon_IdxJet[10000];
+    int   Muon_nMuHit[10000];
+    int   Muon_nTkHit[10000];
+    int   Muon_nPixHit[10000];
+    int   Muon_nOutHit[10000];
+    int   Muon_isGlobal[10000];
+    int   Muon_nMatched[10000];
+    float Muon_chi2[10000];
+    float Muon_chi2Tk[10000];
+    float Muon_pt[10000];
+    float Muon_eta[10000];
+    float Muon_ptrel[10000];
+    float Muon_vz[10000];
+    int   Muon_hist[10000];
     
     
     
