@@ -119,6 +119,7 @@ process.selectedPatElectrons.cut= cms.string('pt > 5. && abs(eta) < 2.4 && track
 process.selectedPatElectronsForS8= cms.EDFilter("PATElectronSelector",
     src = cms.InputTag("patElectrons"),
     cut = cms.string('pt > 5. && abs(eta) < 2.4 && trackerDrivenSeed() && gsfTrack().numberOfValidHits() > 10 && gsfTrack().hitPattern().numberOfValidPixelHits() > 1 && gsfTrack().normalizedChi2() < 10 && electronID("softElectronCands") ')
+)
 
 # ususally pt(caloJet)> 30. Now lowered at the beginning. For the PF added the loose jetID
 
