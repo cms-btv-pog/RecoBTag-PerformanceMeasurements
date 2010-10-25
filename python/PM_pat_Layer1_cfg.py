@@ -110,6 +110,8 @@ process.selectedPatMuonsForPtRel= cms.EDFilter("PATMuonSelector",
     cut = cms.string('pt > 5. & abs(eta) < 2.4 & isGlobalMuon() & globalTrack().hitPattern().numberOfValidMuonHits() > 0 & numberOfMatches() > 1 & innerTrack().numberOfValidHits()> 10 & innerTrack().hitPattern().numberOfValidPixelHits()>1 & innerTrack().trackerExpectedHitsOuter().numberOfHits() <3 & innerTrack().normalizedChi2() < 10 & globalTrack().normalizedChi2() < 10 ')
 )
 
+process.load("RecoBTag.PerformanceMeasurements.PMConversionFilter_cfi")
+
 process.patElectrons.electronIDSources = cms.PSet(
   softElectronCands = cms.InputTag("softElectronCands")
 )
@@ -117,7 +119,7 @@ process.patElectrons.electronIDSources = cms.PSet(
 process.selectedPatElectrons.cut= cms.string('pt > 5. && abs(eta) < 2.4 && trackerDrivenSeed() && gsfTrack().numberOfValidHits()> 7 && electronID("softElectronCands")')
 
 process.selectedPatElectronsForS8= cms.EDFilter("PATElectronSelector",
-    src = cms.InputTag("patElectrons"),
+    src = cms.InputTag("PMConversionFilter"),
     cut = cms.string('pt > 5. && abs(eta) < 2.4 && trackerDrivenSeed() && gsfTrack().numberOfValidHits() > 10 && gsfTrack().hitPattern().numberOfValidPixelHits() > 1 && gsfTrack().normalizedChi2() < 10 && electronID("softElectronCands") ')
 )
 
@@ -152,10 +154,11 @@ process.countPatLeptons.minNumber = cms.uint32(1)
 
 #process.PM_tuple = cms.Sequence( process.simpleSecondaryVertexHighPurBJetTags*process.patDefaultSequence )
 
-process.PM_tuple = cms.Sequence( 
+process.PM_tuple = cms.Sequence(
   process.patDefaultSequence *
   (
     process.selectedPatMuonsForPtRel +
+    process.PMConversionFilter * 
     process.selectedPatElectronsForS8
   ) 
 )
