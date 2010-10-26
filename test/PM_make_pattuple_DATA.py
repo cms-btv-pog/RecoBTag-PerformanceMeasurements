@@ -94,10 +94,8 @@ process.out.SelectEvents = cms.untracked.PSet(
 
 # Explicit list of collections to keep (basis is default PAT event content)
 process.out.outputCommands.extend( [ # PAT Objects
-                                     'keep *_selectedPatMuons_*_*',
-	                             'keep *_selectedPatMuonsForPtRel_*_*',
-                                     'keep *_selectedPatElectrons_*_*',
-	                             'keep *_selectedPatElectronsForS8_*_*',
+                                     'keep *_selectedPatMuons*_*_*',
+                                     'keep *_selectedPatElectrons*_*_*',
                                      'keep *_selectedPatJets*_*_*',       # All Jets
                                      # Generator information
                                      'keep GenEventInfoProduct_generator_*_*',
