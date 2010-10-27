@@ -155,6 +155,7 @@ process.countPatLeptons.minNumber = cms.uint32(1)
 #process.PM_tuple = cms.Sequence( process.simpleSecondaryVertexHighPurBJetTags*process.patDefaultSequence )
 
 process.PM_tuple = cms.Sequence(
+  process.softElectronCands *
   process.patDefaultSequence *
   (
     process.selectedPatMuonsForPtRel +
