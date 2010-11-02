@@ -13,12 +13,18 @@
 #include "TLegend.h"
 
 #include<iostream>
+#include <iomanip>
 #include<fstream>
 
 ClassImp(S8Solver)
 
+using std::cout;
+using std::cerr;
+using std::endl;
+
 //____________________________________________________________
-S8Solver::S8Solver()
+S8Solver::S8Solver():
+    _doBinnedSolution(true)
 {
     fAlphaConst = true;
     fBetaConst = false;
@@ -43,6 +49,9 @@ S8Solver::S8Solver()
     fDeltaConst = false;
     fGammaConst = true;
     fusemctrue = false;
+
+    for(int i = 0; 8 > i; ++i)
+        *(_averageResults + i) = 0;
 }
 //____________________________________________________________
 void S8Solver::Clear() {
@@ -489,13 +498,67 @@ void S8Solver::GetInput() {
     TF1 *Fdelta = fh_delta->GetFunction("pol0");
     TF1 *Fgamma = fh_gamma->GetFunction("pol0");
 
+    /*
     TotalInput["kappa_b"] = fKappabf * Fkb->GetParameter(0);
     TotalInput["kappa_cl"] = fKappaclf * Fkcl->GetParameter(0);
     TotalInput["alpha"] = fAlphaf * Falpha->GetParameter(0);
     TotalInput["beta"] = fBetaf * Fbeta->GetParameter(0);
     TotalInput["delta"] =fDeltaf * Fdelta->GetParameter(0);
     TotalInput["gamma"] = fGammaf * Fgamma->GetParameter(0);
+    */
 
+    // Get Total Input
+    //
+    {
+        using std::setw;
+        using std::left;
+
+        const double eff_tag_b = integrate(b_halljets_tagged) /
+                                 integrate(halljets_b);
+
+        const double eff_tag_cl = integrate(cl_halljets_tagged) /
+                                  integrate(halljets_cl);
+
+        const double eff_mu_b = integrate(b_halljets_ptrel) /
+                                integrate(halljets_b);
+
+        const double eff_mu_cl = integrate(cl_halljets_ptrel) /
+                                 integrate(halljets_cl);
+
+        cout << " [+] " << setw(15) << left << "eff_tag_b" << eff_tag_b << endl;
+        cout << " [+] " << setw(15) << left << "eff_tag_cl" << eff_tag_cl << endl;
+        cout << " [+] " << setw(15) << left << "eff_mu_b" << eff_mu_b << endl;
+        cout << " [+] " << setw(15) << left << "eff_mu_cl" << eff_mu_cl << endl;
+
+        TotalInput["alpha"] = fAlphaf * integrate(cl_halloppjets_tagged) /
+                              integrate(halloppjets_cl) / eff_tag_cl;
+        cout << " [+] " << setw(15) << left << "alpha" << TotalInput["alpha"] << endl;
+        
+        TotalInput["beta"] = fBetaf * integrate(b_halloppjets_tagged) /
+                             integrate(halloppjets_b) / eff_tag_b;
+        cout << " [+] " << setw(15) << left << "beta" << TotalInput["beta"] << endl;
+
+        TotalInput["gamma"] = fGammaf * integrate(cl_halloppjets_ptrel) /
+                              integrate(halloppjets_cl) / eff_mu_cl;
+        cout << " [+] " << setw(15) << left << "gamma" << TotalInput["gamma"] << endl;
+        
+        TotalInput["delta"] = fDeltaf * integrate(b_halloppjets_ptrel) /
+                              integrate(halloppjets_b) / eff_mu_b;
+        cout << " [+] " << setw(15) << left << "delta" << TotalInput["delta"] << endl;
+
+        TotalInput["kappa_cl"] = fKappaclf * integrate(cl_halljets_ptreltagged) /
+                                 integrate(halljets_cl) /
+                                 eff_mu_cl / eff_tag_cl;
+        cout << " [+] " << setw(15) << left << "kappa_cl" << TotalInput["kappa_cl"] << endl;
+
+        TotalInput["kappa_b"] = fKappabf * integrate(b_halljets_ptreltagged) /
+                                integrate(halljets_b) /
+                                eff_mu_b / eff_tag_b;
+        cout << " [+] " << setw(15) << left << "kappa_b" << TotalInput["kappa_b"] << endl;
+    }
+
+    //error
+    
     // binned input base in the n samples
     TF1 *F_kb = fh_kb->GetFunction("pol1");
     TF1 *F_kcl = fh_kcl->GetFunction("pol1");
@@ -665,6 +728,9 @@ void S8Solver::Solve() {
         sol.SetCorr(TotalInput["kappa_b"],TotalInput["beta"],TotalInput["delta"],
                     TotalInput["kappa_cl"],TotalInput["alpha"],TotalInput["gamma"]);
 
+        // Correlation errors are only used in case Systematic errors are
+        // calculated by the Numeric Solver. Otherwise they do not make sense
+        //
         sol.SetCorrError((fh_kb->GetFunction("pol0"))->GetParError(0),
                          (fh_beta->GetFunction("pol0"))->GetParError(0),
                          (fh_delta->GetFunction("pol0"))->GetParError(0),
@@ -673,16 +739,25 @@ void S8Solver::Solve() {
                          (fh_gamma->GetFunction("pol0"))->GetParError(0));
                          
         sol.SetError(2);
-        sol.SetNbErrorIteration(100);
+        sol.SetNbErrorIteration(1000);
         sol.SetInitialOrder(1,1);
         bool converge = true;
         
         // pick solution manually if requested
         for (std::map<int, int>::const_iterator ipick = fPickSolutionMap.begin(); ipick!= fPickSolutionMap.end(); ++ipick) {
-            if ( ipick->first == 0 ) sol.SetSolution( ipick->second );
-            }
+            if ( ipick->first == 0 )
+                sol.SetSolution(ipick->second);
+        }
 
         sol.Solve();
+
+        TFile *out = TFile::Open("out.root", "recreate");
+        for (int i = 0; 8 > i; ++i)
+        {
+            sol.result(i)->Write();
+            *(_averageResults + i) = (TH1 *) sol.result(i)->Clone();
+        }
+        out->Close();
 
         if (converge) {
             fTotalSolution["n_b"]       = sol.GetResultVec(0)*TotalInput["n"];
@@ -694,7 +769,17 @@ void S8Solver::Solve() {
             fTotalSolution["p_b"]       = sol.GetResultVec(6)*fTotalSolution["n_b"];
             fTotalSolution["p_cl"]      = sol.GetResultVec(7)*fTotalSolution["n_cl"];
         
+            for(int i = 0; 8 > i; ++i)
+            {
+                if (sol.GetErrorSupVec(i) != sol.GetErrorInfVec(i))
+                    cerr << " [-] Asymmetric errors (" << i << "): +(-) "
+                        << sol.GetErrorSupVec(i)
+                        << '(' << sol.GetErrorInfVec(i) << ')' << endl;
+            }
+
             // FIX errors
+            //
+            /*
             fTotalSolutionErr["n_b"]       = (sol.GetErrorSupVec(0)+sol.GetErrorInfVec(0))/2. * TotalInput["n"];
             fTotalSolutionErr["n_cl"]      = (sol.GetErrorSupVec(1)+sol.GetErrorInfVec(1))/2. * TotalInput["n"];
             fTotalSolutionErr["effMu_b"]   = (sol.GetErrorSupVec(2)+sol.GetErrorInfVec(2))/2.;
@@ -703,6 +788,16 @@ void S8Solver::Solve() {
             fTotalSolutionErr["effTag_cl"] = (sol.GetErrorSupVec(5)+sol.GetErrorInfVec(5))/2.;
             fTotalSolutionErr["p_b"]       = (sol.GetErrorSupVec(6)+sol.GetErrorInfVec(6))/2. * fTotalSolution["n_b"];
             fTotalSolutionErr["p_cl"]      = (sol.GetErrorSupVec(7)+sol.GetErrorInfVec(7))/2. * fTotalSolution["n_cl"];
+            */
+
+            fTotalSolutionErr["n_b"]       = sol.getError(0) * TotalInput["n"];
+            fTotalSolutionErr["n_cl"]      = sol.getError(1) * TotalInput["n"];
+            fTotalSolutionErr["effMu_b"]   = sol.getError(2);
+            fTotalSolutionErr["effMu_cl"]  = sol.getError(3);
+            fTotalSolutionErr["effTag_b"]  = sol.getError(4);
+            fTotalSolutionErr["effTag_cl"] = sol.getError(5);
+            fTotalSolutionErr["p_b"]       = sol.getError(6) * fTotalSolution["n_b"];
+            fTotalSolutionErr["p_cl"]      = sol.getError(7) * fTotalSolution["n_cl"];
         } else {
             for( std::map<TString,double>::const_iterator ii=fTotalSolution.begin(); ii!=fTotalSolution.end(); ++ii) {
                 fTotalSolution[ii->first] = 0.;
@@ -710,6 +805,10 @@ void S8Solver::Solve() {
             }
         }
         std::cout << " Finished with average solution " << std::endl;
+        cout << endl;
+
+        if (!_doBinnedSolution)
+            return;
         
         // binned solutions
         for( std::map<int,std::map<TString,double> >::const_iterator ibin = BinnedInput.begin(); ibin!=BinnedInput.end(); ++ibin) {
@@ -754,6 +853,15 @@ void S8Solver::Solve() {
             std::map<TString,double> tmpsoluerr;
                 
             if (converge) {
+        
+                for(int i = 0; 8 > i; ++i)
+                {
+                    if (sol.GetErrorSupVec(i) != sol.GetErrorInfVec(i))
+                        cerr << " [-] Assymmetric errors (" << i << "): +(-) "
+                            << sol.GetErrorSupVec(i)
+                            << '(' << sol.GetErrorInfVec(i) << ')' << endl;
+                }
+
                 tmpsolu["n_b"]       = solu.GetResultVec(0)*tmpinput["n"];
                 tmpsolu["n_cl"]      = solu.GetResultVec(1)*tmpinput["n"];
                 tmpsolu["effMu_b"]   = solu.GetResultVec(2);
@@ -764,14 +872,14 @@ void S8Solver::Solve() {
                 tmpsolu["p_cl"]      = solu.GetResultVec(7)*tmpsolu["n_cl"];
                 
                 // FIX errors
-                tmpsoluerr["n_b"]       = (solu.GetErrorSupVec(0)+solu.GetErrorInfVec(0))/2. * tmpinput["n"];
-                tmpsoluerr["n_cl"]      = (solu.GetErrorSupVec(1)+solu.GetErrorInfVec(1))/2. * tmpinput["n"];
-                tmpsoluerr["effMu_b"]   = (solu.GetErrorSupVec(2)+solu.GetErrorInfVec(2))/2.;
-                tmpsoluerr["effMu_cl"]  = (solu.GetErrorSupVec(3)+solu.GetErrorInfVec(3))/2.;
-                tmpsoluerr["effTag_b"]  = (solu.GetErrorSupVec(4)+solu.GetErrorInfVec(4))/2.;
-                tmpsoluerr["effTag_cl"] = (solu.GetErrorSupVec(5)+solu.GetErrorInfVec(5))/2.;
-                tmpsoluerr["p_b"]       = (solu.GetErrorSupVec(6)+solu.GetErrorInfVec(6))/2. * tmpsolu["n_b"];
-                tmpsoluerr["p_cl"]      = (solu.GetErrorSupVec(7)+solu.GetErrorInfVec(7))/2. * tmpsolu["n_cl"];
+                tmpsoluerr["n_b"]       = solu.getError(0) * tmpinput["n"];
+                tmpsoluerr["n_cl"]      = solu.getError(1) * tmpinput["n"];
+                tmpsoluerr["effMu_b"]   = solu.getError(2);
+                tmpsoluerr["effMu_cl"]  = solu.getError(3);
+                tmpsoluerr["effTag_b"]  = solu.getError(4);
+                tmpsoluerr["effTag_cl"] = solu.getError(5);
+                tmpsoluerr["p_b"]       = solu.getError(6) * tmpsolu["n_b"];
+                tmpsoluerr["p_cl"]      = solu.getError(7) * tmpsolu["n_cl"];
             } else {
                 for( std::map<TString,double>::const_iterator ii=fTotalSolution.begin(); ii!=fTotalSolution.end(); ++ii) {
                     tmpsolu[ii->first] = 0.;
@@ -961,8 +1069,21 @@ void S8Solver::DumpTable(std::string filename) {
     
 }
 
-void S8Solver::Draw(int maxNbins) {
-    
+void S8Solver::Draw(int maxNbins)
+{
+    /*
+    for(int i = 0; 8 > i; ++i)
+    {
+        if (_averageResults[i])
+        {
+            TCanvas *canvas = new TCanvas();
+            _averageResults[i]->Draw();
+        }
+        else
+            cout << " average results " << i << " are not found" << endl;
+    }
+    */
+
   Int_t nxbins = fBinnedSolution.size();
 
   if (maxNbins != 0 ) nxbins = maxNbins;
@@ -1354,4 +1475,9 @@ void S8Solver::Print(TString extension ) {
         acv->Print(TString(tmpname+"."+extension));
     }
 
+}
+
+double S8Solver::integrate(TH1 *hist)
+{
+    return hist->Integral(1, hist->GetNbinsX() + 1);
 }

@@ -27,81 +27,112 @@
 //     eax (ebx)   : efficiency of cut x on signal a (b)
 //
 /////////////////////////////////////////////////////////////////////////
+
+#include <iostream>
+#include <string>
+
+#include <boost/lexical_cast.hpp>
+
+#include "TF1.h"
+#include "TH1F.h"
+
 #include "S8NumericSolver.h"
 
+using std::cout;
+using std::endl;
+using boost::lexical_cast;
 
 S8NumericSolver::S8NumericSolver() : TNamed()
 {
-// Generic constructor
-this->Reset();
+    // Generic constructor
+    //
+    Reset();
+}
+
+S8NumericSolver::~S8NumericSolver()
+{
+    delete fRndm;
+
+    for(int i = 0; 8 > i; ++i)
+    {
+        delete *(_result + i);
+    }
 }
 
 
 S8NumericSolver::S8NumericSolver(std::string name) : TNamed(name,name)
 {
-this->Reset();
+    Reset();
 }
 
 S8NumericSolver::S8NumericSolver(std::string name, Double_t n, Double_t n1, Double_t n2 , Double_t n3,
                              Double_t n12, Double_t n23, Double_t n31, Double_t n123) : TNamed(name,name)
 {
-// Constructor with input initialization :
-// n    : total numer of events in data sample
-// nx   : number of events passing cut x
-// nxy  : number of events passing cuts x and y
-// n123 : number of events passing all 3 cuts.
-  this->Reset();
-  this->SetInput(n,n1,n2,n3,n12,n23,n31,n123);
+    // Constructor with input initialization :
+    // n    : total numer of events in data sample
+    // nx   : number of events passing cut x
+    // nxy  : number of events passing cuts x and y
+    // n123 : number of events passing all 3 cuts.
+    Reset();
+    SetInput(n,n1,n2,n3,n12,n23,n31,n123);
 }
 
 S8NumericSolver::S8NumericSolver(std::string name, Double_t* n) : TNamed(name,name)
 {
-this->Reset();
-this->SetInput(n[0],n[1],n[2],n[3],n[4],n[5],n[6],n[7]);
+    Reset();
+    SetInput(n[0],n[1],n[2],n[3],n[4],n[5],n[6],n[7]);
 }
 
 
 void S8NumericSolver::Reset()
 {
-// Reseting inputs, correlations, results and errors
-kError = 0;
-fRndm = new TRandom3(12345);
+    using std::string;
 
-for(Int_t i=0 ; i<8 ; ++i)
-  {
-  fInput[i]  = 0.  ;
-  fIndep[i]  = 0.  ;
+    // Reseting inputs, correlations, results and errors
+    kError = 0;
+    fRndm = new TRandom3(12345);
 
-  fErrorinf_Stat[i] = 0. ;
-  fErrorsup_Stat[i] = 0.;
-  fErrorinf_Syst[i] = 0. ;
-  fErrorsup_Syst[i] = 0. ;
-
-  if( i<6 )
+    for(int i = 0; 8 > i; ++i)
     {
-    fCorr[i/3][i%3]    = 1. ;
-    fCorrerr[i/3][i%3] = 1. ;
-    kc[i/3][i%3]= 1.;
-    if(i<3)
-      {
-      q[i]=-1.;
-      Q[i]=-1.;
-      }
+        *(_result + i) = new TH1F((string("res") + lexical_cast<string>(i)).c_str(),
+                                  (string("Result") + lexical_cast<string>(i)).c_str(),
+                                  1000, 0, 1.);
     }
 
-  }
-QQQ= -1. ;
-fAsym[0]= 0;
-fAsym[1]= 1;
- fNpt = 20000;//5000;
-fIter = 10000;
- fAveRes = 0.;
- fAveResSetup = false;
- fverbose = false;
- 
- fForceSol = false;
- fpickSol = 0;
+    for(Int_t i = 0 ; i < 8 ; ++i)
+    {
+        fInput[i]  = 0.  ;
+        fIndep[i]  = 0.  ;
 
+        fErrorinf_Stat[i] = 0. ;
+        fErrorsup_Stat[i] = 0.;
+        fErrorinf_Syst[i] = 0. ;
+        fErrorsup_Syst[i] = 0. ;
+
+        if (i < 6)
+        {
+            fCorr[i/3][i%3]    = 1. ;
+            fCorrerr[i/3][i%3] = 1. ;
+            kc[i/3][i%3]= 1.;
+
+            if (i < 3)
+            {
+                q[i]=-1.;
+                Q[i]=-1.;
+            }
+        }
+    }
+    QQQ= -1. ;
+    fAsym[0]= 0;
+    fAsym[1]= 1;
+    fNpt = 20000;//5000;
+    fIter = 10000;
+    fAveRes = 0.;
+    fAveResSetup = false;
+    fverbose = false;
+
+    fForceSol = false;
+    fpickSol = 0;
 }
 
 void S8NumericSolver::SetInput(Double_t n, Double_t n1, Double_t n2 , Double_t n3,
@@ -173,216 +204,244 @@ for(Int_t i=0;i<6;++i)
 
 Int_t S8NumericSolver::Solve()
 {
-Double_t shift[14]={0};
-Double_t res[5]={0};
-MakeSystem(shift);
+    Double_t shift[14]={0};
+    Double_t res[5]={0};
+    MakeSystem(shift);
 
- fverbose = true; 
-if(!FindSolution(res,SolveSystem(res))) {
-	std::cout << "[S8Numeric] SOLUTION NOT FOUND, leaving ...." << std::endl;
-	return 0;
-}
- std::cout << "[S8Numeric] got solutions, now compute errors" << std::endl;
- fverbose = false;
- ComputeErrors();
-return 1;
+    fverbose = true; 
+    if(!FindSolution(res,SolveSystem(res)))
+    {
+        std::cout << "[S8Numeric] SOLUTION NOT FOUND, leaving ...." << std::endl;
+        return 0;
+    }
+
+    std::cout << "[S8Numeric] got solutions, now compute errors" << std::endl;
+    fverbose = false;
+
+    ComputeErrors();
+    fitErrors();
+
+    return 1;
 }
 
 Int_t S8NumericSolver::FindSolution(Double_t* res, int n)
 {
 
-	int npositiveSols = 0;
-	int nphysicalSols = 0;
-	int thesols = -1;
-	int thesols2 = -1;
-	double deltares = 9999999;
+    int npositiveSols = 0;
+    int nphysicalSols = 0;
+    int thesols = -1;
+    int thesols2 = -1;
+    double deltares = 9999999;
 
-	if (fForceSol) {
-	  if (fverbose) std::cout << "[S8Numeric] Solution chosen manually, Force to be solution # " << fpickSol<< std::endl;
-	  fNb = res[fpickSol -1 ];
-	  for(int i=0; i<8;++i) fMapResult[i] =  fResult[i] = E(i%2,i/2);
-	  return 1;
-	}
+    if (fForceSol) {
+      if (fverbose) std::cout << "[S8Numeric] Solution chosen manually, Force to be solution # " << fpickSol<< std::endl;
+      fNb = res[fpickSol -1 ];
+      for(int i=0; i<8;++i) fMapResult[i] =  fResult[i] = E(i%2,i/2);
+      return 1;
+    }
 
-	if (fverbose) std::cout << "[S8Numeric] now print all solutions:"<< std::endl;
-	for(int j=1; j<= n; ++j) {
-		fNb = res[j-1];
-		if (fverbose) std::cout << " solution # " << j << std::endl;
-		double tmpsol[8];
-		double totprod=1;
-		for(int i=0; i<8;++i) {
-			tmpsol[i] = E(i%2,i/2);
-			if (fverbose) std::cout << " result i = " << i << " " <<  tmpsol[i] << std::endl;
-			totprod=totprod*tmpsol[i];
-		}
-		if (totprod>=0) {
-			npositiveSols++;
-			int tmpcounter = 0;
-			for(int ii=2; ii<=5;++ii) {
-				
-				if (tmpsol[ii]>=0 && tmpsol[ii]<=1.) tmpcounter++;
-			}
-			if (tmpcounter==4) nphysicalSols++;
-			double tmpdeltares = fabs(fAveRes - res[j-1]);
-			if ( nphysicalSols>0 ) {
-				if (fAveResSetup && (deltares>tmpdeltares) ) {thesols = j-1; deltares = tmpdeltares;}
-				else if (!fAveResSetup && tmpcounter==4 ) { 
-				thesols = j-1;}
-				else if (!fAveResSetup && nphysicalSols>1 && tmpcounter==4 ) {
-					if ( tmpsol[4]>0 && tmpsol[4]>tmpsol[5] && tmpsol[2]>tmpsol[3] )				thesols = j-1;
-				}
-			}
-		}
-		if ( tmpsol[4]>0 && tmpsol[4]>tmpsol[5] && tmpsol[2]>tmpsol[3] ) thesols2= j-1;
-		
-		if (fverbose) {
-			std::cout << "\n";
-			std::cout << "  number of physical solutions = " << nphysicalSols << std::endl;
-		}
-	}
-		
-	if (nphysicalSols==0) {
-		if ( thesols2 != -1 ) {
-			fNb = res[thesols2];
-			for(int i=0; i<8;++i) fMapResult[i] =  fResult[i] = E(i%2,i/2);
-		}
-		else return 0;
-	}
-	else {
-		std::cout << "the sols = " << thesols << std::endl;
-		fNb = res[thesols];
-		for(int i=0; i<8;++i) fMapResult[i] =  fResult[i] = E(i%2,i/2);
-		return 1;
-	}
-
+    if (fverbose) std::cout << "[S8Numeric] now print all solutions:"<< std::endl;
+    for(int j=1; j<= n; ++j) {
+        fNb = res[j-1];
+        if (fverbose) std::cout << " solution # " << j << std::endl;
+        double tmpsol[8];
+        double totprod=1;
+        for(int i=0; i<8;++i) {
+            tmpsol[i] = E(i%2,i/2);
+            if (fverbose) std::cout << " result i = " << i << " " <<  tmpsol[i] << std::endl;
+            totprod=totprod*tmpsol[i];
+        }
+        if (totprod>=0) {
+            npositiveSols++;
+            int tmpcounter = 0;
+            for(int ii=2; ii<=5;++ii) {
+                
+                if (tmpsol[ii]>=0 && tmpsol[ii]<=1.) tmpcounter++;
+            }
+            if (tmpcounter==4) nphysicalSols++;
+            double tmpdeltares = fabs(fAveRes - res[j-1]);
+            if ( nphysicalSols>0 ) {
+                if (fAveResSetup && (deltares>tmpdeltares) ) {thesols = j-1; deltares = tmpdeltares;}
+                else if (!fAveResSetup && tmpcounter==4 ) { 
+                thesols = j-1;}
+                else if (!fAveResSetup && nphysicalSols>1 && tmpcounter==4 ) {
+                    if ( tmpsol[4]>0 && tmpsol[4]>tmpsol[5] && tmpsol[2]>tmpsol[3] )                thesols = j-1;
+                }
+            }
+        }
+        if ( tmpsol[4]>0 && tmpsol[4]>tmpsol[5] && tmpsol[2]>tmpsol[3] ) thesols2= j-1;
+        
+        if (fverbose) {
+            std::cout << "\n";
+            std::cout << "  number of physical solutions = " << nphysicalSols << std::endl;
+        }
+    }
+        
+    if (nphysicalSols==0) {
+        if ( thesols2 != -1 ) {
+            fNb = res[thesols2];
+            for(int i=0; i<8;++i) fMapResult[i] =  fResult[i] = E(i%2,i/2);
+        }
+        else return 0;
+    }
+    else {
+        //std::cout << "the sols = " << thesols << std::endl;
+        fNb = res[thesols];
+        for(int i=0; i<8;++i) fMapResult[i] =  fResult[i] = E(i%2,i/2);
         return 1;
-/*
-	
-if(n<=0)
-  {
-//  printf("\nNo physics solution.\n");
-  return 0;
-  }
-else if(n==1) fNb = res[0];
-else if(n==2)
-  {
-  Double_t a=0,b=0;
-  Bool_t bb[2];
-  for(Int_t i=0;i<2;++i)
-    {
-    fNb = res[i];
-    Int_t u = (2*i-1)*fAsym[1];
-    a = E(0,fAsym[0])*u;
-    b = E(1,fAsym[0])*u;
-    bb[i] = (a<b);
     }
-  if     ( bb[0] &&  bb[1]) fNb = res[0];
-  else if(!bb[0] && !bb[1]) fNb = res[1];
-  else
-    {
-    printf("\nCannot solve ambiguity... Try SetInitialOrder on another parameter\n");
-    return 0;
-    }
-  }
-else if(n>2)
-  {
-  printf("\nToo many solutions. What's going on here ?\n");
-  return 0;
-  }
 
-*/
-	
-//for(int i=0; i<8;++i) fResult[i] = E(i%2,i/2);
-//return 1;
+    return 1;
 }
 
 
 void S8NumericSolver::ComputeErrors()
 {
-printf("Start computing errors -> mode : %d\n",kError);
-if(kError==0) return;
+    printf("Start computing errors -> mode : %d\n",kError);
+    if(kError==0)
+        return;
 
-Double_t central[8]={0};
-Double_t res[5];
-for(int i=0;i<8;++i)
-  {
-	  central[i] = fMapResult[i];//fResult[i];
-  fErrorsup_Stat[i] = 0.;
-  fErrorinf_Stat[i] = 0.;
-  fErrorsup_Syst[i] = 0.;
-  fErrorinf_Syst[i] = 0.;
-  fMapErrorInf_Stat[i] = 0;
-  fMapErrorSup_Stat[i] = 0;
-  
-  }
-Int_t Nsup = 0;
-Int_t Ninf = 0;
-Double_t shift[14] = {0.};
-if(kError==1 || kError==2) // Stat error
-  {
-  printf("   Computing stat errors\n");
-  Ninf = Nsup = 0;
-  for(int i=8;i<14;++i) shift[i] = 0.;
-  for(int i=0;i<fIter;++i)
+    Double_t central[8]={0};
+    Double_t res[5];
+    for(int i=0;i<8;++i)
     {
-    Double_t w[8] = {0};
+        central[i] = fMapResult[i];//fResult[i];
+        fErrorsup_Stat[i] = 0.;
+        fErrorinf_Stat[i] = 0.;
+        fErrorsup_Syst[i] = 0.;
+        fErrorinf_Syst[i] = 0.;
+        fMapErrorInf_Stat[i] = 0;
+        fMapErrorSup_Stat[i] = 0;
+    }
 
-    for(int j=0;j<8;++j) w[j] = fRndm->Gaus(0.,1.)*fIndep[j];
-    shift[0] = w[0]+w[1]+w[2]+w[3]+w[4]+w[5]+w[6]+w[7];
-    shift[1] = w[0] + w[2] + w[4] + w[6];
-    shift[2] = w[0] + w[1] + w[4] + w[5];
-    shift[3] = w[0] + w[1] + w[2] + w[3];
-    shift[4] = w[0] + w[4];
-    shift[5] = w[0] + w[1];
-    shift[6] = w[0] + w[2];
-    shift[7] = w[0] ;
-    MakeSystem(shift);
+    Int_t Nsup[8] = {0};
+    Int_t Ninf[8] = {0};
+    Double_t shift[14] = {0.};
+    if(kError==1 || kError==2) // Stat error
+    {
+        printf("   Computing stat errors\n");
+        for(int i = 0; 8 > i; ++i)
+        {
+          *(Nsup + i) = 0;
+          *(Ninf + i) = 0;
+        }
 
-    if(!FindSolution(res,SolveSystem(res))) continue;
-    for(int j=0;j<8;++j)
-      {
-		  //if(fResult[j]<central[j] && fResult[j]>0) {fErrorinf_Stat[j]+= pow(fResult[j]-central[j],2); Ninf++;}
-		  //if(fResult[j]>central[j] && fResult[j]<1) {fErrorsup_Stat[j]+= pow(fResult[j]-central[j],2); Nsup++;}
-	  if(fMapResult[j]<central[j] && fMapResult[j]>0) {fMapErrorInf_Stat[j]+= pow(fMapResult[j]-central[j],2); Ninf++;}
-      if(fMapResult[j]>central[j] && fMapResult[j]<1) {fMapErrorSup_Stat[j]+= pow(fMapResult[j]-central[j],2); Nsup++;}
-      }
+        for(int i=8;i<14;++i)
+          shift[i] = 0.;
+
+        for(int i = 0; i < fIter; ++i)
+        {
+            Double_t w[8] = {0};
+
+            for(int j=0;j<8;++j) w[j] = fRndm->Gaus(0.,1.)*fIndep[j];
+            shift[0] = w[0]+w[1]+w[2]+w[3]+w[4]+w[5]+w[6]+w[7];
+            shift[1] = w[0] + w[2] + w[4] + w[6];
+            shift[2] = w[0] + w[1] + w[4] + w[5];
+            shift[3] = w[0] + w[1] + w[2] + w[3];
+            shift[4] = w[0] + w[4];
+            shift[5] = w[0] + w[1];
+            shift[6] = w[0] + w[2];
+            shift[7] = w[0] ;
+            MakeSystem(shift);
+
+            if(!FindSolution(res,SolveSystem(res)))
+                continue;
+
+            for(int j = 0; j < 8; ++j)
+            {
+                _result[j]->Fill(fMapResult[j]);
+
+                //if(fResult[j]<central[j] && fResult[j]>0) {fErrorinf_Stat[j]+= pow(fResult[j]-central[j],2); Ninf++;}
+                //if(fResult[j]>central[j] && fResult[j]<1) {fErrorsup_Stat[j]+= pow(fResult[j]-central[j],2); Nsup++;}
+                if (fMapResult[j] < central[j] &&
+                    fMapResult[j] > 0)
+                {
+                    fMapErrorInf_Stat[j] += pow(fMapResult[j] - central[j], 2);
+                    ++*(Ninf + j);
+                }
+
+                if (fMapResult[j] > central[j] &&
+                    fMapResult[j] < 1)
+                {
+                    fMapErrorSup_Stat[j] += pow(fMapResult[j] - central[j], 2);
+                    ++*(Nsup + j);
+                }
+            }
+        }
+
+        for(int i = 0; i < 8; ++i)
+        {
+            //fErrorinf_Stat[i]/=Ninf;
+            //fErrorsup_Stat[i]/=Nsup;
+            if (0 < *(Ninf + i))
+                fMapErrorInf_Stat[i] /= *(Ninf + i);
+
+            if (0 < *(Nsup + i))
+                fMapErrorSup_Stat[i] /= *(Nsup + i);   
+        }
     }
-  for(int i=0;i<8;++i)
+
+    if(kError==1 || kError==3) // Syst error
     {
-		//fErrorinf_Stat[i]/=Ninf;
-		//fErrorsup_Stat[i]/=Nsup;
-	fMapErrorInf_Stat[i]/=Ninf;
-    fMapErrorSup_Stat[i]/=Nsup;  
+        printf("   Computing syst errors\n");
+
+        for(int i = 0; i < 8; ++i)
+        {
+            shift[i] = 0.;
+            *(Ninf + i) = 0;
+            *(Nsup + i) = 0;
+        }
+
+        for(int i=0;i<fIter;++i)
+        {
+            for(Int_t j=0;j<6;++j)
+                shift[j+8] = fRndm->Gaus(0.,1.)*fCorrerr[j/3][j%3];
+
+            MakeSystem(shift);
+
+            if(!FindSolution(res,SolveSystem(res)))
+                continue;
+
+            for(int j=0;j<8;++j)
+            {
+                //if(fResult[j]<central[j] && fResult[j]>0) {fErrorinf_Syst[j]+= pow(fResult[j]-central[j],2); Ninf++;}
+                //if(fResult[j]>central[j] && fResult[j]<1) {fErrorsup_Syst[j]+= pow(fResult[j]-central[j],2); Nsup++;}
+                if (fMapResult[j] < central[j] &&
+                    fMapResult[j] > 0)
+                {
+                    fMapErrorInf_Stat[j] += pow(fMapResult[j] - central[j], 2);
+                    ++*(Ninf + j);
+                }
+
+                if (fMapResult[j] > central[j] &&
+                    fMapResult[j] < 1)
+                {
+                    fMapErrorSup_Stat[j] += pow(fMapResult[j] - central[j], 2);
+                    ++*(Nsup + j);
+                }
+            }
+        }
+
+        for(int i = 0; i < 8; ++i)
+        {
+            //fErrorinf_Syst[i]/=Ninf;
+            //fErrorsup_Syst[i]/=Nsup;
+            if (0 < *(Ninf + i))
+                fMapErrorInf_Stat[i] /= *(Ninf + i);
+
+            if (0 < *(Nsup + i))
+                fMapErrorSup_Stat[i] /= *(Nsup + i);   
+        }
     }
-  }
-if(kError==1 || kError==3) // Syst error
-  {
-  printf("   Computing syst errors\n");
-  Ninf = Nsup = 0;
-  for(int i=0;i<8;++i) shift[i] = 0.;
-  for(int i=0;i<fIter;++i)
-    {
-    for(Int_t j=0;j<6;++j) shift[j+8] = fRndm->Gaus(0.,1.)*fCorrerr[j/3][j%3];
-    MakeSystem(shift);
-    if(!FindSolution(res,SolveSystem(res))) continue;
-    for(int j=0;j<8;++j)
-      {
-		  //if(fResult[j]<central[j] && fResult[j]>0) {fErrorinf_Syst[j]+= pow(fResult[j]-central[j],2); Ninf++;}
-		  //if(fResult[j]>central[j] && fResult[j]<1) {fErrorsup_Syst[j]+= pow(fResult[j]-central[j],2); Nsup++;}
-	  if(fMapResult[j]<central[j] && fMapResult[j]>0) {fErrorinf_Stat[j]+= pow(fMapResult[j]-central[j],2); Ninf++;}
-      if(fMapResult[j]>central[j] && fMapResult[j]<1) {fErrorsup_Stat[j]+= pow(fMapResult[j]-central[j],2); Nsup++;}
-      }
-    }
-  for(int i=0;i<8;++i)
-    {
-		//fErrorinf_Syst[i]/=Ninf;
-		//fErrorsup_Syst[i]/=Nsup;
-	fMapErrorInf_Stat[i]/=Ninf;
-    fMapErrorSup_Stat[i]/=Nsup;
-    }
-  }
-for(int i=0;i<8;++i) fMapResult[i] = fResult[i] = central[i];
- 
+
+    for(int i = 0; i < 8; ++i)
+        fMapResult[i] = fResult[i] = central[i];
+}
+
+void S8NumericSolver::fitErrors()
+{
+    for(int i = 0; 8 > i; ++i)
+        _result[i]->Fit("gaus", "0+");
 }
 
 void S8NumericSolver::SetError( Int_t b )
@@ -444,6 +503,16 @@ if(n>=0 && n<8 && kError>0)
   if(opt=="All" || opt=="" || opt == "Syst") err += fErrorinf_Syst[n];
   }
 return sqrt(err);
+}
+
+double S8NumericSolver::getError(const int &id)
+{
+    if (0 > id ||
+        7 < id)
+
+        return -1;
+
+    return _result[id]->GetFunction("gaus")->GetParameter(2);
 }
 
 Double_t S8NumericSolver::GetResult(std::string label)
@@ -622,33 +691,40 @@ return a;
 
 Double_t S8NumericSolver::T()
 {
-Double_t a = U(0)*U(1)*U(2)*(C()*I()) ;
-       a+= V()*U(2)*U(0)*(C()*G());
-       a+= V()*U(0)*U(1)*(A()*I());
-       a+= V()*V()*U(0)*(A()*G());
-     a*= kc[1][0]*kc[1][1]*kc[1][2];
-       a+= -QQQ*W()*W()*(C()*I());
-return a;
+    Double_t a = U(0)*U(1)*U(2)*(C()*I()) ;
+        a+= V()*U(2)*U(0)*(C()*G());
+        a+= V()*U(0)*U(1)*(A()*I());
+        a+= V()*V()*U(0)*(A()*G());
+        a*= kc[1][0]*kc[1][1]*kc[1][2];
+        a+= -QQQ*W()*W()*(C()*I());
+
+    return a;
 }
 
 Double_t S8NumericSolver::E(Int_t i,Int_t j) // i=0..1 : sample , j=0..3 : tag
 {
-Double_t e = -1;
-if(j==0)
-  {
-  if(i==0) e = -V(); // first fraction
-  else     e = W();
-  }
-else
-  {
-  if(i==1) e = (U(j-1)+V()*E(0,j))/W();
-  else
+    Double_t e = -1;
+    if(j==0)
     {
-    if(j==1) e = (-K()*N()*Y()+P()*K()*X() - T()*N()*N())/((K()*N()+P()*P())*X() - P()*N()*Y() + N()*N()*Z());
-    else e = (A(j-1)+B(j-1)*E(0,(j%3)+1))/(C(j-1)+D(j-1)*E(0,(j%3)+1)) ;
+        if(i==0)
+            e = -V(); // first fraction
+        else    
+            e = W();
     }
-  }
-return e;
+    else
+    {
+        if(i==1)
+            e = (U(j-1)+V()*E(0,j))/W();
+        else
+        {
+            if(j==1)
+                e = (-K()*N()*Y()+P()*K()*X() - T()*N()*N())/((K()*N()+P()*P())*X() - P()*N()*Y() + N()*N()*Z());
+            else
+                e = (A(j-1)+B(j-1)*E(0,(j%3)+1))/(C(j-1)+D(j-1)*E(0,(j%3)+1)) ;
+        }
+    }
+
+    return e;
 }
 
 
@@ -720,7 +796,7 @@ for(Int_t i=0;i<=fNpt;++i)
     Double_t aa = (f-fold)/(x-xold);
     Double_t bb = f-aa*x;
     res[n] = -bb/aa;
-	// print results
+    // print results
     //std::cout<< "[S8Numeric] n = " << n << " res =" << res[n] << " function f = " << f << std::endl;
     n++;
     }
@@ -731,6 +807,12 @@ for(Int_t i=0;i<=fNpt;++i)
 return n;
 }
 
+TH1 *S8NumericSolver::result(const int &id)
+{
+    if (0 > id ||
+        7 < id)
 
+        return 0;
 
-
+    return _result[id];
+}

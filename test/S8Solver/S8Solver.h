@@ -54,6 +54,8 @@ class S8Solver {
 				fPickSolutionMap[bin] = solution;
 		}
 
+        void setDoBinnedSolution(bool flag) { _doBinnedSolution = flag; }
+
 
         void Verbose(bool option) { fVerbose = option; };
 		void PrintData(TString option="");
@@ -129,6 +131,7 @@ class S8Solver {
 		double fGammaf;
 		bool frebin; int fnbins;
 		bool frecalculateFactors;
+        bool _doBinnedSolution;
 		double fminPtrel;
 		double fMaxPtrel;
 		std::map< TString, double > TotalInput;
@@ -213,6 +216,10 @@ class S8Solver {
 		TGraphErrors *ginput_pmu;
 		TGraphErrors *ginput_ptag;
 		TGraphErrors *ginput_ptagmu; 
+
+        double integrate(TH1 *);
+
+        TH1 *_averageResults[8];
 		
 		ClassDef(S8Solver,1);
 };
