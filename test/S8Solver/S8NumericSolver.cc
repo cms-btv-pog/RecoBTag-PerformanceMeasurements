@@ -96,7 +96,7 @@ void S8NumericSolver::Reset()
     {
         *(_result + i) = new TH1F((string("res") + lexical_cast<string>(i)).c_str(),
                                   (string("Result") + lexical_cast<string>(i)).c_str(),
-                                  1000, 0, 1.);
+                                  2000, 0, 2.);
     }
 
     for(Int_t i = 0 ; i < 8 ; ++i)
@@ -441,7 +441,14 @@ void S8NumericSolver::ComputeErrors()
 void S8NumericSolver::fitErrors()
 {
     for(int i = 0; 8 > i; ++i)
+    {
+        cout << " Fit result: " << i << endl;
         _result[i]->Fit("gaus", "0+");
+        //_result[i]->Print("all");
+        cout << " sigma[" << i << "]: "
+            << _result[i]->GetFunction("gaus")->GetParameter(2) << endl;
+        cout << endl;
+    }
 }
 
 void S8NumericSolver::SetError( Int_t b )

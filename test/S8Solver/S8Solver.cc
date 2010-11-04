@@ -21,6 +21,10 @@ ClassImp(S8Solver)
 using std::cout;
 using std::cerr;
 using std::endl;
+using std::pair;
+using std::setprecision;
+using std::fixed;
+using std::make_pair;
 
 //____________________________________________________________
 S8Solver::S8Solver():
@@ -513,48 +517,61 @@ void S8Solver::GetInput() {
         using std::setw;
         using std::left;
 
-        const double eff_tag_b = integrate(b_halljets_tagged) /
-                                 integrate(halljets_b);
+        const Measurement eff_tag_b = calculateEfficiency(b_halljets_tagged,
+                                                         halljets_b);
 
-        const double eff_tag_cl = integrate(cl_halljets_tagged) /
-                                  integrate(halljets_cl);
+        const Measurement eff_tag_cl = calculateEfficiency(cl_halljets_tagged,
+                                                          halljets_cl);
 
-        const double eff_mu_b = integrate(b_halljets_ptrel) /
-                                integrate(halljets_b);
+        const Measurement eff_mu_b = calculateEfficiency(b_halljets_ptrel,
+                                                        halljets_b);
 
-        const double eff_mu_cl = integrate(cl_halljets_ptrel) /
-                                 integrate(halljets_cl);
+        const Measurement eff_mu_cl = calculateEfficiency(cl_halljets_ptrel,
+                                                         halljets_cl);
 
         cout << " [+] " << setw(15) << left << "eff_tag_b" << eff_tag_b << endl;
         cout << " [+] " << setw(15) << left << "eff_tag_cl" << eff_tag_cl << endl;
         cout << " [+] " << setw(15) << left << "eff_mu_b" << eff_mu_b << endl;
         cout << " [+] " << setw(15) << left << "eff_mu_cl" << eff_mu_cl << endl;
 
-        TotalInput["alpha"] = fAlphaf * integrate(cl_halloppjets_tagged) /
-                              integrate(halloppjets_cl) / eff_tag_cl;
-        cout << " [+] " << setw(15) << left << "alpha" << TotalInput["alpha"] << endl;
-        
-        TotalInput["beta"] = fBetaf * integrate(b_halloppjets_tagged) /
-                             integrate(halloppjets_b) / eff_tag_b;
-        cout << " [+] " << setw(15) << left << "beta" << TotalInput["beta"] << endl;
+        const Measurement alpha = fAlphaf *
+            calculateEfficiency(cl_halloppjets_tagged,
+                                halloppjets_cl) / eff_tag_cl;
 
-        TotalInput["gamma"] = fGammaf * integrate(cl_halloppjets_ptrel) /
-                              integrate(halloppjets_cl) / eff_mu_cl;
-        cout << " [+] " << setw(15) << left << "gamma" << TotalInput["gamma"] << endl;
-        
-        TotalInput["delta"] = fDeltaf * integrate(b_halloppjets_ptrel) /
-                              integrate(halloppjets_b) / eff_mu_b;
-        cout << " [+] " << setw(15) << left << "delta" << TotalInput["delta"] << endl;
+        const Measurement beta = fBetaf *
+            calculateEfficiency(b_halloppjets_tagged,
+                                halloppjets_b) / eff_tag_b;
 
-        TotalInput["kappa_cl"] = fKappaclf * integrate(cl_halljets_ptreltagged) /
-                                 integrate(halljets_cl) /
-                                 eff_mu_cl / eff_tag_cl;
-        cout << " [+] " << setw(15) << left << "kappa_cl" << TotalInput["kappa_cl"] << endl;
+        const Measurement gamma = fGammaf *
+            calculateEfficiency(cl_halloppjets_ptrel,
+                                halloppjets_cl) / eff_mu_cl;
 
-        TotalInput["kappa_b"] = fKappabf * integrate(b_halljets_ptreltagged) /
-                                integrate(halljets_b) /
-                                eff_mu_b / eff_tag_b;
-        cout << " [+] " << setw(15) << left << "kappa_b" << TotalInput["kappa_b"] << endl;
+        const Measurement delta = fDeltaf *
+            calculateEfficiency(b_halloppjets_ptrel,
+                                halloppjets_b) / eff_mu_b;
+
+        const Measurement kappaCL = fKappaclf *
+            calculateEfficiency(cl_halljets_ptreltagged,
+                                halljets_cl) / eff_mu_cl / eff_tag_cl;
+
+        const Measurement kappaB = fKappabf *
+            calculateEfficiency(b_halljets_ptreltagged,
+                                halljets_b) / eff_mu_b / eff_tag_b;
+
+
+        cout << " [+] " << setw(15) << left << "alpha" << alpha << endl;
+        cout << " [+] " << setw(15) << left << "beta" << beta << endl;
+        cout << " [+] " << setw(15) << left << "gamma" << gamma << endl;
+        cout << " [+] " << setw(15) << left << "delta" << delta << endl;
+        cout << " [+] " << setw(15) << left << "kappaCL" << kappaCL << endl;
+        cout << " [+] " << setw(15) << left << "kappaB" << kappaB << endl;
+
+        TotalInput["alpha"] = alpha.first;
+        TotalInput["beta"] = beta.first;
+        TotalInput["gamma"] = gamma.first; 
+        TotalInput["delta"] = delta.first; 
+        TotalInput["kappa_cl"] = kappaCL.first;
+        TotalInput["kappa_b"] = kappaB.first;
     }
 
     //error
@@ -1477,7 +1494,42 @@ void S8Solver::Print(TString extension ) {
 
 }
 
-double S8Solver::integrate(TH1 *hist)
+double integrate(const TH1 *hist)
 {
     return hist->Integral(1, hist->GetNbinsX() + 1);
+}
+
+S8Solver::Measurement S8Solver::calculateEfficiency(const TH1 *numerator,
+                                                    const TH1 *denominator) const
+{
+    const double n1 = integrate(numerator);
+    const double n2 = integrate(denominator);
+    const double eff = n1 / n2;
+
+    return make_pair(eff, eff * (1 - eff) / n2);
+}
+
+S8Solver::Measurement operator *(const double &scaleFactor,
+                                 const S8Solver::Measurement &measurement)
+{
+    return make_pair(scaleFactor * measurement.first,
+                     scaleFactor * scaleFactor * measurement.second);
+}
+
+S8Solver::Measurement operator /(const S8Solver::Measurement &measurement1,
+                                 const S8Solver::Measurement &measurement2)
+{
+    return make_pair(measurement1.first / measurement2.first,
+                     pow(1. / measurement2.first, 2) * measurement1.second +
+                     pow(measurement1.first / pow(measurement2.first, 2), 2) *
+                        measurement2.second);
+}
+
+std::ostream &operator<<(std::ostream &out,
+                         const S8Solver::Measurement &measurement)
+{
+    const double sigma = sqrt(measurement.second);
+
+    return out << setprecision(4) << fixed << measurement.first << " +/- " << sigma
+        << " ("  << 100 * sigma / measurement.first << "%)";
 }

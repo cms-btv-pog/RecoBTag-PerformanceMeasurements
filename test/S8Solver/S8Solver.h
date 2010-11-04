@@ -13,11 +13,16 @@
 
 #include <string>
 #include <map>
+#include <utility>
 
 
-class S8Solver {
-
+class S8Solver
+{
   public:
+        // Central value and variance (binomial)
+        //
+        typedef std::pair<double, double> Measurement;
+
         S8Solver();
 		//S8Solver(std::string name);
 		virtual ~S8Solver(){};
@@ -106,6 +111,8 @@ class S8Solver {
 		void GetInput();
 		
   private:
+        Measurement calculateEfficiency(const TH1 *, const TH1 *) const;
+
         bool fVerbose;
 		TFile *finputFile;
 		TFile *finputCorrFile;
@@ -135,6 +142,7 @@ class S8Solver {
 		double fminPtrel;
 		double fMaxPtrel;
 		std::map< TString, double > TotalInput;
+        std::map< TString, double > TotalInputErr;
 		std::map< int, std::map< TString, double> > BinnedInput;
 		std::map< TString, double > fTotalSolution;
 		std::map< TString, double > fTotalSolutionErr;
@@ -217,12 +225,21 @@ class S8Solver {
 		TGraphErrors *ginput_ptag;
 		TGraphErrors *ginput_ptagmu; 
 
-        double integrate(TH1 *);
-
         TH1 *_averageResults[8];
 		
 		ClassDef(S8Solver,1);
 };
+
+double integrate(const TH1 *);
+
+S8Solver::Measurement operator *(const double &, const S8Solver::Measurement &);
+
+// Measurements are treated independently
+//
+S8Solver::Measurement operator /(const S8Solver::Measurement &,
+                                 const S8Solver::Measurement &);
+
+std::ostream &operator<<(std::ostream &, const S8Solver::Measurement &);
 
 
 #endif
