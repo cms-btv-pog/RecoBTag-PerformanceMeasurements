@@ -4,6 +4,7 @@
 #include "S8NumericSolver.h"
 #include "S8FitSolver.h"
 
+#include "TH1.h"
 #include "TF1.h"
 #include "TAxis.h"
 #include "TGraphErrors.h"
@@ -517,6 +518,21 @@ void S8Solver::GetInput() {
         using std::setw;
         using std::left;
 
+        cout << " [+] " << setw(15) << left << "n b" << integrate(halljets_b) << endl;
+        cout << " [+] " << setw(15) << left << "n cl" << integrate(halljets_cl) << endl;
+        cout << " [+] " << setw(15) << left << "n tag b" << integrate(b_halljets_tagged) << endl;
+        cout << " [+] " << setw(15) << left << "n tag cl" << integrate(cl_halljets_tagged) << endl;
+        cout << " [+] " << setw(15) << left << "n mu b" << integrate(b_halljets_ptrel) << endl;
+        cout << " [+] " << setw(15) << left << "n mu cl" << integrate(cl_halljets_ptrel) << endl;
+        cout << endl;
+        cout << " [+] " << setw(15) << left << "p b" << integrate(halloppjets_b) << endl;
+        cout << " [+] " << setw(15) << left << "p cl" << integrate(halloppjets_cl) << endl;
+        cout << " [+] " << setw(15) << left << "p tag b" << integrate(b_halloppjets_tagged) << endl;
+        cout << " [+] " << setw(15) << left << "p tag cl" << integrate(cl_halloppjets_tagged) << endl;
+        cout << " [+] " << setw(15) << left << "p mu b" << integrate(b_halloppjets_ptrel) << endl;
+        cout << " [+] " << setw(15) << left << "p mu cl" << integrate(cl_halloppjets_ptrel) << endl;
+        cout << endl;
+
         const Measurement eff_tag_b = calculateEfficiency(b_halljets_tagged,
                                                          halljets_b);
 
@@ -533,6 +549,7 @@ void S8Solver::GetInput() {
         cout << " [+] " << setw(15) << left << "eff_tag_cl" << eff_tag_cl << endl;
         cout << " [+] " << setw(15) << left << "eff_mu_b" << eff_mu_b << endl;
         cout << " [+] " << setw(15) << left << "eff_mu_cl" << eff_mu_cl << endl;
+        cout << endl;
 
         const Measurement alpha = fAlphaf *
             calculateEfficiency(cl_halloppjets_tagged,
@@ -1494,19 +1511,29 @@ void S8Solver::Print(TString extension ) {
 
 }
 
-double integrate(const TH1 *hist)
+S8Solver::Measurement integrate(const TH1 *hist)
 {
-    return hist->Integral(1, hist->GetNbinsX() + 1);
+    double error = 0;
+    double integral = 0;// = hist->IntegralAndError(1, hist->GetNbinsX() + 1, error);
+    for(int bin = 1, bins = hist->GetNbinsX() + 1; bins >= bin; ++bin)
+    {
+        integral += hist->GetBinContent(bin);
+        error += pow(hist->GetBinError(bin), 2);
+    }
+
+    return make_pair(integral, error);
 }
 
 S8Solver::Measurement S8Solver::calculateEfficiency(const TH1 *numerator,
                                                     const TH1 *denominator) const
 {
-    const double n1 = integrate(numerator);
-    const double n2 = integrate(denominator);
-    const double eff = n1 / n2;
+    const Measurement n1 = integrate(numerator);
+    const Measurement n2 = integrate(denominator);
+    const double eff = n1.first / n2.first;
+    const double error = ((1 - 2 * eff) * n1.second +
+                            pow(eff, 2) * n2.second) / pow(n2.first, 2);
 
-    return make_pair(eff, eff * (1 - eff) / n2);
+    return make_pair(eff, error);
 }
 
 S8Solver::Measurement operator *(const double &scaleFactor,

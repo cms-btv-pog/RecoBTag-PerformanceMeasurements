@@ -230,7 +230,7 @@ class S8Solver
 		ClassDef(S8Solver,1);
 };
 
-double integrate(const TH1 *);
+S8Solver::Measurement integrate(const TH1 *);
 
 S8Solver::Measurement operator *(const double &, const S8Solver::Measurement &);
 
