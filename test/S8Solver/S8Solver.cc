@@ -28,7 +28,6 @@ using std::setprecision;
 using std::fixed;
 using std::make_pair;
 
-//____________________________________________________________
 S8Solver::S8Solver():
     _doBinnedSolution(true)
 {
@@ -59,17 +58,21 @@ S8Solver::S8Solver():
     for(int i = 0; 8 > i; ++i)
         *(_averageResults + i) = 0;
 }
-//____________________________________________________________
-void S8Solver::Clear() {
 
-    if (fh_alpha) delete fh_alpha; if (fh_beta) delete fh_beta;
-    if (fh_kb) delete fh_kb; if (fh_kcl) delete fh_kcl;
-    if (fh_delta) delete fh_delta; if (fh_gamma) delete fh_gamma;
-    if (feffTag_b) delete feffTag_b; if (feffTag_cl) delete feffTag_cl;
-    if (feffmu_b) delete feffmu_b; if (feffmu_cl) delete feffmu_cl;
-    
+void S8Solver::Clear()
+{
+    if (fh_alpha) delete fh_alpha;
+    if (fh_beta) delete fh_beta;
+    if (fh_kb) delete fh_kb;
+    if (fh_kcl) delete fh_kcl;
+    if (fh_delta) delete fh_delta;
+    if (fh_gamma) delete fh_gamma;
+    if (feffTag_b) delete feffTag_b;
+    if (feffTag_cl) delete feffTag_cl;
+    if (feffmu_b) delete feffmu_b;
+    if (feffmu_cl) delete feffmu_cl;
 }
-//____________________________________________________________
+
 void S8Solver::LoadHistos()
 {
     finputFile->cd();
@@ -469,7 +472,8 @@ void S8Solver::LoadHistos()
 }
 
 
-void S8Solver::GetInput() {
+void S8Solver::GetInput()
+{
 
     this->LoadHistos();
     
@@ -733,15 +737,14 @@ void S8Solver::GetInput() {
     cout << _binnedInput.size() << " binned inputs stored" << endl;
 }
 
-void S8Solver::Solve() {
+void S8Solver::Solve()
+{
 
     this->GetInput();
     
-    if (fmethod=="analytic" || fmethod=="fit" ) {
-
+    if (fmethod=="analytic" || fmethod=="fit" )
+    {
         S8AnalyticSolver sol;
-        
-        // average solution
         
         sol.Solve(TotalInput);
 
@@ -749,7 +752,8 @@ void S8Solver::Solve() {
         fTotalSolutionErr = sol.GetSolutionErr();
 
         // now fit
-        if (fmethod=="fit") {
+        if (fmethod=="fit")
+        {
             S8FitSolver s8fit;
             s8fit.Init(fTotalSolution);
             s8fit.Solve(TotalInput);
@@ -758,7 +762,8 @@ void S8Solver::Solve() {
         }
         
             // binned solution
-            for( std::map<int,std::map<TString,double> >::const_iterator ibin = BinnedInput.begin(); ibin!=BinnedInput.end(); ++ibin) {
+            for( std::map<int,std::map<TString,double> >::const_iterator ibin = BinnedInput.begin(); ibin!=BinnedInput.end(); ++ibin)
+            {
                 sol.Solve(ibin->second);
                 fBinnedSolution[ibin->first] = sol.GetSolution();
                 fBinnedSolutionErr[ibin->first] = sol.GetSolutionErr();
@@ -774,41 +779,33 @@ void S8Solver::Solve() {
             }
         
     }
-    if (fmethod=="numeric") {
 
-        // average solution
-        std::cout<< " Starting to find average solution " << std::endl;
-        Double_t inputs[8];
-        inputs[0] = TotalInput["n"];
-        inputs[1] = TotalInput["nMu"];
-        inputs[2] = TotalInput["nTag"];
-        inputs[3] = TotalInput["p"];
-        inputs[4] = TotalInput["nMuTag"];
-        inputs[5] = TotalInput["pTag"];
-        inputs[6] = TotalInput["pMu"];
-        inputs[7] = TotalInput["pMuTag"];
-
-        cout << "Old Input" << endl;
-        for(int i = 0; 8 > i; ++i)
-            cout << inputs[i] << endl;
+    else if (fmethod=="numeric")
+    {
         cout << endl;
-        
+        cout << "AVERAGE SOLUTION" << endl;
+        cout << endl;
+
+        // Print S8 input
+        //
+        cout << _totalInput << endl;
+
         S8NumericSolver sol("sol");
         sol.setInput(_totalInput);
-
-        cout << "Total Input to S8NumSolver:" << endl
-            << _totalInput << endl;
 
         sol.SetError(2);
         sol.SetNbErrorIteration(1000);
         sol.SetInitialOrder(1, 1);
-        bool converge = true;
         
-        // pick solution manually if requested
-        for (std::map<int, int>::const_iterator ipick = fPickSolutionMap.begin(); ipick!= fPickSolutionMap.end(); ++ipick)
+        // Force solution manually if requested
+        //
+        for(std::map<int,int>::const_iterator ipick = fPickSolutionMap.begin();
+            ipick!= fPickSolutionMap.end();
+            ++ipick)
         {
-            if ( ipick->first == 0 )
-            {
+            if (0 == ipick->first)
+            { 
+                std::cout << "> Force average solution # " << ipick->second << std::endl;
                 sol.SetSolution(ipick->second);
 
                 break;
@@ -817,93 +814,78 @@ void S8Solver::Solve() {
 
         sol.Solve();
 
-        TFile *out = TFile::Open("out_avg.root", "recreate");
-        for (int i = 0; 8 > i; ++i)
+        // Save Results in output file
+        //
         {
-            sol.result(i)->Write();
-            *(_averageResults + i) = (TH1 *) sol.result(i)->Clone();
-        }
-        out->Close();
-
-        if (converge) {
-            fTotalSolution["n_b"]       = sol.GetResultVec(0) * _totalInput[NumericInput::N].first;
-            fTotalSolution["n_cl"]      = sol.GetResultVec(1) * _totalInput[NumericInput::N].first;
-            fTotalSolution["effMu_b"]   = sol.GetResultVec(2);
-            fTotalSolution["effMu_cl"]  = sol.GetResultVec(3);
-            fTotalSolution["effTag_b"]  = sol.GetResultVec(4);
-            fTotalSolution["effTag_cl"] = sol.GetResultVec(5);
-            fTotalSolution["p_b"]       = sol.GetResultVec(6)*fTotalSolution["n_b"];
-            fTotalSolution["p_cl"]      = sol.GetResultVec(7)*fTotalSolution["n_cl"];
-        
-            for(int i = 0; 8 > i; ++i)
+            TFile *out = TFile::Open("out_avg.root", "recreate");
+            for (int i = 0; 8 > i; ++i)
             {
-                if (sol.GetErrorSupVec(i) != sol.GetErrorInfVec(i))
-                    cerr << " [-] Asymmetric errors (" << i << "): +(-) "
-                        << sol.GetErrorSupVec(i)
-                        << '(' << sol.GetErrorInfVec(i) << ')' << endl;
+                sol.result(i)->Write();
+                *(_averageResults + i) = (TH1 *) sol.result(i)->Clone();
             }
-
-            fTotalSolutionErr["n_b"]       = sol.getError(0) * _totalInput[NumericInput::N].first;
-            fTotalSolutionErr["n_cl"]      = sol.getError(1) * _totalInput[NumericInput::N].first;
-            fTotalSolutionErr["effMu_b"]   = sol.getError(2);
-            fTotalSolutionErr["effMu_cl"]  = sol.getError(3);
-            fTotalSolutionErr["effTag_b"]  = sol.getError(4);
-            fTotalSolutionErr["effTag_cl"] = sol.getError(5);
-            fTotalSolutionErr["p_b"]       = sol.getError(6) * fTotalSolution["n_b"];
-            fTotalSolutionErr["p_cl"]      = sol.getError(7) * fTotalSolution["n_cl"];
-        } else {
-            for( std::map<TString,double>::const_iterator ii=fTotalSolution.begin(); ii!=fTotalSolution.end(); ++ii) {
-                fTotalSolution[ii->first] = 0.;
-                fTotalSolutionErr[ii->first] = 0.;
-            }
+            out->Close();
         }
-        std::cout << " Finished with average solution " << std::endl;
-        cout << endl;
+
+        fTotalSolution["n_b"]       = sol.GetResultVec(0) * _totalInput[NumericInput::N].first;
+        fTotalSolution["n_cl"]      = sol.GetResultVec(1) * _totalInput[NumericInput::N].first;
+        fTotalSolution["effMu_b"]   = sol.GetResultVec(2);
+        fTotalSolution["effMu_cl"]  = sol.GetResultVec(3);
+        fTotalSolution["effTag_b"]  = sol.GetResultVec(4);
+        fTotalSolution["effTag_cl"] = sol.GetResultVec(5);
+        fTotalSolution["p_b"]       = sol.GetResultVec(6)*fTotalSolution["n_b"];
+        fTotalSolution["p_cl"]      = sol.GetResultVec(7)*fTotalSolution["n_cl"];
+    
+        for(int i = 0; 8 > i; ++i)
+        {
+            if (sol.GetErrorSupVec(i) != sol.GetErrorInfVec(i))
+                cerr << " [-] Asymmetric errors (" << i << "): +(-) "
+                    << sol.GetErrorSupVec(i)
+                    << '(' << sol.GetErrorInfVec(i) << ')' << endl;
+        }
+
+        fTotalSolutionErr["n_b"]       = sol.getError(0) * _totalInput[NumericInput::N].first;
+        fTotalSolutionErr["n_cl"]      = sol.getError(1) * _totalInput[NumericInput::N].first;
+        fTotalSolutionErr["effMu_b"]   = sol.getError(2);
+        fTotalSolutionErr["effMu_cl"]  = sol.getError(3);
+        fTotalSolutionErr["effTag_b"]  = sol.getError(4);
+        fTotalSolutionErr["effTag_cl"] = sol.getError(5);
+        fTotalSolutionErr["p_b"]       = sol.getError(6) * fTotalSolution["n_b"];
+        fTotalSolutionErr["p_cl"]      = sol.getError(7) * fTotalSolution["n_cl"];
 
         if (!_doBinnedSolution)
             return;
         
         // binned solutions
         //
-        for( std::map<int,std::map<TString,double> >::const_iterator ibin = BinnedInput.begin(); ibin!=BinnedInput.end(); ++ibin) {
-            cout << "BIN " << ibin->first << endl;
+        for(std::map<int,std::map<TString,double> >::const_iterator ibin = BinnedInput.begin();
+            ibin != BinnedInput.end();
+            ++ibin)
+        {
             cout << endl;
-
-            converge = true;
-            std::map<TString,double> tmpinput;
-            tmpinput = ibin->second;
-            
-            inputs[0] = tmpinput["n"];
-            inputs[1] = tmpinput["nMu"];
-            inputs[2] = tmpinput["nTag"];
-            inputs[3] = tmpinput["p"];
-            inputs[4] = tmpinput["nMuTag"];
-            inputs[5] = tmpinput["pTag"];
-            inputs[6] = tmpinput["pMu"];
-            inputs[7] = tmpinput["pMuTag"];
-
-            cout << "Old Input" << endl;
-            for(int i = 0; 8 > i; ++i)
-                cout << inputs[i] << endl;
+            cout << "BINED SOLUTION... BIN " << ibin->first << endl;
             cout << endl;
 
             const NumericInput &input = _binnedInput[ibin->first - 1];
+
+            // Print S8 input
+            //
+            cout << input << endl;
             
             S8NumericSolver solu("solu");
             solu.setInput(input);
-
-            cout << input << endl;
 
             solu.SetError(2);
             solu.SetNbErrorIteration(1000);
             solu.SetInitialOrder(1, 1);
 
             // pick solution manually if requested
-            for (std::map<int, int>::const_iterator ipick = fPickSolutionMap.begin(); ipick!= fPickSolutionMap.end(); ++ipick)
+            for(std::map<int, int>::const_iterator ipick = fPickSolutionMap.begin();
+                ipick != fPickSolutionMap.end();
+                ++ipick)
             {
                 if (ipick->first == ibin->first)
                 {
-                    std::cout << " force solution # " << ipick->second << std::endl;
+                    std::cout << "> Force binned solution # " << ipick->second << std::endl;
                     solu.SetSolution( ipick->second );
 
                     break;
@@ -912,6 +894,8 @@ void S8Solver::Solve() {
             
             solu.Solve();
 
+            // Save Fits
+            //
             {
                 std::ostringstream name;
                 name << "out_bin_" << ibin->first << ".root";
@@ -923,54 +907,44 @@ void S8Solver::Solve() {
                 binout->Close();
             }
 
-
             std::map<TString,double> tmpsolu;
             std::map<TString,double> tmpsoluerr;
                 
-            if (converge) {
-                tmpsolu["n_b"]       = solu.GetResultVec(0) * input[NumericInput::N].first;
-                tmpsolu["n_cl"]      = solu.GetResultVec(1) * input[NumericInput::N].first;
-                tmpsolu["effMu_b"]   = solu.GetResultVec(2);
-                tmpsolu["effMu_cl"]  = solu.GetResultVec(3);
-                tmpsolu["effTag_b"]  = solu.GetResultVec(4);
-                tmpsolu["effTag_cl"] = solu.GetResultVec(5);
-                tmpsolu["p_b"]       = solu.GetResultVec(6)*tmpsolu["n_b"];
-                tmpsolu["p_cl"]      = solu.GetResultVec(7)*tmpsolu["n_cl"];
-                
-                for(int i = 0; 8 > i; ++i)
-                {
-                    if (sol.GetErrorSupVec(i) != sol.GetErrorInfVec(i))
-                        cerr << " [-] Assymmetric errors (" << i << "): +(-) "
-                            << sol.GetErrorSupVec(i)
-                            << '(' << sol.GetErrorInfVec(i) << ')' << endl;
-                }
-
-                // FIX errors
-                tmpsoluerr["n_b"]       = solu.getError(0) * input[NumericInput::N].first;
-                tmpsoluerr["n_cl"]      = solu.getError(1) * input[NumericInput::N].first;
-                tmpsoluerr["effMu_b"]   = solu.getError(2);
-                tmpsoluerr["effMu_cl"]  = solu.getError(3);
-                tmpsoluerr["effTag_b"]  = solu.getError(4);
-                tmpsoluerr["effTag_cl"] = solu.getError(5);
-                tmpsoluerr["p_b"]       = solu.getError(6) * tmpsolu["n_b"];
-                tmpsoluerr["p_cl"]      = solu.getError(7) * tmpsolu["n_cl"];
-            } else {
-                for( std::map<TString,double>::const_iterator ii=fTotalSolution.begin(); ii!=fTotalSolution.end(); ++ii) {
-                    tmpsolu[ii->first] = 0.;
-                    tmpsoluerr[ii->first] = 0.;
-                }
+            tmpsolu["n_b"]       = solu.GetResultVec(0) * input[NumericInput::N].first;
+            tmpsolu["n_cl"]      = solu.GetResultVec(1) * input[NumericInput::N].first;
+            tmpsolu["effMu_b"]   = solu.GetResultVec(2);
+            tmpsolu["effMu_cl"]  = solu.GetResultVec(3);
+            tmpsolu["effTag_b"]  = solu.GetResultVec(4);
+            tmpsolu["effTag_cl"] = solu.GetResultVec(5);
+            tmpsolu["p_b"]       = solu.GetResultVec(6)*tmpsolu["n_b"];
+            tmpsolu["p_cl"]      = solu.GetResultVec(7)*tmpsolu["n_cl"];
+            
+            for(int i = 0; 8 > i; ++i)
+            {
+                if (solu.GetErrorSupVec(i) != solu.GetErrorInfVec(i))
+                    cerr << " [-] Assymmetric errors (" << i << "): +(-) "
+                        << solu.GetErrorSupVec(i)
+                        << '(' << solu.GetErrorInfVec(i) << ')' << endl;
             }
+
+            // FIX errors
+            tmpsoluerr["n_b"]       = solu.getError(0) * input[NumericInput::N].first;
+            tmpsoluerr["n_cl"]      = solu.getError(1) * input[NumericInput::N].first;
+            tmpsoluerr["effMu_b"]   = solu.getError(2);
+            tmpsoluerr["effMu_cl"]  = solu.getError(3);
+            tmpsoluerr["effTag_b"]  = solu.getError(4);
+            tmpsoluerr["effTag_cl"] = solu.getError(5);
+            tmpsoluerr["p_b"]       = solu.getError(6) * tmpsolu["n_b"];
+            tmpsoluerr["p_cl"]      = solu.getError(7) * tmpsolu["n_cl"];
 
             fBinnedSolution[ibin->first] = tmpsolu;
             fBinnedSolutionErr[ibin->first] = tmpsoluerr;
-
-            std::cout << " solver done with bin " << ibin->first << std::endl;
         }
     }
-
 }
 
-void S8Solver::PrintData(TString option) {
+void S8Solver::PrintData(TString option)
+{
 
     std::cout << " Name: " << fthename << std::endl;
     std::cout << " Method: " << fmethod << std::endl;
@@ -1032,7 +1006,8 @@ void S8Solver::PrintData(TString option) {
     
 }
 
-void S8Solver::DumpTable(std::string filename) {
+void S8Solver::DumpTable(std::string filename)
+{
 
     Int_t nxbins = fBinnedSolution.size();
     // separator
@@ -1145,19 +1120,6 @@ void S8Solver::DumpTable(std::string filename) {
 
 void S8Solver::Draw(int maxNbins)
 {
-    /*
-    for(int i = 0; 8 > i; ++i)
-    {
-        if (_averageResults[i])
-        {
-            TCanvas *canvas = new TCanvas();
-            _averageResults[i]->Draw();
-        }
-        else
-            cout << " average results " << i << " are not found" << endl;
-    }
-    */
-
   Int_t nxbins = fBinnedSolution.size();
 
   if (maxNbins != 0 ) nxbins = maxNbins;
@@ -1205,8 +1167,8 @@ void S8Solver::Draw(int maxNbins)
   TArrayD input_ntagmuErr(nxbins);
   TArrayD input_ptagmuErr(nxbins);
   
-    for (int ibin = 1; ibin<= nxbins; ++ibin) {
-
+    for (int ibin = 1; ibin<= nxbins; ++ibin)
+    {
         ptarray[ibin-1] = fnHisto->GetXaxis()->GetBinCenter(ibin);
         ptarrayErr[ibin-1] = 0.5 * fnHisto->GetXaxis()->GetBinWidth(ibin);
         effTag_b[ibin-1] = feffTag_b->GetBinContent(ibin);
@@ -1217,13 +1179,12 @@ void S8Solver::Draw(int maxNbins)
         effTag_clErr[ibin-1] = feffTag_cl->GetBinError(ibin);
         effmu_cl[ibin-1] = feffmu_cl->GetBinContent(ibin);
         effmu_clErr[ibin-1] = feffmu_cl->GetBinError(ibin);
-        
     }
 
     // binned input
     int jjbin= 0;
-    for( std::map<int,std::map<TString,double> >::const_iterator ibin = BinnedInput.begin(); ibin!=BinnedInput.end(); ++ibin) {
-
+    for( std::map<int,std::map<TString,double> >::const_iterator ibin = BinnedInput.begin(); ibin!=BinnedInput.end(); ++ibin)
+    {
         std::map<TString,double> tmpinput;
         tmpinput = ibin->second;
             
@@ -1248,12 +1209,13 @@ void S8Solver::Draw(int maxNbins)
         jjbin++;
     }
     
-    for( std::map<int,std::map<TString,double> >::const_iterator ibin = fBinnedSolution.begin(); ibin!=fBinnedSolution.end(); ++ibin) {
-            
+    for( std::map<int,std::map<TString,double> >::const_iterator ibin = fBinnedSolution.begin(); ibin!=fBinnedSolution.end(); ++ibin)
+    {
         std::map<TString, double> tmpmaps8 = ibin->second;
         std::map<TString, double> tmpmaps8err = fBinnedSolutionErr[ibin->first];
 
-        if (ibin->first <= nxbins) {
+        if (ibin->first <= nxbins)
+        {
             s8effTag_b[ibin->first -1] = tmpmaps8["effTag_b"];
             s8effTag_bErr[ibin->first -1] = tmpmaps8err["effTag_b"];
             s8effmu_b[ibin->first -1] = tmpmaps8["effMu_b"];
@@ -1578,14 +1540,14 @@ void S8Solver::calculateCorrCoefficients(NumericInput &numericInput)
     numericInput[NumericInput::KAPPA_B] = kappaB;
 }
 
-void S8Solver::Print(TString extension ) {
-    for(std::map<TString,TCanvas*>::const_iterator icv=cv_map.begin(); icv!=cv_map.end(); ++icv){
-
+void S8Solver::Print(TString extension )
+{
+    for(std::map<TString,TCanvas*>::const_iterator icv=cv_map.begin(); icv!=cv_map.end(); ++icv)
+    {
         TString tmpname = icv->first;
         TCanvas *acv = icv->second;
         acv->Print(TString(tmpname+"."+extension));
     }
-
 }
 
 Measurement integrate(const TH1 *hist)
