@@ -18,23 +18,30 @@ process.MessageLogger.cerr = cms.untracked.PSet(
 
 
 #-- Input Source --------------------------------------------------------------
+process.source = cms.Source(
+    "PoolSource",
+    fileNames = cms.untracked.vstring()
+)
 
-#process.load("RecoBTag.PerformanceMeasurements.mcFiles_cff")
+for file in open("input.txt").readlines():
+    process.source.fileNames.append(file.strip())
 
-process.source.fileNames = [
-'/store/mc/Spring10/MinBias/GEN-SIM-RECO/START3X_V26A_356ReReco-v1/0009/FEFC70B6-F53D-DF11-B57E-003048679150.root',
-'/store/mc/Spring10/MinBias/GEN-SIM-RECO/START3X_V26A_356ReReco-v1/0009/FED8673E-F53D-DF11-9E58-0026189437EB.root',
-'/store/mc/Spring10/MinBias/GEN-SIM-RECO/START3X_V26A_356ReReco-v1/0009/FEBF7874-EF3D-DF11-910D-002354EF3BDF.root',
-'/store/mc/Spring10/MinBias/GEN-SIM-RECO/START3X_V26A_356ReReco-v1/0009/FEA8ECD8-F13D-DF11-8EBD-00304867BFAE.root'
-    ]
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10))
+process.options = cms.untracked.PSet(
+    wantSummary = cms.untracked.bool(True)
+)
 
-process.maxEvents.input = 10000
+process.TFileService = cms.Service(
+    "TFileService",
+
+    fileName = cms.string("s8_tree.root")
+)
 
 #-- Select good events -----------------------------------------------------------
 process.load("RecoBTag.PerformanceMeasurements.getEvent_cff")
 
 #-- Calibration tag -----------------------------------------------------------
-process.GlobalTag.globaltag = cms.string('START36_V4::All')
+process.GlobalTag.globaltag = cms.string('GR_R_38X_V13::All')
 
 #-------------------- TO RUN DATA -----------------
 
@@ -63,7 +70,7 @@ switchJECSet( process, "Spring10")
 #----------- load pat sequence -------------------------------------
 # load as last so every setting will be applyed to all jets collection added
 
-from RecoBTag.PerformanceMeasurements.PM_pat_Layer1_cfg import * 
+from RecoBTag.PerformanceMeasurements.PM_pat_Layer1_cfg import *
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
 
@@ -74,8 +81,10 @@ process.load('RecoJets.Configuration.RecoGenJets_cff')
 #-------------------- PATH TO RUN  -----------------
 
 process.p = cms.Path( process.getEventMC*
-                      process.genParticlesForJets*process.ak5GenJets*
-                      process.PM_tuple)
+    process.genParticlesForJets *
+    process.ak5GenJets*
+    process.PM_tuple
+)
 
 #-------- OUTPUT MODULE configuration -----------------------------------------------
 
@@ -122,4 +131,8 @@ process.out.outputCommands.extend( [ # PAT Objects
                                      'keep HcalNoiseSummary_*_*_*'
                                      ] )
 
+# No output
+del(process.outpath)
 
+import FWCore.ParameterSet.printPaths as pp      
+pp.printPaths(process)

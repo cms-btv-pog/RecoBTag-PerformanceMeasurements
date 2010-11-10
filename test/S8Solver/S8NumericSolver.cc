@@ -36,6 +36,8 @@
 #include "TF1.h"
 #include "TH1F.h"
 
+#include "S8NumericInput.h"
+
 #include "S8NumericSolver.h"
 
 using std::cout;
@@ -156,6 +158,32 @@ void S8NumericSolver::SetInput(Double_t n, Double_t n1, Double_t n2 , Double_t n
   fIndep[5] = sqrt(n2 - n12 - fIndep[1])  ;
   fIndep[6] = sqrt(n1 - n12 - fIndep[2])  ;
   fIndep[7] = sqrt(n - fIndep[6] - fIndep[5] - fIndep[4] - n3) ;
+}
+
+void S8NumericSolver::setInput(const NumericInput &input)
+{
+    SetInput(input[NumericInput::N].first,
+             input[NumericInput::N_MU].first,
+             input[NumericInput::N_TAG].first,
+             input[NumericInput::P].first,
+             input[NumericInput::N_MU_TAG].first,
+             input[NumericInput::P_TAG].first,
+             input[NumericInput::P_MU].first,
+             input[NumericInput::P_MU_TAG].first);
+
+    SetCorr(input[NumericInput::KAPPA_B].first,
+            input[NumericInput::BETA].first,
+            input[NumericInput::DELTA].first,
+            input[NumericInput::KAPPA_CL].first,
+            input[NumericInput::ALPHA].first,
+            input[NumericInput::GAMMA].first);
+
+    SetCorrError(sqrt(input[NumericInput::KAPPA_B].second),
+                 sqrt(input[NumericInput::BETA].second),
+                 sqrt(input[NumericInput::DELTA].second),
+                 sqrt(input[NumericInput::KAPPA_CL].second),
+                 sqrt(input[NumericInput::ALPHA].second),
+                 sqrt(input[NumericInput::GAMMA].second));
 }
 
 void S8NumericSolver::SetCorr(Double_t c12a, Double_t c23a, Double_t c31a,
