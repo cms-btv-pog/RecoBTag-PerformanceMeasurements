@@ -123,9 +123,10 @@ class S8NumericSolver : public TNamed
         void SetPrecision( Int_t pr ) {fNpt = pr ;}
         void SetNbErrorIteration( Int_t pr ) {fIter = pr ;}
 
-        void SetSolution( Int_t asol) {
-        fForceSol = true;
-        fpickSol = asol;
+        void SetSolution( Int_t asol)
+        {
+            fForceSol = true;
+            fpickSol = asol;
         }
 
         void SetInitialOrder(Int_t n, Int_t a = 1);

@@ -44,7 +44,7 @@ using std::cout;
 using std::endl;
 using boost::lexical_cast;
 
-S8NumericSolver::S8NumericSolver() : TNamed()
+S8NumericSolver::S8NumericSolver()
 {
     // Generic constructor
     //
@@ -215,31 +215,37 @@ void S8NumericSolver::SetCorrError(Double_t c12a, Double_t c23a, Double_t c31a,
 }
 
 
+// Shift all System8 inputs and correlation coefficients
+//
 void S8NumericSolver::MakeSystem(Double_t *shift)
 {
-Double_t N = fInput[0]+shift[0];
-for(Int_t i=0;i<3;++i)
-  {
-  q[i] = (fInput[i+1]+shift[i+1])/N ;
-  Q[i] = (fInput[i+4]+shift[i+4])/N ;
-  }
-QQQ = fInput[7]/N;
-for(Int_t i=0;i<6;++i)
-  {
-  kc[i/3][i%3] = fCorr[i/3][i%3] + shift[i+8];
-  }
+    Double_t N = fInput[0]+shift[0];
+    for(Int_t i=0;i<3;++i)
+    {
+        q[i] = (fInput[i+1]+shift[i+1])/N ;
+        Q[i] = (fInput[i+4]+shift[i+4])/N ;
+    }
+
+    QQQ = fInput[7]/N;
+
+    for(Int_t i=0;i<6;++i)
+    {
+        kc[i/3][i%3] = fCorr[i/3][i%3] + shift[i+8];
+    }
 }
 
 Int_t S8NumericSolver::Solve()
 {
     Double_t shift[14]={0};
     Double_t res[5]={0};
+
     MakeSystem(shift);
 
     fverbose = true; 
     if(!FindSolution(res,SolveSystem(res)))
     {
         std::cout << "[S8Numeric] SOLUTION NOT FOUND, leaving ...." << std::endl;
+
         return 0;
     }
 
@@ -252,8 +258,12 @@ Int_t S8NumericSolver::Solve()
     return 1;
 }
 
+// n is the number of found solutions
+//
 Int_t S8NumericSolver::FindSolution(Double_t* res, int n)
 {
+    using std::cout;
+    using std::endl;
 
     int npositiveSols = 0;
     int nphysicalSols = 0;
@@ -261,61 +271,128 @@ Int_t S8NumericSolver::FindSolution(Double_t* res, int n)
     int thesols2 = -1;
     double deltares = 9999999;
 
-    if (fForceSol) {
-      if (fverbose) std::cout << "[S8Numeric] Solution chosen manually, Force to be solution # " << fpickSol<< std::endl;
-      fNb = res[fpickSol -1 ];
-      for(int i=0; i<8;++i) fMapResult[i] =  fResult[i] = E(i%2,i/2);
-      return 1;
+    if (fForceSol)
+    {
+        if (fverbose)
+            cout << "[S8Numeric] Solution chosen manually, Force to be solution # "
+                << fpickSol << endl;
+
+        fNb = res[fpickSol - 1];
+        for(int i=0; i<8; ++i)
+            fMapResult[i] =  fResult[i] = E(i%2,i/2);
+
+        return 1;
     }
 
-    if (fverbose) std::cout << "[S8Numeric] now print all solutions:"<< std::endl;
-    for(int j=1; j<= n; ++j) {
+    if (fverbose)
+        cout << "[S8Numeric] now print all solutions:"<< endl;
+
+    // Print all found solutions
+    //
+    for(int j = 1; j <= n; ++j)
+    {
         fNb = res[j-1];
-        if (fverbose) std::cout << " solution # " << j << std::endl;
+        if (fverbose)
+            std::cout << " solution # " << j << std::endl;
+
         double tmpsol[8];
         double totprod=1;
-        for(int i=0; i<8;++i) {
+        bool didNotFindNegativeValue = true;
+        for(int i=0; i<8;++i)
+        {
+            // E(...) will use other methods including W() and V(). Those
+            // depend on the fNb. Threfore fNb defines solution
+            //
             tmpsol[i] = E(i%2,i/2);
-            if (fverbose) std::cout << " result i = " << i << " " <<  tmpsol[i] << std::endl;
-            totprod=totprod*tmpsol[i];
+            if (fverbose)
+                cout << " result i = " << i << " " <<  tmpsol[i] << endl;
+
+            totprod *= tmpsol[i];
+
+            if (0 > *(tmpsol + i))
+                didNotFindNegativeValue = false;
         }
-        if (totprod>=0) {
-            npositiveSols++;
+
+        // Product of all Efficiencies should be greater than 1
+        // (bug) Consider solution with two negative solutions
+        //
+        if (didNotFindNegativeValue &&
+            totprod >= 0)
+        {
+            ++npositiveSols;
+
             int tmpcounter = 0;
-            for(int ii=2; ii<=5;++ii) {
-                
-                if (tmpsol[ii]>=0 && tmpsol[ii]<=1.) tmpcounter++;
+            // Check that efficiencies: 2, 3, 4, 5 are in range
+            //     [0..1]
+            //
+            for(int ii=2; ii<=5;++ii)
+            {
+                if (tmpsol[ii]>=0 && tmpsol[ii]<=1.)
+                    ++tmpcounter;
             }
-            if (tmpcounter==4) nphysicalSols++;
+
+            if (tmpcounter==4)
+                ++nphysicalSols;
+
             double tmpdeltares = fabs(fAveRes - res[j-1]);
-            if ( nphysicalSols>0 ) {
-                if (fAveResSetup && (deltares>tmpdeltares) ) {thesols = j-1; deltares = tmpdeltares;}
-                else if (!fAveResSetup && tmpcounter==4 ) { 
-                thesols = j-1;}
-                else if (!fAveResSetup && nphysicalSols>1 && tmpcounter==4 ) {
-                    if ( tmpsol[4]>0 && tmpsol[4]>tmpsol[5] && tmpsol[2]>tmpsol[3] )                thesols = j-1;
+
+            if (nphysicalSols > 0)
+            {
+                if (fAveResSetup &&
+                    deltares > tmpdeltares)
+                {
+                    thesols = j - 1;
+                    deltares = tmpdeltares;
+                }
+                else if (!fAveResSetup &&
+                         tmpcounter == 4 )
+                { 
+                    thesols = j-1;
+                }
+                else if (!fAveResSetup &&
+                         nphysicalSols > 1 &&
+                         tmpcounter == 4 )
+                {
+                    if (tmpsol[4]>0 &&
+                        tmpsol[4]>tmpsol[5] &&
+                        tmpsol[2]>tmpsol[3] )
+
+                        thesols = j-1;
                 }
             }
         }
-        if ( tmpsol[4]>0 && tmpsol[4]>tmpsol[5] && tmpsol[2]>tmpsol[3] ) thesols2= j-1;
+
+        if (tmpsol[4]>0 &&
+            tmpsol[4]>tmpsol[5] &&
+            tmpsol[2]>tmpsol[3])
+
+            thesols2= j-1;
         
-        if (fverbose) {
+        if (fverbose)
+        {
             std::cout << "\n";
-            std::cout << "  number of physical solutions = " << nphysicalSols << std::endl;
+            std::cout << "  number of physical solutions = "
+                << nphysicalSols << std::endl;
         }
     }
         
-    if (nphysicalSols==0) {
-        if ( thesols2 != -1 ) {
+    if (nphysicalSols==0)
+    {
+        if ( thesols2 != -1 )
+        {
             fNb = res[thesols2];
-            for(int i=0; i<8;++i) fMapResult[i] =  fResult[i] = E(i%2,i/2);
+            for(int i=0; i<8;++i)
+                fMapResult[i] =  fResult[i] = E(i%2,i/2);
         }
-        else return 0;
+        else
+            return 0;
     }
-    else {
-        //std::cout << "the sols = " << thesols << std::endl;
+    else
+    {
         fNb = res[thesols];
-        for(int i=0; i<8;++i) fMapResult[i] =  fResult[i] = E(i%2,i/2);
+        for(int i=0; i<8;++i)
+            fMapResult[i] =  fResult[i] = E(i%2,i/2);
+
         return 1;
     }
 
@@ -331,9 +408,13 @@ void S8NumericSolver::ComputeErrors()
 
     Double_t central[8]={0};
     Double_t res[5];
+
+    // Cache central solution
+    //
     for(int i=0;i<8;++i)
     {
         central[i] = fMapResult[i];//fResult[i];
+
         fErrorsup_Stat[i] = 0.;
         fErrorinf_Stat[i] = 0.;
         fErrorsup_Syst[i] = 0.;
@@ -354,14 +435,17 @@ void S8NumericSolver::ComputeErrors()
           *(Ninf + i) = 0;
         }
 
-        for(int i=8;i<14;++i)
-          shift[i] = 0.;
-
+        // Run N (fIter) Pseudo-Experiments
+        //
         for(int i = 0; i < fIter; ++i)
         {
             Double_t w[8] = {0};
 
-            for(int j=0;j<8;++j) w[j] = fRndm->Gaus(0.,1.)*fIndep[j];
+            // fIndep is the error on each input value
+            //
+            for(int j=0;j<8;++j)
+                w[j] = fRndm->Gaus(0.,1.) * fIndep[j];
+
             shift[0] = w[0]+w[1]+w[2]+w[3]+w[4]+w[5]+w[6]+w[7];
             shift[1] = w[0] + w[2] + w[4] + w[6];
             shift[2] = w[0] + w[1] + w[4] + w[5];
@@ -370,13 +454,37 @@ void S8NumericSolver::ComputeErrors()
             shift[5] = w[0] + w[1];
             shift[6] = w[0] + w[2];
             shift[7] = w[0] ;
+
+            // Note: coefficients are not shifted (!)
+            //
             MakeSystem(shift);
 
-            if(!FindSolution(res,SolveSystem(res)))
+            // Solve system: all variables in the class will be screwed
+            // up. Class does not care about this, b/c it assumes the
+            // central value was already saved
+            //
+            if (!FindSolution(res, SolveSystem(res)))
                 continue;
 
+            // Several solutions were found (or, at least one).
+            // (bug) For each solution we'd have set of 8 outputs.
+            //       the code below uses only the last found instead
+            //       of looking into each solution
+            //
+            // Note: fNb references the found solution. It is set by the
+            //       FindSolution method
+            //
             for(int j = 0; j < 8; ++j)
             {
+                // Test if value is within X% from the central value
+                //
+                if (fabs(fMapResult[j] - central[j]) >= .2 * central[j])
+                    continue;
+
+                // Idea: only values from the Central solution should be
+                //       kept. Therefore add something like test if new
+                //       value is within, say 10% from the central value.
+                //
                 _result[j]->Fill(fMapResult[j]);
 
                 //if(fResult[j]<central[j] && fResult[j]>0) {fErrorinf_Stat[j]+= pow(fResult[j]-central[j],2); Ninf++;}
@@ -399,8 +507,6 @@ void S8NumericSolver::ComputeErrors()
 
         for(int i = 0; i < 8; ++i)
         {
-            //fErrorinf_Stat[i]/=Ninf;
-            //fErrorsup_Stat[i]/=Nsup;
             if (0 < *(Ninf + i))
                 fMapErrorInf_Stat[i] /= *(Ninf + i);
 
@@ -462,6 +568,8 @@ void S8NumericSolver::ComputeErrors()
         }
     }
 
+    // Restore cenral solution
+    //
     for(int i = 0; i < 8; ++i)
         fMapResult[i] = fResult[i] = central[i];
 }
@@ -479,31 +587,30 @@ void S8NumericSolver::fitErrors()
     }
 }
 
-void S8NumericSolver::SetError( Int_t b )
-{
 // Error computing mode
 // 0 : no errors
 // 1 : Stat + Syst
 // 2 : Stat only
 // 3 : Syst only
-
-kError = b ;
+void S8NumericSolver::SetError( Int_t b )
+{
+    kError = b ;
 }
+
 Double_t S8NumericSolver::GetValue(Double_t* tab, std::string label)
 {
-if(label == "na")  return tab[0];
-if(label == "nb")  return tab[1];
-if(label == "ea1") return tab[2];
-if(label == "eb1") return tab[3];
-if(label == "ea2") return tab[4];
-if(label == "eb2") return tab[5];
-if(label == "ea3") return tab[6];
-if(label == "eb3") return tab[7];
-return 0;
+    if(label == "na")  return tab[0];
+    if(label == "nb")  return tab[1];
+    if(label == "ea1") return tab[2];
+    if(label == "eb1") return tab[3];
+    if(label == "ea2") return tab[4];
+    if(label == "eb2") return tab[5];
+    if(label == "ea3") return tab[6];
+    if(label == "eb3") return tab[7];
+
+    return 0;
 }
 
-Double_t S8NumericSolver::GetResult(Int_t n)
-{
 // return the system 8 results :
 // n = 0 -> na
 // n = 1 -> nb
@@ -513,31 +620,41 @@ Double_t S8NumericSolver::GetResult(Int_t n)
 // n = 5 -> eb2
 // n = 6 -> ea3
 // n = 7 -> eb3
+Double_t S8NumericSolver::GetResult(Int_t n)
+{
+    if(n>=0 && n<8)
+        return fResult[n];
 
-if(n>=0 && n<8) return fResult[n];
-return 0;
+    return 0;
 }
 
-Double_t S8NumericSolver::GetErrorSup(Int_t n ,std::string opt)
+Double_t S8NumericSolver::GetErrorSup(Int_t n,std::string opt)
 {
-Double_t err = 0.;
-if(n>=0 && n<8 && kError>0)
-  {
-  if(opt=="All" || opt=="" || opt == "Stat") err += fErrorsup_Stat[n];
-  if(opt=="All" || opt=="" || opt == "Syst") err += fErrorsup_Syst[n];
-  }
-return sqrt(err);
+    Double_t err = 0.;
+    if (n >= 0 && n < 8 && kError > 0)
+    {
+        if(opt=="All" || opt=="" || opt == "Stat")
+            err += fErrorsup_Stat[n];
+
+        if(opt=="All" || opt=="" || opt == "Syst")
+            err += fErrorsup_Syst[n];
+    }
+
+    return sqrt(err);
 }
 
 Double_t S8NumericSolver::GetErrorInf(Int_t n ,std::string opt)
 {
-Double_t err = 0.;
-if(n>=0 && n<8 && kError>0)
-  {
-  if(opt=="All" || opt=="" || opt == "Stat") err += fErrorinf_Stat[n];
-  if(opt=="All" || opt=="" || opt == "Syst") err += fErrorinf_Syst[n];
-  }
-return sqrt(err);
+    Double_t err = 0.;
+    if(n>=0 && n<8 && kError>0)
+    {
+        if(opt=="All" || opt=="" || opt == "Stat")
+            err += fErrorinf_Stat[n];
+
+        if(opt=="All" || opt=="" || opt == "Syst")
+            err += fErrorinf_Syst[n];
+    }
+    return sqrt(err);
 }
 
 double S8NumericSolver::getError(const int &id)
@@ -550,32 +667,55 @@ double S8NumericSolver::getError(const int &id)
     return _result[id]->GetFunction("gaus")->GetParameter(2);
 }
 
-Double_t S8NumericSolver::GetResult(std::string label)
-{
 // return the system 8 results :
 // label must be one of those
 // "na", "nb", "ea1", "eb1", "ea2", "eb2", "ea3", "eb3"
-return this->GetValue(fResult, label);
+Double_t S8NumericSolver::GetResult(std::string label)
+{
+    return this->GetValue(fResult, label);
 }
 
 Double_t S8NumericSolver::GetErrorSup(std::string label,std::string opt)
 {
-Double_t err = 0.;
-if(opt=="All" || opt=="" || opt == "Stat") err+= this->GetValue(fErrorsup_Stat, label);
-if(opt=="All" || opt=="" || opt == "Syst") err+= this->GetValue(fErrorsup_Stat, label);
-return sqrt(err);
+    Double_t err = 0.;
+    if (opt=="All" || opt=="" || opt == "Stat")
+        err+= this->GetValue(fErrorsup_Stat, label);
+
+    if (opt=="All" || opt=="" || opt == "Syst")
+        err+= this->GetValue(fErrorsup_Stat, label);
+
+    return sqrt(err);
 }
 
 Double_t S8NumericSolver::GetErrorInf(std::string label,std::string opt)
 {
-Double_t err = 0.;
-if(opt=="All" || opt=="" || opt == "Stat") err+= this->GetValue(fErrorinf_Stat, label);
-if(opt=="All" || opt=="" || opt == "Syst") err+= this->GetValue(fErrorinf_Stat, label);
-return sqrt(err);
+    Double_t err = 0.;
+    if (opt=="All" || opt=="" || opt == "Stat")
+        err+= this->GetValue(fErrorinf_Stat, label);
+
+    if (opt=="All" || opt=="" || opt == "Syst")
+        err+= this->GetValue(fErrorinf_Stat, label);
+
+    return sqrt(err);
 }
 
+// return the system 8 results :
+// n = 0 -> na
+// n = 1 -> nb
+// n = 2 -> ea1
+// n = 3 -> eb1
+// n = 4 -> ea2
+// n = 5 -> eb2
+// n = 6 -> ea3
+// n = 7 -> eb3
 Double_t S8NumericSolver::GetResultVec(Int_t n)
 {
+    if(n>=0 && n<8)
+        return fMapResult[n];
+
+    return 0;
+}
+
 // return the system 8 results :
 // n = 0 -> na
 // n = 1 -> nb
@@ -585,14 +725,14 @@ Double_t S8NumericSolver::GetResultVec(Int_t n)
 // n = 5 -> eb2
 // n = 6 -> ea3
 // n = 7 -> eb3
-
-  //std::cout << "[S8NumericSolver] GetResultVec " << n << " " << fMapResult[n] << std::endl; 
-if(n>=0 && n<8) return fMapResult[n];
-return 0;
-}
-
 Double_t S8NumericSolver::GetErrorSupVec(Int_t n)
 {
+    if(n>=0 && n<8)
+        return sqrt(fMapErrorSup_Stat[n]);
+
+    return 0;
+}
+
 // return the system 8 results :
 // n = 0 -> na
 // n = 1 -> nb
@@ -602,32 +742,16 @@ Double_t S8NumericSolver::GetErrorSupVec(Int_t n)
 // n = 5 -> eb2
 // n = 6 -> ea3
 // n = 7 -> eb3
-
-  //std::cout << "[S8NumericSolver] GetErrorSupVec " << n << " " << fMapErrorSup_Stat[n] << std::endl; 
-if(n>=0 && n<8) return sqrt(fMapErrorSup_Stat[n]);
-return 0;
-}
 Double_t S8NumericSolver::GetErrorInfVec(Int_t n)
 {
-// return the system 8 results :
-// n = 0 -> na
-// n = 1 -> nb
-// n = 2 -> ea1
-// n = 3 -> eb1
-// n = 4 -> ea2
-// n = 5 -> eb2
-// n = 6 -> ea3
-// n = 7 -> eb3
+    if(n>=0 && n<8)
+        return sqrt(fMapErrorInf_Stat[n]);
 
-  // std::cout << "[S8NumericSolver] GetErrorInfVec " << n << " " << fMapErrorInf_Stat[n] << std::endl; 
-if(n>=0 && n<8) return sqrt(fMapErrorInf_Stat[n]);
-return 0;
+    return 0;
 }
 
 
 
-void S8NumericSolver::SetInitialOrder(Int_t n,Int_t a)
-{
 // Define criteria used to resolve ambiguity in system solution.
 // Force a parameter to be larger (a=1) or smaller (a=-1) to its
 // symmetric.
@@ -636,14 +760,16 @@ void S8NumericSolver::SetInitialOrder(Int_t n,Int_t a)
 // n=2 -> ea2, eb2
 // n=3 -> ea3, eb3
 // If not called, default is na > nb.
-Int_t b = 1;
-if(a) b=a/fabs(a);
-fAsym[0] = n;
-fAsym[1] = b;
+void S8NumericSolver::SetInitialOrder(Int_t n,Int_t a)
+{
+    Int_t b = 1;
+    if(a)
+        b=a/fabs(a);
+
+    fAsym[0] = n;
+    fAsym[1] = b;
 }
 
-void S8NumericSolver::SetInitialOrder(std::string s1, std::string s2, std::string s3)
-{
 // Define criteria used to resolve ambiguity in system solution.
 // Force a parameter to be larger to its
 // symmetric.
@@ -651,77 +777,88 @@ void S8NumericSolver::SetInitialOrder(std::string s1, std::string s2, std::strin
 // n=1 -> ea1, eb1
 // n=2 -> ea2, eb2
 // n=3 -> ea3, eb3
-// If not called, default is na > nb.
-char s = s1[1];
-char t = s3[1];
-char u = s1[0];
-char v = s3[0];
-Int_t n=-1 , a=0;
-if(u=='n' && v=='n') n = 0;
-if(u=='e' && v=='e')
-  {
-  if(s1[2]==s3[2]) n = ((Int_t) s1[2]) - 48;
-  else
+void S8NumericSolver::SetInitialOrder(std::string s1, std::string s2, std::string s3)
+{
+    // If not called, default is na > nb.
+    char s = s1[1];
+    char t = s3[1];
+    char u = s1[0];
+    char v = s3[0];
+    Int_t n=-1 , a=0;
+    if(u=='n' && v=='n')
+        n = 0;
+
+    if(u=='e' && v=='e')
     {
-    printf("\nIgnore SetInitialOrder(\"%s\", \"%s\", \"%s\") : Wrong parameters.\n",s1.c_str(),s2.c_str(),s3.c_str());
-    return;
+        if(s1[2]==s3[2])
+            n = ((Int_t) s1[2]) - 48;
+        else
+        {
+            printf("\nIgnore SetInitialOrder(\"%s\", \"%s\", \"%s\") : Wrong parameters.\n",s1.c_str(),s2.c_str(),s3.c_str());
+
+            return;
+        }
     }
-  }
-if     (s=='a' && t=='b' && s2=="<") a = -1;
-else if(s=='a' && t=='b' && s2==">") a = 1;
-else if(s=='b' && t=='a' && s2=="<") a = 1;
-else if(s=='b' && t=='a' && s2==">") a = -1;
-if(a==0 || n==-1)
-  {
-  printf("\nIgnore SetInitialOrder(\"%s\", \"%s\", \"%s\") : Wrong parameters.\n",s1.c_str(),s2.c_str(),s3.c_str());
-  return;
-  }
-SetInitialOrder(n,a);
+
+    if     (s=='a' && t=='b' && s2=="<") a = -1;
+    else if(s=='a' && t=='b' && s2==">") a = 1;
+    else if(s=='b' && t=='a' && s2=="<") a = 1;
+    else if(s=='b' && t=='a' && s2==">") a = -1;
+
+    if(a==0 || n==-1)
+    {
+        printf("\nIgnore SetInitialOrder(\"%s\", \"%s\", \"%s\") : Wrong parameters.\n",s1.c_str(),s2.c_str(),s3.c_str());
+
+        return;
+    }
+
+    SetInitialOrder(n,a);
 }
 
 /********************************************************************/
 
 Double_t S8NumericSolver::X()
 {
-Double_t a = V()*V()*B()*J()*U(1);
-       a+= V()*V()*D()*H()*U(2);
-       a+= V()*D()*J()*U(1)*U(2);
-       a+= V()*V()*V()*B()*H();
-     a*= kc[1][0]*kc[1][1]*kc[1][2];
-       a+= kc[0][0]*kc[0][1]*kc[0][2]*(B()*H()*V()*W()*W()*-1.);
-return a;
+    Double_t a = V()*V()*B()*J()*U(1);
+           a+= V()*V()*D()*H()*U(2);
+           a+= V()*D()*J()*U(1)*U(2);
+           a+= V()*V()*V()*B()*H();
+         a*= kc[1][0]*kc[1][1]*kc[1][2];
+           a+= kc[0][0]*kc[0][1]*kc[0][2]*(B()*H()*V()*W()*W()*-1.);
+
+    return a;
 }
 
 Double_t S8NumericSolver::Y()
 {
-Double_t a = U(0)*U(1)*U(2)*D()*J() ;
-       a+= V()*U(1)*U(2)*(D()*I()+C()*J());
-       a+= V()*U(2)*U(0)*(D()*H());
-       a+= V()*U(0)*U(1)*(B()*J());
-       a+= V()*V()*U(1)*(B()*I()+A()*J());
-       a+= V()*V()*U(2)*(C()*H()+D()*G());
-       a+= V()*V()*U(0)*(B()*H());
-       a+= V()*V()*V()*(A()*H()+B()*G());
-     a*= kc[1][0]*kc[1][1]*kc[1][2];
-       a+= kc[0][0]*kc[0][1]*kc[0][2]*((A()*H()+B()*G())*V()*W()*W()*-1.);
-       a+= -QQQ*W()*W()*D()*J();
-return a;
+    Double_t a = U(0)*U(1)*U(2)*D()*J() ;
+           a+= V()*U(1)*U(2)*(D()*I()+C()*J());
+           a+= V()*U(2)*U(0)*(D()*H());
+           a+= V()*U(0)*U(1)*(B()*J());
+           a+= V()*V()*U(1)*(B()*I()+A()*J());
+           a+= V()*V()*U(2)*(C()*H()+D()*G());
+           a+= V()*V()*U(0)*(B()*H());
+           a+= V()*V()*V()*(A()*H()+B()*G());
+         a*= kc[1][0]*kc[1][1]*kc[1][2];
+           a+= kc[0][0]*kc[0][1]*kc[0][2]*((A()*H()+B()*G())*V()*W()*W()*-1.);
+           a+= -QQQ*W()*W()*D()*J();
+    return a;
 }
 
 Double_t S8NumericSolver::Z()
 {
-Double_t a = U(0)*U(1)*U(2)*(D()*I()+C()*J()) ;
-       a+= V()*U(1)*U(2)*(C()*I());
-       a+= V()*U(2)*U(0)*(C()*H()+D()*G());
-       a+= V()*U(0)*U(1)*(B()*I()+A()*J());
-       a+= V()*V()*U(1)*(A()*I());
-       a+= V()*V()*U(2)*(C()*G());
-       a+= V()*V()*U(0)*(A()*H()+B()*G());
-       a+= V()*V()*V()*(A()*G());
-     a*= kc[1][0]*kc[1][1]*kc[1][2];
-       a+= kc[0][0]*kc[0][1]*kc[0][2]*(A()*G()*V()*W()*W()*-1.);
-       a+= -QQQ*W()*W()*(D()*I()+C()*J());
-return a;
+    Double_t a = U(0)*U(1)*U(2)*(D()*I()+C()*J()) ;
+           a+= V()*U(1)*U(2)*(C()*I());
+           a+= V()*U(2)*U(0)*(C()*H()+D()*G());
+           a+= V()*U(0)*U(1)*(B()*I()+A()*J());
+           a+= V()*V()*U(1)*(A()*I());
+           a+= V()*V()*U(2)*(C()*G());
+           a+= V()*V()*U(0)*(A()*H()+B()*G());
+           a+= V()*V()*V()*(A()*G());
+         a*= kc[1][0]*kc[1][1]*kc[1][2];
+           a+= kc[0][0]*kc[0][1]*kc[0][2]*(A()*G()*V()*W()*W()*-1.);
+           a+= -QQQ*W()*W()*(D()*I()+C()*J());
+    return a;
 }
 
 Double_t S8NumericSolver::T()
@@ -765,81 +902,107 @@ Double_t S8NumericSolver::E(Int_t i,Int_t j) // i=0..1 : sample , j=0..3 : tag
 
 Double_t S8NumericSolver::ZeroFunctionFb(Double_t x)
 {
-fNb = x;
+    fNb = x;
 
-Double_t KK = K()*1e5;
-Double_t KK2 = KK*KK;
-Double_t KK3 = KK*KK2;
+    Double_t KK = K()*1e5;
+    Double_t KK2 = KK*KK;
+    Double_t KK3 = KK*KK2;
 
-Double_t NN = N()*1e5;
-Double_t NN2 = NN*NN;
-Double_t NN3 = NN*NN2;
-Double_t NN4 = NN*NN3;
-Double_t NN5 = NN*NN4;
+    Double_t NN = N()*1e5;
+    Double_t NN2 = NN*NN;
+    Double_t NN3 = NN*NN2;
+    Double_t NN4 = NN*NN3;
+    Double_t NN5 = NN*NN4;
 
-Double_t PP = P()*1e5;
-Double_t PP2 = PP*PP;
-Double_t PP3 = PP*PP2;
+    Double_t PP = P()*1e5;
+    Double_t PP2 = PP*PP;
+    Double_t PP3 = PP*PP2;
 
-Double_t XX = X()*1e5;
-Double_t XX2 = XX*XX;
+    Double_t XX = X()*1e5;
+    Double_t XX2 = XX*XX;
 
-Double_t YY = Y()*1e5;
-Double_t YY2 = YY*YY;
+    Double_t YY = Y()*1e5;
+    Double_t YY2 = YY*YY;
 
-Double_t ZZ = Z()*1e5;
-Double_t ZZ2 = ZZ*ZZ;
+    Double_t ZZ = Z()*1e5;
+    Double_t ZZ2 = ZZ*ZZ;
 
-Double_t TT = T()*1e5;
-Double_t TT2 = TT*TT;
+    Double_t TT = T()*1e5;
+    Double_t TT2 = TT*TT;
 
-Double_t A1  = - KK3*NN2*XX2;
-A1        += -2*KK2*NN3*XX*ZZ;
-A1        += KK2*NN3*YY2   ;
-A1        += -KK2*NN2*PP*XX*YY   ;
-A1        += 2*KK*NN4*YY*TT   ;
-A1        += -3*KK*NN3*PP*XX*TT   ;
-A1        += KK*NN3*PP*YY*ZZ   ;
-A1        += -KK*NN2*PP2*XX*ZZ   ;
-A1        += -KK*NN4*ZZ2   ;
-A1        += +NN5*TT2   ;
-A1        += -NN4*PP*ZZ*TT   ;
-A1        += NN3*PP2*YY*TT   ;
-A1        += -NN2*PP3*XX*TT   ;
+    Double_t A1  = - KK3*NN2*XX2;
+    A1        += -2*KK2*NN3*XX*ZZ;
+    A1        += KK2*NN3*YY2   ;
+    A1        += -KK2*NN2*PP*XX*YY   ;
+    A1        += 2*KK*NN4*YY*TT   ;
+    A1        += -3*KK*NN3*PP*XX*TT   ;
+    A1        += KK*NN3*PP*YY*ZZ   ;
+    A1        += -KK*NN2*PP2*XX*ZZ   ;
+    A1        += -KK*NN4*ZZ2   ;
+    A1        += +NN5*TT2   ;
+    A1        += -NN4*PP*ZZ*TT   ;
+    A1        += NN3*PP2*YY*TT   ;
+    A1        += -NN2*PP3*XX*TT   ;
 
-return A1;
+    return A1;
 }
 
 
+// Function will return number of found solutions
+//
 Int_t S8NumericSolver::SolveSystem(Double_t* res)
 {
-Double_t f = 0.;
-Double_t fold = 0.;
-Double_t x = 0.;
-Double_t xold = 0.;
-Int_t n=0;
+    Double_t f = 0.;
+    Double_t fold = 0.;
+    Double_t x = 0.;
+    Double_t xold = 0.;
+    Int_t n=0;
 
-Double_t u = 1./fNpt;
-for(Int_t i=0;i<=fNpt;++i)
-  {
-  x = i*u ;
-  f = ZeroFunctionFb(x);
-  if(TMath::Abs(f)<1e-6) {continue;}
-  if(fold*f < 0)
+    // Step
+    //
+    Double_t u = 1./fNpt;
+
+    for( Int_t i = 0; i <= fNpt; ++i)
     {
-    if((x-xold) == 0) continue;
-    Double_t aa = (f-fold)/(x-xold);
-    Double_t bb = f-aa*x;
-    res[n] = -bb/aa;
-    // print results
-    //std::cout<< "[S8Numeric] n = " << n << " res =" << res[n] << " function f = " << f << std::endl;
-    n++;
+        x = i*u ;
+        f = ZeroFunctionFb(x);
+
+        if(TMath::Abs(f)<1e-6)
+            continue;
+
+        // check if solution flipped sign
+        //
+        if (fold*f < 0)
+        {
+            if ((x-xold) == 0)
+                continue;
+
+            // Expansion:
+            //      f = f0 + f' * x + ...
+            //
+            // f'
+            //
+            Double_t aa = (f-fold)/(x-xold);
+
+            // f0
+            //
+            Double_t bb = f-aa*x;
+
+            res[n] = -bb/aa;
+
+            ++n;
+        }
+
+        fold = f;
+        xold = x;
+
+        // Limit number of possible solutions to 5
+        //
+        if (n==5)
+            break;
     }
-  fold = f;
-  xold = x;
-  if(n==5) break;
-  }
-return n;
+
+    return n;
 }
 
 TH1 *S8NumericSolver::result(const int &id)
