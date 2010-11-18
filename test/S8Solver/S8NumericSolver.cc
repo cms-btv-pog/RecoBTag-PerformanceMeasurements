@@ -160,30 +160,34 @@ void S8NumericSolver::SetInput(Double_t n, Double_t n1, Double_t n2 , Double_t n
   fIndep[7] = sqrt(n - fIndep[6] - fIndep[5] - fIndep[4] - n3) ;
 }
 
-void S8NumericSolver::setInput(const NumericInput &input)
+void S8NumericSolver::setInput(const NumericInputGroup &inputGroup)
 {
-    SetInput(input[NumericInput::N].first,
-             input[NumericInput::N_MU].first,
-             input[NumericInput::N_TAG].first,
-             input[NumericInput::P].first,
-             input[NumericInput::N_MU_TAG].first,
-             input[NumericInput::P_TAG].first,
-             input[NumericInput::P_MU].first,
-             input[NumericInput::P_MU_TAG].first);
+    const NumericInput &input = inputGroup.input;
 
-    SetCorr(input[NumericInput::KAPPA_B].first,
-            input[NumericInput::BETA].first,
-            input[NumericInput::DELTA].first,
-            input[NumericInput::KAPPA_CL].first,
-            input[NumericInput::ALPHA].first,
-            input[NumericInput::GAMMA].first);
+    SetInput(input.n.all.first,
+             input.n.mu.first,
+             input.n.tag.first,
+             input.p.all.first,
+             input.n.muTag.first,
+             input.p.tag.first,
+             input.p.mu.first,
+             input.p.muTag.first);
 
-    SetCorrError(sqrt(input[NumericInput::KAPPA_B].second),
-                 sqrt(input[NumericInput::BETA].second),
-                 sqrt(input[NumericInput::DELTA].second),
-                 sqrt(input[NumericInput::KAPPA_CL].second),
-                 sqrt(input[NumericInput::ALPHA].second),
-                 sqrt(input[NumericInput::GAMMA].second));
+    const Coefficients &coef = inputGroup.coefficients;
+        
+    SetCorr(coef.kappaB.first,
+            coef.beta.first,
+            coef.delta.first,
+            coef.kappaCL.first,
+            coef.alpha.first,
+            coef.gamma.first);
+
+    SetCorrError(sqrt(coef.kappaB.second),
+                 sqrt(coef.beta.second),
+                 sqrt(coef.delta.second),
+                 sqrt(coef.kappaCL.second),
+                 sqrt(coef.alpha.second),
+                 sqrt(coef.gamma.second));
 }
 
 void S8NumericSolver::SetCorr(Double_t c12a, Double_t c23a, Double_t c31a,

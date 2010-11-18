@@ -75,6 +75,8 @@ void S8Solver::Clear()
 
 void S8Solver::LoadHistos()
 {
+    // Load Solver Input plots
+    //
     finputFile->cd();
 
     //  for analyzer
@@ -97,9 +99,20 @@ void S8Solver::LoadHistos()
     fpHistoSvx = (TH1D*) fpSvxHistoBase->ProjectionX("fpHistoSvx", -1, ith_max_bin, "e");
     fnHistoAll = (TH1D*) fnSvxHistoBase->ProjectionX("fnHistoAll",ith_ptrel_bin, ith_max_bin,"e");
     fpHistoAll = (TH1D*) fpSvxHistoBase->ProjectionX("fpHistoAll",ith_ptrel_bin, ith_max_bin,"e");
+
+    // Save input plots in the SolverInput
+    //
+    _solverInput.n.all = fnHisto;
+    _solverInput.n.mu = fnHistoMu;
+    _solverInput.n.tag = fnHistoSvx;
+    _solverInput.n.muTag = fnHistoAll;
+
+    _solverInput.p.all = fpHisto;
+    _solverInput.p.mu = fpHistoMu;
+    _solverInput.p.tag = fpHistoSvx;
+    _solverInput.p.muTag = fpHistoAll;
     
     std::cout << " got projections" << std::endl;
-    
     
     // rebin correlation factors
     const int ncorrptarray = 3;
@@ -108,21 +121,21 @@ void S8Solver::LoadHistos()
     Double_t corretabins[ncorrptarray] = {0.,1.5,2.5};
 
     // recalculate correlation factors
-    if (frecalculateFactors) {
+    //
+    if (frecalculateFactors)
+    {
         std::cout << " recalculate correlation factors " << std::endl;
         
         std::map< TString, TH1*> h1;
         std::map< TString, TH2*> h2;
         
-        if (fisCorrFile) {
-            std::cout << "what" << std::endl;
+        if (fisCorrFile)
             finputCorrFile->cd();
-            std::cout << " another file" << std::endl;
-        } else {
+        else
             finputFile->cd();
-        }
 
         // for analyzer
+        //
         h2["b_npT"] = (TH2F*) gDirectory->Get("MCTruth/n_"+fcategory+"_b");
         h2["cl_npT"] = (TH2F*) gDirectory->Get("MCTruth/n_"+fcategory+"_cl");
         h2["b_ppT"] = (TH2F*) gDirectory->Get("MCTruth/p_"+fcategory+"_b");
@@ -163,6 +176,26 @@ void S8Solver::LoadHistos()
         cl_halloppjets_ptrel  = h2["cl_ppT"]->ProjectionX("cl_halloppjets_ptrel", ith_ptrel_bin , ith_max_bin,"e");
         b_halloppjets_ptreltagged  = h2["b_pcmbpT"]->ProjectionX("b_halloppjets_ptreltagged", ith_ptrel_bin , ith_max_bin,"e");
         cl_halloppjets_ptreltagged = h2["cl_pcmbpT"]->ProjectionX("cl_halloppjets_ptreltagged", ith_ptrel_bin , ith_max_bin,"e");
+
+        _flavouredInput.n.b = halljets_b;
+        _flavouredInput.n.tag.b = htagjets_b;
+        _flavouredInput.n.mu.b = halljets_b_ptrel;
+        _flavouredInput.n.muTag.b = htagjets_b_ptrel;
+
+        _flavouredInput.n.cl = halljets_cl;
+        _flavouredInput.n.tag.cl = htagjets_cl;
+        _flavouredInput.n.mu.cl = halljets_cl_ptrel;
+        _flavouredInput.n.muTag.cl = htagjets_cl_ptrel;
+
+        _flavouredInput.p.b = halloppjets_b;
+        _flavouredInput.p.tag.b = htagoppjets_b;
+        _flavouredInput.p.mu.b = halloppjets_b_ptrel;
+        _flavouredInput.p.muTag.b = htagoppjets_b_ptrel;
+
+        _flavouredInput.p.cl = halloppjets_cl;
+        _flavouredInput.p.tag.cl = htagoppjets_cl;
+        _flavouredInput.p.mu.cl = halloppjets_cl_ptrel;
+        _flavouredInput.p.muTag.cl = htagoppjets_cl_ptrel;
 
         std::cout << " got projections" << std::endl;
         
@@ -408,7 +441,8 @@ void S8Solver::LoadHistos()
 
     }
     // should I remove the following loop?
-    else {
+    else
+    {
         // true efficiency
         feffTag_b = (TH1D*) gDirectory->Get("eff_TaggedJet_b");
         feffTag_cl = (TH1D*) gDirectory->Get("eff_TaggedJet_cl");
@@ -419,8 +453,10 @@ void S8Solver::LoadHistos()
         
         if (fisCorrFile) finputCorrFile->cd();
         
-        if (fcategory=="pT") {
-            if (frebin) {
+        if (fcategory=="pT")
+        {
+            if (frebin)
+            {
                 
                 TH1D* tmpfh_alpha = (TH1D*) gDirectory->Get("alpha");
                 TH1D* tmpfh_beta = (TH1D*) gDirectory->Get("beta");
@@ -443,8 +479,11 @@ void S8Solver::LoadHistos()
                 fh_kcl = (TH1D*) gDirectory->Get("kappa_cl");
             }
         
-        } else {
-            if (frebin) {
+        }
+        else
+        {
+            if (frebin)
+            {
                 TH1D* tmpfh_alpha = (TH1D*) gDirectory->Get("alpha_eta");
                 TH1D* tmpfh_beta = (TH1D*) gDirectory->Get("beta_eta");
                 TH1D* tmpfh_kb = (TH1D*) gDirectory->Get("kappa_eta_b");
@@ -468,16 +507,15 @@ void S8Solver::LoadHistos()
             }
         }
     }
+
     std::cout << " got correlations" << std::endl;
 }
 
-
 void S8Solver::GetInput()
 {
-
-    this->LoadHistos();
+    LoadHistos();
     
-//  // integrated input
+    // integrated input
     if (fusemctrue)
     {
         TotalInput["n"] = halljets_b->Integral(1,halljets_b->GetNbinsX()+1) + halljets_cl->Integral(1,halljets_cl->GetNbinsX()+1);
@@ -511,53 +549,7 @@ void S8Solver::GetInput()
 
     // Get Total Input
     //
-    {
-        InputGroup &n = _totalInput.n();
-        InputGroup &p = _totalInput.p();
-
-        n.b = integrate(halljets_b);
-        n.cl = integrate(halljets_cl);
-        n.tag.b = integrate(b_halljets_tagged);
-        n.tag.cl = integrate(cl_halljets_tagged);
-        n.mu.b = integrate(b_halljets_ptrel);
-        n.mu.cl = integrate(cl_halljets_ptrel);
-        n.muTag.b = integrate(b_halljets_ptreltagged); 
-        n.muTag.cl = integrate(cl_halljets_ptreltagged); 
-
-        p.b = integrate(halloppjets_b);
-        p.cl = integrate(halloppjets_cl);
-        p.tag.b = integrate(b_halloppjets_tagged);
-        p.tag.cl = integrate(cl_halloppjets_tagged);
-        p.mu.b = integrate(b_halloppjets_ptrel);
-        p.mu.cl = integrate(cl_halloppjets_ptrel);
-        p.muTag.b = integrate(b_halloppjets_ptreltagged); 
-        p.muTag.cl = integrate(cl_halloppjets_ptreltagged); 
-
-        calculateCorrCoefficients(_totalInput);
-
-        if (fusemctrue)
-        {
-            _totalInput[NumericInput::N] = integrate(halljets_b) + integrate(halljets_cl);
-            _totalInput[NumericInput::N_MU] = integrate(halljets_b_ptrel) + integrate(halljets_cl_ptrel);
-            _totalInput[NumericInput::P] = integrate(halloppjets_b) + integrate(halloppjets_cl);
-            _totalInput[NumericInput::P_MU] = integrate(halloppjets_b_ptrel) + integrate(halloppjets_cl_ptrel);
-            _totalInput[NumericInput::N_TAG] = integrate(htagjets_b) + integrate(htagjets_cl);
-            _totalInput[NumericInput::N_MU_TAG] =  integrate(htagjets_b_ptrel) + integrate(htagjets_cl_ptrel);
-            _totalInput[NumericInput::P_TAG] = integrate(htagoppjets_b) + integrate(htagoppjets_cl);
-            _totalInput[NumericInput::P_MU_TAG] =  integrate(htagoppjets_b_ptrel) + integrate(htagoppjets_cl_ptrel);
-        }
-        else
-        {
-            _totalInput[NumericInput::N] = integrate(fnHisto);
-            _totalInput[NumericInput::N_MU] = integrate(fnHistoMu);
-            _totalInput[NumericInput::P] = integrate(fpHisto);
-            _totalInput[NumericInput::P_MU] = integrate(fpHistoMu);
-            _totalInput[NumericInput::N_TAG] = integrate(fnHistoSvx);
-            _totalInput[NumericInput::N_MU_TAG] = integrate(fnHistoAll);
-            _totalInput[NumericInput::P_TAG] = integrate(fpHistoSvx);
-            _totalInput[NumericInput::P_MU_TAG] = integrate(fpHistoAll);
-        }
-    }
+    _totalInput = inputGroup(_solverInput, _flavouredInput);
 
     // binned input base in the n samples
     //
@@ -567,7 +559,6 @@ void S8Solver::GetInput()
     TF1 *F_beta = fh_beta->GetFunction("pol1");
     TF1 *F_delta = fh_delta->GetFunction("pol1");
     TF1 *F_gamma = fh_gamma->GetFunction("pol1");
-
 
     std::vector< TH1* > HistoList;
     HistoList.push_back(fnHisto);
@@ -601,81 +592,33 @@ void S8Solver::GetInput()
     name.push_back("delta");
     name.push_back("gamma");
 
-    for (int ibin = 1; ibin<= fnHisto->GetNbinsX(); ++ibin) {
+    // Binned input
+    //
+    for(int ibin = 1, bins = fnHisto->GetNbinsX();
+         bins >= ibin;
+         ++ibin)
+    {
+        // Calculate each bin input explicitly
+        //
+        NumericInputGroup group = inputGroup(_solverInput,
+                                             _flavouredInput,
+                                             ibin);
+
+        if (bins == ibin)
+        {
+            // Last bin
+            //
+            add(group, _solverInput, _flavouredInput, ibin);
+        }
+
+        _binnedInput.push_back(group);
+        
         std::map<TString, double> tmpmap;
 
         double pt = fnHisto->GetXaxis()->GetBinCenter(ibin);
 
-        // Calculate each bin input explicitly
-        //
+        for ( size_t ihisto=0; ihisto!=HistoList.size(); ++ihisto)
         {
-            NumericInput numericInput;
-
-            InputGroup &n = numericInput.n();
-            InputGroup &p = numericInput.p();
-
-            n.b = measurementFromBin(halljets_b, ibin);
-            n.cl = measurementFromBin(halljets_cl, ibin);
-            n.tag.b = measurementFromBin(b_halljets_tagged, ibin);
-            n.tag.cl = measurementFromBin(cl_halljets_tagged, ibin);
-            n.mu.b = measurementFromBin(b_halljets_ptrel, ibin);
-            n.mu.cl = measurementFromBin(cl_halljets_ptrel, ibin);
-            n.muTag.b = measurementFromBin(b_halljets_ptreltagged, ibin); 
-            n.muTag.cl = measurementFromBin(cl_halljets_ptreltagged, ibin); 
-
-            p.b = measurementFromBin(halloppjets_b, ibin);
-            p.cl = measurementFromBin(halloppjets_cl, ibin);
-            p.tag.b = measurementFromBin(b_halloppjets_tagged, ibin);
-            p.tag.cl = measurementFromBin(cl_halloppjets_tagged, ibin);
-            p.mu.b = measurementFromBin(b_halloppjets_ptrel, ibin);
-            p.mu.cl = measurementFromBin(cl_halloppjets_ptrel, ibin);
-            p.muTag.b = measurementFromBin(b_halloppjets_ptreltagged, ibin); 
-            p.muTag.cl = measurementFromBin(cl_halloppjets_ptreltagged, ibin); 
-
-            calculateCorrCoefficients(numericInput);
-
-            if (fusemctrue)
-            {
-                numericInput[NumericInput::N] = measurementFromBin(halljets_b, ibin) +
-                                                measurementFromBin(halljets_cl, ibin);
-
-                numericInput[NumericInput::N_MU] = measurementFromBin(halljets_b_ptrel, ibin) +
-                                                   measurementFromBin(halljets_cl_ptrel, ibin);
-
-                numericInput[NumericInput::P] = measurementFromBin(halloppjets_b, ibin) +
-                                                measurementFromBin(halloppjets_cl, ibin);
-
-                numericInput[NumericInput::P_MU] = measurementFromBin(halloppjets_b_ptrel, ibin) +
-                                                   measurementFromBin(halloppjets_cl_ptrel, ibin);
-
-                numericInput[NumericInput::N_TAG] = measurementFromBin(htagjets_b, ibin) +
-                                                     measurementFromBin(htagjets_cl, ibin);
-
-                numericInput[NumericInput::N_MU_TAG] =  measurementFromBin(htagjets_b_ptrel, ibin) +
-                                                        measurementFromBin(htagjets_cl_ptrel, ibin);
-
-                numericInput[NumericInput::P_TAG] = measurementFromBin(htagoppjets_b, ibin) +
-                                                    measurementFromBin(htagoppjets_cl, ibin);
-
-                numericInput[NumericInput::P_MU_TAG] =  measurementFromBin(htagoppjets_b_ptrel, ibin) +
-                                                        measurementFromBin(htagoppjets_cl_ptrel, ibin);
-            }
-            else
-            {
-                numericInput[NumericInput::N] = measurementFromBin(fnHisto, ibin);
-                numericInput[NumericInput::N_MU] = measurementFromBin(fnHistoMu, ibin);
-                numericInput[NumericInput::P] = measurementFromBin(fpHisto, ibin);
-                numericInput[NumericInput::P_MU] = measurementFromBin(fpHistoMu, ibin);
-                numericInput[NumericInput::N_TAG] = measurementFromBin(fnHistoSvx, ibin);
-                numericInput[NumericInput::N_MU_TAG] = measurementFromBin(fnHistoAll, ibin);
-                numericInput[NumericInput::P_TAG] = measurementFromBin(fpHistoSvx, ibin);
-                numericInput[NumericInput::P_MU_TAG] = measurementFromBin(fpHistoAll, ibin);
-            }
-
-            _binnedInput.push_back(numericInput);
-        }
-        
-        for ( size_t ihisto=0; ihisto!=HistoList.size(); ++ihisto) {
             TH1D *htemp = (TH1D*) HistoList[ihisto];
 
             if (name[ihisto]=="kappa_b"||name[ihisto]=="kappa_cl"||
@@ -826,8 +769,10 @@ void S8Solver::Solve()
             out->Close();
         }
 
-        fTotalSolution["n_b"]       = sol.GetResultVec(0) * _totalInput[NumericInput::N].first;
-        fTotalSolution["n_cl"]      = sol.GetResultVec(1) * _totalInput[NumericInput::N].first;
+        fTotalSolution["n_b"]       = sol.GetResultVec(0) *
+                                        _totalInput.input.n.all.first;
+        fTotalSolution["n_cl"]      = sol.GetResultVec(1) *
+                                        _totalInput.input.n.all.first;
         fTotalSolution["effMu_b"]   = sol.GetResultVec(2);
         fTotalSolution["effMu_cl"]  = sol.GetResultVec(3);
         fTotalSolution["effTag_b"]  = sol.GetResultVec(4);
@@ -843,8 +788,10 @@ void S8Solver::Solve()
                     << '(' << sol.GetErrorInfVec(i) << ')' << endl;
         }
 
-        fTotalSolutionErr["n_b"]       = sol.getError(0) * _totalInput[NumericInput::N].first;
-        fTotalSolutionErr["n_cl"]      = sol.getError(1) * _totalInput[NumericInput::N].first;
+        fTotalSolutionErr["n_b"]       = sol.getError(0) *
+                                            _totalInput.input.n.all.first;
+        fTotalSolutionErr["n_cl"]      = sol.getError(1) *
+                                            _totalInput.input.n.all.first;
         fTotalSolutionErr["effMu_b"]   = sol.getError(2);
         fTotalSolutionErr["effMu_cl"]  = sol.getError(3);
         fTotalSolutionErr["effTag_b"]  = sol.getError(4);
@@ -865,14 +812,14 @@ void S8Solver::Solve()
             cout << "BINED SOLUTION... BIN " << ibin->first << endl;
             cout << endl;
 
-            const NumericInput &input = _binnedInput[ibin->first - 1];
+            const NumericInputGroup &inputGroup = _binnedInput[ibin->first - 1];
 
             // Print S8 input
             //
-            cout << input << endl;
+            cout << inputGroup << endl;
             
             S8NumericSolver solu("solu");
-            solu.setInput(input);
+            solu.setInput(inputGroup);
 
             solu.SetError(2);
             solu.SetNbErrorIteration(1000);
@@ -910,8 +857,10 @@ void S8Solver::Solve()
             std::map<TString,double> tmpsolu;
             std::map<TString,double> tmpsoluerr;
                 
-            tmpsolu["n_b"]       = solu.GetResultVec(0) * input[NumericInput::N].first;
-            tmpsolu["n_cl"]      = solu.GetResultVec(1) * input[NumericInput::N].first;
+            tmpsolu["n_b"]       = solu.GetResultVec(0) *
+                                    inputGroup.input.n.all.first;
+            tmpsolu["n_cl"]      = solu.GetResultVec(1) *
+                                    inputGroup.input.n.all.first;
             tmpsolu["effMu_b"]   = solu.GetResultVec(2);
             tmpsolu["effMu_cl"]  = solu.GetResultVec(3);
             tmpsolu["effTag_b"]  = solu.GetResultVec(4);
@@ -928,8 +877,10 @@ void S8Solver::Solve()
             }
 
             // FIX errors
-            tmpsoluerr["n_b"]       = solu.getError(0) * input[NumericInput::N].first;
-            tmpsoluerr["n_cl"]      = solu.getError(1) * input[NumericInput::N].first;
+            tmpsoluerr["n_b"]       = solu.getError(0) *
+                                        inputGroup.input.n.all.first;
+            tmpsoluerr["n_cl"]      = solu.getError(1) *
+                                        inputGroup.input.n.all.first;
             tmpsoluerr["effMu_b"]   = solu.getError(2);
             tmpsoluerr["effMu_cl"]  = solu.getError(3);
             tmpsoluerr["effTag_b"]  = solu.getError(4);
@@ -945,7 +896,6 @@ void S8Solver::Solve()
 
 void S8Solver::PrintData(TString option)
 {
-
     std::cout << " Name: " << fthename << std::endl;
     std::cout << " Method: " << fmethod << std::endl;
     std::cout << " Category: " << fcategory << std::endl;
@@ -1502,44 +1452,6 @@ void S8Solver::Draw(int maxNbins)
     lege->Draw();
 }
 
-void S8Solver::calculateCorrCoefficients(NumericInput &numericInput)
-{
-    InputGroup &n = numericInput.n();
-    InputGroup &p = numericInput.p();
-    EffGroup &eff = numericInput.eff();
-
-    eff.tag.b = calculateEfficiency(n.tag.b, n.b);
-    eff.tag.cl = calculateEfficiency(n.tag.cl, n.cl);
-
-    eff.mu.b = calculateEfficiency(n.mu.b, n.b);
-    eff.mu.cl = calculateEfficiency(n.mu.cl, n.cl);
-
-    const Measurement alpha = fAlphaf *
-        calculateEfficiency(p.tag.cl, p.cl) / eff.tag.cl;
-
-    const Measurement beta = fBetaf *
-        calculateEfficiency(p.tag.b, p.b) / eff.tag.b;
-
-    const Measurement gamma = fGammaf *
-        calculateEfficiency(p.mu.cl, p.cl) / eff.mu.cl;
-
-    const Measurement delta = fDeltaf *
-        calculateEfficiency(p.mu.b, p.b) / eff.mu.b;
-
-    const Measurement kappaCL = fKappaclf *
-        calculateEfficiency(n.muTag.cl, n.cl) / eff.mu.cl / eff.tag.cl;
-
-    const Measurement kappaB = fKappabf *
-        calculateEfficiency(n.muTag.b, n.b) / eff.mu.b / eff.tag.b;
-
-    numericInput[NumericInput::ALPHA] = alpha;
-    numericInput[NumericInput::BETA] = beta;
-    numericInput[NumericInput::GAMMA] = gamma;
-    numericInput[NumericInput::DELTA] = delta;
-    numericInput[NumericInput::KAPPA_CL] = kappaCL;
-    numericInput[NumericInput::KAPPA_B] = kappaB;
-}
-
 void S8Solver::Print(TString extension )
 {
     for(std::map<TString,TCanvas*>::const_iterator icv=cv_map.begin(); icv!=cv_map.end(); ++icv)
@@ -1550,36 +1462,186 @@ void S8Solver::Print(TString extension )
     }
 }
 
-Measurement integrate(const TH1 *hist)
+
+
+void inputGroup(numeric::InputGroup &inputGroup,
+                const solver::PlotGroup &plotGroup,
+                const int &bin)
 {
-    Measurement measurement;
+    inputGroup.all += measurement(plotGroup.all, bin);
+    inputGroup.mu += measurement(plotGroup.mu, bin);
+    inputGroup.tag += measurement(plotGroup.tag, bin);
+    inputGroup.muTag += measurement(plotGroup.muTag, bin);
+}
+
+void inputGroup(numeric::InputGroup &inputGroup,
+                const solver::PlotGroup &plotGroup)
+{
+    inputGroup.all += measurement(plotGroup.all);
+    inputGroup.mu += measurement(plotGroup.mu);
+    inputGroup.tag += measurement(plotGroup.tag);
+    inputGroup.muTag += measurement(plotGroup.muTag);
+}
+
+void flavouredInput(numeric::FlavouredInput &input,
+                    const solver::FlavouredPlot &plot,
+                    const int &bin)
+{
+    input.b += measurement(plot.b, bin);
+    input.cl += measurement(plot.cl, bin);
+}
+
+void flavouredInput(numeric::FlavouredInput &input,
+                    const solver::FlavouredPlot &plot)
+{
+    input.b += measurement(plot.b);
+    input.cl += measurement(plot.cl);
+}
+
+NumericInputGroup inputGroup(const SolverInput &input,
+                             const FlavouredSolverInput &flavouredInput,
+                             const int &bin)
+{
+    NumericInputGroup group;
+
+    // S8 Input
+    //
+    fill(group.input, input, bin);
+
+    // MC Input
+    //
+    fill(group.flavouredInput, flavouredInput, bin);
+
+    // Measurements
+    //
+    inputGroup(group, group.flavouredInput.n, group.flavouredInput.p);
+
+    return group;
+}
+
+NumericInputGroup inputGroup(const SolverInput &input,
+                             const FlavouredSolverInput &flavouredInput)
+{
+    NumericInputGroup group;
+
+    // S8 Input
+    //
+    fill(group.input, input);
+
+    // MC Input
+    //
+    fill(group.flavouredInput, flavouredInput);
+
+    // Measurements
+    //
+    inputGroup(group, group.flavouredInput.n, group.flavouredInput.p);
+
+    return group;
+}
+
+void add(NumericInputGroup &group,
+         const SolverInput &input,
+         const FlavouredSolverInput &flavouredInput,
+         const int &bin)
+{
+    // S8 Input
+    //
+    fill(group.input, input, bin);
+
+    // MC Input
+    //
+    fill(group.flavouredInput, flavouredInput, bin);
+
+    // Measurements
+    //
+    inputGroup(group, group.flavouredInput.n, group.flavouredInput.p);
+}
+
+void inputGroup(NumericInputGroup &group,
+                const numeric::FlavouredInputGroup &n,
+                const numeric::FlavouredInputGroup &p)
+{
+    // Efficiencies
+    //
+    FlavouredEffGroup &eff = group.efficiency;
+    eff.tag.b = n.tag.b % n.b;
+    eff.tag.cl = n.tag.cl % n.cl;
+
+    eff.mu.b = n.mu.b % n.b;
+    eff.mu.cl = n.mu.cl % n.cl;
+
+    // Coefficients
+    //
+    Coefficients &coef = group.coefficients;
+    coef.alpha = p.tag.cl % p.cl / eff.tag.cl;
+    coef.beta = p.tag.b % p.b / eff.tag.b;
+
+    coef.gamma = p.mu.cl % p.cl / eff.mu.cl;
+    coef.delta = p.mu.b % p.b / eff.mu.b;
+
+    coef.kappaCL = n.muTag.cl % n.cl / eff.mu.cl / eff.tag.cl;
+    coef.kappaB = n.muTag.b % n.b / eff.mu.b / eff.tag.b;
+}
+
+void fill(NumericInput &numericInput, const SolverInput &input, const int &bin)
+{
+    inputGroup(numericInput.n, input.n, bin);
+    inputGroup(numericInput.p, input.p, bin);
+}
+
+void fill(NumericInput &numericInput, const SolverInput &input)
+{
+    inputGroup(numericInput.n, input.n);
+    inputGroup(numericInput.p, input.p);
+}
+
+void fill(FlavouredNumericInput &numericInput,
+          const FlavouredSolverInput &input,
+          const int &bin)
+{
+    fill(numericInput.n, input.n, bin);
+    fill(numericInput.p, input.p, bin);
+}
+
+void fill(FlavouredNumericInput &numericInput,
+          const FlavouredSolverInput &input)
+{
+    fill(numericInput.n, input.n);
+    fill(numericInput.p, input.p);
+}
+
+void fill(numeric::FlavouredInputGroup &inputGroup,
+          const solver::FlavouredPlotGroup &plotGroup,
+          const int &bin)
+{
+    flavouredInput(inputGroup, plotGroup, bin);
+    flavouredInput(inputGroup.mu, plotGroup.mu, bin);
+    flavouredInput(inputGroup.tag, plotGroup.tag, bin);
+    flavouredInput(inputGroup.muTag, plotGroup.muTag, bin);
+}
+
+void fill(numeric::FlavouredInputGroup &inputGroup,
+          const solver::FlavouredPlotGroup &plotGroup)
+{
+    flavouredInput(inputGroup, plotGroup);
+    flavouredInput(inputGroup.mu, plotGroup.mu);
+    flavouredInput(inputGroup.tag, plotGroup.tag);
+    flavouredInput(inputGroup.muTag, plotGroup.muTag);
+}
+
+Measurement measurement(const TH1 *hist, const int &bin)
+{
+    return make_pair(hist->GetBinContent(bin),
+                     pow(hist->GetBinError(bin), 2));
+}
+
+Measurement measurement(const TH1 *hist)
+{
+    Measurement newMeasurement;
     for(int bin = 1, bins = hist->GetNbinsX() + 1; bins >= bin; ++bin)
     {
-        measurement += measurementFromBin(hist, bin);
+        newMeasurement += measurement(hist, bin);
     }
 
-    return measurement;
-}
-
-Measurement measurementFromBin(const TH1 *hist, const int &bin)
-{
-    return make_pair(hist->GetBinContent(bin), pow(hist->GetBinError(bin), 2));
-}
-
-Measurement calculateEfficiency(const Measurement &n1, const Measurement &n2)
-{
-    const double eff = n1.first / n2.first;
-    const double error = ((1 - 2 * eff) * n1.second +
-                            pow(eff, 2) * n2.second) / pow(n2.first, 2);
-
-    return make_pair(eff, error);
-}
-
-Measurement calculateEfficiency(const TH1 *numerator,
-                                const TH1 *denominator)
-{
-    const Measurement n1 = integrate(numerator);
-    const Measurement n2 = integrate(denominator);
-
-    return calculateEfficiency(n1, n2);
+    return newMeasurement;
 }

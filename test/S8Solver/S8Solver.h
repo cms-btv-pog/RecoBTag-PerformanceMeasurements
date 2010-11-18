@@ -16,6 +16,7 @@
 #include <utility>
 
 #include "S8NumericInput.h"
+#include "S8SolverInput.h"
 
 class S8Solver
 {
@@ -51,7 +52,8 @@ class S8Solver
 		void SetMethod( TString option ) { fmethod = option; }
 		void UseMCTrue(bool option) { fusemctrue = option; }
 		void Solve();
-		void SetSolution( int bin, int solution) {
+		void SetSolution( int bin, int solution)
+        {
 			// bin 0 corresponds to average solution
 				fPickSolutionMap[bin] = solution;
 		}
@@ -64,7 +66,8 @@ class S8Solver
 		void DumpTable(std::string filename="table.txt");
 		void Draw(int maxNbins=0);
 		void Print(TString extension="eps");
-		void Save(TString filename="solver.root") {
+		void Save(TString filename="solver.root")
+        {
 
 			TFile *ofile = new TFile(filename,"RECREATE");
 
@@ -102,7 +105,6 @@ class S8Solver
 			ofile->Close();
 			delete ofile;
 		};
-		
 		
   protected:
 		void GetInput();
@@ -204,7 +206,6 @@ class S8Solver
 		TH1D *b_halloppjets_ptreltagged ; 
 		TH1D *cl_halloppjets_ptreltagged ;
 
-
 		TGraphErrors *geffTag_b;
 		TGraphErrors *gS8effTag_b;
 		TGraphErrors *geffmu_b;
@@ -224,18 +225,59 @@ class S8Solver
 
         TH1 *_averageResults[8];
 
-        void calculateCorrCoefficients(NumericInput &numericInput);
+        FlavouredSolverInput      _flavouredInput;
+        SolverInput               _solverInput;
 
-        NumericInput              _totalInput;
-        std::vector<NumericInput> _binnedInput;
+        NumericInputGroup              _totalInput;
+        std::vector<NumericInputGroup> _binnedInput;
 		
 		ClassDef(S8Solver,1);
 };
 
-Measurement calculateEfficiency(const TH1 *, const TH1 *);
-Measurement calculateEfficiency(const Measurement &, const Measurement &);
+void inputGroup(numeric::InputGroup &, const solver::PlotGroup &, const int &);
+void inputGroup(numeric::InputGroup &, const solver::PlotGroup &);
 
-Measurement integrate(const TH1 *);
-Measurement measurementFromBin(const TH1 *, const int &);
+void flavouredInput(numeric::FlavouredInput &,
+                    const solver::FlavouredPlot &,
+                    const int &);
+
+void flavouredInput(numeric::FlavouredInput &,
+                    const solver::FlavouredPlot &);
+
+// Calculate Numeric Group Eff and Coeff
+//
+void inputGroup(NumericInputGroup &group,
+                const numeric::FlavouredInputGroup &n,
+                const numeric::FlavouredInputGroup &p);
+
+NumericInputGroup inputGroup(const SolverInput &,
+                             const FlavouredSolverInput &,
+                             const int &bin);
+
+NumericInputGroup inputGroup(const SolverInput &,
+                             const FlavouredSolverInput &);
+
+void add(NumericInputGroup &group,
+         const SolverInput &input,
+         const FlavouredSolverInput &flavouredInput,
+         const int &bin);
+
+void fill(NumericInput &, const SolverInput &, const int &);
+void fill(NumericInput &, const SolverInput &);
+
+void fill(FlavouredNumericInput &, const FlavouredSolverInput &, const int &);
+void fill(FlavouredNumericInput &, const FlavouredSolverInput &);
+
+void fill(numeric::FlavouredInputGroup &,
+          const solver::FlavouredPlotGroup &,
+          const int &);
+
+void fill(numeric::FlavouredInputGroup &,
+          const solver::FlavouredPlotGroup &);
+
+
+Measurement measurement(const TH1 *, const int &);
+
+Measurement measurement(const TH1 *);
 
 #endif

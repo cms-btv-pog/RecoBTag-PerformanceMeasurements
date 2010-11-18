@@ -112,7 +112,7 @@ class S8NumericSolver : public TNamed
         void SetInput(Double_t n, Double_t n1, Double_t n2, Double_t n3,
         Double_t n12, Double_t n23, Double_t n31, Double_t n123) ;
 
-        void setInput(const NumericInput &);
+        void setInput(const NumericInputGroup &);
         void SetCorr(Double_t c12a, Double_t c23a, Double_t c31a,
         Double_t c12b, Double_t c23b, Double_t c31b) ;
 
