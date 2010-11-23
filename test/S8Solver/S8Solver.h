@@ -68,6 +68,11 @@ class S8Solver
 		void GetInput();
 		
   private:
+        typedef std::map<TString, double> InputMap;
+        typedef std::map<int, InputMap>      BinnedInputMap;
+
+        void printSolution(const InputMap &, const InputMap &) const;
+
         bool fVerbose;
 		TFile *finputFile;
 		TFile *finputCorrFile;
@@ -96,9 +101,6 @@ class S8Solver
         bool _doBinnedSolution;
 		double fminPtrel;
 		double fMaxPtrel;
-
-        typedef std::map<TString, double> InputMap;
-        typedef std::map<int, InputMap>      BinnedInputMap;
 
 		InputMap TotalInput;
         InputMap TotalInputErr;
@@ -193,8 +195,9 @@ class S8Solver
         FlavouredSolverInput      _flavouredInput;
         SolverInput               _solverInput;
 
-        NumericInputGroup              _totalInput;
-        std::vector<NumericInputGroup> _binnedInput;
+        typedef std::vector<NumericInputGroup> BinnedNumericInputGroup;
+        NumericInputGroup       _totalInput;
+        BinnedNumericInputGroup _binnedInput;
 		
 		ClassDef(S8Solver,1);
 };

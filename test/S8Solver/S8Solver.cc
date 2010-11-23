@@ -13,11 +13,12 @@
 #include "TArrayD.h"
 #include "TLegend.h"
 
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <iterator>
 #include <fstream>
-#include <sstream>
 #include <memory>
+#include <sstream>
 
 ClassImp(S8Solver)
 
@@ -25,10 +26,13 @@ using std::auto_ptr;
 using std::cout;
 using std::cerr;
 using std::endl;
-using std::pair;
-using std::setprecision;
 using std::fixed;
 using std::make_pair;
+using std::pair;
+using std::right;
+using std::setw;
+using std::setfill;
+using std::setprecision;
 
 S8Solver::S8Solver():
     _doBinnedSolution(true)
@@ -728,10 +732,6 @@ void S8Solver::Solve()
         cout << "AVERAGE SOLUTION" << endl;
         cout << endl;
 
-        // Print S8 input
-        //
-        cout << _totalInput << endl;
-
         S8NumericSolver sol("sol");
         sol.setInput(_totalInput);
 
@@ -813,10 +813,6 @@ void S8Solver::Solve()
 
             const NumericInputGroup &inputGroup = _binnedInput[ibin->first - 1];
 
-            // Print S8 input
-            //
-            cout << inputGroup << endl;
-            
             S8NumericSolver solu("solu");
             solu.setInput(inputGroup);
 
@@ -903,6 +899,8 @@ void S8Solver::SetSolution(const int &bin, const int &solution)
 
 void S8Solver::PrintData(TString option)
 {
+    // Setup
+    //
     std::cout << " Name: " << fthename << std::endl;
     std::cout << " Method: " << fmethod << std::endl;
     std::cout << " Category: " << fcategory << std::endl;
@@ -918,60 +916,63 @@ void S8Solver::PrintData(TString option)
     std::cout << " k_b scale factor: " << fKappabf << std::endl;
     std::cout << " k_cl scale factor: " << fKappaclf << std::endl;
     
-    if (option=="input")
+    // Print Input and solution right after input
+    //
+    cout << "INPUT" << endl;
+    cout << endl;
+
+    cout << " [Average]" << endl
+        << _totalInput << endl
+        << endl;
+
+    cout << " SOLUTION" << endl;
+    printSolution(fTotalSolution, fTotalSolutionErr);
+    cout << endl;
+
+    cout << " [Binned]" << endl;
+    for(BinnedNumericInputGroup::const_iterator inputGroup =
+            _binnedInput.begin(),
+            begin= _binnedInput.begin();
+        _binnedInput.end() != inputGroup;
+        ++inputGroup)
     {
-        cout << " Input values" << endl;
-        cout << " Average: " << endl;
-        for(InputMap::const_iterator i = TotalInput.begin();
-            i != TotalInput.end();
-            ++i)
+        const int bin = std::distance(begin, inputGroup);
+        cout << setw(40) << right << setfill('-')
+            << "Bin " << bin
+            << " -----" << setfill(' ') << endl;
+
+        cout << *inputGroup << endl;
+        cout << endl;
+
+        cout << " SOLUTION" << endl;
+        printSolution(fBinnedSolution[bin], fBinnedSolutionErr[bin]);
+
+        cout << setw(50) << setfill('-') << ' ' << setfill(' ')
+            << endl
+            << endl;
+    }
+}
+
+void S8Solver::printSolution(const InputMap &input, const InputMap &error) const
+{
+    for(InputMap::const_iterator i = input.begin();
+        i != input.end();
+        ++i)
+    {
+        cout << i->first << " = " << i->second << " +/- ";
+
+        InputMap::const_iterator err = error.find(i->first);
+        if (error.end() == err)
         {
-            cout << i->first << " = " << i->second << endl;
+            cout << " No Error" << endl;
+
+            continue;
         }
 
-        cout << " Binned: " << endl;
-        for(BinnedInputMap::const_iterator ibin = BinnedInput.begin();
-            ibin!=BinnedInput.end();
-            ++ibin)
-        {
-            cout << "### bin: " << ibin->first << endl;
-
-            InputMap tmpmap = ibin->second;
-            for(InputMap::const_iterator i = tmpmap.begin();
-                i != tmpmap.end();
-                ++i)
-            {
-                cout << i->first << " = " << i->second << endl;
-            }
-        }
-        
+        cout << err->second << " ("
+            << (1. * err->second / i->second) << ")"
+            << std::endl;
     }
-    else
-    {
-        std::cout << " Solutions: " << std::endl;
-        
-        std::cout << " Average: " << std::endl;
-        for( std::map<TString,double>::const_iterator i = fTotalSolution.begin(); i!=fTotalSolution.end(); ++i) {
-            std::cout << i->first << " = " << i->second << " \\pm "
-                << fTotalSolutionErr[i->first] << "    ("
-                << (1. * fTotalSolutionErr[i->first] / i->second) << ")"
-                << std::endl;
-        }
-        std::cout << " Binned: " << std::endl;
-        for( std::map<int,std::map<TString,double> >::const_iterator ibin = fBinnedSolution.begin(); ibin!=fBinnedSolution.end(); ++ibin) {
-            
-            std::cout << "### bin: " << ibin->first << std::endl;
-            std::map<TString, double> tmpmap = ibin->second;
-            std::map<TString, double> tmpmaperr = fBinnedSolutionErr[ibin->first];
-            for( std::map<TString,double>::const_iterator i = tmpmap.begin(); i!=tmpmap.end(); ++i) {
-                std::cout << i->first << " = " << i->second << " \\pm "
-                    << tmpmaperr[i->first] << "   ("
-                    << (1. * tmpmaperr[i->first] / i->second) << ")"
-                    << std::endl;
-            }
-        }
-    }
-    
 }
 
 void S8Solver::Save(TString filename)
