@@ -107,6 +107,18 @@ process.load("PhysicsTools.JetMCAlgos.CaloJetsMCFlavour_cfi")
 #############   Include the jet corrections ##########
 process.load("JetMETCorrections.Configuration.DefaultJEC_cff")
 
+process.ak5CaloL2Relative.useCondDB = False
+process.ak5CaloL3Absolute.useCondDB = False
+process.ak5CaloResidual.useCondDB = False
+
+process.ak5PFL2Relative.useCondDB = False
+process.ak5PFL3Absolute.useCondDB = False
+process.ak5PFResidual.useCondDB = False
+
+process.ak5JPTL2Relative.useCondDB = False
+process.ak5JPTL3Absolute.useCondDB = False
+process.ak5JPTResidual.useCondDB = False
+
 
 process.load("SimTracker.TrackHistory.TrackClassifier_cff")
 process.load("RecoBTag.PerformanceMeasurements.MistagAnalyzer_cff")
@@ -135,7 +147,7 @@ process.out = cms.OutputModule("PoolOutputModule",
 #Filter for PFJets
 process.PFJetsFilter = cms.EDFilter("PFJetSelector",
  src = cms.InputTag("ak5PFJets"),
- cut = cms.string("pt > 10.0 && abs(eta) < 2.5 && neutralHadronEnergyFraction < 1.0 && neutralEmEnergyFraction < 1.0 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 1.0"),
+ cut = cms.string("pt > 10.0 && abs(eta) < 2.4 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 0.99"),                  
  filter = cms.bool(True)
 )
 #---------------------------------------
@@ -159,6 +171,9 @@ process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
  		      maxAbsZ = cms.double(24), 
  		      maxd0 = cms.double(2)	
                      )
+
+#Noise filter
+process.load('CommonTools/RecoAlgos/HBHENoiseFilter_cfi')
 
 
 ### from Cristina: calibration JetProb
@@ -195,6 +210,7 @@ process.p = cms.Path(
         process.ak5PFJetsL2L3
 #$$
         *process.PFJetsFilter
+        *process.HBHENoiseFilter
         *process.noscraping
         *process.primaryVertexFilter
 	*process.ak5JetTracksAssociatorAtVertex

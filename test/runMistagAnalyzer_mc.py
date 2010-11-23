@@ -126,6 +126,18 @@ process.load("PhysicsTools.JetMCAlgos.CaloJetsMCFlavour_cfi")
 #############   Include the jet corrections ##########
 process.load("JetMETCorrections.Configuration.DefaultJEC_cff")
 
+process.ak5CaloL2Relative.useCondDB = False
+process.ak5CaloL3Absolute.useCondDB = False
+process.ak5CaloResidual.useCondDB = False
+
+process.ak5PFL2Relative.useCondDB = False
+process.ak5PFL3Absolute.useCondDB = False
+process.ak5PFResidual.useCondDB = False
+
+process.ak5JPTL2Relative.useCondDB = False
+process.ak5JPTL3Absolute.useCondDB = False
+process.ak5JPTResidual.useCondDB = False
+
 
 process.load("SimTracker.TrackHistory.TrackClassifier_cff")
 process.load("RecoBTag.PerformanceMeasurements.MistagAnalyzer_cff")
@@ -214,7 +226,8 @@ process.p = cms.Path(
         *process.ak5PFJetsL2L3
 #$$
         *process.PFJetsFilter
-        *process.noscraping
+        #*process.noscraping
+        #*process.HBHENoiseFilter
         *process.primaryVertexFilter
 	*process.ak5JetTracksAssociatorAtVertex
 	*process.btagging

@@ -263,7 +263,9 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("Jet_hist3",       Jet_hist3       ,"Jet_hist3[nJet]/I");
   smalltree->Branch("Jet_histJet",     Jet_histJet     ,"Jet_histJet[nJet]/I");
   smalltree->Branch("Jet_histSvx",     Jet_histSvx     ,"Jet_histSvx[nJet]/I");
-  
+  smalltree->Branch("Jet_residual_caloJet", Jet_residual_caloJet    ,"Jet_residual_caloJet/F"); 
+  smalltree->Branch("Jet_residual_pfJet",   Jet_residual_pfJet      ,"Jet_residual_pfJet/F"); 
+  smalltree->Branch("Jet_residual_tcJet",   Jet_residual_tcJet      ,"Jet_residual_tcJet/F"); 
   
   
   smalltree->Branch("nMuon"	   ,&nMuon	 ,"nMuon/I");
