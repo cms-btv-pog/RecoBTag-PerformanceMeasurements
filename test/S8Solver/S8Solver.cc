@@ -918,25 +918,36 @@ void S8Solver::PrintData(TString option)
     std::cout << " k_b scale factor: " << fKappabf << std::endl;
     std::cout << " k_cl scale factor: " << fKappaclf << std::endl;
     
-    if (option=="input") {
-        std::cout << " Input values" << std::endl;
-        std::cout << " Average: " << std::endl;
-        for( std::map<TString,double>::const_iterator i = TotalInput.begin(); i!=TotalInput.end(); ++i) {
-            std::cout << i->first << " = " << i->second << std::endl;
+    if (option=="input")
+    {
+        cout << " Input values" << endl;
+        cout << " Average: " << endl;
+        for(InputMap::const_iterator i = TotalInput.begin();
+            i != TotalInput.end();
+            ++i)
+        {
+            cout << i->first << " = " << i->second << endl;
         }
-        std::cout << " Binned: " << std::endl;
-        for( std::map<int,std::map< TString, double > >::const_iterator ibin = BinnedInput.begin(); ibin!=BinnedInput.end(); ++ibin) {
 
-            std::cout << "### bin: " << ibin->first << std::endl;
-            std::map<TString, double> tmpmap = ibin->second;
-            
-            for( std::map<TString,double>::const_iterator i = tmpmap.begin(); i!=tmpmap.end(); ++i) {
-                std::cout << i->first << " = " << i->second << std::endl;
+        cout << " Binned: " << endl;
+        for(BinnedInputMap::const_iterator ibin = BinnedInput.begin();
+            ibin!=BinnedInput.end();
+            ++ibin)
+        {
+            cout << "### bin: " << ibin->first << endl;
+
+            InputMap tmpmap = ibin->second;
+            for(InputMap::const_iterator i = tmpmap.begin();
+                i != tmpmap.end();
+                ++i)
+            {
+                cout << i->first << " = " << i->second << endl;
             }
         }
         
     }
-    else {
+    else
+    {
         std::cout << " Solutions: " << std::endl;
         
         std::cout << " Average: " << std::endl;
@@ -1503,7 +1514,9 @@ void S8Solver::Draw(int maxNbins)
 
 void S8Solver::Print(TString extension )
 {
-    for(std::map<TString,TCanvas*>::const_iterator icv=cv_map.begin(); icv!=cv_map.end(); ++icv)
+    for(std::map<TString,TCanvas*>::const_iterator icv=cv_map.begin();
+        icv != cv_map.end();
+        ++icv)
     {
         TString tmpname = icv->first;
         TCanvas *acv = icv->second;
