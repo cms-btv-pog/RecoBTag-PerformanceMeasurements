@@ -52,11 +52,7 @@ class S8Solver
 		void SetMethod( TString option ) { fmethod = option; }
 		void UseMCTrue(bool option) { fusemctrue = option; }
 		void Solve();
-		void SetSolution( int bin, int solution)
-        {
-			// bin 0 corresponds to average solution
-				fPickSolutionMap[bin] = solution;
-		}
+		void SetSolution(const int &bin, const int &solution);
 
         void setDoBinnedSolution(bool flag) { _doBinnedSolution = flag; }
 
@@ -66,45 +62,7 @@ class S8Solver
 		void DumpTable(std::string filename="table.txt");
 		void Draw(int maxNbins=0);
 		void Print(TString extension="eps");
-		void Save(TString filename="solver.root")
-        {
-
-			TFile *ofile = new TFile(filename,"RECREATE");
-
-			// true efficiency
-			feffTag_b->Write();
-			feffTag_cl->Write();
-			feffmu_b->Write();
-			feffmu_cl->Write();
-			// input
-			fnHisto->Write();
-			fpHisto->Write();
-			fnHistoMu->Write();
-			fpHistoMu->Write();
-			fnHistoSvx->Write();
-			fpHistoSvx->Write();
-			fnHistoAll->Write();
-			fpHistoAll->Write();
-			fh_kb->Write();
-			fh_kcl->Write();
-			fh_alpha->Write();
-			fh_beta->Write();
-			fh_delta->Write();
-			fh_gamma->Write();
-			// output
-			geffTag_b->Write();
-			gS8effTag_b->Write();
-			geffmu_b->Write();
-			gS8effmu_b->Write();
-			geffTag_cl->Write();
-			gS8effTag_cl->Write();
-			geffmu_cl->Write();
-			gS8effmu_cl->Write();
-				
-			//ofile->Write();
-			ofile->Close();
-			delete ofile;
-		};
+		void Save(TString filename="solver.root");
 		
   protected:
 		void GetInput();
@@ -138,14 +96,21 @@ class S8Solver
         bool _doBinnedSolution;
 		double fminPtrel;
 		double fMaxPtrel;
-		std::map< TString, double > TotalInput;
-        std::map< TString, double > TotalInputErr;
-		std::map< int, std::map< TString, double> > BinnedInput;
-		std::map< TString, double > fTotalSolution;
-		std::map< TString, double > fTotalSolutionErr;
+
+        typedef std::map<TString, double> InputMap;
+        typedef std::map<int, InputMap>      BinnedInputMap;
+
+		InputMap TotalInput;
+        InputMap TotalInputErr;
+
+		BinnedInputMap BinnedInput;
+
+		InputMap fTotalSolution;
+		InputMap fTotalSolutionErr;
 		std::map< int, int > fPickSolutionMap;
-		std::map< int, std::map< TString, double> > fBinnedSolution;
-		std::map< int, std::map< TString, double> > fBinnedSolutionErr;
+        
+		BinnedInputMap fBinnedSolution;
+		BinnedInputMap fBinnedSolutionErr;
 
 		std::map<TString, TCanvas*> cv_map;
 

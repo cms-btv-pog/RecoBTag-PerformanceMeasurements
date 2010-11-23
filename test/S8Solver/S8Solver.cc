@@ -17,9 +17,11 @@
 #include <iomanip>
 #include <fstream>
 #include <sstream>
+#include <memory>
 
 ClassImp(S8Solver)
 
+using std::auto_ptr;
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -80,10 +82,10 @@ void S8Solver::LoadHistos()
     finputFile->cd();
 
     //  for analyzer
-    fnHistoBase = (TH2F*) gDirectory->Get("muon_in_jet/n_"+fcategory);
-    fpHistoBase = (TH2F*) gDirectory->Get("muon_in_jet/p_"+fcategory);
-    fnSvxHistoBase = (TH2F*) gDirectory->Get("muon_in_jet/ntag_"+fcategory);
-    fpSvxHistoBase = (TH2F*) gDirectory->Get("muon_in_jet/ptag_"+fcategory);
+    fnHistoBase = (TH2F*) gDirectory->Get("lepton_in_jet/n_"+fcategory);
+    fpHistoBase = (TH2F*) gDirectory->Get("lepton_in_jet/p_"+fcategory);
+    fnSvxHistoBase = (TH2F*) gDirectory->Get("lepton_in_jet/ntag_"+fcategory);
+    fpSvxHistoBase = (TH2F*) gDirectory->Get("lepton_in_jet/ptag_"+fcategory);
 
     // get bin for pTrel cut
     int ith_ptrel_bin = (int) fnHistoBase->GetYaxis()->FindBin(fminPtrel);
@@ -539,14 +541,6 @@ void S8Solver::GetInput()
         TotalInput["pMuTag"] = fpHistoAll->Integral(1,fpHistoAll->GetNbinsX()+1);
     }
 
-    // asumming parameters fitted to a constant
-    TF1 *Fkb = fh_kb->GetFunction("pol0");
-    TF1 *Fkcl = fh_kcl->GetFunction("pol0");
-    TF1 *Falpha = fh_alpha->GetFunction("pol0");
-    TF1 *Fbeta = fh_beta->GetFunction("pol0");
-    TF1 *Fdelta = fh_delta->GetFunction("pol0");
-    TF1 *Fgamma = fh_gamma->GetFunction("pol0");
-
     // Get Total Input
     //
     _totalInput = inputGroup(_solverInput, _flavouredInput);
@@ -612,6 +606,9 @@ void S8Solver::GetInput()
         }
 
         _binnedInput.push_back(group);
+
+        // Done binned input preparation
+        //
         
         std::map<TString, double> tmpmap;
 
@@ -682,8 +679,7 @@ void S8Solver::GetInput()
 
 void S8Solver::Solve()
 {
-
-    this->GetInput();
+    GetInput();
     
     if (fmethod=="analytic" || fmethod=="fit" )
     {
@@ -695,6 +691,7 @@ void S8Solver::Solve()
         fTotalSolutionErr = sol.GetSolutionErr();
 
         // now fit
+        //
         if (fmethod=="fit")
         {
             S8FitSolver s8fit;
@@ -703,26 +700,28 @@ void S8Solver::Solve()
             fTotalSolution = s8fit.GetSolution();
             fTotalSolutionErr = s8fit.GetSolutionErr();
         }
-        
-            // binned solution
-            for( std::map<int,std::map<TString,double> >::const_iterator ibin = BinnedInput.begin(); ibin!=BinnedInput.end(); ++ibin)
-            {
-                sol.Solve(ibin->second);
-                fBinnedSolution[ibin->first] = sol.GetSolution();
-                fBinnedSolutionErr[ibin->first] = sol.GetSolutionErr();
-                
-                // now fit
-                if (fmethod=="fit") {
-                    S8FitSolver as8fit;
-                    as8fit.Init(fBinnedSolution[ibin->first]);
-                    as8fit.Solve(ibin->second);
-                    fBinnedSolution[ibin->first] = as8fit.GetSolution();
-                    fBinnedSolutionErr[ibin->first] = as8fit.GetSolutionErr();
-                }
-            }
-        
-    }
 
+        // binned solution
+        //
+        for(BinnedInputMap::const_iterator ibin = BinnedInput.begin();
+            ibin != BinnedInput.end();
+            ++ibin)
+        {
+            sol.Solve(ibin->second);
+            fBinnedSolution[ibin->first] = sol.GetSolution();
+            fBinnedSolutionErr[ibin->first] = sol.GetSolutionErr();
+            
+            // now fit
+            //
+            if (fmethod=="fit") {
+                S8FitSolver as8fit;
+                as8fit.Init(fBinnedSolution[ibin->first]);
+                as8fit.Solve(ibin->second);
+                fBinnedSolution[ibin->first] = as8fit.GetSolution();
+                fBinnedSolutionErr[ibin->first] = as8fit.GetSolutionErr();
+            }
+        }
+    }
     else if (fmethod=="numeric")
     {
         cout << endl;
@@ -832,7 +831,8 @@ void S8Solver::Solve()
             {
                 if (ipick->first == ibin->first)
                 {
-                    std::cout << "> Force binned solution # " << ipick->second << std::endl;
+                    cout << "> Force binned solution # " << ipick->second
+                        << endl;
                     solu.SetSolution( ipick->second );
 
                     break;
@@ -892,6 +892,13 @@ void S8Solver::Solve()
             fBinnedSolutionErr[ibin->first] = tmpsoluerr;
         }
     }
+}
+
+// bin 0 corresponds to average solution
+//
+void S8Solver::SetSolution(const int &bin, const int &solution)
+{
+    fPickSolutionMap[bin] = solution;
 }
 
 void S8Solver::PrintData(TString option)
@@ -956,9 +963,53 @@ void S8Solver::PrintData(TString option)
     
 }
 
+void S8Solver::Save(TString filename)
+{
+    auto_ptr<TFile> ofile(new TFile(filename,"RECREATE"));
+    if (!ofile->IsOpen())
+    {
+        cerr << "Failed to open output file" << endl;
+
+        return;
+    }
+
+    /*
+    // true efficiency
+    feffTag_b->Write();
+    feffTag_cl->Write();
+    feffmu_b->Write();
+    feffmu_cl->Write();
+
+    // input
+    fnHisto->Write();
+    fpHisto->Write();
+    fnHistoMu->Write();
+    fpHistoMu->Write();
+    fnHistoSvx->Write();
+    fpHistoSvx->Write();
+    fnHistoAll->Write();
+    fpHistoAll->Write();
+    fh_kb->Write();
+    fh_kcl->Write();
+    fh_alpha->Write();
+    fh_beta->Write();
+    fh_delta->Write();
+    fh_gamma->Write();
+
+    // output
+    geffTag_b->Write();
+    gS8effTag_b->Write();
+    geffmu_b->Write();
+    gS8effmu_b->Write();
+    geffTag_cl->Write();
+    gS8effTag_cl->Write();
+    geffmu_cl->Write();
+    gS8effmu_cl->Write();
+    */
+}
+
 void S8Solver::DumpTable(std::string filename)
 {
-
     Int_t nxbins = fBinnedSolution.size();
     // separator
     std::string sp = ",";
@@ -1065,7 +1116,6 @@ void S8Solver::DumpTable(std::string filename)
             bbin++;
         }
     }
-    
 }
 
 void S8Solver::Draw(int maxNbins)
@@ -1084,7 +1134,6 @@ void S8Solver::Draw(int maxNbins)
   TArrayD s8effTag_clErr(nxbins);
   TArrayD s8effmu_cl(nxbins);
   TArrayD s8effmu_clErr(nxbins);
-
   
   TArrayD effTag_b(nxbins);
   TArrayD effTag_bErr(nxbins);
