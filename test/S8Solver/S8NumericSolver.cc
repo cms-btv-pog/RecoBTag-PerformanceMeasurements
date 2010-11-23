@@ -98,7 +98,7 @@ void S8NumericSolver::Reset()
     {
         *(_result + i) = new TH1F((string("res") + lexical_cast<string>(i)).c_str(),
                                   (string("Result") + lexical_cast<string>(i)).c_str(),
-                                  2000, 0, 2.);
+                                  200, 0, 2.);
     }
 
     for(Int_t i = 0 ; i < 8 ; ++i)
