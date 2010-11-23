@@ -157,6 +157,11 @@ std::ostream &operator<<(std::ostream &out, const Coefficients &coefficients)
 
 std::ostream &operator<<(std::ostream &out, const NumericInputGroup &group)
 {
+    out << " Bin" << endl;
+    out << "     " << setw(15) << left << " "
+        << group.bin << endl;
+    out << endl;
+
     out << " Input" << endl;
     out << group.input << endl;
 

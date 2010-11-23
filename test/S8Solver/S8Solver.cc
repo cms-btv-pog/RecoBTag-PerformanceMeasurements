@@ -66,6 +66,11 @@ S8Solver::S8Solver():
         *(_averageResults + i) = 0;
 }
 
+S8Solver::~S8Solver()
+{
+    Clear();
+}
+
 void S8Solver::Clear()
 {
     if (fh_alpha) delete fh_alpha;
@@ -599,9 +604,10 @@ void S8Solver::GetInput()
     {
         // Calculate each bin input explicitly
         //
-        NumericInputGroup group = inputGroup(_solverInput,
-                                             _flavouredInput,
-                                             ibin);
+        NumericInputGroup group = inputGroup(
+            _solverInput,
+            _flavouredInput,
+            ibin);
 
         if (bins == ibin)
         {
@@ -778,18 +784,20 @@ void S8Solver::Solve()
 
         // binned solutions
         //
-        for(std::map<int,std::map<TString,double> >::const_iterator ibin = BinnedInput.begin();
-            ibin != BinnedInput.end();
-            ++ibin)
+        int bin = 1;
+        const int maxBins = 10000;
+        for(BinnedNumericInputGroup::const_iterator inputGroup =
+                _binnedInput.begin();
+            _binnedInput.end() != inputGroup &&
+                maxBins >= bin;
+            ++inputGroup, ++bin)
         {
             cout << endl;
-            cout << "BINED SOLUTION... BIN " << ibin->first << endl;
+            cout << "BINED SOLUTION... BIN " << bin << endl;
             cout << endl;
 
-            const NumericInputGroup &inputGroup = _binnedInput[ibin->first - 1];
-
             S8NumericSolver solu("solu");
-            solu.setInput(inputGroup);
+            solu.setInput(*inputGroup);
 
             solu.SetError(2);
             solu.SetNbErrorIteration(1000);
@@ -800,7 +808,7 @@ void S8Solver::Solve()
                 ipick != fPickSolutionMap.end();
                 ++ipick)
             {
-                if (ipick->first == ibin->first)
+                if (ipick->first == bin)
                 {
                     cout << "> Force binned solution # " << ipick->second
                         << endl;
@@ -816,7 +824,7 @@ void S8Solver::Solve()
             //
             {
                 std::ostringstream name;
-                name << "out_bin_" << ibin->first << ".root";
+                name << "out_bin_" << bin << ".root";
                 TFile *binout = TFile::Open(name.str().c_str(), "recreate");
                 for (int i = 0; 8 > i; ++i)
                 {
@@ -825,49 +833,10 @@ void S8Solver::Solve()
                 binout->Close();
             }
 
-            Solution solution;
-            saveSolution(solution, solu, inputGroup);
-            _binnedSolution.push_back(solution);
-
-
-            /*
-            std::map<TString,double> tmpsolu;
-            std::map<TString,double> tmpsoluerr;
-                
-            tmpsolu["n_b"]       = solu.GetResultVec(0) *
-                                    inputGroup.input.n.all.first;
-            tmpsolu["n_cl"]      = solu.GetResultVec(1) *
-                                    inputGroup.input.n.all.first;
-            tmpsolu["effMu_b"]   = solu.GetResultVec(2);
-            tmpsolu["effMu_cl"]  = solu.GetResultVec(3);
-            tmpsolu["effTag_b"]  = solu.GetResultVec(4);
-            tmpsolu["effTag_cl"] = solu.GetResultVec(5);
-            tmpsolu["p_b"]       = solu.GetResultVec(6)*tmpsolu["n_b"];
-            tmpsolu["p_cl"]      = solu.GetResultVec(7)*tmpsolu["n_cl"];
-            
-            for(int i = 0; 8 > i; ++i)
-            {
-                if (solu.GetErrorSupVec(i) != solu.GetErrorInfVec(i))
-                    cerr << " [-] Assymmetric errors (" << i << "): +(-) "
-                        << solu.GetErrorSupVec(i)
-                        << '(' << solu.GetErrorInfVec(i) << ')' << endl;
-            }
-
-            // FIX errors
-            tmpsoluerr["n_b"]       = solu.getError(0) *
-                                        inputGroup.input.n.all.first;
-            tmpsoluerr["n_cl"]      = solu.getError(1) *
-                                        inputGroup.input.n.all.first;
-            tmpsoluerr["effMu_b"]   = solu.getError(2);
-            tmpsoluerr["effMu_cl"]  = solu.getError(3);
-            tmpsoluerr["effTag_b"]  = solu.getError(4);
-            tmpsoluerr["effTag_cl"] = solu.getError(5);
-            tmpsoluerr["p_b"]       = solu.getError(6) * tmpsolu["n_b"];
-            tmpsoluerr["p_cl"]      = solu.getError(7) * tmpsolu["n_cl"];
-
-            fBinnedSolution[ibin->first] = tmpsolu;
-            fBinnedSolutionErr[ibin->first] = tmpsoluerr;
-            */
+            SolutionInBin solutionInBin;
+            saveSolution(solutionInBin.solution, solu, *inputGroup);
+            solutionInBin.bin = inputGroup->bin;
+            _binnedSolution.push_back(solutionInBin);
         }
     }
 }
@@ -913,22 +882,19 @@ void S8Solver::PrintData(TString option)
     // Binned
     //
     cout << " [Binned]" << endl;
-    for(BinnedNumericInputGroup::const_iterator inputGroup =
-            _binnedInput.begin(),
-            begin= _binnedInput.begin();
-        _binnedInput.end() != inputGroup;
-        ++inputGroup)
+    int bin = 0;
+    for(BinnedSolution::const_iterator solution = _binnedSolution.begin();
+        _binnedSolution.end() != solution;
+        ++solution, ++bin)
     {
-        const int bin = std::distance(begin, inputGroup);
         cout << setw(40) << setfill('-') << ' '
-            << " Bin " << bin
+            << " Bin " << (bin + 1)
             << " ---" << setfill(' ') << endl
             << endl;
-
-        cout << *inputGroup << endl;
+        cout << _binnedInput[bin] << endl;
 
         cout << " SOLUTION" << endl;
-        cout << _binnedSolution[bin] << endl;
+        cout << solution->solution << endl;
 
         cout << setw(50) << setfill('-') << ' ' << setfill(' ')
             << endl
@@ -945,6 +911,12 @@ void S8Solver::Save(TString filename)
 
         return;
     }
+
+    generateGraphs();
+
+    // Save Graphs
+    //
+    _graphs->save(ofile.get());
 
     /*
     // true efficiency
@@ -1093,51 +1065,59 @@ void S8Solver::DumpTable(std::string filename)
 
 void S8Solver::Draw(int maxNbins)
 {
-  Int_t nxbins = fBinnedSolution.size();
+    generateGraphs();
 
-  if (maxNbins != 0 ) nxbins = maxNbins;
-  
-  TArrayD ptarray(nxbins);
-  TArrayD ptarrayErr(nxbins);
-  TArrayD s8effTag_b(nxbins);
-  TArrayD s8effTag_bErr(nxbins);
-  TArrayD s8effmu_b(nxbins);
-  TArrayD s8effmu_bErr(nxbins);
-  TArrayD s8effTag_cl(nxbins);
-  TArrayD s8effTag_clErr(nxbins);
-  TArrayD s8effmu_cl(nxbins);
-  TArrayD s8effmu_clErr(nxbins);
-  
-  TArrayD effTag_b(nxbins);
-  TArrayD effTag_bErr(nxbins);
-  TArrayD effTag_cl(nxbins);
-  TArrayD effTag_clErr(nxbins);
-  TArrayD effmu_b(nxbins);
-  TArrayD effmu_bErr(nxbins);
-  TArrayD effmu_cl(nxbins);
-  TArrayD effmu_clErr(nxbins);
-  TArrayD effTagmu_b(nxbins);
-  TArrayD effTagmu_bErr(nxbins);
-  TArrayD effTagmu_cl(nxbins);
-  TArrayD effTagmu_clErr(nxbins);
+    // Draw Graphs
+    //
+    _graphs->draw();
 
-  TArrayD input_n(nxbins);
-  TArrayD input_p(nxbins);
-  TArrayD input_ntag(nxbins);
-  TArrayD input_ptag(nxbins);
-  TArrayD input_nmu(nxbins);
-  TArrayD input_pmu(nxbins);
-  TArrayD input_ntagmu(nxbins);
-  TArrayD input_ptagmu(nxbins);
+    /*
+    Int_t nxbins = fBinnedSolution.size();
 
-  TArrayD input_nErr(nxbins);
-  TArrayD input_pErr(nxbins);
-  TArrayD input_ntagErr(nxbins);
-  TArrayD input_ptagErr(nxbins);
-  TArrayD input_nmuErr(nxbins);
-  TArrayD input_pmuErr(nxbins);
-  TArrayD input_ntagmuErr(nxbins);
-  TArrayD input_ptagmuErr(nxbins);
+    if (maxNbins != 0 )
+        nxbins = maxNbins;
+
+    TArrayD ptarray(nxbins);
+    TArrayD ptarrayErr(nxbins);
+    TArrayD s8effTag_b(nxbins);
+    TArrayD s8effTag_bErr(nxbins);
+    TArrayD s8effmu_b(nxbins);
+    TArrayD s8effmu_bErr(nxbins);
+    TArrayD s8effTag_cl(nxbins);
+    TArrayD s8effTag_clErr(nxbins);
+    TArrayD s8effmu_cl(nxbins);
+    TArrayD s8effmu_clErr(nxbins);
+
+    TArrayD effTag_b(nxbins);
+    TArrayD effTag_bErr(nxbins);
+    TArrayD effTag_cl(nxbins);
+    TArrayD effTag_clErr(nxbins);
+    TArrayD effmu_b(nxbins);
+    TArrayD effmu_bErr(nxbins);
+    TArrayD effmu_cl(nxbins);
+    TArrayD effmu_clErr(nxbins);
+    TArrayD effTagmu_b(nxbins);
+    TArrayD effTagmu_bErr(nxbins);
+    TArrayD effTagmu_cl(nxbins);
+    TArrayD effTagmu_clErr(nxbins);
+
+    TArrayD input_n(nxbins);
+    TArrayD input_p(nxbins);
+    TArrayD input_ntag(nxbins);
+    TArrayD input_ptag(nxbins);
+    TArrayD input_nmu(nxbins);
+    TArrayD input_pmu(nxbins);
+    TArrayD input_ntagmu(nxbins);
+    TArrayD input_ptagmu(nxbins);
+
+    TArrayD input_nErr(nxbins);
+    TArrayD input_pErr(nxbins);
+    TArrayD input_ntagErr(nxbins);
+    TArrayD input_ptagErr(nxbins);
+    TArrayD input_nmuErr(nxbins);
+    TArrayD input_pmuErr(nxbins);
+    TArrayD input_ntagmuErr(nxbins);
+    TArrayD input_ptagmuErr(nxbins);
   
     for (int ibin = 1; ibin<= nxbins; ++ibin)
     {
@@ -1154,10 +1134,13 @@ void S8Solver::Draw(int maxNbins)
     }
 
     // binned input
+    //
     int jjbin= 0;
-    for( std::map<int,std::map<TString,double> >::const_iterator ibin = BinnedInput.begin(); ibin!=BinnedInput.end(); ++ibin)
+    for(BinnedInputMap::const_iterator ibin = BinnedInput.begin();
+        ibin!=BinnedInput.end();
+        ++ibin)
     {
-        std::map<TString,double> tmpinput;
+        InputMap tmpinput;
         tmpinput = ibin->second;
             
         input_n[jjbin] = tmpinput["n"];
@@ -1181,10 +1164,14 @@ void S8Solver::Draw(int maxNbins)
         jjbin++;
     }
     
-    for( std::map<int,std::map<TString,double> >::const_iterator ibin = fBinnedSolution.begin(); ibin!=fBinnedSolution.end(); ++ibin)
+    // Binned Solution
+    //
+    for(BinnedInputMap::const_iterator ibin = fBinnedSolution.begin();
+        ibin!=fBinnedSolution.end();
+        ++ibin)
     {
-        std::map<TString, double> tmpmaps8 = ibin->second;
-        std::map<TString, double> tmpmaps8err = fBinnedSolutionErr[ibin->first];
+        InputMap tmpmaps8 = ibin->second;
+        InputMap tmpmaps8err = fBinnedSolutionErr[ibin->first];
 
         if (ibin->first <= nxbins)
         {
@@ -1209,65 +1196,68 @@ void S8Solver::Draw(int maxNbins)
     geffmu_cl = new TGraphErrors(nxbins,ptarray.GetArray(),effmu_cl.GetArray(),ptarrayErr.GetArray(),effmu_clErr.GetArray());
     gS8effmu_cl = new TGraphErrors(nxbins,ptarray.GetArray(),s8effmu_cl.GetArray(),ptarrayErr.GetArray(),s8effmu_clErr.GetArray());
 
-    geffTag_b->SetTitle("True b-efficiency");
-    gS8effTag_b->SetTitle("System8 Results");
-    geffTag_b->SetName("geffTag_b");
-    gS8effTag_b->SetName("gS8effTag_b");
-    
-    geffTag_cl->SetTitle("True cl-efficiency");
-    gS8effTag_cl->SetTitle("System8 Results");
-    geffTag_cl->SetName("geffTag_cl");
-    gS8effTag_cl->SetName("gS8effTag_cl");
-    
-    geffmu_b->SetTitle("True b-efficiency");
-    gS8effmu_b->SetTitle("System8 Results");
-    geffmu_b->SetName("geffmu_b");
-    gS8effmu_b->SetName("gS8effmu_b");
+    // Set Titles
+    //
+    {
+        geffTag_b->SetTitle("True b-efficiency");
+        gS8effTag_b->SetTitle("System8 Results");
+        geffTag_b->SetName("geffTag_b");
+        gS8effTag_b->SetName("gS8effTag_b");
+        
+        geffTag_cl->SetTitle("True cl-efficiency");
+        gS8effTag_cl->SetTitle("System8 Results");
+        geffTag_cl->SetName("geffTag_cl");
+        gS8effTag_cl->SetName("gS8effTag_cl");
+        
+        geffmu_b->SetTitle("True b-efficiency");
+        gS8effmu_b->SetTitle("System8 Results");
+        geffmu_b->SetName("geffmu_b");
+        gS8effmu_b->SetName("gS8effmu_b");
 
-    geffmu_cl->SetTitle("True cl-efficiency");
-    gS8effmu_cl->SetTitle("System8 Results");
-    geffmu_cl->SetName("geffmu_cl");
-    gS8effmu_cl->SetName("gS8effmu_cl");
+        geffmu_cl->SetTitle("True cl-efficiency");
+        gS8effmu_cl->SetTitle("System8 Results");
+        geffmu_cl->SetName("geffmu_cl");
+        gS8effmu_cl->SetName("gS8effmu_cl");
+    }
 
-    geffTag_b->SetMarkerStyle(8);
-    gS8effTag_b->SetMarkerStyle(8);
-    geffTag_b->SetMarkerColor(1);
-    gS8effTag_b->SetMarkerColor(2);
-    geffTag_b->SetLineColor(1); 
-    gS8effTag_b->SetLineColor(2); 
-    geffTag_b->SetMarkerSize(1.5); 
-    gS8effTag_b->SetMarkerSize(1.5); 
+    // Apply styles
+    {
+        geffTag_b->SetMarkerStyle(8);
+        gS8effTag_b->SetMarkerStyle(8);
+        geffTag_b->SetMarkerColor(1);
+        gS8effTag_b->SetMarkerColor(2);
+        geffTag_b->SetLineColor(1); 
+        gS8effTag_b->SetLineColor(2); 
+        geffTag_b->SetMarkerSize(1.5); 
+        gS8effTag_b->SetMarkerSize(1.5); 
 
-    geffTag_cl->SetMarkerStyle(8);
-    gS8effTag_cl->SetMarkerStyle(8);
-    geffTag_cl->SetMarkerColor(1);
-    gS8effTag_cl->SetMarkerColor(2);
-    geffTag_cl->SetLineColor(1); 
-    gS8effTag_cl->SetLineColor(2); 
-    geffTag_cl->SetMarkerSize(1.5); 
-    gS8effTag_cl->SetMarkerSize(1.5); 
+        geffTag_cl->SetMarkerStyle(8);
+        gS8effTag_cl->SetMarkerStyle(8);
+        geffTag_cl->SetMarkerColor(1);
+        gS8effTag_cl->SetMarkerColor(2);
+        geffTag_cl->SetLineColor(1); 
+        gS8effTag_cl->SetLineColor(2); 
+        geffTag_cl->SetMarkerSize(1.5); 
+        gS8effTag_cl->SetMarkerSize(1.5); 
 
+        geffmu_b->SetMarkerStyle(8);
+        gS8effmu_b->SetMarkerStyle(8);
+        geffmu_b->SetMarkerColor(1);
+        gS8effmu_b->SetMarkerColor(2);
+        geffmu_b->SetLineColor(1); 
+        gS8effmu_b->SetLineColor(2); 
+        geffmu_b->SetMarkerSize(1.5); 
+        gS8effmu_b->SetMarkerSize(1.5); 
 
-    geffmu_b->SetMarkerStyle(8);
-    gS8effmu_b->SetMarkerStyle(8);
-    geffmu_b->SetMarkerColor(1);
-    gS8effmu_b->SetMarkerColor(2);
-    geffmu_b->SetLineColor(1); 
-    gS8effmu_b->SetLineColor(2); 
-    geffmu_b->SetMarkerSize(1.5); 
-    gS8effmu_b->SetMarkerSize(1.5); 
-
-
-    geffmu_cl->SetMarkerStyle(8);
-    gS8effmu_cl->SetMarkerStyle(8);
-    geffmu_cl->SetMarkerColor(1);
-    gS8effmu_cl->SetMarkerColor(2);
-    geffmu_cl->SetLineColor(1); 
-    gS8effmu_cl->SetLineColor(2); 
-    geffmu_cl->SetMarkerSize(1.5); 
-    gS8effmu_cl->SetMarkerSize(1.5); 
-
-
+        geffmu_cl->SetMarkerStyle(8);
+        gS8effmu_cl->SetMarkerStyle(8);
+        geffmu_cl->SetMarkerColor(1);
+        gS8effmu_cl->SetMarkerColor(2);
+        geffmu_cl->SetLineColor(1); 
+        gS8effmu_cl->SetLineColor(2); 
+        geffmu_cl->SetMarkerSize(1.5); 
+        gS8effmu_cl->SetMarkerSize(1.5); 
+    }
 
     TString prefix = "effTag_b";    
     cv_map[prefix+"_"+fthename] = new TCanvas(prefix+"_"+fthename,prefix+"_"+fthename,700,700); 
@@ -1377,25 +1367,25 @@ void S8Solver::Draw(int maxNbins)
     gPad->SetGrid();
 
     acvname = "xcorrelations_"+fthename;
-        cv_map[acvname] = new TCanvas(acvname,acvname,700,700);
-        fh_delta->SetMarkerStyle(22);
-        fh_gamma->SetMarkerStyle(23);
-        fh_delta->SetMarkerColor(1);
-        fh_gamma->SetMarkerColor(2);
-        fh_delta->SetLineColor(1);
-        fh_gamma->SetLineColor(2);
-        fh_delta->SetMinimum(0.7);
-        fh_delta->SetMaximum(1.3);
-        fh_delta->Draw("P");
-        fh_gamma->Draw("Psame");
-        
-        TLegend *legcc = new TLegend(0.77,0.22,0.87,0.38,"","NDC");
-        legcc->SetTextSize(0.029);
-        legcc->SetFillColor(10);
-        legcc->AddEntry(fh_delta,"#delta","P");
-        legcc->AddEntry(fh_gamma,"#gamma","P");
-        legcc->Draw();
-        gPad->SetGrid();
+    cv_map[acvname] = new TCanvas(acvname,acvname,700,700);
+    fh_delta->SetMarkerStyle(22);
+    fh_gamma->SetMarkerStyle(23);
+    fh_delta->SetMarkerColor(1);
+    fh_gamma->SetMarkerColor(2);
+    fh_delta->SetLineColor(1);
+    fh_gamma->SetLineColor(2);
+    fh_delta->SetMinimum(0.7);
+    fh_delta->SetMaximum(1.3);
+    fh_delta->Draw("P");
+    fh_gamma->Draw("Psame");
+    
+    TLegend *legcc = new TLegend(0.77,0.22,0.87,0.38,"","NDC");
+    legcc->SetTextSize(0.029);
+    legcc->SetFillColor(10);
+    legcc->AddEntry(fh_delta,"#delta","P");
+    legcc->AddEntry(fh_gamma,"#gamma","P");
+    legcc->Draw();
+    gPad->SetGrid();
 
     ginput_n   = new TGraphErrors(nxbins,ptarray.GetArray(),input_n.GetArray(),ptarrayErr.GetArray(),0);
     ginput_nmu = new TGraphErrors(nxbins,ptarray.GetArray(),input_nmu.GetArray(),ptarrayErr.GetArray(),0);
@@ -1406,32 +1396,36 @@ void S8Solver::Draw(int maxNbins)
     ginput_ptag   = new TGraphErrors(nxbins,ptarray.GetArray(),input_ptag.GetArray(),ptarrayErr.GetArray(),0);
     ginput_ptagmu = new TGraphErrors(nxbins,ptarray.GetArray(),input_ptagmu.GetArray(),ptarrayErr.GetArray(),0);
 
-    ginput_n->SetMarkerStyle(8);
-    ginput_nmu->SetMarkerStyle(8);
-    ginput_ntag->SetMarkerStyle(8);
-    ginput_ntagmu->SetMarkerStyle(8);
-    ginput_p->SetMarkerStyle(8);
-    ginput_pmu->SetMarkerStyle(8);
-    ginput_ptag->SetMarkerStyle(8);
-    ginput_ptagmu->SetMarkerStyle(8);
+    // Apply Styles
+    //
+    {
+        ginput_n->SetMarkerStyle(8);
+        ginput_nmu->SetMarkerStyle(8);
+        ginput_ntag->SetMarkerStyle(8);
+        ginput_ntagmu->SetMarkerStyle(8);
+        ginput_p->SetMarkerStyle(8);
+        ginput_pmu->SetMarkerStyle(8);
+        ginput_ptag->SetMarkerStyle(8);
+        ginput_ptagmu->SetMarkerStyle(8);
 
-    ginput_n->SetMarkerColor(1);
-    ginput_nmu->SetMarkerColor(2);
-    ginput_ntag->SetMarkerColor(3);
-    ginput_ntagmu->SetMarkerColor(4);
-    ginput_p->SetMarkerColor(1);
-    ginput_pmu->SetMarkerColor(2);
-    ginput_ptag->SetMarkerColor(3);
-    ginput_ptagmu->SetMarkerColor(4);
+        ginput_n->SetMarkerColor(1);
+        ginput_nmu->SetMarkerColor(2);
+        ginput_ntag->SetMarkerColor(3);
+        ginput_ntagmu->SetMarkerColor(4);
+        ginput_p->SetMarkerColor(1);
+        ginput_pmu->SetMarkerColor(2);
+        ginput_ptag->SetMarkerColor(3);
+        ginput_ptagmu->SetMarkerColor(4);
 
-    ginput_n->SetLineColor(1);
-    ginput_nmu->SetLineColor(2);
-    ginput_ntag->SetLineColor(3);
-    ginput_ntagmu->SetLineColor(4);
-    ginput_p->SetLineColor(1);
-    ginput_pmu->SetLineColor(2);
-    ginput_ptag->SetLineColor(3);
-    ginput_ptagmu->SetLineColor(4);
+        ginput_n->SetLineColor(1);
+        ginput_nmu->SetLineColor(2);
+        ginput_ntag->SetLineColor(3);
+        ginput_ntagmu->SetLineColor(4);
+        ginput_p->SetLineColor(1);
+        ginput_pmu->SetLineColor(2);
+        ginput_ptag->SetLineColor(3);
+        ginput_ptagmu->SetLineColor(4);
+    }
 
     acvname = "ninputs_"+fthename;
     cv_map[acvname] = new TCanvas(acvname,acvname,700,700);
@@ -1472,25 +1466,27 @@ void S8Solver::Draw(int maxNbins)
     lege->AddEntry(ginput_ptag,"p^{tag}","P");
     lege->AddEntry(ginput_ptagmu,"p^{tag,mu}","P");
     lege->Draw();
+    */
 }
 
-void S8Solver::Print(TString extension )
+
+
+// Generage graphs for binned solutions only
+//
+void S8Solver::generateGraphs()
 {
-    for(std::map<TString,TCanvas*>::const_iterator icv=cv_map.begin();
-        icv != cv_map.end();
-        ++icv)
-    {
-        TString tmpname = icv->first;
-        TCanvas *acv = icv->second;
-        acv->Print(TString(tmpname+"."+extension));
-    }
+    if (_graphs.get())
+        return;
+
+    cout << "Generate Group" << endl;
+    _graphs.reset(new GraphGroup(_binnedInput, _binnedSolution));
 }
 
 
 
 // Helpers
 //
-void saveSolution(S8Solver::Solution &solution,
+void saveSolution(Solution &solution,
                   S8NumericSolver &solver,
                   const NumericInputGroup &inputGroup)
 {
@@ -1549,9 +1545,9 @@ void saveSolution(S8Solver::Solution &solution,
                   pow(solver.getError(7) * n_cl, 2));
 }
 
-std::ostream &operator <<(std::ostream &out, const S8Solver::Solution &solution)
+std::ostream &operator <<(std::ostream &out, const Solution &solution)
 {
-    for(S8Solver::Solution::const_iterator measurement = solution.begin();
+    for(Solution::const_iterator measurement = solution.begin();
         solution.end() != measurement;
         ++measurement)
     {
@@ -1601,6 +1597,11 @@ NumericInputGroup inputGroup(const SolverInput &input,
                              const int &bin)
 {
     NumericInputGroup group;
+
+    group.bin = 
+            make_pair(input.n.all->GetBinCenter(bin),
+                      pow(input.n.all->GetBinWidth(bin) / 2, 2));
+;
 
     // S8 Input
     //

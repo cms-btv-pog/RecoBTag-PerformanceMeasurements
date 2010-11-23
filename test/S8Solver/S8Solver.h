@@ -13,22 +13,25 @@
 
 #include <string>
 #include <map>
+#include <memory>
+#include <stack>
 #include <utility>
 
 #include "S8NumericInput.h"
 #include "S8SolverInput.h"
+#include "S8GraphGroup.h"
+#include "S8Solution.h"
 
 class S8NumericSolver;
 
 class S8Solver
 {
   public:
-        typedef std::map<std::string, Measurement> Solution;
-        typedef std::vector<Solution> BinnedSolution;
+        typedef std::vector<SolutionInBin> BinnedSolution;
 
         S8Solver();
-		//S8Solver(std::string name);
-		virtual ~S8Solver(){};
+		virtual ~S8Solver();
+
 		void Clear();
 		void LoadHistos();
 		void SetName(TString value) {fthename= value;}
@@ -66,13 +69,14 @@ class S8Solver
 		void PrintData(TString option="");
 		void DumpTable(std::string filename="table.txt");
 		void Draw(int maxNbins=0);
-		void Print(TString extension="eps");
 		void Save(TString filename="solver.root");
 		
   protected:
 		void GetInput();
 		
   private:
+        void generateGraphs();
+
         typedef std::map<TString, double> InputMap;
         typedef std::map<int, InputMap>   BinnedInputMap;
 
@@ -204,15 +208,18 @@ class S8Solver
 
         Solution       _totalSolution;
         BinnedSolution _binnedSolution;
+
+        typedef std::map<std::string, TGraphErrors> Graphs;
+        std::auto_ptr<GraphGroup> _graphs;
 		
 		ClassDef(S8Solver,1);
 };
 
-void saveSolution(S8Solver::Solution &,
+void saveSolution(Solution &,
                   S8NumericSolver &,
                   const NumericInputGroup &);
 
-std::ostream &operator <<(std::ostream &, const S8Solver::Solution &);
+std::ostream &operator <<(std::ostream &, const Solution &);
 
 void inputGroup(numeric::InputGroup &, const solver::PlotGroup &, const int &);
 void inputGroup(numeric::InputGroup &, const solver::PlotGroup &);

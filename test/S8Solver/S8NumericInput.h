@@ -79,6 +79,7 @@ struct NumericInputGroup
     FlavouredNumericInput flavouredInput;
     FlavouredEffGroup     efficiency;
     Coefficients          coefficients;
+    Measurement           bin;
 };
 
 std::ostream &operator<<(std::ostream &, const Measurement &);
