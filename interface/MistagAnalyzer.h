@@ -45,10 +45,8 @@ Implementation:
 #include "SimTracker/Records/interface/TrackAssociatorRecord.h"
 #include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
 
-//$$
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "CategoryFinder.h"
-//$$
 
 // reco track and vertex
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
@@ -94,10 +92,10 @@ Implementation:
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 
-
 //residual jet corrections
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+
 
 struct ltstr
 {
@@ -131,15 +129,12 @@ private:
 
     float calculPtRel();
 
-//$$
     bool findCat(const reco::Track* ,CategoryFinder& );
     std::vector< float > getTrackProbabilies(std::vector< float > , int );
     double calculProbability(std::vector< float > );
-//$$
 
     reco::JetFlavour getMatchedParton(const reco::Jet &jet);
     float calculPtRel(reco::Track theMuon, reco::Jet theJet, double JES , string jetcoll );
-    
     
     int matchMuon(const edm::RefToBase<reco::Track>& theMuon, edm::View<reco::Muon>& muons);
 
@@ -162,10 +157,9 @@ private:
     std::string jetPModuleName_;
     std::string jetPPosModuleName_;
     std::string jetPNegModuleName_;
-//$$
+
     std::string jetBModuleName_;
     std::string jetBNegModuleName_;
-//$$
 
     std::string trackCHEModuleName_;
     std::string trackCNegHEModuleName_;
@@ -251,7 +245,6 @@ private:
     TH1F* hCFlav_Tagger            ;
     TH1F* hBFlav_Tagger            ;
 
-//$$    
     TH1F*  IPSign_cat0  ;
     TH1F*  IPSign_cat1  ;
     TH1F*  IPSign_cat2  ;
@@ -284,7 +277,6 @@ private:
     CategoryFinder cat7;
     CategoryFinder cat8;
     CategoryFinder cat9;
-//$$
 
     TTree *smalltree;
 
@@ -295,16 +287,12 @@ private:
     float Track_length[10000];
     float Track_dist[10000];
     float Track_IP2D[10000];
-//$$
     float Track_IP2Dsig[10000];
-//$$
     float Track_IP[10000];
     float Track_IPsig[10000];
     float Track_Proba[10000];
 
-//$$
     float Track_p[10000];
-//$$
     float Track_pt[10000];
     float Track_eta[10000];
     float Track_phi[10000];
@@ -344,13 +332,11 @@ private:
     float Jet_ProbaN[10000];
     float Jet_ProbaP[10000];
     float Jet_Proba[10000];
-//$$
     float Jet_BprobN[10000];
     float Jet_Bprob[10000];
-    float Jet_TkProba[10000];
-    float Jet_TkProbaP[10000];
-    float Jet_TkProbaN[10000];
-//$$
+//     float Jet_TkProba[10000];
+//     float Jet_TkProbaP[10000];
+//     float Jet_TkProbaN[10000];
     float Jet_SvxN[10000];
     float Jet_Svx[10000];
     int   Jet_SvxNTracks[10000];
@@ -369,7 +355,7 @@ private:
     float Jet_residual_caloJet[10000] ;
     float Jet_residual_pfJet[10000]   ;
     float Jet_residual_tcJet[10000]   ;
-  
+    
     int   nMuon;
     int   Muon_IdxJet[10000];
     int   Muon_nMuHit[10000];
@@ -406,11 +392,10 @@ private:
     float PV_ndf[10000];
     int   PV_isgood[10000];
     int   PV_isfake[10000];
-//$$
+
     float PVz;
 
     float pthat;
-//$$
     
     int nSV;
     float SV_x[10000];
