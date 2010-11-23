@@ -57,10 +57,8 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   softMuonNegModuleName_    = iConfig.getParameter<std::string>("softMuonNegModuleName");
   softMuonTagInfoName_      = iConfig.getParameter<std::string>("softMuonTagInfoName");
   
-  
   muonCollectionName_       = iConfig.getParameter<edm::InputTag>("muonCollectionName");
   triggerTable_              = iConfig.getParameter<edm::InputTag>("triggerTable");
-  
   
   
 ///////////////
@@ -124,6 +122,7 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   TrackProbaNeg_Cat8    = fs->make<TH1F>("TrackProbaNEG Cat8","TrackProbaNEG Cat8",100, 0., 1.);
   TrackProbaNeg_Cat9    = fs->make<TH1F>("TrackProbaNEG Cat9","TrackProbaNEG Cat9",100, 0., 1.);
 
+
 ///////////////
 // TTree
   
@@ -141,7 +140,7 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   if ( produceJetProbaTree_ ) {
      
   //--------------------------------------
-  //tracks information 
+  // track information 
   //--------------------------------------
   smalltree->Branch("nTrack",	       &nTrack, 	"nTrack/I");
   smalltree->Branch("Track_dxy",       Track_dxy,	"Track_dxy[nTrack]/F");
@@ -181,7 +180,7 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("Track_category",  Track_category,  "Track_category[nTrack]/I");
 
   //--------------------------------------
-  //primary vertex information 
+  // primary vertex information 
   //--------------------------------------
 //  smalltree->Branch("nPV"	   ,&nPV	 ,"nPV/I");
   smalltree->Branch("PV_x"	   ,PV_x	 ,"PV_x[nPV]/F");
@@ -196,7 +195,7 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("PV_isfake"    ,PV_isfake	 ,"PV_isfake[nPV]/I");
   
   //--------------------------------------
-  //secondary vertex information 
+  // secondary vertex information 
   //--------------------------------------
   smalltree->Branch("nSV"	   ,&nSV	 ,"nSV/I");
   smalltree->Branch("SV_x"	   ,SV_x	 ,"SV_x[nSV]/F");
@@ -212,9 +211,13 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   }
     
   //--------------------------------------
-  //jets information 
+  // jet information 
   //--------------------------------------
   smalltree->Branch("Jet_pt",          Jet_pt	       ,"Jet_pt[nJet]/F");
+//$$
+  smalltree->Branch("Jet_et",          Jet_et	       ,"Jet_et[nJet]/F");
+  smalltree->Branch("Jet_residual",    Jet_residual    ,"Jet_residual/F"); 
+//$$
   smalltree->Branch("Jet_jes",         Jet_jes         ,"Jet_jes[nJet]/F");
   smalltree->Branch("Jet_eta",         Jet_eta         ,"Jet_eta[nJet]/F");
   smalltree->Branch("Jet_phi",         Jet_phi         ,"Jet_phi[nJet]/F");
@@ -237,6 +240,9 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("Jet_SvxTracks",   Jet_SvxTracks   ,"Jet_SvxTracks[nJet]/I");
   smalltree->Branch("Jet_SvxNHP",      Jet_SvxNHP      ,"Jet_SvxNHP[nJet]/F");
   smalltree->Branch("Jet_SvxHP",       Jet_SvxHP       ,"Jet_SvxHP[nJet]/F");
+//$$
+  smalltree->Branch("Jet_SvxMass",     Jet_SvxMass     ,"Jet_SvxMass[nJet]/F");
+//$$
   smalltree->Branch("Jet_CombSvxN",    Jet_CombSvxN    ,"Jet_CombSvxN[nJet]/F");
   smalltree->Branch("Jet_CombSvx",     Jet_CombSvx     ,"Jet_CombSvx[nJet]/F");
   smalltree->Branch("Jet_SoftMuN",     Jet_SoftMuN     ,"Jet_SoftMuN[nJet]/F");
@@ -246,12 +252,15 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("Jet_hist3",       Jet_hist3       ,"Jet_hist3[nJet]/I");
   smalltree->Branch("Jet_histJet",     Jet_histJet     ,"Jet_histJet[nJet]/I");
   smalltree->Branch("Jet_histSvx",     Jet_histSvx     ,"Jet_histSvx[nJet]/I");
-  smalltree->Branch("Jet_residual_caloJet", Jet_residual_caloJet    ,"Jet_residual_caloJet/F"); 
-  smalltree->Branch("Jet_residual_pfJet",   Jet_residual_pfJet      ,"Jet_residual_pfJet/F"); 
-  smalltree->Branch("Jet_residual_tcJet",   Jet_residual_tcJet      ,"Jet_residual_tcJet/F"); 
   
+  smalltree->Branch("Jet_nFirstTrack", Jet_nFirstTrack ,"Jet_nFirstTrack[nJet]/I");
+  smalltree->Branch("Jet_nLastTrack",  Jet_nLastTrack  ,"Jet_nLastTrack[nJet]/I"); 
+  smalltree->Branch("Jet_nFirstSV",    Jet_nFirstSV    ,"Jet_nFirstSV[nJet]/I");
+  smalltree->Branch("Jet_nLastSV",     Jet_nLastSV     ,"Jet_nLastSV[nJet]/I");
   
-  
+  //--------------------------------------
+  // muon information 
+  //--------------------------------------
   smalltree->Branch("nMuon"	   ,&nMuon	 ,"nMuon/I");
   smalltree->Branch("Muon_IdxJet",   Muon_IdxJet   ,"Muon_IdxJet[nMuon]/I");
   smalltree->Branch("Muon_nMuHit",   Muon_nMuHit   ,"Muon_nMuHit[nMuon]/I");
@@ -260,7 +269,6 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("Muon_nOutHit",  Muon_nOutHit  ,"Muon_nOutHit[nMuon]/I");
   smalltree->Branch("Muon_isGlobal", Muon_isGlobal ,"Muon_isGlobal[nMuon]/I");
   smalltree->Branch("Muon_nMatched", Muon_nMatched ,"Muon_nMatched[nMuon]/I");
-  
   smalltree->Branch("Muon_chi2",     Muon_chi2     ,"Muon_chi2[nMuon]/F");
   smalltree->Branch("Muon_chi2Tk",   Muon_chi2Tk   ,"Muon_chi2Tk[nMuon]/F");
   smalltree->Branch("Muon_pt",       Muon_pt       ,"Muon_pt[nMuon]/F");
@@ -268,12 +276,27 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("Muon_ptrel",    Muon_ptrel    ,"Muon_ptrel[nMuon]/F");
   smalltree->Branch("Muon_vz",       Muon_vz       ,"Muon_vz[nMuon]/F");
   smalltree->Branch("Muon_hist",     Muon_hist     ,"Muon_hist[nMuon]/I");
-  
-  smalltree->Branch("Jet_nFirstTrack", Jet_nFirstTrack ,"Jet_nFirstTrack[nJet]/I");
-  smalltree->Branch("Jet_nLastTrack",  Jet_nLastTrack  ,"Jet_nLastTrack[nJet]/I"); 
-  smalltree->Branch("Jet_nFirstSV",    Jet_nFirstSV    ,"Jet_nFirstSV[nJet]/I");
-  smalltree->Branch("Jet_nLastSV",     Jet_nLastSV     ,"Jet_nLastSV[nJet]/I");
     
+  // prepare residual corrections
+  string JEC_PATH("CondFormats/JetMETObjects/data/");
+  
+  edm::FileInPath fipRes_PF(JEC_PATH+"Spring10DataV2_L2L3Residual_AK5PF.txt");
+  JetCorrectorParameters *ResJetCorPar_PF = new JetCorrectorParameters(fipRes_PF.fullPath());
+  std::vector<JetCorrectorParameters> vparam_PF;
+  vparam_PF.push_back(*ResJetCorPar_PF);
+  resJEC_PF = new FactorizedJetCorrector(vparam_PF);
+  
+  edm::FileInPath fipRes_JPT(JEC_PATH+"Spring10DataV2_L2L3Residual_AK5JPT.txt");
+  JetCorrectorParameters *ResJetCorPar_JPT = new JetCorrectorParameters(fipRes_JPT.fullPath());
+  std::vector<JetCorrectorParameters> vparam_JPT;
+  vparam_JPT.push_back(*ResJetCorPar_JPT);
+  resJEC_JPT = new FactorizedJetCorrector(vparam_JPT);
+  
+  edm::FileInPath fipRes_Calo(JEC_PATH+"Spring10DataV2_L2L3Residual_AK5Calo.txt");
+  JetCorrectorParameters *ResJetCorPar_Calo = new JetCorrectorParameters(fipRes_Calo.fullPath());
+  std::vector<JetCorrectorParameters> vparam_Calo;
+  vparam_Calo.push_back(*ResJetCorPar_Calo);
+  resJEC_Calo = new FactorizedJetCorrector(vparam_Calo);
 }
 
  
@@ -320,33 +343,13 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   // Tag Jets
   if ( useTrackHistory_ ) classifier_.newEvent(iEvent, iSetup);
   
+  // Jet Energy Correction
   const JetCorrector *acorrector = JetCorrector::getJetCorrector(jetCorrector_,iSetup);
-  // Calo Jets
+
   //Handle<reco::CaloJetCollection> jetsColl;
   //iEvent.getByLabel(CaloJetCollectionTags_, jetsColl);
   //const reco::CaloJetCollection recoJets =   *(jetsColl.product());
-   //prepare residual corrections
-  string JEC_PATH("CondFormats/JetMETObjects/data/");
-  
-  edm::FileInPath fipRes_PF(JEC_PATH+"Spring10DataV2_L2L3Residual_AK5PF.txt");
-  JetCorrectorParameters *ResJetCorPar_PF = new JetCorrectorParameters(fipRes_PF.fullPath());
-  std::vector<JetCorrectorParameters> vparam_PF;
-  vparam_PF.push_back(*ResJetCorPar_PF);
-  FactorizedJetCorrector *resJEC_PF = new FactorizedJetCorrector(vparam_PF);
-  
-  
-  edm::FileInPath fipRes_JPT(JEC_PATH+"Spring10DataV2_L2L3Residual_AK5JPT.txt");
-  JetCorrectorParameters *ResJetCorPar_JPT = new JetCorrectorParameters(fipRes_JPT.fullPath());
-  std::vector<JetCorrectorParameters> vparam_JPT;
-  vparam_JPT.push_back(*ResJetCorPar_JPT);
-  FactorizedJetCorrector *resJEC_JPT = new FactorizedJetCorrector(vparam_JPT);
-  
-  
-  edm::FileInPath fipRes_Calo(JEC_PATH+"Spring10DataV2_L2L3Residual_AK5Calo.txt");
-  JetCorrectorParameters *ResJetCorPar_Calo = new JetCorrectorParameters(fipRes_Calo.fullPath());
-  std::vector<JetCorrectorParameters> vparam_Calo;
-  vparam_Calo.push_back(*ResJetCorPar_Calo);
-  FactorizedJetCorrector *resJEC_Calo = new FactorizedJetCorrector(vparam_Calo);
+
   
   edm::Handle <edm::View <reco::Jet> > jetsCollHandle;
   iEvent.getByLabel (CaloJetCollectionTags_, jetsCollHandle);
@@ -492,8 +495,9 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   Handle<TriggerResults> h_trigRes;
 //  iEvent.getByLabel(InputTag("TriggerResults::HLT"), h_trigRes); // Data or MC Spring09
 //  iEvent.getByLabel(InputTag("TriggerResults::REDIGI36X"), h_trigRes); // MC Summer10
-//  iEvent.getByLabel(InputTag("TriggerResults::REDIGI38X"), h_trigRes); // MC Fall10 AODSIM
+//  iEvent.getByLabel(InputTag("TriggerResults::REDIGI38X"), h_trigRes); // MC Fall10
 //  iEvent.getByLabel(InputTag("TriggerResults::REDIGI38XTP"), h_trigRes); // MC Fall10 GEN-SIM-RECODEBUG
+//  iEvent.getByLabel(InputTag("TriggerResults::REDIGI38XPU"), h_trigRes); // MC Fall10 with Pile-Up
   iEvent.getByLabel(triggerTable_, h_trigRes);
 
   tr = *h_trigRes;
@@ -508,30 +512,80 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   
     for (unsigned int i=0; i< tr.size(); i++) {
     if ( !tr[i].accept() == 1 ) continue;
+
 // Trigger table 2010
 //$$
       if ( triggerList[i] == "HLT_L1Jet6U"   ) BitTrigger +=1 ;
       if ( triggerList[i] == "HLT_L1Jet10U"  ) BitTrigger +=2 ;
-      if ( triggerList[i] == "HLT_Jet15U_HcalNoiseFiltered" ) BitTrigger +=4 ;   
-      if ( triggerList[i] == "HLT_Jet15U"    ) BitTrigger +=10 ; 
-      if ( triggerList[i] == "HLT_Jet30U"    ) BitTrigger +=20 ; 
-      if ( triggerList[i] == "HLT_Jet50U"    ) BitTrigger +=40 ;   
-      if ( triggerList[i] == "HLT_Jet70U"    ) BitTrigger +=100 ;	 
-      if ( triggerList[i] == "HLT_Jet100U"   ) BitTrigger +=200 ;   
+      if ( triggerList[i] == "HLT_Jet15U_HcalNoiseFiltered" )    BitTrigger +=4 ;   
+      if ( triggerList[i] == "HLT_Jet15U_HcalNoiseFiltered_v1" ) BitTrigger +=4 ;   
+      if ( triggerList[i] == "HLT_Jet15U_HcalNoiseFiltered_v2" ) BitTrigger +=4 ;   
+      if ( triggerList[i] == "HLT_Jet15U_HcalNoiseFiltered_v3" ) BitTrigger +=4 ;   
+      if ( triggerList[i] == "HLT_Jet15U"    )    BitTrigger +=10 ; 
+      if ( triggerList[i] == "HLT_Jet15U_v1"    ) BitTrigger +=10 ; 
+      if ( triggerList[i] == "HLT_Jet15U_v2"    ) BitTrigger +=10 ; 
+      if ( triggerList[i] == "HLT_Jet15U_v3"    ) BitTrigger +=10 ; 
+      if ( triggerList[i] == "HLT_Jet30U"    )    BitTrigger +=20 ; 
+      if ( triggerList[i] == "HLT_Jet30U_v1"    ) BitTrigger +=20 ; 
+      if ( triggerList[i] == "HLT_Jet30U_v2"    ) BitTrigger +=20 ; 
+      if ( triggerList[i] == "HLT_Jet30U_v3"    ) BitTrigger +=20 ; 
+      if ( triggerList[i] == "HLT_Jet50U"    )    BitTrigger +=40 ;   
+      if ( triggerList[i] == "HLT_Jet50U_v1"    ) BitTrigger +=40 ;   
+      if ( triggerList[i] == "HLT_Jet50U_v2"    ) BitTrigger +=40 ;   
+      if ( triggerList[i] == "HLT_Jet50U_v3"    ) BitTrigger +=40 ;   
+      if ( triggerList[i] == "HLT_Jet70U"    )    BitTrigger +=100 ;	 
+      if ( triggerList[i] == "HLT_Jet70U_v1"    ) BitTrigger +=100 ;	 
+      if ( triggerList[i] == "HLT_Jet70U_v2"    ) BitTrigger +=100 ;	 
+      if ( triggerList[i] == "HLT_Jet70U_v3"    ) BitTrigger +=100 ;	 
+      if ( triggerList[i] == "HLT_Jet100U"   )    BitTrigger +=200 ;   
+      if ( triggerList[i] == "HLT_Jet100U_v1"   ) BitTrigger +=200 ;   
+      if ( triggerList[i] == "HLT_Jet100U_v2"   ) BitTrigger +=200 ;   
+      if ( triggerList[i] == "HLT_Jet100U_v3"   ) BitTrigger +=200 ;   
+      if ( triggerList[i] == "HLT_Jet140U"   )    BitTrigger +=400 ;   
+      if ( triggerList[i] == "HLT_Jet140U_v1"   ) BitTrigger +=400 ;   
+      if ( triggerList[i] == "HLT_Jet140U_v2"   ) BitTrigger +=400 ;   
+      if ( triggerList[i] == "HLT_Jet140U_v3"   ) BitTrigger +=400 ;   
       if ( triggerList[i] == "HLT_DiJetAve15U_8E29" ) BitTrigger +=1000 ;   
-      if ( triggerList[i] == "HLT_DiJetAve30U_8E29" ) BitTrigger +=2000 ;   
-      if ( triggerList[i] == "HLT_DiJetAve50U_8E29" ) BitTrigger +=4000 ;   
       if ( triggerList[i] == "HLT_DiJetAve15U" )      BitTrigger +=1000 ;   
+      if ( triggerList[i] == "HLT_DiJetAve15U_v1" )   BitTrigger +=1000 ;   
+      if ( triggerList[i] == "HLT_DiJetAve15U_v2" )   BitTrigger +=1000 ;   
+      if ( triggerList[i] == "HLT_DiJetAve15U_v3" )   BitTrigger +=1000 ;   
+      if ( triggerList[i] == "HLT_DiJetAve30U_8E29" ) BitTrigger +=2000 ;   
       if ( triggerList[i] == "HLT_DiJetAve30U" )      BitTrigger +=2000 ;   
+      if ( triggerList[i] == "HLT_DiJetAve30U_v1" )   BitTrigger +=2000 ;   
+      if ( triggerList[i] == "HLT_DiJetAve30U_v2" )   BitTrigger +=2000 ;   
+      if ( triggerList[i] == "HLT_DiJetAve30U_v3" )   BitTrigger +=2000 ;   
+      if ( triggerList[i] == "HLT_DiJetAve50U_8E29" ) BitTrigger +=4000 ;   
       if ( triggerList[i] == "HLT_DiJetAve50U" )      BitTrigger +=4000 ;   
+      if ( triggerList[i] == "HLT_DiJetAve50U_v1" )   BitTrigger +=4000 ;   
+      if ( triggerList[i] == "HLT_DiJetAve50U_v2" )   BitTrigger +=4000 ;   
+      if ( triggerList[i] == "HLT_DiJetAve50U_v3" )   BitTrigger +=4000 ;   
       if ( triggerList[i] == "HLT_BTagMu_Jet10U" )       BitTrigger +=10000 ;   
       if ( triggerList[i] == "HLT_BTagMu_Jet20U" )       BitTrigger +=20000 ;   
       if ( triggerList[i] == "HLT_DoubleMu3" )           BitTrigger +=40000 ;   
-      if ( triggerList[i] == "HLT_BTagMu_DiJet10U" )     BitTrigger +=100000 ;   
-      if ( triggerList[i] == "HLT_BTagMu_DiJet20U" )     BitTrigger +=200000 ;   
-      if ( triggerList[i] == "HLT_BTagMu_DiJet20U_Mu5" ) BitTrigger +=400000 ;   
-      if ( triggerList[i] == "HLT_BTagMu_DiJet30U" )     BitTrigger +=1000000 ;   
-      if ( triggerList[i] == "HLT_BTagMu_DiJet30U_Mu5" ) BitTrigger +=2000000 ;   
+      if ( triggerList[i] == "HLT_DoubleMu3_v1" )        BitTrigger +=40000 ;	
+      if ( triggerList[i] == "HLT_DoubleMu3_v2" )        BitTrigger +=40000 ;	
+      if ( triggerList[i] == "HLT_DoubleMu3_v3" )        BitTrigger +=40000 ;	
+      if ( triggerList[i] == "HLT_BTagMu_DiJet10U" )        BitTrigger +=100000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet10U_v1" )     BitTrigger +=100000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet10U_v2" )     BitTrigger +=100000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet10U_v3" )     BitTrigger +=100000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet20U" )        BitTrigger +=200000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet20U_v1" )     BitTrigger +=200000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet20U_v2" )     BitTrigger +=200000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet20U_v3" )     BitTrigger +=200000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet20U_Mu5" )    BitTrigger +=400000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet20U_Mu5_v1" ) BitTrigger +=400000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet20U_Mu5_v2" ) BitTrigger +=400000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet20U_Mu5_v3" ) BitTrigger +=400000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet30U" )        BitTrigger +=1000000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet30U_v1" )     BitTrigger +=1000000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet30U_v2" )     BitTrigger +=1000000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet30U_v3" )     BitTrigger +=1000000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet30U_Mu5" )    BitTrigger +=2000000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet30U_Mu5_v1" ) BitTrigger +=2000000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet30U_Mu5_v2" ) BitTrigger +=2000000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_DiJet30U_Mu5_v3" ) BitTrigger +=2000000 ;   
 //$$
 // std::cout << " Run Evt " << Run << " " << Evt << " trigger list " << triggerList[i] << std::endl;
     }
@@ -589,6 +643,9 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     Jet_eta[nJet]     = (jetsColl.at(ijet)).eta();
     Jet_phi[nJet]     = (jetsColl.at(ijet)).phi();
     Jet_pt[nJet]      = (jetsColl.at(ijet)).pt();
+//$$
+    Jet_et[nJet]      = (jetsColl.at(ijet)).et();
+//$$
     
     Jet_jes[nJet]     = JES;
     
@@ -601,10 +658,9 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     resJEC_JPT->setJetEta(jetsColl.at(ijet).eta());
     resJEC_JPT->setJetPt(jetsColl.at(ijet).pt());
     
-    
-    Jet_residual_caloJet[nJet] = resJEC_Calo->getCorrection();
-    Jet_residual_pfJet[nJet]   = resJEC_PF->getCorrection();
-    Jet_residual_tcJet[nJet]   = resJEC_JPT->getCorrection();
+    Jet_residual[nJet]   = resJEC_PF->getCorrection();
+//     Jet_residual = resJEC_Calo->getCorrection();
+//     Jet_residual = resJEC_JPT->getCorrection();
     
     float etajet = TMath::Abs( (jetsColl.at(ijet)).eta());
     float phijet = (jetsColl.at(ijet)).phi();
@@ -837,7 +893,6 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       SoftMN = ((*jetTags_softMuneg)[ith_tagged].second);
     if ( SoftMN > 0 ) SoftMN = -SoftMN;
     
-
 // Muon information
     ith_tagged = itagjetMuon;
     for (unsigned int leptIdx = 0; leptIdx < (*tagInos_softmuon)[ith_tagged].leptons(); leptIdx++){
@@ -1131,6 +1186,23 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     Jet_SvxNTracks[nJet] = svxNegtracks.size();	 
     Jet_SvxTracks[nJet]  = svxPostracks.size();	 
    
+//$$
+    float SVmass = 0.;
+    if ( svxPostracks.size() > 0 ) {
+      float SVpx = 0., SVpy = 0., SVpz = 0., SVee = 0.;
+      for (unsigned int i=0; i < svxPostracks.size(); i++) {
+        SVpx += (svxPostracks[i])->px();
+        SVpy += (svxPostracks[i])->py();
+        SVpz += (svxPostracks[i])->pz();
+        SVee += TMath::Sqrt( (svxPostracks[i])->p()*(svxPostracks[i])->p() + 0.135*0.135 );
+      }
+      SVmass = SVee*SVee - SVpx*SVpx - SVpy*SVpy - SVpz*SVpz;
+      if ( SVmass > 0. ) SVmass = TMath::Sqrt( SVmass );
+    }
+// std::cout << " Jet " << nJet << " pt " << Jet_pt[nJet]*JES*Jet_residual[nJet] << " SVmass " << SVmass << std::endl;
+    Jet_SvxMass[nJet] = SVmass;	 
+//$$
+
     nJet++;
 
 

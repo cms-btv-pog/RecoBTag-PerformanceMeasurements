@@ -16,7 +16,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.17 2010/10/20 10:58:06 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.19 2010/11/23 11:10:09 jandrea Exp $
 //
 //
 
@@ -84,13 +84,11 @@ Implementation:
 #include "DataFormats/BTauReco/interface/SoftLeptonTagInfo.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
 
-
 // trigger
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "FWCore/Framework/interface/TriggerNamesService.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
-
 
 //residual jet corrections
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
@@ -114,6 +112,7 @@ struct ltstr
 using namespace edm;
 using namespace reco;
 //using namespace BTagMCTools;
+
 
 class MistagAnalyzer : public edm::EDAnalyzer
 {
@@ -291,7 +290,6 @@ private:
     float Track_IP[10000];
     float Track_IPsig[10000];
     float Track_Proba[10000];
-
     float Track_p[10000];
     float Track_pt[10000];
     float Track_eta[10000];
@@ -299,7 +297,6 @@ private:
     float Track_chi2[10000];
     int   Track_charge[10000];
     int   Track_history[10000];
-
     int   Track_nHitStrip[10000];
     int   Track_nHitPixel[10000];
     int   Track_nHitAll[10000];
@@ -310,16 +307,18 @@ private:
     int   Track_nHitPXB[10000];
     int   Track_nHitPXF[10000];
     int   Track_isHitL1[10000];
-
     int   Track_PV[10000];
     int   Track_SV[10000];
     float Track_PVweight[10000];
     float Track_SVweight[10000];
-
     int   Track_category[10000];
 
     int nJet;
     float Jet_pt[10000];
+//$$
+    float Jet_et[10000];
+    float Jet_residual[10000];
+//$$
     float Jet_jes[10000];
     float Jet_eta[10000];
     float Jet_phi[10000];
@@ -334,15 +333,15 @@ private:
     float Jet_Proba[10000];
     float Jet_BprobN[10000];
     float Jet_Bprob[10000];
-//     float Jet_TkProba[10000];
-//     float Jet_TkProbaP[10000];
-//     float Jet_TkProbaN[10000];
     float Jet_SvxN[10000];
     float Jet_Svx[10000];
     int   Jet_SvxNTracks[10000];
     int   Jet_SvxTracks[10000];
     float Jet_SvxNHP[10000];
     float Jet_SvxHP[10000];
+//$$
+    float Jet_SvxMass[10000];
+//$$
     float Jet_CombSvxN[10000];
     float Jet_CombSvx[10000];
     float Jet_SoftMuN[10000];
@@ -352,9 +351,12 @@ private:
     int   Jet_hist3[10000];
     int   Jet_histJet[10000];
     int   Jet_histSvx[10000];
-    float Jet_residual_caloJet[10000] ;
-    float Jet_residual_pfJet[10000]   ;
-    float Jet_residual_tcJet[10000]   ;
+    int   Jet_ntracks[10000];
+    int   Jet_flavour[10000];
+    int   Jet_nFirstTrack[10000];
+    int   Jet_nLastTrack[10000]; 
+    int   Jet_nFirstSV[10000];
+    int   Jet_nLastSV[10000];
     
     int   nMuon;
     int   Muon_IdxJet[10000];
@@ -372,15 +374,6 @@ private:
     float Muon_vz[10000];
     int   Muon_hist[10000];
     
-    
-    
-    int   Jet_ntracks[10000];
-    int   Jet_flavour[10000];
-    int   Jet_nFirstTrack[10000];
-    int   Jet_nLastTrack[10000]; 
-    int   Jet_nFirstSV[10000];
-    int   Jet_nLastSV[10000];
-    
     int nPV;
     float PV_x[10000];
     float PV_y[10000];
@@ -392,10 +385,6 @@ private:
     float PV_ndf[10000];
     int   PV_isgood[10000];
     int   PV_isfake[10000];
-
-    float PVz;
-
-    float pthat;
     
     int nSV;
     float SV_x[10000];
@@ -413,6 +402,11 @@ private:
     int Run;
     int Evt;
     int LumiBlock;
+    float PVz;
+    float pthat;
+    FactorizedJetCorrector *resJEC_PF ;
+    FactorizedJetCorrector *resJEC_JPT;
+    FactorizedJetCorrector *resJEC_Calo;
 };
 
 #endif
