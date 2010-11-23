@@ -27,6 +27,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 using std::fixed;
+using std::left;
 using std::make_pair;
 using std::pair;
 using std::right;
@@ -756,7 +757,7 @@ void S8Solver::Solve()
 
         sol.Solve();
 
-        // Save Results in output file
+        // Save Fit Results in output file
         //
         {
             TFile *out = TFile::Open("out_avg.root", "recreate");
@@ -768,39 +769,13 @@ void S8Solver::Solve()
             out->Close();
         }
 
-        fTotalSolution["n_b"]       = sol.GetResultVec(0) *
-                                        _totalInput.input.n.all.first;
-        fTotalSolution["n_cl"]      = sol.GetResultVec(1) *
-                                        _totalInput.input.n.all.first;
-        fTotalSolution["effMu_b"]   = sol.GetResultVec(2);
-        fTotalSolution["effMu_cl"]  = sol.GetResultVec(3);
-        fTotalSolution["effTag_b"]  = sol.GetResultVec(4);
-        fTotalSolution["effTag_cl"] = sol.GetResultVec(5);
-        fTotalSolution["p_b"]       = sol.GetResultVec(6)*fTotalSolution["n_b"];
-        fTotalSolution["p_cl"]      = sol.GetResultVec(7)*fTotalSolution["n_cl"];
-    
-        for(int i = 0; 8 > i; ++i)
-        {
-            if (sol.GetErrorSupVec(i) != sol.GetErrorInfVec(i))
-                cerr << " [-] Asymmetric errors (" << i << "): +(-) "
-                    << sol.GetErrorSupVec(i)
-                    << '(' << sol.GetErrorInfVec(i) << ')' << endl;
-        }
-
-        fTotalSolutionErr["n_b"]       = sol.getError(0) *
-                                            _totalInput.input.n.all.first;
-        fTotalSolutionErr["n_cl"]      = sol.getError(1) *
-                                            _totalInput.input.n.all.first;
-        fTotalSolutionErr["effMu_b"]   = sol.getError(2);
-        fTotalSolutionErr["effMu_cl"]  = sol.getError(3);
-        fTotalSolutionErr["effTag_b"]  = sol.getError(4);
-        fTotalSolutionErr["effTag_cl"] = sol.getError(5);
-        fTotalSolutionErr["p_b"]       = sol.getError(6) * fTotalSolution["n_b"];
-        fTotalSolutionErr["p_cl"]      = sol.getError(7) * fTotalSolution["n_cl"];
+        saveSolution(_totalSolution, sol, _totalInput);
 
         if (!_doBinnedSolution)
             return;
         
+        _binnedSolution.clear();
+
         // binned solutions
         //
         for(std::map<int,std::map<TString,double> >::const_iterator ibin = BinnedInput.begin();
@@ -850,6 +825,12 @@ void S8Solver::Solve()
                 binout->Close();
             }
 
+            Solution solution;
+            saveSolution(solution, solu, inputGroup);
+            _binnedSolution.push_back(solution);
+
+
+            /*
             std::map<TString,double> tmpsolu;
             std::map<TString,double> tmpsoluerr;
                 
@@ -886,6 +867,7 @@ void S8Solver::Solve()
 
             fBinnedSolution[ibin->first] = tmpsolu;
             fBinnedSolutionErr[ibin->first] = tmpsoluerr;
+            */
         }
     }
 }
@@ -922,13 +904,14 @@ void S8Solver::PrintData(TString option)
     cout << endl;
 
     cout << " [Average]" << endl
-        << _totalInput << endl
-        << endl;
+        << _totalInput << endl;
 
     cout << " SOLUTION" << endl;
-    printSolution(fTotalSolution, fTotalSolutionErr);
-    cout << endl;
+    cout << _totalSolution << endl
+        << endl;
 
+    // Binned
+    //
     cout << " [Binned]" << endl;
     for(BinnedNumericInputGroup::const_iterator inputGroup =
             _binnedInput.begin(),
@@ -937,41 +920,19 @@ void S8Solver::PrintData(TString option)
         ++inputGroup)
     {
         const int bin = std::distance(begin, inputGroup);
-        cout << setw(40) << right << setfill('-')
-            << "Bin " << bin
-            << " -----" << setfill(' ') << endl;
+        cout << setw(40) << setfill('-') << ' '
+            << " Bin " << bin
+            << " ---" << setfill(' ') << endl
+            << endl;
 
         cout << *inputGroup << endl;
-        cout << endl;
 
         cout << " SOLUTION" << endl;
-        printSolution(fBinnedSolution[bin], fBinnedSolutionErr[bin]);
+        cout << _binnedSolution[bin] << endl;
 
         cout << setw(50) << setfill('-') << ' ' << setfill(' ')
             << endl
             << endl;
-    }
-}
-
-void S8Solver::printSolution(const InputMap &input, const InputMap &error) const
-{
-    for(InputMap::const_iterator i = input.begin();
-        i != input.end();
-        ++i)
-    {
-        cout << i->first << " = " << i->second << " +/- ";
-
-        InputMap::const_iterator err = error.find(i->first);
-        if (error.end() == err)
-        {
-            cout << " No Error" << endl;
-
-            continue;
-        }
-
-        cout << err->second << " ("
-            << (1. * err->second / i->second) << ")"
-            << std::endl;
     }
 }
 
@@ -1526,6 +1487,80 @@ void S8Solver::Print(TString extension )
 }
 
 
+
+// Helpers
+//
+void saveSolution(S8Solver::Solution &solution,
+                  S8NumericSolver &solver,
+                  const NumericInputGroup &inputGroup)
+{
+    // Remove any previously saved solutions
+    //
+    solution.clear();
+
+    // n_b
+    //
+    const double n_b = solver.GetResultVec(0) * inputGroup.input.n.all.first;
+    solution["n_b"] =
+        make_pair(n_b,
+                  pow(solver.getError(0) * inputGroup.input.n.all.first, 2));
+
+    // n_cl
+    //
+    const double n_cl = solver.GetResultVec(1) * inputGroup.input.n.all.first;
+    solution["n_cl"] = 
+        make_pair(n_cl,
+                  pow(solver.getError(1) * inputGroup.input.n.all.first, 2));
+
+    // Eff_mu_b
+    //
+    solution["eff_mu_b"] =
+        make_pair(solver.GetResultVec(2),
+                  pow(solver.getError(2), 2));
+
+    // Eff_mu_cl
+    //
+    solution["eff_mu_cl"] =
+        make_pair(solver.GetResultVec(3),
+                  pow(solver.getError(3), 2));
+
+    // Eff_tag_b
+    //
+    solution["eff_tag_b"] = 
+        make_pair(solver.GetResultVec(4),
+                  pow(solver.getError(4), 2));
+
+    // Eff_tag_cl
+    //
+    solution["eff_tag_cl"] =
+        make_pair(solver.GetResultVec(5),
+                  pow(solver.getError(5), 2));
+
+    // p_b
+    //
+    solution["p_b"] = 
+        make_pair(solver.GetResultVec(6) * n_b,
+                  pow(solver.getError(6) * n_b, 2));
+
+    // p_cl
+    //
+    solution["p_cl"] = 
+        make_pair(solver.GetResultVec(7) * n_cl,
+                  pow(solver.getError(7) * n_cl, 2));
+}
+
+std::ostream &operator <<(std::ostream &out, const S8Solver::Solution &solution)
+{
+    for(S8Solver::Solution::const_iterator measurement = solution.begin();
+        solution.end() != measurement;
+        ++measurement)
+    {
+        out << " [+] " << setw(15) << left << measurement->first
+            << measurement->second << endl;
+    }
+
+    return out;
+}
 
 void inputGroup(numeric::InputGroup &inputGroup,
                 const solver::PlotGroup &plotGroup,

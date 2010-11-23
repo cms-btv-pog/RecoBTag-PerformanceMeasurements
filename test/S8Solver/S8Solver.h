@@ -18,9 +18,14 @@
 #include "S8NumericInput.h"
 #include "S8SolverInput.h"
 
+class S8NumericSolver;
+
 class S8Solver
 {
   public:
+        typedef std::map<std::string, Measurement> Solution;
+        typedef std::vector<Solution> BinnedSolution;
+
         S8Solver();
 		//S8Solver(std::string name);
 		virtual ~S8Solver(){};
@@ -69,9 +74,7 @@ class S8Solver
 		
   private:
         typedef std::map<TString, double> InputMap;
-        typedef std::map<int, InputMap>      BinnedInputMap;
-
-        void printSolution(const InputMap &, const InputMap &) const;
+        typedef std::map<int, InputMap>   BinnedInputMap;
 
         bool fVerbose;
 		TFile *finputFile;
@@ -198,9 +201,18 @@ class S8Solver
         typedef std::vector<NumericInputGroup> BinnedNumericInputGroup;
         NumericInputGroup       _totalInput;
         BinnedNumericInputGroup _binnedInput;
+
+        Solution       _totalSolution;
+        BinnedSolution _binnedSolution;
 		
 		ClassDef(S8Solver,1);
 };
+
+void saveSolution(S8Solver::Solution &,
+                  S8NumericSolver &,
+                  const NumericInputGroup &);
+
+std::ostream &operator <<(std::ostream &, const S8Solver::Solution &);
 
 void inputGroup(numeric::InputGroup &, const solver::PlotGroup &, const int &);
 void inputGroup(numeric::InputGroup &, const solver::PlotGroup &);
