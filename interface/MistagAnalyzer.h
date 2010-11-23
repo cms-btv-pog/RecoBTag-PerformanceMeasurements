@@ -16,7 +16,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.16 2010/10/04 17:17:04 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.17 2010/10/20 10:58:06 jandrea Exp $
 //
 //
 
@@ -92,6 +92,12 @@ Implementation:
 #include "FWCore/Framework/interface/TriggerNamesService.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
+
+
+
+//residual jet corrections
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 
 struct ltstr
 {
@@ -360,7 +366,10 @@ private:
     int   Jet_hist3[10000];
     int   Jet_histJet[10000];
     int   Jet_histSvx[10000];
-    
+    float Jet_residual_caloJet[10000] ;
+    float Jet_residual_pfJet[10000]   ;
+    float Jet_residual_tcJet[10000]   ;
+  
     int   nMuon;
     int   Muon_IdxJet[10000];
     int   Muon_nMuHit[10000];

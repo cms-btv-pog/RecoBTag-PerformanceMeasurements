@@ -340,6 +340,31 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   //iEvent.getByLabel(CaloJetCollectionTags_, jetsColl);
   //const reco::CaloJetCollection recoJets =   *(jetsColl.product());
   
+  
+  //prepare residual corrections
+  string JEC_PATH("CondFormats/JetMETObjects/data/");
+  
+  edm::FileInPath fipRes_PF(JEC_PATH+"Spring10DataV2_L2L3Residual_AK5PF.txt");
+  JetCorrectorParameters *ResJetCorPar_PF = new JetCorrectorParameters(fipRes_PF.fullPath());
+  std::vector<JetCorrectorParameters> vparam_PF;
+  vparam_PF.push_back(*ResJetCorPar_PF);
+  FactorizedJetCorrector *resJEC_PF = new FactorizedJetCorrector(vparam_PF);
+  
+  
+  edm::FileInPath fipRes_JPT(JEC_PATH+"Spring10DataV2_L2L3Residual_AK5JPT.txt");
+  JetCorrectorParameters *ResJetCorPar_JPT = new JetCorrectorParameters(fipRes_JPT.fullPath());
+  std::vector<JetCorrectorParameters> vparam_JPT;
+  vparam_JPT.push_back(*ResJetCorPar_JPT);
+  FactorizedJetCorrector *resJEC_JPT = new FactorizedJetCorrector(vparam_JPT);
+  
+  
+  edm::FileInPath fipRes_Calo(JEC_PATH+"Spring10DataV2_L2L3Residual_AK5Calo.txt");
+  JetCorrectorParameters *ResJetCorPar_Calo = new JetCorrectorParameters(fipRes_Calo.fullPath());
+  std::vector<JetCorrectorParameters> vparam_Calo;
+  vparam_Calo.push_back(*ResJetCorPar_Calo);
+  FactorizedJetCorrector *resJEC_Calo = new FactorizedJetCorrector(vparam_Calo);
+  
+  
   edm::Handle <edm::View <reco::Jet> > jetsCollHandle;
   iEvent.getByLabel (CaloJetCollectionTags_, jetsCollHandle);
   edm::View<reco::Jet> jetsColl = *jetsCollHandle;
@@ -583,6 +608,22 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     Jet_pt[nJet]      = (jetsColl.at(ijet)).pt();
     
     Jet_jes[nJet]     = JES;
+    
+    resJEC_Calo->setJetEta(jetsColl.at(ijet).eta());
+    resJEC_Calo->setJetPt(jetsColl.at(ijet).pt());
+    
+    resJEC_PF->setJetEta(jetsColl.at(ijet).eta());
+    resJEC_PF->setJetPt(jetsColl.at(ijet).pt());
+    
+    resJEC_JPT->setJetEta(jetsColl.at(ijet).eta());
+    resJEC_JPT->setJetPt(jetsColl.at(ijet).pt());
+    
+    
+    Jet_residual_caloJet[nJet] = resJEC_Calo->getCorrection();
+    Jet_residual_pfJet[nJet]   = resJEC_PF->getCorrection();
+    Jet_residual_tcJet[nJet]   = resJEC_JPT->getCorrection();
+    
+    
     
     float etajet = TMath::Abs( (jetsColl.at(ijet)).eta());
     float phijet = (jetsColl.at(ijet)).phi();
@@ -1411,6 +1452,23 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 //
 // Fill TTree
 //
+  ResJetCorPar_PF = 0 ;
+  delete ResJetCorPar_PF ;
+  resJEC_PF = 0  ;
+  delete resJEC_PF ;
+  
+  
+  ResJetCorPar_JPT = 0  ;
+  delete ResJetCorPar_JPT ;
+  resJEC_JPT = 0  ;
+  delete resJEC_JPT ;
+  
+  
+  ResJetCorPar_Calo = 0  ;
+  delete ResJetCorPar_Calo ;
+  resJEC_Calo  = 0 ;
+  delete resJEC_Calo ;
+  
   smalltree->Fill();
 
   hData_All_NJets->Fill( Njets );
