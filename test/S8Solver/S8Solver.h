@@ -63,6 +63,9 @@ class S8Solver
 		void SetSolution(const int &bin, const int &solution);
 
         void setDoBinnedSolution(bool flag) { _doBinnedSolution = flag; }
+        void setDoAverageSolution(bool flag) { _doAverageSolution = flag; }
+        void setFirstBin(const int &value) { _firstBin = value; }
+        void setLastBin(const int &value) { _lastBin = value; }
 
 
         void Verbose(bool option) { fVerbose = option; };
@@ -76,6 +79,8 @@ class S8Solver
 		
   private:
         void generateGraphs();
+        void doAverageSolution();
+        void doBinnedSolution();
 
         typedef std::map<TString, double> InputMap;
         typedef std::map<int, InputMap>   BinnedInputMap;
@@ -105,7 +110,6 @@ class S8Solver
 		double fGammaf;
 		bool frebin; int fnbins;
 		bool frecalculateFactors;
-        bool _doBinnedSolution;
 		double fminPtrel;
 		double fMaxPtrel;
 
@@ -122,8 +126,6 @@ class S8Solver
 		BinnedInputMap fBinnedSolutionErr;
 
 		std::map<TString, TCanvas*> cv_map;
-
-		//int fPickBin; int fPicknSol;
 
 		TH2F* fnHistoBase;
 		TH2F* fpHistoBase;
@@ -198,6 +200,11 @@ class S8Solver
 		TGraphErrors *ginput_ptagmu; 
 
         TH1 *_averageResults[8];
+
+        bool _doBinnedSolution;
+        bool _doAverageSolution;
+        int _firstBin;
+        int _lastBin;
 
         FlavouredSolverInput      _flavouredInput;
         SolverInput               _solverInput;
