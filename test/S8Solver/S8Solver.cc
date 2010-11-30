@@ -36,7 +36,10 @@ using std::setfill;
 using std::setprecision;
 
 S8Solver::S8Solver():
-    _doBinnedSolution(true)
+    _doBinnedSolution(true),
+    _doAverageSolution(true),
+    _firstBin(-1),
+    _lastBin(-1)
 {
     fAlphaConst = true;
     fBetaConst = false;
@@ -735,109 +738,122 @@ void S8Solver::Solve()
     }
     else if (fmethod=="numeric")
     {
+        doAverageSolution();
+
+        doBinnedSolution();
+    }
+}
+
+void S8Solver::doAverageSolution()
+{
+    if (!_doAverageSolution)
+        return;
+
+    cout << endl;
+    cout << "AVERAGE SOLUTION" << endl;
+    cout << endl;
+
+    S8NumericSolver sol("sol");
+    sol.setInput(_totalInput);
+
+    sol.SetError(2);
+    sol.SetNbErrorIteration(1000);
+    sol.SetInitialOrder(1, 1);
+    
+    // Force solution manually if requested
+    //
+    for(std::map<int,int>::const_iterator ipick = fPickSolutionMap.begin();
+        ipick!= fPickSolutionMap.end();
+        ++ipick)
+    {
+        if (0 == ipick->first)
+        { 
+            std::cout << "> Force average solution # " << ipick->second << std::endl;
+            sol.SetSolution(ipick->second);
+
+            break;
+        }
+    }
+
+    sol.Solve();
+
+    // Save Fit Results in output file
+    //
+    {
+        TFile *out = TFile::Open("out_avg.root", "recreate");
+        for (int i = 0; 8 > i; ++i)
+        {
+            sol.result(i)->Write();
+            *(_averageResults + i) = (TH1 *) sol.result(i)->Clone();
+        }
+        out->Close();
+    }
+
+    saveSolution(_totalSolution, sol, _totalInput);
+}
+
+void S8Solver::doBinnedSolution()
+{
+    if (!_doBinnedSolution)
+        return;
+    
+    _binnedSolution.clear();
+
+    // binned solutions
+    //
+    int bin = -1 == _firstBin ? 1 : _firstBin;
+    const int maxBin = -1 == _lastBin ? 10000 : _lastBin;
+    for(BinnedNumericInputGroup::const_iterator inputGroup =
+            _binnedInput.begin();
+        _binnedInput.end() != inputGroup &&
+            maxBin >= bin;
+        ++inputGroup, ++bin)
+    {
         cout << endl;
-        cout << "AVERAGE SOLUTION" << endl;
+        cout << "BINED SOLUTION... BIN " << bin << endl;
         cout << endl;
 
-        S8NumericSolver sol("sol");
-        sol.setInput(_totalInput);
+        S8NumericSolver solu("solu");
+        solu.setInput(*inputGroup);
 
-        sol.SetError(2);
-        sol.SetNbErrorIteration(1000);
-        sol.SetInitialOrder(1, 1);
-        
-        // Force solution manually if requested
-        //
-        for(std::map<int,int>::const_iterator ipick = fPickSolutionMap.begin();
-            ipick!= fPickSolutionMap.end();
+        solu.SetError(2);
+        solu.SetNbErrorIteration(1000);
+        solu.SetInitialOrder(1, 1);
+
+        // pick solution manually if requested
+        for(std::map<int, int>::const_iterator ipick = fPickSolutionMap.begin();
+            ipick != fPickSolutionMap.end();
             ++ipick)
         {
-            if (0 == ipick->first)
-            { 
-                std::cout << "> Force average solution # " << ipick->second << std::endl;
-                sol.SetSolution(ipick->second);
+            if (ipick->first == bin)
+            {
+                cout << "> Force binned solution # " << ipick->second
+                    << endl;
+                solu.SetSolution( ipick->second );
 
                 break;
             }
         }
+        
+        solu.Solve();
 
-        sol.Solve();
-
-        // Save Fit Results in output file
+        // Save Fits
         //
         {
-            TFile *out = TFile::Open("out_avg.root", "recreate");
+            std::ostringstream name;
+            name << "out_bin_" << bin << ".root";
+            TFile *binout = TFile::Open(name.str().c_str(), "recreate");
             for (int i = 0; 8 > i; ++i)
             {
-                sol.result(i)->Write();
-                *(_averageResults + i) = (TH1 *) sol.result(i)->Clone();
+                solu.result(i)->Write();
             }
-            out->Close();
+            binout->Close();
         }
 
-        saveSolution(_totalSolution, sol, _totalInput);
-
-        if (!_doBinnedSolution)
-            return;
-        
-        _binnedSolution.clear();
-
-        // binned solutions
-        //
-        int bin = 1;
-        const int maxBins = 10000;
-        for(BinnedNumericInputGroup::const_iterator inputGroup =
-                _binnedInput.begin();
-            _binnedInput.end() != inputGroup &&
-                maxBins >= bin;
-            ++inputGroup, ++bin)
-        {
-            cout << endl;
-            cout << "BINED SOLUTION... BIN " << bin << endl;
-            cout << endl;
-
-            S8NumericSolver solu("solu");
-            solu.setInput(*inputGroup);
-
-            solu.SetError(2);
-            solu.SetNbErrorIteration(1000);
-            solu.SetInitialOrder(1, 1);
-
-            // pick solution manually if requested
-            for(std::map<int, int>::const_iterator ipick = fPickSolutionMap.begin();
-                ipick != fPickSolutionMap.end();
-                ++ipick)
-            {
-                if (ipick->first == bin)
-                {
-                    cout << "> Force binned solution # " << ipick->second
-                        << endl;
-                    solu.SetSolution( ipick->second );
-
-                    break;
-                }
-            }
-            
-            solu.Solve();
-
-            // Save Fits
-            //
-            {
-                std::ostringstream name;
-                name << "out_bin_" << bin << ".root";
-                TFile *binout = TFile::Open(name.str().c_str(), "recreate");
-                for (int i = 0; 8 > i; ++i)
-                {
-                    solu.result(i)->Write();
-                }
-                binout->Close();
-            }
-
-            SolutionInBin solutionInBin;
-            saveSolution(solutionInBin.solution, solu, *inputGroup);
-            solutionInBin.bin = inputGroup->bin;
-            _binnedSolution.push_back(solutionInBin);
-        }
+        SolutionInBin solutionInBin;
+        saveSolution(solutionInBin.solution, solu, *inputGroup);
+        solutionInBin.bin = inputGroup->bin;
+        _binnedSolution.push_back(solutionInBin);
     }
 }
 
@@ -867,17 +883,18 @@ void S8Solver::PrintData(TString option)
     std::cout << " k_b scale factor: " << fKappabf << std::endl;
     std::cout << " k_cl scale factor: " << fKappaclf << std::endl;
     
-    // Print Input and solution right after input
-    //
-    cout << "INPUT" << endl;
-    cout << endl;
+    if (_doAverageSolution)
+    {
+        cout << " [Average]" << endl
+            << _totalInput << endl;
 
-    cout << " [Average]" << endl
-        << _totalInput << endl;
+        cout << " SOLUTION" << endl;
+        cout << _totalSolution << endl
+            << endl;
+    }
 
-    cout << " SOLUTION" << endl;
-    cout << _totalSolution << endl
-        << endl;
+    if (!_doBinnedSolution)
+        return;
 
     // Binned
     //
@@ -904,6 +921,13 @@ void S8Solver::PrintData(TString option)
 
 void S8Solver::Save(TString filename)
 {
+    if (!_doBinnedSolution)
+    {
+        cout << "Binned solution is not run. Nothing to save" << endl;
+
+        return;
+    }
+
     auto_ptr<TFile> ofile(new TFile(filename,"RECREATE"));
     if (!ofile->IsOpen())
     {
@@ -1065,6 +1089,13 @@ void S8Solver::DumpTable(std::string filename)
 
 void S8Solver::Draw(int maxNbins)
 {
+    if (!_doBinnedSolution)
+    {
+        cout << "Binned solution is not run. Nothing to Draw" << endl;
+
+        return;
+    }
+
     generateGraphs();
 
     // Draw Graphs
