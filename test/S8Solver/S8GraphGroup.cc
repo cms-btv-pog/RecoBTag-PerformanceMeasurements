@@ -12,6 +12,8 @@
 #include <TCanvas.h>
 #include <TDirectory.h>
 #include <TGraphErrors.h>
+#include <TLegend.h>
+#include <TMultiGraph.h>
 
 #include "S8GraphGroup.h"
 
@@ -180,10 +182,167 @@ void EffGraphGroup::save(TDirectory *folder)
 
 
 
+InputGraph::InputGraph(const int &size)
+{
+    all.reset(new TGraphErrors(size));
+    all->SetMarkerStyle(8);
+    all->SetMarkerColor(1);
+    all->SetLineColor(1); 
+    all->SetMarkerSize(1.2); 
+
+    mu.reset(new TGraphErrors(size));
+    mu->SetMarkerStyle(8);
+    mu->SetMarkerColor(kRed);
+    mu->SetLineColor(kRed); 
+    mu->SetMarkerSize(1.2); 
+
+    tag.reset(new TGraphErrors(size));
+    tag->SetMarkerStyle(8);
+    tag->SetMarkerColor(kGreen);
+    tag->SetLineColor(kGreen); 
+    tag->SetMarkerSize(1.2); 
+
+    muTag.reset(new TGraphErrors(size));
+    muTag->SetMarkerStyle(8);
+    muTag->SetMarkerColor(kBlue);
+    muTag->SetLineColor(kBlue); 
+    muTag->SetMarkerSize(1.2); 
+}
+
+
+
+InputGraphGroup::InputGraphGroup(const BinnedNumericInputGroup &binnedInput):
+    n(binnedInput.size()),
+    p(binnedInput.size())
+{
+    int point = 0;
+    for(BinnedNumericInputGroup::const_iterator inputGroup =
+            binnedInput.begin();
+        binnedInput.end() != inputGroup;
+        ++inputGroup, ++point)
+    {
+        fill(n.all.get(), point,
+             inputGroup->bin, inputGroup->input.n.all);
+
+        fill(p.all.get(), point,
+             inputGroup->bin, inputGroup->input.p.all);
+
+        fill(n.mu.get(), point,
+             inputGroup->bin, inputGroup->input.n.mu);
+
+        fill(p.mu.get(), point,
+             inputGroup->bin, inputGroup->input.p.mu);
+
+        fill(n.tag.get(), point,
+             inputGroup->bin, inputGroup->input.n.tag);
+
+        fill(p.tag.get(), point,
+             inputGroup->bin, inputGroup->input.p.tag);
+
+        fill(n.muTag.get(), point,
+             inputGroup->bin, inputGroup->input.n.muTag);
+
+        fill(p.muTag.get(), point,
+             inputGroup->bin, inputGroup->input.p.muTag);
+    }
+}
+
+InputGraphGroup::~InputGraphGroup()
+{
+    while(!_heaps.empty())
+    {
+        delete _heaps.top();
+
+        _heaps.pop();
+    }
+
+    cout << "Input Graph Group is destroyed" << endl;
+}
+
+void InputGraphGroup::draw()
+{
+    TCanvas *canvas = new TCanvas();
+    _heaps.push(canvas);
+    canvas->SetTitle("(n) Inputs");
+    canvas->SetGrid();
+
+    TMultiGraph *graph = new TMultiGraph();
+    _heaps.push(graph);
+    graph->Add((TGraphErrors *) n.all->Clone(), "lp");
+    graph->Add((TGraphErrors *) n.mu->Clone(), "lp");
+    graph->Add((TGraphErrors *) n.tag->Clone(), "lp");
+    graph->Add((TGraphErrors *) n.muTag->Clone(), "lp");
+    graph->Draw("a");
+
+    TLegend *legend = new TLegend(0.57,0.22,0.87,0.38, "Input");
+    _heaps.push(legend);
+    legend->SetMargin(0.12);
+    legend->SetTextSize(0.027);
+    legend->SetFillColor(10);
+    legend->AddEntry(n.all.get(), "n", "p");
+    legend->AddEntry(n.mu.get(), "n mu", "p");
+    legend->AddEntry(n.tag.get(), "n tag", "p");
+    legend->AddEntry(n.muTag.get(), "n muTag", "p");
+    legend->Draw();
+
+    canvas = new TCanvas();
+    _heaps.push(canvas);
+    canvas->SetTitle("(p) Inputs");
+    canvas->SetGrid();
+
+    graph = new TMultiGraph();
+    _heaps.push(graph);
+    graph->Add((TGraphErrors *) p.all->Clone(), "lp");
+    graph->Add((TGraphErrors *) p.mu->Clone(), "lp");
+    graph->Add((TGraphErrors *) p.tag->Clone(), "lp");
+    graph->Add((TGraphErrors *) p.muTag->Clone(), "lp");
+    graph->Draw("a");
+
+    legend = new TLegend(0.57,0.22,0.87,0.38, "Input");
+    _heaps.push(legend);
+    legend->SetMargin(0.12);
+    legend->SetTextSize(0.027);
+    legend->SetFillColor(10);
+    legend->AddEntry(p.all.get(), "p", "p");
+    legend->AddEntry(p.mu.get(), "p mu", "p");
+    legend->AddEntry(p.tag.get(), "p tag", "p");
+    legend->AddEntry(p.muTag.get(), "p muTag", "p");
+    legend->Draw();
+}
+
+void InputGraphGroup::save(TDirectory *folder)
+{
+    TDirectory *subdir = folder->mkdir("input");
+    if (!subdir)
+    {
+        cerr << "failed to create input subdir in ROOT file" << endl;
+
+        return;
+    }
+
+    subdir->cd();
+
+    n.all->Write("n");
+    p.all->Write("p");
+
+    n.mu->Write("n_mu");
+    p.mu->Write("p_mu");
+
+    n.tag->Write("n_tag");
+    p.tag->Write("p_tag");
+
+    n.muTag->Write("n_muTag");
+    p.muTag->Write("p_muTag");
+
+    folder->cd();
+}
+
+
 GraphGroup::GraphGroup(const BinnedNumericInputGroup &binnedInput,
                        const BinnedSolution &binnedSolution):
     mcEfficiency("mc", binnedInput),
-    s8Efficiency("s8", binnedSolution)
+    s8Efficiency("s8", binnedSolution),
+    input(binnedInput)
 {
     alpha.reset(new TGraphErrors(binnedInput.size()));
     alpha->SetMarkerStyle(23);
@@ -288,6 +447,7 @@ void GraphGroup::save(TDirectory *folder)
 
     mcEfficiency.save(folder);
     s8Efficiency.save(folder);
+    input.save(folder);
 }
 
 void GraphGroup::draw()
@@ -330,4 +490,6 @@ void GraphGroup::draw()
 
     mcEfficiency.draw();
     s8Efficiency.draw();
+
+    input.draw();
 }

@@ -54,6 +54,33 @@ struct EffGraphGroup
         std::string _prefix;
 };
 
+struct InputGraph
+{
+    InputGraph(const int &size);
+
+    std::auto_ptr<TGraphErrors> all;
+    std::auto_ptr<TGraphErrors> mu;
+    std::auto_ptr<TGraphErrors> tag;
+    std::auto_ptr<TGraphErrors> muTag;
+};
+
+struct InputGraphGroup
+{
+    InputGraphGroup(const BinnedNumericInputGroup &);
+    ~InputGraphGroup();
+
+    void draw();
+    void save(TDirectory *);
+
+    InputGraph n;
+    InputGraph p;
+
+    private:
+        typedef std::stack<TObject *> Heap;
+
+        Heap        _heaps;
+};
+
 struct GraphGroup
 {
     GraphGroup(const BinnedNumericInputGroup &, const BinnedSolution &);
@@ -74,6 +101,8 @@ struct GraphGroup
 
     EffGraphGroup mcEfficiency;
     EffGraphGroup s8Efficiency;
+
+    InputGraphGroup input;
 
     private:
         typedef std::stack<TObject *> Heap;
