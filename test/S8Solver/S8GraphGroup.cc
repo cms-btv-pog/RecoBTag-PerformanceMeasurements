@@ -276,9 +276,6 @@ void InputGraphGroup::draw()
 
     TLegend *legend = new TLegend(0.57,0.22,0.87,0.38, "Input");
     _heaps.push(legend);
-    legend->SetMargin(0.12);
-    legend->SetTextSize(0.027);
-    legend->SetFillColor(10);
     legend->AddEntry(n.all.get(), "n", "p");
     legend->AddEntry(n.mu.get(), "n mu", "p");
     legend->AddEntry(n.tag.get(), "n tag", "p");
@@ -300,9 +297,6 @@ void InputGraphGroup::draw()
 
     legend = new TLegend(0.57,0.22,0.87,0.38, "Input");
     _heaps.push(legend);
-    legend->SetMargin(0.12);
-    legend->SetTextSize(0.027);
-    legend->SetFillColor(10);
     legend->AddEntry(p.all.get(), "p", "p");
     legend->AddEntry(p.mu.get(), "p mu", "p");
     legend->AddEntry(p.tag.get(), "p tag", "p");
@@ -346,43 +340,43 @@ GraphGroup::GraphGroup(const BinnedNumericInputGroup &binnedInput,
 {
     alpha.reset(new TGraphErrors(binnedInput.size()));
     alpha->SetMarkerStyle(23);
-    alpha->SetMarkerColor(4);
-    alpha->SetLineColor(4);
+    alpha->SetMarkerColor(kRed + 1);
+    alpha->SetLineColor(kRed + 1);
     alpha->SetMinimum(0.7);
     alpha->SetMaximum(1.3);
 
     beta.reset(new TGraphErrors(binnedInput.size()));
     beta->SetMarkerStyle(22); 
-    beta->SetMarkerColor(3); 
-    beta->SetLineColor(3); 
+    beta->SetMarkerColor(kGreen + 1); 
+    beta->SetLineColor(kGreen + 1); 
     beta->SetMinimum(0.7);
     beta->SetMaximum(1.3);
 
     gamma.reset(new TGraphErrors(binnedInput.size()));
     gamma->SetMarkerStyle(23);
-    gamma->SetMarkerColor(2);
-    gamma->SetLineColor(2);
+    gamma->SetMarkerColor(kRed + 1);
+    gamma->SetLineColor(kRed + 1);
     gamma->SetMinimum(0.7);
     gamma->SetMaximum(1.3);
 
     delta.reset(new TGraphErrors(binnedInput.size()));
     delta->SetMarkerStyle(22);
-    delta->SetMarkerColor(1);
-    delta->SetLineColor(1);
+    delta->SetMarkerColor(kGreen + 1);
+    delta->SetLineColor(kGreen + 1);
     delta->SetMinimum(0.7);
     delta->SetMaximum(1.3);
 
     kappaB.reset(new TGraphErrors(binnedInput.size()));
     kappaB->SetMarkerStyle(20); 
-    kappaB->SetMarkerColor(1); 
-    kappaB->SetLineColor(1); 
+    kappaB->SetMarkerColor(kGreen + 1); 
+    kappaB->SetLineColor(kGreen + 1); 
     kappaB->SetMinimum(0.7);
     kappaB->SetMaximum(1.3);
 
     kappaCL.reset(new TGraphErrors(binnedInput.size()));
     kappaCL->SetMarkerStyle(21); 
-    kappaCL->SetMarkerColor(2); 
-    kappaCL->SetLineColor(2); 
+    kappaCL->SetMarkerColor(kRed + 1); 
+    kappaCL->SetLineColor(kRed + 1); 
     kappaCL->SetMinimum(0.7);
     kappaCL->SetMaximum(1.3);
 
@@ -452,41 +446,68 @@ void GraphGroup::save(TDirectory *folder)
 
 void GraphGroup::draw()
 {
+    // tag
+    //
     TCanvas *canvas = new TCanvas();
     _heaps.push(canvas);
-    canvas->SetTitle("Alpha");
+    canvas->SetTitle("Alpha, Beta");
     canvas->SetGrid();
-    alpha->Draw("ap");
 
+    TMultiGraph *graph = new TMultiGraph();
+    _heaps.push(graph);
+    graph->Add((TGraphErrors *) alpha->Clone(), "lp");
+    graph->Add((TGraphErrors *) beta->Clone(), "lp");
+    graph->SetMinimum(0.8);
+    graph->SetMaximum(1.2);
+    graph->Draw("a");
+
+    TLegend *legend = new TLegend(0.57,0.22,0.87,0.38, "Coeffcients");
+    _heaps.push(legend);
+    legend->AddEntry(alpha.get(), "alpha", "p");
+    legend->AddEntry(beta.get(), "beta", "p");
+    legend->Draw();
+
+    // mu
+    //
     canvas = new TCanvas();
     _heaps.push(canvas);
-    canvas->SetTitle("Beta");
+    canvas->SetTitle("Gamma, Delta");
     canvas->SetGrid();
-    beta->Draw("ap");
 
+    graph = new TMultiGraph();
+    _heaps.push(graph);
+    graph->Add((TGraphErrors *) gamma->Clone(), "lp");
+    graph->Add((TGraphErrors *) delta->Clone(), "lp");
+    graph->SetMinimum(0.8);
+    graph->SetMaximum(1.2);
+    graph->Draw("a");
+
+    legend = new TLegend(0.57,0.22,0.87,0.38, "Coeffcients");
+    _heaps.push(legend);
+    legend->AddEntry(gamma.get(), "gamma", "p");
+    legend->AddEntry(delta.get(), "delta", "p");
+    legend->Draw();
+
+    // muTag
+    //
     canvas = new TCanvas();
     _heaps.push(canvas);
-    canvas->SetTitle("Gamma");
+    canvas->SetTitle("KappaCL, KappaB");
     canvas->SetGrid();
-    gamma->Draw("ap");
 
-    canvas = new TCanvas();
-    _heaps.push(canvas);
-    canvas->SetTitle("Delta");
-    canvas->SetGrid();
-    delta->Draw("ap");
+    graph = new TMultiGraph();
+    _heaps.push(graph);
+    graph->Add((TGraphErrors *) kappaCL->Clone(), "lp");
+    graph->Add((TGraphErrors *) kappaB->Clone(), "lp");
+    graph->SetMinimum(0.8);
+    graph->SetMaximum(1.2);
+    graph->Draw("a");
 
-    canvas = new TCanvas();
-    _heaps.push(canvas);
-    canvas->SetTitle("KappaB");
-    canvas->SetGrid();
-    kappaB->Draw("ap");
-
-    canvas = new TCanvas();
-    _heaps.push(canvas);
-    canvas->SetTitle("KappaCL");
-    canvas->SetGrid();
-    kappaCL->Draw("ap");
+    legend = new TLegend(0.57,0.22,0.87,0.38, "Coeffcients");
+    _heaps.push(legend);
+    legend->AddEntry(kappaCL.get(), "kappaCL", "p");
+    legend->AddEntry(kappaB.get(), "kappaB", "p");
+    legend->Draw();
 
     mcEfficiency.draw();
     s8Efficiency.draw();
