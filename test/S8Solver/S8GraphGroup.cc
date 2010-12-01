@@ -150,9 +150,12 @@ void EffGraph::draw()
 {
     TCanvas *canvas = new TCanvas();
     _heaps.push(canvas);
-    canvas->SetTitle("Eff Mu b");
+    canvas->SetWindowSize(1024, 768);
+    canvas->Divide(2, 2);
+    canvas->SetTitle("Eff");
     canvas->SetGrid();
 
+    canvas->cd(1)->SetGrid();
     TMultiGraph *graph = new TMultiGraph();
     _heaps.push(graph);
     graph->Add((TGraphErrors *) mc.mu.b->Clone(), "lp");
@@ -167,11 +170,7 @@ void EffGraph::draw()
     legend->AddEntry(s8.mu.b.get(), "System8", "p");
     legend->Draw();
 
-    canvas = new TCanvas();
-    _heaps.push(canvas);
-    canvas->SetTitle("Eff Mu cl");
-    canvas->SetGrid();
-
+    canvas->cd(2)->SetGrid();
     graph = new TMultiGraph();
     _heaps.push(graph);
     graph->Add((TGraphErrors *) mc.mu.cl->Clone(), "lp");
@@ -186,11 +185,7 @@ void EffGraph::draw()
     legend->AddEntry(s8.mu.cl.get(), "System8", "p");
     legend->Draw();
 
-    canvas = new TCanvas();
-    _heaps.push(canvas);
-    canvas->SetTitle("Eff Tag b");
-    canvas->SetGrid();
-
+    canvas->cd(3)->SetGrid();
     graph = new TMultiGraph();
     _heaps.push(graph);
     graph->Add((TGraphErrors *) mc.tag.b->Clone(), "lp");
@@ -205,11 +200,7 @@ void EffGraph::draw()
     legend->AddEntry(s8.tag.b.get(), "System8", "p");
     legend->Draw();
 
-    canvas = new TCanvas();
-    _heaps.push(canvas);
-    canvas->SetTitle("Eff Tag cl");
-    canvas->SetGrid();
-
+    canvas->cd(4)->SetGrid();
     graph = new TMultiGraph();
     _heaps.push(graph);
     graph->Add((TGraphErrors *) mc.tag.cl->Clone(), "lp");
@@ -335,9 +326,13 @@ void InputGraphGroup::draw()
 {
     TCanvas *canvas = new TCanvas();
     _heaps.push(canvas);
-    canvas->SetTitle("(n) Inputs");
-    canvas->SetGrid();
+    canvas->SetWindowSize(1024, 640);
+    canvas->Divide(2, 1);
+    canvas->SetTitle("Inputs");
 
+    // (n)
+    //
+    canvas->cd(1)->SetGrid();
     TMultiGraph *graph = new TMultiGraph();
     _heaps.push(graph);
     graph->Add((TGraphErrors *) n.all->Clone(), "lp");
@@ -348,17 +343,16 @@ void InputGraphGroup::draw()
 
     TLegend *legend = new TLegend(0.57,0.22,0.87,0.38, "Input");
     _heaps.push(legend);
+    legend->SetTextSize(0.03);
     legend->AddEntry(n.all.get(), "n", "p");
     legend->AddEntry(n.mu.get(), "n mu", "p");
     legend->AddEntry(n.tag.get(), "n tag", "p");
     legend->AddEntry(n.muTag.get(), "n muTag", "p");
     legend->Draw();
 
-    canvas = new TCanvas();
-    _heaps.push(canvas);
-    canvas->SetTitle("(p) Inputs");
-    canvas->SetGrid();
-
+    // (p)
+    //
+    canvas->cd(2)->SetGrid();
     graph = new TMultiGraph();
     _heaps.push(graph);
     graph->Add((TGraphErrors *) p.all->Clone(), "lp");
@@ -369,6 +363,7 @@ void InputGraphGroup::draw()
 
     legend = new TLegend(0.57,0.22,0.87,0.38, "Input");
     _heaps.push(legend);
+    legend->SetTextSize(0.03);
     legend->AddEntry(p.all.get(), "p", "p");
     legend->AddEntry(p.mu.get(), "p mu", "p");
     legend->AddEntry(p.tag.get(), "p tag", "p");
@@ -516,35 +511,16 @@ void GraphGroup::save(TDirectory *folder)
 
 void GraphGroup::draw()
 {
-    // tag
-    //
     TCanvas *canvas = new TCanvas();
     _heaps.push(canvas);
-    canvas->SetTitle("Alpha, Beta");
-    canvas->SetGrid();
-
-    TMultiGraph *graph = new TMultiGraph();
-    _heaps.push(graph);
-    graph->Add((TGraphErrors *) alpha->Clone(), "lp");
-    graph->Add((TGraphErrors *) beta->Clone(), "lp");
-    graph->SetMinimum(0.8);
-    graph->SetMaximum(1.2);
-    graph->Draw("a");
-
-    TLegend *legend = new TLegend(0.57,0.22,0.87,0.38, "Coeffcients");
-    _heaps.push(legend);
-    legend->AddEntry(alpha.get(), "alpha", "p");
-    legend->AddEntry(beta.get(), "beta", "p");
-    legend->Draw();
+    canvas->SetWindowSize(1200,640);
+    canvas->Divide(3, 1);
+    canvas->SetTitle("Coefficients");
 
     // mu
     //
-    canvas = new TCanvas();
-    _heaps.push(canvas);
-    canvas->SetTitle("Gamma, Delta");
-    canvas->SetGrid();
-
-    graph = new TMultiGraph();
+    canvas->cd(1)->SetGrid();
+    TMultiGraph *graph = new TMultiGraph();
     _heaps.push(graph);
     graph->Add((TGraphErrors *) gamma->Clone(), "lp");
     graph->Add((TGraphErrors *) delta->Clone(), "lp");
@@ -552,19 +528,34 @@ void GraphGroup::draw()
     graph->SetMaximum(1.2);
     graph->Draw("a");
 
-    legend = new TLegend(0.57,0.22,0.87,0.38, "Coeffcients");
+    TLegend *legend = new TLegend(0.57,0.22,0.87,0.38, "Coeffcients");
     _heaps.push(legend);
+    legend->SetTextSize(0.04);
     legend->AddEntry(gamma.get(), "gamma", "p");
     legend->AddEntry(delta.get(), "delta", "p");
     legend->Draw();
 
+    // tag
+    //
+    canvas->cd(2)->SetGrid();
+    graph = new TMultiGraph();
+    _heaps.push(graph);
+    graph->Add((TGraphErrors *) alpha->Clone(), "lp");
+    graph->Add((TGraphErrors *) beta->Clone(), "lp");
+    graph->SetMinimum(0.8);
+    graph->SetMaximum(1.2);
+    graph->Draw("a");
+
+    legend = new TLegend(0.57,0.22,0.87,0.38, "Coeffcients");
+    _heaps.push(legend);
+    legend->SetTextSize(0.04);
+    legend->AddEntry(alpha.get(), "alpha", "p");
+    legend->AddEntry(beta.get(), "beta", "p");
+    legend->Draw();
+
     // muTag
     //
-    canvas = new TCanvas();
-    _heaps.push(canvas);
-    canvas->SetTitle("KappaCL, KappaB");
-    canvas->SetGrid();
-
+    canvas->cd(3)->SetGrid();
     graph = new TMultiGraph();
     _heaps.push(graph);
     graph->Add((TGraphErrors *) kappaCL->Clone(), "lp");
@@ -575,6 +566,7 @@ void GraphGroup::draw()
 
     legend = new TLegend(0.57,0.22,0.87,0.38, "Coeffcients");
     _heaps.push(legend);
+    legend->SetTextSize(0.04);
     legend->AddEntry(kappaCL.get(), "kappaCL", "p");
     legend->AddEntry(kappaB.get(), "kappaB", "p");
     legend->Draw();
