@@ -35,6 +35,43 @@ void fill(TGraphErrors *graph, const int &point,
     graph->SetPointError(point, sqrt(x.second), sqrt(y.second));
 }
 
+void fill(TGraphErrors *scale, const TGraphErrors *s8, const TGraphErrors *mc)
+{
+    using std::make_pair;
+
+    for(int point = 0; s8->GetN() > point; ++point)
+    {
+        double s8X;
+        double s8Y;
+        s8->GetPoint(point, s8X, s8Y);
+
+        double mcX;
+        double mcY;
+        mc->GetPoint(point, mcX, mcY);
+
+        Measurement x = make_pair(s8X, pow(s8->GetErrorX(point), 2));
+        Measurement y = make_pair(s8Y, pow(s8->GetErrorY(point), 2)) /
+            make_pair(mcY, pow(mc->GetErrorY(point), 2));
+
+        fill(scale, point, x, y);
+    }
+}
+
+void fill(EffGraphGroup &scale,
+          const EffGraphGroup &s8,
+          const EffGraphGroup &mc)
+{
+    fill(scale.mu.b.get(), s8.mu.b.get(), mc.mu.b.get());
+    fill(scale.mu.cl.get(), s8.mu.cl.get(), mc.mu.cl.get());
+    fill(scale.tag.b.get(), s8.tag.b.get(), mc.tag.b.get());
+    fill(scale.tag.cl.get(), s8.tag.cl.get(), mc.tag.cl.get());
+}
+
+
+FlavouredEffGraphGroup::FlavouredEffGraphGroup(const int &size)
+{
+    init(size, true);
+}
 
 FlavouredEffGraphGroup::FlavouredEffGraphGroup(
     const BinnedSolution &binnedSolution)
@@ -64,6 +101,12 @@ void FlavouredEffGraphGroup::init(const int &size, const bool &isMC)
 }
 
 
+
+EffGraphGroup::EffGraphGroup(const int &size):
+    mu(size),
+    tag(size)
+{
+}
 
 EffGraphGroup::EffGraphGroup(const BinnedSolution &binnedSolution):
     mu(binnedSolution),
@@ -130,8 +173,10 @@ void EffGraphGroup::save(TDirectory *)
 EffGraph::EffGraph(const BinnedNumericInputGroup &binnedInput,
                    const BinnedSolution &binnedSolution):
     mc(binnedInput),
-    s8(binnedSolution)
+    s8(binnedSolution),
+    scale(binnedSolution.size())
 {
+    fill(scale, s8, mc);
 }
 
 EffGraph::~EffGraph()
@@ -213,6 +258,47 @@ void EffGraph::draw()
     _heaps.push(legend);
     legend->AddEntry(mc.tag.cl.get(), "Monte-Carlo", "p");
     legend->AddEntry(s8.tag.cl.get(), "System8", "p");
+    legend->Draw();
+
+    // Scales
+    //
+    canvas = new TCanvas();
+    _heaps.push(canvas);
+    canvas->SetWindowSize(1024, 768);
+    canvas->Divide(2, 2);
+    canvas->SetTitle("Eff");
+    canvas->SetGrid();
+
+    canvas->cd(1)->SetGrid();
+    scale.mu.b->Draw("ap");
+
+    legend = new TLegend(0.57,0.22,0.87,0.38, "Eff Mu b");
+    _heaps.push(legend);
+    legend->AddEntry(scale.mu.b.get(), "Scale Factor", "p");
+    legend->Draw();
+
+    canvas->cd(2)->SetGrid();
+    scale.mu.cl->Draw("ap");
+
+    legend = new TLegend(0.57,0.22,0.87,0.38, "Eff Mu cl");
+    _heaps.push(legend);
+    legend->AddEntry(scale.mu.cl.get(), "Scale Factor", "p");
+    legend->Draw();
+
+    canvas->cd(3)->SetGrid();
+    scale.tag.b->Draw("ap");
+
+    legend = new TLegend(0.57,0.22,0.87,0.38, "Eff Tag b");
+    _heaps.push(legend);
+    legend->AddEntry(scale.tag.b.get(), "Scale Factor", "p");
+    legend->Draw();
+
+    canvas->cd(4)->SetGrid();
+    scale.tag.cl->Draw("ap");
+
+    legend = new TLegend(0.57,0.22,0.87,0.38, "Eff Tag cl");
+    _heaps.push(legend);
+    legend->AddEntry(scale.tag.cl.get(), "Scale Factor", "p");
     legend->Draw();
 }
 

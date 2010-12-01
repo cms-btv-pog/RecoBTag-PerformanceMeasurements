@@ -26,6 +26,7 @@ typedef std::vector<SolutionInBin> BinnedSolution;
 
 struct FlavouredEffGraphGroup
 {
+    explicit FlavouredEffGraphGroup(const int &size);
     FlavouredEffGraphGroup(const BinnedSolution &);
     FlavouredEffGraphGroup(const BinnedNumericInputGroup &);
 
@@ -37,6 +38,7 @@ struct FlavouredEffGraphGroup
 
 struct EffGraphGroup
 {
+    explicit EffGraphGroup(const int &);
     EffGraphGroup(const BinnedSolution &);
     EffGraphGroup(const BinnedNumericInputGroup &);
 
@@ -56,6 +58,7 @@ struct EffGraph
 
     EffGraphGroup mc;
     EffGraphGroup s8;
+    EffGraphGroup scale;
 
     private:
         typedef std::stack<TObject *> Heap;
