@@ -29,7 +29,7 @@ struct FlavouredEffGraphGroup
     FlavouredEffGraphGroup(const BinnedSolution &);
     FlavouredEffGraphGroup(const BinnedNumericInputGroup &);
 
-    void init(const int &);
+    void init(const int &, const bool &isMonteCarlo = false);
 
     std::auto_ptr<TGraphErrors> b;
     std::auto_ptr<TGraphErrors> cl;
@@ -37,21 +37,30 @@ struct FlavouredEffGraphGroup
 
 struct EffGraphGroup
 {
-    EffGraphGroup(const std::string &, const BinnedSolution &);
-    EffGraphGroup(const std::string &, const BinnedNumericInputGroup &);
-    ~EffGraphGroup();
+    EffGraphGroup(const BinnedSolution &);
+    EffGraphGroup(const BinnedNumericInputGroup &);
 
-    void draw();
     void save(TDirectory *);
 
     FlavouredEffGraphGroup mu;
     FlavouredEffGraphGroup tag;
+};
+
+struct EffGraph
+{
+    EffGraph(const BinnedNumericInputGroup &, const BinnedSolution &);
+    ~EffGraph();
+
+    void draw();
+    void save(TDirectory *);
+
+    EffGraphGroup mc;
+    EffGraphGroup s8;
 
     private:
         typedef std::stack<TObject *> Heap;
 
         Heap        _heaps;
-        std::string _prefix;
 };
 
 struct InputGraph
@@ -99,8 +108,7 @@ struct GraphGroup
     std::auto_ptr<TGraphErrors> kappaB;
     std::auto_ptr<TGraphErrors> kappaCL;
 
-    EffGraphGroup mcEfficiency;
-    EffGraphGroup s8Efficiency;
+    EffGraph efficiency;
 
     InputGraphGroup input;
 

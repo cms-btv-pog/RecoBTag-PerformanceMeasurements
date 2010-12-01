@@ -45,31 +45,29 @@ FlavouredEffGraphGroup::FlavouredEffGraphGroup(
 FlavouredEffGraphGroup::FlavouredEffGraphGroup(
     const BinnedNumericInputGroup &binnedInput)
 {
-    init(binnedInput.size());
+    init(binnedInput.size(), true);
 }
 
-void FlavouredEffGraphGroup::init(const int &size)
+void FlavouredEffGraphGroup::init(const int &size, const bool &isMC)
 {
     b.reset(new TGraphErrors(size));
     b->SetMarkerStyle(8);
-    b->SetMarkerColor(1);
+    b->SetMarkerColor(isMC ? 1 : kGreen + 1);
     b->SetLineColor(1); 
     b->SetMarkerSize(1.5); 
 
     cl.reset(new TGraphErrors(size));
     cl->SetMarkerStyle(8);
-    cl->SetMarkerColor(1);
-    cl->SetLineColor(1); 
+    cl->SetMarkerColor(isMC ? 1 : kRed + 1);
+    cl->SetLineColor(isMC ? 1 : kRed + 1); 
     cl->SetMarkerSize(1.5); 
 }
 
 
 
-EffGraphGroup::EffGraphGroup(const std::string &prefix,
-                             const BinnedSolution &binnedSolution):
+EffGraphGroup::EffGraphGroup(const BinnedSolution &binnedSolution):
     mu(binnedSolution),
-    tag(binnedSolution),
-    _prefix(prefix)
+    tag(binnedSolution)
 {
     int point = 0;
     for(BinnedSolution::const_iterator solutionInBin = binnedSolution.begin();
@@ -94,11 +92,9 @@ EffGraphGroup::EffGraphGroup(const std::string &prefix,
     }
 }
 
-EffGraphGroup::EffGraphGroup(const std::string &prefix,
-                             const BinnedNumericInputGroup &binnedInput):
+EffGraphGroup::EffGraphGroup(const BinnedNumericInputGroup &binnedInput):
     mu(binnedInput),
-    tag(binnedInput),
-    _prefix(prefix)
+    tag(binnedInput)
 {
     int point = 0;
     for(BinnedNumericInputGroup::const_iterator inputGroup =
@@ -120,7 +116,25 @@ EffGraphGroup::EffGraphGroup(const std::string &prefix,
     }
 }
 
-EffGraphGroup::~EffGraphGroup()
+void EffGraphGroup::save(TDirectory *)
+{
+    mu.b->Write("eff_mu_b");
+    mu.cl->Write("eff_mu_cl");
+
+    tag.b->Write("eff_tag_b");
+    tag.cl->Write("eff_tag_cl");
+}
+
+
+
+EffGraph::EffGraph(const BinnedNumericInputGroup &binnedInput,
+                   const BinnedSolution &binnedSolution):
+    mc(binnedInput),
+    s8(binnedSolution)
+{
+}
+
+EffGraph::~EffGraph()
 {
     while(!_heaps.empty())
     {
@@ -129,54 +143,112 @@ EffGraphGroup::~EffGraphGroup()
         _heaps.pop();
     }
 
-    cout << "Eff Graph group is destroyed" << endl;
+    cout << "Efficiency Group is destroyed" << endl;
 }
 
-void EffGraphGroup::draw()
+void EffGraph::draw()
 {
     TCanvas *canvas = new TCanvas();
     _heaps.push(canvas);
-    canvas->SetTitle((_prefix + "Eff Mu B").c_str());
+    canvas->SetTitle("Eff Mu b");
     canvas->SetGrid();
-    mu.b->Draw("ap");
+
+    TMultiGraph *graph = new TMultiGraph();
+    _heaps.push(graph);
+    graph->Add((TGraphErrors *) mc.mu.b->Clone(), "lp");
+    graph->Add((TGraphErrors *) s8.mu.b->Clone(), "lp");
+    graph->SetMinimum(0.4);
+    graph->SetMaximum(1.0);
+    graph->Draw("a");
+
+    TLegend *legend = new TLegend(0.57,0.22,0.87,0.38, "Eff Mu b");
+    _heaps.push(legend);
+    legend->AddEntry(mc.mu.b.get(), "Monte-Carlo", "p");
+    legend->AddEntry(s8.mu.b.get(), "System8", "p");
+    legend->Draw();
 
     canvas = new TCanvas();
     _heaps.push(canvas);
-    canvas->SetTitle((_prefix + "Eff Mu CL").c_str());
+    canvas->SetTitle("Eff Mu cl");
     canvas->SetGrid();
-    mu.cl->Draw("ap");
+
+    graph = new TMultiGraph();
+    _heaps.push(graph);
+    graph->Add((TGraphErrors *) mc.mu.cl->Clone(), "lp");
+    graph->Add((TGraphErrors *) s8.mu.cl->Clone(), "lp");
+    graph->SetMinimum(0.1);
+    graph->SetMaximum(0.5);
+    graph->Draw("a");
+
+    legend = new TLegend(0.57,0.22,0.87,0.38, "Eff Mu cl");
+    _heaps.push(legend);
+    legend->AddEntry(mc.mu.cl.get(), "Monte-Carlo", "p");
+    legend->AddEntry(s8.mu.cl.get(), "System8", "p");
+    legend->Draw();
 
     canvas = new TCanvas();
     _heaps.push(canvas);
-    canvas->SetTitle((_prefix + "Eff Tag B").c_str());
+    canvas->SetTitle("Eff Tag b");
     canvas->SetGrid();
-    tag.b->Draw("ap");
+
+    graph = new TMultiGraph();
+    _heaps.push(graph);
+    graph->Add((TGraphErrors *) mc.tag.b->Clone(), "lp");
+    graph->Add((TGraphErrors *) s8.tag.b->Clone(), "lp");
+    graph->SetMinimum(0.4);
+    graph->SetMaximum(1.0);
+    graph->Draw("a");
+
+    legend = new TLegend(0.57,0.22,0.87,0.38, "Eff Tag b");
+    _heaps.push(legend);
+    legend->AddEntry(mc.tag.b.get(), "Monte-Carlo", "p");
+    legend->AddEntry(s8.tag.b.get(), "System8", "p");
+    legend->Draw();
 
     canvas = new TCanvas();
     _heaps.push(canvas);
-    canvas->SetTitle((_prefix + "Eff Tag CL").c_str());
+    canvas->SetTitle("Eff Tag cl");
     canvas->SetGrid();
-    tag.cl->Draw("ap");
+
+    graph = new TMultiGraph();
+    _heaps.push(graph);
+    graph->Add((TGraphErrors *) mc.tag.cl->Clone(), "lp");
+    graph->Add((TGraphErrors *) s8.tag.cl->Clone(), "lp");
+    graph->SetMinimum(0.1);
+    graph->SetMaximum(0.5);
+    graph->Draw("a");
+
+    legend = new TLegend(0.57,0.22,0.87,0.38, "Eff Tag cl");
+    _heaps.push(legend);
+    legend->AddEntry(mc.tag.cl.get(), "Monte-Carlo", "p");
+    legend->AddEntry(s8.tag.cl.get(), "System8", "p");
+    legend->Draw();
 }
 
-void EffGraphGroup::save(TDirectory *folder)
+void EffGraph::save(TDirectory *folder)
 {
-    TDirectory *subdir = folder->mkdir((_prefix + "efficiency").c_str());
+    TDirectory *subdir = folder->mkdir("mcefficiency");
     if (!subdir)
     {
-        cerr << "failed to create efficiency subdir in ROOT file" << endl;
+        cerr << "failed to create mcefficiency subdir in ROOT file" << endl;
 
         return;
     }
 
     subdir->cd();
+    mc.save(subdir);
+    folder->cd();
 
-    mu.b->Write("eff_mu_b");
-    mu.cl->Write("eff_mu_cl");
+    subdir = folder->mkdir("s8efficiency");
+    if (!subdir)
+    {
+        cerr << "failed to create s8efficiency subdir in ROOT file" << endl;
 
-    tag.b->Write("eff_tag_b");
-    tag.cl->Write("eff_tag_cl");
+        return;
+    }
 
+    subdir->cd();
+    s8.save(subdir);
     folder->cd();
 }
 
@@ -334,8 +406,7 @@ void InputGraphGroup::save(TDirectory *folder)
 
 GraphGroup::GraphGroup(const BinnedNumericInputGroup &binnedInput,
                        const BinnedSolution &binnedSolution):
-    mcEfficiency("mc", binnedInput),
-    s8Efficiency("s8", binnedSolution),
+    efficiency(binnedInput, binnedSolution),
     input(binnedInput)
 {
     alpha.reset(new TGraphErrors(binnedInput.size()));
@@ -439,8 +510,7 @@ void GraphGroup::save(TDirectory *folder)
 
     folder->cd();
 
-    mcEfficiency.save(folder);
-    s8Efficiency.save(folder);
+    efficiency.save(folder);
     input.save(folder);
 }
 
@@ -509,8 +579,7 @@ void GraphGroup::draw()
     legend->AddEntry(kappaB.get(), "kappaB", "p");
     legend->Draw();
 
-    mcEfficiency.draw();
-    s8Efficiency.draw();
+    efficiency.draw();
 
     input.draw();
 }
