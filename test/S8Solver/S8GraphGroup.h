@@ -24,6 +24,11 @@ class TObject;
 typedef std::vector<NumericInputGroup> BinnedNumericInputGroup;
 typedef std::vector<SolutionInBin> BinnedSolution;
 
+struct Graph
+{
+    enum Type { PT, ETA, PHI };
+};
+
 struct FlavouredEffGraphGroup
 {
     explicit FlavouredEffGraphGroup(const int &size);
@@ -38,9 +43,9 @@ struct FlavouredEffGraphGroup
 
 struct EffGraphGroup
 {
-    explicit EffGraphGroup(const int &);
-    EffGraphGroup(const BinnedSolution &);
-    EffGraphGroup(const BinnedNumericInputGroup &);
+    explicit EffGraphGroup(const Graph::Type &, const int &);
+    EffGraphGroup(const Graph::Type &, const BinnedSolution &);
+    EffGraphGroup(const Graph::Type &, const BinnedNumericInputGroup &);
 
     void save(TDirectory *);
 
@@ -50,7 +55,8 @@ struct EffGraphGroup
 
 struct EffGraph
 {
-    EffGraph(const BinnedNumericInputGroup &, const BinnedSolution &);
+    EffGraph(const Graph::Type &,
+             const BinnedNumericInputGroup &, const BinnedSolution &);
     ~EffGraph();
 
     void draw();
@@ -64,11 +70,12 @@ struct EffGraph
         typedef std::stack<TObject *> Heap;
 
         Heap        _heaps;
+        Graph::Type _type;
 };
 
 struct InputGraph
 {
-    InputGraph(const int &size);
+    InputGraph(const Graph::Type &, const int &size);
 
     std::auto_ptr<TGraphErrors> all;
     std::auto_ptr<TGraphErrors> mu;
@@ -78,7 +85,7 @@ struct InputGraph
 
 struct InputGraphGroup
 {
-    InputGraphGroup(const BinnedNumericInputGroup &);
+    InputGraphGroup(const Graph::Type &, const BinnedNumericInputGroup &);
     ~InputGraphGroup();
 
     void draw();
@@ -91,11 +98,13 @@ struct InputGraphGroup
         typedef std::stack<TObject *> Heap;
 
         Heap        _heaps;
+        Graph::Type _type;
 };
 
 struct GraphGroup
 {
-    GraphGroup(const BinnedNumericInputGroup &, const BinnedSolution &);
+    GraphGroup(const BinnedNumericInputGroup &, const BinnedSolution &,
+               const Graph::Type & = Graph::PT);
     ~GraphGroup();
 
     void save(TDirectory *);
@@ -117,7 +126,9 @@ struct GraphGroup
 
     private:
         typedef std::stack<TObject *> Heap;
+
         Heap _heaps;
+        Graph::Type _type;
 };
 
 #endif

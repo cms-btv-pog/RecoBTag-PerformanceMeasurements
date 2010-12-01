@@ -8,10 +8,14 @@
 
 #include <cmath>
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 
+#include <TAxis.h>
 #include <TCanvas.h>
 #include <TDirectory.h>
 #include <TGraphErrors.h>
+#include <TLatex.h>
 #include <TLegend.h>
 #include <TMultiGraph.h>
 
@@ -20,6 +24,53 @@
 using std::cerr;
 using std::cout;
 using std::endl;
+
+TLatex *createLabel(const double &luminosity = 31.6)
+{
+    std::ostringstream title;
+    title << "#splitline{CMS Preliminary 2010}{"
+        << std::fixed << std::setprecision(2) << luminosity
+        << " pb^{-1} at #sqrt{s} = 7 TeV}";
+
+    TLatex *label = new TLatex(3.570061, 23.08044, title.str().c_str());
+    label->SetNDC();
+    label->SetTextAlign(13);
+    label->SetX(0.4);
+    label->SetY(0.908);
+
+    return label;
+}
+
+void style(TLegend *legend)
+{ 
+    legend->SetBorderSize(1);
+    legend->SetLineStyle(1);
+    legend->SetTextFont(43);
+    legend->SetTextSizePixels(24);
+    legend->SetFillColor(0);
+}
+
+std::string getXTitle(const Graph::Type &type)
+{
+    switch(type)
+    {
+        case Graph::PT:  return "jet p_{T} [GeV/c]";
+        case Graph::ETA: return "jet #eta";
+        case Graph::PHI: return "jet #phi";
+    }
+
+    return "";
+}
+
+void setXtitle(const Graph::Type &type, TGraphErrors *graph)
+{
+    graph->GetXaxis()->SetTitle(getXTitle(type).c_str());
+}
+
+void setXtitle(const Graph::Type &type, TMultiGraph *graph)
+{
+    graph->GetXaxis()->SetTitle(getXTitle(type).c_str());
+}
 
 void fill(TGraph *graph, const int &point,
                       const Measurement &x, const Measurement &y)
@@ -90,7 +141,7 @@ void FlavouredEffGraphGroup::init(const int &size, const bool &isMC)
     b.reset(new TGraphErrors(size));
     b->SetMarkerStyle(8);
     b->SetMarkerColor(isMC ? 1 : kGreen + 1);
-    b->SetLineColor(1); 
+    b->SetLineColor(isMC ? 1 : kGreen + 1); 
     b->SetMarkerSize(1.5); 
 
     cl.reset(new TGraphErrors(size));
@@ -102,16 +153,23 @@ void FlavouredEffGraphGroup::init(const int &size, const bool &isMC)
 
 
 
-EffGraphGroup::EffGraphGroup(const int &size):
+EffGraphGroup::EffGraphGroup(const Graph::Type &type, const int &size):
     mu(size),
     tag(size)
 {
 }
 
-EffGraphGroup::EffGraphGroup(const BinnedSolution &binnedSolution):
+EffGraphGroup::EffGraphGroup(const Graph::Type &type,
+                             const BinnedSolution &binnedSolution):
     mu(binnedSolution),
     tag(binnedSolution)
 {
+    mu.b->GetYaxis()->SetTitle("Eff Mu b");
+    mu.cl->GetYaxis()->SetTitle("Eff Mu cl");
+
+    tag.b->GetYaxis()->SetTitle("Eff Mu b");
+    tag.cl->GetYaxis()->SetTitle("Eff Mu cl");
+
     int point = 0;
     for(BinnedSolution::const_iterator solutionInBin = binnedSolution.begin();
         binnedSolution.end() != solutionInBin;
@@ -135,10 +193,23 @@ EffGraphGroup::EffGraphGroup(const BinnedSolution &binnedSolution):
     }
 }
 
-EffGraphGroup::EffGraphGroup(const BinnedNumericInputGroup &binnedInput):
+EffGraphGroup::EffGraphGroup(const Graph::Type &type,
+                             const BinnedNumericInputGroup &binnedInput):
     mu(binnedInput),
     tag(binnedInput)
 {
+    mu.b->GetYaxis()->SetTitle("Eff Mu b");
+    mu.cl->GetYaxis()->SetTitle("Eff Mu cl");
+
+    setXtitle(type, mu.b.get());
+    setXtitle(type, mu.cl.get());
+
+    tag.b->GetYaxis()->SetTitle("Eff Mu b");
+    tag.cl->GetYaxis()->SetTitle("Eff Mu cl");
+
+    setXtitle(type, tag.b.get());
+    setXtitle(type, tag.cl.get());
+
     int point = 0;
     for(BinnedNumericInputGroup::const_iterator inputGroup =
             binnedInput.begin();
@@ -170,12 +241,20 @@ void EffGraphGroup::save(TDirectory *)
 
 
 
-EffGraph::EffGraph(const BinnedNumericInputGroup &binnedInput,
+EffGraph::EffGraph(const Graph::Type &type,
+                   const BinnedNumericInputGroup &binnedInput,
                    const BinnedSolution &binnedSolution):
-    mc(binnedInput),
-    s8(binnedSolution),
-    scale(binnedSolution.size())
+    mc(type, binnedInput),
+    s8(type, binnedSolution),
+    scale(type, binnedSolution.size()),
+    _type(type)
 {
+    scale.mu.b->GetYaxis()->SetTitle("Scale Factor");
+    scale.mu.cl->GetYaxis()->SetTitle("Scale Factor");
+
+    scale.tag.b->GetYaxis()->SetTitle("Scale Factor");
+    scale.tag.cl->GetYaxis()->SetTitle("Scale Factor");
+
     fill(scale, s8, mc);
 }
 
@@ -206,14 +285,21 @@ void EffGraph::draw()
     graph->Add((TGraphErrors *) mc.mu.b->Clone(), "lp");
     graph->Add((TGraphErrors *) s8.mu.b->Clone(), "lp");
     graph->SetMinimum(0.4);
-    graph->SetMaximum(1.0);
+    graph->SetMaximum(1.1);
     graph->Draw("a");
+    graph->GetYaxis()->SetTitle("#epsilon_{b}^{#mu}");
+    setXtitle(_type, graph);
 
-    TLegend *legend = new TLegend(0.57,0.22,0.87,0.38, "Eff Mu b");
+    TLegend *legend = new TLegend(0.57,0.22,0.91,0.38);
     _heaps.push(legend);
     legend->AddEntry(mc.mu.b.get(), "Monte-Carlo", "p");
-    legend->AddEntry(s8.mu.b.get(), "System8", "p");
+    legend->AddEntry(s8.mu.b.get(), "Data", "p");
+    style(legend);
     legend->Draw();
+
+    TLatex *label = createLabel();
+    _heaps.push(label);
+    label->Draw();
 
     canvas->cd(2)->SetGrid();
     graph = new TMultiGraph();
@@ -221,14 +307,21 @@ void EffGraph::draw()
     graph->Add((TGraphErrors *) mc.mu.cl->Clone(), "lp");
     graph->Add((TGraphErrors *) s8.mu.cl->Clone(), "lp");
     graph->SetMinimum(0.1);
-    graph->SetMaximum(0.5);
+    graph->SetMaximum(0.6);
     graph->Draw("a");
+    graph->GetYaxis()->SetTitle("#epsilon_{cl}^{#mu}");
+    setXtitle(_type, graph);
 
-    legend = new TLegend(0.57,0.22,0.87,0.38, "Eff Mu cl");
+    legend = new TLegend(0.57,0.22,0.91,0.38);
     _heaps.push(legend);
+    style(legend);
     legend->AddEntry(mc.mu.cl.get(), "Monte-Carlo", "p");
-    legend->AddEntry(s8.mu.cl.get(), "System8", "p");
+    legend->AddEntry(s8.mu.cl.get(), "Data", "p");
     legend->Draw();
+
+    label = createLabel();
+    _heaps.push(label);
+    label->Draw();
 
     canvas->cd(3)->SetGrid();
     graph = new TMultiGraph();
@@ -236,14 +329,21 @@ void EffGraph::draw()
     graph->Add((TGraphErrors *) mc.tag.b->Clone(), "lp");
     graph->Add((TGraphErrors *) s8.tag.b->Clone(), "lp");
     graph->SetMinimum(0.4);
-    graph->SetMaximum(1.0);
+    graph->SetMaximum(1.1);
     graph->Draw("a");
+    graph->GetYaxis()->SetTitle("#epsilon_{b}^{tag}");
+    setXtitle(_type, graph);
 
-    legend = new TLegend(0.57,0.22,0.87,0.38, "Eff Tag b");
+    legend = new TLegend(0.57,0.22,0.91,0.38);
     _heaps.push(legend);
+    style(legend);
     legend->AddEntry(mc.tag.b.get(), "Monte-Carlo", "p");
-    legend->AddEntry(s8.tag.b.get(), "System8", "p");
+    legend->AddEntry(s8.tag.b.get(), "Data", "p");
     legend->Draw();
+
+    label = createLabel();
+    _heaps.push(label);
+    label->Draw();
 
     canvas->cd(4)->SetGrid();
     graph = new TMultiGraph();
@@ -251,14 +351,21 @@ void EffGraph::draw()
     graph->Add((TGraphErrors *) mc.tag.cl->Clone(), "lp");
     graph->Add((TGraphErrors *) s8.tag.cl->Clone(), "lp");
     graph->SetMinimum(0.1);
-    graph->SetMaximum(0.5);
+    graph->SetMaximum(0.6);
     graph->Draw("a");
+    graph->GetYaxis()->SetTitle("#epsilon_{cl}^{tag}");
+    setXtitle(_type, graph);
 
-    legend = new TLegend(0.57,0.22,0.87,0.38, "Eff Tag cl");
+    legend = new TLegend(0.57,0.22,0.91,0.38);
     _heaps.push(legend);
+    style(legend);
     legend->AddEntry(mc.tag.cl.get(), "Monte-Carlo", "p");
-    legend->AddEntry(s8.tag.cl.get(), "System8", "p");
+    legend->AddEntry(s8.tag.cl.get(), "Data", "p");
     legend->Draw();
+
+    label = createLabel();
+    _heaps.push(label);
+    label->Draw();
 
     // Scales
     //
@@ -270,36 +377,48 @@ void EffGraph::draw()
     canvas->SetGrid();
 
     canvas->cd(1)->SetGrid();
+    scale.mu.b->SetMinimum(.6);
+    scale.mu.b->SetMaximum(1.4);
     scale.mu.b->Draw("ap");
+    scale.mu.b->GetYaxis()->SetTitle("SF_{b}^{#mu}");
+    setXtitle(_type, scale.mu.b.get());
 
-    legend = new TLegend(0.57,0.22,0.87,0.38, "Eff Mu b");
-    _heaps.push(legend);
-    legend->AddEntry(scale.mu.b.get(), "Scale Factor", "p");
-    legend->Draw();
+    label = createLabel();
+    _heaps.push(label);
+    label->Draw();
 
     canvas->cd(2)->SetGrid();
+    scale.mu.cl->SetMinimum(.6);
+    scale.mu.cl->SetMaximum(1.4);
     scale.mu.cl->Draw("ap");
+    scale.mu.cl->GetYaxis()->SetTitle("SF_{cl}^{#mu}");
+    setXtitle(_type, scale.mu.cl.get());
 
-    legend = new TLegend(0.57,0.22,0.87,0.38, "Eff Mu cl");
-    _heaps.push(legend);
-    legend->AddEntry(scale.mu.cl.get(), "Scale Factor", "p");
-    legend->Draw();
+    label = createLabel();
+    _heaps.push(label);
+    label->Draw();
 
     canvas->cd(3)->SetGrid();
+    scale.tag.b->SetMinimum(.6);
+    scale.tag.b->SetMaximum(1.4);
     scale.tag.b->Draw("ap");
+    scale.tag.b->GetYaxis()->SetTitle("SF_{b}^{tag}");
+    setXtitle(_type, scale.tag.b.get());
 
-    legend = new TLegend(0.57,0.22,0.87,0.38, "Eff Tag b");
-    _heaps.push(legend);
-    legend->AddEntry(scale.tag.b.get(), "Scale Factor", "p");
-    legend->Draw();
+    label = createLabel();
+    _heaps.push(label);
+    label->Draw();
 
     canvas->cd(4)->SetGrid();
+    scale.tag.cl->SetMinimum(.6);
+    scale.tag.cl->SetMaximum(1.4);
     scale.tag.cl->Draw("ap");
+    scale.tag.cl->GetYaxis()->SetTitle("SF_{cl}^{tag}");
+    setXtitle(_type, scale.tag.cl.get());
 
-    legend = new TLegend(0.57,0.22,0.87,0.38, "Eff Tag cl");
-    _heaps.push(legend);
-    legend->AddEntry(scale.tag.cl.get(), "Scale Factor", "p");
-    legend->Draw();
+    label = createLabel();
+    _heaps.push(label);
+    label->Draw();
 }
 
 void EffGraph::save(TDirectory *folder)
@@ -331,38 +450,48 @@ void EffGraph::save(TDirectory *folder)
 
 
 
-InputGraph::InputGraph(const int &size)
+InputGraph::InputGraph(const Graph::Type &type, const int &size)
 {
     all.reset(new TGraphErrors(size));
     all->SetMarkerStyle(8);
     all->SetMarkerColor(1);
     all->SetLineColor(1); 
     all->SetMarkerSize(1.2); 
+    all->GetYaxis()->SetTitle("entries");
+    setXtitle(type, all.get());
 
     mu.reset(new TGraphErrors(size));
     mu->SetMarkerStyle(8);
     mu->SetMarkerColor(kRed);
     mu->SetLineColor(kRed); 
     mu->SetMarkerSize(1.2); 
+    mu->GetYaxis()->SetTitle("entries");
+    setXtitle(type, mu.get());
 
     tag.reset(new TGraphErrors(size));
     tag->SetMarkerStyle(8);
     tag->SetMarkerColor(kGreen);
     tag->SetLineColor(kGreen); 
     tag->SetMarkerSize(1.2); 
+    tag->GetYaxis()->SetTitle("entries");
+    setXtitle(type, tag.get());
 
     muTag.reset(new TGraphErrors(size));
     muTag->SetMarkerStyle(8);
     muTag->SetMarkerColor(kBlue);
     muTag->SetLineColor(kBlue); 
     muTag->SetMarkerSize(1.2); 
+    muTag->GetYaxis()->SetTitle("entries");
+    setXtitle(type, muTag.get());
 }
 
 
 
-InputGraphGroup::InputGraphGroup(const BinnedNumericInputGroup &binnedInput):
-    n(binnedInput.size()),
-    p(binnedInput.size())
+InputGraphGroup::InputGraphGroup(const Graph::Type &type,
+                                 const BinnedNumericInputGroup &binnedInput):
+    n(type, binnedInput.size()),
+    p(type, binnedInput.size()),
+    _type(type)
 {
     int point = 0;
     for(BinnedNumericInputGroup::const_iterator inputGroup =
@@ -426,15 +555,21 @@ void InputGraphGroup::draw()
     graph->Add((TGraphErrors *) n.tag->Clone(), "lp");
     graph->Add((TGraphErrors *) n.muTag->Clone(), "lp");
     graph->Draw("a");
+    graph->GetYaxis()->SetTitle("entries");
+    setXtitle(_type, graph);
 
-    TLegend *legend = new TLegend(0.57,0.22,0.87,0.38, "Input");
+    TLegend *legend = new TLegend(0.57,0.22,0.87,0.38);
     _heaps.push(legend);
-    legend->SetTextSize(0.03);
+    style(legend);
     legend->AddEntry(n.all.get(), "n", "p");
     legend->AddEntry(n.mu.get(), "n mu", "p");
     legend->AddEntry(n.tag.get(), "n tag", "p");
     legend->AddEntry(n.muTag.get(), "n muTag", "p");
     legend->Draw();
+
+    TLatex *label = createLabel();
+    _heaps.push(label);
+    label->Draw();
 
     // (p)
     //
@@ -446,15 +581,21 @@ void InputGraphGroup::draw()
     graph->Add((TGraphErrors *) p.tag->Clone(), "lp");
     graph->Add((TGraphErrors *) p.muTag->Clone(), "lp");
     graph->Draw("a");
+    graph->GetYaxis()->SetTitle("entries");
+    setXtitle(_type, graph);
 
-    legend = new TLegend(0.57,0.22,0.87,0.38, "Input");
+    legend = new TLegend(0.57,0.22,0.87,0.38);
     _heaps.push(legend);
-    legend->SetTextSize(0.03);
+    style(legend);
     legend->AddEntry(p.all.get(), "p", "p");
     legend->AddEntry(p.mu.get(), "p mu", "p");
     legend->AddEntry(p.tag.get(), "p tag", "p");
     legend->AddEntry(p.muTag.get(), "p muTag", "p");
     legend->Draw();
+
+    label = createLabel();
+    _heaps.push(label);
+    label->Draw();
 }
 
 void InputGraphGroup::save(TDirectory *folder)
@@ -485,10 +626,13 @@ void InputGraphGroup::save(TDirectory *folder)
 }
 
 
+
 GraphGroup::GraphGroup(const BinnedNumericInputGroup &binnedInput,
-                       const BinnedSolution &binnedSolution):
-    efficiency(binnedInput, binnedSolution),
-    input(binnedInput)
+                       const BinnedSolution &binnedSolution,
+                       const Graph::Type &type):
+    efficiency(type, binnedInput, binnedSolution),
+    input(type, binnedInput),
+    _type(type)
 {
     alpha.reset(new TGraphErrors(binnedInput.size()));
     alpha->SetMarkerStyle(23);
@@ -496,6 +640,8 @@ GraphGroup::GraphGroup(const BinnedNumericInputGroup &binnedInput,
     alpha->SetLineColor(kRed + 1);
     alpha->SetMinimum(0.7);
     alpha->SetMaximum(1.3);
+    alpha->GetYaxis()->SetTitle("a.u.");
+    setXtitle(_type, alpha.get());
 
     beta.reset(new TGraphErrors(binnedInput.size()));
     beta->SetMarkerStyle(22); 
@@ -503,6 +649,8 @@ GraphGroup::GraphGroup(const BinnedNumericInputGroup &binnedInput,
     beta->SetLineColor(kGreen + 1); 
     beta->SetMinimum(0.7);
     beta->SetMaximum(1.3);
+    beta->GetYaxis()->SetTitle("a.u.");
+    setXtitle(_type, beta.get());
 
     gamma.reset(new TGraphErrors(binnedInput.size()));
     gamma->SetMarkerStyle(23);
@@ -510,6 +658,8 @@ GraphGroup::GraphGroup(const BinnedNumericInputGroup &binnedInput,
     gamma->SetLineColor(kRed + 1);
     gamma->SetMinimum(0.7);
     gamma->SetMaximum(1.3);
+    gamma->GetYaxis()->SetTitle("a.u.");
+    setXtitle(_type, gamma.get());
 
     delta.reset(new TGraphErrors(binnedInput.size()));
     delta->SetMarkerStyle(22);
@@ -517,6 +667,8 @@ GraphGroup::GraphGroup(const BinnedNumericInputGroup &binnedInput,
     delta->SetLineColor(kGreen + 1);
     delta->SetMinimum(0.7);
     delta->SetMaximum(1.3);
+    delta->GetYaxis()->SetTitle("a.u.");
+    setXtitle(_type, delta.get());
 
     kappaB.reset(new TGraphErrors(binnedInput.size()));
     kappaB->SetMarkerStyle(20); 
@@ -524,6 +676,8 @@ GraphGroup::GraphGroup(const BinnedNumericInputGroup &binnedInput,
     kappaB->SetLineColor(kGreen + 1); 
     kappaB->SetMinimum(0.7);
     kappaB->SetMaximum(1.3);
+    kappaB->GetYaxis()->SetTitle("a.u.");
+    setXtitle(_type, kappaB.get());
 
     kappaCL.reset(new TGraphErrors(binnedInput.size()));
     kappaCL->SetMarkerStyle(21); 
@@ -531,6 +685,8 @@ GraphGroup::GraphGroup(const BinnedNumericInputGroup &binnedInput,
     kappaCL->SetLineColor(kRed + 1); 
     kappaCL->SetMinimum(0.7);
     kappaCL->SetMaximum(1.3);
+    kappaCL->GetYaxis()->SetTitle("a.u.");
+    setXtitle(_type, kappaCL.get());
 
     int point = 0;
     for(BinnedNumericInputGroup::const_iterator inputGroup =
@@ -613,13 +769,19 @@ void GraphGroup::draw()
     graph->SetMinimum(0.8);
     graph->SetMaximum(1.2);
     graph->Draw("a");
+    graph->GetYaxis()->SetTitle("a.u.");
+    setXtitle(_type, graph);
 
-    TLegend *legend = new TLegend(0.57,0.22,0.87,0.38, "Coeffcients");
+    TLegend *legend = new TLegend(0.57,0.22,0.97,0.38);
     _heaps.push(legend);
-    legend->SetTextSize(0.04);
-    legend->AddEntry(gamma.get(), "gamma", "p");
-    legend->AddEntry(delta.get(), "delta", "p");
+    style(legend);
+    legend->AddEntry(gamma.get(), "gamma (cl)", "p");
+    legend->AddEntry(delta.get(), "delta (b)", "p");
     legend->Draw();
+
+    TLatex *label = createLabel();
+    _heaps.push(label);
+    label->Draw();
 
     // tag
     //
@@ -631,13 +793,19 @@ void GraphGroup::draw()
     graph->SetMinimum(0.8);
     graph->SetMaximum(1.2);
     graph->Draw("a");
+    graph->GetYaxis()->SetTitle("a.u.");
+    setXtitle(_type, graph);
 
-    legend = new TLegend(0.57,0.22,0.87,0.38, "Coeffcients");
+    legend = new TLegend(0.57,0.22,0.97,0.38);
     _heaps.push(legend);
-    legend->SetTextSize(0.04);
-    legend->AddEntry(alpha.get(), "alpha", "p");
-    legend->AddEntry(beta.get(), "beta", "p");
+    style(legend);
+    legend->AddEntry(alpha.get(), "alpha (cl)", "p");
+    legend->AddEntry(beta.get(), "beta (b)", "p");
     legend->Draw();
+
+    label = createLabel();
+    _heaps.push(label);
+    label->Draw();
 
     // muTag
     //
@@ -649,13 +817,19 @@ void GraphGroup::draw()
     graph->SetMinimum(0.8);
     graph->SetMaximum(1.2);
     graph->Draw("a");
+    graph->GetYaxis()->SetTitle("a.u.");
+    setXtitle(_type, graph);
 
-    legend = new TLegend(0.57,0.22,0.87,0.38, "Coeffcients");
+    legend = new TLegend(0.57,0.22,0.97,0.38);
     _heaps.push(legend);
-    legend->SetTextSize(0.04);
+    style(legend);
     legend->AddEntry(kappaCL.get(), "kappaCL", "p");
     legend->AddEntry(kappaB.get(), "kappaB", "p");
     legend->Draw();
+
+    label = createLabel();
+    _heaps.push(label);
+    label->Draw();
 
     efficiency.draw();
 

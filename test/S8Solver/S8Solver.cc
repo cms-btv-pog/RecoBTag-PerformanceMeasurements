@@ -801,10 +801,19 @@ void S8Solver::doBinnedSolution()
 
     // binned solutions
     //
-    int bin = -1 == _firstBin ? 1 : _firstBin;
-    const int maxBin = -1 == _lastBin ? 10000 : _lastBin;
-    for(BinnedNumericInputGroup::const_iterator inputGroup =
-            _binnedInput.begin();
+    unsigned int bin = (-1 == _firstBin ? 1 : _firstBin);
+    const unsigned int maxBin = (-1 == _lastBin ? 10000 : _lastBin);
+    if (1 > bin ||
+        _binnedInput.size() < bin)
+    {
+        cerr << "first bin value " << bin << " is not supported" << endl;
+
+        return;
+    }
+
+    BinnedNumericInputGroup::const_iterator inputGroup = _binnedInput.begin();
+    advance(inputGroup, bin - 1);
+    for(;
         _binnedInput.end() != inputGroup &&
             maxBin >= bin;
         ++inputGroup, ++bin)
@@ -825,7 +834,7 @@ void S8Solver::doBinnedSolution()
             ipick != fPickSolutionMap.end();
             ++ipick)
         {
-            if (ipick->first == bin)
+            if (static_cast<unsigned int>(ipick->first) == bin)
             {
                 cout << "> Force binned solution # " << ipick->second
                     << endl;
@@ -1113,7 +1122,15 @@ void S8Solver::generateGraphs()
         return;
 
     cout << "Generate Group" << endl;
-    _graphs.reset(new GraphGroup(_binnedInput, _binnedSolution));
+    
+    if ("eta" == fcategory)
+        _graphs.reset(new GraphGroup(_binnedInput, _binnedSolution,
+                                     Graph::ETA));
+    else if ("phi" == fcategory)
+        _graphs.reset(new GraphGroup(_binnedInput, _binnedSolution,
+                                     Graph::PHI));
+    else
+        _graphs.reset(new GraphGroup(_binnedInput, _binnedSolution));
 }
 
 

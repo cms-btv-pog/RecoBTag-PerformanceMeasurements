@@ -41,6 +41,7 @@ class S8Solver
 		void SetPtrelMaxCut ( double value ) { fMaxPtrel = value; }
 		void SetPtFits() { fcategory = "pT"; }
 		void SetEtaFits() { fcategory = "eta"; }
+        void setPhiFits() { fcategory = "phi"; }
 		void SetRebin( int nbins ) { frebin = true; fnbins = nbins; }
 		void SetMinimum( double value ) { fMin = value; }
 		void SetMaximum( double value ) { fMax = value; }
