@@ -382,6 +382,8 @@ Int_t S8NumericSolver::FindSolution(Double_t* res, int n)
         
     if (nphysicalSols==0)
     {
+        return 0;
+        /*
         if ( thesols2 != -1 )
         {
             fNb = res[thesols2];
@@ -390,6 +392,7 @@ Int_t S8NumericSolver::FindSolution(Double_t* res, int n)
         }
         else
             return 0;
+        */
     }
     else
     {
