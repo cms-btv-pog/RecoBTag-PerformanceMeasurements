@@ -12,6 +12,7 @@
 
 #include <TAxis.h>
 #include <TCanvas.h>
+#include <TClass.h>
 #include <TDirectory.h>
 #include <TGraphErrors.h>
 #include <TLatex.h>
@@ -23,6 +24,114 @@
 using std::cerr;
 using std::cout;
 using std::endl;
+using std::make_pair;
+using std::pair;
+
+typedef pair<double, double> Range;
+
+// ROOT TGraph::GetMaximum() and GetMinimum() methods are broken
+// in v5.22
+//
+Range range(const TGraphErrors *graph, const double &margin = .2)
+{
+    Range result = make_pair(0, 0);
+
+    for(int point = 0; graph->GetN() > point; ++point)
+    {
+        double x;
+        double y;
+
+        graph->GetPoint(point, x, y);
+
+        double sigmaY = graph->GetErrorY(point);
+
+        Range yRange = make_pair(y - sigmaY, y + sigmaY);
+
+        if (!point ||
+            result.first > yRange.first)
+
+            result.first = yRange.first;
+
+        if (!point ||
+            result.second < yRange.second)
+            result.second = yRange.second;
+    }
+
+    result.first  *= (1 - margin);
+    result.second *= (1 + margin);
+
+    return result;
+}
+
+// ROOT TGraph::GetMaximum() and GetMinimum() methods are broken
+// in v5.22
+//
+Range range(const TGraph *graph, const double &margin = .2)
+{
+    Range result = make_pair(0, 0);
+
+    for(int point = 0; graph->GetN() > point; ++point)
+    {
+        double x;
+        double y;
+
+        graph->GetPoint(point, x, y);
+
+        if (!point ||
+            result.first > y)
+
+            result.first = y;
+
+        if (!point ||
+            result.second < y)
+            result.second = y;
+    }
+
+    result.first  *= (1 - margin);
+    result.second *= (1 + margin);
+
+    return result;
+}
+
+// Find range of the MultiGraph: such method does not exist in ROOT
+// Margin is defined in percent
+//
+Range range(const TMultiGraph *graph, const double &margin = .2)
+{
+    Range result = make_pair(0, 0);
+    bool rangeIsInitialized = false;
+
+    cout << "Search for range" << endl;
+
+    for(TIter next(graph->GetListOfGraphs());
+        TObject *obj = next();
+        )
+    {
+        Range graphRange;
+
+        if (obj->IsA()->InheritsFrom(TGraphErrors::Class()))
+            graphRange = range(dynamic_cast<TGraphErrors *>(obj), margin);
+        else
+            graphRange = range(dynamic_cast<TGraph *>(obj), margin);
+
+        cout << "min: " << graphRange.first
+            << "     max: " << graphRange.second << endl;
+
+        if (!rangeIsInitialized ||
+            result.first > graphRange.first)
+
+            result.first = graphRange.first;
+
+        if (!rangeIsInitialized ||
+            result.second < graphRange.second)
+
+            result.second = graphRange.second;
+
+        rangeIsInitialized = true;
+    }
+
+    return result;
+}
 
 TLatex *createLabel(const double &luminosity = 31.6)
 {
@@ -283,8 +392,10 @@ void EffGraph::draw()
     _heaps.push(graph);
     graph->Add((TGraphErrors *) mc.mu.b->Clone(), "lp");
     graph->Add((TGraphErrors *) s8.mu.b->Clone(), "lp");
-    graph->SetMinimum(0.4);
-    graph->SetMaximum(1.1);
+    Range graphRange = range(graph);
+    cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
+    graph->SetMinimum(graphRange.first);
+    graph->SetMaximum(graphRange.second);
     graph->Draw("a");
     graph->GetYaxis()->SetTitle("#epsilon_{b}^{#mu}");
     setXtitle(_type, graph);
@@ -305,8 +416,10 @@ void EffGraph::draw()
     _heaps.push(graph);
     graph->Add((TGraphErrors *) mc.mu.cl->Clone(), "lp");
     graph->Add((TGraphErrors *) s8.mu.cl->Clone(), "lp");
-    graph->SetMinimum(0.1);
-    graph->SetMaximum(0.6);
+    graphRange = range(graph);
+    cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
+    graph->SetMinimum(graphRange.first);
+    graph->SetMaximum(graphRange.second);
     graph->Draw("a");
     graph->GetYaxis()->SetTitle("#epsilon_{cl}^{#mu}");
     setXtitle(_type, graph);
@@ -327,8 +440,10 @@ void EffGraph::draw()
     _heaps.push(graph);
     graph->Add((TGraphErrors *) mc.tag.b->Clone(), "lp");
     graph->Add((TGraphErrors *) s8.tag.b->Clone(), "lp");
-    graph->SetMinimum(0.4);
-    graph->SetMaximum(1.1);
+    graphRange = range(graph);
+    cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
+    graph->SetMinimum(graphRange.first);
+    graph->SetMaximum(graphRange.second);
     graph->Draw("a");
     graph->GetYaxis()->SetTitle("#epsilon_{b}^{tag}");
     setXtitle(_type, graph);
@@ -349,8 +464,10 @@ void EffGraph::draw()
     _heaps.push(graph);
     graph->Add((TGraphErrors *) mc.tag.cl->Clone(), "lp");
     graph->Add((TGraphErrors *) s8.tag.cl->Clone(), "lp");
-    graph->SetMinimum(0.1);
-    graph->SetMaximum(0.6);
+    graphRange = range(graph);
+    cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
+    graph->SetMinimum(graphRange.first);
+    graph->SetMaximum(graphRange.second);
     graph->Draw("a");
     graph->GetYaxis()->SetTitle("#epsilon_{cl}^{tag}");
     setXtitle(_type, graph);
@@ -376,8 +493,10 @@ void EffGraph::draw()
     canvas->SetGrid();
 
     canvas->cd(1)->SetGrid();
-    scale.mu.b->SetMinimum(.6);
-    scale.mu.b->SetMaximum(1.4);
+    graphRange = range(scale.mu.b.get());
+    cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
+    scale.mu.b->SetMinimum(graphRange.first);
+    scale.mu.b->SetMaximum(graphRange.second);
     scale.mu.b->Draw("ap");
     scale.mu.b->GetYaxis()->SetTitle("SF_{b}^{#mu}");
     setXtitle(_type, scale.mu.b.get());
@@ -387,8 +506,10 @@ void EffGraph::draw()
     label->Draw();
 
     canvas->cd(2)->SetGrid();
-    scale.mu.cl->SetMinimum(.6);
-    scale.mu.cl->SetMaximum(1.4);
+    graphRange = range(scale.mu.cl.get());
+    cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
+    scale.mu.cl->SetMinimum(graphRange.first);
+    scale.mu.cl->SetMaximum(graphRange.second);
     scale.mu.cl->Draw("ap");
     scale.mu.cl->GetYaxis()->SetTitle("SF_{cl}^{#mu}");
     setXtitle(_type, scale.mu.cl.get());
@@ -398,8 +519,10 @@ void EffGraph::draw()
     label->Draw();
 
     canvas->cd(3)->SetGrid();
-    scale.tag.b->SetMinimum(.6);
-    scale.tag.b->SetMaximum(1.4);
+    graphRange = range(scale.tag.b.get());
+    cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
+    scale.tag.b->SetMinimum(graphRange.first);
+    scale.tag.b->SetMaximum(graphRange.second);
     scale.tag.b->Draw("ap");
     scale.tag.b->GetYaxis()->SetTitle("SF_{b}^{tag}");
     setXtitle(_type, scale.tag.b.get());
@@ -409,8 +532,10 @@ void EffGraph::draw()
     label->Draw();
 
     canvas->cd(4)->SetGrid();
-    scale.tag.cl->SetMinimum(.6);
-    scale.tag.cl->SetMaximum(1.4);
+    graphRange = range(scale.tag.cl.get());
+    cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
+    scale.tag.cl->SetMinimum(graphRange.first);
+    scale.tag.cl->SetMaximum(graphRange.second);
     scale.tag.cl->Draw("ap");
     scale.tag.cl->GetYaxis()->SetTitle("SF_{cl}^{tag}");
     setXtitle(_type, scale.tag.cl.get());
@@ -765,8 +890,10 @@ void GraphGroup::draw()
     _heaps.push(graph);
     graph->Add((TGraphErrors *) gamma->Clone(), "lp");
     graph->Add((TGraphErrors *) delta->Clone(), "lp");
-    graph->SetMinimum(0.8);
-    graph->SetMaximum(1.2);
+    Range graphRange = range(graph);
+    cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
+    graph->SetMinimum(graphRange.first);
+    graph->SetMaximum(graphRange.second);
     graph->Draw("a");
     graph->GetYaxis()->SetTitle("a.u.");
     setXtitle(_type, graph);
@@ -789,8 +916,10 @@ void GraphGroup::draw()
     _heaps.push(graph);
     graph->Add((TGraphErrors *) alpha->Clone(), "lp");
     graph->Add((TGraphErrors *) beta->Clone(), "lp");
-    graph->SetMinimum(0.8);
-    graph->SetMaximum(1.2);
+    graphRange = range(graph);
+    cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
+    graph->SetMinimum(graphRange.first);
+    graph->SetMaximum(graphRange.second);
     graph->Draw("a");
     graph->GetYaxis()->SetTitle("a.u.");
     setXtitle(_type, graph);
@@ -813,8 +942,10 @@ void GraphGroup::draw()
     _heaps.push(graph);
     graph->Add((TGraphErrors *) kappaCL->Clone(), "lp");
     graph->Add((TGraphErrors *) kappaB->Clone(), "lp");
-    graph->SetMinimum(0.8);
-    graph->SetMaximum(1.2);
+    graphRange = range(graph);
+    cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
+    graph->SetMinimum(graphRange.first);
+    graph->SetMaximum(graphRange.second);
     graph->Draw("a");
     graph->GetYaxis()->SetTitle("a.u.");
     setXtitle(_type, graph);
