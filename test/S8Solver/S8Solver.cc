@@ -844,7 +844,8 @@ void S8Solver::doBinnedSolution()
             }
         }
         
-        solu.Solve();
+        if (!solu.Solve())
+            continue;
 
         // Save Fits
         //
@@ -862,6 +863,7 @@ void S8Solver::doBinnedSolution()
         SolutionInBin solutionInBin;
         saveSolution(solutionInBin.solution, solu, *inputGroup);
         solutionInBin.bin = inputGroup->bin;
+        solutionInBin.binID = bin;
         _binnedSolution.push_back(solutionInBin);
     }
 }
@@ -908,16 +910,18 @@ void S8Solver::PrintData(TString option)
     // Binned
     //
     cout << " [Binned]" << endl;
-    int bin = 0;
     for(BinnedSolution::const_iterator solution = _binnedSolution.begin();
         _binnedSolution.end() != solution;
-        ++solution, ++bin)
+        ++solution)
     {
         cout << setw(40) << setfill('-') << ' '
-            << " Bin " << (bin + 1)
+            << " Bin " << solution->binID
             << " ---" << setfill(' ') << endl
             << endl;
-        cout << _binnedInput[bin] << endl;
+
+        BinnedNumericInputGroup::const_iterator input = _binnedInput.begin();
+        advance(input, (solution->binID - 1));
+        cout << *input << endl;
 
         cout << " SOLUTION" << endl;
         cout << solution->solution << endl;
