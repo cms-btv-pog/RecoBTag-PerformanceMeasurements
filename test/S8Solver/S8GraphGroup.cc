@@ -8,7 +8,6 @@
 
 #include <cmath>
 #include <iostream>
-#include <iomanip>
 #include <sstream>
 
 #include <TAxis.h>
@@ -29,7 +28,7 @@ TLatex *createLabel(const double &luminosity = 31.6)
 {
     std::ostringstream title;
     title << "#splitline{CMS Preliminary 2010}{"
-        << std::fixed << std::setprecision(2) << luminosity
+        << static_cast<unsigned int>(ceil(luminosity))
         << " pb^{-1} at #sqrt{s} = 7 TeV}";
 
     TLatex *label = new TLatex(3.570061, 23.08044, title.str().c_str());
