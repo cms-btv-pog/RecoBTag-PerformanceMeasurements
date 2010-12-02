@@ -133,12 +133,17 @@ Range range(const TMultiGraph *graph, const double &margin = .2)
     return result;
 }
 
-TLatex *createLabel(const double &luminosity = 31.6)
+TLatex *createLabel(const double &luminosity = 31.6, const bool &isMC = false)
 {
     std::ostringstream title;
-    title << "#splitline{CMS Preliminary 2010}{"
-        << static_cast<unsigned int>(ceil(luminosity))
-        << " pb^{-1} at #sqrt{s} = 7 TeV}";
+    title << "#splitline{CMS Preliminary 2010}{";
+
+    if (isMC)
+        title << "Simulation";
+    else
+        title << static_cast<unsigned int>(ceil(luminosity)) << " pb^{-1}";
+   
+    title << " at #sqrt{s} = 7 TeV}";
 
     TLatex *label = new TLatex(3.570061, 23.08044, title.str().c_str());
     label->SetNDC();
@@ -156,6 +161,18 @@ void style(TLegend *legend)
     legend->SetTextFont(43);
     legend->SetTextSizePixels(24);
     legend->SetFillColor(0);
+}
+
+void style(TMultiGraph *graph)
+{
+    graph->GetXaxis()->SetNdivisions(6);
+    graph->GetYaxis()->SetNdivisions(6);
+}
+
+void style(TGraphErrors *graph)
+{
+    graph->GetXaxis()->SetNdivisions(6);
+    graph->GetYaxis()->SetNdivisions(6);
 }
 
 std::string getXTitle(const Graph::Type &type)
@@ -398,6 +415,7 @@ void EffGraph::draw()
     graph->SetMaximum(graphRange.second);
     graph->Draw("a");
     graph->GetYaxis()->SetTitle("#epsilon_{b}^{#mu}");
+    style(graph);
     setXtitle(_type, graph);
 
     TLegend *legend = new TLegend(0.57,0.22,0.91,0.38);
@@ -422,6 +440,7 @@ void EffGraph::draw()
     graph->SetMaximum(graphRange.second);
     graph->Draw("a");
     graph->GetYaxis()->SetTitle("#epsilon_{cl}^{#mu}");
+    style(graph);
     setXtitle(_type, graph);
 
     legend = new TLegend(0.57,0.22,0.91,0.38);
@@ -446,6 +465,7 @@ void EffGraph::draw()
     graph->SetMaximum(graphRange.second);
     graph->Draw("a");
     graph->GetYaxis()->SetTitle("#epsilon_{b}^{tag}");
+    style(graph);
     setXtitle(_type, graph);
 
     legend = new TLegend(0.57,0.22,0.91,0.38);
@@ -470,6 +490,7 @@ void EffGraph::draw()
     graph->SetMaximum(graphRange.second);
     graph->Draw("a");
     graph->GetYaxis()->SetTitle("#epsilon_{cl}^{tag}");
+    style(graph);
     setXtitle(_type, graph);
 
     legend = new TLegend(0.57,0.22,0.91,0.38);
@@ -499,6 +520,7 @@ void EffGraph::draw()
     scale.mu.b->SetMaximum(graphRange.second);
     scale.mu.b->Draw("ap");
     scale.mu.b->GetYaxis()->SetTitle("SF_{b}^{#mu}");
+    style(scale.mu.b.get());
     setXtitle(_type, scale.mu.b.get());
 
     label = createLabel();
@@ -512,6 +534,7 @@ void EffGraph::draw()
     scale.mu.cl->SetMaximum(graphRange.second);
     scale.mu.cl->Draw("ap");
     scale.mu.cl->GetYaxis()->SetTitle("SF_{cl}^{#mu}");
+    style(scale.mu.cl.get());
     setXtitle(_type, scale.mu.cl.get());
 
     label = createLabel();
@@ -525,6 +548,7 @@ void EffGraph::draw()
     scale.tag.b->SetMaximum(graphRange.second);
     scale.tag.b->Draw("ap");
     scale.tag.b->GetYaxis()->SetTitle("SF_{b}^{tag}");
+    style(scale.tag.b.get());
     setXtitle(_type, scale.tag.b.get());
 
     label = createLabel();
@@ -538,6 +562,7 @@ void EffGraph::draw()
     scale.tag.cl->SetMaximum(graphRange.second);
     scale.tag.cl->Draw("ap");
     scale.tag.cl->GetYaxis()->SetTitle("SF_{cl}^{tag}");
+    style(scale.tag.cl.get());
     setXtitle(_type, scale.tag.cl.get());
 
     label = createLabel();
@@ -581,7 +606,7 @@ InputGraph::InputGraph(const Graph::Type &type, const int &size)
     all->SetMarkerColor(1);
     all->SetLineColor(1); 
     all->SetMarkerSize(1.2); 
-    all->GetYaxis()->SetTitle("entries");
+    all->GetYaxis()->SetTitle("#mu-in-jets");
     setXtitle(type, all.get());
 
     mu.reset(new TGraphErrors(size));
@@ -589,7 +614,7 @@ InputGraph::InputGraph(const Graph::Type &type, const int &size)
     mu->SetMarkerColor(kRed);
     mu->SetLineColor(kRed); 
     mu->SetMarkerSize(1.2); 
-    mu->GetYaxis()->SetTitle("entries");
+    mu->GetYaxis()->SetTitle("#mu-in-jets");
     setXtitle(type, mu.get());
 
     tag.reset(new TGraphErrors(size));
@@ -597,7 +622,7 @@ InputGraph::InputGraph(const Graph::Type &type, const int &size)
     tag->SetMarkerColor(kGreen);
     tag->SetLineColor(kGreen); 
     tag->SetMarkerSize(1.2); 
-    tag->GetYaxis()->SetTitle("entries");
+    tag->GetYaxis()->SetTitle("#mu-in-jets");
     setXtitle(type, tag.get());
 
     muTag.reset(new TGraphErrors(size));
@@ -605,7 +630,7 @@ InputGraph::InputGraph(const Graph::Type &type, const int &size)
     muTag->SetMarkerColor(kBlue);
     muTag->SetLineColor(kBlue); 
     muTag->SetMarkerSize(1.2); 
-    muTag->GetYaxis()->SetTitle("entries");
+    muTag->GetYaxis()->SetTitle("#mu-in-jets");
     setXtitle(type, muTag.get());
 }
 
@@ -679,7 +704,8 @@ void InputGraphGroup::draw()
     graph->Add((TGraphErrors *) n.tag->Clone(), "lp");
     graph->Add((TGraphErrors *) n.muTag->Clone(), "lp");
     graph->Draw("a");
-    graph->GetYaxis()->SetTitle("entries");
+    graph->GetYaxis()->SetTitle("#mu-in-jets");
+    style(graph);
     setXtitle(_type, graph);
 
     TLegend *legend = new TLegend(0.57,0.22,0.87,0.38);
@@ -705,7 +731,8 @@ void InputGraphGroup::draw()
     graph->Add((TGraphErrors *) p.tag->Clone(), "lp");
     graph->Add((TGraphErrors *) p.muTag->Clone(), "lp");
     graph->Draw("a");
-    graph->GetYaxis()->SetTitle("entries");
+    graph->GetYaxis()->SetTitle("#mu-in-jets");
+    style(graph);
     setXtitle(_type, graph);
 
     legend = new TLegend(0.57,0.22,0.87,0.38);
@@ -896,6 +923,7 @@ void GraphGroup::draw()
     graph->SetMaximum(graphRange.second);
     graph->Draw("a");
     graph->GetYaxis()->SetTitle("a.u.");
+    style(graph);
     setXtitle(_type, graph);
 
     TLegend *legend = new TLegend(0.57,0.22,0.97,0.38);
@@ -905,7 +933,7 @@ void GraphGroup::draw()
     legend->AddEntry(delta.get(), "delta (b)", "p");
     legend->Draw();
 
-    TLatex *label = createLabel();
+    TLatex *label = createLabel(31.6, true);
     _heaps.push(label);
     label->Draw();
 
@@ -922,6 +950,7 @@ void GraphGroup::draw()
     graph->SetMaximum(graphRange.second);
     graph->Draw("a");
     graph->GetYaxis()->SetTitle("a.u.");
+    style(graph);
     setXtitle(_type, graph);
 
     legend = new TLegend(0.57,0.22,0.97,0.38);
@@ -931,7 +960,7 @@ void GraphGroup::draw()
     legend->AddEntry(beta.get(), "beta (b)", "p");
     legend->Draw();
 
-    label = createLabel();
+    label = createLabel(31.6, true);
     _heaps.push(label);
     label->Draw();
 
@@ -948,6 +977,7 @@ void GraphGroup::draw()
     graph->SetMaximum(graphRange.second);
     graph->Draw("a");
     graph->GetYaxis()->SetTitle("a.u.");
+    style(graph);
     setXtitle(_type, graph);
 
     legend = new TLegend(0.57,0.22,0.97,0.38);
@@ -957,7 +987,7 @@ void GraphGroup::draw()
     legend->AddEntry(kappaB.get(), "kappaB", "p");
     legend->Draw();
 
-    label = createLabel();
+    label = createLabel(31.6, true);
     _heaps.push(label);
     label->Draw();
 
