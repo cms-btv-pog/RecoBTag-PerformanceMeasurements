@@ -697,6 +697,7 @@ void InputGraphGroup::draw()
     // (n)
     //
     canvas->cd(1)->SetGrid();
+    canvas->cd(1)->SetLogy();
     TMultiGraph *graph = new TMultiGraph();
     _heaps.push(graph);
     graph->Add((TGraphErrors *) n.all->Clone(), "lp");
@@ -724,6 +725,7 @@ void InputGraphGroup::draw()
     // (p)
     //
     canvas->cd(2)->SetGrid();
+    canvas->cd(2)->SetLogy();
     graph = new TMultiGraph();
     _heaps.push(graph);
     graph->Add((TGraphErrors *) p.all->Clone(), "lp");
