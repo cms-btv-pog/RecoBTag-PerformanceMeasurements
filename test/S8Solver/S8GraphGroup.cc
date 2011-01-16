@@ -133,7 +133,7 @@ Range range(const TMultiGraph *graph, const double &margin = .2)
     return result;
 }
 
-TLatex *createLabel(const double &luminosity = 31.6, const bool &isMC = false)
+TLatex *createLabel(const double &luminosity = 33.3, const bool &isMC = false)
 {
     std::ostringstream title;
     title << "#splitline{CMS Preliminary 2010}{";

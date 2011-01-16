@@ -40,6 +40,7 @@
 
 #include "S8NumericSolver.h"
 
+using std::cerr;
 using std::cout;
 using std::endl;
 using boost::lexical_cast;
@@ -99,6 +100,7 @@ void S8NumericSolver::Reset()
         *(_result + i) = new TH1F((string("res") + lexical_cast<string>(i)).c_str(),
                                   (string("Result") + lexical_cast<string>(i)).c_str(),
                                   200, 0, 2.);
+        *(_result_errors + i) = 0;
     }
 
     for(Int_t i = 0 ; i < 8 ; ++i)
@@ -585,11 +587,22 @@ void S8NumericSolver::fitErrors()
 {
     for(int i = 0; 8 > i; ++i)
     {
+        TH1 *result = _result[i];
+        if (!result->GetEntries())
+        {
+            cerr << "Error plot is empty for result: " << i << endl;
+
+            continue;
+        }
+
         cout << " Fit result: " << i << endl;
-        _result[i]->Fit("gaus", "0+");
-        //_result[i]->Print("all");
-        cout << " sigma[" << i << "]: "
-            << _result[i]->GetFunction("gaus")->GetParameter(2) << endl;
+
+        result->Fit("gaus", "0+");
+
+        double error = _result[i]->GetFunction("gaus")->GetParameter(2);
+        _result_errors[i] = error;
+
+        cout << " sigma[" << i << "]: " << error << endl;
         cout << endl;
     }
 }
@@ -671,7 +684,7 @@ double S8NumericSolver::getError(const int &id)
 
         return -1;
 
-    return _result[id]->GetFunction("gaus")->GetParameter(2);
+    return _result_errors[id];
 }
 
 // return the system 8 results :

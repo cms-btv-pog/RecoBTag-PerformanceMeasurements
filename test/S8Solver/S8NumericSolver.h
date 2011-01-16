@@ -153,7 +153,8 @@ class S8NumericSolver : public TNamed
         double getError(const int &);
 
     private:
-        TH1 *_result[8];
+        TH1    *_result[8];
+        double  _result_errors[8];
 };
 
 #endif
