@@ -1,0 +1,9 @@
+<use name=root>
+<use name=boost_regex>
+<use name=boost_program_options>
+
+<Flags CXXFLAGS="-I${CMSSW_BASE}/src/FWLite/Redirector">
+
+<export>
+    <lib name=FWLiteRedirector>
+</export>

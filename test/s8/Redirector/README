@@ -1,0 +1,8 @@
+Introduction
+============
+
+  This is an implementation of the buffer that can be sent to multiple streams.
+  MultiStreamBuffer is responsible for given task. Redirector is a class that
+  redirects one stream into another upon initialization and restores streams
+  back on destruction. Finally, Debug is responsible for opening output file
+  and dump all standard streams there: cout, cerr, clog.
