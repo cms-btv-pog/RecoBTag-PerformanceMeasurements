@@ -13,7 +13,7 @@
 //
 // Original Author:  Jason Keller
 //         Created:  Wed Oct 20 15:27:14 CDT 2010
-// $Id$
+// $Id: PMConversionFilter.cc,v 1.1 2010/10/25 14:26:50 kellerjd Exp $
 //
 //
 
@@ -112,13 +112,13 @@ PMConversionFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
        outputCol->push_back(*electron);
        continue;
      }
-     const reco::TrackRef& ctfTrack = electron->closestCtfTrackRef();
+     const reco::TrackBaseRef ctfTrack(electron->closestCtfTrackRef());
 
      bool isGood = true;
      for(reco::ConversionCollection::const_iterator conversion = conversions->begin();
          conversion != conversions->end(); ++conversion)
      {
-       const std::vector<reco::TrackRef>& convTracks = conversion->tracks();
+       const std::vector<reco::TrackBaseRef>& convTracks = conversion->tracks();
        for(unsigned int i = 0; i != convTracks.size(); ++i)
        {
          if(ctfTrack == convTracks[i])
