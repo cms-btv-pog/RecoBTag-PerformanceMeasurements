@@ -16,6 +16,7 @@
 // CMS includes
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/FWLite/interface/Event.h"
+#include "DataFormats/FWLite/interface/ChainEvent.h"
 #include "DataFormats/FWLite/interface/Handle.h"
 #include "DataFormats/Provenance/interface/LuminosityBlockRange.h"
 #include "DataFormats/Provenance/interface/LuminosityBlockID.h"
