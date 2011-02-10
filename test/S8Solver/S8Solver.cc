@@ -954,40 +954,6 @@ void S8Solver::Save(TString filename)
     // Save Graphs
     //
     _graphs->save(ofile.get());
-
-    /*
-    // true efficiency
-    feffTag_b->Write();
-    feffTag_cl->Write();
-    feffmu_b->Write();
-    feffmu_cl->Write();
-
-    // input
-    fnHisto->Write();
-    fpHisto->Write();
-    fnHistoMu->Write();
-    fpHistoMu->Write();
-    fnHistoSvx->Write();
-    fpHistoSvx->Write();
-    fnHistoAll->Write();
-    fpHistoAll->Write();
-    fh_kb->Write();
-    fh_kcl->Write();
-    fh_alpha->Write();
-    fh_beta->Write();
-    fh_delta->Write();
-    fh_gamma->Write();
-
-    // output
-    geffTag_b->Write();
-    gS8effTag_b->Write();
-    geffmu_b->Write();
-    gS8effmu_b->Write();
-    geffTag_cl->Write();
-    gS8effTag_cl->Write();
-    geffmu_cl->Write();
-    gS8effmu_cl->Write();
-    */
 }
 
 void S8Solver::DumpTable(std::string filename)
@@ -1383,12 +1349,16 @@ void fill(numeric::FlavouredInputGroup &inputGroup,
     flavouredInput(inputGroup.muTag, plotGroup.muTag);
 }
 
+// Get Y with the error from histogram bin
+//
 Measurement measurement(const TH1 *hist, const int &bin)
 {
     return make_pair(hist->GetBinContent(bin),
                      pow(hist->GetBinError(bin), 2));
 }
 
+// Get average Y value with error from the histogram
+//
 Measurement measurement(const TH1 *hist)
 {
     Measurement newMeasurement;
