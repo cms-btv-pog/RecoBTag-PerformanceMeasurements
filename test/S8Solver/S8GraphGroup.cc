@@ -215,19 +215,45 @@ void fill(TGraphErrors *scale, const TGraphErrors *s8, const TGraphErrors *mc)
 {
     using std::make_pair;
 
-    for(int point = 0; s8->GetN() > point; ++point)
+    for(int point = 0, mcPoint = 0; s8->GetN() > point; ++point)
     {
         double s8X;
         double s8Y;
         s8->GetPoint(point, s8X, s8Y);
 
-        double mcX;
+        double mcX = 0;
         double mcY;
-        mc->GetPoint(point, mcX, mcY);
+
+        while(mc->GetN() > mcPoint)
+        {
+            mc->GetPoint(mcPoint, mcX, mcY);
+
+            if (mcX < s8X)
+            {
+                ++mcPoint;
+
+                continue;
+            }
+
+            if (mcX > s8X)
+                mcX = -1;
+
+            break;
+        }
+
+        // Check if more points are left in the MC Graph
+        //
+        if (!mcX)
+            break;
+
+        // Is point missing?
+        //
+        if (-1 == mcX)
+            continue;
 
         Measurement x = make_pair(s8X, pow(s8->GetErrorX(point), 2));
         Measurement y = make_pair(s8Y, pow(s8->GetErrorY(point), 2)) /
-            make_pair(mcY, pow(mc->GetErrorY(point), 2));
+            make_pair(mcY, pow(mc->GetErrorY(mcPoint), 2));
 
         fill(scale, point, x, y);
     }
@@ -335,6 +361,9 @@ EffGraphGroup::EffGraphGroup(const Graph::Type &type,
     setXtitle(type, tag.b.get());
     setXtitle(type, tag.cl.get());
 
+    cout << "Fill Eff graph group" << endl;
+    cout << " Points: " << binnedInput.size() << endl;
+
     int point = 0;
     for(BinnedNumericInputGroup::const_iterator inputGroup =
             binnedInput.begin();
@@ -347,12 +376,17 @@ EffGraphGroup::EffGraphGroup(const Graph::Type &type,
         fill(mu.cl.get(), point,
              inputGroup->bin, inputGroup->efficiency.mu.cl);
 
+        cout << " p: " << point << " bin: " << inputGroup->bin
+            << " eff_tag_b: " << inputGroup->efficiency.tag.b << endl;
+
         fill(tag.b.get(), point,
              inputGroup->bin, inputGroup->efficiency.tag.b);
 
         fill(tag.cl.get(), point,
              inputGroup->bin, inputGroup->efficiency.tag.cl);
     }
+
+    cout << endl;
 }
 
 void EffGraphGroup::save(TDirectory *)
