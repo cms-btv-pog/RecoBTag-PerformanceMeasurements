@@ -53,6 +53,9 @@ Measurement operator *(const double &scaleFactor,
 Measurement operator /(const Measurement &m1,
                        const Measurement &m2)
 {
+    if (!m2.first)
+        return make_pair(0, 0);
+
     return make_pair(m1.first / m2.first,
                      pow(1. / m2.first, 2) * m1.second +
                         pow(m1.first / pow(m2.first, 2), 2) * m2.second);
@@ -62,6 +65,9 @@ Measurement operator /(const Measurement &m1,
 Measurement operator %(const Measurement &m1,
                        const Measurement &m2)
 {
+    if (!m2.first)
+        return make_pair(0, 0);
+
     const double eff = m1.first / m2.first;
 
     return make_pair(eff,
