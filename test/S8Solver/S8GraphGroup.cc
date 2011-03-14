@@ -34,7 +34,8 @@ typedef pair<double, double> Range;
 //
 Range range(const TGraphErrors *graph, const double &margin = .2)
 {
-    Range result = make_pair(0, 0);
+    cout << "find range: " << endl;
+    Range result = make_pair(1e9, 0);
 
     for(int point = 0; graph->GetN() > point; ++point)
     {
@@ -42,6 +43,11 @@ Range range(const TGraphErrors *graph, const double &margin = .2)
         double y;
 
         graph->GetPoint(point, x, y);
+
+        if (0 == y)
+            continue;
+
+        cout << "y: " << y << endl;
 
         double sigmaY = graph->GetErrorY(point);
 
@@ -60,6 +66,8 @@ Range range(const TGraphErrors *graph, const double &margin = .2)
     result.first  *= (1 - margin);
     result.second *= (1 + margin);
 
+    cout << endl;
+
     return result;
 }
 
@@ -68,7 +76,7 @@ Range range(const TGraphErrors *graph, const double &margin = .2)
 //
 Range range(const TGraph *graph, const double &margin = .2)
 {
-    Range result = make_pair(0, 0);
+    Range result = make_pair(1e9, 0);
 
     for(int point = 0; graph->GetN() > point; ++point)
     {
@@ -441,8 +449,8 @@ void EffGraph::draw()
     canvas->cd(1)->SetGrid();
     TMultiGraph *graph = new TMultiGraph();
     _heaps.push(graph);
-    graph->Add((TGraphErrors *) mc.mu.b->Clone(), "lp");
-    graph->Add((TGraphErrors *) s8.mu.b->Clone(), "lp");
+    graph->Add((TGraphErrors *) mc.mu.b->Clone(), "p");
+    graph->Add((TGraphErrors *) s8.mu.b->Clone(), "p");
     Range graphRange = range(graph);
     cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
     graph->SetMinimum(graphRange.first);
@@ -466,8 +474,8 @@ void EffGraph::draw()
     canvas->cd(2)->SetGrid();
     graph = new TMultiGraph();
     _heaps.push(graph);
-    graph->Add((TGraphErrors *) mc.mu.cl->Clone(), "lp");
-    graph->Add((TGraphErrors *) s8.mu.cl->Clone(), "lp");
+    graph->Add((TGraphErrors *) mc.mu.cl->Clone(), "p");
+    graph->Add((TGraphErrors *) s8.mu.cl->Clone(), "p");
     graphRange = range(graph);
     cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
     graph->SetMinimum(graphRange.first);
@@ -488,36 +496,42 @@ void EffGraph::draw()
     _heaps.push(label);
     label->Draw();
 
-    canvas->cd(3)->SetGrid();
-    graph = new TMultiGraph();
-    _heaps.push(graph);
-    graph->Add((TGraphErrors *) mc.tag.b->Clone(), "lp");
-    graph->Add((TGraphErrors *) s8.tag.b->Clone(), "lp");
-    graphRange = range(graph);
-    cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
-    graph->SetMinimum(graphRange.first);
-    graph->SetMaximum(graphRange.second);
-    graph->Draw("a");
-    graph->GetYaxis()->SetTitle("#epsilon_{b}^{tag}");
-    style(graph);
-    setXtitle(_type, graph);
+    {
+        TCanvas *canvas = new TCanvas();
+        _heaps.push(canvas);
+        canvas->SetGrid();
+        graph = new TMultiGraph();
+        _heaps.push(graph);
+        graph->Add((TGraphErrors *) mc.tag.b->Clone(), "p");
+        graph->Add((TGraphErrors *) s8.tag.b->Clone(), "p");
+        graphRange = range(graph);
+        cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
+        graph->SetMinimum(graphRange.first);
+        graph->SetMaximum(graphRange.second);
+        graph->Draw("a");
+        graph->GetYaxis()->SetTitle("#epsilon_{b}^{tag}");
+        style(graph);
+        setXtitle(_type, graph);
 
-    legend = new TLegend(0.57,0.22,0.91,0.38);
-    _heaps.push(legend);
-    style(legend);
-    legend->AddEntry(mc.tag.b.get(), "Monte-Carlo", "p");
-    legend->AddEntry(s8.tag.b.get(), "Data", "p");
-    legend->Draw();
+        legend = new TLegend(0.57,0.22,0.91,0.38);
+        _heaps.push(legend);
+        style(legend);
+        legend->AddEntry(mc.tag.b.get(), "Monte-Carlo", "p");
+        legend->AddEntry(s8.tag.b.get(), "Data", "p");
+        legend->Draw();
 
-    label = createLabel();
-    _heaps.push(label);
-    label->Draw();
+        label = createLabel();
+        _heaps.push(label);
+        label->Draw();
+
+        canvas->SaveAs("eff.png");
+    }
 
     canvas->cd(4)->SetGrid();
     graph = new TMultiGraph();
     _heaps.push(graph);
-    graph->Add((TGraphErrors *) mc.tag.cl->Clone(), "lp");
-    graph->Add((TGraphErrors *) s8.tag.cl->Clone(), "lp");
+    graph->Add((TGraphErrors *) mc.tag.cl->Clone(), "p");
+    graph->Add((TGraphErrors *) s8.tag.cl->Clone(), "p");
     graphRange = range(graph);
     cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
     graph->SetMinimum(graphRange.first);
@@ -575,19 +589,25 @@ void EffGraph::draw()
     _heaps.push(label);
     label->Draw();
 
-    canvas->cd(3)->SetGrid();
-    graphRange = range(scale.tag.b.get());
-    cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
-    scale.tag.b->SetMinimum(graphRange.first);
-    scale.tag.b->SetMaximum(graphRange.second);
-    scale.tag.b->Draw("ap");
-    scale.tag.b->GetYaxis()->SetTitle("SF_{b}^{tag}");
-    style(scale.tag.b.get());
-    setXtitle(_type, scale.tag.b.get());
+    {
+        TCanvas *canvas = new TCanvas();
+        _heaps.push(canvas);
+        canvas->SetGrid();
+        graphRange = range(scale.tag.b.get());
+        cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
+        scale.tag.b->SetMinimum(graphRange.first);
+        scale.tag.b->SetMaximum(graphRange.second);
+        scale.tag.b->Draw("ap");
+        scale.tag.b->GetYaxis()->SetTitle("SF_{b}^{tag}");
+        style(scale.tag.b.get());
+        setXtitle(_type, scale.tag.b.get());
 
-    label = createLabel();
-    _heaps.push(label);
-    label->Draw();
+        label = createLabel();
+        _heaps.push(label);
+        label->Draw();
+
+        canvas->SaveAs("sf.png");
+    }
 
     canvas->cd(4)->SetGrid();
     graphRange = range(scale.tag.cl.get());
@@ -602,6 +622,8 @@ void EffGraph::draw()
     label = createLabel();
     _heaps.push(label);
     label->Draw();
+
+    canvas->Update();
 }
 
 void EffGraph::save(TDirectory *folder)
@@ -734,10 +756,10 @@ void InputGraphGroup::draw()
     canvas->cd(1)->SetLogy();
     TMultiGraph *graph = new TMultiGraph();
     _heaps.push(graph);
-    graph->Add((TGraphErrors *) n.all->Clone(), "lp");
-    graph->Add((TGraphErrors *) n.mu->Clone(), "lp");
-    graph->Add((TGraphErrors *) n.tag->Clone(), "lp");
-    graph->Add((TGraphErrors *) n.muTag->Clone(), "lp");
+    graph->Add((TGraphErrors *) n.all->Clone(), "p");
+    graph->Add((TGraphErrors *) n.mu->Clone(), "p");
+    graph->Add((TGraphErrors *) n.tag->Clone(), "p");
+    graph->Add((TGraphErrors *) n.muTag->Clone(), "p");
     graph->Draw("a");
     graph->GetYaxis()->SetTitle("#mu-in-jets");
     style(graph);
@@ -762,10 +784,10 @@ void InputGraphGroup::draw()
     canvas->cd(2)->SetLogy();
     graph = new TMultiGraph();
     _heaps.push(graph);
-    graph->Add((TGraphErrors *) p.all->Clone(), "lp");
-    graph->Add((TGraphErrors *) p.mu->Clone(), "lp");
-    graph->Add((TGraphErrors *) p.tag->Clone(), "lp");
-    graph->Add((TGraphErrors *) p.muTag->Clone(), "lp");
+    graph->Add((TGraphErrors *) p.all->Clone(), "p");
+    graph->Add((TGraphErrors *) p.mu->Clone(), "p");
+    graph->Add((TGraphErrors *) p.tag->Clone(), "p");
+    graph->Add((TGraphErrors *) p.muTag->Clone(), "p");
     graph->Draw("a");
     graph->GetYaxis()->SetTitle("#mu-in-jets");
     style(graph);
@@ -783,6 +805,8 @@ void InputGraphGroup::draw()
     label = createLabel();
     _heaps.push(label);
     label->Draw();
+
+    canvas->SaveAs("inputs.png");
 }
 
 void InputGraphGroup::save(TDirectory *folder)
@@ -951,8 +975,8 @@ void GraphGroup::draw()
     canvas->cd(1)->SetGrid();
     TMultiGraph *graph = new TMultiGraph();
     _heaps.push(graph);
-    graph->Add((TGraphErrors *) gamma->Clone(), "lp");
-    graph->Add((TGraphErrors *) delta->Clone(), "lp");
+    graph->Add((TGraphErrors *) gamma->Clone(), "p");
+    graph->Add((TGraphErrors *) delta->Clone(), "p");
     Range graphRange = range(graph);
     cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
     graph->SetMinimum(graphRange.first);
@@ -978,8 +1002,8 @@ void GraphGroup::draw()
     canvas->cd(2)->SetGrid();
     graph = new TMultiGraph();
     _heaps.push(graph);
-    graph->Add((TGraphErrors *) alpha->Clone(), "lp");
-    graph->Add((TGraphErrors *) beta->Clone(), "lp");
+    graph->Add((TGraphErrors *) alpha->Clone(), "p");
+    graph->Add((TGraphErrors *) beta->Clone(), "p");
     graphRange = range(graph);
     cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
     graph->SetMinimum(graphRange.first);
@@ -1005,8 +1029,8 @@ void GraphGroup::draw()
     canvas->cd(3)->SetGrid();
     graph = new TMultiGraph();
     _heaps.push(graph);
-    graph->Add((TGraphErrors *) kappaCL->Clone(), "lp");
-    graph->Add((TGraphErrors *) kappaB->Clone(), "lp");
+    graph->Add((TGraphErrors *) kappaCL->Clone(), "p");
+    graph->Add((TGraphErrors *) kappaB->Clone(), "p");
     graphRange = range(graph);
     cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
     graph->SetMinimum(graphRange.first);
@@ -1030,4 +1054,6 @@ void GraphGroup::draw()
     efficiency.draw();
 
     input.draw();
+
+    canvas->SaveAs("coeff.png");
 }
