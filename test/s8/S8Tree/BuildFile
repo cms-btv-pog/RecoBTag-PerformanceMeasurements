@@ -1,6 +1,0 @@
-<use name=root>
-<use name=boost>
-
-<export>
-    <lib name=TreeSystem8>
-</export>
