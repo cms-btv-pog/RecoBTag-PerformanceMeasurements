@@ -964,15 +964,13 @@ void GraphGroup::save(TDirectory *folder)
 
 void GraphGroup::draw()
 {
-    TCanvas *canvas = new TCanvas();
-    _heaps.push(canvas);
-    canvas->SetWindowSize(1200,640);
-    canvas->Divide(3, 1);
-    canvas->SetTitle("Coefficients");
-
     // mu
     //
-    canvas->cd(1)->SetGrid();
+    TCanvas *canvas = new TCanvas();
+    _heaps.push(canvas);
+    canvas->SetTitle("Coefficients");
+
+    canvas->SetGrid();
     TMultiGraph *graph = new TMultiGraph();
     _heaps.push(graph);
     graph->Add((TGraphErrors *) gamma->Clone(), "p");
@@ -997,9 +995,15 @@ void GraphGroup::draw()
     _heaps.push(label);
     label->Draw();
 
+    canvas->SaveAs("gamma_delta.png");
+
     // tag
     //
-    canvas->cd(2)->SetGrid();
+    canvas = new TCanvas();
+    _heaps.push(canvas);
+    canvas->SetTitle("Coefficients");
+
+    canvas->SetGrid();
     graph = new TMultiGraph();
     _heaps.push(graph);
     graph->Add((TGraphErrors *) alpha->Clone(), "p");
@@ -1024,9 +1028,15 @@ void GraphGroup::draw()
     _heaps.push(label);
     label->Draw();
 
+    canvas->SaveAs("alpha_beta.png");
+
     // muTag
     //
-    canvas->cd(3)->SetGrid();
+    canvas = new TCanvas();
+    _heaps.push(canvas);
+    canvas->SetTitle("Coefficients");
+
+    canvas->SetGrid();
     graph = new TMultiGraph();
     _heaps.push(graph);
     graph->Add((TGraphErrors *) kappaCL->Clone(), "p");
@@ -1055,5 +1065,5 @@ void GraphGroup::draw()
 
     input.draw();
 
-    canvas->SaveAs("coeff.png");
+    canvas->SaveAs("kappa.png");
 }
