@@ -16,7 +16,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.19 2010/11/23 11:10:09 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.20 2010/11/23 16:12:41 jandrea Exp $
 //
 //
 
@@ -93,6 +93,8 @@ Implementation:
 //residual jet corrections
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
 
 
 struct ltstr
@@ -277,8 +279,11 @@ private:
     CategoryFinder cat8;
     CategoryFinder cat9;
 
+    ///////////////
+    // Ntuple info
+    
     TTree *smalltree;
-
+    
     int   nTrack;
     float Track_dxy[10000];
     float Track_dz[10000];
@@ -397,6 +402,13 @@ private:
     float SV_ndf[10000];
     float SV_flight[10000];
     float SV_flightErr[10000];
+    
+    int nPU;                    // the number of pileup interactions that have been added to the event
+    float PU_z[10000];          // the true primary vertex position along the z axis for each added interaction
+    float PU_sumpT_low[10000];  // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > low_cut
+    float PU_sumpT_high[10000]; // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > high_cut
+    int   PU_ntrks_low[10000];  // the number of tracks originating from each interaction, where track pT > low_cu
+    int   PU_ntrks_high[10000]; // the number of tracks originating from each interaction, where track pT > high_cut 
     
     int BitTrigger;
     int Run;

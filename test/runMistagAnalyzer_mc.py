@@ -16,28 +16,23 @@ process.source = cms.Source(
     "PoolSource",
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(   
-        '/store/mc/Fall10/QCD_Pt_30to50_TuneZ2_7TeV_pythia6/GEN-SIM-RECODEBUG/START38_V12-v1/0000/FE60B60E-E7DB-DF11-B82F-0030486790C0.root',
-        '/store/mc/Fall10/QCD_Pt_30to50_TuneZ2_7TeV_pythia6/GEN-SIM-RECODEBUG/START38_V12-v1/0000/FCE36495-FEDB-DF11-8132-0018F3D096DC.root',
-        '/store/mc/Fall10/QCD_Pt_30to50_TuneZ2_7TeV_pythia6/GEN-SIM-RECODEBUG/START38_V12-v1/0000/FC820950-E7DB-DF11-89C6-00304867D838.root',
-        '/store/mc/Fall10/QCD_Pt_30to50_TuneZ2_7TeV_pythia6/GEN-SIM-RECODEBUG/START38_V12-v1/0000/FC445F23-F7DB-DF11-926B-001A92810AC0.root',
-        '/store/mc/Fall10/QCD_Pt_30to50_TuneZ2_7TeV_pythia6/GEN-SIM-RECODEBUG/START38_V12-v1/0000/FC2FC680-E8DB-DF11-9588-0030486790B0.root'
+        'file:DCFB362D-1450-E011-8959-003048673EA4.root'
 
-#         '/store/mc/Fall10/QCD_Pt-30to50_MuPt5Enriched_TuneZ2_7TeV-pythia6/AODSIM/START38_V12-v1/0006/F2990AEF-EBCA-DF11-B191-485B39800C0C.root',
-#         '/store/mc/Fall10/QCD_Pt-30to50_MuPt5Enriched_TuneZ2_7TeV-pythia6/AODSIM/START38_V12-v1/0006/E6B32F6B-E7CA-DF11-8429-00261834B5D2.root',
-#         '/store/mc/Fall10/QCD_Pt-30to50_MuPt5Enriched_TuneZ2_7TeV-pythia6/AODSIM/START38_V12-v1/0006/E27A0FBD-FCCA-DF11-A998-E0CB4E19F987.root',
-#         '/store/mc/Fall10/QCD_Pt-30to50_MuPt5Enriched_TuneZ2_7TeV-pythia6/AODSIM/START38_V12-v1/0006/D077A8B4-EACA-DF11-AFF8-485B39800C03.root',
-#         '/store/mc/Fall10/QCD_Pt-30to50_MuPt5Enriched_TuneZ2_7TeV-pythia6/AODSIM/START38_V12-v1/0006/C6ADB927-08CB-DF11-B34A-E0CB4E29C4D4.root'
+# 	'/store/mc/Spring11/QCD_Pt_170to300_TuneZ2_7TeV_pythia6/AODSIM/PU_S1_START311_V1G1-v1/0011/DCFB362D-1450-E011-8959-003048673EA4.root',
+# 	'/store/mc/Spring11/QCD_Pt_170to300_TuneZ2_7TeV_pythia6/AODSIM/PU_S1_START311_V1G1-v1/0010/788D1D7C-AC4F-E011-B2C5-0025B3E0645C.root',
+# 	'/store/mc/Spring11/QCD_Pt_170to300_TuneZ2_7TeV_pythia6/AODSIM/PU_S1_START311_V1G1-v1/0010/523A5F14-B54F-E011-8482-003048D47A14.root',
+# 	'/store/mc/Spring11/QCD_Pt_170to300_TuneZ2_7TeV_pythia6/AODSIM/PU_S1_START311_V1G1-v1/0010/4601B125-BF4F-E011-A339-003048D45FC8.root',
+# 	'/store/mc/Spring11/QCD_Pt_170to300_TuneZ2_7TeV_pythia6/AODSIM/PU_S1_START311_V1G1-v1/0010/18077F16-0A50-E011-B473-003048D477A4.root'
   )
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(-1)
 )
 
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = "START38_V13::All" # use a valid global tag here!
-
+process.GlobalTag.globaltag = "START311_V1::All" 
 
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
@@ -94,22 +89,6 @@ process.load("PhysicsTools.JetMCAlgos.CaloJetsMCFlavour_cfi")
 #############   Include the jet corrections ##########
 process.load("JetMETCorrections.Configuration.DefaultJEC_cff")
 
-
-process.ak5CaloL2Relative.useCondDB = False
-process.ak5CaloL3Absolute.useCondDB = False
-process.ak5CaloResidual.useCondDB = False
-
-process.ak5PFL2Relative.useCondDB = False
-process.ak5PFL3Absolute.useCondDB = False
-process.ak5PFResidual.useCondDB = False
-
-process.ak5JPTL2Relative.useCondDB = False
-process.ak5JPTL3Absolute.useCondDB = False
-process.ak5JPTResidual.useCondDB = False
-
-
-
-
 process.load("SimTracker.TrackHistory.TrackClassifier_cff")
 process.load("RecoBTag.PerformanceMeasurements.MistagAnalyzer_cff")
 
@@ -125,7 +104,7 @@ process.out = cms.OutputModule("PoolOutputModule",
 #Filter for PFJets
 process.PFJetsFilter = cms.EDFilter("PFJetSelector",
  src = cms.InputTag("ak5PFJets"),
- cut = cms.string("pt > 10.0 && abs(eta) < 2.4 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 0.99"),
+ cut = cms.string("pt > 10.0 && abs(eta) < 2.5 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 0.99"),
  filter = cms.bool(True)
 )
 #---------------------------------------
@@ -149,18 +128,20 @@ process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
  		      maxd0 = cms.double(2)	
                      )
 
-#Noise filter
-process.load('CommonTools/RecoAlgos/HBHENoiseFilter_cfi')
+### from Cristina JP calibration for cmsRun only : 
+# from CondCore.DBCommon.CondDBCommon_cfi import *
+# process.load("RecoBTag.TrackProbability.trackProbabilityFakeCond_cfi")
+# process.trackProbabilityFakeCond.connect =cms.string( "sqlite_fip:RecoBTag/PerformanceMeasurements/test/btagnew_mc_39X_QCD.db")
+# process.es_prefer_trackProbabilityFakeCond = cms.ESPrefer("PoolDBESSource","trackProbabilityFakeCond")
 
-
-### from Cristina: calibration JetProb
+### from Cristina JP calibration for crab only: 
 process.GlobalTag.toGet = cms.VPSet(
   cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
-       tag = cms.string("TrackProbabilityCalibration_2D_MCQpt30"),
-       connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU")),
+       tag = cms.string("TrackProbabilityCalibration_2D_Qcd80to120Winter10_v1_mc"),
+       connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_BTAU")),
   cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-       tag = cms.string("TrackProbabilityCalibration_3D_MCQpt30"),
-       connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"))
+       tag = cms.string("TrackProbabilityCalibration_3D_Qcd80to120Winter10_v1_mc"),
+       connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_BTAU"))
 )
 
 
@@ -169,11 +150,10 @@ process.GlobalTag.toGet = cms.VPSet(
 process.TFileService = cms.Service("TFileService", fileName = cms.string("JetTree.root") )
  
 process.mistag.isData = False
-process.mistag.useTrackHistory = True
+process.mistag.useTrackHistory = False
 process.mistag.produceJetProbaTree = False
-#process.mistag.triggerTable = 'TriggerResults::HLT'
-#process.mistag.triggerTable = 'TriggerResults::REDIGI38X'
-process.mistag.triggerTable = 'TriggerResults::REDIGI38XTP'
+#process.mistag.triggerTable = 'TriggerResults::HLT' # Data
+process.mistag.triggerTable = 'TriggerResults::REDIGI311X' # MC
 #---------------------------------------
 
 
@@ -196,7 +176,6 @@ process.p = cms.Path(
         *process.ak5PFJetsL2L3
 #$$
         *process.PFJetsFilter
-        *process.HBHENoiseFilter
         *process.noscraping
         *process.primaryVertexFilter
 	*process.ak5JetTracksAssociatorAtVertex
@@ -212,4 +191,3 @@ process.p = cms.Path(
 	*process.jetBProbabilityBJetTags*process.negativeOnlyJetBProbabilityJetTags
 	*process.mistag
 	)
-

@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Thu Jun 10 18:18:33 2010 by ROOT version 5.20/00
+// Sun Feb 27 18:38:57 2011 by ROOT version 5.20/00
 // from TTree ttree/ttree
-// found on file: JetTree_All.root
+// found on file: JetTree.root
 //////////////////////////////////////////////////////////
 
 #ifndef JetTree_h
@@ -23,7 +23,18 @@ public :
    Int_t           Run;
    Int_t           Evt;
    Int_t           LumiBlock;
+   Int_t           nPV;
+   Float_t         PVz;
+   Float_t         pthat;
+   Int_t           nPU;
+   Float_t         PU_z[20];   //[nPU]
+   Float_t         PU_sumpT_low[20];   //[nPU]
+   Float_t         PU_sumpT_high[20];   //[nPU]
+   Int_t           PU_ntrks_low[20];   //[nPU]
+   Int_t           PU_ntrks_high[20];   //[nPU]
    Float_t         Jet_pt[50];   //[nJet]
+   Float_t         Jet_et[50];   //[nJet]
+   Float_t         Jet_residual[50];   //[nJet]
    Float_t         Jet_jes[50];   //[nJet]
    Float_t         Jet_eta[50];   //[nJet]
    Float_t         Jet_phi[50];   //[nJet]
@@ -38,12 +49,15 @@ public :
    Float_t         Jet_ProbaN[50];   //[nJet]
    Float_t         Jet_ProbaP[50];   //[nJet]
    Float_t         Jet_Proba[50];   //[nJet]
+   Float_t         Jet_BprobN[50];   //[nJet]
+   Float_t         Jet_Bprob[50];   //[nJet]
    Float_t         Jet_SvxN[50];   //[nJet]
    Float_t         Jet_Svx[50];   //[nJet]
    Int_t           Jet_SvxNTracks[50];   //[nJet]
    Int_t           Jet_SvxTracks[50];   //[nJet]
    Float_t         Jet_SvxNHP[50];   //[nJet]
    Float_t         Jet_SvxHP[50];   //[nJet]
+   Float_t         Jet_SvxMass[50];   //[nJet]
    Float_t         Jet_CombSvxN[50];   //[nJet]
    Float_t         Jet_CombSvx[50];   //[nJet]
    Float_t         Jet_SoftMuN[50];   //[nJet]
@@ -53,15 +67,25 @@ public :
    Int_t           Jet_hist3[50];   //[nJet]
    Int_t           Jet_histJet[50];   //[nJet]
    Int_t           Jet_histSvx[50];   //[nJet]
-   Int_t           Jet_histMuon[50];   //[nJet]
-   Int_t           Jet_mu_nHit[50];   //[nJet]
-   Float_t         Jet_mu_chi2[50];   //[nJet]
-   Float_t         Jet_mu_pt[50];   //[nJet]
-   Float_t         Jet_mu_ptrel[50];   //[nJet]
    Int_t           Jet_nFirstTrack[50];   //[nJet]
    Int_t           Jet_nLastTrack[50];   //[nJet]
    Int_t           Jet_nFirstSV[50];   //[nJet]
    Int_t           Jet_nLastSV[50];   //[nJet]
+   Int_t           nMuon;
+   Int_t           Muon_IdxJet[10];   //[nMuon]
+   Int_t           Muon_nMuHit[10];   //[nMuon]
+   Int_t           Muon_nTkHit[10];   //[nMuon]
+   Int_t           Muon_nPixHit[10];   //[nMuon]
+   Int_t           Muon_nOutHit[10];   //[nMuon]
+   Int_t           Muon_isGlobal[10];   //[nMuon]
+   Int_t           Muon_nMatched[10];   //[nMuon]
+   Float_t         Muon_chi2[10];   //[nMuon]
+   Float_t         Muon_chi2Tk[10];   //[nMuon]
+   Float_t         Muon_pt[10];   //[nMuon]
+   Float_t         Muon_eta[10];   //[nMuon]
+   Float_t         Muon_ptrel[10];   //[nMuon]
+   Float_t         Muon_vz[10];   //[nMuon]
+   Int_t           Muon_hist[10];   //[nMuon]
 
    // List of branches
    TBranch        *b_BitTrigger;   //!
@@ -69,7 +93,18 @@ public :
    TBranch        *b_Run;   //!
    TBranch        *b_Evt;   //!
    TBranch        *b_LumiBlock;   //!
+   TBranch        *b_nPV;   //!
+   TBranch        *b_PVz;   //!
+   TBranch        *b_pthat;   //!
+   TBranch        *b_nPU;   //!
+   TBranch        *b_PU_z;   //!
+   TBranch        *b_PU_sumpT_low;   //!
+   TBranch        *b_PU_sumpT_high;   //!
+   TBranch        *b_PU_ntrks_low;   //!
+   TBranch        *b_PU_ntrks_high;   //!
    TBranch        *b_Jet_pt;   //!
+   TBranch        *b_Jet_et;   //!
+   TBranch        *b_Jet_residual;   //!
    TBranch        *b_Jet_jes;   //!
    TBranch        *b_Jet_eta;   //!
    TBranch        *b_Jet_phi;   //!
@@ -84,12 +119,15 @@ public :
    TBranch        *b_Jet_ProbaN;   //!
    TBranch        *b_Jet_ProbaP;   //!
    TBranch        *b_Jet_Proba;   //!
+   TBranch        *b_Jet_BprobN;   //!
+   TBranch        *b_Jet_Bprob;   //!
    TBranch        *b_Jet_SvxN;   //!
    TBranch        *b_Jet_Svx;   //!
    TBranch        *b_Jet_SvxNTracks;   //!
    TBranch        *b_Jet_SvxTracks;   //!
    TBranch        *b_Jet_SvxNHP;   //!
    TBranch        *b_Jet_SvxHP;   //!
+   TBranch        *b_Jet_SvxMass;   //!
    TBranch        *b_Jet_CombSvxN;   //!
    TBranch        *b_Jet_CombSvx;   //!
    TBranch        *b_Jet_SoftMuN;   //!
@@ -99,15 +137,25 @@ public :
    TBranch        *b_Jet_hist3;   //!
    TBranch        *b_Jet_histJet;   //!
    TBranch        *b_Jet_histSvx;   //!
-   TBranch        *b_Jet_histMuon;   //!
-   TBranch        *b_Jet_mu_nHit;   //!
-   TBranch        *b_Jet_mu_chi2;   //!
-   TBranch        *b_Jet_mu_pt;   //!
-   TBranch        *b_Jet_mu_ptrel;   //!
    TBranch        *b_Jet_nFirstTrack;   //!
    TBranch        *b_Jet_nLastTrack;   //!
    TBranch        *b_Jet_nFirstSV;   //!
    TBranch        *b_Jet_nLastSV;   //!
+   TBranch        *b_nMuon;   //!
+   TBranch        *b_Muon_IdxJet;   //!
+   TBranch        *b_Muon_nMuHit;   //!
+   TBranch        *b_Muon_nTkHit;   //!
+   TBranch        *b_Muon_nPixHit;   //!
+   TBranch        *b_Muon_nOutHit;   //!
+   TBranch        *b_Muon_isGlobal;   //!
+   TBranch        *b_Muon_nMatched;   //!
+   TBranch        *b_Muon_chi2;   //!
+   TBranch        *b_Muon_chi2Tk;   //!
+   TBranch        *b_Muon_pt;   //!
+   TBranch        *b_Muon_eta;   //!
+   TBranch        *b_Muon_ptrel;   //!
+   TBranch        *b_Muon_vz;   //!
+   TBranch        *b_Muon_hist;   //!
 
    JetTree(TTree *tree=0);
    virtual ~JetTree();
@@ -124,6 +172,7 @@ public :
                Float_t  aEtaMin = 0., 
                Float_t  aEtaMax = 10., 
                Float_t  aFreeCut = 0., 
+               Int_t    aIntCut = 0, 
                TString  afilename = "output.root");
 //$$
    virtual Bool_t   Notify();
@@ -138,10 +187,10 @@ JetTree::JetTree(TTree *tree)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("JetTree_All.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("JetTree.root");
       if (!f) {
-         f = new TFile("JetTree_All.root");
-         f->cd("JetTree_All.root:/mistag");
+         f = new TFile("JetTree.root");
+         f->cd("JetTree.root:/mistag");
       }
       tree = (TTree*)gDirectory->Get("ttree");
 
@@ -197,7 +246,18 @@ void JetTree::Init(TTree *tree)
    fChain->SetBranchAddress("Run", &Run, &b_Run);
    fChain->SetBranchAddress("Evt", &Evt, &b_Evt);
    fChain->SetBranchAddress("LumiBlock", &LumiBlock, &b_LumiBlock);
+   fChain->SetBranchAddress("nPV", &nPV, &b_nPV);
+   fChain->SetBranchAddress("PVz", &PVz, &b_PVz);
+   fChain->SetBranchAddress("pthat", &pthat, &b_pthat);
+   fChain->SetBranchAddress("nPU", &nPU, &b_nPU);
+   fChain->SetBranchAddress("PU_z", PU_z, &b_PU_z);
+   fChain->SetBranchAddress("PU_sumpT_low", PU_sumpT_low, &b_PU_sumpT_low);
+   fChain->SetBranchAddress("PU_sumpT_high", PU_sumpT_high, &b_PU_sumpT_high);
+   fChain->SetBranchAddress("PU_ntrks_low", PU_ntrks_low, &b_PU_ntrks_low);
+   fChain->SetBranchAddress("PU_ntrks_high", PU_ntrks_high, &b_PU_ntrks_high);
    fChain->SetBranchAddress("Jet_pt", Jet_pt, &b_Jet_pt);
+   fChain->SetBranchAddress("Jet_et", Jet_et, &b_Jet_et);
+   fChain->SetBranchAddress("Jet_residual", Jet_residual, &b_Jet_residual);
    fChain->SetBranchAddress("Jet_jes", Jet_jes, &b_Jet_jes);
    fChain->SetBranchAddress("Jet_eta", Jet_eta, &b_Jet_eta);
    fChain->SetBranchAddress("Jet_phi", Jet_phi, &b_Jet_phi);
@@ -212,12 +272,15 @@ void JetTree::Init(TTree *tree)
    fChain->SetBranchAddress("Jet_ProbaN", Jet_ProbaN, &b_Jet_ProbaN);
    fChain->SetBranchAddress("Jet_ProbaP", Jet_ProbaP, &b_Jet_ProbaP);
    fChain->SetBranchAddress("Jet_Proba", Jet_Proba, &b_Jet_Proba);
+   fChain->SetBranchAddress("Jet_BprobN", Jet_BprobN, &b_Jet_BprobN);
+   fChain->SetBranchAddress("Jet_Bprob", Jet_Bprob, &b_Jet_Bprob);
    fChain->SetBranchAddress("Jet_SvxN", Jet_SvxN, &b_Jet_SvxN);
    fChain->SetBranchAddress("Jet_Svx", Jet_Svx, &b_Jet_Svx);
    fChain->SetBranchAddress("Jet_SvxNTracks", Jet_SvxNTracks, &b_Jet_SvxNTracks);
    fChain->SetBranchAddress("Jet_SvxTracks", Jet_SvxTracks, &b_Jet_SvxTracks);
    fChain->SetBranchAddress("Jet_SvxNHP", Jet_SvxNHP, &b_Jet_SvxNHP);
    fChain->SetBranchAddress("Jet_SvxHP", Jet_SvxHP, &b_Jet_SvxHP);
+   fChain->SetBranchAddress("Jet_SvxMass", Jet_SvxMass, &b_Jet_SvxMass);
    fChain->SetBranchAddress("Jet_CombSvxN", Jet_CombSvxN, &b_Jet_CombSvxN);
    fChain->SetBranchAddress("Jet_CombSvx", Jet_CombSvx, &b_Jet_CombSvx);
    fChain->SetBranchAddress("Jet_SoftMuN", Jet_SoftMuN, &b_Jet_SoftMuN);
@@ -227,15 +290,25 @@ void JetTree::Init(TTree *tree)
    fChain->SetBranchAddress("Jet_hist3", Jet_hist3, &b_Jet_hist3);
    fChain->SetBranchAddress("Jet_histJet", Jet_histJet, &b_Jet_histJet);
    fChain->SetBranchAddress("Jet_histSvx", Jet_histSvx, &b_Jet_histSvx);
-   fChain->SetBranchAddress("Jet_histMuon", Jet_histMuon, &b_Jet_histMuon);
-   fChain->SetBranchAddress("Jet_mu_nHit", Jet_mu_nHit, &b_Jet_mu_nHit);
-   fChain->SetBranchAddress("Jet_mu_chi2", Jet_mu_chi2, &b_Jet_mu_chi2);
-   fChain->SetBranchAddress("Jet_mu_pt", Jet_mu_pt, &b_Jet_mu_pt);
-   fChain->SetBranchAddress("Jet_mu_ptrel", Jet_mu_ptrel, &b_Jet_mu_ptrel);
    fChain->SetBranchAddress("Jet_nFirstTrack", Jet_nFirstTrack, &b_Jet_nFirstTrack);
    fChain->SetBranchAddress("Jet_nLastTrack", Jet_nLastTrack, &b_Jet_nLastTrack);
    fChain->SetBranchAddress("Jet_nFirstSV", Jet_nFirstSV, &b_Jet_nFirstSV);
    fChain->SetBranchAddress("Jet_nLastSV", Jet_nLastSV, &b_Jet_nLastSV);
+   fChain->SetBranchAddress("nMuon", &nMuon, &b_nMuon);
+   fChain->SetBranchAddress("Muon_IdxJet", Muon_IdxJet, &b_Muon_IdxJet);
+   fChain->SetBranchAddress("Muon_nMuHit", Muon_nMuHit, &b_Muon_nMuHit);
+   fChain->SetBranchAddress("Muon_nTkHit", Muon_nTkHit, &b_Muon_nTkHit);
+   fChain->SetBranchAddress("Muon_nPixHit", Muon_nPixHit, &b_Muon_nPixHit);
+   fChain->SetBranchAddress("Muon_nOutHit", Muon_nOutHit, &b_Muon_nOutHit);
+   fChain->SetBranchAddress("Muon_isGlobal", Muon_isGlobal, &b_Muon_isGlobal);
+   fChain->SetBranchAddress("Muon_nMatched", Muon_nMatched, &b_Muon_nMatched);
+   fChain->SetBranchAddress("Muon_chi2", Muon_chi2, &b_Muon_chi2);
+   fChain->SetBranchAddress("Muon_chi2Tk", Muon_chi2Tk, &b_Muon_chi2Tk);
+   fChain->SetBranchAddress("Muon_pt", Muon_pt, &b_Muon_pt);
+   fChain->SetBranchAddress("Muon_eta", Muon_eta, &b_Muon_eta);
+   fChain->SetBranchAddress("Muon_ptrel", Muon_ptrel, &b_Muon_ptrel);
+   fChain->SetBranchAddress("Muon_vz", Muon_vz, &b_Muon_vz);
+   fChain->SetBranchAddress("Muon_hist", Muon_hist, &b_Muon_hist);
    Notify();
 }
 

@@ -43,21 +43,23 @@ output directory.
 Some title cards can be set in JetsAna_Run.C, which also allows to read the same
 Ntuples several times in a single pass (with different output Root files at each
 pass):
- t->Loop(NN,TagCut,PtMin,PtMax,EtaMin,EtaMax,FreeCut,"filename");
+ t->Loop(NN,TagCut,PtMin,PtMax,EtaMin,EtaMax,FreeCut,IntCut,"filename");
 with 
  - NN: the chosen tagging algorithm 
        0 = Jet Probability (JP), 
-       1 = Track Counting with first track (used to veto jets with a positive IP track), 
-       2 = Track Counting with second track (TCHE), 
-       3 = Track Counting with third track (TCHP), 
-       4 = Simple Secondary Vertex (SSV), 
-       5 = Combined Secondary Vertex (CSV), 
-       6 = Soft Muon with Neural Net, 
-       7 = Soft Muon with PtRel
+       1 = Jet BProbability (JBP),
+       2 = Track Counting High Efficiency (TCHE), 
+       3 = Track Counting High Purity (TCHP), 
+       4 = Simple Secondary Vertex High Efficiency (SSVHE), 
+       5 = Simple Secondary Vertex High Purity (SSVHP), 
+       6 = Combined Secondary Vertex (CSV), 
+       7 = Soft Muon with PtRel, 
+       8 = Track Counting with first track
  - TagCut: the cut on the tagging discriminant for a given operating point
  - PtMin, PtMax: the considered jet Pt range 
  - EtaMin, EtaMax: the considered jet Eta range
  - FreeCut: a free variable for some further selection cut 
+ - IntCut: another free variable for the HLT bit selection 
  - filename: the output root file 
    Caution : please choose different names for different values of the previous 
              variables and also for different input Ntuples !

@@ -11,40 +11,109 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-c.Add("~/NTUPLES/CMSSW_3_6_1_patch3/Data/JetMETTau_Run2010A-PromptReco-v2/JetTree_All.root");
+c.Add("../NTUPLES/CMSSW_4_1_2_patch1/Data/Jet_Run2011A-PromptReco/JetTree_All_EXT1.root");
+
+// c.Add("../NTUPLES/CMSSW_3_11_3/MC/QCD_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1/JetTree_Pt_80to120.root");  // Jet110
+// c.Add("../NTUPLES/CMSSW_3_11_3/MC/QCD_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1/JetTree_Pt_120to170.root"); // Jet150 + 190
+// c.Add("../NTUPLES/CMSSW_3_11_3/MC/QCD_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1/JetTree_Pt_170to300.root");
 
 ////////////////////////////////////////////////////////////////////////////////
 
  JetTree* t = new JetTree(&c);
 
- t->Loop(5,2.00,30.,999.,0.,2.4,1000.,"Data-prompt-Jet15U_ptGT30_SSVHPT.root");
-//  t->Loop(2,1.25,30.,999.,0.,2.4,1000.,"output.root");
+ t->Loop(2,1.70,20.,999.,0.,2.4,0.,30,"output.root");
 
-//  t->Loop(1,3.00,0.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_IP1.root");
-//  t->Loop(2,1.70,0.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_TCHEL.root");
-//  t->Loop(2,3.30,0.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_TCHEM.root");
-//  t->Loop(3,1.93,0.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_TCHPM.root");
-//  t->Loop(3,3.41,0.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_TCHPT.root");
-//  t->Loop(4,1.74,0.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_SSVHEM.root");
-//  t->Loop(4,3.05,0.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_SSVHET.root");
-//  t->Loop(5,2.00,0.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_SSVHPT.root");
-//  t->Loop(0,.215,0.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_JPL.root");
-//  t->Loop(0,.459,0.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_JPM.root");
-//  t->Loop(0,.669,0.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_JPT.root");
-//  t->Loop(5,0.38,0.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_CSVL.root");
-//  t->Loop(5,0.75,0.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_CSVM.root");
-//  t->Loop(5,.921,0.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_CSVT.root");
+// //  t->Loop(0,.275,20.,999.,0.,2.4,0.,30,"output/Data_Jet30_JPL.root");
+//  t->Loop(0,.545,20.,999.,0.,2.4,0.,30,"output/Data_Jet30_JPM.root");
+// //  t->Loop(0,.790,20.,999.,0.,2.4,0.,30,"output/Data_Jet30_JPT.root");
+// //  t->Loop(1,1.33,20.,999.,0.,2.4,0.,30,"output/Data_Jet30_JBPL.root");
+//  t->Loop(1,2.55,20.,999.,0.,2.4,0.,30,"output/Data_Jet30_JBPM.root");
+// //  t->Loop(1,3.74,20.,999.,0.,2.4,0.,30,"output/Data_Jet30_JBPT.root");
+// //  t->Loop(2,1.70,20.,999.,0.,2.4,0.,30,"output/Data_Jet30_TCHEL.root");
+//  t->Loop(2,3.30,20.,999.,0.,2.4,0.,30,"output/Data_Jet30_TCHEM.root");
+//  t->Loop(3,1.93,20.,999.,0.,2.4,0.,30,"output/Data_Jet30_TCHPM.root");
+// //  t->Loop(3,3.41,20.,999.,0.,2.4,0.,30,"output/Data_Jet30_TCHPT.root");
+//  t->Loop(4,1.74,20.,999.,0.,2.4,0.,30,"output/Data_Jet30_SSVHEM.root");
+//  t->Loop(5,2.00,20.,999.,0.,2.4,0.,30,"output/Data_Jet30_SSVHPT.root");
+// 
+// //  t->Loop(0,.275,20.,999.,0.,2.4,0.,60,"output/Data_Jet60_JPL.root");
+//  t->Loop(0,.545,20.,999.,0.,2.4,0.,60,"output/Data_Jet60_JPM.root");
+// //  t->Loop(0,.790,20.,999.,0.,2.4,0.,60,"output/Data_Jet60_JPT.root");
+// //  t->Loop(1,1.33,20.,999.,0.,2.4,0.,60,"output/Data_Jet60_JBPL.root");
+//  t->Loop(1,2.55,20.,999.,0.,2.4,0.,60,"output/Data_Jet60_JBPM.root");
+// //  t->Loop(1,3.74,20.,999.,0.,2.4,0.,60,"output/Data_Jet60_JBPT.root");
+// //  t->Loop(2,1.70,20.,999.,0.,2.4,0.,60,"output/Data_Jet60_TCHEL.root");
+//  t->Loop(2,3.30,20.,999.,0.,2.4,0.,60,"output/Data_Jet60_TCHEM.root");
+//  t->Loop(3,1.93,20.,999.,0.,2.4,0.,60,"output/Data_Jet60_TCHPM.root");
+// //  t->Loop(3,3.41,20.,999.,0.,2.4,0.,60,"output/Data_Jet60_TCHPT.root");
+//  t->Loop(4,1.74,20.,999.,0.,2.4,0.,60,"output/Data_Jet60_SSVHEM.root");
+//  t->Loop(5,2.00,20.,999.,0.,2.4,0.,60,"output/Data_Jet60_SSVHPT.root");
+// 
+// //  t->Loop(0,.275,20.,999.,0.,2.4,0.,80,"output/Data_Jet80_JPL.root");
+//  t->Loop(0,.545,20.,999.,0.,2.4,0.,80,"output/Data_Jet80_JPM.root");
+// //  t->Loop(0,.790,20.,999.,0.,2.4,0.,80,"output/Data_Jet80_JPT.root");
+// //  t->Loop(1,1.33,20.,999.,0.,2.4,0.,80,"output/Data_Jet80_JBPL.root");
+//  t->Loop(1,2.55,20.,999.,0.,2.4,0.,80,"output/Data_Jet80_JBPM.root");
+// //  t->Loop(1,3.74,20.,999.,0.,2.4,0.,80,"output/Data_Jet80_JBPT.root");
+// //  t->Loop(2,1.70,20.,999.,0.,2.4,0.,80,"output/Data_Jet80_TCHEL.root");
+//  t->Loop(2,3.30,20.,999.,0.,2.4,0.,80,"output/Data_Jet80_TCHEM.root");
+//  t->Loop(3,1.93,20.,999.,0.,2.4,0.,80,"output/Data_Jet80_TCHPM.root");
+// //  t->Loop(3,3.41,20.,999.,0.,2.4,0.,80,"output/Data_Jet80_TCHPT.root");
+//  t->Loop(4,1.74,20.,999.,0.,2.4,0.,80,"output/Data_Jet80_SSVHEM.root");
+//  t->Loop(5,2.00,20.,999.,0.,2.4,0.,80,"output/Data_Jet80_SSVHPT.root");
+// 
+// //  t->Loop(0,.275,20.,999.,0.,2.4,0.,110,"output/Data_Jet110_JPL.root");
+//  t->Loop(0,.545,20.,999.,0.,2.4,0.,110,"output/Data_Jet110_JPM.root");
+// //  t->Loop(0,.790,20.,999.,0.,2.4,0.,110,"output/Data_Jet110_JPT.root");
+// //  t->Loop(1,1.33,20.,999.,0.,2.4,0.,110,"output/Data_Jet110_JBPL.root");
+//  t->Loop(1,2.55,20.,999.,0.,2.4,0.,110,"output/Data_Jet110_JBPM.root");
+// //  t->Loop(1,3.74,20.,999.,0.,2.4,0.,110,"output/Data_Jet110_JBPT.root");
+// //  t->Loop(2,1.70,20.,999.,0.,2.4,0.,110,"output/Data_Jet110_TCHEL.root");
+//  t->Loop(2,3.30,20.,999.,0.,2.4,0.,110,"output/Data_Jet110_TCHEM.root");
+//  t->Loop(3,1.93,20.,999.,0.,2.4,0.,110,"output/Data_Jet110_TCHPM.root");
+// //  t->Loop(3,3.41,20.,999.,0.,2.4,0.,110,"output/Data_Jet110_TCHPT.root");
+//  t->Loop(4,1.74,20.,999.,0.,2.4,0.,110,"output/Data_Jet110_SSVHEM.root");
+//  t->Loop(5,2.00,20.,999.,0.,2.4,0.,110,"output/Data_Jet110_SSVHPT.root");
+// 
+// //  t->Loop(0,.275,20.,999.,0.,2.4,0.,150,"output/Data_Jet150_JPL.root");
+//  t->Loop(0,.545,20.,999.,0.,2.4,0.,150,"output/Data_Jet150_JPM.root");
+// //  t->Loop(0,.790,20.,999.,0.,2.4,0.,150,"output/Data_Jet150_JPT.root");
+// //  t->Loop(1,1.33,20.,999.,0.,2.4,0.,150,"output/Data_Jet150_JBPL.root");
+//  t->Loop(1,2.55,20.,999.,0.,2.4,0.,150,"output/Data_Jet150_JBPM.root");
+// //  t->Loop(1,3.74,20.,999.,0.,2.4,0.,150,"output/Data_Jet150_JBPT.root");
+// //  t->Loop(2,1.70,20.,999.,0.,2.4,0.,150,"output/Data_Jet150_TCHEL.root");
+//  t->Loop(2,3.30,20.,999.,0.,2.4,0.,150,"output/Data_Jet150_TCHEM.root");
+//  t->Loop(3,1.93,20.,999.,0.,2.4,0.,150,"output/Data_Jet150_TCHPM.root");
+// //  t->Loop(3,3.41,20.,999.,0.,2.4,0.,150,"output/Data_Jet150_TCHPT.root");
+//  t->Loop(4,1.74,20.,999.,0.,2.4,0.,150,"output/Data_Jet150_SSVHEM.root");
+//  t->Loop(5,2.00,20.,999.,0.,2.4,0.,150,"output/Data_Jet150_SSVHPT.root");
+// 
+// //  t->Loop(0,.275,20.,999.,0.,2.4,0.,190,"output/Data_Jet190_JPL.root");
+//  t->Loop(0,.545,20.,999.,0.,2.4,0.,190,"output/Data_Jet190_JPM.root");
+// //  t->Loop(0,.790,20.,999.,0.,2.4,0.,190,"output/Data_Jet190_JPT.root");
+// //  t->Loop(1,1.33,20.,999.,0.,2.4,0.,190,"output/Data_Jet190_JBPL.root");
+//  t->Loop(1,2.55,20.,999.,0.,2.4,0.,190,"output/Data_Jet190_JBPM.root");
+// //  t->Loop(1,3.74,20.,999.,0.,2.4,0.,190,"output/Data_Jet190_JBPT.root");
+// //  t->Loop(2,1.70,20.,999.,0.,2.4,0.,190,"output/Data_Jet190_TCHEL.root");
+//  t->Loop(2,3.30,20.,999.,0.,2.4,0.,190,"output/Data_Jet190_TCHEM.root");
+//  t->Loop(3,1.93,20.,999.,0.,2.4,0.,190,"output/Data_Jet190_TCHPM.root");
+// //  t->Loop(3,3.41,20.,999.,0.,2.4,0.,190,"output/Data_Jet190_TCHPT.root");
+//  t->Loop(4,1.74,20.,999.,0.,2.4,0.,190,"output/Data_Jet190_SSVHEM.root");
+//  t->Loop(5,2.00,20.,999.,0.,2.4,0.,190,"output/Data_Jet190_SSVHPT.root");
 
-//  t->Loop(1,3.00,30.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_ptGT30_IP1.root");
-//  t->Loop(2,1.70,30.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_ptGT30_TCHEL.root");
-//  t->Loop(2,3.30,30.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_ptGT30_TCHEM.root");
-//  t->Loop(3,1.93,30.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_ptGT30_TCHPM.root");
-//  t->Loop(3,3.41,30.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_ptGT30_TCHPT.root");
-//  t->Loop(4,1.74,30.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_ptGT30_SSVHEM.root");
-//  t->Loop(4,3.05,30.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_ptGT30_SSVHET.root");
-//  t->Loop(5,2.00,30.,999.,0.,2.4,1000.,"output/Data-prompt-Jet15U_ptGT30_SSVHPT.root");
+//  t->Loop(2,1.70,20.,999.,0.,2.4,0.,30,"output/TurnOn/Data_Jet30_TCHEL.root");
+//  t->Loop(2,1.70,20.,999.,0.,2.4,0.,60,"output/TurnOn/Data_Jet60_TCHEL.root");
+//  t->Loop(2,1.70,20.,999.,0.,2.4,0.,80,"output/TurnOn/Data_Jet80_TCHEL.root");
+//  t->Loop(2,1.70,20.,999.,0.,2.4,0.,110,"output/TurnOn/Data_Jet110_TCHEL.root");
+//  t->Loop(2,1.70,20.,999.,0.,2.4,0.,150,"output/TurnOn/Data_Jet150_TCHEL.root");
+//  t->Loop(2,1.70,20.,999.,0.,2.4,0.,190,"output/TurnOn/Data_Jet190_TCHEL.root");
+//  t->Loop(2,1.70,20.,999.,0.,2.4,0.,3060,"output/TurnOn/Data_Jet3060_TCHEL.root");
+//  t->Loop(2,1.70,20.,999.,0.,2.4,0.,6080,"output/TurnOn/Data_Jet6080_TCHEL.root");
+//  t->Loop(2,1.70,20.,999.,0.,2.4,0.,80110,"output/TurnOn/Data_Jet80110_TCHEL.root");
+//  t->Loop(2,1.70,20.,999.,0.,2.4,0.,110150,"output/TurnOn/Data_Jet110150_TCHEL.root");
+//  t->Loop(2,1.70,20.,999.,0.,2.4,0.,150190,"output/TurnOn/Data_Jet150190_TCHEL.root");
 
 ////////////////////////////////////////////////////////////////////////////////
 
- gSystem->Exec("kill -9 "+TString(Form("%d",gSystem->GetPid())));
+//  gSystem->Exec("kill -9 "+TString(Form("%d",gSystem->GetPid())));
 }
