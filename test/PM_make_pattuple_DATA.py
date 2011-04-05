@@ -1,47 +1,43 @@
-#
-# see also this example  
-# http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/PhysicsTools/PatExamples/test/patLayer1_fromRECO_7TeV_firstdata_cfg.py?revision=1.1.2.2&view=markup&pathrev=V00-02-16
-#
-
-# 
-#The good collisions runs and "good" lumi section ranges can be found from http://pccmsdqm04.cern.ch/runregistry/
-#instruction here https://twiki.cern.ch/twiki/bin/viewauth/CMS/DQMRunRegistry
-#
-
 import FWCore.ParameterSet.Config as cms
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
  
 #-- Message Logger ------------------------------------------------------------
 process.MessageLogger.categories.append('PATSummaryTables')
-process.MessageLogger.cerr.FwkReport.reportEvery=100
 process.MessageLogger.cerr = cms.untracked.PSet(
     default          = cms.untracked.PSet( limit = cms.untracked.int32(-1)  ),
     PATSummaryTables = cms.untracked.PSet( limit = cms.untracked.int32(-1) ),
     FwkReport = cms.untracked.PSet(
-	reportEvery = cms.untracked.int32(100)
+	reportEvery = cms.untracked.int32(1000)
     )
 
 )
 
+
 #-- Input Source --------------------------------------------------------------
 process.source.fileNames = [
-
- '/store/data/Run2010A/Mu/RECO/Jun14thReReco_v1/0000/FE7AAFE8-A878-DF11-A8CF-0017A4770824.root',
- '/store/data/Run2010A/Mu/RECO/Jun14thReReco_v1/0000/FE86F550-8479-DF11-B056-00237DF345D6.root',
- '/store/data/Run2010A/Mu/RECO/Jun14thReReco_v1/0000/FEFAF52B-AE78-DF11-878C-0017A477103C.root'
-
+    'file:/tmp/adamwo/F0505325-7EEB-DF11-B911-0024E876A855.root'
     ]
 
 #-- EndImput Source -----------------------------------------------------------
 
-process.maxEvents.input = -1
+process.maxEvents.input = 5000
 
 #-- Select good events -----------------------------------------------------------
 process.load("RecoBTag.PerformanceMeasurements.getEvent_cff")
 
 
 #-- Calibration tag -----------------------------------------------------------
-process.GlobalTag.globaltag = cms.string('GR_R_38X_V13::All')
+#process.GlobalTag.globaltag = cms.string('GR_R_38X_V13::All')
+process.GlobalTag.globaltag = cms.string('FT_R_38X_V14A::All')
+#-- Calibration tag -----------------------------------------------------------
+process.GlobalTag.toGet = cms.VPSet(
+    cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
+             tag = cms.string("TrackProbabilityCalibration_2D_Data14_offline"),
+             connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_BTAU")),
+    cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
+             tag = cms.string("TrackProbabilityCalibration_3D_Data14_offline"),
+             connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_BTAU"))
+    )
 
 #-------------------- TO RUN DATA -----------------
 
@@ -54,10 +50,10 @@ removeMCMatching(process,['All'])
 #process.allPatJets.addJetID = False
 #process.allPatJetsAK5.addJetID = False
 
-#------------------------ JEC -----------------------
-from PhysicsTools.PatAlgos.tools.jetTools import *
+##------------------------ JEC -----------------------
+#from PhysicsTools.PatAlgos.tools.jetTools import *
 ##switchJECSet( process, "Summer09_7TeV_ReReco332")
-switchJECSet( process, "Spring10")
+#switchJECSet( process, "Spring10")
 
 #----------- clean up jet filters in path -------------------------------------
 #need to check if we need this clean up jet filters in path
@@ -73,10 +69,44 @@ from RecoBTag.PerformanceMeasurements.PM_pat_Layer1_cfg import *
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
 
+process.HLTfilter = cms.EDFilter("HLTHighLevel",
+    TriggerResultsTag  = cms.InputTag("TriggerResults","","HLT"),
+    HLTPaths           = cms.vstring("HLT_BTagMu*"),
+#    HLTPaths           = cms.vstring("HLT_Jet*"),
+    eventSetupPathsKey = cms.string(''),
+    andOr              = cms.bool(True), #----- True = OR, False = AND between the HLTPaths
+    throw              = cms.bool(True)
+)
+
+process.countPatJetsAK5Calo = process.countPatJets.clone()
+process.countPatJetsAK5Calo.src = cms.InputTag("selectedPatJets")
+process.countPatJetsAK5Calo.minNumber = 2
+process.countPatJetsAK5Track = process.countPatJets.clone()
+process.countPatJetsAK5Track.src = cms.InputTag("selectedPatJetsAK5Track")
+process.countPatJetsAK5Track.minNumber = 2
+process.countPatJetsAK5PF = process.countPatJets.clone()
+process.countPatJetsAK5PF.src = cms.InputTag("selectedPatJetsAK5PF")
+process.countPatJetsAK5PF.minNumber = 2
+
 #-------------------- TO RUN ON DATA -----------------
-process.p = cms.Path(
+process.pCalo = cms.Path(
+    process.HLTfilter*
     process.getEventDATA*
-    process.PM_tuple)
+    process.btagging*
+    process.PM_tuple*
+    process.countPatJetsAK5Calo)
+process.pTrack = cms.Path(
+    process.HLTfilter*
+    process.getEventDATA*
+    process.btagging*
+    process.PM_tuple*
+    process.countPatJetsAK5Track)
+process.pPF = cms.Path(
+    process.HLTfilter*
+    process.getEventDATA*
+    process.btagging*
+    process.PM_tuple*
+    process.countPatJetsAK5PF)
 
 #-------- OUTPUT MODULE configuration -----------------------------------------------
 
@@ -89,13 +119,13 @@ process.out.dropMetaData = cms.untracked.string('DROPPED')   # Get rid of metada
 process.out.outputCommands = [ 'drop *' ]
 
 process.out.SelectEvents = cms.untracked.PSet(
-    SelectEvents = cms.vstring('p')
+    SelectEvents = cms.vstring('pCalo','pTrack','pPF')
 )
 
 # Explicit list of collections to keep (basis is default PAT event content)
 process.out.outputCommands.extend( [ # PAT Objects
                                      'keep *_selectedPatMuons*_*_*',
-                                     'keep *_selectedPatElectrons*_*_*',
+#                                     'keep *_selectedPatElectrons*_*_*',
                                      'keep *_selectedPatJets*_*_*',       # All Jets
                                      # Generator information
                                      'keep GenEventInfoProduct_generator_*_*',
@@ -124,3 +154,6 @@ process.out.outputCommands.extend( [ # PAT Objects
                                      ] )
 
 
+process.schedule = cms.Schedule(process.pCalo,process.pTrack,process.pPF
+                                ,process.outpath
+                                )
