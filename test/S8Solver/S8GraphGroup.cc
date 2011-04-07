@@ -524,7 +524,7 @@ void EffGraph::draw()
         _heaps.push(label);
         label->Draw();
 
-        canvas->SaveAs("eff.png");
+        canvas->SaveAs("eff.pdf");
     }
 
     canvas->cd(4)->SetGrid();
@@ -606,7 +606,7 @@ void EffGraph::draw()
         _heaps.push(label);
         label->Draw();
 
-        canvas->SaveAs("sf.png");
+        canvas->SaveAs("sf.pdf");
     }
 
     canvas->cd(4)->SetGrid();
@@ -806,7 +806,7 @@ void InputGraphGroup::draw()
     _heaps.push(label);
     label->Draw();
 
-    canvas->SaveAs("inputs.png");
+    canvas->SaveAs("inputs.pdf");
 }
 
 void InputGraphGroup::save(TDirectory *folder)
@@ -899,6 +899,24 @@ GraphGroup::GraphGroup(const BinnedNumericInputGroup &binnedInput,
     kappaCL->GetYaxis()->SetTitle("a.u.");
     setXtitle(_type, kappaCL.get());
 
+    kappaB123.reset(new TGraphErrors(binnedInput.size()));
+    kappaB123->SetMarkerStyle(20); 
+    kappaB123->SetMarkerColor(kGreen + 1); 
+    kappaB123->SetLineColor(kGreen + 1); 
+    kappaB123->SetMinimum(0.7);
+    kappaB123->SetMaximum(1.3);
+    kappaB123->GetYaxis()->SetTitle("a.u.");
+    setXtitle(_type, kappaB123.get());
+
+    kappaCL123.reset(new TGraphErrors(binnedInput.size()));
+    kappaCL123->SetMarkerStyle(21); 
+    kappaCL123->SetMarkerColor(kRed + 1); 
+    kappaCL123->SetLineColor(kRed + 1); 
+    kappaCL123->SetMinimum(0.7);
+    kappaCL123->SetMaximum(1.3);
+    kappaCL123->GetYaxis()->SetTitle("a.u.");
+    setXtitle(_type, kappaCL123.get());
+
     int point = 0;
     for(BinnedNumericInputGroup::const_iterator inputGroup =
             binnedInput.begin();
@@ -922,6 +940,12 @@ GraphGroup::GraphGroup(const BinnedNumericInputGroup &binnedInput,
 
         fill(kappaCL.get(), point,
              inputGroup->bin, inputGroup->coefficients.kappaCL);
+
+        fill(kappaB123.get(), point,
+             inputGroup->bin, inputGroup->coefficients.kappaB123);
+
+        fill(kappaCL123.get(), point,
+             inputGroup->bin, inputGroup->coefficients.kappaCL123);
     }
 }
 
@@ -955,6 +979,8 @@ void GraphGroup::save(TDirectory *folder)
     delta->Write("delta");
     kappaB->Write("kappaB");
     kappaCL->Write("kappaCL");
+    kappaB123->Write("kappaB123");
+    kappaCL123->Write("kappaCL123");
 
     folder->cd();
 
@@ -995,7 +1021,7 @@ void GraphGroup::draw()
     _heaps.push(label);
     label->Draw();
 
-    canvas->SaveAs("gamma_delta.png");
+    canvas->SaveAs("gamma_delta.pdf");
 
     // tag
     //
@@ -1028,7 +1054,7 @@ void GraphGroup::draw()
     _heaps.push(label);
     label->Draw();
 
-    canvas->SaveAs("alpha_beta.png");
+    canvas->SaveAs("alpha_beta.pdf");
 
     // muTag
     //
@@ -1064,6 +1090,42 @@ void GraphGroup::draw()
     efficiency.draw();
 
     input.draw();
+    canvas->SaveAs("kappa.pdf");
 
-    canvas->SaveAs("kappa.png");
+    // muTag Kappa123
+    //
+    canvas = new TCanvas();
+    _heaps.push(canvas);
+    canvas->SetTitle("Coefficients");
+
+    canvas->SetGrid();
+    graph = new TMultiGraph();
+    _heaps.push(graph);
+    graph->Add((TGraphErrors *) kappaCL123->Clone(), "p");
+    graph->Add((TGraphErrors *) kappaB123->Clone(), "p");
+    graphRange = range(graph);
+    cout << "  found range: " << graphRange.first << ".." << graphRange.second << endl;
+    graph->SetMinimum(graphRange.first);
+    graph->SetMaximum(graphRange.second);
+    graph->Draw("a");
+    graph->GetYaxis()->SetTitle("a.u.");
+    style(graph);
+    setXtitle(_type, graph);
+
+    legend = new TLegend(0.57,0.22,0.97,0.38);
+    _heaps.push(legend);
+    style(legend);
+    legend->AddEntry(kappaCL123.get(), "kappaCL123", "p");
+    legend->AddEntry(kappaB123.get(), "kappaB123", "p");
+    legend->Draw();
+
+    label = createLabel(31.6, true);
+    _heaps.push(label);
+    label->Draw();
+
+    efficiency.draw();
+
+    input.draw();
+
+    canvas->SaveAs("kappa123.pdf");
 }

@@ -119,6 +119,8 @@ struct GraphGroup
     std::auto_ptr<TGraphErrors> delta;
     std::auto_ptr<TGraphErrors> kappaB;
     std::auto_ptr<TGraphErrors> kappaCL;
+    std::auto_ptr<TGraphErrors> kappaB123;
+    std::auto_ptr<TGraphErrors> kappaCL123;
 
     EffGraph efficiency;
 

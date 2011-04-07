@@ -1,8 +1,10 @@
+#include <cmath>
 
 #include "S8Solver.h"
 #include "S8AnalyticSolver.h"
-#include "S8NumericSolver.h"
+#include "System8Solver.h"
 #include "S8FitSolver.h"
+#include "System8Solver.h"
 
 #include "TH1.h"
 #include "TF1.h"
@@ -753,15 +755,15 @@ void S8Solver::doAverageSolution()
     cout << "AVERAGE SOLUTION" << endl;
     cout << endl;
 
-    S8NumericSolver sol("sol");
+    System8Solver sol;
     sol.setInput(_totalInput);
 
-    sol.SetError(2);
-    sol.SetNbErrorIteration(1000);
+    sol.SetError(System8Solver::STAT, 1000);
     sol.SetInitialOrder(1, 1);
     
     // Force solution manually if requested
     //
+    /*
     for(std::map<int,int>::const_iterator ipick = fPickSolutionMap.begin();
         ipick!= fPickSolutionMap.end();
         ++ipick)
@@ -774,6 +776,7 @@ void S8Solver::doAverageSolution()
             break;
         }
     }
+    */
 
     sol.Solve();
 
@@ -822,14 +825,14 @@ void S8Solver::doBinnedSolution()
         cout << "BINED SOLUTION... BIN " << bin << endl;
         cout << endl;
 
-        S8NumericSolver solu("solu");
+        System8Solver solu;
         solu.setInput(*inputGroup);
 
-        solu.SetError(2);
-        solu.SetNbErrorIteration(1000);
+        solu.SetError(System8Solver::STAT, 1000);
         solu.SetInitialOrder(1, 1);
 
         // pick solution manually if requested
+        /*
         for(std::map<int, int>::const_iterator ipick = fPickSolutionMap.begin();
             ipick != fPickSolutionMap.end();
             ++ipick)
@@ -843,6 +846,7 @@ void S8Solver::doBinnedSolution()
                 break;
             }
         }
+        */
         
         if (!solu.Solve())
             continue;
@@ -1108,7 +1112,7 @@ void S8Solver::generateGraphs()
 // Helpers
 //
 void saveSolution(Solution &solution,
-                  S8NumericSolver &solver,
+                  System8Solver &solver,
                   const NumericInputGroup &inputGroup)
 {
     // Remove any previously saved solutions
@@ -1117,14 +1121,14 @@ void saveSolution(Solution &solution,
 
     // n_b
     //
-    const double n_b = solver.GetResultVec(0) * inputGroup.input.n.all.first;
+    const double n_b = solver.GetResult(0) * inputGroup.input.n.all.first;
     solution["n_b"] =
         make_pair(n_b,
                   pow(solver.getError(0) * inputGroup.input.n.all.first, 2));
 
     // n_cl
     //
-    const double n_cl = solver.GetResultVec(1) * inputGroup.input.n.all.first;
+    const double n_cl = solver.GetResult(1) * inputGroup.input.n.all.first;
     solution["n_cl"] = 
         make_pair(n_cl,
                   pow(solver.getError(1) * inputGroup.input.n.all.first, 2));
@@ -1132,37 +1136,37 @@ void saveSolution(Solution &solution,
     // Eff_mu_b
     //
     solution["eff_mu_b"] =
-        make_pair(solver.GetResultVec(2),
+        make_pair(solver.GetResult(2),
                   pow(solver.getError(2), 2));
 
     // Eff_mu_cl
     //
     solution["eff_mu_cl"] =
-        make_pair(solver.GetResultVec(3),
+        make_pair(solver.GetResult(3),
                   pow(solver.getError(3), 2));
 
     // Eff_tag_b
     //
     solution["eff_tag_b"] = 
-        make_pair(solver.GetResultVec(4),
+        make_pair(solver.GetResult(4),
                   pow(solver.getError(4), 2));
 
     // Eff_tag_cl
     //
     solution["eff_tag_cl"] =
-        make_pair(solver.GetResultVec(5),
+        make_pair(solver.GetResult(5),
                   pow(solver.getError(5), 2));
 
     // p_b
     //
     solution["p_b"] = 
-        make_pair(solver.GetResultVec(6) * n_b,
+        make_pair(solver.GetResult(6) * n_b,
                   pow(solver.getError(6) * n_b, 2));
 
     // p_cl
     //
     solution["p_cl"] = 
-        make_pair(solver.GetResultVec(7) * n_cl,
+        make_pair(solver.GetResult(7) * n_cl,
                   pow(solver.getError(7) * n_cl, 2));
 }
 
@@ -1301,6 +1305,9 @@ void inputGroup(NumericInputGroup &group,
 
     coef.kappaCL = n.muTag.cl % n.cl / eff.mu.cl / eff.tag.cl;
     coef.kappaB = n.muTag.b % n.b / eff.mu.b / eff.tag.b;
+
+    coef.kappaCL123 = p.muTag.cl % p.cl / eff.mu.cl / eff.tag.cl;
+    coef.kappaB123 = p.muTag.b % p.b / eff.mu.b / eff.tag.b;
 }
 
 void fill(NumericInput &numericInput, const SolverInput &input, const int &bin)

@@ -71,6 +71,8 @@ struct Coefficients
     Measurement delta;
     Measurement kappaCL;
     Measurement kappaB;
+    Measurement kappaCL123;
+    Measurement kappaB123;
 };
 
 struct NumericInputGroup

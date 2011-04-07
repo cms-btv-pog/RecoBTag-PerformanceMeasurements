@@ -157,6 +157,10 @@ std::ostream &operator<<(std::ostream &out, const Coefficients &coefficients)
         << coefficients.kappaCL << endl;
     out << " [+] " << setw(15) << left << "kappaB"
         << coefficients.kappaB << endl;
+    out << " [+] " << setw(15) << left << "kappaCL123"
+        << coefficients.kappaCL123 << endl;
+    out << " [+] " << setw(15) << left << "kappaB123"
+        << coefficients.kappaB123 << endl;
 
     return out;
 }

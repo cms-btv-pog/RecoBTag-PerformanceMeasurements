@@ -22,7 +22,7 @@
 #include "S8GraphGroup.h"
 #include "S8Solution.h"
 
-class S8NumericSolver;
+class System8Solver;
 
 class S8Solver
 {
@@ -224,7 +224,7 @@ class S8Solver
 };
 
 void saveSolution(Solution &,
-                  S8NumericSolver &,
+                  System8Solver &,
                   const NumericInputGroup &);
 
 std::ostream &operator <<(std::ostream &, const Solution &);
