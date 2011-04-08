@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sun Feb 27 18:38:57 2011 by ROOT version 5.20/00
+// Thu Apr  7 10:47:28 2011 by ROOT version 5.27/06b
 // from TTree ttree/ttree
 // found on file: JetTree.root
 //////////////////////////////////////////////////////////
@@ -27,11 +27,12 @@ public :
    Float_t         PVz;
    Float_t         pthat;
    Int_t           nPU;
-   Float_t         PU_z[20];   //[nPU]
-   Float_t         PU_sumpT_low[20];   //[nPU]
-   Float_t         PU_sumpT_high[20];   //[nPU]
-   Int_t           PU_ntrks_low[20];   //[nPU]
-   Int_t           PU_ntrks_high[20];   //[nPU]
+   Int_t           PU_bunch[50];   //[nPU]
+   Float_t         PU_z[50];   //[nPU]
+   Float_t         PU_sumpT_low[50];   //[nPU]
+   Float_t         PU_sumpT_high[50];   //[nPU]
+   Int_t           PU_ntrks_low[50];   //[nPU]
+   Int_t           PU_ntrks_high[50];   //[nPU]
    Float_t         Jet_pt[50];   //[nJet]
    Float_t         Jet_et[50];   //[nJet]
    Float_t         Jet_residual[50];   //[nJet]
@@ -86,6 +87,14 @@ public :
    Float_t         Muon_ptrel[10];   //[nMuon]
    Float_t         Muon_vz[10];   //[nMuon]
    Int_t           Muon_hist[10];   //[nMuon]
+   Int_t           nCFromGSplit;
+   Float_t         cFromGSplit_pT[40];   //[nCFromGSplit]
+   Float_t         cFromGSplit_eta[40];   //[nCFromGSplit]
+   Float_t         cFromGSplit_phi[40];   //[nCFromGSplit]
+   Int_t           nBFromGSplit;
+   Float_t         bFromGSplit_pT[40];   //[nBFromGSplit]
+   Float_t         bFromGSplit_eta[40];   //[nBFromGSplit]
+   Float_t         bFromGSplit_phi[40];   //[nBFromGSplit]
 
    // List of branches
    TBranch        *b_BitTrigger;   //!
@@ -97,6 +106,7 @@ public :
    TBranch        *b_PVz;   //!
    TBranch        *b_pthat;   //!
    TBranch        *b_nPU;   //!
+   TBranch        *b_PU_bunch;   //!
    TBranch        *b_PU_z;   //!
    TBranch        *b_PU_sumpT_low;   //!
    TBranch        *b_PU_sumpT_high;   //!
@@ -156,6 +166,14 @@ public :
    TBranch        *b_Muon_ptrel;   //!
    TBranch        *b_Muon_vz;   //!
    TBranch        *b_Muon_hist;   //!
+   TBranch        *b_nCFromGSplit;   //!
+   TBranch        *b_cFromGSplit_pT;   //!
+   TBranch        *b_cFromGSplit_eta;   //!
+   TBranch        *b_cFromGSplit_phi;   //!
+   TBranch        *b_nBFromGSplit;   //!
+   TBranch        *b_bFromGSplit_pT;   //!
+   TBranch        *b_bFromGSplit_eta;   //!
+   TBranch        *b_bFromGSplit_phi;   //!
 
    JetTree(TTree *tree=0);
    virtual ~JetTree();
@@ -250,6 +268,7 @@ void JetTree::Init(TTree *tree)
    fChain->SetBranchAddress("PVz", &PVz, &b_PVz);
    fChain->SetBranchAddress("pthat", &pthat, &b_pthat);
    fChain->SetBranchAddress("nPU", &nPU, &b_nPU);
+   fChain->SetBranchAddress("PU_bunch", PU_bunch, &b_PU_bunch);
    fChain->SetBranchAddress("PU_z", PU_z, &b_PU_z);
    fChain->SetBranchAddress("PU_sumpT_low", PU_sumpT_low, &b_PU_sumpT_low);
    fChain->SetBranchAddress("PU_sumpT_high", PU_sumpT_high, &b_PU_sumpT_high);
@@ -309,6 +328,14 @@ void JetTree::Init(TTree *tree)
    fChain->SetBranchAddress("Muon_ptrel", Muon_ptrel, &b_Muon_ptrel);
    fChain->SetBranchAddress("Muon_vz", Muon_vz, &b_Muon_vz);
    fChain->SetBranchAddress("Muon_hist", Muon_hist, &b_Muon_hist);
+   fChain->SetBranchAddress("nCFromGSplit", &nCFromGSplit, &b_nCFromGSplit);
+   fChain->SetBranchAddress("cFromGSplit_pT", cFromGSplit_pT, &b_cFromGSplit_pT);
+   fChain->SetBranchAddress("cFromGSplit_eta", cFromGSplit_eta, &b_cFromGSplit_eta);
+   fChain->SetBranchAddress("cFromGSplit_phi", cFromGSplit_phi, &b_cFromGSplit_phi);
+   fChain->SetBranchAddress("nBFromGSplit", &nBFromGSplit, &b_nBFromGSplit);
+   fChain->SetBranchAddress("bFromGSplit_pT", bFromGSplit_pT, &b_bFromGSplit_pT);
+   fChain->SetBranchAddress("bFromGSplit_eta", bFromGSplit_eta, &b_bFromGSplit_eta);
+   fChain->SetBranchAddress("bFromGSplit_phi", bFromGSplit_phi, &b_bFromGSplit_phi);
    Notify();
 }
 

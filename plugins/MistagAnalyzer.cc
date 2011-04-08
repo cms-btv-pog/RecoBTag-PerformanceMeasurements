@@ -136,14 +136,15 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("nPV",&nPV,"nPV/I");
   smalltree->Branch("PVz",&PVz,"PVz/F");
   smalltree->Branch("pthat",&pthat,"pthat/F");
-//$$  
+ 
   smalltree->Branch("nPU", &nPU, "nPU/I");
+  smalltree->Branch("PU_bunch",      PU_bunch,      "PU_bunch[nPU]/I");
   smalltree->Branch("PU_z",          PU_z,          "PU_z[nPU]/F");
   smalltree->Branch("PU_sumpT_low",  PU_sumpT_low , "PU_sumpT_low[nPU]/F");
   smalltree->Branch("PU_sumpT_high", PU_sumpT_high, "PU_sumpT_high[nPU]/F");
   smalltree->Branch("PU_ntrks_low",  PU_ntrks_low , "PU_ntrks_low[nPU]/I");
   smalltree->Branch("PU_ntrks_high", PU_ntrks_high, "PU_ntrks_high[nPU]/I");
-//$$    
+
     
   if ( produceJetProbaTree_ ) {
      
@@ -190,7 +191,6 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   //--------------------------------------
   // primary vertex information 
   //--------------------------------------
-//  smalltree->Branch("nPV"	   ,&nPV	 ,"nPV/I");
   smalltree->Branch("PV_x"	   ,PV_x	 ,"PV_x[nPV]/F");
   smalltree->Branch("PV_y"	   ,PV_y	 ,"PV_y[nPV]/F");
   smalltree->Branch("PV_z"	   ,PV_z	 ,"PV_z[nPV]/F");
@@ -280,7 +280,19 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("Muon_ptrel",    Muon_ptrel    ,"Muon_ptrel[nMuon]/F");
   smalltree->Branch("Muon_vz",       Muon_vz       ,"Muon_vz[nMuon]/F");
   smalltree->Branch("Muon_hist",     Muon_hist     ,"Muon_hist[nMuon]/I");
-    
+  
+  smalltree->Branch("nCFromGSplit",      &nCFromGSplit     ,"nCFromGSplit/I");
+  smalltree->Branch("cFromGSplit_pT",    cFromGSplit_pT    ,"cFromGSplit_pT[nCFromGSplit]/F");
+  smalltree->Branch("cFromGSplit_eta",   cFromGSplit_eta   ,"cFromGSplit_eta[nCFromGSplit]/F");
+  smalltree->Branch("cFromGSplit_phi",   cFromGSplit_phi   ,"cFromGSplit_phi[nCFromGSplit]/F");
+//   smalltree->Branch("cFromGSplit_pdgID", cFromGSplit_pdgID ,"cFromGSplit_pdgID[nCFromGSplit]/I");
+  
+  smalltree->Branch("nBFromGSplit",      &nBFromGSplit     ,"nBFromGSplit/I");
+  smalltree->Branch("bFromGSplit_pT",    bFromGSplit_pT    ,"bFromGSplit_pT[nBFromGSplit]/F");
+  smalltree->Branch("bFromGSplit_eta",   bFromGSplit_eta   ,"bFromGSplit_eta[nBFromGSplit]/F");
+  smalltree->Branch("bFromGSplit_phi",   bFromGSplit_phi   ,"bFromGSplit_phi[nBFromGSplit]/F");
+//   smalltree->Branch("bFromGSplit_pdgID", bFromGSplit_pdgID ,"bFromGSplit_pdgID[nBFromGSplit]/I");
+  
 //$$
 //   // prepare residual corrections
 //   string JEC_PATH("CondFormats/JetMETObjects/data/");
@@ -355,7 +367,11 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   //Handle<reco::CaloJetCollection> jetsColl;
   //iEvent.getByLabel(CaloJetCollectionTags_, jetsColl);
   //const reco::CaloJetCollection recoJets =   *(jetsColl.product());
-
+ 
+  
+  
+  
+  
   
   edm::Handle <edm::View <reco::Jet> > jetsCollHandle;
   iEvent.getByLabel (CaloJetCollectionTags_, jetsCollHandle);
@@ -364,39 +380,72 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   // initialize flavour identifiers
   edm::Handle<JetFlavourMatchingCollection> jetMC;
 
-  // pthat and pileup for MC
+  //------------------------------------------------------
+  // MC informations
+  //------------------------------------------------------
   pthat = -1.;
+  nPU = 0;
+  nCFromGSplit = 0;
+  nBFromGSplit = 0;
   if ( !isData_ ) {
+
+  // pthat
     edm::Handle<GenEventInfoProduct> geninfos;
     iEvent.getByLabel( "generator",geninfos ); 
-    
+     
     if (geninfos->binningValues().size()>0) pthat = geninfos->binningValues()[0];
 
-//$$
-//     edm::Handle<PileupSummaryInfo> PupInfo;
-//     iEvent.getByLabel("addPileupInfo", PupInfo);
-//     
-    nPU = 0;
-//     for (int i=0; i<PupInfo->getPU_NumInteractions(); i++) {
-//       PU_z[i]          = (PupInfo->getPU_zpositions())[i];      
-//       PU_sumpT_low[i]  = (PupInfo->getPU_sumpT_lowpT())[i];     
-//       PU_sumpT_high[i] = (PupInfo->getPU_sumpT_highpT())[i];    
-//       PU_ntrks_low[i]  = (PupInfo->getPU_ntrks_lowpT())[i];     
-//       PU_ntrks_high[i] = (PupInfo->getPU_ntrks_highpT())[i];
-//       nPU++;
-//     } 
-//$$
-  }
+  // pileup
+    edm::Handle<std::vector <PileupSummaryInfo> > PupInfo;
+    iEvent.getByLabel("addPileupInfo", PupInfo);
+    
+    std::vector<PileupSummaryInfo>::const_iterator ipu;
+    for (ipu = PupInfo->begin(); ipu != PupInfo->end(); ++ipu) {
+      for (int i=0; i<ipu->getPU_NumInteractions(); i++) {
+//         PU_bunch[nPU] = ipu->getBunchCrossing();
+        PU_z[nPU]  	   = (ipu->getPU_zpositions())[i];	   
+	PU_sumpT_low[nPU]  = (ipu->getPU_sumpT_lowpT())[i];     
+	PU_sumpT_high[nPU] = (ipu->getPU_sumpT_highpT())[i];    
+	PU_ntrks_low[nPU]  = (ipu->getPU_ntrks_lowpT())[i];     
+	PU_ntrks_high[nPU] = (ipu->getPU_ntrks_highpT())[i];
+	nPU++;
+      } 
+    }
+ 
+  // gluon spliting
+    edm:Handle<reco::GenParticleCollection> genParticles;
+    iEvent.getByLabel ("genParticles", genParticles);
+
+    for (size_t i = 0; i < genParticles->size (); ++i) {
+      const GenParticle & genIt = (*genParticles)[i];
+      if(abs(genIt.pdgId()) == 5 &&genIt.status() == 2 ) {
+        bFromGSplit_pT[nBFromGSplit]	= genIt.p4().pt();
+        bFromGSplit_eta[nBFromGSplit]	= genIt.p4().eta();
+        bFromGSplit_phi[nBFromGSplit]	= genIt.p4().phi();
+//         bFromGSplit_pdgID[nBFromGSplit] = genIt.pdgId();      
+        nBFromGSplit++;
+      } 
+      if(abs(genIt.pdgId ()) == 4 &&genIt.status() == 2 ) {
+        cFromGSplit_pT[nCFromGSplit]	= genIt.p4().pt();
+        cFromGSplit_eta[nCFromGSplit]	= genIt.p4().eta();
+        cFromGSplit_phi[nCFromGSplit]	= genIt.p4().phi();
+//         cFromGSplit_pdgID[nCFromGSplit] = genIt.pdgId();       
+        nCFromGSplit++;
+      } 
+    }
+
+  } // end MC info
  
   //------------------------------------------------------
-  //get muons
+  // Muons
   //------------------------------------------------------
    edm::Handle<edm::View<reco::Muon> >  muonsHandle; 
    iEvent.getByLabel(muonCollectionName_,muonsHandle);
    edm::View<reco::Muon> muons = *muonsHandle;
   
+
   //------------------------------------------------------
-  //TrackCounting taggers
+  // TrackCounting taggers
   //------------------------------------------------------
   Handle<std::vector<reco::TrackIPTagInfo> > tagInfo;
   iEvent.getByLabel("impactParameterTagInfos", tagInfo);
@@ -412,7 +461,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   iEvent.getByLabel(trackCNegHPModuleName_, jetTags_NegTCHighPur);
   
   //------------------------------------------------------
-  //Jet Probability tagger
+  // Jet Probability tagger
   //------------------------------------------------------
   edm::Handle<reco::JetTagCollection> jetTags_JP;
   iEvent.getByLabel(jetPModuleName_, jetTags_JP);
@@ -430,7 +479,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   iEvent.getByLabel(jetBNegModuleName_, jetTags_NegJB);
   
   //------------------------------------------------------
-  //Secondary vertex taggers
+  // Secondary vertex taggers
   //------------------------------------------------------
   Handle<std::vector<reco::SecondaryVertexTagInfo> > tagInfoSVx;
   iEvent.getByLabel("secondaryVertexTagInfos", tagInfoSVx);
@@ -454,7 +503,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   iEvent.getByLabel(combinedSvtxNegModuleName_, jetTags_negCombinedSvtx);
   
   //------------------------------------------------------
-  //Soft muon tagger
+  // Soft muon tagger
   //------------------------------------------------------
   
   edm::Handle<reco::JetTagCollection> jetTags_softMu;
@@ -467,7 +516,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   
 
   //------------------
-  //Primary vertex
+  // Primary vertex
   //------------------
   Handle<reco::VertexCollection> primaryVertex;
   iEvent.getByLabel(primaryVertexColl_,primaryVertex);
@@ -509,7 +558,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
 
   //------------------------------------------------------
-  //Trigger info
+  // Trigger info
   //------------------------------------------------------
   
   TriggerResults tr;
