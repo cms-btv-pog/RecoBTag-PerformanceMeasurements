@@ -160,6 +160,7 @@ process.mistag.triggerTable = 'TriggerResults::REDIGI311X' # MC
 # process.mistag.Jets = 'ak5CaloJets'
 # process.mistag.Jets = 'ak5PFJets'
 process.mistag.Jets = 'PFJetsFilter'
+process.AK5byRef.jets = 'PFJetsFilter'
 # process.mistag.jetCorrector = cms.string('ak5CaloL2L3')
 process.mistag.jetCorrector = cms.string('ak5PFL2L3')
 # process.ak5JetTracksAssociatorAtVertex.jets = "ak5CaloJets"
@@ -171,11 +172,11 @@ process.softMuonTagInfos.jets = "PFJetsFilter"
 
 
 process.p = cms.Path(
-        process.myPartons*process.AK5Flavour
+        process.PFJetsFilter
+        *process.myPartons*process.AK5Flavour
 #$$ usefull ?
         *process.ak5PFJetsL2L3
 #$$
-        *process.PFJetsFilter
         *process.noscraping
         *process.primaryVertexFilter
 	*process.ak5JetTracksAssociatorAtVertex

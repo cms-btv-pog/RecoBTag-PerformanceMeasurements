@@ -16,7 +16,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.20 2010/11/23 16:12:41 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.21 2011/03/31 08:07:21 jandrea Exp $
 //
 //
 
@@ -95,6 +95,8 @@ Implementation:
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
+#include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 
 struct ltstr
@@ -320,10 +322,8 @@ private:
 
     int nJet;
     float Jet_pt[10000];
-//$$
     float Jet_et[10000];
     float Jet_residual[10000];
-//$$
     float Jet_jes[10000];
     float Jet_eta[10000];
     float Jet_phi[10000];
@@ -344,9 +344,7 @@ private:
     int   Jet_SvxTracks[10000];
     float Jet_SvxNHP[10000];
     float Jet_SvxHP[10000];
-//$$
     float Jet_SvxMass[10000];
-//$$
     float Jet_CombSvxN[10000];
     float Jet_CombSvx[10000];
     float Jet_SoftMuN[10000];
@@ -404,11 +402,24 @@ private:
     float SV_flightErr[10000];
     
     int nPU;                    // the number of pileup interactions that have been added to the event
+    int   PU_bunch[10000];      // 0 if on time pileup, -1 or +1 if out-of-time
     float PU_z[10000];          // the true primary vertex position along the z axis for each added interaction
     float PU_sumpT_low[10000];  // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > low_cut
     float PU_sumpT_high[10000]; // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > high_cut
     int   PU_ntrks_low[10000];  // the number of tracks originating from each interaction, where track pT > low_cu
     int   PU_ntrks_high[10000]; // the number of tracks originating from each interaction, where track pT > high_cut 
+    
+    int nCFromGSplit;
+    float cFromGSplit_pT[10000];
+    float cFromGSplit_eta[10000];
+    float cFromGSplit_phi[10000];
+    int   cFromGSplit_pdgID[10000];
+    
+    int nBFromGSplit;
+    float bFromGSplit_pT[10000];
+    float bFromGSplit_eta[10000];
+    float bFromGSplit_phi[10000];
+    int   bFromGSplit_pdgID[10000];
     
     int BitTrigger;
     int Run;
