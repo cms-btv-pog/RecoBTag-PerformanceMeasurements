@@ -113,7 +113,7 @@ const s8::GenParticle *Jet::genParticle() const
 
 double Jet::btag(const BTag &tag) const
 {
-    if (TCHE > tag || SSVHP < tag)
+    if (TCHE > tag || BTAGS <= tag)
         throw out_of_range("BTag id is out of range");
 
     return *(_btag + tag);
@@ -136,7 +136,7 @@ void Jet::setTracks(const int &tracks)
 
 void Jet::setBTag(const BTag &tag, const double &value)
 {
-    if (TCHE > tag || SSVHP < tag)
+    if (TCHE > tag || BTAGS <= tag)
         throw out_of_range("BTag id is out of range");
 
     *(_btag + tag) = value;

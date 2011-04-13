@@ -21,7 +21,18 @@ namespace s8
             // Different BTaggers specification (to speed up search for
             // b-tagger). BTAGS are only for internal use.
             //
-            enum BTag { TCHE, TCHP, JP, SSV, SSVHE, SSVHP, BTAGS};
+            enum BTag { 
+                TCHE,
+                TCHP, 
+                JP,
+                SSV,
+                SSVHE,
+                SSVHP, 
+                JBP,        // Jet B Probability
+                CSV,        // Combined Secondary Vertex
+                CSV_MVA,    // Combined Secondary Vertex MVA
+                BTAGS
+            };
 
             Jet() throw();
             ~Jet() throw();
