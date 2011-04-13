@@ -21,6 +21,7 @@ namespace core
             virtual void optionDebugIsSet(const std::string &);
             virtual void optionOutputIsSet(const std::string &);
             virtual void optionEventsIsSet(const int &);
+            virtual void optionSkipEventsIsSet(const int &);
             virtual void optionInputIsSet(const std::string &);
     };
 }

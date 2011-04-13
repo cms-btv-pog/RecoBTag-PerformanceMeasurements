@@ -69,6 +69,11 @@ void GenericOptions::init()
                 boost::bind(&GenericOptions::optionEventsIsSet, this, _1)),
             "Maximum number of events to be processed: 0 - all")
 
+        ("skip-events,s",
+            po::value<int>()->default_value(0)->notifier(
+                boost::bind(&GenericOptions::optionSkipEventsIsSet, this, _1)),
+            "Skip events: 0 - none")
+
         ("input,i",
             po::value<vector<string> >()->notifier(
                 boost::bind(&GenericOptions::optionInputIsSet, this, _1)),
@@ -112,6 +117,13 @@ void GenericOptions::print(std::ostream &out) const
     out << setw(25) << left << " [+] Output" <<
         (_output.empty() ? "---" : _output) << endl;
 
+    out << setw(25) << left << " [+] Skip Events";
+    if (_skip_events)
+        out << _skip_events;
+    else
+        out << "---";
+    out << endl;
+
     out << setw(25) << left << " [+] Events";
     if (_events)
         out << _events;
@@ -119,8 +131,8 @@ void GenericOptions::print(std::ostream &out) const
         out << "all";
     out << endl;
 
-    out << setw(25) << left << " [+] Inputs (" << _inputs.size()
-        << "):" << endl;
+    out << setw(25) << left << " [+] Inputs" << "("
+        << _inputs.size() << "):" << endl;
     for(Files::const_iterator input = _inputs.begin();
         _inputs.end() != input;
         ++input)
@@ -161,6 +173,20 @@ void GenericOptions::optionEventsIsSet(const int &value)
 
     if (_delegate)
         _delegate->optionEventsIsSet(value);
+}
+
+void GenericOptions::optionSkipEventsIsSet(const int &value)
+{
+    if (0 > value)
+        throw runtime_error("Negative number of events to skip is specified");
+
+    if (!value)
+        return;
+
+    _skip_events = value;
+
+    if (_delegate)
+        _delegate->optionSkipEventsIsSet(value);
 }
 
 void GenericOptions::optionInputIsSet(const vector<string> &value)

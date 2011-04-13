@@ -48,6 +48,7 @@ namespace core
             void optionDebugIsSet(const std::string &);
             void optionOutputIsSet(const std::string &);
             void optionEventsIsSet(const int &);
+            void optionSkipEventsIsSet(const int &);
             void optionInputIsSet(const std::vector<std::string> &);
 
             void readInputFilesFromTXT(const std::string &);
@@ -59,6 +60,7 @@ namespace core
             std::string              _debug;
             std::string              _output;
             int                      _events;
+            int                      _skip_events;
 
             // pirs: (Filename,DoesFileExist)
             //

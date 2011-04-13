@@ -28,6 +28,10 @@ void GenericOptionsDelegate::optionEventsIsSet(const int &)
 {
 }
 
+void GenericOptionsDelegate::optionSkipEventsIsSet(const int &)
+{
+}
+
 void GenericOptionsDelegate::optionInputIsSet(const string &)
 {
 }
