@@ -46,3 +46,8 @@ core::Options *MonitorController::createOptions()
 {
     return _options.get();
 }
+
+bool MonitorController::inputFileShouldLoadTriggers()
+{
+    return true;
+}

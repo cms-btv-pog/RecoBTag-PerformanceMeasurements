@@ -28,6 +28,14 @@ void MuonInJetOptionsDelegate::optionAwayTagIsSet(const string &)
 {
 }
 
-void MuonInJetOptionsDelegate::optionMuonPtIsSet(const double &)
+void MuonInJetOptionsDelegate::optionMuonPtIsSet(const Range &)
+{
+}
+
+void MuonInJetOptionsDelegate::optionJetPtIsSet(const Range &)
+{
+}
+
+void MuonInJetOptionsDelegate::optionJetEtaIsSet(const Range &)
 {
 }

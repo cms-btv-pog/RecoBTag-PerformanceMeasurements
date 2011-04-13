@@ -42,7 +42,8 @@ namespace s8
 
                 // Group is responsible for filling plots
                 //
-                virtual void fill(const Lepton *, const Jet *) = 0;
+                virtual void fill(const Lepton *, const Jet *,
+                                  const double &weight = 1) = 0;
 
                 // Each group knows how to save itself
                 //
@@ -88,7 +89,8 @@ namespace s8
 
                 virtual void setDiscriminator(LeptonInJetDiscriminator *);
 
-                virtual void fill(const Lepton *, const Jet *);
+                virtual void fill(const Lepton *, const Jet *,
+                                  const double &weight = 1);
                 virtual void save(TDirectory *) const;
 
             private:
@@ -118,7 +120,8 @@ namespace s8
                 virtual void setDiscriminator(LeptonInJetDiscriminator *);
 
                 virtual void setTaggerOperatingPoint(const TaggerOperatingPoint *);
-                virtual void fill(const Lepton *, const Jet *);
+                virtual void fill(const Lepton *, const Jet *,
+                                  const double &weight = 1);
                 virtual void save(TDirectory *) const;
 
             private:
@@ -142,7 +145,8 @@ namespace s8
                 virtual void setDiscriminator(LeptonInJetDiscriminator *);
 
                 virtual void setTaggerOperatingPoint(const TaggerOperatingPoint *);
-                virtual void fill(const Lepton *, const Jet *);
+                virtual void fill(const Lepton *, const Jet *,
+                                  const double &weight = 1);
                 virtual void save(TDirectory *) const;
 
             private:
@@ -162,7 +166,8 @@ namespace s8
                 virtual void setDiscriminator(LeptonInJetDiscriminator *);
 
                 virtual void setTaggerOperatingPoint(const TaggerOperatingPoint *);
-                virtual void fill(const Lepton *, const Jet *);
+                virtual void fill(const Lepton *, const Jet *,
+                                  const double &weight = 1);
                 virtual void save(TDirectory *) const;
 
             private:
@@ -188,7 +193,8 @@ namespace s8
             virtual void setDiscriminator(LeptonInJetDiscriminator *);
 
             virtual void setTaggerOperatingPoint(const TaggerOperatingPoint *);
-            virtual void fill(const Lepton *, const Jet *);
+            virtual void fill(const Lepton *, const Jet *,
+                              const double &weight = 1);
             virtual void save(TDirectory *) const;
 
         private:

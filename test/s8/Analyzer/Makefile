@@ -1,6 +1,6 @@
 CCC      = g++
 
-SUBSYS   = S8Tree IO Utility Option
+SUBSYS   = S8Tree IO Utility Option Selector
 
 LIB		 = libAnalyzer.so
 

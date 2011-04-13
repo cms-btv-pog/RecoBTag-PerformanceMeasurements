@@ -38,6 +38,10 @@ namespace s8
             //
             virtual core::Options *createOptions();
 
+            // InputFileDelegate interface
+            //
+            virtual bool inputFileShouldLoadTriggers();
+
             std::auto_ptr<SolverInputAnalyzer> _analyzer;
             std::auto_ptr<SolverInputOptions>  _options;
     };

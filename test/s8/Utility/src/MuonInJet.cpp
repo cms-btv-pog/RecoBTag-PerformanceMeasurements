@@ -32,8 +32,6 @@ MuonInJet::MuonInJet() throw()
 
     _awayJetTaggerOperatingPoint = 0;
 
-    _muonMinimumPtCut = 0;
-
     _lepton = 0;
     _jet = 0;
 }
@@ -55,16 +53,6 @@ void MuonInJet::setDelegate(MuonInJetDelegate *delegate)
 void MuonInJet::setAwayJetTaggerOperatingPoint(const TaggerOperatingPoint *tag)
 {
     _awayJetTaggerOperatingPoint = tag;
-}
-
-void MuonInJet::setMuonMinimumPtCut(const double &pt)
-{
-    using std::runtime_error;
-
-    if (0 > pt)
-        throw runtime_error("Negative pT supplied");
-
-    _muonMinimumPtCut = pt;
 }
 
 void MuonInJet::operator()(const Event *event)
@@ -107,6 +95,9 @@ void MuonInJet::operator()(const Event *event)
         if (!_lepton)
             continue;
 
+        if (_delegate->shouldSkipMuonInJetPlusAwayJet(_lepton, _jet))
+            continue;
+
         _delegate->muonIsInJetPlusAwayJet(_lepton, _jet);
 
         // check if there is tagged away jet
@@ -143,11 +134,6 @@ void MuonInJet::operator()(const Event *event)
 
 void MuonInJet::leptonIsInJet(const Lepton *lepton, const Jet *jet)
 {
-    if (_muonMinimumPtCut &&
-        lepton->p4()->Pt() < _muonMinimumPtCut)
-
-        return;
-
     if (_lepton &&
         _lepton->p4()->Pt() >= lepton->p4()->Pt())
 

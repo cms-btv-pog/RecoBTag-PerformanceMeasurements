@@ -46,3 +46,8 @@ core::Options *SolverInputController::createOptions()
 {
     return _options.get();
 }
+
+bool SolverInputController::inputFileShouldLoadTriggers()
+{
+    return true;
+}

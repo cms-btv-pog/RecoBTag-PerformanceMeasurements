@@ -37,7 +37,7 @@ namespace s8
             virtual void init();
 
             virtual void eventDidLoad(const Event *);
-
+            virtual void print(std::ostream &) const;
             virtual void save(TDirectory *) const;
 
             // SolverInputOptionsDelegate interface

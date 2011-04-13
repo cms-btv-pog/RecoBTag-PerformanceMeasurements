@@ -14,6 +14,7 @@
 
 class TDirectory;
 class TH1;
+class TH3;
 class TLorentzVector;
 
 namespace s8
@@ -43,7 +44,7 @@ namespace s8
             TH1 *plot(const Plot &);
 
         protected:
-            void fill(const Plot &, const double &);
+            void fill(const double &weight, const Plot &, const double &);
 
         private:
             std::auto_ptr<TH1> _pt;
@@ -61,7 +62,7 @@ namespace s8
 
             virtual void save(TDirectory *);
 
-            void fill(const TLorentzVector *, const TLorentzVector *);
+            void fill(const double &weight, const TLorentzVector *, const TLorentzVector *);
 
             TH1 *plot(const Plot &);
 
@@ -77,31 +78,47 @@ namespace s8
         public:
             MonitorLepton(const std::string &prefix);
 
-            void fill(const Lepton *);
+            void fill(const double &weight, const Lepton *);
     };
 
     class MonitorJet: public MonitorBase
     {
         public:
             MonitorJet(const std::string &prefix);
+            virtual ~MonitorJet() throw();
 
-            void fill(const Jet *);
+            void fill(const double &weight, const Jet *);
+            void fillDiscriminator(const double &weight, const double &value);
+
+            virtual void save(TDirectory *);
+
+        private:
+            std::auto_ptr<TH1> _discriminator;
     };
 
     class MonitorMuonInJet: public Monitor
     {
         public:
+            enum Plot { MUON, JET, DELTA };
+
             // Use: 'n' or 'p' as prefix
             //
             MonitorMuonInJet(const std::string &prefix);
+            virtual ~MonitorMuonInJet() throw();
 
-            void fill(const Lepton *, const Jet *);
+            MonitorJet *jet();
+            MonitorDelta *delta();
+
+            void fill(const double &weight, const Lepton *, const Jet *,
+                    const int &npv = 0);
+
             virtual void save(TDirectory *);
 
         private:
             MonitorLepton _muon;
             MonitorJet    _jet;
             MonitorDelta  _delta;
+            std::auto_ptr<TH3> _pt_eta_pv;
     };
 }
 

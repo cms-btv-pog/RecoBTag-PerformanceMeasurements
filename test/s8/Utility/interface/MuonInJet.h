@@ -32,7 +32,6 @@ namespace s8
             void setDelegate(MuonInJetDelegate *);
 
             void setAwayJetTaggerOperatingPoint(const TaggerOperatingPoint *);
-            void setMuonMinimumPtCut(const double &);
 
             virtual void operator()(const Event *);
 
@@ -48,8 +47,6 @@ namespace s8
 
             std::auto_ptr<LeptonInJet>  _leptonInJet;
             const TaggerOperatingPoint *_awayJetTaggerOperatingPoint;
-
-            double _muonMinimumPtCut;
 
             const Lepton *_lepton;
             const Jet    *_jet;

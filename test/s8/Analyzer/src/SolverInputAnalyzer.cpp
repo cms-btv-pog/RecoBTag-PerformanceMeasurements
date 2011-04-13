@@ -6,21 +6,24 @@
  * Copyright 2010, All rights reserved
  */
 
+#include <cmath>
+
 #include <iostream>
 #include <stdexcept>
 
 #include <TDirectory.h>
+#include <TFile.h>
 #include <TH1F.h>
+#include <TH3F.h>
 #include <TLorentzVector.h>
 
 #include "IO/interface/Event.h"
 #include "S8Tree/interface/S8Fwd.h"
-#include "S8Tree/interface/S8GenEvent.h"
 #include "S8Tree/interface/S8Jet.h"
-#include "S8Tree/interface/S8TreeInfo.h"
-#include "S8Tree/interface/S8TriggerCenter.h"
+#include "S8Tree/interface/S8Lepton.h"
 #include "Utility/interface/LeptonInJetDiscriminator.h"
 #include "Utility/interface/MuonInJet.h"
+#include "Selector/interface/S8Selector.h"
 #include "Utility/interface/SolverLeptonInJetPlots.h"
 #include "Utility/interface/TaggerOperatingPoint.h"
 
@@ -30,19 +33,20 @@ using std::cerr;
 using std::clog;
 using std::cout;
 using std::endl;
+using std::runtime_error;
 
 using s8::SolverInputAnalyzer;
 
-SolverInputAnalyzer::SolverInputAnalyzer() throw():
-    _gluonSplitting(KEEP),
-    _minPtHat(0),
-    _maxPtHat(0),
-    _otherEvent(false)
+SolverInputAnalyzer::SolverInputAnalyzer() throw()
 {
+    _s8_selector = 0;
+    _reweights = 0;
 }
 
 SolverInputAnalyzer::~SolverInputAnalyzer() throw()
 {
+    if (_s8_selector)
+        delete _s8_selector;
 }
 
 
@@ -51,11 +55,6 @@ SolverInputAnalyzer::~SolverInputAnalyzer() throw()
 //
 void SolverInputAnalyzer::init()
 {
-    _gluonSplitting = KEEP;
-    _minPtHat = 0;
-    _maxPtHat = 0;
-    _otherEvent = false;
-
     _muonInJetTagger.reset(new TaggerOperatingPoint());
     _awayJetTagger.reset(new TaggerOperatingPoint());
 
@@ -76,84 +75,35 @@ void SolverInputAnalyzer::init()
 
     _solverNPlots->init();
     _solverPPlots->init();
+
+    _s8_selector = new S8Selector();
+    _n_primary_vertices = 0;
 }
+
+void SolverInputAnalyzer::treeDidLoad(const TreeInfo *,
+                                      const TriggerCenter *trigger_center)
+{
+    _s8_selector->treeDidLoad(trigger_center);
+}
+
 
 void SolverInputAnalyzer::eventDidLoad(const Event *event)
 {
-    using s8::Jets;
-
-    // PtHat cut
-    //
-    if (_minPtHat &&
-        event->gen()->ptHat() < _minPtHat ||
-        
-        _maxPtHat &&
-        event->gen()->ptHat() > _maxPtHat)
-
+    const Event *modified_event = (*_s8_selector)(event);
+    if (!modified_event)
         return;
 
-    // Gluon Splitting
-    //
-    switch(_gluonSplitting)
-    {
-        case KEEP: break;
-
-        case REMOVE:
-            {
-                if (event->gen()->isGluonSplitting(s8::GenEvent::BB))
-                    return;
-
-                break;
-            }
-
-        case ONLY:
-            {
-                if (!event->gen()->isGluonSplitting(s8::GenEvent::BB))
-                    return;
-
-                break;
-            }
-
-        case ENHANCE:
-            {
-                if (!event->gen()->isGluonSplitting(s8::GenEvent::BB))
-                {
-                    _otherEvent = !_otherEvent;
-
-                    if (_otherEvent)
-                        return;
-                }
-
-                break;
-            }
-
-        case SIMULATE:
-            {
-                const Jets *jets = event->jets();
-
-                if (2 != jets->size())
-                    return;
-
-                for(Jets::const_iterator jet = jets->begin();
-                    jets->end() != jet;
-                    ++jet)
-                {
-                    if (30 >= (*jet)->p4()->Pt())
-                        return;
-                }
-
-                const Jet *jet1 = (*jets)[0];
-                const Jet *jet2 = (*jets)[1];
-
-                if (1.5 <= jet1->p4()->DeltaR(*(jet2->p4())))
-                    return;
-            }
-    }
-
+    event = modified_event;
+    _n_primary_vertices = event->primaryVertices()->size();
 
     // call muon in jet
     //
     (*_muonInJet)(event);
+}
+
+void SolverInputAnalyzer::print(std::ostream &out) const
+{
+    _s8_selector->print(out);
 }
 
 void SolverInputAnalyzer::save(TDirectory *directory) const
@@ -177,22 +127,6 @@ void SolverInputAnalyzer::optionDataIsSet(const bool &value)
     }
 }
 
-void SolverInputAnalyzer::optionGluonSplittingIsSet(const GluonSplitting &value)
-{
-    _gluonSplitting = value;
-}
-
-void SolverInputAnalyzer::optionPtHatIsSet(const int &min, const int &max)
-{
-    using std::runtime_error;
-
-    if (0 > min || 0 > max)
-        throw runtime_error("Negative value of the pThat cut range is supplied");
-
-    _minPtHat = min;
-    _maxPtHat = max;
-}
-
 // MuonInJetOptionsDelegate interface
 //
 void SolverInputAnalyzer::optionTagIsSet(const std::string &tag)
@@ -205,21 +139,101 @@ void SolverInputAnalyzer::optionAwayTagIsSet(const std::string &tag)
     *_awayJetTagger << tag;
 }
 
-void SolverInputAnalyzer::optionMuonPtIsSet(const double &pt)
+void SolverInputAnalyzer::optionMuonPtIsSet(const Range &value)
 {
-    _muonInJet->setMuonMinimumPtCut(pt);
+    _n_muon_pt = value;
+}
+
+void SolverInputAnalyzer::optionJetPtIsSet(const Range &value)
+{
+    _n_jet_pt = value;
+}
+
+void SolverInputAnalyzer::optionJetEtaIsSet(const Range &value)
+{
+    _n_jet_eta = value;
+}
+
+// PythiaOptionsDelegate interface
+//
+void SolverInputAnalyzer::optionGluonSplittingIsSet(const GluonSplitting &value)
+{
+    _s8_selector->optionGluonSplittingIsSet(value);
+}
+
+void SolverInputAnalyzer::optionPtHatIsSet(const Range &value)
+{
+    _s8_selector->optionPtHatIsSet(value);
+}
+
+// Trigger options
+//
+void SolverInputAnalyzer::optionTriggerIsSet(const Trigger &trigger)
+{
+    _s8_selector->optionTriggerIsSet(trigger);
+}
+
+void SolverInputAnalyzer::optionSimulateTriggerIsSet(const bool &value)
+{
+    _s8_selector->optionSimulateTriggerIsSet(value);
+}
+
+void SolverInputAnalyzer::optionReweightTriggerIsSet(const std::string &filename)
+{
+    _reweight_file.reset(new TFile(filename.c_str(), "read"));
+    if (!_reweight_file->IsOpen())
+        throw runtime_error("Failed to open reweights file: " + filename);
+
+    _reweights = dynamic_cast<TH3 *>(_reweight_file->Get("n_pt_eta_pv"));
+    if (!_reweights)
+        throw runtime_error("Failed to extract reweights from: " + filename);
+}
+
+// Misc Options
+//
+void SolverInputAnalyzer::optionPrimaryVerticesIsSet(const Range &primary_vertices)
+{
+    _s8_selector->optionPrimaryVerticesIsSet(primary_vertices);
 }
 
 // MuonInJetDelegate interface
 //
+bool SolverInputAnalyzer::shouldSkipMuonInJetPlusAwayJet(const Lepton *muon,
+                                                         const Jet *jet)
+{
+    return !isValueInRange(muon->p4()->Pt(), _n_muon_pt) ||
+           !isValueInRange(jet->p4()->Pt(), _n_jet_pt) ||
+           !isValueInRange(fabs(jet->p4()->Eta()), _n_jet_eta);
+}
+
 void SolverInputAnalyzer::muonIsInJetPlusAwayJet(const Lepton *lepton,
                                                  const Jet *jet)
 {
-    _solverNPlots->fill(lepton, jet);
+    double weight = 1;
+    const double jet_pt = jet->p4()->Pt();
+
+    if (_reweights &&
+        isValueInRange(jet_pt, _n_jet_pt))
+
+        weight = _reweights->GetBinContent(_reweights->FindBin(jet->p4()->Pt(),
+                                                               jet->p4()->Eta(),
+                                                               _n_primary_vertices));
+
+    _solverNPlots->fill(lepton, jet, weight);
 }
 
 void SolverInputAnalyzer::muonIsInJetPlusTaggedAwayJet(const Lepton *lepton,
                                                        const Jet *jet)
 {
-    _solverPPlots->fill(lepton, jet);
+    double weight = 1;
+    const double jet_pt = jet->p4()->Pt();
+
+    if (_reweights &&
+        isValueInRange(jet_pt, _n_jet_pt))
+
+        weight = _reweights->GetBinContent(_reweights->FindBin(jet->p4()->Pt(),
+                                                               jet->p4()->Eta(),
+                                                               _n_primary_vertices));
+
+    _solverPPlots->fill(lepton, jet, weight);
 }

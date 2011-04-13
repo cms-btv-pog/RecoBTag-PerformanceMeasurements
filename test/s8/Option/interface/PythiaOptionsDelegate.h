@@ -11,30 +11,35 @@
 
 namespace s8
 {
+    class Range;
+
     class PythiaOptionsDelegate
     {
         public:
-            enum GluonSplitting { KEEP,     // keep all events including the
-                                            // Gluon Splitting
+            enum GluonSplitting { 
+                // Do nothing
+                //
+                KEEP,
 
-                                  REMOVE,   // remove events with gluon splitting
+                // keep only specific gluon splitting events (KEEP = BB + CC)
+                //
+                BB, CC, ONLY,
 
-                                  ONLY,     // keep only events with the
-                                            // Gluon Splitting
+                // remove specific gluon splitting events (REMOVE = BB + CC)
+                //
+                NO_BB, NO_CC, REMOVE,
 
-                                  ENHANCE,  // Enhanse sample with Gluon
-                                            // Splitting: count the non-gluon
-                                            // splitting event events every Nth
-
-                                  SIMULATE  // Simulate Gluon splitting: 2 jets
-                                            // with high pt and deltaR
+                // enhance specifig gluon splitting events (ENHANCE = BB + CC)
+                // [count every Nth event without gluon splitting]
+                //
+                ADD_BB, ADD_CC, ENHANCE
             };
 
             PythiaOptionsDelegate() throw();
             virtual ~PythiaOptionsDelegate() throw();
 
             virtual void optionGluonSplittingIsSet(const GluonSplitting &);
-            virtual void optionPtHatIsSet(const int &min, const int &max);
+            virtual void optionPtHatIsSet(const Range &);
     };
 }
 

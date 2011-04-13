@@ -1,6 +1,6 @@
 # Subsystems
 #
-SUBSYS = Stat IO Utility Option Analyzer Controller Application ROOT
+SUBSYS = Stat IO Utility Option Selector Analyzer Controller Application ROOT
 SUBMOD = S8Tree Redirector FWCore
 
 # Special rules to clean each subsystem

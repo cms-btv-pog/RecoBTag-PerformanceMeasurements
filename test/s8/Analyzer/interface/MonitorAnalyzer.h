@@ -11,24 +11,31 @@
 
 #include <memory>
 
+#include <boost/shared_ptr.hpp>
+
 #include "Analyzer/interface/Analyzer.h"
 #include "Option/interface/MonitorOptionsDelegate.h"
 #include "Option/interface/PythiaOptionsDelegate.h"
+#include "Utility/interface/Range.h"
 #include "Utility/interface/MuonInJetDelegate.h"
 
+class TFile;
 class TH1;
+class TH3;
 
 namespace s8
 {
     class MonitorDelta;
     class MonitorJet;
     class MonitorLepton;
+    class MonitorMuonInJet;
     class MuonInJet;
+    class S8Selector;
     class TaggerOperatingPoint;
 
-    class MonitorAnalyzer: public Analyzer,
-                           public MonitorOptionsDelegate,
-                           public MuonInJetDelegate
+    class MonitorAnalyzer: virtual public Analyzer,
+                           virtual public MonitorOptionsDelegate,
+                           virtual public MuonInJetDelegate
     {
         public:
             MonitorAnalyzer() throw();
@@ -38,17 +45,24 @@ namespace s8
             //
             virtual void init();
 
+            virtual void treeDidLoad(const TreeInfo *, const TriggerCenter *);
             virtual void eventDidLoad(const Event *);
-
+            virtual void print(std::ostream &) const;
             virtual void save(TDirectory *) const;
 
-            // MuonInJetOptionsDelegate interface
+            // MuonInJet options
             //
             virtual void optionTagIsSet(const std::string &);
             virtual void optionAwayTagIsSet(const std::string &);
+            virtual void optionMuonPtIsSet(const Range &);
+            virtual void optionJetPtIsSet(const Range &);
+            virtual void optionJetEtaIsSet(const Range &);
 
             // MuonInJetDelegate interface
             //
+            virtual bool shouldSkipMuonInJetPlusAwayJet(const Lepton *,
+                                                        const Jet *);
+
             virtual void muonIsInJetPlusAwayJet(const Lepton *,
                                                 const Jet *);
 
@@ -58,7 +72,17 @@ namespace s8
             // PythiaOptionsDelegate interface
             //
             virtual void optionGluonSplittingIsSet(const GluonSplitting &);
-            virtual void optionPtHatIsSet(const int &min, const int &max);
+            virtual void optionPtHatIsSet(const Range &);
+
+            // Trigger options
+            //
+            virtual void optionTriggerIsSet(const Trigger &);
+            virtual void optionSimulateTriggerIsSet(const bool &);
+            virtual void optionReweightTriggerIsSet(const std::string &);
+
+            // Misc options
+            //
+            virtual void optionPrimaryVerticesIsSet(const Range &);
 
         private:
             void saveGenericPlots(TDirectory *) const;
@@ -75,6 +99,7 @@ namespace s8
             std::auto_ptr<TH1> _muons;
             std::auto_ptr<TH1> _jets;
             std::auto_ptr<TH1> _pthat;
+            std::auto_ptr<TH1> _primary_vertices;
 
             std::auto_ptr<MonitorLepton> _monitorMuons;
             std::auto_ptr<MonitorJet> _monitorJets;
@@ -82,18 +107,25 @@ namespace s8
 
             // (n) plots
             //
-            std::auto_ptr<MonitorLepton> _monitorNMuons;
-            std::auto_ptr<MonitorJet>    _monitorNJets;
-            std::auto_ptr<MonitorDelta>  _monitorNDelta;
+            std::auto_ptr<MonitorMuonInJet> _monitorNMuonInJet;
+            std::auto_ptr<TH1> _n_primary_vertices;
+            std::auto_ptr<TH1> _n_primary_vertices_z;
+            bool _are_n_plots_filled;
 
             // (p) plots
             //
-            std::auto_ptr<MonitorLepton> _monitorPMuons;
-            std::auto_ptr<MonitorJet>    _monitorPJets;
-            std::auto_ptr<MonitorDelta>  _monitorPDelta;
+            std::auto_ptr<MonitorMuonInJet> _monitorPMuonInJet;
 
-            int _minPtHat;
-            int _maxPtHat;
+            Range _n_muon_pt;
+            Range _n_jet_pt;
+            Range _n_jet_eta;
+
+            S8Selector    *_s8_selector;
+
+            boost::shared_ptr<TFile> _reweight_file;
+            TH3 *_reweights;
+
+            const Event *_event;
     };
 }
 

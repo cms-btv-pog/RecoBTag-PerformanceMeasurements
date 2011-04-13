@@ -9,6 +9,8 @@
 #ifndef S8_TRIGGER_OPTIONS
 #define S8_TRIGGER_OPTIONS
 
+#include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -36,14 +38,22 @@ namespace s8
             virtual void print(std::ostream &out) const;
 
         private:
-            typedef std::vector<std::string> Triggers;
+            typedef unsigned int                Hash;
+            typedef std::vector<std::string>    Triggers;
+            typedef std::map<Hash, std::string> TriggerMap;
 
             void optionTriggerIsSet(const Triggers &);
+            void optionUseTriggerPrescaleIsSet(const bool &);
+            void optionSimulateTriggerIsSet(const bool &);
+            void optionReweightTriggerIsSet(const std::string &);
 
             TriggerOptionsDelegate                 *_delegate;
             std::auto_ptr<po::options_description>  _description;
 
-            Triggers _triggers;
+            TriggerMap _trigger_map;
+            bool _use_trigger_prescale;
+            bool _simulate_trigger;
+            std::string _reweight_trigger;
     };
 }
 

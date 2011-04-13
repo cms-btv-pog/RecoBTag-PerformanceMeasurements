@@ -16,8 +16,10 @@
 namespace s8
 {
     class MuonInJetOptions;
+    class MiscOptions;
     class PythiaOptions;
     class SolverInputOptionsDelegate;
+    class TriggerOptions;
 
     class SolverInputOptions: public core::Options
     {
@@ -44,8 +46,10 @@ namespace s8
             std::auto_ptr<po::options_description>  _description;
             std::auto_ptr<po::options_description>  _hiddenDescription;
 
+            std::auto_ptr<MiscOptions> _misc_options;
             std::auto_ptr<MuonInJetOptions> _muonInJetOptions;
             std::auto_ptr<PythiaOptions>    _pythiaOptions;
+            std::auto_ptr<TriggerOptions>   _triggerOptions;
 
             bool        _isData;
     };

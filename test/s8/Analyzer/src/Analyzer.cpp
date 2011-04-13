@@ -21,3 +21,14 @@ Analyzer::~Analyzer() throw()
 void Analyzer::treeDidLoad(const TreeInfo *, const TriggerCenter *)
 {
 }
+
+
+
+// Helpers
+//
+std::ostream &s8::operator<<(std::ostream &out, const Analyzer &analyzer)
+{
+    analyzer.print(out);
+
+    return out;
+}

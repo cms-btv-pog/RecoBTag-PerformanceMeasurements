@@ -101,6 +101,10 @@ void PtRelAnalyzer::eventDidLoad(const Event *event)
     (*_muonInJet)(event);
 }
 
+void PtRelAnalyzer::print(std::ostream &) const
+{
+}
+
 void PtRelAnalyzer::save(TDirectory *directory) const
 {
     TDirectory *output = directory->mkdir("PtRelAnalyzer");

@@ -38,6 +38,10 @@ namespace s8
             //
             virtual core::Options *createOptions();
 
+            // InputFileDelegate interface
+            //
+            virtual bool inputFileShouldLoadTriggers();
+
             std::auto_ptr<MonitorAnalyzer> _analyzer;
             std::auto_ptr<MonitorOptions>  _options;
     };

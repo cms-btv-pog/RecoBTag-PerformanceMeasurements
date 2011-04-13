@@ -11,7 +11,6 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/regex.hpp>
 
@@ -22,7 +21,6 @@
 using std::runtime_error;
 using std::string;
 
-using boost::lexical_cast;
 using boost::regex;
 using boost::smatch;
 
@@ -30,8 +28,7 @@ using s8::PythiaOptions;
 using s8::PythiaOptionsDelegate;
 
 PythiaOptions::PythiaOptions() throw():
-    _minPtHat(0),
-    _maxPtHat(0)
+    _gluon_splitting("---")
 {
     _delegate = 0;
 }
@@ -54,17 +51,17 @@ void PythiaOptions::init()
 {
     _description.reset(new po::options_description("Pythia Options"));
     _description->add_options()
-        ("gluon-splitting",
-            po::value<string>()->default_value("keep")->notifier(
+        ("g-split",
+            po::value<string>()->notifier(
                 boost::bind(&PythiaOptions::optionGluonSplittingIsSet,
                             this, _1)),
-            "Use gluon Splitting (bbbar only): keep, remove, only, enhance, simulate (2 jets events with delta R and pT cut)")
+            "Use gluon splitting. Values:\nBB, CC, ONLY (BB or CC)\nNO_BB, NO_CC, REMOVE (BB and CC)\nADD_BB, ADD_CC, ENHANCE (BB and CC)")
 
         ("pthat",
-            po::value<string>()->default_value("")->notifier(
+            po::value<string>()->notifier(
                 boost::bind(&PythiaOptions::optionPtHatIsSet,
                             this, _1)),
-            "Cut Pt Hat. Only integers are supported. Format: --pthat=MIN..MAX")
+            "Cut Pt Hat. Format: --pthat=MIN..MAX")
     ;
 }
 
@@ -81,23 +78,8 @@ void PythiaOptions::print(std::ostream &out) const
 
     out << "Pythia Options" << endl;
     out << setw(25) << left << " [+] Gluon Splitting"
-        << _gluonSplitting << endl;
-
-    out << setw(25) << left << " [+] Pt Hat Cut";
-    if (_minPtHat || _maxPtHat)
-    {
-        if (_minPtHat)
-            out << _minPtHat;
-
-        out << "..";
-
-        if (_maxPtHat)
-            out << _maxPtHat;
-
-        out << endl;
-    }
-    else
-        out << "undefined" << endl;
+        << _gluon_splitting << endl;
+    out << setw(25) << left << " [+] Pt Hat Cut" << _pt_hat << endl;
 }
 
 
@@ -107,25 +89,49 @@ void PythiaOptions::optionGluonSplittingIsSet(const string &value)
     string option = value;
     boost::to_lower(option);
 
-    if ("keep" == option)
+    // [see PythiaOptionsDelegate for description]
+    //
+    if ("bb" == option)
+    {
+        if (_delegate)
+            _delegate->optionGluonSplittingIsSet(PythiaOptionsDelegate::BB);
+    }
+    else if ("cc" == option)
+    {
+        if (_delegate)
+            _delegate->optionGluonSplittingIsSet(PythiaOptionsDelegate::CC);
+    }
+    else if ("keep" == option)
     {
         if (_delegate)
             _delegate->optionGluonSplittingIsSet(PythiaOptionsDelegate::KEEP);
+    }
+
+    else if ("no_bb" == option)
+    {
+        if (_delegate)
+            _delegate->optionGluonSplittingIsSet(PythiaOptionsDelegate::NO_BB);
+    }
+    else if ("no_cc" == option)
+    {
+        if (_delegate)
+            _delegate->optionGluonSplittingIsSet(PythiaOptionsDelegate::NO_CC);
     }
     else if ("remove" == option)
     {
         if (_delegate)
             _delegate->optionGluonSplittingIsSet(PythiaOptionsDelegate::REMOVE);
     }
-    else if ("only" == option)
+
+    else if ("add_bb" == option)
     {
         if (_delegate)
-            _delegate->optionGluonSplittingIsSet(PythiaOptionsDelegate::ONLY);
+            _delegate->optionGluonSplittingIsSet(PythiaOptionsDelegate::ADD_BB);
     }
-    else if ("simulate" == option)
+    else if ("add_cc" == option)
     {
         if (_delegate)
-            _delegate->optionGluonSplittingIsSet(PythiaOptionsDelegate::SIMULATE);
+            _delegate->optionGluonSplittingIsSet(PythiaOptionsDelegate::ADD_CC);
     }
     else if ("enhance" == option)
     {
@@ -135,7 +141,7 @@ void PythiaOptions::optionGluonSplittingIsSet(const string &value)
     else
         throw runtime_error("Unsupported Gluon Splitting option used: " + value);
 
-    _gluonSplitting = value;
+    _gluon_splitting = value;
 }
 
 void PythiaOptions::optionPtHatIsSet(const string &value)
@@ -143,25 +149,8 @@ void PythiaOptions::optionPtHatIsSet(const string &value)
     if (value.empty())
         return;
 
-    smatch matches;
-    regex pattern("^(?:(\\d+)..(\\d+)|(\\d+)..|..(\\d+))$");
-    if (!regex_match(value, matches, pattern))
-        throw runtime_error("Unsuppored pthat format. Use: min..max");
-
-    if (matches[4].matched)
-    {
-        _maxPtHat = lexical_cast<int>(matches[4]);
-    }
-    else if(matches[3].matched)
-    {
-        _minPtHat = lexical_cast<int>(matches[3]);
-    }
-    else
-    {
-        _minPtHat = lexical_cast<int>(matches[1]);
-        _maxPtHat = lexical_cast<int>(matches[2]);
-    }
+    parse(_pt_hat, value);
 
     if (_delegate)
-        _delegate->optionPtHatIsSet(_minPtHat, _maxPtHat);
+        _delegate->optionPtHatIsSet(_pt_hat);
 }

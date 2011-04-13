@@ -17,7 +17,9 @@
 #include <boost/regex.hpp>
 
 #include "Option/interface/MuonInJetOptions.h"
+#include "Option/interface/MiscOptions.h"
 #include "Option/interface/PythiaOptions.h"
+#include "Option/interface/TriggerOptions.h"
 #include "Option/interface/SolverInputOptionsDelegate.h"
 
 #include "Option/interface/SolverInputOptions.h"
@@ -51,8 +53,10 @@ void SolverInputOptions::setDelegate(SolverInputOptionsDelegate *delegate)
 {
     _delegate = delegate;
 
+    _misc_options->setDelegate(delegate);
     _muonInJetOptions->setDelegate(delegate);
     _pythiaOptions->setDelegate(delegate);
+    _triggerOptions->setDelegate(delegate);
 }
 
 void SolverInputOptions::init()
@@ -60,11 +64,14 @@ void SolverInputOptions::init()
     _hiddenDescription.reset(new po::options_description("Solver Input Options"));
     _hiddenDescription->add_options()
         ("data",
-            po::value<bool>()->default_value(false)->notifier(
+            po::value<bool>()->implicit_value(true)->notifier(
                 boost::bind(&SolverInputOptions::optionDataIsSet,
                             this, _1)),
             "Input is Data if set (no flavour splitting)")
     ;
+
+    _misc_options.reset(new MiscOptions());
+    _misc_options->init();
 
     _muonInJetOptions.reset(new MuonInJetOptions());
     _muonInJetOptions->init();
@@ -72,10 +79,15 @@ void SolverInputOptions::init()
     _pythiaOptions.reset(new PythiaOptions());
     _pythiaOptions->init();
 
+    _triggerOptions.reset(new TriggerOptions());
+    _triggerOptions->init();
+
     _description.reset(new po::options_description());
     _description->add(*_hiddenDescription)
+        .add(*_misc_options->description())
         .add(*_muonInJetOptions->description())
-        .add(*_pythiaOptions->description());
+        .add(*_pythiaOptions->description())
+        .add(*_triggerOptions->description());
 }
 
 po::options_description *SolverInputOptions::description() const
@@ -89,10 +101,16 @@ void SolverInputOptions::print(std::ostream &out) const
     using std::left;
     using std::setw;
 
+    _misc_options->print(out);
+    out << endl;
+
     _muonInJetOptions->print(out);
     out << endl;
 
     _pythiaOptions->print(out);
+    out << endl;
+
+    _triggerOptions->print(out);
     out << endl;
 
     out << "Solver Input Options" << endl;

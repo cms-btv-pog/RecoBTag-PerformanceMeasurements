@@ -12,6 +12,7 @@
 #include <string>
 
 #include "FWCore/interface/Options.h"
+#include "Utility/interface/Range.h"
 
 namespace s8
 {
@@ -41,9 +42,8 @@ namespace s8
             PythiaOptionsDelegate             *_delegate;
             std::auto_ptr<po::options_description>  _description;
 
-            std::string _gluonSplitting;
-            int         _minPtHat;
-            int         _maxPtHat;
+            std::string _gluon_splitting;
+            Range       _pt_hat;
     };
 }
 

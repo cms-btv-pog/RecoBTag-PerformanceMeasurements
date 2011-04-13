@@ -9,13 +9,17 @@
 #ifndef S8_SOLVER_INPUT_OPTIONS_DELEGATE
 #define S8_SOLVER_INPUT_OPTIONS_DELEGATE
 
+#include "Option/interface/MiscOptionsDelegate.h"
 #include "Option/interface/MuonInJetOptionsDelegate.h"
 #include "Option/interface/PythiaOptionsDelegate.h"
+#include "Option/interface/TriggerOptionsDelegate.h"
 
 namespace s8
 {
-    class SolverInputOptionsDelegate: public MuonInJetOptionsDelegate,
-                                      public PythiaOptionsDelegate
+    class SolverInputOptionsDelegate: public MiscOptionsDelegate,
+                                      public MuonInJetOptionsDelegate,
+                                      public PythiaOptionsDelegate,
+                                      public TriggerOptionsDelegate
     {
         public:
             SolverInputOptionsDelegate() throw();

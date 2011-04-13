@@ -16,7 +16,7 @@
 namespace s8
 {
     class TriggerAnalyzer;
-    class MuonInJetOptions;
+    class TriggerOptions;
 
     class TriggerController: public AppController
     {
@@ -34,11 +34,16 @@ namespace s8
             //
             virtual Analyzer *createAnalyzer();
 
+            // core::AppController interface
+            //
+            virtual core::Options *createOptions();
+
             // InputFileDelegate interface
             //
-            virtual bool inputFileShouldContinue();
+            virtual bool inputFileShouldLoadTriggers();
 
-            std::auto_ptr<TriggerAnalyzer>    _analyzer;
+            std::auto_ptr<TriggerAnalyzer> _analyzer;
+            std::auto_ptr<TriggerOptions>  _options;
     };
 }
 

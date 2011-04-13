@@ -139,7 +139,8 @@ void LeptonInJetPlotCategory::setDiscriminator(LeptonInJetDiscriminator *discrim
     _discriminator = discriminator;
 }
 
-void LeptonInJetPlotCategory::fill(const Lepton *lepton, const Jet *jet)
+void LeptonInJetPlotCategory::fill(const Lepton *lepton, const Jet *jet,
+                                   const double &weight)
 {
     if (_didNotInitialize)
         throw runtime_error("LeptonInJetPlotCategory did not initialize");
@@ -149,9 +150,9 @@ void LeptonInJetPlotCategory::fill(const Lepton *lepton, const Jet *jet)
 
     const double discriminant = _discriminator->operator()(lepton, jet);
 
-    _pt->Fill(jet->p4()->Pt(), discriminant);
-    _eta->Fill(fabs(jet->p4()->Eta()), discriminant);
-    _phi->Fill(fabs(jet->p4()->Phi()), discriminant);
+    _pt->Fill(jet->p4()->Pt(), discriminant, weight);
+    _eta->Fill(fabs(jet->p4()->Eta()), discriminant, weight);
+    _phi->Fill(fabs(jet->p4()->Phi()), discriminant, weight);
 }
 
 void LeptonInJetPlotCategory::save(TDirectory *) const
@@ -201,15 +202,16 @@ void LeptonInJetPlotGroup::setTaggerOperatingPoint(const TaggerOperatingPoint
     _operatingPoint = operatingPoint;
 }
 
-void LeptonInJetPlotGroup::fill(const Lepton *lepton, const Jet *jet)
+void LeptonInJetPlotGroup::fill(const Lepton *lepton, const Jet *jet,
+                                const double &weight)
 {
     if (!_operatingPoint)
         throw runtime_error("LeptonInJetPlotGroup: tagger operating point is not set");
 
-    _all->fill(lepton, jet);
+    _all->fill(lepton, jet, weight);
 
     if (*_operatingPoint < jet->btag(_operatingPoint->btag()))
-        _tag->fill(lepton, jet);
+        _tag->fill(lepton, jet, weight);
 }
 
 void LeptonInJetPlotGroup::save(TDirectory *dir) const
@@ -243,9 +245,10 @@ void NonFlavouredLeptonInJetPlotGroup::setTaggerOperatingPoint(const TaggerOpera
 }
 
 void NonFlavouredLeptonInJetPlotGroup::fill(const Lepton *lepton,
-                                            const Jet *jet)
+                                            const Jet *jet,
+                                            const double &weight)
 {
-    _plots->fill(lepton, jet);
+    _plots->fill(lepton, jet, weight);
 }
 
 void NonFlavouredLeptonInJetPlotGroup::save(TDirectory *directory) const
@@ -308,7 +311,8 @@ void FlavouredLeptonInJetPlotGroup::setTaggerOperatingPoint(const TaggerOperatin
     _cl->setTaggerOperatingPoint(operatingPoint);
 }
 
-void FlavouredLeptonInJetPlotGroup::fill(const Lepton *lepton, const Jet *jet)
+void FlavouredLeptonInJetPlotGroup::fill(const Lepton *lepton, const Jet *jet,
+                                         const double &weight)
 {
     // PDG IDs: http://pdg.lbl.gov/mc_particle_id_contents.html
     //
@@ -327,14 +331,14 @@ void FlavouredLeptonInJetPlotGroup::fill(const Lepton *lepton, const Jet *jet)
     //
     switch(abs(jet->flavour()))
     {
-        case 5:  _b->fill(lepton, jet);
+        case 5:  _b->fill(lepton, jet, weight);
                  break;
 
         case 4: // Fall through
         case 3: // Fall through
         case 2: // Fall through
         case 1: // Fall through
-        case 21: _cl->fill(lepton, jet);
+        case 21: _cl->fill(lepton, jet, weight);
                  break;
     }
 }
@@ -411,12 +415,13 @@ void SolverLeptonInJetPlots::setTaggerOperatingPoint(const TaggerOperatingPoint 
     _nonFlavoured->setTaggerOperatingPoint(operatingPoint);
 }
 
-void SolverLeptonInJetPlots::fill(const Lepton *lepton, const Jet *jet)
+void SolverLeptonInJetPlots::fill(const Lepton *lepton, const Jet *jet,
+                                  const double &weight)
 {
     if (_isFlavoured)
-        _flavoured->fill(lepton, jet);
+        _flavoured->fill(lepton, jet, weight);
 
-    _nonFlavoured->fill(lepton, jet);
+    _nonFlavoured->fill(lepton, jet, weight);
 }
 
 void SolverLeptonInJetPlots::save(TDirectory *dir) const

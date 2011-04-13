@@ -9,6 +9,8 @@
 #ifndef S8_ANALYZER
 #define S8_ANALYZER
 
+#include <iosfwd>
+
 class TDirectory;
 
 namespace s8
@@ -29,8 +31,16 @@ namespace s8
 
             virtual void eventDidLoad(const Event *) = 0;
 
+            // Print summary
+            //
+            virtual void print(std::ostream &) const = 0;
+
+            // Save results
+            //
             virtual void save(TDirectory *) const = 0;
     };
+
+    std::ostream &operator<<(std::ostream &, const Analyzer &);
 }
 
 #endif

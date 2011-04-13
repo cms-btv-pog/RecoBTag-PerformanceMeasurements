@@ -49,6 +49,7 @@ namespace s8
             // Generic Options Delegate interface
             //
             virtual void optionDebugIsSet(const std::string &);
+            virtual void optionSkipEventsIsSet(const int &);
             virtual void optionEventsIsSet(const int &);
 
         protected:
@@ -81,6 +82,7 @@ namespace s8
 
             std::auto_ptr<core::Debug> _debug;
 
+            int _skip_events;
             int _maxEvents;
             int _processedEvents;
 

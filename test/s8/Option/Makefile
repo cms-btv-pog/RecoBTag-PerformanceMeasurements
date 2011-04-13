@@ -1,6 +1,6 @@
 CCC      = g++
 
-SUBSYS   = FWCore Utility
+SUBSYS   = FWCore Utility S8Tree
 
 LIB		 = libOption.so
 
@@ -12,7 +12,7 @@ else
 endif
 
 CXXFLAGS = ${DEBUG} -pipe -Wall -fPIC -I../ -I${ROOTSYS}/include -I${BOOST_ROOT}/include
-LDFLAGS  = -shared -W1 `root-config --libs` -L${BOOST_ROOT}/lib -lboost_program_options -lboost_regex -L../lib $(foreach subsys,$(SUBSYS),$(addprefix -l,$(subsys)))
+LDFLAGS  = -shared -W1 `root-config --libs` -L${BOOST_ROOT}/lib -lboost_program_options -lboost_regex -lboost_system -lboost_filesystem -L../lib $(foreach subsys,$(SUBSYS),$(addprefix -l,$(subsys)))
 
 # Get list of all heads, sources and objects. Each source (%.cpp) whould have
 # an object file
@@ -20,7 +20,7 @@ HEADS    = $(wildcard ./interface/*.h)
 SRCS     = $(wildcard ./src/*.cpp)
 
 OBJS     = $(foreach obj,$(addprefix ./obj/,$(patsubst %.cpp,%.o,$(notdir $(SRCS)))),$(obj))
-LIBS     = -L${BOOST_ROOT}/lib -lboost_program_options -lboost_regex
+LIBS     = -L${BOOST_ROOT}/lib -lboost_program_options -lboost_regex -lboost_system -lboost_filesystem
 
 # Rules to be always executed: empty ones
 .PHONY: all

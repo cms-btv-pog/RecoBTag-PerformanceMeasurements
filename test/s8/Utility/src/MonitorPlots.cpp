@@ -10,6 +10,7 @@
 
 #include <TDirectory.h>
 #include <TH1F.h>
+#include <TH3F.h>
 #include <TLorentzVector.h>
 
 #include "S8Tree/interface/S8Jet.h"
@@ -38,7 +39,7 @@ Monitor::~Monitor() throw()
 
 MonitorBase::MonitorBase(const std::string &prefix)
 {
-    _pt.reset(new TH1F((prefix + "_pt").c_str(), "Pt", 75, 0, 150));
+    _pt.reset(new TH1F((prefix + "_pt").c_str(), "Pt", 230, 0, 230));
     _pt->GetXaxis()->SetTitle("p_{T} [GeV/c]");
     _pt->Sumw2();
 
@@ -55,7 +56,7 @@ MonitorBase::~MonitorBase() throw()
 {
 }
 
-void MonitorBase::fill(const Plot &plot, const double &value)
+void MonitorBase::fill(const double &weight, const Plot &plot, const double &value)
 {
     TH1 *histogram = 0;
 
@@ -73,7 +74,7 @@ void MonitorBase::fill(const Plot &plot, const double &value)
         default: throw runtime_error("Unsuppored Plot: " + plot);
     }
 
-    histogram->Fill(value);
+    histogram->Fill(value, weight);
 }
 
 void MonitorBase::save(TDirectory *)
@@ -129,12 +130,22 @@ MonitorDelta::~MonitorDelta() throw()
 {
 }
 
-void MonitorDelta::fill(const TLorentzVector *p4_1, const TLorentzVector *p4_2)
+MonitorJet *MonitorMuonInJet::jet()
 {
-    _ptrel->Fill(p4_1->Vect().Perp(p4_2->Vect()));
-    _deltaR->Fill(p4_1->DeltaR(*p4_2));
-    _deltaPhi->Fill(p4_1->DeltaPhi(*p4_2));
-    _deltaEta->Fill(p4_1->Eta() - p4_2->Eta());
+    return &_jet;
+}
+
+MonitorDelta *MonitorMuonInJet::delta()
+{
+    return &_delta;
+}
+
+void MonitorDelta::fill(const double &weight, const TLorentzVector *p4_1, const TLorentzVector *p4_2)
+{
+    _ptrel->Fill(p4_1->Vect().Perp(p4_2->Vect()), weight);
+    _deltaR->Fill(p4_1->DeltaR(*p4_2), weight);
+    _deltaPhi->Fill(p4_1->DeltaPhi(*p4_2), weight);
+    _deltaEta->Fill(p4_1->Eta() - p4_2->Eta(), weight);
 }
 
 void MonitorDelta::save(TDirectory *)
@@ -176,11 +187,11 @@ MonitorLepton::MonitorLepton(const std::string &prefix):
 {
 }
 
-void MonitorLepton::fill(const Lepton *lepton)
+void MonitorLepton::fill(const double &weight, const Lepton *lepton)
 {
-    MonitorBase::fill(PT,  lepton->p4()->Pt());
-    MonitorBase::fill(ETA, lepton->p4()->Eta());
-    MonitorBase::fill(PHI, lepton->p4()->Phi());
+    MonitorBase::fill(weight, PT,  lepton->p4()->Pt());
+    MonitorBase::fill(weight, ETA, lepton->p4()->Eta());
+    MonitorBase::fill(weight, PHI, lepton->p4()->Phi());
 }
 
 
@@ -188,13 +199,32 @@ void MonitorLepton::fill(const Lepton *lepton)
 MonitorJet::MonitorJet(const std::string &prefix):
     MonitorBase(prefix)
 {
+    _discriminator.reset(new TH1F((prefix + "_disc").c_str(), "Discriminator", 100, 0, 10));
+    _discriminator->GetXaxis()->SetTitle("b-Tag discriminator");
+    _discriminator->Sumw2();
 }
 
-void MonitorJet::fill(const Jet *jet)
+MonitorJet::~MonitorJet() throw()
 {
-    MonitorBase::fill(PT,  jet->p4()->Pt());
-    MonitorBase::fill(ETA, jet->p4()->Eta());
-    MonitorBase::fill(PHI, jet->p4()->Phi());
+}
+
+void MonitorJet::fill(const double &weight, const Jet *jet)
+{
+    MonitorBase::fill(weight, PT,  jet->p4()->Pt());
+    MonitorBase::fill(weight, ETA, jet->p4()->Eta());
+    MonitorBase::fill(weight, PHI, jet->p4()->Phi());
+}
+
+void MonitorJet::fillDiscriminator(const double &weight, const double &value)
+{
+    _discriminator->Fill(value, weight);
+}
+
+void MonitorJet::save(TDirectory *dir)
+{
+    MonitorBase::save(dir);
+
+    _discriminator->Write();
 }
 
 
@@ -202,15 +232,34 @@ void MonitorJet::fill(const Jet *jet)
 MonitorMuonInJet::MonitorMuonInJet(const std::string &prefix):
     _muon(prefix + "mu"),
     _jet(prefix + "jet"),
-    _delta(prefix)
+    _delta(prefix + "mujet")
+{
+    TAxis *pt_axis = _jet.plot(MonitorBase::PT)->GetXaxis();
+    TAxis *eta_axis = _jet.plot(MonitorBase::ETA)->GetXaxis();
+
+    _pt_eta_pv.reset(new TH3F((prefix + "_pt_eta_pv").c_str(), "Pt Eta Npv",
+                    pt_axis->GetNbins(), pt_axis->GetXmin(), pt_axis->GetXmax(),
+                    eta_axis->GetNbins(), eta_axis->GetXmin(), eta_axis->GetXmax(),
+                    10, 0, 10));
+    _pt_eta_pv->GetXaxis()->SetTitle("p_{T} [GeV/c]");
+    _pt_eta_pv->GetYaxis()->SetTitle("#eta");
+    _pt_eta_pv->GetZaxis()->SetTitle("N_{PV}");
+    _pt_eta_pv->Sumw2();
+}
+
+MonitorMuonInJet::~MonitorMuonInJet() throw()
 {
 }
 
-void MonitorMuonInJet::fill(const Lepton *muon, const Jet *jet)
+void MonitorMuonInJet::fill(const double &weight,
+                            const Lepton *muon,
+                            const Jet *jet,
+                            const int &npv)
 {
-    _muon.fill(muon);
-    _jet.fill(jet);
-    _delta.fill(muon->p4(), jet->p4());
+    _muon.fill(weight, muon);
+    _jet.fill(weight, jet);
+    _delta.fill(weight, muon->p4(), jet->p4());
+    _pt_eta_pv->Fill(jet->p4()->Pt(), jet->p4()->Eta(), npv, weight);
 }
 
 void MonitorMuonInJet::save(TDirectory *dir)
@@ -218,4 +267,5 @@ void MonitorMuonInJet::save(TDirectory *dir)
     _muon.save(dir);
     _jet.save(dir);
     _delta.save(dir);
+    _pt_eta_pv->Write();
 }

@@ -19,6 +19,12 @@ bool MuonInJetDelegate::muonInJetShouldProcessJet(const Jet *)
     return true;
 }
 
+bool MuonInJetDelegate::shouldSkipMuonInJetPlusAwayJet(const Lepton *,
+                                                       const Jet *)
+{
+    return false;
+}
+
 void MuonInJetDelegate::muonIsInJetPlusAwayJet(const Lepton *, const Jet *)
 {
 }

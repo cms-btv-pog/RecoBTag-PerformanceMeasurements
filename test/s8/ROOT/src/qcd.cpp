@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 
+#include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
+
 #include <TCanvas.h>
 #include <TClass.h>
 #include <TFile.h>
@@ -18,7 +21,9 @@ using std::cout;
 using std::endl;
 using std::string;
 
-double luminosity = 33.3;
+using boost::lexical_cast;
+
+double luminosity = 0;
 
 void MergeRootfile(TDirectory *target, TList *sourcelist );
 void scale(TFile *file, TH1 *);
@@ -27,8 +32,8 @@ int main(int argc, char *argv[])
 try
 {
     // Test if sufficient number of arguments is specified.
-    if (4 > argc)
-        throw std::invalid_argument("usage: merge out.root in.root [more_in.root]");
+    if (5 > argc)
+        throw std::invalid_argument("usage: merge luminosity out.root in.root [more_in.root]");
 
     std::auto_ptr<TRint> application(new TRint("histInMemory", 0, 0));
 
@@ -36,8 +41,12 @@ try
     TList *inputs = 0;
     try
     {
+        ::luminosity = lexical_cast<double>(argv[1]);
+        if (0 >= ::luminosity)
+            throw std::runtime_error("Non-positive luminosity is specified");
+
         // Create output file
-        output = new TFile(argv[1], "RECREATE");
+        output = new TFile(argv[2], "RECREATE");
         if (!output->IsOpen())
             throw std::runtime_error("Failed to open output file");
 
@@ -45,7 +54,7 @@ try
         //
         inputs = new TList();
         cout << "Inputs" << endl;
-        for( int i = 2; argc > i; ++i)
+        for( int i = 3; argc > i; ++i)
         {
             cout << " [+] " << argv[i] << endl;
             inputs->Add(TFile::Open(argv[i]));
@@ -182,35 +191,36 @@ void MergeRootfile(TDirectory *target, TList *sourcelist )
 
 void scale(TFile *file, TH1 *hist)
 {
-    std::string filename = file->GetName();
+    boost::filesystem::path path(file->GetName());
+    std::string filename = boost::filesystem::basename(path);
 
-    if ("pt15to20.root" == filename)
+    if ("pt15to20" == filename)
     {
-        hist->Scale(579200000 * 0.00254 / 2438213 * luminosity);
+        hist->Scale(579200000 * 0.00254 / 2884915 * luminosity);
     }
-    else if ("pt20to30.root" == filename)
+    else if ("pt20to30" == filename)
     {
-        hist->Scale(236300000 * 0.00518 / 9680563 * luminosity);
+        hist->Scale(236300000 * 0.00518 / 11461085 * luminosity);
     }
-    else if ("pt30to50.root" == filename)
+    else if ("pt30to50" == filename)
     {
-        hist->Scale(53070000 * 0.01090 / 9604454 * luminosity);
+        hist->Scale(53070000 * 0.01090 / 11431864 * luminosity);
     }
-    else if ("pt50to80.root" == filename)
+    else if ("pt50to80" == filename)
     {
-        hist->Scale(6351000 * 0.02274 / 8979776 * luminosity);
+        hist->Scale(6351000 * 0.02274 / 10748755 * luminosity);
     }
-    else if ("pt80to120.root" == filename)
+    else if ("pt80to120" == filename)
     {
-        hist->Scale(785100 * 0.037 / 2661423 * luminosity);
+        hist->Scale(785100 * 0.037 / 3191979 * luminosity);
     }
-    else if ("pt120to150.root" == filename)
+    else if ("pt120to150" == filename)
     {
-        hist->Scale(92950 * 0.04777 / 833464 * luminosity);
+        hist->Scale(92950 * 0.04777 / 998503 * luminosity);
     }
-    else if ("pt150.root" == filename)
+    else if ("pt150" == filename)
     {
-        hist->Scale(47580 * 0.048 / 860174 * luminosity);
+        hist->Scale(47580 * 0.05964 / 1022541 * luminosity);
     }
     
     else

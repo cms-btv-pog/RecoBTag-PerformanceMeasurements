@@ -13,6 +13,8 @@
 
 namespace s8
 {
+    class Range;
+
     class MuonInJetOptionsDelegate
     {
         public:
@@ -21,7 +23,9 @@ namespace s8
 
             virtual void optionTagIsSet(const std::string &);
             virtual void optionAwayTagIsSet(const std::string &);
-            virtual void optionMuonPtIsSet(const double &);
+            virtual void optionMuonPtIsSet(const Range &);
+            virtual void optionJetPtIsSet(const Range &);
+            virtual void optionJetEtaIsSet(const Range &);
     };
 }
 

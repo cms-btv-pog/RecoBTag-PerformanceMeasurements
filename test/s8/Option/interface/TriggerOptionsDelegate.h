@@ -13,13 +13,18 @@
 
 namespace s8
 {
+    class Trigger;
+
     class TriggerOptionsDelegate
     {
         public:
             TriggerOptionsDelegate() throw();
             virtual ~TriggerOptionsDelegate() throw();
 
-            virtual void optionTriggerIsSet(const std::string &);
+            virtual void optionTriggerIsSet(const Trigger &);
+            virtual void optionUseTriggerPrescaleIsSet(const bool &);
+            virtual void optionSimulateTriggerIsSet(const bool &);
+            virtual void optionReweightTriggerIsSet(const std::string &);
     };
 }
 

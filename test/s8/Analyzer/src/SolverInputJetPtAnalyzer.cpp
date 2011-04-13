@@ -71,6 +71,10 @@ void SolverInputJetPtAnalyzer::eventDidLoad(const Event *event)
     (*_muonInJet)(event);
 }
 
+void SolverInputJetPtAnalyzer::print(std::ostream &) const
+{
+}
+
 void SolverInputJetPtAnalyzer::save(TDirectory *directory) const
 {
     // Save (n) and (p) plots

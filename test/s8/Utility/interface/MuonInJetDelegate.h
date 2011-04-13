@@ -21,6 +21,9 @@ namespace s8
 
             virtual bool muonInJetShouldProcessJet(const Jet *);
 
+            virtual bool shouldSkipMuonInJetPlusAwayJet(const Lepton *,
+                                                        const Jet *);
+
             virtual void muonIsInJetPlusAwayJet(const Lepton *,
                                                 const Jet *);
 

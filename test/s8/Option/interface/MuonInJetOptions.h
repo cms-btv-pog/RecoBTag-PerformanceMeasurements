@@ -12,6 +12,7 @@
 #include <string>
 
 #include "FWCore/interface/Options.h"
+#include "Utility/interface/Range.h"
 
 namespace s8
 {
@@ -37,14 +38,18 @@ namespace s8
         private:
             void optionTagIsSet(const std::string &);
             void optionAwayTagIsSet(const std::string &);
-            void optionMuonPtIsSet(const double &);
+            void optionMuonPtIsSet(const std::string &);
+            void optionJetPtIsSet(const std::string &);
+            void optionJetEtaIsSet(const std::string &);
 
             MuonInJetOptionsDelegate               *_delegate;
             std::auto_ptr<po::options_description>  _description;
 
             std::string _tag;
             std::string _awayTag;
-            double      _muonPt;
+            Range       _muon_pt;
+            Range       _jet_pt;
+            Range       _jet_eta;
     };
 }
 

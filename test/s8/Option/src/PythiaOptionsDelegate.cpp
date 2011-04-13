@@ -22,7 +22,6 @@ void PythiaOptionsDelegate::optionGluonSplittingIsSet(const GluonSplitting &)
 {
 }
 
-void PythiaOptionsDelegate::optionPtHatIsSet(const int &min,
-                                             const int &max)
+void PythiaOptionsDelegate::optionPtHatIsSet(const Range &)
 {
 }

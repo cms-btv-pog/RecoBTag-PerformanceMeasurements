@@ -7,6 +7,7 @@
  */
 
 #include "Analyzer/interface/TriggerAnalyzer.h"
+#include "Option/interface/TriggerOptions.h"
 
 #include "Controller/interface/TriggerController.h"
 
@@ -20,16 +21,6 @@ TriggerController::~TriggerController() throw()
 {
 }
 
-s8::Analyzer *TriggerController::createAnalyzer()
-{
-    return _analyzer.get();
-}
-
-bool TriggerController::inputFileShouldContinue()
-{
-    return false;
-}
-
 // Override parent init()
 //
 void TriggerController::init()
@@ -40,4 +31,23 @@ void TriggerController::init()
 
     _analyzer.reset(new TriggerAnalyzer());
     _analyzer->init();
+
+    _options.reset(new TriggerOptions());
+    _options->init();
+    _options->setDelegate(_analyzer.get());
+}
+
+s8::Analyzer *TriggerController::createAnalyzer()
+{
+    return _analyzer.get();
+}
+
+core::Options *TriggerController::createOptions()
+{
+    return _options.get();
+}
+
+bool TriggerController::inputFileShouldLoadTriggers()
+{
+    return true;
 }

@@ -27,6 +27,7 @@ using std::endl;
 using s8::AppController;
 
 AppController::AppController() throw():
+    _skip_events(0),
     _maxEvents(0),
     _processedEvents(0)
 {
@@ -62,6 +63,8 @@ void AppController::applicationDidRun()
 
     clock_t stopClock = clock();
 
+    cout << *_analyzer << endl;
+
     cout << "Stats" << endl;
     cout << setw(25) << left << " - Run time"
         << (static_cast<double>(stopClock) - _startClock) / CLOCKS_PER_SEC
@@ -79,6 +82,11 @@ void AppController::applicationDidRun()
 void AppController::optionDebugIsSet(const std::string &fileName)
 {
     _debug->init(fileName);
+}
+
+void AppController::optionSkipEventsIsSet(const int &value)
+{
+    _skip_events = value;
 }
 
 void AppController::optionEventsIsSet(const int &value)
@@ -160,6 +168,13 @@ bool AppController::inputFileShouldLoadPrimaryVertices()
 
 void AppController::inputFileDidLoadEvent(const s8::Event *event)
 {
+    if (_skip_events)
+    {
+        --_skip_events;
+
+        return;
+    }
+
     ++_processedEvents;
 
     // pass event to analyzer
