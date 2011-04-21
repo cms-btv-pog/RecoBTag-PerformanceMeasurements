@@ -1121,14 +1121,16 @@ void saveSolution(Solution &solution,
 
     // n_b
     //
-    const double n_b = solver.GetResult(0) * inputGroup.input.n.all.first;
+    //const double n_b = solver.GetResult(0) * inputGroup.input.n.all.first;
+    const double n_b = solver.getCentralValue(0) * inputGroup.input.n.all.first;
     solution["n_b"] =
         make_pair(n_b,
                   pow(solver.getError(0) * inputGroup.input.n.all.first, 2));
 
     // n_cl
     //
-    const double n_cl = solver.GetResult(1) * inputGroup.input.n.all.first;
+    //const double n_cl = solver.GetResult(1) * inputGroup.input.n.all.first;
+    const double n_cl = solver.getCentralValue(1) * inputGroup.input.n.all.first;
     solution["n_cl"] = 
         make_pair(n_cl,
                   pow(solver.getError(1) * inputGroup.input.n.all.first, 2));
@@ -1136,37 +1138,43 @@ void saveSolution(Solution &solution,
     // Eff_mu_b
     //
     solution["eff_mu_b"] =
-        make_pair(solver.GetResult(2),
+        //make_pair(solver.GetResult(2),
+        make_pair(solver.getCentralValue(2),
                   pow(solver.getError(2), 2));
 
     // Eff_mu_cl
     //
     solution["eff_mu_cl"] =
-        make_pair(solver.GetResult(3),
+        //make_pair(solver.GetResult(3),
+        make_pair(solver.getCentralValue(3),
                   pow(solver.getError(3), 2));
 
     // Eff_tag_b
     //
     solution["eff_tag_b"] = 
-        make_pair(solver.GetResult(4),
+        //make_pair(solver.GetResult(4),
+        make_pair(solver.getCentralValue(4),
                   pow(solver.getError(4), 2));
 
     // Eff_tag_cl
     //
     solution["eff_tag_cl"] =
-        make_pair(solver.GetResult(5),
+        //make_pair(solver.GetResult(5),
+        make_pair(solver.getCentralValue(5),
                   pow(solver.getError(5), 2));
 
     // p_b
     //
     solution["p_b"] = 
-        make_pair(solver.GetResult(6) * n_b,
+        //make_pair(solver.GetResult(6) * n_b,
+        make_pair(solver.getCentralValue(6) * n_b,
                   pow(solver.getError(6) * n_b, 2));
 
     // p_cl
     //
     solution["p_cl"] = 
-        make_pair(solver.GetResult(7) * n_cl,
+        //make_pair(solver.GetResult(7) * n_cl,
+        make_pair(solver.getCentralValue(7) * n_cl,
                   pow(solver.getError(7) * n_cl, 2));
 }
 

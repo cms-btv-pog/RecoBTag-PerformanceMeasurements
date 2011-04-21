@@ -107,6 +107,7 @@ fCovmatrix.ResizeTo(8,8);
                                   (string("Result") + lexical_cast<string>(i)).c_str(),
                                   200, 0, 2.);
         *(_result_errors + i) = 0;
+        *(_central_values + i) = 0;
     }
 
 for(int i=0 ; i<8 ; ++i)
@@ -329,8 +330,8 @@ if(kError==STAT || kError==ALL) // Stat error
 
         // Test if value is within X% from the central value
         //
-        if (fabs(fResult[j] - central[j]) >= .2 * central[j])
-            continue;
+        // if (fabs(fResult[j] - central[j]) >= .2 * central[j])
+        //    continue;
 
         // Idea: only values from the Central solution should be
         //       kept. Therefore add something like test if new
@@ -406,7 +407,11 @@ void System8Solver::fitErrors()
         double error = _result[i]->GetFunction("gaus")->GetParameter(2);
         _result_errors[i] = error;
 
-        cout << " sigma[" << i << "]: " << error << endl;
+        double central_value = _result[i]->GetFunction("gaus")->GetParameter(1);
+        _central_values[i] = central_value;
+
+        cout << " central[" << i << "]: " << central_value
+            << "   sigma[" << i << "]: " << error << endl;
         cout << endl;
     }
 }
@@ -419,6 +424,16 @@ double System8Solver::getError(const int &id)
         return -1;
 
     return _result_errors[id];
+}
+
+double System8Solver::getCentralValue(const int &id)
+{
+    if (0 > id ||
+        7 < id)
+
+        return -1;
+
+    return _central_values[id];
 }
 
 TH1 *System8Solver::result(const int &id)

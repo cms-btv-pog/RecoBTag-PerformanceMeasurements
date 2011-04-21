@@ -153,6 +153,7 @@ public :
 
     TH1 *result(const int &);
     double getError(const int &);
+    double getCentralValue(const int &);
 
 private :
 
@@ -192,6 +193,7 @@ private :
     private:
         TH1    *_result[8];
         double  _result_errors[8];
+        double _central_values[8];
 };
 
 void demo(Double_t* inputs, Double_t* corr, Int_t k, Double_t *ans);
