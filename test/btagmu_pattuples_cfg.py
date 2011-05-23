@@ -25,7 +25,7 @@ options.register ('hltProcess',
                   'HLT_BTagMu*',
                   VarParsing.multiplicity.singleton,
                   VarParsing.varType.string,
-                  "HLT process name to use.")
+                  "HLT path name to filter.")
 
 options.register ('use41x',
                   False,
@@ -125,7 +125,7 @@ process.HBHENoiseFilter.minIsolatedNoiseSumEt = cms.double(999999.)
 ####### HLT Filter ############
 process.HLTfilter = cms.EDFilter("HLTHighLevel",
                                  TriggerResultsTag  = cms.InputTag("TriggerResults","","HLT"),
-                                 HLTPaths           = cms.vstring("HLT_BTagMu*"),
+                                 HLTPaths           = cms.vstring(options.hltProcess),
                                  #    HLTPaths           = cms.vstring("HLT_Jet*"),
                                  eventSetupPathsKey = cms.string(''),
                                  andOr              = cms.bool(True), #----- True = OR, False = AND between the HLTPaths
