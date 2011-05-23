@@ -1,5 +1,0 @@
-Introduction
-============
-
-    CMSSW analysis modules: Analyzers and Filters. The code is NOT stand alone
-    and should be compiled ONLY within the CMSSW framework.
