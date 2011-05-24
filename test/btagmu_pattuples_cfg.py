@@ -21,7 +21,7 @@ options.register ('applyHLT',
                   VarParsing.varType.int,
                   "Apply HLT Filter")
 
-options.register ('hltProcess',
+options.register ('hltPath',
                   'HLT_BTagMu*',
                   VarParsing.multiplicity.singleton,
                   VarParsing.varType.string,
@@ -39,32 +39,63 @@ options.register ('writeS8Tree',
                   VarParsing.varType.int,
                   "Run S8 tree maker")
 
+options.register ('noPAToutput',
+                  False,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.int,
+                  "Do not store PAT output, only avaiable when writeS8Tree is enable")
+
 options.parseArguments()
 
 inputJetCorrLabelnoPF2PAT = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute'])
+hltProcess = "HLT"
 
 if not options.useData :
     
     inputJetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'])
-        
-    process.source.fileNames = [
-        '/store/relval/CMSSW_4_2_2/RelValTTbar/GEN-SIM-RECO/START42_V11-v1/0005/50AC4DBF-746D-E011-8CF9-00248C55CC62.root'
-        ]
+
+    if options.use41x :
+        hltProcess = "REDIGI311X"
+        inputJetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual'])
+        inputJetCorrLabelnoPF2PAT = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual'])
+
+        process.source.fileNames = [
+
+            '/store/mc/Spring11/QCD_Pt-50to80_MuPt5Enriched_TuneZ2_7TeV-pythia6/AODSIM/PU_S1_START311_V1G1-v1/0006/C0DFBC89-064F-E011-811C-003048D439BE.root',
+            '/store/mc/Spring11/QCD_Pt-50to80_MuPt5Enriched_TuneZ2_7TeV-pythia6/AODSIM/PU_S1_START311_V1G1-v1/0006/BE8563E4-064F-E011-8604-003048F0E83C.root',
+            '/store/mc/Spring11/QCD_Pt-50to80_MuPt5Enriched_TuneZ2_7TeV-pythia6/AODSIM/PU_S1_START311_V1G1-v1/0006/BCA3025A-084F-E011-8265-003048F0EBB8.root',
+            '/store/mc/Spring11/QCD_Pt-50to80_MuPt5Enriched_TuneZ2_7TeV-pythia6/AODSIM/PU_S1_START311_V1G1-v1/0006/BCA201D6-064F-E011-B8D5-003048F0E1EE.root'
+            ]
+    else :
+                                    
+        process.source.fileNames = [
+            '/store/relval/CMSSW_4_2_2/RelValTTbar/GEN-SIM-RECO/START42_V11-v1/0005/50AC4DBF-746D-E011-8CF9-00248C55CC62.root'
+            ]
     
 else :
     
     inputJetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'])
+
+    if options.use41x :
+
+        inputJetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual'])
+        inputJetCorrLabelnoPF2PAT = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual'])
         
-    process.source.fileNames = [
-        '/store/data/Run2011A/METBTag/AOD/May10ReReco-v1/0000/02C65CCC-8F7E-E011-AAEF-00304867BFA8.root',
-        '/store/data/Run2011A/METBTag/AOD/May10ReReco-v1/0000/02A210E3-937E-E011-8651-0026189438F3.root',
-        '/store/data/Run2011A/METBTag/AOD/May10ReReco-v1/0000/029270DD-E67C-E011-933B-002618943838.root',
-        '/store/data/Run2011A/METBTag/AOD/May10ReReco-v1/0000/0286BD59-577C-E011-A09E-0026189438A7.root',
-        '/store/data/Run2011A/METBTag/AOD/May10ReReco-v1/0000/006930CD-A17E-E011-B660-002618943833.root',
-        '/store/data/Run2011A/METBTag/AOD/May10ReReco-v1/0000/002C519F-967E-E011-B128-0026189438BF.root',
-        '/store/data/Run2011A/METBTag/AOD/May10ReReco-v1/0000/001D4EEF-C67E-E011-B46D-00304867904E.root'
-        
+        process.source.fileNames = [
+            
+            # 41x data
         ]
+    else :
+        process.source.fileNames = [
+            '/store/data/Run2011A/METBTag/AOD/May10ReReco-v1/0000/02C65CCC-8F7E-E011-AAEF-00304867BFA8.root',
+            '/store/data/Run2011A/METBTag/AOD/May10ReReco-v1/0000/02A210E3-937E-E011-8651-0026189438F3.root',
+            '/store/data/Run2011A/METBTag/AOD/May10ReReco-v1/0000/029270DD-E67C-E011-933B-002618943838.root',
+            '/store/data/Run2011A/METBTag/AOD/May10ReReco-v1/0000/0286BD59-577C-E011-A09E-0026189438A7.root',
+            '/store/data/Run2011A/METBTag/AOD/May10ReReco-v1/0000/006930CD-A17E-E011-B660-002618943833.root',
+            '/store/data/Run2011A/METBTag/AOD/May10ReReco-v1/0000/002C519F-967E-E011-B128-0026189438BF.root',
+            '/store/data/Run2011A/METBTag/AOD/May10ReReco-v1/0000/001D4EEF-C67E-E011-B46D-00304867904E.root'
+            
+            ]
 
 print options
 
@@ -87,25 +118,11 @@ if not options.use41x :
         process.GlobalTag.globaltag = cms.string( 'START42_V12::All' )
 else:
     # 4.1.x configuration
-    process.load("CondCore.DBCommon.CondDBCommon_cfi")
-    process.jec = cms.ESSource("PoolDBESSource",
-                               DBParameters = cms.PSet(
-        messageLevel = cms.untracked.int32(0)
-        ),
-                               timetype = cms.string('runnumber'),
-                               toGet = cms.VPSet(
-        cms.PSet(
-        record = cms.string('JetCorrectionsRecord'),
-        tag    = cms.string('JetCorrectorParametersCollection_Jec10V3_AK5PFchs'),
-        label  = cms.untracked.string('AK5PFchs')
-        )
-        ),
-                               ## here you add as many jet types as you need (AK5Calo, AK5JPT, AK7PF, AK7Calo, KT4PF, KT4Calo, KT6PF, KT6Calo)
-                               connect = cms.string('sqlite_file:Jec10V3.db')
-                               )
-    process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
-    
-
+    if options.useData:
+        process.GlobalTag.globaltag = cms.string( 'GR_R_41_V0::All' )
+    else :
+        process.GlobalTag.globaltag = cms.string( 'START41_V0::All' )
+        
     
 # require scraping filter
 process.scrapingVeto = cms.EDFilter("FilterOutScraping",
@@ -124,8 +141,8 @@ process.HBHENoiseFilter.minIsolatedNoiseSumEt = cms.double(999999.)
 ###############################
 ####### HLT Filter ############
 process.HLTfilter = cms.EDFilter("HLTHighLevel",
-                                 TriggerResultsTag  = cms.InputTag("TriggerResults","","HLT"),
-                                 HLTPaths           = cms.vstring(options.hltProcess),
+                                 TriggerResultsTag  = cms.InputTag("TriggerResults","",hltProcess),
+                                 HLTPaths           = cms.vstring(options.hltPath),
                                  #    HLTPaths           = cms.vstring("HLT_Jet*"),
                                  eventSetupPathsKey = cms.string(''),
                                  andOr              = cms.bool(True), #----- True = OR, False = AND between the HLTPaths
@@ -143,38 +160,8 @@ process.HLTfilter = cms.EDFilter("HLTHighLevel",
 
 pvSrc = 'offlinePrimaryVertices'
 if options.use41x :
-    pvSrc = 'offlinePrimaryVerticesDAF'
-    process.offlinePrimaryVerticesDAF = cms.EDProducer("PrimaryVertexProducer",
-                                                       verbose = cms.untracked.bool(False),
-                                                       algorithm = cms.string('AdaptiveVertexFitter'),
-                                                       TrackLabel = cms.InputTag("generalTracks"),
-                                                       useBeamConstraint = cms.bool(False),
-                                                       beamSpotLabel = cms.InputTag("offlineBeamSpot"),
-                                                       minNdof  = cms.double(0.0),
-                                                       PVSelParameters = cms.PSet(
-        maxDistanceToBeam = cms.double(1.0)
-        ),
-                                                       TkFilterParameters = cms.PSet(
-        algorithm=cms.string('filter'),
-        maxNormalizedChi2 = cms.double(20.0),
-        minPixelLayersWithHits=cms.int32(2),
-        minSiliconLayersWithHits = cms.int32(5),
-        maxD0Significance = cms.double(5.0),
-        minPt = cms.double(0.0),
-        trackQuality = cms.string("any")
-        ),
-                                                       
-                                                       TkClusParameters = cms.PSet(
-        algorithm   = cms.string("DA"),
-        TkDAClusParameters = cms.PSet(
-        coolingFactor = cms.double(0.6),  #  moderate annealing speed
-        Tmin = cms.double(4.),            #  end of annealing
-        vertexSize = cms.double(0.01),    #  ~ resolution / sqrt(Tmin)
-        d0CutOff = cms.double(3.),        # downweight high IP tracks
-        dzCutOff = cms.double(4.)         # outlier rejection after freeze-out (T<Tmin)
-        )
-        )
-)
+    # redo DAF vertices
+    process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi")
     
     
 process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
@@ -219,12 +206,24 @@ process.prunedGenParticles = cms.EDProducer("GenParticlePruner",
 # Default PF2PAT with AK5 jets. Make sure to turn ON the L1fastjet stuff. 
 from PhysicsTools.PatAlgos.tools.pfTools import *
 postfix = "PFlow"
-usePF2PAT(process,
-          runPF2PAT=True,
-          jetAlgo='AK5',
-          runOnMC=not options.useData,
-          postfix=postfix,
-          jetCorrections=inputJetCorrLabel)
+if options.use41x :
+    usePF2PAT(process,runPF2PAT=True, jetAlgo='AK5', runOnMC=not options.useData, postfix=postfix)
+    process.pfPileUpPFlow.Enable = True
+    process.pfPileUpPFlow.Vertices = 'goodOfflinePrimaryVertices'
+    process.pfJetsPFlow.doAreaFastjet = True
+    process.pfJetsPFlow.doRhoFastjet = False
+    process.patJetCorrFactorsPFlow.payload = inputJetCorrLabel[0]
+    process.patJetCorrFactorsPFlow.levels = inputJetCorrLabel[1]
+    process.patJetCorrFactorsPFlow.rho = cms.InputTag("kt6PFJetsPFlow", "rho")
+    
+else:
+    
+    usePF2PAT(process,
+              runPF2PAT=True,
+              jetAlgo='AK5',
+              runOnMC=not options.useData,
+              postfix=postfix,
+              jetCorrections=inputJetCorrLabel)
 
 # Do not remove muons inside jets
 getattr(process,"pfNoMuon"+postfix).enable = False
@@ -232,7 +231,6 @@ getattr(process,"pfNoMuon"+postfix).enable = False
 
 process.pfPileUpPFlow.Enable = True
 process.pfPileUpPFlow.Vertices = 'goodOfflinePrimaryVertices'
-process.pfPileUpPFlow.checkClosestZVertex = False
 
 process.pfJetsPFlow.doAreaFastjet = True
 process.pfJetsPFlow.doRhoFastjet = False
@@ -394,6 +392,10 @@ process.patseq = cms.Sequence(
     process.prunedGenParticles
     )
 
+if options.use41x :
+    process.patseq.replace( process.HLTfilter,
+                            process.HLTfilter*process.offlinePrimaryVertices )
+    
 ##########################
 ## check HLT filter option
 if not options.applyHLT:
@@ -406,7 +408,8 @@ if options.writeS8Tree:
     # load S8 tree maker module
     process.load("EDModule.Analyzer.S8TreeMaker_cfi")
     # configure tree maker
-    process.S8TreeMaker.triggers = "TriggerResults::HLT"
+    process.S8TreeMaker.saveTriggers = True
+    process.S8TreeMaker.triggers = "TriggerResults::"+hltProcess
     process.S8TreeMaker.primaryVertices = "goodOfflinePrimaryVertices"
     process.S8TreeMaker.jets = "selectedPatJetsAK5PF"
     process.S8TreeMaker.muons = "selectedPatMuons"
@@ -499,4 +502,8 @@ else :
                                    'keep PileupSummaryInfos_*_*_*'
                                    ]
 
+if options.writeS8Tree and options.noPAToutput:
+    print "PAT EDM output will not be written!"
+    del(process.outpath)
+    
 #open('junk.py','w').write(process.dumpPython())
