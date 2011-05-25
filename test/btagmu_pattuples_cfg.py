@@ -148,7 +148,7 @@ process.HLTfilter = cms.EDFilter("HLTHighLevel",
                                  andOr              = cms.bool(True), #----- True = OR, False = AND between the HLTPaths
                                  throw              = cms.bool(True)
                                  )
-
+    
 # switch on PAT trigger
 #from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
 #switchOnTrigger( process, hltProcess=options.hltProcess )
@@ -391,7 +391,7 @@ process.patseq = cms.Sequence(
     process.goodPatJetsAK5PF*
     process.prunedGenParticles
     )
-
+    
 if options.use41x :
     process.patseq.replace( process.HLTfilter,
                             process.HLTfilter*process.offlinePrimaryVertices )
