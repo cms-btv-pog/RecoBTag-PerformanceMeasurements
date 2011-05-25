@@ -123,7 +123,16 @@ else:
     else :
         process.GlobalTag.globaltag = cms.string( 'START41_V0::All' )
         
-    
+# pick the latest calibrations from JP taggers
+process.GlobalTag.toGet = cms.VPSet(
+    cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
+             tag = cms.string("TrackProbabilityCalibration_2D_2011_v1_mc"),
+             connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_BTAU")),
+    cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
+             tag = cms.string("TrackProbabilityCalibration_3D_2011_v1_mc"),
+             connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_BTAU"))
+)
+
 # require scraping filter
 process.scrapingVeto = cms.EDFilter("FilterOutScraping",
                                     applyfilter = cms.untracked.bool(True),
