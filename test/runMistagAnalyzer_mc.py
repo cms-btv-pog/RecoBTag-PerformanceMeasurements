@@ -16,23 +16,34 @@ process.source = cms.Source(
     "PoolSource",
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(   
-        'file:DCFB362D-1450-E011-8959-003048673EA4.root'
+#         'file:.root'
 
-# 	'/store/mc/Spring11/QCD_Pt_170to300_TuneZ2_7TeV_pythia6/AODSIM/PU_S1_START311_V1G1-v1/0011/DCFB362D-1450-E011-8959-003048673EA4.root',
-# 	'/store/mc/Spring11/QCD_Pt_170to300_TuneZ2_7TeV_pythia6/AODSIM/PU_S1_START311_V1G1-v1/0010/788D1D7C-AC4F-E011-B2C5-0025B3E0645C.root',
-# 	'/store/mc/Spring11/QCD_Pt_170to300_TuneZ2_7TeV_pythia6/AODSIM/PU_S1_START311_V1G1-v1/0010/523A5F14-B54F-E011-8482-003048D47A14.root',
-# 	'/store/mc/Spring11/QCD_Pt_170to300_TuneZ2_7TeV_pythia6/AODSIM/PU_S1_START311_V1G1-v1/0010/4601B125-BF4F-E011-A339-003048D45FC8.root',
-# 	'/store/mc/Spring11/QCD_Pt_170to300_TuneZ2_7TeV_pythia6/AODSIM/PU_S1_START311_V1G1-v1/0010/18077F16-0A50-E011-B473-003048D477A4.root'
+        '/store/mc/Summer11/QCD_Pt-80to120_TuneZ2_7TeV_pythia6/AODSIM/PU_S3_START42_V11-v2/0002/FA97B0C7-DB7D-E011-990A-485B39800C14.root',
+        '/store/mc/Summer11/QCD_Pt-80to120_TuneZ2_7TeV_pythia6/AODSIM/PU_S3_START42_V11-v2/0002/FA5C01BD-E47D-E011-87CF-485B39800BCA.root',
+        '/store/mc/Summer11/QCD_Pt-80to120_TuneZ2_7TeV_pythia6/AODSIM/PU_S3_START42_V11-v2/0002/FA49A8F9-E17D-E011-B8DD-E0CB4E1A118E.root',
+        '/store/mc/Summer11/QCD_Pt-80to120_TuneZ2_7TeV_pythia6/AODSIM/PU_S3_START42_V11-v2/0002/F8E63805-E27D-E011-A7F2-485B39800C0A.root',
+        '/store/mc/Summer11/QCD_Pt-80to120_TuneZ2_7TeV_pythia6/AODSIM/PU_S3_START42_V11-v2/0002/F86EC6F9-E17D-E011-991B-485B39800BA0.root',
   )
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(100)
 )
 
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = "START311_V1::All" 
+process.GlobalTag.globaltag = "START42_V12::All" 
+
+#$$
+##-------------------- Import the JEC services -----------------------
+process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
+##-------------------- Import the Jet RECO modules -----------------------
+process.load('RecoJets.Configuration.RecoPFJets_cff')
+##-------------------- Turn-on the FastJet density calculation -----------------------
+process.kt6PFJets.doRhoFastjet = True
+##-------------------- Turn-on the FastJet jet area calculation for your favorite algorithm -----------------------
+process.ak5PFJets.doAreaFastjet = True
+#$$
 
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
@@ -72,6 +83,8 @@ process.load("RecoBTag.SecondaryVertex.simpleSecondaryVertexNegativeHighEffBJetT
 process.load("RecoBTag.SecondaryVertex.simpleSecondaryVertexNegativeHighPurBJetTags_cfi")
 process.load("RecoBTag.SecondaryVertex.combinedSecondaryVertexNegativeBJetTags_cfi")
 process.load("RecoBTag.SecondaryVertex.combinedSecondaryVertexNegativeES_cfi")
+process.load("RecoBTag.SecondaryVertex.combinedSecondaryVertexPositiveBJetTags_cfi")
+process.load("RecoBTag.SecondaryVertex.combinedSecondaryVertexPositiveES_cfi")
 
 # for Soft Muon tagger
 process.load("RecoBTag.SoftLepton.negativeSoftMuonES_cfi")
@@ -88,6 +101,11 @@ process.load("PhysicsTools.JetMCAlgos.CaloJetsMCFlavour_cfi")
 
 #############   Include the jet corrections ##########
 process.load("JetMETCorrections.Configuration.DefaultJEC_cff")
+#$$
+process.load('RecoJets.Configuration.RecoPFJets_cff')
+process.kt6PFJets.doRhoFastjet = True
+process.ak5PFJets.doAreaFastjet = True
+#$$
 
 process.load("SimTracker.TrackHistory.TrackClassifier_cff")
 process.load("RecoBTag.PerformanceMeasurements.MistagAnalyzer_cff")
@@ -119,6 +137,7 @@ process.noscraping = cms.EDFilter("FilterOutScraping",
                                thresh = cms.untracked.double(0.25)
                                )
 
+process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi")
 
 #Filter for good primary vertex
 process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
@@ -129,20 +148,20 @@ process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
                      )
 
 ### from Cristina JP calibration for cmsRun only : 
-# from CondCore.DBCommon.CondDBCommon_cfi import *
-# process.load("RecoBTag.TrackProbability.trackProbabilityFakeCond_cfi")
-# process.trackProbabilityFakeCond.connect =cms.string( "sqlite_fip:RecoBTag/PerformanceMeasurements/test/btagnew_mc_39X_QCD.db")
-# process.es_prefer_trackProbabilityFakeCond = cms.ESPrefer("PoolDBESSource","trackProbabilityFakeCond")
+from CondCore.DBCommon.CondDBCommon_cfi import *
+process.load("RecoBTag.TrackProbability.trackProbabilityFakeCond_cfi")
+process.trackProbabilityFakeCond.connect =cms.string( "sqlite_fip:RecoBTag/PerformanceMeasurements/test/btagnew_MC_414_2011.db")
+process.es_prefer_trackProbabilityFakeCond = cms.ESPrefer("PoolDBESSource","trackProbabilityFakeCond")
 
 ### from Cristina JP calibration for crab only: 
-process.GlobalTag.toGet = cms.VPSet(
-  cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
-       tag = cms.string("TrackProbabilityCalibration_2D_Qcd80to120Winter10_v1_mc"),
-       connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_BTAU")),
-  cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-       tag = cms.string("TrackProbabilityCalibration_3D_Qcd80to120Winter10_v1_mc"),
-       connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_BTAU"))
-)
+# process.GlobalTag.toGet = cms.VPSet(
+#   cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
+#        tag = cms.string("TrackProbabilityCalibration_2D_2011_v1_mc"),
+#        connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_BTAU")),
+#   cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
+#        tag = cms.string("TrackProbabilityCalibration_3D_2011_v1_mc"),
+#        connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_BTAU"))
+# )
 
 
 #---------------------------------------
@@ -152,32 +171,34 @@ process.TFileService = cms.Service("TFileService", fileName = cms.string("JetTre
 process.mistag.isData = False
 process.mistag.useTrackHistory = False
 process.mistag.produceJetProbaTree = False
-#process.mistag.triggerTable = 'TriggerResults::HLT' # Data
-process.mistag.triggerTable = 'TriggerResults::REDIGI311X' # MC
+process.mistag.triggerTable = 'TriggerResults::HLT' # Data and MC
 #---------------------------------------
 
 
-# process.mistag.Jets = 'ak5CaloJets'
 # process.mistag.Jets = 'ak5PFJets'
 process.mistag.Jets = 'PFJetsFilter'
-process.AK5byRef.jets = 'PFJetsFilter'
-# process.mistag.jetCorrector = cms.string('ak5CaloL2L3')
-process.mistag.jetCorrector = cms.string('ak5PFL2L3')
-# process.ak5JetTracksAssociatorAtVertex.jets = "ak5CaloJets"
+#process.mistag.jetCorrector = cms.string('ak5PFL2L3')
+process.mistag.jetCorrector = cms.string('ak5PFL1FastL2L3')
+#process.mistag.jetCorrector = cms.string('ak5PFL1FastL2L3Residual')
+
 # process.ak5JetTracksAssociatorAtVertex.jets = "ak5PFJets"
 process.ak5JetTracksAssociatorAtVertex.jets = "PFJetsFilter"
-# process.softMuonTagInfos.jets = "ak5CaloJets"
 # process.softMuonTagInfos.jets = "ak5PFJets"
 process.softMuonTagInfos.jets = "PFJetsFilter"
 
 
+process.AK5byRef.jets  = 'PFJetsFilter'
+
 process.p = cms.Path(
-        process.PFJetsFilter
-        *process.myPartons*process.AK5Flavour
-#$$ usefull ?
-        *process.ak5PFJetsL2L3
+#$$
+        process.kt6PFJets   
+	*process.ak5PFJets  
+        *process.PFJetsFilter
+	*process.myPartons
+	*process.AK5Flavour
 #$$
         *process.noscraping
+        *process.offlinePrimaryVertices 
         *process.primaryVertexFilter
 	*process.ak5JetTracksAssociatorAtVertex
 	*process.btagging
@@ -185,10 +206,9 @@ process.p = cms.Path(
 	*process.negativeTrackCountingHighEffJetTags*process.negativeTrackCountingHighPur
 	*process.secondaryVertexTagInfos*process.simpleSecondaryVertexHighEffBJetTags*process.simpleSecondaryVertexHighPurBJetTags
 	*process.secondaryVertexNegativeTagInfos*process.simpleSecondaryVertexNegativeHighEffBJetTags*process.simpleSecondaryVertexNegativeHighPurBJetTags
-        *process.combinedSecondaryVertexNegativeBJetTags
+        *process.combinedSecondaryVertexNegativeBJetTags*process.combinedSecondaryVertexPositiveBJetTags
 	#*process.negativeSoftMuonBJetTags*process.positiveSoftMuonBJetTags	
 	*process.negativeSoftLeptonByPtBJetTags*process.positiveSoftLeptonByPtBJetTags	
-	*process.jetProbabilityBJetTags
 	*process.jetBProbabilityBJetTags*process.negativeOnlyJetBProbabilityJetTags
 	*process.mistag
 	)

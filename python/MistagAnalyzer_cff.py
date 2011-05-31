@@ -53,6 +53,7 @@ mistag = cms.EDAnalyzer("MistagAnalyzer",
     
     combinedSvtxModuleName    = cms.string('combinedSecondaryVertexBJetTags'),
     combinedSvtxNegModuleName = cms.string('combinedSecondaryVertexNegativeBJetTags'),
+    combinedSvtxPosModuleName = cms.string('combinedSecondaryVertexPositiveBJetTags'),
     svtxModuleNameHighPur     = cms.string('simpleSecondaryVertexHighPurBJetTags'),
     svtxNegModuleNameHighPur  = cms.string('simpleSecondaryVertexNegativeHighPurBJetTags'),
     svtxModuleNameHighEff     = cms.string('simpleSecondaryVertexHighEffBJetTags'),
