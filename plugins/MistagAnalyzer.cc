@@ -3,7 +3,7 @@
 
 MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfig)  
 {
-//now do what ever initialization is needed
+//now do what ever initialization you need
 
 // Flavour identification
   flavourMatchOptionf = iConfig.getParameter<std::string>( "flavourMatchOption" );
@@ -21,8 +21,8 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   vetoPos_   = iConfig.getParameter<double>("vetoPos");
   ntrackMin_ = iConfig.getParameter<int>("ntrackMin");
 
-  isData_    = iConfig.getParameter<bool>("isData");
-  useTrackHistory_       = iConfig.getParameter<bool>("useTrackHistory");
+  isData_              = iConfig.getParameter<bool>("isData");
+  useTrackHistory_     = iConfig.getParameter<bool>("useTrackHistory");
   produceJetProbaTree_ = iConfig.getParameter<bool>("produceJetProbaTree");
   
 // Modules
@@ -52,6 +52,7 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   
   combinedSvtxModuleName_     = iConfig.getParameter<std::string>("combinedSvtxModuleName");
   combinedSvtxNegModuleName_  = iConfig.getParameter<std::string>("combinedSvtxNegModuleName");
+  combinedSvtxPosModuleName_  = iConfig.getParameter<std::string>("combinedSvtxPosModuleName");
   
   softMuonModuleName_       = iConfig.getParameter<std::string>("softMuonModuleName");
   softMuonNegModuleName_    = iConfig.getParameter<std::string>("softMuonNegModuleName");
@@ -229,12 +230,22 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("Jet_phi",         Jet_phi         ,"Jet_phi[nJet]/F");
   smalltree->Branch("Jet_ntracks",     Jet_ntracks     ,"Jet_ntracks[nJet]/I");
   smalltree->Branch("Jet_flavour",     Jet_flavour     ,"Jet_flavour[nJet]/I");
-  smalltree->Branch("Jet_Ip1N",        Jet_Ip1N        ,"Jet_Ip1N[nJet]/F");
-  smalltree->Branch("Jet_Ip1P",        Jet_Ip1P        ,"Jet_Ip1P[nJet]/F");
+//$$  smalltree->Branch("Jet_Ip1N",        Jet_Ip1N        ,"Jet_Ip1N[nJet]/F");
+//$$  smalltree->Branch("Jet_Ip1P",        Jet_Ip1P        ,"Jet_Ip1P[nJet]/F");
   smalltree->Branch("Jet_Ip2N",        Jet_Ip2N        ,"Jet_Ip2N[nJet]/F");
   smalltree->Branch("Jet_Ip2P",        Jet_Ip2P        ,"Jet_Ip2P[nJet]/F");
   smalltree->Branch("Jet_Ip3N",        Jet_Ip3N        ,"Jet_Ip3N[nJet]/F");
   smalltree->Branch("Jet_Ip3P",        Jet_Ip3P        ,"Jet_Ip3P[nJet]/F");
+//$$
+  smalltree->Branch("Jet_Ip4N",        Jet_Ip4N        ,"Jet_Ip4N[nJet]/F");
+  smalltree->Branch("Jet_Ip4P",        Jet_Ip4P        ,"Jet_Ip4P[nJet]/F");
+  smalltree->Branch("Jet_Mass2N",      Jet_Mass2N      ,"Jet_Mass2N[nJet]/F");
+  smalltree->Branch("Jet_Mass2P",      Jet_Mass2P      ,"Jet_Mass2P[nJet]/F");
+  smalltree->Branch("Jet_Mass3N",      Jet_Mass3N      ,"Jet_Mass3N[nJet]/F");
+  smalltree->Branch("Jet_Mass3P",      Jet_Mass3P      ,"Jet_Mass3P[nJet]/F");
+  smalltree->Branch("Jet_Mass4N",      Jet_Mass4N      ,"Jet_Mass4N[nJet]/F");
+  smalltree->Branch("Jet_Mass4P",      Jet_Mass4P      ,"Jet_Mass4P[nJet]/F");
+//$$
   smalltree->Branch("Jet_ProbaN",      Jet_ProbaN      ,"Jet_ProbaN[nJet]/F");
   smalltree->Branch("Jet_ProbaP",      Jet_ProbaP      ,"Jet_ProbaP[nJet]/F");
   smalltree->Branch("Jet_Proba",       Jet_Proba       ,"Jet_Proba[nJet]/F");
@@ -242,12 +253,13 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("Jet_Bprob",       Jet_Bprob       ,"Jet_Bprob[nJet]/F");
   smalltree->Branch("Jet_SvxN",        Jet_SvxN        ,"Jet_SvxN[nJet]/F");
   smalltree->Branch("Jet_Svx",         Jet_Svx         ,"Jet_Svx[nJet]/F");
-  smalltree->Branch("Jet_SvxNTracks",  Jet_SvxNTracks  ,"Jet_SvxNTracks[nJet]/I");
-  smalltree->Branch("Jet_SvxTracks",   Jet_SvxTracks   ,"Jet_SvxTracks[nJet]/I");
+//$$  smalltree->Branch("Jet_SvxNTracks",  Jet_SvxNTracks  ,"Jet_SvxNTracks[nJet]/I");
+//$$  smalltree->Branch("Jet_SvxTracks",   Jet_SvxTracks   ,"Jet_SvxTracks[nJet]/I");
   smalltree->Branch("Jet_SvxNHP",      Jet_SvxNHP      ,"Jet_SvxNHP[nJet]/F");
   smalltree->Branch("Jet_SvxHP",       Jet_SvxHP       ,"Jet_SvxHP[nJet]/F");
   smalltree->Branch("Jet_SvxMass",     Jet_SvxMass     ,"Jet_SvxMass[nJet]/F");
   smalltree->Branch("Jet_CombSvxN",    Jet_CombSvxN    ,"Jet_CombSvxN[nJet]/F");
+  smalltree->Branch("Jet_CombSvxP",    Jet_CombSvxP    ,"Jet_CombSvxP[nJet]/F");
   smalltree->Branch("Jet_CombSvx",     Jet_CombSvx     ,"Jet_CombSvx[nJet]/F");
   smalltree->Branch("Jet_SoftMuN",     Jet_SoftMuN     ,"Jet_SoftMuN[nJet]/F");
   smalltree->Branch("Jet_SoftMu",      Jet_SoftMu      ,"Jet_SoftMu[nJet]/F");
@@ -259,8 +271,8 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   
   smalltree->Branch("Jet_nFirstTrack", Jet_nFirstTrack ,"Jet_nFirstTrack[nJet]/I");
   smalltree->Branch("Jet_nLastTrack",  Jet_nLastTrack  ,"Jet_nLastTrack[nJet]/I"); 
-  smalltree->Branch("Jet_nFirstSV",    Jet_nFirstSV    ,"Jet_nFirstSV[nJet]/I");
-  smalltree->Branch("Jet_nLastSV",     Jet_nLastSV     ,"Jet_nLastSV[nJet]/I");
+//$$  smalltree->Branch("Jet_nFirstSV",    Jet_nFirstSV    ,"Jet_nFirstSV[nJet]/I");
+//$$  smalltree->Branch("Jet_nLastSV",     Jet_nLastSV     ,"Jet_nLastSV[nJet]/I");
   
   //--------------------------------------
   // muon information 
@@ -347,6 +359,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 {
   using namespace edm;
   using namespace std;
+  using namespace reco;
 
   //------------------------------------------------------
   //Event informations
@@ -362,17 +375,14 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   if ( useTrackHistory_ ) classifier_.newEvent(iEvent, iSetup);
   
   // Jet Energy Correction
+  
   const JetCorrector *acorrector = JetCorrector::getJetCorrector(jetCorrector_,iSetup);
+  
 
   //Handle<reco::CaloJetCollection> jetsColl;
   //iEvent.getByLabel(CaloJetCollectionTags_, jetsColl);
   //const reco::CaloJetCollection recoJets =   *(jetsColl.product());
  
-  
-  
-  
-  
-  
   edm::Handle <edm::View <reco::Jet> > jetsCollHandle;
   iEvent.getByLabel (CaloJetCollectionTags_, jetsCollHandle);
   edm::View<reco::Jet> jetsColl = *jetsCollHandle;
@@ -501,6 +511,8 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   iEvent.getByLabel(combinedSvtxModuleName_, jetTags_CombinedSvtx);
   edm::Handle<reco::JetTagCollection> jetTags_negCombinedSvtx;
   iEvent.getByLabel(combinedSvtxNegModuleName_, jetTags_negCombinedSvtx);
+  edm::Handle<reco::JetTagCollection> jetTags_posCombinedSvtx;
+  iEvent.getByLabel(combinedSvtxPosModuleName_, jetTags_posCombinedSvtx);
   
   //------------------------------------------------------
   // Soft muon tagger
@@ -588,53 +600,69 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 //         || triggerList[i] == "HLT_Jet15U_HcalNoiseFiltered_v1"
 //         || triggerList[i] == "HLT_Jet15U_HcalNoiseFiltered_v2"
 //         || triggerList[i] == "HLT_Jet15U_HcalNoiseFiltered_v3"
-        || triggerList[i] == "HLT_Jet30_v1"         ) BitTrigger +=10 ; 
+        || triggerList[i] == "HLT_Jet30_v1"
+        || triggerList[i] == "HLT_Jet30_v2"         ) BitTrigger +=10 ; 
       if ( triggerList[i] == "HLT_Jet30U"
         || triggerList[i] == "HLT_Jet30U_v1"
         || triggerList[i] == "HLT_Jet30U_v2"
         || triggerList[i] == "HLT_Jet30U_v3"
-        || triggerList[i] == "HLT_Jet60_v1"         ) BitTrigger +=20 ; 
+        || triggerList[i] == "HLT_Jet60_v1"
+        || triggerList[i] == "HLT_Jet60_v2"         ) BitTrigger +=20 ; 
       if ( triggerList[i] == "HLT_Jet50U"
         || triggerList[i] == "HLT_Jet50U_v1"
         || triggerList[i] == "HLT_Jet50U_v2"
         || triggerList[i] == "HLT_Jet50U_v3"
-        || triggerList[i] == "HLT_Jet80_v1"         ) BitTrigger +=40 ; 
+        || triggerList[i] == "HLT_Jet80_v1"
+        || triggerList[i] == "HLT_Jet80_v2"         ) BitTrigger +=40 ; 
       if ( triggerList[i] == "HLT_Jet70U"
         || triggerList[i] == "HLT_Jet70U_v1"
         || triggerList[i] == "HLT_Jet70U_v2"
         || triggerList[i] == "HLT_Jet70U_v3"
-        || triggerList[i] == "HLT_Jet110_v1"        ) BitTrigger +=100 ; 
+        || triggerList[i] == "HLT_Jet110_v1"
+        || triggerList[i] == "HLT_Jet110_v2"        ) BitTrigger +=100 ; 
       if ( triggerList[i] == "HLT_Jet100U"
         || triggerList[i] == "HLT_Jet100U_v1"
         || triggerList[i] == "HLT_Jet100U_v2"
         || triggerList[i] == "HLT_Jet100U_v3"
-        || triggerList[i] == "HLT_Jet150_v1"        ) BitTrigger +=200 ; 
+        || triggerList[i] == "HLT_Jet150_v1"
+        || triggerList[i] == "HLT_Jet150_v2"        ) BitTrigger +=200 ; 
       if ( triggerList[i] == "HLT_Jet140U"
         || triggerList[i] == "HLT_Jet140U_v1"
         || triggerList[i] == "HLT_Jet140U_v2"
         || triggerList[i] == "HLT_Jet140U_v3"
-        || triggerList[i] == "HLT_Jet190_v1"        ) BitTrigger +=400 ; 
-      if ( triggerList[i] == "HLT_Jet240_v1"        ) BitTrigger +=1 ; 
-      if ( triggerList[i] == "HLT_Jet370_v1"        ) BitTrigger +=2 ; 
-      if ( triggerList[i] == "HLT_Jet370_NoJetID_v1") BitTrigger +=4 ; 
+        || triggerList[i] == "HLT_Jet190_v1"
+        || triggerList[i] == "HLT_Jet190_v2"        ) BitTrigger +=400 ; 
+      if ( triggerList[i] == "HLT_Jet240_v1"
+        || triggerList[i] == "HLT_Jet240_v2"        ) BitTrigger +=1 ; 
+      if ( triggerList[i] == "HLT_Jet300_v1"        ) BitTrigger +=2 ; 
+      if ( triggerList[i] == "HLT_Jet370_v1"
+        || triggerList[i] == "HLT_Jet370_v2"
+        || triggerList[i] == "HLT_Jet370_NoJetID_v1"
+        || triggerList[i] == "HLT_Jet370_NoJetID_v2") BitTrigger +=4 ; 
       if ( triggerList[i] == "HLT_DiJetAve15U_8E29" 
         || triggerList[i] == "HLT_DiJetAve15U"
         || triggerList[i] == "HLT_DiJetAve15U_v1"
         || triggerList[i] == "HLT_DiJetAve15U_v2"
         || triggerList[i] == "HLT_DiJetAve15U_v3"
-        || triggerList[i] == "HLT_DiJetAve15U_v4"   ) BitTrigger +=1000 ; 
+        || triggerList[i] == "HLT_DiJetAve15U_v4"
+        || triggerList[i] == "HLT_DiJetAve30_v1"
+        || triggerList[i] == "HLT_DiJetAve30_v2"    ) BitTrigger +=1000 ; 
       if ( triggerList[i] == "HLT_DiJetAve30U_8E29" 
         || triggerList[i] == "HLT_DiJetAve30U"
         || triggerList[i] == "HLT_DiJetAve30U_v1"
         || triggerList[i] == "HLT_DiJetAve30U_v2"
         || triggerList[i] == "HLT_DiJetAve30U_v3"
-        || triggerList[i] == "HLT_DiJetAve30U_v4"   ) BitTrigger +=2000 ; 
+        || triggerList[i] == "HLT_DiJetAve30U_v4"
+        || triggerList[i] == "HLT_DiJetAve60_v1"
+        || triggerList[i] == "HLT_DiJetAve60_v2"    ) BitTrigger +=2000 ; 
       if ( triggerList[i] == "HLT_DiJetAve50U_8E29" 
         || triggerList[i] == "HLT_DiJetAve50U"
         || triggerList[i] == "HLT_DiJetAve50U_v1"
         || triggerList[i] == "HLT_DiJetAve50U_v2"
         || triggerList[i] == "HLT_DiJetAve50U_v3"
-        || triggerList[i] == "HLT_DiJetAve50U_v4"   ) BitTrigger +=4000 ;   
+        || triggerList[i] == "HLT_DiJetAve50U_v4"
+        || triggerList[i] == "HLT_DiJetAve80_v1"
+        || triggerList[i] == "HLT_DiJetAve80_v2"    ) BitTrigger +=4000 ; 
 //
       if ( triggerList[i] == "HLT_BTagMu_Jet10U"    
         || triggerList[i] == "HLT_BTagMu_Jet20U"
@@ -647,7 +675,8 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         || triggerList[i] == "HLT_BTagMu_DiJet20U_Mu5_v2"
         || triggerList[i] == "HLT_BTagMu_DiJet20U_Mu5_v3"  
         || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v1"  
-        || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v2" ) BitTrigger +=10000 ;   
+        || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v2"
+        || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v3" ) BitTrigger +=10000 ;   
       if ( triggerList[i] == "HLT_BTagMu_DiJet30U"
         || triggerList[i] == "HLT_BTagMu_DiJet30U_v1"
         || triggerList[i] == "HLT_BTagMu_DiJet30U_v2"
@@ -657,11 +686,14 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         || triggerList[i] == "HLT_BTagMu_DiJet30U_Mu5_v2"
         || triggerList[i] == "HLT_BTagMu_DiJet30U_Mu5_v3"
         || triggerList[i] == "HLT_BTagMu_DiJet60_Mu7_v1"
-        || triggerList[i] == "HLT_BTagMu_DiJet60_Mu7_v2" ) BitTrigger +=20000 ;   
+        || triggerList[i] == "HLT_BTagMu_DiJet60_Mu7_v2"
+        || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v3" ) BitTrigger +=20000 ;   
       if ( triggerList[i] == "HLT_BTagMu_DiJet80_Mu9_v1"
-        || triggerList[i] == "HLT_BTagMu_DiJet80_Mu9_v2" ) BitTrigger +=40000 ;   
+        || triggerList[i] == "HLT_BTagMu_DiJet80_Mu9_v2"
+        || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v3" ) BitTrigger +=40000 ;   
       if ( triggerList[i] == "HLT_BTagMu_DiJet100_Mu9_v1"
-        || triggerList[i] == "HLT_BTagMu_DiJet100_Mu9_v2" ) BitTrigger +=100000 ;   
+        || triggerList[i] == "HLT_BTagMu_DiJet100_Mu9_v2"
+        || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v3" ) BitTrigger +=100000 ;   
 //$$ 
 // std::cout << " Run Evt " << Run << " " << Evt << " trigger list " << triggerList[i] << std::endl;
     }
@@ -690,12 +722,21 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
   //*********************************
   // Loop over the jets
-  
-  //CaloJetCollection::const_iterator jet;
+  edm::View<reco::Jet>::const_iterator pjet = jetsColl.begin();
+  //CaloJetCollection::const_iterator pjet = jetsCollHandle->begin();
       
   for ( unsigned int ijet = 0; ijet < jetsColl.size(); ijet++) {
-    
-    double JES = acorrector->correction(jetsColl.at(ijet) );
+    //cout << "get JES " << endl;
+    //double JES = acorrector->correction(jetsColl.at(ijet).p4() );   
+     
+    //edm::RefToBase<reco::Jet> jetRef((jetsColl,ijet));
+    //TrackRef ref(tracks, track - tracks->begin());
+    //edm::RefToBase<reco::Jet> jetRef(edm::Ref<edm::View<reco::Jet> >(jetsColl,  pjet-jetsColl.begin() ));
+    edm::RefToBase<reco::Jet> jetRef( jetsCollHandle,  pjet-jetsColl.begin() );
+
+    double JES = acorrector->correction( jetsColl.at(ijet), jetRef, iEvent,iSetup  ); 
+     pjet++;
+    //cout << "get JES done " << endl;
     double jetpt  = (jetsColl.at(ijet)).pt()  ;
     double jeteta = (jetsColl.at(ijet)).eta() ;
     double ptjet  = jetpt* JES;
@@ -927,6 +968,148 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     }
     Jet_nLastTrack[nJet]   = nTrack;
     
+//$$
+// get the 4 highest positive and 4 lowest negative IP/sig tracks
+    k = 0;
+    int k1 = -1, k2 = -1, k3 = -1, k4 = -1;
+    int n1 = -1, n2 = -1, n3 = -1, n4 = -1;
+    float kip1 = -100., kip2 = -100., kip3 = -100., kip4 = -100.;   
+    float nip1 =  100., nip2 =  100., nip3 =  100., nip4 =  100.;   
+    for (unsigned int itt=0; itt < assotracks.size(); itt++) {
+      GlobalPoint maximumClose = (*tagInfo)[ith_tagged].impactParameterData()[k].closestToJetAxis;
+      float decayLen = (maximumClose - (Pv_point)).mag(); 
+      float distJetAxis = (*tagInfo)[ith_tagged].impactParameterData()[k].distanceToJetAxis.value();
+      if ( std::fabs(distJetAxis) < 0.07 && decayLen < 5.0 ) {
+	float kip = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.significance();
+//         cout << k << " " << kip << endl;
+        if ( kip > kip1 ) {
+          k4 = k3;
+          k3 = k2;
+          k2 = k1;
+	  k1 = k;
+	  kip4 = kip3;
+	  kip3 = kip2;
+	  kip2 = kip1;
+	  kip1 = kip;
+	}
+        else if ( kip > kip2 ) {
+          k4 = k3;
+          k3 = k2;
+          k2 = k;
+	  kip4 = kip3;
+	  kip3 = kip2;
+	  kip2 = kip;
+	}
+        else if ( kip > kip3 ) {
+          k4 = k3;
+          k3 = k;
+	  kip4 = kip3;
+	  kip3 = kip;
+	}
+        else if ( kip > kip4 ) {
+          k4 = k;
+	  kip4 = kip;
+	}
+        if ( kip < nip1 ) {
+          n4 = n3;
+          n3 = n2;
+          n2 = n1;
+	  n1 = k;
+	  nip4 = nip3;
+	  nip3 = nip2;
+	  nip2 = nip1;
+	  nip1 = kip;
+	}
+        else if ( kip < nip2 ) {
+          n4 = n3;
+          n3 = n2;
+          n2 = k;
+	  nip4 = nip3;
+	  nip3 = nip2;
+	  nip2 = kip;
+	}
+        else if ( kip < nip3 ) {
+          n4 = n3;
+          n3 = k;
+	  nip4 = nip3;
+	  nip3 = kip;
+	}
+        else if ( kip < nip4 ) {
+          n4 = k;
+	  nip4 = kip;
+	}
+      }
+      k++;
+    } // end loop on tracks
+    if ( kip1 < 0. ) k1 = -1;
+    if ( kip2 < 0. ) k2 = -1;
+    if ( kip3 < 0. ) k3 = -1;
+    if ( kip4 < 0. ) k4 = -1;
+    if ( nip1 > 0. ) n1 = -1;
+    if ( nip2 > 0. ) n2 = -1;
+    if ( nip3 > 0. ) n3 = -1;
+    if ( nip4 > 0. ) n4 = -1;
+//     cout << " ordered " << n1 << " " << n2 << " " << n3 << " " << n4 << " "  
+//                         << k4 << " " << k3 << " " << k2 << " " << k1 << endl;
+//     cout << endl;
+
+// compute the invariant mass of this set of tracks
+    float Tpx = 0., Tpy = 0., Tpz = 0., Tee = 0., Tmass = 0.;
+    float Tmass2P = -1., Tmass3P = -1., Tmass4P = -1.;
+    if ( k2 >= 0 ) {
+      Tpx = (assotracks[k1])->px() + (assotracks[k2])->px();
+      Tpy = (assotracks[k1])->py() + (assotracks[k2])->py();
+      Tpz = (assotracks[k1])->pz() + (assotracks[k2])->pz();
+      Tee = TMath::Sqrt( (assotracks[k1])->p()*(assotracks[k1])->p()+0.135*0.135)
+          + TMath::Sqrt( (assotracks[k2])->p()*(assotracks[k2])->p()+0.135*0.135);
+      Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
+      if ( Tmass > 0. ) Tmass2P = TMath::Sqrt( Tmass );
+      if ( k3 >= 0 ) {
+        Tpx += (assotracks[k3])->px();
+        Tpy += (assotracks[k3])->py();
+        Tpz += (assotracks[k3])->pz();
+        Tee += TMath::Sqrt( (assotracks[k3])->p()*(assotracks[k3])->p()+0.135*0.135);
+        Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
+        if ( Tmass > 0. ) Tmass3P = TMath::Sqrt( Tmass );
+        if ( k4 >= 0 ) {
+          Tpx += (assotracks[k4])->px();
+          Tpy += (assotracks[k4])->py();
+          Tpz += (assotracks[k4])->pz();
+          Tee += TMath::Sqrt( (assotracks[k4])->p()*(assotracks[k4])->p()+0.135*0.135);
+          Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
+          if ( Tmass > 0. ) Tmass4P = TMath::Sqrt( Tmass );
+        }
+      }
+    }
+    Tpx = 0., Tpy = 0., Tpz = 0., Tee = 0., Tmass = 0.;
+    float Tmass2N = -1., Tmass3N = -1., Tmass4N = -1.;
+    if ( n2 >= 0 ) {
+      Tpx = (assotracks[n1])->px() + (assotracks[n2])->px();
+      Tpy = (assotracks[n1])->py() + (assotracks[n2])->py();
+      Tpz = (assotracks[n1])->pz() + (assotracks[n2])->pz();
+      Tee = TMath::Sqrt( (assotracks[n1])->p()*(assotracks[n1])->p()+0.135*0.135)
+          + TMath::Sqrt( (assotracks[n2])->p()*(assotracks[n2])->p()+0.135*0.135);
+      Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
+      if ( Tmass > 0. ) Tmass2N = TMath::Sqrt( Tmass );
+      if ( n3 >= 0 ) {
+        Tpx += (assotracks[n3])->px();
+        Tpy += (assotracks[n3])->py();
+        Tpz += (assotracks[n3])->pz();
+        Tee += TMath::Sqrt( (assotracks[n3])->p()*(assotracks[n3])->p()+0.135*0.135);
+        Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
+        if ( Tmass > 0. ) Tmass3N = TMath::Sqrt( Tmass );
+        if ( n4 >= 0 ) {
+          Tpx += (assotracks[n4])->px();
+          Tpy += (assotracks[n4])->py();
+          Tpz += (assotracks[n4])->pz();
+          Tee += TMath::Sqrt( (assotracks[n4])->p()*(assotracks[n4])->p()+0.135*0.135);
+          Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
+          if ( Tmass > 0. ) Tmass4N = TMath::Sqrt( Tmass );
+        }
+      }
+    }
+//$$
+
 // b-tagger discriminants
     float Proba  = (*jetTags_JP)[ith_tagged].second;
     ith_tagged   = this->TaggedJet(jetsColl.at(ijet),jetTags_PosJP);
@@ -943,6 +1126,8 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     float CombinedSvtx  = (*jetTags_CombinedSvtx)[ith_tagged].second;
     ith_tagged          = this->TaggedJet(jetsColl.at(ijet),jetTags_negCombinedSvtx);
     float CombinedSvtxN = (*jetTags_negCombinedSvtx)[ith_tagged].second;
+    ith_tagged  	= this->TaggedJet(jetsColl.at(ijet),jetTags_posCombinedSvtx);
+    float CombinedSvtxP = (*jetTags_posCombinedSvtx)[ith_tagged].second;
     
     //reco::TaggingVariableList variables =
     //                   svComputer((*tagInfo)[ith_tagged], (*tagInfoSVx)[ith_tagged]);
@@ -971,7 +1156,6 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     if ( SoftMN > 0 ) SoftMN = -SoftMN;
     
 // Muon information
-//$$
     ith_tagged = itagjetMuon;
     for (unsigned int leptIdx = 0; leptIdx < (*tagInos_softmuon)[ith_tagged].leptons(); leptIdx++){
      
@@ -1023,7 +1207,6 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	nMuon++;
       }
     }
-//$$
     
 // Jet information
     Jet_ProbaN[nJet]   = ProbaN;	 
@@ -1033,9 +1216,10 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     Jet_Bprob[nJet]    = Bprob;	  
     Jet_SvxN[nJet]     = SvtxN;        
     Jet_Svx[nJet]      = Svtx;        
-    Jet_SvxNHP[nJet]   = SvtxNHP;        
-    Jet_SvxHP[nJet]    = SvtxHP;   	
+    Jet_SvxNHP[nJet]   = SvtxNHP;	 
+    Jet_SvxHP[nJet]    = SvtxHP;    
     Jet_CombSvxN[nJet] = CombinedSvtxN;
+    Jet_CombSvxP[nJet] = CombinedSvtxP;
     Jet_CombSvx[nJet]  = CombinedSvtx;  
     Jet_SoftMuN[nJet]  = SoftMN;	 
     Jet_SoftMu[nJet]   = SoftM; 	 
@@ -1064,22 +1248,6 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       if(idSize > 2) flags3N = classifier_.evaluate( tracks[indexes[idSize-3]] ).flags();
     }
     
-    Jet_Ip1P[nJet]  = -100;
-    Jet_Ip1N[nJet]  =  100;
-    for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
-	 itipdata != ipdata.end(); itipdata++) {
-
-      float decayLen = ((*itipdata).closestToJetAxis - (Pv_point)).mag(); 
-      float distJetAxis = (*itipdata).distanceToJetAxis.value();
-//$$
-    if ( abs(distJetAxis) > 0.07 || decayLen > 5.0 ) continue;
-//$$	 
-      double ip3D = (*itipdata).ip3d.significance();
-      if( ip3D > Jet_Ip1P[nJet] ) Jet_Ip1P[nJet] = ip3D;         
-      if( ip3D < Jet_Ip1N[nJet] ) Jet_Ip1N[nJet] = ip3D;
-    }
-    Jet_Ip1N[nJet] = -Jet_Ip1N[nJet];
-    
     ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_TCHighEff);
     Jet_Ip2P[nJet]   = (*jetTags_TCHighEff)[ith_tagged].second;
     ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_TCHighPur);
@@ -1089,6 +1257,47 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_NegTCHighPur);
     Jet_Ip3N[nJet]   = (*jetTags_NegTCHighPur)[ith_tagged].second;
     
+//$$
+//     Jet_Ip1P[nJet]  = -100;
+//     Jet_Ip1N[nJet]  =  100;
+//     for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
+//       itipdata != ipdata.end(); itipdata++) {
+// 
+//       float decayLen = ((*itipdata).closestToJetAxis - (Pv_point)).mag(); 
+//       float distJetAxis = (*itipdata).distanceToJetAxis.value();
+//     if ( abs(distJetAxis) > 0.07 || decayLen > 5.0 ) continue;
+//       double ip3D = (*itipdata).ip3d.significance();
+//       if( ip3D > Jet_Ip1P[nJet] ) Jet_Ip1P[nJet] = ip3D;	 
+//       if( ip3D < Jet_Ip1N[nJet] ) Jet_Ip1N[nJet] = ip3D;
+//     }
+//     Jet_Ip1N[nJet] = -Jet_Ip1N[nJet];
+//$$	 
+//     if ( Jet_Ip2P[nJet] != kip2  || Jet_Ip3P[nJet] != kip3 
+//       || Jet_Ip2N[nJet] !=-nip2  || Jet_Ip3N[nJet] !=-nip3 ){ 
+//  cout << " ERROR " << n2 << " " << n3 << " " << k3 << " " << k2 << endl;
+//  cout << "       " << nip2 << " " << nip3 << " " << kip3 << " " << kip2 << endl;
+//  cout << "       " << -Jet_Ip2N[nJet] << " " << -Jet_Ip3N[nJet] << " "  
+//                    <<  Jet_Ip3P[nJet] << " " <<  Jet_Ip2P[nJet] << endl;
+//  cout << endl;
+//     }
+
+    Jet_Ip4P[nJet]  = kip4;
+    Jet_Ip4N[nJet]  = nip4;
+    Jet_Ip4N[nJet] = -Jet_Ip4N[nJet];
+    Jet_Mass2N[nJet] = Tmass2N;
+    Jet_Mass2P[nJet] = Tmass2P;
+    Jet_Mass3N[nJet] = Tmass3N;
+    Jet_Mass3P[nJet] = Tmass3P;
+    Jet_Mass4N[nJet] = Tmass4N;
+    Jet_Mass4P[nJet] = Tmass4P;
+
+//     cout << " Jet " << nJet << " pt " << Jet_pt[nJet]*JES*Jet_residual[nJet] << " " 
+//          << n1 << " " << n2 << " " << n3 << " " << n4 << " "  
+//          << k4 << " " << k3 << " " << k2 << " " << k1 << endl;
+//     cout << "    Mass neg " << Jet_Mass2N[nJet] << " " << Jet_Mass3N[nJet] << " " << Jet_Mass4N[nJet]
+//          << "    Mass pos " << Jet_Mass2P[nJet] << " " << Jet_Mass3P[nJet] << " " << Jet_Mass4P[nJet] << endl;
+//$$
+
     //*****************************************************************
     //get track histories for 1st, 2nd and 3rd track (TC)
     //*****************************************************************
@@ -1274,16 +1483,16 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		        + (cap7+can7)*10000000 + (cap8+can8)*100000000;
     }
 
-    Jet_SvxNTracks[nJet] = svxNegtracks.size();	 
-    Jet_SvxTracks[nJet]  = svxPostracks.size();	 
+//$$    Jet_SvxNTracks[nJet] = svxNegtracks.size();	 
+//$$    Jet_SvxTracks[nJet]  = svxPostracks.size();	 
    
 //$$
     float SVmass = 0.;
     if ( (*tagInfoSVx)[ith_tagged].nVertices() > 0) {
       SVmass = (*tagInfoSVx)[ith_tagged].secondaryVertex(0).p4().mass();
     }
-// std::cout << " Jet " << nJet << " pt " << Jet_pt[nJet]*JES*Jet_residual[nJet] << " SVmass " << SVmass << std::endl;
     Jet_SvxMass[nJet] = SVmass;	 
+// std::cout << " Jet " << nJet << " pt " << Jet_pt[nJet]*JES*Jet_residual[nJet] << " SVmass " << SVmass << std::endl;
 //$$
 
     nJet++;
@@ -1306,10 +1515,6 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       if ( ProbaN > 0 ) varneg = 20.*ProbaN;
       //       if ( ProbaP > tagCut_ ) TagPos = true;
       //       if ( ProbaN > tagCut_ ) TagNeg = true;
-    }
-    else if ( selTagger_ == 1 ) {     // jet fisrt track
-      if ( Jet_Ip1P[nJet] > 0. ) varpos = Jet_Ip1P[nJet];
-      if ( Jet_Ip1N[nJet] > 0. ) varneg = Jet_Ip1N[nJet];
     }
     else if ( selTagger_ == 2 ) {     // TC High Eff.
       if ( Jet_Ip2P[nJet] > 0. ) varpos = Jet_Ip2P[nJet];
@@ -1348,9 +1553,6 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     //       if ( varpos > tagCut_ ) TagPos = true;
     //       if ( varneg > tagCut_ ) TagNeg = true;
     //     }
-    
-    //     // veto on positive tag
-    //     if ( Jet_Ip1P[nJet] < vetoPos_ ) Veto = true;
     
     //***************************
     
@@ -1539,7 +1741,12 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 // Fill TTree
 //
 //$$
-  smalltree->Fill();
+  int trig100 = BitTrigger%100;
+  int trig1 = BitTrigger%10;
+  int trig2 = (trig100 - trig1) / 10;
+  if ( trig2 >= 4 ) smalltree->Fill();
+//$$
+//$$  smalltree->Fill();
 //$$
 //$$  if ( nMuon > 0 ) smalltree->Fill();
 //$$

@@ -16,7 +16,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.21 2011/03/31 08:07:21 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.22 2011/04/08 15:32:20 jandrea Exp $
 //
 //
 
@@ -56,7 +56,9 @@ Implementation:
 #include "DataFormats/JetReco/interface/CaloJet.h"
 #include "DataFormats/BTauReco/interface/JetTag.h"
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
+#include "DataFormats/JetReco/interface/JetCollection.h"
 #include "DataFormats/JetReco/interface/Jet.h"
+
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/TrackingRecHit/interface/TrackingRecHit.h"
 #include "DataFormats/TrackingRecHit/interface/TrackingRecHitFwd.h"
@@ -97,7 +99,7 @@ Implementation:
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
-
+#include "DataFormats/JetReco/interface/JetCollection.h"
 
 struct ltstr
 {
@@ -171,6 +173,7 @@ private:
     std::string trackCNegHPModuleName_;
 
     std::string combinedSvtxModuleName_;
+    std::string combinedSvtxPosModuleName_;
     std::string combinedSvtxNegModuleName_;
 
     std::string svtxModuleNameHighPur_;
@@ -333,6 +336,14 @@ private:
     float Jet_Ip2P[10000];
     float Jet_Ip3N[10000];
     float Jet_Ip3P[10000];
+    float Jet_Ip4N[10000];
+    float Jet_Ip4P[10000];
+    float Jet_Mass2N[10000];
+    float Jet_Mass2P[10000];
+    float Jet_Mass3N[10000];
+    float Jet_Mass3P[10000];
+    float Jet_Mass4N[10000];
+    float Jet_Mass4P[10000];
     float Jet_ProbaN[10000];
     float Jet_ProbaP[10000];
     float Jet_Proba[10000];
@@ -346,6 +357,7 @@ private:
     float Jet_SvxHP[10000];
     float Jet_SvxMass[10000];
     float Jet_CombSvxN[10000];
+    float Jet_CombSvxP[10000];
     float Jet_CombSvx[10000];
     float Jet_SoftMuN[10000];
     float Jet_SoftMu[10000];
