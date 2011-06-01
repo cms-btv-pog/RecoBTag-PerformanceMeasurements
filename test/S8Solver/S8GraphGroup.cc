@@ -144,13 +144,14 @@ Range range(const TMultiGraph *graph, const double &margin = .2)
 TLatex *createLabel(const double &luminosity = 33.3, const bool &isMC = false)
 {
     std::ostringstream title;
-    title << "#splitline{CMS Preliminary 2010}{";
+    title << "#splitline{CMS Preliminary 2011}{";
 
     if (isMC)
         title << "Simulation";
-    else
-        title << static_cast<unsigned int>(ceil(luminosity)) << " pb^{-1}";
-   
+    //else
+    //title << static_cast<unsigned int>(ceil(luminosity)) << " pb^{-1}";
+      
+
     title << " at #sqrt{s} = 7 TeV}";
 
     TLatex *label = new TLatex(3.570061, 23.08044, title.str().c_str());
