@@ -9,7 +9,7 @@ import optparse
 if __name__ =='__main__':
 
     ## command line options
-    parser = optparse.OptionParser ("Usage: %prog --command file-reference.txt [--commandMC file-mc.txt --command1 file-syst1.txt --command2 file-syst2.txt --systname]")
+    parser = optparse.OptionParser ("Usage: %prog --command file-reference.txt [--commandMC file-mc.txt --command1 file-syst1.txt --command2 file-syst2.txt --systname --outlatex syst.tex]")
     # required parameters
     cmdGroup = optparse.OptionGroup (parser, "Command Options ")
     cmdGroup.add_option ('--reference', dest='command', action='store',
@@ -22,7 +22,9 @@ if __name__ =='__main__':
                          help = 'systematic file')
     cmdGroup.add_option ('--systname', dest='systname', action='store',
                          help = 'name of systematic output file')
-
+    cmdGroup.add_option ('--outlatex', dest='outlatex', action='store',
+                         help = 'name of the latex output file')
+    
     parser.add_option_group (cmdGroup)
     (options, args) = parser.parse_args()
     #if len (args) < 1:
@@ -33,6 +35,8 @@ if __name__ =='__main__':
     #print options.command
     #print options.command1
 
+    IsLongTable = False
+    
     listoffiles = []
     listofnames = []
     listofbins = []
@@ -45,9 +49,11 @@ if __name__ =='__main__':
     if options.command1:
         listoffiles.append(options.command1)
         listofnames.append('syst1')
+        
     if options.command2:
         listoffiles.append(options.command2)
         listofnames.append('syst2')
+        IsLongTable = True
 
     bigtable = {} # per bin pt
     rowtable = {}
@@ -124,15 +130,22 @@ if __name__ =='__main__':
 
 print bigtable.keys()
 
-print "Now print table: \n\n"
-print '''
+print "Now print table in file: "+options.outlatex +" \n\n"
+thetable = '''
 \\begin{table}[h]
 \\begin{centering}
-\\begin{tabular}{|c|c|c|c|c|c|c|} \hline 
 '''
-# header
-print "jet $p_T$ & Nominal Data & low & $\Delta$ & high & $\Delta$ & $\Delta_{max}$  \\\ \hline"
-
+if IsLongTable:
+    thetable +='''
+    \\begin{tabular}{|c|c|c|c|c|c|c|} \hline 
+    jet $p_T$ & Nominal Data & low & $\Delta$ & high & $\Delta$ & $\Delta_{max}$  \\\ \hline
+    '''
+else:
+    thetable +='''
+    \\begin{tabular}{|c|c|c|c|} \hline
+    jet $p_T$ & Nominal Data & systematic & $\Delta$ \\\ \hline"
+    '''
+    
 outputfile = None
 if options.systname:
     outputfile = open(options.systname,"w")
@@ -171,27 +184,38 @@ for irow in listofbins:
                 aline += tmprow['mc_beff'] + ' $\pm$ ' + tmprow['mc_beff_err'] +sp
                 delta[niisample] = round(math.fabs(delta[0] - float(tmprow['mc_beff']))/delta[0],3)
 
-            aline += str(delta[niisample]) + sp
+            if IsLongTable:
+                aline += str(delta[niisample]) + sp
+            else:
+                aline += str(delta[niisample]) 
         niisample += 1
 
-    if niisample>1:
+    if niisample>1 and IsLongTable:
         if delta[1]>=delta[2]: maxdelta = delta[1]
         else: maxdelta = delta[2]
         aline += str(maxdelta) + ' \\\\'
     else:
         aline += ' \\\\'
 
-    print aline
+    #print aline
+    thetable += aline +'\n'
+    
     aline = ''
     if outputfile:
         outputfile.write(bin_pt+" "+str(maxdelta)+"\n")
 
-print '''
+thetable += '''
 \hline
 \end{tabular}
-%\caption{MC cutflow}\label{tab:tab}
+%\caption{Systematic uncertainties}\label{tab:tab}
 \end{centering}
 \end{table}
 '''
+
+outputfile.close()
+
+outtexfile = open(options.outlatex,"w")
+outtexfile.write(thetable)
+outtexfile.close()
 
 
