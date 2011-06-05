@@ -18,8 +18,12 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   //gStyle->SetPadBorderSize(0);  
   //gStyle->SetOptStat(1111111);
 
+  // use the TDR CMS style
   gROOT->ProcessLine(".L tdrstyle.C");
   setTDRStyle();
+
+  int datacolor = 1; // black
+  int mccolor = 2; // red
 
   Double_t xp,yp;
   Double_t xpe,ype;
@@ -101,6 +105,8 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   std::cout << "low/high " << low <<"/" << high <<std::endl;
   g1->GetYaxis()->SetRangeUser(low,high);
   gPad->SetTickx();
+  g1->SetMarkerColor(mccolor);
+  g1->SetLineColor(mccolor);
   g1->Draw("AP");
   
 
@@ -126,6 +132,9 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   
   int npoints=g2->GetN();
   g2->SetMarkerStyle(23);
+  g2->SetMarkerColor(datacolor);
+  g2->SetLineColor(datacolor);
+
   g2->Draw("P");
   
   std::ostringstream title;
@@ -207,7 +216,9 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   //label->Draw();
   c1->Update();
   
-  c1->Print("eff_tag_b.pdf","pdf");
+  TString pdfname = "s8_eff_sf_"+TString(OP)+".pdf";
+  //if TString(datalegend) !="Data" ) pdfname = "s8_eff_sf_"+TString(OP)+"_closure.pdf";
+  c1->Print(pdfname,"pdf");
   
 
 }
