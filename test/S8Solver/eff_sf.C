@@ -100,8 +100,8 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   g1->SetMarkerStyle(22);
 
   int n = g1->GetN() ;
-  double low = 0.22; //(effmc[0]- 0.1);
-  double high = 0.88; //(1.1* effmc[n-1]);
+  double low = 0.18; //(effmc[0]- 0.1);
+  double high = 0.98; //(1.1* effmc[n-1]);
   std::cout << "low/high " << low <<"/" << high <<std::endl;
   g1->GetYaxis()->SetRangeUser(low,high);
   gPad->SetTickx();
@@ -138,17 +138,18 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   g2->Draw("P");
   
   std::ostringstream title;
-  title << "#splitline{CMS Preliminary 2011}{ at #sqrt{s} = 7 TeV}";
+  title << "CMS Preliminary 2011 at #sqrt{s} = 7 TeV"; 
+  //title << "#splitline{CMS Preliminary 2011}{   at #sqrt{s} = 7 TeV}";
   //title << "16 pb^{-1}";
   //title << " at #sqrt{s} = 7 TeV}";
   TLatex *label = new TLatex(3.570061, 23.08044, title.str().c_str());
   label->SetNDC();
   label->SetTextAlign(13);
-  label->SetX(0.5);
+  label->SetX(0.25);
   label->SetY(0.970);
-  double yl = low - 0.05 ;
+  double yl = low - 0.09 ;
   double yh = yl + 0.15;
-  TLegend* leg = new TLegend(0.4,yl,0.7,yh); //use inspector
+  TLegend* leg = new TLegend(0.44,yl,0.74,yh); //use inspector
   leg->SetFillColor(0);
   leg->SetBorderSize(0);
   leg->AddEntry(g1, "Simulation", "P");
@@ -206,7 +207,7 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   e0->Draw("AP");
   
   std::ostringstream title;   
-  title << "#splitline{CMS Preliminary 2011}{at #sqrt{s} = 7 TeV}";
+  title << "#splitline{CMS Preliminary 2011}{ at #sqrt{s} = 7 TeV}";
   
   TLatex *label = new TLatex(3.570061, 23.08044, title.str().c_str());
   label->SetNDC();
