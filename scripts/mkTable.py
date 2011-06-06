@@ -40,6 +40,7 @@ if __name__ =='__main__':
     listoffiles = []
     listofnames = []
     listofbins = []
+    listofbin_widths = []
     if options.command:
         listoffiles.append(options.command)
         listofnames.append('reference')
@@ -69,6 +70,8 @@ if __name__ =='__main__':
         gotkeyword = False
         akeyword = "[Binned]"
         bin_pt = '0'
+        bin_pt_width = 0
+        
         for line in txtfile:
 
             if line.find('Generate Group')!=-1:
@@ -96,6 +99,8 @@ if __name__ =='__main__':
                 
                     if len(tmplist)>0:
                         bin_pt = tmplist[0]
+                        bin_pt_width = float(tmplist[2])
+                        
                         #print bin_pt
 
                     getMCeff = True
@@ -119,7 +124,9 @@ if __name__ =='__main__':
                         rowtable['s8_beff_err']=bin_s8_befferr
                         
                         bigtable[bin_pt+"_"+samplename] = rowtable
-                        if iif==1: listofbins.append(bin_pt+"_"+samplename)
+                        if iif==1:
+                            listofbins.append(bin_pt+"_"+samplename)
+                            listofbin_widths.append(bin_pt_width)
                         print "storing row for "+ bin_pt+"_"+samplename
                         print rowtable
                         #print bigtable[bin_pt+"_"+samplename]
@@ -143,24 +150,30 @@ if IsLongTable:
 else:
     thetable +='''
     \\begin{tabular}{|c|c|c|c|} \hline
-    jet $p_T$ & Nominal Data & systematic & $\Delta$ \\\ \hline"
+    jet $p_T$ & Nominal Data & systematic & $\Delta$ \\\ \hline
     '''
     
 outputfile = None
 if options.systname:
     outputfile = open(options.systname,"w")
 
+iirowcounter = 0
+
 for irow in listofbins:
 
     aline = ''
     sp = ' & '
     bin_pt = irow.split("_")[0]
-    bin_pt_str = str( float(bin_pt) )
+    bin_pt_width = listofbin_widths[iirowcounter]
+    min_pt_bin = str( int(round(float(bin_pt) - bin_pt_width,0 ) ))
+    max_pt_bin = str( int(round(float(bin_pt) + bin_pt_width,0 ) ))
+    bin_pt_str = min_pt_bin +" - " + max_pt_bin
     aline += bin_pt_str + sp
     niisample = 0
     delta = [0,0,0]
     maxdelta = 0
     #keepline = True
+    iirowcounter += 1
     for isample in listofnames:
 
         #print "bin is "+bin_pt+" sample is "+isample
