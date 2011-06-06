@@ -214,8 +214,10 @@ for irow in listofbins:
     thetable += aline +'\n'
     
     aline = ''
+    maxdelta = delta[1]
     if outputfile:
-        outputfile.write(bin_pt+" "+str(maxdelta)+"\n")
+        outputfile.write(min_pt_bin +" " + max_pt_bin + " " + str(maxdelta)+"\n")
+        #outputfile.write(bin_pt+" "+str(maxdelta)+"\n")
 
 thetable += '''
 \hline
