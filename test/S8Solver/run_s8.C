@@ -20,6 +20,8 @@ void run_s8( const char * data, const char * mc, int useMcTrue = 0) {
     //s->SetEtaFits();
 //    s->setFirstBin(1);
 //    s->setLastBin(6);
+    Double_t xbins[6] = {20,30,40,50,80,240};
+    s->SetRebin(5, xbins);
     //s->SetSolution(0, 1);
     //s->SetSolution(1, 1);
     //s->SetSolution(2, 1);
