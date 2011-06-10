@@ -152,8 +152,19 @@ else:
     \\begin{tabular}{|c|c|c|c|} \hline
     jet $p_T$ & Nominal Data & systematic & $\Delta$ \\\ \hline
     '''
-    
+
+newtable = '''
+\\begin{table}[h]
+\\begin{centering}
+
+\\begin{tabular}{cccc}
+tagger & $\\epsilon^{data}_{b}$ & $\\epsilon^{MC}_{b}$ & $SF_{b}$ \\\ \\hline
+'''
+
+print newtable
+
 outputfile = None
+
 if options.systname:
     outputfile = open(options.systname,"w")
 
@@ -174,6 +185,7 @@ for irow in listofbins:
     maxdelta = 0
     #keepline = True
     iirowcounter += 1
+    newline = ""
     for isample in listofnames:
 
         #print "bin is "+bin_pt+" sample is "+isample
@@ -188,6 +200,13 @@ for irow in listofbins:
             delta[0] = float(tmprow['s8_beff'])
             #print str(delta)
             aline += tmprow['s8_beff'] + ' $\pm$ ' + tmprow['s8_beff_err'] +sp
+            newline += tmprow['s8_beff'] + ' $\pm$ ' + tmprow['s8_beff_err'] +sp + tmprow['mc_beff'] + ' $\pm$ ' + tmprow['mc_beff_err'] +sp
+            tmpSF = float(tmprow['s8_beff'])/float(tmprow['mc_beff'])
+            tmpSFerr = float(tmprow['mc_beff'])*float(tmprow['mc_beff'])*float(tmprow['s8_beff_err'])*float(tmprow['s8_beff_err']) + float(tmprow['s8_beff'])*float(tmprow['s8_beff'])*float(tmprow['mc_beff_err'])*float(tmprow['mc_beff_err'])
+            tmpSFerr = tmpSFerr/(float(tmprow['mc_beff'])*float(tmprow['mc_beff'])*float(tmprow['mc_beff'])*float(tmprow['mc_beff']))
+            tmpSFerr = math.sqrt( tmpSFerr )
+            newline += str( round(tmpSF,4) ) + ' $\pm$ ' + str( round(tmpSFerr,4) ) 
+            print bin_pt_str+ sp + newline
         else:    
             if isample!="MC":
                 aline += tmprow['s8_beff'] + ' $\pm$ ' + tmprow['s8_beff_err'] +sp
@@ -200,7 +219,9 @@ for irow in listofbins:
             if IsLongTable:
                 aline += str(delta[niisample]) + sp
             else:
-                aline += str(delta[niisample]) 
+                aline += str(delta[niisample])
+
+                
         niisample += 1
 
     if niisample>1 and IsLongTable:
@@ -226,6 +247,15 @@ thetable += '''
 \end{centering}
 \end{table}
 '''
+
+endnewtable = '''
+\hline
+\end{tabular}
+%\caption{Eff and SF}\label{tab:tab}
+\end{centering}
+\end{table}
+'''
+print endnewtable
 
 outputfile.close()
 
