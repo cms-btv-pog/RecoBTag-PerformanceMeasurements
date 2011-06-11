@@ -9,7 +9,7 @@
 #include "TFile.h"
 #include "TROOT.h"
 
-void eff_sf(const char *filename="s8.root", const char * OP= "", const char *datalegend="Data") {
+void eff_sf(const char *filename="s8.root", const char * OP= "", const char *datalegend="Data", const char *ptrelfilename="") {
 
   //gROOT->SetStyle("Plain");
   //gStyle->SetFillColor(0);
@@ -23,42 +23,37 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   gROOT->ProcessLine(".L tdrstyle.C");
   setTDRStyle();
 
+  // define some colors
   int datacolor = 1; // black
   int mccolor = 2; // red
 
   Double_t xp,yp;
   Double_t xpe,ype;
   
-  
-  TFile* file = TFile::Open(filename);
-  
-  if (  ! file->IsOpen() ) {
-    cerr << "Could not open the input file "  << endl;
-    
-  }
-  
-  
-  
-  gDirectory->cd("mcefficiency");
-  
-  
-  TCanvas* c1 = new TCanvas("c1", "c1", 600, 800);
-  TPad *d1, *d2;
-  
-  c1->Divide(1,2,0,0);
-  d1 = (TPad*)c1->GetPad(1);
-  d1->SetPad(0.01,0.35,0.95,0.95);
-  d2 = (TPad*)c1->GetPad(2);
-  d2->SetPad(0.01,0.02,0.95,0.35);
-	
-	
-  d1->cd();
-  gPad->SetBottomMargin(0);
-  gPad->SetRightMargin(0.04);
-  gPad->SetLeftMargin(0.19);
-  gPad->SetGrid();
+  bool HasPtrel = false;
 
-  g1 = (TGraphErrors*) eff_tag_b;
+  TFile *file, *ptrelfile;
+  
+  file = new TFile(filename);
+  
+  if ( TString(ptrelfilename) != "" ) 
+    {
+      ptrelfile = new TFile(ptrelfilename);
+      HasPtrel = true;
+    }
+
+  if ( file->IsZombie() ) 
+    {    
+      cout << "Could not open input file " << filename  << " exit now. " << endl;
+      return;
+    }
+  
+  
+  // get plots.
+  file->cd();
+  file->cd("mcefficiency");
+  // get MC Efficiencies
+  TGraphErrors *g1 = (TGraphErrors*) gDirectory->Get("eff_tag_b");
 
   Double_t effmc[20];
   Double_t effdata[20];
@@ -74,10 +69,7 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   Double_t sf_y_error[20] ;
   
   Double_t sf_x_error[20];
-	
-	
-	
-	
+		
   for(int i = 0;  g1->GetN() > i; ++i) {
     g1->GetPoint(i,xp,yp);
     xpe=g1->GetErrorX(i);
@@ -89,6 +81,21 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
     effmc_yerr[i]=ype;
   }
   
+  TCanvas* c1 = new TCanvas("c1", "c1", 600, 800);
+  TPad *d1, *d2;
+
+  c1->Divide(1,2,0,0);
+  d1 = (TPad*)c1->GetPad(1);
+  d1->SetPad(0.01,0.35,0.95,0.95);
+  d2 = (TPad*)c1->GetPad(2);
+  d2->SetPad(0.01,0.02,0.95,0.35);
+
+  d1->cd();
+  gPad->SetBottomMargin(0);
+  gPad->SetRightMargin(0.04);
+  gPad->SetLeftMargin(0.19);
+  gPad->SetGrid();
+
   g1->SetTitle("Efficiency");
   g1->GetXaxis()->SetTitle("Jet p_{T} [GeV/c]");
   TString tmplabel("b-tag Efficiency #epsilon_{b}");
@@ -110,15 +117,11 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   g1->SetLineColor(mccolor);
   g1->Draw("AP");
   
-
-
-
-
+  // get S8 efficiencies
   gDirectory->cd("../s8efficiency");
   
-  g2 = (TGraphErrors*) eff_tag_b;
-  
-  
+  TGraphErrors *g2 = (TGraphErrors*) gDirectory->Get("eff_tag_b");
+   
   for(int i = 0;  g2->GetN() > i; ++i) {
     g2->GetPoint(i,xp,yp);
     xpe=g2->GetErrorX(i);
@@ -138,12 +141,11 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
 
   g2->Draw("P");
   
-  std::ostringstream title;
-  title << "CMS Preliminary 2011 at #sqrt{s} = 7 TeV"; 
+  std::string title = "CMS Preliminary 2011 at #sqrt{s} = 7 TeV"; 
   //title << "#splitline{CMS Preliminary 2011}{   at #sqrt{s} = 7 TeV}";
   //title << "16 pb^{-1}";
   //title << " at #sqrt{s} = 7 TeV}";
-  TLatex *label = new TLatex(3.570061, 23.08044, title.str().c_str());
+  TLatex *label = new TLatex(3.570061, 23.08044, title.c_str());
   label->SetNDC();
   label->SetTextAlign(13);
   label->SetX(0.25);
@@ -157,7 +159,25 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   leg->AddEntry(g2, datalegend, "P");
   leg->Draw();
   label->Draw();
-  
+ 
+  // get ptrel results if available
+  TGraphErrors *ptrel_data_g;
+  TGraphErrors *ptrel_mc_g;
+  TGraphErrors *ptrel_sf_g;
+
+  if (HasPtrel) 
+    {
+      ptrelfile->cd();
+      TH1F *htmp = (TH1F*) gDirectory->Get("Data_"+TString(OP)+"__KinWeights_PVWeighting_DW");
+      ptrel_data_g = new TGraphErrors( htmp );
+      ptrel_mc_g   = new TGraphErrors( (TH1*) gDirectory->Get("MC_"+TString(OP)+"__KinWeights_PVWeighting_DW") );
+      ptrel_sf_g   = new TGraphErrors( (TH1*) gDirectory->Get("SF_"+TString(OP)+"__KinWeights_PVWeighting_DW") );
+
+      ptrel_data_g->Draw("P");
+      ptrel_mc_g->Draw("P");
+      
+    }
+
   
   d2->cd();
   gPad->SetLeftMargin(0.19);
@@ -207,11 +227,11 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   //e0->GetYaxis()->CenterTitle(kTRUE);
   e0->Draw("AP");
   
-  std::ostringstream title;   
-  title << "#splitline{CMS Preliminary 2011}{ at #sqrt{s} = 7 TeV}";
+  //std::ostringstream title;   
+  //title << "#splitline{CMS Preliminary 2011}{ at #sqrt{s} = 7 TeV}";
   
-  TLatex *label = new TLatex(3.570061, 23.08044, title.str().c_str());
-  label->SetNDC();
+  //TLatex *label = new TLatex(3.570061, 23.08044, title.str().c_str());
+  //label->SetNDC();
   label->SetTextAlign(13);
   label->SetX(0.4);
   label->SetY(0.890);
