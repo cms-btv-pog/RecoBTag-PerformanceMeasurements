@@ -17,15 +17,20 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   //gStyle->SetOptTitle(0);
   //gStyle->SetPadBorderMode(0);
   //gStyle->SetPadBorderSize(0);  
-  //gStyle->SetOptStat(1111111);
+  //gStyle->SetOptStat(0);
 
   // use the TDR CMS style
   gROOT->ProcessLine(".L tdrstyle.C");
   setTDRStyle();
+  gStyle->SetOptFit(0);
 
   // define some colors
-  int datacolor = 1; // black
-  int mccolor = 2; // red
+  int s8color = 2; // red
+  int ptrelcolor = 4; // blue
+  int s8marker_data = 20;
+  int s8marker_mc = 24;
+  int ptrelmarker_data = 21;
+  int ptrelmarker_mc = 25;
 
   Double_t xp,yp;
   Double_t xpe,ype;
@@ -94,27 +99,27 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   gPad->SetBottomMargin(0);
   gPad->SetRightMargin(0.04);
   gPad->SetLeftMargin(0.19);
-  gPad->SetGrid();
+  //gPad->SetGrid();
 
   g1->SetTitle("Efficiency");
-  g1->GetXaxis()->SetTitle("Jet p_{T} [GeV/c]");
+  g1->GetXaxis()->SetTitle("Jet p_{T} [GeV]");
   TString tmplabel("b-tag Efficiency #epsilon_{b}");
   tmplabel = TString(OP) + TString(" ")+ tmplabel;
   g1->GetYaxis()->SetTitle(tmplabel);
   g1->GetYaxis()->SetTitleSize(0.05);
-  g1->GetYaxis()->SetLabelSize(0.03);
-  g1->GetYaxis()->SetTitleOffset(0.9);
+  g1->GetYaxis()->SetLabelSize(0.05);
+  g1->GetYaxis()->SetTitleOffset(1.2);
   //  g1->GetYaxis()->CenterTitle(true);
-  g1->SetMarkerStyle(22);
+  g1->SetMarkerStyle(s8marker_mc);
 
   int n = g1->GetN() ;
-  double low = 0.18; //(effmc[0]- 0.1);
+  double low = 0.02; //(effmc[0]- 0.1);
   double high = 0.98; //(1.1* effmc[n-1]);
   std::cout << "low/high " << low <<"/" << high <<std::endl;
   g1->GetYaxis()->SetRangeUser(low,high);
   gPad->SetTickx();
-  g1->SetMarkerColor(mccolor);
-  g1->SetLineColor(mccolor);
+  g1->SetMarkerColor(s8color);
+  g1->SetLineColor(s8color);
   g1->Draw("AP");
   
   // get S8 efficiencies
@@ -135,9 +140,9 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   
   
   int npoints=g2->GetN();
-  g2->SetMarkerStyle(23);
-  g2->SetMarkerColor(datacolor);
-  g2->SetLineColor(datacolor);
+  g2->SetMarkerStyle(s8marker_data);
+  g2->SetMarkerColor(s8color);
+  g2->SetLineColor(s8color);
 
   g2->Draw("P");
   
@@ -149,16 +154,7 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   label->SetNDC();
   label->SetTextAlign(13);
   label->SetX(0.25);
-  label->SetY(0.970);
-  double yl = low - 0.09 ;
-  double yh = yl + 0.15;
-  TLegend* leg = new TLegend(0.44,yl,0.74,yh); //use inspector
-  leg->SetFillColor(0);
-  leg->SetBorderSize(0);
-  leg->AddEntry(g1, "Simulation", "P");
-  leg->AddEntry(g2, datalegend, "P");
-  leg->Draw();
-  label->Draw();
+  label->SetY(0.96);
  
   // get ptrel results if available
   TGraphErrors *ptrel_data_g;
@@ -168,18 +164,50 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   if (HasPtrel) 
     {
       ptrelfile->cd();
-      TH1F *htmp = (TH1F*) gDirectory->Get("Data_"+TString(OP)+"__KinWeights_PVWeighting_DW");
-      ptrel_data_g = new TGraphErrors( htmp );
+      //TH1F *htmp = (TH1F*) gDirectory->Get("Data_"+TString(OP)+"__KinWeights_PVWeighting_DW");
+      ptrel_data_g = new TGraphErrors( (TH1*) gDirectory->Get("Data_"+TString(OP)+"__KinWeights_PVWeighting_DW") );
       ptrel_mc_g   = new TGraphErrors( (TH1*) gDirectory->Get("MC_"+TString(OP)+"__KinWeights_PVWeighting_DW") );
       ptrel_sf_g   = new TGraphErrors( (TH1*) gDirectory->Get("SF_"+TString(OP)+"__KinWeights_PVWeighting_DW") );
+
+      ptrel_data_g->SetLineColor(ptrelcolor);
+      ptrel_data_g->SetMarkerColor(ptrelcolor);
+      ptrel_mc_g->SetLineColor(ptrelcolor);
+      ptrel_mc_g->SetMarkerColor(ptrelcolor);
+      
+      ptrel_data_g->SetMarkerStyle(ptrelmarker_data);
+      ptrel_mc_g->SetMarkerStyle(ptrelmarker_mc);
+      ptrel_data_g->SetMarkerSize(1.5);
+      ptrel_mc_g->SetMarkerSize(1.5);
 
       ptrel_data_g->Draw("P");
       ptrel_mc_g->Draw("P");
       
     }
 
+  double yl = low ;
+  double yh = yl + 0.2;
+  TLegend* leg = new TLegend(0.62,yl,0.92,yh); //use inspector
+  leg->SetFillColor(0);
+  leg->SetBorderSize(0);
+  if (HasPtrel)
+    {
+      leg->AddEntry(g1, "Simulation System8", "P");
+      leg->AddEntry(g2, TString(datalegend)+" System8", "P");
+      leg->AddEntry(ptrel_mc_g, "Simulation PtRel", "P");
+      leg->AddEntry(ptrel_data_g, TString(datalegend)+" Ptrel", "P");
+    }
+  else
+    {
+      leg->AddEntry(g1, "Simulation", "P");
+      leg->AddEntry(g2, datalegend, "P");
+    }
+
+  leg->Draw();
+  label->Draw();
+
   
   d2->cd();
+  
   gPad->SetLeftMargin(0.19);
   gPad->SetTopMargin(0);
   gPad->SetRightMargin(0.04);
@@ -187,7 +215,7 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   gPad->SetBottomMargin(0.3);
   gPad->SetTickx();
   gPad->SetRightMargin(0.04); 
-  gPad->SetGrid();
+  //gPad->SetGrid();
   
   
   for(int i = 0;  npoints > i; ++i) {
@@ -203,22 +231,23 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   
   
   TGraphErrors* e0 = new TGraphErrors(npoints, pt, sf, sf_x_error, sf_y_error);
-  //e0->SetMarkerColor(7);
-  e0->SetMarkerStyle(20);
+  e0->SetMarkerColor(s8color);
+  e0->SetLineColor(s8color);
+  e0->SetMarkerStyle(s8marker_data);
   e0->SetMarkerSize(1.3);
   e0->SetTitle("Scale Factors");
-  e0->GetXaxis()->SetTitle("Jet p_{T} [GeV/c]");
+  e0->GetXaxis()->SetTitle("Jet p_{T} [GeV]");
   e0->GetXaxis()->SetTitleOffset(1.2);
-
+  e0->GetXaxis()->SetTitleSize(0.09);
+  e0->GetXaxis()->SetLabelSize(0.09);
   //e0->GetYaxis()->SetRangeUser(0, 1);
   //e0->GetXaxis()->CenterTitle(kTRUE);
-  e0->GetYaxis()->SetTitle("Data/MC Scale Factor SF_{b}");
-  e0->GetYaxis()->SetTitleSize(0.06);
-  e0->GetYaxis()->SetTitleOffset(0.9);
+  e0->GetYaxis()->SetTitle("Data/Sim. SF_{b}");
+  e0->GetYaxis()->SetTitleSize(0.09);
+  e0->GetYaxis()->SetTitleOffset(0.7);
   e0->GetYaxis()->CenterTitle(true);
-  e0->GetXaxis()->SetLabelSize(0.07); 
-  e0->GetYaxis()->SetLabelSize(0.06); 
-  e0->GetXaxis()->SetTitleSize(0.07);
+  e0->GetYaxis()->SetLabelSize(0.09); 
+  
   
   //    e0->GetXaxis()->SetLabelOffset(0.04);
   
@@ -227,14 +256,48 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   //e0->GetYaxis()->CenterTitle(kTRUE);
   e0->Draw("AP");
   
+  // plot ptrel SF if available
+  if (HasPtrel)
+    {
+      ptrel_sf_g->SetMarkerSize(1.3);
+      ptrel_sf_g->SetMarkerStyle(ptrelmarker_data);
+      ptrel_sf_g->SetLineColor(ptrelcolor);
+      ptrel_sf_g->SetMarkerColor(ptrelcolor);
+
+      ptrel_sf_g->Draw("P");
+    }
+
+  if (HasPtrel)
+    {
+      TLegend* leg2 = new TLegend(0.62,0.76,0.92,0.76+(yh-yl)*0.7); //use inspector
+      leg2->SetFillColor(0);
+      leg2->SetBorderSize(0);
+      leg2->AddEntry(e0, "System8", "P");
+      leg2->AddEntry(ptrel_sf_g, "PtRel", "P");
+      leg2->Draw();
+    }
+
+  TF1 *s8_fit = new TF1("s8_fit","pol1",20,120);
+  s8_fit->SetLineColor(s8color);
+  TF1 *ptrel_fit =new TF1("ptrel_fit","pol1",20,120);
+  ptrel_fit->SetLineColor(ptrelcolor);
+
+  e0->Fit("s8_fit","RE");
+  cout << "System8 fit chi2 = "<< s8_fit->GetChisquare() << endl;
+  if (HasPtrel) 
+    {
+      ptrel_sf_g->Fit("ptrel_fit","RE");
+      cout << "PtRel fit chi2 = "<< ptrel_fit->GetChisquare() << endl;
+    }
+
   //std::ostringstream title;   
   //title << "#splitline{CMS Preliminary 2011}{ at #sqrt{s} = 7 TeV}";
   
   //TLatex *label = new TLatex(3.570061, 23.08044, title.str().c_str());
   //label->SetNDC();
-  label->SetTextAlign(13);
-  label->SetX(0.4);
-  label->SetY(0.890);
+  //label->SetTextAlign(13);
+  //label->SetX(0.4);
+  //label->SetY(0.890);
   //label->Draw();
   c1->Update();
   
