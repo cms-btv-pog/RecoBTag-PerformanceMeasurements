@@ -247,14 +247,11 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   e0->GetYaxis()->SetTitleOffset(0.7);
   e0->GetYaxis()->CenterTitle(true);
   e0->GetYaxis()->SetLabelSize(0.09); 
-  
-  
-  //    e0->GetXaxis()->SetLabelOffset(0.04);
-  
   e0->GetYaxis()->SetRangeUser(0.48,1.52);
 
-  //e0->GetYaxis()->CenterTitle(kTRUE);
-  e0->Draw("AP");
+  TMultiGraph *the_sf = new TMultiGraph();
+  the_sf->Add(e0,"p");
+  //e0->Draw("AP");
   
   // plot ptrel SF if available
   if (HasPtrel)
@@ -264,8 +261,32 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
       ptrel_sf_g->SetLineColor(ptrelcolor);
       ptrel_sf_g->SetMarkerColor(ptrelcolor);
 
-      ptrel_sf_g->Draw("P");
+      //ptrel_sf_g->Draw("P");
+      the_sf->Add(ptrel_sf_g,"p");
+
+      // get last bin content
+      Double_t last_bin_ptrel,last_bin_s8;
+      Double_t tmpx;
+      //ptrel_sf_g->Print("all");
+      ptrel_sf_g->GetPoint(149,tmpx,last_bin_ptrel);
+      e0->GetPoint(e0->GetN() - 1,tmpx,last_bin_s8);
+      cout << last_bin_ptrel << endl;
+      cout << last_bin_s8 << endl;
+      cout << "Averaged SF for last bin: SF = " << (last_bin_ptrel+last_bin_s8)/2 << endl;
+
     }
+
+  the_sf->Draw("a");
+  the_sf->GetXaxis()->SetTitle("Jet p_{T} [GeV]");
+  the_sf->GetXaxis()->SetTitleOffset(1.2);
+  the_sf->GetXaxis()->SetTitleSize(0.09);
+  the_sf->GetXaxis()->SetLabelSize(0.09);
+  the_sf->GetYaxis()->SetTitle("Data/Sim. SF_{b}");
+  the_sf->GetYaxis()->SetTitleSize(0.09);
+  the_sf->GetYaxis()->SetTitleOffset(0.7);
+  the_sf->GetYaxis()->CenterTitle(true);
+  the_sf->GetYaxis()->SetLabelSize(0.09);
+  the_sf->GetYaxis()->SetRangeUser(0.48,1.52);
 
   if (HasPtrel)
     {
@@ -277,6 +298,8 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
       leg2->Draw();
     }
 
+  // Fit individually ptrel and s8 scale factors
+  /*
   TF1 *s8_fit = new TF1("s8_fit","pol1",20,120);
   s8_fit->SetLineColor(s8color);
   TF1 *ptrel_fit =new TF1("ptrel_fit","pol1",20,120);
@@ -289,20 +312,17 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
       ptrel_sf_g->Fit("ptrel_fit","RE");
       cout << "PtRel fit chi2 = "<< ptrel_fit->GetChisquare() << endl;
     }
+  */
+  // Fit simultaneously ptrel and s8
+  TF1 *sf_fit = new TF1("sf_fit","pol0",20,120);
+  sf_fit->SetLineColor(1);
+  sf_fit->SetLineWidth(2);
+  the_sf->Fit("sf_fit","RE");
+  cout << "fit chi2 = " << sf_fit->GetChisquare() << endl;
 
-  //std::ostringstream title;   
-  //title << "#splitline{CMS Preliminary 2011}{ at #sqrt{s} = 7 TeV}";
-  
-  //TLatex *label = new TLatex(3.570061, 23.08044, title.str().c_str());
-  //label->SetNDC();
-  //label->SetTextAlign(13);
-  //label->SetX(0.4);
-  //label->SetY(0.890);
-  //label->Draw();
   c1->Update();
-  
+  // Print file
   TString pdfname = "s8_eff_sf_"+TString(OP)+".pdf";
-  //if TString(datalegend) !="Data" ) pdfname = "s8_eff_sf_"+TString(OP)+"_closure.pdf";
   c1->Print(pdfname,"pdf");
   
 
