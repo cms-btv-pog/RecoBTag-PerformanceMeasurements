@@ -115,7 +115,7 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   int n = g1->GetN() ;
   double low = 0.02; //(effmc[0]- 0.1);
   double high = 0.98; //(1.1* effmc[n-1]);
-  std::cout << "low/high " << low <<"/" << high <<std::endl;
+  //std::cout << "low/high " << low <<"/" << high <<std::endl;
   g1->GetYaxis()->SetRangeUser(low,high);
   gPad->SetTickx();
   g1->SetMarkerColor(s8color);
@@ -224,8 +224,8 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
     sf_y_error[i]=((effdata_yerr[i]*effdata_yerr[i])/(effdata[i]*effdata[i]))+
       ((effmc_yerr[i]*effmc_yerr[i])/(effmc[i]*effmc[i]));
     sf_y_error[i]=sqrt(sf_y_error[i])*sf[i];
-    cout << effdata[i] << " " << effmc[i] << " " << sf[i] << 
-      " " << sf_y_error[i] << " " << sf_y_error[i]/sf[i] << endl;
+    //cout << effdata[i] << " " << effmc[i] << " " << sf[i] << 
+    //  " " << sf_y_error[i] << " " << sf_y_error[i]/sf[i] << endl;
     
   }
   
