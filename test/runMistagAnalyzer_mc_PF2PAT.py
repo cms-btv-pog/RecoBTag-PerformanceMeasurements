@@ -62,6 +62,7 @@ process.load("SimTracker.TrackHistory.TrackHistory_cff")
 process.load("RecoBTag.ImpactParameter.negativeOnlyJetBProbabilityComputer_cfi")
 process.load("RecoBTag.ImpactParameter.negativeOnlyJetProbabilityComputer_cfi")
 process.load("RecoBTag.ImpactParameter.positiveOnlyJetProbabilityComputer_cfi")
+process.load("RecoBTag.ImpactParameter.positiveOnlyJetBProbabilityComputer_cfi")
 process.load("RecoBTag.ImpactParameter.negativeTrackCounting3D2ndComputer_cfi")
 process.load("RecoBTag.ImpactParameter.negativeTrackCounting3D3rdComputer_cfi")
 process.load("RecoBTag.Configuration.RecoBTag_cff")
@@ -69,6 +70,7 @@ process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
 process.load("RecoBTag.ImpactParameter.negativeOnlyJetBProbabilityJetTags_cfi")
 process.load("RecoBTag.ImpactParameter.negativeOnlyJetProbabilityJetTags_cfi")
 process.load("RecoBTag.ImpactParameter.positiveOnlyJetProbabilityJetTags_cfi")
+process.load("RecoBTag.ImpactParameter.positiveOnlyJetBProbabilityJetTags_cfi")
 process.load("RecoBTag.ImpactParameter.negativeTrackCountingHighPur_cfi")
 process.load("RecoBTag.ImpactParameter.negativeTrackCountingHighEffJetTags_cfi")
 process.load("RecoBTag.ImpactParameter.jetProbabilityBJetTags_cfi")
@@ -253,6 +255,7 @@ process.noscraping = cms.EDFilter("FilterOutScraping",
 
 
 #Filter for good primary vertex
+process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi")
 process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
                       vertexCollection = cms.InputTag('offlinePrimaryVertices'),
                       minimumNDOF = cms.uint32(4) ,
@@ -303,9 +306,51 @@ process.ak5JetTracksAssociatorAtVertex.jets = "selectedPatJetsPF2PAT"
 process.softMuonTagInfos.jets = "selectedPatJetsPF2PAT"
 
 
+
+
+
+process.jetProbabilityMixed = cms.ESProducer("JetProbabilityESProducer",
+    impactParameterType = cms.int32(0), ## 0 = 3D, 1 = 2D
+
+    deltaR = cms.double(0.3),
+    maximumDistanceToJetAxis = cms.double(0.07),
+    trackIpSign = cms.int32(0), ## 0 = use both, 1 = positive only, -1 = negative only
+
+    minimumProbability = cms.double(0.005),
+    maximumDecayLength = cms.double(5.0),
+    trackQualityClass = cms.string("any")
+)
+
+
+process.jetBProbabilityMixed = cms.ESProducer("JetBProbabilityESProducer",
+    impactParameterType = cms.int32(0), ## 0 = 3D, 1 = 2D
+
+    deltaR = cms.double(-1.0), ## use cut from JTA
+
+    maximumDistanceToJetAxis = cms.double(0.07),
+    trackIpSign = cms.int32(0), ## 0 = use both, 1 = positive only, -1 = negative only
+
+    minimumProbability = cms.double(0.005),
+    numberOfBTracks = cms.uint32(4),
+    maximumDecayLength = cms.double(5.0),
+
+    trackQualityClass = cms.string("any")
+)
+
+
+
+process.jetProbabilityBJetTags.jetTagComputer  = 'jetProbabilityMixed'
+process.jetBProbabilityBJetTags.jetTagComputer = 'jetBProbabilityMixed'
+
+
+
+
+
+
 process.p = cms.Path(
 #$$
         process.kt6PFJets
+        *process.offlinePrimaryVertices 
 	*process.goodOfflinePrimaryVertices
 	*getattr(process,"patPF2PATSequence"+postfix)
         #*process.PFJetsFilter
@@ -322,7 +367,7 @@ process.p = cms.Path(
         *process.combinedSecondaryVertexNegativeBJetTags*process.combinedSecondaryVertexPositiveBJetTags
 	#*process.negativeSoftMuonBJetTags*process.positiveSoftMuonBJetTags	
 	*process.negativeSoftLeptonByPtBJetTags*process.positiveSoftLeptonByPtBJetTags	
-	*process.jetBProbabilityBJetTags*process.negativeOnlyJetBProbabilityJetTags
+	*process.negativeOnlyJetBProbabilityJetTags*process.positiveOnlyJetBProbabilityJetTags
 	*process.mistag
 	)
 	

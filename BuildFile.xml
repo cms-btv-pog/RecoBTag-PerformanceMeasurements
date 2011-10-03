@@ -23,6 +23,7 @@
 <use   name="SimTracker/TrackAssociation"/>
 <use   name="SimTracker/Records"/>
 <use   name="TrackingTools/TransientTrack"/>
+<use   name="TrackingTools/IPTools">
 <use   name="PhysicsTools/UtilAlgos"/>
 <flags   CXXFLAGS="-O0 -g"/>
 <export>

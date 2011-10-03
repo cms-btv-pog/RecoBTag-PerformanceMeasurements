@@ -16,7 +16,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.22 2011/04/08 15:32:20 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.23 2011/05/31 10:18:56 jandrea Exp $
 //
 //
 
@@ -100,7 +100,10 @@ Implementation:
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/JetReco/interface/JetCollection.h"
+#include "DataFormats/JetReco/interface/GenJetCollection.h"
 
+//reconstruct IP
+#include "TrackingTools/IPTools/interface/IPTools.h"
 struct ltstr
 {
     bool operator()(const edm::RefToBase<reco::Jet> s1, edm::RefToBase<reco::Jet> s2) const
@@ -125,6 +128,21 @@ class MistagAnalyzer : public edm::EDAnalyzer
 public:
     explicit MistagAnalyzer(const edm::ParameterSet&);
     ~MistagAnalyzer();
+    
+    // auxiliary class holding simulated primary vertices
+class simPrimaryVertex {
+public:
+  simPrimaryVertex(double x1,double y1,double z1):x(x1),y(y1),z(z1),ptsq(0),nGenTrk(0){};
+  double x,y,z;
+   HepMC::FourVector ptot;
+  //HepLorentzVector ptot;
+  double ptsq;
+  int nGenTrk;
+  std::vector<int> finalstateParticles;
+  std::vector<int> simTrackIndex;
+  std::vector<int> genVertex;
+  const reco::Vertex *recVtx;
+};
 
 
 private:
@@ -144,8 +162,10 @@ private:
     int matchMuon(const edm::RefToBase<reco::Track>& theMuon, edm::View<reco::Muon>& muons);
 
     void setTracksPV( const reco::Vertex *pv, bool isPV );
-
-
+    
+    double getGenJetPt(reco::Jet theJet, GenJetCollection &theJets);
+    int getMuonTk(double pt);
+    
     // ----------member data ---------------------------
     std::string outputFile_;
     //std::vector< std::string > moduleLabel_;
@@ -165,6 +185,7 @@ private:
 
     std::string jetBModuleName_;
     std::string jetBNegModuleName_;
+    std::string jetBPosModuleName_;
 
     std::string trackCHEModuleName_;
     std::string trackCNegHEModuleName_;
@@ -202,7 +223,8 @@ private:
     // trigger list
     std::vector<std::string> triggernames_;
     bool TriggerInfo_;
-
+    std::string genJetCollection_;
+    
     std::map<edm::RefToBase<reco::Jet>, unsigned int, ltstr> flavoursMapf;
     edm::Handle<reco::JetFlavourMatchingCollection> theJetPartonMapf;
     int TaggedJet(reco::Jet , edm::Handle<reco::JetTagCollection >  );
@@ -325,7 +347,7 @@ private:
 
     int nJet;
     float Jet_pt[10000];
-    float Jet_et[10000];
+    float Jet_genpt[10000];
     float Jet_residual[10000];
     float Jet_jes[10000];
     float Jet_eta[10000];
@@ -338,10 +360,6 @@ private:
     float Jet_Ip3P[10000];
     float Jet_Ip4N[10000];
     float Jet_Ip4P[10000];
-    float Jet_Mass2N[10000];
-    float Jet_Mass2P[10000];
-    float Jet_Mass3N[10000];
-    float Jet_Mass3P[10000];
     float Jet_Mass4N[10000];
     float Jet_Mass4P[10000];
     float Jet_ProbaN[10000];
@@ -349,6 +367,7 @@ private:
     float Jet_Proba[10000];
     float Jet_BprobN[10000];
     float Jet_Bprob[10000];
+    float Jet_BprobP[10000];
     float Jet_SvxN[10000];
     float Jet_Svx[10000];
     int   Jet_SvxNTracks[10000];
@@ -388,6 +407,10 @@ private:
     float Muon_ptrel[10000];
     float Muon_vz[10000];
     int   Muon_hist[10000];
+    int   Muon_TrackIdx[10000];
+    float Muon_IPsig[10000];
+    float  Muon_IPsigIn[10000];
+    float Muon_Proba[10000];
     
     int nPV;
     float PV_x[10000];
@@ -438,10 +461,14 @@ private:
     int Evt;
     int LumiBlock;
     float PVz;
+    float PVzSim;
     float pthat;
     FactorizedJetCorrector *resJEC_PF ;
     FactorizedJetCorrector *resJEC_JPT;
     FactorizedJetCorrector *resJEC_Calo;
+    
+    std::vector<simPrimaryVertex> getSimPVs(const edm::Handle<edm::HepMCProduct> evtMC);
+ 
 };
 
 #endif
