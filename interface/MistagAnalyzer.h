@@ -16,7 +16,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.23 2011/05/31 10:18:56 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.24 2011/10/03 13:44:19 jandrea Exp $
 //
 //
 
@@ -409,7 +409,7 @@ private:
     int   Muon_hist[10000];
     int   Muon_TrackIdx[10000];
     float Muon_IPsig[10000];
-    float  Muon_IPsigIn[10000];
+    float Muon_IP[10000];
     float Muon_Proba[10000];
     
     int nPV;

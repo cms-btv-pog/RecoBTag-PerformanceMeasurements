@@ -1,4 +1,3 @@
-
 #include "RecoBTag/PerformanceMeasurements/interface/MistagAnalyzer.h"
 
 MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfig)  
@@ -294,7 +293,7 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("Muon_hist",     Muon_hist     ,"Muon_hist[nMuon]/I");
 //$$  smalltree->Branch("Muon_TrackIdx", Muon_TrackIdx ,"Muon_TrackIdx[nMuon]/I");
   smalltree->Branch("Muon_IPsig",    Muon_IPsig    ,"Muon_IPsig[nMuon]/F");
-  smalltree->Branch("Muon_IPsigIn",  Muon_IPsigIn  ,"Muon_IPsigIn[nMuon]/F");
+  smalltree->Branch("Muon_IP",       Muon_IP       ,"Muon_IP[nMuon]/F");
   smalltree->Branch("Muon_Proba",    Muon_Proba    ,"Muon_Proba[nMuon]/F");
 //$$
   
@@ -890,13 +889,13 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       flavour = abs(getMatchedParton(jetsColl.at(ijet)).getFlavour());   
       if ( flavour >= 1 && flavour <= 3 ) flavour = 1;  
       Flavour = flavour;
+      Jet_genpt[nJet]   = getGenJetPt((jetsColl.at(ijet)), genJets);
     }
     
     Jet_flavour[nJet] = Flavour;
     Jet_eta[nJet]     = (jetsColl.at(ijet)).eta();
     Jet_phi[nJet]     = (jetsColl.at(ijet)).phi();
     Jet_pt[nJet]      = (jetsColl.at(ijet)).pt();
-    Jet_genpt[nJet]   = getGenJetPt((jetsColl.at(ijet)), genJets);
     
     Jet_jes[nJet]     = JES;
     
@@ -1105,145 +1104,145 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     Jet_nLastTrack[nJet]   = nTrack;
     
 //$$
-// get the 4 highest positive and 4 lowest negative IP/sig tracks
-    k = 0;
-    int k1 = -1, k2 = -1, k3 = -1, k4 = -1;
-    int n1 = -1, n2 = -1, n3 = -1, n4 = -1;
-    float kip1 = -100., kip2 = -100., kip3 = -100., kip4 = -100.;   
-    float nip1 =  100., nip2 =  100., nip3 =  100., nip4 =  100.;   
-    for (unsigned int itt=0; itt < assotracks.size(); itt++) {
-      GlobalPoint maximumClose = (*tagInfo)[ith_tagged].impactParameterData()[k].closestToJetAxis;
-      float decayLen = (maximumClose - (Pv_point)).mag(); 
-      float distJetAxis = (*tagInfo)[ith_tagged].impactParameterData()[k].distanceToJetAxis.value();
-      if ( std::fabs(distJetAxis) < 0.07 && decayLen < 5.0 ) {
-	float kip = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.significance();
-//         cout << k << " " << kip << endl;
-        if ( kip > kip1 ) {
-          k4 = k3;
-          k3 = k2;
-          k2 = k1;
-	  k1 = k;
-	  kip4 = kip3;
-	  kip3 = kip2;
-	  kip2 = kip1;
-	  kip1 = kip;
-	}
-        else if ( kip > kip2 ) {
-          k4 = k3;
-          k3 = k2;
-          k2 = k;
-	  kip4 = kip3;
-	  kip3 = kip2;
-	  kip2 = kip;
-	}
-        else if ( kip > kip3 ) {
-          k4 = k3;
-          k3 = k;
-	  kip4 = kip3;
-	  kip3 = kip;
-	}
-        else if ( kip > kip4 ) {
-          k4 = k;
-	  kip4 = kip;
-	}
-        if ( kip < nip1 ) {
-          n4 = n3;
-          n3 = n2;
-          n2 = n1;
-	  n1 = k;
-	  nip4 = nip3;
-	  nip3 = nip2;
-	  nip2 = nip1;
-	  nip1 = kip;
-	}
-        else if ( kip < nip2 ) {
-          n4 = n3;
-          n3 = n2;
-          n2 = k;
-	  nip4 = nip3;
-	  nip3 = nip2;
-	  nip2 = kip;
-	}
-        else if ( kip < nip3 ) {
-          n4 = n3;
-          n3 = k;
-	  nip4 = nip3;
-	  nip3 = kip;
-	}
-        else if ( kip < nip4 ) {
-          n4 = k;
-	  nip4 = kip;
-	}
-      }
-      k++;
-    } // end loop on tracks
-    if ( kip1 < 0. ) k1 = -1;
-    if ( kip2 < 0. ) k2 = -1;
-    if ( kip3 < 0. ) k3 = -1;
-    if ( kip4 < 0. ) k4 = -1;
-    if ( nip1 > 0. ) n1 = -1;
-    if ( nip2 > 0. ) n2 = -1;
-    if ( nip3 > 0. ) n3 = -1;
-    if ( nip4 > 0. ) n4 = -1;
-//     cout << " ordered " << n1 << " " << n2 << " " << n3 << " " << n4 << " "  
-//                         << k4 << " " << k3 << " " << k2 << " " << k1 << endl;
-//     cout << endl;
-
-// compute the invariant mass of this set of tracks
-    float Tpx = 0., Tpy = 0., Tpz = 0., Tee = 0., Tmass = 0.;
-    float Tmass2P = -1., Tmass3P = -1., Tmass4P = -1.;
-    if ( k2 >= 0 ) {
-      Tpx = (assotracks[k1])->px() + (assotracks[k2])->px();
-      Tpy = (assotracks[k1])->py() + (assotracks[k2])->py();
-      Tpz = (assotracks[k1])->pz() + (assotracks[k2])->pz();
-      Tee = TMath::Sqrt( (assotracks[k1])->p()*(assotracks[k1])->p()+0.135*0.135)
-          + TMath::Sqrt( (assotracks[k2])->p()*(assotracks[k2])->p()+0.135*0.135);
-      Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
-      if ( Tmass > 0. ) Tmass2P = TMath::Sqrt( Tmass );
-      if ( k3 >= 0 ) {
-        Tpx += (assotracks[k3])->px();
-        Tpy += (assotracks[k3])->py();
-        Tpz += (assotracks[k3])->pz();
-        Tee += TMath::Sqrt( (assotracks[k3])->p()*(assotracks[k3])->p()+0.135*0.135);
-        Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
-        if ( Tmass > 0. ) Tmass3P = TMath::Sqrt( Tmass );
-        if ( k4 >= 0 ) {
-          Tpx += (assotracks[k4])->px();
-          Tpy += (assotracks[k4])->py();
-          Tpz += (assotracks[k4])->pz();
-          Tee += TMath::Sqrt( (assotracks[k4])->p()*(assotracks[k4])->p()+0.135*0.135);
-          Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
-          if ( Tmass > 0. ) Tmass4P = TMath::Sqrt( Tmass );
-        }
-      }
-    }
-    Tpx = 0., Tpy = 0., Tpz = 0., Tee = 0., Tmass = 0.;
-    float Tmass2N = -1., Tmass3N = -1., Tmass4N = -1.;
-    if ( n2 >= 0 ) {
-      Tpx = (assotracks[n1])->px() + (assotracks[n2])->px();
-      Tpy = (assotracks[n1])->py() + (assotracks[n2])->py();
-      Tpz = (assotracks[n1])->pz() + (assotracks[n2])->pz();
-      Tee = TMath::Sqrt( (assotracks[n1])->p()*(assotracks[n1])->p()+0.135*0.135)
-          + TMath::Sqrt( (assotracks[n2])->p()*(assotracks[n2])->p()+0.135*0.135);
-      Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
-      if ( Tmass > 0. ) Tmass2N = TMath::Sqrt( Tmass );
-      if ( n3 >= 0 ) {
-        Tpx += (assotracks[n3])->px();
-        Tpy += (assotracks[n3])->py();
-        Tpz += (assotracks[n3])->pz();
-        Tee += TMath::Sqrt( (assotracks[n3])->p()*(assotracks[n3])->p()+0.135*0.135);
-        Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
-        if ( Tmass > 0. ) Tmass3N = TMath::Sqrt( Tmass );
-        if ( n4 >= 0 ) {
-          Tpx += (assotracks[n4])->px();
-          Tpy += (assotracks[n4])->py();
-          Tpz += (assotracks[n4])->pz();
-          Tee += TMath::Sqrt( (assotracks[n4])->p()*(assotracks[n4])->p()+0.135*0.135);
-          Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
-          if ( Tmass > 0. ) Tmass4N = TMath::Sqrt( Tmass );
-        }
-      }
-    }
+// // get the 4 highest positive and 4 lowest negative IP/sig tracks
+//     k = 0;
+//     int k1 = -1, k2 = -1, k3 = -1, k4 = -1;
+//     int n1 = -1, n2 = -1, n3 = -1, n4 = -1;
+//     float kip1 = -100., kip2 = -100., kip3 = -100., kip4 = -100.;   
+//     float nip1 =  100., nip2 =  100., nip3 =  100., nip4 =  100.;   
+//     for (unsigned int itt=0; itt < assotracks.size(); itt++) {
+//       GlobalPoint maximumClose = (*tagInfo)[ith_tagged].impactParameterData()[k].closestToJetAxis;
+//       float decayLen = (maximumClose - (Pv_point)).mag(); 
+//       float distJetAxis = (*tagInfo)[ith_tagged].impactParameterData()[k].distanceToJetAxis.value();
+//       if ( std::fabs(distJetAxis) < 0.07 && decayLen < 5.0 ) {
+// 	float kip = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.significance();
+// //         cout << k << " " << kip << endl;
+//         if ( kip > kip1 ) {
+//           k4 = k3;
+//           k3 = k2;
+//           k2 = k1;
+// 	  k1 = k;
+// 	  kip4 = kip3;
+// 	  kip3 = kip2;
+// 	  kip2 = kip1;
+// 	  kip1 = kip;
+// 	}
+//         else if ( kip > kip2 ) {
+//           k4 = k3;
+//           k3 = k2;
+//           k2 = k;
+// 	  kip4 = kip3;
+// 	  kip3 = kip2;
+// 	  kip2 = kip;
+// 	}
+//         else if ( kip > kip3 ) {
+//           k4 = k3;
+//           k3 = k;
+// 	  kip4 = kip3;
+// 	  kip3 = kip;
+// 	}
+//         else if ( kip > kip4 ) {
+//           k4 = k;
+// 	  kip4 = kip;
+// 	}
+//         if ( kip < nip1 ) {
+//           n4 = n3;
+//           n3 = n2;
+//           n2 = n1;
+// 	  n1 = k;
+// 	  nip4 = nip3;
+// 	  nip3 = nip2;
+// 	  nip2 = nip1;
+// 	  nip1 = kip;
+// 	}
+//         else if ( kip < nip2 ) {
+//           n4 = n3;
+//           n3 = n2;
+//           n2 = k;
+// 	  nip4 = nip3;
+// 	  nip3 = nip2;
+// 	  nip2 = kip;
+// 	}
+//         else if ( kip < nip3 ) {
+//           n4 = n3;
+//           n3 = k;
+// 	  nip4 = nip3;
+// 	  nip3 = kip;
+// 	}
+//         else if ( kip < nip4 ) {
+//           n4 = k;
+// 	  nip4 = kip;
+// 	}
+//       }
+//       k++;
+//     } // end loop on tracks
+//     if ( kip1 < 0. ) k1 = -1;
+//     if ( kip2 < 0. ) k2 = -1;
+//     if ( kip3 < 0. ) k3 = -1;
+//     if ( kip4 < 0. ) k4 = -1;
+//     if ( nip1 > 0. ) n1 = -1;
+//     if ( nip2 > 0. ) n2 = -1;
+//     if ( nip3 > 0. ) n3 = -1;
+//     if ( nip4 > 0. ) n4 = -1;
+// //     cout << " ordered " << n1 << " " << n2 << " " << n3 << " " << n4 << " "  
+// //                         << k4 << " " << k3 << " " << k2 << " " << k1 << endl;
+// //     cout << endl;
+// 
+// // compute the invariant mass of this set of tracks
+//     float Tpx = 0., Tpy = 0., Tpz = 0., Tee = 0., Tmass = 0.;
+//     float Tmass2P = -1., Tmass3P = -1., Tmass4P = -1.;
+//     if ( k2 >= 0 ) {
+//       Tpx = (assotracks[k1])->px() + (assotracks[k2])->px();
+//       Tpy = (assotracks[k1])->py() + (assotracks[k2])->py();
+//       Tpz = (assotracks[k1])->pz() + (assotracks[k2])->pz();
+//       Tee = TMath::Sqrt( (assotracks[k1])->p()*(assotracks[k1])->p()+0.135*0.135)
+//           + TMath::Sqrt( (assotracks[k2])->p()*(assotracks[k2])->p()+0.135*0.135);
+//       Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
+//       if ( Tmass > 0. ) Tmass2P = TMath::Sqrt( Tmass );
+//       if ( k3 >= 0 ) {
+//         Tpx += (assotracks[k3])->px();
+//         Tpy += (assotracks[k3])->py();
+//         Tpz += (assotracks[k3])->pz();
+//         Tee += TMath::Sqrt( (assotracks[k3])->p()*(assotracks[k3])->p()+0.135*0.135);
+//         Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
+//         if ( Tmass > 0. ) Tmass3P = TMath::Sqrt( Tmass );
+//         if ( k4 >= 0 ) {
+//           Tpx += (assotracks[k4])->px();
+//           Tpy += (assotracks[k4])->py();
+//           Tpz += (assotracks[k4])->pz();
+//           Tee += TMath::Sqrt( (assotracks[k4])->p()*(assotracks[k4])->p()+0.135*0.135);
+//           Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
+//           if ( Tmass > 0. ) Tmass4P = TMath::Sqrt( Tmass );
+//         }
+//       }
+//     }
+//     Tpx = 0., Tpy = 0., Tpz = 0., Tee = 0., Tmass = 0.;
+//     float Tmass2N = -1., Tmass3N = -1., Tmass4N = -1.;
+//     if ( n2 >= 0 ) {
+//       Tpx = (assotracks[n1])->px() + (assotracks[n2])->px();
+//       Tpy = (assotracks[n1])->py() + (assotracks[n2])->py();
+//       Tpz = (assotracks[n1])->pz() + (assotracks[n2])->pz();
+//       Tee = TMath::Sqrt( (assotracks[n1])->p()*(assotracks[n1])->p()+0.135*0.135)
+//           + TMath::Sqrt( (assotracks[n2])->p()*(assotracks[n2])->p()+0.135*0.135);
+//       Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
+//       if ( Tmass > 0. ) Tmass2N = TMath::Sqrt( Tmass );
+//       if ( n3 >= 0 ) {
+//         Tpx += (assotracks[n3])->px();
+//         Tpy += (assotracks[n3])->py();
+//         Tpz += (assotracks[n3])->pz();
+//         Tee += TMath::Sqrt( (assotracks[n3])->p()*(assotracks[n3])->p()+0.135*0.135);
+//         Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
+//         if ( Tmass > 0. ) Tmass3N = TMath::Sqrt( Tmass );
+//         if ( n4 >= 0 ) {
+//           Tpx += (assotracks[n4])->px();
+//           Tpy += (assotracks[n4])->py();
+//           Tpz += (assotracks[n4])->pz();
+//           Tee += TMath::Sqrt( (assotracks[n4])->p()*(assotracks[n4])->p()+0.135*0.135);
+//           Tmass = Tee*Tee - Tpx*Tpx - Tpy*Tpy - Tpz*Tpz;
+//           if ( Tmass > 0. ) Tmass4N = TMath::Sqrt( Tmass );
+//         }
+//       }
+//     }
 //$$
 
 // b-tagger discriminants
@@ -1323,7 +1322,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         Muon_IPsig[nMuon] = -100.;
         Muon_Proba[nMuon] = -100.;
 	if ( mutkid >= 0 ) {
-          Muon_IPsig[nMuon] = Track_IPsig[mutkid];
+//          Muon_IPsig[nMuon] = Track_IPsig[mutkid];
           Muon_Proba[nMuon] = Track_Proba[mutkid];
 	}
 //$$	
@@ -1341,7 +1340,6 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	  if ( theFlagP[TrackCategories::SharedInnerHits] )    Muon_hist[nMuon] += int(pow(10., -1 + 9)); 
 	}
 	
-	
 	//---------------------------------
 	// calculate IP/s of muons' tracks
 	//---------------------------------
@@ -1350,8 +1348,8 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	std::pair<bool,Measurement1D> ip = IPTools::signedImpactParameter3D(tt, direction, (*primaryVertex)[0]);
 	float muonip3D = ip.second.value();
 	float muonip3Derror = ip.second.error();
-        Muon_IPsigIn[nMuon] = muonip3D/muonip3Derror;
-
+        if ( muonip3Derror > 0. ) Muon_IPsig[nMuon] = muonip3D/muonip3Derror;
+        Muon_IP[nMuon] = muonip3D;
 	
 // if ( muons[muIdx].numberOfMatches() < 1 ) {
 // std::cout << " Muon " << nMuon << " pt " << muons[muIdx].pt() << " eta " << muons[muIdx].eta() << " ptrel " << Muon_ptrel[nMuon] << std::endl;
@@ -1441,11 +1439,11 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 //  cout << endl;
 //     }
 
-    Jet_Ip4P[nJet]  = kip4;
-    Jet_Ip4N[nJet]  = nip4;
-    Jet_Ip4N[nJet] = -Jet_Ip4N[nJet];
-    Jet_Mass4N[nJet] = Tmass4N;
-    Jet_Mass4P[nJet] = Tmass4P;
+//     Jet_Ip4P[nJet]  = kip4;
+//     Jet_Ip4N[nJet]  = nip4;
+//     Jet_Ip4N[nJet] = -Jet_Ip4N[nJet];
+//     Jet_Mass4N[nJet] = Tmass4N;
+//     Jet_Mass4P[nJet] = Tmass4P;
 
 //     cout << " Jet " << nJet << " pt " << Jet_pt[nJet]*JES*Jet_residual[nJet] << " " 
 //          << n1 << " " << n2 << " " << n3 << " " << n4 << " "  
@@ -2257,7 +2255,6 @@ std::vector<MistagAnalyzer::simPrimaryVertex> MistagAnalyzer::getSimPVs(
   const HepMC::GenEvent* evt=evtMC->GetEvent();
   if (evt) {
 
-    int idx=0;
     for ( HepMC::GenEvent::vertex_const_iterator vitr= evt->vertices_begin();
 	  vitr != evt->vertices_end(); ++vitr ) { // loop for vertex ...
 	HepMC::FourVector pos = (*vitr)->position();
