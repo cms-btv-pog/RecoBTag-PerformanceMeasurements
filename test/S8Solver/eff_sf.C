@@ -8,6 +8,8 @@
 #include "TLatex.h"
 #include "TFile.h"
 #include "TROOT.h"
+#include <iomanip>
+
 
 void eff_sf(const char *filename="s8.root", const char * OP= "", const char *datalegend="Data", const char *ptrelfilename="") {
 
@@ -113,8 +115,8 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
   g1->SetMarkerStyle(s8marker_mc);
 
   int n = g1->GetN() ;
-  double low = 0.02; //(effmc[0]- 0.1);
-  double high = 0.98; //(1.1* effmc[n-1]);
+  double low = (effmc[0]- 0.1);
+  double high = (1.1* effmc[n-1]);
   //std::cout << "low/high " << low <<"/" << high <<std::endl;
   g1->GetYaxis()->SetRangeUser(low,high);
   gPad->SetTickx();
@@ -146,15 +148,13 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
 
   g2->Draw("P");
   
-  std::string title = "CMS Preliminary 2011 at #sqrt{s} = 7 TeV"; 
-  //title << "#splitline{CMS Preliminary 2011}{   at #sqrt{s} = 7 TeV}";
-  //title << "16 pb^{-1}";
-  //title << " at #sqrt{s} = 7 TeV}";
+  std::string title = "CMS prelim. at #sqrt{s} = 7 TeV"; 
   TLatex *label = new TLatex(3.570061, 23.08044, title.c_str());
+//  TLatex *label = new TLatex(3.570061, 23.08044, title.c_str());
   label->SetNDC();
   label->SetTextAlign(13);
   label->SetX(0.25);
-  label->SetY(0.96);
+  label->SetY(0.98);
  
   // get ptrel results if available
   TGraphErrors *ptrel_data_g;
@@ -165,9 +165,9 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
     {
       ptrelfile->cd();
       //TH1F *htmp = (TH1F*) gDirectory->Get("Data_"+TString(OP)+"__KinWeights_PVWeighting_DW");
-      ptrel_data_g = new TGraphErrors( (TH1*) gDirectory->Get("Data_"+TString(OP)+"__KinWeights_PVWeighting_DW") );
-      ptrel_mc_g   = new TGraphErrors( (TH1*) gDirectory->Get("MC_"+TString(OP)+"__KinWeights_PVWeighting_DW") );
-      ptrel_sf_g   = new TGraphErrors( (TH1*) gDirectory->Get("SF_"+TString(OP)+"__KinWeights_PVWeighting_DW") );
+      ptrel_data_g = new TGraphErrors( (TH1*) gDirectory->Get("Data_"+TString(OP)+"__KinWeights_PVWeighting_80GeVLarge") );
+      ptrel_mc_g   = new TGraphErrors( (TH1*) gDirectory->Get("MC_"+TString(OP)+"__KinWeights_PVWeighting_80GeVLarge") );
+      ptrel_sf_g   = new TGraphErrors( (TH1*) gDirectory->Get("SF_"+TString(OP)+"__KinWeights_PVWeighting_80GeVLarge") );
 
       ptrel_data_g->SetLineColor(ptrelcolor);
       ptrel_data_g->SetMarkerColor(ptrelcolor);
@@ -204,7 +204,17 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
 
   leg->Draw();
   label->Draw();
-
+  TPaveText p6(0.62,yh,0.92,yh+0.05,"brNDC");
+  p6.SetBorderSize(0);
+  p6.SetFillColor(kWhite);
+  p6.SetTextSize(0.04);
+  std::ostringstream os;
+  os << " for 1.2 < #eta < 2.4 ";
+  TString buffer(os.str()); 
+  p6.AddText(buffer);
+  p6.Draw();
+  c1->Update();
+ 
   
   d2->cd();
   
@@ -290,15 +300,14 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
 
   if (HasPtrel)
     {
-      TLegend* leg2 = new TLegend(0.62,0.76,0.92,0.76+(yh-yl)*0.7); //use inspector
+      TLegend* leg2 = new TLegend(0.62,0.76,0.92,0.76+(yh-yl)*0.5); //use inspector
       leg2->SetFillColor(0);
       leg2->SetBorderSize(0);
       leg2->AddEntry(e0, "System8", "P");
       leg2->AddEntry(ptrel_sf_g, "PtRel", "P");
       leg2->Draw();
     }
-
-  // Fit individually ptrel and s8 scale factors
+ // Fit individually ptrel and s8 scale factors
   /*
   TF1 *s8_fit = new TF1("s8_fit","pol1",20,120);
   s8_fit->SetLineColor(s8color);
@@ -314,13 +323,24 @@ void eff_sf(const char *filename="s8.root", const char * OP= "", const char *dat
     }
   */
   // Fit simultaneously ptrel and s8
-  TF1 *sf_fit = new TF1("sf_fit","pol0",20,120);
+  TF1 *sf_fit = new TF1("sf_fit","pol0",20,240);
   sf_fit->SetLineColor(1);
   sf_fit->SetLineWidth(2);
   the_sf->Fit("sf_fit","RE");
   cout << "fit chi2 = " << sf_fit->GetChisquare() << endl;
-
+  cout << "fit p0 = " << sf_fit->GetParameter(0) << endl;
+  cout << "fit err = " << sqrt(2)*sf_fit->GetParError(0) << endl;
+  TPaveText p5(0.25,0.86,0.45,0.96,"brNDC");
+  p5.SetBorderSize(0);
+  p5.SetFillColor(kWhite);
+  p5.SetTextSize(0.06);
+  std::ostringstream os;
+  os << "<SF> = " << setprecision(2) <<sf_fit->GetParameter(0) << " #pm "<< setprecision(0) << sqrt(2)*sf_fit->GetParError(0) <<" (stat.)";
+  TString buffer(os.str()); 
+  p5.AddText(buffer);
+  p5.Draw();
   c1->Update();
+
   // Print file
   TString pdfname = "s8_eff_sf_"+TString(OP)+".pdf";
   c1->Print(pdfname,"pdf");

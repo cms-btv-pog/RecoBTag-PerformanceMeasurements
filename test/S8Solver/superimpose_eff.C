@@ -13,7 +13,7 @@ void superimpose_eff(const char *filenominal="s8.root",
 		     const char *filelow = "s8.root",
 		     const char *filemed = "s8.root",
 		     const char *filehigh = "s8.root",
-		     const char * OP= "", bool etaplot= false) {
+		     const char * OP= "", bool etaplot= true) {
 
   //gROOT->SetStyle("Plain");
   //gStyle->SetFillColor(0);
@@ -94,8 +94,8 @@ void superimpose_eff(const char *filenominal="s8.root",
   gnominal->SetMarkerStyle(22);
 
   //int n = gnominal->GetN() ;
-  double low = 0.18; //(effmc[0]- 0.1);
-  double high = 0.98; //(1.1* effmc[n-1]);
+  double low = 0.08; //(effmc[0]- 0.1);
+  double high = 0.58; //(1.1* effmc[n-1]);
   //std::cout << "low/high " << low <<"/" << high <<std::endl;
   gnominal->GetYaxis()->SetRangeUser(low,high);
   gnominal->SetMarkerStyle( markers[0] );
