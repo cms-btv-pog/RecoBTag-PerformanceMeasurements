@@ -10,7 +10,7 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 options = VarParsing ('python')
 
 options.register ('useData',
-                  True,
+                  False,
                   VarParsing.multiplicity.singleton,
                   VarParsing.varType.int,
                   "Run this on real data")
@@ -34,13 +34,13 @@ options.register ('use41x',
                   "Use the 41x options")
 
 options.register ('writeS8Tree',
-                  False,
+                  True,
                   VarParsing.multiplicity.singleton,
                   VarParsing.varType.int,
                   "Run S8 tree maker")
 
 options.register ('noPAToutput',
-                  False,
+                  True,
                   VarParsing.multiplicity.singleton,
                   VarParsing.varType.int,
                   "Do not store PAT output, only avaiable when writeS8Tree is enable")
@@ -69,7 +69,7 @@ if not options.useData :
     else :
                                     
         process.source.fileNames = [
-            '/store/relval/CMSSW_4_2_2/RelValTTbar/GEN-SIM-RECO/START42_V11-v1/0005/50AC4DBF-746D-E011-8CF9-00248C55CC62.root'
+            '/store/mc/Summer11/QCD_Pt-15to20_MuPt5Enriched_TuneZ2_7TeV-pythia6/AODSIM/PU_S3_START42_V11-v1/0000/00225AC3-D878-E011-BA0E-00215E21DA5C.root'
             ]
     
 else :
