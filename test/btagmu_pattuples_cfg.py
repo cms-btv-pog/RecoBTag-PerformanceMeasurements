@@ -10,7 +10,7 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 options = VarParsing ('python')
 
 options.register ('useData',
-                  False,
+                  True,
                   VarParsing.multiplicity.singleton,
                   VarParsing.varType.int,
                   "Run this on real data")

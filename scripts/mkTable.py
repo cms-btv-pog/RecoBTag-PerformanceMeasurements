@@ -20,6 +20,8 @@ if __name__ =='__main__':
                          help = 'systematic file')
     cmdGroup.add_option ('--syst2', dest='command2', action='store',
                          help = 'systematic file')
+    cmdGroup.add_option ('--syst3', dest='command3', action='store',
+                         help = 'systematic file')
     cmdGroup.add_option ('--systname', dest='systname', action='store',
                          help = 'name of systematic output file')
     cmdGroup.add_option ('--outlatex', dest='outlatex', action='store',
@@ -36,7 +38,8 @@ if __name__ =='__main__':
     #print options.command1
 
     IsLongTable = False
-    
+    IsLongLongTable = False
+
     listoffiles = []
     listofnames = []
     listofbins = []
@@ -55,6 +58,12 @@ if __name__ =='__main__':
         listoffiles.append(options.command2)
         listofnames.append('syst2')
         IsLongTable = True
+
+    if options.command3:
+        listoffiles.append(options.command3)
+        listofnames.append('syst3')
+        IsLongLongTable = True
+
 
     bigtable = {} # per bin pt
     rowtable = {}
@@ -142,7 +151,12 @@ thetable = '''
 \\begin{table}[h]
 \\begin{centering}
 '''
-if IsLongTable:
+if IsLongLongTable:
+    thetable +='''
+    \\begin{tabular}{|c|c|c|c|c|c|c|c|c|} \hline 
+    jet $p_T$ & Nominal Data & low & $\Delta$ & medium & $\Delta$ & high & $\Delta$ & $\Delta_{max}$  \\\ \hline
+    '''
+elif IsLongTable:
     thetable +='''
     \\begin{tabular}{|c|c|c|c|c|c|c|} \hline 
     jet $p_T$ & Nominal Data & low & $\Delta$ & high & $\Delta$ & $\Delta_{max}$  \\\ \hline
@@ -181,7 +195,7 @@ for irow in listofbins:
     bin_pt_str = min_pt_bin +" - " + max_pt_bin
     aline += bin_pt_str + sp
     niisample = 0
-    delta = [0,0,0]
+    delta = [0,0,0,0]
     maxdelta = 0
     #keepline = True
     iirowcounter += 1
@@ -189,7 +203,6 @@ for irow in listofbins:
     for isample in listofnames:
 
         #print "bin is "+bin_pt+" sample is "+isample
-
         if not bigtable.has_key(bin_pt+"_"+isample):
             #keppline = False
             aline += sp + sp
@@ -216,7 +229,7 @@ for irow in listofbins:
                 aline += tmprow['mc_beff'] + ' $\pm$ ' + tmprow['mc_beff_err'] +sp
                 delta[niisample] = round(math.fabs(delta[0] - float(tmprow['mc_beff']))/delta[0],3)
 
-            if IsLongTable:
+            if IsLongTable or IsLongLongTable:
                 aline += str(delta[niisample]) + sp
             else:
                 aline += str(delta[niisample])
@@ -224,9 +237,9 @@ for irow in listofbins:
                 
         niisample += 1
 
-    if niisample>1 and IsLongTable:
-        if delta[1]>=delta[2]: maxdelta = delta[1]
-        else: maxdelta = delta[2]
+    if niisample>1 and ( IsLongTable or IsLongLongTable ):
+        print "delta is %s" % delta
+        maxdelta = max( delta[1:] )
         aline += str(maxdelta) + ' \\\\'
     else:
         aline += ' \\\\'
