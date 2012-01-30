@@ -66,7 +66,7 @@ class S8Solver
 		void UseMCTrue(bool option) { fusemctrue = option; }
 		void Solve();
 		void SetSolution(const int &bin, const int &solution);
-
+		void UseMCTruthAwayTag() { fMCtruthAwayTag = true; }
         void setDoBinnedSolution(bool flag) { _doBinnedSolution = flag; }
         void setDoAverageSolution(bool flag) { _doAverageSolution = flag; }
         void setFirstBin(const int &value) { _firstBin = value; }
@@ -106,6 +106,7 @@ class S8Solver
 		bool fGammaConst;
 		bool fisCorrFile;
         bool fusemctrue;
+	bool fMCtruthAwayTag;
 
 		double fAlphaf;
 		double fBetaf;

@@ -66,6 +66,7 @@ S8Solver::S8Solver():
     fDeltaConst = false;
     fGammaConst = true;
     fusemctrue = false;
+    fMCtruthAwayTag = false;
 
     for(int i = 0; 8 > i; ++i)
         *(_averageResults + i) = 0;
@@ -411,8 +412,17 @@ void S8Solver::LoadHistos()
         h1["eff_mu_taggedaway_b"]->Divide(b_halloppjets_ptrel , halloppjets_b, 1.,1.,"B");
         h1["eff_mu_taggedaway_cl"]->Divide( cl_halloppjets_ptrel, halloppjets_cl, 1.,1.,"B");
 
-        feffTag_b = (TH1D*) h1["eff_TaggedJet_b"]->Clone("feffTag_b"); 
-        feffTag_cl = (TH1D*) h1["eff_TaggedJet_cl"]->Clone("feffTag_cl");
+	if (! fMCtruthAwayTag )
+	  {
+	    feffTag_b = (TH1D*) h1["eff_TaggedJet_b"]->Clone("feffTag_b"); 
+	    feffTag_cl = (TH1D*) h1["eff_TaggedJet_cl"]->Clone("feffTag_cl");
+	  }
+	else
+	  {
+	    feffTag_b = (TH1D*) h1["eff_TaggedBothJets_b"]->Clone("feffTag_b");
+            feffTag_cl = (TH1D*) h1["eff_TaggedBothJets_cl"]->Clone("feffTag_cl");
+	  }
+
         feffmu_b = (TH1D*) h1["eff_pTrel_b"]->Clone("feffmu_b"); 
         feffmu_cl = (TH1D*) h1["eff_pTrel_cl"]->Clone("feffmu_cl");
         
@@ -492,8 +502,17 @@ void S8Solver::LoadHistos()
     else
     {
         // true efficiency
-        feffTag_b = (TH1D*) gDirectory->Get("eff_TaggedJet_b");
-        feffTag_cl = (TH1D*) gDirectory->Get("eff_TaggedJet_cl");
+      if (! fMCtruthAwayTag )
+	{
+	  feffTag_b = (TH1D*) gDirectory->Get("eff_TaggedBothJets_b");
+	  feffTag_cl = (TH1D*) gDirectory->Get("eff_TaggedBothJets_cl");
+	}
+      else
+	{
+	  feffTag_b = (TH1D*) gDirectory->Get("eff_TaggedBothJets_b");
+          feffTag_cl = (TH1D*) gDirectory->Get("eff_TaggedBothJets_cl");
+	}
+
         feffmu_b = (TH1D*) gDirectory->Get("eff_pTrel_b");
         feffmu_cl = (TH1D*) gDirectory->Get("eff_pTrel_cl");
         feffTagmu_b = (TH1D*) gDirectory->Get("eff_pTrel_TaggedJet_b");
