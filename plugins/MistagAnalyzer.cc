@@ -23,6 +23,7 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   isData_              = iConfig.getParameter<bool>("isData");
   useTrackHistory_     = iConfig.getParameter<bool>("useTrackHistory");
   produceJetProbaTree_ = iConfig.getParameter<bool>("produceJetProbaTree");
+  producePtRelTemplate_ = iConfig.getParameter<bool>("producePtRelTemplate");
   
 // Modules
   primaryVertexColl_   = iConfig.getParameter<std::string>("primaryVertexColl");
@@ -140,6 +141,7 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("pthat",&pthat,"pthat/F");
   smalltree->Branch("PVzSim",&PVzSim,"PVzSim/F");
  
+  smalltree->Branch("nPUtrue", &nPUtrue, "nPUtrue/I");
   smalltree->Branch("nPU", &nPU, "nPU/I");
 //   smalltree->Branch("PU_bunch",      PU_bunch,      "PU_bunch[nPU]/I");
 //   smalltree->Branch("PU_z",          PU_z,          "PU_z[nPU]/F");
@@ -272,6 +274,8 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("Jet_nLastTrack",  Jet_nLastTrack  ,"Jet_nLastTrack[nJet]/I"); 
 //$$  smalltree->Branch("Jet_nFirstSV",    Jet_nFirstSV    ,"Jet_nFirstSV[nJet]/I");
 //$$  smalltree->Branch("Jet_nLastSV",     Jet_nLastSV     ,"Jet_nLastSV[nJet]/I");
+  smalltree->Branch("Jet_nFirstTrkInc", Jet_nFirstTrkInc ,"Jet_nFirstTrkInc[nJet]/I");
+  smalltree->Branch("Jet_nLastTrkInc",  Jet_nLastTrkInc  ,"Jet_nLastTrkInc[nJet]/I"); 
   
   //--------------------------------------
   // muon information 
@@ -297,6 +301,15 @@ MistagAnalyzer::MistagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iC
   smalltree->Branch("Muon_Proba",    Muon_Proba    ,"Muon_Proba[nMuon]/F");
 //$$
   
+  //--------------------------------------
+  // Inclusive Track information for PtRel template 
+  //--------------------------------------
+  smalltree->Branch("nTrkInc"	   ,&nTrkInc	 ,"nTrkInc/I");
+  smalltree->Branch("TrkInc_pt",       TrkInc_pt       ,"TrkInc_pt[nTrkInc]/F");
+  smalltree->Branch("TrkInc_ptrel",    TrkInc_ptrel    ,"TrkInc_ptrel[nTrkInc]/F");
+  smalltree->Branch("TrkInc_IPsig",    TrkInc_IPsig    ,"TrkInc_IPsig[nTrkInc]/F");
+  smalltree->Branch("TrkInc_IP",       TrkInc_IP       ,"TrkInc_IP[nTrkInc]/F");
+
   smalltree->Branch("nCFromGSplit",      &nCFromGSplit     ,"nCFromGSplit/I");
   smalltree->Branch("cFromGSplit_pT",    cFromGSplit_pT    ,"cFromGSplit_pT[nCFromGSplit]/F");
   smalltree->Branch("cFromGSplit_eta",   cFromGSplit_eta   ,"cFromGSplit_eta[nCFromGSplit]/F");
@@ -403,6 +416,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   // MC informations
   //------------------------------------------------------
   pthat = -1.;
+  nPUtrue = -1;
   nPU = 0;
   nCFromGSplit = 0;
   nBFromGSplit = 0;
@@ -432,6 +446,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	PU_ntrks_high[nPU] = (ipu->getPU_ntrks_highpT())[i];
 	nPU++;
       } 
+      nPUtrue = ipu->getTrueNumInteractions();
     }
  
   // gluon spliting
@@ -462,7 +477,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       iEvent.getByLabel("generator",theHepMCProduct);
       std::vector<simPrimaryVertex> simpv;
       simpv=getSimPVs(theHepMCProduct);
-      cout << "simpv.size() " << simpv.size() << endl;
+//       cout << "simpv.size() " << simpv.size() << endl;
     }
     
     iEvent.getByLabel(genJetCollection_,genJetsHandle);
@@ -555,29 +570,12 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   iEvent.getByLabel(softMuonTagInfoName_, tagInos_softmuon);
   
   
-  
-  
-  
-  
-  
   //----------------------------------------
   // Transient track for IP calculation
   //----------------------------------------
   edm::ESHandle<TransientTrackBuilder> trackBuilder;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", trackBuilder);
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   
   //------------------
   // Primary vertex
@@ -649,16 +647,17 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         || triggerList[i] == "HLT_Jet15U_v1"
         || triggerList[i] == "HLT_Jet15U_v2"
         || triggerList[i] == "HLT_Jet15U_v3"
-//         || triggerList[i] == "HLT_Jet15U_HcalNoiseFiltered"
-//         || triggerList[i] == "HLT_Jet15U_HcalNoiseFiltered_v1"
-//         || triggerList[i] == "HLT_Jet15U_HcalNoiseFiltered_v2"
-//         || triggerList[i] == "HLT_Jet15U_HcalNoiseFiltered_v3"
         || triggerList[i] == "HLT_Jet30_v1"
         || triggerList[i] == "HLT_Jet30_v2"
         || triggerList[i] == "HLT_Jet30_v3"
         || triggerList[i] == "HLT_Jet30_v4"
         || triggerList[i] == "HLT_Jet30_v5"
-        || triggerList[i] == "HLT_Jet30_v6"         ) BitTrigger +=10 ; 
+        || triggerList[i] == "HLT_Jet30_v6"
+        || triggerList[i] == "HLT_PFJet40_v1"
+        || triggerList[i] == "HLT_PFJet40_v2"
+        || triggerList[i] == "HLT_PFJet40_v3"
+        || triggerList[i] == "HLT_PFJet40_v4"
+        || triggerList[i] == "HLT_PFJet40_v5"       ) BitTrigger +=10 ; 
       if ( triggerList[i] == "HLT_Jet30U"
         || triggerList[i] == "HLT_Jet30U_v1"
         || triggerList[i] == "HLT_Jet30U_v2"
@@ -678,7 +677,12 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         || triggerList[i] == "HLT_Jet80_v3" 
         || triggerList[i] == "HLT_Jet80_v4" 
         || triggerList[i] == "HLT_Jet80_v5" 
-        || triggerList[i] == "HLT_Jet80_v6"         ) BitTrigger +=40 ; 
+        || triggerList[i] == "HLT_Jet80_v6"
+        || triggerList[i] == "HLT_PFJet80_v1"
+        || triggerList[i] == "HLT_PFJet80_v2"
+        || triggerList[i] == "HLT_PFJet80_v3"
+        || triggerList[i] == "HLT_PFJet80_v4"
+        || triggerList[i] == "HLT_PFJet80_v5"       ) BitTrigger +=40 ; 
       if ( triggerList[i] == "HLT_Jet70U"
         || triggerList[i] == "HLT_Jet70U_v1"
         || triggerList[i] == "HLT_Jet70U_v2"
@@ -698,7 +702,12 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         || triggerList[i] == "HLT_Jet150_v3"
         || triggerList[i] == "HLT_Jet150_v4"
         || triggerList[i] == "HLT_Jet150_v5"
-        || triggerList[i] == "HLT_Jet150_v6"        ) BitTrigger +=200 ; 
+        || triggerList[i] == "HLT_Jet150_v6"
+        || triggerList[i] == "HLT_PFJet140_v1"
+        || triggerList[i] == "HLT_PFJet140_v2"
+        || triggerList[i] == "HLT_PFJet140_v3"
+        || triggerList[i] == "HLT_PFJet140_v4"
+        || triggerList[i] == "HLT_PFJet140_v5"      ) BitTrigger +=200 ; 
       if ( triggerList[i] == "HLT_Jet140U"
         || triggerList[i] == "HLT_Jet140U_v1"
         || triggerList[i] == "HLT_Jet140U_v2"
@@ -708,36 +717,38 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         || triggerList[i] == "HLT_Jet190_v3"
         || triggerList[i] == "HLT_Jet190_v4"
         || triggerList[i] == "HLT_Jet190_v5"
-        || triggerList[i] == "HLT_Jet190_v6"        ) BitTrigger +=400 ; 
+        || triggerList[i] == "HLT_Jet190_v6"
+        || triggerList[i] == "HLT_PFJet200_v1"
+        || triggerList[i] == "HLT_PFJet200_v2"
+        || triggerList[i] == "HLT_PFJet200_v3"
+        || triggerList[i] == "HLT_PFJet200_v4"
+        || triggerList[i] == "HLT_PFJet200_v5"      ) BitTrigger +=400 ; 
       if ( triggerList[i] == "HLT_Jet240_v1"
         || triggerList[i] == "HLT_Jet240_v2"
         || triggerList[i] == "HLT_Jet240_v3"
         || triggerList[i] == "HLT_Jet240_v4"
         || triggerList[i] == "HLT_Jet240_v5"
-        || triggerList[i] == "HLT_Jet240_v6"        ) BitTrigger +=1 ; 
+        || triggerList[i] == "HLT_Jet240_v6"
+        || triggerList[i] == "HLT_PFJet260_v1"
+        || triggerList[i] == "HLT_PFJet260_v2"
+        || triggerList[i] == "HLT_PFJet260_v3"
+        || triggerList[i] == "HLT_PFJet260_v4"
+        || triggerList[i] == "HLT_PFJet260_v5"      ) BitTrigger +=1 ; 
       if ( triggerList[i] == "HLT_Jet300_v1" 
         || triggerList[i] == "HLT_Jet300_v2"
         || triggerList[i] == "HLT_Jet300_v3"
         || triggerList[i] == "HLT_Jet300_v4"
-        || triggerList[i] == "HLT_Jet300_v5"        ) BitTrigger +=2 ;
-      if ((triggerList[i] == "HLT_Jet370_v1"
-        || triggerList[i] == "HLT_Jet370_v2"
-        || triggerList[i] == "HLT_Jet370_v3"
-        || triggerList[i] == "HLT_Jet370_v4"
-        || triggerList[i] == "HLT_Jet370_v5"
-        || triggerList[i] == "HLT_Jet370_v6") && NoJetID == 0) {
-	  NoJetID = 1;
-	  BitTrigger +=4 ;
-	}
-      if ((triggerList[i] == "HLT_Jet370_NoJetID_v1"
-        || triggerList[i] == "HLT_Jet370_NoJetID_v2"
-        || triggerList[i] == "HLT_Jet370_NoJetID_v3"
-        || triggerList[i] == "HLT_Jet370_NoJetID_v4"
-        || triggerList[i] == "HLT_Jet370_NoJetID_v5"
-        || triggerList[i] == "HLT_Jet370_NoJetID_v6") && NoJetID == 0) {
-	  NoJetID = 1;
-	  BitTrigger +=4 ; 
-	}
+        || triggerList[i] == "HLT_Jet300_v5"
+        || triggerList[i] == "HLT_PFJet320_v1"
+        || triggerList[i] == "HLT_PFJet320_v2"
+        || triggerList[i] == "HLT_PFJet320_v3"
+        || triggerList[i] == "HLT_PFJet320_v4"
+        || triggerList[i] == "HLT_PFJet320_v5"      ) BitTrigger +=2 ;
+      if ( triggerList[i] == "HLT_PFJet400_v1"
+        || triggerList[i] == "HLT_PFJet400_v2"
+        || triggerList[i] == "HLT_PFJet400_v3"
+        || triggerList[i] == "HLT_PFJet400_v4"
+        || triggerList[i] == "HLT_PFJet400_v5"      ) BitTrigger +=4 ;
       if ( triggerList[i] == "HLT_DiJetAve15U_8E29" 
         || triggerList[i] == "HLT_DiJetAve15U"
         || triggerList[i] == "HLT_DiJetAve15U_v1"
@@ -749,7 +760,12 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         || triggerList[i] == "HLT_DiJetAve30_v3"
         || triggerList[i] == "HLT_DiJetAve30_v4"
         || triggerList[i] == "HLT_DiJetAve30_v5"
-        || triggerList[i] == "HLT_DiJetAve30_v6"    ) BitTrigger +=1000 ; 
+        || triggerList[i] == "HLT_DiJetAve30_v6"
+        || triggerList[i] == "HLT_DiPFJetAve40_v1"
+        || triggerList[i] == "HLT_DiPFJetAve40_v2"
+        || triggerList[i] == "HLT_DiPFJetAve40_v3"
+        || triggerList[i] == "HLT_DiPFJetAve40_v4"
+        || triggerList[i] == "HLT_DiPFJetAve40_v5"  ) BitTrigger +=1000 ; 
       if ( triggerList[i] == "HLT_DiJetAve30U_8E29" 
         || triggerList[i] == "HLT_DiJetAve30U"
         || triggerList[i] == "HLT_DiJetAve30U_v1"
@@ -761,7 +777,12 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         || triggerList[i] == "HLT_DiJetAve60_v3"
         || triggerList[i] == "HLT_DiJetAve60_v4"
         || triggerList[i] == "HLT_DiJetAve60_v5"
-        || triggerList[i] == "HLT_DiJetAve60_v6"    ) BitTrigger +=2000 ; 
+        || triggerList[i] == "HLT_DiJetAve60_v6"
+        || triggerList[i] == "HLT_DiPFJetAve80_v1"
+        || triggerList[i] == "HLT_DiPFJetAve80_v2"
+        || triggerList[i] == "HLT_DiPFJetAve80_v3"
+        || triggerList[i] == "HLT_DiPFJetAve80_v4"
+        || triggerList[i] == "HLT_DiPFJetAve80_v5"  ) BitTrigger +=2000 ; 
       if ( triggerList[i] == "HLT_DiJetAve50U_8E29" 
         || triggerList[i] == "HLT_DiJetAve50U"
         || triggerList[i] == "HLT_DiJetAve50U_v1"
@@ -773,7 +794,12 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         || triggerList[i] == "HLT_DiJetAve80_v3"
         || triggerList[i] == "HLT_DiJetAve80_v4"
         || triggerList[i] == "HLT_DiJetAve80_v5"
-        || triggerList[i] == "HLT_DiJetAve80_v6"    ) BitTrigger +=4000 ; 
+        || triggerList[i] == "HLT_DiJetAve80_v6"
+        || triggerList[i] == "HLT_DiPFJetAve140_v1"
+        || triggerList[i] == "HLT_DiPFJetAve140_v2"
+        || triggerList[i] == "HLT_DiPFJetAve140_v3"
+        || triggerList[i] == "HLT_DiPFJetAve140_v4"
+        || triggerList[i] == "HLT_DiPFJetAve140_v5" ) BitTrigger +=4000 ; 
 //
       if ( triggerList[i] == "HLT_BTagMu_Jet10U"    
         || triggerList[i] == "HLT_BTagMu_Jet20U"
@@ -793,7 +819,9 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v6"
         || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v7"
         || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v8"
-        || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v9" ) BitTrigger +=10000 ;   
+        || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v9"
+        || triggerList[i] == "HLT_BTagMu_DiJet20_L1FastJet_Mu5_v1"
+        || triggerList[i] == "HLT_BTagMu_DiJet20_L1FastJet_Mu5_v2" ) BitTrigger +=10000 ;   
       if ( triggerList[i] == "HLT_BTagMu_DiJet30U"
         || triggerList[i] == "HLT_BTagMu_DiJet30U_v1"
         || triggerList[i] == "HLT_BTagMu_DiJet30U_v2"
@@ -804,31 +832,47 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         || triggerList[i] == "HLT_BTagMu_DiJet30U_Mu5_v3"
         || triggerList[i] == "HLT_BTagMu_DiJet60_Mu7_v1"
         || triggerList[i] == "HLT_BTagMu_DiJet60_Mu7_v2"
+        || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v1"
+        || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v2"
         || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v3"
         || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v4"
         || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v5"
         || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v6"
         || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v7"
         || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v8"
-        || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v9" ) BitTrigger +=20000 ;   
+        || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v9"
+        || triggerList[i] == "HLT_BTagMu_DiJet40_L1FastJet_Mu5_v1"
+        || triggerList[i] == "HLT_BTagMu_DiJet40_L1FastJet_Mu5_v2" ) BitTrigger +=20000 ;   
       if ( triggerList[i] == "HLT_BTagMu_DiJet80_Mu9_v1"
         || triggerList[i] == "HLT_BTagMu_DiJet80_Mu9_v2"
+        || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v1"
+        || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v2"
         || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v3"
         || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v4"
         || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v5"
         || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v6"
         || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v7"
         || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v8"
-        || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v9" ) BitTrigger +=40000 ;   
+        || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v9"
+        || triggerList[i] == "HLT_BTagMu_DiJet70_L1FastJet_Mu5_v1"
+        || triggerList[i] == "HLT_BTagMu_DiJet70_L1FastJet_Mu5_v2" ) BitTrigger +=40000 ;   
       if ( triggerList[i] == "HLT_BTagMu_DiJet100_Mu9_v1"
         || triggerList[i] == "HLT_BTagMu_DiJet100_Mu9_v2"
+        || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v1"
+        || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v2"
         || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v3"
         || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v4"
         || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v5"
         || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v6"
         || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v7"
         || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v8"
-        || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v9" ) BitTrigger +=100000 ;   
+        || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v9"
+        || triggerList[i] == "HLT_BTagMu_DiJet110_L1FastJet_Mu5_v1"
+        || triggerList[i] == "HLT_BTagMu_DiJet110_L1FastJet_Mu5_v2" ) BitTrigger +=100000 ;   
+      if ( triggerList[i] == "HLT_BTagMu_Jet300_L1FastJet_Mu5_v1"
+        || triggerList[i] == "HLT_BTagMu_Jet300_Mu5_v1"
+        || triggerList[i] == "HLT_BTagMu_Jet300_Mu5_v2"
+        || triggerList[i] == "HLT_BTagMu_Jet300_Mu5_v3" )   BitTrigger +=200000 ;   
 //$$ 
 // std::cout << " Run Evt " << Run << " " << Evt << " trigger list " << triggerList[i] << std::endl;
     }
@@ -849,6 +893,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   int can0, can1, can2, can3, can4, can5, can6, can7, can8;
 
   nTrack = 0;
+  nTrkInc = 0;
   nSV = 0; 
   int Njets = 0;
   int numjet = 0;
@@ -869,7 +914,11 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     //edm::RefToBase<reco::Jet> jetRef(edm::Ref<edm::View<reco::Jet> >(jetsColl,  pjet-jetsColl.begin() ));
     edm::RefToBase<reco::Jet> jetRef( jetsCollHandle,  pjet-jetsColl.begin() );
 
-    double JES = acorrector->correction( jetsColl.at(ijet), jetRef, iEvent,iSetup  ); 
+    //double JES = acorrector->correction( jetsColl.at(ijet), jetRef, iEvent,iSetup  ); 
+    double JES = acorrector->correction( jetsColl.at(ijet),iEvent,iSetup  ); 
+    
+    
+    
      pjet++;
     //cout << "get JES done " << endl;
     double jetpt  = (jetsColl.at(ijet)).pt()  ;
@@ -932,6 +981,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     Jet_ntracks[nJet] = ntagtracks;
 
     Jet_nFirstTrack[nJet]  = nTrack;
+    Jet_nFirstTrkInc[nJet] = nTrkInc;
     int k=0;
     
     const edm::RefVector<reco::TrackCollection> & assotracks((*tagInfo)[ith_tagged].selectedTracks());
@@ -1098,10 +1148,36 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
 	  nTrack++;
 	}
+
+//$$
+        if ( producePtRelTemplate_ ) {
+          if ( (assotracks[itt])->quality(reco::TrackBase::highPurity)
+// Remove the tracks that are pixel-less
+            && (assotracks[itt])->algo()!=(reco::TrackBase::iter4)
+            && (assotracks[itt])->algo()!=(reco::TrackBase::iter5)
+            && deltaR < 0.4
+            && (assotracks[itt])->pt() > 5.
+            && (assotracks[itt])->numberOfValidHits() >= 11
+            && (assotracks[itt])->hitPattern().numberOfValidPixelHits() >= 2
+            && (assotracks[itt])->normalizedChi2() < 10
+            && (assotracks[itt])->trackerExpectedHitsOuter().numberOfHits() <= 2
+            && (assotracks[itt])->dz()-(*pv).z() < 1. ) { 
+
+	    TrkInc_IP[nTrkInc]	  = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.value();
+	    TrkInc_IPsig[nTrkInc] = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.significance();
+	    TrkInc_pt[nTrkInc]	  = (assotracks[itt])->pt();
+	    TrkInc_ptrel[nTrkInc] =  calculPtRel( (*(assotracks[itt])), jetsColl.at(ijet), JES, CaloJetCollectionTags_);
+
+	    nTrkInc++;
+	  }
+	}
+//$$
+
 	k++;
       } // end loop on tracks
 //$$    }
     Jet_nLastTrack[nJet]   = nTrack;
+    Jet_nLastTrkInc[nJet]  = nTrkInc;
     
 //$$
 // // get the 4 highest positive and 4 lowest negative IP/sig tracks
@@ -1895,16 +1971,9 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 // Fill TTree
 //
 //$$
-  smalltree->Fill();
-//$$
-//   int trig100 = BitTrigger%100;
-//   int trig1 = BitTrigger%10;
-//   int trig2 = (trig100 - trig1) / 10;
-//   if ( trig2 >= 4 ) smalltree->Fill();
+  if ( BitTrigger > 0 || Run < 0 ) smalltree->Fill();
 //$$
 //$$  if ( nMuon > 0 ) smalltree->Fill();
-//$$
-//$$  if ( BitTrigger > 0 ) smalltree->Fill();
 //$$
 
   hData_All_NJets->Fill( Njets );
@@ -2230,7 +2299,6 @@ int MistagAnalyzer::TaggedJet(reco::Jet calojet, edm::Handle<reco::JetTagCollect
 
 int MistagAnalyzer::matchMuon(const edm::RefToBase<reco::Track>& theMuon, edm::View<reco::Muon>& muons ){
  double small = 1.e-3;
- 
   int matchedMu = -1;
   for(unsigned int i=0; i<muons.size(); i++){
      double muonpt = -10000;
@@ -2240,17 +2308,12 @@ int MistagAnalyzer::matchMuon(const edm::RefToBase<reco::Track>& theMuon, edm::V
      if ( fabs(theMuon->pt() - muonpt )  < small  ){ matchedMu = i; }
     
   }
-  
-  
   return matchedMu;
-
-
 }
 
 
-std::vector<MistagAnalyzer::simPrimaryVertex> MistagAnalyzer::getSimPVs(
-				      const Handle<HepMCProduct> evtMC)
-{
+std::vector<MistagAnalyzer::simPrimaryVertex> MistagAnalyzer::getSimPVs(const Handle<HepMCProduct> evtMC){
+				      
   std::vector<MistagAnalyzer::simPrimaryVertex> simpv;
   const HepMC::GenEvent* evt=evtMC->GetEvent();
   if (evt) {

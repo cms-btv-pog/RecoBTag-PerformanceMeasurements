@@ -15,16 +15,10 @@ process.source = cms.Source(
     "PoolSource",
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(   
-# Summer11 S4 MC
-#         'file:FEB0DEC7-DF8D-E011-8D10-00266CF33288.root'
-# Summer11 QCD_Pt-30to50_MuPt5Enriched S3 MC
-        'file:FEBD6E0A-967F-E011-819A-0024E87699A6.root'
-
-#         '/store/mc/Summer11/QCD_Pt-80to120_TuneZ2_7TeV_pythia6/AODSIM/PU_S3_START42_V11-v2/0002/FA97B0C7-DB7D-E011-990A-485B39800C14.root',
-#         '/store/mc/Summer11/QCD_Pt-80to120_TuneZ2_7TeV_pythia6/AODSIM/PU_S3_START42_V11-v2/0002/FA5C01BD-E47D-E011-87CF-485B39800BCA.root',
-#         '/store/mc/Summer11/QCD_Pt-80to120_TuneZ2_7TeV_pythia6/AODSIM/PU_S3_START42_V11-v2/0002/FA49A8F9-E17D-E011-B8DD-E0CB4E1A118E.root',
-#         '/store/mc/Summer11/QCD_Pt-80to120_TuneZ2_7TeV_pythia6/AODSIM/PU_S3_START42_V11-v2/0002/F8E63805-E27D-E011-A7F2-485B39800C0A.root',
-#         '/store/mc/Summer11/QCD_Pt-80to120_TuneZ2_7TeV_pythia6/AODSIM/PU_S3_START42_V11-v2/0002/F86EC6F9-E17D-E011-991B-485B39800BA0.root',
+# /RelValQCD_170_300_8TeV/CMSSW_5_2_0-PU_START52_V4_special_120307_btag-v1/AODSIM
+#         'file:00519466-F76F-E111-BC4E-001A9281173A.root'
+# /QCD_Pt-15to3000_TuneZ2star_Flat_8TeV_pythia6/Summer12-PU_S7_START52_V9-v1/AODSIM
+        'file:009BD969-778A-E111-8B85-003048F0E1AC.root'
   )
 )
 
@@ -34,7 +28,7 @@ process.maxEvents = cms.untracked.PSet(
 
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = "START42_V12::All" 
+process.GlobalTag.globaltag = "START52_V9::All" 
 
 ##-------------------- Import the JEC services -----------------------
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
@@ -200,9 +194,6 @@ process.kt6PFJets.doAreaFastjet = True
 #process.patJetCorrFactorsPFlow.rho = cms.InputTag("kt6PFJets", "rho")
 getattr(process,"patJetCorrFactors"+postfix).rho = cms.InputTag("kt6PFJets", "rho")
 
-#-------------------------------------
-#Redo the primary vertex
-
 from PhysicsTools.SelectorUtils.pvSelector_cfi import pvSelector
 
 process.goodOfflinePrimaryVertices = cms.EDFilter(
@@ -210,9 +201,7 @@ process.goodOfflinePrimaryVertices = cms.EDFilter(
     filterParams = pvSelector.clone( minNdof = cms.double(4.0), maxZ = cms.double(24.0) ),
     src=cms.InputTag('offlinePrimaryVertices')
     )
-    
-#-------------------------------------
-#JetID
+
 process.load('PhysicsTools.SelectorUtils.pfJetIDSelector_cfi')
 process.load('PhysicsTools.SelectorUtils.jetIDSelector_cfi')
 process.jetIDSelector.version = cms.string('PURE09')
@@ -247,7 +236,6 @@ process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
  		      maxd0 = cms.double(2)	
                      )
 
-
 ### from Cristina JP calibration for cmsRun only : 
 # from CondCore.DBCommon.CondDBCommon_cfi import *
 # process.load("RecoBTag.TrackProbability.trackProbabilityFakeCond_cfi")
@@ -255,14 +243,14 @@ process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
 # process.es_prefer_trackProbabilityFakeCond = cms.ESPrefer("PoolDBESSource","trackProbabilityFakeCond")
 
 ### from Cristina JP calibration for crab only: 
-process.GlobalTag.toGet = cms.VPSet(
-  cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
-       tag = cms.string("TrackProbabilityCalibration_2D_2011_v1_mc"),
-       connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_BTAU")),
-  cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-       tag = cms.string("TrackProbabilityCalibration_3D_2011_v1_mc"),
-       connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_BTAU"))
-)
+# process.GlobalTag.toGet = cms.VPSet(
+#   cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
+#        tag = cms.string("TrackProbabilityCalibration_2D_2012MC_v1"),
+#        connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU")),
+#   cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
+#        tag = cms.string("TrackProbabilityCalibration_3D_2012MC_v1"),
+#        connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"))
+# )
 
 
 #---------------------------------------
@@ -272,6 +260,7 @@ process.TFileService = cms.Service("TFileService", fileName = cms.string("JetTre
 process.mistag.isData              = False
 process.mistag.useTrackHistory     = False
 process.mistag.produceJetProbaTree = False
+process.mistag.producePtRelTemplate = False
 process.mistag.triggerTable = 'TriggerResults::HLT' # Data and MC
 #---------------------------------------
 
@@ -284,47 +273,37 @@ process.mistag.Jets = 'selectedPatJetsPF2PAT'
 process.mistag.jetCorrector = cms.string('ak5PFL1FastL2L3')
 #process.mistag.jetCorrector = cms.string('ak5PFL1FastL2L3Residual')
 
+
 # process.ak5JetTracksAssociatorAtVertex.jets = "ak5PFJets"
 process.ak5JetTracksAssociatorAtVertex.jets = "selectedPatJetsPF2PAT"
 # process.softMuonTagInfos.jets = "ak5PFJets"
 process.softMuonTagInfos.jets = "selectedPatJetsPF2PAT"
 
 
-process.jetProbabilityMixed = cms.ESProducer("JetProbabilityESProducer",
-    impactParameterType = cms.int32(0), ## 0 = 3D, 1 = 2D
-
-    deltaR = cms.double(0.3),
-    maximumDistanceToJetAxis = cms.double(0.07),
-    trackIpSign = cms.int32(0), ## 0 = use both, 1 = positive only, -1 = negative only
-
-    minimumProbability = cms.double(0.005),
-    maximumDecayLength = cms.double(5.0),
-    trackQualityClass = cms.string("any")
-)
-
-
-#-------------------------------------
-#Jet Probability
-process.jetBProbabilityMixed = cms.ESProducer("JetBProbabilityESProducer",
-    impactParameterType = cms.int32(0), ## 0 = 3D, 1 = 2D
-
-    deltaR = cms.double(-1.0), ## use cut from JTA
-
-    maximumDistanceToJetAxis = cms.double(0.07),
-    trackIpSign = cms.int32(0), ## 0 = use both, 1 = positive only, -1 = negative only
-
-    minimumProbability = cms.double(0.005),
-    numberOfBTracks = cms.uint32(4),
-    maximumDecayLength = cms.double(5.0),
-
-    trackQualityClass = cms.string("any")
-)
-
-process.jetProbabilityBJetTags.jetTagComputer  = 'jetProbabilityMixed'
-process.jetBProbabilityBJetTags.jetTagComputer = 'jetBProbabilityMixed'
+# process.jetProbabilityMixed = cms.ESProducer("JetProbabilityESProducer",
+#     impactParameterType = cms.int32(0), ## 0 = 3D, 1 = 2D
+# 
+#     deltaR = cms.double(0.3),
+#     maximumDistanceToJetAxis = cms.double(0.07),
+#     trackIpSign = cms.int32(0), ## 0 = use both, 1 = positive only, -1 = negative only
+#     minimumProbability = cms.double(0.005),
+#     maximumDecayLength = cms.double(5.0),
+#     trackQualityClass = cms.string("any")
+# )
+# process.jetBProbabilityMixed = cms.ESProducer("JetBProbabilityESProducer",
+#     impactParameterType = cms.int32(0), ## 0 = 3D, 1 = 2D
+#     deltaR = cms.double(-1.0), ## use cut from JTA
+#     maximumDistanceToJetAxis = cms.double(0.07),
+#     trackIpSign = cms.int32(0), ## 0 = use both, 1 = positive only, -1 = negative only
+#     minimumProbability = cms.double(0.005),
+#     numberOfBTracks = cms.uint32(4),
+#     maximumDecayLength = cms.double(5.0),
+#     trackQualityClass = cms.string("any")
+# )
+# process.jetProbabilityBJetTags.jetTagComputer  = 'jetProbabilityMixed'
+# process.jetBProbabilityBJetTags.jetTagComputer = 'jetBProbabilityMixed'
 
 
-#-------------------------------------
 process.p = cms.Path(
 #$$
         process.kt6PFJets

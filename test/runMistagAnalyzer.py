@@ -15,10 +15,10 @@ process.source = cms.Source(
     "PoolSource",
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(   
-# data from /Jet/May10ReReco-v1
-       'file:FCCB5194-257C-E011-83C3-0024E876804B.root'
-# data from /Jet/Run2011A-05Aug2011-v1
-#         'file:FEFA03FA-01C0-E011-8279-0015178C4A48.root'
+# data from /Jet/Run2012A-PromptReco-v1/AOD
+#        'file:FE2E21F0-0583-E111-8DA9-001D09F241F0.root'
+# data from /BTag/Run2012A-PromptReco-v1/AOD
+       'file:B6F789ED-0583-E111-9791-001D09F24D8A.root'
   )
 )
 
@@ -28,7 +28,8 @@ process.maxEvents = cms.untracked.PSet(
 
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = "GR_R_42_V14::All" # global tag for EPS 2011 with FastJet
+process.GlobalTag.globaltag = "GR_R_52_V7::All"
+# process.GlobalTag.globaltag = "GR_R_53_V2B::All"
 
 
 ##-------------------- Import the JEC services -----------------------
@@ -252,13 +253,11 @@ process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
 ### from Cristina JP calibration for crab only: 
 process.GlobalTag.toGet = cms.VPSet(
   cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
-#      tag = cms.string("TrackProbabilityCalibration_2D_2010Data_v1_offline"),
-       tag = cms.string("TrackProbabilityCalibration_2D_2011Data_v1_offline"),
-       connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_BTAU")),
+       tag = cms.string("TrackProbabilityCalibration_2D_2012DataTOT_v1_offline"),
+       connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU")),
   cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-#      tag = cms.string("TrackProbabilityCalibration_3D_2010Data_v1_offline"),
-       tag = cms.string("TrackProbabilityCalibration_3D_2011Data_v1_offline"),
-       connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_BTAU"))
+       tag = cms.string("TrackProbabilityCalibration_3D_2012DataTOT_v1_offline"),
+       connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"))
 )
 
 
@@ -269,6 +268,7 @@ process.TFileService = cms.Service("TFileService", fileName = cms.string("JetTre
 process.mistag.isData              = True
 process.mistag.useTrackHistory     = False
 process.mistag.produceJetProbaTree = False
+process.mistag.producePtRelTemplate = False
 process.mistag.triggerTable = 'TriggerResults::HLT' # Data and MC
 #---------------------------------------
 
@@ -287,38 +287,31 @@ process.ak5JetTracksAssociatorAtVertex.jets = "selectedPatJetsPF2PAT"
 process.softMuonTagInfos.jets = "selectedPatJetsPF2PAT"
 
 
-process.jetProbabilityMixed = cms.ESProducer("JetProbabilityESProducer",
-    impactParameterType = cms.int32(0), ## 0 = 3D, 1 = 2D
-
-    deltaR = cms.double(0.3),
-    maximumDistanceToJetAxis = cms.double(0.07),
-    trackIpSign = cms.int32(0), ## 0 = use both, 1 = positive only, -1 = negative only
-
-    minimumProbability = cms.double(0.005),
-    maximumDecayLength = cms.double(5.0),
-    trackQualityClass = cms.string("any")
-)
-
-
-#-------------------------------------
-#Jet Probability
-process.jetBProbabilityMixed = cms.ESProducer("JetBProbabilityESProducer",
-    impactParameterType = cms.int32(0), ## 0 = 3D, 1 = 2D
-
-    deltaR = cms.double(-1.0), ## use cut from JTA
-
-    maximumDistanceToJetAxis = cms.double(0.07),
-    trackIpSign = cms.int32(0), ## 0 = use both, 1 = positive only, -1 = negative only
-
-    minimumProbability = cms.double(0.005),
-    numberOfBTracks = cms.uint32(4),
-    maximumDecayLength = cms.double(5.0),
-
-    trackQualityClass = cms.string("any")
-)
-
-process.jetProbabilityBJetTags.jetTagComputer  = 'jetProbabilityMixed'
-process.jetBProbabilityBJetTags.jetTagComputer = 'jetBProbabilityMixed'
+# process.jetProbabilityMixed = cms.ESProducer("JetProbabilityESProducer",
+#     impactParameterType = cms.int32(0), ## 0 = 3D, 1 = 2D
+#     deltaR = cms.double(0.3),
+#     maximumDistanceToJetAxis = cms.double(0.07),
+#     trackIpSign = cms.int32(0), ## 0 = use both, 1 = positive only, -1 = negative only
+#     minimumProbability = cms.double(0.005),
+#     maximumDecayLength = cms.double(5.0),
+#     trackQualityClass = cms.string("any")
+# )
+# 
+# #-------------------------------------
+# #Jet Probability
+# process.jetBProbabilityMixed = cms.ESProducer("JetBProbabilityESProducer",
+#     impactParameterType = cms.int32(0), ## 0 = 3D, 1 = 2D
+#     deltaR = cms.double(-1.0), ## use cut from JTA
+#     maximumDistanceToJetAxis = cms.double(0.07),
+#     trackIpSign = cms.int32(0), ## 0 = use both, 1 = positive only, -1 = negative only
+#     minimumProbability = cms.double(0.005),
+#     numberOfBTracks = cms.uint32(4),
+#     maximumDecayLength = cms.double(5.0),
+#     trackQualityClass = cms.string("any")
+# )
+# 
+# process.jetProbabilityBJetTags.jetTagComputer  = 'jetProbabilityMixed'
+# process.jetBProbabilityBJetTags.jetTagComputer = 'jetBProbabilityMixed'
 
 
 #---------------------------------------

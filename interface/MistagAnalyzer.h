@@ -16,7 +16,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.24 2011/10/03 13:44:19 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.25 2011/10/04 11:34:35 jandrea Exp $
 //
 //
 
@@ -219,6 +219,7 @@ private:
     int ntrackMin_;
     bool isData_;
     bool produceJetProbaTree_;
+    bool producePtRelTemplate_;
 
     // trigger list
     std::vector<std::string> triggernames_;
@@ -391,6 +392,8 @@ private:
     int   Jet_nLastTrack[10000]; 
     int   Jet_nFirstSV[10000];
     int   Jet_nLastSV[10000];
+    int   Jet_nFirstTrkInc[10000];
+    int   Jet_nLastTrkInc[10000]; 
     
     int   nMuon;
     int   Muon_IdxJet[10000];
@@ -411,6 +414,12 @@ private:
     float Muon_IPsig[10000];
     float Muon_IP[10000];
     float Muon_Proba[10000];
+    
+    int   nTrkInc;
+    float TrkInc_pt[10000];
+    float TrkInc_ptrel[10000];
+    float TrkInc_IPsig[10000];
+    float TrkInc_IP[10000];
     
     int nPV;
     float PV_x[10000];
@@ -436,6 +445,7 @@ private:
     float SV_flight[10000];
     float SV_flightErr[10000];
     
+    int nPUtrue;                // the true number of pileup interactions that have been added to the event
     int nPU;                    // the number of pileup interactions that have been added to the event
     int   PU_bunch[10000];      // 0 if on time pileup, -1 or +1 if out-of-time
     float PU_z[10000];          // the true primary vertex position along the z axis for each added interaction
