@@ -25,6 +25,9 @@
 <use   name="TrackingTools/TransientTrack"/>
 <use   name="TrackingTools/IPTools">
 <use   name="PhysicsTools/UtilAlgos"/>
+<use   name="RecoBTau/JetTagComputer"/>
+<use   name="RecoBTag/SecondaryVertex"/>
+
 <flags   CXXFLAGS="-O0 -g"/>
 <export>
   <lib   name="1"/>
