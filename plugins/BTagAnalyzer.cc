@@ -161,7 +161,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   //--------------------------------------
   smalltree->Branch("nTrack",	       &nTrack, 	"nTrack/I");
   smalltree->Branch("Track_dxy",       Track_dxy,	"Track_dxy[nTrack]/F");
-  smalltree->Branch("Track_LongIP",    Track_LongIP,	"Track_LongIP[nTrack]/F");
+  smalltree->Branch("Track_dz",    Track_dz,	"Track_dz[nTrack]/F");
   smalltree->Branch("Track_zIP",       Track_zIP,	"Track_zIP[nTrack]/F");
   smalltree->Branch("Track_length",    Track_length,	"Track_length[nTrack]/F");
   smalltree->Branch("Track_dist",      Track_dist,	"Track_dist[nTrack]/F");
@@ -313,6 +313,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   smalltree->Branch("Muon_chi2Tk",   Muon_chi2Tk   ,"Muon_chi2Tk[nMuon]/F");
   smalltree->Branch("Muon_pt",       Muon_pt       ,"Muon_pt[nMuon]/F");
   smalltree->Branch("Muon_eta",      Muon_eta      ,"Muon_eta[nMuon]/F");
+  smalltree->Branch("Muon_phi",      Muon_phi      ,"Muon_phi[nMuon]/F");
   smalltree->Branch("Muon_ptrel",    Muon_ptrel    ,"Muon_ptrel[nMuon]/F");
   smalltree->Branch("Muon_vz",       Muon_vz       ,"Muon_vz[nMuon]/F");
   smalltree->Branch("Muon_hist",     Muon_hist     ,"Muon_hist[nMuon]/I");
@@ -452,7 +453,6 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   PVzSim = -10.;
   mcweight=1.;
   if ( !isData_ ) {
-
   // pthat
     edm::Handle<GenEventInfoProduct> geninfos;
     iEvent.getByLabel( "generator",geninfos ); 
@@ -512,10 +512,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     iEvent.getByLabel(genJetCollection_,genJetsHandle);
     genJets =	*(genJetsHandle.product());
     
-    
-    
-    Handle< GenEventInfoProduct   > genInfo;
-    mcweight=genInfo->weight();
+
 
   } // end MC info
  
@@ -1049,7 +1046,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	if ( std::fabs(distJetAxis) < 0.07 && decayLen < 5.0 && deltaR < 0.3 ) {
 //$$
 	  Track_dxy[nTrack]      = (assotracks[itt])->dxy(pv->position());
-	  Track_LongIP[nTrack]   = (assotracks[itt])->dz(pv->position());
+	  Track_dz[nTrack]   = (assotracks[itt])->dz(pv->position());
 	  Track_zIP[nTrack]      = (assotracks[itt])->dz()-(*pv).z();	
 	  Track_length[nTrack]   = decayLen;
 	  Track_dist[nTrack]     = distJetAxis;
@@ -1440,6 +1437,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	Muon_chi2Tk[nMuon]  = muons[muIdx].innerTrack()->normalizedChi2()  ;
 	Muon_pt[nMuon]       = muons[muIdx].pt() 			   ;
 	Muon_eta[nMuon]      = muons[muIdx].eta()			   ;
+	Muon_phi[nMuon]      = muons[muIdx].phi()			   ;
 	Muon_ratio[nMuon]    = ((*tagInos_softmuon)[ith_tagged].properties(leptIdx).ratio);
         Muon_deltaR[nMuon]   = ((*tagInos_softmuon)[ith_tagged].properties(leptIdx).deltaR);
 

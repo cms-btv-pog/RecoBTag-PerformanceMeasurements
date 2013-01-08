@@ -328,7 +328,7 @@ private:
     
     int   nTrack;
     float Track_dxy[10000];
-    float Track_LongIP[10000];
+    float Track_dz[10000];
     float Track_zIP[10000];
     float Track_length[10000];
     float Track_dist[10000];
@@ -428,6 +428,7 @@ private:
     float Muon_chi2Tk[10000];
     float Muon_pt[10000];
     float Muon_eta[10000];
+    float Muon_phi[10000];
     float Muon_ptrel[10000];
     float Muon_vz[10000];
     int   Muon_hist[10000];
