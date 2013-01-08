@@ -1,6 +1,6 @@
 ##*****************************************************
 ##*****************************************************
-##******** for MC
+##******** for DATA
 ##*****************************************************
 ##*****************************************************
 import FWCore.ParameterSet.Config as cms
@@ -19,7 +19,8 @@ process.source = cms.Source(
 #        'file:FE2E21F0-0583-E111-8DA9-001D09F241F0.root'
 # data from /BTag/Run2012A-PromptReco-v1/AOD
        #'file:000A540B-76E7-E111-A557-003048C69406.root'
-       'file:02CFCC4D-68EB-E111-A8A8-485B39800C2B.root'
+       #'file:FC834104-FF2E-E211-AF15-003048F1BF66.root'
+       'file:5AC9D874-D6E8-E111-A768-00261894387D.root'
   )
 )
 
@@ -31,6 +32,7 @@ process.maxEvents = cms.untracked.PSet(
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = "GR_R_52_V7::All"
 # process.GlobalTag.globaltag = "GR_R_53_V2B::All"
+
 
 ##-------------------- Import the JEC services -----------------------
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
@@ -119,7 +121,7 @@ process.load("PhysicsTools.PatAlgos.patSequences_cff")
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False))
 
 # process.load("CommonTools.ParticleFlow.Sources.source_ZtoMus_DBS_cfi")
-runOnMC = True
+runOnMC = False
 
 from PhysicsTools.PatAlgos.tools.pfTools import *
 
@@ -265,7 +267,7 @@ process.GlobalTag.toGet = cms.VPSet(
 process.TFileService = cms.Service("TFileService", fileName = cms.string("TrackTree.root") )
 #process.TFileService = cms.Service("TFileService", fileName = cms.string("JetTree.root") )
  
-process.btagana.isData              = False 
+process.btagana.isData              =True 
 process.btagana.useTrackHistory     = False
 process.btagana.produceJetProbaTree = True
 process.btagana.producePtRelTemplate = False
@@ -337,7 +339,7 @@ process.p = cms.Path(
 	*process.goodOfflinePrimaryVertices
 	*getattr(process,"patPF2PATSequence"+postfix)
         #*process.PFJetsFilter
-	*process.myPartons*process.AK5Flavour
+#$$	*process.myPartons*process.AK5Flavour
 #$$
         *process.noscraping
         *process.primaryVertexFilter
