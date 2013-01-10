@@ -23,7 +23,7 @@
 <use   name="SimTracker/TrackAssociation"/>
 <use   name="SimTracker/Records"/>
 <use   name="TrackingTools/TransientTrack"/>
-<use   name="TrackingTools/IPTools">
+<use   name="TrackingTools/IPTools"/>
 <use   name="PhysicsTools/UtilAlgos"/>
 <use   name="RecoBTau/JetTagComputer"/>
 <use   name="RecoBTag/SecondaryVertex"/>
