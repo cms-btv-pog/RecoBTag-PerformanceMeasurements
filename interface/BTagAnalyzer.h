@@ -232,6 +232,7 @@ private:
     double vetoPos_;
     int ntrackMin_;
     bool isData_;
+    bool use_selected_tracks_;
     bool produceJetProbaTree_;
     bool producePtRelTemplate_;
 
@@ -414,7 +415,8 @@ private:
     int   Jet_nFirstSV[10000];
     int   Jet_nLastSV[10000];
     int   Jet_nFirstTrkInc[10000];
-    int   Jet_nLastTrkInc[10000]; 
+    int   Jet_nLastTrkInc[10000];
+    int   Jet_SV_multi[10000]; 
     
     int   nMuon;
     int   Muon_IdxJet[10000];
@@ -480,6 +482,11 @@ private:
     float SV_flight2DErr[10000];
     float SV_totCharge[10000]; 
     float SV_vtxDistJetAxis[10000]; 
+    int   SV_nTrk[10000]; 
+    int   SV_nTrk_firstVxt[10000];
+    float SV_mass[10000];	 
+    float SV_vtx_eta[10000];
+    float SV_vtx_phi[10000];   
     
     int nPUtrue;                // the true number of pileup interactions that have been added to the event
     int nPU;                    // the number of pileup interactions that have been added to the event

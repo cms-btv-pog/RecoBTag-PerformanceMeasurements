@@ -21,6 +21,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   ntrackMin_ = iConfig.getParameter<int>("ntrackMin");
 
   isData_              = iConfig.getParameter<bool>("isData");
+  use_selected_tracks_ = iConfig.getParameter<bool>("use_selected_tracks");
   useTrackHistory_     = iConfig.getParameter<bool>("useTrackHistory");
   produceJetProbaTree_ = iConfig.getParameter<bool>("produceJetProbaTree");
   producePtRelTemplate_ = iConfig.getParameter<bool>("producePtRelTemplate");
@@ -220,27 +221,33 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   //--------------------------------------
   // secondary vertex information 
   //--------------------------------------
-  smalltree->Branch("nSV"	        ,&nSV	           ,"nSV/I");
-  smalltree->Branch("SV_x"	        ,SV_x	           ,"SV_x[nSV]/F");
-  smalltree->Branch("SV_y"	        ,SV_y	           ,"SV_y[nSV]/F");
-  smalltree->Branch("SV_z"	        ,SV_z	           ,"SV_z[nSV]/F");
-  smalltree->Branch("SV_ex"	        ,SV_ex	           ,"SV_ex[nSV]/F");
-  smalltree->Branch("SV_ey"	        ,SV_ey	           ,"SV_ey[nSV]/F");
-  smalltree->Branch("SV_ez"	        ,SV_ez	           ,"SV_ez[nSV]/F");
-  smalltree->Branch("SV_chi2"	        ,SV_chi2           ,"SV_chi2[nSV]/F");
-  smalltree->Branch("SV_ndf"	        ,SV_ndf	           ,"SV_ndf[nSV]/F");
-  smalltree->Branch("SV_flight"         ,SV_flight         ,"SV_flight[nSV]/F");
-  smalltree->Branch("SV_flightErr"      ,SV_flightErr      ,"SV_flightErr[nSV]/F");
-  smalltree->Branch("SV_deltaR_jet"     ,SV_deltaR_jet     ,"SV_deltaR_jet[nSV]/F");
-  smalltree->Branch("SV_deltaR_sum_jet" ,SV_deltaR_sum_jet ,"SV_deltaR_sum_jet[nSV]/F");
-  smalltree->Branch("SV_deltaR_sum_dir" ,SV_deltaR_sum_dir ,"SV_deltaR_sum_dir[nSV]/F");
-  smalltree->Branch("SV_energy_ratio"	,SV_energy_ratio   ,"SV_energy_ratio[nSV]/F");
-  smalltree->Branch("SV_aboveC"	        ,SV_aboveC	   ,"SV_aboveC[nSV]/F");
-  smalltree->Branch("SV_vtx_pt"	        ,SV_vtx_pt	   ,"SV_vtx_pt[nSV]/F");
-  smalltree->Branch("SV_flight2D"       ,SV_flight2D       ,"SV_flight2D[nSV]/F");
-  smalltree->Branch("SV_flight2DErr"    ,SV_flight2DErr    ,"SV_flight2DErr[nSV]/F");
-  smalltree->Branch("SV_totCharge"      ,SV_totCharge      ,"SV_totCharge [nSV]/F");
-  smalltree->Branch("SV_vtxDistJetAxis" ,SV_vtxDistJetAxis ,"SV_vtxDistJetAxis [nSV]/F");
+  smalltree->Branch("nSV"	        , &nSV	           ,"nSV/I");
+  smalltree->Branch("SV_x"	        , SV_x	           ,"SV_x[nSV]/F");
+  smalltree->Branch("SV_y"	        , SV_y	           ,"SV_y[nSV]/F");
+  smalltree->Branch("SV_z"	        , SV_z	           ,"SV_z[nSV]/F");
+  smalltree->Branch("SV_ex"	        , SV_ex	           ,"SV_ex[nSV]/F");
+  smalltree->Branch("SV_ey"	        , SV_ey	           ,"SV_ey[nSV]/F");
+  smalltree->Branch("SV_ez"	        , SV_ez	           ,"SV_ez[nSV]/F");
+  smalltree->Branch("SV_chi2"	        , SV_chi2           ,"SV_chi2[nSV]/F");
+  smalltree->Branch("SV_ndf"	        , SV_ndf	           ,"SV_ndf[nSV]/F");
+  smalltree->Branch("SV_flight"         , SV_flight         ,"SV_flight[nSV]/F");
+  smalltree->Branch("SV_flightErr"      , SV_flightErr      ,"SV_flightErr[nSV]/F");
+  smalltree->Branch("SV_deltaR_jet"     , SV_deltaR_jet     ,"SV_deltaR_jet[nSV]/F");
+  smalltree->Branch("SV_deltaR_sum_jet" , SV_deltaR_sum_jet ,"SV_deltaR_sum_jet[nSV]/F");
+  smalltree->Branch("SV_deltaR_sum_dir" , SV_deltaR_sum_dir ,"SV_deltaR_sum_dir[nSV]/F");
+  smalltree->Branch("SV_energy_ratio"	, SV_energy_ratio   ,"SV_energy_ratio[nSV]/F");
+  smalltree->Branch("SV_aboveC"	        , SV_aboveC	   ,"SV_aboveC[nSV]/F");
+  smalltree->Branch("SV_vtx_pt"	        , SV_vtx_pt	   ,"SV_vtx_pt[nSV]/F");
+  smalltree->Branch("SV_flight2D"       , SV_flight2D       ,"SV_flight2D[nSV]/F");
+  smalltree->Branch("SV_flight2DErr"    , SV_flight2DErr    ,"SV_flight2DErr[nSV]/F");
+  smalltree->Branch("SV_totCharge"      , SV_totCharge      ,"SV_totCharge [nSV]/F");
+  smalltree->Branch("SV_vtxDistJetAxis" , SV_vtxDistJetAxis ,"SV_vtxDistJetAxis [nSV]/F");
+  smalltree->Branch("SV_nTrk"           , SV_nTrk,          " SV_nTrk[nSV]/I");
+  smalltree->Branch("SV_nTrk_firstVxt"  ,  SV_nTrk_firstVxt ," SV_nTrk_firstVxt[nSV]/I");
+  smalltree->Branch("SV_mass"           ,  SV_mass          ," SV_mass[nSV]/F");
+  smalltree->Branch("SV_vtx_eta"	        , SV_vtx_eta	   ,"SV_vtx_eta[nSV]/F");
+  smalltree->Branch("SV_vtx_phi"	        , SV_vtx_phi	   ,"SV_vtx_phi[nSV]/F");
+  
   
   }
     
@@ -293,8 +300,9 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   
   smalltree->Branch("Jet_nFirstTrack", Jet_nFirstTrack ,"Jet_nFirstTrack[nJet]/I");
   smalltree->Branch("Jet_nLastTrack",  Jet_nLastTrack  ,"Jet_nLastTrack[nJet]/I"); 
-//$$  smalltree->Branch("Jet_nFirstSV",    Jet_nFirstSV    ,"Jet_nFirstSV[nJet]/I");
-//$$  smalltree->Branch("Jet_nLastSV",     Jet_nLastSV     ,"Jet_nLastSV[nJet]/I");
+  smalltree->Branch("Jet_nFirstSV",    Jet_nFirstSV    ,"Jet_nFirstSV[nJet]/I");
+  smalltree->Branch("Jet_nLastSV",     Jet_nLastSV     ,"Jet_nLastSV[nJet]/I");
+  smalltree->Branch("Jet_SV_multi",    Jet_SV_multi      ,"Jet_SV_multi[nJet]/I");  
   smalltree->Branch("Jet_nFirstTrkInc", Jet_nFirstTrkInc ,"Jet_nFirstTrkInc[nJet]/I");
   smalltree->Branch("Jet_nLastTrkInc",  Jet_nLastTrkInc  ,"Jet_nLastTrkInc[nJet]/I"); 
   
@@ -1025,29 +1033,49 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     Jet_nFirstTrkInc[nJet] = nTrkInc;
     int k=0;
     
-    const edm::RefVector<reco::TrackCollection> & assotracks((*tagInfo)[ith_tagged].selectedTracks());
+    //edm::RefVector<reco::TrackCollection> *assotracks;
+    
+    const edm::RefVector<reco::TrackCollection>  &selected_tracks((*tagInfo)[ith_tagged].selectedTracks());
+    const edm::RefVector<reco::TrackCollection>  &no_sel_tracks((*tagInfo)[ith_tagged].tracks());
+    
+    //if (use_selected_tracks_) 
+    //assotracks=&selected_tracks;
+    //else                      assotracks=&no_sel_tracks;
+    
 
 //$$    if ( produceJetProbaTree_ ) {
-      for (unsigned int itt=0; itt < assotracks.size(); itt++) {
+      
+    unsigned int trackSize = selected_tracks.size();
+    if(!use_selected_tracks_)trackSize = no_sel_tracks.size();
+    
+      for (unsigned int itt=0; itt < trackSize; itt++) {
 	//(*tagInfo)[ith_tagged].probability(itt,0);
 
-	const reco::Track  &ptrack = (*(assotracks[itt]));
 
+ 
+	reco::Track  ptrack;
+	if(use_selected_tracks_) ptrack= *selected_tracks[itt];
+	else ptrack= *no_sel_tracks[itt];
+	 
         GlobalPoint maximumClose = (*tagInfo)[ith_tagged].impactParameterData()[k].closestToJetAxis;
         float decayLen = (maximumClose - (Pv_point)).mag(); 
 	float distJetAxis = (*tagInfo)[ith_tagged].impactParameterData()[k].distanceToJetAxis.value();
-        float deta = (assotracks[itt])->eta() - Jet_eta[nJet];
-        float dphi = (assotracks[itt])->phi() - Jet_phi[nJet];
+        float deta = ptrack.eta() - Jet_eta[nJet];
+        float dphi = ptrack.phi() - Jet_phi[nJet];
         if ( dphi > TMath::Pi() ) dphi = 2.*TMath::Pi() - dphi;
         float deltaR = TMath::Sqrt(deta*deta + dphi*dphi);
 	
+	bool pass_cut_trk =false;
+	
+	if (std::fabs(distJetAxis) < 0.07 && decayLen < 5.0 && deltaR < 0.3)  pass_cut_trk=true;
+	
       // track selection
+//$$    
+	if ( (use_selected_tracks_ && pass_cut_trk) ||  !use_selected_tracks_) {
 //$$
-	if ( std::fabs(distJetAxis) < 0.07 && decayLen < 5.0 && deltaR < 0.3 ) {
-//$$
-	  Track_dxy[nTrack]      = (assotracks[itt])->dxy(pv->position());
-	  Track_dz[nTrack]   = (assotracks[itt])->dz(pv->position());
-	  Track_zIP[nTrack]      = (assotracks[itt])->dz()-(*pv).z();	
+	  Track_dxy[nTrack]      = ptrack.dxy(pv->position());
+	  Track_dz[nTrack]       = ptrack.dz(pv->position());
+	  Track_zIP[nTrack]      = ptrack.dz()-(*pv).z();	
 	  Track_length[nTrack]   = decayLen;
 	  Track_dist[nTrack]     = distJetAxis;
 	  Track_IP2D[nTrack]     = (*tagInfo)[ith_tagged].impactParameterData()[k].ip2d.value();
@@ -1059,24 +1087,24 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  
 	  Track_Proba[nTrack]    = (*tagInfo)[ith_tagged].probabilities(0)[k];
 	  
-	  Track_p[nTrack]        = (assotracks[itt])->p();
-	  Track_pt[nTrack]       = (assotracks[itt])->pt();
-	  Track_eta[nTrack]      = (assotracks[itt])->eta();
-	  Track_phi[nTrack]      = (assotracks[itt])->phi();
+	  Track_p[nTrack]        = ptrack.p();
+	  Track_pt[nTrack]       = ptrack.pt();
+	  Track_eta[nTrack]      = ptrack.eta();
+	  Track_phi[nTrack]      = ptrack.phi();
 // 	  Track_chi2[nTrack]     = (assotracks[itt])->chi2();    
-	  Track_chi2[nTrack]     = (assotracks[itt])->normalizedChi2();   
-	  Track_charge[nTrack]   = (assotracks[itt])->charge();
+	  Track_chi2[nTrack]     = ptrack.normalizedChi2();   
+	  Track_charge[nTrack]   = ptrack.charge();
 	  
-	  Track_nHitAll[nTrack]  = (assotracks[itt])->numberOfValidHits();
-	  Track_nHitPixel[nTrack]= (assotracks[itt])->hitPattern().numberOfValidPixelHits();
-	  Track_nHitStrip[nTrack]= (assotracks[itt])->hitPattern().numberOfValidStripHits();
-	  Track_nHitTIB[nTrack]  = (assotracks[itt])->hitPattern().numberOfValidStripTIBHits();
-	  Track_nHitTID[nTrack]  = (assotracks[itt])->hitPattern().numberOfValidStripTIDHits();
-	  Track_nHitTOB[nTrack]  = (assotracks[itt])->hitPattern().numberOfValidStripTOBHits();
-	  Track_nHitTEC[nTrack]  = (assotracks[itt])->hitPattern().numberOfValidStripTECHits();
-	  Track_nHitPXB[nTrack]  = (assotracks[itt])->hitPattern().numberOfValidPixelBarrelHits();
-	  Track_nHitPXF[nTrack]  = (assotracks[itt])->hitPattern().numberOfValidPixelEndcapHits();
-	  Track_isHitL1[nTrack]  = (assotracks[itt])->hitPattern().hasValidHitInFirstPixelBarrel();
+	  Track_nHitAll[nTrack]  = ptrack.numberOfValidHits();
+	  Track_nHitPixel[nTrack]= ptrack.hitPattern().numberOfValidPixelHits();
+	  Track_nHitStrip[nTrack]= ptrack.hitPattern().numberOfValidStripHits();
+	  Track_nHitTIB[nTrack]  = ptrack.hitPattern().numberOfValidStripTIBHits();
+	  Track_nHitTID[nTrack]  = ptrack.hitPattern().numberOfValidStripTIDHits();
+	  Track_nHitTOB[nTrack]  = ptrack.hitPattern().numberOfValidStripTOBHits();
+	  Track_nHitTEC[nTrack]  = ptrack.hitPattern().numberOfValidStripTECHits();
+	  Track_nHitPXB[nTrack]  = ptrack.hitPattern().numberOfValidPixelBarrelHits();
+	  Track_nHitPXF[nTrack]  = ptrack.hitPattern().numberOfValidPixelEndcapHits();
+	  Track_isHitL1[nTrack]  = ptrack.hitPattern().hasValidHitInFirstPixelBarrel();
 	  
           Track_PV[nTrack] = 0;
 	  Track_SV[nTrack] = 0;
@@ -1197,22 +1225,22 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 //$$
         if ( producePtRelTemplate_ ) {
-          if ( (assotracks[itt])->quality(reco::TrackBase::highPurity)
+          if ( ptrack.quality(reco::TrackBase::highPurity)
 // Remove the tracks that are pixel-less
-            && (assotracks[itt])->algo()!=(reco::TrackBase::iter4)
-            && (assotracks[itt])->algo()!=(reco::TrackBase::iter5)
+            && ptrack.algo()!=(reco::TrackBase::iter4)
+            && ptrack.algo()!=(reco::TrackBase::iter5)
             && deltaR < 0.4
-            && (assotracks[itt])->pt() > 5.
-            && (assotracks[itt])->numberOfValidHits() >= 11
-            && (assotracks[itt])->hitPattern().numberOfValidPixelHits() >= 2
-            && (assotracks[itt])->normalizedChi2() < 10
-            && (assotracks[itt])->trackerExpectedHitsOuter().numberOfHits() <= 2
-            && (assotracks[itt])->dz()-(*pv).z() < 1. ) { 
+            && ptrack.pt() > 5.
+            && ptrack.numberOfValidHits() >= 11
+            && ptrack.hitPattern().numberOfValidPixelHits() >= 2
+            && ptrack.normalizedChi2() < 10
+            && ptrack.trackerExpectedHitsOuter().numberOfHits() <= 2
+            && ptrack.dz()-(*pv).z() < 1. ) { 
 
 	    TrkInc_IP[nTrkInc]	  = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.value();
 	    TrkInc_IPsig[nTrkInc] = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.significance();
-	    TrkInc_pt[nTrkInc]	  = (assotracks[itt])->pt();
-	    TrkInc_ptrel[nTrkInc] =  calculPtRel( (*(assotracks[itt])), jetsColl.at(ijet), JES, CaloJetCollectionTags_);
+	    TrkInc_pt[nTrkInc]	  = ptrack.pt();
+	    //TrkInc_ptrel[nTrkInc] =  calculPtRel( (*ptrack), jetsColl.at(ijet), JES, CaloJetCollectionTags_);
 
 	    nTrkInc++;
 	  }
@@ -1713,7 +1741,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     //*****************************************************************
     Jet_histSvx[nJet] = 0;
     Jet_nFirstSV[nJet]  = nSV;
-    
+    Jet_SV_multi[nJet]  = (*tagInfoSVx)[ith_tagged].nVertices();
     ith_tagged =    this->TaggedJet(jetsColl.at(ijet),jetTags_SvtxHighEff);
     
     if ( produceJetProbaTree_  && (*tagInfoSVx)[ith_tagged].nVertices() > 0) {
@@ -1725,12 +1753,13 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       SV_ez[nSV]   = (*tagInfoSVx)[ith_tagged].secondaryVertex(0).zError();
       SV_chi2[nSV] = (*tagInfoSVx)[ith_tagged].secondaryVertex(0).chi2();
       SV_ndf[nSV]  = (*tagInfoSVx)[ith_tagged].secondaryVertex(0).ndof();
+      
       SV_flight[nSV]	  = (*tagInfoSVx)[ith_tagged].flightDistance(0).value();
       SV_flightErr[nSV]   = (*tagInfoSVx)[ith_tagged].flightDistance(0).error();
       SV_flight2D[nSV]	  = (*tagInfoSVx)[ith_tagged].flightDistance(0, true).value();
       SV_flight2DErr[nSV] = (*tagInfoSVx)[ith_tagged].flightDistance(0, true).error();
-      
-      
+      SV_nTrk[nSV]        = (*tagInfoSVx)[ith_tagged].nVertexTracks();
+      SV_nTrk_firstVxt[nSV] =  (*tagInfoSVx)[ith_tagged].secondaryVertex(0).tracksSize();   
  // ------------------------added by Camille ---------------------------------------------------------------------------------------//  
       
       
@@ -1752,6 +1781,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       if(vars.checkTag(reco::btau::trackSip3dSigAboveCharm) ) SV_aboveC[ith_tagged] = (  vars.get( reco::btau::trackSip3dSigAboveCharm ));
       else SV_aboveC[ith_tagged] = (  -9999 ); 
       
+      if(vars.checkTag(reco::btau::vertexMass)) SV_mass[ith_tagged] = ( vars.get( reco::btau::vertexMass));
+      else  SV_mass[ith_tagged] = ( -9999 );      
       
       Int_t totcharge=0;          
       TrackKinematics vertexKinematics;
@@ -1790,7 +1821,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       SV_deltaR_sum_jet[ith_tagged] = ( Geom::deltaR(vertexSum, jetDir) );
       SV_deltaR_sum_dir[ith_tagged] = ( Geom::deltaR( flightDir, vertexSum ) );
       SV_vtx_pt[ith_tagged] = vertex.p4().pt();
-      
+      SV_vtx_eta[ith_tagged] = vertex.p4().eta();
+      SV_vtx_phi[ith_tagged] = vertex.p4().phi();
       
       jetVertex[ith_tagged] = (math::XYZVector(jet->vx(),jet->vy(),jet->vz()));
       
