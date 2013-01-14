@@ -15,6 +15,8 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
 // Parameters
   minJetPt_  = iConfig.getParameter<double>("MinPt");
   maxJetEta_ = iConfig.getParameter<double>("MaxEta");
+  
+  
   selTagger_ = iConfig.getParameter<int>("selTagger");
   tagCut_    = iConfig.getParameter<double>("tagCut");
   vetoPos_   = iConfig.getParameter<double>("vetoPos");
@@ -1026,21 +1028,24 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     
 // Loop on Selected Tracks
 //
-    int ntagtracks = (*tagInfo)[ith_tagged].probabilities(0).size();
+    const edm::RefVector<reco::TrackCollection>  &selected_tracks((*tagInfo)[ith_tagged].selectedTracks());
+    const edm::RefVector<reco::TrackCollection>  &no_sel_tracks((*tagInfo)[ith_tagged].tracks());    
+    
+    edm::ESHandle<TransientTrackBuilder> builder;
+    iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", builder);
+        
+    int ntagtracks;
+    if (use_selected_tracks_) ntagtracks = (*tagInfo)[ith_tagged].probabilities(0).size();
+    else ntagtracks=no_sel_tracks.size();
+    
     Jet_ntracks[nJet] = ntagtracks;
 
     Jet_nFirstTrack[nJet]  = nTrack;
     Jet_nFirstTrkInc[nJet] = nTrkInc;
     int k=0;
     
-    //edm::RefVector<reco::TrackCollection> *assotracks;
-    
-    const edm::RefVector<reco::TrackCollection>  &selected_tracks((*tagInfo)[ith_tagged].selectedTracks());
-    const edm::RefVector<reco::TrackCollection>  &no_sel_tracks((*tagInfo)[ith_tagged].tracks());
-    
-    //if (use_selected_tracks_) 
-    //assotracks=&selected_tracks;
-    //else                      assotracks=&no_sel_tracks;
+
+
     
 
 //$$    if ( produceJetProbaTree_ ) {
@@ -1048,6 +1053,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     unsigned int trackSize = selected_tracks.size();
     if(!use_selected_tracks_)trackSize = no_sel_tracks.size();
     
+    
+    if (trackSize==0) continue;
       for (unsigned int itt=0; itt < trackSize; itt++) {
 	//(*tagInfo)[ith_tagged].probability(itt,0);
 
@@ -1056,12 +1063,26 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	reco::Track  ptrack;
 	if(use_selected_tracks_) ptrack= *selected_tracks[itt];
 	else ptrack= *no_sel_tracks[itt];
-	 
-        GlobalPoint maximumClose = (*tagInfo)[ith_tagged].impactParameterData()[k].closestToJetAxis;
-        float decayLen = (maximumClose - (Pv_point)).mag(); 
-	float distJetAxis = (*tagInfo)[ith_tagged].impactParameterData()[k].distanceToJetAxis.value();
+	
+	TransientTrack transientTrack = builder->build(ptrack);
+	GlobalVector direction((jetsColl.at(ijet)).px(), (jetsColl.at(ijet)).py(), (jetsColl.at(ijet)).pz());
+        float decayLen;
+        float distJetAxis;
+	
+	if(use_selected_tracks_){
+          GlobalPoint maximumClose = (*tagInfo)[ith_tagged].impactParameterData()[k].closestToJetAxis;
+          decayLen = (maximumClose - (Pv_point)).mag();
+	  distJetAxis = (*tagInfo)[ith_tagged].impactParameterData()[k].distanceToJetAxis.value();
+	}
+	else{
+	  Measurement1D decayLen = IPTools::signedDecayLength3D(builder->build(ptrack), direction, *pv).first;
+          Measurement1D distJetAxis =IPTools::jetTrackDistance(transientTrack, direction, *pv).first;
+	}
+	
+	
         float deta = ptrack.eta() - Jet_eta[nJet];
         float dphi = ptrack.phi() - Jet_phi[nJet];
+	
         if ( dphi > TMath::Pi() ) dphi = 2.*TMath::Pi() - dphi;
         float deltaR = TMath::Sqrt(deta*deta + dphi*dphi);
 	
@@ -1078,14 +1099,35 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  Track_zIP[nTrack]      = ptrack.dz()-(*pv).z();	
 	  Track_length[nTrack]   = decayLen;
 	  Track_dist[nTrack]     = distJetAxis;
-	  Track_IP2D[nTrack]     = (*tagInfo)[ith_tagged].impactParameterData()[k].ip2d.value();
-	  Track_IP2Dsig[nTrack]  = (*tagInfo)[ith_tagged].impactParameterData()[k].ip2d.significance();
-	  Track_IP[nTrack]       = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.value();
-	  Track_IPsig[nTrack]    = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.significance();
-	  Track_IP2Derr[nTrack]  = (*tagInfo)[ith_tagged].impactParameterData()[k].ip2d.error();
-	  Track_IPerr[nTrack]  = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.error();
 	  
-	  Track_Proba[nTrack]    = (*tagInfo)[ith_tagged].probabilities(0)[k];
+	  if(use_selected_tracks_){
+	    Track_IP2D[nTrack]     = (*tagInfo)[ith_tagged].impactParameterData()[k].ip2d.value();
+	    Track_IP2Dsig[nTrack]  = (*tagInfo)[ith_tagged].impactParameterData()[k].ip2d.significance();
+	    Track_IP[nTrack]       = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.value();
+	    Track_IPsig[nTrack]    = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.significance();
+	    Track_IP2Derr[nTrack]  = (*tagInfo)[ith_tagged].impactParameterData()[k].ip2d.error();
+	    Track_IPerr[nTrack]  = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.error();
+	    Track_Proba[nTrack]    = (*tagInfo)[ith_tagged].probabilities(0)[k];
+	  }
+	  else {        
+	    Measurement1D ip2d = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;
+	    Measurement1D ip3d = IPTools::signedImpactParameter3D(builder->build(ptrack), direction, *pv).second;
+	    Measurement1D ip2dsig = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).first;
+	    Measurement1D ip3dsig = IPTools::signedImpactParameter3D(builder->build(ptrack), direction,
+	    *pv).first;
+
+	    
+	    Track_IP2D[nTrack]     = (ip2d.value());
+	    Track_IP2Dsig[nTrack]  = (ip2d.value())/(ip2d.error());
+	    Track_IP[nTrack]       = (ip3d.value());
+	    Track_IPsig[nTrack]    = (ip3d.value())/(ip3d.error());
+	    Track_IP2Derr[nTrack]  = (ip2d.error());
+	    Track_IPerr[nTrack]    = (ip3d.error());
+	    Track_Proba[nTrack]    =0;	  
+	  
+	  }
+	  
+	  
 	  
 	  Track_p[nTrack]        = ptrack.p();
 	  Track_pt[nTrack]       = ptrack.pt();
@@ -1237,8 +1279,14 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
             && ptrack.trackerExpectedHitsOuter().numberOfHits() <= 2
             && ptrack.dz()-(*pv).z() < 1. ) { 
 
-	    TrkInc_IP[nTrkInc]	  = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.value();
-	    TrkInc_IPsig[nTrkInc] = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.significance();
+
+
+            if(use_selected_tracks_){
+	      TrkInc_IP[nTrkInc]	  = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.value();
+	      TrkInc_IPsig[nTrkInc] = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.significance();
+	    }
+	    
+	    
 	    TrkInc_pt[nTrkInc]	  = ptrack.pt();
 	    //TrkInc_ptrel[nTrkInc] =  calculPtRel( (*ptrack), jetsColl.at(ijet), JES, CaloJetCollectionTags_);
 
