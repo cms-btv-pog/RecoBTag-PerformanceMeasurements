@@ -180,6 +180,7 @@ private:
     
     double getGenJetPt(reco::Jet theJet, GenJetCollection &theJets);
     int getMuonTk(double pt);
+    bool NameCompatible(const std::string& pattern, const std::string& name);
     
     // ----------member data ---------------------------
     std::string outputFile_;

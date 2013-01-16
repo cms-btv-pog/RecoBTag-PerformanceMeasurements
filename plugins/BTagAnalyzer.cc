@@ -684,236 +684,41 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 // Trigger table 2010/2011
 //$$
-      if ( triggerList[i] == "HLT_Jet15U"
-        || triggerList[i] == "HLT_Jet15U_v1"
-        || triggerList[i] == "HLT_Jet15U_v2"
-        || triggerList[i] == "HLT_Jet15U_v3"
-        || triggerList[i] == "HLT_Jet30_v1"
-        || triggerList[i] == "HLT_Jet30_v2"
-        || triggerList[i] == "HLT_Jet30_v3"
-        || triggerList[i] == "HLT_Jet30_v4"
-        || triggerList[i] == "HLT_Jet30_v5"
-        || triggerList[i] == "HLT_Jet30_v6"
-        || triggerList[i] == "HLT_PFJet40_v1"
-        || triggerList[i] == "HLT_PFJet40_v2"
-        || triggerList[i] == "HLT_PFJet40_v3"
-        || triggerList[i] == "HLT_PFJet40_v4"
-        || triggerList[i] == "HLT_PFJet40_v5"       ) BitTrigger +=10 ; 
-      if ( triggerList[i] == "HLT_Jet30U"
-        || triggerList[i] == "HLT_Jet30U_v1"
-        || triggerList[i] == "HLT_Jet30U_v2"
-        || triggerList[i] == "HLT_Jet30U_v3"
-        || triggerList[i] == "HLT_Jet60_v1"
-        || triggerList[i] == "HLT_Jet60_v2"
-        || triggerList[i] == "HLT_Jet60_v3"
-        || triggerList[i] == "HLT_Jet60_v4"
-        || triggerList[i] == "HLT_Jet60_v5"
-        || triggerList[i] == "HLT_Jet60_v6"         ) BitTrigger +=20 ; 
-      if ( triggerList[i] == "HLT_Jet50U"
-        || triggerList[i] == "HLT_Jet50U_v1"
-        || triggerList[i] == "HLT_Jet50U_v2"
-        || triggerList[i] == "HLT_Jet50U_v3"
-        || triggerList[i] == "HLT_Jet80_v1"
-        || triggerList[i] == "HLT_Jet80_v2" 
-        || triggerList[i] == "HLT_Jet80_v3" 
-        || triggerList[i] == "HLT_Jet80_v4" 
-        || triggerList[i] == "HLT_Jet80_v5" 
-        || triggerList[i] == "HLT_Jet80_v6"
-        || triggerList[i] == "HLT_PFJet80_v1"
-        || triggerList[i] == "HLT_PFJet80_v2"
-        || triggerList[i] == "HLT_PFJet80_v3"
-        || triggerList[i] == "HLT_PFJet80_v4"
-        || triggerList[i] == "HLT_PFJet80_v5"       ) BitTrigger +=40 ; 
-      if ( triggerList[i] == "HLT_Jet70U"
-        || triggerList[i] == "HLT_Jet70U_v1"
-        || triggerList[i] == "HLT_Jet70U_v2"
-        || triggerList[i] == "HLT_Jet70U_v3"
-        || triggerList[i] == "HLT_Jet110_v1"
-        || triggerList[i] == "HLT_Jet110_v2"
-        || triggerList[i] == "HLT_Jet110_v3"
-        || triggerList[i] == "HLT_Jet110_v4"
-        || triggerList[i] == "HLT_Jet110_v5"
-        || triggerList[i] == "HLT_Jet110_v6"        ) BitTrigger +=100 ; 
-      if ( triggerList[i] == "HLT_Jet100U"
-        || triggerList[i] == "HLT_Jet100U_v1"
-        || triggerList[i] == "HLT_Jet100U_v2"
-        || triggerList[i] == "HLT_Jet100U_v3"
-        || triggerList[i] == "HLT_Jet150_v1"
-        || triggerList[i] == "HLT_Jet150_v2"
-        || triggerList[i] == "HLT_Jet150_v3"
-        || triggerList[i] == "HLT_Jet150_v4"
-        || triggerList[i] == "HLT_Jet150_v5"
-        || triggerList[i] == "HLT_Jet150_v6"
-        || triggerList[i] == "HLT_PFJet140_v1"
-        || triggerList[i] == "HLT_PFJet140_v2"
-        || triggerList[i] == "HLT_PFJet140_v3"
-        || triggerList[i] == "HLT_PFJet140_v4"
-        || triggerList[i] == "HLT_PFJet140_v5"      ) BitTrigger +=200 ; 
-      if ( triggerList[i] == "HLT_Jet140U"
-        || triggerList[i] == "HLT_Jet140U_v1"
-        || triggerList[i] == "HLT_Jet140U_v2"
-        || triggerList[i] == "HLT_Jet140U_v3"
-        || triggerList[i] == "HLT_Jet190_v1"
-        || triggerList[i] == "HLT_Jet190_v2"
-        || triggerList[i] == "HLT_Jet190_v3"
-        || triggerList[i] == "HLT_Jet190_v4"
-        || triggerList[i] == "HLT_Jet190_v5"
-        || triggerList[i] == "HLT_Jet190_v6"
-        || triggerList[i] == "HLT_PFJet200_v1"
-        || triggerList[i] == "HLT_PFJet200_v2"
-        || triggerList[i] == "HLT_PFJet200_v3"
-        || triggerList[i] == "HLT_PFJet200_v4"
-        || triggerList[i] == "HLT_PFJet200_v5"      ) BitTrigger +=400 ; 
-      if ( triggerList[i] == "HLT_Jet240_v1"
-        || triggerList[i] == "HLT_Jet240_v2"
-        || triggerList[i] == "HLT_Jet240_v3"
-        || triggerList[i] == "HLT_Jet240_v4"
-        || triggerList[i] == "HLT_Jet240_v5"
-        || triggerList[i] == "HLT_Jet240_v6"
-        || triggerList[i] == "HLT_PFJet260_v1"
-        || triggerList[i] == "HLT_PFJet260_v2"
-        || triggerList[i] == "HLT_PFJet260_v3"
-        || triggerList[i] == "HLT_PFJet260_v4"
-        || triggerList[i] == "HLT_PFJet260_v5"      ) BitTrigger +=1 ; 
-      if ( triggerList[i] == "HLT_Jet300_v1" 
-        || triggerList[i] == "HLT_Jet300_v2"
-        || triggerList[i] == "HLT_Jet300_v3"
-        || triggerList[i] == "HLT_Jet300_v4"
-        || triggerList[i] == "HLT_Jet300_v5"
-        || triggerList[i] == "HLT_PFJet320_v1"
-        || triggerList[i] == "HLT_PFJet320_v2"
-        || triggerList[i] == "HLT_PFJet320_v3"
-        || triggerList[i] == "HLT_PFJet320_v4"
-        || triggerList[i] == "HLT_PFJet320_v5"      ) BitTrigger +=2 ;
-      if ( triggerList[i] == "HLT_PFJet400_v1"
-        || triggerList[i] == "HLT_PFJet400_v2"
-        || triggerList[i] == "HLT_PFJet400_v3"
-        || triggerList[i] == "HLT_PFJet400_v4"
-        || triggerList[i] == "HLT_PFJet400_v5"      ) BitTrigger +=4 ;
-      if ( triggerList[i] == "HLT_DiJetAve15U_8E29" 
-        || triggerList[i] == "HLT_DiJetAve15U"
-        || triggerList[i] == "HLT_DiJetAve15U_v1"
-        || triggerList[i] == "HLT_DiJetAve15U_v2"
-        || triggerList[i] == "HLT_DiJetAve15U_v3"
-        || triggerList[i] == "HLT_DiJetAve15U_v4"
-        || triggerList[i] == "HLT_DiJetAve30_v1"
-        || triggerList[i] == "HLT_DiJetAve30_v2"
-        || triggerList[i] == "HLT_DiJetAve30_v3"
-        || triggerList[i] == "HLT_DiJetAve30_v4"
-        || triggerList[i] == "HLT_DiJetAve30_v5"
-        || triggerList[i] == "HLT_DiJetAve30_v6"
-        || triggerList[i] == "HLT_DiPFJetAve40_v1"
-        || triggerList[i] == "HLT_DiPFJetAve40_v2"
-        || triggerList[i] == "HLT_DiPFJetAve40_v3"
-        || triggerList[i] == "HLT_DiPFJetAve40_v4"
-        || triggerList[i] == "HLT_DiPFJetAve40_v5"  ) BitTrigger +=1000 ; 
-      if ( triggerList[i] == "HLT_DiJetAve30U_8E29" 
-        || triggerList[i] == "HLT_DiJetAve30U"
-        || triggerList[i] == "HLT_DiJetAve30U_v1"
-        || triggerList[i] == "HLT_DiJetAve30U_v2"
-        || triggerList[i] == "HLT_DiJetAve30U_v3"
-        || triggerList[i] == "HLT_DiJetAve30U_v4"
-        || triggerList[i] == "HLT_DiJetAve60_v1"
-        || triggerList[i] == "HLT_DiJetAve60_v2"
-        || triggerList[i] == "HLT_DiJetAve60_v3"
-        || triggerList[i] == "HLT_DiJetAve60_v4"
-        || triggerList[i] == "HLT_DiJetAve60_v5"
-        || triggerList[i] == "HLT_DiJetAve60_v6"
-        || triggerList[i] == "HLT_DiPFJetAve80_v1"
-        || triggerList[i] == "HLT_DiPFJetAve80_v2"
-        || triggerList[i] == "HLT_DiPFJetAve80_v3"
-        || triggerList[i] == "HLT_DiPFJetAve80_v4"
-        || triggerList[i] == "HLT_DiPFJetAve80_v5"  ) BitTrigger +=2000 ; 
-      if ( triggerList[i] == "HLT_DiJetAve50U_8E29" 
-        || triggerList[i] == "HLT_DiJetAve50U"
-        || triggerList[i] == "HLT_DiJetAve50U_v1"
-        || triggerList[i] == "HLT_DiJetAve50U_v2"
-        || triggerList[i] == "HLT_DiJetAve50U_v3"
-        || triggerList[i] == "HLT_DiJetAve50U_v4"
-        || triggerList[i] == "HLT_DiJetAve80_v1"
-        || triggerList[i] == "HLT_DiJetAve80_v2"
-        || triggerList[i] == "HLT_DiJetAve80_v3"
-        || triggerList[i] == "HLT_DiJetAve80_v4"
-        || triggerList[i] == "HLT_DiJetAve80_v5"
-        || triggerList[i] == "HLT_DiJetAve80_v6"
-        || triggerList[i] == "HLT_DiPFJetAve140_v1"
-        || triggerList[i] == "HLT_DiPFJetAve140_v2"
-        || triggerList[i] == "HLT_DiPFJetAve140_v3"
-        || triggerList[i] == "HLT_DiPFJetAve140_v4"
-        || triggerList[i] == "HLT_DiPFJetAve140_v5" ) BitTrigger +=4000 ; 
-//
-      if ( triggerList[i] == "HLT_BTagMu_Jet10U"    
-        || triggerList[i] == "HLT_BTagMu_Jet20U"
-        || triggerList[i] == "HLT_BTagMu_DiJet20U"
-        || triggerList[i] == "HLT_BTagMu_DiJet20U_v1"
-        || triggerList[i] == "HLT_BTagMu_DiJet20U_v2"
-        || triggerList[i] == "HLT_BTagMu_DiJet20U_v3"
-        || triggerList[i] == "HLT_BTagMu_DiJet20U_Mu5"
-        || triggerList[i] == "HLT_BTagMu_DiJet20U_Mu5_v1"
-        || triggerList[i] == "HLT_BTagMu_DiJet20U_Mu5_v2"
-        || triggerList[i] == "HLT_BTagMu_DiJet20U_Mu5_v3"  
-        || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v1"  
-        || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v2"
-        || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v3"
-        || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v4"
-        || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v5"
-        || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v6"
-        || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v7"
-        || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v8"
-        || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v9"
-        || triggerList[i] == "HLT_BTagMu_DiJet20_L1FastJet_Mu5_v1"
-        || triggerList[i] == "HLT_BTagMu_DiJet20_L1FastJet_Mu5_v2" ) BitTrigger +=10000 ;   
-      if ( triggerList[i] == "HLT_BTagMu_DiJet30U"
-        || triggerList[i] == "HLT_BTagMu_DiJet30U_v1"
-        || triggerList[i] == "HLT_BTagMu_DiJet30U_v2"
-        || triggerList[i] == "HLT_BTagMu_DiJet30U_v3"   
-        || triggerList[i] == "HLT_BTagMu_DiJet30U_Mu5" 
-        || triggerList[i] == "HLT_BTagMu_DiJet30U_Mu5_v1"
-        || triggerList[i] == "HLT_BTagMu_DiJet30U_Mu5_v2"
-        || triggerList[i] == "HLT_BTagMu_DiJet30U_Mu5_v3"
-        || triggerList[i] == "HLT_BTagMu_DiJet60_Mu7_v1"
-        || triggerList[i] == "HLT_BTagMu_DiJet60_Mu7_v2"
-        || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v1"
-        || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v2"
-        || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v3"
-        || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v4"
-        || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v5"
-        || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v6"
-        || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v7"
-        || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v8"
-        || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v9"
-        || triggerList[i] == "HLT_BTagMu_DiJet40_L1FastJet_Mu5_v1"
-        || triggerList[i] == "HLT_BTagMu_DiJet40_L1FastJet_Mu5_v2" ) BitTrigger +=20000 ;   
-      if ( triggerList[i] == "HLT_BTagMu_DiJet80_Mu9_v1"
-        || triggerList[i] == "HLT_BTagMu_DiJet80_Mu9_v2"
-        || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v1"
-        || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v2"
-        || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v3"
-        || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v4"
-        || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v5"
-        || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v6"
-        || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v7"
-        || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v8"
-        || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v9"
-        || triggerList[i] == "HLT_BTagMu_DiJet70_L1FastJet_Mu5_v1"
-        || triggerList[i] == "HLT_BTagMu_DiJet70_L1FastJet_Mu5_v2" ) BitTrigger +=40000 ;   
-      if ( triggerList[i] == "HLT_BTagMu_DiJet100_Mu9_v1"
-        || triggerList[i] == "HLT_BTagMu_DiJet100_Mu9_v2"
-        || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v1"
-        || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v2"
-        || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v3"
-        || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v4"
-        || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v5"
-        || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v6"
-        || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v7"
-        || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v8"
-        || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v9"
-        || triggerList[i] == "HLT_BTagMu_DiJet110_L1FastJet_Mu5_v1"
-        || triggerList[i] == "HLT_BTagMu_DiJet110_L1FastJet_Mu5_v2" ) BitTrigger +=100000 ;   
-      if ( triggerList[i] == "HLT_BTagMu_Jet300_L1FastJet_Mu5_v1"
-        || triggerList[i] == "HLT_BTagMu_Jet300_Mu5_v1"
-        || triggerList[i] == "HLT_BTagMu_Jet300_Mu5_v2"
-        || triggerList[i] == "HLT_BTagMu_Jet300_Mu5_v3" )   BitTrigger +=200000 ;   
+
+      if (NameCompatible("HLT_Jet15U*",triggerList[i]) || NameCompatible("HLT_Jet30*",triggerList[i])
+      ||NameCompatible("HLT_PFJet40*",triggerList[i]) ) BitTrigger +=10 ;
+      if (NameCompatible("HLT_Jet30U*",triggerList[i]) || NameCompatible("HLT_Jet60*",triggerList[i]) ) BitTrigger +=20 ;
+      if (NameCompatible("HLT_Jet50U*",triggerList[i]) || NameCompatible("HLT_Jet80*",triggerList[i])
+      ||NameCompatible("HLT_PFJet80*",triggerList[i]) ) BitTrigger +=40 ;
+      if (NameCompatible("HLT_Jet70U*",triggerList[i]) || NameCompatible("HLT_Jet110*",triggerList[i]) ) BitTrigger +=100 ;
+      if (NameCompatible("HLT_Jet100U*",triggerList[i]) || NameCompatible("HLT_Jet150*",triggerList[i])
+      ||NameCompatible("HLT_PFJet140*",triggerList[i]) ) BitTrigger +=200 ;
+      if (NameCompatible("HLT_Jet140U*",triggerList[i]) || NameCompatible("HLT_Jet190*",triggerList[i])
+      ||NameCompatible("HLT_PFJet200*",triggerList[i]) ) BitTrigger +=400 ;
+      if (NameCompatible("HLT_Jet240*",triggerList[i]) || NameCompatible("HLT_PFJet260*",triggerList[i]) ) BitTrigger +=1 ;
+      if (NameCompatible("HLT_Jet300*",triggerList[i]) || NameCompatible("HLT_PFJet320*",triggerList[i]) ) BitTrigger +=2 ;
+      if (NameCompatible("HLT_PFJet400*",triggerList[i]) ) BitTrigger +=4 ;
+      if (NameCompatible("HLT_DiJetAve15*",triggerList[i]) ||
+      NameCompatible("HLT_DiJetAve30*",triggerList[i])||NameCompatible("HLT_DiPFJetAve40*",triggerList[i]) ) BitTrigger +=1000 ;
+      if (NameCompatible("HLT_DiJetAve30U*",triggerList[i]) ||
+      NameCompatible("HLT_DiJetAve60*",triggerList[i])||NameCompatible("HLT_DiPFJetAve80*",triggerList[i]) ) BitTrigger +=2000 ;
+      if (NameCompatible("HLT_DiJetAve50U*",triggerList[i]) ||
+      NameCompatible("HLT_DiJetAve80*",triggerList[i])||NameCompatible("HLT_DiPFJetAve140*",triggerList[i]) ) BitTrigger +=4000 ;
+      if (NameCompatible("HLT_BTagMu_Jet10U*",triggerList[i]) ||
+      NameCompatible("HLT_BTagMu_Jet20U*",triggerList[i])||NameCompatible("HLT_BTagMu_DiJet20U*",triggerList[i])
+      ||NameCompatible("HLT_BTagMu_DiJet20U_Mu5*",triggerList[i])||NameCompatible("HLT_BTagMu_DiJet20_Mu5*",triggerList[i])
+      ||NameCompatible("HLT_BTagMu_DiJet20_L1FastJet_Mu5*",triggerList[i])) BitTrigger +=10000 ;
+      if (NameCompatible("HLT_BTagMu_DiJet30U*",triggerList[i]) ||
+      NameCompatible("HLT_BTagMu_DiJet30U_Mu5*",triggerList[i])||NameCompatible("HLT_BTagMu_DiJet60_Mu7*",triggerList[i])
+      ||NameCompatible("HLT_BTagMu_DiJet40_Mu5*",triggerList[i])||NameCompatible("HLT_BTagMu_DiJet20_L1FastJet_Mu5*",triggerList[i])) BitTrigger +=20000 ;
+      if (NameCompatible("HLT_BTagMu_DiJet80_Mu9*",triggerList[i]) ||
+      NameCompatible("HLT_BTagMu_DiJet70_Mu5*",triggerList[i]) ||NameCompatible("HLT_BTagMu_DiJet70_L1FastJet_Mu5*",triggerList[i]) )BitTrigger +=40000 ;
+      if (NameCompatible("HLT_BTagMu_DiJet100_Mu9*",triggerList[i]) ||
+      NameCompatible("HLT_BTagMu_DiJet110_Mu5*",triggerList[i])
+      ||NameCompatible("HLT_BTagMu_DiJet110_L1FastJet_Mu5*",triggerList[i]) )BitTrigger +=100000 ;
+      if (NameCompatible("HLT_BTagMu_Jet300_L1FastJet_Mu5*",triggerList[i]) ||
+      NameCompatible("HLT_BTagMu_Jet300_Mu5*",triggerList[i]) )BitTrigger +=200000 ;
+
 //$$ 
 // std::cout << " Run Evt " << Run << " " << Evt << " trigger list " << triggerList[i] << std::endl;
     }
@@ -1058,27 +863,31 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       for (unsigned int itt=0; itt < trackSize; itt++) {
 	//(*tagInfo)[ith_tagged].probability(itt,0);
 
-
- 
 	reco::Track  ptrack;
 	if(use_selected_tracks_) ptrack= *selected_tracks[itt];
 	else ptrack= *no_sel_tracks[itt];
 	
 	TransientTrack transientTrack = builder->build(ptrack);
 	GlobalVector direction((jetsColl.at(ijet)).px(), (jetsColl.at(ijet)).py(), (jetsColl.at(ijet)).pz());
-        float decayLen;
-        float distJetAxis;
+
 	
 	if(use_selected_tracks_){
           GlobalPoint maximumClose = (*tagInfo)[ith_tagged].impactParameterData()[k].closestToJetAxis;
-          decayLen = (maximumClose - (Pv_point)).mag();
-	  distJetAxis = (*tagInfo)[ith_tagged].impactParameterData()[k].distanceToJetAxis.value();
+          float decayLe = (maximumClose - (Pv_point)).mag();
+	  float distJetAx = (*tagInfo)[ith_tagged].impactParameterData()[k].distanceToJetAxis.value();
+	  Track_length[nTrack]   = decayLe;
+	  Track_dist[nTrack]     = distJetAx;	  
 	}
 	else{
-	  Measurement1D decayLen = IPTools::signedDecayLength3D(builder->build(ptrack), direction, *pv).first;
-          Measurement1D distJetAxis =IPTools::jetTrackDistance(transientTrack, direction, *pv).first;
+	  Measurement1D decayL   = IPTools::signedDecayLength3D(transientTrack, direction, *pv).second;
+          Measurement1D distJetA = IPTools::jetTrackDistance(transientTrack, direction, *pv).first;
+	  Track_length[nTrack]   = (decayL.value());
+	  Track_dist[nTrack]     = (distJetA.value());	  
 	}
 	
+	
+	float distJetAxis=Track_dist[nTrack];
+	float decayLen=Track_length[nTrack];
 	
         float deta = ptrack.eta() - Jet_eta[nJet];
         float dphi = ptrack.phi() - Jet_phi[nJet];
@@ -1097,21 +906,18 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  Track_dxy[nTrack]      = ptrack.dxy(pv->position());
 	  Track_dz[nTrack]       = ptrack.dz(pv->position());
 	  Track_zIP[nTrack]      = ptrack.dz()-(*pv).z();	
-	  Track_length[nTrack]   = decayLen;
-	  Track_dist[nTrack]     = distJetAxis;
-	  
 	  if(use_selected_tracks_){
 	    Track_IP2D[nTrack]     = (*tagInfo)[ith_tagged].impactParameterData()[k].ip2d.value();
 	    Track_IP2Dsig[nTrack]  = (*tagInfo)[ith_tagged].impactParameterData()[k].ip2d.significance();
 	    Track_IP[nTrack]       = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.value();
 	    Track_IPsig[nTrack]    = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.significance();
 	    Track_IP2Derr[nTrack]  = (*tagInfo)[ith_tagged].impactParameterData()[k].ip2d.error();
-	    Track_IPerr[nTrack]  = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.error();
+	    Track_IPerr[nTrack]    = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.error();
 	    Track_Proba[nTrack]    = (*tagInfo)[ith_tagged].probabilities(0)[k];
 	  }
 	  else {        
-	    Measurement1D ip2d = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;
-	    Measurement1D ip3d = IPTools::signedImpactParameter3D(builder->build(ptrack), direction, *pv).second;
+	    Measurement1D ip2d    = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;
+	    Measurement1D ip3d    = IPTools::signedImpactParameter3D(builder->build(ptrack), direction, *pv).second;
 	    Measurement1D ip2dsig = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).first;
 	    Measurement1D ip3dsig = IPTools::signedImpactParameter3D(builder->build(ptrack), direction,
 	    *pv).first;
@@ -1509,8 +1315,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	Muon_nMuHit[nMuon]    = muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits();
 	Muon_nOutHit[nMuon]   = muons[muIdx].innerTrack()->trackerExpectedHitsOuter().numberOfHits();
 	Muon_nMuHit[nMuon]    = muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits();
-	Muon_chi2[nMuon]    = muons[muIdx].globalTrack()->normalizedChi2() ;
-	Muon_chi2Tk[nMuon]  = muons[muIdx].innerTrack()->normalizedChi2()  ;
+	Muon_chi2[nMuon]      = muons[muIdx].globalTrack()->normalizedChi2() ;
+	Muon_chi2Tk[nMuon]    = muons[muIdx].innerTrack()->normalizedChi2()  ;
 	Muon_pt[nMuon]       = muons[muIdx].pt() 			   ;
 	Muon_eta[nMuon]      = muons[muIdx].eta()			   ;
 	Muon_phi[nMuon]      = muons[muIdx].phi()			   ;
@@ -1550,19 +1356,15 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	//---------------------------------
 	reco::TransientTrack tt = trackBuilder->build(muons[muIdx].innerTrack());
         GlobalVector direction((jetsColl.at(ijet)).px(), (jetsColl.at(ijet)).py(), (jetsColl.at(ijet)).pz());
-	std::pair<bool,Measurement1D> ip   = IPTools::signedImpactParameter3D(tt, direction, (*primaryVertex)[0]);
-	std::pair<bool,Measurement1D> ip2d = IPTools::signedTransverseImpactParameter(tt, direction, (*primaryVertex)[0]);
+	Measurement1D ip   = IPTools::signedImpactParameter3D(tt, direction, (*primaryVertex)[0]).second;
+	Measurement1D ip2d = IPTools::signedTransverseImpactParameter(tt, direction, (*primaryVertex)[0]).second;
 	
+        Muon_IP[nMuon]   = ip.value();
+	Muon_IP2D[nMuon] = ip2d.value();
+        Muon_IPsig[nMuon]   = (ip.value())/(ip.error());
+	Muon_IP2Dsig[nMuon] = (ip2d.value())/(ip2d.error());	 
+
 	
-	float muonip3D = ip.second.value();
-	float muonip3Derror = ip.second.error();
-	float muonip2D = ip2d.second.value();
-	float muonip2Derror = ip2d.second.error();	
-	
-        if ( muonip3Derror > 0. ) Muon_IPsig[nMuon] = muonip3D/muonip3Derror;
-	if ( muonip2Derror > 0. ) Muon_IP2Dsig[nMuon] = muonip2D/muonip2Derror;
-        Muon_IP[nMuon] = muonip3D;
-	Muon_IP2D[nMuon]    =  muonip3D;
 	
 // if ( muons[muIdx].numberOfMatches() < 1 ) {
 // std::cout << " Muon " << nMuon << " pt " << muons[muIdx].pt() << " eta " << muons[muIdx].eta() << " ptrel " << Muon_ptrel[nMuon] << std::endl;
@@ -1871,6 +1673,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       SV_vtx_pt[ith_tagged] = vertex.p4().pt();
       SV_vtx_eta[ith_tagged] = vertex.p4().eta();
       SV_vtx_phi[ith_tagged] = vertex.p4().phi();
+      
+      
       
       jetVertex[ith_tagged] = (math::XYZVector(jet->vx(),jet->vy(),jet->vz()));
       
@@ -2615,6 +2419,74 @@ int BTagAnalyzer::getMuonTk(double pt) {
   }
   return idxTk;
 }
+
+
+// -------------------------------------------------------------------------
+// NameCompatible
+// -------------------------------------------------------------------------
+bool BTagAnalyzer::NameCompatible(const std::string& pattern, const std::string& name) 
+{
+  // Easy case : 
+  if (name.size() < pattern.size()) return false;
+  else if (pattern=="*") return true;
+
+  // Counting number of * in pattern 
+  unsigned int sharp_counter=0;
+  int sharp_pos=-1;
+  for (unsigned i=0; i<pattern.length(); i++)
+  { if (pattern[i]=='*') 
+    { 
+      sharp_counter++;
+      if (sharp_pos==-1) sharp_pos=i;
+    }
+  }
+
+  // no * case
+  if (sharp_counter==0) return (pattern==name);
+
+  // 2 or more * case
+  else if (sharp_counter>1) return false;
+
+  // only one *
+  else
+  {
+    // '*' at the begin of the name
+    if (sharp_pos==0)
+    {
+      return (pattern.compare(1, // the second character
+                              pattern.size()-1, // pattern size without '*'
+                              name, 
+                              name.size()-pattern.size()+1, 
+                              pattern.size()-1 ) == 0); // pattern size without '*'
+    }
+    else if (static_cast<unsigned int>(sharp_pos)==(pattern.size()-1))
+    {
+      return (pattern.compare(0, // the beginning
+                              pattern.size()-1, // pattern size without '*' 
+                              name,
+                              0, // the beginning
+                              pattern.size()-1) == 0); // pattern size without '*'
+    }
+    else
+    {
+      if (!(pattern.compare(0,
+                            sharp_pos,
+                            name,
+                            0,
+                            sharp_pos)==0)) return false;
+
+      return (pattern.compare(sharp_pos+1, // the second character
+                              pattern.size()-sharp_pos-1, // pattern size without '*'
+                              name, 
+                              name.size()-pattern.size()+sharp_pos+1, 
+                              pattern.size()-sharp_pos-1) == 0); // pattern size without '*'
+
+    }
+  }
+}
+
+
+
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(BTagAnalyzer);
