@@ -29,8 +29,9 @@ process.maxEvents = cms.untracked.PSet(
 
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = "GR_R_52_V7::All"
+process.GlobalTag.globaltag = "START53_V16::All"
 # process.GlobalTag.globaltag = "GR_R_53_V2B::All"
+#process.GlobalTag.globaltag = "START53_V7A::All"
 
 ##-------------------- Import the JEC services -----------------------
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
@@ -135,7 +136,7 @@ useL1FastJet    = True  # needs useL1Offset being off, error otherwise
 useL1Offset     = False # needs useL1FastJet being off, error otherwise
 useL2Relative   = True
 useL3Absolute   = True
-# useL2L3Residual = True  # takes effect only on data; currently disabled for CMSSW_4_2_X GlobalTags!
+useL2L3Residual = True  # takes effect only on data; currently disabled for CMSSW_4_2_X GlobalTags!
 useL5Flavor     = False
 useL7Parton     = False
 
@@ -157,8 +158,8 @@ if useL2Relative:
   jecLevels.append( 'L2Relative' )
 if useL3Absolute:
   jecLevels.append( 'L3Absolute' )
-# if useL2L3Residual and not runOnMC:
-#   jecLevelsPF.append( 'L2L3Residual' )
+if useL2L3Residual and not runOnMC:
+   jecLevelsPF.append( 'L2L3Residual' )
 if useL5Flavor:
   jecLevels.append( 'L5Flavor' )
 if useL7Parton:
@@ -166,9 +167,9 @@ if useL7Parton:
 
 usePF2PAT(process,runPF2PAT=True, jetAlgo=jetAlgo, runOnMC=runOnMC, postfix=postfix) 
 
-applyPostfix(process,"patJetCorrFactors",postfix).levels     = cms.vstring('L1FastJet','L2Relative','L3Absolute')
+#applyPostfix(process,"patJetCorrFactors",postfix).levels     = cms.vstring('L1FastJet','L2Relative','L3Absolute')
 applyPostfix(process,"patJetCorrFactors",postfix).rho        = cms.InputTag("kt6PFJets","rho")
-applyPostfix(process,"patJetCorrFactors",postfix).payload    = cms.string('AK5PFchs')
+#applyPostfix(process,"patJetCorrFactors",postfix).payload    = cms.string('AK5PFchs')
 applyPostfix(process,"pfPileUp",postfix).checkClosestZVertex = cms.bool(False) 
 
 from PhysicsTools.PatAlgos.tools.metTools import *
@@ -266,6 +267,7 @@ process.TFileService = cms.Service("TFileService", fileName = cms.string("TrackT
 #process.TFileService = cms.Service("TFileService", fileName = cms.string("JetTree.root") )
  
 process.btagana.isData              = False 
+process.btagana.use_selected_tracks =False
 process.btagana.useTrackHistory     = False
 process.btagana.produceJetProbaTree = True
 process.btagana.producePtRelTemplate = False
@@ -279,7 +281,7 @@ process.AK5byRef.jets = "selectedPatJetsPF2PAT"
 process.btagana.Jets = 'selectedPatJetsPF2PAT'
 #process.btagana.jetCorrector = cms.string('ak5PFL2L3')
 process.btagana.jetCorrector = cms.string('ak5PFL1FastL2L3')
-#process.btagana.jetCorrector = cms.string('ak5PFL1FastL2L3Residual')
+process.btagana.jetCorrector = cms.string('ak5PFL1FastL2L3Residual')
 
 # process.ak5JetTracksAssociatorAtVertex.jets = "ak5PFJets"
 process.ak5JetTracksAssociatorAtVertex.jets = "selectedPatJetsPF2PAT"

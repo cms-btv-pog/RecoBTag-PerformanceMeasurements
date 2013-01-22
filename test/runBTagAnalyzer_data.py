@@ -30,7 +30,7 @@ process.maxEvents = cms.untracked.PSet(
 
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = "GR_R_52_V7::All"
+process.GlobalTag.globaltag = "GR_R_53_V19::All"
 # process.GlobalTag.globaltag = "GR_R_53_V2B::All"
 
 
@@ -264,10 +264,11 @@ process.GlobalTag.toGet = cms.VPSet(
 
 
 #---------------------------------------
-process.TFileService = cms.Service("TFileService", fileName = cms.string("TrackTree.root") )
+process.TFileService = cms.Service("TFileService", fileName = cms.string("TrackTree_data.root") )
 #process.TFileService = cms.Service("TFileService", fileName = cms.string("JetTree.root") )
  
 process.btagana.isData              =True 
+process.btagana.use_selected_tracks = False
 process.btagana.useTrackHistory     = False
 process.btagana.produceJetProbaTree = True
 process.btagana.producePtRelTemplate = False
