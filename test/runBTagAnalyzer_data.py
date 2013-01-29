@@ -130,16 +130,6 @@ jetAlgo="AK5"
 
 usePFnoPU = True # before any top projection
 
-# levels to be accessible from the jets
-# jets are corrected to L3Absolute (MC), L2L3Residual (data) automatically, if enabled here
-# and remain uncorrected, if none of these levels is enabled here
-useL1FastJet    = True  # needs useL1Offset being off, error otherwise
-useL1Offset     = False # needs useL1FastJet being off, error otherwise
-useL2Relative   = True
-useL3Absolute   = True
-# useL2L3Residual = True  # takes effect only on data; currently disabled for CMSSW_4_2_X GlobalTags!
-useL5Flavor     = False
-useL7Parton     = False
 
 # JEC set
 jecSetBase = jetAlgo
@@ -148,27 +138,27 @@ if usePFnoPU:
   jecSetPF += 'chs'
 
 # JEC levels
-if useL1FastJet and useL1Offset:
-  sys.exit( 'ERROR: switch off either "L1FastJet" or "L1Offset"' )
-jecLevels = []
-if useL1FastJet:
-  jecLevels.append( 'L1FastJet' )
-if useL1Offset:
-  jecLevels.append( 'L1Offset' )
-if useL2Relative:
-  jecLevels.append( 'L2Relative' )
-if useL3Absolute:
-  jecLevels.append( 'L3Absolute' )
-# if useL2L3Residual and not runOnMC:
-#   jecLevelsPF.append( 'L2L3Residual' )
-if useL5Flavor:
-  jecLevels.append( 'L5Flavor' )
-if useL7Parton:
-  jecLevels.append( 'L7Parton' )
+#if useL1FastJet and useL1Offset:
+#  sys.exit( 'ERROR: switch off either "L1FastJet" or "L1Offset"' )
+#jecLevels = []
+#if useL1FastJet:
+#  jecLevels.append( 'L1FastJet' )
+#if useL1Offset:
+#  jecLevels.append( 'L1Offset' )
+#if useL2Relative:
+#  jecLevels.append( 'L2Relative' )
+#if useL3Absolute:
+#  jecLevels.append( 'L3Absolute' )
+## if useL2L3Residual and not runOnMC:
+##   jecLevelsPF.append( 'L2L3Residual' )
+#if useL5Flavor:
+#  jecLevels.append( 'L5Flavor' )
+#if useL7Parton:
+#  jecLevels.append( 'L7Parton' )
 
 usePF2PAT(process,runPF2PAT=True, jetAlgo=jetAlgo, runOnMC=runOnMC, postfix=postfix) 
 
-applyPostfix(process,"patJetCorrFactors",postfix).levels     = cms.vstring('L1FastJet','L2Relative','L3Absolute')
+applyPostfix(process,"patJetCorrFactors",postfix).levels     = cms.vstring('L1FastJet','L2Relative','L3Absolute', 'L2L3Residual')
 applyPostfix(process,"patJetCorrFactors",postfix).rho        = cms.InputTag("kt6PFJets","rho")
 applyPostfix(process,"patJetCorrFactors",postfix).payload    = cms.string('AK5PFchs')
 applyPostfix(process,"pfPileUp",postfix).checkClosestZVertex = cms.bool(False) 
