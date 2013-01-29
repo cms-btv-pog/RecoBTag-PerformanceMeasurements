@@ -489,7 +489,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     }
  
   // gluon spliting
-    edm:Handle<reco::GenParticleCollection> genParticles;
+    edm::Handle<reco::GenParticleCollection> genParticles;
     iEvent.getByLabel ("genParticles", genParticles);
 
     for (size_t i = 0; i < genParticles->size (); ++i) {
@@ -525,8 +525,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 
   } // end MC info
- 
-
+//   cout << "Evt:" <<Evt << endl;
+//   cout << "pthat:" <<pthat << endl;
   //------------------------------------------------------
   // Muons
   //------------------------------------------------------
@@ -683,39 +683,287 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     if ( !tr[i].accept() == 1 ) continue;
 
 // Trigger table 2010/2011
-//$$
+//$$      
 
-      if (NameCompatible("HLT_Jet15U*",triggerList[i]) || NameCompatible("HLT_Jet30*",triggerList[i])
-      ||NameCompatible("HLT_PFJet40*",triggerList[i]) ) BitTrigger +=10 ;
-      if (NameCompatible("HLT_Jet30U*",triggerList[i]) || NameCompatible("HLT_Jet60*",triggerList[i]) ) BitTrigger +=20 ;
-      if (NameCompatible("HLT_Jet50U*",triggerList[i]) || NameCompatible("HLT_Jet80*",triggerList[i])
-      ||NameCompatible("HLT_PFJet80*",triggerList[i]) ) BitTrigger +=40 ;
-      if (NameCompatible("HLT_Jet70U*",triggerList[i]) || NameCompatible("HLT_Jet110*",triggerList[i]) ) BitTrigger +=100 ;
-      if (NameCompatible("HLT_Jet100U*",triggerList[i]) || NameCompatible("HLT_Jet150*",triggerList[i])
-      ||NameCompatible("HLT_PFJet140*",triggerList[i]) ) BitTrigger +=200 ;
-      if (NameCompatible("HLT_Jet140U*",triggerList[i]) || NameCompatible("HLT_Jet190*",triggerList[i])
-      ||NameCompatible("HLT_PFJet200*",triggerList[i]) ) BitTrigger +=400 ;
-      if (NameCompatible("HLT_Jet240*",triggerList[i]) || NameCompatible("HLT_PFJet260*",triggerList[i]) ) BitTrigger +=1 ;
-      if (NameCompatible("HLT_Jet300*",triggerList[i]) || NameCompatible("HLT_PFJet320*",triggerList[i]) ) BitTrigger +=2 ;
-      if (NameCompatible("HLT_PFJet400*",triggerList[i]) ) BitTrigger +=4 ;
-      if (NameCompatible("HLT_DiJetAve15*",triggerList[i]) ||
-      NameCompatible("HLT_DiJetAve30*",triggerList[i])||NameCompatible("HLT_DiPFJetAve40*",triggerList[i]) ) BitTrigger +=1000 ;
+// if ( triggerList[i] == "HLT_Jet15U"
+//         || triggerList[i] == "HLT_Jet15U_v1"
+//         || triggerList[i] == "HLT_Jet15U_v2"
+//         || triggerList[i] == "HLT_Jet15U_v3"
+//         || triggerList[i] == "HLT_Jet30_v1"
+//         || triggerList[i] == "HLT_Jet30_v2"
+//         || triggerList[i] == "HLT_Jet30_v3"
+//         || triggerList[i] == "HLT_Jet30_v4"
+//         || triggerList[i] == "HLT_Jet30_v5"
+//         || triggerList[i] == "HLT_Jet30_v6"
+//         || triggerList[i] == "HLT_PFJet40_v1"
+//         || triggerList[i] == "HLT_PFJet40_v2"
+//         || triggerList[i] == "HLT_PFJet40_v3"
+//         || triggerList[i] == "HLT_PFJet40_v4"
+//         || triggerList[i] == "HLT_PFJet40_v5"       ) BitTrigger +=10 ; 
+//       if ( triggerList[i] == "HLT_Jet30U"
+//         || triggerList[i] == "HLT_Jet30U_v1"
+//         || triggerList[i] == "HLT_Jet30U_v2"
+//         || triggerList[i] == "HLT_Jet30U_v3"
+//         || triggerList[i] == "HLT_Jet60_v1"
+//         || triggerList[i] == "HLT_Jet60_v2"
+//         || triggerList[i] == "HLT_Jet60_v3"
+//         || triggerList[i] == "HLT_Jet60_v4"
+//         || triggerList[i] == "HLT_Jet60_v5"
+//         || triggerList[i] == "HLT_Jet60_v6"         ) BitTrigger +=20 ; 
+//       if ( triggerList[i] == "HLT_Jet50U"
+//         || triggerList[i] == "HLT_Jet50U_v1"
+//         || triggerList[i] == "HLT_Jet50U_v2"
+//         || triggerList[i] == "HLT_Jet50U_v3"
+//         || triggerList[i] == "HLT_Jet80_v1"
+//         || triggerList[i] == "HLT_Jet80_v2" 
+//         || triggerList[i] == "HLT_Jet80_v3" 
+//         || triggerList[i] == "HLT_Jet80_v4" 
+//         || triggerList[i] == "HLT_Jet80_v5" 
+//         || triggerList[i] == "HLT_Jet80_v6"
+//         || triggerList[i] == "HLT_PFJet80_v1"
+//         || triggerList[i] == "HLT_PFJet80_v2"
+//         || triggerList[i] == "HLT_PFJet80_v3"
+//         || triggerList[i] == "HLT_PFJet80_v4"
+//         || triggerList[i] == "HLT_PFJet80_v5"       ) BitTrigger +=40 ; 
+//       if ( triggerList[i] == "HLT_Jet70U"
+//         || triggerList[i] == "HLT_Jet70U_v1"
+//         || triggerList[i] == "HLT_Jet70U_v2"
+//         || triggerList[i] == "HLT_Jet70U_v3"
+//         || triggerList[i] == "HLT_Jet110_v1"
+//         || triggerList[i] == "HLT_Jet110_v2"
+//         || triggerList[i] == "HLT_Jet110_v3"
+//         || triggerList[i] == "HLT_Jet110_v4"
+//         || triggerList[i] == "HLT_Jet110_v5"
+//         || triggerList[i] == "HLT_Jet110_v6"        ) BitTrigger +=100 ; 
+//       if ( triggerList[i] == "HLT_Jet100U"
+//         || triggerList[i] == "HLT_Jet100U_v1"
+//         || triggerList[i] == "HLT_Jet100U_v2"
+//         || triggerList[i] == "HLT_Jet100U_v3"
+//         || triggerList[i] == "HLT_Jet150_v1"
+//         || triggerList[i] == "HLT_Jet150_v2"
+//         || triggerList[i] == "HLT_Jet150_v3"
+//         || triggerList[i] == "HLT_Jet150_v4"
+//         || triggerList[i] == "HLT_Jet150_v5"
+//         || triggerList[i] == "HLT_Jet150_v6"
+//         || triggerList[i] == "HLT_PFJet140_v1"
+//         || triggerList[i] == "HLT_PFJet140_v2"
+//         || triggerList[i] == "HLT_PFJet140_v3"
+//         || triggerList[i] == "HLT_PFJet140_v4"
+//         || triggerList[i] == "HLT_PFJet140_v5"      ) BitTrigger +=200 ; 
+//       if ( triggerList[i] == "HLT_Jet140U"
+//         || triggerList[i] == "HLT_Jet140U_v1"
+//         || triggerList[i] == "HLT_Jet140U_v2"
+//         || triggerList[i] == "HLT_Jet140U_v3"
+//         || triggerList[i] == "HLT_Jet190_v1"
+//         || triggerList[i] == "HLT_Jet190_v2"
+//         || triggerList[i] == "HLT_Jet190_v3"
+//         || triggerList[i] == "HLT_Jet190_v4"
+//         || triggerList[i] == "HLT_Jet190_v5"
+//         || triggerList[i] == "HLT_Jet190_v6"
+//         || triggerList[i] == "HLT_PFJet200_v1"
+//         || triggerList[i] == "HLT_PFJet200_v2"
+//         || triggerList[i] == "HLT_PFJet200_v3"
+//         || triggerList[i] == "HLT_PFJet200_v4"
+//         || triggerList[i] == "HLT_PFJet200_v5"      ) BitTrigger +=400 ; 
+//       if ( triggerList[i] == "HLT_Jet240_v1"
+//         || triggerList[i] == "HLT_Jet240_v2"
+//         || triggerList[i] == "HLT_Jet240_v3"
+//         || triggerList[i] == "HLT_Jet240_v4"
+//         || triggerList[i] == "HLT_Jet240_v5"
+//         || triggerList[i] == "HLT_Jet240_v6"
+//         || triggerList[i] == "HLT_PFJet260_v1"
+//         || triggerList[i] == "HLT_PFJet260_v2"
+//         || triggerList[i] == "HLT_PFJet260_v3"
+//         || triggerList[i] == "HLT_PFJet260_v4"
+//         || triggerList[i] == "HLT_PFJet260_v5"      ) BitTrigger +=1 ; 
+//       if ( triggerList[i] == "HLT_Jet300_v1" 
+//         || triggerList[i] == "HLT_Jet300_v2"
+//         || triggerList[i] == "HLT_Jet300_v3"
+//         || triggerList[i] == "HLT_Jet300_v4"
+//         || triggerList[i] == "HLT_Jet300_v5"
+//         || triggerList[i] == "HLT_PFJet320_v1"
+//         || triggerList[i] == "HLT_PFJet320_v2"
+//         || triggerList[i] == "HLT_PFJet320_v3"
+//         || triggerList[i] == "HLT_PFJet320_v4"
+//         || triggerList[i] == "HLT_PFJet320_v5"      ) BitTrigger +=2 ;
+//       if ( triggerList[i] == "HLT_PFJet400_v1"
+//         || triggerList[i] == "HLT_PFJet400_v2"
+//         || triggerList[i] == "HLT_PFJet400_v3"
+//         || triggerList[i] == "HLT_PFJet400_v4"
+//         || triggerList[i] == "HLT_PFJet400_v5"      ) BitTrigger +=4 ;
+//       if ( triggerList[i] == "HLT_DiJetAve15U_8E29" 
+//         || triggerList[i] == "HLT_DiJetAve15U"
+//         || triggerList[i] == "HLT_DiJetAve15U_v1"
+//         || triggerList[i] == "HLT_DiJetAve15U_v2"
+//         || triggerList[i] == "HLT_DiJetAve15U_v3"
+//         || triggerList[i] == "HLT_DiJetAve15U_v4"
+//         || triggerList[i] == "HLT_DiJetAve30_v1"
+//         || triggerList[i] == "HLT_DiJetAve30_v2"
+//         || triggerList[i] == "HLT_DiJetAve30_v3"
+//         || triggerList[i] == "HLT_DiJetAve30_v4"
+//         || triggerList[i] == "HLT_DiJetAve30_v5"
+//         || triggerList[i] == "HLT_DiJetAve30_v6"
+//         || triggerList[i] == "HLT_DiPFJetAve40_v1"
+//         || triggerList[i] == "HLT_DiPFJetAve40_v2"
+//         || triggerList[i] == "HLT_DiPFJetAve40_v3"
+//         || triggerList[i] == "HLT_DiPFJetAve40_v4"
+//         || triggerList[i] == "HLT_DiPFJetAve40_v5"  ) BitTrigger +=1000 ; 
+//       if ( triggerList[i] == "HLT_DiJetAve30U_8E29" 
+//         || triggerList[i] == "HLT_DiJetAve30U"
+//         || triggerList[i] == "HLT_DiJetAve30U_v1"
+//         || triggerList[i] == "HLT_DiJetAve30U_v2"
+//         || triggerList[i] == "HLT_DiJetAve30U_v3"
+//         || triggerList[i] == "HLT_DiJetAve30U_v4"
+//         || triggerList[i] == "HLT_DiJetAve60_v1"
+//         || triggerList[i] == "HLT_DiJetAve60_v2"
+//         || triggerList[i] == "HLT_DiJetAve60_v3"
+//         || triggerList[i] == "HLT_DiJetAve60_v4"
+//         || triggerList[i] == "HLT_DiJetAve60_v5"
+//         || triggerList[i] == "HLT_DiJetAve60_v6"
+//         || triggerList[i] == "HLT_DiPFJetAve80_v1"
+//         || triggerList[i] == "HLT_DiPFJetAve80_v2"
+//         || triggerList[i] == "HLT_DiPFJetAve80_v3"
+//         || triggerList[i] == "HLT_DiPFJetAve80_v4"
+//         || triggerList[i] == "HLT_DiPFJetAve80_v5"  ) BitTrigger +=2000 ; 
+//       if ( triggerList[i] == "HLT_DiJetAve50U_8E29" 
+//         || triggerList[i] == "HLT_DiJetAve50U"
+//         || triggerList[i] == "HLT_DiJetAve50U_v1"
+//         || triggerList[i] == "HLT_DiJetAve50U_v2"
+//         || triggerList[i] == "HLT_DiJetAve50U_v3"
+//         || triggerList[i] == "HLT_DiJetAve50U_v4"
+//         || triggerList[i] == "HLT_DiJetAve80_v1"
+//         || triggerList[i] == "HLT_DiJetAve80_v2"
+//         || triggerList[i] == "HLT_DiJetAve80_v3"
+//         || triggerList[i] == "HLT_DiJetAve80_v4"
+//         || triggerList[i] == "HLT_DiJetAve80_v5"
+//         || triggerList[i] == "HLT_DiJetAve80_v6"
+//         || triggerList[i] == "HLT_DiPFJetAve140_v1"
+//         || triggerList[i] == "HLT_DiPFJetAve140_v2"
+//         || triggerList[i] == "HLT_DiPFJetAve140_v3"
+//         || triggerList[i] == "HLT_DiPFJetAve140_v4"
+//         || triggerList[i] == "HLT_DiPFJetAve140_v5" ) BitTrigger +=4000 ; 
+// //
+//       if ( triggerList[i] == "HLT_BTagMu_Jet10U"    
+//         || triggerList[i] == "HLT_BTagMu_Jet20U"
+//         || triggerList[i] == "HLT_BTagMu_DiJet20U"
+//         || triggerList[i] == "HLT_BTagMu_DiJet20U_v1"
+//         || triggerList[i] == "HLT_BTagMu_DiJet20U_v2"
+//         || triggerList[i] == "HLT_BTagMu_DiJet20U_v3"
+//         || triggerList[i] == "HLT_BTagMu_DiJet20U_Mu5"
+//         || triggerList[i] == "HLT_BTagMu_DiJet20U_Mu5_v1"
+//         || triggerList[i] == "HLT_BTagMu_DiJet20U_Mu5_v2"
+//         || triggerList[i] == "HLT_BTagMu_DiJet20U_Mu5_v3"  
+//         || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v1"  
+//         || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v2"
+//         || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v3"
+//         || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v4"
+//         || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v5"
+//         || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v6"
+//         || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v7"
+//         || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v8"
+//         || triggerList[i] == "HLT_BTagMu_DiJet20_Mu5_v9"
+//         || triggerList[i] == "HLT_BTagMu_DiJet20_L1FastJet_Mu5_v1"
+//         || triggerList[i] == "HLT_BTagMu_DiJet20_L1FastJet_Mu5_v2" ) BitTrigger +=10000 ;   
+//       if ( triggerList[i] == "HLT_BTagMu_DiJet30U"
+//         || triggerList[i] == "HLT_BTagMu_DiJet30U_v1"
+//         || triggerList[i] == "HLT_BTagMu_DiJet30U_v2"
+//         || triggerList[i] == "HLT_BTagMu_DiJet30U_v3"   
+//         || triggerList[i] == "HLT_BTagMu_DiJet30U_Mu5" 
+//         || triggerList[i] == "HLT_BTagMu_DiJet30U_Mu5_v1"
+//         || triggerList[i] == "HLT_BTagMu_DiJet30U_Mu5_v2"
+//         || triggerList[i] == "HLT_BTagMu_DiJet30U_Mu5_v3"
+//         || triggerList[i] == "HLT_BTagMu_DiJet60_Mu7_v1"
+//         || triggerList[i] == "HLT_BTagMu_DiJet60_Mu7_v2"
+//         || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v1"
+//         || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v2"
+//         || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v3"
+//         || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v4"
+//         || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v5"
+//         || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v6"
+//         || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v7"
+//         || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v8"
+//         || triggerList[i] == "HLT_BTagMu_DiJet40_Mu5_v9"
+//         || triggerList[i] == "HLT_BTagMu_DiJet40_L1FastJet_Mu5_v1"
+//         || triggerList[i] == "HLT_BTagMu_DiJet40_L1FastJet_Mu5_v2" ) BitTrigger +=20000 ;   
+//       if ( triggerList[i] == "HLT_BTagMu_DiJet80_Mu9_v1"
+//         || triggerList[i] == "HLT_BTagMu_DiJet80_Mu9_v2"
+//         || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v1"
+//         || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v2"
+//         || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v3"
+//         || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v4"
+//         || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v5"
+//         || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v6"
+//         || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v7"
+//         || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v8"
+//         || triggerList[i] == "HLT_BTagMu_DiJet70_Mu5_v9"
+//         || triggerList[i] == "HLT_BTagMu_DiJet70_L1FastJet_Mu5_v1"
+//         || triggerList[i] == "HLT_BTagMu_DiJet70_L1FastJet_Mu5_v2" ) BitTrigger +=40000 ;   
+//       if ( triggerList[i] == "HLT_BTagMu_DiJet100_Mu9_v1"
+//         || triggerList[i] == "HLT_BTagMu_DiJet100_Mu9_v2"
+//         || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v1"
+//         || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v2"
+//         || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v3"
+//         || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v4"
+//         || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v5"
+//         || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v6"
+//         || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v7"
+//         || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v8"
+//         || triggerList[i] == "HLT_BTagMu_DiJet110_Mu5_v9"
+//         || triggerList[i] == "HLT_BTagMu_DiJet110_L1FastJet_Mu5_v1"
+//         || triggerList[i] == "HLT_BTagMu_DiJet110_L1FastJet_Mu5_v2" ) BitTrigger +=100000 ;   
+//       if ( triggerList[i] == "HLT_BTagMu_Jet300_L1FastJet_Mu5_v1"
+//         || triggerList[i] == "HLT_BTagMu_Jet300_Mu5_v1"
+//         || triggerList[i] == "HLT_BTagMu_Jet300_Mu5_v2"
+//         || triggerList[i] == "HLT_BTagMu_Jet300_Mu5_v3" )   BitTrigger +=200000 ;   
+
+      if (NameCompatible("HLT_Jet15U*",triggerList[i]) || NameCompatible("HLT_Jet30_v*",triggerList[i])
+      ||NameCompatible("HLT_PFJet40_v*",triggerList[i]) ) BitTrigger +=10 ;
+      
+      if (NameCompatible("HLT_Jet30U*",triggerList[i]) || NameCompatible("HLT_Jet60_v*",triggerList[i]) ) BitTrigger +=20 ;
+      
+      if (NameCompatible("HLT_Jet50U*",triggerList[i]) || NameCompatible("HLT_Jet80_v*",triggerList[i])
+      ||NameCompatible("HLT_PFJet80_v*",triggerList[i]) ) BitTrigger +=40 ;
+      
+      if (NameCompatible("HLT_Jet70U*",triggerList[i]) || NameCompatible("HLT_Jet110_v*",triggerList[i]) ) BitTrigger +=100 ;
+      
+      if (NameCompatible("HLT_Jet100U*",triggerList[i]) || NameCompatible("HLT_Jet150_v*",triggerList[i])
+      ||NameCompatible("HLT_PFJet140_v*",triggerList[i]) ) BitTrigger +=200 ;
+      
+      if (NameCompatible("HLT_Jet140U*",triggerList[i]) || NameCompatible("HLT_Jet190_v*",triggerList[i])
+      ||NameCompatible("HLT_PFJet200_v*",triggerList[i]) ) BitTrigger +=400 ;
+      
+      if (NameCompatible("HLT_Jet240_v*",triggerList[i]) || NameCompatible("HLT_PFJet260_v*",triggerList[i]) ) BitTrigger +=1 ;
+      
+      if (NameCompatible("HLT_Jet300_v*",triggerList[i]) || NameCompatible("HLT_PFJet320_v*",triggerList[i]) ) BitTrigger +=2 ;
+      
+      if (NameCompatible("HLT_PFJet400_v*",triggerList[i]) ) BitTrigger +=4 ;
+      
+      if (NameCompatible("HLT_DiJetAve15U*",triggerList[i]) ||
+      NameCompatible("HLT_DiJetAve30_v*",triggerList[i])||NameCompatible("HLT_DiPFJetAve40_v*",triggerList[i])) BitTrigger +=1000 ;
+      
       if (NameCompatible("HLT_DiJetAve30U*",triggerList[i]) ||
-      NameCompatible("HLT_DiJetAve60*",triggerList[i])||NameCompatible("HLT_DiPFJetAve80*",triggerList[i]) ) BitTrigger +=2000 ;
+      NameCompatible("HLT_DiJetAve60_v*",triggerList[i])||NameCompatible("HLT_DiPFJetAve80_v*",triggerList[i]) ) BitTrigger +=2000 ;
+      
       if (NameCompatible("HLT_DiJetAve50U*",triggerList[i]) ||
-      NameCompatible("HLT_DiJetAve80*",triggerList[i])||NameCompatible("HLT_DiPFJetAve140*",triggerList[i]) ) BitTrigger +=4000 ;
+      NameCompatible("HLT_DiJetAve80_v*",triggerList[i])||NameCompatible("HLT_DiPFJetAve140_v*",triggerList[i])) BitTrigger +=4000 ;
+      
       if (NameCompatible("HLT_BTagMu_Jet10U*",triggerList[i]) ||
       NameCompatible("HLT_BTagMu_Jet20U*",triggerList[i])||NameCompatible("HLT_BTagMu_DiJet20U*",triggerList[i])
       ||NameCompatible("HLT_BTagMu_DiJet20U_Mu5*",triggerList[i])||NameCompatible("HLT_BTagMu_DiJet20_Mu5*",triggerList[i])
-      ||NameCompatible("HLT_BTagMu_DiJet20_L1FastJet_Mu5*",triggerList[i])) BitTrigger +=10000 ;
-      if (NameCompatible("HLT_BTagMu_DiJet30U*",triggerList[i]) ||
+      ||NameCompatible("HLT_BTagMu_DiJet20_L1FastJet_Mu5_v*",triggerList[i])) BitTrigger +=10000 ;
+      
+      if (NameCompatible("HLT_BTagMu_DiJet30U",triggerList[i]) ||
+      NameCompatible("HLT_BTagMu_DiJet30U_v*",triggerList[i])||
       NameCompatible("HLT_BTagMu_DiJet30U_Mu5*",triggerList[i])||NameCompatible("HLT_BTagMu_DiJet60_Mu7*",triggerList[i])
       ||NameCompatible("HLT_BTagMu_DiJet40_Mu5*",triggerList[i])||NameCompatible("HLT_BTagMu_DiJet20_L1FastJet_Mu5*",triggerList[i])) BitTrigger +=20000 ;
+      
       if (NameCompatible("HLT_BTagMu_DiJet80_Mu9*",triggerList[i]) ||
       NameCompatible("HLT_BTagMu_DiJet70_Mu5*",triggerList[i]) ||NameCompatible("HLT_BTagMu_DiJet70_L1FastJet_Mu5*",triggerList[i]) )BitTrigger +=40000 ;
-      if (NameCompatible("HLT_BTagMu_DiJet100_Mu9*",triggerList[i]) ||
+      
+      if (NameCompatible("HLT_BTagMu_DiJet100_Mu9_v*",triggerList[i]) ||
       NameCompatible("HLT_BTagMu_DiJet110_Mu5*",triggerList[i])
       ||NameCompatible("HLT_BTagMu_DiJet110_L1FastJet_Mu5*",triggerList[i]) )BitTrigger +=100000 ;
+      
       if (NameCompatible("HLT_BTagMu_Jet300_L1FastJet_Mu5*",triggerList[i]) ||
       NameCompatible("HLT_BTagMu_Jet300_Mu5*",triggerList[i]) )BitTrigger +=200000 ;
 
@@ -724,6 +972,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     }
 // std::cout << " Run Evt " << Run << " " << Evt << " bit trigger " << BitTrigger << std::endl;
 
+
+  //cout << "BitTrigger:" <<BitTrigger << endl;
     
   if ( flavourMatchOptionf == "fastMC" && !isData_ ) {
     iEvent.getByLabel(flavourSourcef, jetMC);
@@ -779,12 +1029,16 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     //cout << "get JES done " << endl;
     double jetpt  = (jetsColl.at(ijet)).pt()  ;
     double jeteta = (jetsColl.at(ijet)).eta() ;
-    double ptjet  = jetpt* JES;
+    //double ptjet  = jetpt* JES;
+    double ptjet  = jetpt;
     
 //$$
-    if ( jetpt*JES < 18. || std::fabs( jeteta ) > 2.5 ) continue;
+    //if ( jetpt*JES < 18. || std::fabs( jeteta ) > 2.5 ) continue;
+    if ( jetpt < 18. || std::fabs( jeteta ) > 2.5 ) continue;
+    
 //$$
-    if ( jetpt*JES > minJetPt_ && std::fabs( jeteta ) < maxJetEta_ ) Njets++; 
+    //if ( jetpt*JES > minJetPt_ && std::fabs( jeteta ) < maxJetEta_ ) Njets++; 
+    if ( jetpt > minJetPt_ && std::fabs( jeteta ) < maxJetEta_ ) Njets++; 
 
     int ith_tagged = -1;      
     float Flavour  =-1;    
@@ -802,6 +1056,12 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     Jet_phi[nJet]     = (jetsColl.at(ijet)).phi();
     Jet_pt[nJet]      = (jetsColl.at(ijet)).pt();
     
+//     cout << "jet n" <<nJet<<endl;
+//     cout << "Jet_eta:" <<Jet_eta[nJet] << endl;
+//     cout << "Jet_phi:" << Jet_phi[nJet]<< endl;
+//     cout << "Jet_pt:" << Jet_pt[nJet]<< endl;
+    
+
     Jet_jes[nJet]     = JES;
     
 //$$
@@ -934,7 +1194,6 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  }
 	  
 	  
-	  
 	  Track_p[nTrack]        = ptrack.p();
 	  Track_pt[nTrack]       = ptrack.pt();
 	  Track_eta[nTrack]      = ptrack.eta();
@@ -960,6 +1219,20 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  Track_SVweight[nTrack] = 0.;
 	  
 	  Track_isfromSV[nTrack] = 0.;
+	  
+// 	  cout <<"track n" << nTrack<< endl;
+// 	  cout <<"Track_pt" <<Track_pt[nTrack] << endl;
+// 	  cout <<"Track_eta" <<Track_eta[nTrack] << endl;
+// 	  cout <<"Track_dz" << Track_dz[nTrack]<< endl;
+// 	  cout << "Track_length" << Track_length[nTrack]<< endl;
+// 	  cout << "Track_dist" <<Track_dist[nTrack] << endl;
+// 	  cout << "Track_IP2D" << Track_IP2D[nTrack]<< endl;
+// 	  cout << "Track_IP2Derr" << Track_IP2Derr[nTrack]<< endl;
+// 	  cout << "Track_IP" <<Track_IP[nTrack] << endl;
+// 	  cout << "Track_IPerr" << Track_IPerr[nTrack]<< endl;
+// 	  cout << "Track_nHitPixel" << Track_nHitPixel[nTrack]<< endl;
+// 	  cout << "Track_nHitStrip" <<Track_nHitStrip[nTrack] << endl;
+
 	  
 	  Track_history[nTrack] = 0;
           if ( useTrackHistory_ && !isData_ ) {
@@ -1299,6 +1572,12 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 // Muon information
     ith_tagged = itagjetMuon;
     
+//     cout << "JetProba:" << Proba<< endl;
+//     cout << "JetBprob:" << Bprob<< endl;
+//     cout << "CombinedSvtx:" << CombinedSvtx<< endl;
+//     cout << "Svtx:" <<Svtx << endl;
+//     cout << "SvtxHP:" << SvtxHP<< endl;
+    
     
 
     for (unsigned int leptIdx = 0; leptIdx < (*tagInos_softmuon)[ith_tagged].leptons(); leptIdx++){
@@ -1323,7 +1602,12 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	Muon_ratio[nMuon]    = ((*tagInos_softmuon)[ith_tagged].properties(leptIdx).ratio);
         Muon_deltaR[nMuon]   = ((*tagInos_softmuon)[ith_tagged].properties(leptIdx).deltaR);
 
-
+//         cout <<"Muon_ptrel:" << Muon_ptrel[nMuon]<< endl;
+//         cout <<"Muon_eta:" <<Muon_eta[nMuon] << endl;
+//         cout <<"Muon_pt:" << Muon_pt[nMuon]<< endl;
+//         cout <<"Muon_deltaR:" << Muon_deltaR[nMuon]<< endl;
+	
+	
 	Muon_isGlobal[nMuon] = muons[muIdx].isGlobalMuon();
 	Muon_nMatched[nMuon] = muons[muIdx].numberOfMatches() ;
 	Muon_vz[nMuon]       = muons[muIdx].vz();
@@ -1380,6 +1664,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       }
     }
     
+    
 // Jet information
     Jet_ProbaN[nJet]   = ProbaN;	 
     Jet_ProbaP[nJet]   = ProbaP;	  
@@ -1429,6 +1714,10 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     Jet_Ip2N[nJet]   = (*jetTags_NegTCHighEff)[ith_tagged].second;
     ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_NegTCHighPur);
     Jet_Ip3N[nJet]   = (*jetTags_NegTCHighPur)[ith_tagged].second;
+    
+    //cout << "TCHE" <<Jet_Ip2P[nJet] << endl;
+    //cout << "TCHP" << Jet_Ip3P[nJet]<< endl;
+    
     
 //$$
     Jet_Ip1P[nJet]  = -100;
@@ -1759,7 +2048,9 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     //*********************************
     // Jet analysis
     
-    if ( (jetpt * JES) <= minJetPt_ || std::fabs( jeteta ) >= maxJetEta_ ) continue;
+    //if ( (jetpt * JES) <= minJetPt_ || std::fabs( jeteta ) >= maxJetEta_ ) continue;
+    if ( (jetpt ) <= minJetPt_ || std::fabs( jeteta ) >= maxJetEta_ ) continue;
+    
     numjet++;
         
     //*****************************************************************
