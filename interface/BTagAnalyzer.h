@@ -115,6 +115,8 @@ Implementation:
 #include "RecoBTau/JetTagComputer/interface/JetTagComputerRecord.h"
 #include "RecoBTag/SecondaryVertex/interface/CombinedSVComputer.h"
 #include "RecoBTag/SecondaryVertex/interface/TrackKinematics.h"
+#include "RecoVertex/VertexPrimitives/interface/ConvertToFromReco.h"
+
 
 struct ltstr
 {
@@ -334,8 +336,7 @@ private:
     
     int   nTrack;
     float Track_dxy[nMaxTrk_];
-    float Track_dz[nMaxTrk_];
-    float Track_zIP[nMaxTrk_];
+    float Track_LongIP[nMaxTrk_];
     float Track_length[nMaxTrk_];
     float Track_dist[nMaxTrk_];
     float Track_IP2D[nMaxTrk_];

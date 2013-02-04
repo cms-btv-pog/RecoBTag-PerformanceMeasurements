@@ -164,8 +164,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   //--------------------------------------
   smalltree->Branch("nTrack",	       &nTrack, 	"nTrack/I");
   smalltree->Branch("Track_dxy",       Track_dxy,	"Track_dxy[nTrack]/F");
-  smalltree->Branch("Track_dz",    Track_dz,	"Track_dz[nTrack]/F");
-  smalltree->Branch("Track_zIP",       Track_zIP,	"Track_zIP[nTrack]/F");
+  smalltree->Branch("Track_LongIP",    Track_LongIP,	"Track_LongIP[nTrack]/F");
   smalltree->Branch("Track_length",    Track_length,	"Track_length[nTrack]/F");
   smalltree->Branch("Track_dist",      Track_dist,	"Track_dist[nTrack]/F");
   smalltree->Branch("Track_IP2D",      Track_IP2D,	"Track_IP2D[nTrack]/F");
@@ -1129,25 +1128,26 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	
 	TransientTrack transientTrack = builder->build(ptrack);
 	GlobalVector direction((jetsColl.at(ijet)).px(), (jetsColl.at(ijet)).py(), (jetsColl.at(ijet)).pz());
-
 	
-	if(use_selected_tracks_){
-          GlobalPoint maximumClose = (*tagInfo)[ith_tagged].impactParameterData()[k].closestToJetAxis;
-          float decayLe = (maximumClose - (Pv_point)).mag();
-	  float distJetAx = (*tagInfo)[ith_tagged].impactParameterData()[k].distanceToJetAxis.value();
-	  Track_length[nTrack]   = decayLe;
-	  Track_dist[nTrack]     = distJetAx;	  
+	
+	//--------------------------------
+	Double_t decayLength=-1;
+	TrajectoryStateOnSurface closest =
+	    IPTools::closestApproachToJet(transientTrack.impactPointState(), *pv, direction, transientTrack.field());
+	if (closest.isValid()){
+	  decayLength =  (closest.globalPosition()-   RecoVertex::convertPos(pv->position())).mag() ;
 	}
 	else{
-	  Measurement1D decayL   = IPTools::signedDecayLength3D(transientTrack, direction, *pv).second;
-          Measurement1D distJetA = IPTools::jetTrackDistance(transientTrack, direction, *pv).first;
-	  Track_length[nTrack]   = (decayL.value());
-	  Track_dist[nTrack]     = (distJetA.value());	  
+	  decayLength = -1;
 	}
+
+	Double_t distJetAxis =  IPTools::jetTrackDistance(transientTrack, direction, *pv).second.value();
+
+	Track_dist[nTrack]     =distJetAxis;
+	Track_length[nTrack]   =decayLength;
 	
-	
-	float distJetAxis=Track_dist[nTrack];
-	float decayLen=Track_length[nTrack];
+	Track_dxy[nTrack]      = ptrack.dxy(pv->position());
+	Track_LongIP[nTrack]   = ptrack.dz(pv->position());
 	
         float deta = ptrack.eta() - Jet_eta[nJet];
         float dphi = ptrack.phi() - Jet_phi[nJet];
@@ -1157,15 +1157,14 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	
 	bool pass_cut_trk =false;
 	
-	if (std::fabs(distJetAxis) < 0.07 && decayLen < 5.0 && deltaR < 0.3)  pass_cut_trk=true;
+	if (std::fabs(distJetAxis) < 0.07 && decayLength < 5.0 && deltaR < 0.3)  pass_cut_trk=true;
 	
       // track selection
 //$$    
 	if ( (use_selected_tracks_ && pass_cut_trk) ||  !use_selected_tracks_) {
 //$$
-	  Track_dxy[nTrack]      = ptrack.dxy(pv->position());
-	  Track_dz[nTrack]       = ptrack.dz(pv->position());
-	  Track_zIP[nTrack]      = ptrack.dz()-(*pv).z();	
+
+	  
 	  if(use_selected_tracks_){
 	    Track_IP2D[nTrack]     = (*tagInfo)[ith_tagged].impactParameterData()[k].ip2d.value();
 	    Track_IP2Dsig[nTrack]  = (*tagInfo)[ith_tagged].impactParameterData()[k].ip2d.significance();
@@ -1220,18 +1219,18 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  
 	  Track_isfromSV[nTrack] = 0.;
 	  
-// 	  cout <<"track n" << nTrack<< endl;
-// 	  cout <<"Track_pt" <<Track_pt[nTrack] << endl;
-// 	  cout <<"Track_eta" <<Track_eta[nTrack] << endl;
-// 	  cout <<"Track_dz" << Track_dz[nTrack]<< endl;
-// 	  cout << "Track_length" << Track_length[nTrack]<< endl;
-// 	  cout << "Track_dist" <<Track_dist[nTrack] << endl;
-// 	  cout << "Track_IP2D" << Track_IP2D[nTrack]<< endl;
-// 	  cout << "Track_IP2Derr" << Track_IP2Derr[nTrack]<< endl;
-// 	  cout << "Track_IP" <<Track_IP[nTrack] << endl;
-// 	  cout << "Track_IPerr" << Track_IPerr[nTrack]<< endl;
-// 	  cout << "Track_nHitPixel" << Track_nHitPixel[nTrack]<< endl;
-// 	  cout << "Track_nHitStrip" <<Track_nHitStrip[nTrack] << endl;
+	  cout <<"track n" << nTrack<< endl;
+	  cout <<"Track_pt" <<Track_pt[nTrack] << endl;
+	  cout <<"Track_eta" <<Track_eta[nTrack] << endl;
+	  cout <<"Track_LongIP" << Track_LongIP[nTrack]<< endl;
+	  cout << "Track_length" << Track_length[nTrack]<< endl;
+	  cout << "Track_dist" <<Track_dist[nTrack] << endl;
+	  cout << "Track_IP2D" << Track_IP2D[nTrack]<< endl;
+	  cout << "Track_IP2Derr" << Track_IP2Derr[nTrack]<< endl;
+	  cout << "Track_IP" <<Track_IP[nTrack] << endl;
+	  cout << "Track_IPerr" << Track_IPerr[nTrack]<< endl;
+	  cout << "Track_nHitPixel" << Track_nHitPixel[nTrack]<< endl;
+	  cout << "Track_nHitStrip" <<Track_nHitStrip[nTrack] << endl;
 
 	  
 	  Track_history[nTrack] = 0;
