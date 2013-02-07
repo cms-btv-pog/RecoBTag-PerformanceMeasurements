@@ -34,6 +34,32 @@ process.GlobalTag.globaltag = "GR_R_53_V19::All"
 # process.GlobalTag.globaltag = "GR_R_53_V2B::All"
 
 
+
+
+##############################################
+#### Add new retrained CSV b tagging algo ####
+##############################################
+#process.load("CondCore.DBCommon.CondDBSetup_cfi")
+
+#process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
+#   process.CondDBSetup,
+#   timetype = cms.string('runnumber'),
+#   toGet = cms.VPSet(cms.PSet(
+#      record = cms.string('BTauGenericMVAJetTagComputerRcd'),
+#                tag = cms.string('MVAComputerContainer_JetTags_v3_offline')
+#   )),
+#   connect = cms.string('frontier://FrontierProd/CMS_COND_PAT_000'),
+#   BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
+#)
+
+#process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
+
+
+
+
+
+
+
 ##-------------------- Import the JEC services -----------------------
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 #$$
@@ -56,7 +82,9 @@ process.load("RecoBTau.JetTagComputer.jetTagRecord_cfi")
 
 process.load("SimTracker.TrackHistory.TrackHistory_cff")
 
+############################################################################
 # for Impact Parameter based taggers
+############################################################################
 process.load("RecoBTag.ImpactParameter.negativeOnlyJetBProbabilityComputer_cfi")
 process.load("RecoBTag.ImpactParameter.negativeOnlyJetProbabilityComputer_cfi")
 process.load("RecoBTag.ImpactParameter.positiveOnlyJetProbabilityComputer_cfi")
@@ -76,7 +104,9 @@ process.load("RecoBTag.ImpactParameter.jetBProbabilityBJetTags_cfi")
 
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 
+############################################################################
 # for Secondary Vertex taggers
+############################################################################
 process.load("RecoBTag.SecondaryVertex.secondaryVertexTagInfos_cfi")
 process.load("RecoBTag.SecondaryVertex.secondaryVertexNegativeTagInfos_cfi")
 process.load("RecoBTag.SecondaryVertex.simpleSecondaryVertexHighEffBJetTags_cfi")
@@ -87,6 +117,51 @@ process.load("RecoBTag.SecondaryVertex.combinedSecondaryVertexNegativeBJetTags_c
 process.load("RecoBTag.SecondaryVertex.combinedSecondaryVertexNegativeES_cfi")
 process.load("RecoBTag.SecondaryVertex.combinedSecondaryVertexPositiveBJetTags_cfi")
 process.load("RecoBTag.SecondaryVertex.combinedSecondaryVertexPositiveES_cfi")
+
+
+############################################################################
+# for Inclusive Secondary Vertexing
+############################################################################
+process.load("RecoVertex.AdaptiveVertexFinder.inclusiveVertexing_cff")
+process.load("RecoBTag.SecondaryVertex.bToCharmDecayVertexMerger_cfi")
+
+process.combinedInclusiveSecondaryVertexPositiveBJetTags = process.combinedInclusiveSecondaryVertexBJetTags.clone()
+process.combinedInclusiveSecondaryVertexPositiveBJetTags.jetTagComputer = cms.string('combinedSecondaryVertexPositive')
+
+
+############################################################################
+# for the Retrained CSV
+############################################################################
+#process.combinedSecondaryVertexRetrained = process.combinedSecondaryVertex.clone()
+#process.combinedSecondaryVertexRetrained.calibrationRecords = cms.vstring(
+#      'CombinedSVRetrain2RecoVertex', 
+#      'CombinedSVRetrain2PseudoVertex', 
+#      'CombinedSVRetrain2NoVertex'
+#      )
+#process.combinedSecondaryVertexRetrainedBJetTags = process.combinedSecondaryVertexBJetTags.clone()
+#process.combinedSecondaryVertexRetrainedBJetTags.jetTagComputer = cms.string('combinedSecondaryVertexRetrained')
+
+#process.combinedSecondaryVertexNegativeRetrained = process.combinedSecondaryVertexNegative.clone()
+#process.combinedSecondaryVertexNegativeRetrained.calibrationRecords = cms.vstring(
+#      'CombinedSVRetrain2RecoVertex', 
+#      'CombinedSVRetrain2PseudoVertex', 
+#      'CombinedSVRetrain2NoVertex'
+#      )
+#process.combinedSecondaryVertexNegativeRetrainedBJetTags = process.combinedSecondaryVertexNegativeBJetTags.clone()
+#process.combinedSecondaryVertexNegativeRetrainedBJetTags.jetTagComputer = cms.string('combinedSecondaryVertexNegativeRetrained')
+
+#process.combinedSecondaryVertexPositiveRetrained = process.combinedSecondaryVertexPositive.clone()
+#process.combinedSecondaryVertexPositiveRetrained.calibrationRecords = cms.vstring(
+#      'CombinedSVRetrain2RecoVertex', 
+#      'CombinedSVRetrain2PseudoVertex', 
+#      'CombinedSVRetrain2NoVertex'
+#      )
+#process.combinedSecondaryVertexPositiveRetrainedBJetTags = process.combinedSecondaryVertexPositiveBJetTags.clone()
+#process.combinedSecondaryVertexPositiveRetrainedBJetTags.jetTagComputer = cms.string('combinedSecondaryVertexPositiveRetrained')
+
+
+
+
 
 # for Soft Muon tagger
 process.load("RecoBTag.SoftLepton.negativeSoftMuonES_cfi")
@@ -137,42 +212,17 @@ jecSetPF = jecSetBase + 'PF'
 if usePFnoPU:
   jecSetPF += 'chs'
 
-# JEC levels
-#if useL1FastJet and useL1Offset:
-#  sys.exit( 'ERROR: switch off either "L1FastJet" or "L1Offset"' )
-#jecLevels = []
-#if useL1FastJet:
-#  jecLevels.append( 'L1FastJet' )
-#if useL1Offset:
-#  jecLevels.append( 'L1Offset' )
-#if useL2Relative:
-#  jecLevels.append( 'L2Relative' )
-#if useL3Absolute:
-#  jecLevels.append( 'L3Absolute' )
-## if useL2L3Residual and not runOnMC:
-##   jecLevelsPF.append( 'L2L3Residual' )
-#if useL5Flavor:
-#  jecLevels.append( 'L5Flavor' )
-#if useL7Parton:
-#  jecLevels.append( 'L7Parton' )
 
-usePF2PAT(process,runPF2PAT=True, jetAlgo=jetAlgo, runOnMC=runOnMC, postfix=postfix) 
+usePF2PAT(process,runPF2PAT=True, jetAlgo=jetAlgo, runOnMC=runOnMC, postfix=postfix, 
+jetCorrections=('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']) ) 
 
-applyPostfix(process,"patJetCorrFactors",postfix).levels     = cms.vstring('L1FastJet','L2Relative','L3Absolute', 'L2L3Residual')
-applyPostfix(process,"patJetCorrFactors",postfix).rho        = cms.InputTag("kt6PFJets","rho")
-applyPostfix(process,"patJetCorrFactors",postfix).payload    = cms.string('AK5PFchs')
+
 applyPostfix(process,"pfPileUp",postfix).checkClosestZVertex = cms.bool(False) 
 
 from PhysicsTools.PatAlgos.tools.metTools import *
 
-addTcMET(process, 'TC')
-process.patMETsTC.addGenMET = False
-
 process.pfPileUpPF2PAT.Enable = True
-#process.pfPileUpPF2PAT.checkClosestZVertex = cms.bool(False)
 process.pfPileUpPF2PAT.Vertices = cms.InputTag('goodOfflinePrimaryVertices')
-process.pfJetsPF2PAT.doAreaFastjet = True
-process.pfJetsPF2PAT.doRhoFastjet = False
 
 process.load('RecoJets.Configuration.RecoJets_cff')
 from RecoJets.JetProducers.kt4PFJets_cfi import kt4PFJets
@@ -208,11 +258,12 @@ process.jetIDSelector.version = cms.string('PURE09')
 
 #-------------------------------------
 #Filter for PFJets
-process.PFJetsFilter = cms.EDFilter("PFJetSelector",
- src = cms.InputTag("selectedPatJetsPF2PAT"),
- cut = cms.string("pt > 10.0 && abs(eta) < 2.5 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 0.99"),
- filter = cms.bool(True)
-)
+process.PATJetsFilter = cms.EDFilter("PATJetSelector",    
+                                    src = cms.InputTag("selectedPatJetsPF2PAT"),
+                                    cut = cms.string("pt > 10.0 && abs(eta) < 2.5 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 0.99"),
+                                    #filter = cms.bool(True)
+                                    )
+				    
 #---------------------------------------
 process.load("bTag.CommissioningCommonSetup.caloJetIDFilter_cff")
 
@@ -267,18 +318,16 @@ process.btagana.triggerTable = 'TriggerResults::HLT' # Data and MC
 
 
 process.AK5byRef.jets = "selectedPatJetsPF2PAT"
+process.btagana.jetCorrector = cms.string('ak5PFL1FastL2L3Residual')
 
-# process.btagana.Jets = 'ak5PFJets'
-process.btagana.Jets = 'selectedPatJetsPF2PAT'
-#process.btagana.jetCorrector = cms.string('ak5PFL2L3')
-process.btagana.jetCorrector = cms.string('ak5PFL1FastL2L3')
-#process.btagana.jetCorrector = cms.string('ak5PFL1FastL2L3Residual')
+#process.btagana.Jets = 'selectedPatJetsPF2PAT'
+#process.ak5JetTracksAssociatorAtVertex.jets = "selectedPatJetsPF2PAT"
+#process.softMuonTagInfos.jets = "selectedPatJetsPF2PAT"
 
-# process.ak5JetTracksAssociatorAtVertex.jets = "ak5PFJets"
-process.ak5JetTracksAssociatorAtVertex.jets = "selectedPatJetsPF2PAT"
-# process.softMuonTagInfos.jets = "ak5PFJets"
-process.softMuonTagInfos.jets = "selectedPatJetsPF2PAT"
 
+process.btagana.Jets = 'PATJetsFilter'
+process.ak5JetTracksAssociatorAtVertex.jets = "PATJetsFilter"
+process.softMuonTagInfos.jets = "PATJetsFilter"
 
 # process.jetProbabilityMixed = cms.ESProducer("JetProbabilityESProducer",
 #     impactParameterType = cms.int32(0), ## 0 = 3D, 1 = 2D
@@ -325,15 +374,16 @@ process.p = cms.Path(
 #$$        process.JetHLTFilter
 #$$        *process.kt6PFJets  
 #$$
-        process.kt6PFJets
+        #process.kt6PFJets
+        process.noscraping
+        *process.primaryVertexFilter
         *process.offlinePrimaryVertices 
 	*process.goodOfflinePrimaryVertices
 	*getattr(process,"patPF2PATSequence"+postfix)
-        #*process.PFJetsFilter
+        *process.PATJetsFilter
+        *process.inclusiveVertexing*process.inclusiveMergedVerticesFiltered*process.bToCharmDecayVertexMerged
 #$$	*process.myPartons*process.AK5Flavour
 #$$
-        *process.noscraping
-        *process.primaryVertexFilter
 	*process.ak5JetTracksAssociatorAtVertex
 	*process.btagging
 	*process.positiveOnlyJetProbabilityJetTags*process.negativeOnlyJetProbabilityJetTags
@@ -344,6 +394,10 @@ process.p = cms.Path(
 	#*process.negativeSoftMuonBJetTags*process.positiveSoftMuonBJetTags	
 	*process.negativeSoftLeptonByPtBJetTags*process.positiveSoftLeptonByPtBJetTags	
 	*process.negativeOnlyJetBProbabilityJetTags*process.positiveOnlyJetBProbabilityJetTags
+        #*process.combinedSecondaryVertexRetrainedBJetTags*process.combinedSecondaryVertexNegativeRetrainedBJetTags*process.combinedSecondaryVertexPositiveRetrainedBJetTags
+        *process.inclusiveSecondaryVertexFinderTagInfosFiltered*process.simpleInclusiveSecondaryVertexHighEffBJetTags*process.simpleInclusiveSecondaryVertexHighPurBJetTags
+        *process.doubleSecondaryVertexHighEffBJetTags
+        *process.inclusiveSecondaryVertexFinderTagInfos*process.combinedInclusiveSecondaryVertexBJetTags*process.combinedInclusiveSecondaryVertexPositiveBJetTags
 	*process.btagana
 	)
 	
