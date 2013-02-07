@@ -136,8 +136,12 @@ using namespace edm;
 using namespace reco;
 //using namespace BTagMCTools;
 
-const UInt_t nMaxTrk_=100000;
-const UInt_t nMaxJets_=10000;
+const UInt_t nMaxTrk_  = 100000;
+const UInt_t nMaxJets_ = 10000;
+const UInt_t nMaxMuons_= 10000;
+const UInt_t nMaxPVs_= 10000;
+const UInt_t nMaxSVs_= 10000;
+const UInt_t nMaxPUs_= 10000;
 
 
 class BTagAnalyzer : public edm::EDAnalyzer
@@ -216,6 +220,18 @@ private:
     std::string combinedSvtxModuleName_;
     std::string combinedSvtxPosModuleName_;
     std::string combinedSvtxNegModuleName_;
+
+    std::string combinedSvtxRetrainedModuleName_;
+    std::string combinedSvtxPosRetrainedModuleName_;
+    std::string combinedSvtxNegRetrainedModuleName_;
+    
+    std::string simpleIVFModuleNameHighPur_;
+    std::string simpleIVFModuleNameHighEff_;
+
+    std::string doubleIVFModuleNameHighEff_;
+
+    std::string combinedIVFModuleName_;
+    std::string combinedIVFPosModuleName_;
 
     std::string svtxModuleNameHighPur_;
     std::string svtxNegModuleNameHighPur_;
@@ -317,6 +333,17 @@ private:
     TH1F*  TrackProbaNeg_Cat7 ;
     TH1F*  TrackProbaNeg_Cat8 ;
     TH1F*  TrackProbaNeg_Cat9 ;
+    TH1F*  TrackProbJet80 ;
+    TH1F*  TrackProbJet80_Cat0 ;
+    TH1F*  TrackProbJet80_Cat1 ;
+    TH1F*  TrackProbJet80_Cat2 ;
+    TH1F*  TrackProbJet80_Cat3 ;
+    TH1F*  TrackProbJet80_Cat4 ;
+    TH1F*  TrackProbJet80_Cat5 ;
+    TH1F*  TrackProbJet80_Cat6 ;
+    TH1F*  TrackProbJet80_Cat7 ;
+    TH1F*  TrackProbJet80_Cat8 ;
+    TH1F*  TrackProbJet80_Cat9 ;
 
     CategoryFinder cat0;
     CategoryFinder cat1;
@@ -336,6 +363,8 @@ private:
     
     int   nTrack;
     float Track_dxy[nMaxTrk_];
+    float Track_dz[nMaxTrk_];
+    float Track_zIP[nMaxTrk_];
     float Track_LongIP[nMaxTrk_];
     float Track_length[nMaxTrk_];
     float Track_dist[nMaxTrk_];
@@ -407,6 +436,14 @@ private:
     float Jet_CombSvxN[nMaxJets_];
     float Jet_CombSvxP[nMaxJets_];
     float Jet_CombSvx[nMaxJets_];
+    float Jet_CombSvxN_R[nMaxJets_];
+    float Jet_CombSvxP_R[nMaxJets_];
+    float Jet_CombSvx_R[nMaxJets_];
+    float Jet_SimpIVF_HP[nMaxJets_];
+    float Jet_SimpIVF_HE[nMaxJets_];
+    float Jet_DoubIVF_HE[nMaxJets_];
+    float Jet_CombIVF[nMaxJets_];
+    float Jet_CombIVF_P[nMaxJets_];
     float Jet_SoftMuN[nMaxJets_];
     float Jet_SoftMu[nMaxJets_];
     int   Jet_hist1[nMaxJets_];
@@ -425,85 +462,87 @@ private:
     int   Jet_SV_multi[nMaxJets_]; 
     
     int   nMuon;
-    int   Muon_IdxJet[10000];
-    int   Muon_nMuHit[10000];
-    int   Muon_nTkHit[10000];
-    int   Muon_nPixHit[10000];
-    int   Muon_nOutHit[10000];
-    int   Muon_isGlobal[10000];
-    int   Muon_nMatched[10000];
-    float Muon_chi2[10000];
-    float Muon_chi2Tk[10000];
-    float Muon_pt[10000];
-    float Muon_eta[10000];
-    float Muon_phi[10000];
-    float Muon_ptrel[10000];
-    float Muon_vz[10000];
-    int   Muon_hist[10000];
-    int   Muon_TrackIdx[10000];
-    float Muon_IPsig[10000];
-    float Muon_IP[10000];
-    float Muon_Proba[10000];
-    float Muon_IP2D[10000];
-    float Muon_IP2Dsig[10000];
-    float Muon_deltaR[10000];
-    float Muon_ratio[10000]; 
+    int   Muon_IdxJet[nMaxMuons_];
+    int   Muon_nMuHit[nMaxMuons_];
+    int   Muon_nTkHit[nMaxMuons_];
+    int   Muon_nPixHit[nMaxMuons_];
+    int   Muon_nOutHit[nMaxMuons_];
+    int   Muon_isGlobal[nMaxMuons_];
+    int   Muon_nMatched[nMaxMuons_];
+    float Muon_chi2[nMaxMuons_];
+    float Muon_chi2Tk[nMaxMuons_];
+    float Muon_pt[nMaxMuons_];
+    float Muon_eta[nMaxMuons_];
+    float Muon_phi[nMaxMuons_];
+    float Muon_ptrel[nMaxMuons_];
+    float Muon_vz[nMaxMuons_];
+    int   Muon_hist[nMaxMuons_];
+    int   Muon_TrackIdx[nMaxMuons_];
+    float Muon_IPsig[nMaxMuons_];
+    float Muon_IP[nMaxMuons_];
+    float Muon_Proba[nMaxMuons_];
+    float Muon_IP2D[nMaxMuons_];
+    float Muon_IP2Dsig[nMaxMuons_];
+    float Muon_deltaR[nMaxMuons_];
+    float Muon_ratio[nMaxMuons_]; 
     
     int   nTrkInc;
     float TrkInc_pt[nMaxTrk_];
+    float TrkInc_eta[nMaxTrk_];
+    float TrkInc_phi[nMaxTrk_];
     float TrkInc_ptrel[nMaxTrk_];
     float TrkInc_IPsig[nMaxTrk_];
     float TrkInc_IP[nMaxTrk_];
     
     int nPV;
-    float PV_x[10000];
-    float PV_y[10000];
-    float PV_z[10000];
-    float PV_ex[10000];
-    float PV_ey[10000];
-    float PV_ez[10000];
-    float PV_chi2[10000];
-    float PV_ndf[10000];
-    int   PV_isgood[10000];
-    int   PV_isfake[10000];
+    float PV_x[nMaxPVs_];
+    float PV_y[nMaxPVs_];
+    float PV_z[nMaxPVs_];
+    float PV_ex[nMaxPVs_];
+    float PV_ey[nMaxPVs_];
+    float PV_ez[nMaxPVs_];
+    float PV_chi2[nMaxPVs_];
+    float PV_ndf[nMaxPVs_];
+    int   PV_isgood[nMaxPVs_];
+    int   PV_isfake[nMaxPVs_];
     
     int nSV;
-    float SV_x[10000];
-    float SV_y[10000];
-    float SV_z[10000];
-    float SV_ex[10000];
-    float SV_ey[10000];
-    float SV_ez[10000];
-    float SV_chi2[10000];
-    float SV_ndf[10000];
-    float SV_flight[10000];
-    float SV_flightErr[10000];
-    float SV_deltaR_jet[10000]; 
-    float SV_deltaR_sum_jet[10000];
-    float SV_deltaR_sum_dir[10000];
-    float SV_energy_ratio[10000];
-    float SV_aboveC[10000];	 
-    float SV_vtx_pt[10000];
-    float SV_flight2D[10000];
-    float SV_flight2DErr[10000];
-    float SV_totCharge[10000]; 
-    float SV_vtxDistJetAxis[10000]; 
-    int   SV_nTrk[10000]; 
-    int   SV_nTrk_firstVxt[10000];
-    float SV_mass[10000];	 
-    float SV_vtx_eta[10000];
-    float SV_vtx_phi[10000];   
+    float SV_x[nMaxSVs_];
+    float SV_y[nMaxSVs_];
+    float SV_z[nMaxSVs_];
+    float SV_ex[nMaxSVs_];
+    float SV_ey[nMaxSVs_];
+    float SV_ez[nMaxSVs_];
+    float SV_chi2[nMaxSVs_];
+    float SV_ndf[nMaxSVs_];
+    float SV_flight[nMaxSVs_];
+    float SV_flightErr[nMaxSVs_];
+    float SV_deltaR_jet[nMaxSVs_]; 
+    float SV_deltaR_sum_jet[nMaxSVs_];
+    float SV_deltaR_sum_dir[nMaxSVs_];
+    float SV_energy_ratio[nMaxSVs_];
+    float SV_aboveC[nMaxSVs_];	 
+    float SV_vtx_pt[nMaxSVs_];
+    float SV_flight2D[nMaxSVs_];
+    float SV_flight2DErr[nMaxSVs_];
+    float SV_totCharge[nMaxSVs_]; 
+    float SV_vtxDistJetAxis[nMaxSVs_]; 
+    int   SV_nTrk[nMaxSVs_]; 
+    int   SV_nTrk_firstVxt[nMaxSVs_];
+    float SV_mass[nMaxSVs_];	 
+    float SV_vtx_eta[nMaxSVs_];
+    float SV_vtx_phi[nMaxSVs_];   
     
     int nPUtrue;                // the true number of pileup interactions that have been added to the event
     int nPU;                    // the number of pileup interactions that have been added to the event
-    int   PU_bunch[10000];      // 0 if on time pileup, -1 or +1 if out-of-time
-    float PU_z[10000];          // the true primary vertex position along the z axis for each added interaction
-    float PU_sumpT_low[10000];  // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > low_cut
-    float PU_sumpT_high[10000]; // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > high_cut
-    int   PU_ntrks_low[10000];  // the number of tracks originating from each interaction, where track pT > low_cu
-    int   PU_ntrks_high[10000]; // the number of tracks originating from each interaction, where track pT > high_cut 
+    int   PU_bunch[nMaxPUs_];      // 0 if on time pileup, -1 or +1 if out-of-time
+    float PU_z[nMaxPUs_];          // the true primary vertex position along the z axis for each added interaction
+    float PU_sumpT_low[nMaxPUs_];  // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > low_cut
+    float PU_sumpT_high[nMaxPUs_]; // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > high_cut
+    int   PU_ntrks_low[nMaxPUs_];  // the number of tracks originating from each interaction, where track pT > low_cu
+    int   PU_ntrks_high[nMaxPUs_]; // the number of tracks originating from each interaction, where track pT > high_cut 
     float mcweight;
-    math::XYZVector jetVertex[1000]; 
+    math::XYZVector jetVertex; 
     
     int nCFromGSplit;
     float cFromGSplit_pT[10000];
@@ -516,6 +555,17 @@ private:
     float bFromGSplit_eta[10000];
     float bFromGSplit_phi[10000];
     int   bFromGSplit_pdgID[10000];
+    
+    
+    int nBHadrons;
+    float BHadron_pT[1000];
+    float BHadron_eta[1000];
+    float BHadron_phi[1000];
+    float BHadron_mass[1000];
+    int   BHadron_pdgID[1000];
+    
+    
+    
     
     int BitTrigger;
     int Run;
