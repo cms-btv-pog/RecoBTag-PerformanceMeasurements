@@ -287,19 +287,19 @@ process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
                      )
 
 
-### from Cristina JP calibration for cmsRun only : 
+### JP calibration for cmsRun only : 
 # from CondCore.DBCommon.CondDBCommon_cfi import *
 # process.load("RecoBTag.TrackProbability.trackProbabilityFakeCond_cfi")
 # process.trackProbabilityFakeCond.connect =cms.string( "sqlite_fip:RecoBTag/PerformanceMeasurements/test/btagnew_Data_2011_41X.db")
 # process.es_prefer_trackProbabilityFakeCond = cms.ESPrefer("PoolDBESSource","trackProbabilityFakeCond")
 
-### from Cristina JP calibration for crab only: 
+### JP calibration for crab only: 
 process.GlobalTag.toGet = cms.VPSet(
   cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
-       tag = cms.string("TrackProbabilityCalibration_2D_2012DataTOT_v1_offline"),
+       tag = cms.string("TrackProbabilityCalibration_2D_Data53X_v2"),
        connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU")),
   cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-       tag = cms.string("TrackProbabilityCalibration_3D_2012DataTOT_v1_offline"),
+       tag = cms.string("TrackProbabilityCalibration_3D_Data53X_v2"),
        connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"))
 )
 
@@ -329,45 +329,26 @@ process.btagana.Jets = 'PATJetsFilter'
 process.ak5JetTracksAssociatorAtVertex.jets = "PATJetsFilter"
 process.softMuonTagInfos.jets = "PATJetsFilter"
 
-# process.jetProbabilityMixed = cms.ESProducer("JetProbabilityESProducer",
-#     impactParameterType = cms.int32(0), ## 0 = 3D, 1 = 2D
-#     deltaR = cms.double(0.3),
-#     maximumDistanceToJetAxis = cms.double(0.07),
-#     trackIpSign = cms.int32(0), ## 0 = use both, 1 = positive only, -1 = negative only
-#     minimumProbability = cms.double(0.005),
-#     maximumDecayLength = cms.double(5.0),
-#     trackQualityClass = cms.string("any")
-# )
-# 
-# #-------------------------------------
-# #Jet Probability
-# process.jetBProbabilityMixed = cms.ESProducer("JetBProbabilityESProducer",
-#     impactParameterType = cms.int32(0), ## 0 = 3D, 1 = 2D
-#     deltaR = cms.double(-1.0), ## use cut from JTA
-#     maximumDistanceToJetAxis = cms.double(0.07),
-#     trackIpSign = cms.int32(0), ## 0 = use both, 1 = positive only, -1 = negative only
-#     minimumProbability = cms.double(0.005),
-#     numberOfBTracks = cms.uint32(4),
-#     maximumDecayLength = cms.double(5.0),
-#     trackQualityClass = cms.string("any")
-# )
-# 
-# process.jetProbabilityBJetTags.jetTagComputer  = 'jetProbabilityMixed'
-# process.jetBProbabilityBJetTags.jetTagComputer = 'jetBProbabilityMixed'
+
 
 
 #---------------------------------------
 # trigger selection !
+# import HLTrigger.HLTfilters.triggerResultsFilter_cfi as hlt
 # process.JetHLTFilter = hlt.triggerResultsFilter.clone(
 #     triggerConditions = cms.vstring(
-# # 	 " HLT_Jet80_v6"
-# 	 " HLT_Jet110_v6"
+#	"HLT_PFJet80_v*"
 #     ),
 #     hltResults = cms.InputTag("TriggerResults","","HLT"),
 #     l1tResults = cms.InputTag( "" ),
-#     throw = cms.bool( False) #set to false to deal with missing triggers while running over different trigger menus
+#     throw = cms.bool( False ) #set to false to deal with missing triggers while running over different trigger menus
 #     )
 #---------------------------------------
+
+
+
+
+
 
 process.p = cms.Path(
 #$$
