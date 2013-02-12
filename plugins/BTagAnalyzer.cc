@@ -550,14 +550,14 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     
     for (size_t i = 0; i < genParticles->size (); ++i) {
       const GenParticle & genIt = (*genParticles)[i];
-      if(abs(genIt.pdgId()) == 5 &&genIt.status() == 2 ) {
+      if( abs(genIt.pdgId()) == 5 &&  genIt.status() == 2  ) {
         bFromGSplit_pT[nBFromGSplit]	= genIt.p4().pt();
         bFromGSplit_eta[nBFromGSplit]	= genIt.p4().eta();
         bFromGSplit_phi[nBFromGSplit]	= genIt.p4().phi();
 	//         bFromGSplit_pdgID[nBFromGSplit] = genIt.pdgId();      
         nBFromGSplit++;
       } 
-      if(abs(genIt.pdgId ()) == 4 &&genIt.status() == 2 ) {
+      if(abs(genIt.pdgId ()) == 4 &&  genIt.status() == 2 ) {
         cFromGSplit_pT[nCFromGSplit]	= genIt.p4().pt();
         cFromGSplit_eta[nCFromGSplit]	= genIt.p4().eta();
         cFromGSplit_phi[nCFromGSplit]	= genIt.p4().phi();
@@ -566,8 +566,9 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       }
       
       // BHadrons
+      if( genIt.status() == 2 && genIt.mother() !=0){
       const Candidate * mom = genIt.mother();
-      if (genIt.status() == 2 && abs(mom->pdgId()) < 100) {
+      if (abs(mom->pdgId()) < 100) {
 	int IDb = abs(genIt.pdgId());
 	if ( (IDb >=  511 && IDb <=  557) || (IDb >= 5114 && IDb <= 5554) || 
 	     (IDb >=10511 && IDb <=10555) || (IDb >=20513 && IDb <=20555) || IDb ==30553 ||
@@ -584,7 +585,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  nBHadrons++;
 	}
       }
-      
+     
+     } 
     }
     
     // simulated PV
