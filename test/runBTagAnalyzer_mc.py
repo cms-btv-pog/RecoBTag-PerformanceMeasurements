@@ -1,6 +1,6 @@
 ##*****************************************************
 ##*****************************************************
-##******** for DATA
+##******** for MC
 ##*****************************************************
 ##*****************************************************
 import FWCore.ParameterSet.Config as cms
@@ -295,13 +295,12 @@ process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
 ### JP calibration for crab only: 
 process.GlobalTag.toGet = cms.VPSet(
   cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
-       tag = cms.string("TrackProbabilityCalibration_2D_Data53X_v2"),
+       tag = cms.string("TrackProbabilityCalibration_2D_MC53X_v2"),
        connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU")),
   cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-       tag = cms.string("TrackProbabilityCalibration_3D_Data53X_v2"),
+       tag = cms.string("TrackProbabilityCalibration_3D_MC53X_v2"),
        connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"))
 )
-
 
 #---------------------------------------
 process.TFileService = cms.Service("TFileService", fileName = cms.string("TrackTree_mc.root") )
@@ -317,7 +316,7 @@ process.btagana.triggerTable = 'TriggerResults::HLT' # Data and MC
 
 
 process.AK5byRef.jets = "selectedPatJetsPF2PAT"
-process.btagana.jetCorrector = cms.string('ak5PFL1FastL2L3Residual')
+process.btagana.jetCorrector = cms.string('ak5PFL1FastL2L3')
 
 #process.btagana.Jets = 'selectedPatJetsPF2PAT'
 #process.ak5JetTracksAssociatorAtVertex.jets = "selectedPatJetsPF2PAT"
