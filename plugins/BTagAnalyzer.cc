@@ -375,8 +375,8 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   smalltree->Branch("Muon_IP2Dsig",  Muon_IP2Dsig  ,"Muon_IP2Dsig[nMuon]/F");
   smalltree->Branch("Muon_IP2D",     Muon_IP2D     ,"Muon_IP2D[nMuon]/F");  
   smalltree->Branch("Muon_Proba",    Muon_Proba    ,"Muon_Proba[nMuon]/F");
-  smalltree->Branch("Muon_deltaR",   Muon_deltaR   ,"Muon_deltaR[nJet]/F");
-  smalltree->Branch("Muon_ratio",    Muon_ratio    ,"Muon_ratio[nJet]/F");
+  smalltree->Branch("Muon_deltaR",   Muon_deltaR   ,"Muon_deltaR[nMuon]/F");
+  smalltree->Branch("Muon_ratio",    Muon_ratio    ,"Muon_ratio[nMuon]/F");
   
   //$$
   
@@ -1104,18 +1104,22 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	
 	
 	Track_history[nTrack] = 0;
+	
+	
 	if ( useTrackHistory_ && !isData_ ) {
-	  TrackCategories::Flags theFlag = classifier_.evaluate( (*tagInfo)[ith_tagged].selectedTracks()[k] ).flags();
+	  TrackCategories::Flags theFlag ;
+	  if(use_selected_tracks_) theFlag  = classifier_.evaluate( (*tagInfo)[ith_tagged].selectedTracks()[k] ).flags();
+	  else                     theFlag  = classifier_.evaluate( (*tagInfo)[ith_tagged].tracks()[k] ).flags();
 	  
-	  if      ( theFlag[TrackCategories::BWeakDecay] )         Track_history[nTrack] += pow(10, -1 + 1); 
-	  else if ( theFlag[TrackCategories::CWeakDecay] )         Track_history[nTrack] += pow(10, -1 + 2); 
-	  else if ( theFlag[TrackCategories::TauDecay] )           Track_history[nTrack] += pow(10, -1 + 3); 
-	  else if ( theFlag[TrackCategories::ConversionsProcess] ) Track_history[nTrack] += pow(10, -1 + 4); 
-	  else if ( theFlag[TrackCategories::KsDecay] )            Track_history[nTrack] += pow(10, -1 + 5); 
-	  else if ( theFlag[TrackCategories::LambdaDecay] )        Track_history[nTrack] += pow(10, -1 + 6); 
-	  else if ( theFlag[TrackCategories::HadronicProcess] )    Track_history[nTrack] += pow(10, -1 + 7); 
-	  else if ( theFlag[TrackCategories::Fake] )               Track_history[nTrack] += pow(10, -1 + 8); 
-	  else if ( theFlag[TrackCategories::SharedInnerHits] )    Track_history[nTrack] += pow(10, -1 + 9); 
+	  if ( theFlag[TrackCategories::BWeakDecay] )	      Track_history[nTrack] += pow(10, -1 + 1); 
+	  if ( theFlag[TrackCategories::CWeakDecay] )	      Track_history[nTrack] += pow(10, -1 + 2); 
+	  if ( theFlag[TrackCategories::TauDecay] )	      Track_history[nTrack] += pow(10, -1 + 3); 
+	  if ( theFlag[TrackCategories::ConversionsProcess] ) Track_history[nTrack] += pow(10, -1 + 4); 
+	  if ( theFlag[TrackCategories::KsDecay] )	      Track_history[nTrack] += pow(10, -1 + 5); 
+	  if ( theFlag[TrackCategories::LambdaDecay] )        Track_history[nTrack] += pow(10, -1 + 6); 
+	  if ( theFlag[TrackCategories::HadronicProcess] )    Track_history[nTrack] += pow(10, -1 + 7); 
+	  if ( theFlag[TrackCategories::Fake] ) 	      Track_history[nTrack] += pow(10, -1 + 8); 
+	  if ( theFlag[TrackCategories::SharedInnerHits] )    Track_history[nTrack] += pow(10, -1 + 9); 
 	}
 	
 	// Track categories for Jet Probability calibration
@@ -1130,6 +1134,14 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	// 	  Jet_TkProbaN[nJet] = calculProbability( theVectOrdered3 );
 	
 	Track_category[nTrack] = -1;
+	
+	//for deltaR(track-jet) < 0.3
+	TLorentzVector track4P, jet4P;
+	track4P.SetPtEtaPhiM(ptrack.pt(), ptrack.eta(), ptrack.phi(), 0. );
+	jet4P.SetPtEtaPhiM( (jetsColl.at(ijet)).pt(), (jetsColl.at(ijet)).eta(), (jetsColl.at(ijet)).phi(), (jetsColl.at(ijet)).energy() );
+	
+	
+	if(jet4P.DeltaR(track4P) < 0.3 && std::fabs(distJetAxis) < 0.07 && decayLength < 5.0 ){
 	
 	if ( findCat( &ptrack, *&cat0 ) ) {
 	  Track_category[nTrack] = 0;
@@ -1249,6 +1261,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	      TrackProbJet80_Cat9->Fill( -Track_Proba[nTrack] );
 	    }
 	  }
+	}
 	}
 	
 	nTrack++;
@@ -1622,7 +1635,10 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     
     ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_TCHighEff);
     std::vector<TrackIPTagInfo::TrackIPData>  ipdata = (*tagInfo)[ith_tagged].impactParameterData();
+    
     TrackRefVector tracks( (*tagInfo)[ith_tagged].selectedTracks() );
+    
+    
     std::vector<std::size_t> indexes( sortedIndexes(ipdata) );
     
     TrackCategories::Flags flags1P;
