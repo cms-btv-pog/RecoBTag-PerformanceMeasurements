@@ -551,7 +551,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   int njet_data  =0; 
 
   
-  bool passSistrip;
+  bool passNhit;
   bool passPix    ; 
   bool passIPz    ;
   bool passPt     ; 
@@ -618,7 +618,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   AddHisto("track_multi"  ,      "number of tracks in the jets",                40,-0.5,39.5  );
   AddHisto("trk_multi_sel"  ,    "number of selected tracks in the jets",       40,-0.5,39.5  );
   AddHisto("track_chi2"   ,      "normalized chi2 of the tracks",               100,0.,30.    );
-  AddHisto("track_HStrip" ,      "number of hits in the SiStrip",               35,-0.5, 34.5 );
+  AddHisto("track_nHit" ,        "number of hits ",               35,-0.5, 34.5 );
   AddHisto("track_HPix"   ,      "number of hits in the Pixel",                 10,-0.5, 9.5  );
   
   AddHisto("track_IPs"    ,      "3D IP significance of all tracks",	        100,-35.,35.  );
@@ -652,7 +652,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   AddHisto("track_isfromSV",     "Track is from SV",                            2,-0.5, 1.5   );  
   AddHisto("track_pt"	  ,      "pT of all the tracks",	                80,0.,200.    );
   AddHisto("track_chi2_cut"     ,"normalized chi2 ",  	                        100,0.,30.    );
-  AddHisto("track_HStrip_cut"   ,"number of hits in the SiStrip ",               35,-0.5, 34.5 );
+  AddHisto("track_nHit_cut"   ,"number of hits  ",               35,-0.5, 34.5 );
   AddHisto("track_HPix_cut"     ,"number of hits in the Pixel ",                 10,-0.5, 9.5  );
   AddHisto("track_len_cut"      ,"decay length ",		                100,0,25.     );
   AddHisto("track_dist_cut"     ,"distance to the jet axis ",                    100,0.,0.3    );
@@ -983,7 +983,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
 	  //-------------------------//
 	  //-----Track selection-----//
           //-------------------------//  
-	  passSistrip=false;
+	  passNhit=false;
 	  passPix= false;
 	  passIPz=false;
 	  passPt=false;
@@ -992,7 +992,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
 	  passtrklen=false;
 	  passTrackIP2D=false;
 	    
-	  if (Track_nHitStrip[itrk]>=8)   passSistrip=true;
+	  if (Track_nHitAll[itrk]>=8)   passNhit=true;
 	  if (Track_nHitPixel[itrk]>=2)   passPix= true;
 	  if (fabs(Track_dz[itrk])<17)   passIPz=true;
 	  if (Track_pt[itrk]>1)           passPt=true;
@@ -1003,36 +1003,36 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
 	  
 	  if (!use_selected_tracks){
 	    
-	    if (passSistrip && passPix && passIPz && passPt && passnormchi2 && passtrkdist && passTrackIP2D){
+	    if (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrkdist && passTrackIP2D){
 	      FillHisto_floatFromMap("track_len_cut",          flav, isGluonSplit ,Track_length[itrk] , ww);
 	    }
-	    if (passSistrip && passPix && passIPz && passPt && passnormchi2 && passtrklen && passTrackIP2D){
+	    if (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrklen && passTrackIP2D){
 	      FillHisto_floatFromMap("track_dist_cut",         flav, isGluonSplit ,fabs(Track_dist[itrk])   , ww);
 	    }	    
-	    if (passSistrip && passPix && passIPz && passPt && passtrkdist && passtrklen && passTrackIP2D){
+	    if (passNhit && passPix && passIPz && passPt && passtrkdist && passtrklen && passTrackIP2D){
 	      FillHisto_floatFromMap("track_chi2_cut",         flav, isGluonSplit ,Track_chi2[itrk]	   ,ww);
 	    }	    
-	    if (passSistrip && passPix && passIPz && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D){
+	    if (passNhit && passPix && passIPz && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D){
 	      FillHisto_floatFromMap("track_pt_cut",           flav, isGluonSplit ,Track_pt[itrk]     , ww);
 	    }	    
-	    if (passSistrip && passPix && passPt && passnormchi2 && passtrkdist && passtrklen){
+	    if (passNhit && passPix && passPt && passnormchi2 && passtrkdist && passtrklen){
 	      FillHisto_floatFromMap("track_dz_cut",          flav, isGluonSplit ,Track_dz[itrk]      ,ww);
 	    }
-	    if (passSistrip && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D){
+	    if (passNhit && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D){
 	      FillHisto_intFromMap(  "track_HPix_cut",         flav, isGluonSplit ,Track_nHitPixel[itrk],ww);
 	    }	
 	    if (passPix && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D){
-	      FillHisto_intFromMap(  "track_HStrip_cut",       flav, isGluonSplit ,Track_nHitStrip[itrk],ww);	  
+	      FillHisto_intFromMap(  "track_nHit_cut",       flav, isGluonSplit ,Track_nHitAll[itrk],ww);	  
 	    }
-	    if (passPix && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D){
+	    if (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen ){
 	      FillHisto_intFromMap(  "track_IP2D_cut",         flav, isGluonSplit ,Track_IP2D[itrk],ww);	  
 	    }	    
 	  }
-	  if (passSistrip && passPix && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D){
+	  if (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D){
 	    ntracksel++;
 	    
 	    FillHisto_floatFromMap("track_chi2",    flav, isGluonSplit ,Track_chi2[itrk]	   ,ww);
-	    FillHisto_intFromMap(  "track_HStrip",  flav, isGluonSplit ,Track_nHitStrip[itrk],ww);
+	    FillHisto_intFromMap(  "track_nHit",  flav, isGluonSplit ,Track_nHitAll[itrk],ww);
 	    FillHisto_intFromMap(  "track_HPix",    flav, isGluonSplit ,Track_nHitPixel[itrk],ww);
 	    FillHisto_floatFromMap("track_IPs",     flav, isGluonSplit ,Track_IPsig[itrk]    ,ww);
 	    FillHisto_floatFromMap("track_IP",      flav, isGluonSplit ,Track_IP[itrk]       ,ww);
