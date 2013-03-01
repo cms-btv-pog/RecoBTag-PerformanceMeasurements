@@ -120,7 +120,7 @@ void CommPlotProducer::Counter(){
 //------------------------------------------------------------------------------//
 //-------------Set PU--------------------------------------------------------//
 //-----------------------------------------------------------------------------//
-float CommPlotProducer::SetPU(vector<float> PUvector, TString PUdataFile){
+void CommPlotProducer::SetPU(vector<float> PUvector, TString PUdataFile){
 
 
   vector<float> mc_vect;
@@ -139,12 +139,9 @@ float CommPlotProducer::SetPU(vector<float> PUvector, TString PUdataFile){
   
   LumiWeights = reweight::LumiReWeighting(mc_vect,data_vect);
   
-  WeightPU = LumiWeights.weight( nPUtrue );   
-  
-  return WeightPU;
 }
 
-float CommPlotProducer::SetPU2012_S7(TString PUdataFile){
+void CommPlotProducer::SetPU2012_S7(TString PUdataFile){
  
   // Distribution used for Summer2012 MC.
   Double_t Summer2012_S7[60] = {2.344E-05,2.344E-05,2.344E-05,2.344E-05,4.687E-04,4.687E-04,7.032E-04,9.414E-04,1.234E-03,
@@ -170,14 +167,9 @@ float CommPlotProducer::SetPU2012_S7(TString PUdataFile){
   
   LumiWeights = reweight::LumiReWeighting(mc_vect,data_vect);
   
-  WeightPU = LumiWeights.weight( nPUtrue );   
-  
-  return WeightPU;
-
-
 }
 
-float CommPlotProducer::SetPU2012_S10(TString PUdataFile){
+void CommPlotProducer::SetPU2012_S10(TString PUdataFile){
  
   // Distribution used for Summer2012 MC.
   Double_t Summer2012_S10[60] = {2.560E-06, 5.239E-06, 1.420E-05, 5.005E-05, 1.001E-04, 2.705E-04, 1.999E-03, 
@@ -204,10 +196,6 @@ float CommPlotProducer::SetPU2012_S10(TString PUdataFile){
   
   LumiWeights = reweight::LumiReWeighting(mc_vect,data_vect);
   
-  WeightPU = LumiWeights.weight( nPUtrue );   
-  
-  return WeightPU;
-
 
 }
 //------------------------------------------------------------------------------//
@@ -763,13 +751,14 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
     
     if (!isData){
       if (nPUtrue >=59) nPUtrue=59;     
+      float WeightPU = LumiWeights.weight( nPUtrue );   
       ww*=WeightPU;
-      
-    }    
+      cout << " nPUtrue " << nPUtrue << " WeightPU " << WeightPU << endl; 
+      if(WeightPU == 0  ) cout << "found null PU weights " <<  nPUtrue  << endl;
+      if(WeightPU == 1  ) cout << "found null PU weights " <<  nPUtrue << endl;
+      if(WeightPU > 10 ) cout << "diverging PU weights " << WeightPU << endl;
     
-    if(!isData && WeightPU == 0  ) cout << "found null PU weights " <<  nPUtrue  << endl;
-    if(!isData && WeightPU == 1  ) cout << "found null PU weights " <<  nPUtrue << endl;
-    if(!isData && WeightPU > 10 ) cout << "diverging PU weights " << WeightPU << endl;
+    }    
     
     
     //-----------------------------------

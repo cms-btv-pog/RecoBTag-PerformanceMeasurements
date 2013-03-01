@@ -40,7 +40,6 @@ public :
    
    double x_section[10]; 
    double nmc_evt_vect[10];
-   float WeightPU; 
    float WeightXS;
    float sum_xs;
    int choice;
@@ -459,9 +458,9 @@ public :
    virtual void     FillHisto_intFromMap(TString name, int flavour, bool isGS, int value, float weight);
    virtual void     FillHisto2D_int_floatFromMap(TString name, int flavour, bool isGS, int value, float value2, float weight);
    virtual void     FillHisto2D_float_floatFromMap(TString name, int flavour, bool isGS, float value, float value2, float weight);
-   virtual float    SetPU(vector<float> PUvector, TString PUdataFile);
-   virtual float    SetPU2012_S10(TString PUdataFile);
-   virtual float    SetPU2012_S7(TString PUdataFile);   
+   virtual void     SetPU(vector<float> PUvector, TString PUdataFile);
+   virtual void     SetPU2012_S10(TString PUdataFile);
+   virtual void     SetPU2012_S7(TString PUdataFile);   
    virtual int      SetXS();
    virtual void     Counter();
    virtual float    GetEvtWeight() ; 
