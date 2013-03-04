@@ -50,7 +50,7 @@ if (Draw_track_plots){
   Draw("track_multi"  ,      "number of tracks in the jets",1);		   
   Draw("trk_multi_sel"  ,    "number of selected tracks in the jets",1);	   
   Draw("track_chi2"   ,      "normalized #chi^{2} of the tracks"	,1);	   
-  Draw("track_HStrip" ,      "number of hits in the SiStrip",1);		   
+  Draw("track_nHit" ,      "number of hits in the SiStrip",1);		   
   Draw("track_HPix"   ,      "number of hits in the Pixel",1);		   
   Draw("track_IPs"    ,      "3D IP significance of all tracks",1);	   
   Draw("track_IPs1tr" ,      "3D IP significance of the first track",1);	   
@@ -85,7 +85,7 @@ if (Draw_track_plots){
   }  
 if (Draw_Nminus1_plots){  
   Draw("track_chi2_cut"    ,"selected tracks without the #chi^{2} normalized  cut",1);	    
-  Draw("track_HStrip_cut"  ,"selected tracks without the number of hits in the SiStrip cut",1);
+  Draw("track_nHit_cut"  ,"selected tracks without the number of hits in the SiStrip cut",1);
   Draw("track_HPix_cut"    ,"selected tracks without the number of hits in the Pixel cut",1);  
   Draw("track_len_cut"     ,"selected tracks without the decay length cut",1);		    
   Draw("track_dist_cut"    ,"selected tracks without the distance to the jet axis cut" ,1);  
