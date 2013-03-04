@@ -24,11 +24,15 @@ using namespace std;
 TString filename="output_data.root";
 TString title= "CMS 2012 preliminary, #sqrt{s} = 8 TeV,  17 fb^{-1}";
 TString format=".gif"; // .png or .pdf
+bool bOverflow=false;
 
 
 void Draw(TString name, TString histotitle, bool log);
 void DrawTagRate(TString name, TString histotitle, bool log);
 void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY, bool log);
+void OverFlowBinFix(TH1F* );
+
+//--------
 
 void DrawCommPlot(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots, bool Draw_muons_plots, bool Draw_discriminator_plots , bool Draw_tagRate_plots, bool Draw_2D_plots){
 
@@ -177,6 +181,8 @@ if (Draw_2D_plots){
 
 }
 
+//--------------------------
+
 void Draw(TString name, TString histotitle, bool log)
 
 {
@@ -198,6 +204,16 @@ void Draw(TString name, TString histotitle, bool log)
  hist_l         = (TH1F*)gROOT->FindObject(name+"_l");
  hist_data      = (TH1F*)gROOT->FindObject(name+"_data");
  
+
+ if (bOverflow) {
+  OverFlowBinFix(hist_b);
+  OverFlowBinFix(hist_c);
+  OverFlowBinFix(hist_gsplit);
+  OverFlowBinFix(hist_l);
+  OverFlowBinFix(hist_data);
+ }
+
+
 
  TH1F* histo_tot = (TH1F*) hist_b->Clone();
  histo_tot->Sumw2();
@@ -339,6 +355,9 @@ void Draw(TString name, TString histotitle, bool log)
 }
 
 
+//--------------------------
+
+
 void DrawTagRate(TString name, TString histotitle, bool log){
 
 
@@ -358,6 +377,14 @@ void DrawTagRate(TString name, TString histotitle, bool log){
  hist_l         = (TH1F*)gROOT->FindObject(name+"_l");
  hist_data      = (TH1F*)gROOT->FindObject(name+"_data");
  
+ if (bOverflow) {
+  OverFlowBinFix(hist_b);
+  OverFlowBinFix(hist_c);
+  OverFlowBinFix(hist_gsplit);
+  OverFlowBinFix(hist_l);
+  OverFlowBinFix(hist_data);
+ }
+
 
  TH1F* histo_tot = (TH1F*) hist_b->Clone();
  histo_tot->Sumw2();
@@ -538,6 +565,9 @@ void DrawTagRate(TString name, TString histotitle, bool log){
 }
 
 
+//--------------------------
+
+
 void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY, bool log){
 
 
@@ -677,6 +707,39 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
   if(log) name_plot=name+"_Log"+format;
   canvas->SaveAs("Commissioning_plots/"+name_plot);
 
+}
+
+//------------
+
+void OverFlowBinFix(TH1F* histo){
+
+  Float_t val, errval;
+
+  val=histo->GetBinContent(1)+histo->GetBinContent(0);
+  errval=0;
+  if(histo->GetBinContent(1)!=0.)
+    errval+=pow(histo->GetBinError(1)/histo->GetBinContent(1),2);
+  if(histo->GetBinContent(0)!=0.)
+    errval+=pow(histo->GetBinError(0)/histo->GetBinContent(0),2);
+  errval=sqrt(errval)*val;
+  histo->SetBinContent(1,val);
+  histo->SetBinError(1,errval);
+  histo->SetBinContent(0,0);
+  histo->SetBinError(0,0);
+
+  Int_t highbin=histo->GetNbinsX();
+
+  val=histo->GetBinContent(highbin)+histo->GetBinContent(highbin+1);
+  errval=0;
+  if(histo->GetBinContent(highbin)!=0.)
+    errval+=pow(histo->GetBinError(highbin)/histo->GetBinContent(highbin),2);
+  if(histo->GetBinContent(highbin+1)!=0.)
+    errval+=pow(histo->GetBinError(highbin+1)/histo->GetBinContent(highbin+1),2);
+  errval=sqrt(errval)*val;
+  histo->SetBinContent(highbin,val);
+  histo->SetBinError(highbin,errval);
+  histo->SetBinContent(highbin+1,0);
+  histo->SetBinError(highbin+1,0);
 }
 
 
