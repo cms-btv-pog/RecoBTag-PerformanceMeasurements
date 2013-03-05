@@ -581,6 +581,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   AddHisto("muon_Sip2d",	 "Muon 2D IP significance",50, -35, 35   );
   AddHisto("muon_DeltaR",	 "Muon1 deltaR",50,0,0.5); //90
   
+  AddHisto("sv_deltaR_jet",      "sv_deltaR_jet",                                   50,0.,0.5    );
   AddHisto("sv_deltaR_sumJet",   "SVvtxSumJetDeltaR",                                   50,0.,0.5    );
   AddHisto("sv_deltaR_sumDir",   "SVvtxSumVtxDirDeltaR",                                50,0.,0.5    );
   AddHisto("sv_en_ratio",        "Fractional energy",                                   50,0.,1.     );  
