@@ -259,6 +259,9 @@ private:
     bool produceJetProbaTree_;
     bool producePtRelTemplate_;
 
+    bool use_ttbar_filter_;
+    edm::InputTag channel_;
+
     // trigger list
     std::vector<std::string> triggernames_;
     bool TriggerInfo_;
@@ -577,6 +580,18 @@ private:
     FactorizedJetCorrector *resJEC_PF ;
     FactorizedJetCorrector *resJEC_JPT;
     FactorizedJetCorrector *resJEC_Calo;  
+
+    int ttbar_chan;
+    float lepton1_pT;
+    float lepton2_pT;
+    float lepton1_eta;
+    float lepton2_eta;
+    float lepton1_phi;
+    float lepton2_phi;
+    float met;
+    float mll;
+    int trig_ttbar;
+
 
     std::vector<simPrimaryVertex> getSimPVs(const edm::Handle<edm::HepMCProduct> evtMC);
  

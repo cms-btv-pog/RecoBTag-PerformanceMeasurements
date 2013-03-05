@@ -74,4 +74,7 @@ btagana = cms.EDAnalyzer("BTagAnalyzer",
     softMuonModuleName        = cms.string('positiveSoftLeptonByPtBJetTags'),
     softMuonNegModuleName     = cms.string('negativeSoftLeptonByPtBJetTags'),
     softMuonTagInfoName       = cms.string('softMuonTagInfos'),
+
+    use_ttbar_filter      = cms.bool(False),
+    channel       = cms.InputTag("ttbarselectionproducer"),
 )

@@ -28,6 +28,9 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   produceJetProbaTree_ = iConfig.getParameter<bool> ("produceJetProbaTree");
   producePtRelTemplate_ = iConfig.getParameter<bool>("producePtRelTemplate");
   
+  use_ttbar_filter_     = iConfig.getParameter<bool> ("use_ttbar_filter");
+  channel_      = iConfig.getParameter<edm::InputTag> ("channel");
+  
   // Modules
   primaryVertexColl_   = iConfig.getParameter<std::string>("primaryVertexColl");
   
@@ -184,6 +187,19 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   //   smalltree->Branch("PU_ntrks_low",  PU_ntrks_low , "PU_ntrks_low[nPU]/I");
   //   smalltree->Branch("PU_ntrks_high", PU_ntrks_high, "PU_ntrks_high[nPU]/I");
   
+
+  if (use_ttbar_filter_) {
+   smalltree->Branch("ttbar_chan",  &ttbar_chan,  "ttbar_chan/I");
+   smalltree->Branch("lepton1_pT",  &lepton1_pT,  "lepton1_pT/F");
+   smalltree->Branch("lepton1_eta", &lepton1_eta, "lepton1_eta/F");
+   smalltree->Branch("lepton1_phi", &lepton1_phi, "lepton1_phi/F");
+   smalltree->Branch("lepton2_pT",  &lepton2_pT,  "lepton2_pT/F");
+   smalltree->Branch("lepton2_eta", &lepton2_eta, "lepton2_eta/F");
+   smalltree->Branch("lepton2_phi", &lepton2_phi, "lepton2_phi/F");
+   smalltree->Branch("met", &met, "met/F");
+   smalltree->Branch("mll", &mll, "mll/F");
+   smalltree->Branch("trig_ttbar", &trig_ttbar, "trig_ttbar/I");
+  }
   
   if ( produceJetProbaTree_ ) {
     
@@ -606,6 +622,41 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   } // end MC info
   //   cout << "Evt:" <<Evt << endl;
   //   cout << "pthat:" <<pthat << endl;
+
+
+  //------------------------------------------------------
+  // ttbar information
+  //------------------------------------------------------
+
+  if (use_ttbar_filter_) {
+   Handle<int> pIn;
+   iEvent.getByLabel(channel_, pIn);
+   ttbar_chan=*pIn;
+   Handle<vector< double  >> pIn2;
+   iEvent.getByLabel(channel_, pIn2);
+   if (pIn2->size()==8) {
+    lepton1_pT=(*pIn2)[0];
+    lepton1_eta=(*pIn2)[1];
+    lepton1_phi=(*pIn2)[2];
+    lepton2_pT=(*pIn2)[3];
+    lepton2_eta=(*pIn2)[4];
+    lepton2_phi=(*pIn2)[5];
+    met=(*pIn2)[6];
+    mll=(*pIn2)[7];
+   }
+   else {
+    lepton1_pT=-1;
+    lepton1_eta=-1;
+    lepton1_phi=-1;
+    lepton2_pT=-1;
+    lepton2_eta=-1;
+    lepton2_phi=-1;
+    met=-1;
+    mll=-1;
+   }
+  }
+
+
   //------------------------------------------------------
   // Muons
   //------------------------------------------------------
@@ -770,6 +821,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   tr = *h_trigRes;
   
   BitTrigger = 0;
+  if (use_ttbar_filter_) trig_ttbar = 0;
   
   vector<string> triggerList;
   Service<service::TriggerNamesService> tns;
@@ -833,10 +885,23 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     if (NameCompatible("HLT_BTagMu_Jet300_L1FastJet_Mu5*",triggerList[i]) ||
 	NameCompatible("HLT_BTagMu_Jet300_Mu5*",triggerList[i]) )BitTrigger +=200000 ;
     
+    if (use_ttbar_filter_) {
+      // trigger for ttbar  : https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiTopRefEventSel#Triggers
+      if (NameCompatible("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",triggerList[i]) ) trig_ttbar +=1 ;  // 2-electron
+      if (NameCompatible("HLT_Mu17_Mu8_v*",triggerList[i]) )  trig_ttbar +=2 ;  // 2-muon case1
+      if (NameCompatible("HLT_Mu17_TkMu8_v*",triggerList[i]) ) trig_ttbar +=4 ;  // 2-muon case2
+      if (NameCompatible("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",triggerList[i]) ) trig_ttbar +=10;  //muon + electron case1
+      if (NameCompatible("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",triggerList[i]) ) trig_ttbar +=20 ;  // muon + electron
+    }
+
     //$$ 
     // std::cout << " Run Evt " << Run << " " << Evt << " trigger list " << triggerList[i] << std::endl;
   }
   // std::cout << " Run Evt " << Run << " " << Evt << " bit trigger " << BitTrigger << std::endl;
+
+  if (use_ttbar_filter_) {
+    if (trig_ttbar>0) BitTrigger+=1000000; // to fill the ntuple!
+  }
   
   
   //cout << "BitTrigger:" <<BitTrigger << endl;
@@ -881,6 +946,14 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //------------- end added-----------------------------------------------------------//
   
   
+  TLorentzVector thelepton1;
+  TLorentzVector thelepton2;
+  if (use_ttbar_filter_) {
+   thelepton1.SetPtEtaPhiM(lepton1_pT, lepton1_eta, lepton1_phi, 0.);
+   thelepton2.SetPtEtaPhiM(lepton2_pT, lepton2_eta, lepton2_phi, 0.);
+  }
+
+
   for ( unsigned int ijet = 0; ijet < jetsColl.size(); ijet++) {
     //cout << "get JES " << endl;
     //double JES = acorrector->correction(jetsColl.at(ijet).p4() );   
@@ -905,7 +978,17 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     //$$
     //if ( jetpt*JES > minJetPt_ && std::fabs( jeteta ) < maxJetEta_ ) Njets++; 
     
-    
+   
+    // overlap removal with lepton from ttbar selection
+    if (use_ttbar_filter_) {
+     TLorentzVector thejet;
+     thejet.SetPtEtaPhiM(ptjet, jeteta,  (jetsColl.at(ijet)).phi(), 0.);
+     double deltaR1 = thejet.DeltaR(thelepton1);
+     double deltaR2 = thejet.DeltaR(thelepton2);
+     if (ttbar_chan>=0 && (deltaR1 < 0.5 || deltaR2 < 0.5)) continue;
+    }
+    // end of removal
+ 
     
     numjet++;
     
@@ -1290,6 +1373,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  
 	  
 	  TrkInc_pt[nTrkInc]	  = ptrack.pt();
+          TrkInc_eta[nTrkInc]	= ptrack.eta();
 	  TrkInc_phi[nTrkInc]   = ptrack.phi();
 	  TrkInc_ptrel[nTrkInc] =  calculPtRel( ptrack , jetsColl.at(ijet), JES, CaloJetCollectionTags_);
 	  
