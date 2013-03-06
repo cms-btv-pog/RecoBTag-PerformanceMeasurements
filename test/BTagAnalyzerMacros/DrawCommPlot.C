@@ -110,7 +110,7 @@ if (Draw_sv_plots){
   Draw("sv_flight3DSig","SV 3D flight distance significance",1);
   Draw("sv_multi_0","nr. of SV including bin 0",1); 
   //Draw("sv_tot_charge ","SV charge",1);
-  Draw("svnTrk","nr. of from a SV",1);	
+  Draw("svnTrk","nr. of tracks from a SV",1);	
   Draw("svnTrk_firstVxt","nr. of tracks from the first SV",1);
   Draw("sv_flight3Derr","SV 3D flight distance error",1);
   Draw("sv_flight2Derr","SV 2D flight distance error",1);
@@ -377,14 +377,6 @@ void DrawTagRate(TString name, TString histotitle, bool log){
  hist_l         = (TH1F*)gROOT->FindObject(name+"_l");
  hist_data      = (TH1F*)gROOT->FindObject(name+"_data");
  
- if (bOverflow) {
-  OverFlowBinFix(hist_b);
-  OverFlowBinFix(hist_c);
-  OverFlowBinFix(hist_gsplit);
-  OverFlowBinFix(hist_l);
-  OverFlowBinFix(hist_data);
- }
-
 
  TH1F* histo_tot = (TH1F*) hist_b->Clone();
  histo_tot->Sumw2();
@@ -529,7 +521,7 @@ void DrawTagRate(TString name, TString histotitle, bool log){
   latex->SetTextFont(42); //22
 
   latex->SetTextAlign(13);
-  latex->DrawLatex(0.12, 0.96, title);
+  latex->DrawLatex(0.08, 0.96, title);
   
 
   c1->cd();  
@@ -559,8 +551,8 @@ void DrawTagRate(TString name, TString histotitle, bool log){
 
   c1->cd();
   
-  TString name_plot=name+"_Linear"+format;
-  if(log) name_plot=name+"_Log"+format;
+  TString name_plot="tag_"+name+"_Linear"+format;
+  if(log) name_plot="tag_"+name+"_Log"+format;
   c1->SaveAs("Commissioning_plots/"+name_plot);
 }
 
@@ -603,7 +595,7 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
  histo_tot    ->Scale(scale_f);
 
   
- TProfile * pro_mc = histo_tot->ProfileX();
+ TProfile * pro_mc = histo_tot->ProfileX(name+"_tot");
  TProfile * pro_mc_b = hist_b->ProfileX();
  TProfile * pro_mc_c = hist_c->ProfileX();
  TProfile * pro_mc_udsg = hist_l->ProfileX();
@@ -702,6 +694,19 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
   pro_mc_udsg->Draw("hist,same");
   pro_mc->Draw("hist,same");
   pro_data->Draw("e,same");
+
+  TLegend* qw = 0;
+  qw =  new TLegend(0.6,0.73,0.95,1.);
+  qw->AddEntry(pro_data,        "e#mu ttbar data"                   ,"p");
+  qw->AddEntry(pro_mc,          "total "                 ,"l");
+  qw->AddEntry(pro_mc_b,        "b quark"                ,"l");
+  qw->AddEntry(pro_mc_gspl,     "b from gluon splitting" ,"l");
+  qw->AddEntry(pro_mc_c,        "c quark"                ,"l");
+  qw->AddEntry(pro_mc_udsg,     "uds quark or gluon"     ,"l");
+
+  qw->SetFillColor(0);
+  qw->Draw();
+
 
   TString name_plot=name+"_Linear"+format;
   if(log) name_plot=name+"_Log"+format;
