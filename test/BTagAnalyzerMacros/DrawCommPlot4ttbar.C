@@ -144,7 +144,7 @@ if (Draw_muons_plots){
   Draw("muon_Ip2d",	     "Muon 2D IP",1, move+1);	       
   Draw("muon_Sip3d",	     "Muon 3D IP significance",1, move+1);
   Draw("muon_Sip2d",	     "Muon 2D IP significance",1, move+1);
-  Draw("muon_DeltaR",	     "Muon1 #Delta R",1);
+  Draw("muon_DeltaR",	     "Muon #Delta R",1);
   
   } 
 if (Draw_discriminator_plots){  
@@ -221,7 +221,7 @@ void Draw(TString name, TString histotitle, bool log, int move_legend)
  hist_data      = (TH1F*)gROOT->FindObject(name+"_data");
  
 
- if (bOverflow) {
+ if (bOverflow && name!="SSV" && name!="SSVHP") {
   OverFlowBinFix(hist_b);
   OverFlowBinFix(hist_c);
   OverFlowBinFix(hist_gsplit);
@@ -317,6 +317,11 @@ void Draw(TString name, TString histotitle, bool log, int move_legend)
  if (move_legend==2) {
     if (log)  stack->SetMaximum( 5.*stack->GetMaximum() ) ;
     else stack->SetMaximum( 1.1*stack->GetMaximum() ) ;
+ }
+ 
+ if (stack->GetMinimum()> hist_l->GetMinimum()) {
+   if (log && hist_l->GetMinimum()>0.) stack->SetMinimum(hist_l->GetMinimum());
+   else if (!log) stack->SetMinimum(hist_l->GetMinimum());
  }
 
  stack    ->Draw("hist");  
@@ -522,7 +527,7 @@ void DrawTTbar(TString name, TString histotitle, bool log, int move_legend)
   
   //Legend
  qw->AddEntry(hist_data,     "e#mu data",                       "p");
- qw->AddEntry(hist_ttbar,    "t#bar{t} MC"           ,         "f");
+ qw->AddEntry(hist_ttbar,    "t#bar{t}"           ,         "f");
  qw->AddEntry(hist_dy,       "DY"     ,"f");
  qw->AddEntry(hist_st,       "tW"           ,         "f");
 
@@ -596,6 +601,7 @@ void DrawTagRate(TString name, TString histotitle, bool log){
  hist_l         = (TH1F*)gROOT->FindObject(name+"_l");
  hist_data      = (TH1F*)gROOT->FindObject(name+"_data");
  
+/*
  if (bOverflow) {
   OverFlowBinFix(hist_b);
   OverFlowBinFix(hist_c);
@@ -603,6 +609,7 @@ void DrawTagRate(TString name, TString histotitle, bool log){
   OverFlowBinFix(hist_l);
   OverFlowBinFix(hist_data);
  }
+*/
 
 
  TH1F* histo_tot = (TH1F*) hist_b->Clone();
@@ -830,7 +837,7 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
  histo_tot    ->Scale(scale_f);
 
   
- TProfile * pro_mc = histo_tot->ProfileX();
+ TProfile * pro_mc = histo_tot->ProfileX(name+"_tot");
  TProfile * pro_mc_b = hist_b->ProfileX();
  TProfile * pro_mc_c = hist_c->ProfileX();
  TProfile * pro_mc_udsg = hist_l->ProfileX();
@@ -929,6 +936,20 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
   pro_mc_udsg->Draw("hist,same");
   pro_mc->Draw("hist,same");
   pro_data->Draw("e,same");
+
+  TLegend* qw = 0;
+  qw =  new TLegend(0.6,0.73,0.95,1.);
+  qw->AddEntry(pro_data,        "e#mu ttbar data"                   ,"p");
+  qw->AddEntry(pro_mc,          "total "                 ,"l");
+  qw->AddEntry(pro_mc_b,        "b quark"                ,"l");
+  qw->AddEntry(pro_mc_gspl,     "b from gluon splitting" ,"l");
+  qw->AddEntry(pro_mc_c,        "c quark"                ,"l");
+  qw->AddEntry(pro_mc_udsg,     "uds quark or gluon"     ,"l");
+
+  qw->SetFillColor(0);
+  qw->Draw();
+
+
 
   TString name_plot=name+"_Linear"+format;
   if(log) name_plot=name+"_Log"+format;

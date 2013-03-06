@@ -554,7 +554,7 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
   AddHisto("jet_pt_all"	  ,"pT of all jets",		     PtMax/10,0,PtMax );
   AddHisto("jet_pt_sv"	  ,"pT of jets containing a SV",     PtMax/10,0,PtMax);
   AddHisto("jet_eta"	  ,"eta of all jets",		     50,-2.5,2.5);
-  AddHisto("jet_phi"	  ,"phi of all jets",		     20,-1.*pi,pi); 
+  AddHisto("jet_phi"	  ,"phi of all jets",		     40,-1.*pi,pi); 
   
   AddHisto("muon_multi"   ,      "number of muons",	   7,-0.5,6.5    );
   AddHisto("muon_multi_sel"   ,  "number of selected muons",7,-0.5,6.5   );
@@ -562,7 +562,7 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
   AddHisto("mu_chi2"	  ,      "norm. chi2 of the muon", 50,0,10       );  
   AddHisto("muon_Pt",		 "Muon p_{T}",  	   50, 0, 100	 );
   AddHisto("muon_eta",		 "Muon #eta",  	           50, -2.5, 2.5 );  
-  AddHisto("muon_phi",		 "Muon #phi",  	           80, -1.*pi,pi);
+  AddHisto("muon_phi",		 "Muon #phi",  	           40, -1.*pi,pi);
   AddHisto("muon_Ip3d", 	 "Muon 3D IP",  	   50, -0.1, 0.1 );
   AddHisto("muon_Ip2d", 	 "Muon 2D IP",  	   50, -0.1, 0.1 );
   AddHisto("muon_Sip3d",	 "Muon 3D IP significance",50, -35, 35   );
@@ -576,7 +576,7 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
   AddHisto("sv_aboveC",          "IP significance 2D charm",                            50,-35.,35.  );
   AddHisto("sv_pt",              "Vtx p_{T}",                                           50,0.,100.   );
   AddHisto("sv_eta",             "Vtx #eta",                                            50, -2.5, 2.5);
-  AddHisto("sv_phi",             "Vtx #phi",                                            80, -1.*pi,pi);
+  AddHisto("sv_phi",             "Vtx #phi",                                            40, -1.*pi,pi);
   AddHisto("sv_flightSig2D",     "Flight distance significance 2D",                     50,0.,80.    );
   AddHisto("sv_flight2D",        "Flight distance 2D",                                  50,0.,2.5    );
   AddHisto("sv_flight3D",        "Flight distance 3D",                                  50,0.,15.    );  
@@ -625,7 +625,7 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
    
   AddHisto("track_len"     ,     "decay length",		                100,0,25.     );
   AddHisto("track_dist"    ,     "distance to the jet axis",                    100,0.,0.3    );
-  AddHisto("track_dz"     ,     "transverse IP",                               100,-20,20  );  
+  AddHisto("track_dz"     ,     "transverse IP",                               100,-20.,20.  );  
   AddHisto("track_isfromSV",     "Track is from SV",                            2,-0.5, 1.5   );  
   AddHisto("track_pt"	  ,      "pT of all the tracks",	                80,0.,200.    );
   AddHisto("track_chi2_cut"     ,"normalized chi2 ",  	                        100,0.,30.    );
@@ -633,7 +633,7 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
   AddHisto("track_HPix_cut"     ,"number of hits in the Pixel ",                 10,-0.5, 9.5  );
   AddHisto("track_len_cut"      ,"decay length ",		                100,0,25.     );
   AddHisto("track_dist_cut"     ,"distance to the jet axis ",                    100,0.,0.3    );
-  AddHisto("track_dz_cut"      ,"transverse IP ",		                10,-0.5, 9.5  );  
+  AddHisto("track_dz_cut"      ,"transverse IP ",		                100,-20., 20.  );  
   AddHisto("track_pt_cut"       ,"pT ",	                                        80,0.,200.);
   AddHisto("track_IP2D_cut"     ,"IP2D ",	                                100,-0.1,0.1);
    
