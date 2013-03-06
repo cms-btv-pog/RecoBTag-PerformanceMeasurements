@@ -26,6 +26,7 @@ TString title= "CMS 2012 preliminary, #sqrt{s} = 8 TeV,  12.2 fb^{-1}";
 TString format=".gif"; // .png or .pdf
 bool bOverflow=true;
 bool b_ordering=false;
+bool web = true;
 
 
 void Draw(TString name, TString histotitle, bool log, int move_legend=0);
@@ -314,9 +315,11 @@ void Draw(TString name, TString histotitle, bool log, int move_legend)
  
  if (hist_data->GetMaximum() > stack->GetMaximum() ) stack->SetMaximum( hist_data->GetMaximum()*1.1) ;
 
+ float xmov=1;
  if (move_legend==2) {
-    if (log)  stack->SetMaximum( 5.*stack->GetMaximum() ) ;
-    else stack->SetMaximum( 1.1*stack->GetMaximum() ) ;
+    if (log)  xmov=5;
+    else xmov=1.1;
+    stack->SetMaximum( xmov*stack->GetMaximum() ) ;
  }
  
  if (stack->GetMinimum()> hist_l->GetMinimum()) {
@@ -394,6 +397,16 @@ void Draw(TString name, TString histotitle, bool log, int move_legend)
  if(log) name_plot=name+"_Log"+format;
  c1->SaveAs("Commissioning_plots/"+name_plot);
 
+ if (log && web) {  // save also _Linear for web
+ canvas_1 ->cd();
+ canvas_1->SetLogy(false);
+ if (xmov==5) {
+    stack->SetMaximum( 1.1*stack->GetMaximum() ) ;
+ }
+ c1->cd();  
+ c1->SaveAs("Commissioning_plots/"+name+"_Linear"+format);
+   
+ }
 
 }
 
