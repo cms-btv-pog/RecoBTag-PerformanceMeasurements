@@ -293,8 +293,6 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
     smalltree->Branch("SV_mass"           , SV_mass           ,"SV_mass[nSV]/F");
     smalltree->Branch("SV_vtx_eta"	  , SV_vtx_eta        ,"SV_vtx_eta[nSV]/F");
     smalltree->Branch("SV_vtx_phi"	  , SV_vtx_phi        ,"SV_vtx_phi[nSV]/F");
-    
-    
   }
   
   //--------------------------------------
@@ -308,28 +306,26 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   smalltree->Branch("Jet_phi",         Jet_phi         ,"Jet_phi[nJet]/F");
   smalltree->Branch("Jet_ntracks",     Jet_ntracks     ,"Jet_ntracks[nJet]/I");
   smalltree->Branch("Jet_flavour",     Jet_flavour     ,"Jet_flavour[nJet]/I");
-  //$$
-  smalltree->Branch("Jet_Ip1N",        Jet_Ip1N        ,"Jet_Ip1N[nJet]/F");
-  smalltree->Branch("Jet_Ip1P",        Jet_Ip1P        ,"Jet_Ip1P[nJet]/F");
-  //$$
+  //  smalltree->Branch("Jet_Ip1N",	   Jet_Ip1N	   ,"Jet_Ip1N[nJet]/F");
+  //  smalltree->Branch("Jet_Ip1P",	   Jet_Ip1P	   ,"Jet_Ip1P[nJet]/F");
   smalltree->Branch("Jet_Ip2N",        Jet_Ip2N        ,"Jet_Ip2N[nJet]/F");
   smalltree->Branch("Jet_Ip2P",        Jet_Ip2P        ,"Jet_Ip2P[nJet]/F");
   smalltree->Branch("Jet_Ip3N",        Jet_Ip3N        ,"Jet_Ip3N[nJet]/F");
   smalltree->Branch("Jet_Ip3P",        Jet_Ip3P        ,"Jet_Ip3P[nJet]/F");
-  //$$  smalltree->Branch("Jet_Ip4N",        Jet_Ip4N        ,"Jet_Ip4N[nJet]/F");
-  //$$  smalltree->Branch("Jet_Ip4P",        Jet_Ip4P        ,"Jet_Ip4P[nJet]/F");
-  //$$  smalltree->Branch("Jet_Mass4N",      Jet_Mass4N      ,"Jet_Mass4N[nJet]/F");
-  //$$  smalltree->Branch("Jet_Mass4P",      Jet_Mass4P      ,"Jet_Mass4P[nJet]/F");
+  //  smalltree->Branch("Jet_Ip4N",	   Jet_Ip4N	   ,"Jet_Ip4N[nJet]/F");
+  //  smalltree->Branch("Jet_Ip4P",	   Jet_Ip4P	   ,"Jet_Ip4P[nJet]/F");
+  //  smalltree->Branch("Jet_Mass4N",	   Jet_Mass4N	   ,"Jet_Mass4N[nJet]/F");
+  //  smalltree->Branch("Jet_Mass4P",	   Jet_Mass4P	   ,"Jet_Mass4P[nJet]/F");
   smalltree->Branch("Jet_ProbaN",      Jet_ProbaN      ,"Jet_ProbaN[nJet]/F");
   smalltree->Branch("Jet_ProbaP",      Jet_ProbaP      ,"Jet_ProbaP[nJet]/F");
-  smalltree->Branch("Jet_Proba",       Jet_Proba       ,"Jet_Proba[nJet]/F");
+//$$  smalltree->Branch("Jet_Proba",       Jet_Proba       ,"Jet_Proba[nJet]/F");
   smalltree->Branch("Jet_BprobN",      Jet_BprobN      ,"Jet_BprobN[nJet]/F");
   smalltree->Branch("Jet_BprobP",      Jet_BprobP      ,"Jet_BprobP[nJet]/F");
-  smalltree->Branch("Jet_Bprob",       Jet_Bprob       ,"Jet_Bprob[nJet]/F");
+//$$  smalltree->Branch("Jet_Bprob",       Jet_Bprob       ,"Jet_Bprob[nJet]/F");
   smalltree->Branch("Jet_SvxN",        Jet_SvxN        ,"Jet_SvxN[nJet]/F");
   smalltree->Branch("Jet_Svx",         Jet_Svx         ,"Jet_Svx[nJet]/F");
-  //$$  smalltree->Branch("Jet_SvxNTracks",  Jet_SvxNTracks  ,"Jet_SvxNTracks[nJet]/I");
-  //$$  smalltree->Branch("Jet_SvxTracks",   Jet_SvxTracks   ,"Jet_SvxTracks[nJet]/I");
+  //  smalltree->Branch("Jet_SvxNTracks",  Jet_SvxNTracks  ,"Jet_SvxNTracks[nJet]/I");
+  //  smalltree->Branch("Jet_SvxTracks",   Jet_SvxTracks   ,"Jet_SvxTracks[nJet]/I");
   smalltree->Branch("Jet_SvxNHP",      Jet_SvxNHP      ,"Jet_SvxNHP[nJet]/F");
   smalltree->Branch("Jet_SvxHP",       Jet_SvxHP       ,"Jet_SvxHP[nJet]/F");
   smalltree->Branch("Jet_SvxMass",     Jet_SvxMass     ,"Jet_SvxMass[nJet]/F");
@@ -337,17 +333,14 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   smalltree->Branch("Jet_CombSvxP",    Jet_CombSvxP    ,"Jet_CombSvxP[nJet]/F");
   smalltree->Branch("Jet_CombSvx",     Jet_CombSvx     ,"Jet_CombSvx[nJet]/F");
   
-  //smalltree->Branch("Jet_CombSvxN_R",	 Jet_CombSvxN_R    ,"Jet_CombSvxN_R[nJet]/F");
-  //smalltree->Branch("Jet_CombSvxP_R",	 Jet_CombSvxP_R    ,"Jet_CombSvxP_R[nJet]/F");
-  //smalltree->Branch("Jet_CombSvx_R",	 Jet_CombSvx_R     ,"Jet_CombSvx_R[nJet]/F");
+  //$$ smalltree->Branch("Jet_CombSvxN_R",	 Jet_CombSvxN_R    ,"Jet_CombSvxN_R[nJet]/F");
+  //$$ smalltree->Branch("Jet_CombSvxP_R",	 Jet_CombSvxP_R    ,"Jet_CombSvxP_R[nJet]/F");
+  //$$ smalltree->Branch("Jet_CombSvx_R",	 Jet_CombSvx_R     ,"Jet_CombSvx_R[nJet]/F");
   smalltree->Branch("Jet_SimpIVF_HP",  Jet_SimpIVF_HP  ,"Jet_SimpIVF_HP[nJet]/F");
   smalltree->Branch("Jet_SimpIVF_HE",  Jet_SimpIVF_HE  ,"Jet_SimpIVF_HE[nJet]/F");
   smalltree->Branch("Jet_DoubIVF_HE",  Jet_DoubIVF_HE  ,"Jet_DoubIVF_HE[nJet]/F");
   smalltree->Branch("Jet_CombIVF",     Jet_CombIVF     ,"Jet_CombIVF[nJet]/F");
   smalltree->Branch("Jet_CombIVF_P"  , Jet_CombIVF_P   ,"Jet_CombIVF_P[nJet]/F");
-  
-  
-  
   
   smalltree->Branch("Jet_SoftMuN",     Jet_SoftMuN     ,"Jet_SoftMuN[nJet]/F");
   smalltree->Branch("Jet_SoftMu",      Jet_SoftMu      ,"Jet_SoftMu[nJet]/F");
@@ -368,7 +361,6 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   //--------------------------------------
   // muon information 
   //--------------------------------------
-  
   smalltree->Branch("nMuon"	   ,&nMuon	 ,"nMuon/I");
   smalltree->Branch("Muon_IdxJet",   Muon_IdxJet   ,"Muon_IdxJet[nMuon]/I");
   smalltree->Branch("Muon_nMuHit",   Muon_nMuHit   ,"Muon_nMuHit[nMuon]/I");
@@ -385,7 +377,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   smalltree->Branch("Muon_ptrel",    Muon_ptrel    ,"Muon_ptrel[nMuon]/F");
   smalltree->Branch("Muon_vz",       Muon_vz       ,"Muon_vz[nMuon]/F");
   smalltree->Branch("Muon_hist",     Muon_hist     ,"Muon_hist[nMuon]/I");
-  //$$  smalltree->Branch("Muon_TrackIdx", Muon_TrackIdx ,"Muon_TrackIdx[nMuon]/I");
+  //  smalltree->Branch("Muon_TrackIdx", Muon_TrackIdx ,"Muon_TrackIdx[nMuon]/I");
   smalltree->Branch("Muon_IPsig",    Muon_IPsig    ,"Muon_IPsig[nMuon]/F");
   smalltree->Branch("Muon_IP",       Muon_IP       ,"Muon_IP[nMuon]/F");
   smalltree->Branch("Muon_IP2Dsig",  Muon_IP2Dsig  ,"Muon_IP2Dsig[nMuon]/F");
@@ -393,8 +385,6 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   smalltree->Branch("Muon_Proba",    Muon_Proba    ,"Muon_Proba[nMuon]/F");
   smalltree->Branch("Muon_deltaR",   Muon_deltaR   ,"Muon_deltaR[nMuon]/F");
   smalltree->Branch("Muon_ratio",    Muon_ratio    ,"Muon_ratio[nMuon]/F");
-  
-  //$$
   
   //--------------------------------------
   // Inclusive Track information for PtRel template 
@@ -421,8 +411,6 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   
   smalltree->Branch("mcweight", &mcweight     ,"mcweight/F");
   
-  
-  
   smalltree->Branch("nBHadrons",     &nBHadrons    ,"nBHadrons/I");
   smalltree->Branch("BHadron_pT",    BHadron_pT    ,"BHadron_pT[nBHadrons]/F");
   smalltree->Branch("BHadron_eta",   BHadron_eta   ,"BHadron_eta[nBHadrons]/F");
@@ -430,10 +418,23 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   smalltree->Branch("BHadron_mass",  BHadron_mass  ,"BHadron_mass[nBHadrons]/F");
   smalltree->Branch("BHadron_pdgID", BHadron_pdgID ,"BHadron_pdgID[nBHadrons]/I");
   
+//$$  
+  smalltree->Branch("nGenlep",    &nGenlep      ,"nGenlep/I");
+  smalltree->Branch("Genlep_pT",    Genlep_pT    ,"Genlep_pT[nGenlep]/F");
+  smalltree->Branch("Genlep_eta",   Genlep_eta   ,"Genlep_eta[nGenlep]/F");
+  smalltree->Branch("Genlep_phi",   Genlep_phi   ,"Genlep_phi[nGenlep]/F");
+  smalltree->Branch("Genlep_pdgID", Genlep_pdgID ,"Genlep_pdgID[nGenlep]/I");
+  smalltree->Branch("Genlep_mother",Genlep_mother,"Genlep_mother[nGenlep]/I");
+
+  smalltree->Branch("nGenquark",    &nGenquark      ,"nGenquark/I");
+  smalltree->Branch("Genquark_pT",    Genquark_pT    ,"Genquark_pT[nGenquark]/F");
+  smalltree->Branch("Genquark_eta",   Genquark_eta   ,"Genquark_eta[nGenquark]/F");
+  smalltree->Branch("Genquark_phi",   Genquark_phi   ,"Genquark_phi[nGenquark]/F");
+  smalltree->Branch("Genquark_pdgID", Genquark_pdgID ,"Genquark_pdgID[nGenquark]/I");
+  smalltree->Branch("Genquark_mother",Genquark_mother,"Genquark_mother[nGenquark]/I");
+//$$  
   
   
-  
-  //$$
   //   // prepare residual corrections
   //   string JEC_PATH("CondFormats/JetMETObjects/data/");
   //   
@@ -454,7 +455,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   //   std::vector<JetCorrectorParameters> vparam_Calo;
   //   vparam_Calo.push_back(*ResJetCorPar_Calo);
   //   resJEC_Calo = new FactorizedJetCorrector(vparam_Calo);
-  //$$
+
   cout << "BTagAnalyzer constructed " << endl;
 }
 
@@ -532,6 +533,10 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   nCFromGSplit = 0;
   nBFromGSplit = 0;
   nBHadrons    = 0;
+//$$
+  nGenlep     = 0;
+  nGenquark   = 0;
+//$$
   PVzSim = -10.;
   mcweight=1.;
   if ( !isData_ ) {
@@ -560,39 +565,58 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       nPUtrue = ipu->getTrueNumInteractions();
     }
     
-    // gluon spliting
     edm::Handle<reco::GenParticleCollection> genParticles;
     iEvent.getByLabel ("genParticles", genParticles);
-    
+
+//$$      
+    // generated particles
     for (size_t i = 0; i < genParticles->size (); ++i) {
       const GenParticle & genIt = (*genParticles)[i];
-      if( abs(genIt.pdgId()) == 5 &&  genIt.status() == 2  ) {
-        bFromGSplit_pT[nBFromGSplit]	= genIt.p4().pt();
-        bFromGSplit_eta[nBFromGSplit]	= genIt.p4().eta();
-        bFromGSplit_phi[nBFromGSplit]	= genIt.p4().phi();
-	//         bFromGSplit_pdgID[nBFromGSplit] = genIt.pdgId();      
-        nBFromGSplit++;
+      int ID = abs(genIt.pdgId());
+
+      // prompt b and c
+      if ( (ID == 4 || ID == 5) && genIt.status() == 3 ) {
+        const Candidate * moth = genIt.mother();
+        Genquark_pT[nGenquark]     = genIt.p4().pt();
+        Genquark_eta[nGenquark]    = genIt.p4().eta();
+        Genquark_phi[nGenquark]    = genIt.p4().phi();
+        Genquark_pdgID[nGenquark]  = genIt.pdgId();
+        Genquark_mother[nGenquark] = moth->pdgId();
+//  cout << " status " << genIt.status() << " pdgId " << genIt.pdgId()  << " pT " << genIt.p4().pt() << " mother " << moth->pdgId() << endl;
+        nGenquark++;
       } 
-      if(abs(genIt.pdgId ()) == 4 &&  genIt.status() == 2 ) {
-        cFromGSplit_pT[nCFromGSplit]	= genIt.p4().pt();
-        cFromGSplit_eta[nCFromGSplit]	= genIt.p4().eta();
-        cFromGSplit_phi[nCFromGSplit]	= genIt.p4().phi();
-	//         cFromGSplit_pdgID[nCFromGSplit] = genIt.pdgId();       
-        nCFromGSplit++;
+
+      // gluon spliting
+      if ( ( ID == 4 || ID == 5 ) && genIt.status() == 2 ) {
+        const Candidate * moth = genIt.mother();
+        int IDmoth = abs(moth->pdgId());
+	if ( IDmoth != 6 && IDmoth != 23 && IDmoth != 24 ) {
+          if ( ID == 5 ) {
+            bFromGSplit_pT[nBFromGSplit]  = genIt.p4().pt();
+            bFromGSplit_eta[nBFromGSplit] = genIt.p4().eta();
+            bFromGSplit_phi[nBFromGSplit] = genIt.p4().phi();
+            nBFromGSplit++;
+          } 
+          if ( ID == 4 ) {
+            cFromGSplit_pT[nCFromGSplit]  = genIt.p4().pt();
+            cFromGSplit_eta[nCFromGSplit] = genIt.p4().eta();
+            cFromGSplit_phi[nCFromGSplit] = genIt.p4().phi();
+            nCFromGSplit++;
+          }
+        }
       }
       
       // BHadrons
-      if( genIt.status() == 2 && genIt.mother() !=0){
-      const Candidate * mom = genIt.mother();
-      if (abs(mom->pdgId()) < 100) {
-	int IDb = abs(genIt.pdgId());
-	if ( (IDb >=  511 && IDb <=  557) || (IDb >= 5114 && IDb <= 5554) || 
-	     (IDb >=10511 && IDb <=10555) || (IDb >=20513 && IDb <=20555) || IDb ==30553 ||
-	     (IDb>=100551 && IDb<=100557) || (IDb>=110551 && IDb<=110557) || 
-	     (IDb>=120551 && IDb<=120557) || (IDb>=130551 && IDb<=130557) ||
-	     (IDb>=200551 && IDb<=200557) || (IDb>=210551 && IDb<=210557) || 
-	     (IDb>=220551 && IDb<=220557) || (IDb>=300551 && IDb<=300557) ||
-	     (IDb == 9000553 || IDb == 9010553) ) {
+      if ( (ID >=  511 && ID <=  557) || (ID >= 5114 && ID <= 5554) || 
+	   (ID >=10511 && ID <=10555) || (ID >=20513 && ID <=20555) || ID ==30553 ||
+	   (ID>=100551 && ID<=100557) || (ID>=110551 && ID<=110557) || 
+	   (ID>=120551 && ID<=120557) || (ID>=130551 && ID<=130557) ||
+	   (ID>=200551 && ID<=200557) || (ID>=210551 && ID<=210557) || 
+	   (ID>=220551 && ID<=220557) || (ID>=300551 && ID<=300557) ||
+	   (ID == 9000553 || ID == 9010553) ) {
+        const Candidate * moth = genIt.mother();
+//  cout << " pdgId " << genIt.pdgId()  << " pT " << genIt.p4().pt() << " mother " << mother->pdgId() << endl;
+        if ( abs(moth->pdgId()) < 100 ) {
 	  BHadron_pT[nBHadrons]    = genIt.p4().pt();
 	  BHadron_eta[nBHadrons]   = genIt.p4().eta();
 	  BHadron_phi[nBHadrons]   = genIt.p4().phi();
@@ -601,10 +625,58 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  nBHadrons++;
 	}
       }
-     
-     } 
-    }
-    
+
+      // Leptons
+      if ( (ID == 11 || ID == 13) && genIt.p4().pt() > 3. ) {
+        const Candidate * moth1 = genIt.mother();
+      if ( moth1->pdgId() != genIt.pdgId() ) {
+	Genlep_pT[nGenlep]    = genIt.p4().pt();
+	Genlep_eta[nGenlep]   = genIt.p4().eta();
+	Genlep_phi[nGenlep]   = genIt.p4().phi();
+	Genlep_pdgID[nGenlep] = genIt.pdgId();
+	const Candidate * moth2 = moth1->mother();
+        const Candidate * moth3 = moth2->mother();
+        const Candidate * moth4 = moth3->mother();
+	int isWZ = 0, istau = 0, isB = 0, isD = 0;
+	int ID1 = abs( moth1->pdgId() );
+	int ID2 = abs( moth2->pdgId() );
+	int ID3 = abs( moth3->pdgId() );
+	int ID4 = abs( moth4->pdgId() );
+	if ( ID1 == 15 ) istau = 1; 
+	if ( ID1 == 24 || ID2 == 24 || ID3 == 24 || ID4 == 24 || 
+	     ID1 == 25 || ID2 == 25 || ID3 == 25 || ID4 == 25 ) isWZ = 1; 
+	if ( ID1 == 411 || ID1 == 421 || ID1 == 431 || 
+	     ID1 ==4112 || ID1 ==4122 || ID1 ==4132 || 
+	     ID1 ==4212 || ID1 ==4222 || ID1 ==4232 || ID1 ==4332 ) isD = 1; 
+	if ( ID2 == 411 || ID2 == 421 || ID2 == 431 || 
+	     ID2 ==4112 || ID2 ==4122 || ID2 ==4132 || 
+	     ID2 ==4212 || ID2 ==4222 || ID2 ==4232 || ID2 ==4332 ) isD = 1; 
+	if ( ID1 == 511 || ID1 == 521 || ID1 == 531 || ID1 == 541 || 
+	     ID1 ==5112 || ID1 ==5122 || ID1 ==5132 || 
+	     ID1 ==5212 || ID1 ==5222 || ID1 ==5232 || ID1 ==5332 ) isB = 1;
+	if ( ID2 == 511 || ID2 == 521 || ID2 == 531 || ID2 == 541 || 
+	     ID2 ==5112 || ID2 ==5122 || ID2 ==5132 || 
+	     ID2 ==5212 || ID2 ==5222 || ID2 ==5232 || ID2 ==5332 ) isB = 1;
+	if ( ID3 == 511 || ID3 == 521 || ID3 == 531 || ID3 == 541 || 
+	     ID3 ==5112 || ID3 ==5122 || ID3 ==5132 || 
+	     ID3 ==5212 || ID3 ==5222 || ID3 ==5232 || ID3 ==5332 ) isB = 1;
+	if ( ID4 == 511 || ID4 == 521 || ID4 == 531 || ID4 == 541 || 
+	     ID4 ==5112 || ID4 ==5122 || ID4 ==5132 || 
+	     ID4 ==5212 || ID4 ==5222 || ID4 ==5232 || ID4 ==5332 ) isB = 1;
+	if ( isB+isD != 0 ) Genlep_mother[nGenlep] = 5*isB + 4*isD;
+	else                Genlep_mother[nGenlep] = 10*istau + 100*isWZ;
+//  cout << " lepton " << nGenlep << " pdgID " << Genlep_pdgID[nGenlep] 
+//       << " moth1 " << moth1->pdgId() << " moth2 " << moth2->pdgId()
+//       << " moth3 " << moth3->pdgId() << " moth4 " << moth4->pdgId()
+//       << " pT " << Genlep_pT[nGenlep]
+//       << " from " << Genlep_mother[nGenlep] << endl;
+	nGenlep++;
+      }
+      }
+      
+    } // end loop on generated particles
+//$$      
+          
     // simulated PV
     if ( useTrackHistory_ ) {
       edm::Handle<edm::HepMCProduct> theHepMCProduct;
@@ -790,7 +862,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     pv=  new reco::Vertex(p,e,1,1,1);
     //newvertex = true;
   }
-  GlobalPoint Pv_point = GlobalPoint((*pv).x(), (*pv).y(), (*pv).z());
+//   GlobalPoint Pv_point = GlobalPoint((*pv).x(), (*pv).y(), (*pv).z());
   PVz = (*primaryVertex)[0].z();
   
   nPV=0;
@@ -894,7 +966,6 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       if (NameCompatible("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",triggerList[i]) ) trig_ttbar +=20 ;  // muon + electron
     }
 
-    //$$ 
     // std::cout << " Run Evt " << Run << " " << Evt << " trigger list " << triggerList[i] << std::endl;
   }
   // std::cout << " Run Evt " << Run << " " << Evt << " bit trigger " << BitTrigger << std::endl;
@@ -975,8 +1046,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     
     
     if ( ptjet < minJetPt_ || std::fabs( jeteta ) > maxJetEta_ ) continue;
-    //$$
-    //if ( jetpt*JES > minJetPt_ && std::fabs( jeteta ) < maxJetEta_ ) Njets++; 
+    // if ( jetpt*JES > minJetPt_ && std::fabs( jeteta ) < maxJetEta_ ) Njets++; 
     
    
     // overlap removal with lepton from ttbar selection
@@ -1014,7 +1084,6 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     
     Jet_jes[nJet]     = JES;
     
-    //$$
     //     resJEC_Calo->setJetEta(jetsColl.at(ijet).eta());
     //     resJEC_Calo->setJetPt(jetsColl.at(ijet).pt());
     //     
@@ -1028,7 +1097,6 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     // //     Jet_residual[nJet] = resJEC_Calo->getCorrection();
     // //     Jet_residual[nJet] = resJEC_JPT->getCorrection();
     Jet_residual[nJet]   = 1.;
-    //$$
     
     float etajet = TMath::Abs( (jetsColl.at(ijet)).eta());
     float phijet = (jetsColl.at(ijet)).phi();
@@ -1059,15 +1127,10 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     Jet_nFirstTrkInc[nJet] = nTrkInc;
     int k=0;
     
-    
-    
-    
-    
-    //$$    if ( produceJetProbaTree_ ) {
+    //    if ( produceJetProbaTree_ ) {
     
     unsigned int trackSize = selected_tracks.size();
     if(!use_selected_tracks_)trackSize = no_sel_tracks.size();
-    
     
     if (trackSize==0) continue;
     for (unsigned int itt=0; itt < trackSize; itt++) {
@@ -1113,12 +1176,10 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       if (std::fabs(distJetAxis) < 0.07 && decayLength < 5.0)  pass_cut_trk=true;
       
       // track selection
-      //$$    
+
       if ( (use_selected_tracks_ && pass_cut_trk) ||  !use_selected_tracks_) {
-	//$$
 	
-	
-	if(use_selected_tracks_){
+	if ( use_selected_tracks_ ) {
 	  Track_IP2D[nTrack]     = (*tagInfo)[ith_tagged].impactParameterData()[k].ip2d.value();
 	  Track_IP2Dsig[nTrack]  = (*tagInfo)[ith_tagged].impactParameterData()[k].ip2d.significance();
 	  Track_IP[nTrack]       = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.value();
@@ -1131,9 +1192,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  Measurement1D ip2d    = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;
 	  Measurement1D ip3d    = IPTools::signedImpactParameter3D(builder->build(ptrack), direction, *pv).second;
 	  Measurement1D ip2dsig = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).first;
-	  Measurement1D ip3dsig = IPTools::signedImpactParameter3D(builder->build(ptrack), direction,
-								   *pv).first;
-	  
+	  Measurement1D ip3dsig = IPTools::signedImpactParameter3D(builder->build(ptrack), direction, *pv).first;
 	  
 	  Track_IP2D[nTrack]     = (ip2d.value());
 	  Track_IP2Dsig[nTrack]  = (ip2d.value())/(ip2d.error());
@@ -1142,9 +1201,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  Track_IP2Derr[nTrack]  = (ip2d.error());
 	  Track_IPerr[nTrack]    = (ip3d.error());
 	  Track_Proba[nTrack]    = -1000;	  
-	  
 	}
-	
 	
 	Track_p[nTrack]        = ptrack.p();
 	Track_pt[nTrack]       = ptrack.pt();
@@ -1349,8 +1406,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	
 	nTrack++;
       }
-       if (use_selected_tracks_) Jet_ntracks[nJet] = nTrack-Jet_nFirstTrack[nJet];
-      //$$
+      if ( use_selected_tracks_ ) Jet_ntracks[nJet] = nTrack-Jet_nFirstTrack[nJet];
+ 
       if ( producePtRelTemplate_ ) {
 	if ( ptrack.quality(reco::TrackBase::highPurity)
 	     // Remove the tracks that are pixel-less
@@ -1364,30 +1421,23 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	     && ptrack.trackerExpectedHitsOuter().numberOfHits() <= 2
 	     && ptrack.dz()-(*pv).z() < 1. ) { 
 	  
-	  
-	  
-	  if(use_selected_tracks_){
+	  if ( use_selected_tracks_ ) {
 	    TrkInc_IP[nTrkInc]	  = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.value();
 	    TrkInc_IPsig[nTrkInc] = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.significance();
 	  }
 	  
-	  
-	  TrkInc_pt[nTrkInc]	  = ptrack.pt();
+	  TrkInc_pt[nTrkInc]	= ptrack.pt();
           TrkInc_eta[nTrkInc]	= ptrack.eta();
 	  TrkInc_phi[nTrkInc]   = ptrack.phi();
-	  TrkInc_ptrel[nTrkInc] =  calculPtRel( ptrack , jetsColl.at(ijet), JES, CaloJetCollectionTags_);
-	  
+	  TrkInc_ptrel[nTrkInc] = calculPtRel( ptrack , jetsColl.at(ijet), JES, CaloJetCollectionTags_);
 	  
 	  nTrkInc++;
 	}
       }
-      //$$
-      
       k++;
+
     } // end loop on tracks
-    //$$    }
     
-    //$$
     // // get the 4 highest positive and 4 lowest negative IP/sig tracks
     //     k = 0;
     //     int k1 = -1, k2 = -1, k3 = -1, k4 = -1;
@@ -1527,7 +1577,6 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     //         }
     //       }
     //     }
-    //$$
     
     Jet_nLastTrack[nJet]   = nTrack;
     Jet_nLastTrkInc[nJet]  = nTrkInc;
@@ -1636,7 +1685,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	Muon_isGlobal[nMuon] = muons[muIdx].isGlobalMuon();
 	Muon_nMatched[nMuon] = muons[muIdx].numberOfMatches() ;
 	Muon_vz[nMuon]       = muons[muIdx].vz();
-	//$$        Muon_TrackIdx[nMuon] = getMuonTk( muons[muIdx].innerTrack()->pt());
+	// Muon_TrackIdx[nMuon] = getMuonTk( muons[muIdx].innerTrack()->pt());
         int mutkid = getMuonTk( muons[muIdx].innerTrack()->pt());
         Muon_IPsig[nMuon] = -100.;
         Muon_Proba[nMuon] = -100.;
@@ -1645,7 +1694,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  //          Muon_IPsig[nMuon] = Track_IPsig[mutkid];
           Muon_Proba[nMuon] = Track_Proba[mutkid];
 	}
-	//$$	
+
 	Muon_hist[nMuon] = 0; 
 	if ( useTrackHistory_ && !isData_ ) {	  
 	  TrackCategories::Flags theFlagP = classifier_.evaluate( (*tagInos_softmuon)[ith_tagged].lepton(leptIdx) ).flags();
@@ -1688,7 +1737,6 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	nMuon++;
       }
     }
-    
     
     // Jet information
     Jet_ProbaN[nJet]   = ProbaN;	 
@@ -1757,21 +1805,20 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     //cout << "TCHP" << Jet_Ip3P[nJet]<< endl;
     
     
-    //$$
-    Jet_Ip1P[nJet]  = -100;
-    Jet_Ip1N[nJet]  =  100;
-    for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
-	 itipdata != ipdata.end(); itipdata++) {
+//     Jet_Ip1P[nJet]  = -100;
+//     Jet_Ip1N[nJet]  =  100;
+//     for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
+// 	 itipdata != ipdata.end(); itipdata++) {
+// 
+//       float decayLen = ((*itipdata).closestToJetAxis - (Pv_point)).mag(); 
+//       float distJetAxis = (*itipdata).distanceToJetAxis.value();
+//       if ( abs(distJetAxis) > 0.07 || decayLen > 5.0 ) continue;
+//       double ip3D = (*itipdata).ip3d.significance();
+//       if( ip3D > Jet_Ip1P[nJet] ) Jet_Ip1P[nJet] = ip3D;	 
+//       if( ip3D < Jet_Ip1N[nJet] ) Jet_Ip1N[nJet] = ip3D;
+//     }
+//     Jet_Ip1N[nJet] = -Jet_Ip1N[nJet];
 
-      float decayLen = ((*itipdata).closestToJetAxis - (Pv_point)).mag(); 
-      float distJetAxis = (*itipdata).distanceToJetAxis.value();
-      if ( abs(distJetAxis) > 0.07 || decayLen > 5.0 ) continue;
-      double ip3D = (*itipdata).ip3d.significance();
-      if( ip3D > Jet_Ip1P[nJet] ) Jet_Ip1P[nJet] = ip3D;	 
-      if( ip3D < Jet_Ip1N[nJet] ) Jet_Ip1N[nJet] = ip3D;
-    }
-    Jet_Ip1N[nJet] = -Jet_Ip1N[nJet];
-    //$$	 
     //     if ( Jet_Ip2P[nJet] != kip2  || Jet_Ip3P[nJet] != kip3 
     //       || Jet_Ip2N[nJet] !=-nip2  || Jet_Ip3N[nJet] !=-nip3 ){ 
     //  cout << " ERROR " << n2 << " " << n3 << " " << k3 << " " << k2 << endl;
@@ -1792,7 +1839,6 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     //          << k4 << " " << k3 << " " << k2 << " " << k1 << endl;
     //     cout << "    Mass neg " << Jet_Mass2N[nJet] << " " << Jet_Mass3N[nJet] << " " << Jet_Mass4N[nJet]
     //          << "    Mass pos " << Jet_Mass2P[nJet] << " " << Jet_Mass3P[nJet] << " " << Jet_Mass4P[nJet] << endl;
-    //$$
     
     //*****************************************************************
     //get track histories for 1st, 2nd and 3rd track (TC)
@@ -2073,17 +2119,15 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	+ (cap7+can7)*10000000 + (cap8+can8)*100000000;
     }
     
-    //$$    Jet_SvxNTracks[nJet] = svxNegtracks.size();	 
-    //$$    Jet_SvxTracks[nJet]  = svxPostracks.size();	 
+    //    Jet_SvxNTracks[nJet] = svxNegtracks.size();  
+    //    Jet_SvxTracks[nJet]  = svxPostracks.size();  
     
-    //$$
     float SVmass = 0.;
     if ( (*tagInfoSVx)[ith_tagged].nVertices() > 0) {
       SVmass = (*tagInfoSVx)[ith_tagged].secondaryVertex(0).p4().mass();
     }
     Jet_SvxMass[nJet] = SVmass;	 
     // std:: << " Jet " << nJet << " pt " << Jet_pt[nJet]*JES*Jet_residual[nJet] << " SVmass " << SVmass << std::endl;
-    //$$
     
     nJet++;
     

@@ -402,10 +402,6 @@ private:
     float Track_SVweight[nMaxTrk_];
     int   Track_category[nMaxTrk_];
     
-    
-    
-    
-
     int nJet;
     float Jet_pt[nMaxJets_];
     float Jet_genpt[nMaxJets_];
@@ -559,16 +555,28 @@ private:
     float bFromGSplit_phi[10000];
     int   bFromGSplit_pdgID[10000];
     
-    
     int nBHadrons;
     float BHadron_pT[1000];
     float BHadron_eta[1000];
     float BHadron_phi[1000];
     float BHadron_mass[1000];
     int   BHadron_pdgID[1000];
-    
-    
-    
+
+//$$   
+    int nGenlep;
+    float Genlep_pT[100];
+    float Genlep_eta[100];
+    float Genlep_phi[100];
+    int   Genlep_pdgID[100];
+    int   Genlep_mother[100];
+
+    int nGenquark;
+    float Genquark_pT[100];
+    float Genquark_eta[100];
+    float Genquark_phi[100];
+    int   Genquark_pdgID[100];
+    int   Genquark_mother[100];
+//$$   
     
     int BitTrigger;
     int Run;
