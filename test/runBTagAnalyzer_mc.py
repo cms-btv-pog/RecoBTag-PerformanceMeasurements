@@ -15,12 +15,12 @@ process.source = cms.Source(
     "PoolSource",
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(   
-# data from /Jet/Run2012A-PromptReco-v1/AOD
-#        'file:FE2E21F0-0583-E111-8DA9-001D09F241F0.root'
-# data from /BTag/Run2012A-PromptReco-v1/AOD
-       #'file:000A540B-76E7-E111-A557-003048C69406.root'
-       #'file:FC834104-FF2E-E211-AF15-003048F1BF66.root'
-       'file:02CFCC4D-68EB-E111-A8A8-485B39800C2B.root'
+# /QCD_Pt-80to120_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v2/GEN-SIM-RECODEBUG
+#     'file:/opt/sbg/data/data1/cms/blochd/CMSSW_5_3_2_patch5/src/RecoBTag/PerformanceMeasurements/test/FEE3EAB8-FCF3-E111-AE7D-00266CF3322C.root'
+# /QCD_Pt-300to470_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/GEN-SIM-RECODEBUG
+#     'file:9C259CB6-F5F3-E111-AB15-00266CF32A20.root'
+# /TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
+    'file:/opt/sbg/data/data1/cms/blochd/CMSSW_5_3_7_patch1/src/RecoBTag/PerformanceMeasurements/test/6435E333-1826-E211-9E1F-003048D4DEAE.root'
   )
 )
 
@@ -30,9 +30,7 @@ process.maxEvents = cms.untracked.PSet(
 
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = "START53_V7A::All"
-
-
+process.GlobalTag.globaltag = "START53_V7F::All"
 
 
 ##############################################
@@ -52,11 +50,6 @@ process.GlobalTag.globaltag = "START53_V7A::All"
 #)
 
 #process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
-
-
-
-
-
 
 
 ##-------------------- Import the JEC services -----------------------
@@ -157,9 +150,6 @@ process.combinedInclusiveSecondaryVertexPositiveBJetTags.jetTagComputer = cms.st
 #      )
 #process.combinedSecondaryVertexPositiveRetrainedBJetTags = process.combinedSecondaryVertexPositiveBJetTags.clone()
 #process.combinedSecondaryVertexPositiveRetrainedBJetTags.jetTagComputer = cms.string('combinedSecondaryVertexPositiveRetrained')
-
-
-
 
 
 # for Soft Muon tagger
@@ -303,14 +293,16 @@ process.GlobalTag.toGet = cms.VPSet(
 )
 
 #---------------------------------------
-process.TFileService = cms.Service("TFileService", fileName = cms.string("TrackTree_mc.root") )
-#process.TFileService = cms.Service("TFileService", fileName = cms.string("JetTree.root") )
+#process.TFileService = cms.Service("TFileService", fileName = cms.string("TrackTree.root") )
+process.TFileService = cms.Service("TFileService", fileName = cms.string("JetTree.root") )
  
 process.btagana.isData              = False 
-process.btagana.use_selected_tracks = False
+#$$
+process.btagana.use_selected_tracks = True   ## False if you want to run on all tracks
 process.btagana.useTrackHistory     = False
-process.btagana.produceJetProbaTree = True
-process.btagana.producePtRelTemplate = False
+process.btagana.produceJetProbaTree = False  ## True if you want to keep track and SV info!
+process.btagana.producePtRelTemplate = True  ## True for performance studies
+#$$
 process.btagana.triggerTable = 'TriggerResults::HLT' # Data and MC
 #---------------------------------------
 
@@ -328,10 +320,6 @@ process.ak5JetTracksAssociatorAtVertex.jets = "PATJetsFilter"
 process.softMuonTagInfos.jets = "PATJetsFilter"
 
 
-
-
-
-
 #---------------------------------------
 # trigger selection !
 # import HLTrigger.HLTfilters.triggerResultsFilter_cfi as hlt
@@ -346,18 +334,10 @@ process.softMuonTagInfos.jets = "PATJetsFilter"
 #---------------------------------------
 
 
-
-
-
-
-
-
 process.p = cms.Path(
 #$$
-#$$        process.JetHLTFilter
-#$$        *process.kt6PFJets  
+#$$        process.JetHLTFilter*
 #$$
-        #process.kt6PFJets
         process.noscraping
         *process.primaryVertexFilter
         *process.offlinePrimaryVertices 
