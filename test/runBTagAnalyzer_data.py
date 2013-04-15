@@ -20,7 +20,7 @@ process.source = cms.Source(
 # data from /BTag/Run2012A-PromptReco-v1/AOD
        #'file:000A540B-76E7-E111-A557-003048C69406.root'
        #'file:FC834104-FF2E-E211-AF15-003048F1BF66.root'
-       'file:5AC9D874-D6E8-E111-A768-00261894387D.root'
+       '/store/data/Run2012A/BTag/AOD/22Jan2013-v1/30000/FE1706DA-9481-E211-8D8E-002590596490.root'
   )
 )
 
@@ -30,8 +30,7 @@ process.maxEvents = cms.untracked.PSet(
 
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = "GR_R_53_V19::All"
-# process.GlobalTag.globaltag = "GR_R_53_V2B::All"
+process.GlobalTag.globaltag = "FT_53_V21_AN3::All"
 
 
 
@@ -73,7 +72,8 @@ process.ak5PFJets.doAreaFastjet = True
 
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
-process.load("Configuration.StandardSequences.Geometry_cff")
+#process.load("Configuration.StandardSequences.Geometry_cff")
+process.load("Configuration.Geometry.GeometryIdeal_cff")
 
 process.load("SimTracker.TrackAssociation.TrackAssociatorByChi2_cfi")
 process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
@@ -294,15 +294,17 @@ process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
 # process.es_prefer_trackProbabilityFakeCond = cms.ESPrefer("PoolDBESSource","trackProbabilityFakeCond")
 
 ### JP calibration for crab only: 
-process.GlobalTag.toGet = cms.VPSet(
-  cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
-       tag = cms.string("TrackProbabilityCalibration_2D_Data53X_v2"),
-       connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU")),
-  cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-       tag = cms.string("TrackProbabilityCalibration_3D_Data53X_v2"),
-       connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"))
-)
+#process.GlobalTag.toGet = cms.VPSet(
+#  cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
+#       tag = cms.string("TrackProbabilityCalibration_2D_Data53X_v2"),
+#       connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU")),
+#  cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
+#       tag = cms.string("TrackProbabilityCalibration_3D_Data53X_v2"),
+#       connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"))
+#)
 
+# Veto against Hcal Laser polluted events
+process.load("EventFilter.HcalRawToDigi.hcallaserFilterFromTriggerResult_cff")
 
 #---------------------------------------
 process.TFileService = cms.Service("TFileService", fileName = cms.string("TrackTree_data.root") )
@@ -360,6 +362,7 @@ process.p = cms.Path(
         *process.primaryVertexFilter
         *process.offlinePrimaryVertices 
 	*process.goodOfflinePrimaryVertices
+        *process.hcalfilter
 	*getattr(process,"patPF2PATSequence"+postfix)
         *process.PATJetsFilter
         *process.inclusiveVertexing*process.inclusiveMergedVerticesFiltered*process.bToCharmDecayVertexMerged
@@ -386,4 +389,5 @@ process.p = cms.Path(
 
 
 
-
+# reduce verbosity
+process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(100)
