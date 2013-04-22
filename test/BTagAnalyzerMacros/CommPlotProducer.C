@@ -27,8 +27,7 @@ using namespace std;
 //-------------Fill number of events for each sample--------------------------------------//
 //----------------------------------------------------------------------------------------//
 
-void CommPlotProducer::Fill_nevent(double n15,double n20,double n30,double n50,double n80,double n120,double n170,double n300,double
-n470,double n600){
+void CommPlotProducer::Fill_nevent(double n15,double n20,double n30,double n50,double n80,double n120,double n170,double n300,double n470,double n600, double n800, double n1000){
 
  
   nmc_evt_vect[0]=n15;
@@ -41,6 +40,8 @@ n470,double n600){
   nmc_evt_vect[7]=n300;  
   nmc_evt_vect[8]=n470;   
   nmc_evt_vect[9]=n600;
+  nmc_evt_vect[10]=n800;
+  nmc_evt_vect[11]=n1000;
   
 }
 
@@ -61,15 +62,18 @@ void CommPlotProducer::Counter(){
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
     
-    
      
     nb = fChain->GetEntry(jentry);   nbytes += nb;
     Nevent++;
     
     if(Nevent%50000 ==0 && Nevent!=0) cout << " number of processed events is " << Nevent << endl;    
-    if      ( pthat >=  15. && pthat <  30. ){
-      use15_30=true;
-      n15_30++;
+    if      ( pthat >=  15. && pthat <  20. ){
+      use15_20=true;
+      n15_20++;
+    } 
+    else if ( pthat >=  20. && pthat <  30. ){
+      use20_30=true;    
+      n20_30++;
     } 
     else if ( pthat >=  30. && pthat <  50. ){
       use30_50=true;    
@@ -103,10 +107,32 @@ void CommPlotProducer::Counter(){
       use600_800=true;    
       n600_800++;
     }
+    else if ( pthat >= 800. && pthat <= 1000. ){
+      use800_1000=true;    
+      n800_1000++;
+    }
+    else if ( pthat >= 1000. ){
+      use1000_inf=true;    
+      n1000_inf++;
+    }
+
+    if      ( pthat >=  15. && pthat <  30. ){
+      use15_30=true;
+      n15_30++;
+    } 
+    else if ( pthat >= 120. && pthat < 150. ){
+      use120_150=true;    
+      n120_150++;
+    }
+    else if ( pthat >= 150. ){
+      use150_inf=true;    
+      n150_inf++;
+    }
 
   }  
   
-  if  (use15_30)  cout << "Run with QCD15_30   sample with " << n15_30  << " events" <<endl; 
+  if  (use15_20)  cout << "Run with QCD15_20   sample with " << n15_20  << " events" <<endl; 
+  if  (use20_30)  cout << "Run with QCD20_30   sample with " << n20_30  << " events" <<endl; 
   if  (use30_50)  cout << "Run with QCD30_50   sample with " << n30_50  << " events" <<endl;
   if  (use50_80)  cout << "Run with QCD50_80   sample with " << n50_80  << " events" <<endl;
   if  (use80_120) cout << "Run with QCD80_120  sample with " << n80_120 << " events" <<endl;
@@ -115,6 +141,58 @@ void CommPlotProducer::Counter(){
   if  (use300_470)cout << "Run with QCD300_470 sample with " << n300_470<< " events" <<endl;
   if  (use470_600)cout << "Run with QCD470_600 sample with " << n470_600<< " events" <<endl;
   if  (use600_800)cout << "Run with QCD600_800 sample with " << n600_800<< " events" <<endl;
+  if  (use800_1000)cout << "Run with QCD800_1000 sample with " << n800_1000<< " events" <<endl;
+  if  (use1000_inf)cout << "Run with QCD1000 sample with " << n1000_inf<< " events" <<endl;
+  cout << endl;
+  if (use15_30) cout << "Run with QCD15_30   sample with " << n15_30  << " events" <<endl;
+  if (use150_inf) cout << "Run with QCD150   sample with " << n150_inf  << " events" <<endl;
+
+  cout << endl;
+  cout << endl;
+
+  /*
+  pythia Inclusive  8TeV : 0     , n15-30, n30-50, n50-80,  n80-120,  n120-170, n170-300,  n300-470,  n470-600, n600-800, n800-1000        --> 10 fichiers
+  pythia MuEnriched 8TeV : n15-20, n20-30, n30-50, n50-80,  n80-120,  n120-170, n170-300,  n300-470,  n470-600, n600-800, n800-1000, n1000 --> 12 fichies
+  herwig Inclusive  8TeV : 0     , n15-30, n30-50, n50-80,  n80-120,  n120-170, n170-300,  n300-470,  n470-600, n600-800, n800-1000, n1000 --> 11 fichiers
+  herwig MuEnriched 8TeV : n15-20, n20-30, n30-50, n50-80,  n80-120,  n120-170, n170-300,  n300-470,  n470-600, n600-800, n800-1000, n1000 --> 12 fichies
+
+  pythia Inclusive  7TeV : 0     , n15-30, n30-50, n50-80,  n80-120,  n120-170, n170-300,  n300-470,  n470-600, n600-800, n800-1000;       --> 10 fichiers
+  pythia MuEnriched 7TeV : n15-20, n20-30, n30-50, n50-80,  n80-120,  n120-150, n150-plus                                                  --> 7 fichiers
+  */
+
+  cout << " To write in runCode.C " << endl;
+  if (qcdtype==0) { // inclusive qcd 
+    cout << " double   n15    = 0. ; " <<endl;
+    cout << " double   n20    = "<< n15_30 << "; " << endl;
+  }
+  else { // MuEnriched qcd
+    cout << " double   n15    = "<< n15_20 << "; " << endl;
+    cout << " double   n20    = "<< n20_30 << "; " << endl;
+  }
+  cout << " double   n30    = "<< n30_50 << "; " << endl;
+  cout << " double   n50    = "<< n50_80 << "; " << endl;
+  cout << " double   n80    = "<< n80_120 << "; " << endl;
+  if (sqrtstev!=7) { // 8 TeV
+    cout << " double   n120  = "<< n120_170 << "; " << endl;
+    cout << " double   n170  = "<< n170_300 << "; " << endl;
+    cout << " double   n300  = "<< n300_470 << "; " << endl;
+    cout << " double   n470  = "<< n470_600 << "; " << endl;
+    cout << " double   n600  = "<< n600_800 << "; " << endl;
+    cout << " double   n800  = "<< n800_1000 << "; " << endl;
+    cout << " double   n1000 = "<< n1000_inf << "; " << endl;
+  }
+  else if (qcdtype==1) { // 7 TeV MuEnriched qcd
+    cout << " double   n120  = "<< n120_150 << "; " << endl;
+    cout << " double   n170  = "<< n150_inf << "; " << endl;
+    cout << " double   n300  = 0.; " << endl;
+    cout << " double   n470  = 0.; " << endl; 
+    cout << " double   n600  = 0.; " << endl;
+    cout << " double   n800  = 0.; " << endl;
+    cout << " double   n1000 = 0.; " << endl;
+  }
+  cout << " m.Fill_nevent(n15,n20,n30,n50,n80,n120,n170,n300,n470,n600,n800,n1000);" << endl;
+
+
 }
 
 //------------------------------------------------------------------------------//
@@ -133,7 +211,7 @@ void CommPlotProducer::SetPU(vector<float> PUvector, TString PUdataFile){
   for( int i=0; i<60; ++i) {
     mc_vect.push_back(PUvector[i]);
   }
-  for (int i=0; i<PUvector.size(); i++){
+  for (int i=0; i<(int)PUvector.size(); i++){
     data_vect.push_back(npu_dat->GetBinContent(i+1));
   }
   
@@ -198,80 +276,99 @@ void CommPlotProducer::SetPU2012_S10(TString PUdataFile){
   
 
 }
+void CommPlotProducer::SetPV(){
+
+
+  vector<float> mc_vect;
+  vector<float> data_vect;
+  puweight=false;
+  
+  TFile *filepuest = new TFile("test/abcd/output_all.root","READ");
+  TH1F* npu_mc= (TH1F*) filepuest->Get("nPV_mc_unw");
+  TH1F* npu_dat= (TH1F*) filepuest->Get("nPV_data");
+    
+  float n_integral_mc = npu_mc->Integral();
+  float n_integral_da = npu_dat->Integral();
+  npu_mc->Scale(1./n_integral_mc);
+  npu_dat->Scale(1./n_integral_da);
+
+  for (int i=0; i<60; i++){
+    mc_vect.push_back(npu_mc->GetBinContent(i+1));
+    data_vect.push_back(npu_dat->GetBinContent(i+1));
+  }
+  
+  LumiWeights = reweight::LumiReWeighting(mc_vect,data_vect);
+  
+}
 //------------------------------------------------------------------------------//
 //-------------Set cross sections--------------------------------------------------------//
 //-----------------------------------------------------------------------------//
-int CommPlotProducer::SetXS(){
 
-  double pythia_xs[9]={816000000.0,66285328.0, 8148778.0,1033680.0,156293.3,34138.15,1759.549,113.8791,27.01};
+void CommPlotProducer::SetInfo(TString generator, bool qcd, int TeV){
+  gentype = generator;
+  qcdtype = qcd;
+  sqrtstev = TeV;
+}
 
-  for (int i=0; i<9; i++){
-    x_section[i]=pythia_xs[i];
+void CommPlotProducer::SetXS(){
+
+  if (gentype=="pythia" || gentype=="herwig") {
+    SetXS(gentype,qcdtype,sqrtstev);  // use what has been defined with SetInfo()
+  } 
+  else {
+    if (sqrtstev!=-1) {
+       cout << " MC Info not recognized! " << endl;
+    }
+    cout << " Set Default values to Pythia inclusive 8 TeV " << endl;
+    SetInfo("pythia",0,8);
+    SetXS("pythia",0,8);   
   }
-  choice=0; 
-  return choice;
 
 }
 
-int CommPlotProducer::SetXS(TString generator, bool MuEnriched, int TeV){
+void CommPlotProducer::SetXS(TString generator, bool MuEnriched, int TeV){
+  /*
+  pythia Inclusive  8TeV : 0     , n15-30, n30-50, n50-80,  n80-120,  n120-170, n170-300,  n300-470,  n470-600, n600-800, n800-1000        --> 10 fichiers
+  pythia MuEnriched 8TeV : n15-20, n20-30, n30-50, n50-80,  n80-120,  n120-170, n170-300,  n300-470,  n470-600, n600-800, n800-1000, n1000 --> 12 fichies
+  herwig Inclusive  8TeV : 0     , n15-30, n30-50, n50-80,  n80-120,  n120-170, n170-300,  n300-470,  n470-600, n600-800, n800-1000, n1000 --> 11 fichiers
+  herwig MuEnriched 8TeV : n15-20, n20-30, n30-50, n50-80,  n80-120,  n120-170, n170-300,  n300-470,  n470-600, n600-800, n800-1000, n1000 --> 12 fichies
 
-double pythia_xs8MU[8]={806298.0, 176187.6, 40448,7463.94,2299.752,151.8048, 11.79648, 2.690196};
-double pythia_xs7MU[7]={1471168.0, 1224034.0,578463.0,144421.74,29048.7,4440.2215,2837.6712 };
-double pythia_xs7  [10]={815900000.0,53120000.0,6359000.0,784300.0,115100.0,24260.0,1168.0,70.22,15.55,1.844 };
-double herwig_xs8  [6]={5.32E7,6550000.0,836000.0,126600.0,27900.0,1579.0};
+  pythia Inclusive  7TeV : 0     , n15-30, n30-50, n50-80,  n80-120,  n120-170, n170-300,  n300-470,  n470-600, n600-800, n800-1000;       --> 10 fichiers
+  pythia MuEnriched 7TeV : n15-20, n20-30, n30-50, n50-80,  n80-120,  n120-150, n150-plus                                                  --> 7 fichiers
+  */
 
-choice=0;
+
+  // http://cms.cern.ch/iCMS/jsp/mcprod/admin/requestmanagement.jsp?pwg=BTV&campid=Summer12_DR53X
+  //                              0  &     15-30
+  //                          15-20        20-30         30-50         50-80      80-120       120-170      170-300      300-470     470-600    600-800   800-1000   10000         
+  double pythia_xs8  [12]={         0.,  9.8828742E8,  66285328.0,   8148778.0,  1033680.0,    156293.3,   34138.15,    1759.549,   113.8791,      26.9921, 3.550036,     0.};  // PTHAT 0, 15-30
+  double pythia_xs8MU[12]={2.73858e+06,   1.8655e+06,   806298.0,    176187.6,      40448,     7463.94,    2299.752,    151.8048,    11.79648,    2.690196,   0.368781,     0.0849078};
+  
+  double herwig_xs8  [12]={         0.,        7.9E8,     5.32E7,   6545700.0,   833630.0,    126490.0,    27935.0,      1461.0,      95.25,     22.73,     2.997,     0.665}; // PTHAT 0, 15-30
+  double herwig_xs8MU[12]={1.56419e+06,      783598.,      34139,     81821.2,   13754.9,     3162.25,    751.452,     53.4726,    3.22898,   1.00467,     0.128871,  0.025935};
+  
+  double pythia_xs7  [12]={         0.,   815900000.0, 53120000.0,    6359000.0,  784300.0,    115100.0,     24260.0,       1168.0,     70.22,      15.55,   1.844,    0 };
+  double pythia_xs7MU[12]={  1471168.0,     1224034.0,   578463.0,    144421.74,   29048.7,   4440.2215,  2837.6712,          0,        0.,          0.,     0.,     0.};  
+  //remark for pythia_xs7MU, it is for PTHAT 120-150 & 150-inf (and not 120-170 and 170-300)
+
  
-  if (generator=="pythia"){
-    if (MuEnriched){
-      if (TeV==8){
-        choice=1;
-        for (int i=0; i<8; i++){
-          x_section[i]=pythia_xs8MU[i];
-        }        
-      }
-      else {
-        choice=2;
-        for (int i=0; i<7; i++){
-          x_section[i]=pythia_xs7MU[i];
-        }       
-      }
-    }
-    else{
-      if (TeV==7){
-        choice=3;
-        for (int i=0; i<10; i++){
-          x_section[i]=pythia_xs7[i];
-        }         
-      }
-    }
-  }
-  if (generator=="herwig"){  
-    choice=4;
-    for (int i=0; i<6; i++){
-      x_section[i]=herwig_xs8[i];
-    }   
-  }
-  
+  if      (generator=="pythia" && !MuEnriched && TeV==8){       for (int i=0; i<12; i++){ x_section[i]=pythia_xs8[i]; }        }
+  else if (generator=="pythia" &&  MuEnriched && TeV==8){       for (int i=0; i<12; i++){ x_section[i]=pythia_xs8MU[i]; }        }
 
-  
-  return choice;
+  else if (generator=="herwig" && !MuEnriched && TeV==8){       for (int i=0; i<12; i++){ x_section[i]=herwig_xs8[i]; }        }
+  else if (generator=="herwig" &&  MuEnriched && TeV==8){       for (int i=0; i<12; i++){ x_section[i]=herwig_xs8MU[i]; }        }
+
+  else if (generator=="pythia" && !MuEnriched && TeV==7){       for (int i=0; i<12; i++){ x_section[i]=pythia_xs7[i]; }        }
+  else if (generator=="pythia" &&  MuEnriched && TeV==7){       for (int i=0; i<12; i++){ x_section[i]=pythia_xs7MU[i]; }        }
 
 }
 
 void CommPlotProducer::SetSumXS(){
   sum_xs=0.0;
   
-  if (nmc_evt_vect[0]>0)  sum_xs+=x_section[0];
-  if (nmc_evt_vect[1]>0)  sum_xs+=x_section[1];
-  if (nmc_evt_vect[2]>0)  sum_xs+=x_section[2];
-  if (nmc_evt_vect[3]>0)  sum_xs+=x_section[3];
-  if (nmc_evt_vect[4]>0) sum_xs+=x_section[4];
-  if (nmc_evt_vect[5]>0) sum_xs+=x_section[5];
-  if (nmc_evt_vect[6]>0) sum_xs+=x_section[6];
-  if (nmc_evt_vect[7]>0) sum_xs+=x_section[7];
-  if (nmc_evt_vect[8]>0) sum_xs+=x_section[8]; 
-  if (nmc_evt_vect[9]>0) sum_xs+=x_section[9];
+  for (int i=0; i<12; i++) {
+   if (nmc_evt_vect[i]>0)  sum_xs+=x_section[i];
+  }
 
 }
 
@@ -286,225 +383,88 @@ float CommPlotProducer::GetEvtWeight(){
   float  nevt  =0.0;
   float  xs    =0.0;
   
-  if (choice ==0){// Use pythia 8 TeV
   
+  if (qcdtype==0) { // inclusive
     if ( pthat >=  15. && pthat <  30. ){
-      nevt  =nmc_evt_vect[0];
-      xs=x_section[0];
-    } 
-     
-    if ( pthat >=  30. && pthat <  50. ){
       nevt  =nmc_evt_vect[1];
       xs=x_section[1];
-    }
-      
-    if ( pthat >=  50. && pthat <  80. ){
-      nevt  =nmc_evt_vect[2];
-      xs=x_section[2];
-    }     
-    if ( pthat >=  80. && pthat <  120. ){
-      nevt  =nmc_evt_vect[3];
-      xs=x_section[3];
     } 
-     
-    if ( pthat >=  120. && pthat <  170. ){
-      nevt  =nmc_evt_vect[4];
-      xs=x_section[4];
-    }
-      
-    if ( pthat >=  170. && pthat <  300. ){
-      nevt  =nmc_evt_vect[5];
-      xs=x_section[5];
-    }    
-  
-    if ( pthat >=  300. && pthat <  470. ){
-      nevt  =nmc_evt_vect[6];
-      xs=x_section[6];
-    } 
-     
-    if ( pthat >=  470. && pthat <  600. ){
-      nevt  =nmc_evt_vect[7];
-      xs=x_section[7];
-    }
-      
-    if ( pthat >=  600. && pthat <  800. ){
-      nevt  =nmc_evt_vect[8];
-      xs=x_section[8];
-    }
-  
   }
-  if (choice ==1){// Use pythia 8 TeV MuEnriched
-
-     
-    if ( pthat >=  30. && pthat <  50. ){
-      nevt  =nmc_evt_vect[0];
-      xs=x_section[0];
-    }
-      
-    if ( pthat >=  50. && pthat <  80. ){
-      nevt  =nmc_evt_vect[1];
-      xs=x_section[1];
-    }     
-    if ( pthat >=  80. && pthat <  120. ){
-      nevt  =nmc_evt_vect[2];
-      xs=x_section[2];
-    } 
-     
-    if ( pthat >=  120. && pthat <  170. ){
-      nevt  =nmc_evt_vect[3];
-      xs=x_section[3];
-    }
-      
-    if ( pthat >=  170. && pthat <  300. ){
-      nevt  =nmc_evt_vect[4];
-      xs=x_section[4];
-    }    
-  
-    if ( pthat >=  300. && pthat <  470. ){
-      nevt  =nmc_evt_vect[5];
-      xs=x_section[5];
-    } 
-     
-    if ( pthat >=  470. && pthat <  600. ){
-      nevt  =nmc_evt_vect[6];
-      xs=x_section[6];
-    }
-      
-    if ( pthat >=  600. && pthat <  800. ){
-      nevt  =nmc_evt_vect[7];
-      xs=x_section[7];
-    }
-  
-  }  
-  
-  if (choice ==3){// Use pythia 7 TeV MuEnriched
-
-    if ( pthat >=  15. && pthat <  30. ){
-      nevt  =nmc_evt_vect[0];
-      xs=x_section[0];
-    } 
-     
-    if ( pthat >=  30. && pthat <  50. ){
-      nevt  =nmc_evt_vect[1];
-      xs=x_section[1];
-    }
-      
-    if ( pthat >=  50. && pthat <  80. ){
-      nevt  =nmc_evt_vect[2];
-      xs=x_section[2];
-    }     
-    if ( pthat >=  80. && pthat <  120. ){
-      nevt  =nmc_evt_vect[3];
-      xs=x_section[3];
-    } 
-     
-    if ( pthat >=  120. && pthat <  170. ){
-      nevt  =nmc_evt_vect[4];
-      xs=x_section[4];
-    }
-      
-    if ( pthat >=  170. && pthat <  300. ){
-      nevt  =nmc_evt_vect[5];
-      xs=x_section[5];
-    }    
-  
-    if ( pthat >=  300. && pthat <  470. ){
-      nevt  =nmc_evt_vect[6];
-      xs=x_section[6];
-    } 
-     
-    if ( pthat >=  470. && pthat <  600. ){
-      nevt  =nmc_evt_vect[7];
-      xs=x_section[7];
-    }
-      
-    if ( pthat >=  600. && pthat <  800. ){
-      nevt  =nmc_evt_vect[8];
-      xs=x_section[8];
-    }
-    if ( pthat >=  800. && pthat <  1000. ){
-      nevt  =nmc_evt_vect[9];
-      xs=x_section[9];
-    }  
-  }
-  
-  if (choice ==2){// Use pythia 7 TeV MuEnriched
-
-     
+  else {
     if ( pthat >=  15. && pthat <  20. ){
       nevt  =nmc_evt_vect[0];
       xs=x_section[0];
-    }
-      
-    if ( pthat >=  20. && pthat <  30. ){
+    } 
+    else if ( pthat >=  20. && pthat <  30. ){
       nevt  =nmc_evt_vect[1];
       xs=x_section[1];
-    }     
-    if ( pthat >=  30. && pthat < 50. ){
+    } 
+  }
+     
+  if ( pthat >=  30. && pthat <  50. ){
       nevt  =nmc_evt_vect[2];
       xs=x_section[2];
-    } 
-     
-    if ( pthat >=  50. && pthat <  80. ){
+  }
+  else if ( pthat >=  50. && pthat <  80. ){
       nevt  =nmc_evt_vect[3];
       xs=x_section[3];
-    }
-      
-    if ( pthat >=  80. && pthat <  120. ){
+  }     
+  else if ( pthat >=  80. && pthat <  120. ){
       nevt  =nmc_evt_vect[4];
       xs=x_section[4];
-    }    
-  
+  } 
+  if (gentype=="pythia" && qcdtype==1 && sqrtstev==7) {
     if ( pthat >=  120. && pthat <  150. ){
       nevt  =nmc_evt_vect[5];
       xs=x_section[5];
     } 
-    if ( pthat >=  150. ){
+    else if ( pthat >=  150. ){
       nevt  =nmc_evt_vect[6];
       xs=x_section[6];
     }   
-  }     
-  
-  if (choice ==4){// Use Herwig 8 TeV
-
-     
-    if ( pthat >=  30 && pthat <  50. ){
-      nevt  =nmc_evt_vect[0];
-      xs=x_section[0];
+    else {
+      nevt=0;
+      xs=0;
     }
-      
-    if ( pthat >=  50. && pthat <  80. ){
-      nevt  =nmc_evt_vect[1];
-      xs=x_section[1];
-    }     
-    if ( pthat >=  80. && pthat < 120. ){
-      nevt  =nmc_evt_vect[2];
-      xs=x_section[2];
-    } 
-     
+  }
+  else {
     if ( pthat >=  120. && pthat <  170. ){
-      nevt  =nmc_evt_vect[3];
-      xs=x_section[3];
-    }
-      
-    if ( pthat >=  170. && pthat <  300. ){
-      nevt  =nmc_evt_vect[4];
-      xs=x_section[4];
-    }    
-    if ( pthat >=  300 ){
       nevt  =nmc_evt_vect[5];
       xs=x_section[5];
     }
-   
-  }  
+    else if ( pthat >=  170. && pthat <  300. ){
+      nevt  =nmc_evt_vect[6];
+      xs=x_section[6];
+    }    
+    else if ( pthat >=  300. && pthat <  470. ){
+      nevt  =nmc_evt_vect[7];
+      xs=x_section[7];
+    } 
+    else if ( pthat >=  470. && pthat <  600. ){
+      nevt  =nmc_evt_vect[8];
+      xs=x_section[8];
+    }
+    else if ( pthat >=  600. && pthat <  800. ){
+      nevt  =nmc_evt_vect[9];
+      xs=x_section[9];
+    }
+    else if ( pthat >=  800. && pthat <  1000. ){
+      nevt  =nmc_evt_vect[10];
+      xs=x_section[10];
+    }
+    else if ( pthat >=  1000. ){
+      nevt  =nmc_evt_vect[11];
+      xs=x_section[11];
+    }
+  }     
   
-  WeightXS =xs/(sum_xs*nevt);  
+  if (nevt>0) { WeightXS =xs/(sum_xs*nevt);  }
+  else { WeightXS=0.; }
   
-  if ( pthat <1. ) WeightXS=1. ;
+  if ( pthat <1. ) WeightXS=1. ;  // data
 
   return  WeightXS;
    
-  
 }
 
 
@@ -519,6 +479,8 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   float PtMin  = PtMin_Cut;  
   float PtMax  = PtMax_Cut;  
   float EtaCut = 2.4; 
+  double pi=acos(-1);
+
   
   int Year = 2012;  
   
@@ -531,12 +493,6 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   float N_event_data_after_sel  =0;
   
   
-  int njet_c     =0;
-  int njet_b     =0;   
-  int njet_bfromg=0;    
-  int njet_l     =0;  
-  int njet_mc    =0; 
-  int njet_data  =0; 
 
   
   bool passNhit;
@@ -552,29 +508,31 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   TFile *myfile=new TFile(output_name+".root",      "recreate");
   
   // --------------------------------------Histograms declaration------------------------------------------------//   
-  TH1F* nPU_mc                  = new TH1F("nPU_mc",                "nPU_mc",                50,-0.5,49.5);
-  TH1F* nPU_data                = new TH1F("nPU_data",              "nPU_data",              50,-0.5,49.5);
-  TH1F* nPV_mc                  = new TH1F("nPV_mc",                "nPV_mc",                50,-0.5,49.5);
-  TH1F* pt_hat                  = new TH1F("pt_hat",                "pt_hat",                80,0,800);
+  TH1F* nPU_mc                  = new TH1F("nPU_mc",                "nPU_mc",                60,-0.5,59.5);
+  TH1F* nPV_data                = new TH1F("nPV_data",              "nPV_data",              60,-0.5,59.5);
+  TH1F* nPV_mc                  = new TH1F("nPV_mc",                "nPV_mc",                60,-0.5,59.5);
+  TH1F* nPV_mc_unw              = new TH1F("nPV_mc_unw",            "nPV_mc_unw",                60,-0.5,59.5);
+  TH1F* pt_hat                  = new TH1F("pt_hat",                "pt_hat",                240,0,1200);
+  TH1F* pt_hat_fin              = new TH1F("pt_hat_fin",            "pt_hat_fin",                240,0,1200);
   TH1F* jet_pt_mc               = new TH1F("jet_pt_mc",  	    "jet_pt_mc", 	     80,0,PtMax);
+  TH1F* nJet_data               = new TH1F("nJet_data",             "nJet_data",             100,0,100    );
+  TH1F* nJet_mc                 = new TH1F("nJet_mc",               "nJet_mc",               100,0,100    );
   
   // --------------------------------------Histograms declaration -----------------------------------------//
   
-  AddHisto("nPU"          ,"number of PU event",	     60,-0.5,59.5);
  
-  AddHisto("jet_multi"    ,"number of jets",		     20,0,20    );
   AddHisto("jet_pt_all"	  ,"pT of all jets",		     PtMax/10,0,PtMax );
   AddHisto("jet_pt_sv"	  ,"pT of jets containing a SV",     PtMax/10,0,PtMax);
   AddHisto("jet_eta"	  ,"eta of all jets",		     50,-2.5,2.5);
-  AddHisto("jet_phi"	  ,"phi of all jets",		     20,-5,5    );
+  AddHisto("jet_phi"    ,"phi of all jets",                40,-1.*pi,pi);
   
   AddHisto("muon_multi"   ,      "number of muons",	   7,-0.5,6.5    );
   AddHisto("muon_multi_sel"   ,  "number of selected muons",7,-0.5,6.5   );
   AddHisto("mu_ptrel"	  ,      "pT rel. of the muon",	   50,0,5        );
   AddHisto("mu_chi2"	  ,      "norm. chi2 of the muon", 50,0,10       );  
-  AddHisto("muon_Pt",		 "Muon p_{T}",  	   200, 0, 100	 );
+  AddHisto("muon_Pt",		 "Muon p_{T}",  	   50, 0, 100	 );
   AddHisto("muon_eta",		 "Muon #eta",  	           50, -2.5, 2.5 );  
-  AddHisto("muon_phi",		 "Muon #phi",  	           80, -4, 4	 );
+  AddHisto("muon_phi",                 "Muon #phi",              40, -1.*pi,pi);
   AddHisto("muon_Ip3d", 	 "Muon 3D IP",  	   50, -0.1, 0.1 );
   AddHisto("muon_Ip2d", 	 "Muon 2D IP",  	   50, -0.1, 0.1 );
   AddHisto("muon_Sip3d",	 "Muon 3D IP significance",50, -35, 35   );
@@ -588,7 +546,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   AddHisto("sv_aboveC",          "IP significance 2D charm",                            50,-35.,35.  );
   AddHisto("sv_pt",              "Vtx p_{T}",                                           50,0.,100.   );
   AddHisto("sv_eta",             "Vtx #eta",                                            50, -2.5, 2.5);
-  AddHisto("sv_phi",             "Vtx #phi",                                            80, -4, 4    );
+  AddHisto("sv_phi",             "Vtx #phi",                                            40, -1.*pi,pi);
   AddHisto("sv_flightSig2D",     "Flight distance significance 2D",                     50,0.,80.    );
   AddHisto("sv_flight2D",        "Flight distance 2D",                                  50,0.,2.5    );
   AddHisto("sv_flight3D",        "Flight distance 3D",                                  50,0.,15.    );  
@@ -600,13 +558,13 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   AddHisto("sv_tot_charge",      "Total charge",                                        21,-10.5,10.5);
   AddHisto("svnTrk",	         "Track multiplicity : SVnVertexTracks (centered)",     13,-0.5,12.5 );
   AddHisto("svnTrk_firstVxt",    "Track multiplicity : SVnFirstVertexTracks (centered)", 11,-0.5,10.5 ); 
-  AddHisto("sv_flight3Derr",     "Flight distance error 3D",                            50,0.,0.2);
-  AddHisto("sv_flight2Derr",     "Flight distance error 2D",                            50,0.,0.05);
+  AddHisto("sv_flight3Derr",     "Flight distance error 3D",                            50,0.,0.5);
+  AddHisto("sv_flight2Derr",     "Flight distance error 2D",                            50,0.,0.2);
   AddHisto("sv_mass_3trk"	,"invariant mass of the secondary vertex with at least 3 SV tracks",  50,0.,8.     );
   
-  AddHisto("track_multi"  ,      "number of tracks in the jets",                40,-0.5,39.5  );
+  AddHisto("track_multi"  ,      "number of tracks in the jets",                80,-0.5,79.5  );
   AddHisto("trk_multi_sel"  ,    "number of selected tracks in the jets",       40,-0.5,39.5  );
-  AddHisto("track_chi2"   ,      "normalized chi2 of the tracks",               100,0.,30.    );
+  AddHisto("track_chi2"   ,      "normalized chi2 of the tracks",               100,0.,5.    );
   AddHisto("track_nHit" ,        "number of hits ",               35,-0.5, 34.5 );
   AddHisto("track_HPix"   ,      "number of hits in the Pixel",                 10,-0.5, 9.5  );
   
@@ -635,9 +593,9 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   AddHisto("track_IP2D3tr" ,     "2D IP of the third track",                    100,-0.1,0.1);
   AddHisto("track_IP2Derr3tr" ,  "2D IP error of the third track",              100,0,0.1);   
    
-  AddHisto("track_len"     ,     "decay length",		                100,0,25.     );
-  AddHisto("track_dist"    ,     "distance to the jet axis",                    100,0.,0.3    );
-  AddHisto("track_dz"     ,     "transverse IP",                               100,-20,20  );  
+  AddHisto("track_len"     ,     "decay length",		                100,0,5.     );
+  AddHisto("track_dist"    ,     "distance to the jet axis",                    100,0.,0.08    );
+  AddHisto("track_dz"     ,     "transverse IP",                               100,-3,3  );  
   AddHisto("track_isfromSV",     "Track is from SV",                            2,-0.5, 1.5   );  
   AddHisto("track_pt"	  ,      "pT of all the tracks",	                80,0.,200.    );
   AddHisto("track_chi2_cut"     ,"normalized chi2 ",  	                        100,0.,30.    );
@@ -645,7 +603,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   AddHisto("track_HPix_cut"     ,"number of hits in the Pixel ",                 10,-0.5, 9.5  );
   AddHisto("track_len_cut"      ,"decay length ",		                100,0,25.     );
   AddHisto("track_dist_cut"     ,"distance to the jet axis ",                    100,0.,0.3    );
-  AddHisto("track_dz_cut"      ,"transverse IP ",		                10,-0.5, 9.5  );  
+  AddHisto("track_dz_cut"      ,"transverse IP ",		                100,-20., 20.  );  
   AddHisto("track_pt_cut"       ,"pT ",	                                        80,0.,200.);
   AddHisto("track_IP2D_cut"     ,"IP2D ",	                                100,-0.1,0.1);
    
@@ -660,18 +618,18 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   AddHisto("TCHP"	  ,"TCHP",				     50,0.,30. );  
   AddHisto("JP" 	  ,"JP",				     50,0.,2.5 );
   AddHisto("JBP"	  ,"JBP",				     50,0.,8.  );
-  AddHisto("SSV"	  ,"SSV",				     50,0.,7.  );
+  AddHisto("SSV"	  ,"SSVHE",				     50,0.,7.  );
   AddHisto("SSVHP"	  ,"SSVHP",				     50,0.,7.  );
   AddHisto("CSV"	  ,"CSV",				     50,0.,1.  );
   
-  AddHisto2D("seltrack_vs_jetpt", "sel track multiplicity vs jet pt",         30,60,1000, 100,-0.5,99.5);
-  AddHisto2D("sv_mass_vs_flightDist3D", " SVMass vs SV 3D flight distance ",  100,0, 10,100,0,6);			
-  AddHisto2D("avg_sv_mass_vs_jetpt","Avg SVMass vs jet pt",                   30,60,1000, 100,0,6);
-  AddHisto2D("sv_deltar_jet_vs_jetpt","SVJetDeltaR vs jet pt",                25,60,300, 50,0.,0.5);  
-  AddHisto2D("sv_deltar_sum_jet_vs_jetpt","SVvtxSumJetDeltaR vs jet pt",      25,60,300, 50,0.,0.5);
-  AddHisto2D("sv_deltar_sum_dir_vs_jetpt","SVvtxSumVtxDirDeltaR vs jet pt",   25,60,300, 50,0.,0.5); 
-  AddHisto2D("muon_ptrel_vs_jetpt","Muon_p{T}^{rel} vs jet pt",               30,60,1000,50,0,5);  
-  AddHisto2D("muon_DeltaR_vs_jetpt","Muon1 DeltaR vs jet pt",                 30,60,1000,50,0,0.5);
+  AddHisto2D("seltrack_vs_jetpt", "sel track multiplicity vs jet pt",         PtMax/20,0,PtMax, 100,-0.5,99.5);
+  AddHisto2D("sv_mass_vs_flightDist3D", " SVMass vs SV 3D flight distance ",  50,0, 10,60,0,6);			
+  AddHisto2D("avg_sv_mass_vs_jetpt","Avg SVMass vs jet pt",                   PtMax/20,0,PtMax, 100,0,6);
+  AddHisto2D("sv_deltar_jet_vs_jetpt","SVJetDeltaR vs jet pt",                PtMax/20,0,PtMax, 50,0.,0.5);  
+  AddHisto2D("sv_deltar_sum_jet_vs_jetpt","SVvtxSumJetDeltaR vs jet pt",      PtMax/20,0,PtMax, 50,0.,0.5);
+  AddHisto2D("sv_deltar_sum_dir_vs_jetpt","SVvtxSumVtxDirDeltaR vs jet pt",   PtMax/20,0,PtMax, 50,0.,0.5); 
+  AddHisto2D("muon_ptrel_vs_jetpt","Muon_p{T}^{rel} vs jet pt",               PtMax/20,0,PtMax,50,0,5);  
+  AddHisto2D("muon_DeltaR_vs_jetpt","Muon1 DeltaR vs jet pt",                 PtMax/20,0,PtMax,50,0,0.5);
 
   
   Nevent = 0;
@@ -705,9 +663,13 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
     float ww=1; 
     
     //------------------------ cross section checks---------------------------------//
-    if      ( pthat >=  15. && pthat <  30. ){
-      n15_30++;
-      use15_30=true;
+    if      ( pthat >=  15. && pthat <  20. ){
+      n15_20++;
+      use15_20=true;
+    } 
+    else if ( pthat >=  20. && pthat <  30. ){
+      n20_30++;
+      use20_30=true;
     } 
     else if ( pthat >=  30. && pthat <  50. ){
       n30_50++;
@@ -741,23 +703,38 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
       n600_800++;
       use600_800=true;
     }
+    else if ( pthat >= 800. && pthat <= 1000. ){
+      n800_1000++;
+      use800_1000=true;
+    }
+    else if (pthat >= 1000. ){
+      n1000_inf++;
+      use1000_inf=true;
+    }
     //-----------------------------------//
     //-------xs reweighting--------------//
     //-----------------------------------//
 
     ww=GetEvtWeight();
+    float ww_unp=ww;
     //--------------------------------------------//  
     //-------------pile-up reweighting------------//  
     //--------------------------------------------//  
     
     if (!isData){
       if (nPUtrue >=59) nPUtrue=59;     
-      float WeightPU = LumiWeights.weight( nPUtrue );   
+      float WeightPU =1;
+      if (puweight) {
+         WeightPU  = LumiWeights.weight( nPUtrue );   
+         ///cout << " nPUtrue " << nPUtrue << " WeightPU " << WeightPU << endl; 
+         if(WeightPU == 0 && nPUtrue<45 ) cout << "found null PU weights " <<  nPUtrue  << endl;
+         if(WeightPU == 1 ) cout << "found weights=1 for" <<  nPUtrue << endl;
+         if(WeightPU > 10 ) cout << "diverging PU weights " << WeightPU << endl;
+      }
+      else {  // weight vs PV --> SetPV() in runCode
+         WeightPU  = LumiWeights.weight( nPV );   
+      }
       ww*=WeightPU;
-      cout << " nPUtrue " << nPUtrue << " WeightPU " << WeightPU << endl; 
-      if(WeightPU == 0  ) cout << "found null PU weights " <<  nPUtrue  << endl;
-      if(WeightPU == 1  ) cout << "found null PU weights " <<  nPUtrue << endl;
-      if(WeightPU > 10 ) cout << "diverging PU weights " << WeightPU << endl;
     
     }    
     
@@ -767,6 +744,13 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
     //-----------------------------------
     Nevent++;
     if(Nevent%50000 ==0 && Nevent!=0) cout << " number of processed events is " << Nevent << endl;
+
+    int njet_c     =0;
+    int njet_b     =0;   
+    int njet_bfromg=0;    
+    int njet_l     =0;  
+    int njet_mc    =0; 
+    int njet_data  =0; 
     
     //at least 1 jet in the event
     if (nJet<=0) continue;
@@ -827,7 +811,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
       //if (  ptjet > 100. && fabs(Jet_eta[ijet]) < EtaCut ) JetPtCut = true;
       //if(JetPtCut) cout << "ptjet 1 " <<   ptjet << "  fabs(Jet_eta[ijet]) " << fabs(Jet_eta[ijet]) << endl;
       
-      if (      IntCut ==  40 && ptjet >  50. && fabs(Jet_eta[ijet])  < EtaCut ) JetPtCut = true;
+      if (      IntCut ==  40 && ptjet >  60. && fabs(Jet_eta[ijet])  < EtaCut ) JetPtCut = true;
       else if ( IntCut ==  80 && ptjet > 100. && fabs(Jet_eta[ijet])  < EtaCut ) JetPtCut = true;
       else if ( IntCut == 140 && ptjet > 160. && fabs(Jet_eta[ijet])  < EtaCut ) JetPtCut = true;
       else if ( IntCut == 200 && ptjet > 220. && fabs(Jet_eta[ijet])  < EtaCut ) JetPtCut = true;
@@ -843,7 +827,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
     
     if(isData){
       N_event_data_after_sel++;
-      nPU_data       ->Fill(nPV);
+      nPV_data       ->Fill(nPV);
     }
     else{
       //N_event_mc+=ww;      
@@ -851,12 +835,14 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
       nPU_mc         ->Fill(nPUtrue,ww);
       pt_hat         ->Fill(pthat,ww);
       nPV_mc         ->Fill(nPV,ww);
+      nPV_mc_unw     ->Fill(nPV,ww_unp);
     }
 
       
     //-----------------------------------
     //Loop on jets 
     //-----------------------------------
+    bool finselect = false;
     for (int ijet = 0; ijet < nJet; ijet++) {
       
       float ptjet    = Jet_pt[ijet];
@@ -868,6 +854,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
           
       if (   ptjet  < PtMin  || ptjet  > PtMax   ) continue;
       if (   fabs(etajet) > EtaCut               ) continue;
+      finselect = true;
 
       float mass_sv        =0.;
       int n_sv             =0.;
@@ -942,7 +929,6 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
 	else               isGluonSplit=false;
       }    
       
-      FillHisto_floatFromMap("jet_multi",                  flav, isGluonSplit ,nJet     ,ww);
       FillHisto_floatFromMap("jet_pt_all",                 flav, isGluonSplit ,ptjet    ,ww);
       if (nSV > 0)FillHisto_floatFromMap("jet_pt_sv",      flav, isGluonSplit ,ptjet    ,ww);
       
@@ -1269,13 +1255,11 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
     //---------------------------------
     //fill jet multiplicity
     //---------------------------------
-    //if(njet_mc > 0 || njet_data > 0){ 
-    if(isData) HistoBtag[4]->Fill(njet_data);
-    else{
-      HistoBtag[0]->Fill(float(njet_b)     /float(njet_mc) ,ww);
-      HistoBtag[1]->Fill(float(njet_bfromg)/float(njet_mc) ,ww);
-      HistoBtag[2]->Fill(float(njet_c)     /float(njet_mc) ,ww);
-      HistoBtag[3]->Fill(float(njet_l)     /float(njet_mc) ,ww);
+
+    if(isData) nJet_data->Fill(njet_data);
+    else {
+      nJet_mc->Fill(njet_mc, ww);
+      if (finselect) pt_hat_fin->Fill(pthat,ww);
     }
     
     
@@ -1289,7 +1273,9 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   cout <<" Run over "<< N_event_data_before_sel<<" data events and " << N_event_mc_before_sel<< " mc events."<<endl;
   cout <<" After selection -> "<< N_event_data_after_sel<<" data events and "<< N_event_mc_after_sel<< "mc events left" <<endl;   
   // //   
-  if  (use15_30)  cout << "Run with QCD15_30   sample with " << n15_30  << " events" <<endl; 
+  cout << endl;
+  if  (use15_20)  cout << "Run with QCD15_20   sample with " << n15_20  << " events" <<endl; 
+  if  (use20_30)  cout << "Run with QCD20_30   sample with " << n20_30  << " events" <<endl; 
   if  (use30_50)  cout << "Run with QCD30_50   sample with " << n30_50  << " events" <<endl;
   if  (use50_80)  cout << "Run with QCD50_80   sample with " << n50_80  << " events" <<endl;
   if  (use80_120) cout << "Run with QCD80_120  sample with " << n80_120 << " events" <<endl;
@@ -1298,15 +1284,30 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   if  (use300_470)cout << "Run with QCD300_470 sample with " << n300_470<< " events" <<endl;
   if  (use470_600)cout << "Run with QCD470_600 sample with " << n470_600<< " events" <<endl;
   if  (use600_800)cout << "Run with QCD600_800 sample with " << n600_800<< " events" <<endl;
+  if  (use800_1000)cout << "Run with QCD800_1000 sample with " << n800_1000<< " events" <<endl;
+  if  (use1000_inf)cout << "Run with QCD1000_ sample with " << n1000_inf<< " events" <<endl;
 
   
   myfile->cd();
+  nPU_mc->Write();
+  nPV_data->Write();
+  nPV_mc->Write();
+  nPV_mc_unw->Write();
+  pt_hat->Write();
+  pt_hat_fin->Write();
+  jet_pt_mc->Write();
+  nJet_data->Write();
+  nJet_mc->Write();
+  
+
   for (unsigned int i=0; i<HistoBtag.size(); i++) {
     HistoBtag[i]->Write();
   }
   for (unsigned int i=0; i<HistoBtag2D.size(); i++) {
     HistoBtag2D[i]->Write();
   }  
+  myfile->Close();
+
 
 }
 

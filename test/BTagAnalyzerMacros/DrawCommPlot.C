@@ -21,13 +21,21 @@
 
 using namespace std;
 
-TString filename="output_data.root";
-TString title= "CMS 2012 preliminary, #sqrt{s} = 8 TeV,  17 fb^{-1}";
+TString filename="test/d/output_all.root";
+TString dir4plots="test/Commissioning_plots";
+//TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  19.7 fb^{-1}";
+//TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  A:0.89 fb^{-1}";
+//TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  B:4.43 fb^{-1}";
+//TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  C:7.15 fb^{-1}";
+TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  D:7.27 fb^{-1}";
+TString datacaption = "HLT_PFJet40, jet pT>60 ";
 TString format=".gif"; // .png or .pdf
-bool bOverflow=false;
+bool bOverflow=true;
+bool web = true;
 
 
 void Draw(TString name, TString histotitle, bool log);
+void DrawMC(TString name, TString histotitle, bool log);
 void DrawTagRate(TString name, TString histotitle, bool log);
 void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY, bool log);
 void OverFlowBinFix(TH1F* );
@@ -36,106 +44,106 @@ void OverFlowBinFix(TH1F* );
 
 void DrawCommPlot(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots, bool Draw_muons_plots, bool Draw_discriminator_plots , bool Draw_tagRate_plots, bool Draw_2D_plots){
 
-  TString action = "mkdir Commissioning_plots";
+  TString action = "mkdir "+dir4plots;
   system(action);
   
   
 //Draw("jet_multi"    ,"number of jets",1);	    
 Draw("jet_pt_all"   ,"pT of all jets",1);	    
 Draw("jet_pt_sv"    ,"pT of jets containing a SV",1);
-Draw("jet_eta"      ,"eta of all jets",	1);    
-Draw("jet_phi"      ,"phi of all jets",1);
+Draw("jet_eta"      ,"eta of all jets",	0);    
+Draw("jet_phi"      ,"phi of all jets",0);
+DrawMC("nPV"      ,"# of PV",0);
 
 if (Draw_track_plots){	      
-  Draw("track_multi"  ,      "number of tracks in the jets",1);		   
-  Draw("trk_multi_sel"  ,    "number of selected tracks in the jets",1);	   
+  Draw("track_multi"  ,      "number of tracks in the jets",0);		   
+  Draw("trk_multi_sel"  ,    "number of selected tracks in the jets",0);	   
   Draw("track_chi2"   ,      "normalized #chi^{2} of the tracks"	,1);	   
-  Draw("track_nHit" ,      "number of hits",1);		   
-  Draw("track_HPix"   ,      "number of hits in the Pixel",1);		   
-  Draw("track_IPs"    ,      "3D IP significance of all tracks",1);	   
-  Draw("track_IPs1tr" ,      "3D IP significance of the first track",1);	   
-  Draw("track_IPs2tr" ,      "3D IP significance of the second track",1);     
-  Draw("track_IP"     ,      "3D IP of all tracks",1);			   
-  Draw("track_IP1tr"  ,      "3D IP of the first track"	,1);	   
-  Draw("track_IP2tr"  ,      "3D IP of the second track",1);		   
-  Draw("track_IP2Ds"	,    "2D IP significance of all tracks"	,1);   
-  Draw("track_IP2Ds1tr" ,    "2D IP significance of the first track",1);	   
-  Draw("track_IP2Ds2tr" ,    "2D IP significance of the second track" ,1);    
-  Draw("track_IP2D"    ,     "2D IP of all tracks",1);			   
-  Draw("track_IP2D1tr" ,     "2D IP of the first track"	,1);	   
-  Draw("track_IP2D2tr" ,     "2D IP of the second track",1);		   
-  Draw("track_IP2Derr1tr" ,  "2D IP error of the first track",1);  	   
-  Draw("track_IPerr1tr"   ,  "3D IP error of the first track" ,1); 	   
-  Draw("track_IP2Derr2tr" ,  "2D IP error of the second track" ,1);	   
-  Draw("track_IPerr2tr"   ,  "3D IP error of the second track" ,1);	   
-  Draw("track_IP2Derr" ,     "2D IP error of all tracks",1);				   
-  Draw("track_IPerr"   ,     "3D IP error of all tracks",1);				   
+  Draw("track_nHit" ,      "number of hits",0);		   
+  Draw("track_HPix"   ,      "number of hits in the Pixel",0);		   
   Draw("track_len"     ,     "Track decay length",1);				   
   Draw("track_dist"    ,     "Track distance to the jet axis"	,1);	   
   Draw("track_dz"     ,      "Track transverse IP",1);				   
-  Draw("track_isfromSV",     "Track is from SV",1);			   
   Draw("track_pt"     ,      "pT of all the tracks",1);			   
-	
-  Draw("track_IPs3tr" ,    "3D IP significance of the third track",1);	
+  //Draw("track_isfromSV",     "Track is from SV",1);			   
+
+  Draw("track_IPs"    ,      "3D IP significance of all tracks",1);	   
+  Draw("track_IPs1tr" ,      "3D IP significance of the first track",1);	   
+  Draw("track_IPs2tr" ,      "3D IP significance of the second track",1);     
+  Draw("track_IPs3tr" ,      "3D IP significance of the third track",1);	
+  Draw("track_IP"     ,      "3D IP of all tracks",1);			   
+  Draw("track_IP1tr"  ,      "3D IP of the first track"	,1);	   
+  Draw("track_IP2tr"  ,      "3D IP of the second track",1);		   
   Draw("track_IP3tr"  ,      "3D IP of the third track"	,1);	
-  Draw("track_IPerr3tr"   ,  "3D IP error of the third track" ,1); 	
+  Draw("track_IP2Ds"	,    "2D IP significance of all tracks"	,1);   
+  Draw("track_IP2Ds1tr" ,    "2D IP significance of the first track",1);	   
+  Draw("track_IP2Ds2tr" ,    "2D IP significance of the second track" ,1);    
   Draw("track_IP2Ds3tr" ,    "2D IP significance of the second track" ,1);
+  Draw("track_IP2D"    ,     "2D IP of all tracks",1);			   
+  Draw("track_IP2D1tr" ,     "2D IP of the first track"	,1);	   
+  Draw("track_IP2D2tr" ,     "2D IP of the second track",1);		   
   Draw("track_IP2D3tr" ,     "2D IP of the third track"	,1);	
+  Draw("track_IP2Derr" ,     "2D IP error of all tracks",1);				   
+  Draw("track_IP2Derr1tr" ,  "2D IP error of the first track",1);  	   
+  Draw("track_IP2Derr2tr" ,  "2D IP error of the second track" ,1);	   
   Draw("track_IP2Derr3tr" ,  "2D IP error of the third track",1);  	
+  Draw("track_IPerr"   ,     "3D IP error of all tracks",1);				   
+  Draw("track_IPerr1tr"   ,  "3D IP error of the first track" ,1); 	   
+  Draw("track_IPerr2tr"   ,  "3D IP error of the second track" ,1);	   
+  Draw("track_IPerr3tr"   ,  "3D IP error of the third track" ,1); 	
+	
   }  
 if (Draw_Nminus1_plots){  
-  Draw("track_chi2_cut"    ,"selected tracks without the #chi^{2} normalized  cut",1);	    
-  Draw("track_nHit_cut"  ,"selected tracks without the number of hits cut",1);
-  Draw("track_HPix_cut"    ,"selected tracks without the number of hits in the Pixel cut",1);  
-  Draw("track_len_cut"     ,"selected tracks without the decay length cut",1);		    
-  Draw("track_dist_cut"    ,"selected tracks without the distance to the jet axis cut" ,1);  
-  Draw("track_dz_cut"     ,"selected tracks without the transverse IP cut",1);		    
-  Draw("track_pt_cut"	   ,"selected tracks without the pT cut",1);
+  Draw("track_chi2_cut"    ,"Normalized #chi^{2} @N-1 step",1);	    
+  Draw("track_nHit_cut"  ," Number of hits @N-1 step",0);
+  Draw("track_HPix_cut"    ,"Number of hits in the Pixel @N-1 step",0);  
+  Draw("track_len_cut"     ,"Decay length @N-1 step",1);		    
+  Draw("track_dist_cut"    ,"Distance to the jet axis @N-1 step" ,1);  
+  Draw("track_dz_cut"     , "Transverse IP @N-1 step",1);		    
+  Draw("track_pt_cut"	   ,"Track pT @N-1 step",1);
   }
 if (Draw_sv_plots){
 
-  Draw("sv_mass","SV mass",1);
+  Draw("sv_multi_0","nr. of SV including bin 0",1); 
   Draw("sv_multi","nr. of SV",1);
+  Draw("sv_mass","SV mass",0);
+  Draw("sv_mass_3trk","SV mass if #tracks@SV >=3",0);
   Draw("sv_chi2norm","SV norm. #chi^{2}",1);
-  Draw("sv_deltaR_sumJet","#Delta R between the jet and the SV",1);
-  Draw("sv_deltaR_sumDir","#Delta R between the jet direction and the SV",1);
-  Draw("sv_en_ratio","SV energy ratio",1);	
+  Draw("sv_deltaR_jet","Delta R between the jet and the SV direction.",0);
+  Draw("sv_deltaR_sumJet","#Delta R between the jet and the SV",0);
+  Draw("sv_deltaR_sumDir","#Delta R between the jet direction and the SV",0);
+  Draw("sv_en_ratio","SV energy ratio",0);	
   Draw("sv_aboveC","IP2D of the first track above the charm threshold",1);	
   Draw("sv_pt","SV p_{T}",1); 	
-  Draw("sv_eta","SV #eta",1);	
-  Draw("sv_phi","SV #phi",1);	
-  Draw("sv_flightSig2D","SV 2D flight distance significance",1);
-  Draw("sv_flight2D","SV 2D flight distance",1);	
+  Draw("sv_eta","SV #eta",0);	
+  Draw("sv_phi","SV #phi",0);	
   Draw("sv_flight3D","SV 3D flight distance",1);	
+  Draw("sv_flight2D","SV 2D flight distance",1);	
   Draw("sv_flight3DSig","SV 3D flight distance significance",1);
-  Draw("sv_multi_0","nr. of SV including bin 0",1); 
-  //Draw("sv_tot_charge ","SV charge",1);
-  Draw("svnTrk","nr. of tracks from a SV",1);	
-  Draw("svnTrk_firstVxt","nr. of tracks from the first SV",1);
+  Draw("sv_flightSig2D","SV 2D flight distance significance",1);
   Draw("sv_flight3Derr","SV 3D flight distance error",1);
   Draw("sv_flight2Derr","SV 2D flight distance error",1);
-  Draw("sv_mass_3trk","SV mass if more than 3 tracks attached to an SV",1);
+  Draw("svnTrk","nr. of tracks from a SV",1);	
+  Draw("svnTrk_firstVxt","nr. of tracks from the first SV",1);
   }
 if (Draw_muons_plots){  
   Draw("muon_multi"   ,      "number of muons", 1);       
   Draw("muon_multi_sel"   ,  "number of selected muons",1);
-  Draw("mu_ptrel"     ,      "p_{T} rel. of the muon",1);    
+  Draw("mu_ptrel"     ,      "p_{T} rel. of the muon",0);    
   Draw("mu_chi2"      ,      "norm. #chi^{2} of the muon", 1);
   Draw("muon_Pt",	     "Muon p_{T}",1);	       
-  Draw("muon_eta",	     "Muon #eta",1);	       
-  Draw("muon_phi",	     "Muon #phi",1);	       
+  Draw("muon_eta",	     "Muon #eta",0);	       
+  Draw("muon_phi",	     "Muon #phi",0);	       
   Draw("muon_Ip3d",	     "Muon 3D IP",1);	       
   Draw("muon_Ip2d",	     "Muon 2D IP",1);	       
   Draw("muon_Sip3d",	     "Muon 3D IP significance",1);
   Draw("muon_Sip2d",	     "Muon 2D IP significance",1);
-  Draw("muon_DeltaR",	     "Muon1 #Delta R",1);
+  Draw("muon_DeltaR",	     "Muon1 #Delta R",0);
   
   } 
 if (Draw_discriminator_plots){  
-  Draw("TCHE_extended1"       ,"TCHE (extended1)",1);    
-  Draw("TCHP_extended1"       ,"TCHP (extended1)",1);    
-  Draw("TCHE_extended2"       ,"TCHE (extended2)", 1);   
-  Draw("TCHP_extended2"       ,"TCHP (extended2)",1);    
+  Draw("TCHE_extended1"       ,"TCHE (extended)",1);    
+  Draw("TCHP_extended1"       ,"TCHP (extended)",1);    
   Draw("discri_ssche0",      "SSVHE Discriminator", 1);
   Draw("discri_sschp0",      "SSVHP Discriminator", 1);
 
@@ -150,20 +158,18 @@ if (Draw_discriminator_plots){
   }
   			    
 if (Draw_tagRate_plots){ 
-  DrawTagRate("TCHE_extended1","TCHE (extended1)", 0);
-  DrawTagRate("TCHP_extended1"," TCHP (extended1)", 0);
-  DrawTagRate("TCHE_extended2","TCHE (extended2)", 0);
-  DrawTagRate("TCHP_extended2","TCHP (extended2)", 0);
-  DrawTagRate("discri_ssche0","SSVHE (extended)", 0);
-  DrawTagRate("discri_sschp0","SSVHP (extended)", 0);
+  DrawTagRate("TCHE_extended1","TCHE (extended)", 1);
+  DrawTagRate("TCHP_extended1"," TCHP (extended)", 1);
+  DrawTagRate("discri_ssche0","SSVHE (extended)", 1);
+  DrawTagRate("discri_sschp0","SSVHP (extended)", 1);
 
-  DrawTagRate("TCHE"	      ,"TCHE Discriminator", 0);
-  DrawTagRate("TCHP"	      ,"TCHP Discriminator", 0);
-  DrawTagRate("JP"	      ,"JP Discriminator", 0);
-  DrawTagRate("JBP"	      ,"JBP Discriminator", 0);
-  DrawTagRate("SSV"	      ,"SSVHE Discriminator", 0);
-  DrawTagRate("SSVHP"         ,"SSVHP Discriminator", 0);
-  DrawTagRate("CSV"	      ,"CSV Discriminator", 0);
+  DrawTagRate("TCHE"	      ,"TCHE Discriminator", 1);
+  DrawTagRate("TCHP"	      ,"TCHP Discriminator", 1);
+  DrawTagRate("JP"	      ,"JP Discriminator", 1);
+  DrawTagRate("JBP"	      ,"JBP Discriminator", 1);
+  DrawTagRate("SSV"	      ,"SSVHE Discriminator", 1);
+  DrawTagRate("SSVHP"         ,"SSVHP Discriminator", 1);
+  DrawTagRate("CSV"	      ,"CSV Discriminator", 1);
 
   
   }
@@ -205,7 +211,7 @@ void Draw(TString name, TString histotitle, bool log)
  hist_data      = (TH1F*)gROOT->FindObject(name+"_data");
  
 
- if (bOverflow) {
+ if (bOverflow && name!="SSV" && name!="SSVHP") {
   OverFlowBinFix(hist_b);
   OverFlowBinFix(hist_c);
   OverFlowBinFix(hist_gsplit);
@@ -288,6 +294,11 @@ void Draw(TString name, TString histotitle, bool log)
  canvas_1->SetLogy(log);
  
  if (hist_data->GetMaximum() > stack->GetMaximum() ) stack->SetMaximum( hist_data->GetMaximum()*1.1) ;
+ if (name=="jet_phi" || name=="sv_phi" || name=="muon_phi") {
+  if (log) stack->SetMinimum(0.01);
+  else  stack->SetMinimum(0.); 
+ }
+
  stack    ->Draw("hist");  
   
  stack    ->GetHistogram()->GetXaxis()->SetTitle(name);
@@ -298,11 +309,20 @@ void Draw(TString name, TString histotitle, bool log)
 
  hist_data->Draw("same e");
 
+
+ int move_legend=0;
+ if (name=="jet_phi" || name=="sv_phi" || name=="muon_phi" ) move_legend=1;
+ if (log && name=="sv_en_ratio" ) move_legend=1;
 // TLegend* qw =  new TLegend(0.54,0.63,0.88,0.9);
- TLegend* qw =  new TLegend(0.6,0.73,0.95,1.);
+ TLegend* qw;
+ if (move_legend==1) {
+   qw =  new TLegend(0.35,0.25,0.70,0.52);
+ }
+ else qw =  new TLegend(0.6,0.73,0.95,1.);
+
   
   //Legend
- qw->AddEntry(hist_data,     "data",                       "p");
+ qw->AddEntry(hist_data,     datacaption,                       "p");
  qw->AddEntry(hist_b,        "b quark"           ,         "f");
  qw->AddEntry(hist_gsplit,   "b from gluon splitting"     ,"f");
  qw->AddEntry(hist_c,        "c quark"           ,         "f");
@@ -349,7 +369,16 @@ void Draw(TString name, TString histotitle, bool log)
   
  TString name_plot=name+"_Linear"+format; 
  if(log) name_plot=name+"_Log"+format;
- c1->SaveAs("Commissioning_plots/"+name_plot);
+ c1->SaveAs(dir4plots+"/"+name_plot);
+
+ if (log && web) {  // save also _Linear for web
+  canvas_1 ->cd();
+  canvas_1->SetLogy(false);
+  c1->cd();
+  c1->SaveAs(dir4plots+"/"+name+"_Linear"+format);
+ }
+
+
 
 
 }
@@ -491,6 +520,7 @@ void DrawTagRate(TString name, TString histotitle, bool log){
   TPad *c1_1 = new TPad("canvas_1", "canvas_1",0,0.25,1.0,0.98);
   c1_1->Draw();
   c1_1->cd(); 
+  c1_1->SetLogy(log);
 
   if (TagRate_Data->GetMaximum() > hs->GetMaximum() ) {
     hs->SetMaximum(TagRate_Data->GetMaximum()*1.1 );
@@ -506,7 +536,7 @@ void DrawTagRate(TString name, TString histotitle, bool log){
     // ADD LEGEND
   TLegend* qw = 0;
   qw = new TLegend(0.6,0.73,0.95,1.);
-  qw->AddEntry(TagRate_Data,        "data"                     ,"p");
+  qw->AddEntry(TagRate_Data,        datacaption                     ,"p");
   qw->AddEntry(TagRate_MC_b,        "b quark"                  ,"f");
   qw->AddEntry(TagRate_MC_gspl,     "b from gluon splitting"   ,"f");
   qw->AddEntry(TagRate_MC_c,        "c quark"                  ,"f");
@@ -553,7 +583,14 @@ void DrawTagRate(TString name, TString histotitle, bool log){
   
   TString name_plot="tag_"+name+"_Linear"+format;
   if(log) name_plot="tag_"+name+"_Log"+format;
-  c1->SaveAs("Commissioning_plots/"+name_plot);
+  c1->SaveAs(dir4plots+"/"+name_plot);
+
+  if (log && web) {  // save also _Linear for web
+   c1_1 ->cd();
+   c1_1->SetLogy(false);
+   c1->cd();
+   c1->SaveAs(dir4plots+"/tag_"+name+"_Linear"+format);
+  }
 }
 
 
@@ -686,7 +723,16 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
   if (pro_mc_udsg->GetMaximum() > maxhist) maxhist = pro_mc_udsg->GetMaximum()*1.1;
   if (pro_mc->GetMaximum() > maxhist) maxhist = pro_mc->GetMaximum()*1.1;
   if (pro_data->GetMaximum() > maxhist) maxhist = pro_data->GetMaximum()*1.1;
+
+  float minhist= pro_mc_gspl->GetMinimum();
+  if (pro_mc_b->GetMinimum() < minhist) minhist = pro_mc_b->GetMinimum()*0.9;
+  if (pro_mc_c->GetMinimum() < minhist) minhist = pro_mc_c->GetMinimum()*0.9;
+  if (pro_mc_udsg->GetMinimum() < minhist) minhist = pro_mc_udsg->GetMinimum()*0.9;
+  if (pro_mc->GetMinimum() < minhist) minhist = pro_mc->GetMinimum()*0.9;
+  if (pro_data->GetMinimum() < minhist) minhist = pro_data->GetMinimum()*0.9;
+
   if (maxhist> pro_mc_gspl->GetMaximum()) pro_mc_gspl->SetMaximum(maxhist);
+  if (pro_mc_gspl->GetMinimum() >minhist) pro_mc_gspl->SetMinimum(minhist);
 
   pro_mc_gspl->Draw("hist");
   pro_mc_b->Draw("hist,same");
@@ -697,7 +743,7 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
 
   TLegend* qw = 0;
   qw =  new TLegend(0.6,0.73,0.95,1.);
-  qw->AddEntry(pro_data,        "e#mu ttbar data"                   ,"p");
+  qw->AddEntry(pro_data,        datacaption                   ,"p");
   qw->AddEntry(pro_mc,          "total "                 ,"l");
   qw->AddEntry(pro_mc_b,        "b quark"                ,"l");
   qw->AddEntry(pro_mc_gspl,     "b from gluon splitting" ,"l");
@@ -710,7 +756,7 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
 
   TString name_plot=name+"_Linear"+format;
   if(log) name_plot=name+"_Log"+format;
-  canvas->SaveAs("Commissioning_plots/"+name_plot);
+  canvas->SaveAs(dir4plots+"/"+name_plot);
 
 }
 
@@ -748,3 +794,130 @@ void OverFlowBinFix(TH1F* histo){
 }
 
 
+void DrawMC(TString name, TString histotitle, bool log)
+ 
+{
+ TFile *myFile     = new TFile(filename);
+ TH1F* hist_mc;     
+ TH1F* hist_data;  
+ if (name=="nPV") {
+//   hist_mc       = (TH1F*)gROOT->FindObject(name+"_mc_unw");
+   hist_mc       = (TH1F*)gROOT->FindObject(name+"_mc");
+  }
+ else {
+   hist_mc       = (TH1F*)gROOT->FindObject(name+"_mc");
+ }
+ hist_data     = (TH1F*)gROOT->FindObject(name+"_data");
+ float scale_f = (hist_data->Integral())/(hist_mc->Integral());
+ hist_mc       ->Scale(scale_f);
+
+ double titleoffsety=0.2;
+ double titlesizex=0.17;
+ double titlesizey=0.2;
+ double labelsizex=0.14;
+  
+   
+ hist_data  ->GetYaxis()->SetTitleSize(titlesizey);
+ hist_data  ->GetYaxis()->SetTitleOffset(titleoffsety);
+  
+ hist_mc     ->GetYaxis()->SetTitleSize(titlesizey);
+ hist_mc     ->GetYaxis()->SetTitleOffset(titleoffsety);
+  
+ TH1F* histo_ratio;
+ histo_ratio = (TH1F*) hist_data->Clone();
+ histo_ratio->Sumw2();
+ histo_ratio->SetName("histo_ratio");
+ histo_ratio->SetTitle("");
+  
+ histo_ratio->Divide(hist_mc);
+  
+ hist_data  ->SetLineWidth(2);
+ hist_data  ->SetMarkerStyle(20);  
+ hist_data  ->SetMarkerSize(0.75); 
+
+ hist_mc     ->SetFillColor(2);
+
+ gStyle->SetOptTitle(0);
+ gStyle->SetOptStat(0);  
+  
+ TCanvas *c1 = new TCanvas("c1", "c1",10,32,782,552);
+ c1->SetFillColor(10);
+ c1->  cd();   
+  
+
+ TPad* canvas_1 = new TPad("canvas_1", "canvas_1",0,0.25,1.0,0.98);
+ canvas_1 ->Draw();
+ canvas_1 ->cd();
+ 
+ canvas_1->SetLogy(log);
+ 
+ hist_mc    ->Draw("hist");  
+  
+ hist_mc    ->GetXaxis()->SetTitle(name);
+ hist_mc    ->GetYaxis()->SetTitle("entries");
+
+ hist_mc    ->SetTitleSize(0.08,"Y");
+ hist_mc    ->SetTitleOffset(0.65,"Y"); 
+
+ hist_data->Draw("same e");
+
+
+ TLegend* qw =  new TLegend(0.6,0.73,0.95,1.);
+  //Legend
+ qw->AddEntry(hist_data,     datacaption,                       "p");
+ qw->AddEntry(hist_mc,        "MC "           ,         "f");
+ 
+ qw->SetFillColor(0);
+ qw->Draw();
+  
+  
+ TLatex *latex = new TLatex();
+ latex->SetNDC();
+ latex->SetTextSize(0.055);
+ latex->SetTextFont(42); //22
+
+ latex->SetTextAlign(13);
+ latex->DrawLatex(0.08, 0.96, title);
+
+
+ c1->cd();  
+  
+ TPad* canvas_2 = new TPad("canvas_2", "canvas_2",0,0.,1.0,0.32);
+ canvas_2->Draw();
+ canvas_2->cd();
+ gPad->SetBottomMargin(0.375);
+ gPad->SetGridy();
+  
+ histo_ratio->SetMarkerStyle(20);
+ histo_ratio->SetMarkerSize(0.75);
+ histo_ratio->SetLineWidth(2);
+ 
+ histo_ratio->GetYaxis()->SetTitle("Data/MC");
+ histo_ratio->GetXaxis()->SetTitle(histotitle);
+ histo_ratio->GetYaxis()->SetNdivisions( 505 );
+
+ histo_ratio->GetXaxis()->SetLabelSize( labelsizex);
+ histo_ratio->GetXaxis()->SetTitleSize( titlesizex );
+
+ histo_ratio->SetMinimum(0.4);
+ histo_ratio->SetMaximum(1.6);
+ histo_ratio->Draw("E1X0");
+
+/*
+ if (name=="nPV") {
+   cout << " nPV ratio Data/MC " << endl;
+   for (int i=1; i<61; i++) {
+     cout <<i-1 << "  " << histo_ratio->GetBinContent(i) <<endl;
+   }
+ }
+*/
+
+ c1->cd();  
+  
+ TString name_plot=name+"_Linear"+format; 
+ if(log) name_plot=name+"_Log"+format;
+ c1->SaveAs(dir4plots+"/"+name_plot);
+
+ 
+
+}

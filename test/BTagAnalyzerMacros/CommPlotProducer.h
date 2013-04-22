@@ -30,24 +30,30 @@ public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
    bool            produceJetProbaTree;
-   float           n15_30,n30_50,n50_80,n80_120,n120_170,n170_300,n300_470,n470_600,n600_800;
-   bool            use15_30,use30_50,use50_80,use80_120,use120_170,use170_300,use300_470,use470_600,use600_800;
+   double           n15_20, n20_30, n30_50,n50_80,n80_120,n120_170,n170_300,n300_470,n470_600,n600_800, n800_1000, n1000_inf;
+   double           n15_30, n120_150, n150_inf;
+   bool            use15_20,use20_30, use30_50,use50_80,use80_120,use120_170,use170_300,use300_470,use470_600,use600_800, use800_1000, use1000_inf;
+   bool            use15_30, use120_150, use150_inf; 
    std::vector<TH1F*>   HistoBtag;  
    std::vector<TH2F*>   HistoBtag2D;  
     
    std::map<TString, int>   HistoBtag_map; 
    std::map<TString, int>   HistoBtag2D_map; 
    
-   double x_section[10]; 
-   double nmc_evt_vect[10];
+   double x_section[12]; 
+   double nmc_evt_vect[12];
    float WeightXS;
    float sum_xs;
-   int choice;
+
+   TString gentype;
+   bool qcdtype;
+   int sqrtstev;
      
    int numb_histo;
    int numb_histo2D;   
    
    reweight::LumiReWeighting LumiWeights;
+   bool puweight;
    
    // Declaration of leaf types
 
@@ -461,11 +467,13 @@ public :
    virtual void     SetPU(vector<float> PUvector, TString PUdataFile);
    virtual void     SetPU2012_S10(TString PUdataFile);
    virtual void     SetPU2012_S7(TString PUdataFile);   
-   virtual int      SetXS();
+   virtual void     SetPV();
+   virtual void     SetXS();
    virtual void     Counter();
    virtual float    GetEvtWeight() ; 
-   virtual int      SetXS(TString generator, bool MuEnriched, int TeV) ;
-   virtual void     Fill_nevent(double n15,double n20, double n30,double n50,double n80,double n120,double n170,double n300,double n470,double n600); 
+   virtual void     SetXS(TString generator, bool MuEnriched, int TeV) ;
+   virtual void     SetInfo(TString generator, bool qcd, int TeV) ;
+   virtual void     Fill_nevent(double n15,double n20, double n30,double n50,double n80,double n120,double n170,double n300,double n470,double n600, double n800, double n1000); 
    virtual void     SetSumXS();
    
    virtual bool            passMuonSelection(int muidx, int ijet);
@@ -478,17 +486,24 @@ CommPlotProducer::CommPlotProducer(TChain *superTree)
 
    numb_histo = 0;
    numb_histo2D = 0;
-   use15_30  =false;
-   use30_50  =false;
-   use50_80  =false;
-   use80_120 =false;
-   use120_170=false;
-   use170_300=false;
-   use300_470=false;
-   use470_600=false;
-   use600_800=false;
+   use15_20   =false;
+   use20_30   =false;
+   use30_50   =false;
+   use50_80   =false;
+   use80_120  =false;
+   use120_170 =false;
+   use170_300 =false;
+   use300_470 =false;
+   use470_600 =false;
+   use600_800 =false;
+   use800_1000=false;
+   use1000_inf=false;
+   use15_30   =false;
+   use120_150 =false;
+   use150_inf =false;
    
-   n15_30   =0;
+   n15_20   =0;
+   n20_30   =0;
    n30_50   =0;
    n50_80   =0;
    n80_120  =0;
@@ -497,7 +512,14 @@ CommPlotProducer::CommPlotProducer(TChain *superTree)
    n300_470 =0;
    n470_600 =0;
    n600_800 =0;
+   n800_1000=0;
+   n1000_inf=0;
+   n15_30   =0;
+   n120_150 =0;
+   n150_inf =0;
+   sqrtstev=-1;
    produceJetProbaTree=true;
+   puweight=true;
    
    if (superTree==0) {
       TChain *newchain = new TChain("btagana/ttree");
@@ -756,6 +778,7 @@ void CommPlotProducer::Show(Long64_t entry)
 // Print contents of entry.
 // If entry is not specified, print current entry
    if (!fChain) return;
+   cout << " Show entry = " << entry << endl;
    fChain->Show(entry);
 }
 Int_t CommPlotProducer::Cut(Long64_t entry)
