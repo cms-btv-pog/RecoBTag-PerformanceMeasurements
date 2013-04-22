@@ -30,7 +30,7 @@ process.maxEvents = cms.untracked.PSet(
 
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = "START53_V7F::All"
+process.GlobalTag.globaltag = "START53_V20::All"
 
 
 ##############################################
@@ -65,7 +65,8 @@ process.ak5PFJets.doAreaFastjet = True
 
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
-process.load("Configuration.StandardSequences.Geometry_cff")
+#process.load("Configuration.StandardSequences.Geometry_cff")
+process.load("Configuration.Geometry.GeometryIdeal_cff")
 
 process.load("SimTracker.TrackAssociation.TrackAssociatorByChi2_cfi")
 process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
