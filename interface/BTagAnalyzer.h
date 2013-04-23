@@ -139,6 +139,7 @@ using namespace reco;
 const UInt_t nMaxTrk_  = 100000;
 const UInt_t nMaxJets_ = 10000;
 const UInt_t nMaxMuons_= 10000;
+const UInt_t nMaxElectrons_= 10000;
 const UInt_t nMaxPVs_= 10000;
 const UInt_t nMaxSVs_= 10000;
 const UInt_t nMaxPUs_= 10000;
@@ -222,8 +223,20 @@ private:
     std::string combinedSvtxNegModuleName_;
 
     std::string combinedSvtxRetrainedModuleName_;
-    std::string combinedSvtxPosRetrainedModuleName_;
-    std::string combinedSvtxNegRetrainedModuleName_;
+    std::string combinedSvtxRetrainedPosModuleName_;
+    std::string combinedSvtxRetrainedNegModuleName_;
+
+    std::string combinedCSVJPModuleName_;
+    std::string combinedCSVJPPosModuleName_;
+    std::string combinedCSVJPNegModuleName_;
+
+    std::string combinedCSVSLModuleName_;
+    std::string combinedCSVSLPosModuleName_;
+    std::string combinedCSVSLNegModuleName_;
+
+    std::string combinedCSVJPSLModuleName_;
+    std::string combinedCSVJPSLPosModuleName_;
+    std::string combinedCSVJPSLNegModuleName_;
     
     std::string simpleIVFModuleNameHighPur_;
     std::string simpleIVFModuleNameHighEff_;
@@ -238,9 +251,21 @@ private:
     std::string svtxModuleNameHighEff_;
     std::string svtxNegModuleNameHighEff_;
 
-    std::string softMuonModuleName_;
-    std::string softMuonNegModuleName_;
-    std::string softMuonTagInfoName_;
+    //std::string softMuonModuleName_;
+    //std::string softMuonNegModuleName_;
+    //std::string softMuonTagInfoName_;
+
+    std::string softPFMuonModuleName_;
+    std::string softPFMuonPosModuleName_;
+    std::string softPFMuonNegModuleName_;
+
+    std::string softPFElectronModuleName_;
+    std::string softPFElectronPosModuleName_;
+    std::string softPFElectronNegModuleName_;
+
+    edm::InputTag softPFMuonTagInfoName_;
+    edm::InputTag softPFElectronTagInfoName_;
+
 
     std::string primaryVertexColl_;
 
@@ -435,16 +460,29 @@ private:
     float Jet_CombSvxN[nMaxJets_];
     float Jet_CombSvxP[nMaxJets_];
     float Jet_CombSvx[nMaxJets_];
-    float Jet_CombSvxN_R[nMaxJets_];
-    float Jet_CombSvxP_R[nMaxJets_];
-    float Jet_CombSvx_R[nMaxJets_];
+    float Jet_RetCombSvxN[nMaxJets_];
+    float Jet_RetCombSvxP[nMaxJets_];
+    float Jet_RetCombSvx[nMaxJets_];
+    float Jet_CombCSVJP_N[nMaxJets_];
+    float Jet_CombCSVJP_P[nMaxJets_];
+    float Jet_CombCSVJP[nMaxJets_];
+    float Jet_CombCSVSL_N[nMaxJets_];
+    float Jet_CombCSVSL_P[nMaxJets_];
+    float Jet_CombCSVSL[nMaxJets_];
+    float Jet_CombCSVJPSL_N[nMaxJets_];
+    float Jet_CombCSVJPSL_P[nMaxJets_];
+    float Jet_CombCSVJPSL[nMaxJets_];
     float Jet_SimpIVF_HP[nMaxJets_];
     float Jet_SimpIVF_HE[nMaxJets_];
     float Jet_DoubIVF_HE[nMaxJets_];
     float Jet_CombIVF[nMaxJets_];
     float Jet_CombIVF_P[nMaxJets_];
     float Jet_SoftMuN[nMaxJets_];
+    float Jet_SoftMuP[nMaxJets_];
     float Jet_SoftMu[nMaxJets_];
+    float Jet_SoftElN[nMaxJets_];
+    float Jet_SoftElP[nMaxJets_];
+    float Jet_SoftEl[nMaxJets_];
     int   Jet_hist1[nMaxJets_];
     int   Jet_hist2[nMaxJets_];
     int   Jet_hist3[nMaxJets_];
@@ -459,6 +497,7 @@ private:
     int   Jet_nFirstTrkInc[nMaxJets_];
     int   Jet_nLastTrkInc[nMaxJets_];
     int   Jet_SV_multi[nMaxJets_]; 
+    int   Jet_VtxCat[nMaxJets_]; 
     
     int   nMuon;
     int   Muon_IdxJet[nMaxMuons_];
@@ -484,6 +523,30 @@ private:
     float Muon_IP2Dsig[nMaxMuons_];
     float Muon_deltaR[nMaxMuons_];
     float Muon_ratio[nMaxMuons_]; 
+
+    int nPFElectron;
+    float PFElectron_IdxJet[nMaxElectrons_];
+    float PFElectron_pt[nMaxElectrons_];
+    float PFElectron_eta[nMaxElectrons_];
+    float PFElectron_phi[nMaxElectrons_];
+    float PFElectron_ptrel[nMaxElectrons_];
+    float PFElectron_ratio[nMaxElectrons_];
+    float PFElectron_ratioRel[nMaxElectrons_];
+    float PFElectron_deltaR[nMaxElectrons_];
+    float PFElectron_IPsig[nMaxElectrons_];
+    float PFElectron_mva_e_pi[nMaxElectrons_];
+
+    int nPFMuon;
+    float PFMuon_IdxJet[nMaxElectrons_];
+    float PFMuon_pt[nMaxElectrons_];
+    float PFMuon_eta[nMaxElectrons_];
+    float PFMuon_phi[nMaxElectrons_];
+    float PFMuon_ptrel[nMaxElectrons_];
+    float PFMuon_ratio[nMaxElectrons_];
+    float PFMuon_ratioRel[nMaxElectrons_];
+    float PFMuon_deltaR[nMaxElectrons_];
+    float PFMuon_IPsig[nMaxElectrons_];
+    int   PFMuon_GoodQuality[nMaxElectrons_];
     
     int   nTrkInc;
     float TrkInc_pt[nMaxTrk_];

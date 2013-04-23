@@ -20,7 +20,7 @@ process.source = cms.Source(
 # data from /BTag/Run2012A-PromptReco-v1/AOD
        #'file:000A540B-76E7-E111-A557-003048C69406.root'
        #'file:FC834104-FF2E-E211-AF15-003048F1BF66.root'
-       '/store/data/Run2012A/BTag/AOD/22Jan2013-v1/30000/FE1706DA-9481-E211-8D8E-002590596490.root'
+       'file:5AC9D874-D6E8-E111-A768-00261894387D.root'
   )
 )
 
@@ -31,32 +31,28 @@ process.maxEvents = cms.untracked.PSet(
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = "FT_53_V21_AN3::All"
+#process.GlobalTag.globaltag = "GR_R_53_V19::All"
+# process.GlobalTag.globaltag = "GR_R_53_V2B::All"
 
 
 
 
 ##############################################
-#### Add new retrained CSV b tagging algo ####
+# Get calibrations for the CSV taggers
 ##############################################
-#process.load("CondCore.DBCommon.CondDBSetup_cfi")
+process.load("CondCore.DBCommon.CondDBSetup_cfi")
+process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
+   process.CondDBSetup,
+   timetype = cms.string('runnumber'),
+   toGet = cms.VPSet(cms.PSet(
+      record = cms.string('BTauGenericMVAJetTagComputerRcd'),
+                tag = cms.string('MVAComputerContainer_Retrained53X_JetTags_v2')
+   )),
+   connect = cms.string('frontier://FrontierProd/CMS_COND_PAT_000'),
+   BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
+)
 
-#process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
-#   process.CondDBSetup,
-#   timetype = cms.string('runnumber'),
-#   toGet = cms.VPSet(cms.PSet(
-#      record = cms.string('BTauGenericMVAJetTagComputerRcd'),
-#                tag = cms.string('MVAComputerContainer_JetTags_v3_offline')
-#   )),
-#   connect = cms.string('frontier://FrontierProd/CMS_COND_PAT_000'),
-#   BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
-#)
-
-#process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
-
-
-
-
-
+process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord") 
 
 
 ##-------------------- Import the JEC services -----------------------
@@ -128,42 +124,45 @@ process.load("RecoBTag.SecondaryVertex.bToCharmDecayVertexMerger_cfi")
 process.combinedInclusiveSecondaryVertexPositiveBJetTags = process.combinedInclusiveSecondaryVertexBJetTags.clone()
 process.combinedInclusiveSecondaryVertexPositiveBJetTags.jetTagComputer = cms.string('combinedSecondaryVertexPositive')
 
+############################################################################
+# For the Retrained CSV
+############################################################################
+process.combinedSecondaryVertexRetrained = process.combinedSecondaryVertex.clone(
+  calibrationRecords = cms.vstring(
+    'CombinedSVRetrainRecoVertex',
+    'CombinedSVRetrainPseudoVertex',
+    'CombinedSVRetrainNoVertex'
+  )
+)
+process.combinedSecondaryVertexRetrainedBJetTags = process.combinedSecondaryVertexBJetTags.clone(
+  jetTagComputer = cms.string('combinedSecondaryVertexRetrained')
+)
+
+process.combinedSecondaryVertexRetrainedNegative = process.combinedSecondaryVertexNegative.clone(
+  calibrationRecords = cms.vstring(
+    'CombinedSVRetrainRecoVertex', 
+    'CombinedSVRetrainPseudoVertex', 
+    'CombinedSVRetrainNoVertex'
+  )
+)
+process.combinedSecondaryVertexRetrainedNegativeBJetTags = process.combinedSecondaryVertexNegativeBJetTags.clone(
+  jetTagComputer = cms.string('combinedSecondaryVertexRetrainedNegative')
+)
+
+process.combinedSecondaryVertexRetrainedPositive = process.combinedSecondaryVertexPositive.clone(
+  calibrationRecords = cms.vstring(
+    'CombinedSVRetrainRecoVertex', 
+    'CombinedSVRetrainPseudoVertex', 
+    'CombinedSVRetrainNoVertex'
+    )
+  )
+process.combinedSecondaryVertexRetrainedPositiveBJetTags = process.combinedSecondaryVertexPositiveBJetTags.clone(
+  jetTagComputer = cms.string('combinedSecondaryVertexRetrainedPositive')
+)
 
 ############################################################################
-# for the Retrained CSV
+# For the Soft Lepton taggers
 ############################################################################
-#process.combinedSecondaryVertexRetrained = process.combinedSecondaryVertex.clone()
-#process.combinedSecondaryVertexRetrained.calibrationRecords = cms.vstring(
-#      'CombinedSVRetrain2RecoVertex', 
-#      'CombinedSVRetrain2PseudoVertex', 
-#      'CombinedSVRetrain2NoVertex'
-#      )
-#process.combinedSecondaryVertexRetrainedBJetTags = process.combinedSecondaryVertexBJetTags.clone()
-#process.combinedSecondaryVertexRetrainedBJetTags.jetTagComputer = cms.string('combinedSecondaryVertexRetrained')
-
-#process.combinedSecondaryVertexNegativeRetrained = process.combinedSecondaryVertexNegative.clone()
-#process.combinedSecondaryVertexNegativeRetrained.calibrationRecords = cms.vstring(
-#      'CombinedSVRetrain2RecoVertex', 
-#      'CombinedSVRetrain2PseudoVertex', 
-#      'CombinedSVRetrain2NoVertex'
-#      )
-#process.combinedSecondaryVertexNegativeRetrainedBJetTags = process.combinedSecondaryVertexNegativeBJetTags.clone()
-#process.combinedSecondaryVertexNegativeRetrainedBJetTags.jetTagComputer = cms.string('combinedSecondaryVertexNegativeRetrained')
-
-#process.combinedSecondaryVertexPositiveRetrained = process.combinedSecondaryVertexPositive.clone()
-#process.combinedSecondaryVertexPositiveRetrained.calibrationRecords = cms.vstring(
-#      'CombinedSVRetrain2RecoVertex', 
-#      'CombinedSVRetrain2PseudoVertex', 
-#      'CombinedSVRetrain2NoVertex'
-#      )
-#process.combinedSecondaryVertexPositiveRetrainedBJetTags = process.combinedSecondaryVertexPositiveBJetTags.clone()
-#process.combinedSecondaryVertexPositiveRetrainedBJetTags.jetTagComputer = cms.string('combinedSecondaryVertexPositiveRetrained')
-
-
-
-
-
-# for Soft Muon tagger
 process.load("RecoBTag.SoftLepton.negativeSoftMuonES_cfi")
 process.load("RecoBTag.SoftLepton.positiveSoftMuonES_cfi")
 process.load("RecoBTag.SoftLepton.negativeSoftMuonBJetTags_cfi")
@@ -173,6 +172,396 @@ process.load("RecoBTag.SoftLepton.negativeSoftLeptonByPtES_cfi")
 process.load("RecoBTag.SoftLepton.positiveSoftLeptonByPtES_cfi")
 process.load("RecoBTag.SoftLepton.negativeSoftMuonByPtBJetTags_cfi")
 process.load("RecoBTag.SoftLepton.positiveSoftMuonByPtBJetTags_cfi")
+
+# for new softElectron tagger 
+process.softPFElectronRetrained = process.softElectron.clone()
+process.softPFElectronRetrainedBJetsTags = process.softPFElectronBJetTags.clone( jetTagComputer = 'softPFElectronRetrained' )
+
+process.load("RecoBTag.SoftLepton.negativeSoftElectronES_cfi")
+process.load("RecoBTag.SoftLepton.negativeSoftPFElectronBJetTags_cfi")
+process.negativeSoftPFElectronRetrained = process.negativeSoftElectron.clone()
+process.negativeSoftPFElectronRetrainedBJetsTags = process.negativeSoftPFElectronBJetTags.clone( jetTagComputer = 'negativeSoftPFElectronRetrained' )
+                                                   
+process.load("RecoBTag.SoftLepton.positiveSoftElectronES_cfi")
+process.load("RecoBTag.SoftLepton.positiveSoftPFElectronBJetTags_cfi")
+process.positiveSoftPFElectronRetrained = process.positiveSoftElectron.clone()
+process.positiveSoftPFElectronRetrainedBJetsTags = process.positiveSoftPFElectronBJetTags.clone( jetTagComputer = 'positiveSoftPFElectronRetrained' )
+        
+# for new softMuon tagger
+process.softPFMuonRetrained = process.softMuon.clone()
+process.softPFMuonRetrainedBJetsTags = process.softPFMuonBJetTags.clone( jetTagComputer = 'softPFMuonRetrained' )
+
+process.load("RecoBTag.SoftLepton.negativeSoftMuonES_cfi")
+process.load("RecoBTag.SoftLepton.negativeSoftPFMuonBJetTags_cfi")
+process.negativeSoftPFMuonRetrained = process.negativeSoftMuon.clone()
+process.negativeSoftPFMuonRetrainedBJetsTags = process.negativeSoftPFMuonBJetTags.clone( jetTagComputer = 'negativeSoftPFMuonRetrained' )
+
+process.load("RecoBTag.SoftLepton.positiveSoftMuonES_cfi")
+process.load("RecoBTag.SoftLepton.positiveSoftPFMuonBJetTags_cfi")
+process.positiveSoftPFMuonRetrained = process.positiveSoftMuon.clone()
+process.positiveSoftPFMuonRetrainedBJetsTags = process.positiveSoftPFMuonBJetTags.clone( jetTagComputer = 'positiveSoftPFMuonRetrained' )
+
+############################################################################
+# For the combined CSV + JP tagger
+############################################################################
+process.combinedCSVJP = process.combinedMVA.clone(
+  calibrationRecord = 'CombinedCSVJP',
+  jetTagComputers = cms.VPSet(
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = cms.string('jetProbability')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('combinedSecondaryVertexRetrained')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = cms.string('softPFMuonRetrained')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('softPFElectronRetrained')
+    )
+  )
+)
+process.combinedCSVJPBJetTags = process.combinedMVABJetTags.clone(
+  jetTagComputer = 'combinedCSVJP',
+  tagInfos = cms.VInputTag(
+    cms.InputTag("impactParameterTagInfos"),
+    cms.InputTag("secondaryVertexTagInfos"),
+    cms.InputTag("softPFMuonsTagInfos"),
+    cms.InputTag("softPFElectronsTagInfos")
+  )
+)
+
+process.load("RecoBTau.JetTagComputer.negativeCombinedMVAES_cfi")
+process.negativeCombinedCSVJP = process.negativeCombinedMVA.clone(
+  calibrationRecord = 'CombinedCSVJP',
+  jetTagComputers = cms.VPSet(
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('negativeOnlyJetProbability')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('combinedSecondaryVertexRetrainedNegative')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('negativeSoftPFMuonRetrained')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('negativeSoftPFElectronRetrained')
+    )
+  )
+)
+process.load("RecoBTau.JetTagComputer.negativeCombinedMVABJetTags_cfi")
+process.negativeCombinedCSVJPBJetTags = process.negativeCombinedMVABJetTags.clone(
+  jetTagComputer = 'negativeCombinedCSVJP',
+  tagInfos = cms.VInputTag(
+    cms.InputTag("impactParameterTagInfos"),
+    cms.InputTag("secondaryVertexTagInfos"),
+    cms.InputTag("softPFMuonsTagInfos"),
+    cms.InputTag("softPFElectronsTagInfos")
+  )
+)
+
+process.load("RecoBTau.JetTagComputer.positiveCombinedMVAES_cfi")
+process.positiveCombinedCSVJP = process.positiveCombinedMVA.clone(
+  calibrationRecord = 'CombinedCSVJP',
+  jetTagComputers = cms.VPSet(
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('positiveOnlyJetProbability')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('combinedSecondaryVertexRetrainedPositive')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('positiveSoftPFMuonRetrained')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('positiveSoftPFElectronRetrained')
+    )
+  )
+)
+process.load("RecoBTau.JetTagComputer.positiveCombinedMVABJetTags_cfi")
+process.positiveCombinedCSVJPBJetTags = process.positiveCombinedMVABJetTags.clone(
+  jetTagComputer = 'positiveCombinedCSVJP',
+  tagInfos = cms.VInputTag(
+    cms.InputTag("impactParameterTagInfos"),
+    cms.InputTag("secondaryVertexTagInfos"),
+    cms.InputTag("softPFMuonsTagInfos"),
+    cms.InputTag("softPFElectronsTagInfos")
+  )
+)
+ 
+ 
+############################################################################
+# For the combined CSV + JP + SL tagger
+############################################################################
+process.combinedCSVJPSL = process.combinedMVA.clone(
+  calibrationRecord = 'CombinedCSVJPSL',
+  jetTagComputers = cms.VPSet(
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = cms.string('jetProbability')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('combinedSecondaryVertexRetrained')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = cms.string('softPFMuonRetrained')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('softPFElectronRetrained')
+    )
+  )
+)
+process.combinedCSVJPSLBJetTags = process.combinedMVABJetTags.clone(
+  jetTagComputer = 'combinedCSVJPSL',
+  tagInfos = cms.VInputTag(
+    cms.InputTag("impactParameterTagInfos"),
+    cms.InputTag("secondaryVertexTagInfos"),
+    cms.InputTag("softPFMuonsTagInfos"),
+    cms.InputTag("softPFElectronsTagInfos")
+  )
+)
+
+process.negativeCombinedCSVJPSL = process.negativeCombinedMVA.clone(
+  calibrationRecord = 'CombinedCSVJPSL',
+  jetTagComputers = cms.VPSet(
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('negativeOnlyJetProbability')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('combinedSecondaryVertexRetrainedNegative')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('negativeSoftPFMuonRetrained')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('negativeSoftPFElectronRetrained')
+    )
+  )
+)
+process.negativeCombinedCSVJPSLBJetTags = process.negativeCombinedMVABJetTags.clone(
+  jetTagComputer = 'negativeCombinedCSVJPSL',
+  tagInfos = cms.VInputTag(
+    cms.InputTag("impactParameterTagInfos"),
+    cms.InputTag("secondaryVertexTagInfos"),
+    cms.InputTag("softPFMuonsTagInfos"),
+    cms.InputTag("softPFElectronsTagInfos")
+  )
+)
+
+process.positiveCombinedCSVJPSL = process.positiveCombinedMVA.clone(
+  calibrationRecord = 'CombinedCSVJPSL',
+  jetTagComputers = cms.VPSet(
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('positiveOnlyJetProbability')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('combinedSecondaryVertexRetrainedPositive')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('positiveSoftPFMuonRetrained')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('positiveSoftPFElectronRetrained')
+    )
+  )
+)
+process.positiveCombinedCSVJPSLBJetTags = process.positiveCombinedMVABJetTags.clone(
+  jetTagComputer = 'positiveCombinedCSVJPSL',
+  tagInfos = cms.VInputTag(
+    cms.InputTag("impactParameterTagInfos"),
+    cms.InputTag("secondaryVertexTagInfos"),
+    cms.InputTag("softPFMuonsTagInfos"),
+    cms.InputTag("softPFElectronsTagInfos")
+  )
+)
+ 
+############################################################################
+# For the combined CSV + SL tagger
+############################################################################
+process.combinedCSVSL = process.combinedMVA.clone(
+  calibrationRecord = 'CombinedCSVSL',
+  jetTagComputers = cms.VPSet(
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = cms.string('jetProbability')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('combinedSecondaryVertexRetrained')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = cms.string('softPFMuonRetrained')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('softPFElectronRetrained')
+    )
+  )
+)
+process.combinedCSVSLBJetTags = process.combinedMVABJetTags.clone(
+  jetTagComputer = 'combinedCSVSL',
+  tagInfos = cms.VInputTag(
+    cms.InputTag("impactParameterTagInfos"),
+    cms.InputTag("secondaryVertexTagInfos"),
+    cms.InputTag("softPFMuonsTagInfos"),
+    cms.InputTag("softPFElectronsTagInfos")
+  )
+)
+
+process.negativeCombinedCSVSL = process.negativeCombinedMVA.clone(
+  calibrationRecord = 'CombinedCSVSL',
+  jetTagComputers = cms.VPSet(
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('negativeOnlyJetProbability')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('combinedSecondaryVertexRetrainedNegative')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('negativeSoftPFMuonRetrained')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('negativeSoftPFElectronRetrained')
+    )
+  )
+)
+process.negativeCombinedCSVSLBJetTags = process.negativeCombinedMVABJetTags.clone(
+  jetTagComputer = 'negativeCombinedCSVSL',
+  tagInfos = cms.VInputTag(
+    cms.InputTag("impactParameterTagInfos"),
+    cms.InputTag("secondaryVertexTagInfos"),
+    cms.InputTag("softPFMuonsTagInfos"),
+    cms.InputTag("softPFElectronsTagInfos")
+  )
+)
+
+process.positiveCombinedCSVSL = process.positiveCombinedMVA.clone(
+  calibrationRecord = 'CombinedCSVSL',
+  jetTagComputers = cms.VPSet(
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('positiveOnlyJetProbability')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('combinedSecondaryVertexRetrainedPositive')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('positiveSoftPFMuonRetrained')
+    ),
+    cms.PSet(
+      discriminator = cms.bool(True),
+      variables = cms.bool(False),
+      jetTagComputer = 
+      cms.string('positiveSoftPFElectronRetrained')
+    )
+  )
+)
+process.positiveCombinedCSVSLBJetTags = process.positiveCombinedMVABJetTags.clone(
+  jetTagComputer = 'positiveCombinedCSVSL',
+  tagInfos = cms.VInputTag(
+    cms.InputTag("impactParameterTagInfos"),
+    cms.InputTag("secondaryVertexTagInfos"),
+    cms.InputTag("softPFMuonsTagInfos"),
+    cms.InputTag("softPFElectronsTagInfos")
+  )
+)
+
+
+#
 
 process.load("PhysicsTools.JetMCAlgos.CaloJetsMCFlavour_cfi")  
 
@@ -294,17 +683,15 @@ process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
 # process.es_prefer_trackProbabilityFakeCond = cms.ESPrefer("PoolDBESSource","trackProbabilityFakeCond")
 
 ### JP calibration for crab only: 
-#process.GlobalTag.toGet = cms.VPSet(
-#  cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
-#       tag = cms.string("TrackProbabilityCalibration_2D_Data53X_v2"),
-#       connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU")),
-#  cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-#       tag = cms.string("TrackProbabilityCalibration_3D_Data53X_v2"),
-#       connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"))
-#)
+## process.GlobalTag.toGet = cms.VPSet(
+##   cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
+##        tag = cms.string("TrackProbabilityCalibration_2D_Data53X_v2"),
+##        connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU")),
+##   cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
+##        tag = cms.string("TrackProbabilityCalibration_3D_Data53X_v2"),
+##        connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"))
+## )
 
-# Veto against Hcal Laser polluted events
-process.load("EventFilter.HcalRawToDigi.hcallaserFilterFromTriggerResult_cff")
 
 #---------------------------------------
 process.TFileService = cms.Service("TFileService", fileName = cms.string("TrackTree_data.root") )
@@ -332,7 +719,10 @@ process.ak5JetTracksAssociatorAtVertex.jets = "PATJetsFilter"
 process.softMuonTagInfos.jets = "PATJetsFilter"
 
 
-
+process.softPFMuonsTagInfos.primaryVertex = cms.InputTag("goodOfflinePrimaryVertices") 
+process.softPFMuonsTagInfos.jets = "PATJetsFilter"
+process.softPFElectronsTagInfos.primaryVertex = cms.InputTag("goodOfflinePrimaryVertices") 
+process.softPFElectronsTagInfos.jets = "PATJetsFilter"
 
 #---------------------------------------
 # trigger selection !
@@ -347,9 +737,9 @@ process.softMuonTagInfos.jets = "PATJetsFilter"
 #     )
 #---------------------------------------
 
-
-
-
+# Filter for HCAL laser events in prompt 2012A+B+C, snippet for "Datasets from the 2013 rereco and Multijet parked":
+# https://twiki.cern.ch/twiki/bin/view/CMS/PdmVKnowFeatures#HCAL_laser_events_in_prompt_2012
+process.load("EventFilter.HcalRawToDigi.hcallaserFilterFromTriggerResult_cff")
 
 
 process.p = cms.Path(
@@ -359,10 +749,10 @@ process.p = cms.Path(
 #$$
         #process.kt6PFJets
         process.noscraping
+        *process.hcalfilter # filter for HCAL laser events
         *process.primaryVertexFilter
         *process.offlinePrimaryVertices 
 	*process.goodOfflinePrimaryVertices
-        *process.hcalfilter
 	*getattr(process,"patPF2PATSequence"+postfix)
         *process.PATJetsFilter
         *process.inclusiveVertexing*process.inclusiveMergedVerticesFiltered*process.bToCharmDecayVertexMerged
@@ -375,10 +765,17 @@ process.p = cms.Path(
 	*process.secondaryVertexTagInfos*process.simpleSecondaryVertexHighEffBJetTags*process.simpleSecondaryVertexHighPurBJetTags
 	*process.secondaryVertexNegativeTagInfos*process.simpleSecondaryVertexNegativeHighEffBJetTags*process.simpleSecondaryVertexNegativeHighPurBJetTags
         *process.combinedSecondaryVertexNegativeBJetTags*process.combinedSecondaryVertexPositiveBJetTags
-	#*process.negativeSoftMuonBJetTags*process.positiveSoftMuonBJetTags	
-	*process.negativeSoftLeptonByPtBJetTags*process.positiveSoftLeptonByPtBJetTags	
+	#*process.negativeSoftMuonBJetTags*process.positiveSoftMuonBJetTags
+        *process.positiveSoftLeptonByPtBJetTags	
+        #*process.softPFMuonsTagInfos  
+	*process.softPFMuonRetrainedBJetsTags*process.negativeSoftPFMuonRetrainedBJetsTags*process.positiveSoftPFMuonRetrainedBJetsTags
+        #*process.softPFElectronsTagInfos  
+        *process.softPFElectronRetrainedBJetsTags*process.negativeSoftPFElectronRetrainedBJetsTags*process.positiveSoftPFElectronRetrainedBJetsTags
 	*process.negativeOnlyJetBProbabilityJetTags*process.positiveOnlyJetBProbabilityJetTags
-        #*process.combinedSecondaryVertexRetrainedBJetTags*process.combinedSecondaryVertexNegativeRetrainedBJetTags*process.combinedSecondaryVertexPositiveRetrainedBJetTags
+        *process.combinedSecondaryVertexRetrainedBJetTags*process.combinedSecondaryVertexRetrainedNegativeBJetTags*process.combinedSecondaryVertexRetrainedPositiveBJetTags
+        *process.combinedCSVJPBJetTags*process.negativeCombinedCSVJPBJetTags*process.positiveCombinedCSVJPBJetTags
+        *process.combinedCSVSLBJetTags*process.negativeCombinedCSVSLBJetTags*process.positiveCombinedCSVSLBJetTags
+        *process.combinedCSVJPSLBJetTags*process.negativeCombinedCSVJPSLBJetTags*process.positiveCombinedCSVJPSLBJetTags
         *process.inclusiveSecondaryVertexFinderTagInfosFiltered*process.simpleInclusiveSecondaryVertexHighEffBJetTags*process.simpleInclusiveSecondaryVertexHighPurBJetTags
         *process.doubleSecondaryVertexHighEffBJetTags
         *process.inclusiveSecondaryVertexFinderTagInfos*process.combinedInclusiveSecondaryVertexBJetTags*process.combinedInclusiveSecondaryVertexPositiveBJetTags
@@ -389,5 +786,4 @@ process.p = cms.Path(
 
 
 
-# reduce verbosity
-process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(100)
+

@@ -61,7 +61,23 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   combinedSvtxNegModuleName_  = iConfig.getParameter<std::string>("combinedSvtxNegModuleName");
   combinedSvtxPosModuleName_  = iConfig.getParameter<std::string>("combinedSvtxPosModuleName");
   
+  combinedSvtxRetrainedModuleName_     = iConfig.getParameter<std::string>("combinedSvtxRetrainedModuleName");
+  combinedSvtxRetrainedNegModuleName_  = iConfig.getParameter<std::string>("combinedSvtxRetrainedNegModuleName");
+  combinedSvtxRetrainedPosModuleName_  = iConfig.getParameter<std::string>("combinedSvtxRetrainedPosModuleName");
   
+  combinedCSVJPModuleName_     = iConfig.getParameter<std::string>("combinedCSVJPModuleName");
+  combinedCSVJPNegModuleName_  = iConfig.getParameter<std::string>("combinedCSVJPNegModuleName");
+  combinedCSVJPPosModuleName_  = iConfig.getParameter<std::string>("combinedCSVJPPosModuleName");
+  
+  combinedCSVSLModuleName_     = iConfig.getParameter<std::string>("combinedCSVSLModuleName");
+  combinedCSVSLNegModuleName_  = iConfig.getParameter<std::string>("combinedCSVSLNegModuleName");
+  combinedCSVSLPosModuleName_  = iConfig.getParameter<std::string>("combinedCSVSLPosModuleName");
+  
+  combinedCSVJPSLModuleName_     = iConfig.getParameter<std::string>("combinedCSVJPSLModuleName");
+  combinedCSVJPSLNegModuleName_  = iConfig.getParameter<std::string>("combinedCSVJPSLNegModuleName");
+  combinedCSVJPSLPosModuleName_  = iConfig.getParameter<std::string>("combinedCSVJPSLPosModuleName");
+  
+ 
   
   
   simpleIVFModuleNameHighPur_    = iConfig.getParameter<std::string>("simpleIVFModuleNameHighPur");
@@ -75,11 +91,23 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   
   
   
-  softMuonModuleName_       = iConfig.getParameter<std::string>("softMuonModuleName");
-  softMuonNegModuleName_    = iConfig.getParameter<std::string>("softMuonNegModuleName");
-  softMuonTagInfoName_      = iConfig.getParameter<std::string>("softMuonTagInfoName");
+  //softMuonModuleName_       = iConfig.getParameter<std::string>("softMuonModuleName");
+  //softMuonNegModuleName_    = iConfig.getParameter<std::string>("softMuonNegModuleName");
+  //softMuonTagInfoName_      = iConfig.getParameter<std::string>("softMuonTagInfoName");
+
+  softPFMuonModuleName_       = iConfig.getParameter<std::string>("softPFMuonModuleName");
+  softPFMuonPosModuleName_    = iConfig.getParameter<std::string>("softPFMuonPosModuleName");
+  softPFMuonNegModuleName_    = iConfig.getParameter<std::string>("softPFMuonNegModuleName");
+
+  softPFElectronModuleName_       = iConfig.getParameter<std::string>("softPFElectronModuleName");
+  softPFElectronPosModuleName_    = iConfig.getParameter<std::string>("softPFElectronPosModuleName");
+  softPFElectronNegModuleName_    = iConfig.getParameter<std::string>("softPFElectronNegModuleName");
+
+  softPFMuonTagInfoName_      = iConfig.getParameter<edm::InputTag>("softPFMuonTagInfoName");
+  softPFElectronTagInfoName_  = iConfig.getParameter<edm::InputTag>("softPFElectronTagInfoName");
   
   muonCollectionName_       = iConfig.getParameter<edm::InputTag>("muonCollectionName");
+
   triggerTable_             = iConfig.getParameter<edm::InputTag>("triggerTable");
   genJetCollection_         = iConfig.getParameter<std::string>("genJetCollection");
   
@@ -333,9 +361,22 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   smalltree->Branch("Jet_CombSvxP",    Jet_CombSvxP    ,"Jet_CombSvxP[nJet]/F");
   smalltree->Branch("Jet_CombSvx",     Jet_CombSvx     ,"Jet_CombSvx[nJet]/F");
   
-  //$$ smalltree->Branch("Jet_CombSvxN_R",	 Jet_CombSvxN_R    ,"Jet_CombSvxN_R[nJet]/F");
-  //$$ smalltree->Branch("Jet_CombSvxP_R",	 Jet_CombSvxP_R    ,"Jet_CombSvxP_R[nJet]/F");
-  //$$ smalltree->Branch("Jet_CombSvx_R",	 Jet_CombSvx_R     ,"Jet_CombSvx_R[nJet]/F");
+  smalltree->Branch("Jet_RetCombSvxN",	 Jet_RetCombSvxN    ,"Jet_RetCombSvxN[nJet]/F");
+  smalltree->Branch("Jet_RetCombSvxP",	 Jet_RetCombSvxP    ,"Jet_RetCombSvxP[nJet]/F");
+  smalltree->Branch("Jet_RetCombSvx",	 Jet_RetCombSvx     ,"Jet_RetCombSvx[nJet]/F");
+  
+  smalltree->Branch("Jet_CombCSVJP_N",	 Jet_CombCSVJP_N    ,"Jet_CombCSVJP_N[nJet]/F");
+  smalltree->Branch("Jet_CombCSVJP_P",	 Jet_CombCSVJP_P    ,"Jet_CombCSVJP_P[nJet]/F");
+  smalltree->Branch("Jet_CombCSVJP", 	 Jet_CombCSVJP      ,"Jet_CombCSVJP[nJet]/F");
+  
+  smalltree->Branch("Jet_CombCSVSL_N",	 Jet_CombCSVSL_N    ,"Jet_CombCSVSL_N[nJet]/F");
+  smalltree->Branch("Jet_CombCSVSL_P",	 Jet_CombCSVSL_P    ,"Jet_CombCSVSL_P[nJet]/F");
+  smalltree->Branch("Jet_CombCSVSL",	 Jet_CombCSVSL      ,"Jet_CombCSVSL[nJet]/F");
+  
+  smalltree->Branch("Jet_CombCSVJPSL_N", Jet_CombCSVJPSL_N  ,"Jet_CombCSVJPSL_N[nJet]/F");
+  smalltree->Branch("Jet_CombCSVJPSL_P", Jet_CombCSVJPSL_P  ,"Jet_CombCSVJPSL_P[nJet]/F");
+  smalltree->Branch("Jet_CombCSVJPSL",	 Jet_CombCSVJPSL    ,"Jet_CombCSVJPSL[nJet]/F");
+
   smalltree->Branch("Jet_SimpIVF_HP",  Jet_SimpIVF_HP  ,"Jet_SimpIVF_HP[nJet]/F");
   smalltree->Branch("Jet_SimpIVF_HE",  Jet_SimpIVF_HE  ,"Jet_SimpIVF_HE[nJet]/F");
   smalltree->Branch("Jet_DoubIVF_HE",  Jet_DoubIVF_HE  ,"Jet_DoubIVF_HE[nJet]/F");
@@ -343,7 +384,13 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   smalltree->Branch("Jet_CombIVF_P"  , Jet_CombIVF_P   ,"Jet_CombIVF_P[nJet]/F");
   
   smalltree->Branch("Jet_SoftMuN",     Jet_SoftMuN     ,"Jet_SoftMuN[nJet]/F");
+  smalltree->Branch("Jet_SoftMuP",     Jet_SoftMuP     ,"Jet_SoftMuP[nJet]/F");
   smalltree->Branch("Jet_SoftMu",      Jet_SoftMu      ,"Jet_SoftMu[nJet]/F");
+
+  smalltree->Branch("Jet_SoftElN",     Jet_SoftElN     ,"Jet_SoftElN[nJet]/F");
+  smalltree->Branch("Jet_SoftElP",     Jet_SoftElP     ,"Jet_SoftElP[nJet]/F");
+  smalltree->Branch("Jet_SoftEl",      Jet_SoftEl      ,"Jet_SoftEl[nJet]/F");
+
   smalltree->Branch("Jet_hist1",       Jet_hist1       ,"Jet_hist1[nJet]/I");
   smalltree->Branch("Jet_hist2",       Jet_hist2       ,"Jet_hist2[nJet]/I");
   smalltree->Branch("Jet_hist3",       Jet_hist3       ,"Jet_hist3[nJet]/I");
@@ -357,6 +404,9 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   smalltree->Branch("Jet_SV_multi",    Jet_SV_multi      ,"Jet_SV_multi[nJet]/I");  
   smalltree->Branch("Jet_nFirstTrkInc", Jet_nFirstTrkInc ,"Jet_nFirstTrkInc[nJet]/I");
   smalltree->Branch("Jet_nLastTrkInc",  Jet_nLastTrkInc  ,"Jet_nLastTrkInc[nJet]/I"); 
+
+  smalltree->Branch("Jet_VtxCat",      Jet_VtxCat  ,      "Jet_VtxCat[nJet]/I");
+  
   
   //--------------------------------------
   // muon information 
@@ -385,6 +435,36 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   smalltree->Branch("Muon_Proba",    Muon_Proba    ,"Muon_Proba[nMuon]/F");
   smalltree->Branch("Muon_deltaR",   Muon_deltaR   ,"Muon_deltaR[nMuon]/F");
   smalltree->Branch("Muon_ratio",    Muon_ratio    ,"Muon_ratio[nMuon]/F");
+  
+  //--------------------------------------
+  // pf electron information 
+  //--------------------------------------
+  smalltree->Branch("nPFElectron"	  ,&nPFElectron	       ,"nPFElectron/I");
+  smalltree->Branch("PFElectron_IdxJet",   PFElectron_IdxJet   ,"PFElectron_IdxJet[nPFElectron]/I");
+  smalltree->Branch("PFElectron_pt",       PFElectron_pt       ,"PFElectron_pt[nPFElectron]/F");
+  smalltree->Branch("PFElectron_eta",      PFElectron_eta      ,"PFElectron_eta[nPFElectron]/F");
+  smalltree->Branch("PFElectron_phi",      PFElectron_phi      ,"PFElectron_phi[nPFElectron]/F");
+  smalltree->Branch("PFElectron_ptrel",    PFElectron_ptrel    ,"PFElectron_ptrel[nPFElectron]/F");
+  smalltree->Branch("PFElectron_deltaR",   PFElectron_deltaR   ,"PFElectron_deltaR[nPFElectron]/F");
+  smalltree->Branch("PFElectron_ratio",    PFElectron_ratio    ,"PFElectron_ratio[nPFElectron]/F");
+  smalltree->Branch("PFElectron_ratioRel", PFElectron_ratioRel ,"PFElectron_ratioRel[nPFElectron]/F");
+  smalltree->Branch("PFElectron_IPsig",    PFElectron_IPsig    ,"PFElectron_IPsig[nPFElectron]/F"); 
+  //smalltree->Branch("PFElectron_mva_e_pi", PFElectron_mva_e_pi ,"PFElectron_mva_e_pi[nPFElectron]/F"); 
+  
+  //--------------------------------------
+  // pf muon information 
+  //--------------------------------------
+  smalltree->Branch("nPFMuon"	         ,&nPFMuon           ,"nPFMuon/I");
+  smalltree->Branch("PFMuon_IdxJet",      PFMuon_IdxJet      ,"PFMuon_IdxJet[nPFMuon]/I");
+  smalltree->Branch("PFMuon_pt",          PFMuon_pt          ,"PFMuon_pt[nPFMuon]/F");
+  smalltree->Branch("PFMuon_eta",         PFMuon_eta         ,"PFMuon_eta[nPFMuon]/F");
+  smalltree->Branch("PFMuon_phi",         PFMuon_phi         ,"PFMuon_phi[nPFMuon]/F");
+  smalltree->Branch("PFMuon_ptrel",       PFMuon_ptrel       ,"PFMuon_ptrel[nPFMuon]/F");
+  smalltree->Branch("PFMuon_deltaR",      PFMuon_deltaR      ,"PFMuon_deltaR[nPFMuon]/F");
+  smalltree->Branch("PFMuon_ratio",       PFMuon_ratio       ,"PFMuon_ratio[nPFMuon]/F");
+  smalltree->Branch("PFMuon_ratioRel",    PFMuon_ratioRel    ,"PFMuon_ratioRel[nPFMuon]/F");
+  smalltree->Branch("PFMuon_IPsig",       PFMuon_IPsig       ,"PFMuon_IPsig[nPFMuon]/F");    
+  smalltree->Branch("PFMuon_GoodQuality", PFMuon_GoodQuality ,"PFMuon_GoodQuality[nPFMuon]/I");    
   
   //--------------------------------------
   // Inclusive Track information for PtRel template 
@@ -800,12 +880,33 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   edm::Handle<reco::JetTagCollection> jetTags_posCombinedSvtx;
   iEvent.getByLabel(combinedSvtxPosModuleName_, jetTags_posCombinedSvtx);
   
-  //$$  edm::Handle<reco::JetTagCollection> jetTags_CombinedSvtx_R;
-  //$$  iEvent.getByLabel(combinedSvtxRetrainedModuleName_, jetTags_CombinedSvtx_R);
-  //$$  edm::Handle<reco::JetTagCollection> jetTags_negCombinedSvtx_R;
-  //$$  iEvent.getByLabel(combinedSvtxNegRetrainedModuleName_, jetTags_negCombinedSvtx_R);
-  //$$  edm::Handle<reco::JetTagCollection> jetTags_posCombinedSvtx_R;
-  //$$  iEvent.getByLabel(combinedSvtxPosRetrainedModuleName_, jetTags_posCombinedSvtx_R);
+  edm::Handle<reco::JetTagCollection> jetTags_RetCombinedSvtx;
+  iEvent.getByLabel(combinedSvtxRetrainedModuleName_, jetTags_RetCombinedSvtx);
+  edm::Handle<reco::JetTagCollection> jetTags_negRetCombinedSvtx;
+  iEvent.getByLabel(combinedSvtxRetrainedNegModuleName_, jetTags_negRetCombinedSvtx);
+  edm::Handle<reco::JetTagCollection> jetTags_posRetCombinedSvtx;
+  iEvent.getByLabel(combinedSvtxRetrainedPosModuleName_, jetTags_posRetCombinedSvtx);
+  
+  edm::Handle<reco::JetTagCollection> jetTags_CombinedCSVJP;
+  iEvent.getByLabel(combinedCSVJPModuleName_, jetTags_CombinedCSVJP);
+  edm::Handle<reco::JetTagCollection> jetTags_negCombinedCSVJP;
+  iEvent.getByLabel(combinedCSVJPNegModuleName_, jetTags_negCombinedCSVJP);
+  edm::Handle<reco::JetTagCollection> jetTags_posCombinedCSVJP;
+  iEvent.getByLabel(combinedCSVJPPosModuleName_, jetTags_posCombinedCSVJP);
+  
+  edm::Handle<reco::JetTagCollection> jetTags_CombinedCSVSL;
+  iEvent.getByLabel(combinedCSVSLModuleName_, jetTags_CombinedCSVSL);
+  edm::Handle<reco::JetTagCollection> jetTags_negCombinedCSVSL;
+  iEvent.getByLabel(combinedCSVSLNegModuleName_, jetTags_negCombinedCSVSL);
+  edm::Handle<reco::JetTagCollection> jetTags_posCombinedCSVSL;
+  iEvent.getByLabel(combinedCSVSLPosModuleName_, jetTags_posCombinedCSVSL);
+  
+  edm::Handle<reco::JetTagCollection> jetTags_CombinedCSVJPSL;
+  iEvent.getByLabel(combinedCSVJPSLModuleName_, jetTags_CombinedCSVJPSL);
+  edm::Handle<reco::JetTagCollection> jetTags_negCombinedCSVJPSL;
+  iEvent.getByLabel(combinedCSVJPSLNegModuleName_, jetTags_negCombinedCSVJPSL);
+  edm::Handle<reco::JetTagCollection> jetTags_posCombinedCSVJPSL;
+  iEvent.getByLabel(combinedCSVJPSLPosModuleName_, jetTags_posCombinedCSVJPSL);
   
   edm::Handle<reco::JetTagCollection> jetTags_simpleIVF_HP;
   iEvent.getByLabel(simpleIVFModuleNameHighPur_, jetTags_simpleIVF_HP);
@@ -821,16 +922,35 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   iEvent.getByLabel(combinedIVFPosModuleName_, jetTags_combinedIVF_P);
   
   //------------------------------------------------------
-  // Soft muon tagger
+  // Soft lepton tagger
   //------------------------------------------------------
   
   edm::Handle<reco::JetTagCollection> jetTags_softMu;
-  iEvent.getByLabel(softMuonModuleName_, jetTags_softMu);
+  iEvent.getByLabel(softPFMuonModuleName_, jetTags_softMu);
+  edm::Handle<reco::JetTagCollection> jetTags_softMupos;
+  iEvent.getByLabel(softPFMuonPosModuleName_, jetTags_softMupos);
   edm::Handle<reco::JetTagCollection> jetTags_softMuneg;
-  iEvent.getByLabel(softMuonNegModuleName_, jetTags_softMuneg);
+  iEvent.getByLabel(softPFMuonNegModuleName_, jetTags_softMuneg);
+
+  edm::Handle<reco::SoftLeptonTagInfoCollection> tagInfoSoftMuon;
+  iEvent.getByLabel(softPFMuonTagInfoName_, tagInfoSoftMuon);
   
-  edm::Handle<reco::SoftLeptonTagInfoCollection> tagInos_softmuon;
-  iEvent.getByLabel(softMuonTagInfoName_, tagInos_softmuon);
+  edm::Handle<reco::JetTagCollection> jetTags_softEl;
+  iEvent.getByLabel(softPFElectronModuleName_, jetTags_softEl);
+  edm::Handle<reco::JetTagCollection> jetTags_softElpos;
+  iEvent.getByLabel(softPFElectronPosModuleName_, jetTags_softElpos);
+  edm::Handle<reco::JetTagCollection> jetTags_softElneg;
+  iEvent.getByLabel(softPFElectronNegModuleName_, jetTags_softElneg);
+  
+  edm::Handle<reco::SoftLeptonTagInfoCollection> tagInfoSoftElectron;
+  iEvent.getByLabel(softPFElectronTagInfoName_, tagInfoSoftElectron);
+  
+  // Backward compatibility for performance measurements
+  edm::Handle<reco::JetTagCollection> jetTags_softMuPerf;
+  iEvent.getByLabel("positiveSoftLeptonByPtBJetTags", jetTags_softMuPerf);
+
+  edm::Handle<reco::SoftLeptonTagInfoCollection> tagInfoSoftMuonPerf;
+  iEvent.getByLabel("softMuonTagInfos", tagInfoSoftMuonPerf);
   
   
   //----------------------------------------
@@ -998,6 +1118,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   int numjet = 0;
   nJet = 0;
   nMuon = 0;
+  nPFElectron = 0;
+  nPFMuon = 0;
   
   
   //*********************************
@@ -1263,8 +1385,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	}
 	
 	// Track categories for Jet Probability calibration
-	//if ( Track_IPsig[nTrack] < 0 ) TrackProbaNeg->Fill(-Track_Proba[nTrack]);
-	//if ( Track_IPsig[nTrack] < 0 && PFJet80 ) TrackProbJet80->Fill(-Track_Proba[nTrack]);
+	//$$$$ if ( Track_IPsig[nTrack] < 0 ) TrackProbaNeg->Fill(-Track_Proba[nTrack]);
+	//$$$$ if ( Track_IPsig[nTrack] < 0 && PFJet80 ) TrackProbJet80->Fill(-Track_Proba[nTrack]);
 	
 	// 	  std::vector<float > theVectOrdered  = getTrackProbabilies(((*tagInfo)[ith_tagged].probabilities(0)), 0);
 	// 	  Jet_TkProba[nJet]  = calculProbability( theVectOrdered );
@@ -1283,12 +1405,12 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	
 	if(jet4P.DeltaR(track4P) < 0.3 && std::fabs(distJetAxis) < 0.07 && decayLength < 5.0 ){
 
-//$$$$
-	if ( Track_IPsig[nTrack] < 0 ) TrackProbaNeg->Fill(-Track_Proba[nTrack]);
-	if ( Track_IPsig[nTrack] < 0 && PFJet80 ) TrackProbJet80->Fill(-Track_Proba[nTrack]);
-//$$$$
-	
-	if ( findCat( &ptrack, *&cat0 ) ) {
+	  //$$$$
+	  if ( Track_IPsig[nTrack] < 0 ) TrackProbaNeg->Fill(-Track_Proba[nTrack]);
+	  if ( Track_IPsig[nTrack] < 0 && PFJet80 ) TrackProbJet80->Fill(-Track_Proba[nTrack]);
+	  //$$$$
+ 
+        if ( findCat( &ptrack, *&cat0 ) ) {
 	  Track_category[nTrack] = 0;
 	  if ( Track_IPsig[nTrack] < 0 ) { 
 	    IPSign_cat0->Fill( Track_IPsig[nTrack] );
@@ -1605,13 +1727,45 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     float CombinedSvtxN = (*jetTags_negCombinedSvtx)[ith_tagged].second;
     ith_tagged  	= this->TaggedJet(jetsColl.at(ijet),jetTags_posCombinedSvtx);
     float CombinedSvtxP = (*jetTags_posCombinedSvtx)[ith_tagged].second;
+
+    int ith_tagged_IP = this->TaggedJet(jetsColl.at(ijet),jetTags_TCHighEff);
+    int ith_tagged_svx = this->TaggedJet(jetsColl.at(ijet),jetTags_SvtxHighEff);
+
+    std::vector<const reco::BaseTagInfo*>  baseTagInfos_test;
+    JetTagComputer::TagInfoHelper helper_test(baseTagInfos_test);
+    baseTagInfos_test.push_back( &(*tagInfo)[ith_tagged_IP]) ; 
+    baseTagInfos_test.push_back( &(*tagInfoSVx)[ith_tagged_svx]);
+    TaggingVariableList vars_test = computer->taggingVariables(helper_test);
+    float JetVtxCategory = -9999.;
+    if(vars_test.checkTag(reco::btau::vertexCategory)) JetVtxCategory = ( vars_test.get(reco::btau::vertexCategory) );
+
+    ith_tagged             = this->TaggedJet(jetsColl.at(ijet),jetTags_RetCombinedSvtx);
+    float RetCombinedSvtx  = (*jetTags_RetCombinedSvtx)[ith_tagged].second;
+    ith_tagged             = this->TaggedJet(jetsColl.at(ijet),jetTags_negRetCombinedSvtx);
+    float RetCombinedSvtxN = (*jetTags_negRetCombinedSvtx)[ith_tagged].second;
+    ith_tagged  	   = this->TaggedJet(jetsColl.at(ijet),jetTags_posRetCombinedSvtx);
+    float RetCombinedSvtxP = (*jetTags_posRetCombinedSvtx)[ith_tagged].second;
     
-    //$$    ith_tagged            = this->TaggedJet(jetsColl.at(ijet),jetTags_CombinedSvtx_R);
-    //$$    float CombinedSvtx_R  = (*jetTags_CombinedSvtx_R)[ith_tagged].second;
-    //$$    ith_tagged            = this->TaggedJet(jetsColl.at(ijet),jetTags_negCombinedSvtx_R);
-    //$$    float CombinedSvtxN_R = (*jetTags_negCombinedSvtx_R)[ith_tagged].second;
-    //$$    ith_tagged  	  = this->TaggedJet(jetsColl.at(ijet),jetTags_posCombinedSvtx_R);
-    //$$    float CombinedSvtxP_R = (*jetTags_posCombinedSvtx_R)[ith_tagged].second;
+    ith_tagged           = this->TaggedJet(jetsColl.at(ijet),jetTags_CombinedCSVJP);
+    float CombinedCSVJP  = (*jetTags_CombinedCSVJP)[ith_tagged].second;
+    ith_tagged           = this->TaggedJet(jetsColl.at(ijet),jetTags_negCombinedCSVJP);
+    float CombinedCSVJPN = (*jetTags_negCombinedCSVJP)[ith_tagged].second;
+    ith_tagged  	 = this->TaggedJet(jetsColl.at(ijet),jetTags_posCombinedCSVJP);
+    float CombinedCSVJPP = (*jetTags_posCombinedCSVJP)[ith_tagged].second;
+    
+    ith_tagged           = this->TaggedJet(jetsColl.at(ijet),jetTags_CombinedCSVSL);
+    float CombinedCSVSL  = (*jetTags_CombinedCSVSL)[ith_tagged].second;
+    ith_tagged           = this->TaggedJet(jetsColl.at(ijet),jetTags_negCombinedCSVSL);
+    float CombinedCSVSLN = (*jetTags_negCombinedCSVSL)[ith_tagged].second;
+    ith_tagged  	 = this->TaggedJet(jetsColl.at(ijet),jetTags_posCombinedCSVSL);
+    float CombinedCSVSLP = (*jetTags_posCombinedCSVSL)[ith_tagged].second;
+    
+    ith_tagged           = this->TaggedJet(jetsColl.at(ijet),jetTags_CombinedCSVJPSL);
+    float CombinedCSVJPSL  = (*jetTags_CombinedCSVJPSL)[ith_tagged].second;
+    ith_tagged           = this->TaggedJet(jetsColl.at(ijet),jetTags_negCombinedCSVJPSL);
+    float CombinedCSVJPSLN = (*jetTags_negCombinedCSVJPSL)[ith_tagged].second;
+    ith_tagged  	 = this->TaggedJet(jetsColl.at(ijet),jetTags_posCombinedCSVJPSL);
+    float CombinedCSVJPSLP = (*jetTags_posCombinedCSVJPSL)[ith_tagged].second;
     
     ith_tagged            = this->TaggedJet(jetsColl.at(ijet),jetTags_simpleIVF_HP);
     float SimpleIVF_HP    = (*jetTags_simpleIVF_HP)[ith_tagged].second;
@@ -1636,38 +1790,69 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     float SvtxHP  = (*jetTags_SvtxHighPur)[ith_tagged].second;
     ith_tagged    = this->TaggedJet(jetsColl.at(ijet),jetTags_negSvtxHighPur);
     float SvtxNHP = (*jetTags_negSvtxHighPur)[ith_tagged].second;
-    
+
     float SoftM  = 0;
+    float SoftMP = 0;
     float SoftMN = 0;
     ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_softMu);
-    int itagjetMuon = ith_tagged;
+    int itagjetPFMuon = ith_tagged;
     if ( (*jetTags_softMu)[ith_tagged].second     > -100000 )   
       SoftM  = (*jetTags_softMu)[ith_tagged].second;
+    ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_softMupos);
+    if ( (*jetTags_softMupos)[ith_tagged].second  > -100000 )   
+      SoftMP = ((*jetTags_softMupos)[ith_tagged].second);
     ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_softMuneg);
     if ( (*jetTags_softMuneg)[ith_tagged].second  > -100000 )   
       SoftMN = ((*jetTags_softMuneg)[ith_tagged].second);
-    if ( SoftMN > 0 ) SoftMN = -SoftMN;
+    //if ( SoftMN > 0 ) SoftMN = -SoftMN;
     
-    // Muon information
-    ith_tagged = itagjetMuon;
+    // PFMuon information
+    ith_tagged = itagjetPFMuon;    
     
-    //     cout << "JetProba:" << Proba<< endl;
-    //     cout << "JetBprob:" << Bprob<< endl;
-    //     cout << "CombinedSvtx:" << CombinedSvtx<< endl;
-    //     cout << "Svtx:" <<Svtx << endl;
-    //     cout << "SvtxHP:" << SvtxHP<< endl;
-    
-    
-    
-    for (unsigned int leptIdx = 0; leptIdx < (*tagInos_softmuon)[ith_tagged].leptons(); leptIdx++){
+    for (unsigned int leptIdx = 0; leptIdx < (*tagInfoSoftMuon)[ith_tagged].leptons(); leptIdx++) {
       
-      int muIdx = matchMuon( (*tagInos_softmuon)[ith_tagged].lepton(leptIdx), muons );
+      PFMuon_IdxJet[nPFMuon]    = nJet;
+      PFMuon_pt[nPFMuon]        = (*tagInfoSoftMuon)[ith_tagged].lepton(leptIdx)->pt();
+      PFMuon_eta[nPFMuon]       = (*tagInfoSoftMuon)[ith_tagged].lepton(leptIdx)->eta();
+      PFMuon_phi[nPFMuon]       = (*tagInfoSoftMuon)[ith_tagged].lepton(leptIdx)->phi();
+      PFMuon_ptrel[nPFMuon]     = calculPtRel( (*(*tagInfoSoftMuon)[ith_tagged].lepton(leptIdx)), jetsColl.at(ijet), JES, CaloJetCollectionTags_);
+      PFMuon_ratio[nPFMuon]     = ((*tagInfoSoftMuon)[ith_tagged].properties(leptIdx).ratio);
+      PFMuon_ratioRel[nPFMuon]  = ((*tagInfoSoftMuon)[ith_tagged].properties(leptIdx).ratioRel);
+      PFMuon_deltaR[nPFMuon]    = ((*tagInfoSoftMuon)[ith_tagged].properties(leptIdx).deltaR);
+      PFMuon_IPsig[nPFMuon]     = ((*tagInfoSoftMuon)[ith_tagged].properties(leptIdx).sip3d);
+
+      PFMuon_GoodQuality[nPFMuon] = 0;
+      int muIdx = matchMuon( (*tagInfoSoftMuon)[ith_tagged].lepton(leptIdx), muons );
+      if ( muIdx != -1 && muons[muIdx].isGlobalMuon() == 1 ) {
+
+	PFMuon_GoodQuality[nPFMuon] = 1;
+	
+	if (muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits()>0 && 
+	    muons[muIdx].numberOfMatches()>1 && muons[muIdx].innerTrack()->hitPattern().numberOfValidHits()>10 &&
+	    muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits()>1 && 
+	    muons[muIdx].innerTrack()->trackerExpectedHitsOuter().numberOfHits()<3 &&
+	    muons[muIdx].globalTrack()->normalizedChi2()<10. && muons[muIdx].innerTrack()->normalizedChi2()<10.)
+	  PFMuon_GoodQuality[nPFMuon] = 2;
+	
+      }
+
+      nPFMuon++;
+
+    }
+    
+    // Old soft muon information for perfomance study safety
+    
+    ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_softMuPerf);
+    
+    for (unsigned int leptIdx = 0; leptIdx < (*tagInfoSoftMuonPerf)[ith_tagged].leptons(); leptIdx++){
+
+      int muIdx = matchMuon( (*tagInfoSoftMuonPerf)[ith_tagged].lepton(leptIdx), muons );
       //      if ( muIdx != -1 ) std::cout << " Jet " << nJet << " pt " << Jet_pt[nJet]*JES*Jet_residual[nJet] << " Global " << muons[muIdx].isGlobalMuon() << " Matches " << muons[muIdx].numberOfMatches() << std::endl;
       if ( muIdx != -1 && muons[muIdx].isGlobalMuon() == 1 ) {
-	//if(muIdx > (muons.size())) cout << "wrong idx for muon " << muIdx << "  while muon size is " << (*tagInos_softmuon)[ith_tagged].leptons() << endl;
+	//if(muIdx > (muons.size())) cout << "wrong idx for muon " << muIdx << "  while muon size is " << (*tagInfoSoftMuonPerf)[ith_tagged].leptons() << endl;
         //if (nMuon !=0) continue;
 	Muon_IdxJet[nMuon] = nJet;
-	Muon_ptrel[nMuon]   = calculPtRel( (*(*tagInos_softmuon)[ith_tagged].lepton(leptIdx)), jetsColl.at(ijet), JES, CaloJetCollectionTags_);
+	Muon_ptrel[nMuon]   = calculPtRel( (*(*tagInfoSoftMuonPerf)[ith_tagged].lepton(leptIdx)), jetsColl.at(ijet), JES, CaloJetCollectionTags_);
 	Muon_nTkHit[nMuon]    = muons[muIdx].innerTrack()->hitPattern().numberOfValidHits();
 	Muon_nPixHit[nMuon]   = muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits();
 	Muon_nMuHit[nMuon]    = muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits();
@@ -1678,8 +1863,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	Muon_pt[nMuon]       = muons[muIdx].pt() 			   ;
 	Muon_eta[nMuon]      = muons[muIdx].eta()			   ;
 	Muon_phi[nMuon]      = muons[muIdx].phi()			   ;
-	Muon_ratio[nMuon]    = ((*tagInos_softmuon)[ith_tagged].properties(leptIdx).ratio);
-        Muon_deltaR[nMuon]   = ((*tagInos_softmuon)[ith_tagged].properties(leptIdx).deltaR);
+	Muon_ratio[nMuon]    = ((*tagInfoSoftMuonPerf)[ith_tagged].properties(leptIdx).ratio);
+        Muon_deltaR[nMuon]   = ((*tagInfoSoftMuonPerf)[ith_tagged].properties(leptIdx).deltaR);
 	
 	//         cout <<"Muon_ptrel:" << Muon_ptrel[nMuon]<< endl;
 	//         cout <<"Muon_eta:" <<Muon_eta[nMuon] << endl;
@@ -1702,7 +1887,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 	Muon_hist[nMuon] = 0; 
 	if ( useTrackHistory_ && !isData_ ) {	  
-	  TrackCategories::Flags theFlagP = classifier_.evaluate( (*tagInos_softmuon)[ith_tagged].lepton(leptIdx) ).flags();
+	  TrackCategories::Flags theFlagP = classifier_.evaluate( (*tagInfoSoftMuonPerf)[ith_tagged].lepton(leptIdx) ).flags();
 	  if ( theFlagP[TrackCategories::BWeakDecay] )         Muon_hist[nMuon] += int(pow(10., -1 + 1)); 
 	  if ( theFlagP[TrackCategories::CWeakDecay] )         Muon_hist[nMuon] += int(pow(10., -1 + 2)); 
 	  if ( theFlagP[TrackCategories::TauDecay] )	       Muon_hist[nMuon] += int(pow(10., -1 + 3));  
@@ -1742,7 +1927,42 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	nMuon++;
       }
     }
+  
+    float SoftE  = 0;
+    float SoftEP = 0;
+    float SoftEN = 0;
+    ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_softEl);
+    int itagjetPFElectron = ith_tagged;
+    if ( (*jetTags_softEl)[ith_tagged].second     > -100000 )   
+      SoftE  = (*jetTags_softEl)[ith_tagged].second;
+    ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_softElpos);
+    if ( (*jetTags_softElpos)[ith_tagged].second  > -100000 )   
+      SoftEP = ((*jetTags_softElpos)[ith_tagged].second);
+    ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_softElneg);
+    if ( (*jetTags_softElneg)[ith_tagged].second  > -100000 )   
+      SoftEN = ((*jetTags_softElneg)[ith_tagged].second);
+    //if ( SoftEN > 0 ) SoftEN = -SoftEN;
     
+    // PFElectron information
+    ith_tagged = itagjetPFElectron;    
+    
+    for (unsigned int leptIdx = 0; leptIdx < (*tagInfoSoftElectron)[ith_tagged].leptons(); leptIdx++) {
+      
+      PFElectron_IdxJet[nPFElectron]    = nJet;
+      PFElectron_pt[nPFElectron]        = (*tagInfoSoftElectron)[ith_tagged].lepton(leptIdx)->pt();
+      PFElectron_eta[nPFElectron]       = (*tagInfoSoftElectron)[ith_tagged].lepton(leptIdx)->eta();
+      PFElectron_phi[nPFElectron]       = (*tagInfoSoftElectron)[ith_tagged].lepton(leptIdx)->phi();
+      PFElectron_ptrel[nPFElectron]     = calculPtRel( (*(*tagInfoSoftElectron)[ith_tagged].lepton(leptIdx)), jetsColl.at(ijet), JES, CaloJetCollectionTags_);
+      PFElectron_ratio[nPFElectron]     = ((*tagInfoSoftElectron)[ith_tagged].properties(leptIdx).ratio);
+      PFElectron_ratioRel[nPFElectron]  = ((*tagInfoSoftElectron)[ith_tagged].properties(leptIdx).ratioRel);
+      PFElectron_deltaR[nPFElectron]    = ((*tagInfoSoftElectron)[ith_tagged].properties(leptIdx).deltaR);
+      PFElectron_IPsig[nPFElectron]     = ((*tagInfoSoftElectron)[ith_tagged].properties(leptIdx).sip3d);
+      PFElectron_mva_e_pi[nPFElectron]       = -999.;//(*tagInfoSoftElectron)[ith_tagged].properties(leptIdx).mva_e_pi;
+      
+      nPFElectron++;
+
+    }
+
     // Jet information
     Jet_ProbaN[nJet]   = ProbaN;	 
     Jet_ProbaP[nJet]   = ProbaP;	  
@@ -1757,18 +1977,31 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     Jet_CombSvxN[nJet] = CombinedSvtxN;
     Jet_CombSvxP[nJet] = CombinedSvtxP;
     Jet_CombSvx[nJet]  = CombinedSvtx;  
-    //$$    Jet_CombSvxN_R[nJet] = CombinedSvtxN_R;
-    //$$    Jet_CombSvxP_R[nJet] = CombinedSvtxP_R;
-    //$$    Jet_CombSvx_R[nJet]  = CombinedSvtx_R;   
+    Jet_RetCombSvxN[nJet] = RetCombinedSvtxN;
+    Jet_RetCombSvxP[nJet] = RetCombinedSvtxP;
+    Jet_RetCombSvx[nJet]  = RetCombinedSvtx;     
+    Jet_CombCSVJP_N[nJet] = CombinedCSVJPN;
+    Jet_CombCSVJP_P[nJet] = CombinedCSVJPP;
+    Jet_CombCSVJP[nJet]  = CombinedCSVJP;        
+    Jet_CombCSVSL_N[nJet] = CombinedCSVSLN;
+    Jet_CombCSVSL_P[nJet] = CombinedCSVSLP;
+    Jet_CombCSVSL[nJet]  = CombinedCSVSL;        
+    Jet_CombCSVJPSL_N[nJet] = CombinedCSVJPSLN;
+    Jet_CombCSVJPSL_P[nJet] = CombinedCSVJPSLP;
+    Jet_CombCSVJPSL[nJet]  = CombinedCSVJPSL;   
     Jet_SimpIVF_HP[nJet]  = SimpleIVF_HP;
     Jet_SimpIVF_HE[nJet]  = SimpleIVF_HE;
     Jet_DoubIVF_HE[nJet]  = DoubleIVF_HE;
     Jet_CombIVF[nJet]     = CombinedIVF; 
     Jet_CombIVF_P[nJet]   = CombinedIVF_P;
     Jet_SoftMuN[nJet]  = SoftMN;	 
+    Jet_SoftMuP[nJet]  = SoftMP;	 
     Jet_SoftMu[nJet]   = SoftM; 	
-    Jet_SoftMuN[nJet]  = SoftMN;	 
-    Jet_SoftMu[nJet]   = SoftM; 	 
+    Jet_SoftElN[nJet]  = SoftEN;	
+    Jet_SoftElP[nJet]  = SoftEP;	 
+    Jet_SoftEl[nJet]   = SoftE; 	 
+
+    Jet_VtxCat[nJet] = JetVtxCategory;
     
     ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_TCHighEff);
     std::vector<TrackIPTagInfo::TrackIPData>  ipdata = (*tagInfo)[ith_tagged].impactParameterData();

@@ -57,10 +57,26 @@ btagana = cms.EDAnalyzer("BTagAnalyzer",
     combinedSvtxNegModuleName = cms.string('combinedSecondaryVertexNegativeBJetTags'),
     combinedSvtxPosModuleName = cms.string('combinedSecondaryVertexPositiveBJetTags'),
         
+    combinedSvtxJPModuleName    = cms.string('combinedSecondaryVertexJPBJetTags'),
+    combinedSvtxNegJPModuleName = cms.string('combinedSecondaryVertexNegativeJPBJetTags'),
+    combinedSvtxPosJPModuleName = cms.string('combinedSecondaryVertexPositiveJPBJetTags'),
+        
     combinedSvtxRetrainedModuleName    = cms.string('combinedSecondaryVertexRetrainedBJetTags'),
-    combinedSvtxNegRetrainedModuleName = cms.string('combinedSecondaryVertexNegativeRetrainedBJetTags'),
-    combinedSvtxPosRetrainedModuleName = cms.string('combinedSecondaryVertexPositiveRetrainedBJetTags'),
-			
+    combinedSvtxRetrainedNegModuleName = cms.string('combinedSecondaryVertexRetrainedNegativeBJetTags'),
+    combinedSvtxRetrainedPosModuleName = cms.string('combinedSecondaryVertexRetrainedPositiveBJetTags'),
+        
+    combinedCSVJPModuleName    = cms.string('combinedCSVJPBJetTags'),
+    combinedCSVJPNegModuleName = cms.string('negativeCombinedCSVJPBJetTags'),
+    combinedCSVJPPosModuleName = cms.string('positiveCombinedCSVJPBJetTags'),
+        
+    combinedCSVSLModuleName    = cms.string('combinedCSVSLBJetTags'),
+    combinedCSVSLNegModuleName = cms.string('negativeCombinedCSVSLBJetTags'),
+    combinedCSVSLPosModuleName = cms.string('positiveCombinedCSVSLBJetTags'),
+        
+    combinedCSVJPSLModuleName    = cms.string('combinedCSVJPSLBJetTags'),
+    combinedCSVJPSLNegModuleName = cms.string('negativeCombinedCSVJPSLBJetTags'),
+    combinedCSVJPSLPosModuleName = cms.string('positiveCombinedCSVJPSLBJetTags'),
+        			
     simpleIVFModuleNameHighPur      = cms.string('simpleInclusiveSecondaryVertexHighPurBJetTags'),
     simpleIVFModuleNameHighEff      = cms.string('simpleInclusiveSecondaryVertexHighEffBJetTags'),
     doubleIVFModuleNameHighEff      = cms.string('doubleSecondaryVertexHighEffBJetTags'),      
@@ -71,10 +87,22 @@ btagana = cms.EDAnalyzer("BTagAnalyzer",
     svtxNegModuleNameHighPur  = cms.string('simpleSecondaryVertexNegativeHighPurBJetTags'),
     svtxModuleNameHighEff     = cms.string('simpleSecondaryVertexHighEffBJetTags'),
     svtxNegModuleNameHighEff  = cms.string('simpleSecondaryVertexNegativeHighEffBJetTags'),
-    softMuonModuleName        = cms.string('positiveSoftLeptonByPtBJetTags'),
-    softMuonNegModuleName     = cms.string('negativeSoftLeptonByPtBJetTags'),
-    softMuonTagInfoName       = cms.string('softMuonTagInfos'),
-
+                         
+    #softMuonModuleName        = cms.string('positiveSoftLeptonByPtBJetTags'),
+    #softMuonNegModuleName     = cms.string('negativeSoftLeptonByPtBJetTags'),
+    #softMuonTagInfoName       = cms.string('softMuonTagInfos'),
+                         
+    softPFMuonModuleName        = cms.string('softPFMuonRetrainedBJetsTags'),
+    softPFMuonPosModuleName     = cms.string('positiveSoftPFMuonRetrainedBJetsTags'),
+    softPFMuonNegModuleName     = cms.string('negativeSoftPFMuonRetrainedBJetsTags'),
+                         
+    softPFElectronModuleName    = cms.string('softPFElectronRetrainedBJetsTags'),
+    softPFElectronPosModuleName = cms.string('positiveSoftPFElectronRetrainedBJetsTags'),
+    softPFElectronNegModuleName = cms.string('negativeSoftPFElectronRetrainedBJetsTags'),
+                                                 
+    softPFMuonTagInfoName       = cms.InputTag('softPFMuonsTagInfos'),
+    softPFElectronTagInfoName   = cms.InputTag('softPFElectronsTagInfos'),
+                         
     use_ttbar_filter      = cms.bool(False),
     channel       = cms.InputTag("ttbarselectionproducer"),
 )
