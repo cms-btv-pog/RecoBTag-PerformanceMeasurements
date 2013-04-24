@@ -26,7 +26,7 @@ process.source = cms.Source(
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(100)
 )
 
 
@@ -53,22 +53,8 @@ process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
 process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord") 
 
 
-
-
-##-------------------- Import the JEC services -----------------------
-process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
-#$$
-##-------------------- Import the Jet RECO modules -----------------------
-process.load('RecoJets.Configuration.RecoPFJets_cff')
-##-------------------- Turn-on the FastJet density calculation -----------------------
-process.kt6PFJets.doRhoFastjet = True
-##-------------------- Turn-on the FastJet jet area calculation for your favorite algorithm -----------------------
-process.ak5PFJets.doAreaFastjet = True
-#$$
-
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
-#process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.Geometry.GeometryIdeal_cff")
 
 
@@ -563,9 +549,6 @@ process.positiveCombinedCSVSLBJetTags = process.positiveCombinedMVABJetTags.clon
 )
 
 #
-
-process.load("PhysicsTools.JetMCAlgos.CaloJetsMCFlavour_cfi")  
-
 process.load("SimTracker.TrackHistory.TrackClassifier_cff")
 process.load("RecoBTag.PerformanceMeasurements.BTagAnalyzer_cff")
 
@@ -614,20 +597,6 @@ from PhysicsTools.PatAlgos.tools.metTools import *
 process.pfPileUpPF2PAT.Enable = True
 process.pfPileUpPF2PAT.Vertices = cms.InputTag('goodOfflinePrimaryVertices')
 
-process.load('RecoJets.Configuration.RecoJets_cff')
-from RecoJets.JetProducers.kt4PFJets_cfi import kt4PFJets
-
-process.kt6PFJets               = kt4PFJets.clone()
-process.kt6PFJets.rParam        = 0.6     
-#process.kt6PFJets.src           = cms.InputTag('pfNoElectron'+postfix)
-process.kt6PFJets.Rho_EtaMax    = cms.double( 4.4)
-process.kt6PFJets.doRhoFastjet  = True
-process.kt6PFJets.doAreaFastjet = True
-#process.kt6PFJets.voronoiRfact  = 0.9
-
-#process.patJetCorrFactorsPFlow.rho = cms.InputTag("kt6PFJets", "rho")
-getattr(process,"patJetCorrFactors"+postfix).rho = cms.InputTag("kt6PFJets", "rho")
-
 #-------------------------------------
 #Redo the primary vertex
 
@@ -655,8 +624,6 @@ process.PATJetsFilter = cms.EDFilter("PATJetSelector",
                                     )
 				    
 #---------------------------------------
-process.load("bTag.CommissioningCommonSetup.caloJetIDFilter_cff")
-
 
 #Filter for removing scraping events
 process.noscraping = cms.EDFilter("FilterOutScraping",
@@ -696,8 +663,7 @@ process.GlobalTag.toGet = cms.VPSet(
 #---------------------------------------
 #process.TFileService = cms.Service("TFileService", fileName = cms.string("TrackTree.root") )
 process.TFileService = cms.Service("TFileService", fileName = cms.string("JetTree.root") )
- 
-process.btagana.isData              = False 
+
 #$$
 process.btagana.use_selected_tracks = True   ## False if you want to run on all tracks
 process.btagana.useTrackHistory     = False
@@ -706,10 +672,6 @@ process.btagana.producePtRelTemplate = True  ## True for performance studies
 #$$
 process.btagana.triggerTable = 'TriggerResults::HLT' # Data and MC
 #---------------------------------------
-
-
-process.AK5byRef.jets = "selectedPatJetsPF2PAT"
-process.btagana.jetCorrector = cms.string('ak5PFL1FastL2L3')
 
 #process.btagana.Jets = 'selectedPatJetsPF2PAT'
 #process.ak5JetTracksAssociatorAtVertex.jets = "selectedPatJetsPF2PAT"
@@ -746,12 +708,10 @@ process.p = cms.Path(
 #$$
         process.noscraping
         *process.primaryVertexFilter
-        *process.offlinePrimaryVertices 
 	*process.goodOfflinePrimaryVertices
 	*getattr(process,"patPF2PATSequence"+postfix)
         *process.PATJetsFilter
         *process.inclusiveVertexing*process.inclusiveMergedVerticesFiltered*process.bToCharmDecayVertexMerged
-	*process.myPartons*process.AK5Flavour
 	*process.ak5JetTracksAssociatorAtVertex
 	*process.btagging
 	*process.positiveOnlyJetProbabilityJetTags*process.negativeOnlyJetProbabilityJetTags

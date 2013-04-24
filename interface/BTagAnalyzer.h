@@ -32,6 +32,8 @@ Implementation:
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Utilities/interface/RegexMatch.h"
+
 #include "DataFormats/JetReco/interface/JetTracksAssociation.h"
 #include "DataFormats/BTauReco/interface/TrackIPTagInfo.h"
 //#include "PhysicsTools/Utilities/interface/deltaR.h"
@@ -40,11 +42,6 @@ Implementation:
 #include "DataFormats/GeometrySurface/interface/Line.h"
 #include "DataFormats/GeometryCommonDetAlgo/interface/Measurement1D.h"
 #include "DataFormats/GeometryVector/interface/VectorUtil.h"
-
-#include "JetMETCorrections/Objects/interface/JetCorrector.h"
-
-//#include "RecoBTag/MCTools/interface/JetFlavour.h"
-//#include "RecoBTag/MCTools/interface/JetFlavourIdentifier.h"
 
 #include "SimTracker/Records/interface/TrackAssociatorRecord.h"
 #include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
@@ -78,9 +75,6 @@ Implementation:
 #include "TNtuple.h"
 
 #include "DataFormats/BTauReco/interface/SecondaryVertexTagInfo.h"
-//#include "RecoBTag/MCTools/interface/JetFlavour.h"
-//#include "RecoBTag/MCTools/interface/JetFlavourIdentifier.h"
-#include "SimDataFormats/JetMatching/interface/JetFlavourMatching.h"
 
 #include "SimTracker/TrackAssociation/interface/TrackAssociatorBase.h"
 #include "SimTracker/TrackAssociation/interface/TrackAssociatorByHits.h"
@@ -96,17 +90,14 @@ Implementation:
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
-//residual jet corrections
-#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
-#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
-
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/JetReco/interface/JetCollection.h"
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
 
-//reconstruct IP
+// reconstruct IP
 #include "TrackingTools/IPTools/interface/IPTools.h"
 
 #include "RecoBTau/JetTagComputer/interface/GenericMVAJetTagComputer.h"
@@ -117,16 +108,12 @@ Implementation:
 #include "RecoBTag/SecondaryVertex/interface/TrackKinematics.h"
 #include "RecoVertex/VertexPrimitives/interface/ConvertToFromReco.h"
 
+#include <boost/regex.hpp>
 
-struct ltstr
-{
-    bool operator()(const edm::RefToBase<reco::Jet> s1, edm::RefToBase<reco::Jet> s2) const
-    {
-        if (s1.id() != s2.id()) return s1.id()<s2.id();
-        return s1.key()< s2.key();
-    }
-};
-
+//
+// constants, enums and typedefs
+//
+typedef std::vector<pat::Jet> PatJetCollection;
 
 //
 // class declaration
@@ -178,31 +165,30 @@ private:
     std::vector< float > getTrackProbabilies(std::vector< float > , int );
     double calculProbability(std::vector< float > );
 
-    reco::JetFlavour getMatchedParton(const reco::Jet &jet);
-    float calculPtRel(reco::Track theMuon, reco::Jet theJet, double JES , string jetcoll );
+    float calculPtRel(const reco::Track& theMuon, const pat::Jet& theJet);
     
-    int matchMuon(const edm::RefToBase<reco::Track>& theMuon, edm::View<reco::Muon>& muons);
+    int matchMuon(const edm::RefToBase<reco::Track>& theMuon, const edm::View<reco::Muon>& muons);
 
     void setTracksPV( const reco::Vertex *pv, bool isPV );
     
-    double getGenJetPt(reco::Jet theJet, GenJetCollection &theJets);
     int getMuonTk(double pt);
     bool NameCompatible(const std::string& pattern, const std::string& name);
-    
+
+    int TaggedJet(const pat::Jet& , const edm::Handle<reco::JetTagCollection >&  );
+
+    std::vector<simPrimaryVertex> getSimPVs(const edm::Handle<edm::HepMCProduct>& evtMC);
+
     // ----------member data ---------------------------
     std::string outputFile_;
     //std::vector< std::string > moduleLabel_;
 
-    std::string flavourMatchOptionf;
-    edm::InputTag flavourSourcef;
     edm::InputTag muonCollectionName_;
     edm::InputTag triggerTable_;
     edm::InputTag SVComputer_;
     
     //JetFlavourIdentifier jetFlavourIdentifier_;
 
-    std::string CaloJetCollectionTags_;
-    std::string jetCorrector_;
+    std::string JetCollectionTag_;
 
     std::string jetPModuleName_;
     std::string jetPPosModuleName_;
@@ -291,10 +277,6 @@ private:
     std::vector<std::string> triggernames_;
     bool TriggerInfo_;
     std::string genJetCollection_;
-    
-    std::map<edm::RefToBase<reco::Jet>, unsigned int, ltstr> flavoursMapf;
-    edm::Handle<reco::JetFlavourMatchingCollection> theJetPartonMapf;
-    int TaggedJet(reco::Jet , edm::Handle<reco::JetTagCollection >  );
 
     TNtuple* nTuplesJets;
     TrackClassifier classifier_;
@@ -648,9 +630,6 @@ private:
     float PVz;
     float PVzSim;
     float pthat;
-    FactorizedJetCorrector *resJEC_PF ;
-    FactorizedJetCorrector *resJEC_JPT;
-    FactorizedJetCorrector *resJEC_Calo;  
 
     int ttbar_chan;
     float lepton1_pT;
@@ -662,10 +641,6 @@ private:
     float met;
     float mll;
     int trig_ttbar;
-
-
-    std::vector<simPrimaryVertex> getSimPVs(const edm::Handle<edm::HepMCProduct> evtMC);
- 
 };
 
 #endif
