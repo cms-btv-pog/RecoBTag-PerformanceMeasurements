@@ -24,80 +24,67 @@ btagana = cms.EDAnalyzer("BTagAnalyzer",
     muonCollectionName       = cms.InputTag('muons'),
     triggerTable             = cms.InputTag("TriggerResults"),
     svComputer               = cms.InputTag( "combinedSecondaryVertex" ),
-    jetIdParameters         = cms.PSet(
-        vetoFlavour         = cms.vstring(),
-        rejectBCSplitting   = cms.bool(False),
-        physicsDefinition   = cms.bool(False),
-        coneSizeToAssociate = cms.double(0.3),
-        fillLeptons         = cms.bool(False),
-        fillHeavyHadrons    = cms.bool(False),
-        fillPartons         = cms.bool(True),
-        mcSource            = cms.string('source')
-    ),
-    
-    
-    #list of netagive tagger for mistag rate
-    trackCNegHPModuleName   = cms.string('negativeTrackCountingHighPur'),
-    trackCNegHEModuleName   = cms.string('negativeTrackCountingHighEffJetTags'),
-    trackCHPModuleName      = cms.string('trackCountingHighPurBJetTags'),
-    
-    jetBModuleName          = cms.string('jetBProbabilityBJetTags'),
-    jetBNegModuleName       = cms.string('negativeOnlyJetBProbabilityJetTags'),
-    jetBPosModuleName       = cms.string('positiveOnlyJetBProbabilityJetTags'),
-    jetPModuleName          = cms.string('jetProbabilityBJetTags'),
-    jetPPosModuleName       = cms.string('positiveOnlyJetProbabilityJetTags'),
-    jetPNegModuleName       = cms.string('negativeOnlyJetProbabilityJetTags'),
-    trackCHEModuleName      = cms.string('trackCountingHighEffBJetTags'),
-    
-    combinedSvtxModuleName    = cms.string('combinedSecondaryVertexBJetTags'),
-    combinedSvtxNegModuleName = cms.string('combinedSecondaryVertexNegativeBJetTags'),
-    combinedSvtxPosModuleName = cms.string('combinedSecondaryVertexPositiveBJetTags'),
-        
-    combinedSvtxJPModuleName    = cms.string('combinedSecondaryVertexJPBJetTags'),
-    combinedSvtxNegJPModuleName = cms.string('combinedSecondaryVertexNegativeJPBJetTags'),
-    combinedSvtxPosJPModuleName = cms.string('combinedSecondaryVertexPositiveJPBJetTags'),
-        
-    combinedSvtxRetrainedModuleName    = cms.string('combinedSecondaryVertexRetrainedBJetTags'),
-    combinedSvtxRetrainedNegModuleName = cms.string('combinedSecondaryVertexRetrainedNegativeBJetTags'),
-    combinedSvtxRetrainedPosModuleName = cms.string('combinedSecondaryVertexRetrainedPositiveBJetTags'),
-        
-    combinedCSVJPModuleName    = cms.string('combinedCSVJPBJetTags'),
-    combinedCSVJPNegModuleName = cms.string('negativeCombinedCSVJPBJetTags'),
-    combinedCSVJPPosModuleName = cms.string('positiveCombinedCSVJPBJetTags'),
-        
-    combinedCSVSLModuleName    = cms.string('combinedCSVSLBJetTags'),
-    combinedCSVSLNegModuleName = cms.string('negativeCombinedCSVSLBJetTags'),
-    combinedCSVSLPosModuleName = cms.string('positiveCombinedCSVSLBJetTags'),
-        
-    combinedCSVJPSLModuleName    = cms.string('combinedCSVJPSLBJetTags'),
-    combinedCSVJPSLNegModuleName = cms.string('negativeCombinedCSVJPSLBJetTags'),
-    combinedCSVJPSLPosModuleName = cms.string('positiveCombinedCSVJPSLBJetTags'),
-        			
-    simpleIVFModuleNameHighPur      = cms.string('simpleInclusiveSecondaryVertexHighPurBJetTags'),
-    simpleIVFModuleNameHighEff      = cms.string('simpleInclusiveSecondaryVertexHighEffBJetTags'),
-    doubleIVFModuleNameHighEff      = cms.string('doubleSecondaryVertexHighEffBJetTags'),      
-    combinedIVFModuleName	    = cms.string('combinedInclusiveSecondaryVertexBJetTags'),  
-    combinedIVFPosModuleName	    = cms.string('combinedInclusiveSecondaryVertexPositiveBJetTags'),
 
-    svtxModuleNameHighPur     = cms.string('simpleSecondaryVertexHighPurBJetTags'),
-    svtxNegModuleNameHighPur  = cms.string('simpleSecondaryVertexNegativeHighPurBJetTags'),
-    svtxModuleNameHighEff     = cms.string('simpleSecondaryVertexHighEffBJetTags'),
-    svtxNegModuleNameHighEff  = cms.string('simpleSecondaryVertexNegativeHighEffBJetTags'),
+    # list of taggers
+    trackCHEBJetTags      = cms.string('trackCountingHighEffBJetTags'),
+    trackCNegHEBJetTags   = cms.string('negativeTrackCountingHighEffJetTags'),
+
+    trackCHPBJetTags      = cms.string('trackCountingHighPurBJetTags'),
+    trackCNegHPBJetTags   = cms.string('negativeTrackCountingHighPurJetTags'),
+
+    jetBPBJetTags          = cms.string('jetBProbabilityBJetTags'),
+    jetBPNegBJetTags       = cms.string('negativeOnlyJetBProbabilityJetTags'),
+    jetBPPosBJetTags       = cms.string('positiveOnlyJetBProbabilityJetTags'),
+
+    jetPBJetTags          = cms.string('jetProbabilityBJetTags'),
+    jetPNegBJetTags       = cms.string('negativeOnlyJetProbabilityJetTags'),
+    jetPPosBJetTags       = cms.string('positiveOnlyJetProbabilityJetTags'),
+    
+    combinedSVBJetTags    = cms.string('combinedSecondaryVertexBJetTags'),
+    combinedSVNegBJetTags = cms.string('combinedSecondaryVertexNegativeBJetTags'),
+    combinedSVPosBJetTags = cms.string('combinedSecondaryVertexPositiveBJetTags'),
+        
+    combinedSVRetrainedBJetTags    = cms.string('combinedSecondaryVertexRetrainedBJetTags'),
+    combinedSVRetrainedNegBJetTags = cms.string('combinedSecondaryVertexRetrainedNegativeBJetTags'),
+    combinedSVRetrainedPosBJetTags = cms.string('combinedSecondaryVertexRetrainedPositiveBJetTags'),
+        
+    combinedCSVJPBJetTags    = cms.string('combinedCSVJPBJetTags'),
+    combinedCSVJPNegBJetTags = cms.string('negativeCombinedCSVJPBJetTags'),
+    combinedCSVJPPosBJetTags = cms.string('positiveCombinedCSVJPBJetTags'),
+        
+    combinedCSVSLBJetTags    = cms.string('combinedCSVSLBJetTags'),
+    combinedCSVSLNegBJetTags = cms.string('negativeCombinedCSVSLBJetTags'),
+    combinedCSVSLPosBJetTags = cms.string('positiveCombinedCSVSLBJetTags'),
+        
+    combinedCSVJPSLBJetTags    = cms.string('combinedCSVJPSLBJetTags'),
+    combinedCSVJPSLNegBJetTags = cms.string('negativeCombinedCSVJPSLBJetTags'),
+    combinedCSVJPSLPosBJetTags = cms.string('positiveCombinedCSVJPSLBJetTags'),
+        			
+    simpleIVFSVHighPurBJetTags      = cms.string('simpleInclusiveSecondaryVertexHighPurBJetTags'),
+    simpleIVFSVHighEffBJetTags      = cms.string('simpleInclusiveSecondaryVertexHighEffBJetTags'),
+    doubleIVFSVHighEffBJetTags      = cms.string('doubleSecondaryVertexHighEffBJetTags'),
+    combinedIVFSVBJetTags	    = cms.string('combinedInclusiveSecondaryVertexBJetTags'),
+    combinedIVFSVPosBJetTags	    = cms.string('combinedInclusiveSecondaryVertexPositiveBJetTags'),
+
+    simpleSVHighPurBJetTags     = cms.string('simpleSecondaryVertexHighPurBJetTags'),
+    simpleSVNegHighPurBJetTags  = cms.string('simpleSecondaryVertexNegativeHighPurBJetTags'),
+    simpleSVHighEffBJetTags     = cms.string('simpleSecondaryVertexHighEffBJetTags'),
+    simpleSVNegHighEffBJetTags  = cms.string('simpleSecondaryVertexNegativeHighEffBJetTags'),
                          
-    #softMuonModuleName        = cms.string('positiveSoftLeptonByPtBJetTags'),
-    #softMuonNegModuleName     = cms.string('negativeSoftLeptonByPtBJetTags'),
+    #softMuonBJetTags        = cms.string('positiveSoftLeptonByPtBJetTags'),
+    #softMuonNegBJetTags     = cms.string('negativeSoftLeptonByPtBJetTags'),
     #softMuonTagInfoName       = cms.string('softMuonTagInfos'),
                          
-    softPFMuonModuleName        = cms.string('softPFMuonRetrainedBJetsTags'),
-    softPFMuonPosModuleName     = cms.string('positiveSoftPFMuonRetrainedBJetsTags'),
-    softPFMuonNegModuleName     = cms.string('negativeSoftPFMuonRetrainedBJetsTags'),
-                         
-    softPFElectronModuleName    = cms.string('softPFElectronRetrainedBJetsTags'),
-    softPFElectronPosModuleName = cms.string('positiveSoftPFElectronRetrainedBJetsTags'),
-    softPFElectronNegModuleName = cms.string('negativeSoftPFElectronRetrainedBJetsTags'),
+    softPFMuonBJetTags        = cms.string('softPFMuonRetrainedBJetTags'),
+    softPFMuonNegBJetTags     = cms.string('negativeSoftPFMuonRetrainedBJetTags'),
+    softPFMuonPosBJetTags     = cms.string('positiveSoftPFMuonRetrainedBJetTags'),
+    
+    softPFElectronBJetTags    = cms.string('softPFElectronRetrainedBJetTags'),
+    softPFElectronNegBJetTags = cms.string('negativeSoftPFElectronRetrainedBJetTags'),
+    softPFElectronPosBJetTags = cms.string('positiveSoftPFElectronRetrainedBJetTags'),
                                                  
-    softPFMuonTagInfoName       = cms.InputTag('softPFMuonsTagInfos'),
-    softPFElectronTagInfoName   = cms.InputTag('softPFElectronsTagInfos'),
+    softPFMuonTagInfos       = cms.string('softPFMuons'),     # need to omit the 'TagInfos' part from the label
+    softPFElectronTagInfos   = cms.string('softPFElectrons'), # need to omit the 'TagInfos' part from the label
                          
     use_ttbar_filter      = cms.bool(False),
     channel       = cms.InputTag("ttbarselectionproducer"),

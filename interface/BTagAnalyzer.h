@@ -27,12 +27,9 @@ Implementation:
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
-
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/Utilities/interface/RegexMatch.h"
 
 #include "DataFormats/JetReco/interface/JetTracksAssociation.h"
 #include "DataFormats/BTauReco/interface/TrackIPTagInfo.h"
@@ -50,13 +47,10 @@ Implementation:
 #include "CategoryFinder.h"
 
 // reco track and vertex
-#include "DataFormats/JetReco/interface/CaloJetCollection.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "RecoVertex/VertexPrimitives/interface/TransientVertex.h"
-#include "DataFormats/JetReco/interface/CaloJet.h"
 #include "DataFormats/BTauReco/interface/JetTag.h"
-#include "DataFormats/JetReco/interface/CaloJetCollection.h"
 #include "DataFormats/JetReco/interface/JetCollection.h"
 #include "DataFormats/JetReco/interface/Jet.h"
 
@@ -108,6 +102,7 @@ Implementation:
 #include "RecoBTag/SecondaryVertex/interface/TrackKinematics.h"
 #include "RecoVertex/VertexPrimitives/interface/ConvertToFromReco.h"
 
+#include "FWCore/Utilities/interface/RegexMatch.h"
 #include <boost/regex.hpp>
 
 //
@@ -118,10 +113,9 @@ typedef std::vector<pat::Jet> PatJetCollection;
 //
 // class declaration
 //
-//using BTagMCTools::JetFlavour;
-using namespace edm;
+
+// using namespace edm;
 using namespace reco;
-//using namespace BTagMCTools;
 
 const UInt_t nMaxTrk_  = 100000;
 const UInt_t nMaxJets_ = 10000;
@@ -174,8 +168,6 @@ private:
     int getMuonTk(double pt);
     bool NameCompatible(const std::string& pattern, const std::string& name);
 
-    int TaggedJet(const pat::Jet& , const edm::Handle<reco::JetTagCollection >&  );
-
     std::vector<simPrimaryVertex> getSimPVs(const edm::Handle<edm::HepMCProduct>& evtMC);
 
     // ----------member data ---------------------------
@@ -185,72 +177,68 @@ private:
     edm::InputTag muonCollectionName_;
     edm::InputTag triggerTable_;
     edm::InputTag SVComputer_;
-    
-    //JetFlavourIdentifier jetFlavourIdentifier_;
 
     std::string JetCollectionTag_;
 
-    std::string jetPModuleName_;
-    std::string jetPPosModuleName_;
-    std::string jetPNegModuleName_;
+    std::string jetPBJetTags_;
+    std::string jetPNegBJetTags_;
+    std::string jetPPosBJetTags_;
 
-    std::string jetBModuleName_;
-    std::string jetBNegModuleName_;
-    std::string jetBPosModuleName_;
+    std::string jetBPBJetTags_;
+    std::string jetBPNegBJetTags_;
+    std::string jetBPPosBJetTags_;
 
-    std::string trackCHEModuleName_;
-    std::string trackCNegHEModuleName_;
+    std::string trackCHEBJetTags_;
+    std::string trackCNegHEBJetTags_;
 
-    std::string trackCHPModuleName_;
-    std::string trackCNegHPModuleName_;
+    std::string trackCHPBJetTags_;
+    std::string trackCNegHPBJetTags_;
 
-    std::string combinedSvtxModuleName_;
-    std::string combinedSvtxPosModuleName_;
-    std::string combinedSvtxNegModuleName_;
+    std::string combinedSVBJetTags_;
+    std::string combinedSVNegBJetTags_;
+    std::string combinedSVPosBJetTags_;
 
-    std::string combinedSvtxRetrainedModuleName_;
-    std::string combinedSvtxRetrainedPosModuleName_;
-    std::string combinedSvtxRetrainedNegModuleName_;
+    std::string combinedSVRetrainedBJetTags_;
+    std::string combinedSVRetrainedNegBJetTags_;
+    std::string combinedSVRetrainedPosBJetTags_;
 
-    std::string combinedCSVJPModuleName_;
-    std::string combinedCSVJPPosModuleName_;
-    std::string combinedCSVJPNegModuleName_;
+    std::string combinedCSVJPBJetTags_;
+    std::string combinedCSVJPNegBJetTags_;
+    std::string combinedCSVJPPosBJetTags_;
 
-    std::string combinedCSVSLModuleName_;
-    std::string combinedCSVSLPosModuleName_;
-    std::string combinedCSVSLNegModuleName_;
+    std::string combinedCSVSLBJetTags_;
+    std::string combinedCSVSLNegBJetTags_;
+    std::string combinedCSVSLPosBJetTags_;
 
-    std::string combinedCSVJPSLModuleName_;
-    std::string combinedCSVJPSLPosModuleName_;
-    std::string combinedCSVJPSLNegModuleName_;
+    std::string combinedCSVJPSLBJetTags_;
+    std::string combinedCSVJPSLNegBJetTags_;
+    std::string combinedCSVJPSLPosBJetTags_;
     
-    std::string simpleIVFModuleNameHighPur_;
-    std::string simpleIVFModuleNameHighEff_;
+    std::string simpleIVFSVHighPurBJetTags_;
+    std::string simpleIVFSVHighEffBJetTags_;
+    std::string doubleIVFSVHighEffBJetTags_;
+    std::string combinedIVFSVBJetTags_;
+    std::string combinedIVFSVPosBJetTags_;
 
-    std::string doubleIVFModuleNameHighEff_;
+    std::string simpleSVHighEffBJetTags_;
+    std::string simpleSVNegHighEffBJetTags_;
+    std::string simpleSVHighPurBJetTags_;
+    std::string simpleSVNegHighPurBJetTags_;
 
-    std::string combinedIVFModuleName_;
-    std::string combinedIVFPosModuleName_;
-
-    std::string svtxModuleNameHighPur_;
-    std::string svtxNegModuleNameHighPur_;
-    std::string svtxModuleNameHighEff_;
-    std::string svtxNegModuleNameHighEff_;
-
-    //std::string softMuonModuleName_;
-    //std::string softMuonNegModuleName_;
+    //std::string softMuonBJetTags_;
+    //std::string softMuonNegBJetTags_;
     //std::string softMuonTagInfoName_;
 
-    std::string softPFMuonModuleName_;
-    std::string softPFMuonPosModuleName_;
-    std::string softPFMuonNegModuleName_;
+    std::string softPFMuonBJetTags_;
+    std::string softPFMuonNegBJetTags_;
+    std::string softPFMuonPosBJetTags_;
 
-    std::string softPFElectronModuleName_;
-    std::string softPFElectronPosModuleName_;
-    std::string softPFElectronNegModuleName_;
+    std::string softPFElectronBJetTags_;
+    std::string softPFElectronNegBJetTags_;
+    std::string softPFElectronPosBJetTags_;
 
-    edm::InputTag softPFMuonTagInfoName_;
-    edm::InputTag softPFElectronTagInfoName_;
+    std::string softPFMuonTagInfos_;
+    std::string softPFElectronTagInfos_;
 
 
     std::string primaryVertexColl_;
