@@ -114,7 +114,7 @@ typedef std::vector<pat::Jet> PatJetCollection;
 // class declaration
 //
 
-// using namespace edm;
+using namespace std;
 using namespace reco;
 
 const UInt_t nMaxTrk_  = 100000;
@@ -132,7 +132,7 @@ public:
     explicit BTagAnalyzer(const edm::ParameterSet&);
     ~BTagAnalyzer();
     
-    // auxiliary class holding simulated primary vertices
+// auxiliary class holding simulated primary vertices
 class simPrimaryVertex {
 public:
   simPrimaryVertex(double x1,double y1,double z1):x(x1),y(y1),z(z1),ptsq(0),nGenTrk(0){};
@@ -152,8 +152,6 @@ private:
     virtual void beginJob() ;
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
     virtual void endJob() ;
-
-    float calculPtRel();
 
     bool findCat(const reco::Track* ,CategoryFinder& );
     std::vector< float > getTrackProbabilies(std::vector< float > , int );
@@ -467,7 +465,9 @@ private:
     int   Jet_nFirstTrkInc[nMaxJets_];
     int   Jet_nLastTrkInc[nMaxJets_];
     int   Jet_SV_multi[nMaxJets_]; 
-    int   Jet_VtxCat[nMaxJets_]; 
+    int   Jet_VtxCat[nMaxJets_];
+    int   Jet_looseID[nMaxJets_];
+    int   Jet_tightID[nMaxJets_];
     
     int   nMuon;
     int   Muon_IdxJet[nMaxMuons_];

@@ -1,10 +1,10 @@
 #include "RecoBTag/PerformanceMeasurements/interface/BTagAnalyzer.h"
-// #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
+#include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 
-// PFJetIDSelectionFunctor pfjetIDLoose( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE );
-// PFJetIDSelectionFunctor pfjetIDTight( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT );
-// 
-// pat::strbitset retpf = pfjetIDLoose.getBitTemplate();
+PFJetIDSelectionFunctor pfjetIDLoose( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE );
+PFJetIDSelectionFunctor pfjetIDTight( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT );
+
+pat::strbitset retpf = pfjetIDLoose.getBitTemplate();
 
 BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfig)  
 {
@@ -394,6 +394,8 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   smalltree->Branch("Jet_nLastTrkInc",  Jet_nLastTrkInc  ,"Jet_nLastTrkInc[nJet]/I"); 
 
   smalltree->Branch("Jet_VtxCat",      Jet_VtxCat  ,      "Jet_VtxCat[nJet]/I");
+  smalltree->Branch("Jet_looseID",      Jet_looseID  ,      "Jet_looseID[nJet]/I");
+  smalltree->Branch("Jet_tightID",      Jet_tightID  ,      "Jet_tightID[nJet]/I");
   
   
   //--------------------------------------
@@ -981,6 +983,11 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     Jet_eta[nJet]     = pjet->eta();
     Jet_phi[nJet]     = pjet->phi();
     Jet_pt[nJet]      = pjet->pt();
+
+    retpf.set(false);
+    Jet_looseID[nJet] = ( pfjetIDLoose( *pjet, retpf ) ? 1 : 0 );
+    retpf.set(false);
+    Jet_tightID[nJet] = ( pfjetIDTight( *pjet, retpf ) ? 1 : 0 );
     
     //     cout << "jet n" <<nJet<<endl;
     //     cout << "Jet_eta:" <<Jet_eta[nJet] << endl;
@@ -2571,7 +2578,7 @@ int BTagAnalyzer::matchMuon(const edm::RefToBase<reco::Track>& theMuon, const ed
 }
 
 
-std::vector<BTagAnalyzer::simPrimaryVertex> BTagAnalyzer::getSimPVs(const Handle<HepMCProduct>& evtMC){
+std::vector<BTagAnalyzer::simPrimaryVertex> BTagAnalyzer::getSimPVs(const edm::Handle<edm::HepMCProduct>& evtMC){
   
   std::vector<BTagAnalyzer::simPrimaryVertex> simpv;
   const HepMC::GenEvent* evt=evtMC->GetEvent();
