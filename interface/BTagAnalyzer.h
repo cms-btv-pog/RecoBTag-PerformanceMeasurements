@@ -262,7 +262,6 @@ private:
     // trigger list
     std::vector<std::string> triggernames_;
     bool TriggerInfo_;
-    std::string genJetCollection_;
 
     TNtuple* nTuplesJets;
     TrackClassifier classifier_;

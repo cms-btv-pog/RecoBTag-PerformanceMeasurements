@@ -97,9 +97,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   muonCollectionName_       = iConfig.getParameter<edm::InputTag>("muonCollectionName");
 
   triggerTable_             = iConfig.getParameter<edm::InputTag>("triggerTable");
-  genJetCollection_         = iConfig.getParameter<std::string>("genJetCollection");
-  
-  
+
   SVComputer_               = iConfig.getParameter<edm::InputTag>( "svComputer");
   
   
@@ -554,10 +552,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   
   edm::Handle <PatJetCollection> jetsColl;
   iEvent.getByLabel (JetCollectionTag_, jetsColl);
-  
-  
-  edm::Handle<reco::GenJetCollection> genJetsHandle;
-  reco::GenJetCollection genJets;
+
   //------------------------------------------------------
   // MC informations
   //------------------------------------------------------
@@ -719,12 +714,6 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       simpv=getSimPVs(theHepMCProduct);
       //       cout << "simpv.size() " << simpv.size() << endl;
     }
-    
-    iEvent.getByLabel(genJetCollection_,genJetsHandle);
-    genJets =	*(genJetsHandle.product());
-    
-    
-    
   } // end MC info
   //   cout << "Evt:" <<Evt << endl;
   //   cout << "pthat:" <<pthat << endl;

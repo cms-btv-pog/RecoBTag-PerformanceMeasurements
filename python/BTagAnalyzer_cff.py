@@ -20,7 +20,6 @@ btagana = cms.EDAnalyzer("BTagAnalyzer",
     vetoPos                  = cms.double(4.0),
     use_selected_tracks      = cms.bool(True),
     Jets                     = cms.string('ak5PFJets'),
-    genJetCollection         = cms.string('ak5GenJets'),
     muonCollectionName       = cms.InputTag('muons'),
     triggerTable             = cms.InputTag("TriggerResults"),
     svComputer               = cms.InputTag( "combinedSecondaryVertex" ),
@@ -87,5 +86,5 @@ btagana = cms.EDAnalyzer("BTagAnalyzer",
     softPFElectronTagInfos   = cms.string('softPFElectrons'), # need to omit the 'TagInfos' part from the label
                          
     use_ttbar_filter      = cms.bool(False),
-    channel       = cms.InputTag("ttbarselectionproducer"),
+    channel       = cms.InputTag("ttbarselectionproducer")
 )
