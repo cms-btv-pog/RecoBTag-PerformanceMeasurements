@@ -612,8 +612,6 @@ newDiscriminatorSources = cms.VInputTag(
 ## Add additional b-tag discriminators to the default jet collection
 getattr(process,'patJets'+postfix).discriminatorSources = getattr(process,'patJets'+postfix).discriminatorSources + newDiscriminatorSources
 
-## Remove MC matching when running over data
-removeMCMatchingPF2PAT( process, postfix=postfix )
 
 ## Add TagInfos to PAT jets
 for m in ['patJets'+postfix]:
