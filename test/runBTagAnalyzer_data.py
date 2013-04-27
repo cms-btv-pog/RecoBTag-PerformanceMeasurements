@@ -14,7 +14,7 @@ process = cms.Process("BTagAna")
 process.source = cms.Source(
     "PoolSource",
     # replace 'myfile.root' with the source file you want to use
-    fileNames = cms.untracked.vstring(   
+    fileNames = cms.untracked.vstring(
 # data from /Jet/Run2012A-PromptReco-v1/AOD
 #        'file:FE2E21F0-0583-E111-8DA9-001D09F241F0.root'
 # data from /BTag/Run2012A-PromptReco-v1/AOD
@@ -31,10 +31,6 @@ process.maxEvents = cms.untracked.PSet(
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = "FT_53_V21_AN3::All"
-#process.GlobalTag.globaltag = "GR_R_53_V19::All"
-# process.GlobalTag.globaltag = "GR_R_53_V2B::All"
-
-
 
 
 ##############################################
@@ -52,7 +48,7 @@ process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
    BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
 )
 
-process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord") 
+process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
 
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
@@ -131,7 +127,7 @@ process.negativeSoftPFElectronRetrainedBJetTags = process.negativeSoftPFElectron
   jetTagComputer = 'negativeSoftPFElectronRetrained',
   tagInfos = cms.VInputTag(cms.InputTag("softPFElectronsTagInfosAODPFlow"))
 )
-                                                   
+
 process.load("RecoBTag.SoftLepton.positiveSoftElectronES_cfi")
 process.load("RecoBTag.SoftLepton.positiveSoftPFElectronBJetTags_cfi")
 process.positiveSoftPFElectronRetrained = process.positiveSoftElectron.clone()
@@ -139,7 +135,7 @@ process.positiveSoftPFElectronRetrainedBJetTags = process.positiveSoftPFElectron
   jetTagComputer = 'positiveSoftPFElectronRetrained',
   tagInfos = cms.VInputTag(cms.InputTag("softPFElectronsTagInfosAODPFlow"))
 )
-        
+
 # for new softMuon tagger
 process.softPFMuonRetrained = process.softMuon.clone()
 process.softPFMuonRetrainedBJetTags = process.softPFMuonBJetTags.clone(
@@ -284,8 +280,8 @@ process.positiveCombinedCSVJPBJetTags = process.positiveCombinedMVABJetTags.clon
     cms.InputTag("softPFElectronsTagInfosAODPFlow")
   )
 )
- 
- 
+
+
 ############################################################################
 # For the combined CSV + JP + SL tagger
 ############################################################################
@@ -403,7 +399,7 @@ process.positiveCombinedCSVJPSLBJetTags = process.positiveCombinedMVABJetTags.cl
     cms.InputTag("softPFElectronsTagInfosAODPFlow")
   )
 )
- 
+
 ############################################################################
 # For the combined CSV + SL tagger
 ############################################################################
@@ -525,7 +521,7 @@ process.positiveCombinedCSVSLBJetTags = process.positiveCombinedMVABJetTags.clon
 
 ## Output Module Configuration
 process.out = cms.OutputModule("PoolOutputModule",
-    outputCommands = cms.untracked.vstring('keep *', 
+    outputCommands = cms.untracked.vstring('keep *',
         'keep recoJetTags_*_*_*'),
     fileName = cms.untracked.string('testtt.root')
 )
@@ -570,7 +566,7 @@ bTagDiscriminators = ['jetBProbabilityBJetTags', 'jetProbabilityBJetTags', 'trac
 from PhysicsTools.PatAlgos.tools.jetTools import *
 ## Switch the default jet collection (done in order to use the above b-tag discriminators)
 switchJetCollection(process,
-    cms.InputTag("pfNoTauPFlow"),
+    cms.InputTag('pfNoTau'+postfix),
     doJTA        = True,
     doBTagging   = True,
     btagdiscriminators = bTagDiscriminators,
@@ -582,8 +578,8 @@ switchJetCollection(process,
 )
 
 ## Add additional b-taggers to the PAT sequence
-getattr(process,'patPF2PATSequencePFlow').replace( getattr(process,'combinedInclusiveSecondaryVertexPositiveBJetTagsAODPFlow'),
-  getattr(process,'combinedInclusiveSecondaryVertexPositiveBJetTagsAODPFlow')
+getattr(process,'patPF2PATSequence'+postfix).replace( getattr(process,'combinedInclusiveSecondaryVertexPositiveBJetTagsAOD'+postfix),
+  getattr(process,'combinedInclusiveSecondaryVertexPositiveBJetTagsAOD'+postfix)
   + process.softPFMuonRetrainedBJetTags + process.negativeSoftPFMuonRetrainedBJetTags + process.positiveSoftPFMuonRetrainedBJetTags
   + process.softPFElectronRetrainedBJetTags + process.negativeSoftPFElectronRetrainedBJetTags + process.positiveSoftPFElectronRetrainedBJetTags
   + process.combinedSecondaryVertexRetrainedBJetTags + process.combinedSecondaryVertexRetrainedNegativeBJetTags + process.combinedSecondaryVertexRetrainedPositiveBJetTags
@@ -614,8 +610,10 @@ newDiscriminatorSources = cms.VInputTag(
 )
 
 ## Add additional b-tag discriminators to the default jet collection
-getattr(process,'patJetsPFlow').discriminatorSources = getattr(process,'patJetsPFlow').discriminatorSources + newDiscriminatorSources
+getattr(process,'patJets'+postfix).discriminatorSources = getattr(process,'patJets'+postfix).discriminatorSources + newDiscriminatorSources
 
+## Remove MC matching when running over data
+removeMCMatchingPF2PAT( process, postfix=postfix )
 
 ## Add TagInfos to PAT jets
 for m in ['patJets'+postfix]:
@@ -625,8 +623,8 @@ for m in ['patJets'+postfix]:
 
 
 from PhysicsTools.PatAlgos.tools.coreTools import *
-## Remove taus from the PAT sequence to speed up processing
-removeSpecificPATObjects(process,names=['Taus'],postfix=postfix)
+## Remove objects not used from the PAT sequence to speed up processing
+removeSpecificPATObjects(process,names=['Photons', 'Electrons', 'Muons', 'Taus'],postfix=postfix)
 
 #-------------------------------------
 #Redo the primary vertex
@@ -653,8 +651,8 @@ process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi")
 process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
                       vertexCollection = cms.InputTag('offlinePrimaryVertices'),
                       minimumNDOF = cms.uint32(4) ,
- 		      maxAbsZ = cms.double(24), 
- 		      maxd0 = cms.double(2)	
+                      maxAbsZ = cms.double(24),
+                      maxd0 = cms.double(2)
                      )
 
 
@@ -663,13 +661,13 @@ from RecoBTag.PerformanceMeasurements.patTools import *
 adaptPVs(process, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'), postfix=postfix, sequence='patPF2PATSequence')
 
 
-### JP calibration for cmsRun only : 
+### JP calibration for cmsRun only :
 # from CondCore.DBCommon.CondDBCommon_cfi import *
 # process.load("RecoBTag.TrackProbability.trackProbabilityFakeCond_cfi")
 # process.trackProbabilityFakeCond.connect =cms.string( "sqlite_fip:RecoBTag/PerformanceMeasurements/test/btagnew_Data_2011_41X.db")
 # process.es_prefer_trackProbabilityFakeCond = cms.ESPrefer("PoolDBESSource","trackProbabilityFakeCond")
 
-### JP calibration for crab only: 
+### JP calibration for crab only:
 ## process.GlobalTag.toGet = cms.VPSet(
 ##   cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
 ##        tag = cms.string("TrackProbabilityCalibration_2D_Data53X_v2"),
@@ -702,7 +700,7 @@ process.btagana.triggerTable = 'TriggerResults::HLT' # Data and MC
 # import HLTrigger.HLTfilters.triggerResultsFilter_cfi as hlt
 # process.JetHLTFilter = hlt.triggerResultsFilter.clone(
 #     triggerConditions = cms.vstring(
-#	"HLT_PFJet80_v*"
+#       "HLT_PFJet80_v*"
 #     ),
 #     hltResults = cms.InputTag("TriggerResults","","HLT"),
 #     l1tResults = cms.InputTag( "" ),
@@ -722,12 +720,12 @@ process.p = cms.Path(
         process.noscraping
         *process.hcalfilter # filter for HCAL laser events
         *process.primaryVertexFilter
-	*process.goodOfflinePrimaryVertices
-	*getattr(process,"patPF2PATSequence"+postfix)
-	*process.btagana
-	)
-	
-	## Output Module Configuration (expects a path 'p')
+        *process.goodOfflinePrimaryVertices
+        *getattr(process,"patPF2PATSequence"+postfix)
+        *process.btagana
+        )
+
+        ## Output Module Configuration (expects a path 'p')
 
 
 

@@ -14,7 +14,7 @@ process = cms.Process("BTagAna")
 process.source = cms.Source(
     "PoolSource",
     # replace 'myfile.root' with the source file you want to use
-    fileNames = cms.untracked.vstring(   
+    fileNames = cms.untracked.vstring(
 # /QCD_Pt-80to120_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v2/GEN-SIM-RECODEBUG
 #     'file:/opt/sbg/data/data1/cms/blochd/CMSSW_5_3_2_patch5/src/RecoBTag/PerformanceMeasurements/test/FEE3EAB8-FCF3-E111-AE7D-00266CF3322C.root'
 # /QCD_Pt-300to470_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/GEN-SIM-RECODEBUG
@@ -32,7 +32,6 @@ process.maxEvents = cms.untracked.PSet(
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = "START53_V20::All"
-#process.GlobalTag.globaltag = "START53_V7F::All"
 
 
 ##############################################
@@ -50,7 +49,7 @@ process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
    BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
 )
 
-process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord") 
+process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
 
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
@@ -523,7 +522,7 @@ process.positiveCombinedCSVSLBJetTags = process.positiveCombinedMVABJetTags.clon
 
 ## Output Module Configuration
 process.out = cms.OutputModule("PoolOutputModule",
-    outputCommands = cms.untracked.vstring('keep *', 
+    outputCommands = cms.untracked.vstring('keep *',
         'keep recoJetTags_*_*_*'),
     fileName = cms.untracked.string('testtt.root')
 )
@@ -568,7 +567,7 @@ bTagDiscriminators = ['jetBProbabilityBJetTags', 'jetProbabilityBJetTags', 'trac
 from PhysicsTools.PatAlgos.tools.jetTools import *
 ## Switch the default jet collection (done in order to use the above b-tag discriminators)
 switchJetCollection(process,
-    cms.InputTag("pfNoTauPFlow"),
+    cms.InputTag('pfNoTau'+postfix),
     doJTA        = True,
     doBTagging   = True,
     btagdiscriminators = bTagDiscriminators,
@@ -580,8 +579,8 @@ switchJetCollection(process,
 )
 
 ## Add additional b-taggers to the PAT sequence
-getattr(process,'patPF2PATSequencePFlow').replace( getattr(process,'combinedInclusiveSecondaryVertexPositiveBJetTagsAODPFlow'),
-  getattr(process,'combinedInclusiveSecondaryVertexPositiveBJetTagsAODPFlow')
+getattr(process,'patPF2PATSequence'+postfix).replace( getattr(process,'combinedInclusiveSecondaryVertexPositiveBJetTagsAOD'+postfix),
+  getattr(process,'combinedInclusiveSecondaryVertexPositiveBJetTagsAOD'+postfix)
   + process.softPFMuonRetrainedBJetTags + process.negativeSoftPFMuonRetrainedBJetTags + process.positiveSoftPFMuonRetrainedBJetTags
   + process.softPFElectronRetrainedBJetTags + process.negativeSoftPFElectronRetrainedBJetTags + process.positiveSoftPFElectronRetrainedBJetTags
   + process.combinedSecondaryVertexRetrainedBJetTags + process.combinedSecondaryVertexRetrainedNegativeBJetTags + process.combinedSecondaryVertexRetrainedPositiveBJetTags
@@ -612,7 +611,7 @@ newDiscriminatorSources = cms.VInputTag(
 )
 
 ## Add additional b-tag discriminators to the default jet collection
-getattr(process,'patJetsPFlow').discriminatorSources = getattr(process,'patJetsPFlow').discriminatorSources + newDiscriminatorSources
+getattr(process,'patJets'+postfix).discriminatorSources = getattr(process,'patJets'+postfix).discriminatorSources + newDiscriminatorSources
 
 
 ## Add TagInfos to PAT jets
@@ -623,8 +622,8 @@ for m in ['patJets'+postfix]:
 
 
 from PhysicsTools.PatAlgos.tools.coreTools import *
-## Remove taus from the PAT sequence to speed up processing
-removeSpecificPATObjects(process,names=['Taus'],postfix=postfix)
+## Remove objects not used from the PAT sequence to speed up processing
+removeSpecificPATObjects(process,names=['Photons', 'Electrons', 'Muons', 'Taus'],postfix=postfix)
 
 #-------------------------------------
 #Redo the primary vertex
@@ -651,8 +650,8 @@ process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi")
 process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
                       vertexCollection = cms.InputTag('offlinePrimaryVertices'),
                       minimumNDOF = cms.uint32(4) ,
- 		      maxAbsZ = cms.double(24), 
- 		      maxd0 = cms.double(2)	
+                      maxAbsZ = cms.double(24),
+                      maxd0 = cms.double(2)
                      )
 
 
@@ -661,13 +660,13 @@ from RecoBTag.PerformanceMeasurements.patTools import *
 adaptPVs(process, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'), postfix=postfix, sequence='patPF2PATSequence')
 
 
-### JP calibration for cmsRun only : 
+### JP calibration for cmsRun only :
 # from CondCore.DBCommon.CondDBCommon_cfi import *
 # process.load("RecoBTag.TrackProbability.trackProbabilityFakeCond_cfi")
 # process.trackProbabilityFakeCond.connect =cms.string( "sqlite_fip:RecoBTag/PerformanceMeasurements/test/btagnew_Data_2011_41X.db")
 # process.es_prefer_trackProbabilityFakeCond = cms.ESPrefer("PoolDBESSource","trackProbabilityFakeCond")
 
-### JP calibration for crab only: 
+### JP calibration for crab only:
 process.GlobalTag.toGet = cms.VPSet(
   cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
        tag = cms.string("TrackProbabilityCalibration_2D_MC53X_v2"),
@@ -699,7 +698,7 @@ process.btagana.triggerTable = 'TriggerResults::HLT' # Data and MC
 # import HLTrigger.HLTfilters.triggerResultsFilter_cfi as hlt
 # process.JetHLTFilter = hlt.triggerResultsFilter.clone(
 #     triggerConditions = cms.vstring(
-#	"HLT_PFJet80_v*"
+#       "HLT_PFJet80_v*"
 #     ),
 #     hltResults = cms.InputTag("TriggerResults","","HLT"),
 #     l1tResults = cms.InputTag( "" ),
@@ -714,12 +713,12 @@ process.p = cms.Path(
 #$$
         process.noscraping
         *process.primaryVertexFilter
-	*process.goodOfflinePrimaryVertices
-	*getattr(process,"patPF2PATSequence"+postfix)
-	*process.btagana
-	)
-	
-	## Output Module Configuration (expects a path 'p')
+        *process.goodOfflinePrimaryVertices
+        *getattr(process,"patPF2PATSequence"+postfix)
+        *process.btagana
+        )
+
+        ## Output Module Configuration (expects a path 'p')
 
 
 
