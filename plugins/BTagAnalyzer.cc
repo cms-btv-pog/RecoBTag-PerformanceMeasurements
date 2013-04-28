@@ -15,11 +15,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   minJetPt_  = iConfig.getParameter<double>("MinPt");
   maxJetEta_ = iConfig.getParameter<double>("MaxEta");
   
-  
-  selTagger_ = iConfig.getParameter<int>   ("selTagger");
-  tagCut_    = iConfig.getParameter<double>("tagCut");
-  vetoPos_   = iConfig.getParameter<double>("vetoPos");
-  ntrackMin_ = iConfig.getParameter<int>   ("ntrackMin");
+  selTagger_ = iConfig.getParameter<int>("selTagger");
 
   use_selected_tracks_ = iConfig.getParameter<bool> ("use_selected_tracks");
   useTrackHistory_     = iConfig.getParameter<bool> ("useTrackHistory");
@@ -30,9 +26,9 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   channel_      = iConfig.getParameter<edm::InputTag> ("channel");
   
   // Modules
-  primaryVertexColl_   = iConfig.getParameter<std::string>("primaryVertexColl");
+  primaryVertexColl_   = iConfig.getParameter<edm::InputTag>("primaryVertexColl");
   
-  JetCollectionTag_ = iConfig.getParameter<std::string>("Jets");
+  JetCollectionTag_ = iConfig.getParameter<edm::InputTag>("Jets");
   
   trackCHEBJetTags_    = iConfig.getParameter<std::string>("trackCHEBJetTags");
   trackCNegHEBJetTags_ = iConfig.getParameter<std::string>("trackCNegHEBJetTags");
@@ -73,11 +69,11 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig): classifier_(iConfi
   combinedCSVJPSLNegBJetTags_  = iConfig.getParameter<std::string>("combinedCSVJPSLNegBJetTags");
   combinedCSVJPSLPosBJetTags_  = iConfig.getParameter<std::string>("combinedCSVJPSLPosBJetTags");
   
-  simpleIVFSVHighPurBJetTags_    = iConfig.getParameter<std::string>("simpleIVFSVHighPurBJetTags");
-  simpleIVFSVHighEffBJetTags_    = iConfig.getParameter<std::string>("simpleIVFSVHighEffBJetTags");
-  doubleIVFSVHighEffBJetTags_    = iConfig.getParameter<std::string>("doubleIVFSVHighEffBJetTags");
-  combinedIVFSVBJetTags_    = iConfig.getParameter<std::string>("combinedIVFSVBJetTags");
-  combinedIVFSVPosBJetTags_ = iConfig.getParameter<std::string>("combinedIVFSVPosBJetTags");
+  simpleIVFSVHighPurBJetTags_ = iConfig.getParameter<std::string>("simpleIVFSVHighPurBJetTags");
+  simpleIVFSVHighEffBJetTags_ = iConfig.getParameter<std::string>("simpleIVFSVHighEffBJetTags");
+  doubleIVFSVHighEffBJetTags_ = iConfig.getParameter<std::string>("doubleIVFSVHighEffBJetTags");
+  combinedIVFSVBJetTags_      = iConfig.getParameter<std::string>("combinedIVFSVBJetTags");
+  combinedIVFSVPosBJetTags_   = iConfig.getParameter<std::string>("combinedIVFSVPosBJetTags");
 
   //softMuonBJetTags_       = iConfig.getParameter<std::string>("softMuonBJetTags");
   //softMuonNegBJetTags_    = iConfig.getParameter<std::string>("softMuonNegBJetTags");

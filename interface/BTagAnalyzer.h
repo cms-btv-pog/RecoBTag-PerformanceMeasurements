@@ -16,7 +16,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Thu Dec 20 10:00:00 CEST 2012
-// 
+//
 //
 //
 
@@ -84,7 +84,7 @@ Implementation:
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
-#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/JetReco/interface/JetCollection.h"
@@ -131,7 +131,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
 public:
     explicit BTagAnalyzer(const edm::ParameterSet&);
     ~BTagAnalyzer();
-    
+
 // auxiliary class holding simulated primary vertices
 class simPrimaryVertex {
 public:
@@ -158,11 +158,11 @@ private:
     double calculProbability(std::vector< float > );
 
     float calculPtRel(const reco::Track& theMuon, const pat::Jet& theJet);
-    
+
     int matchMuon(const edm::RefToBase<reco::Track>& theMuon, const edm::View<reco::Muon>& muons);
 
     void setTracksPV( const reco::Vertex *pv, bool isPV );
-    
+
     int getMuonTk(double pt);
     bool NameCompatible(const std::string& pattern, const std::string& name);
 
@@ -176,7 +176,7 @@ private:
     edm::InputTag triggerTable_;
     edm::InputTag SVComputer_;
 
-    std::string JetCollectionTag_;
+    edm::InputTag JetCollectionTag_;
 
     std::string jetPBJetTags_;
     std::string jetPNegBJetTags_;
@@ -211,7 +211,7 @@ private:
     std::string combinedCSVJPSLBJetTags_;
     std::string combinedCSVJPSLNegBJetTags_;
     std::string combinedCSVJPSLPosBJetTags_;
-    
+
     std::string simpleIVFSVHighPurBJetTags_;
     std::string simpleIVFSVHighEffBJetTags_;
     std::string doubleIVFSVHighEffBJetTags_;
@@ -239,7 +239,7 @@ private:
     std::string softPFElectronTagInfos_;
 
 
-    std::string primaryVertexColl_;
+    edm::InputTag primaryVertexColl_;
 
     bool useTrackHistory_;
     TFile*  rootFile_;
@@ -248,9 +248,6 @@ private:
 
 
     int selTagger_;
-    double tagCut_;
-    double vetoPos_;
-    int ntrackMin_;
     bool isData_;
     bool use_selected_tracks_;
     bool produceJetProbaTree_;
@@ -268,7 +265,7 @@ private:
 
     ///////////////
     // Some Histograms
-    
+
     edm::Service<TFileService> fs;
 
     TH1F* hData_All_NJets       ;
@@ -353,9 +350,9 @@ private:
 
     ///////////////
     // Ntuple info
-    
+
     TTree *smalltree;
-    
+
     int   nTrack;
     float Track_dxy[nMaxTrk_];
     float Track_dz[nMaxTrk_];
@@ -393,7 +390,7 @@ private:
     float Track_PVweight[nMaxTrk_];
     float Track_SVweight[nMaxTrk_];
     int   Track_category[nMaxTrk_];
-    
+
     int nJet;
     float Jet_pt[nMaxJets_];
     float Jet_genpt[nMaxJets_];
@@ -458,16 +455,16 @@ private:
     int   Jet_ntracks[nMaxJets_];
     int   Jet_flavour[nMaxJets_];
     int   Jet_nFirstTrack[nMaxJets_];
-    int   Jet_nLastTrack[nMaxJets_]; 
+    int   Jet_nLastTrack[nMaxJets_];
     int   Jet_nFirstSV[nMaxJets_];
     int   Jet_nLastSV[nMaxJets_];
     int   Jet_nFirstTrkInc[nMaxJets_];
     int   Jet_nLastTrkInc[nMaxJets_];
-    int   Jet_SV_multi[nMaxJets_]; 
+    int   Jet_SV_multi[nMaxJets_];
     int   Jet_VtxCat[nMaxJets_];
     int   Jet_looseID[nMaxJets_];
     int   Jet_tightID[nMaxJets_];
-    
+
     int   nMuon;
     int   Muon_IdxJet[nMaxMuons_];
     int   Muon_nMuHit[nMaxMuons_];
@@ -491,7 +488,7 @@ private:
     float Muon_IP2D[nMaxMuons_];
     float Muon_IP2Dsig[nMaxMuons_];
     float Muon_deltaR[nMaxMuons_];
-    float Muon_ratio[nMaxMuons_]; 
+    float Muon_ratio[nMaxMuons_];
 
     int nPFElectron;
     float PFElectron_IdxJet[nMaxElectrons_];
@@ -516,7 +513,7 @@ private:
     float PFMuon_deltaR[nMaxElectrons_];
     float PFMuon_IPsig[nMaxElectrons_];
     int   PFMuon_GoodQuality[nMaxElectrons_];
-    
+
     int   nTrkInc;
     float TrkInc_pt[nMaxTrk_];
     float TrkInc_eta[nMaxTrk_];
@@ -524,7 +521,7 @@ private:
     float TrkInc_ptrel[nMaxTrk_];
     float TrkInc_IPsig[nMaxTrk_];
     float TrkInc_IP[nMaxTrk_];
-    
+
     int nPV;
     float PV_x[nMaxPVs_];
     float PV_y[nMaxPVs_];
@@ -536,7 +533,7 @@ private:
     float PV_ndf[nMaxPVs_];
     int   PV_isgood[nMaxPVs_];
     int   PV_isfake[nMaxPVs_];
-    
+
     int nSV;
     float SV_x[nMaxSVs_];
     float SV_y[nMaxSVs_];
@@ -548,22 +545,22 @@ private:
     float SV_ndf[nMaxSVs_];
     float SV_flight[nMaxSVs_];
     float SV_flightErr[nMaxSVs_];
-    float SV_deltaR_jet[nMaxSVs_]; 
+    float SV_deltaR_jet[nMaxSVs_];
     float SV_deltaR_sum_jet[nMaxSVs_];
     float SV_deltaR_sum_dir[nMaxSVs_];
     float SV_energy_ratio[nMaxSVs_];
-    float SV_aboveC[nMaxSVs_];	 
+    float SV_aboveC[nMaxSVs_];
     float SV_vtx_pt[nMaxSVs_];
     float SV_flight2D[nMaxSVs_];
     float SV_flight2DErr[nMaxSVs_];
-    float SV_totCharge[nMaxSVs_]; 
-    float SV_vtxDistJetAxis[nMaxSVs_]; 
-    int   SV_nTrk[nMaxSVs_]; 
+    float SV_totCharge[nMaxSVs_];
+    float SV_vtxDistJetAxis[nMaxSVs_];
+    int   SV_nTrk[nMaxSVs_];
     int   SV_nTrk_firstVxt[nMaxSVs_];
-    float SV_mass[nMaxSVs_];	 
+    float SV_mass[nMaxSVs_];
     float SV_vtx_eta[nMaxSVs_];
-    float SV_vtx_phi[nMaxSVs_];   
-    
+    float SV_vtx_phi[nMaxSVs_];
+
     int nPUtrue;                // the true number of pileup interactions that have been added to the event
     int nPU;                    // the number of pileup interactions that have been added to the event
     int   PU_bunch[nMaxPUs_];      // 0 if on time pileup, -1 or +1 if out-of-time
@@ -571,22 +568,22 @@ private:
     float PU_sumpT_low[nMaxPUs_];  // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > low_cut
     float PU_sumpT_high[nMaxPUs_]; // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > high_cut
     int   PU_ntrks_low[nMaxPUs_];  // the number of tracks originating from each interaction, where track pT > low_cu
-    int   PU_ntrks_high[nMaxPUs_]; // the number of tracks originating from each interaction, where track pT > high_cut 
+    int   PU_ntrks_high[nMaxPUs_]; // the number of tracks originating from each interaction, where track pT > high_cut
     float mcweight;
-    math::XYZVector jetVertex; 
-    
+    math::XYZVector jetVertex;
+
     int nCFromGSplit;
     float cFromGSplit_pT[10000];
     float cFromGSplit_eta[10000];
     float cFromGSplit_phi[10000];
     int   cFromGSplit_pdgID[10000];
-    
+
     int nBFromGSplit;
     float bFromGSplit_pT[10000];
     float bFromGSplit_eta[10000];
     float bFromGSplit_phi[10000];
     int   bFromGSplit_pdgID[10000];
-    
+
     int nBHadrons;
     float BHadron_pT[1000];
     float BHadron_eta[1000];
@@ -594,7 +591,7 @@ private:
     float BHadron_mass[1000];
     int   BHadron_pdgID[1000];
 
-//$$   
+//$$
     int nGenlep;
     float Genlep_pT[100];
     float Genlep_eta[100];
@@ -608,8 +605,8 @@ private:
     float Genquark_phi[100];
     int   Genquark_pdgID[100];
     int   Genquark_mother[100];
-//$$   
-    
+//$$
+
     int BitTrigger;
     int Run;
     int Evt;
