@@ -34,6 +34,11 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
+options.register('runSubJets', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Run subjets"
+)
 
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', 100)
@@ -600,6 +605,7 @@ process.positiveCombinedCSVSLBJetTags = process.positiveCombinedMVABJetTags.clon
     cms.InputTag("softPFElectronsTagInfosAODPFlow")
   )
 )
+#-------------------------------------
 
 #-------------------------------------
 ## Output Module Configuration (expects a path 'p')
@@ -636,6 +642,7 @@ switchJetCollection(process,
     cms.InputTag('pfNoTau'+postfix),
     doJTA        = True,
     doBTagging   = True,
+    #btagInfo=bTagInfos,
     btagdiscriminators = bTagDiscriminators,
     jetCorrLabel = jetCorrectionsAK5,
     doType1MET   = False,
@@ -678,21 +685,123 @@ newDiscriminatorSources = cms.VInputTag(
 
 ## Add additional b-tag discriminators to the default jet collection
 getattr(process,'patJets'+postfix).discriminatorSources = getattr(process,'patJets'+postfix).discriminatorSources + newDiscriminatorSources
+#-------------------------------------
 
+#-------------------------------------
+# CA8 jets (Gen and Reco)
+from RecoJets.JetProducers.ca4GenJets_cfi import ca4GenJets
+process.ca8GenJetsNoNu = ca4GenJets.clone(
+    rParam = cms.double(0.8),
+    src = cms.InputTag("genParticlesForJetsNoNu")
+)
+from RecoJets.JetProducers.ca4PFJets_cfi import ca4PFJets
+process.ca8PFJets = ca4PFJets.clone(
+    rParam = cms.double(0.8),
+    src = getattr(process,"pfJets"+postfix).src,
+    srcPVs = getattr(process,"pfJets"+postfix).srcPVs,
+    doAreaFastjet = cms.bool(True)
+)
 
+## CA8 pruned jets (Gen and Reco)
+from RecoJets.JetProducers.ca4GenJets_cfi import ca4GenJets
+from RecoJets.JetProducers.SubJetParameters_cfi import SubJetParameters
+process.ca8GenJetsNoNuPruned = ca4GenJets.clone(
+    SubJetParameters,
+    rParam = cms.double(0.8),
+    src = cms.InputTag("genParticlesForJetsNoNu"),
+    usePruning = cms.bool(True),
+    writeCompound = cms.bool(True),
+    jetCollInstanceName=cms.string("SubJets")
+)
+from RecoJets.JetProducers.ak5PFJetsPruned_cfi import ak5PFJetsPruned
+process.ca8PFJetsPruned = ak5PFJetsPruned.clone(
+    jetAlgorithm = cms.string("CambridgeAachen"),
+    rParam = cms.double(0.8),
+    src = getattr(process,"pfJets"+postfix).src,
+    srcPVs = getattr(process,"pfJets"+postfix).srcPVs,
+    doAreaFastjet = cms.bool(True),
+    writeCompound = cms.bool(True),
+    jetCollInstanceName=cms.string("SubJets")
+)
+
+if options.runSubJets:
+    ## PATify CA8 jets
+    addJetCollection(
+        process,
+        cms.InputTag('ca8PFJets'),
+        'CA8','PF',
+        doJTA=True,
+        doBTagging=True,
+        #btagInfo=bTagInfos,
+        btagdiscriminators=bTagDiscriminators,
+        jetCorrLabel=jetCorrectionsAK7,
+        doType1MET=False,
+        doL1Cleaning=False,
+        doL1Counters=False,
+        doJetID=False,
+        genJetCollection=cms.InputTag("ca8GenJetsNoNu")
+    )
+    addJetCollection(
+        process,
+        cms.InputTag('ca8PFJetsPruned'),
+        'CA8Pruned','PF',
+        doJTA=False,
+        doBTagging=False,
+        #btagInfo=bTagInfos,
+        btagdiscriminators=bTagDiscriminators,
+        jetCorrLabel=jetCorrectionsAK7,
+        doType1MET=False,
+        doL1Cleaning=False,
+        doL1Counters=False,
+        doJetID=False,
+        genJetCollection=cms.InputTag("ca8GenJetsNoNu")
+    )
+    addJetCollection(
+        process,
+        cms.InputTag('ca8PFJetsPruned','SubJets'),
+        'CA8PrunedSubJets', 'PF',
+        doJTA=True,
+        doBTagging=True,
+        #btagInfo=bTagInfos,
+        btagdiscriminators=bTagDiscriminators,
+        jetCorrLabel=jetCorrectionsAK5,
+        doType1MET=False,
+        doL1Cleaning=False,
+        doL1Counters=False,
+        doJetID=False,
+        genJetCollection=cms.InputTag('ca8GenJetsNoNuPruned','SubJets')
+    )
+
+## Establish references between PAT fat jets and PAT subjets using the BoostedJetMerger
+process.selectedPatJetsCA8PrunedPFPacked = cms.EDProducer("BoostedJetMerger",
+    jetSrc=cms.InputTag("selectedPatJetsCA8PrunedPF"),
+    subjetSrc=cms.InputTag("selectedPatJetsCA8PrunedSubJetsPF")
+)
+#-------------------------------------
+
+#-------------------------------------
 from PhysicsTools.PatAlgos.tools.coreTools import *
 ## Remove objects not used from the PAT sequences to speed up processing
 removeSpecificPATObjects(process,names=['Photons', 'Electrons', 'Muons', 'Taus'],postfix=postfix)
+if options.runSubJets:
+    removeAllPATObjectsBut(process, ['Jets'])
 
+if options.runOnData and options.runSubJets:
+    ## Remove MC matching when running over data
+    removeMCMatching( process, ['All'] )
 
 ## Add TagInfos to PAT jets
-for m in ['patJets'+postfix]:
+patJets = ['patJets'+postfix]
+if options.runSubJets:
+    patJets.append('patJetsCA8PrunedSubJetsPF')
+
+for m in patJets:
     if hasattr(process,m):
         print "Switching 'addTagInfos' for " + m + " to 'True'"
         setattr( getattr(process,m), 'addTagInfos', cms.bool(True) )
-
 #-------------------------------------
 
+#-------------------------------------
 ## Produce a collection of good primary vertices
 from PhysicsTools.SelectorUtils.pvSelector_cfi import pvSelector
 process.goodOfflinePrimaryVertices = cms.EDFilter("PrimaryVertexObjectFilter",
@@ -708,7 +817,6 @@ process.noscraping = cms.EDFilter("FilterOutScraping",
     thresh = cms.untracked.double(0.25)
 )
 
-
 ## Filter for good primary vertex
 process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi")
 process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
@@ -717,13 +825,17 @@ process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
     maxAbsZ = cms.double(24),
     maxd0 = cms.double(2)
 )
+#-------------------------------------
 
-
+#-------------------------------------
 from RecoBTag.PerformanceMeasurements.patTools import *
 ## Adapt primary vertex collection
 adaptPVs(process, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'), postfix=postfix, sequence='patPF2PATSequence')
+if options.runSubJets:
+    adaptPVs(process, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'), postfix='', sequence='patDefaultSequence')
+#-------------------------------------
 
-
+#-------------------------------------
 if not options.runOnData:
     ## JP calibration for cmsRun only :
     #from CondCore.DBCommon.CondDBCommon_cfi import *
@@ -740,8 +852,9 @@ if not options.runOnData:
            tag = cms.string("TrackProbabilityCalibration_3D_MC53X_v2"),
            connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"))
     )
-
 #---------------------------------------
+
+#-------------------------------------
 process.load("RecoBTag.PerformanceMeasurements.BTagAnalyzer_cff")
 
 process.btagana.use_selected_tracks  = True   ## False if you want to run on all tracks
@@ -753,9 +866,11 @@ if options.runOnData:
     process.btagana.useTrackHistory      = False
     process.btagana.produceJetProbaTree  = True  ## True if you want to keep track and SV info!
     process.btagana.producePtRelTemplate = False  ## True for performance studies
-process.btagana.primaryVertexColl = 'goodOfflinePrimaryVertices'
-process.btagana.Jets = 'selectedPatJets'+postfix
-process.btagana.triggerTable = 'TriggerResults::HLT' # Data and MC
+process.btagana.primaryVertexColl = cms.InputTag('goodOfflinePrimaryVertices')
+process.btagana.Jets = cms.InputTag('selectedPatJets'+postfix)
+process.btagana.triggerTable = cms.InputTag('TriggerResults::HLT') # Data and MC
+
+process.btaganaSubJets = process.btagana.clone( Jets = cms.InputTag('selectedPatJetsCA8PrunedSubJetsPF') )
 #---------------------------------------
 
 #---------------------------------------
@@ -777,6 +892,7 @@ process.btagana.triggerTable = 'TriggerResults::HLT' # Data and MC
 process.load("EventFilter.HcalRawToDigi.hcallaserFilterFromTriggerResult_cff")
 #---------------------------------------
 
+#---------------------------------------
 ## Define event filter sequence
 process.filtSeq = cms.Sequence(
     #process.JetHLTFilter*
@@ -787,12 +903,41 @@ if options.runOnData:
     process.filtSeq = cms.Sequence( process.filtSeq * process.hcalfilter )
 
 
+## Define jet sequences
+process.genJetSeq = cms.Sequence(
+    process.ca8GenJetsNoNu
+    + process.ca8GenJetsNoNuPruned
+)
+process.jetSeq = cms.Sequence(
+    process.ca8PFJets
+    + process.ca8PFJetsPruned
+)
+if not options.runOnData:
+    process.jetSeq = cms.Sequence( process.genJetSeq + process.jetSeq )
+
+
+## Define combined PF2PAT + subjet sequence
+process.combPF2PATSubJetSeq = cms.Sequence( getattr(process,"patPF2PATSequence"+postfix) )
+if options.runSubJets:
+    process.combPF2PATSubJetSeq = cms.Sequence(
+        getattr(process,"patPF2PATSequence"+postfix)
+        * process.jetSeq
+        * getattr(process,"patDefaultSequence")
+        * process.selectedPatJetsCA8PrunedPFPacked
+    )
+
+## Define analyzer sequence
+process.analyzerSeq = cms.Sequence( process.btagana )
+if options.runSubJets:
+    process.analyzerSeq = cms.Sequence( process.btagana + process.btaganaSubJets )
+#---------------------------------------
+
 process.p = cms.Path(
     process.filtSeq
-    *process.goodOfflinePrimaryVertices
-    *getattr(process,"patPF2PATSequence"+postfix)
-    *process.btagana
+    * process.goodOfflinePrimaryVertices
+    * process.combPF2PATSubJetSeq
+    * process.analyzerSeq
 )
 
-# Delete predefined Endpath (needed for running with CRAB)
+# Delete predefined output module (needed for running with CRAB)
 del process.out
