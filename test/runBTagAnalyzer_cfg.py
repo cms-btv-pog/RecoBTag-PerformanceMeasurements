@@ -646,7 +646,7 @@ switchJetCollection(process,
     btagdiscriminators = bTagDiscriminators,
     jetCorrLabel = jetCorrectionsAK5,
     doType1MET   = False,
-    genJetCollection = cms.InputTag("ak5GenJetsNoNu"),
+    genJetCollection = cms.InputTag('ak5GenJetsNoNu'),
     doJetID      = False,
     postfix      = postfix
 )
@@ -726,20 +726,16 @@ process.ca8PFJetsPruned = ak5PFJetsPruned.clone(
 
 if options.runSubJets:
     ## PATify CA8 jets
-    addJetCollection(
-        process,
+    switchJetCollection(process,
         cms.InputTag('ca8PFJets'),
-        'CA8','PF',
-        doJTA=True,
-        doBTagging=True,
+        doJTA        = True,
+        doBTagging   = True,
         #btagInfo=bTagInfos,
-        btagdiscriminators=bTagDiscriminators,
-        jetCorrLabel=jetCorrectionsAK7,
-        doType1MET=False,
-        doL1Cleaning=False,
-        doL1Counters=False,
-        doJetID=False,
-        genJetCollection=cms.InputTag("ca8GenJetsNoNu")
+        btagdiscriminators = bTagDiscriminators,
+        jetCorrLabel = jetCorrectionsAK5,
+        doType1MET   = False,
+        genJetCollection = cms.InputTag('ca8GenJetsNoNu'),
+        doJetID      = False
     )
     addJetCollection(
         process,
@@ -754,7 +750,7 @@ if options.runSubJets:
         doL1Cleaning=False,
         doL1Counters=False,
         doJetID=False,
-        genJetCollection=cms.InputTag("ca8GenJetsNoNu")
+        genJetCollection=cms.InputTag('ca8GenJetsNoNu')
     )
     addJetCollection(
         process,
