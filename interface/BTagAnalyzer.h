@@ -105,6 +105,8 @@ Implementation:
 #include "FWCore/Utilities/interface/RegexMatch.h"
 #include <boost/regex.hpp>
 
+#include "RecoBTag/PerformanceMeasurements/interface/JetInfoBranches.h" 
+
 //
 // constants, enums and typedefs
 //
@@ -118,13 +120,12 @@ using namespace std;
 using namespace reco;
 
 const UInt_t nMaxTrk_  = 100000;
-const UInt_t nMaxJets_ = 10000;
 const UInt_t nMaxMuons_= 10000;
 const UInt_t nMaxElectrons_= 10000;
 const UInt_t nMaxPVs_= 10000;
 const UInt_t nMaxSVs_= 10000;
 const UInt_t nMaxPUs_= 10000;
-
+const UInt_t MAX_JETCOLLECTIONS=2;
 
 class BTagAnalyzer : public edm::EDAnalyzer
 {
@@ -147,7 +148,6 @@ public:
   const reco::Vertex *recVtx;
 };
 
-
 private:
     virtual void beginJob() ;
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
@@ -168,15 +168,20 @@ private:
 
     std::vector<simPrimaryVertex> getSimPVs(const edm::Handle<edm::HepMCProduct>& evtMC);
 
+    void processJets (edm::Handle <PatJetCollection>&, const edm::Event&, const edm::EventSetup&, int&) ;  
+
     // ----------member data ---------------------------
     std::string outputFile_;
     //std::vector< std::string > moduleLabel_;
+
+    bool runSubJets_ ;
 
     edm::InputTag muonCollectionName_;
     edm::InputTag triggerTable_;
     edm::InputTag SVComputer_;
 
     edm::InputTag JetCollectionTag_;
+    edm::InputTag FatJetCollectionTag_; 
 
     std::string jetPBJetTags_;
     std::string jetPNegBJetTags_;
@@ -391,80 +396,6 @@ private:
     float Track_SVweight[nMaxTrk_];
     int   Track_category[nMaxTrk_];
 
-    int nJet;
-    float Jet_pt[nMaxJets_];
-    float Jet_genpt[nMaxJets_];
-    float Jet_residual[nMaxJets_];
-    float Jet_jes[nMaxJets_];
-    float Jet_eta[nMaxJets_];
-    float Jet_phi[nMaxJets_];
-    float Jet_Ip1N[nMaxJets_];
-    float Jet_Ip1P[nMaxJets_];
-    float Jet_Ip2N[nMaxJets_];
-    float Jet_Ip2P[nMaxJets_];
-    float Jet_Ip3N[nMaxJets_];
-    float Jet_Ip3P[nMaxJets_];
-    float Jet_Ip4N[nMaxJets_];
-    float Jet_Ip4P[nMaxJets_];
-    float Jet_Mass4N[nMaxJets_];
-    float Jet_Mass4P[nMaxJets_];
-    float Jet_ProbaN[nMaxJets_];
-    float Jet_ProbaP[nMaxJets_];
-    float Jet_Proba[nMaxJets_];
-    float Jet_BprobN[nMaxJets_];
-    float Jet_Bprob[nMaxJets_];
-    float Jet_BprobP[nMaxJets_];
-    float Jet_SvxN[nMaxJets_];
-    float Jet_Svx[nMaxJets_];
-    int   Jet_SvxNTracks[nMaxJets_];
-    int   Jet_SvxTracks[nMaxJets_];
-    float Jet_SvxNHP[nMaxJets_];
-    float Jet_SvxHP[nMaxJets_];
-    float Jet_SvxMass[nMaxJets_];
-    float Jet_CombSvxN[nMaxJets_];
-    float Jet_CombSvxP[nMaxJets_];
-    float Jet_CombSvx[nMaxJets_];
-    float Jet_RetCombSvxN[nMaxJets_];
-    float Jet_RetCombSvxP[nMaxJets_];
-    float Jet_RetCombSvx[nMaxJets_];
-    float Jet_CombCSVJP_N[nMaxJets_];
-    float Jet_CombCSVJP_P[nMaxJets_];
-    float Jet_CombCSVJP[nMaxJets_];
-    float Jet_CombCSVSL_N[nMaxJets_];
-    float Jet_CombCSVSL_P[nMaxJets_];
-    float Jet_CombCSVSL[nMaxJets_];
-    float Jet_CombCSVJPSL_N[nMaxJets_];
-    float Jet_CombCSVJPSL_P[nMaxJets_];
-    float Jet_CombCSVJPSL[nMaxJets_];
-    float Jet_SimpIVF_HP[nMaxJets_];
-    float Jet_SimpIVF_HE[nMaxJets_];
-    float Jet_DoubIVF_HE[nMaxJets_];
-    float Jet_CombIVF[nMaxJets_];
-    float Jet_CombIVF_P[nMaxJets_];
-    float Jet_SoftMuN[nMaxJets_];
-    float Jet_SoftMuP[nMaxJets_];
-    float Jet_SoftMu[nMaxJets_];
-    float Jet_SoftElN[nMaxJets_];
-    float Jet_SoftElP[nMaxJets_];
-    float Jet_SoftEl[nMaxJets_];
-    int   Jet_hist1[nMaxJets_];
-    int   Jet_hist2[nMaxJets_];
-    int   Jet_hist3[nMaxJets_];
-    int   Jet_histJet[nMaxJets_];
-    int   Jet_histSvx[nMaxJets_];
-    int   Jet_ntracks[nMaxJets_];
-    int   Jet_flavour[nMaxJets_];
-    int   Jet_nFirstTrack[nMaxJets_];
-    int   Jet_nLastTrack[nMaxJets_];
-    int   Jet_nFirstSV[nMaxJets_];
-    int   Jet_nLastSV[nMaxJets_];
-    int   Jet_nFirstTrkInc[nMaxJets_];
-    int   Jet_nLastTrkInc[nMaxJets_];
-    int   Jet_SV_multi[nMaxJets_];
-    int   Jet_VtxCat[nMaxJets_];
-    int   Jet_looseID[nMaxJets_];
-    int   Jet_tightID[nMaxJets_];
-
     int   nMuon;
     int   Muon_IdxJet[nMaxMuons_];
     int   Muon_nMuHit[nMaxMuons_];
@@ -605,7 +536,12 @@ private:
     float Genquark_phi[100];
     int   Genquark_pdgID[100];
     int   Genquark_mother[100];
+    
 //$$
+
+    //// Jet info 
+
+    JetInfoBranches JetInfo[MAX_JETCOLLECTIONS] ;  
 
     int BitTrigger;
     int Run;
@@ -625,6 +561,24 @@ private:
     float met;
     float mll;
     int trig_ttbar;
+
+   const  reco::Vertex  *pv; 
+
+   bool PFJet80 ; 
+
+   TLorentzVector thelepton1;
+   TLorentzVector thelepton2;
+
+  const GenericMVAJetTagComputer *computer ; 
+
+  edm::View<reco::Muon> muons ; 
+  
+  edm::ESHandle<TransientTrackBuilder> trackBuilder ; 
+  edm::Handle<reco::VertexCollection> primaryVertex ; 
+
+  int cap0, cap1, cap2, cap3, cap4, cap5, cap6, cap7, cap8;
+  int can0, can1, can2, can3, can4, can5, can6, can7, can8;
+
 };
 
 #endif
