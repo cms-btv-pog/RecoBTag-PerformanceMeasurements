@@ -14,7 +14,7 @@ options.register('runOnData', False,
     VarParsing.varType.bool,
     "Run this on real data"
 )
-options.register('outFilename', 'JetTree.root',
+options.register('outFilename', 'JetTree',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Output file name"
@@ -93,7 +93,8 @@ process.source = cms.Source(
         # /QCD_Pt-300to470_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/GEN-SIM-RECODEBUG
         #'/store/mc/Summer12_DR53X/QCD_Pt-300to470_TuneZ2star_8TeV_pythia6/GEN-SIM-RECODEBUG/PU_S10_START53_V7A-v1/0000/0A4671D2-02F4-E111-9CD8-003048C69310.root'
         # /TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
-        '/store/mc/Summer12_DR53X/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S10_START53_V7C-v1/00000/FE7C71D8-DB25-E211-A93B-0025901D4C74.root'
+        #'/store/mc/Summer12_DR53X/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S10_START53_V7C-v1/00000/FE7C71D8-DB25-E211-A93B-0025901D4C74.root'
+        '/store/mc/Summer12_DR53X/WH_ZH_TTH_HToTauTau_M-105_8TeV-pythia6-tauola/AODSIM/PU_S10_START53_V7C-v1/20000/F422BBED-FC77-E211-B2BE-E0CB4E19F98A.root'
     )
 )
 
@@ -104,6 +105,17 @@ if options.runOnData:
         # /BTag/Run2012A-22Jan2013-v1/AOD
         '/store/data/Run2012A/BTag/AOD/22Jan2013-v1/30000/E6959DA6-7081-E211-ABD3-002590596498.root'
     ]
+
+if options.runOnData :    
+	if options.runSubJets :
+		options.outFilename += '_data_subjets.root' 
+	else : 
+		options.outFilename += '_data.root' 
+else : 
+	if options.runSubJets :
+		options.outFilename += '_mc_subjets.root' 
+	else : 
+		options.outFilename += '_mc.root' 
 
 ## Output file
 process.TFileService = cms.Service("TFileService",
@@ -116,10 +128,8 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxE
 ## Options and Output Report
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(options.wantSummary) )
 
-
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = globalTag + '::All'
-
 
 ##############################################
 # Get calibrations for the CSV taggers
@@ -138,7 +148,6 @@ process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
 
 process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
 
-
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
@@ -147,7 +156,6 @@ process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
 process.load("SimTracker.TrackHistory.TrackHistory_cff")
 process.load("SimTracker.TrackHistory.TrackClassifier_cff")
 process.load("RecoBTag.Configuration.RecoBTag_cff")
-
 
 ############################################################################
 # For the Retrained CSV
@@ -368,7 +376,6 @@ process.positiveCombinedCSVJPBJetTags = process.positiveCombinedMVABJetTags.clon
     cms.InputTag("softPFElectronsTagInfosAODPFlow")
   )
 )
-
 
 ############################################################################
 # For the combined CSV + JP + SL tagger
@@ -618,6 +625,7 @@ process.out = cms.OutputModule("PoolOutputModule",
     # unpack the list of commands 'patEventContent'
     outputCommands = cms.untracked.vstring('drop *', *patEventContent)
 )
+
 #-------------------------------------
 ## Standard PAT Configuration File
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
@@ -732,7 +740,7 @@ if options.runSubJets:
         doBTagging   = True,
         #btagInfo=bTagInfos,
         btagdiscriminators = bTagDiscriminators,
-        jetCorrLabel = jetCorrectionsAK5,
+        jetCorrLabel = jetCorrectionsAK7,
         doType1MET   = False,
         genJetCollection = cms.InputTag('ca8GenJetsNoNu'),
         doJetID      = False
@@ -866,7 +874,11 @@ process.btagana.primaryVertexColl = cms.InputTag('goodOfflinePrimaryVertices')
 process.btagana.Jets = cms.InputTag('selectedPatJets'+postfix)
 process.btagana.triggerTable = cms.InputTag('TriggerResults::HLT') # Data and MC
 
-process.btaganaSubJets = process.btagana.clone( Jets = cms.InputTag('selectedPatJetsCA8PrunedSubJetsPF') )
+process.btaganaSubJets = process.btagana.clone( 
+    Jets = cms.InputTag('selectedPatJetsCA8PrunedSubJetsPF'), 
+    FatJets = cms.InputTag('selectedPatJetsCA8PrunedPF'),
+    runSubJets = options.runSubJets 
+    ) 
 #---------------------------------------
 
 #---------------------------------------
@@ -937,3 +949,5 @@ process.p = cms.Path(
 
 # Delete predefined output module (needed for running with CRAB)
 del process.out
+
+open('pydump.py','w').write(process.dumpPython())
