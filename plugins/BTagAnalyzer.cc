@@ -2213,8 +2213,6 @@ void BTagAnalyzer:: processJets (edm::Handle <PatJetCollection>& jetsColl, const
       JetInfo[iJetColl].Jet_SvxMass[JetInfo[iJetColl].nJet] = SVmass;	 
       // std:: << " Jet " << nJet << " pt " << Jet_pt[JetInfo[iJetColl].nJet]*JES*Jet_residual[JetInfo[iJetColl].nJet] << " SVmass " << SVmass << std::endl;
 
-      ++JetInfo[iJetColl].nJet;
-
 
       //*********************************
       // Jet analysis
@@ -2425,6 +2423,8 @@ void BTagAnalyzer:: processJets (edm::Handle <PatJetCollection>& jetsColl, const
       }
 
     } 
+
+    ++JetInfo[iJetColl].nJet;
 
   } // end loop on jet
 
