@@ -39,6 +39,11 @@ options.register('runSubJets', False,
     VarParsing.varType.bool,
     "Run subjets"
 )
+options.register('fatJetPtMin', 100.0,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.float,
+    "Minimum pT for fat jets (default is 100 GeV)"
+)
 
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', 100)
@@ -93,8 +98,8 @@ process.source = cms.Source(
         # /QCD_Pt-300to470_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/GEN-SIM-RECODEBUG
         #'/store/mc/Summer12_DR53X/QCD_Pt-300to470_TuneZ2star_8TeV_pythia6/GEN-SIM-RECODEBUG/PU_S10_START53_V7A-v1/0000/0A4671D2-02F4-E111-9CD8-003048C69310.root'
         # /TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
-        #'/store/mc/Summer12_DR53X/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S10_START53_V7C-v1/00000/FE7C71D8-DB25-E211-A93B-0025901D4C74.root'
-        '/store/mc/Summer12_DR53X/WH_ZH_TTH_HToTauTau_M-105_8TeV-pythia6-tauola/AODSIM/PU_S10_START53_V7C-v1/20000/F422BBED-FC77-E211-B2BE-E0CB4E19F98A.root'
+        '/store/mc/Summer12_DR53X/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S10_START53_V7C-v1/00000/FE7C71D8-DB25-E211-A93B-0025901D4C74.root'
+        #'/store/mc/Summer12_DR53X/WH_ZH_TTH_HToTauTau_M-105_8TeV-pythia6-tauola/AODSIM/PU_S10_START53_V7C-v1/20000/F422BBED-FC77-E211-B2BE-E0CB4E19F98A.root'
     )
 )
 
@@ -106,16 +111,16 @@ if options.runOnData:
         '/store/data/Run2012A/BTag/AOD/22Jan2013-v1/30000/E6959DA6-7081-E211-ABD3-002590596498.root'
     ]
 
-if options.runOnData :    
+if options.runOnData :
 	if options.runSubJets :
-		options.outFilename += '_data_subjets.root' 
-	else : 
-		options.outFilename += '_data.root' 
-else : 
+		options.outFilename += '_data_subjets.root'
+	else :
+		options.outFilename += '_data.root'
+else :
 	if options.runSubJets :
-		options.outFilename += '_mc_subjets.root' 
-	else : 
-		options.outFilename += '_mc.root' 
+		options.outFilename += '_mc_subjets.root'
+	else :
+		options.outFilename += '_mc.root'
 
 ## Output file
 process.TFileService = cms.Service("TFileService",
@@ -189,8 +194,8 @@ process.combinedSecondaryVertexRetrainedPositive = process.combinedSecondaryVert
     'CombinedSVRetrainRecoVertex',
     'CombinedSVRetrainPseudoVertex',
     'CombinedSVRetrainNoVertex'
-    )
   )
+)
 process.combinedSecondaryVertexRetrainedPositiveBJetTags = process.combinedSecondaryVertexPositiveBJetTags.clone(
   jetTagComputer = cms.string('combinedSecondaryVertexRetrainedPositive'),
   tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosAODPFlow"), cms.InputTag("secondaryVertexTagInfosAODPFlow"))
@@ -707,7 +712,8 @@ process.ca8PFJets = ca4PFJets.clone(
     rParam = cms.double(0.8),
     src = getattr(process,"pfJets"+postfix).src,
     srcPVs = getattr(process,"pfJets"+postfix).srcPVs,
-    doAreaFastjet = cms.bool(True)
+    doAreaFastjet = cms.bool(True),
+    jetPtMin = cms.double(options.fatJetPtMin)
 )
 
 ## CA8 pruned jets (Gen and Reco)
@@ -729,7 +735,8 @@ process.ca8PFJetsPruned = ak5PFJetsPruned.clone(
     srcPVs = getattr(process,"pfJets"+postfix).srcPVs,
     doAreaFastjet = cms.bool(True),
     writeCompound = cms.bool(True),
-    jetCollInstanceName=cms.string("SubJets")
+    jetCollInstanceName=cms.string("SubJets"),
+    jetPtMin = cms.double(options.fatJetPtMin)
 )
 
 if options.runSubJets:
@@ -874,11 +881,11 @@ process.btagana.primaryVertexColl = cms.InputTag('goodOfflinePrimaryVertices')
 process.btagana.Jets = cms.InputTag('selectedPatJets'+postfix)
 process.btagana.triggerTable = cms.InputTag('TriggerResults::HLT') # Data and MC
 
-process.btaganaSubJets = process.btagana.clone( 
-    Jets = cms.InputTag('selectedPatJetsCA8PrunedSubJetsPF'), 
+process.btaganaSubJets = process.btagana.clone(
+    Jets = cms.InputTag('selectedPatJetsCA8PrunedSubJetsPF'),
     FatJets = cms.InputTag('selectedPatJetsCA8PrunedPF'),
-    runSubJets = options.runSubJets 
-    ) 
+    runSubJets = options.runSubJets
+    )
 #---------------------------------------
 
 #---------------------------------------
