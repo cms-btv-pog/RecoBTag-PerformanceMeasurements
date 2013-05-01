@@ -23,6 +23,7 @@
   <use name="CondFormats/JetMETObjects"/>
   <use name="RecoBTag/PerformanceMeasurements"/>
   <use name="DataFormats/PatCandidates"/>
+  <use name="fastjet"/>
   <flags EDM_PLUGIN="1"/>
   <flags CXXFLAGS="-O0 -g"/>
 </library>
