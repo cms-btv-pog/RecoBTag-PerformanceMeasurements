@@ -24,6 +24,10 @@ Implementation:
 #include <memory>
 
 // user include files
+// FastJet
+#include "fastjet/PseudoJet.hh"
+// N-subjettiness
+#include "RecoBTag/PerformanceMeasurements/interface/Njettiness.hh"
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
@@ -44,7 +48,7 @@ Implementation:
 #include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
 
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-#include "CategoryFinder.h"
+#include "RecoBTag/PerformanceMeasurements/interface/CategoryFinder.h"
 
 // reco track and vertex
 #include "DataFormats/TrackReco/interface/Track.h"
@@ -105,7 +109,7 @@ Implementation:
 #include "FWCore/Utilities/interface/RegexMatch.h"
 #include <boost/regex.hpp>
 
-#include "RecoBTag/PerformanceMeasurements/interface/JetInfoBranches.h" 
+#include "RecoBTag/PerformanceMeasurements/interface/JetInfoBranches.h"
 
 //
 // constants, enums and typedefs
@@ -168,7 +172,9 @@ private:
 
     std::vector<simPrimaryVertex> getSimPVs(const edm::Handle<edm::HepMCProduct>& evtMC);
 
-    void processJets (edm::Handle <PatJetCollection>&, const edm::Event&, const edm::EventSetup&, int&) ;  
+    void processJets (edm::Handle <PatJetCollection>&, const edm::Event&, const edm::EventSetup&, int&) ;
+
+    int isFromGSP(const reco::Candidate* c);
 
     // ----------member data ---------------------------
     std::string outputFile_;
@@ -181,7 +187,7 @@ private:
     edm::InputTag SVComputer_;
 
     edm::InputTag JetCollectionTag_;
-    edm::InputTag FatJetCollectionTag_; 
+    edm::InputTag FatJetCollectionTag_;
 
     std::string jetPBJetTags_;
     std::string jetPNegBJetTags_;
@@ -503,17 +509,17 @@ private:
     float mcweight;
     math::XYZVector jetVertex;
 
-    int nCFromGSplit;
-    float cFromGSplit_pT[10000];
-    float cFromGSplit_eta[10000];
-    float cFromGSplit_phi[10000];
-    int   cFromGSplit_pdgID[10000];
+    int ncQuarks;
+    float cQuark_pT[10000];
+    float cQuark_eta[10000];
+    float cQuark_phi[10000];
+    int   cQuark_fromGSP[10000];
 
-    int nBFromGSplit;
-    float bFromGSplit_pT[10000];
-    float bFromGSplit_eta[10000];
-    float bFromGSplit_phi[10000];
-    int   bFromGSplit_pdgID[10000];
+    int nbQuarks;
+    float bQuark_pT[10000];
+    float bQuark_eta[10000];
+    float bQuark_phi[10000];
+    int   bQuark_fromGSP[10000];
 
     int nBHadrons;
     float BHadron_pT[1000];
@@ -521,6 +527,8 @@ private:
     float BHadron_phi[1000];
     float BHadron_mass[1000];
     int   BHadron_pdgID[1000];
+    int   BHadron_mother[1000];
+    int   BHadron_hasBdaughter[1000];
 
 //$$
     int nGenlep;
@@ -536,12 +544,12 @@ private:
     float Genquark_phi[100];
     int   Genquark_pdgID[100];
     int   Genquark_mother[100];
-    
+
 //$$
 
-    //// Jet info 
+    //// Jet info
 
-    JetInfoBranches JetInfo[MAX_JETCOLLECTIONS] ;  
+    JetInfoBranches JetInfo[MAX_JETCOLLECTIONS] ;
 
     int BitTrigger;
     int Run;
@@ -562,19 +570,21 @@ private:
     float mll;
     int trig_ttbar;
 
-   const  reco::Vertex  *pv; 
+   const  reco::Vertex  *pv;
 
-   bool PFJet80 ; 
+   bool PFJet80 ;
 
    TLorentzVector thelepton1;
    TLorentzVector thelepton2;
 
-  const GenericMVAJetTagComputer *computer ; 
+  const GenericMVAJetTagComputer *computer ;
 
-  edm::View<reco::Muon> muons ; 
-  
-  edm::ESHandle<TransientTrackBuilder> trackBuilder ; 
-  edm::Handle<reco::VertexCollection> primaryVertex ; 
+  Njettiness nsubjettinessCalculator;
+
+  edm::View<reco::Muon> muons ;
+
+  edm::ESHandle<TransientTrackBuilder> trackBuilder ;
+  edm::Handle<reco::VertexCollection> primaryVertex ;
 
   int cap0, cap1, cap2, cap3, cap4, cap5, cap6, cap7, cap8;
   int can0, can1, can2, can3, can4, can5, can6, can7, can8;
