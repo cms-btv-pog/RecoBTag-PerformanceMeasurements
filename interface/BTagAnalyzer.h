@@ -94,6 +94,7 @@ Implementation:
 #include "DataFormats/JetReco/interface/JetCollection.h"
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
 
 // reconstruct IP
 #include "TrackingTools/IPTools/interface/IPTools.h"
@@ -168,7 +169,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
 
 		std::vector<simPrimaryVertex> getSimPVs(const edm::Handle<edm::HepMCProduct>& evtMC);
 
-		void processJets (edm::Handle <PatJetCollection>&, const edm::Event&, const edm::EventSetup&, int&) ;
+		void processJets (const edm::Handle <PatJetCollection>&, const edm::Event&, const edm::EventSetup&, int&) ;
 
 		int isFromGSP(const reco::Candidate* c);
 
@@ -179,6 +180,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
 		bool runSubJets_ ;
 
 		edm::InputTag muonCollectionName_;
+                edm::InputTag patMuonCollectionName_;
 		edm::InputTag triggerTable_;
 		edm::InputTag SVComputer_;
 
@@ -315,16 +317,16 @@ class BTagAnalyzer : public edm::EDAnalyzer
 		math::XYZVector jetVertex;
 
 		int ncQuarks;
-		float cQuark_pT[10000];
-		float cQuark_eta[10000];
-		float cQuark_phi[10000];
-		int   cQuark_fromGSP[10000];
+		float cQuark_pT[1000];
+		float cQuark_eta[1000];
+		float cQuark_phi[1000];
+		int   cQuark_fromGSP[1000];
 
 		int nbQuarks;
-		float bQuark_pT[10000];
-		float bQuark_eta[10000];
-		float bQuark_phi[10000];
-		int   bQuark_fromGSP[10000];
+		float bQuark_pT[1000];
+		float bQuark_eta[1000];
+		float bQuark_phi[1000];
+		int   bQuark_fromGSP[1000];
 
 		int nBHadrons;
 		float BHadron_pT[1000];
@@ -350,7 +352,23 @@ class BTagAnalyzer : public edm::EDAnalyzer
 		int   Genquark_pdgID[100];
 		int   Genquark_mother[100];
 
-		//$$
+              int   nPatMuon;
+              int   PatMuon_isGlobal[1000];
+              int   PatMuon_nTkHit[1000];
+              int   PatMuon_nPixHit[1000];
+              int   PatMuon_nOutHit[1000];
+              int   PatMuon_nMuHit[1000];
+              int   PatMuon_nMatched[1000];
+              float PatMuon_chi2[1000];
+              float PatMuon_chi2Tk[1000];
+              float PatMuon_pt[1000];
+              float PatMuon_eta[1000];
+              float PatMuon_phi[1000];
+              float PatMuon_vz[1000];
+              float PatMuon_IP[1000];
+              float PatMuon_IPsig[1000];
+              float PatMuon_IP2D[1000];
+              float PatMuon_IP2Dsig[1000];
 
 		//// Jet info
 
