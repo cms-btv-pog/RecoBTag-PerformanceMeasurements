@@ -44,6 +44,11 @@ options.register('fatJetPtMin', 100.0,
     VarParsing.varType.float,
     "Minimum pT for fat jets (default is 100 GeV)"
 )
+options.register('useTTbarFilter', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Use TTbar filter"
+)
 
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', 100)
@@ -793,7 +798,7 @@ process.selectedPatJetsCA8PrunedPFPacked = cms.EDProducer("BoostedJetMerger",
 #-------------------------------------
 from PhysicsTools.PatAlgos.tools.coreTools import *
 ## Remove objects not used from the PAT sequences to speed up processing
-removeSpecificPATObjects(process,names=['Photons', 'Electrons', 'Muons', 'Taus'],postfix=postfix)
+removeSpecificPATObjects(process,names=['Photons', 'Taus'],postfix=postfix) # Does not seem to work actually
 if options.runSubJets:
     removeAllPATObjectsBut(process, ['Jets'])
 
@@ -839,6 +844,66 @@ process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
 #-------------------------------------
 
 #-------------------------------------
+if options.useTTbarFilter:
+    process.load("RecoBTag.PerformanceMeasurements.TTbarSelectionFilter_cfi")
+    process.load("RecoBTag.PerformanceMeasurements.TTbarSelectionProducer_cfi")
+
+    process.ttbarselectionproducer.isData       = options.runOnData
+    process.ttbarselectionproducer.electronColl = cms.InputTag('selectedPatElectrons'+postfix)
+    process.ttbarselectionproducer.muonColl     = cms.InputTag('selectedPatMuons'+postfix)
+    process.ttbarselectionproducer.jetColl      = cms.InputTag('selectedPatJets'+postfix)
+    process.ttbarselectionproducer.metColl      = cms.InputTag('patMETs'+postfix)
+    process.ttbarselectionfilter.select_ee   = True
+    process.ttbarselectionfilter.select_mumu = True
+    process.ttbarselectionfilter.select_emu  = True
+
+    ## Change the cone size of muon isolation to 0.3
+    getattr(process,"pfIsolatedMuons"+postfix).isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'muPFIsoValueCharged03'+postfix ) )
+    getattr(process,"pfIsolatedMuons"+postfix).isolationValueMapsNeutral = cms.VInputTag( cms.InputTag( 'muPFIsoValueNeutral03'+postfix ), cms.InputTag( 'muPFIsoValueGamma03'+postfix ) )
+    getattr(process,"pfIsolatedMuons"+postfix).deltaBetaIsolationValueMap = cms.InputTag( 'muPFIsoValuePU03'+postfix )
+    getattr(process,"pfIsolatedMuons"+postfix).combinedIsolationCut = cms.double(9999.)
+    getattr(process,"pfIsolatedMuons"+postfix).isolationCut = cms.double(9999.)
+
+    getattr(process,"patMuons"+postfix).isolationValues.pfNeutralHadrons = cms.InputTag( 'muPFIsoValueNeutral03'+postfix )
+    getattr(process,"patMuons"+postfix).isolationValues.pfPhotons = cms.InputTag( 'muPFIsoValueGamma03'+postfix )
+    getattr(process,"patMuons"+postfix).isolationValues.pfChargedHadrons = cms.InputTag( 'muPFIsoValueCharged03'+postfix )
+    getattr(process,"patMuons"+postfix).isolationValues.pfPUChargedHadrons = cms.InputTag( 'muPFIsoValuePU03'+postfix )
+
+    ## Change the cone size of electron isolation to 0.3
+    getattr(process,'pfElectrons'+postfix).isolationValueMapsCharged  = cms.VInputTag(cms.InputTag('elPFIsoValueCharged03PFId'+postfix))
+    getattr(process,'pfElectrons'+postfix).deltaBetaIsolationValueMap = cms.InputTag('elPFIsoValuePU03PFId'+postfix)
+    getattr(process,'pfElectrons'+postfix).isolationValueMapsNeutral  = cms.VInputTag(cms.InputTag('elPFIsoValueNeutral03PFId'+postfix), cms.InputTag('elPFIsoValueGamma03PFId'+postfix))
+
+    getattr(process,'pfIsolatedElectrons'+postfix).isolationValueMapsCharged = cms.VInputTag(cms.InputTag('elPFIsoValueCharged03PFId'+postfix))
+    getattr(process,'pfIsolatedElectrons'+postfix).deltaBetaIsolationValueMap = cms.InputTag('elPFIsoValuePU03PFId'+postfix)
+    getattr(process,'pfIsolatedElectrons'+postfix).isolationValueMapsNeutral = cms.VInputTag(cms.InputTag('elPFIsoValueNeutral03PFId'+postfix), cms.InputTag('elPFIsoValueGamma03PFId'+postfix))
+    getattr(process,'pfIsolatedElectrons'+postfix).combinedIsolationCut = cms.double(9999.)
+    getattr(process,'pfIsolatedElectrons'+postfix).isolationCut = cms.double(9999.)
+
+    ## Electron ID
+    process.load("EGamma.EGammaAnalysisTools.electronIdMVAProducer_cfi")
+    process.eidMVASequence = cms.Sequence( process.mvaTrigV0 + process.mvaNonTrigV0 )
+
+    getattr(process,'patElectrons'+postfix).electronIDSources.mvaTrigV0    = cms.InputTag("mvaTrigV0")
+    getattr(process,'patElectrons'+postfix).electronIDSources.mvaNonTrigV0 = cms.InputTag("mvaNonTrigV0")
+    getattr(process,'patElectrons'+postfix).isolationValues = cms.PSet(
+        pfChargedHadrons = cms.InputTag('elPFIsoValueCharged03PFId'+postfix),
+        pfChargedAll = cms.InputTag('elPFIsoValueChargedAll03PFId'+postfix),
+        pfPUChargedHadrons = cms.InputTag('elPFIsoValuePU03PFId'+postfix),
+        pfNeutralHadrons = cms.InputTag('elPFIsoValueNeutral03PFId'+postfix),
+        pfPhotons = cms.InputTag('elPFIsoValueGamma03PFId'+postfix)
+    )
+    getattr(process,'patPF2PATSequence'+postfix).replace( getattr(process,'patElectrons'+postfix), process.eidMVASequence * getattr(process,'patElectrons'+postfix) )
+
+    ## Convesion rejection
+    ## This should be your last selected electron collection name since currently index is used to match with electron later. We can fix this using reference pointer.
+    #setattr(process,'patConversions'+postfix) = cms.EDProducer("PATConversionProducer",
+        #electronSource = cms.InputTag('selectedPatElectrons'+postfix)
+    #)
+    #getattr(process,'patPF2PATSequence'+postfix) += getattr(process,'patConversions'+postfix)
+#-------------------------------------
+
+#-------------------------------------
 from RecoBTag.PerformanceMeasurements.patTools import *
 ## Adapt primary vertex collection
 adaptPVs(process, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'), postfix=postfix, sequence='patPF2PATSequence')
@@ -879,13 +944,16 @@ if options.runOnData:
     process.btagana.producePtRelTemplate = False  ## True for performance studies
 process.btagana.primaryVertexColl = cms.InputTag('goodOfflinePrimaryVertices')
 process.btagana.Jets = cms.InputTag('selectedPatJets'+postfix)
+process.btagana.patMuonCollectionName = cms.InputTag('selectedPatMuons'+postfix)
+process.btagana.use_ttbar_filter = cms.bool(options.useTTbarFilter)
 process.btagana.triggerTable = cms.InputTag('TriggerResults::HLT') # Data and MC
 
 process.btaganaSubJets = process.btagana.clone(
     Jets = cms.InputTag('selectedPatJetsCA8PrunedSubJetsPF'),
     FatJets = cms.InputTag('selectedPatJetsCA8PrunedPF'),
-    runSubJets = options.runSubJets
-    )
+    runSubJets = options.runSubJets,
+    use_ttbar_filter = cms.bool(False)
+)
 #---------------------------------------
 
 #---------------------------------------
@@ -945,6 +1013,8 @@ if options.runSubJets:
 process.analyzerSeq = cms.Sequence( process.btagana )
 if options.runSubJets:
     process.analyzerSeq = cms.Sequence( process.btagana + process.btaganaSubJets )
+if options.useTTbarFilter:
+    process.analyzerSeq.replace( process.btagana, process.ttbarselectionproducer * process.ttbarselectionfilter * process.btagana )
 #---------------------------------------
 
 process.p = cms.Path(
