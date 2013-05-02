@@ -247,78 +247,13 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   JetInfo[0].RegisterTree(smalltree,"JetInfo");
   if (runSubJets_) JetInfo[1].RegisterTree(smalltree,"FatJetInfo");
 
-  ///////////////
-  // Some Histograms
-
-  hData_All_NJets       = fs->make<TH1F>("hData_All_NJets","nb. of jets"     ,21, -0.5, 20.5);
-  hData_All_NTracks     = fs->make<TH1F>("hData_All_NTracks","nb. of tracks" ,20,  0.5, 25.5);
-  hData_All_JetPt       = fs->make<TH1F>("hData_All_JetPt","pt(jet)"         ,50,  20., 520.);
-  hData_All_JetEta      = fs->make<TH1F>("hData_All_JetEta","|#eta(jet)|"    ,24,   0., 2.5 );
-  hData_NJets           = fs->make<TH1F>("hData_NJets","nb. of jets"         ,21, -0.5, 20.5);
-  hData_NTracks         = fs->make<TH1F>("hData_NTracks","nb. of tracks"     ,20,  0.5, 25.5);
-  hData_JetPt           = fs->make<TH1F>("hData_JetPt","pt(jet)"             ,50,  20., 520.);
-  hData_JetEta          = fs->make<TH1F>("hData_JetEta","|#eta(jet)|"        ,24,  0. , 2.5 );
-
-  hData_Tagger  	= fs->make<TH1F>("hData_Tagger","Tagger"             ,100,-25.,25.);
-  hData_Tagger_TCHE	= fs->make<TH1F>("hData_Tagger_TCHE","Tagger_TCHE"   ,100,-25.,25.);
-  hData_Tagger_TCHP	= fs->make<TH1F>("hData_Tagger_TCHP","Tagger_TCHP"   ,100,-25.,25.);
-  hData_Tagger_JP	= fs->make<TH1F>("hData_Tagger_JP","Tagger_JP"       ,100,-25.,25.);
-  hData_Tagger_SSVHE	= fs->make<TH1F>("hData_Tagger_SSVHE ","Tagger_SSVHE",100,-25.,25.);
-  hData_Tagger_SSVHP	= fs->make<TH1F>("hData_Tagger_SSVHP","Tagger_SSVHP" ,100,-25.,25.);
-  hData_Tagger_CSV	= fs->make<TH1F>("hData_Tagger_CSV","Tagger_CSV"     ,100,-25.,25.);
-  hData_Tagger_MU	= fs->make<TH1F>("hData_Tagger_MU","Tagger_MU"       ,100,-25.,25.);
-
-  hAllFlav_Flavour      = fs->make<TH1F>("hAllFlav_Flavour","Flavour"   ,22,-0.5,21.5);
-  hAllFlav_Tagger	= fs->make<TH1F>("hAllFlav_Tagger","Tagger"     ,100,-25.,25.);
-  hAllFlav_Tagger_Gam	= fs->make<TH1F>("hAllFlav_Tagger_Gam","Tagger" ,100,-25.,25.);
-  hAllFlav_Tagger_K0s	= fs->make<TH1F>("hAllFlav_Tagger_K0s","Tagger" ,100,-25.,25.);
-  hAllFlav_Tagger_Lam	= fs->make<TH1F>("hAllFlav_Tagger_Lam","Tagger" ,100,-25.,25.);
-  hAllFlav_Tagger_Bwd	= fs->make<TH1F>("hAllFlav_Tagger_Bwd","Tagger" ,100,-25.,25.);
-  hAllFlav_Tagger_Cwd	= fs->make<TH1F>("hAllFlav_Tagger_Cwd","Tagger" ,100,-25.,25.);
-  hAllFlav_Tagger_Tau	= fs->make<TH1F>("hAllFlav_Tagger_Tau","Tagger" ,100,-25.,25.);
-  hAllFlav_Tagger_Int	= fs->make<TH1F>("hAllFlav_Tagger_Int","Tagger" ,100,-25.,25.);
-  hAllFlav_Tagger_Fak	= fs->make<TH1F>("hAllFlav_Tagger_Fak","Tagger" ,100,-25.,25.);
-  hAllFlav_Tagger_Bad	= fs->make<TH1F>("hAllFlav_Tagger_Bad","Tagger" ,100,-25.,25.);
-  hAllFlav_Tagger_Oth	= fs->make<TH1F>("hAllFlav_Tagger_Oth","Tagger" ,100,-25.,25.);
-
-  hLightFlav_Tagger	= fs->make<TH1F>("hLightFlav_Tagger","Tagger",100,-25.,25.);
-  hGluonFlav_Tagger	= fs->make<TH1F>("hGluonFlav_Tagger","Tagger",100,-25.,25.);
-  hUDSFlav_Tagger	= fs->make<TH1F>("hUDSFlav_Tagger","Tagger"  ,100,-25.,25.);
-  hCFlav_Tagger 	= fs->make<TH1F>("hCFlav_Tagger","Tagger"    ,100,-25.,25.);
-  hBFlav_Tagger 	= fs->make<TH1F>("hBFlav_Tagger","Tagger"    ,100,-25.,25.);
-
-  IPSign_cat0		= fs->make<TH1F>("IPSign_cat0","-IP/#sigma",50, 0., 25.);
-  IPSign_cat1		= fs->make<TH1F>("IPSign_cat1","-IP/#sigma",50, 0., 25.);
-  IPSign_cat2		= fs->make<TH1F>("IPSign_cat2","-IP/#sigma",50, 0., 25.);
-  IPSign_cat3		= fs->make<TH1F>("IPSign_cat3","-IP/#sigma",50, 0., 25.);
-  IPSign_cat4		= fs->make<TH1F>("IPSign_cat4","-IP/#sigma",50, 0., 25.);
-  IPSign_cat5		= fs->make<TH1F>("IPSign_cat5","-IP/#sigma",50, 0., 25.);
-  IPSign_cat6		= fs->make<TH1F>("IPSign_cat6","-IP/#sigma",50, 0., 25.);
-  IPSign_cat7		= fs->make<TH1F>("IPSign_cat7","-IP/#sigma",50, 0., 25.);
-  IPSign_cat8		= fs->make<TH1F>("IPSign_cat8","-IP/#sigma",50, 0., 25.);
-  IPSign_cat9		= fs->make<TH1F>("IPSign_cat9","-IP/#sigma",50, 0., 25.);
-  TrackProbaNeg 	= fs->make<TH1F>("TrackProbaNEG","TrackProbaNEG",51, 0., 1.02);
-  TrackProbaNeg_Cat0	= fs->make<TH1F>("TrackProbaNEG Cat0","TrackProbaNEG Cat0",51, 0., 1.02);
-  TrackProbaNeg_Cat1	= fs->make<TH1F>("TrackProbaNEG Cat1","TrackProbaNEG Cat1",51, 0., 1.02);
-  TrackProbaNeg_Cat2	= fs->make<TH1F>("TrackProbaNEG Cat2","TrackProbaNEG Cat2",51, 0., 1.02);
-  TrackProbaNeg_Cat3	= fs->make<TH1F>("TrackProbaNEG Cat3","TrackProbaNEG Cat3",51, 0., 1.02);
-  TrackProbaNeg_Cat4	= fs->make<TH1F>("TrackProbaNEG Cat4","TrackProbaNEG Cat4",51, 0., 1.02);
-  TrackProbaNeg_Cat5	= fs->make<TH1F>("TrackProbaNEG Cat5","TrackProbaNEG Cat5",51, 0., 1.02);
-  TrackProbaNeg_Cat6	= fs->make<TH1F>("TrackProbaNEG Cat6","TrackProbaNEG Cat6",51, 0., 1.02);
-  TrackProbaNeg_Cat7	= fs->make<TH1F>("TrackProbaNEG Cat7","TrackProbaNEG Cat7",51, 0., 1.02);
-  TrackProbaNeg_Cat8	= fs->make<TH1F>("TrackProbaNEG Cat8","TrackProbaNEG Cat8",51, 0., 1.02);
-  TrackProbaNeg_Cat9	= fs->make<TH1F>("TrackProbaNEG Cat9","TrackProbaNEG Cat9",51, 0., 1.02);
-  TrackProbJet80	= fs->make<TH1F>("TrackProbJet80","TrackProbJet80",51, 0., 1.02);
-  TrackProbJet80_Cat0	= fs->make<TH1F>("TrackProbJet80 Cat0","TrackProbJet80 Cat0",51, 0., 1.02);
-  TrackProbJet80_Cat1	= fs->make<TH1F>("TrackProbJet80 Cat1","TrackProbJet80 Cat1",51, 0., 1.02);
-  TrackProbJet80_Cat2	= fs->make<TH1F>("TrackProbJet80 Cat2","TrackProbJet80 Cat2",51, 0., 1.02);
-  TrackProbJet80_Cat3	= fs->make<TH1F>("TrackProbJet80 Cat3","TrackProbJet80 Cat3",51, 0., 1.02);
-  TrackProbJet80_Cat4	= fs->make<TH1F>("TrackProbJet80 Cat4","TrackProbJet80 Cat4",51, 0., 1.02);
-  TrackProbJet80_Cat5	= fs->make<TH1F>("TrackProbJet80 Cat5","TrackProbJet80 Cat5",51, 0., 1.02);
-  TrackProbJet80_Cat6	= fs->make<TH1F>("TrackProbJet80 Cat6","TrackProbJet80 Cat6",51, 0., 1.02);
-  TrackProbJet80_Cat7	= fs->make<TH1F>("TrackProbJet80 Cat7","TrackProbJet80 Cat7",51, 0., 1.02);
-  TrackProbJet80_Cat8	= fs->make<TH1F>("TrackProbJet80 Cat8","TrackProbJet80 Cat8",51, 0., 1.02);
-  TrackProbJet80_Cat9	= fs->make<TH1F>("TrackProbJet80 Cat9","TrackProbJet80 Cat9",51, 0., 1.02);
+  //// Book Histosgrams 
+  TFileDirectory HistDirJets = fs->mkdir( "HistJets" ); 
+  Histos[0] = new BookHistograms(HistDirJets) ; 
+  if (runSubJets_) { 
+    TFileDirectory HistDirSubJets = fs->mkdir( "HistSubJets" );
+    Histos[1] = new BookHistograms(HistDirSubJets) ;
+  }
 
   cout << "BTagAnalyzer constructed " << endl;
 }
@@ -449,7 +384,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
           {
             int daughterID = abs(genIt.daughter(d)->pdgId());
             if( (daughterID == 1 || daughterID == 2 || daughterID == 3 ||
-                 daughterID == 4 || daughterID == 5 || daughterID == 6 || daughterID == 21))
+                  daughterID == 4 || daughterID == 5 || daughterID == 6 || daughterID == 21))
               nparton_daughters++;
           }
           if(nparton_daughters == 0)
@@ -476,12 +411,12 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
       // BHadrons
       if ( (ID >=  511 && ID <=  557) || (ID >= 5114 && ID <= 5554) ||
-           (ID >=10511 && ID <=10555) || (ID >=20513 && ID <=20555) || ID ==30553 ||
-           (ID>=100551 && ID<=100557) || (ID>=110551 && ID<=110557) ||
-           (ID>=120551 && ID<=120557) || (ID>=130551 && ID<=130557) ||
-           (ID>=200551 && ID<=200557) || (ID>=210551 && ID<=210557) ||
-           (ID>=220551 && ID<=220557) || (ID>=300551 && ID<=300557) ||
-           ID == 9000553 || ID == 9010553 )
+          (ID >=10511 && ID <=10555) || (ID >=20513 && ID <=20555) || ID ==30553 ||
+          (ID>=100551 && ID<=100557) || (ID>=110551 && ID<=110557) ||
+          (ID>=120551 && ID<=120557) || (ID>=130551 && ID<=130557) ||
+          (ID>=200551 && ID<=200557) || (ID>=210551 && ID<=210557) ||
+          (ID>=220551 && ID<=220557) || (ID>=300551 && ID<=300557) ||
+          ID == 9000553 || ID == 9010553 )
       {
         //  cout << " pdgId " << genIt.pdgId()  << " pT " << genIt.p4().pt() << " mother " << mother->pdgId() << endl;
         BHadron_pT[nBHadrons]    = genIt.p4().pt();
@@ -596,7 +531,6 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       mll=-1;
     }
   }
-
 
   //------------------------------------------------------
   // PAT Muons
@@ -792,8 +726,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //// Do jets
   processJets(jetsColl, iEvent, iSetup, iJetColl) ;
   if (runSubJets_) {
-          iJetColl = 1 ;
-	  processJets(fatjetsColl, iEvent, iSetup, iJetColl) ;
+    iJetColl = 1 ;
+    processJets(fatjetsColl, iEvent, iSetup, iJetColl) ;
   }
 
   //// Fill TTree
@@ -919,7 +853,6 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
 
       if (trackSize==0) continue;
       for (unsigned int itt=0; itt < trackSize; ++itt) {
-        //pjet->tagInfoTrackIP("impactParameter")->probability(itt,0);
 
         reco::Track  ptrack;
         if(use_selected_tracks_) ptrack = *selected_tracks[itt];
@@ -960,7 +893,6 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
         if (std::fabs(distJetAxis) < 0.07 && decayLength < 5.0)  pass_cut_trk=true;
 
         // track selection
-
         if ( (use_selected_tracks_ && pass_cut_trk) ||  !use_selected_tracks_) {
 
           if ( use_selected_tracks_ ) {
@@ -1038,17 +970,17 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
 
           if(jet4P.DeltaR(track4P) < 0.3 && std::fabs(distJetAxis) < 0.07 && decayLength < 5.0 ){
 
-            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) TrackProbaNeg->Fill(-JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack]);
-            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 && PFJet80 ) TrackProbJet80->Fill(-JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack]);
+            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) Histos[iJetColl]->TrackProbaNeg->Fill(-JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack]);
+            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 && PFJet80 ) Histos[iJetColl]->TrackProbJet80->Fill(-JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack]);
 
             if ( findCat( &ptrack, *&cat0 ) ) {
               JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 0;
               if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                IPSign_cat0->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                TrackProbaNeg_Cat0->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->IPSign_cat0->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbaNeg_Cat0->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 if ( PFJet80 ) {
-                  IPSign_cat0->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  TrackProbJet80_Cat0->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->IPSign_cat0->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->TrackProbJet80_Cat0->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 }
               }
             }
@@ -1056,11 +988,11 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
             if ( findCat( &ptrack, *&cat1 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 ) {
               JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack]  = 1;
               if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                IPSign_cat1->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                TrackProbaNeg_Cat1->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->IPSign_cat1->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbaNeg_Cat1->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 if ( PFJet80 ) {
-                  IPSign_cat1->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  TrackProbJet80_Cat1->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->IPSign_cat1->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->TrackProbJet80_Cat1->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 }
               }
             }
@@ -1068,11 +1000,11 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
             if ( findCat( &ptrack, *&cat2 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 ) {
               JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 2;
               if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                IPSign_cat2->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                TrackProbaNeg_Cat2->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->IPSign_cat2->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbaNeg_Cat2->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 if ( PFJet80 ) {
-                  IPSign_cat2->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  TrackProbJet80_Cat2->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->IPSign_cat2->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->TrackProbJet80_Cat2->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 }
               }
             }
@@ -1080,11 +1012,11 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
             if ( findCat( &ptrack, *&cat3 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 ) {
               JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 3;
               if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                IPSign_cat3->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                TrackProbaNeg_Cat3->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->IPSign_cat3->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbaNeg_Cat3->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 if ( PFJet80 ) {
-                  IPSign_cat3->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  TrackProbJet80_Cat3->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->IPSign_cat3->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->TrackProbJet80_Cat3->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 }
               }
             }
@@ -1092,11 +1024,11 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
             if ( findCat( &ptrack, *&cat4 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 ) {
               JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 4;
               if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                IPSign_cat4->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                TrackProbaNeg_Cat4->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->IPSign_cat4->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbaNeg_Cat4->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 if ( PFJet80 ) {
-                  IPSign_cat4->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  TrackProbJet80_Cat4->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->IPSign_cat4->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->TrackProbJet80_Cat4->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 }
               }
             }
@@ -1104,11 +1036,11 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
             if ( findCat( &ptrack, *&cat5 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 4 ) {
               JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 5;
               if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                IPSign_cat5->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                TrackProbaNeg_Cat5->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->IPSign_cat5->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbaNeg_Cat5->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 if ( PFJet80 ) {
-                  IPSign_cat5->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  TrackProbJet80_Cat5->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->IPSign_cat5->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->TrackProbJet80_Cat5->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 }
               }
             }
@@ -1116,11 +1048,11 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
             if ( findCat( &ptrack, *&cat6 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 4 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 5 ) {
               JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 6;
               if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                IPSign_cat6->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                TrackProbaNeg_Cat6->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->IPSign_cat6->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbaNeg_Cat6->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 if ( PFJet80 ) {
-                  IPSign_cat6->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  TrackProbJet80_Cat6->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->IPSign_cat6->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->TrackProbJet80_Cat6->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 }
               }
             }
@@ -1128,11 +1060,11 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
             if ( findCat( &ptrack, *&cat7 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 4 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 5 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 6 ) {
               JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 7;
               if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                IPSign_cat7->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                TrackProbaNeg_Cat7->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->IPSign_cat7->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbaNeg_Cat7->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 if ( PFJet80 ) {
-                  IPSign_cat7->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  TrackProbJet80_Cat7->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->IPSign_cat7->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->TrackProbJet80_Cat7->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 }
               }
             }
@@ -1140,11 +1072,11 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
             if ( findCat( &ptrack, *&cat8 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 4 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 5 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 6 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 7 ) {
               JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 8;
               if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                IPSign_cat8->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                TrackProbaNeg_Cat8->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->IPSign_cat8->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbaNeg_Cat8->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 if ( PFJet80 ) {
-                  IPSign_cat8->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  TrackProbJet80_Cat8->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->IPSign_cat8->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->TrackProbJet80_Cat8->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 }
               }
             }
@@ -1152,11 +1084,11 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
             if ( findCat( &ptrack, *&cat9 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack]!= 4 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 5 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 6 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 7 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 8 ) {
               JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 9;
               if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                IPSign_cat9->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                TrackProbaNeg_Cat9->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->IPSign_cat9->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbaNeg_Cat9->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 if ( PFJet80 ) {
-                  IPSign_cat9->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  TrackProbJet80_Cat9->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->IPSign_cat9->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                  Histos[iJetColl]->TrackProbJet80_Cat9->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
                 }
               }
             }
@@ -1441,7 +1373,7 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
       JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] = 0;
       JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] = 0;
 
-      // Track history
+      // Track Histosry
       if ( useTrackHistory_ && indexes.size()!=0 && !isData_ ) {
         if ( flags1P[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 1));
         if ( flags1P[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 2));
@@ -1508,7 +1440,7 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
       }
 
       //*****************************************************************
-      //get track histories of tracks in jets (for Jet Proba)
+      //get track Histosries of tracks in jets (for Jet Proba)
       //*****************************************************************
       JetInfo[iJetColl].Jet_histJet[JetInfo[iJetColl].nJet] = 0;
 
@@ -1553,7 +1485,7 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
       }
 
       //*****************************************************************
-      //get track histories  associated to sec. vertex (for simple SV)
+      //get track Histosries  associated to sec. vertex (for simple SV)
       //*****************************************************************
       JetInfo[iJetColl].Jet_histSvx[JetInfo[iJetColl].nJet] = 0;
       JetInfo[iJetColl].Jet_nFirstSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
@@ -1718,9 +1650,9 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
       //*********************************
       // Jet analysis
 
-      hData_All_NTracks->Fill( ntagtracks ) ;
-      hData_All_JetPt->Fill( ptjet );
-      hData_All_JetEta->Fill( etajet );
+      Histos[iJetColl]->hData_All_NTracks->Fill( ntagtracks ) ;
+      Histos[iJetColl]->hData_All_JetPt->Fill( ptjet );
+      Histos[iJetColl]->hData_All_JetEta->Fill( etajet );
 
       //*****************************************************************
       //define positive and negative tags
@@ -1757,59 +1689,59 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
         if  (JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet] < -1) varneg = -10.*JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet] - 10.;
       }
 
-      hData_NTracks->Fill( ntagtracks ) ;
-      hData_JetPt->Fill( ptjet );
-      hData_JetEta->Fill( etajet );
+      Histos[iJetColl]->hData_NTracks->Fill( ntagtracks ) ;
+      Histos[iJetColl]->hData_JetPt->Fill( ptjet );
+      Histos[iJetColl]->hData_JetEta->Fill( etajet );
 
       //*********************************
       // Tagging
 
-      if ( varneg > 0 ) hData_Tagger->Fill(-varneg );
-      if ( varpos > 0 ) hData_Tagger->Fill( varpos );
+      if ( varneg > 0 ) Histos[iJetColl]->hData_Tagger->Fill(-varneg );
+      if ( varpos > 0 ) Histos[iJetColl]->hData_Tagger->Fill( varpos );
 
-      if ( JetInfo[iJetColl].Jet_Ip2P[JetInfo[iJetColl].nJet] > 0 )     hData_Tagger_TCHE->Fill( JetInfo[iJetColl].Jet_Ip2P[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_Ip2N[JetInfo[iJetColl].nJet] > 0 )     hData_Tagger_TCHE->Fill(-JetInfo[iJetColl].Jet_Ip2N[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_Ip3P[JetInfo[iJetColl].nJet] > 0 )     hData_Tagger_TCHP->Fill( JetInfo[iJetColl].Jet_Ip3P[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_Ip3N[JetInfo[iJetColl].nJet] > 0 )     hData_Tagger_TCHP->Fill(-JetInfo[iJetColl].Jet_Ip3N[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_ProbaP[JetInfo[iJetColl].nJet] > 0 )   hData_Tagger_JP->Fill( 10*JetInfo[iJetColl].Jet_ProbaP[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet] > 0 )   hData_Tagger_JP->Fill(-10*JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet]  >  1 )    hData_Tagger_SSVHE->Fill( 5*JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_SvxN[JetInfo[iJetColl].nJet] < -1 )    hData_Tagger_SSVHE->Fill( 5*JetInfo[iJetColl].Jet_SvxN[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet]  >  1 )  hData_Tagger_SSVHP->Fill( 5*JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet] < -1 )  hData_Tagger_SSVHP->Fill( 5*JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet] > 0  ) hData_Tagger_CSV->Fill( 25*JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] > 0 ) hData_Tagger_CSV->Fill(-25*JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet]  > 0 )  hData_Tagger_MU->Fill( 2.5*JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet] < 0 )  hData_Tagger_MU->Fill( 2.5*JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet] );
+      if ( JetInfo[iJetColl].Jet_Ip2P[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->    hData_Tagger_TCHE->Fill( JetInfo[iJetColl].Jet_Ip2P[JetInfo[iJetColl].nJet] );
+      if ( JetInfo[iJetColl].Jet_Ip2N[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->    hData_Tagger_TCHE->Fill(-JetInfo[iJetColl].Jet_Ip2N[JetInfo[iJetColl].nJet] );
+      if ( JetInfo[iJetColl].Jet_Ip3P[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->    hData_Tagger_TCHP->Fill( JetInfo[iJetColl].Jet_Ip3P[JetInfo[iJetColl].nJet] );
+      if ( JetInfo[iJetColl].Jet_Ip3N[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->    hData_Tagger_TCHP->Fill(-JetInfo[iJetColl].Jet_Ip3N[JetInfo[iJetColl].nJet] );
+      if ( JetInfo[iJetColl].Jet_ProbaP[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->  hData_Tagger_JP->Fill( 10*JetInfo[iJetColl].Jet_ProbaP[JetInfo[iJetColl].nJet] );
+      if ( JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->  hData_Tagger_JP->Fill(-10*JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet] );
+      if ( JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet]  >  1 ) Histos[iJetColl]->   hData_Tagger_SSVHE->Fill( 5*JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet] );
+      if ( JetInfo[iJetColl].Jet_SvxN[JetInfo[iJetColl].nJet] < -1 ) Histos[iJetColl]->   hData_Tagger_SSVHE->Fill( 5*JetInfo[iJetColl].Jet_SvxN[JetInfo[iJetColl].nJet] );
+      if ( JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet]  >  1 ) Histos[iJetColl]-> hData_Tagger_SSVHP->Fill( 5*JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet] );
+      if ( JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet] < -1 ) Histos[iJetColl]-> hData_Tagger_SSVHP->Fill( 5*JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet] );
+      if ( JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet] > 0  ) Histos[iJetColl]->hData_Tagger_CSV->Fill( 25*JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet] );
+      if ( JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->hData_Tagger_CSV->Fill(-25*JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] );
+      if ( JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet]  > 0 ) Histos[iJetColl]-> hData_Tagger_MU->Fill( 2.5*JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet] );
+      if ( JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet] < 0 ) Histos[iJetColl]-> hData_Tagger_MU->Fill( 2.5*JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet] );
 
       // MC only
       if ( isData_ ) continue;
 
-      hAllFlav_Flavour->Fill( flavour );
-      if ( varneg > 0 ) hAllFlav_Tagger->Fill(-varneg );
-      if ( varpos > 0 ) hAllFlav_Tagger->Fill( varpos );
+      Histos[iJetColl]->hAllFlav_Flavour->Fill( flavour );
+      if ( varneg > 0 ) Histos[iJetColl]->hAllFlav_Tagger->Fill(-varneg );
+      if ( varpos > 0 ) Histos[iJetColl]->hAllFlav_Tagger->Fill( varpos );
       if ( flavour == 1 || flavour == 21 ) { // light q+gluon
-        if ( varneg > 0 ) hLightFlav_Tagger->Fill(-varneg );
-        if ( varpos > 0 ) hLightFlav_Tagger->Fill( varpos );
+        if ( varneg > 0 ) Histos[iJetColl]->hLightFlav_Tagger->Fill(-varneg );
+        if ( varpos > 0 ) Histos[iJetColl]->hLightFlav_Tagger->Fill( varpos );
       } // light q+gluon
       if ( flavour == 21 ) { // gluon jets
-        if ( varneg > 0 ) hGluonFlav_Tagger->Fill(-varneg );
-        if ( varpos > 0 ) hGluonFlav_Tagger->Fill( varpos );
+        if ( varneg > 0 ) Histos[iJetColl]->hGluonFlav_Tagger->Fill(-varneg );
+        if ( varpos > 0 ) Histos[iJetColl]->hGluonFlav_Tagger->Fill( varpos );
       } // gluon jets
       else if ( flavour == 1 ) { // uds jets
-        if ( varneg > 0 ) hUDSFlav_Tagger->Fill(-varneg );
-        if ( varpos > 0 ) hUDSFlav_Tagger->Fill( varpos );
+        if ( varneg > 0 ) Histos[iJetColl]->hUDSFlav_Tagger->Fill(-varneg );
+        if ( varpos > 0 ) Histos[iJetColl]->hUDSFlav_Tagger->Fill( varpos );
       } // uds jets
       else if ( flavour == 4 ) { // c jets
-        if ( varneg > 0 ) hCFlav_Tagger->Fill(-varneg );
-        if ( varpos > 0 ) hCFlav_Tagger->Fill( varpos );
+        if ( varneg > 0 ) Histos[iJetColl]->hCFlav_Tagger->Fill(-varneg );
+        if ( varpos > 0 ) Histos[iJetColl]->hCFlav_Tagger->Fill( varpos );
       } // c jets
       else if ( flavour == 5 ) { // b jets
-        if ( varneg > 0 ) hBFlav_Tagger->Fill(-varneg );
-        if ( varpos > 0 ) hBFlav_Tagger->Fill( varpos );
+        if ( varneg > 0 ) Histos[iJetColl]->hBFlav_Tagger->Fill(-varneg );
+        if ( varpos > 0 ) Histos[iJetColl]->hBFlav_Tagger->Fill( varpos );
       } // b jets
 
-      // Track history
+      // Track Histosry
       if ( useTrackHistory_ && indexes.size()!=0 && !isData_ ) {
 
         int cat1P = 0, cat2P = 0, cat3P = 0, catP = 0;
@@ -1893,28 +1825,28 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
 
 
         if ( varneg > 0 ) {
-          if      ( catN == 1 ) hAllFlav_Tagger_Bwd->Fill(-varneg );
-          else if ( catN == 2 ) hAllFlav_Tagger_Cwd->Fill(-varneg );
-          else if ( catN == 3 ) hAllFlav_Tagger_Tau->Fill(-varneg );
-          else if ( catN == 4 ) hAllFlav_Tagger_Gam->Fill(-varneg );
-          else if ( catN == 5 ) hAllFlav_Tagger_K0s->Fill(-varneg );
-          else if ( catN == 6 ) hAllFlav_Tagger_Lam->Fill(-varneg );
-          else if ( catN == 7 ) hAllFlav_Tagger_Int->Fill(-varneg );
-          else if ( catN == 8 ) hAllFlav_Tagger_Fak->Fill(-varneg );
-          else if ( catN == 9 ) hAllFlav_Tagger_Bad->Fill(-varneg );
-          else                  hAllFlav_Tagger_Oth->Fill(-varneg );
+          if      ( catN == 1 ) Histos[iJetColl]->hAllFlav_Tagger_Bwd->Fill(-varneg );
+          else if ( catN == 2 ) Histos[iJetColl]->hAllFlav_Tagger_Cwd->Fill(-varneg );
+          else if ( catN == 3 ) Histos[iJetColl]->hAllFlav_Tagger_Tau->Fill(-varneg );
+          else if ( catN == 4 ) Histos[iJetColl]->hAllFlav_Tagger_Gam->Fill(-varneg );
+          else if ( catN == 5 ) Histos[iJetColl]->hAllFlav_Tagger_K0s->Fill(-varneg );
+          else if ( catN == 6 ) Histos[iJetColl]->hAllFlav_Tagger_Lam->Fill(-varneg );
+          else if ( catN == 7 ) Histos[iJetColl]->hAllFlav_Tagger_Int->Fill(-varneg );
+          else if ( catN == 8 ) Histos[iJetColl]->hAllFlav_Tagger_Fak->Fill(-varneg );
+          else if ( catN == 9 ) Histos[iJetColl]->hAllFlav_Tagger_Bad->Fill(-varneg );
+          else                  Histos[iJetColl]->hAllFlav_Tagger_Oth->Fill(-varneg );
         }
         if ( varpos > 0 ) {
-          if      ( catP == 1 ) hAllFlav_Tagger_Bwd->Fill( varpos );
-          else if ( catP == 2 ) hAllFlav_Tagger_Cwd->Fill( varpos );
-          else if ( catP == 3 ) hAllFlav_Tagger_Tau->Fill( varpos );
-          else if ( catP == 4 ) hAllFlav_Tagger_Gam->Fill( varpos );
-          else if ( catP == 5 ) hAllFlav_Tagger_K0s->Fill( varpos );
-          else if ( catP == 6 ) hAllFlav_Tagger_Lam->Fill( varpos );
-          else if ( catP == 7 ) hAllFlav_Tagger_Int->Fill( varpos );
-          else if ( catP == 8 ) hAllFlav_Tagger_Fak->Fill( varpos );
-          else if ( catP == 9 ) hAllFlav_Tagger_Bad->Fill( varpos );
-          else                  hAllFlav_Tagger_Oth->Fill( varpos );
+          if      ( catP == 1 ) Histos[iJetColl]->hAllFlav_Tagger_Bwd->Fill( varpos );
+          else if ( catP == 2 ) Histos[iJetColl]->hAllFlav_Tagger_Cwd->Fill( varpos );
+          else if ( catP == 3 ) Histos[iJetColl]->hAllFlav_Tagger_Tau->Fill( varpos );
+          else if ( catP == 4 ) Histos[iJetColl]->hAllFlav_Tagger_Gam->Fill( varpos );
+          else if ( catP == 5 ) Histos[iJetColl]->hAllFlav_Tagger_K0s->Fill( varpos );
+          else if ( catP == 6 ) Histos[iJetColl]->hAllFlav_Tagger_Lam->Fill( varpos );
+          else if ( catP == 7 ) Histos[iJetColl]->hAllFlav_Tagger_Int->Fill( varpos );
+          else if ( catP == 8 ) Histos[iJetColl]->hAllFlav_Tagger_Fak->Fill( varpos );
+          else if ( catP == 9 ) Histos[iJetColl]->hAllFlav_Tagger_Bad->Fill( varpos );
+          else                  Histos[iJetColl]->hAllFlav_Tagger_Oth->Fill( varpos );
         }
       }
 
@@ -1924,11 +1856,11 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
 
   } // end loop on jet
 
-  hData_All_NJets->Fill( JetInfo[iJetColl].nJet );
-  hData_NJets->Fill( numjet );
+  Histos[iJetColl]->hData_All_NJets->Fill( JetInfo[iJetColl].nJet );
+  Histos[iJetColl]->hData_NJets->Fill( numjet );
 
   return ;
-}
+} // BTagAnalyzer:: processJets 
 
 void BTagAnalyzer::setTracksPV( const reco::Vertex *pv, bool isPV, int & iJetColl )
 {
