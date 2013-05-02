@@ -162,7 +162,6 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   }
 
   if ( produceJetProbaTree_ ) {
-
     //--------------------------------------
     // primary vertex information
     //--------------------------------------
@@ -245,7 +244,11 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   // jet information
   //--------------------------------------
   JetInfo[0].RegisterTree(smalltree,"JetInfo");
-  if (runSubJets_) JetInfo[1].RegisterTree(smalltree,"FatJetInfo");
+  if ( produceJetProbaTree_ ) JetInfo[0].RegisterJPTree(smalltree,"JetInfo"); 
+  if ( runSubJets_ ) { 
+    JetInfo[1].RegisterTree(smalltree,"FatJetInfo");
+    JetInfo[1].RegisterJPTree(smalltree,"FatJetInfo");
+  }
 
   //// Book Histosgrams 
   TFileDirectory HistDirJets = fs->mkdir( "HistJets" ); 
@@ -1597,7 +1600,7 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
 
         setTracksPV( &pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0), false, iJetColl );
         ++JetInfo[iJetColl].nSV;
-      }
+      } //// if produceJetProbaTree_ 
       JetInfo[iJetColl].Jet_nLastSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
 
       cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
