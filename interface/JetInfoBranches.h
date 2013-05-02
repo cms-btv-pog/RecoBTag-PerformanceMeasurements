@@ -9,9 +9,9 @@ const UInt_t nMaxMuons_= 10000;
 const UInt_t nMaxElectrons_= 10000;
 const UInt_t nMaxSVs_= 10000;
 
-class JetInfoBranches { 
+class JetInfoBranches {
 
-	public : 
+public :
 
   int nJet;
   float Jet_pt[nMaxJets_];
@@ -34,8 +34,8 @@ class JetInfoBranches {
   float Jet_ProbaP[nMaxJets_];
   float Jet_Proba[nMaxJets_];
   float Jet_BprobN[nMaxJets_];
-  float Jet_Bprob[nMaxJets_];
   float Jet_BprobP[nMaxJets_];
+  float Jet_Bprob[nMaxJets_];
   float Jet_SvxN[nMaxJets_];
   float Jet_Svx[nMaxJets_];
   int   Jet_SvxNTracks[nMaxJets_];
@@ -213,7 +213,7 @@ class JetInfoBranches {
     tree->Branch((name+".nJet").c_str(),            &nJet           ,(name+".nJet/I").c_str());
     tree->Branch((name+".Jet_pt").c_str(),          Jet_pt	    ,(name+".Jet_pt["+name+".nJet]/F").c_str());
     tree->Branch((name+".Jet_genpt").c_str(),       Jet_genpt       ,(name+".Jet_genpt["+name+".nJet]/F").c_str());
-    tree->Branch((name+".Jet_residual").c_str(),    Jet_residual    ,(name+".Jet_residual["+name+".nJet]/F").c_str()); 
+    tree->Branch((name+".Jet_residual").c_str(),    Jet_residual    ,(name+".Jet_residual["+name+".nJet]/F").c_str());
     tree->Branch((name+".Jet_jes").c_str(),         Jet_jes         ,(name+".Jet_jes["+name+".nJet]/F").c_str());
     tree->Branch((name+".Jet_eta").c_str(),         Jet_eta         ,(name+".Jet_eta["+name+".nJet]/F").c_str());
     tree->Branch((name+".Jet_phi").c_str(),         Jet_phi         ,(name+".Jet_phi["+name+".nJet]/F").c_str());
@@ -225,8 +225,10 @@ class JetInfoBranches {
     tree->Branch((name+".Jet_Ip3P").c_str(),        Jet_Ip3P        ,(name+".Jet_Ip3P["+name+".nJet]/F").c_str());
     tree->Branch((name+".Jet_ProbaN").c_str(),      Jet_ProbaN     ,(name+".Jet_ProbaN["+name+".nJet]/F").c_str());
     tree->Branch((name+".Jet_ProbaP").c_str(),      Jet_ProbaP     ,(name+".Jet_ProbaP["+name+".nJet]/F").c_str());
+    tree->Branch((name+".Jet_Proba").c_str(),       Jet_Proba      ,(name+".Jet_Proba["+name+".nJet]/F").c_str());
     tree->Branch((name+".Jet_BprobN").c_str(),      Jet_BprobN     ,(name+".Jet_BprobN["+name+".nJet]/F").c_str());
     tree->Branch((name+".Jet_BprobP").c_str(),      Jet_BprobP     ,(name+".Jet_BprobP["+name+".nJet]/F").c_str());
+    tree->Branch((name+".Jet_Bprob").c_str(),       Jet_Bprob      ,(name+".Jet_Bprob["+name+".nJet]/F").c_str());
     tree->Branch((name+".Jet_SvxN").c_str(),        Jet_SvxN       ,(name+".Jet_SvxN["+name+".nJet]/F").c_str());
     tree->Branch((name+".Jet_Svx").c_str(),         Jet_Svx        ,(name+".Jet_Svx["+name+".nJet]/F").c_str());
     tree->Branch((name+".Jet_SvxNHP").c_str(),      Jet_SvxNHP     ,(name+".Jet_SvxNHP["+name+".nJet]/F").c_str());
@@ -273,12 +275,12 @@ class JetInfoBranches {
     tree->Branch((name+".Jet_histSvx").c_str(),     Jet_histSvx     ,(name+".Jet_histSvx["+name+".nJet]/I").c_str());
 
     tree->Branch((name+".Jet_nFirstTrack").c_str(), Jet_nFirstTrack ,(name+".Jet_nFirstTrack["+name+".nJet]/I").c_str());
-    tree->Branch((name+".Jet_nLastTrack").c_str(),  Jet_nLastTrack  ,(name+".Jet_nLastTrack["+name+".nJet]/I").c_str()); 
+    tree->Branch((name+".Jet_nLastTrack").c_str(),  Jet_nLastTrack  ,(name+".Jet_nLastTrack["+name+".nJet]/I").c_str());
     tree->Branch((name+".Jet_nFirstSV").c_str(),    Jet_nFirstSV    ,(name+".Jet_nFirstSV["+name+".nJet]/I").c_str());
     tree->Branch((name+".Jet_nLastSV").c_str(),     Jet_nLastSV     ,(name+".Jet_nLastSV["+name+".nJet]/I").c_str());
-    tree->Branch((name+".Jet_SV_multi").c_str(),    Jet_SV_multi      ,(name+".Jet_SV_multi["+name+".nJet]/I").c_str());  
+    tree->Branch((name+".Jet_SV_multi").c_str(),    Jet_SV_multi      ,(name+".Jet_SV_multi["+name+".nJet]/I").c_str());
     tree->Branch((name+".Jet_nFirstTrkInc").c_str(), Jet_nFirstTrkInc ,(name+".Jet_nFirstTrkInc["+name+".nJet]/I").c_str());
-    tree->Branch((name+".Jet_nLastTrkInc").c_str(),  Jet_nLastTrkInc  ,(name+".Jet_nLastTrkInc["+name+".nJet]/I").c_str()); 
+    tree->Branch((name+".Jet_nLastTrkInc").c_str(),  Jet_nLastTrkInc  ,(name+".Jet_nLastTrkInc["+name+".nJet]/I").c_str());
 
     tree->Branch((name+".Jet_VtxCat").c_str(),      Jet_VtxCat    ,(name+".Jet_VtxCat["+name+".nJet]/I").c_str() );
     tree->Branch((name+".Jet_looseID").c_str(),      Jet_looseID  ,(name+".Jet_looseID["+name+".nJet]/I").c_str());
@@ -338,94 +340,95 @@ class JetInfoBranches {
   //--------------------------------------
   // muon information
   //--------------------------------------
-  tree->Branch((name+".nMuon").c_str()         ,&nMuon        ,(name+".nMuon/I").c_str()); 
-  tree->Branch((name+".Muon_IdxJet").c_str()   ,Muon_IdxJet   ,(name+".Muon_IdxJet["+name+".nMuon]/I").c_str()); 
-  tree->Branch((name+".Muon_nMuHit").c_str()   ,Muon_nMuHit   ,(name+".Muon_nMuHit["+name+".nMuon]/I").c_str()); 
-  tree->Branch((name+".Muon_nTkHit").c_str()   ,Muon_nTkHit   ,(name+".Muon_nTkHit["+name+".nMuon]/I").c_str()); 
-  tree->Branch((name+".Muon_nPixHit").c_str()  ,Muon_nPixHit  ,(name+".Muon_nPixHit["+name+".nMuon]/I").c_str()); 
-  tree->Branch((name+".Muon_nOutHit").c_str()  ,Muon_nOutHit  ,(name+".Muon_nOutHit["+name+".nMuon]/I").c_str()); 
-  tree->Branch((name+".Muon_isGlobal").c_str() ,Muon_isGlobal ,(name+".Muon_isGlobal["+name+".nMuon]/I").c_str()); 
-  tree->Branch((name+".Muon_nMatched").c_str() ,Muon_nMatched ,(name+".Muon_nMatched["+name+".nMuon]/I").c_str()); 
-  tree->Branch((name+".Muon_chi2").c_str()     ,Muon_chi2     ,(name+".Muon_chi2["+name+".nMuon]/F").c_str()); 
-  tree->Branch((name+".Muon_chi2Tk").c_str()   ,Muon_chi2Tk   ,(name+".Muon_chi2Tk["+name+".nMuon]/F").c_str()); 
-  tree->Branch((name+".Muon_pt").c_str()       ,Muon_pt       ,(name+".Muon_pt["+name+".nMuon]/F").c_str()); 
-  tree->Branch((name+".Muon_eta").c_str()      ,Muon_eta      ,(name+".Muon_eta["+name+".nMuon]/F").c_str()); 
-  tree->Branch((name+".Muon_phi").c_str()      ,Muon_phi      ,(name+".Muon_phi["+name+".nMuon]/F").c_str()); 
-  tree->Branch((name+".Muon_ptrel").c_str()    ,Muon_ptrel    ,(name+".Muon_ptrel["+name+".nMuon]/F").c_str()); 
-  tree->Branch((name+".Muon_vz").c_str()       ,Muon_vz       ,(name+".Muon_vz["+name+".nMuon]/F").c_str()); 
-  tree->Branch((name+".Muon_hist").c_str()     ,Muon_hist     ,(name+".Muon_hist["+name+".nMuon]/I").c_str()); 
-  tree->Branch((name+".Muon_IPsig").c_str()    ,Muon_IPsig    ,(name+".Muon_IPsig["+name+".nMuon]/F").c_str()); 
-  tree->Branch((name+".Muon_IP").c_str()       ,Muon_IP       ,(name+".Muon_IP["+name+".nMuon]/F").c_str()); 
-  tree->Branch((name+".Muon_IP2Dsig").c_str()  ,Muon_IP2Dsig  ,(name+".Muon_IP2Dsig["+name+".nMuon]/F").c_str()); 
-  tree->Branch((name+".Muon_IP2D").c_str()     ,Muon_IP2D     ,(name+".Muon_IP2D["+name+".nMuon]/F").c_str()); 
-  tree->Branch((name+".Muon_Proba").c_str()    ,Muon_Proba    ,(name+".Muon_Proba["+name+".nMuon]/F").c_str()); 
-  tree->Branch((name+".Muon_deltaR").c_str()   ,Muon_deltaR   ,(name+".Muon_deltaR["+name+".nMuon]/F").c_str()); 
-  tree->Branch((name+".Muon_ratio").c_str()    ,Muon_ratio    ,(name+".Muon_ratio["+name+".nMuon]/F").c_str()); 
+  tree->Branch((name+".nMuon").c_str()         ,&nMuon        ,(name+".nMuon/I").c_str());
+  tree->Branch((name+".Muon_IdxJet").c_str()   ,Muon_IdxJet   ,(name+".Muon_IdxJet["+name+".nMuon]/I").c_str());
+  tree->Branch((name+".Muon_nMuHit").c_str()   ,Muon_nMuHit   ,(name+".Muon_nMuHit["+name+".nMuon]/I").c_str());
+  tree->Branch((name+".Muon_nTkHit").c_str()   ,Muon_nTkHit   ,(name+".Muon_nTkHit["+name+".nMuon]/I").c_str());
+  tree->Branch((name+".Muon_nPixHit").c_str()  ,Muon_nPixHit  ,(name+".Muon_nPixHit["+name+".nMuon]/I").c_str());
+  tree->Branch((name+".Muon_nOutHit").c_str()  ,Muon_nOutHit  ,(name+".Muon_nOutHit["+name+".nMuon]/I").c_str());
+  tree->Branch((name+".Muon_isGlobal").c_str() ,Muon_isGlobal ,(name+".Muon_isGlobal["+name+".nMuon]/I").c_str());
+  tree->Branch((name+".Muon_nMatched").c_str() ,Muon_nMatched ,(name+".Muon_nMatched["+name+".nMuon]/I").c_str());
+  tree->Branch((name+".Muon_chi2").c_str()     ,Muon_chi2     ,(name+".Muon_chi2["+name+".nMuon]/F").c_str());
+  tree->Branch((name+".Muon_chi2Tk").c_str()   ,Muon_chi2Tk   ,(name+".Muon_chi2Tk["+name+".nMuon]/F").c_str());
+  tree->Branch((name+".Muon_pt").c_str()       ,Muon_pt       ,(name+".Muon_pt["+name+".nMuon]/F").c_str());
+  tree->Branch((name+".Muon_eta").c_str()      ,Muon_eta      ,(name+".Muon_eta["+name+".nMuon]/F").c_str());
+  tree->Branch((name+".Muon_phi").c_str()      ,Muon_phi      ,(name+".Muon_phi["+name+".nMuon]/F").c_str());
+  tree->Branch((name+".Muon_ptrel").c_str()    ,Muon_ptrel    ,(name+".Muon_ptrel["+name+".nMuon]/F").c_str());
+  tree->Branch((name+".Muon_vz").c_str()       ,Muon_vz       ,(name+".Muon_vz["+name+".nMuon]/F").c_str());
+  tree->Branch((name+".Muon_hist").c_str()     ,Muon_hist     ,(name+".Muon_hist["+name+".nMuon]/I").c_str());
+  tree->Branch((name+".Muon_TrackIdx").c_str() ,Muon_TrackIdx ,(name+".Muon_TrackIdx["+name+".nMuon]/I").c_str());
+  tree->Branch((name+".Muon_IPsig").c_str()    ,Muon_IPsig    ,(name+".Muon_IPsig["+name+".nMuon]/F").c_str());
+  tree->Branch((name+".Muon_IP").c_str()       ,Muon_IP       ,(name+".Muon_IP["+name+".nMuon]/F").c_str());
+  tree->Branch((name+".Muon_IP2Dsig").c_str()  ,Muon_IP2Dsig  ,(name+".Muon_IP2Dsig["+name+".nMuon]/F").c_str());
+  tree->Branch((name+".Muon_IP2D").c_str()     ,Muon_IP2D     ,(name+".Muon_IP2D["+name+".nMuon]/F").c_str());
+  tree->Branch((name+".Muon_Proba").c_str()    ,Muon_Proba    ,(name+".Muon_Proba["+name+".nMuon]/F").c_str());
+  tree->Branch((name+".Muon_deltaR").c_str()   ,Muon_deltaR   ,(name+".Muon_deltaR["+name+".nMuon]/F").c_str());
+  tree->Branch((name+".Muon_ratio").c_str()    ,Muon_ratio    ,(name+".Muon_ratio["+name+".nMuon]/F").c_str());
 
   //--------------------------------------
   // pf electron information
   //--------------------------------------
-  tree->Branch((name+".nPFElectron").c_str()         ,&nPFElectron	  ,(name+".nPFElectron/I").c_str()); 
-  tree->Branch((name+".PFElectron_IdxJet").c_str()   ,PFElectron_IdxJet   ,(name+".PFElectron_IdxJet["+name+".nPFElectron]/I").c_str()); 
-  tree->Branch((name+".PFElectron_pt").c_str()       ,PFElectron_pt       ,(name+".PFElectron_pt["+name+".nPFElectron]/F").c_str()); 
-  tree->Branch((name+".PFElectron_eta").c_str()      ,PFElectron_eta      ,(name+".PFElectron_eta["+name+".nPFElectron]/F").c_str()); 
-  tree->Branch((name+".PFElectron_phi").c_str()      ,PFElectron_phi      ,(name+".PFElectron_phi["+name+".nPFElectron]/F").c_str()); 
-  tree->Branch((name+".PFElectron_ptrel").c_str()    ,PFElectron_ptrel    ,(name+".PFElectron_ptrel["+name+".nPFElectron]/F").c_str()); 
-  tree->Branch((name+".PFElectron_deltaR").c_str()   ,PFElectron_deltaR   ,(name+".PFElectron_deltaR["+name+".nPFElectron]/F").c_str()); 
-  tree->Branch((name+".PFElectron_ratio").c_str()    ,PFElectron_ratio    ,(name+".PFElectron_ratio["+name+".nPFElectron]/F").c_str()); 
-  tree->Branch((name+".PFElectron_ratioRel").c_str() ,PFElectron_ratioRel ,(name+".PFElectron_ratioRel["+name+".nPFElectron]/F").c_str()); 
-  tree->Branch((name+".PFElectron_IPsig").c_str()    ,PFElectron_IPsig    ,(name+".PFElectron_IPsig["+name+".nPFElectron]/F").c_str()); 
+  tree->Branch((name+".nPFElectron").c_str()         ,&nPFElectron	  ,(name+".nPFElectron/I").c_str());
+  tree->Branch((name+".PFElectron_IdxJet").c_str()   ,PFElectron_IdxJet   ,(name+".PFElectron_IdxJet["+name+".nPFElectron]/I").c_str());
+  tree->Branch((name+".PFElectron_pt").c_str()       ,PFElectron_pt       ,(name+".PFElectron_pt["+name+".nPFElectron]/F").c_str());
+  tree->Branch((name+".PFElectron_eta").c_str()      ,PFElectron_eta      ,(name+".PFElectron_eta["+name+".nPFElectron]/F").c_str());
+  tree->Branch((name+".PFElectron_phi").c_str()      ,PFElectron_phi      ,(name+".PFElectron_phi["+name+".nPFElectron]/F").c_str());
+  tree->Branch((name+".PFElectron_ptrel").c_str()    ,PFElectron_ptrel    ,(name+".PFElectron_ptrel["+name+".nPFElectron]/F").c_str());
+  tree->Branch((name+".PFElectron_deltaR").c_str()   ,PFElectron_deltaR   ,(name+".PFElectron_deltaR["+name+".nPFElectron]/F").c_str());
+  tree->Branch((name+".PFElectron_ratio").c_str()    ,PFElectron_ratio    ,(name+".PFElectron_ratio["+name+".nPFElectron]/F").c_str());
+  tree->Branch((name+".PFElectron_ratioRel").c_str() ,PFElectron_ratioRel ,(name+".PFElectron_ratioRel["+name+".nPFElectron]/F").c_str());
+  tree->Branch((name+".PFElectron_IPsig").c_str()    ,PFElectron_IPsig    ,(name+".PFElectron_IPsig["+name+".nPFElectron]/F").c_str());
 
   //--------------------------------------
   // pf muon information
   //--------------------------------------
-  tree->Branch((name+".nPFMuon").c_str()            ,&nPFMuon            ,(name+".nPFMuon/I").c_str()); 
-  tree->Branch((name+".PFMuon_IdxJet").c_str()      ,PFMuon_IdxJet       ,(name+".PFMuon_IdxJet["+name+".nPFMuon]/I").c_str()); 
-  tree->Branch((name+".PFMuon_pt").c_str()          ,PFMuon_pt           ,(name+".PFMuon_pt["+name+".nPFMuon]/F").c_str()); 
-  tree->Branch((name+".PFMuon_eta").c_str()         ,PFMuon_eta          ,(name+".PFMuon_eta["+name+".nPFMuon]/F").c_str()); 
-  tree->Branch((name+".PFMuon_phi").c_str()         ,PFMuon_phi          ,(name+".PFMuon_phi["+name+".nPFMuon]/F").c_str()); 
-  tree->Branch((name+".PFMuon_ptrel").c_str()       ,PFMuon_ptrel        ,(name+".PFMuon_ptrel["+name+".nPFMuon]/F").c_str()); 
-  tree->Branch((name+".PFMuon_deltaR").c_str()      ,PFMuon_deltaR       ,(name+".PFMuon_deltaR["+name+".nPFMuon]/F").c_str()); 
-  tree->Branch((name+".PFMuon_ratio").c_str()       ,PFMuon_ratio        ,(name+".PFMuon_ratio["+name+".nPFMuon]/F").c_str()); 
-  tree->Branch((name+".PFMuon_ratioRel").c_str()    ,PFMuon_ratioRel     ,(name+".PFMuon_ratioRel["+name+".nPFMuon]/F").c_str()); 
-  tree->Branch((name+".PFMuon_IPsig").c_str()       ,PFMuon_IPsig        ,(name+".PFMuon_IPsig["+name+".nPFMuon]/F").c_str()); 
-  tree->Branch((name+".PFMuon_GoodQuality").c_str() ,PFMuon_GoodQuality  ,(name+".PFMuon_GoodQuality["+name+".nPFMuon]/I").c_str()); 
+  tree->Branch((name+".nPFMuon").c_str()            ,&nPFMuon            ,(name+".nPFMuon/I").c_str());
+  tree->Branch((name+".PFMuon_IdxJet").c_str()      ,PFMuon_IdxJet       ,(name+".PFMuon_IdxJet["+name+".nPFMuon]/I").c_str());
+  tree->Branch((name+".PFMuon_pt").c_str()          ,PFMuon_pt           ,(name+".PFMuon_pt["+name+".nPFMuon]/F").c_str());
+  tree->Branch((name+".PFMuon_eta").c_str()         ,PFMuon_eta          ,(name+".PFMuon_eta["+name+".nPFMuon]/F").c_str());
+  tree->Branch((name+".PFMuon_phi").c_str()         ,PFMuon_phi          ,(name+".PFMuon_phi["+name+".nPFMuon]/F").c_str());
+  tree->Branch((name+".PFMuon_ptrel").c_str()       ,PFMuon_ptrel        ,(name+".PFMuon_ptrel["+name+".nPFMuon]/F").c_str());
+  tree->Branch((name+".PFMuon_deltaR").c_str()      ,PFMuon_deltaR       ,(name+".PFMuon_deltaR["+name+".nPFMuon]/F").c_str());
+  tree->Branch((name+".PFMuon_ratio").c_str()       ,PFMuon_ratio        ,(name+".PFMuon_ratio["+name+".nPFMuon]/F").c_str());
+  tree->Branch((name+".PFMuon_ratioRel").c_str()    ,PFMuon_ratioRel     ,(name+".PFMuon_ratioRel["+name+".nPFMuon]/F").c_str());
+  tree->Branch((name+".PFMuon_IPsig").c_str()       ,PFMuon_IPsig        ,(name+".PFMuon_IPsig["+name+".nPFMuon]/F").c_str());
+  tree->Branch((name+".PFMuon_GoodQuality").c_str() ,PFMuon_GoodQuality  ,(name+".PFMuon_GoodQuality["+name+".nPFMuon]/I").c_str());
 
     //--------------------------------------
     // secondary vertex information
     //--------------------------------------
-    tree->Branch((name+".nSV").c_str()                ,&nSV               ,(name+".nSV/I").c_str()); 
-    tree->Branch((name+".SV_x").c_str()               ,SV_x	          ,(name+".SV_x["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_y").c_str()               ,SV_y	          ,(name+".SV_y["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_z").c_str()               ,SV_z	          ,(name+".SV_z["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_ex").c_str()              ,SV_ex	          ,(name+".SV_ex["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_ey").c_str()              ,SV_ey	          ,(name+".SV_ey["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_ez").c_str()              ,SV_ez	          ,(name+".SV_ez["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_chi2").c_str()            ,SV_chi2            ,(name+".SV_chi2["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_ndf").c_str()             ,SV_ndf	          ,(name+".SV_ndf["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_flight").c_str()          ,SV_flight          ,(name+".SV_flight["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_flightErr").c_str()       ,SV_flightErr       ,(name+".SV_flightErr["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_deltaR_jet").c_str()      ,SV_deltaR_jet      ,(name+".SV_deltaR_jet["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_deltaR_sum_jet").c_str()  ,SV_deltaR_sum_jet  ,(name+".SV_deltaR_sum_jet["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_deltaR_sum_dir").c_str()  ,SV_deltaR_sum_dir  ,(name+".SV_deltaR_sum_dir["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_energy_ratio").c_str()    ,SV_energy_ratio    ,(name+".SV_energy_ratio["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_aboveC").c_str()          ,SV_aboveC	  ,(name+".SV_aboveC["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_vtx_pt").c_str()          ,SV_vtx_pt	  ,(name+".SV_vtx_pt["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_flight2D").c_str()        ,SV_flight2D        ,(name+".SV_flight2D["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_flight2DErr").c_str()     ,SV_flight2DErr     ,(name+".SV_flight2DErr["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_totCharge").c_str()       ,SV_totCharge       ,(name+".SV_totCharge ["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_vtxDistJetAxis").c_str()  ,SV_vtxDistJetAxis  ,(name+".SV_vtxDistJetAxis ["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_nTrk").c_str()            ,SV_nTrk            ,(name+".SV_nTrk["+name+".nSV]/I").c_str()); 
-    tree->Branch((name+".SV_nTrk_firstVxt").c_str()   ,SV_nTrk_firstVxt   ,(name+".SV_nTrk_firstVxt["+name+".nSV]/I").c_str()); 
-    tree->Branch((name+".SV_mass").c_str()            ,SV_mass            ,(name+".SV_mass["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_vtx_eta").c_str()         ,SV_vtx_eta         ,(name+".SV_vtx_eta["+name+".nSV]/F").c_str()); 
-    tree->Branch((name+".SV_vtx_phi").c_str()         ,SV_vtx_phi         ,(name+".SV_vtx_phi["+name+".nSV]/F").c_str()); 
-  } 
+    tree->Branch((name+".nSV").c_str()                ,&nSV               ,(name+".nSV/I").c_str());
+    tree->Branch((name+".SV_x").c_str()               ,SV_x	          ,(name+".SV_x["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_y").c_str()               ,SV_y	          ,(name+".SV_y["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_z").c_str()               ,SV_z	          ,(name+".SV_z["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_ex").c_str()              ,SV_ex	          ,(name+".SV_ex["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_ey").c_str()              ,SV_ey	          ,(name+".SV_ey["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_ez").c_str()              ,SV_ez	          ,(name+".SV_ez["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_chi2").c_str()            ,SV_chi2            ,(name+".SV_chi2["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_ndf").c_str()             ,SV_ndf	          ,(name+".SV_ndf["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_flight").c_str()          ,SV_flight          ,(name+".SV_flight["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_flightErr").c_str()       ,SV_flightErr       ,(name+".SV_flightErr["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_deltaR_jet").c_str()      ,SV_deltaR_jet      ,(name+".SV_deltaR_jet["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_deltaR_sum_jet").c_str()  ,SV_deltaR_sum_jet  ,(name+".SV_deltaR_sum_jet["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_deltaR_sum_dir").c_str()  ,SV_deltaR_sum_dir  ,(name+".SV_deltaR_sum_dir["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_energy_ratio").c_str()    ,SV_energy_ratio    ,(name+".SV_energy_ratio["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_aboveC").c_str()          ,SV_aboveC	  ,(name+".SV_aboveC["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_vtx_pt").c_str()          ,SV_vtx_pt	  ,(name+".SV_vtx_pt["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_flight2D").c_str()        ,SV_flight2D        ,(name+".SV_flight2D["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_flight2DErr").c_str()     ,SV_flight2DErr     ,(name+".SV_flight2DErr["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_totCharge").c_str()       ,SV_totCharge       ,(name+".SV_totCharge ["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_vtxDistJetAxis").c_str()  ,SV_vtxDistJetAxis  ,(name+".SV_vtxDistJetAxis ["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_nTrk").c_str()            ,SV_nTrk            ,(name+".SV_nTrk["+name+".nSV]/I").c_str());
+    tree->Branch((name+".SV_nTrk_firstVxt").c_str()   ,SV_nTrk_firstVxt   ,(name+".SV_nTrk_firstVxt["+name+".nSV]/I").c_str());
+    tree->Branch((name+".SV_mass").c_str()            ,SV_mass            ,(name+".SV_mass["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_vtx_eta").c_str()         ,SV_vtx_eta         ,(name+".SV_vtx_eta["+name+".nSV]/F").c_str());
+    tree->Branch((name+".SV_vtx_phi").c_str()         ,SV_vtx_phi         ,(name+".SV_vtx_phi["+name+".nSV]/F").c_str());
+  }
 
-  void ReadTree(TTree *tree, std::string name="JetInfo") { 
+  void ReadTree(TTree *tree, std::string name="JetInfo") {
     tree->SetBranchAddress((name+".Jet_pt").c_str(),          Jet_pt	      );
     tree->SetBranchAddress((name+".Jet_genpt").c_str(),       Jet_genpt       );
-    tree->SetBranchAddress((name+".Jet_residual").c_str(),    Jet_residual    ); 
+    tree->SetBranchAddress((name+".Jet_residual").c_str(),    Jet_residual    );
     tree->SetBranchAddress((name+".Jet_jes").c_str(),         Jet_jes         );
     tree->SetBranchAddress((name+".Jet_eta").c_str(),         Jet_eta         );
     tree->SetBranchAddress((name+".Jet_phi").c_str(),         Jet_phi         );
@@ -437,8 +440,10 @@ class JetInfoBranches {
     tree->SetBranchAddress((name+".Jet_Ip3P").c_str(),        Jet_Ip3P        );
     tree->SetBranchAddress((name+".Jet_ProbaN").c_str(),      Jet_ProbaN      );
     tree->SetBranchAddress((name+".Jet_ProbaP").c_str(),      Jet_ProbaP      );
+    tree->SetBranchAddress((name+".Jet_Proba").c_str(),       Jet_Proba       );
     tree->SetBranchAddress((name+".Jet_BprobN").c_str(),      Jet_BprobN      );
     tree->SetBranchAddress((name+".Jet_BprobP").c_str(),      Jet_BprobP      );
+    tree->SetBranchAddress((name+".Jet_Bprob").c_str(),       Jet_Bprob       );
     tree->SetBranchAddress((name+".Jet_SvxN").c_str(),        Jet_SvxN        );
     tree->SetBranchAddress((name+".Jet_Svx").c_str(),         Jet_Svx         );
     tree->SetBranchAddress((name+".Jet_SvxNHP").c_str(),      Jet_SvxNHP      );
@@ -485,12 +490,12 @@ class JetInfoBranches {
     tree->SetBranchAddress((name+".Jet_histSvx").c_str(),     Jet_histSvx     );
 
     tree->SetBranchAddress((name+".Jet_nFirstTrack").c_str(), Jet_nFirstTrack );
-    tree->SetBranchAddress((name+".Jet_nLastTrack").c_str(),  Jet_nLastTrack  ); 
+    tree->SetBranchAddress((name+".Jet_nLastTrack").c_str(),  Jet_nLastTrack  );
     tree->SetBranchAddress((name+".Jet_nFirstSV").c_str(),    Jet_nFirstSV    );
     tree->SetBranchAddress((name+".Jet_nLastSV").c_str(),     Jet_nLastSV     );
-    tree->SetBranchAddress((name+".Jet_SV_multi").c_str(),    Jet_SV_multi      );  
+    tree->SetBranchAddress((name+".Jet_SV_multi").c_str(),    Jet_SV_multi      );
     tree->SetBranchAddress((name+".Jet_nFirstTrkInc").c_str(),Jet_nFirstTrkInc );
-    tree->SetBranchAddress((name+".Jet_nLastTrkInc").c_str(), Jet_nLastTrkInc  ); 
+    tree->SetBranchAddress((name+".Jet_nLastTrkInc").c_str(), Jet_nLastTrkInc  );
 
     tree->SetBranchAddress((name+".Jet_VtxCat").c_str(),      Jet_VtxCat  );
     tree->SetBranchAddress((name+".Jet_looseID").c_str(),     Jet_looseID);
@@ -499,112 +504,113 @@ class JetInfoBranches {
     //--------------------------------------
     // track information
     //--------------------------------------
-    tree->SetBranchAddress((name+".nTrack").c_str()          ,&nTrack 	     ) ;  
-    tree->SetBranchAddress((name+".Track_dxy").c_str()       ,Track_dxy	     ) ;  
-    tree->SetBranchAddress((name+".Track_dz").c_str()        ,Track_dz	     ) ;  
-    tree->SetBranchAddress((name+".Track_zIP").c_str()       ,Track_zIP	     ) ;  
-    tree->SetBranchAddress((name+".Track_length").c_str()    ,Track_length   ) ;  
-    tree->SetBranchAddress((name+".Track_dist").c_str()      ,Track_dist     ) ;  
-    tree->SetBranchAddress((name+".Track_IP2D").c_str()      ,Track_IP2D     ) ;  
-    tree->SetBranchAddress((name+".Track_IP2Dsig").c_str()   ,Track_IP2Dsig  ) ;  
-    tree->SetBranchAddress((name+".Track_IP2Derr").c_str()   ,Track_IP2Derr  ) ;  
-    tree->SetBranchAddress((name+".Track_IP").c_str()        ,Track_IP	     ) ;  
-    tree->SetBranchAddress((name+".Track_IPsig").c_str()     ,Track_IPsig    ) ;  
-    tree->SetBranchAddress((name+".Track_IPerr").c_str()     ,Track_IPerr    ) ;  
-    tree->SetBranchAddress((name+".Track_Proba").c_str()     ,Track_Proba    ) ;  
-    tree->SetBranchAddress((name+".Track_p").c_str()         ,Track_p	     ) ;  
-    tree->SetBranchAddress((name+".Track_pt").c_str()        ,Track_pt	     ) ;  
-    tree->SetBranchAddress((name+".Track_eta").c_str()       ,Track_eta	     ) ;  
-    tree->SetBranchAddress((name+".Track_phi").c_str()       ,Track_phi	     ) ;  
-    tree->SetBranchAddress((name+".Track_chi2").c_str()      ,Track_chi2     ) ;  
-    tree->SetBranchAddress((name+".Track_charge").c_str()    ,Track_charge   ) ;  
-    tree->SetBranchAddress((name+".Track_history").c_str()   ,Track_history  ) ;  
-    tree->SetBranchAddress((name+".Track_nHitStrip").c_str() ,Track_nHitStrip) ;  
-    tree->SetBranchAddress((name+".Track_nHitPixel").c_str() ,Track_nHitPixel) ;  
-    tree->SetBranchAddress((name+".Track_nHitAll").c_str()   ,Track_nHitAll  ) ;  
-    tree->SetBranchAddress((name+".Track_nHitTIB").c_str()   ,Track_nHitTIB  ) ;  
-    tree->SetBranchAddress((name+".Track_nHitTID").c_str()   ,Track_nHitTID  ) ;  
-    tree->SetBranchAddress((name+".Track_nHitTOB").c_str()   ,Track_nHitTOB  ) ;  
-    tree->SetBranchAddress((name+".Track_nHitTEC").c_str()   ,Track_nHitTEC  ) ;  
-    tree->SetBranchAddress((name+".Track_nHitPXB").c_str()   ,Track_nHitPXB  ) ;  
-    tree->SetBranchAddress((name+".Track_nHitPXF").c_str()   ,Track_nHitPXF  ) ;  
-    tree->SetBranchAddress((name+".Track_isHitL1").c_str()   ,Track_isHitL1  ) ;  
-    tree->SetBranchAddress((name+".Track_PV").c_str()        ,Track_PV       ) ;  
-    tree->SetBranchAddress((name+".Track_SV").c_str()        ,Track_SV       ) ;  
-    tree->SetBranchAddress((name+".Track_PVweight").c_str()  ,Track_PVweight ) ;  
-    tree->SetBranchAddress((name+".Track_SVweight").c_str()  ,Track_SVweight ) ;  
-    tree->SetBranchAddress((name+".Track_isfromSV").c_str()  ,Track_isfromSV ) ; 
-    tree->SetBranchAddress((name+".Track_category").c_str()  ,Track_category ) ;  
+    tree->SetBranchAddress((name+".nTrack").c_str()          ,&nTrack 	     ) ;
+    tree->SetBranchAddress((name+".Track_dxy").c_str()       ,Track_dxy	     ) ;
+    tree->SetBranchAddress((name+".Track_dz").c_str()        ,Track_dz	     ) ;
+    tree->SetBranchAddress((name+".Track_zIP").c_str()       ,Track_zIP	     ) ;
+    tree->SetBranchAddress((name+".Track_length").c_str()    ,Track_length   ) ;
+    tree->SetBranchAddress((name+".Track_dist").c_str()      ,Track_dist     ) ;
+    tree->SetBranchAddress((name+".Track_IP2D").c_str()      ,Track_IP2D     ) ;
+    tree->SetBranchAddress((name+".Track_IP2Dsig").c_str()   ,Track_IP2Dsig  ) ;
+    tree->SetBranchAddress((name+".Track_IP2Derr").c_str()   ,Track_IP2Derr  ) ;
+    tree->SetBranchAddress((name+".Track_IP").c_str()        ,Track_IP	     ) ;
+    tree->SetBranchAddress((name+".Track_IPsig").c_str()     ,Track_IPsig    ) ;
+    tree->SetBranchAddress((name+".Track_IPerr").c_str()     ,Track_IPerr    ) ;
+    tree->SetBranchAddress((name+".Track_Proba").c_str()     ,Track_Proba    ) ;
+    tree->SetBranchAddress((name+".Track_p").c_str()         ,Track_p	     ) ;
+    tree->SetBranchAddress((name+".Track_pt").c_str()        ,Track_pt	     ) ;
+    tree->SetBranchAddress((name+".Track_eta").c_str()       ,Track_eta	     ) ;
+    tree->SetBranchAddress((name+".Track_phi").c_str()       ,Track_phi	     ) ;
+    tree->SetBranchAddress((name+".Track_chi2").c_str()      ,Track_chi2     ) ;
+    tree->SetBranchAddress((name+".Track_charge").c_str()    ,Track_charge   ) ;
+    tree->SetBranchAddress((name+".Track_history").c_str()   ,Track_history  ) ;
+    tree->SetBranchAddress((name+".Track_nHitStrip").c_str() ,Track_nHitStrip) ;
+    tree->SetBranchAddress((name+".Track_nHitPixel").c_str() ,Track_nHitPixel) ;
+    tree->SetBranchAddress((name+".Track_nHitAll").c_str()   ,Track_nHitAll  ) ;
+    tree->SetBranchAddress((name+".Track_nHitTIB").c_str()   ,Track_nHitTIB  ) ;
+    tree->SetBranchAddress((name+".Track_nHitTID").c_str()   ,Track_nHitTID  ) ;
+    tree->SetBranchAddress((name+".Track_nHitTOB").c_str()   ,Track_nHitTOB  ) ;
+    tree->SetBranchAddress((name+".Track_nHitTEC").c_str()   ,Track_nHitTEC  ) ;
+    tree->SetBranchAddress((name+".Track_nHitPXB").c_str()   ,Track_nHitPXB  ) ;
+    tree->SetBranchAddress((name+".Track_nHitPXF").c_str()   ,Track_nHitPXF  ) ;
+    tree->SetBranchAddress((name+".Track_isHitL1").c_str()   ,Track_isHitL1  ) ;
+    tree->SetBranchAddress((name+".Track_PV").c_str()        ,Track_PV       ) ;
+    tree->SetBranchAddress((name+".Track_SV").c_str()        ,Track_SV       ) ;
+    tree->SetBranchAddress((name+".Track_PVweight").c_str()  ,Track_PVweight ) ;
+    tree->SetBranchAddress((name+".Track_SVweight").c_str()  ,Track_SVweight ) ;
+    tree->SetBranchAddress((name+".Track_isfromSV").c_str()  ,Track_isfromSV ) ;
+    tree->SetBranchAddress((name+".Track_category").c_str()  ,Track_category ) ;
 
     //--------------------------------------
     // Inclusive Track information for PtRel template
     //--------------------------------------
-    tree->SetBranchAddress((name+".nTrkInc").c_str()      ,&nTrkInc     ) ; 
-    tree->SetBranchAddress((name+".TrkInc_pt").c_str()    ,TrkInc_pt    ) ; 
-    tree->SetBranchAddress((name+".TrkInc_eta").c_str()   ,TrkInc_eta   ) ; 
-    tree->SetBranchAddress((name+".TrkInc_phi").c_str()   ,TrkInc_phi   ) ; 
-    tree->SetBranchAddress((name+".TrkInc_ptrel").c_str() ,TrkInc_ptrel ) ; 
-    tree->SetBranchAddress((name+".TrkInc_IPsig").c_str() ,TrkInc_IPsig ) ; 
-    tree->SetBranchAddress((name+".TrkInc_IP").c_str()    ,TrkInc_IP    ) ; 
+    tree->SetBranchAddress((name+".nTrkInc").c_str()      ,&nTrkInc     ) ;
+    tree->SetBranchAddress((name+".TrkInc_pt").c_str()    ,TrkInc_pt    ) ;
+    tree->SetBranchAddress((name+".TrkInc_eta").c_str()   ,TrkInc_eta   ) ;
+    tree->SetBranchAddress((name+".TrkInc_phi").c_str()   ,TrkInc_phi   ) ;
+    tree->SetBranchAddress((name+".TrkInc_ptrel").c_str() ,TrkInc_ptrel ) ;
+    tree->SetBranchAddress((name+".TrkInc_IPsig").c_str() ,TrkInc_IPsig ) ;
+    tree->SetBranchAddress((name+".TrkInc_IP").c_str()    ,TrkInc_IP    ) ;
 
     //--------------------------------------
     // muon information
     //--------------------------------------
-    tree->Branch((name+".nMuon").c_str()         ,&nMuon        ) ; 
-    tree->Branch((name+".Muon_IdxJet").c_str()   ,Muon_IdxJet   ) ; 
-    tree->Branch((name+".Muon_nMuHit").c_str()   ,Muon_nMuHit   ) ; 
-    tree->Branch((name+".Muon_nTkHit").c_str()   ,Muon_nTkHit   ) ; 
-    tree->Branch((name+".Muon_nPixHit").c_str()  ,Muon_nPixHit  ) ; 
-    tree->Branch((name+".Muon_nOutHit").c_str()  ,Muon_nOutHit  ) ; 
-    tree->Branch((name+".Muon_isGlobal").c_str() ,Muon_isGlobal ) ; 
-    tree->Branch((name+".Muon_nMatched").c_str() ,Muon_nMatched ) ; 
-    tree->Branch((name+".Muon_chi2").c_str()     ,Muon_chi2     ) ; 
-    tree->Branch((name+".Muon_chi2Tk").c_str()   ,Muon_chi2Tk   ) ; 
-    tree->Branch((name+".Muon_pt").c_str()       ,Muon_pt       ) ; 
-    tree->Branch((name+".Muon_eta").c_str()      ,Muon_eta      ) ; 
-    tree->Branch((name+".Muon_phi").c_str()      ,Muon_phi      ) ; 
-    tree->Branch((name+".Muon_ptrel").c_str()    ,Muon_ptrel    ) ; 
-    tree->Branch((name+".Muon_vz").c_str()       ,Muon_vz       ) ; 
-    tree->Branch((name+".Muon_hist").c_str()     ,Muon_hist     ) ; 
-    tree->Branch((name+".Muon_IPsig").c_str()    ,Muon_IPsig    ) ; 
-    tree->Branch((name+".Muon_IP").c_str()       ,Muon_IP       ) ; 
-    tree->Branch((name+".Muon_IP2Dsig").c_str()  ,Muon_IP2Dsig  ) ; 
-    tree->Branch((name+".Muon_IP2D").c_str()     ,Muon_IP2D     ) ; 
-    tree->Branch((name+".Muon_Proba").c_str()    ,Muon_Proba    ) ; 
-    tree->Branch((name+".Muon_deltaR").c_str()   ,Muon_deltaR   ) ; 
-    tree->Branch((name+".Muon_ratio").c_str()    ,Muon_ratio    ) ; 
+    tree->SetBranchAddress((name+".nMuon").c_str()         ,&nMuon        ) ;
+    tree->SetBranchAddress((name+".Muon_IdxJet").c_str()   ,Muon_IdxJet   ) ;
+    tree->SetBranchAddress((name+".Muon_nMuHit").c_str()   ,Muon_nMuHit   ) ;
+    tree->SetBranchAddress((name+".Muon_nTkHit").c_str()   ,Muon_nTkHit   ) ;
+    tree->SetBranchAddress((name+".Muon_nPixHit").c_str()  ,Muon_nPixHit  ) ;
+    tree->SetBranchAddress((name+".Muon_nOutHit").c_str()  ,Muon_nOutHit  ) ;
+    tree->SetBranchAddress((name+".Muon_isGlobal").c_str() ,Muon_isGlobal ) ;
+    tree->SetBranchAddress((name+".Muon_nMatched").c_str() ,Muon_nMatched ) ;
+    tree->SetBranchAddress((name+".Muon_chi2").c_str()     ,Muon_chi2     ) ;
+    tree->SetBranchAddress((name+".Muon_chi2Tk").c_str()   ,Muon_chi2Tk   ) ;
+    tree->SetBranchAddress((name+".Muon_pt").c_str()       ,Muon_pt       ) ;
+    tree->SetBranchAddress((name+".Muon_eta").c_str()      ,Muon_eta      ) ;
+    tree->SetBranchAddress((name+".Muon_phi").c_str()      ,Muon_phi      ) ;
+    tree->SetBranchAddress((name+".Muon_ptrel").c_str()    ,Muon_ptrel    ) ;
+    tree->SetBranchAddress((name+".Muon_vz").c_str()       ,Muon_vz       ) ;
+    tree->SetBranchAddress((name+".Muon_hist").c_str()     ,Muon_hist     ) ;
+    tree->SetBranchAddress((name+".Muon_TrackIdx").c_str() ,Muon_TrackIdx ) ;
+    tree->SetBranchAddress((name+".Muon_IPsig").c_str()    ,Muon_IPsig    ) ;
+    tree->SetBranchAddress((name+".Muon_IP").c_str()       ,Muon_IP       ) ;
+    tree->SetBranchAddress((name+".Muon_IP2Dsig").c_str()  ,Muon_IP2Dsig  ) ;
+    tree->SetBranchAddress((name+".Muon_IP2D").c_str()     ,Muon_IP2D     ) ;
+    tree->SetBranchAddress((name+".Muon_Proba").c_str()    ,Muon_Proba    ) ;
+    tree->SetBranchAddress((name+".Muon_deltaR").c_str()   ,Muon_deltaR   ) ;
+    tree->SetBranchAddress((name+".Muon_ratio").c_str()    ,Muon_ratio    ) ;
 
     //--------------------------------------
     // pf electron information
     //--------------------------------------
-    tree->Branch((name+".nPFElectron").c_str()         ,&nPFElectron	   ) ; 
-    tree->Branch((name+".PFElectron_IdxJet").c_str()   ,PFElectron_IdxJet  ) ; 
-    tree->Branch((name+".PFElectron_pt").c_str()       ,PFElectron_pt      ) ; 
-    tree->Branch((name+".PFElectron_eta").c_str()      ,PFElectron_eta     ) ; 
-    tree->Branch((name+".PFElectron_phi").c_str()      ,PFElectron_phi     ) ; 
-    tree->Branch((name+".PFElectron_ptrel").c_str()    ,PFElectron_ptrel   ) ; 
-    tree->Branch((name+".PFElectron_deltaR").c_str()   ,PFElectron_deltaR  ) ; 
-    tree->Branch((name+".PFElectron_ratio").c_str()    ,PFElectron_ratio   ) ; 
-    tree->Branch((name+".PFElectron_ratioRel").c_str() ,PFElectron_ratioRel) ; 
-    tree->Branch((name+".PFElectron_IPsig").c_str()    ,PFElectron_IPsig   ) ; 
+    tree->SetBranchAddress((name+".nPFElectron").c_str()         ,&nPFElectron	   ) ;
+    tree->SetBranchAddress((name+".PFElectron_IdxJet").c_str()   ,PFElectron_IdxJet  ) ;
+    tree->SetBranchAddress((name+".PFElectron_pt").c_str()       ,PFElectron_pt      ) ;
+    tree->SetBranchAddress((name+".PFElectron_eta").c_str()      ,PFElectron_eta     ) ;
+    tree->SetBranchAddress((name+".PFElectron_phi").c_str()      ,PFElectron_phi     ) ;
+    tree->SetBranchAddress((name+".PFElectron_ptrel").c_str()    ,PFElectron_ptrel   ) ;
+    tree->SetBranchAddress((name+".PFElectron_deltaR").c_str()   ,PFElectron_deltaR  ) ;
+    tree->SetBranchAddress((name+".PFElectron_ratio").c_str()    ,PFElectron_ratio   ) ;
+    tree->SetBranchAddress((name+".PFElectron_ratioRel").c_str() ,PFElectron_ratioRel) ;
+    tree->SetBranchAddress((name+".PFElectron_IPsig").c_str()    ,PFElectron_IPsig   ) ;
 
     //--------------------------------------
     // pf muon information
     //--------------------------------------
-    tree->Branch((name+".nPFMuon").c_str()            ,&nPFMuon            ) ; 
-    tree->Branch((name+".PFMuon_IdxJet").c_str()      ,PFMuon_IdxJet       ) ; 
-    tree->Branch((name+".PFMuon_pt").c_str()          ,PFMuon_pt           ) ; 
-    tree->Branch((name+".PFMuon_eta").c_str()         ,PFMuon_eta          ) ; 
-    tree->Branch((name+".PFMuon_phi").c_str()         ,PFMuon_phi          ) ; 
-    tree->Branch((name+".PFMuon_ptrel").c_str()       ,PFMuon_ptrel        ) ; 
-    tree->Branch((name+".PFMuon_deltaR").c_str()      ,PFMuon_deltaR       ) ; 
-    tree->Branch((name+".PFMuon_ratio").c_str()       ,PFMuon_ratio        ) ; 
-    tree->Branch((name+".PFMuon_ratioRel").c_str()    ,PFMuon_ratioRel     ) ; 
-    tree->Branch((name+".PFMuon_IPsig").c_str()       ,PFMuon_IPsig        ) ; 
-    tree->Branch((name+".PFMuon_GoodQuality").c_str() ,PFMuon_GoodQuality  ) ; 
+    tree->SetBranchAddress((name+".nPFMuon").c_str()            ,&nPFMuon            ) ;
+    tree->SetBranchAddress((name+".PFMuon_IdxJet").c_str()      ,PFMuon_IdxJet       ) ;
+    tree->SetBranchAddress((name+".PFMuon_pt").c_str()          ,PFMuon_pt           ) ;
+    tree->SetBranchAddress((name+".PFMuon_eta").c_str()         ,PFMuon_eta          ) ;
+    tree->SetBranchAddress((name+".PFMuon_phi").c_str()         ,PFMuon_phi          ) ;
+    tree->SetBranchAddress((name+".PFMuon_ptrel").c_str()       ,PFMuon_ptrel        ) ;
+    tree->SetBranchAddress((name+".PFMuon_deltaR").c_str()      ,PFMuon_deltaR       ) ;
+    tree->SetBranchAddress((name+".PFMuon_ratio").c_str()       ,PFMuon_ratio        ) ;
+    tree->SetBranchAddress((name+".PFMuon_ratioRel").c_str()    ,PFMuon_ratioRel     ) ;
+    tree->SetBranchAddress((name+".PFMuon_IPsig").c_str()       ,PFMuon_IPsig        ) ;
+    tree->SetBranchAddress((name+".PFMuon_GoodQuality").c_str() ,PFMuon_GoodQuality  ) ;
 
-  } 
+  }
 
-}; 
+};
 
-#endif 
+#endif
