@@ -30,6 +30,7 @@ public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
    bool            produceJetProbaTree;
+   bool            produceNewAlgoTree;
    double           n15_20, n20_30, n30_50,n50_80,n80_120,n120_170,n170_300,n300_470,n470_600,n600_800, n800_1000, n1000_inf;
    double           n15_30, n120_150, n150_inf;
    bool            use15_20,use20_30, use30_50,use50_80,use80_120,use120_170,use170_300,use300_470,use470_600,use600_800, use800_1000, use1000_inf;
@@ -101,8 +102,24 @@ public :
    Float_t         Jet_DoubIVF_HE[1000];   //[nJet]
    Float_t         Jet_CombIVF[1000];   //[nJet]
    Float_t         Jet_CombIVF_P[1000];   //[nJet]
+   Float_t         Jet_RetCombSvxN[1000];   //[nJet]
+   Float_t         Jet_RetCombSvxP[1000];   //[nJet]
+   Float_t         Jet_RetCombSvx[1000];   //[nJet]
+   Float_t         Jet_CombCSVJP_N[1000];   //[nJet]
+   Float_t         Jet_CombCSVJP_P[1000];   //[nJet]
+   Float_t         Jet_CombCSVJP[1000];   //[nJet]
+   Float_t         Jet_CombCSVSL_N[1000];   //[nJet]
+   Float_t         Jet_CombCSVSL_P[1000];   //[nJet]
+   Float_t         Jet_CombCSVSL[1000];   //[nJet]
+   Float_t         Jet_CombCSVJPSL_N[1000];   //[nJet]
+   Float_t         Jet_CombCSVJPSL_P[1000];   //[nJet]
+   Float_t         Jet_CombCSVJPSL[1000];   //[nJet]
    Float_t         Jet_SoftMuN[1000];   //[nJet]
+   Float_t         Jet_SoftMuP[1000];   //[nJet]
    Float_t         Jet_SoftMu[1000];   //[nJet]
+   Float_t         Jet_SoftElN[1000];   //[nJet]
+   Float_t         Jet_SoftElP[1000];   //[nJet]
+   Float_t         Jet_SoftEl[1000];   //[nJet]
    Int_t           Jet_hist1[1000];   //[nJet]
    Int_t           Jet_hist2[1000];   //[nJet]
    Int_t           Jet_hist3[1000];   //[nJet]
@@ -138,7 +155,7 @@ public :
    Float_t         Muon_IP2D[1000];   //[nMuon]
    Float_t         Muon_IP2Dsig[1000];   //[nMuon]
    Float_t         Muon_deltaR[1000];   //[nJet]
-   Float_t         Muon_ratio[7];   //[nJet]
+   Float_t         Muon_ratio[1000];   //[nJet]
 
    
    Int_t           nTrkInc;
@@ -298,8 +315,25 @@ public :
    TBranch        *b_Jet_DoubIVF_HE;   //!
    TBranch        *b_Jet_CombIVF;   //!
    TBranch        *b_Jet_CombIVF_P;   //!
+   TBranch        *b_Jet_RetCombSvxN;   //!
+   TBranch        *b_Jet_RetCombSvxP;   //!
+   TBranch        *b_Jet_RetCombSvx;   //!
+   TBranch        *b_Jet_CombCSVJP_N;   //!
+   TBranch        *b_Jet_CombCSVJP_P;   //!
+   TBranch        *b_Jet_CombCSVJP;   //!
+   TBranch        *b_Jet_CombCSVSL_N;   //!
+   TBranch        *b_Jet_CombCSVSL_P;   //!
+   TBranch        *b_Jet_CombCSVSL;   //!
+   TBranch        *b_Jet_CombCSVJPSL_N;   //!
+   TBranch        *b_Jet_CombCSVJPSL_P;   //!
+   TBranch        *b_Jet_CombCSVJPSL;   //!
    TBranch        *b_Jet_SoftMuN;   //!
+   TBranch        *b_Jet_SoftMuP;   //!
    TBranch        *b_Jet_SoftMu;   //!
+   TBranch        *b_Jet_SoftElN;   //!
+   TBranch        *b_Jet_SoftElP;   //!
+   TBranch        *b_Jet_SoftEl;   //!
+
    TBranch        *b_Jet_hist1;   //!
    TBranch        *b_Jet_hist2;   //!
    TBranch        *b_Jet_hist3;   //!
@@ -447,13 +481,14 @@ public :
   TBranch *b_SV_vtx_eta;
   TBranch *b_SV_vtx_phi;
   
-   CommPlotProducer(TChain *supertree=0);
+   CommPlotProducer(TChain *supertree=0, bool infotree1=true, bool infotree2=false);
    virtual ~CommPlotProducer();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TChain *tree);
    virtual void     Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TString outputname);
+   virtual void     Loop(TString trignam, int trigger, float PtMin_Cut, float PtMax_Cut, TString outputname);
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
    virtual void     AddHisto(TString name, TString title,  int nbins, float min, float max);
@@ -476,12 +511,13 @@ public :
    virtual void     Fill_nevent(double n15,double n20, double n30,double n50,double n80,double n120,double n170,double n300,double n470,double n600, double n800, double n1000); 
    virtual void     SetSumXS();
    
-   virtual bool            passMuonSelection(int muidx, int ijet);
+   bool             passMuonSelection(int muidx, int ijet);
+   bool             passTrigger(TString trigger, int pttrig);
 };
 #endif
 
 #ifdef CommPlotProducer_cxx
-CommPlotProducer::CommPlotProducer(TChain *superTree)
+CommPlotProducer::CommPlotProducer(TChain *superTree, bool infotree1, bool infotree2)
 {  
 
    numb_histo = 0;
@@ -518,7 +554,9 @@ CommPlotProducer::CommPlotProducer(TChain *superTree)
    n120_150 =0;
    n150_inf =0;
    sqrtstev=-1;
-   produceJetProbaTree=true;
+   produceJetProbaTree=infotree1;
+   produceNewAlgoTree=infotree2;
+
    puweight=true;
    
    if (superTree==0) {
@@ -758,6 +796,26 @@ void CommPlotProducer::Init(TChain *tree)
   fChain->SetBranchAddress("SV_vtx_phi" ,SV_vtx_phi,&b_SV_vtx_phi);
 
   
+  }
+  if (produceNewAlgoTree) {
+   fChain->SetBranchAddress("Jet_RetCombSvxN", Jet_RetCombSvxN, &b_Jet_RetCombSvxN);
+   fChain->SetBranchAddress("Jet_RetCombSvxP", Jet_RetCombSvxP, &b_Jet_RetCombSvxP);
+   fChain->SetBranchAddress("Jet_RetCombSvx", Jet_RetCombSvx, &b_Jet_RetCombSvx);
+   fChain->SetBranchAddress("Jet_CombCSVJP_N", Jet_CombCSVJP_N, &b_Jet_CombCSVJP_N);
+   fChain->SetBranchAddress("Jet_CombCSVJP_P", Jet_CombCSVJP_P, &b_Jet_CombCSVJP_P);
+   fChain->SetBranchAddress("Jet_CombCSVJP", Jet_CombCSVJP, &b_Jet_CombCSVJP);
+   fChain->SetBranchAddress("Jet_CombCSVSL_N", Jet_CombCSVSL_N, &b_Jet_CombCSVSL_N);
+   fChain->SetBranchAddress("Jet_CombCSVSL_P", Jet_CombCSVSL_P, &b_Jet_CombCSVSL_P);
+   fChain->SetBranchAddress("Jet_CombCSVSL", Jet_CombCSVSL, &b_Jet_CombCSVSL);
+   fChain->SetBranchAddress("Jet_CombCSVJPSL_N", Jet_CombCSVJPSL_N, &b_Jet_CombCSVJPSL_N);
+   fChain->SetBranchAddress("Jet_CombCSVJPSL_P", Jet_CombCSVJPSL_P, &b_Jet_CombCSVJPSL_P);
+   fChain->SetBranchAddress("Jet_CombCSVJPSL", Jet_CombCSVJPSL, &b_Jet_CombCSVJPSL);
+   fChain->SetBranchAddress("Jet_SoftMuN", Jet_SoftMuN, &b_Jet_SoftMuN);
+   fChain->SetBranchAddress("Jet_SoftMuP", Jet_SoftMuP, &b_Jet_SoftMuP);
+   fChain->SetBranchAddress("Jet_SoftMu", Jet_SoftMu, &b_Jet_SoftMu);
+   fChain->SetBranchAddress("Jet_SoftElN", Jet_SoftElN, &b_Jet_SoftElN);
+   fChain->SetBranchAddress("Jet_SoftElP", Jet_SoftElP, &b_Jet_SoftElP);
+   fChain->SetBranchAddress("Jet_SoftEl", Jet_SoftEl, &b_Jet_SoftEl);
   }
    Notify();
 }

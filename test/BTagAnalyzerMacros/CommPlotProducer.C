@@ -55,6 +55,7 @@ void CommPlotProducer::Counter(){
   if (fChain == 0) return;
   
   Long64_t nentries = fChain->GetEntriesFast();
+//  Long64_t nentries = fChain->GetEntries();
   
   Long64_t nbytes = 0, nb = 0;
   
@@ -467,22 +468,24 @@ float CommPlotProducer::GetEvtWeight(){
    
 }
 
-
 void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TString output_name)
+{
+   // if not specified : run on single jet trigger
+   Loop("jet",trigger,PtMin_Cut,PtMax_Cut,output_name);
+}
+
+void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, float PtMax_Cut, TString output_name)
   
   
 { 
   
   //---------------Configuration-----------------------------------------// 
   //produceJetProbaTree=false;
-  int   IntCut = trigger;
   float PtMin  = PtMin_Cut;  
   float PtMax  = PtMax_Cut;  
   float EtaCut = 2.4; 
   double pi=acos(-1);
 
-  
-  int Year = 2012;  
   
   
   // Cross check variables--------------------------------------------------//
@@ -549,6 +552,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   AddHisto("sv_phi",             "Vtx #phi",                                            40, -1.*pi,pi);
   AddHisto("sv_flightSig2D",     "Flight distance significance 2D",                     50,0.,80.    );
   AddHisto("sv_flight2D",        "Flight distance 2D",                                  50,0.,2.5    );
+  AddHisto("sv_flightSig2D_3trk","Flight distance 2D with >=3 tracks",                                  50,0.,2.5    );
   AddHisto("sv_flight3D",        "Flight distance 3D",                                  50,0.,15.    );  
   AddHisto("sv_flight3DSig" ,    "flight distance significance 3D",	                50,0.,80.    );
   AddHisto("sv_multi_0"	  ,      "number of secondary vertex",                          6,-0.5,5.5   );
@@ -598,6 +602,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   AddHisto("track_dz"     ,     "transverse IP",                               100,-3,3  );  
   AddHisto("track_isfromSV",     "Track is from SV",                            2,-0.5, 1.5   );  
   AddHisto("track_pt"	  ,      "pT of all the tracks",	                80,0.,200.    );
+  AddHisto("track_pt15"   ,      "pT of all the tracks",                        150,0.,15.    );
   AddHisto("track_chi2_cut"     ,"normalized chi2 ",  	                        100,0.,30.    );
   AddHisto("track_nHit_cut"   ,"number of hits  ",               35,-0.5, 34.5 );
   AddHisto("track_HPix_cut"     ,"number of hits in the Pixel ",                 10,-0.5, 9.5  );
@@ -605,7 +610,8 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   AddHisto("track_dist_cut"     ,"distance to the jet axis ",                    100,0.,0.3    );
   AddHisto("track_dz_cut"      ,"transverse IP ",		                100,-20., 20.  );  
   AddHisto("track_pt_cut"       ,"pT ",	                                        80,0.,200.);
-  AddHisto("track_IP2D_cut"     ,"IP2D ",	                                100,-0.1,0.1);
+  AddHisto("track_pt15_cut"     , "pT of all the tracks",                       150,0.,15.    );
+  AddHisto("track_IP2D_cut"     ,"IP2D ",	                                100,-1.,1.);
    
   AddHisto("TCHE_extended1"	  ,"TCHE_extended1",				     70, -30.,30. );
   AddHisto("TCHP_extended1"	  ,"TCHP_extended1",				     70, -30.,30. );
@@ -618,9 +624,16 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   AddHisto("TCHP"	  ,"TCHP",				     50,0.,30. );  
   AddHisto("JP" 	  ,"JP",				     50,0.,2.5 );
   AddHisto("JBP"	  ,"JBP",				     50,0.,8.  );
-  AddHisto("SSV"	  ,"SSVHE",				     50,0.,7.  );
-  AddHisto("SSVHP"	  ,"SSVHP",				     50,0.,7.  );
+  AddHisto("SSV"	  ,"SSVHE",				     70,0.,7.  );
+  AddHisto("SSVHP"	  ,"SSVHP",				     70,0.,7.  );
   AddHisto("CSV"	  ,"CSV",				     50,0.,1.  );
+
+  AddHisto("SoftMu"	  ,"SoftMu",				     50,0.,1.  );
+  AddHisto("SoftEl"	  ,"SoftEl",				     50,0.,1.  );
+  AddHisto("CombCSVJP"	  ,"CombCSVJP",				     50,0.,1.  );
+  AddHisto("CombCSVSL"	  ,"CombCSVSL",				     50,0.,1.  );
+  AddHisto("CombCSVJPSL"  ,"CombCSVJPSL",				     50,0.,1.  );
+  AddHisto("RetCombSvx"   ,"RetCombSvx",				     50,0.,1.  );
   
   AddHisto2D("seltrack_vs_jetpt", "sel track multiplicity vs jet pt",         PtMax/20,0,PtMax, 100,-0.5,99.5);
   AddHisto2D("sv_mass_vs_flightDist3D", " SVMass vs SV 3D flight distance ",  50,0, 10,60,0,6);			
@@ -635,10 +648,11 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
   Nevent = 0;
   if (fChain == 0) return;
   
-  Long64_t nentries = fChain->GetEntriesFast();
+  Long64_t nentries = fChain->GetEntries();
   
   Long64_t nbytes = 0, nb = 0;
   
+  cout << " in loop " << nentries <<endl;
   //------------------------------------------------------------------------------------------------------------------//  
   //----------------------------------------EVENT LOOP ---------------------------------------------------------------// 
   //------------------------------------------------------------------------------------------------------------------//  
@@ -648,7 +662,6 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);   nbytes += nb;
 
-    
     //-----------------------------------
     //is data or MC ?
     //-----------------------------------
@@ -737,13 +750,14 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
       ww*=WeightPU;
     
     }    
+    if (!isData)  pt_hat         ->Fill(pthat,ww);
     
     
     //-----------------------------------
     //counter of events
     //-----------------------------------
     Nevent++;
-    if(Nevent%50000 ==0 && Nevent!=0) cout << " number of processed events is " << Nevent << endl;
+    if(Nevent%250000 ==0 && Nevent!=0) cout << " number of processed events is " << Nevent <<  " = " << (100.*Nevent)/(1.*nentries) << "%" <<endl;
 
     int njet_c     =0;
     int njet_b     =0;   
@@ -755,71 +769,13 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
     //at least 1 jet in the event
     if (nJet<=0) continue;
     
+
     //-----------------------------------
     //Apply trigger selection
     //-----------------------------------
-    // Triggers
-    int trig100 = BitTrigger%100;
-    int trig1000 = BitTrigger%1000;
-    //int trig10000 = BitTrigger%10000;
-    
-    int trig1 = BitTrigger%10;
-    int trig2 = (trig100 - trig1) / 10;
-    int trig3 = (trig1000 - trig100) / 100;
-    
-    bool Jet30  = false, Jet40  = false, Jet60  = false, Jet80  = false;
-    bool Jet110 = false, Jet140 = false, Jet150 = false, Jet190 = false;
-    bool Jet200 = false, Jet240 = false, Jet260 = false;
-    bool Jet300 = false, Jet320 = false;
-    
-    if ( trig2==1 || trig2==3 || trig2==5 || trig2==7 )  Jet40  = true;
-    if ( trig2 >= 4 )				         Jet80  = true;
-    if ( trig3==2 || trig3==3 || trig3==6 || trig3==7 )  Jet140 = true;
-    if ( trig3 >= 4 )				         Jet200 = true;
-    if ( trig1==1 || trig1==3 || trig1==5 || trig1==7 )  Jet260 = true;
-    if ( trig1==2 || trig1==3 || trig1==6 || trig1==7 )  Jet320 = true;
-    
-    if ( IntCut ==  30 && !Jet30 )  continue;
-    if ( IntCut ==  40 && !Jet40 )  continue;
-    if ( IntCut ==  60 && !Jet60 )  continue;
-    if ( IntCut ==  80 && !Jet80 )  continue;
-    if ( IntCut == 110 && !Jet110 ) continue;
-    if ( IntCut == 140 && !Jet140 ) continue;
-    if ( IntCut == 150 && !Jet150 ) continue;
-    if ( IntCut == 190 && !Jet190 ) continue;
-    if ( IntCut == 200 && !Jet200 ) continue;
-    if ( IntCut == 240 && !Jet240 ) continue;
-    if ( IntCut == 260 && !Jet260 ) continue;
-    if ( IntCut == 300 && !Jet300 ) continue;
-    if ( IntCut == 320 && !Jet320 ) continue;
-    
-    if ( Year == 2012 && IntCut == 1 
-	 && !Jet40 && !Jet80 && !Jet140
-	 && !Jet200 && !Jet260 && !Jet320 ) continue;
-    
-    //-----------------------------------
-    //Determine if there is at least 
-    //on jet which pass the trigger
-    //in the event => away from the TO
-    //-----------------------------------
-    
-    bool JetPtCut = false;
-    for (int ijet=0; ijet<nJet ; ijet++) {
-      
-      float ptjet = Jet_pt[ijet];
-      //JetPtCut = true;
-      //if (  ptjet > 100. && fabs(Jet_eta[ijet]) < EtaCut ) JetPtCut = true;
-      //if(JetPtCut) cout << "ptjet 1 " <<   ptjet << "  fabs(Jet_eta[ijet]) " << fabs(Jet_eta[ijet]) << endl;
-      
-      if (      IntCut ==  40 && ptjet >  60. && fabs(Jet_eta[ijet])  < EtaCut ) JetPtCut = true;
-      else if ( IntCut ==  80 && ptjet > 100. && fabs(Jet_eta[ijet])  < EtaCut ) JetPtCut = true;
-      else if ( IntCut == 140 && ptjet > 160. && fabs(Jet_eta[ijet])  < EtaCut ) JetPtCut = true;
-      else if ( IntCut == 200 && ptjet > 220. && fabs(Jet_eta[ijet])  < EtaCut ) JetPtCut = true;
-      else if ( IntCut == 260 && ptjet > 300. && fabs(Jet_eta[ijet])  < EtaCut ) JetPtCut = true;
-      else if ( IntCut == 320 && ptjet > 360. && fabs(Jet_eta[ijet])  < EtaCut ) JetPtCut = true;
-      
-    }
-    if (!JetPtCut) continue;
+
+    bool isTrigOK = passTrigger(trigname, trigger);
+    if (!isTrigOK) continue;
     
     //-----------------------------------
     //Fill control plot
@@ -833,7 +789,6 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
       //N_event_mc+=ww;      
       N_event_mc_after_sel++;
       nPU_mc         ->Fill(nPUtrue,ww);
-      pt_hat         ->Fill(pthat,ww);
       nPV_mc         ->Fill(nPV,ww);
       nPV_mc_unw     ->Fill(nPV,ww_unp);
     }
@@ -886,6 +841,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
       float ssvhe    = Jet_Svx[ijet] ;
       float ssvhp    = Jet_SvxHP[ijet];
       float csv      = Jet_CombSvx[ijet];
+      
       
       //cout << "tche " << tche << endl;
       //cout << "tchp " << tchp << endl;
@@ -990,6 +946,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
 	    }	    
 	    if (passNhit && passPix && passIPz && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D){
 	      FillHisto_floatFromMap("track_pt_cut",           flav, isGluonSplit ,Track_pt[itrk]     , ww);
+              FillHisto_floatFromMap("track_pt15_cut",           flav, isGluonSplit ,Track_pt[itrk]     , ww);
 	    }	    
 	    if (passNhit && passPix && passPt && passnormchi2 && passtrkdist && passtrklen){
 	      FillHisto_floatFromMap("track_dz_cut",          flav, isGluonSplit ,Track_dz[itrk]      ,ww);
@@ -1001,7 +958,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
 	      FillHisto_intFromMap(  "track_nHit_cut",       flav, isGluonSplit ,Track_nHitAll[itrk],ww);	  
 	    }
 	    if (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen ){
-	      FillHisto_intFromMap(  "track_IP2D_cut",         flav, isGluonSplit ,Track_IP2D[itrk],ww);	  
+	      FillHisto_floatFromMap(  "track_IP2D_cut",         flav, isGluonSplit ,Track_IP2D[itrk],ww);	  
 	    }	    
 	  }
 	  if (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D){
@@ -1021,6 +978,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
 	    FillHisto_floatFromMap("track_len",     flav, isGluonSplit ,Track_length[itrk]  , ww);
 	    FillHisto_floatFromMap("track_dist",    flav, isGluonSplit ,fabs(Track_dist[itrk])    , ww);
 	    FillHisto_floatFromMap("track_pt",      flav, isGluonSplit ,Track_pt[itrk]      , ww);	  
+            FillHisto_floatFromMap("track_pt15",      flav, isGluonSplit ,Track_pt[itrk]      , ww);
 	    //           cout << "track_chi2 :" << Track_chi2[itrk]<<endl;
 	    //           cout << "track_HStrip :" << Track_nHitStrip[itrk]<<endl;
 	    //           cout << "track_HPix :" << Track_nHitPixel[itrk]<<endl;
@@ -1101,7 +1059,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
 	  chi2norm_sv    = SV_chi2[Jet_nFirstSV[ijet]]/SV_ndf[Jet_nFirstSV[ijet]];
 	  flightSig_sv   = SV_flight[Jet_nFirstSV[ijet]]/SV_flightErr[Jet_nFirstSV[ijet]];
 	  flight2DSig_sv = SV_flight2D[Jet_nFirstSV[ijet]]/SV_flight2DErr[Jet_nFirstSV[ijet]];
-	  mass_sv        =Jet_SvxMass[Jet_nFirstSV[ijet]];
+	  mass_sv        =SV_mass[Jet_nFirstSV[ijet]];
 	  sv_dR_jet      =SV_deltaR_jet[Jet_nFirstSV[ijet]];
 	  sv_dR_dir_sum  =SV_deltaR_sum_dir[Jet_nFirstSV[ijet]];
 	  sv_dR_jet_sum  =SV_deltaR_sum_jet[Jet_nFirstSV[ijet]];
@@ -1113,7 +1071,7 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
 	  
 	  
 	  sv_flight3D    =SV_flight[Jet_nFirstSV[ijet]] ;  
-	  sv_flight3Derr =SV_flight[Jet_nFirstSV[ijet]]; 
+          sv_flight3Derr =SV_flightErr[Jet_nFirstSV[ijet]];
 	  sv_flight2D    =SV_flight2D[Jet_nFirstSV[ijet]];    
 	  sv_flight2Derr =SV_flight2DErr[Jet_nFirstSV[ijet]];    
 	  sv_totchar     =SV_totCharge[Jet_nFirstSV[ijet]] ;
@@ -1144,7 +1102,11 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
 	  FillHisto_floatFromMap("sv_flight3Derr",  flav, isGluonSplit ,sv_flight3Derr,      ww);
 	  FillHisto_floatFromMap("sv_flight3DSig",  flav, isGluonSplit ,flightSig_sv,        ww);
 	
-	  if (sv_nTrk >2)FillHisto_floatFromMap("sv_mass_3trk", flav, isGluonSplit ,mass_sv,ww);
+          if (sv_nTrk >2) {
+           FillHisto_floatFromMap("sv_mass_3trk", flav, isGluonSplit ,mass_sv,ww);
+           FillHisto_floatFromMap("sv_flightSig2D_3trk",  flav, isGluonSplit ,flight2DSig_sv,        ww);
+          }
+
 	
 	  FillHisto2D_float_floatFromMap("sv_mass_vs_flightDist3D"     ,flav,isGluonSplit ,sv_flight3D,mass_sv,ww);	
 	  FillHisto2D_float_floatFromMap("avg_sv_mass_vs_jetpt"        ,flav,isGluonSplit ,ptjet,mass_sv,ww);
@@ -1175,6 +1137,23 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
       FillHisto_floatFromMap("SSV",   flav, isGluonSplit, ssvhe	  ,   ww);
       FillHisto_floatFromMap("SSVHP", flav, isGluonSplit, ssvhp	  ,   ww);
       FillHisto_floatFromMap("CSV",   flav, isGluonSplit, csv	  ,   ww);
+
+      if (produceNewAlgoTree) {
+       float softmu   = Jet_SoftMu[ijet]  ;
+       float solfel   = Jet_SoftEl[ijet];
+       float combjp   = Jet_CombCSVJP[ijet];
+       float combsl   = Jet_CombCSVSL[ijet];
+       float combjpsl = Jet_CombCSVJPSL[ijet];
+       float retrainedcsv= Jet_RetCombSvx[ijet];
+       FillHisto_floatFromMap("SoftMu",      flav, isGluonSplit, softmu  ,   ww);
+       FillHisto_floatFromMap("SoftEl",      flav, isGluonSplit, solfel  ,   ww);
+       FillHisto_floatFromMap("CombCSVJP",   flav, isGluonSplit, combjp  ,   ww);
+       FillHisto_floatFromMap("CombCSVSL",   flav, isGluonSplit, combsl  ,   ww);
+       FillHisto_floatFromMap("CombCSVJPSL", flav, isGluonSplit, combjpsl  ,   ww);
+       FillHisto_floatFromMap("RetCombSvx",  flav, isGluonSplit, retrainedcsv  ,   ww);
+      }
+
+
       //       cout << " TCHE:" << tche<<endl;
       //       cout << " TCHP:" << tchp<<endl;
       //       cout << " JP:" << jetproba<<endl;
@@ -1205,8 +1184,8 @@ void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TStri
 	    if (passMuonSelection(imu, ijet)){
 	      if(nselmuon == 0) {
 	        idxFirstMuon = imu;
-	        nselmuon++;
 	      }
+	      nselmuon++;
 	    }
           }
 	}
@@ -1491,4 +1470,117 @@ bool CommPlotProducer::passMuonSelection(int muidx, int ijet){
   return cut_mu_pass;
   
 }
+
+//--------------------------------------------------------------------------------------------------------------------//
+bool CommPlotProducer::passTrigger(TString trigger, int pttrig) {
+
+
+   // FOR 2012 Trigger ! Not valid for 2011...
+
+   bool passTrig=false;
+
+   int trig100 = BitTrigger%100;
+   int trig1000 = BitTrigger%1000;
+
+   int trig1 = BitTrigger%10;
+   int trig2 = (trig100 - trig1) / 10;
+   int trig3 = (trig1000 - trig100) / 100;
+   int trig5 = int(BitTrigger/100000);
+
+   bool Jet20 = false, Jet30  = false, Jet40  = false, Jet60  = false, Jet70=false, Jet80  = false;
+   bool Jet110 = false, Jet140 = false, Jet150 = false, Jet190 = false;
+   bool Jet200 = false, Jet240 = false, Jet260 = false;
+   bool Jet300 = false, Jet320 = false;
+
+   if (trigger=="jet") {  // SinglePFJet Trigger
+    if ( trig2==1 || trig2==3 || trig2==5 || trig2==7 )  Jet40  = true;
+    if ( trig2 >= 4 )                                    Jet80  = true;
+    if ( trig3==2 || trig3==3 || trig3==6 || trig3==7 )  Jet140 = true;
+    if ( trig3 >= 4 )                                    Jet200 = true;
+    if ( trig1==1 || trig1==3 || trig1==5 || trig1==7 )  Jet260 = true;
+    if ( trig1==2 || trig1==3 || trig1==6 || trig1==7 )  Jet320 = true;
+
+    if ( pttrig ==  30 && Jet30 )  passTrig=true;
+    if ( pttrig ==  40 && Jet40 )  passTrig=true;
+    if ( pttrig ==  60 && Jet60 )  passTrig=true;
+    if ( pttrig ==  80 && Jet80 )  passTrig=true;
+    if ( pttrig == 110 && Jet110 ) passTrig=true;
+    if ( pttrig == 140 && Jet140 ) passTrig=true;
+    if ( pttrig == 150 && Jet150 ) passTrig=true;
+    if ( pttrig == 190 && Jet190 ) passTrig=true;
+    if ( pttrig == 200 && Jet200 ) passTrig=true;
+    if ( pttrig == 240 && Jet240 ) passTrig=true;
+    if ( pttrig == 260 && Jet260 ) passTrig=true;
+    if ( pttrig == 300 && Jet300 ) passTrig=true;
+    if ( pttrig == 320 && Jet320 ) passTrig=true;
+
+    if (!passTrig) { return false; }
+
+    //-----------------------------------
+    //Determine if there is at least 
+    //one jet which pass the trigger
+    //in the event => away from the TO
+    //-----------------------------------
+
+    bool JetPtCut = false;
+    for (int ijet=0; ijet<nJet ; ijet++) {
+      float ptjet = Jet_pt[ijet];
+      float etajet = fabs(Jet_eta[ijet]);
+      if (      pttrig ==  40 && ptjet >  60. && etajet < 2.4 ) JetPtCut = true;
+      else if ( pttrig ==  80 && ptjet > 100. && etajet < 2.4 ) JetPtCut = true;
+      else if ( pttrig == 140 && ptjet > 160. && etajet < 2.4 ) JetPtCut = true;
+      else if ( pttrig == 200 && ptjet > 220. && etajet < 2.4 ) JetPtCut = true;
+      else if ( pttrig == 260 && ptjet > 300. && etajet < 2.4 ) JetPtCut = true;
+      else if ( pttrig == 320 && ptjet > 360. && etajet < 2.4 ) JetPtCut = true;
+       
+    }
+    if (passTrig && JetPtCut) {return true;}
+    else {return false;}
+  }
+  else if (trigger=="btag") { // Btag_Mu_Dijet Trigger 
+    int trig = int(BitTrigger/10000);
+    trig1 = trig%10;
+    if ( trig1==1 || trig1==3 || trig1==5 || trig1==7 ) Jet20  = true;
+    if ( trig1==2 || trig1==3 || trig1==6 || trig1==7 ) Jet40  = true;
+    if ( trig1 >= 4 )                                   Jet70  = true;
+    if ( trig5 == 1 || trig5 == 3 )                     Jet110 = true;
+    if ( trig5 >= 2 )                                   Jet300 = true;
+    
+    if ( Run > 0 && Run < 162803 ) {                     
+      Jet40  = false;
+      Jet70  = false;
+      Jet110 = false;
+    }
+    if ( pttrig ==  20 && Jet20 )  passTrig=true;
+    if ( pttrig ==  40 && Jet40 )  passTrig=true;
+    if ( pttrig ==  70 && Jet70 )  passTrig=true;
+    if ( pttrig == 110 && Jet110 ) passTrig=true;
+    if ( pttrig == 300 && Jet300 ) passTrig=true;
+    
+    
+    if (!passTrig) { return false; }
+    
+    //-----------------------------------
+    //Determine if there is at least 
+    //two jets which pass the trigger
+    //in the event => away from the TO
+    //-----------------------------------
+
+    int njtrig=0;
+    for (int ijet = 0; ijet < nJet; ijet++) {
+     float ptjet = Jet_pt[ijet];
+     float etajet = fabs(Jet_eta[ijet]);
+     if ( pttrig ==20  &&  ptjet > 20. && etajet < 2.4 )  njtrig++;
+     if ( pttrig ==40  &&  ptjet > 60. && etajet < 2.4 )  njtrig++;
+     if ( pttrig ==70  &&  ptjet > 100. && etajet < 2.4 )  njtrig++;
+     if ( pttrig ==110  &&  ptjet > 120. && etajet < 2.4 ) njtrig++;
+     if ( pttrig ==300  &&  ptjet > 320. && etajet < 2.4 ) njtrig++;
+    }
+    if (passTrig && njtrig>1) {return true;}
+    else {return false;}
+
+  }
+  return false;
+}
+
 

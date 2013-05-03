@@ -20,7 +20,9 @@
    superTree->Add("/opt/sbg/cms/ui8_data2/ccollard/BTAG/MC_Dan_2013April/PythiaQCD/QCD_Pt-600to800_Inclusive_8TeV_pythia6_Summer12_DR53X-PU_S10_AODSIM/TrackTree_*.root");
    superTree->Add("/opt/sbg/cms/ui8_data2/ccollard/BTAG/MC_Dan_2013April/PythiaQCD/QCD_Pt-800to1000_Inclusive_8TeV_pythia6_Summer12_DR53X-PU_S10_AODSIM/TrackTree_*.root");
 
-   CommPlotProducer m(superTree);
+   // JetProbaTree : Oui
+   // NewAlgoTree : Non
+   CommPlotProducer m(superTree,1,0);
 
    // Provide MC information. use SetXS(TString generator, bool qcdtype, int TeV) ;
    // with generator = pythia or herwig, qcdtype =0 for inclusive or 1 for MuEnriched, and TeV =7 or 8.
@@ -86,7 +88,7 @@
    //The loop on tthe events takes 4 inputs: the trigger, the ptmin of the jets, the ptmax of the jets, and the output
    //file name 
    
-   m.Loop(40, 60, 500, "output_mc1abcd");
+   m.Loop("jet",40, 60, 500, "output_mc1abcd");
 
    
 }

@@ -21,14 +21,27 @@
 
 using namespace std;
 
-TString filename="test/d/output_all.root";
-TString dir4plots="test/Commissioning_plots";
-//TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  19.7 fb^{-1}";
+//TString filename="test_proof/save_proof_btag40_65_300_w_trigMC.root";
+TString filename="test_output_newalgo.root";
+//TString filename="test_proof/save_proof_trig40_60_500.root";
+//TString filename="test/abcd_new/output_all.root";
+//TString filename="test/abcd_80_80_470/output_all.root";
+//TString filename="test/compaNt/final_out.root";
+//TString filename="test/camille_abcd/test_cami_80_100_500.root";
+//TString dir4plots="test/Commissioning_plots_pthat";
+//TString dir4plots="test_proof/Commissioning_btag40_65";
+TString dir4plots="Commissioning_plots";
+TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  19.7 fb^{-1}";
+//TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  14. fb^{-1}";
+//TString title= "OLD #sqrt{s} = 8 TeV";
 //TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  A:0.89 fb^{-1}";
 //TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  B:4.43 fb^{-1}";
 //TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  C:7.15 fb^{-1}";
-TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  D:7.27 fb^{-1}";
+//TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  D:7.27 fb^{-1}";
 TString datacaption = "HLT_PFJet40, jet pT>60 ";
+//TString datacaption = "HLT_BTag_Mu5_Dijet40, jet pT>65 ";
+//TString datacaption = "HLT_PFJet80, jet pT>100 ";
+//TString datacaption = "HLT_PFJet80, jet pT>80 ";
 TString format=".gif"; // .png or .pdf
 bool bOverflow=true;
 bool web = true;
@@ -42,7 +55,8 @@ void OverFlowBinFix(TH1F* );
 
 //--------
 
-void DrawCommPlot(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots, bool Draw_muons_plots, bool Draw_discriminator_plots , bool Draw_tagRate_plots, bool Draw_2D_plots){
+void DrawCommPlot(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots, bool Draw_muons_plots, bool Draw_discriminator_plots , 
+bool Draw_newdiscriminator_plots, bool Draw_tagRate_plots, bool Draw_2D_plots){
 
   TString action = "mkdir "+dir4plots;
   system(action);
@@ -50,7 +64,6 @@ void DrawCommPlot(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_p
   
 //Draw("jet_multi"    ,"number of jets",1);	    
 Draw("jet_pt_all"   ,"pT of all jets",1);	    
-Draw("jet_pt_sv"    ,"pT of jets containing a SV",1);
 Draw("jet_eta"      ,"eta of all jets",	0);    
 Draw("jet_phi"      ,"phi of all jets",0);
 DrawMC("nPV"      ,"# of PV",0);
@@ -59,12 +72,13 @@ if (Draw_track_plots){
   Draw("track_multi"  ,      "number of tracks in the jets",0);		   
   Draw("trk_multi_sel"  ,    "number of selected tracks in the jets",0);	   
   Draw("track_chi2"   ,      "normalized #chi^{2} of the tracks"	,1);	   
-  Draw("track_nHit" ,      "number of hits",0);		   
-  Draw("track_HPix"   ,      "number of hits in the Pixel",0);		   
+  Draw("track_nHit" ,      "number of hits",1);		   
+  Draw("track_HPix"   ,      "number of hits in the Pixel",1);		   
   Draw("track_len"     ,     "Track decay length",1);				   
   Draw("track_dist"    ,     "Track distance to the jet axis"	,1);	   
   Draw("track_dz"     ,      "Track transverse IP",1);				   
   Draw("track_pt"     ,      "pT of all the tracks",1);			   
+  Draw("track_pt15"     ,      "pT of all the tracks",1);			   
   //Draw("track_isfromSV",     "Track is from SV",1);			   
 
   Draw("track_IPs"    ,      "3D IP significance of all tracks",1);	   
@@ -78,7 +92,7 @@ if (Draw_track_plots){
   Draw("track_IP2Ds"	,    "2D IP significance of all tracks"	,1);   
   Draw("track_IP2Ds1tr" ,    "2D IP significance of the first track",1);	   
   Draw("track_IP2Ds2tr" ,    "2D IP significance of the second track" ,1);    
-  Draw("track_IP2Ds3tr" ,    "2D IP significance of the second track" ,1);
+  Draw("track_IP2Ds3tr" ,    "2D IP significance of the third track" ,1);
   Draw("track_IP2D"    ,     "2D IP of all tracks",1);			   
   Draw("track_IP2D1tr" ,     "2D IP of the first track"	,1);	   
   Draw("track_IP2D2tr" ,     "2D IP of the second track",1);		   
@@ -95,15 +109,17 @@ if (Draw_track_plots){
   }  
 if (Draw_Nminus1_plots){  
   Draw("track_chi2_cut"    ,"Normalized #chi^{2} @N-1 step",1);	    
-  Draw("track_nHit_cut"  ," Number of hits @N-1 step",0);
-  Draw("track_HPix_cut"    ,"Number of hits in the Pixel @N-1 step",0);  
+  Draw("track_nHit_cut"  ," Number of hits @N-1 step",1);
+  Draw("track_HPix_cut"    ,"Number of hits in the Pixel @N-1 step",1);  
   Draw("track_len_cut"     ,"Decay length @N-1 step",1);		    
   Draw("track_dist_cut"    ,"Distance to the jet axis @N-1 step" ,1);  
   Draw("track_dz_cut"     , "Transverse IP @N-1 step",1);		    
   Draw("track_pt_cut"	   ,"Track pT @N-1 step",1);
+  Draw("track_pt15_cut"	   ,"Track pT @N-1 step",1);
   }
 if (Draw_sv_plots){
 
+  Draw("jet_pt_sv"    ,"pT of jets containing a SV",1);
   Draw("sv_multi_0","nr. of SV including bin 0",1); 
   Draw("sv_multi","nr. of SV",1);
   Draw("sv_mass","SV mass",0);
@@ -156,6 +172,14 @@ if (Draw_discriminator_plots){
   Draw("CSV"	      ,"CSV Discriminator",1);
   
   }
+if (Draw_newdiscriminator_plots) {
+  Draw("RetCombSvx"         ,"Retrained CSV Discriminator",1);
+  Draw("CombCSVJP"          ,"Combined CSV+JP Discriminator",1);
+  Draw("CombCSVSL"          ,"Combined CSV+SL Discriminator",1);
+  Draw("CombCSVJPSL"        ,"Combined CSV+JP+SL Discriminator",1);
+  Draw("SoftMu"        ,"Soft Muon Discriminator",1);
+  Draw("SoftEl"        ,"Soft Electron Discriminator",1);
+}
   			    
 if (Draw_tagRate_plots){ 
   DrawTagRate("TCHE_extended1","TCHE (extended)", 1);
@@ -211,7 +235,8 @@ void Draw(TString name, TString histotitle, bool log)
  hist_data      = (TH1F*)gROOT->FindObject(name+"_data");
  
 
- if (bOverflow && name!="SSV" && name!="SSVHP") {
+ if (bOverflow && name!="SSV" && name!="SSVHP" && name!="sv_mass" 
+     && name!="sv_mass_3trk") {
   OverFlowBinFix(hist_b);
   OverFlowBinFix(hist_c);
   OverFlowBinFix(hist_gsplit);
