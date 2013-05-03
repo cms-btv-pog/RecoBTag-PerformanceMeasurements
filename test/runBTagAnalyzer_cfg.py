@@ -809,7 +809,7 @@ if options.runOnData and options.runSubJets:
 ## Add TagInfos to PAT jets
 patJets = ['patJets'+postfix]
 if options.runSubJets:
-    patJets.append('patJetsCA8PrunedSubJetsPF')
+    patJets += ['patJets','patJetsCA8PrunedSubJetsPF']
 
 for m in patJets:
     if hasattr(process,m):
