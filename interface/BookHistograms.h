@@ -8,9 +8,9 @@
 
 class BookHistograms {
 
-  public : 
+  public :
 
-    BookHistograms (TFileDirectory& dir) ; 
+    BookHistograms (TFileDirectory dir) ;
     ~BookHistograms () {} ;
 
     TH1F* hData_All_NJets       ;
@@ -84,11 +84,11 @@ class BookHistograms {
 
 };
 
-#endif 
+#endif
 
-#ifdef BOOKHISTOGRAMS_H 
+#ifdef BOOKHISTOGRAMS_H
 
-BookHistograms::BookHistograms (TFileDirectory& dir) {
+BookHistograms::BookHistograms (TFileDirectory dir) {
 
   ///////////////
   // Some Histograms
