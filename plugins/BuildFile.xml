@@ -25,5 +25,5 @@
   <use name="DataFormats/PatCandidates"/>
   <use name="fastjet"/>
   <flags EDM_PLUGIN="1"/>
-  <flags CXXFLAGS="-O0 -g"/>
+  #<flags CXXFLAGS="-O0 -g -fno-inline"/>
 </library>
