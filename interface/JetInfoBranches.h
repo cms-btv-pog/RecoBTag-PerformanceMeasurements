@@ -20,6 +20,7 @@ class JetInfoBranches {
     float Jet_jes[nMaxJets_];
     float Jet_eta[nMaxJets_];
     float Jet_phi[nMaxJets_];
+    float Jet_mass[nMaxJets_];
     float Jet_Ip1N[nMaxJets_];
     float Jet_Ip1P[nMaxJets_];
     float Jet_Ip2N[nMaxJets_];
@@ -86,6 +87,16 @@ class JetInfoBranches {
     int   Jet_VtxCat[nMaxJets_];
     int   Jet_looseID[nMaxJets_];
     int   Jet_tightID[nMaxJets_];
+    int   Jet_FatJetIdx[nMaxJets_];
+    int   Jet_SubJet1Idx[nMaxJets_];
+    int   Jet_SubJet2Idx[nMaxJets_];
+    float Jet_ptPruned[nMaxJets_];
+    float Jet_jesPruned[nMaxJets_];
+    float Jet_etaPruned[nMaxJets_];
+    float Jet_phiPruned[nMaxJets_];
+    float Jet_massPruned[nMaxJets_];
+    float Jet_tau1[nMaxJets_];
+    float Jet_tau2[nMaxJets_];
 
     int   nTrack;
     float Track_dxy[nMaxTrk_];
@@ -217,6 +228,7 @@ class JetInfoBranches {
       tree->Branch((name+".Jet_jes").c_str(),         Jet_jes         ,(name+".Jet_jes["+name+".nJet]/F").c_str());
       tree->Branch((name+".Jet_eta").c_str(),         Jet_eta         ,(name+".Jet_eta["+name+".nJet]/F").c_str());
       tree->Branch((name+".Jet_phi").c_str(),         Jet_phi         ,(name+".Jet_phi["+name+".nJet]/F").c_str());
+      tree->Branch((name+".Jet_mass").c_str(),        Jet_mass        ,(name+".Jet_mass["+name+".nJet]/F").c_str());
       tree->Branch((name+".Jet_ntracks").c_str(),     Jet_ntracks     ,(name+".Jet_ntracks["+name+".nJet]/I").c_str());
       tree->Branch((name+".Jet_flavour").c_str(),     Jet_flavour     ,(name+".Jet_flavour["+name+".nJet]/I").c_str());
       tree->Branch((name+".Jet_Ip2N").c_str(),        Jet_Ip2N        ,(name+".Jet_Ip2N["+name+".nJet]/F").c_str());
@@ -428,6 +440,24 @@ class JetInfoBranches {
       tree->Branch((name+".SV_vtx_phi").c_str()         ,SV_vtx_phi         ,(name+".SV_vtx_phi["+name+".nSV]/F").c_str());
     }
 
+    void RegisterSubJetSpecificTree(TTree *tree, std::string name="JetInfo") {
+      tree->Branch((name+".Jet_FatJetIdx").c_str(),   Jet_FatJetIdx   ,(name+".Jet_FatJetIdx["+name+".nJet]/I").c_str());
+    }
+
+    void RegisterFatJetSpecificTree(TTree *tree, std::string name="JetInfo") {
+      tree->Branch((name+".Jet_SubJet1Idx").c_str(),  Jet_SubJet1Idx  ,(name+".Jet_SubJet1Idx["+name+".nJet]/I").c_str());
+      tree->Branch((name+".Jet_SubJet2Idx").c_str(),  Jet_SubJet2Idx  ,(name+".Jet_SubJet2Idx["+name+".nJet]/I").c_str());
+      tree->Branch((name+".Jet_ptPruned").c_str(),    Jet_ptPruned    ,(name+".Jet_ptPruned["+name+".nJet]/F").c_str());
+      tree->Branch((name+".Jet_jesPruned").c_str(),   Jet_jesPruned   ,(name+".Jet_jesPruned["+name+".nJet]/F").c_str());
+      tree->Branch((name+".Jet_etaPruned").c_str(),   Jet_etaPruned   ,(name+".Jet_etaPruned["+name+".nJet]/F").c_str());
+      tree->Branch((name+".Jet_phiPruned").c_str(),   Jet_phiPruned   ,(name+".Jet_phiPruned["+name+".nJet]/F").c_str());
+      tree->Branch((name+".Jet_massPruned").c_str(),  Jet_massPruned  ,(name+".Jet_massPruned["+name+".nJet]/F").c_str());
+      tree->Branch((name+".Jet_tau1").c_str(),        Jet_tau1        ,(name+".Jet_tau1["+name+".nJet]/F").c_str());
+      tree->Branch((name+".Jet_tau2").c_str(),        Jet_tau2        ,(name+".Jet_tau2["+name+".nJet]/F").c_str());
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+
     void ReadTree(TTree *tree, std::string name="JetInfo") {
       tree->SetBranchAddress((name+".Jet_pt").c_str(),          Jet_pt	      );
       tree->SetBranchAddress((name+".Jet_genpt").c_str(),       Jet_genpt       );
@@ -617,34 +647,49 @@ class JetInfoBranches {
       //--------------------------------------
       // secondary vertex information
       //--------------------------------------
-      tree->SetBranchAddress((name+".nSV").c_str()                ,&nSV               ) ; 
-      tree->SetBranchAddress((name+".SV_x").c_str()               ,SV_x	              ) ; 
-      tree->SetBranchAddress((name+".SV_y").c_str()               ,SV_y	              ) ; 
-      tree->SetBranchAddress((name+".SV_z").c_str()               ,SV_z	              ) ; 
-      tree->SetBranchAddress((name+".SV_ex").c_str()              ,SV_ex	            ) ; 
-      tree->SetBranchAddress((name+".SV_ey").c_str()              ,SV_ey	            ) ; 
-      tree->SetBranchAddress((name+".SV_ez").c_str()              ,SV_ez	            ) ; 
-      tree->SetBranchAddress((name+".SV_chi2").c_str()            ,SV_chi2            ) ; 
-      tree->SetBranchAddress((name+".SV_ndf").c_str()             ,SV_ndf	            ) ; 
-      tree->SetBranchAddress((name+".SV_flight").c_str()          ,SV_flight          ) ; 
-      tree->SetBranchAddress((name+".SV_flightErr").c_str()       ,SV_flightErr       ) ; 
-      tree->SetBranchAddress((name+".SV_deltaR_jet").c_str()      ,SV_deltaR_jet      ) ; 
-      tree->SetBranchAddress((name+".SV_deltaR_sum_jet").c_str()  ,SV_deltaR_sum_jet  ) ; 
-      tree->SetBranchAddress((name+".SV_deltaR_sum_dir").c_str()  ,SV_deltaR_sum_dir  ) ; 
-      tree->SetBranchAddress((name+".SV_energy_ratio").c_str()    ,SV_energy_ratio    ) ; 
-      tree->SetBranchAddress((name+".SV_aboveC").c_str()          ,SV_aboveC	        ) ; 
-      tree->SetBranchAddress((name+".SV_vtx_pt").c_str()          ,SV_vtx_pt	        ) ; 
-      tree->SetBranchAddress((name+".SV_flight2D").c_str()        ,SV_flight2D        ) ; 
-      tree->SetBranchAddress((name+".SV_flight2DErr").c_str()     ,SV_flight2DErr     ) ; 
-      tree->SetBranchAddress((name+".SV_totCharge").c_str()       ,SV_totCharge       ) ; 
-      tree->SetBranchAddress((name+".SV_vtxDistJetAxis").c_str()  ,SV_vtxDistJetAxis  ) ; 
-      tree->SetBranchAddress((name+".SV_nTrk").c_str()            ,SV_nTrk            ) ; 
-      tree->SetBranchAddress((name+".SV_nTrk_firstVxt").c_str()   ,SV_nTrk_firstVxt   ) ; 
-      tree->SetBranchAddress((name+".SV_mass").c_str()            ,SV_mass            ) ; 
-      tree->SetBranchAddress((name+".SV_vtx_eta").c_str()         ,SV_vtx_eta         ) ; 
-      tree->SetBranchAddress((name+".SV_vtx_phi").c_str()         ,SV_vtx_phi         ) ; 
+      tree->SetBranchAddress((name+".nSV").c_str()                ,&nSV               ) ;
+      tree->SetBranchAddress((name+".SV_x").c_str()               ,SV_x	              ) ;
+      tree->SetBranchAddress((name+".SV_y").c_str()               ,SV_y	              ) ;
+      tree->SetBranchAddress((name+".SV_z").c_str()               ,SV_z	              ) ;
+      tree->SetBranchAddress((name+".SV_ex").c_str()              ,SV_ex	            ) ;
+      tree->SetBranchAddress((name+".SV_ey").c_str()              ,SV_ey	            ) ;
+      tree->SetBranchAddress((name+".SV_ez").c_str()              ,SV_ez	            ) ;
+      tree->SetBranchAddress((name+".SV_chi2").c_str()            ,SV_chi2            ) ;
+      tree->SetBranchAddress((name+".SV_ndf").c_str()             ,SV_ndf	            ) ;
+      tree->SetBranchAddress((name+".SV_flight").c_str()          ,SV_flight          ) ;
+      tree->SetBranchAddress((name+".SV_flightErr").c_str()       ,SV_flightErr       ) ;
+      tree->SetBranchAddress((name+".SV_deltaR_jet").c_str()      ,SV_deltaR_jet      ) ;
+      tree->SetBranchAddress((name+".SV_deltaR_sum_jet").c_str()  ,SV_deltaR_sum_jet  ) ;
+      tree->SetBranchAddress((name+".SV_deltaR_sum_dir").c_str()  ,SV_deltaR_sum_dir  ) ;
+      tree->SetBranchAddress((name+".SV_energy_ratio").c_str()    ,SV_energy_ratio    ) ;
+      tree->SetBranchAddress((name+".SV_aboveC").c_str()          ,SV_aboveC	        ) ;
+      tree->SetBranchAddress((name+".SV_vtx_pt").c_str()          ,SV_vtx_pt	        ) ;
+      tree->SetBranchAddress((name+".SV_flight2D").c_str()        ,SV_flight2D        ) ;
+      tree->SetBranchAddress((name+".SV_flight2DErr").c_str()     ,SV_flight2DErr     ) ;
+      tree->SetBranchAddress((name+".SV_totCharge").c_str()       ,SV_totCharge       ) ;
+      tree->SetBranchAddress((name+".SV_vtxDistJetAxis").c_str()  ,SV_vtxDistJetAxis  ) ;
+      tree->SetBranchAddress((name+".SV_nTrk").c_str()            ,SV_nTrk            ) ;
+      tree->SetBranchAddress((name+".SV_nTrk_firstVxt").c_str()   ,SV_nTrk_firstVxt   ) ;
+      tree->SetBranchAddress((name+".SV_mass").c_str()            ,SV_mass            ) ;
+      tree->SetBranchAddress((name+".SV_vtx_eta").c_str()         ,SV_vtx_eta         ) ;
+      tree->SetBranchAddress((name+".SV_vtx_phi").c_str()         ,SV_vtx_phi         ) ;
     }
 
+   void ReadSubJetSpecificTree(TTree *tree, std::string name="JetInfo") {
+      tree->SetBranchAddress((name+".Jet_FatJetIdx").c_str(),   Jet_FatJetIdx   );
+    }
+
+    void ReadFatJetSpecificTree(TTree *tree, std::string name="JetInfo") {
+      tree->SetBranchAddress((name+".Jet_SubJet1Idx").c_str(),  Jet_SubJet1Idx  );
+      tree->SetBranchAddress((name+".Jet_SubJet2Idx").c_str(),  Jet_SubJet2Idx  );
+      tree->SetBranchAddress((name+".Jet_ptPruned").c_str(),    Jet_ptPruned    );
+      tree->SetBranchAddress((name+".Jet_jesPruned").c_str(),   Jet_jesPruned   );
+      tree->SetBranchAddress((name+".Jet_etaPruned").c_str(),   Jet_etaPruned   );
+      tree->SetBranchAddress((name+".Jet_phiPruned").c_str(),   Jet_phiPruned   );
+      tree->SetBranchAddress((name+".Jet_massPruned").c_str(),  Jet_massPruned  );
+      tree->SetBranchAddress((name+".Jet_tau1").c_str(),        Jet_tau1        );
+      tree->SetBranchAddress((name+".Jet_tau2").c_str(),        Jet_tau2        );
+    }
 };
 
 #endif

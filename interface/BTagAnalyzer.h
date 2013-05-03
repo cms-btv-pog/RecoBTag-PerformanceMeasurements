@@ -37,7 +37,6 @@ Implementation:
 
 #include "DataFormats/JetReco/interface/JetTracksAssociation.h"
 #include "DataFormats/BTauReco/interface/TrackIPTagInfo.h"
-//#include "PhysicsTools/Utilities/interface/deltaR.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
 #include "DataFormats/GeometrySurface/interface/Line.h"
@@ -111,12 +110,13 @@ Implementation:
 #include <boost/regex.hpp>
 
 #include "RecoBTag/PerformanceMeasurements/interface/JetInfoBranches.h"
-#include "RecoBTag/PerformanceMeasurements/interface/BookHistograms.h" 
+#include "RecoBTag/PerformanceMeasurements/interface/BookHistograms.h"
 
 //
 // constants, enums and typedefs
 //
 typedef std::vector<pat::Jet> PatJetCollection;
+typedef std::map<const pat::Jet*,const pat::Jet*> JetToJetMap;
 
 //
 // class declaration
@@ -156,21 +156,22 @@ class BTagAnalyzer : public edm::EDAnalyzer
 		virtual void endJob() ;
 
 		bool findCat(const reco::Track* ,CategoryFinder& );
-		std::vector< float > getTrackProbabilies(std::vector< float > , int );
+		std::vector< float > getTrackProbabilies(std::vector< float > , const int );
 		double calculProbability(std::vector< float > );
 
 		float calculPtRel(const reco::Track& theMuon, const pat::Jet& theJet);
 
 		int matchMuon(const edm::RefToBase<reco::Track>& theMuon, const edm::View<reco::Muon>& muons);
 
-		void setTracksPV( const reco::Vertex *pv, bool isPV, int& );
+		void setTracksPV( const reco::Vertex *pv, const bool isPV, const int );
 
-		int getMuonTk(double pt, int&);
+		int getMuonTk(double pt, const int);
 		bool NameCompatible(const std::string& pattern, const std::string& name);
 
 		std::vector<simPrimaryVertex> getSimPVs(const edm::Handle<edm::HepMCProduct>& evtMC);
 
-		void processJets (const edm::Handle <PatJetCollection>&, const edm::Event&, const edm::EventSetup&, int&) ;
+		void processJets(const edm::Handle<PatJetCollection>&, const edm::Handle<PatJetCollection>&,
+                               const edm::Event&, const edm::EventSetup&, const JetToJetMap&, const int) ;
 
 		int isFromGSP(const reco::Candidate* c);
 
@@ -181,12 +182,13 @@ class BTagAnalyzer : public edm::EDAnalyzer
 		bool runSubJets_ ;
 
 		edm::InputTag muonCollectionName_;
-                edm::InputTag patMuonCollectionName_;
+              edm::InputTag patMuonCollectionName_;
 		edm::InputTag triggerTable_;
 		edm::InputTag SVComputer_;
 
 		edm::InputTag JetCollectionTag_;
 		edm::InputTag FatJetCollectionTag_;
+              edm::InputTag PrunedFatJetCollectionTag_;
 
 		std::string jetPBJetTags_;
 		std::string jetPNegBJetTags_;
@@ -374,6 +376,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
 		//// Jet info
 
 		JetInfoBranches JetInfo[MAX_JETCOLLECTIONS] ;
+              BookHistograms* Histos[MAX_JETCOLLECTIONS] ;
 
 		int BitTrigger;
 		int Run;
@@ -412,8 +415,6 @@ class BTagAnalyzer : public edm::EDAnalyzer
 
 		int cap0, cap1, cap2, cap3, cap4, cap5, cap6, cap7, cap8;
 		int can0, can1, can2, can3, can4, can5, can6, can7, can8;
-
-    BookHistograms* Histos[MAX_JETCOLLECTIONS] ; 
 };
 
 #endif

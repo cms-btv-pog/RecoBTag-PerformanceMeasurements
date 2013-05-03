@@ -55,7 +55,8 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   primaryVertexColl_   = iConfig.getParameter<edm::InputTag>("primaryVertexColl");
 
   JetCollectionTag_ = iConfig.getParameter<edm::InputTag>("Jets");
-  if (runSubJets_) FatJetCollectionTag_ = iConfig.getParameter<edm::InputTag>("FatJets");
+  FatJetCollectionTag_ = iConfig.getParameter<edm::InputTag>("FatJets");
+  PrunedFatJetCollectionTag_ = iConfig.getParameter<edm::InputTag>("PrunedFatJets");
 
   trackCHEBJetTags_    = iConfig.getParameter<std::string>("trackCHEBJetTags");
   trackCNegHEBJetTags_ = iConfig.getParameter<std::string>("trackCNegHEBJetTags");
@@ -244,19 +245,17 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   // jet information
   //--------------------------------------
   JetInfo[0].RegisterTree(smalltree,"JetInfo");
-  if ( produceJetProbaTree_ ) JetInfo[0].RegisterJPTree(smalltree,"JetInfo"); 
-  if ( runSubJets_ ) { 
+  if ( runSubJets_ ) JetInfo[0].RegisterSubJetSpecificTree(smalltree,"JetInfo");
+  if ( produceJetProbaTree_ ) JetInfo[0].RegisterJPTree(smalltree,"JetInfo");
+  if ( runSubJets_ ) {
     JetInfo[1].RegisterTree(smalltree,"FatJetInfo");
-    JetInfo[1].RegisterJPTree(smalltree,"FatJetInfo");
+    JetInfo[1].RegisterFatJetSpecificTree(smalltree,"FatJetInfo");
+    if ( produceJetProbaTree_ ) JetInfo[1].RegisterJPTree(smalltree,"FatJetInfo");
   }
 
-  //// Book Histosgrams 
-  TFileDirectory HistDirJets = fs->mkdir( "HistJets" ); 
-  Histos[0] = new BookHistograms(HistDirJets) ; 
-  if (runSubJets_) { 
-    TFileDirectory HistDirSubJets = fs->mkdir( "HistSubJets" );
-    Histos[1] = new BookHistograms(HistDirSubJets) ;
-  }
+  //// Book Histograms
+  Histos[0] = new BookHistograms(fs->mkdir( "HistJets" )) ;
+  if (runSubJets_) Histos[1] = new BookHistograms(fs->mkdir( "HistFatJets" )) ;
 
   cout << "BTagAnalyzer constructed " << endl;
 }
@@ -311,8 +310,33 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   iEvent.getByLabel (JetCollectionTag_, jetsColl);
 
   edm::Handle <PatJetCollection> fatjetsColl;
+  edm::Handle <PatJetCollection> prunedfatjetsColl;
   if (runSubJets_) {
     iEvent.getByLabel(FatJetCollectionTag_, fatjetsColl) ;
+    iEvent.getByLabel(PrunedFatJetCollectionTag_, prunedfatjetsColl) ;
+  }
+
+  JetToJetMap fatJetToPrunedFatJetMap;
+  if( runSubJets_ )
+  {
+    for(PatJetCollection::const_iterator it = fatjetsColl->begin(); it != fatjetsColl->end(); ++it)
+    {
+      PatJetCollection::const_iterator prunedJetMatch;
+      bool prunedJetMatchFound = false;
+      float dR = 0.8;
+      for(PatJetCollection::const_iterator pjIt = prunedfatjetsColl->begin(); pjIt != prunedfatjetsColl->end(); ++pjIt)
+      {
+        float dR_temp = reco::deltaR( it->p4(), pjIt->p4() );
+        if( dR_temp < dR )
+        {
+          prunedJetMatchFound = true;
+          dR = dR_temp;
+          prunedJetMatch = pjIt;
+        }
+      }
+      if( !prunedJetMatchFound ) edm::LogError("NoMatchingGroomedJet") << "Matching pruned jet not found."; // This should never happen but just in case
+      fatJetToPrunedFatJetMap[&(*it)] = &(*prunedJetMatch);
+    }
   }
 
   //------------------------------------------------------
@@ -727,10 +751,10 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   int iJetColl = 0 ;
   //// Do jets
-  processJets(jetsColl, iEvent, iSetup, iJetColl) ;
+  processJets(jetsColl, fatjetsColl, iEvent, iSetup, fatJetToPrunedFatJetMap, iJetColl) ;
   if (runSubJets_) {
     iJetColl = 1 ;
-    processJets(fatjetsColl, iEvent, iSetup, iJetColl) ;
+    processJets(fatjetsColl, jetsColl, iEvent, iSetup, fatJetToPrunedFatJetMap, iJetColl) ;
   }
 
   //// Fill TTree
@@ -769,7 +793,9 @@ float BTagAnalyzer::calculPtRel(const reco::Track& theMuon, const pat::Jet& theJ
   return ptrel;
 }
 
-void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl, const edm::Event& iEvent, const edm::EventSetup& iSetup, int& iJetColl) {
+void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, const edm::Handle<PatJetCollection>& jetsColl2,
+                               const edm::Event& iEvent, const edm::EventSetup& iSetup, const JetToJetMap& fatJetToPrunedFatJetMap, const int iJetColl)
+{
 
   int numjet = 0;
   JetInfo[iJetColl].nMuon = 0;
@@ -817,14 +843,68 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
     JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet]     = pjet->eta();
     JetInfo[iJetColl].Jet_phi[JetInfo[iJetColl].nJet]     = pjet->phi();
     JetInfo[iJetColl].Jet_pt[JetInfo[iJetColl].nJet]      = pjet->pt();
+    JetInfo[iJetColl].Jet_mass[JetInfo[iJetColl].nJet]    = pjet->mass();
 
     retpf.set(false);
-    JetInfo[iJetColl].Jet_looseID[JetInfo[iJetColl].nJet] = ( pfjetIDLoose( *pjet, retpf ) ? 1 : 0 );
+    JetInfo[iJetColl].Jet_looseID[JetInfo[iJetColl].nJet]  = ( pfjetIDLoose( *pjet, retpf ) ? 1 : 0 );
     retpf.set(false);
-    JetInfo[iJetColl].Jet_tightID[JetInfo[iJetColl].nJet] = ( pfjetIDTight( *pjet, retpf ) ? 1 : 0 );
+    JetInfo[iJetColl].Jet_tightID[JetInfo[iJetColl].nJet]  = ( pfjetIDTight( *pjet, retpf ) ? 1 : 0 );
 
-    JetInfo[iJetColl].Jet_jes[JetInfo[iJetColl].nJet]     = JES;
-    JetInfo[iJetColl].Jet_residual[JetInfo[iJetColl].nJet]   = pjet->pt()/pjet->correctedJet("L3Absolute").pt();
+    JetInfo[iJetColl].Jet_jes[JetInfo[iJetColl].nJet]      = JES;
+    JetInfo[iJetColl].Jet_residual[JetInfo[iJetColl].nJet] = pjet->pt()/pjet->correctedJet("L3Absolute").pt();
+
+    if( runSubJets_ && iJetColl==0 )
+    {
+      int fatjetIdx=-1;
+      for( PatJetCollection::const_iterator jIt = jetsColl2->begin(); jIt != jetsColl2->end(); ++jIt )
+      {
+        if( &(*pjet) == fatJetToPrunedFatJetMap.find(&(*jIt))->second->daughter(0) ||
+            &(*pjet) == fatJetToPrunedFatJetMap.find(&(*jIt))->second->daughter(1) )
+        {
+          fatjetIdx = int( jIt - jetsColl2->begin() );
+          break;
+        }
+      }
+      JetInfo[iJetColl].Jet_FatJetIdx[JetInfo[iJetColl].nJet] = fatjetIdx;
+    }
+
+    if( runSubJets_ && iJetColl==1 )
+    {
+      // N-subjettiness
+      std::vector<fastjet::PseudoJet> fjConstituents;
+      std::vector<edm::Ptr<reco::PFCandidate> > constituents = pjet->getPFConstituents();
+      std::vector<edm::Ptr<reco::PFCandidate> >::const_iterator m;
+      for ( m = constituents.begin(); m != constituents.end(); ++m )
+      {
+        reco::PFCandidatePtr constit = *m;
+        if (constit->pt() == 0)
+        {
+          edm::LogWarning("NullTransverseMomentum") << "dropping input candidate with pt=0";
+          continue;
+        }
+        fjConstituents.push_back(fastjet::PseudoJet(constit->px(),constit->py(),constit->pz(),constit->energy()));
+        fjConstituents.back().set_user_index(m - constituents.begin());
+      }
+
+      JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet] = nsubjettinessCalculator.getTau(1,fjConstituents);
+      JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet] = nsubjettinessCalculator.getTau(2,fjConstituents);
+
+      JetInfo[iJetColl].Jet_ptPruned[JetInfo[iJetColl].nJet]   = fatJetToPrunedFatJetMap.find(&(*pjet))->second->pt();
+      JetInfo[iJetColl].Jet_jesPruned[JetInfo[iJetColl].nJet]  = fatJetToPrunedFatJetMap.find(&(*pjet))->second->pt()/fatJetToPrunedFatJetMap.find(&(*pjet))->second->correctedJet("Uncorrected").pt();
+      JetInfo[iJetColl].Jet_etaPruned[JetInfo[iJetColl].nJet]  = fatJetToPrunedFatJetMap.find(&(*pjet))->second->eta();
+      JetInfo[iJetColl].Jet_phiPruned[JetInfo[iJetColl].nJet]  = fatJetToPrunedFatJetMap.find(&(*pjet))->second->phi();
+      JetInfo[iJetColl].Jet_massPruned[JetInfo[iJetColl].nJet] = fatJetToPrunedFatJetMap.find(&(*pjet))->second->mass();
+
+      int subjet1Idx=-1, subjet2Idx=-1;
+      for( PatJetCollection::const_iterator jIt = jetsColl2->begin(); jIt != jetsColl2->end(); ++jIt )
+      {
+        if( &(*jIt) == fatJetToPrunedFatJetMap.find(&(*pjet))->second->daughter(0) ) subjet1Idx = int( jIt - jetsColl2->begin() );
+        if( &(*jIt) == fatJetToPrunedFatJetMap.find(&(*pjet))->second->daughter(1) ) subjet2Idx = int( jIt - jetsColl2->begin() );
+        if( subjet1Idx>=0 && subjet2Idx>=0 ) break;
+      }
+      JetInfo[iJetColl].Jet_SubJet1Idx[JetInfo[iJetColl].nJet] = subjet1Idx;
+      JetInfo[iJetColl].Jet_SubJet2Idx[JetInfo[iJetColl].nJet] = subjet2Idx;
+    }
 
     float etajet = TMath::Abs( pjet->eta() );
     float phijet = pjet->phi();
@@ -837,7 +917,7 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
       //*****************************************************************
 
       // Loop on Selected Tracks
-      //
+
       const edm::RefVector<reco::TrackCollection>  &selected_tracks( pjet->tagInfoTrackIP("impactParameter")->selectedTracks() );
       const edm::RefVector<reco::TrackCollection>  &no_sel_tracks( pjet->tagInfoTrackIP("impactParameter")->tracks() );
 
@@ -1447,7 +1527,7 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
       //*****************************************************************
       JetInfo[iJetColl].Jet_histJet[JetInfo[iJetColl].nJet] = 0;
 
-      if(useTrackHistory_ && isData_!=1){
+      if(useTrackHistory_ && !isData_){
         TrackRefVector jetProbTracks( pjet->tagInfoTrackIP("impactParameter")->selectedTracks() );
 
         cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
@@ -1488,7 +1568,7 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
       }
 
       //*****************************************************************
-      //get track Histosries  associated to sec. vertex (for simple SV)
+      //get track Histories  associated to sec. vertex (for simple SV)
       //*****************************************************************
       JetInfo[iJetColl].Jet_histSvx[JetInfo[iJetColl].nJet] = 0;
       JetInfo[iJetColl].Jet_nFirstSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
@@ -1516,9 +1596,7 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
 
         // ------------------------added by Camille ---------------------------------------------------------------------------------------//
 
-
         edm::RefToBase<Jet> jet = pjet->tagInfoTrackIP("impactParameter")->jet();
-
 
         std::vector<const reco::BaseTagInfo*>  baseTagInfos;
         JetTagComputer::TagInfoHelper helper(baseTagInfos);
@@ -1600,7 +1678,7 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
 
         setTracksPV( &pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0), false, iJetColl );
         ++JetInfo[iJetColl].nSV;
-      } //// if produceJetProbaTree_ 
+      } //// if produceJetProbaTree_
       JetInfo[iJetColl].Jet_nLastSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
 
       cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
@@ -1826,7 +1904,6 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
           catN = cat1N;
         }
 
-
         if ( varneg > 0 ) {
           if      ( catN == 1 ) Histos[iJetColl]->hAllFlav_Tagger_Bwd->Fill(-varneg );
           else if ( catN == 2 ) Histos[iJetColl]->hAllFlav_Tagger_Cwd->Fill(-varneg );
@@ -1852,20 +1929,18 @@ void BTagAnalyzer:: processJets (const edm::Handle <PatJetCollection>& jetsColl,
           else                  Histos[iJetColl]->hAllFlav_Tagger_Oth->Fill( varpos );
         }
       }
-
-    }
+    } // end if(iJetColl==0)
 
     ++JetInfo[iJetColl].nJet;
-
   } // end loop on jet
 
   Histos[iJetColl]->hData_All_NJets->Fill( JetInfo[iJetColl].nJet );
   Histos[iJetColl]->hData_NJets->Fill( numjet );
 
-  return ;
-} // BTagAnalyzer:: processJets 
+  return;
+} // BTagAnalyzer:: processJets
 
-void BTagAnalyzer::setTracksPV( const reco::Vertex *pv, bool isPV, int & iJetColl )
+void BTagAnalyzer::setTracksPV( const reco::Vertex *pv, const bool isPV, const int iJetColl )
 {
   for (reco::Vertex::trackRef_iterator itt = (*pv).tracks_begin(); itt != (*pv).tracks_end(); ++itt) {
     for (int i=0; i<JetInfo[iJetColl].nTrack; ++i) {
@@ -2025,7 +2100,7 @@ void BTagAnalyzer::endJob() {
 }
 
 
-std::vector< float > BTagAnalyzer::getTrackProbabilies(std::vector< float > v, int ipType){
+std::vector< float > BTagAnalyzer::getTrackProbabilies(std::vector< float > v, const int ipType){
 
   std::vector< float > vectTrackProba;
 
@@ -2168,7 +2243,7 @@ std::vector<BTagAnalyzer::simPrimaryVertex> BTagAnalyzer::getSimPVs(const edm::H
 }
 
 
-int BTagAnalyzer::getMuonTk(double pt, int& iJetColl) {
+int BTagAnalyzer::getMuonTk(double pt, const int iJetColl) {
   int idxTk = -1;
   for (int itk = 0; itk < JetInfo[iJetColl].nTrack ; ++itk) {
     if ( fabs(pt-JetInfo[iJetColl].Track_pt[itk]) < 1e-5 ) idxTk = itk;
