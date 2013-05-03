@@ -910,1026 +910,1023 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     float phijet = pjet->phi();
     if (phijet < 0.) phijet += 2*TMath::Pi();
 
-    if (iJetColl == 0) {
+    //*****************************************************************
+    // Taggers
+    //*****************************************************************
 
-      //*****************************************************************
-      // Taggers
-      //*****************************************************************
+    // Loop on Selected Tracks
 
-      // Loop on Selected Tracks
+    const edm::RefVector<reco::TrackCollection>  &selected_tracks( pjet->tagInfoTrackIP("impactParameter")->selectedTracks() );
+    const edm::RefVector<reco::TrackCollection>  &no_sel_tracks( pjet->tagInfoTrackIP("impactParameter")->tracks() );
 
-      const edm::RefVector<reco::TrackCollection>  &selected_tracks( pjet->tagInfoTrackIP("impactParameter")->selectedTracks() );
-      const edm::RefVector<reco::TrackCollection>  &no_sel_tracks( pjet->tagInfoTrackIP("impactParameter")->tracks() );
+    int ntagtracks;
+    if (use_selected_tracks_) ntagtracks = pjet->tagInfoTrackIP("impactParameter")->probabilities(0).size();
+    else ntagtracks=no_sel_tracks.size();
 
-      int ntagtracks;
-      if (use_selected_tracks_) ntagtracks = pjet->tagInfoTrackIP("impactParameter")->probabilities(0).size();
-      else ntagtracks=no_sel_tracks.size();
+    JetInfo[iJetColl].Jet_ntracks[JetInfo[iJetColl].nJet] = ntagtracks;
 
-      JetInfo[iJetColl].Jet_ntracks[JetInfo[iJetColl].nJet] = ntagtracks;
+    JetInfo[iJetColl].Jet_nFirstTrack[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nTrack;
+    JetInfo[iJetColl].Jet_nFirstTrkInc[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkInc;
+    int k=0;
 
-      JetInfo[iJetColl].Jet_nFirstTrack[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nTrack;
-      JetInfo[iJetColl].Jet_nFirstTrkInc[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkInc;
-      int k=0;
+    unsigned int trackSize = selected_tracks.size();
+    if(!use_selected_tracks_)trackSize = no_sel_tracks.size();
 
-      unsigned int trackSize = selected_tracks.size();
-      if(!use_selected_tracks_)trackSize = no_sel_tracks.size();
+    if (trackSize==0) continue;
+    for (unsigned int itt=0; itt < trackSize; ++itt) {
 
-      if (trackSize==0) continue;
-      for (unsigned int itt=0; itt < trackSize; ++itt) {
+      reco::Track  ptrack;
+      if(use_selected_tracks_) ptrack = *selected_tracks[itt];
+      else ptrack= *no_sel_tracks[itt];
 
-        reco::Track  ptrack;
-        if(use_selected_tracks_) ptrack = *selected_tracks[itt];
-        else ptrack= *no_sel_tracks[itt];
+      TransientTrack transientTrack = trackBuilder->build(ptrack);
+      GlobalVector direction(pjet->px(), pjet->py(), pjet->pz());
 
-        TransientTrack transientTrack = trackBuilder->build(ptrack);
-        GlobalVector direction(pjet->px(), pjet->py(), pjet->pz());
+      //--------------------------------
+      Double_t decayLength=-1;
+      TrajectoryStateOnSurface closest =
+        IPTools::closestApproachToJet(transientTrack.impactPointState(), *pv, direction, transientTrack.field());
+      if (closest.isValid()){
+        decayLength =  (closest.globalPosition()-   RecoVertex::convertPos(pv->position())).mag() ;
+      }
+      else{
+        decayLength = -1;
+      }
 
-        //--------------------------------
-        Double_t decayLength=-1;
-        TrajectoryStateOnSurface closest =
-          IPTools::closestApproachToJet(transientTrack.impactPointState(), *pv, direction, transientTrack.field());
-        if (closest.isValid()){
-          decayLength =  (closest.globalPosition()-   RecoVertex::convertPos(pv->position())).mag() ;
+      Double_t distJetAxis =  IPTools::jetTrackDistance(transientTrack, direction, *pv).second.value();
+
+      JetInfo[iJetColl].Track_dist[JetInfo[iJetColl].nTrack]     =distJetAxis;
+      JetInfo[iJetColl].Track_length[JetInfo[iJetColl].nTrack]   =decayLength;
+
+      JetInfo[iJetColl].Track_dxy[JetInfo[iJetColl].nTrack]      = ptrack.dxy(pv->position());
+      JetInfo[iJetColl].Track_dz[JetInfo[iJetColl].nTrack]       = ptrack.dz(pv->position());
+      JetInfo[iJetColl].Track_zIP[JetInfo[iJetColl].nTrack]      = ptrack.dz()-(*pv).z();
+
+      float deta = ptrack.eta() - JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet];
+      float dphi = ptrack.phi() - JetInfo[iJetColl].Jet_phi[JetInfo[iJetColl].nJet];
+
+      if ( dphi > TMath::Pi() ) dphi = 2.*TMath::Pi() - dphi;
+      float deltaR = TMath::Sqrt(deta*deta + dphi*dphi);
+
+      bool pass_cut_trk =false;
+
+      //if (std::fabs(distJetAxis) < 0.07 && decayLength < 5.0 && deltaR < 0.3)  pass_cut_trk=true;
+      if (std::fabs(distJetAxis) < 0.07 && decayLength < 5.0)  pass_cut_trk=true;
+
+      // track selection
+      if ( (use_selected_tracks_ && pass_cut_trk) ||  !use_selected_tracks_) {
+
+        if ( use_selected_tracks_ ) {
+          JetInfo[iJetColl].Track_IP2D[JetInfo[iJetColl].nTrack]     = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip2d.value();
+          JetInfo[iJetColl].Track_IP2Dsig[JetInfo[iJetColl].nTrack]  = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip2d.significance();
+          JetInfo[iJetColl].Track_IP[JetInfo[iJetColl].nTrack]       = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.value();
+          JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack]    = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.significance();
+          JetInfo[iJetColl].Track_IP2Derr[JetInfo[iJetColl].nTrack]  = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip2d.error();
+          JetInfo[iJetColl].Track_IPerr[JetInfo[iJetColl].nTrack]    = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.error();
+          JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack]    = pjet->tagInfoTrackIP("impactParameter")->probabilities(0)[k];
         }
-        else{
-          decayLength = -1;
+        else {
+          Measurement1D ip2d    = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;
+          Measurement1D ip3d    = IPTools::signedImpactParameter3D(trackBuilder->build(ptrack), direction, *pv).second;
+          //Measurement1D ip2dsig = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).first;
+          //Measurement1D ip3dsig = IPTools::signedImpactParameter3D(trackBuilder->build(ptrack), direction, *pv).first;
+
+          JetInfo[iJetColl].Track_IP2D[JetInfo[iJetColl].nTrack]     = (ip2d.value());
+          JetInfo[iJetColl].Track_IP2Dsig[JetInfo[iJetColl].nTrack]  = (ip2d.value())/(ip2d.error());
+          JetInfo[iJetColl].Track_IP[JetInfo[iJetColl].nTrack]       = (ip3d.value());
+          JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack]    = (ip3d.value())/(ip3d.error());
+          JetInfo[iJetColl].Track_IP2Derr[JetInfo[iJetColl].nTrack]  = (ip2d.error());
+          JetInfo[iJetColl].Track_IPerr[JetInfo[iJetColl].nTrack]    = (ip3d.error());
+          JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack]    = -1000;
         }
 
-        Double_t distJetAxis =  IPTools::jetTrackDistance(transientTrack, direction, *pv).second.value();
+        JetInfo[iJetColl].Track_p[JetInfo[iJetColl].nTrack]        = ptrack.p();
+        JetInfo[iJetColl].Track_pt[JetInfo[iJetColl].nTrack]       = ptrack.pt();
+        JetInfo[iJetColl].Track_eta[JetInfo[iJetColl].nTrack]      = ptrack.eta();
+        JetInfo[iJetColl].Track_phi[JetInfo[iJetColl].nTrack]      = ptrack.phi();
+        JetInfo[iJetColl].Track_chi2[JetInfo[iJetColl].nTrack]     = ptrack.normalizedChi2();
+        JetInfo[iJetColl].Track_charge[JetInfo[iJetColl].nTrack]   = ptrack.charge();
 
-        JetInfo[iJetColl].Track_dist[JetInfo[iJetColl].nTrack]     =distJetAxis;
-        JetInfo[iJetColl].Track_length[JetInfo[iJetColl].nTrack]   =decayLength;
+        JetInfo[iJetColl].Track_nHitAll[JetInfo[iJetColl].nTrack]  = ptrack.numberOfValidHits();
+        JetInfo[iJetColl].Track_nHitPixel[JetInfo[iJetColl].nTrack]= ptrack.hitPattern().numberOfValidPixelHits();
+        JetInfo[iJetColl].Track_nHitStrip[JetInfo[iJetColl].nTrack]= ptrack.hitPattern().numberOfValidStripHits();
+        JetInfo[iJetColl].Track_nHitTIB[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidStripTIBHits();
+        JetInfo[iJetColl].Track_nHitTID[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidStripTIDHits();
+        JetInfo[iJetColl].Track_nHitTOB[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidStripTOBHits();
+        JetInfo[iJetColl].Track_nHitTEC[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidStripTECHits();
+        JetInfo[iJetColl].Track_nHitPXB[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidPixelBarrelHits();
+        JetInfo[iJetColl].Track_nHitPXF[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidPixelEndcapHits();
+        JetInfo[iJetColl].Track_isHitL1[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().hasValidHitInFirstPixelBarrel();
 
-        JetInfo[iJetColl].Track_dxy[JetInfo[iJetColl].nTrack]      = ptrack.dxy(pv->position());
-        JetInfo[iJetColl].Track_dz[JetInfo[iJetColl].nTrack]       = ptrack.dz(pv->position());
-        JetInfo[iJetColl].Track_zIP[JetInfo[iJetColl].nTrack]      = ptrack.dz()-(*pv).z();
+        JetInfo[iJetColl].Track_PV[JetInfo[iJetColl].nTrack] = 0;
+        JetInfo[iJetColl].Track_SV[JetInfo[iJetColl].nTrack] = 0;
+        JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack] = 0.;
+        JetInfo[iJetColl].Track_SVweight[JetInfo[iJetColl].nTrack] = 0.;
 
-        float deta = ptrack.eta() - JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet];
-        float dphi = ptrack.phi() - JetInfo[iJetColl].Jet_phi[JetInfo[iJetColl].nJet];
+        JetInfo[iJetColl].Track_isfromSV[JetInfo[iJetColl].nTrack] = 0.;
+        JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] = 0;
 
-        if ( dphi > TMath::Pi() ) dphi = 2.*TMath::Pi() - dphi;
-        float deltaR = TMath::Sqrt(deta*deta + dphi*dphi);
+        if ( useTrackHistory_ && !isData_ ) {
+          TrackCategories::Flags theFlag ;
+          if(use_selected_tracks_) theFlag  = classifier_.evaluate( pjet->tagInfoTrackIP("impactParameter")->selectedTracks()[k] ).flags();
+          else                     theFlag  = classifier_.evaluate( pjet->tagInfoTrackIP("impactParameter")->tracks()[k] ).flags();
 
-        bool pass_cut_trk =false;
+          if ( theFlag[TrackCategories::BWeakDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 1);
+          if ( theFlag[TrackCategories::CWeakDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 2);
+          if ( theFlag[TrackCategories::TauDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 3);
+          if ( theFlag[TrackCategories::ConversionsProcess] )JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 4);
+          if ( theFlag[TrackCategories::KsDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 5);
+          if ( theFlag[TrackCategories::LambdaDecay] )       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 6);
+          if ( theFlag[TrackCategories::HadronicProcess] )   JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 7);
+          if ( theFlag[TrackCategories::Fake] ) 	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 8);
+          if ( theFlag[TrackCategories::SharedInnerHits] )   JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 9);
+        }
 
-        //if (std::fabs(distJetAxis) < 0.07 && decayLength < 5.0 && deltaR < 0.3)  pass_cut_trk=true;
-        if (std::fabs(distJetAxis) < 0.07 && decayLength < 5.0)  pass_cut_trk=true;
+        JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = -1;
 
-        // track selection
-        if ( (use_selected_tracks_ && pass_cut_trk) ||  !use_selected_tracks_) {
+        TLorentzVector track4P, jet4P;
+        track4P.SetPtEtaPhiM(ptrack.pt(), ptrack.eta(), ptrack.phi(), 0. );
+        jet4P.SetPtEtaPhiM( pjet->pt(), pjet->eta(), pjet->phi(), pjet->energy() );
+
+
+        if(jet4P.DeltaR(track4P) < 0.3 && std::fabs(distJetAxis) < 0.07 && decayLength < 5.0 ){
+
+          if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) Histos[iJetColl]->TrackProbaNeg->Fill(-JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack]);
+          if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 && PFJet80 ) Histos[iJetColl]->TrackProbJet80->Fill(-JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack]);
+
+          if ( findCat( &ptrack, *&cat0 ) ) {
+            JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 0;
+            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
+              Histos[iJetColl]->IPSign_cat0->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+              Histos[iJetColl]->TrackProbaNeg_Cat0->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              if ( PFJet80 ) {
+                Histos[iJetColl]->IPSign_cat0->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbJet80_Cat0->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              }
+            }
+          }
+
+          if ( findCat( &ptrack, *&cat1 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 ) {
+            JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack]  = 1;
+            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
+              Histos[iJetColl]->IPSign_cat1->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+              Histos[iJetColl]->TrackProbaNeg_Cat1->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              if ( PFJet80 ) {
+                Histos[iJetColl]->IPSign_cat1->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbJet80_Cat1->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              }
+            }
+          }
+
+          if ( findCat( &ptrack, *&cat2 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 ) {
+            JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 2;
+            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
+              Histos[iJetColl]->IPSign_cat2->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+              Histos[iJetColl]->TrackProbaNeg_Cat2->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              if ( PFJet80 ) {
+                Histos[iJetColl]->IPSign_cat2->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbJet80_Cat2->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              }
+            }
+          }
+
+          if ( findCat( &ptrack, *&cat3 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 ) {
+            JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 3;
+            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
+              Histos[iJetColl]->IPSign_cat3->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+              Histos[iJetColl]->TrackProbaNeg_Cat3->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              if ( PFJet80 ) {
+                Histos[iJetColl]->IPSign_cat3->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbJet80_Cat3->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              }
+            }
+          }
+
+          if ( findCat( &ptrack, *&cat4 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 ) {
+            JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 4;
+            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
+              Histos[iJetColl]->IPSign_cat4->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+              Histos[iJetColl]->TrackProbaNeg_Cat4->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              if ( PFJet80 ) {
+                Histos[iJetColl]->IPSign_cat4->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbJet80_Cat4->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              }
+            }
+          }
+
+          if ( findCat( &ptrack, *&cat5 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 4 ) {
+            JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 5;
+            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
+              Histos[iJetColl]->IPSign_cat5->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+              Histos[iJetColl]->TrackProbaNeg_Cat5->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              if ( PFJet80 ) {
+                Histos[iJetColl]->IPSign_cat5->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbJet80_Cat5->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              }
+            }
+          }
+
+          if ( findCat( &ptrack, *&cat6 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 4 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 5 ) {
+            JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 6;
+            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
+              Histos[iJetColl]->IPSign_cat6->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+              Histos[iJetColl]->TrackProbaNeg_Cat6->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              if ( PFJet80 ) {
+                Histos[iJetColl]->IPSign_cat6->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbJet80_Cat6->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              }
+            }
+          }
+
+          if ( findCat( &ptrack, *&cat7 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 4 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 5 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 6 ) {
+            JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 7;
+            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
+              Histos[iJetColl]->IPSign_cat7->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+              Histos[iJetColl]->TrackProbaNeg_Cat7->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              if ( PFJet80 ) {
+                Histos[iJetColl]->IPSign_cat7->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbJet80_Cat7->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              }
+            }
+          }
+
+          if ( findCat( &ptrack, *&cat8 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 4 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 5 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 6 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 7 ) {
+            JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 8;
+            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
+              Histos[iJetColl]->IPSign_cat8->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+              Histos[iJetColl]->TrackProbaNeg_Cat8->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              if ( PFJet80 ) {
+                Histos[iJetColl]->IPSign_cat8->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbJet80_Cat8->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              }
+            }
+          }
+
+          if ( findCat( &ptrack, *&cat9 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack]!= 4 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 5 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 6 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 7 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 8 ) {
+            JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 9;
+            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
+              Histos[iJetColl]->IPSign_cat9->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+              Histos[iJetColl]->TrackProbaNeg_Cat9->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              if ( PFJet80 ) {
+                Histos[iJetColl]->IPSign_cat9->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
+                Histos[iJetColl]->TrackProbJet80_Cat9->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
+              }
+            }
+          }
+        }
+
+        ++JetInfo[iJetColl].nTrack;
+      }
+      if ( use_selected_tracks_ ) JetInfo[iJetColl].Jet_ntracks[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrack-JetInfo[iJetColl].Jet_nFirstTrack[JetInfo[iJetColl].nJet];
+
+      if ( producePtRelTemplate_ ) {
+        if ( ptrack.quality(reco::TrackBase::highPurity)
+            // Remove the tracks that are pixel-less
+            && ptrack.algo()!=(reco::TrackBase::iter4)
+            && ptrack.algo()!=(reco::TrackBase::iter5)
+            && deltaR < 0.4
+            && ptrack.pt() > 5.
+            && ptrack.numberOfValidHits() >= 11
+            && ptrack.hitPattern().numberOfValidPixelHits() >= 2
+            && ptrack.normalizedChi2() < 10
+            && ptrack.trackerExpectedHitsOuter().numberOfHits() <= 2
+            && ptrack.dz()-(*pv).z() < 1. ) {
 
           if ( use_selected_tracks_ ) {
-            JetInfo[iJetColl].Track_IP2D[JetInfo[iJetColl].nTrack]     = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip2d.value();
-            JetInfo[iJetColl].Track_IP2Dsig[JetInfo[iJetColl].nTrack]  = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip2d.significance();
-            JetInfo[iJetColl].Track_IP[JetInfo[iJetColl].nTrack]       = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.value();
-            JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack]    = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.significance();
-            JetInfo[iJetColl].Track_IP2Derr[JetInfo[iJetColl].nTrack]  = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip2d.error();
-            JetInfo[iJetColl].Track_IPerr[JetInfo[iJetColl].nTrack]    = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.error();
-            JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack]    = pjet->tagInfoTrackIP("impactParameter")->probabilities(0)[k];
-          }
-          else {
-            Measurement1D ip2d    = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;
-            Measurement1D ip3d    = IPTools::signedImpactParameter3D(trackBuilder->build(ptrack), direction, *pv).second;
-            //Measurement1D ip2dsig = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).first;
-            //Measurement1D ip3dsig = IPTools::signedImpactParameter3D(trackBuilder->build(ptrack), direction, *pv).first;
-
-            JetInfo[iJetColl].Track_IP2D[JetInfo[iJetColl].nTrack]     = (ip2d.value());
-            JetInfo[iJetColl].Track_IP2Dsig[JetInfo[iJetColl].nTrack]  = (ip2d.value())/(ip2d.error());
-            JetInfo[iJetColl].Track_IP[JetInfo[iJetColl].nTrack]       = (ip3d.value());
-            JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack]    = (ip3d.value())/(ip3d.error());
-            JetInfo[iJetColl].Track_IP2Derr[JetInfo[iJetColl].nTrack]  = (ip2d.error());
-            JetInfo[iJetColl].Track_IPerr[JetInfo[iJetColl].nTrack]    = (ip3d.error());
-            JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack]    = -1000;
+            JetInfo[iJetColl].TrkInc_IP[JetInfo[iJetColl].nTrkInc]	  = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.value();
+            JetInfo[iJetColl].TrkInc_IPsig[JetInfo[iJetColl].nTrkInc] = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.significance();
           }
 
-          JetInfo[iJetColl].Track_p[JetInfo[iJetColl].nTrack]        = ptrack.p();
-          JetInfo[iJetColl].Track_pt[JetInfo[iJetColl].nTrack]       = ptrack.pt();
-          JetInfo[iJetColl].Track_eta[JetInfo[iJetColl].nTrack]      = ptrack.eta();
-          JetInfo[iJetColl].Track_phi[JetInfo[iJetColl].nTrack]      = ptrack.phi();
-          JetInfo[iJetColl].Track_chi2[JetInfo[iJetColl].nTrack]     = ptrack.normalizedChi2();
-          JetInfo[iJetColl].Track_charge[JetInfo[iJetColl].nTrack]   = ptrack.charge();
+          JetInfo[iJetColl].TrkInc_pt[JetInfo[iJetColl].nTrkInc]	= ptrack.pt();
+          JetInfo[iJetColl].TrkInc_eta[JetInfo[iJetColl].nTrkInc]	= ptrack.eta();
+          JetInfo[iJetColl].TrkInc_phi[JetInfo[iJetColl].nTrkInc]   = ptrack.phi();
+          JetInfo[iJetColl].TrkInc_ptrel[JetInfo[iJetColl].nTrkInc] = calculPtRel( ptrack , *pjet);
 
-          JetInfo[iJetColl].Track_nHitAll[JetInfo[iJetColl].nTrack]  = ptrack.numberOfValidHits();
-          JetInfo[iJetColl].Track_nHitPixel[JetInfo[iJetColl].nTrack]= ptrack.hitPattern().numberOfValidPixelHits();
-          JetInfo[iJetColl].Track_nHitStrip[JetInfo[iJetColl].nTrack]= ptrack.hitPattern().numberOfValidStripHits();
-          JetInfo[iJetColl].Track_nHitTIB[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidStripTIBHits();
-          JetInfo[iJetColl].Track_nHitTID[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidStripTIDHits();
-          JetInfo[iJetColl].Track_nHitTOB[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidStripTOBHits();
-          JetInfo[iJetColl].Track_nHitTEC[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidStripTECHits();
-          JetInfo[iJetColl].Track_nHitPXB[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidPixelBarrelHits();
-          JetInfo[iJetColl].Track_nHitPXF[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidPixelEndcapHits();
-          JetInfo[iJetColl].Track_isHitL1[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().hasValidHitInFirstPixelBarrel();
-
-          JetInfo[iJetColl].Track_PV[JetInfo[iJetColl].nTrack] = 0;
-          JetInfo[iJetColl].Track_SV[JetInfo[iJetColl].nTrack] = 0;
-          JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack] = 0.;
-          JetInfo[iJetColl].Track_SVweight[JetInfo[iJetColl].nTrack] = 0.;
-
-          JetInfo[iJetColl].Track_isfromSV[JetInfo[iJetColl].nTrack] = 0.;
-          JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] = 0;
-
-          if ( useTrackHistory_ && !isData_ ) {
-            TrackCategories::Flags theFlag ;
-            if(use_selected_tracks_) theFlag  = classifier_.evaluate( pjet->tagInfoTrackIP("impactParameter")->selectedTracks()[k] ).flags();
-            else                     theFlag  = classifier_.evaluate( pjet->tagInfoTrackIP("impactParameter")->tracks()[k] ).flags();
-
-            if ( theFlag[TrackCategories::BWeakDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 1);
-            if ( theFlag[TrackCategories::CWeakDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 2);
-            if ( theFlag[TrackCategories::TauDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 3);
-            if ( theFlag[TrackCategories::ConversionsProcess] )JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 4);
-            if ( theFlag[TrackCategories::KsDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 5);
-            if ( theFlag[TrackCategories::LambdaDecay] )       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 6);
-            if ( theFlag[TrackCategories::HadronicProcess] )   JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 7);
-            if ( theFlag[TrackCategories::Fake] ) 	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 8);
-            if ( theFlag[TrackCategories::SharedInnerHits] )   JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 9);
-          }
-
-          JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = -1;
-
-          TLorentzVector track4P, jet4P;
-          track4P.SetPtEtaPhiM(ptrack.pt(), ptrack.eta(), ptrack.phi(), 0. );
-          jet4P.SetPtEtaPhiM( pjet->pt(), pjet->eta(), pjet->phi(), pjet->energy() );
-
-
-          if(jet4P.DeltaR(track4P) < 0.3 && std::fabs(distJetAxis) < 0.07 && decayLength < 5.0 ){
-
-            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) Histos[iJetColl]->TrackProbaNeg->Fill(-JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack]);
-            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 && PFJet80 ) Histos[iJetColl]->TrackProbJet80->Fill(-JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack]);
-
-            if ( findCat( &ptrack, *&cat0 ) ) {
-              JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 0;
-              if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                Histos[iJetColl]->IPSign_cat0->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                Histos[iJetColl]->TrackProbaNeg_Cat0->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                if ( PFJet80 ) {
-                  Histos[iJetColl]->IPSign_cat0->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  Histos[iJetColl]->TrackProbJet80_Cat0->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                }
-              }
-            }
-
-            if ( findCat( &ptrack, *&cat1 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 ) {
-              JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack]  = 1;
-              if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                Histos[iJetColl]->IPSign_cat1->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                Histos[iJetColl]->TrackProbaNeg_Cat1->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                if ( PFJet80 ) {
-                  Histos[iJetColl]->IPSign_cat1->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  Histos[iJetColl]->TrackProbJet80_Cat1->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                }
-              }
-            }
-
-            if ( findCat( &ptrack, *&cat2 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 ) {
-              JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 2;
-              if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                Histos[iJetColl]->IPSign_cat2->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                Histos[iJetColl]->TrackProbaNeg_Cat2->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                if ( PFJet80 ) {
-                  Histos[iJetColl]->IPSign_cat2->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  Histos[iJetColl]->TrackProbJet80_Cat2->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                }
-              }
-            }
-
-            if ( findCat( &ptrack, *&cat3 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 ) {
-              JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 3;
-              if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                Histos[iJetColl]->IPSign_cat3->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                Histos[iJetColl]->TrackProbaNeg_Cat3->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                if ( PFJet80 ) {
-                  Histos[iJetColl]->IPSign_cat3->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  Histos[iJetColl]->TrackProbJet80_Cat3->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                }
-              }
-            }
-
-            if ( findCat( &ptrack, *&cat4 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 ) {
-              JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 4;
-              if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                Histos[iJetColl]->IPSign_cat4->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                Histos[iJetColl]->TrackProbaNeg_Cat4->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                if ( PFJet80 ) {
-                  Histos[iJetColl]->IPSign_cat4->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  Histos[iJetColl]->TrackProbJet80_Cat4->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                }
-              }
-            }
-
-            if ( findCat( &ptrack, *&cat5 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 4 ) {
-              JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 5;
-              if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                Histos[iJetColl]->IPSign_cat5->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                Histos[iJetColl]->TrackProbaNeg_Cat5->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                if ( PFJet80 ) {
-                  Histos[iJetColl]->IPSign_cat5->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  Histos[iJetColl]->TrackProbJet80_Cat5->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                }
-              }
-            }
-
-            if ( findCat( &ptrack, *&cat6 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 4 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 5 ) {
-              JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 6;
-              if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                Histos[iJetColl]->IPSign_cat6->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                Histos[iJetColl]->TrackProbaNeg_Cat6->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                if ( PFJet80 ) {
-                  Histos[iJetColl]->IPSign_cat6->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  Histos[iJetColl]->TrackProbJet80_Cat6->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                }
-              }
-            }
-
-            if ( findCat( &ptrack, *&cat7 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 4 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 5 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 6 ) {
-              JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 7;
-              if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                Histos[iJetColl]->IPSign_cat7->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                Histos[iJetColl]->TrackProbaNeg_Cat7->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                if ( PFJet80 ) {
-                  Histos[iJetColl]->IPSign_cat7->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  Histos[iJetColl]->TrackProbJet80_Cat7->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                }
-              }
-            }
-
-            if ( findCat( &ptrack, *&cat8 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 4 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 5 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 6 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 7 ) {
-              JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 8;
-              if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                Histos[iJetColl]->IPSign_cat8->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                Histos[iJetColl]->TrackProbaNeg_Cat8->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                if ( PFJet80 ) {
-                  Histos[iJetColl]->IPSign_cat8->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  Histos[iJetColl]->TrackProbJet80_Cat8->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                }
-              }
-            }
-
-            if ( findCat( &ptrack, *&cat9 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack]!= 4 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 5 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 6 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 7 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 8 ) {
-              JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 9;
-              if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
-                Histos[iJetColl]->IPSign_cat9->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                Histos[iJetColl]->TrackProbaNeg_Cat9->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                if ( PFJet80 ) {
-                  Histos[iJetColl]->IPSign_cat9->Fill( -JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
-                  Histos[iJetColl]->TrackProbJet80_Cat9->Fill( -JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack] );
-                }
-              }
-            }
-          }
-
-          ++JetInfo[iJetColl].nTrack;
-        }
-        if ( use_selected_tracks_ ) JetInfo[iJetColl].Jet_ntracks[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrack-JetInfo[iJetColl].Jet_nFirstTrack[JetInfo[iJetColl].nJet];
-
-        if ( producePtRelTemplate_ ) {
-          if ( ptrack.quality(reco::TrackBase::highPurity)
-              // Remove the tracks that are pixel-less
-              && ptrack.algo()!=(reco::TrackBase::iter4)
-              && ptrack.algo()!=(reco::TrackBase::iter5)
-              && deltaR < 0.4
-              && ptrack.pt() > 5.
-              && ptrack.numberOfValidHits() >= 11
-              && ptrack.hitPattern().numberOfValidPixelHits() >= 2
-              && ptrack.normalizedChi2() < 10
-              && ptrack.trackerExpectedHitsOuter().numberOfHits() <= 2
-              && ptrack.dz()-(*pv).z() < 1. ) {
-
-            if ( use_selected_tracks_ ) {
-              JetInfo[iJetColl].TrkInc_IP[JetInfo[iJetColl].nTrkInc]	  = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.value();
-              JetInfo[iJetColl].TrkInc_IPsig[JetInfo[iJetColl].nTrkInc] = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.significance();
-            }
-
-            JetInfo[iJetColl].TrkInc_pt[JetInfo[iJetColl].nTrkInc]	= ptrack.pt();
-            JetInfo[iJetColl].TrkInc_eta[JetInfo[iJetColl].nTrkInc]	= ptrack.eta();
-            JetInfo[iJetColl].TrkInc_phi[JetInfo[iJetColl].nTrkInc]   = ptrack.phi();
-            JetInfo[iJetColl].TrkInc_ptrel[JetInfo[iJetColl].nTrkInc] = calculPtRel( ptrack , *pjet);
-
-            ++JetInfo[iJetColl].nTrkInc;
-          }
-        }
-        ++k;
-
-      } //// end loop on tracks
-
-      JetInfo[iJetColl].Jet_nLastTrack[JetInfo[iJetColl].nJet]   = JetInfo[iJetColl].nTrack;
-      JetInfo[iJetColl].Jet_nLastTrkInc[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nTrkInc;
-      // b-tagger discriminants
-      float Proba  = pjet->bDiscriminator(jetPBJetTags_.c_str());
-      float ProbaN = pjet->bDiscriminator(jetPNegBJetTags_.c_str());
-      float ProbaP = pjet->bDiscriminator(jetPPosBJetTags_.c_str());
-
-      float Bprob  = pjet->bDiscriminator(jetBPBJetTags_.c_str());
-      float BprobN = pjet->bDiscriminator(jetBPNegBJetTags_.c_str());
-      float BprobP = pjet->bDiscriminator(jetBPPosBJetTags_.c_str());
-
-      float CombinedSvtx  = pjet->bDiscriminator(combinedSVBJetTags_.c_str());
-      float CombinedSvtxN = pjet->bDiscriminator(combinedSVNegBJetTags_.c_str());
-      float CombinedSvtxP = pjet->bDiscriminator(combinedSVPosBJetTags_.c_str());
-
-      std::vector<const reco::BaseTagInfo*>  baseTagInfos_test;
-      JetTagComputer::TagInfoHelper helper_test(baseTagInfos_test);
-      baseTagInfos_test.push_back( pjet->tagInfoTrackIP("impactParameter") );
-      baseTagInfos_test.push_back( pjet->tagInfoSecondaryVertex("secondaryVertex") );
-      TaggingVariableList vars_test = computer->taggingVariables(helper_test);
-      float JetVtxCategory = -9999.;
-      if(vars_test.checkTag(reco::btau::vertexCategory)) JetVtxCategory = ( vars_test.get(reco::btau::vertexCategory) );
-
-      float RetCombinedSvtx  = pjet->bDiscriminator(combinedSVRetrainedBJetTags_.c_str());
-      float RetCombinedSvtxN = pjet->bDiscriminator(combinedSVRetrainedNegBJetTags_.c_str());
-      float RetCombinedSvtxP = pjet->bDiscriminator(combinedSVRetrainedPosBJetTags_.c_str());
-
-      float CombinedCSVJP  = pjet->bDiscriminator(combinedCSVJPBJetTags_.c_str());
-      float CombinedCSVJPN = pjet->bDiscriminator(combinedCSVJPNegBJetTags_.c_str());
-      float CombinedCSVJPP = pjet->bDiscriminator(combinedCSVJPPosBJetTags_.c_str());
-
-      float CombinedCSVSL  = pjet->bDiscriminator(combinedCSVSLBJetTags_.c_str());
-      float CombinedCSVSLN = pjet->bDiscriminator(combinedCSVSLNegBJetTags_.c_str());
-      float CombinedCSVSLP = pjet->bDiscriminator(combinedCSVSLPosBJetTags_.c_str());
-
-      float CombinedCSVJPSL  = pjet->bDiscriminator(combinedCSVJPSLBJetTags_.c_str());
-      float CombinedCSVJPSLN = pjet->bDiscriminator(combinedCSVJPSLNegBJetTags_.c_str());
-      float CombinedCSVJPSLP = pjet->bDiscriminator(combinedCSVJPSLPosBJetTags_.c_str());
-
-      float SimpleIVF_HP    = pjet->bDiscriminator(simpleIVFSVHighPurBJetTags_.c_str());
-      float SimpleIVF_HE    = pjet->bDiscriminator(simpleIVFSVHighEffBJetTags_.c_str());
-      float DoubleIVF_HE    = pjet->bDiscriminator(doubleIVFSVHighEffBJetTags_.c_str());
-      float CombinedIVF     = pjet->bDiscriminator(combinedIVFSVBJetTags_.c_str());
-      float CombinedIVF_P   = pjet->bDiscriminator(combinedIVFSVPosBJetTags_.c_str());
-
-      float Svtx    = pjet->bDiscriminator(simpleSVHighEffBJetTags_.c_str());
-      float SvtxN   = pjet->bDiscriminator(simpleSVNegHighEffBJetTags_.c_str());
-      float SvtxHP  = pjet->bDiscriminator(simpleSVHighPurBJetTags_.c_str());
-      float SvtxNHP = pjet->bDiscriminator(simpleSVNegHighPurBJetTags_.c_str());
-
-      float SoftM  = pjet->bDiscriminator(softPFMuonBJetTags_.c_str());
-      float SoftMN = pjet->bDiscriminator(softPFMuonNegBJetTags_.c_str());
-      float SoftMP = pjet->bDiscriminator(softPFMuonPosBJetTags_.c_str());
-
-      // PFMuon information
-      for (unsigned int leptIdx = 0; leptIdx < pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->leptons(); ++leptIdx) {
-
-        JetInfo[iJetColl].PFMuon_IdxJet[JetInfo[iJetColl].nPFMuon]    = JetInfo[iJetColl].nJet;
-        JetInfo[iJetColl].PFMuon_pt[JetInfo[iJetColl].nPFMuon]        = pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->lepton(leptIdx)->pt();
-        JetInfo[iJetColl].PFMuon_eta[JetInfo[iJetColl].nPFMuon]       = pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->lepton(leptIdx)->eta();
-        JetInfo[iJetColl].PFMuon_phi[JetInfo[iJetColl].nPFMuon]       = pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->lepton(leptIdx)->phi();
-        JetInfo[iJetColl].PFMuon_ptrel[JetInfo[iJetColl].nPFMuon]     = calculPtRel( *(pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->lepton(leptIdx)), *pjet );
-        JetInfo[iJetColl].PFMuon_ratio[JetInfo[iJetColl].nPFMuon]     = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).ratio);
-        JetInfo[iJetColl].PFMuon_ratioRel[JetInfo[iJetColl].nPFMuon]  = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).ratioRel);
-        JetInfo[iJetColl].PFMuon_deltaR[JetInfo[iJetColl].nPFMuon]    = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).deltaR);
-        JetInfo[iJetColl].PFMuon_IPsig[JetInfo[iJetColl].nPFMuon]     = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).sip3d);
-
-        JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 0;
-        int muIdx = matchMuon( pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->lepton(leptIdx), muons );
-        if ( muIdx != -1 && muons[muIdx].isGlobalMuon() == 1 ) {
-
-          JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 1;
-
-          if (muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits()>0 &&
-              muons[muIdx].numberOfMatches()>1 && muons[muIdx].innerTrack()->hitPattern().numberOfValidHits()>10 &&
-              muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits()>1 &&
-              muons[muIdx].innerTrack()->trackerExpectedHitsOuter().numberOfHits()<3 &&
-              muons[muIdx].globalTrack()->normalizedChi2()<10. && muons[muIdx].innerTrack()->normalizedChi2()<10.)
-            JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 2;
-
-        }
-        ++JetInfo[iJetColl].nPFMuon;
-      }
-
-      // Old soft muon information for perfomance study safety
-      for (unsigned int leptIdx = 0; leptIdx < pjet->tagInfoSoftLepton("softMuon")->leptons(); ++leptIdx){
-
-        int muIdx = matchMuon( pjet->tagInfoSoftLepton("softMuon")->lepton(leptIdx), muons );
-        if ( muIdx != -1 && muons[muIdx].isGlobalMuon() ) {
-          JetInfo[iJetColl].Muon_IdxJet[JetInfo[iJetColl].nMuon]   = JetInfo[iJetColl].nJet;
-          JetInfo[iJetColl].Muon_ptrel[JetInfo[iJetColl].nMuon]    = calculPtRel( *(pjet->tagInfoSoftLepton("softMuon")->lepton(leptIdx)), *pjet );
-          JetInfo[iJetColl].Muon_nTkHit[JetInfo[iJetColl].nMuon]   = muons[muIdx].innerTrack()->hitPattern().numberOfValidHits();
-          JetInfo[iJetColl].Muon_nPixHit[JetInfo[iJetColl].nMuon]  = muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits();
-          JetInfo[iJetColl].Muon_nOutHit[JetInfo[iJetColl].nMuon]  = muons[muIdx].innerTrack()->trackerExpectedHitsOuter().numberOfHits();
-          JetInfo[iJetColl].Muon_nMuHit[JetInfo[iJetColl].nMuon]   = muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits();
-          JetInfo[iJetColl].Muon_chi2[JetInfo[iJetColl].nMuon]     = muons[muIdx].globalTrack()->normalizedChi2();
-          JetInfo[iJetColl].Muon_chi2Tk[JetInfo[iJetColl].nMuon]   = muons[muIdx].innerTrack()->normalizedChi2();
-          JetInfo[iJetColl].Muon_pt[JetInfo[iJetColl].nMuon]       = muons[muIdx].pt();
-          JetInfo[iJetColl].Muon_eta[JetInfo[iJetColl].nMuon]      = muons[muIdx].eta();
-          JetInfo[iJetColl].Muon_phi[JetInfo[iJetColl].nMuon]      = muons[muIdx].phi();
-          JetInfo[iJetColl].Muon_ratio[JetInfo[iJetColl].nMuon]    = (pjet->tagInfoSoftLepton("softMuon")->properties(leptIdx).ratio);
-          JetInfo[iJetColl].Muon_deltaR[JetInfo[iJetColl].nMuon]   = (pjet->tagInfoSoftLepton("softMuon")->properties(leptIdx).deltaR);
-
-          JetInfo[iJetColl].Muon_isGlobal[JetInfo[iJetColl].nMuon] = 1;
-          JetInfo[iJetColl].Muon_nMatched[JetInfo[iJetColl].nMuon] = muons[muIdx].numberOfMatches() ;
-          JetInfo[iJetColl].Muon_vz[JetInfo[iJetColl].nMuon]       = muons[muIdx].vz();
-          int mutkid = getMuonTk(muons[muIdx].innerTrack()->pt(), iJetColl);
-          JetInfo[iJetColl].Muon_TrackIdx[JetInfo[iJetColl].nMuon] = ( mutkid>=0 ? mutkid: -1 );
-
-          JetInfo[iJetColl].Muon_Proba[JetInfo[iJetColl].nMuon] = -100.;
-          if ( mutkid >= 0 ) {
-            JetInfo[iJetColl].Muon_Proba[JetInfo[iJetColl].nMuon] = JetInfo[iJetColl].Track_Proba[mutkid];
-          }
-
-          JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] = 0;
-          if ( useTrackHistory_ && !isData_ ) {
-            TrackCategories::Flags theFlagP = classifier_.evaluate( pjet->tagInfoSoftLepton("softMuon")->lepton(leptIdx) ).flags();
-            if ( theFlagP[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 1));
-            if ( theFlagP[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 2));
-            if ( theFlagP[TrackCategories::TauDecay] )           JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 3));
-            if ( theFlagP[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 4));
-            if ( theFlagP[TrackCategories::KsDecay] )            JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 5));
-            if ( theFlagP[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 6));
-            if ( theFlagP[TrackCategories::HadronicProcess] )    JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 7));
-            if ( theFlagP[TrackCategories::Fake] )               JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 8));
-            if ( theFlagP[TrackCategories::SharedInnerHits] )    JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 9));
-          }
-
-          //---------------------------------
-          // calculate IP/s of muons' tracks
-          //---------------------------------
-          reco::TransientTrack tt = trackBuilder->build(muons[muIdx].innerTrack());
-          GlobalVector direction(pjet->px(), pjet->py(), pjet->pz());
-          Measurement1D ip   = IPTools::signedImpactParameter3D(tt, direction, (*primaryVertex)[0]).second;
-          Measurement1D ip2d = IPTools::signedTransverseImpactParameter(tt, direction, (*primaryVertex)[0]).second;
-
-          JetInfo[iJetColl].Muon_IP[JetInfo[iJetColl].nMuon]   = ip.value();
-          JetInfo[iJetColl].Muon_IP2D[JetInfo[iJetColl].nMuon] = ip2d.value();
-          JetInfo[iJetColl].Muon_IPsig[JetInfo[iJetColl].nMuon]   = (ip.value())/(ip.error());
-          JetInfo[iJetColl].Muon_IP2Dsig[JetInfo[iJetColl].nMuon] = (ip2d.value())/(ip2d.error());
-
-          ++JetInfo[iJetColl].nMuon;
+          ++JetInfo[iJetColl].nTrkInc;
         }
       }
+      ++k;
 
-      float SoftE  = pjet->bDiscriminator(softPFElectronBJetTags_.c_str());
-      float SoftEN = pjet->bDiscriminator(softPFElectronNegBJetTags_.c_str());
-      float SoftEP = pjet->bDiscriminator(softPFElectronPosBJetTags_.c_str());
+    } //// end loop on tracks
 
-      // PFElectron information
-      for (unsigned int leptIdx = 0; leptIdx < pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->leptons(); ++leptIdx) {
+    JetInfo[iJetColl].Jet_nLastTrack[JetInfo[iJetColl].nJet]   = JetInfo[iJetColl].nTrack;
+    JetInfo[iJetColl].Jet_nLastTrkInc[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nTrkInc;
+    // b-tagger discriminants
+    float Proba  = pjet->bDiscriminator(jetPBJetTags_.c_str());
+    float ProbaN = pjet->bDiscriminator(jetPNegBJetTags_.c_str());
+    float ProbaP = pjet->bDiscriminator(jetPPosBJetTags_.c_str());
 
-        JetInfo[iJetColl].PFElectron_IdxJet[JetInfo[iJetColl].nPFElectron]    = JetInfo[iJetColl].nJet;
-        JetInfo[iJetColl].PFElectron_pt[JetInfo[iJetColl].nPFElectron]        = pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->lepton(leptIdx)->pt();
-        JetInfo[iJetColl].PFElectron_eta[JetInfo[iJetColl].nPFElectron]       = pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->lepton(leptIdx)->eta();
-        JetInfo[iJetColl].PFElectron_phi[JetInfo[iJetColl].nPFElectron]       = pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->lepton(leptIdx)->phi();
-        JetInfo[iJetColl].PFElectron_ptrel[JetInfo[iJetColl].nPFElectron]     = calculPtRel( *(pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->lepton(leptIdx)), *pjet );
-        JetInfo[iJetColl].PFElectron_ratio[JetInfo[iJetColl].nPFElectron]     = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).ratio);
-        JetInfo[iJetColl].PFElectron_ratioRel[JetInfo[iJetColl].nPFElectron]  = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).ratioRel);
-        JetInfo[iJetColl].PFElectron_deltaR[JetInfo[iJetColl].nPFElectron]    = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).deltaR);
-        JetInfo[iJetColl].PFElectron_IPsig[JetInfo[iJetColl].nPFElectron]     = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).sip3d);
-        JetInfo[iJetColl].PFElectron_mva_e_pi[JetInfo[iJetColl].nPFElectron]  = -999.;//pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).mva_e_pi;
+    float Bprob  = pjet->bDiscriminator(jetBPBJetTags_.c_str());
+    float BprobN = pjet->bDiscriminator(jetBPNegBJetTags_.c_str());
+    float BprobP = pjet->bDiscriminator(jetBPPosBJetTags_.c_str());
 
-        ++JetInfo[iJetColl].nPFElectron;
+    float CombinedSvtx  = pjet->bDiscriminator(combinedSVBJetTags_.c_str());
+    float CombinedSvtxN = pjet->bDiscriminator(combinedSVNegBJetTags_.c_str());
+    float CombinedSvtxP = pjet->bDiscriminator(combinedSVPosBJetTags_.c_str());
+
+    std::vector<const reco::BaseTagInfo*>  baseTagInfos_test;
+    JetTagComputer::TagInfoHelper helper_test(baseTagInfos_test);
+    baseTagInfos_test.push_back( pjet->tagInfoTrackIP("impactParameter") );
+    baseTagInfos_test.push_back( pjet->tagInfoSecondaryVertex("secondaryVertex") );
+    TaggingVariableList vars_test = computer->taggingVariables(helper_test);
+    float JetVtxCategory = -9999.;
+    if(vars_test.checkTag(reco::btau::vertexCategory)) JetVtxCategory = ( vars_test.get(reco::btau::vertexCategory) );
+
+    float RetCombinedSvtx  = pjet->bDiscriminator(combinedSVRetrainedBJetTags_.c_str());
+    float RetCombinedSvtxN = pjet->bDiscriminator(combinedSVRetrainedNegBJetTags_.c_str());
+    float RetCombinedSvtxP = pjet->bDiscriminator(combinedSVRetrainedPosBJetTags_.c_str());
+
+    float CombinedCSVJP  = pjet->bDiscriminator(combinedCSVJPBJetTags_.c_str());
+    float CombinedCSVJPN = pjet->bDiscriminator(combinedCSVJPNegBJetTags_.c_str());
+    float CombinedCSVJPP = pjet->bDiscriminator(combinedCSVJPPosBJetTags_.c_str());
+
+    float CombinedCSVSL  = pjet->bDiscriminator(combinedCSVSLBJetTags_.c_str());
+    float CombinedCSVSLN = pjet->bDiscriminator(combinedCSVSLNegBJetTags_.c_str());
+    float CombinedCSVSLP = pjet->bDiscriminator(combinedCSVSLPosBJetTags_.c_str());
+
+    float CombinedCSVJPSL  = pjet->bDiscriminator(combinedCSVJPSLBJetTags_.c_str());
+    float CombinedCSVJPSLN = pjet->bDiscriminator(combinedCSVJPSLNegBJetTags_.c_str());
+    float CombinedCSVJPSLP = pjet->bDiscriminator(combinedCSVJPSLPosBJetTags_.c_str());
+
+    float SimpleIVF_HP    = pjet->bDiscriminator(simpleIVFSVHighPurBJetTags_.c_str());
+    float SimpleIVF_HE    = pjet->bDiscriminator(simpleIVFSVHighEffBJetTags_.c_str());
+    float DoubleIVF_HE    = pjet->bDiscriminator(doubleIVFSVHighEffBJetTags_.c_str());
+    float CombinedIVF     = pjet->bDiscriminator(combinedIVFSVBJetTags_.c_str());
+    float CombinedIVF_P   = pjet->bDiscriminator(combinedIVFSVPosBJetTags_.c_str());
+
+    float Svtx    = pjet->bDiscriminator(simpleSVHighEffBJetTags_.c_str());
+    float SvtxN   = pjet->bDiscriminator(simpleSVNegHighEffBJetTags_.c_str());
+    float SvtxHP  = pjet->bDiscriminator(simpleSVHighPurBJetTags_.c_str());
+    float SvtxNHP = pjet->bDiscriminator(simpleSVNegHighPurBJetTags_.c_str());
+
+    float SoftM  = pjet->bDiscriminator(softPFMuonBJetTags_.c_str());
+    float SoftMN = pjet->bDiscriminator(softPFMuonNegBJetTags_.c_str());
+    float SoftMP = pjet->bDiscriminator(softPFMuonPosBJetTags_.c_str());
+
+    // PFMuon information
+    for (unsigned int leptIdx = 0; leptIdx < pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->leptons(); ++leptIdx) {
+
+      JetInfo[iJetColl].PFMuon_IdxJet[JetInfo[iJetColl].nPFMuon]    = JetInfo[iJetColl].nJet;
+      JetInfo[iJetColl].PFMuon_pt[JetInfo[iJetColl].nPFMuon]        = pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->lepton(leptIdx)->pt();
+      JetInfo[iJetColl].PFMuon_eta[JetInfo[iJetColl].nPFMuon]       = pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->lepton(leptIdx)->eta();
+      JetInfo[iJetColl].PFMuon_phi[JetInfo[iJetColl].nPFMuon]       = pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->lepton(leptIdx)->phi();
+      JetInfo[iJetColl].PFMuon_ptrel[JetInfo[iJetColl].nPFMuon]     = calculPtRel( *(pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->lepton(leptIdx)), *pjet );
+      JetInfo[iJetColl].PFMuon_ratio[JetInfo[iJetColl].nPFMuon]     = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).ratio);
+      JetInfo[iJetColl].PFMuon_ratioRel[JetInfo[iJetColl].nPFMuon]  = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).ratioRel);
+      JetInfo[iJetColl].PFMuon_deltaR[JetInfo[iJetColl].nPFMuon]    = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).deltaR);
+      JetInfo[iJetColl].PFMuon_IPsig[JetInfo[iJetColl].nPFMuon]     = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).sip3d);
+
+      JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 0;
+      int muIdx = matchMuon( pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->lepton(leptIdx), muons );
+      if ( muIdx != -1 && muons[muIdx].isGlobalMuon() == 1 ) {
+
+        JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 1;
+
+        if (muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits()>0 &&
+            muons[muIdx].numberOfMatches()>1 && muons[muIdx].innerTrack()->hitPattern().numberOfValidHits()>10 &&
+            muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits()>1 &&
+            muons[muIdx].innerTrack()->trackerExpectedHitsOuter().numberOfHits()<3 &&
+            muons[muIdx].globalTrack()->normalizedChi2()<10. && muons[muIdx].innerTrack()->normalizedChi2()<10.)
+          JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 2;
+
       }
+      ++JetInfo[iJetColl].nPFMuon;
+    }
 
-      // Jet information
-      JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet]   = ProbaN;
-      JetInfo[iJetColl].Jet_ProbaP[JetInfo[iJetColl].nJet]   = ProbaP;
-      JetInfo[iJetColl].Jet_Proba[JetInfo[iJetColl].nJet]    = Proba;
-      JetInfo[iJetColl].Jet_BprobN[JetInfo[iJetColl].nJet]   = BprobN;
-      JetInfo[iJetColl].Jet_BprobP[JetInfo[iJetColl].nJet]   = BprobP;
-      JetInfo[iJetColl].Jet_Bprob[JetInfo[iJetColl].nJet]    = Bprob;
-      JetInfo[iJetColl].Jet_SvxN[JetInfo[iJetColl].nJet]     = SvtxN;
-      JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet]      = Svtx;
-      JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet]   = SvtxNHP;
-      JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet]    = SvtxHP;
-      JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] = CombinedSvtxN;
-      JetInfo[iJetColl].Jet_CombSvxP[JetInfo[iJetColl].nJet] = CombinedSvtxP;
-      JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet]  = CombinedSvtx;
-      JetInfo[iJetColl].Jet_RetCombSvxN[JetInfo[iJetColl].nJet] = RetCombinedSvtxN;
-      JetInfo[iJetColl].Jet_RetCombSvxP[JetInfo[iJetColl].nJet] = RetCombinedSvtxP;
-      JetInfo[iJetColl].Jet_RetCombSvx[JetInfo[iJetColl].nJet]  = RetCombinedSvtx;
-      JetInfo[iJetColl].Jet_CombCSVJP_N[JetInfo[iJetColl].nJet] = CombinedCSVJPN;
-      JetInfo[iJetColl].Jet_CombCSVJP_P[JetInfo[iJetColl].nJet] = CombinedCSVJPP;
-      JetInfo[iJetColl].Jet_CombCSVJP[JetInfo[iJetColl].nJet]  = CombinedCSVJP;
-      JetInfo[iJetColl].Jet_CombCSVSL_N[JetInfo[iJetColl].nJet] = CombinedCSVSLN;
-      JetInfo[iJetColl].Jet_CombCSVSL_P[JetInfo[iJetColl].nJet] = CombinedCSVSLP;
-      JetInfo[iJetColl].Jet_CombCSVSL[JetInfo[iJetColl].nJet]  = CombinedCSVSL;
-      JetInfo[iJetColl].Jet_CombCSVJPSL_N[JetInfo[iJetColl].nJet] = CombinedCSVJPSLN;
-      JetInfo[iJetColl].Jet_CombCSVJPSL_P[JetInfo[iJetColl].nJet] = CombinedCSVJPSLP;
-      JetInfo[iJetColl].Jet_CombCSVJPSL[JetInfo[iJetColl].nJet]  = CombinedCSVJPSL;
-      JetInfo[iJetColl].Jet_SimpIVF_HP[JetInfo[iJetColl].nJet]  = SimpleIVF_HP;
-      JetInfo[iJetColl].Jet_SimpIVF_HE[JetInfo[iJetColl].nJet]  = SimpleIVF_HE;
-      JetInfo[iJetColl].Jet_DoubIVF_HE[JetInfo[iJetColl].nJet]  = DoubleIVF_HE;
-      JetInfo[iJetColl].Jet_CombIVF[JetInfo[iJetColl].nJet]     = CombinedIVF;
-      JetInfo[iJetColl].Jet_CombIVF_P[JetInfo[iJetColl].nJet]   = CombinedIVF_P;
-      JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet]  = SoftMN;
-      JetInfo[iJetColl].Jet_SoftMuP[JetInfo[iJetColl].nJet]  = SoftMP;
-      JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet]   = SoftM;
-      JetInfo[iJetColl].Jet_SoftElN[JetInfo[iJetColl].nJet]  = SoftEN;
-      JetInfo[iJetColl].Jet_SoftElP[JetInfo[iJetColl].nJet]  = SoftEP;
-      JetInfo[iJetColl].Jet_SoftEl[JetInfo[iJetColl].nJet]   = SoftE;
+    // Old soft muon information for perfomance study safety
+    for (unsigned int leptIdx = 0; leptIdx < pjet->tagInfoSoftLepton("softMuon")->leptons(); ++leptIdx){
 
-      JetInfo[iJetColl].Jet_VtxCat[JetInfo[iJetColl].nJet] = JetVtxCategory;
+      int muIdx = matchMuon( pjet->tagInfoSoftLepton("softMuon")->lepton(leptIdx), muons );
+      if ( muIdx != -1 && muons[muIdx].isGlobalMuon() ) {
+        JetInfo[iJetColl].Muon_IdxJet[JetInfo[iJetColl].nMuon]   = JetInfo[iJetColl].nJet;
+        JetInfo[iJetColl].Muon_ptrel[JetInfo[iJetColl].nMuon]    = calculPtRel( *(pjet->tagInfoSoftLepton("softMuon")->lepton(leptIdx)), *pjet );
+        JetInfo[iJetColl].Muon_nTkHit[JetInfo[iJetColl].nMuon]   = muons[muIdx].innerTrack()->hitPattern().numberOfValidHits();
+        JetInfo[iJetColl].Muon_nPixHit[JetInfo[iJetColl].nMuon]  = muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits();
+        JetInfo[iJetColl].Muon_nOutHit[JetInfo[iJetColl].nMuon]  = muons[muIdx].innerTrack()->trackerExpectedHitsOuter().numberOfHits();
+        JetInfo[iJetColl].Muon_nMuHit[JetInfo[iJetColl].nMuon]   = muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits();
+        JetInfo[iJetColl].Muon_chi2[JetInfo[iJetColl].nMuon]     = muons[muIdx].globalTrack()->normalizedChi2();
+        JetInfo[iJetColl].Muon_chi2Tk[JetInfo[iJetColl].nMuon]   = muons[muIdx].innerTrack()->normalizedChi2();
+        JetInfo[iJetColl].Muon_pt[JetInfo[iJetColl].nMuon]       = muons[muIdx].pt();
+        JetInfo[iJetColl].Muon_eta[JetInfo[iJetColl].nMuon]      = muons[muIdx].eta();
+        JetInfo[iJetColl].Muon_phi[JetInfo[iJetColl].nMuon]      = muons[muIdx].phi();
+        JetInfo[iJetColl].Muon_ratio[JetInfo[iJetColl].nMuon]    = (pjet->tagInfoSoftLepton("softMuon")->properties(leptIdx).ratio);
+        JetInfo[iJetColl].Muon_deltaR[JetInfo[iJetColl].nMuon]   = (pjet->tagInfoSoftLepton("softMuon")->properties(leptIdx).deltaR);
 
-      std::vector<TrackIPTagInfo::TrackIPData>  ipdata = pjet->tagInfoTrackIP("impactParameter")->impactParameterData();
+        JetInfo[iJetColl].Muon_isGlobal[JetInfo[iJetColl].nMuon] = 1;
+        JetInfo[iJetColl].Muon_nMatched[JetInfo[iJetColl].nMuon] = muons[muIdx].numberOfMatches() ;
+        JetInfo[iJetColl].Muon_vz[JetInfo[iJetColl].nMuon]       = muons[muIdx].vz();
+        int mutkid = getMuonTk(muons[muIdx].innerTrack()->pt(), iJetColl);
+        JetInfo[iJetColl].Muon_TrackIdx[JetInfo[iJetColl].nMuon] = ( mutkid>=0 ? mutkid: -1 );
 
-      TrackRefVector tracks( pjet->tagInfoTrackIP("impactParameter")->selectedTracks() );
+        JetInfo[iJetColl].Muon_Proba[JetInfo[iJetColl].nMuon] = -100.;
+        if ( mutkid >= 0 ) {
+          JetInfo[iJetColl].Muon_Proba[JetInfo[iJetColl].nMuon] = JetInfo[iJetColl].Track_Proba[mutkid];
+        }
 
+        JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] = 0;
+        if ( useTrackHistory_ && !isData_ ) {
+          TrackCategories::Flags theFlagP = classifier_.evaluate( pjet->tagInfoSoftLepton("softMuon")->lepton(leptIdx) ).flags();
+          if ( theFlagP[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 1));
+          if ( theFlagP[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 2));
+          if ( theFlagP[TrackCategories::TauDecay] )           JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 3));
+          if ( theFlagP[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 4));
+          if ( theFlagP[TrackCategories::KsDecay] )            JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 5));
+          if ( theFlagP[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 6));
+          if ( theFlagP[TrackCategories::HadronicProcess] )    JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 7));
+          if ( theFlagP[TrackCategories::Fake] )               JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 8));
+          if ( theFlagP[TrackCategories::SharedInnerHits] )    JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 9));
+        }
 
-      std::vector<std::size_t> indexes( sortedIndexes(ipdata) );
+        //---------------------------------
+        // calculate IP/s of muons' tracks
+        //---------------------------------
+        reco::TransientTrack tt = trackBuilder->build(muons[muIdx].innerTrack());
+        GlobalVector direction(pjet->px(), pjet->py(), pjet->pz());
+        Measurement1D ip   = IPTools::signedImpactParameter3D(tt, direction, (*primaryVertex)[0]).second;
+        Measurement1D ip2d = IPTools::signedTransverseImpactParameter(tt, direction, (*primaryVertex)[0]).second;
 
-      TrackCategories::Flags flags1P;
-      TrackCategories::Flags flags2P;
-      TrackCategories::Flags flags3P;
-      TrackCategories::Flags flags1N;
-      TrackCategories::Flags flags2N;
-      TrackCategories::Flags flags3N;
-      int idSize = 0;
+        JetInfo[iJetColl].Muon_IP[JetInfo[iJetColl].nMuon]   = ip.value();
+        JetInfo[iJetColl].Muon_IP2D[JetInfo[iJetColl].nMuon] = ip2d.value();
+        JetInfo[iJetColl].Muon_IPsig[JetInfo[iJetColl].nMuon]   = (ip.value())/(ip.error());
+        JetInfo[iJetColl].Muon_IP2Dsig[JetInfo[iJetColl].nMuon] = (ip2d.value())/(ip2d.error());
 
-      if ( useTrackHistory_ && indexes.size() != 0 && !isData_ ) {
-
-        idSize = indexes.size();
-        flags1P = classifier_.evaluate( tracks[indexes[0]] ).flags();
-        if(idSize > 1) flags2P = classifier_.evaluate( tracks[indexes[1]] ).flags();
-        if(idSize > 2) flags3P = classifier_.evaluate( tracks[indexes[2]] ).flags();
-        flags1N = classifier_.evaluate( tracks[indexes[idSize-1]] ).flags();
-        if(idSize > 1) flags2N = classifier_.evaluate( tracks[indexes[idSize-2]] ).flags();
-        if(idSize > 2) flags3N = classifier_.evaluate( tracks[indexes[idSize-3]] ).flags();
+        ++JetInfo[iJetColl].nMuon;
       }
+    }
 
-      JetInfo[iJetColl].Jet_Ip2P[JetInfo[iJetColl].nJet]   = pjet->bDiscriminator(trackCHEBJetTags_.c_str());
-      JetInfo[iJetColl].Jet_Ip2N[JetInfo[iJetColl].nJet]   = pjet->bDiscriminator(trackCNegHEBJetTags_.c_str());
+    float SoftE  = pjet->bDiscriminator(softPFElectronBJetTags_.c_str());
+    float SoftEN = pjet->bDiscriminator(softPFElectronNegBJetTags_.c_str());
+    float SoftEP = pjet->bDiscriminator(softPFElectronPosBJetTags_.c_str());
 
-      JetInfo[iJetColl].Jet_Ip3P[JetInfo[iJetColl].nJet]   = pjet->bDiscriminator(trackCHPBJetTags_.c_str());
-      JetInfo[iJetColl].Jet_Ip3N[JetInfo[iJetColl].nJet]   = pjet->bDiscriminator(trackCNegHPBJetTags_.c_str());
+    // PFElectron information
+    for (unsigned int leptIdx = 0; leptIdx < pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->leptons(); ++leptIdx) {
 
-      //*****************************************************************
-      //get track histories for 1st, 2nd and 3rd track (TC)
-      //*****************************************************************
-      JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] = 0;
-      JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] = 0;
-      JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] = 0;
+      JetInfo[iJetColl].PFElectron_IdxJet[JetInfo[iJetColl].nPFElectron]    = JetInfo[iJetColl].nJet;
+      JetInfo[iJetColl].PFElectron_pt[JetInfo[iJetColl].nPFElectron]        = pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->lepton(leptIdx)->pt();
+      JetInfo[iJetColl].PFElectron_eta[JetInfo[iJetColl].nPFElectron]       = pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->lepton(leptIdx)->eta();
+      JetInfo[iJetColl].PFElectron_phi[JetInfo[iJetColl].nPFElectron]       = pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->lepton(leptIdx)->phi();
+      JetInfo[iJetColl].PFElectron_ptrel[JetInfo[iJetColl].nPFElectron]     = calculPtRel( *(pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->lepton(leptIdx)), *pjet );
+      JetInfo[iJetColl].PFElectron_ratio[JetInfo[iJetColl].nPFElectron]     = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).ratio);
+      JetInfo[iJetColl].PFElectron_ratioRel[JetInfo[iJetColl].nPFElectron]  = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).ratioRel);
+      JetInfo[iJetColl].PFElectron_deltaR[JetInfo[iJetColl].nPFElectron]    = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).deltaR);
+      JetInfo[iJetColl].PFElectron_IPsig[JetInfo[iJetColl].nPFElectron]     = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).sip3d);
+      JetInfo[iJetColl].PFElectron_mva_e_pi[JetInfo[iJetColl].nPFElectron]  = -999.;//pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).mva_e_pi;
 
-      // Track Histosry
-      if ( useTrackHistory_ && indexes.size()!=0 && !isData_ ) {
-        if ( flags1P[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 1));
-        if ( flags1P[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 2));
-        if ( flags1P[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 3));
-        if ( flags1P[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 4));
-        if ( flags1P[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 5));
-        if ( flags1P[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 6));
-        if ( flags1P[TrackCategories::HadronicProcess] )    JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 7));
-        if ( flags1P[TrackCategories::Fake] )	          JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 8));
-        if ( flags1P[TrackCategories::SharedInnerHits] )	  JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 9));
-        if ( idSize > 1 ) {
-          if ( flags2P[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 1));
-          if ( flags2P[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 2));
-          if ( flags2P[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 3));
-          if ( flags2P[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 4));
-          if ( flags2P[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 5));
-          if ( flags2P[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 6));
-          if ( flags2P[TrackCategories::HadronicProcess] )    JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 7));
-          if ( flags2P[TrackCategories::Fake] )	            JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 8));
-          if ( flags2P[TrackCategories::SharedInnerHits] )    JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 9));
-        }
-        if ( idSize > 2 ) {
-          if ( flags3P[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 1));
-          if ( flags3P[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 2));
-          if ( flags3P[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 3));
-          if ( flags3P[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 4));
-          if ( flags3P[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 5));
-          if ( flags3P[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 6));
-          if ( flags3P[TrackCategories::HadronicProcess] )    JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 7));
-          if ( flags3P[TrackCategories::Fake] )	            JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 8));
-          if ( flags3P[TrackCategories::SharedInnerHits] )    JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 9));
-        }
-        if ( flags1N[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 1));
-        if ( flags1N[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 2));
-        if ( flags1N[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 3));
-        if ( flags1N[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 4));
-        if ( flags1N[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 5));
-        if ( flags1N[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 6));
-        if ( flags1N[TrackCategories::HadronicProcess] )    JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 7));
-        if ( flags1N[TrackCategories::Fake] )	          JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 8));
-        if ( flags1N[TrackCategories::SharedInnerHits] )	  JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 9));
-        if ( idSize > 1 ) {
-          if ( flags2N[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 1));
-          if ( flags2N[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 2));
-          if ( flags2N[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 3));
-          if ( flags2N[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 4));
-          if ( flags2N[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 5));
-          if ( flags2N[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 6));
-          if ( flags2N[TrackCategories::HadronicProcess] )    JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 7));
-          if ( flags2N[TrackCategories::Fake] )	            JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 8));
-          if ( flags2N[TrackCategories::SharedInnerHits] )    JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 9));
-        }
-        if ( idSize > 2 ) {
-          if ( flags3N[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 1));
-          if ( flags3N[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 2));
-          if ( flags3N[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 3));
-          if ( flags3N[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 4));
-          if ( flags3N[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 5));
-          if ( flags3N[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 6));
-          if ( flags3N[TrackCategories::HadronicProcess] )    JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 7));
-          if ( flags3N[TrackCategories::Fake] )	            JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 8));
-          if ( flags3N[TrackCategories::SharedInnerHits] )    JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 9));
-        }
+      ++JetInfo[iJetColl].nPFElectron;
+    }
+
+    // Jet information
+    JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet]   = ProbaN;
+    JetInfo[iJetColl].Jet_ProbaP[JetInfo[iJetColl].nJet]   = ProbaP;
+    JetInfo[iJetColl].Jet_Proba[JetInfo[iJetColl].nJet]    = Proba;
+    JetInfo[iJetColl].Jet_BprobN[JetInfo[iJetColl].nJet]   = BprobN;
+    JetInfo[iJetColl].Jet_BprobP[JetInfo[iJetColl].nJet]   = BprobP;
+    JetInfo[iJetColl].Jet_Bprob[JetInfo[iJetColl].nJet]    = Bprob;
+    JetInfo[iJetColl].Jet_SvxN[JetInfo[iJetColl].nJet]     = SvtxN;
+    JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet]      = Svtx;
+    JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet]   = SvtxNHP;
+    JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet]    = SvtxHP;
+    JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] = CombinedSvtxN;
+    JetInfo[iJetColl].Jet_CombSvxP[JetInfo[iJetColl].nJet] = CombinedSvtxP;
+    JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet]  = CombinedSvtx;
+    JetInfo[iJetColl].Jet_RetCombSvxN[JetInfo[iJetColl].nJet] = RetCombinedSvtxN;
+    JetInfo[iJetColl].Jet_RetCombSvxP[JetInfo[iJetColl].nJet] = RetCombinedSvtxP;
+    JetInfo[iJetColl].Jet_RetCombSvx[JetInfo[iJetColl].nJet]  = RetCombinedSvtx;
+    JetInfo[iJetColl].Jet_CombCSVJP_N[JetInfo[iJetColl].nJet] = CombinedCSVJPN;
+    JetInfo[iJetColl].Jet_CombCSVJP_P[JetInfo[iJetColl].nJet] = CombinedCSVJPP;
+    JetInfo[iJetColl].Jet_CombCSVJP[JetInfo[iJetColl].nJet]  = CombinedCSVJP;
+    JetInfo[iJetColl].Jet_CombCSVSL_N[JetInfo[iJetColl].nJet] = CombinedCSVSLN;
+    JetInfo[iJetColl].Jet_CombCSVSL_P[JetInfo[iJetColl].nJet] = CombinedCSVSLP;
+    JetInfo[iJetColl].Jet_CombCSVSL[JetInfo[iJetColl].nJet]  = CombinedCSVSL;
+    JetInfo[iJetColl].Jet_CombCSVJPSL_N[JetInfo[iJetColl].nJet] = CombinedCSVJPSLN;
+    JetInfo[iJetColl].Jet_CombCSVJPSL_P[JetInfo[iJetColl].nJet] = CombinedCSVJPSLP;
+    JetInfo[iJetColl].Jet_CombCSVJPSL[JetInfo[iJetColl].nJet]  = CombinedCSVJPSL;
+    JetInfo[iJetColl].Jet_SimpIVF_HP[JetInfo[iJetColl].nJet]  = SimpleIVF_HP;
+    JetInfo[iJetColl].Jet_SimpIVF_HE[JetInfo[iJetColl].nJet]  = SimpleIVF_HE;
+    JetInfo[iJetColl].Jet_DoubIVF_HE[JetInfo[iJetColl].nJet]  = DoubleIVF_HE;
+    JetInfo[iJetColl].Jet_CombIVF[JetInfo[iJetColl].nJet]     = CombinedIVF;
+    JetInfo[iJetColl].Jet_CombIVF_P[JetInfo[iJetColl].nJet]   = CombinedIVF_P;
+    JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet]  = SoftMN;
+    JetInfo[iJetColl].Jet_SoftMuP[JetInfo[iJetColl].nJet]  = SoftMP;
+    JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet]   = SoftM;
+    JetInfo[iJetColl].Jet_SoftElN[JetInfo[iJetColl].nJet]  = SoftEN;
+    JetInfo[iJetColl].Jet_SoftElP[JetInfo[iJetColl].nJet]  = SoftEP;
+    JetInfo[iJetColl].Jet_SoftEl[JetInfo[iJetColl].nJet]   = SoftE;
+
+    JetInfo[iJetColl].Jet_VtxCat[JetInfo[iJetColl].nJet] = JetVtxCategory;
+
+    std::vector<TrackIPTagInfo::TrackIPData>  ipdata = pjet->tagInfoTrackIP("impactParameter")->impactParameterData();
+
+    TrackRefVector tracks( pjet->tagInfoTrackIP("impactParameter")->selectedTracks() );
+
+
+    std::vector<std::size_t> indexes( sortedIndexes(ipdata) );
+
+    TrackCategories::Flags flags1P;
+    TrackCategories::Flags flags2P;
+    TrackCategories::Flags flags3P;
+    TrackCategories::Flags flags1N;
+    TrackCategories::Flags flags2N;
+    TrackCategories::Flags flags3N;
+    int idSize = 0;
+
+    if ( useTrackHistory_ && indexes.size() != 0 && !isData_ ) {
+
+      idSize = indexes.size();
+      flags1P = classifier_.evaluate( tracks[indexes[0]] ).flags();
+      if(idSize > 1) flags2P = classifier_.evaluate( tracks[indexes[1]] ).flags();
+      if(idSize > 2) flags3P = classifier_.evaluate( tracks[indexes[2]] ).flags();
+      flags1N = classifier_.evaluate( tracks[indexes[idSize-1]] ).flags();
+      if(idSize > 1) flags2N = classifier_.evaluate( tracks[indexes[idSize-2]] ).flags();
+      if(idSize > 2) flags3N = classifier_.evaluate( tracks[indexes[idSize-3]] ).flags();
+    }
+
+    JetInfo[iJetColl].Jet_Ip2P[JetInfo[iJetColl].nJet]   = pjet->bDiscriminator(trackCHEBJetTags_.c_str());
+    JetInfo[iJetColl].Jet_Ip2N[JetInfo[iJetColl].nJet]   = pjet->bDiscriminator(trackCNegHEBJetTags_.c_str());
+
+    JetInfo[iJetColl].Jet_Ip3P[JetInfo[iJetColl].nJet]   = pjet->bDiscriminator(trackCHPBJetTags_.c_str());
+    JetInfo[iJetColl].Jet_Ip3N[JetInfo[iJetColl].nJet]   = pjet->bDiscriminator(trackCNegHPBJetTags_.c_str());
+
+    //*****************************************************************
+    //get track histories for 1st, 2nd and 3rd track (TC)
+    //*****************************************************************
+    JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] = 0;
+    JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] = 0;
+    JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] = 0;
+
+    // Track Histosry
+    if ( useTrackHistory_ && indexes.size()!=0 && !isData_ ) {
+      if ( flags1P[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 1));
+      if ( flags1P[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 2));
+      if ( flags1P[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 3));
+      if ( flags1P[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 4));
+      if ( flags1P[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 5));
+      if ( flags1P[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 6));
+      if ( flags1P[TrackCategories::HadronicProcess] )    JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 7));
+      if ( flags1P[TrackCategories::Fake] )	          JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 8));
+      if ( flags1P[TrackCategories::SharedInnerHits] )	  JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 9));
+      if ( idSize > 1 ) {
+        if ( flags2P[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 1));
+        if ( flags2P[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 2));
+        if ( flags2P[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 3));
+        if ( flags2P[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 4));
+        if ( flags2P[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 5));
+        if ( flags2P[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 6));
+        if ( flags2P[TrackCategories::HadronicProcess] )    JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 7));
+        if ( flags2P[TrackCategories::Fake] )	            JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 8));
+        if ( flags2P[TrackCategories::SharedInnerHits] )    JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 9));
       }
-
-      //*****************************************************************
-      //get track Histosries of tracks in jets (for Jet Proba)
-      //*****************************************************************
-      JetInfo[iJetColl].Jet_histJet[JetInfo[iJetColl].nJet] = 0;
-
-      if(useTrackHistory_ && !isData_){
-        TrackRefVector jetProbTracks( pjet->tagInfoTrackIP("impactParameter")->selectedTracks() );
-
-        cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
-        can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
-
-        for (unsigned int i=0; i<jetProbTracks.size(); ++i) {
-          reco::TrackIPTagInfo::TrackIPData ip = (pjet->tagInfoTrackIP("impactParameter")->impactParameterData())[i];
-
-          if ( ip.ip3d.significance() > 0 ) {
-            TrackCategories::Flags theFlag = classifier_.evaluate( jetProbTracks[i] ).flags();
-            if ( theFlag[TrackCategories::BWeakDecay] )	      cap0 = 1;
-            if ( theFlag[TrackCategories::CWeakDecay] )	      cap1 = 1;
-            if ( theFlag[TrackCategories::TauDecay] )	      cap2 = 1;
-            if ( theFlag[TrackCategories::ConversionsProcess] ) cap3 = 1;
-            if ( theFlag[TrackCategories::KsDecay] )	      cap4 = 1;
-            if ( theFlag[TrackCategories::LambdaDecay] )        cap5 = 1;
-            if ( theFlag[TrackCategories::HadronicProcess] )    cap6 = 1;
-            if ( theFlag[TrackCategories::Fake] ) 	      cap7 = 1;
-            if ( theFlag[TrackCategories::SharedInnerHits] )    cap8 = 1;
-          }
-          else {
-            TrackCategories::Flags theFlag = classifier_.evaluate( jetProbTracks[i] ).flags();
-            if ( theFlag[TrackCategories::BWeakDecay] )	      can0 = 2;
-            if ( theFlag[TrackCategories::CWeakDecay] )	      can1 = 2;
-            if ( theFlag[TrackCategories::TauDecay] )	      can2 = 2;
-            if ( theFlag[TrackCategories::ConversionsProcess] ) can3 = 2;
-            if ( theFlag[TrackCategories::KsDecay] )	      can4 = 2;
-            if ( theFlag[TrackCategories::LambdaDecay] )        can5 = 2;
-            if ( theFlag[TrackCategories::HadronicProcess] )    can6 = 2;
-            if ( theFlag[TrackCategories::Fake] ) 	      can7 = 2;
-            if ( theFlag[TrackCategories::SharedInnerHits] )    can8 = 2;
-          }
-        }
-        JetInfo[iJetColl].Jet_histJet[JetInfo[iJetColl].nJet] =  cap0+can0 + (cap1+can1)*10 + (cap2+can2)*100
-          + (cap3+can3)*1000     + (cap4+can4)*10000
-          + (cap5+can5)*100000   + (cap6+can6)*1000000
-          + (cap7+can7)*10000000 + (cap8+can8)*100000000;
+      if ( idSize > 2 ) {
+        if ( flags3P[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 1));
+        if ( flags3P[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 2));
+        if ( flags3P[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 3));
+        if ( flags3P[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 4));
+        if ( flags3P[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 5));
+        if ( flags3P[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 6));
+        if ( flags3P[TrackCategories::HadronicProcess] )    JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 7));
+        if ( flags3P[TrackCategories::Fake] )	            JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 8));
+        if ( flags3P[TrackCategories::SharedInnerHits] )    JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 9));
       }
+      if ( flags1N[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 1));
+      if ( flags1N[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 2));
+      if ( flags1N[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 3));
+      if ( flags1N[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 4));
+      if ( flags1N[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 5));
+      if ( flags1N[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 6));
+      if ( flags1N[TrackCategories::HadronicProcess] )    JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 7));
+      if ( flags1N[TrackCategories::Fake] )	          JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 8));
+      if ( flags1N[TrackCategories::SharedInnerHits] )	  JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 9));
+      if ( idSize > 1 ) {
+        if ( flags2N[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 1));
+        if ( flags2N[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 2));
+        if ( flags2N[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 3));
+        if ( flags2N[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 4));
+        if ( flags2N[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 5));
+        if ( flags2N[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 6));
+        if ( flags2N[TrackCategories::HadronicProcess] )    JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 7));
+        if ( flags2N[TrackCategories::Fake] )	            JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 8));
+        if ( flags2N[TrackCategories::SharedInnerHits] )    JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 9));
+      }
+      if ( idSize > 2 ) {
+        if ( flags3N[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 1));
+        if ( flags3N[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 2));
+        if ( flags3N[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 3));
+        if ( flags3N[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 4));
+        if ( flags3N[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 5));
+        if ( flags3N[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 6));
+        if ( flags3N[TrackCategories::HadronicProcess] )    JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 7));
+        if ( flags3N[TrackCategories::Fake] )	            JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 8));
+        if ( flags3N[TrackCategories::SharedInnerHits] )    JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 9));
+      }
+    }
 
-      //*****************************************************************
-      //get track Histories  associated to sec. vertex (for simple SV)
-      //*****************************************************************
-      JetInfo[iJetColl].Jet_histSvx[JetInfo[iJetColl].nJet] = 0;
-      JetInfo[iJetColl].Jet_nFirstSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
-      JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]  = pjet->tagInfoSecondaryVertex("secondaryVertex")->nVertices();
+    //*****************************************************************
+    //get track Histosries of tracks in jets (for Jet Proba)
+    //*****************************************************************
+    JetInfo[iJetColl].Jet_histJet[JetInfo[iJetColl].nJet] = 0;
 
-      if ( produceJetProbaTree_  &&  JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]> 0) {
-
-        JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).x();
-        JetInfo[iJetColl].SV_y[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).y();
-        JetInfo[iJetColl].SV_z[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).z();
-        JetInfo[iJetColl].SV_ex[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).xError();
-        JetInfo[iJetColl].SV_ey[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).yError();
-        JetInfo[iJetColl].SV_ez[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).zError();
-        JetInfo[iJetColl].SV_chi2[JetInfo[iJetColl].nSV] = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).chi2();
-        JetInfo[iJetColl].SV_ndf[JetInfo[iJetColl].nSV]  = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).ndof();
-
-        //cout << "pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).ndof() " << pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).ndof() << endl;
-
-        JetInfo[iJetColl].SV_flight[JetInfo[iJetColl].nSV]	  = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(0).value();
-        JetInfo[iJetColl].SV_flightErr[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(0).error();
-        JetInfo[iJetColl].SV_flight2D[JetInfo[iJetColl].nSV]	  = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(0, true).value();
-        JetInfo[iJetColl].SV_flight2DErr[JetInfo[iJetColl].nSV] = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(0, true).error();
-        JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = pjet->tagInfoSecondaryVertex("secondaryVertex")->nVertexTracks();
-        JetInfo[iJetColl].SV_nTrk_firstVxt[JetInfo[iJetColl].nSV] =  pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).tracksSize();
-
-        // ------------------------added by Camille ---------------------------------------------------------------------------------------//
-
-        edm::RefToBase<Jet> jet = pjet->tagInfoTrackIP("impactParameter")->jet();
-
-        std::vector<const reco::BaseTagInfo*>  baseTagInfos;
-        JetTagComputer::TagInfoHelper helper(baseTagInfos);
-        baseTagInfos.push_back( pjet->tagInfoTrackIP("impactParameter") );
-        baseTagInfos.push_back( pjet->tagInfoSecondaryVertex("secondaryVertex") );
-
-        TaggingVariableList vars = computer->taggingVariables(helper);
-        if(vars.checkTag(reco::btau::vertexEnergyRatio)) JetInfo[iJetColl].SV_energy_ratio[JetInfo[iJetColl].nSV] = ( vars.get(reco::btau::vertexEnergyRatio) );
-        else JetInfo[iJetColl].SV_energy_ratio[JetInfo[iJetColl].nSV] = ( -9999 );
-
-        if(vars.checkTag(reco::btau::vertexJetDeltaR)) JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV] = (  vars.get( reco::btau::vertexJetDeltaR) );
-        else JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV] = ( -9999 );
-
-        if(vars.checkTag(reco::btau::trackSip3dSigAboveCharm) ) JetInfo[iJetColl].SV_aboveC[JetInfo[iJetColl].nSV] = (  vars.get( reco::btau::trackSip3dSigAboveCharm ));
-        else JetInfo[iJetColl].SV_aboveC[JetInfo[iJetColl].nSV] = (  -9999 );
-
-        if(vars.checkTag(reco::btau::vertexMass)) JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV] = ( vars.get( reco::btau::vertexMass));
-        else  JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV] = ( -9999 );
-
-        Int_t totcharge=0;
-        TrackKinematics vertexKinematics;
-
-        const Vertex &vertex = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0);
-
-        Bool_t hasRefittedTracks = vertex.hasRefittedTracks();
-
-        TrackRefVector tracks = pjet->tagInfoSecondaryVertex("secondaryVertex")->vertexTracks(0);
-        for(TrackRefVector::const_iterator track = tracks.begin();
-            track != tracks.end(); ++track) {
-          Double_t w = pjet->tagInfoSecondaryVertex("secondaryVertex")->trackWeight(0, *track);
-          if (w < 0.5)
-            continue;
-          if (hasRefittedTracks) {
-            Track actualTrack = vertex.refittedTrack(*track);
-            vertexKinematics.add(actualTrack, w);
-            totcharge+=actualTrack.charge();
-          }
-          else {
-            vertexKinematics.add(**track, w);
-            const reco::Track& mytrack = **track;
-            totcharge+=mytrack.charge();
-          }
-        }
-
-
-        math::XYZVector jetDir = jet->momentum().Unit();
-
-        Bool_t useTrackWeights = true;
-        math::XYZTLorentzVector vertexSum = useTrackWeights
-          ? vertexKinematics.weightedVectorSum()
-          : vertexKinematics.vectorSum();
-
-        math::XYZTLorentzVector flightDir( pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDirection(0).x(), pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDirection(0).y(), pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDirection(0).z(), 0  );
-        JetInfo[iJetColl].SV_deltaR_sum_jet[JetInfo[iJetColl].nSV] = ( Geom::deltaR(vertexSum, jetDir) );
-        JetInfo[iJetColl].SV_deltaR_sum_dir[JetInfo[iJetColl].nSV] = ( Geom::deltaR( flightDir, vertexSum ) );
-        JetInfo[iJetColl].SV_vtx_pt[JetInfo[iJetColl].nSV] = vertex.p4().pt();
-        JetInfo[iJetColl].SV_vtx_eta[JetInfo[iJetColl].nSV] = vertex.p4().eta();
-        JetInfo[iJetColl].SV_vtx_phi[JetInfo[iJetColl].nSV] = vertex.p4().phi();
-
-
-
-        jetVertex = (math::XYZVector(jet->vx(),jet->vy(),jet->vz()));
-
-        Line::PositionType pos(GlobalPoint(vertex.p4().x(),vertex.p4().y(),vertex.p4().z()));
-        Line::DirectionType dir(GlobalVector(flightDir.px(),flightDir.py(),flightDir.pz()));
-        Line trackline(pos,dir);
-        // get the Jet  line
-        Line::PositionType pos2(GlobalPoint(jetVertex.x(),jetVertex.y(),jetVertex.z()));
-        Line::DirectionType dir2(GlobalVector(jetDir.x(),jetDir.y(),jetDir.z()));
-        Line jetline(pos2,dir2);
-        // now compute the distance between the two lines
-        JetInfo[iJetColl].SV_vtxDistJetAxis[JetInfo[iJetColl].nSV] = (jetline.distance(trackline)).mag();
-
-
-        // total charge at the secondary vertex
-        JetInfo[iJetColl].SV_totCharge[JetInfo[iJetColl].nSV]=totcharge;
-        // ------------------------end added ---------------------------------------------------------------------------------------//
-
-
-        setTracksPV( &pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0), false, iJetColl );
-        ++JetInfo[iJetColl].nSV;
-      } //// if produceJetProbaTree_
-      JetInfo[iJetColl].Jet_nLastSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
+    if(useTrackHistory_ && !isData_){
+      TrackRefVector jetProbTracks( pjet->tagInfoTrackIP("impactParameter")->selectedTracks() );
 
       cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
       can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
 
-      TrackRefVector  svxPostracks( pjet->tagInfoSecondaryVertex("secondaryVertex")->vertexTracks(0) );
+      for (unsigned int i=0; i<jetProbTracks.size(); ++i) {
+        reco::TrackIPTagInfo::TrackIPData ip = (pjet->tagInfoTrackIP("impactParameter")->impactParameterData())[i];
 
-      if ( useTrackHistory_ && !isData_ ) {
-        for (unsigned int i=0; i<svxPostracks.size(); ++i) {
-          TrackCategories::Flags theFlag = classifier_.evaluate( svxPostracks[i] ).flags();
-          if ( theFlag[TrackCategories::BWeakDecay] )         cap0 = 1;
-          if ( theFlag[TrackCategories::CWeakDecay] )         cap1 = 1;
-          if ( theFlag[TrackCategories::TauDecay] )           cap2 = 1;
+        if ( ip.ip3d.significance() > 0 ) {
+          TrackCategories::Flags theFlag = classifier_.evaluate( jetProbTracks[i] ).flags();
+          if ( theFlag[TrackCategories::BWeakDecay] )	      cap0 = 1;
+          if ( theFlag[TrackCategories::CWeakDecay] )	      cap1 = 1;
+          if ( theFlag[TrackCategories::TauDecay] )	      cap2 = 1;
           if ( theFlag[TrackCategories::ConversionsProcess] ) cap3 = 1;
-          if ( theFlag[TrackCategories::KsDecay] )            cap4 = 1;
+          if ( theFlag[TrackCategories::KsDecay] )	      cap4 = 1;
           if ( theFlag[TrackCategories::LambdaDecay] )        cap5 = 1;
           if ( theFlag[TrackCategories::HadronicProcess] )    cap6 = 1;
-          if ( theFlag[TrackCategories::Fake] )	            cap7 = 1;
+          if ( theFlag[TrackCategories::Fake] ) 	      cap7 = 1;
           if ( theFlag[TrackCategories::SharedInnerHits] )    cap8 = 1;
         }
-      }
-
-      TrackRefVector svxNegtracks( pjet->tagInfoSecondaryVertex("secondaryVertexNegative")->vertexTracks(0) );
-
-      if ( useTrackHistory_ && !isData_ ) {
-        for (unsigned int i=0; i<svxNegtracks.size(); ++i) {
-          TrackCategories::Flags theFlag = classifier_.evaluate( svxNegtracks[i] ).flags();
-          if ( theFlag[TrackCategories::BWeakDecay] )         can0 = 2;
-          if ( theFlag[TrackCategories::CWeakDecay] )         can1 = 2;
-          if ( theFlag[TrackCategories::TauDecay] )           can2 = 2;
+        else {
+          TrackCategories::Flags theFlag = classifier_.evaluate( jetProbTracks[i] ).flags();
+          if ( theFlag[TrackCategories::BWeakDecay] )	      can0 = 2;
+          if ( theFlag[TrackCategories::CWeakDecay] )	      can1 = 2;
+          if ( theFlag[TrackCategories::TauDecay] )	      can2 = 2;
           if ( theFlag[TrackCategories::ConversionsProcess] ) can3 = 2;
-          if ( theFlag[TrackCategories::KsDecay] )            can4 = 2;
+          if ( theFlag[TrackCategories::KsDecay] )	      can4 = 2;
           if ( theFlag[TrackCategories::LambdaDecay] )        can5 = 2;
           if ( theFlag[TrackCategories::HadronicProcess] )    can6 = 2;
-          if ( theFlag[TrackCategories::Fake] )	            can7 = 2;
+          if ( theFlag[TrackCategories::Fake] ) 	      can7 = 2;
           if ( theFlag[TrackCategories::SharedInnerHits] )    can8 = 2;
         }
-        JetInfo[iJetColl].Jet_histSvx[JetInfo[iJetColl].nJet] =  cap0+can0 + (cap1+can1)*10 + (cap2+can2)*100
-          + (cap3+can3)*1000     + (cap4+can4)*10000
-          + (cap5+can5)*100000   + (cap6+can6)*1000000
-          + (cap7+can7)*10000000 + (cap8+can8)*100000000;
       }
+      JetInfo[iJetColl].Jet_histJet[JetInfo[iJetColl].nJet] =  cap0+can0 + (cap1+can1)*10 + (cap2+can2)*100
+        + (cap3+can3)*1000     + (cap4+can4)*10000
+        + (cap5+can5)*100000   + (cap6+can6)*1000000
+        + (cap7+can7)*10000000 + (cap8+can8)*100000000;
+    }
 
-      float SVmass = 0.;
-      if ( pjet->tagInfoSecondaryVertex("secondaryVertex")->nVertices() > 0) {
-        SVmass = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).p4().mass();
-      }
-      JetInfo[iJetColl].Jet_SvxMass[JetInfo[iJetColl].nJet] = SVmass;
+    //*****************************************************************
+    //get track Histories  associated to sec. vertex (for simple SV)
+    //*****************************************************************
+    JetInfo[iJetColl].Jet_histSvx[JetInfo[iJetColl].nJet] = 0;
+    JetInfo[iJetColl].Jet_nFirstSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
+    JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]  = pjet->tagInfoSecondaryVertex("secondaryVertex")->nVertices();
 
-      //*********************************
-      // Jet analysis
+    if ( produceJetProbaTree_  &&  JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]> 0) {
 
-      Histos[iJetColl]->hData_All_NTracks->Fill( ntagtracks ) ;
-      Histos[iJetColl]->hData_All_JetPt->Fill( ptjet );
-      Histos[iJetColl]->hData_All_JetEta->Fill( etajet );
+      JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).x();
+      JetInfo[iJetColl].SV_y[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).y();
+      JetInfo[iJetColl].SV_z[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).z();
+      JetInfo[iJetColl].SV_ex[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).xError();
+      JetInfo[iJetColl].SV_ey[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).yError();
+      JetInfo[iJetColl].SV_ez[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).zError();
+      JetInfo[iJetColl].SV_chi2[JetInfo[iJetColl].nSV] = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).chi2();
+      JetInfo[iJetColl].SV_ndf[JetInfo[iJetColl].nSV]  = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).ndof();
 
-      //*****************************************************************
-      //define positive and negative tags
-      //*****************************************************************
-      float varpos = -1000.;
-      float varneg = -1000.;
+      //cout << "pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).ndof() " << pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).ndof() << endl;
 
-      if ( selTagger_ == 0 ) {       // jet proba
-        if ( ProbaP > 0 ) varpos = 20.*ProbaP;
-        if ( ProbaN > 0 ) varneg = 20.*ProbaN;
-      }
-      else if ( selTagger_ == 2 ) {     // TC High Eff.
-        if ( JetInfo[iJetColl].Jet_Ip2P[JetInfo[iJetColl].nJet] > 0. ) varpos = JetInfo[iJetColl].Jet_Ip2P[JetInfo[iJetColl].nJet];
-        if ( JetInfo[iJetColl].Jet_Ip2N[JetInfo[iJetColl].nJet] > 0. ) varneg = JetInfo[iJetColl].Jet_Ip2N[JetInfo[iJetColl].nJet];
-      }
-      else if ( selTagger_ == 3 ) {     // TC High Pure.
-        if ( JetInfo[iJetColl].Jet_Ip3P[JetInfo[iJetColl].nJet] > 0. ) varpos = JetInfo[iJetColl].Jet_Ip3P[JetInfo[iJetColl].nJet];
-        if ( JetInfo[iJetColl].Jet_Ip3N[JetInfo[iJetColl].nJet] > 0. ) varneg = JetInfo[iJetColl].Jet_Ip3N[JetInfo[iJetColl].nJet];
-      }
-      else if ( selTagger_ == 4 ) {    // SSVHE
-        if  (JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet] > 1)   varpos =  10.*JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet] - 10.;
-        if  (JetInfo[iJetColl].Jet_SvxN[JetInfo[iJetColl].nJet] < -1) varneg = -10.*JetInfo[iJetColl].Jet_SvxN[JetInfo[iJetColl].nJet] - 10.;
-      }
-      else if ( selTagger_ == 5 ) {    // SV combined
-        if  (JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet] > 0)  varpos = 50.*JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet];
-        if  (JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] > 0) varneg = 50.*JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet];
-      }
-      else if ( selTagger_ == 6 ) {    // soft muon ptrel
-        if  ( JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet]  > 0) varpos =  5*JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet];
-        if  ( JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet] < 0) varneg = -5*JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet];
-      }
-      else if ( selTagger_ == 7 ) {    // SSVHP
-        if  (JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet] > 1)   varpos =  10.*JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet] - 10.;
-        if  (JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet] < -1) varneg = -10.*JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet] - 10.;
-      }
+      JetInfo[iJetColl].SV_flight[JetInfo[iJetColl].nSV]	  = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(0).value();
+      JetInfo[iJetColl].SV_flightErr[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(0).error();
+      JetInfo[iJetColl].SV_flight2D[JetInfo[iJetColl].nSV]	  = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(0, true).value();
+      JetInfo[iJetColl].SV_flight2DErr[JetInfo[iJetColl].nSV] = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(0, true).error();
+      JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = pjet->tagInfoSecondaryVertex("secondaryVertex")->nVertexTracks();
+      JetInfo[iJetColl].SV_nTrk_firstVxt[JetInfo[iJetColl].nSV] =  pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).tracksSize();
 
-      Histos[iJetColl]->hData_NTracks->Fill( ntagtracks ) ;
-      Histos[iJetColl]->hData_JetPt->Fill( ptjet );
-      Histos[iJetColl]->hData_JetEta->Fill( etajet );
+      // ------------------------added by Camille ---------------------------------------------------------------------------------------//
 
-      //*********************************
-      // Tagging
+      edm::RefToBase<Jet> jet = pjet->tagInfoTrackIP("impactParameter")->jet();
 
-      if ( varneg > 0 ) Histos[iJetColl]->hData_Tagger->Fill(-varneg );
-      if ( varpos > 0 ) Histos[iJetColl]->hData_Tagger->Fill( varpos );
+      std::vector<const reco::BaseTagInfo*>  baseTagInfos;
+      JetTagComputer::TagInfoHelper helper(baseTagInfos);
+      baseTagInfos.push_back( pjet->tagInfoTrackIP("impactParameter") );
+      baseTagInfos.push_back( pjet->tagInfoSecondaryVertex("secondaryVertex") );
 
-      if ( JetInfo[iJetColl].Jet_Ip2P[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->    hData_Tagger_TCHE->Fill( JetInfo[iJetColl].Jet_Ip2P[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_Ip2N[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->    hData_Tagger_TCHE->Fill(-JetInfo[iJetColl].Jet_Ip2N[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_Ip3P[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->    hData_Tagger_TCHP->Fill( JetInfo[iJetColl].Jet_Ip3P[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_Ip3N[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->    hData_Tagger_TCHP->Fill(-JetInfo[iJetColl].Jet_Ip3N[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_ProbaP[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->  hData_Tagger_JP->Fill( 10*JetInfo[iJetColl].Jet_ProbaP[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->  hData_Tagger_JP->Fill(-10*JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet]  >  1 ) Histos[iJetColl]->   hData_Tagger_SSVHE->Fill( 5*JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_SvxN[JetInfo[iJetColl].nJet] < -1 ) Histos[iJetColl]->   hData_Tagger_SSVHE->Fill( 5*JetInfo[iJetColl].Jet_SvxN[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet]  >  1 ) Histos[iJetColl]-> hData_Tagger_SSVHP->Fill( 5*JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet] < -1 ) Histos[iJetColl]-> hData_Tagger_SSVHP->Fill( 5*JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet] > 0  ) Histos[iJetColl]->hData_Tagger_CSV->Fill( 25*JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->hData_Tagger_CSV->Fill(-25*JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet]  > 0 ) Histos[iJetColl]-> hData_Tagger_MU->Fill( 2.5*JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet] );
-      if ( JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet] < 0 ) Histos[iJetColl]-> hData_Tagger_MU->Fill( 2.5*JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet] );
+      TaggingVariableList vars = computer->taggingVariables(helper);
+      if(vars.checkTag(reco::btau::vertexEnergyRatio)) JetInfo[iJetColl].SV_energy_ratio[JetInfo[iJetColl].nSV] = ( vars.get(reco::btau::vertexEnergyRatio) );
+      else JetInfo[iJetColl].SV_energy_ratio[JetInfo[iJetColl].nSV] = ( -9999 );
 
-      // MC only
-      if ( isData_ ) continue;
+      if(vars.checkTag(reco::btau::vertexJetDeltaR)) JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV] = (  vars.get( reco::btau::vertexJetDeltaR) );
+      else JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV] = ( -9999 );
 
-      Histos[iJetColl]->hAllFlav_Flavour->Fill( flavour );
-      if ( varneg > 0 ) Histos[iJetColl]->hAllFlav_Tagger->Fill(-varneg );
-      if ( varpos > 0 ) Histos[iJetColl]->hAllFlav_Tagger->Fill( varpos );
-      if ( flavour == 1 || flavour == 21 ) { // light q+gluon
-        if ( varneg > 0 ) Histos[iJetColl]->hLightFlav_Tagger->Fill(-varneg );
-        if ( varpos > 0 ) Histos[iJetColl]->hLightFlav_Tagger->Fill( varpos );
-      } // light q+gluon
-      if ( flavour == 21 ) { // gluon jets
-        if ( varneg > 0 ) Histos[iJetColl]->hGluonFlav_Tagger->Fill(-varneg );
-        if ( varpos > 0 ) Histos[iJetColl]->hGluonFlav_Tagger->Fill( varpos );
-      } // gluon jets
-      else if ( flavour == 1 ) { // uds jets
-        if ( varneg > 0 ) Histos[iJetColl]->hUDSFlav_Tagger->Fill(-varneg );
-        if ( varpos > 0 ) Histos[iJetColl]->hUDSFlav_Tagger->Fill( varpos );
-      } // uds jets
-      else if ( flavour == 4 ) { // c jets
-        if ( varneg > 0 ) Histos[iJetColl]->hCFlav_Tagger->Fill(-varneg );
-        if ( varpos > 0 ) Histos[iJetColl]->hCFlav_Tagger->Fill( varpos );
-      } // c jets
-      else if ( flavour == 5 ) { // b jets
-        if ( varneg > 0 ) Histos[iJetColl]->hBFlav_Tagger->Fill(-varneg );
-        if ( varpos > 0 ) Histos[iJetColl]->hBFlav_Tagger->Fill( varpos );
-      } // b jets
+      if(vars.checkTag(reco::btau::trackSip3dSigAboveCharm) ) JetInfo[iJetColl].SV_aboveC[JetInfo[iJetColl].nSV] = (  vars.get( reco::btau::trackSip3dSigAboveCharm ));
+      else JetInfo[iJetColl].SV_aboveC[JetInfo[iJetColl].nSV] = (  -9999 );
 
-      // Track Histosry
-      if ( useTrackHistory_ && indexes.size()!=0 && !isData_ ) {
+      if(vars.checkTag(reco::btau::vertexMass)) JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV] = ( vars.get( reco::btau::vertexMass));
+      else  JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV] = ( -9999 );
 
-        int cat1P = 0, cat2P = 0, cat3P = 0, catP = 0;
-        int cat1N = 0, cat2N = 0, cat3N = 0, catN = 0;
-        flags1P[TrackCategories::ConversionsProcess] ;
-        if ( flags1P[TrackCategories::BWeakDecay] )  cat1P = 1;
-        else if ( flags1P[TrackCategories::CWeakDecay] )  cat1P = 2;
-        else if ( flags1P[TrackCategories::TauDecay] )    cat1P = 3;
-        else if ( flags1P[TrackCategories::ConversionsProcess] )  cat1P = 4;
-        else if ( flags1P[TrackCategories::KsDecay] )     cat1P = 5;
-        else if ( flags1P[TrackCategories::LambdaDecay] ) cat1P = 6;
-        else if ( flags1P[TrackCategories::HadronicProcess] ) cat1P = 7;
-        else if ( flags1P[TrackCategories::Fake] )        cat1P = 8;
-        else if ( flags1P[TrackCategories::SharedInnerHits] )         cat1P = 9;
-        if(idSize > 1){
-          if ( flags2P[TrackCategories::BWeakDecay] )  cat2P = 1;
-          else if ( flags2P[TrackCategories::CWeakDecay] )  cat2P = 2;
-          else if ( flags2P[TrackCategories::TauDecay] )    cat2P = 3;
-          else if ( flags2P[TrackCategories::ConversionsProcess] )  cat2P = 4;
-          else if ( flags2P[TrackCategories::KsDecay] )     cat2P = 5;
-          else if ( flags2P[TrackCategories::LambdaDecay] ) cat2P = 6;
-          else if ( flags2P[TrackCategories::HadronicProcess] ) cat2P = 7;
-          else if ( flags2P[TrackCategories::Fake] )        cat2P = 8;
-          else if ( flags2P[TrackCategories::SharedInnerHits] )         cat2P = 9;
+      Int_t totcharge=0;
+      TrackKinematics vertexKinematics;
+
+      const Vertex &vertex = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0);
+
+      Bool_t hasRefittedTracks = vertex.hasRefittedTracks();
+
+      TrackRefVector tracks = pjet->tagInfoSecondaryVertex("secondaryVertex")->vertexTracks(0);
+      for(TrackRefVector::const_iterator track = tracks.begin();
+          track != tracks.end(); ++track) {
+        Double_t w = pjet->tagInfoSecondaryVertex("secondaryVertex")->trackWeight(0, *track);
+        if (w < 0.5)
+          continue;
+        if (hasRefittedTracks) {
+          Track actualTrack = vertex.refittedTrack(*track);
+          vertexKinematics.add(actualTrack, w);
+          totcharge+=actualTrack.charge();
         }
-        if(idSize > 2){
-          if ( flags3P[TrackCategories::BWeakDecay] )  cat3P = 1;
-          else if ( flags3P[TrackCategories::CWeakDecay] )  cat3P = 2;
-          else if ( flags3P[TrackCategories::TauDecay] )    cat3P = 3;
-          else if ( flags3P[TrackCategories::ConversionsProcess] )  cat3P = 4;
-          else if ( flags3P[TrackCategories::KsDecay] )     cat3P = 5;
-          else if ( flags3P[TrackCategories::LambdaDecay] ) cat3P = 6;
-          else if ( flags3P[TrackCategories::HadronicProcess] ) cat3P = 7;
-          else if ( flags3P[TrackCategories::Fake] )        cat3P = 8;
-          else if ( flags3P[TrackCategories::SharedInnerHits] )         cat3P = 9;
-        }
-        if ( flags1N[TrackCategories::BWeakDecay] )  cat1N = 1;
-        else if ( flags1N[TrackCategories::CWeakDecay] )  cat1N = 2;
-        else if ( flags1N[TrackCategories::TauDecay] )    cat1N = 3;
-        else if ( flags1N[TrackCategories::ConversionsProcess] )  cat1N = 4;
-        else if ( flags1N[TrackCategories::KsDecay] )     cat1N = 5;
-        else if ( flags1N[TrackCategories::LambdaDecay] ) cat1N = 6;
-        else if ( flags1N[TrackCategories::HadronicProcess] ) cat1N = 7;
-        else if ( flags1N[TrackCategories::Fake] )        cat1N = 8;
-        else if ( flags1N[TrackCategories::SharedInnerHits] )         cat1N = 9;
-        if(idSize > 1){
-          if ( flags2N[TrackCategories::BWeakDecay] )  cat2N = 1;
-          else if ( flags2N[TrackCategories::CWeakDecay] )  cat2N = 2;
-          else if ( flags2N[TrackCategories::TauDecay] )    cat2N = 3;
-          else if ( flags2N[TrackCategories::ConversionsProcess] )  cat2N = 4;
-          else if ( flags2N[TrackCategories::KsDecay] )     cat2N = 5;
-          else if ( flags2N[TrackCategories::LambdaDecay] ) cat2N = 6;
-          else if ( flags2N[TrackCategories::HadronicProcess] ) cat2N = 7;
-          else if ( flags2N[TrackCategories::Fake] )        cat2N = 8;
-          else if ( flags2N[TrackCategories::SharedInnerHits] )         cat2N = 9;
-        }
-        if(idSize > 2){
-          if ( flags3N[TrackCategories::BWeakDecay] )  cat3N = 1;
-          else if ( flags3N[TrackCategories::CWeakDecay] )  cat3N = 2;
-          else if ( flags3N[TrackCategories::TauDecay] )    cat3N = 3;
-          else if ( flags3N[TrackCategories::ConversionsProcess] )  cat3N = 4;
-          else if ( flags3N[TrackCategories::KsDecay] )     cat3N = 5;
-          else if ( flags3N[TrackCategories::LambdaDecay] ) cat3N = 6;
-          else if ( flags3N[TrackCategories::HadronicProcess] ) cat3N = 7;
-          else if ( flags3N[TrackCategories::Fake] )        cat3N = 8;
-          else if ( flags3N[TrackCategories::SharedInnerHits] )         cat3N = 9;
-        }
-
-        if ( selTagger_ == 0 || selTagger_ == 3 ) {
-          catP = cat3P;
-          catN = cat3N;
-        }
-        else if ( selTagger_ == 2 ) {
-          catP = cat2P;
-          catN = cat2N;
-        }
-        else if ( selTagger_ == 1 ) {
-          catP = cat1P;
-          catN = cat1N;
-        }
-
-        if ( varneg > 0 ) {
-          if      ( catN == 1 ) Histos[iJetColl]->hAllFlav_Tagger_Bwd->Fill(-varneg );
-          else if ( catN == 2 ) Histos[iJetColl]->hAllFlav_Tagger_Cwd->Fill(-varneg );
-          else if ( catN == 3 ) Histos[iJetColl]->hAllFlav_Tagger_Tau->Fill(-varneg );
-          else if ( catN == 4 ) Histos[iJetColl]->hAllFlav_Tagger_Gam->Fill(-varneg );
-          else if ( catN == 5 ) Histos[iJetColl]->hAllFlav_Tagger_K0s->Fill(-varneg );
-          else if ( catN == 6 ) Histos[iJetColl]->hAllFlav_Tagger_Lam->Fill(-varneg );
-          else if ( catN == 7 ) Histos[iJetColl]->hAllFlav_Tagger_Int->Fill(-varneg );
-          else if ( catN == 8 ) Histos[iJetColl]->hAllFlav_Tagger_Fak->Fill(-varneg );
-          else if ( catN == 9 ) Histos[iJetColl]->hAllFlav_Tagger_Bad->Fill(-varneg );
-          else                  Histos[iJetColl]->hAllFlav_Tagger_Oth->Fill(-varneg );
-        }
-        if ( varpos > 0 ) {
-          if      ( catP == 1 ) Histos[iJetColl]->hAllFlav_Tagger_Bwd->Fill( varpos );
-          else if ( catP == 2 ) Histos[iJetColl]->hAllFlav_Tagger_Cwd->Fill( varpos );
-          else if ( catP == 3 ) Histos[iJetColl]->hAllFlav_Tagger_Tau->Fill( varpos );
-          else if ( catP == 4 ) Histos[iJetColl]->hAllFlav_Tagger_Gam->Fill( varpos );
-          else if ( catP == 5 ) Histos[iJetColl]->hAllFlav_Tagger_K0s->Fill( varpos );
-          else if ( catP == 6 ) Histos[iJetColl]->hAllFlav_Tagger_Lam->Fill( varpos );
-          else if ( catP == 7 ) Histos[iJetColl]->hAllFlav_Tagger_Int->Fill( varpos );
-          else if ( catP == 8 ) Histos[iJetColl]->hAllFlav_Tagger_Fak->Fill( varpos );
-          else if ( catP == 9 ) Histos[iJetColl]->hAllFlav_Tagger_Bad->Fill( varpos );
-          else                  Histos[iJetColl]->hAllFlav_Tagger_Oth->Fill( varpos );
+        else {
+          vertexKinematics.add(**track, w);
+          const reco::Track& mytrack = **track;
+          totcharge+=mytrack.charge();
         }
       }
-    } // end if(iJetColl==0)
+
+
+      math::XYZVector jetDir = jet->momentum().Unit();
+
+      Bool_t useTrackWeights = true;
+      math::XYZTLorentzVector vertexSum = useTrackWeights
+        ? vertexKinematics.weightedVectorSum()
+        : vertexKinematics.vectorSum();
+
+      math::XYZTLorentzVector flightDir( pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDirection(0).x(), pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDirection(0).y(), pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDirection(0).z(), 0  );
+      JetInfo[iJetColl].SV_deltaR_sum_jet[JetInfo[iJetColl].nSV] = ( Geom::deltaR(vertexSum, jetDir) );
+      JetInfo[iJetColl].SV_deltaR_sum_dir[JetInfo[iJetColl].nSV] = ( Geom::deltaR( flightDir, vertexSum ) );
+      JetInfo[iJetColl].SV_vtx_pt[JetInfo[iJetColl].nSV] = vertex.p4().pt();
+      JetInfo[iJetColl].SV_vtx_eta[JetInfo[iJetColl].nSV] = vertex.p4().eta();
+      JetInfo[iJetColl].SV_vtx_phi[JetInfo[iJetColl].nSV] = vertex.p4().phi();
+
+
+
+      jetVertex = (math::XYZVector(jet->vx(),jet->vy(),jet->vz()));
+
+      Line::PositionType pos(GlobalPoint(vertex.p4().x(),vertex.p4().y(),vertex.p4().z()));
+      Line::DirectionType dir(GlobalVector(flightDir.px(),flightDir.py(),flightDir.pz()));
+      Line trackline(pos,dir);
+      // get the Jet  line
+      Line::PositionType pos2(GlobalPoint(jetVertex.x(),jetVertex.y(),jetVertex.z()));
+      Line::DirectionType dir2(GlobalVector(jetDir.x(),jetDir.y(),jetDir.z()));
+      Line jetline(pos2,dir2);
+      // now compute the distance between the two lines
+      JetInfo[iJetColl].SV_vtxDistJetAxis[JetInfo[iJetColl].nSV] = (jetline.distance(trackline)).mag();
+
+
+      // total charge at the secondary vertex
+      JetInfo[iJetColl].SV_totCharge[JetInfo[iJetColl].nSV]=totcharge;
+      // ------------------------end added ---------------------------------------------------------------------------------------//
+
+
+      setTracksPV( &pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0), false, iJetColl );
+      ++JetInfo[iJetColl].nSV;
+    } //// if produceJetProbaTree_
+    JetInfo[iJetColl].Jet_nLastSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
+
+    cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
+    can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
+
+    TrackRefVector  svxPostracks( pjet->tagInfoSecondaryVertex("secondaryVertex")->vertexTracks(0) );
+
+    if ( useTrackHistory_ && !isData_ ) {
+      for (unsigned int i=0; i<svxPostracks.size(); ++i) {
+        TrackCategories::Flags theFlag = classifier_.evaluate( svxPostracks[i] ).flags();
+        if ( theFlag[TrackCategories::BWeakDecay] )         cap0 = 1;
+        if ( theFlag[TrackCategories::CWeakDecay] )         cap1 = 1;
+        if ( theFlag[TrackCategories::TauDecay] )           cap2 = 1;
+        if ( theFlag[TrackCategories::ConversionsProcess] ) cap3 = 1;
+        if ( theFlag[TrackCategories::KsDecay] )            cap4 = 1;
+        if ( theFlag[TrackCategories::LambdaDecay] )        cap5 = 1;
+        if ( theFlag[TrackCategories::HadronicProcess] )    cap6 = 1;
+        if ( theFlag[TrackCategories::Fake] )	            cap7 = 1;
+        if ( theFlag[TrackCategories::SharedInnerHits] )    cap8 = 1;
+      }
+    }
+
+    TrackRefVector svxNegtracks( pjet->tagInfoSecondaryVertex("secondaryVertexNegative")->vertexTracks(0) );
+
+    if ( useTrackHistory_ && !isData_ ) {
+      for (unsigned int i=0; i<svxNegtracks.size(); ++i) {
+        TrackCategories::Flags theFlag = classifier_.evaluate( svxNegtracks[i] ).flags();
+        if ( theFlag[TrackCategories::BWeakDecay] )         can0 = 2;
+        if ( theFlag[TrackCategories::CWeakDecay] )         can1 = 2;
+        if ( theFlag[TrackCategories::TauDecay] )           can2 = 2;
+        if ( theFlag[TrackCategories::ConversionsProcess] ) can3 = 2;
+        if ( theFlag[TrackCategories::KsDecay] )            can4 = 2;
+        if ( theFlag[TrackCategories::LambdaDecay] )        can5 = 2;
+        if ( theFlag[TrackCategories::HadronicProcess] )    can6 = 2;
+        if ( theFlag[TrackCategories::Fake] )	            can7 = 2;
+        if ( theFlag[TrackCategories::SharedInnerHits] )    can8 = 2;
+      }
+      JetInfo[iJetColl].Jet_histSvx[JetInfo[iJetColl].nJet] =  cap0+can0 + (cap1+can1)*10 + (cap2+can2)*100
+        + (cap3+can3)*1000     + (cap4+can4)*10000
+        + (cap5+can5)*100000   + (cap6+can6)*1000000
+        + (cap7+can7)*10000000 + (cap8+can8)*100000000;
+    }
+
+    float SVmass = 0.;
+    if ( pjet->tagInfoSecondaryVertex("secondaryVertex")->nVertices() > 0) {
+      SVmass = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).p4().mass();
+    }
+    JetInfo[iJetColl].Jet_SvxMass[JetInfo[iJetColl].nJet] = SVmass;
+
+    //*********************************
+    // Jet analysis
+
+    Histos[iJetColl]->hData_All_NTracks->Fill( ntagtracks ) ;
+    Histos[iJetColl]->hData_All_JetPt->Fill( ptjet );
+    Histos[iJetColl]->hData_All_JetEta->Fill( etajet );
+
+    //*****************************************************************
+    //define positive and negative tags
+    //*****************************************************************
+    float varpos = -1000.;
+    float varneg = -1000.;
+
+    if ( selTagger_ == 0 ) {       // jet proba
+      if ( ProbaP > 0 ) varpos = 20.*ProbaP;
+      if ( ProbaN > 0 ) varneg = 20.*ProbaN;
+    }
+    else if ( selTagger_ == 2 ) {     // TC High Eff.
+      if ( JetInfo[iJetColl].Jet_Ip2P[JetInfo[iJetColl].nJet] > 0. ) varpos = JetInfo[iJetColl].Jet_Ip2P[JetInfo[iJetColl].nJet];
+      if ( JetInfo[iJetColl].Jet_Ip2N[JetInfo[iJetColl].nJet] > 0. ) varneg = JetInfo[iJetColl].Jet_Ip2N[JetInfo[iJetColl].nJet];
+    }
+    else if ( selTagger_ == 3 ) {     // TC High Pure.
+      if ( JetInfo[iJetColl].Jet_Ip3P[JetInfo[iJetColl].nJet] > 0. ) varpos = JetInfo[iJetColl].Jet_Ip3P[JetInfo[iJetColl].nJet];
+      if ( JetInfo[iJetColl].Jet_Ip3N[JetInfo[iJetColl].nJet] > 0. ) varneg = JetInfo[iJetColl].Jet_Ip3N[JetInfo[iJetColl].nJet];
+    }
+    else if ( selTagger_ == 4 ) {    // SSVHE
+      if  (JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet] > 1)   varpos =  10.*JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet] - 10.;
+      if  (JetInfo[iJetColl].Jet_SvxN[JetInfo[iJetColl].nJet] < -1) varneg = -10.*JetInfo[iJetColl].Jet_SvxN[JetInfo[iJetColl].nJet] - 10.;
+    }
+    else if ( selTagger_ == 5 ) {    // SV combined
+      if  (JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet] > 0)  varpos = 50.*JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet];
+      if  (JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] > 0) varneg = 50.*JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet];
+    }
+    else if ( selTagger_ == 6 ) {    // soft muon ptrel
+      if  ( JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet]  > 0) varpos =  5*JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet];
+      if  ( JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet] < 0) varneg = -5*JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet];
+    }
+    else if ( selTagger_ == 7 ) {    // SSVHP
+      if  (JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet] > 1)   varpos =  10.*JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet] - 10.;
+      if  (JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet] < -1) varneg = -10.*JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet] - 10.;
+    }
+
+    Histos[iJetColl]->hData_NTracks->Fill( ntagtracks ) ;
+    Histos[iJetColl]->hData_JetPt->Fill( ptjet );
+    Histos[iJetColl]->hData_JetEta->Fill( etajet );
+
+    //*********************************
+    // Tagging
+
+    if ( varneg > 0 ) Histos[iJetColl]->hData_Tagger->Fill(-varneg );
+    if ( varpos > 0 ) Histos[iJetColl]->hData_Tagger->Fill( varpos );
+
+    if ( JetInfo[iJetColl].Jet_Ip2P[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->    hData_Tagger_TCHE->Fill( JetInfo[iJetColl].Jet_Ip2P[JetInfo[iJetColl].nJet] );
+    if ( JetInfo[iJetColl].Jet_Ip2N[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->    hData_Tagger_TCHE->Fill(-JetInfo[iJetColl].Jet_Ip2N[JetInfo[iJetColl].nJet] );
+    if ( JetInfo[iJetColl].Jet_Ip3P[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->    hData_Tagger_TCHP->Fill( JetInfo[iJetColl].Jet_Ip3P[JetInfo[iJetColl].nJet] );
+    if ( JetInfo[iJetColl].Jet_Ip3N[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->    hData_Tagger_TCHP->Fill(-JetInfo[iJetColl].Jet_Ip3N[JetInfo[iJetColl].nJet] );
+    if ( JetInfo[iJetColl].Jet_ProbaP[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->  hData_Tagger_JP->Fill( 10*JetInfo[iJetColl].Jet_ProbaP[JetInfo[iJetColl].nJet] );
+    if ( JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->  hData_Tagger_JP->Fill(-10*JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet] );
+    if ( JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet]  >  1 ) Histos[iJetColl]->   hData_Tagger_SSVHE->Fill( 5*JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet] );
+    if ( JetInfo[iJetColl].Jet_SvxN[JetInfo[iJetColl].nJet] < -1 ) Histos[iJetColl]->   hData_Tagger_SSVHE->Fill( 5*JetInfo[iJetColl].Jet_SvxN[JetInfo[iJetColl].nJet] );
+    if ( JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet]  >  1 ) Histos[iJetColl]-> hData_Tagger_SSVHP->Fill( 5*JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet] );
+    if ( JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet] < -1 ) Histos[iJetColl]-> hData_Tagger_SSVHP->Fill( 5*JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet] );
+    if ( JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet] > 0  ) Histos[iJetColl]->hData_Tagger_CSV->Fill( 25*JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet] );
+    if ( JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] > 0 ) Histos[iJetColl]->hData_Tagger_CSV->Fill(-25*JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] );
+    if ( JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet]  > 0 ) Histos[iJetColl]-> hData_Tagger_MU->Fill( 2.5*JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet] );
+    if ( JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet] < 0 ) Histos[iJetColl]-> hData_Tagger_MU->Fill( 2.5*JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet] );
+
+    // MC only
+    if ( isData_ ) continue;
+
+    Histos[iJetColl]->hAllFlav_Flavour->Fill( flavour );
+    if ( varneg > 0 ) Histos[iJetColl]->hAllFlav_Tagger->Fill(-varneg );
+    if ( varpos > 0 ) Histos[iJetColl]->hAllFlav_Tagger->Fill( varpos );
+    if ( flavour == 1 || flavour == 21 ) { // light q+gluon
+      if ( varneg > 0 ) Histos[iJetColl]->hLightFlav_Tagger->Fill(-varneg );
+      if ( varpos > 0 ) Histos[iJetColl]->hLightFlav_Tagger->Fill( varpos );
+    } // light q+gluon
+    if ( flavour == 21 ) { // gluon jets
+      if ( varneg > 0 ) Histos[iJetColl]->hGluonFlav_Tagger->Fill(-varneg );
+      if ( varpos > 0 ) Histos[iJetColl]->hGluonFlav_Tagger->Fill( varpos );
+    } // gluon jets
+    else if ( flavour == 1 ) { // uds jets
+      if ( varneg > 0 ) Histos[iJetColl]->hUDSFlav_Tagger->Fill(-varneg );
+      if ( varpos > 0 ) Histos[iJetColl]->hUDSFlav_Tagger->Fill( varpos );
+    } // uds jets
+    else if ( flavour == 4 ) { // c jets
+      if ( varneg > 0 ) Histos[iJetColl]->hCFlav_Tagger->Fill(-varneg );
+      if ( varpos > 0 ) Histos[iJetColl]->hCFlav_Tagger->Fill( varpos );
+    } // c jets
+    else if ( flavour == 5 ) { // b jets
+      if ( varneg > 0 ) Histos[iJetColl]->hBFlav_Tagger->Fill(-varneg );
+      if ( varpos > 0 ) Histos[iJetColl]->hBFlav_Tagger->Fill( varpos );
+    } // b jets
+
+    // Track Histosry
+    if ( useTrackHistory_ && indexes.size()!=0 && !isData_ ) {
+
+      int cat1P = 0, cat2P = 0, cat3P = 0, catP = 0;
+      int cat1N = 0, cat2N = 0, cat3N = 0, catN = 0;
+      flags1P[TrackCategories::ConversionsProcess] ;
+      if ( flags1P[TrackCategories::BWeakDecay] )  cat1P = 1;
+      else if ( flags1P[TrackCategories::CWeakDecay] )  cat1P = 2;
+      else if ( flags1P[TrackCategories::TauDecay] )    cat1P = 3;
+      else if ( flags1P[TrackCategories::ConversionsProcess] )  cat1P = 4;
+      else if ( flags1P[TrackCategories::KsDecay] )     cat1P = 5;
+      else if ( flags1P[TrackCategories::LambdaDecay] ) cat1P = 6;
+      else if ( flags1P[TrackCategories::HadronicProcess] ) cat1P = 7;
+      else if ( flags1P[TrackCategories::Fake] )        cat1P = 8;
+      else if ( flags1P[TrackCategories::SharedInnerHits] )         cat1P = 9;
+      if(idSize > 1){
+        if ( flags2P[TrackCategories::BWeakDecay] )  cat2P = 1;
+        else if ( flags2P[TrackCategories::CWeakDecay] )  cat2P = 2;
+        else if ( flags2P[TrackCategories::TauDecay] )    cat2P = 3;
+        else if ( flags2P[TrackCategories::ConversionsProcess] )  cat2P = 4;
+        else if ( flags2P[TrackCategories::KsDecay] )     cat2P = 5;
+        else if ( flags2P[TrackCategories::LambdaDecay] ) cat2P = 6;
+        else if ( flags2P[TrackCategories::HadronicProcess] ) cat2P = 7;
+        else if ( flags2P[TrackCategories::Fake] )        cat2P = 8;
+        else if ( flags2P[TrackCategories::SharedInnerHits] )         cat2P = 9;
+      }
+      if(idSize > 2){
+        if ( flags3P[TrackCategories::BWeakDecay] )  cat3P = 1;
+        else if ( flags3P[TrackCategories::CWeakDecay] )  cat3P = 2;
+        else if ( flags3P[TrackCategories::TauDecay] )    cat3P = 3;
+        else if ( flags3P[TrackCategories::ConversionsProcess] )  cat3P = 4;
+        else if ( flags3P[TrackCategories::KsDecay] )     cat3P = 5;
+        else if ( flags3P[TrackCategories::LambdaDecay] ) cat3P = 6;
+        else if ( flags3P[TrackCategories::HadronicProcess] ) cat3P = 7;
+        else if ( flags3P[TrackCategories::Fake] )        cat3P = 8;
+        else if ( flags3P[TrackCategories::SharedInnerHits] )         cat3P = 9;
+      }
+      if ( flags1N[TrackCategories::BWeakDecay] )  cat1N = 1;
+      else if ( flags1N[TrackCategories::CWeakDecay] )  cat1N = 2;
+      else if ( flags1N[TrackCategories::TauDecay] )    cat1N = 3;
+      else if ( flags1N[TrackCategories::ConversionsProcess] )  cat1N = 4;
+      else if ( flags1N[TrackCategories::KsDecay] )     cat1N = 5;
+      else if ( flags1N[TrackCategories::LambdaDecay] ) cat1N = 6;
+      else if ( flags1N[TrackCategories::HadronicProcess] ) cat1N = 7;
+      else if ( flags1N[TrackCategories::Fake] )        cat1N = 8;
+      else if ( flags1N[TrackCategories::SharedInnerHits] )         cat1N = 9;
+      if(idSize > 1){
+        if ( flags2N[TrackCategories::BWeakDecay] )  cat2N = 1;
+        else if ( flags2N[TrackCategories::CWeakDecay] )  cat2N = 2;
+        else if ( flags2N[TrackCategories::TauDecay] )    cat2N = 3;
+        else if ( flags2N[TrackCategories::ConversionsProcess] )  cat2N = 4;
+        else if ( flags2N[TrackCategories::KsDecay] )     cat2N = 5;
+        else if ( flags2N[TrackCategories::LambdaDecay] ) cat2N = 6;
+        else if ( flags2N[TrackCategories::HadronicProcess] ) cat2N = 7;
+        else if ( flags2N[TrackCategories::Fake] )        cat2N = 8;
+        else if ( flags2N[TrackCategories::SharedInnerHits] )         cat2N = 9;
+      }
+      if(idSize > 2){
+        if ( flags3N[TrackCategories::BWeakDecay] )  cat3N = 1;
+        else if ( flags3N[TrackCategories::CWeakDecay] )  cat3N = 2;
+        else if ( flags3N[TrackCategories::TauDecay] )    cat3N = 3;
+        else if ( flags3N[TrackCategories::ConversionsProcess] )  cat3N = 4;
+        else if ( flags3N[TrackCategories::KsDecay] )     cat3N = 5;
+        else if ( flags3N[TrackCategories::LambdaDecay] ) cat3N = 6;
+        else if ( flags3N[TrackCategories::HadronicProcess] ) cat3N = 7;
+        else if ( flags3N[TrackCategories::Fake] )        cat3N = 8;
+        else if ( flags3N[TrackCategories::SharedInnerHits] )         cat3N = 9;
+      }
+
+      if ( selTagger_ == 0 || selTagger_ == 3 ) {
+        catP = cat3P;
+        catN = cat3N;
+      }
+      else if ( selTagger_ == 2 ) {
+        catP = cat2P;
+        catN = cat2N;
+      }
+      else if ( selTagger_ == 1 ) {
+        catP = cat1P;
+        catN = cat1N;
+      }
+
+      if ( varneg > 0 ) {
+        if      ( catN == 1 ) Histos[iJetColl]->hAllFlav_Tagger_Bwd->Fill(-varneg );
+        else if ( catN == 2 ) Histos[iJetColl]->hAllFlav_Tagger_Cwd->Fill(-varneg );
+        else if ( catN == 3 ) Histos[iJetColl]->hAllFlav_Tagger_Tau->Fill(-varneg );
+        else if ( catN == 4 ) Histos[iJetColl]->hAllFlav_Tagger_Gam->Fill(-varneg );
+        else if ( catN == 5 ) Histos[iJetColl]->hAllFlav_Tagger_K0s->Fill(-varneg );
+        else if ( catN == 6 ) Histos[iJetColl]->hAllFlav_Tagger_Lam->Fill(-varneg );
+        else if ( catN == 7 ) Histos[iJetColl]->hAllFlav_Tagger_Int->Fill(-varneg );
+        else if ( catN == 8 ) Histos[iJetColl]->hAllFlav_Tagger_Fak->Fill(-varneg );
+        else if ( catN == 9 ) Histos[iJetColl]->hAllFlav_Tagger_Bad->Fill(-varneg );
+        else                  Histos[iJetColl]->hAllFlav_Tagger_Oth->Fill(-varneg );
+      }
+      if ( varpos > 0 ) {
+        if      ( catP == 1 ) Histos[iJetColl]->hAllFlav_Tagger_Bwd->Fill( varpos );
+        else if ( catP == 2 ) Histos[iJetColl]->hAllFlav_Tagger_Cwd->Fill( varpos );
+        else if ( catP == 3 ) Histos[iJetColl]->hAllFlav_Tagger_Tau->Fill( varpos );
+        else if ( catP == 4 ) Histos[iJetColl]->hAllFlav_Tagger_Gam->Fill( varpos );
+        else if ( catP == 5 ) Histos[iJetColl]->hAllFlav_Tagger_K0s->Fill( varpos );
+        else if ( catP == 6 ) Histos[iJetColl]->hAllFlav_Tagger_Lam->Fill( varpos );
+        else if ( catP == 7 ) Histos[iJetColl]->hAllFlav_Tagger_Int->Fill( varpos );
+        else if ( catP == 8 ) Histos[iJetColl]->hAllFlav_Tagger_Fak->Fill( varpos );
+        else if ( catP == 9 ) Histos[iJetColl]->hAllFlav_Tagger_Bad->Fill( varpos );
+        else                  Histos[iJetColl]->hAllFlav_Tagger_Oth->Fill( varpos );
+      }
+    }
 
     ++JetInfo[iJetColl].nJet;
   } // end loop on jet
