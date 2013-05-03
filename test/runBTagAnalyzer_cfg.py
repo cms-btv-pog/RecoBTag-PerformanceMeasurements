@@ -39,7 +39,7 @@ options.register('runSubJets', False,
     VarParsing.varType.bool,
     "Run subjets"
 )
-options.register('fatJetPtMin', 100.0,
+options.register('fatJetPtMin', 150.0,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "Minimum pT for fat jets (default is 100 GeV)"
@@ -59,7 +59,7 @@ print "Running on data: %s"%('True' if options.runOnData else 'False')
 print "Using PFchs: %s"%('True' if options.usePFchs else 'False')
 
 ## Global tag
-globalTag = 'START53_V20'
+globalTag = 'START53_V21'
 if options.runOnData:
     globalTag = 'FT_53_V21_AN3'
 
@@ -949,8 +949,10 @@ process.btagana.use_ttbar_filter = cms.bool(options.useTTbarFilter)
 process.btagana.triggerTable = cms.InputTag('TriggerResults::HLT') # Data and MC
 
 process.btaganaSubJets = process.btagana.clone(
+    MinPt = cms.double(0.),
     Jets = cms.InputTag('selectedPatJetsCA8PrunedSubJetsPF'),
-    FatJets = cms.InputTag('selectedPatJetsCA8PrunedPF'),
+    FatJets = cms.InputTag('selectedPatJets'),
+    PrunedFatJets = cms.InputTag('selectedPatJetsCA8PrunedPFPacked'),
     runSubJets = options.runSubJets,
     use_ttbar_filter = cms.bool(False)
 )
