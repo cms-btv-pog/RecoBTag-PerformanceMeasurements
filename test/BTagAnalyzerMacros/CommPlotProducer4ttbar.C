@@ -648,9 +648,18 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
   AddHisto("TCHP"	  ,"TCHP",				     50,0.,30. );  
   AddHisto("JP" 	  ,"JP",				     50,0.,2.5 );
   AddHisto("JBP"	  ,"JBP",				     50,0.,8.  );
-  AddHisto("SSV"	  ,"SSVHE",				     50,0.,7.  );
-  AddHisto("SSVHP"	  ,"SSVHP",				     50,0.,7.  );
+  AddHisto("SSV"	  ,"SSVHE",				     70,0.,7.  );
+  AddHisto("SSVHP"	  ,"SSVHP",				     70,0.,7.  );
   AddHisto("CSV"	  ,"CSV",				     50,0.,1.  );
+
+
+  AddHisto("SoftMu"       ,"SoftMu",                                 50,0.,1.  );
+  AddHisto("SoftEl"       ,"SoftEl",                                 50,0.,1.  );
+  AddHisto("CombCSVJP"    ,"CombCSVJP",                              50,0.,1.  );
+  AddHisto("CombCSVSL"    ,"CombCSVSL",                              50,0.,1.  );
+  AddHisto("CombCSVJPSL"  ,"CombCSVJPSL",                                    50,0.,1.  );
+  AddHisto("RetCombSvx"   ,"RetCombSvx",                                     50,0.,1.  );
+
   
   AddHisto2D("seltrack_vs_jetpt", "sel track multiplicity vs jet pt",         30,60,1000, 100,-0.5,99.5);
   AddHisto2D("sv_mass_vs_flightDist3D", " SVMass vs SV 3D flight distance ",  100,0, 10,100,0,6);			
@@ -828,6 +837,7 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
       float ssvhe    = Jet_Svx[ijet] ;
       float ssvhp    = Jet_SvxHP[ijet];
       float csv      = Jet_CombSvx[ijet];
+
       
       if (csv>0.244) nbjet_ttbar++;
       //cout << "tche " << tche << endl;
@@ -1045,7 +1055,7 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
 	  chi2norm_sv    = SV_chi2[Jet_nFirstSV[ijet]]/SV_ndf[Jet_nFirstSV[ijet]];
 	  flightSig_sv   = SV_flight[Jet_nFirstSV[ijet]]/SV_flightErr[Jet_nFirstSV[ijet]];
 	  flight2DSig_sv = SV_flight2D[Jet_nFirstSV[ijet]]/SV_flight2DErr[Jet_nFirstSV[ijet]];
-	  mass_sv        =Jet_SvxMass[Jet_nFirstSV[ijet]];
+          mass_sv        =SV_mass[Jet_nFirstSV[ijet]];
 	  sv_dR_jet      =SV_deltaR_jet[Jet_nFirstSV[ijet]];
 	  sv_dR_dir_sum  =SV_deltaR_sum_dir[Jet_nFirstSV[ijet]];
 	  sv_dR_jet_sum  =SV_deltaR_sum_jet[Jet_nFirstSV[ijet]];
@@ -1057,7 +1067,7 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
 	  
 	  
 	  sv_flight3D    =SV_flight[Jet_nFirstSV[ijet]] ;  
-	  sv_flight3Derr =SV_flight[Jet_nFirstSV[ijet]]; 
+          sv_flight3Derr =SV_flightErr[Jet_nFirstSV[ijet]];
 	  sv_flight2D    =SV_flight2D[Jet_nFirstSV[ijet]];    
 	  sv_flight2Derr =SV_flight2DErr[Jet_nFirstSV[ijet]];    
 	  sv_totchar     =SV_totCharge[Jet_nFirstSV[ijet]] ;
@@ -1119,6 +1129,23 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
       FillHisto_floatFromMap("SSV",   flav, isGluonSplit, ssvhe	  ,   ww);
       FillHisto_floatFromMap("SSVHP", flav, isGluonSplit, ssvhp	  ,   ww);
       FillHisto_floatFromMap("CSV",   flav, isGluonSplit, csv	  ,   ww);
+
+      if (produceNewAlgoTree) {
+       float softmu   = Jet_SoftMu[ijet]  ;
+       float solfel   = Jet_SoftEl[ijet];
+       float combjp   = Jet_CombCSVJP[ijet];
+       float combsl   = Jet_CombCSVSL[ijet];
+       float combjpsl = Jet_CombCSVJPSL[ijet];
+       float retrainedcsv= Jet_RetCombSvx[ijet];
+       FillHisto_floatFromMap("SoftMu",      flav, isGluonSplit, softmu  ,   ww);
+       FillHisto_floatFromMap("SoftEl",      flav, isGluonSplit, solfel  ,   ww);
+       FillHisto_floatFromMap("CombCSVJP",   flav, isGluonSplit, combjp  ,   ww);
+       FillHisto_floatFromMap("CombCSVSL",   flav, isGluonSplit, combsl  ,   ww);
+       FillHisto_floatFromMap("CombCSVJPSL", flav, isGluonSplit, combjpsl  ,   ww);
+       FillHisto_floatFromMap("RetCombSvx",  flav, isGluonSplit, retrainedcsv  ,   ww);
+      }
+
+
       //       cout << " TCHE:" << tche<<endl;
       //       cout << " TCHP:" << tchp<<endl;
       //       cout << " JP:" << jetproba<<endl;
@@ -1149,8 +1176,8 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
 	    if (passMuonSelection(imu, ijet)){
 	      if(nselmuon == 0) {
 	        idxFirstMuon = imu;
-	        nselmuon++;
 	      }
+	      nselmuon++;
 	    }
           }
 	}

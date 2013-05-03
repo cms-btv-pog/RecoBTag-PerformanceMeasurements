@@ -21,8 +21,8 @@
 
 using namespace std;
 
-TString filename="output_test.root";
-TString title= "CMS 2012 preliminary, #sqrt{s} = 8 TeV,  12.2 fb^{-1}";
+TString filename="ttbar/output_all.root";
+TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  19.7 fb^{-1}";
 TString format=".gif"; // .png or .pdf
 bool bOverflow=true;
 bool b_ordering=false;
@@ -37,9 +37,10 @@ void OverFlowBinFix(TH1F* );
 
 //--------
 
-void DrawCommPlot(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots, bool Draw_muons_plots, bool Draw_discriminator_plots , bool Draw_tagRate_plots, bool Draw_2D_plots){
+void DrawCommPlot(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots, bool Draw_muons_plots, bool Draw_discriminator_plots , 
+bool Draw_newdiscriminator_plots, bool Draw_tagRate_plots, bool Draw_2D_plots){
 
-  TString action = "mkdir Commissioning_plots";
+  TString action = "mkdir ttbar/Commissioning_plots";
   system(action);
   
   
@@ -75,6 +76,10 @@ if (Draw_track_plots){
   Draw("track_IP"     ,      "3D IP of all tracks",1, move+1);			   
   Draw("track_IP1tr"  ,      "3D IP of the first track"	,1, move+1);	   
   Draw("track_IP2tr"  ,      "3D IP of the second track",1, move+1);		   
+  Draw("track_IPerr"   ,     "3D IP error of all tracks",1);				   
+  Draw("track_IPerr1tr"   ,  "3D IP error of the first track" ,1); 	   
+  Draw("track_IPerr2tr"   ,  "3D IP error of the second track" ,1);	   
+
   Draw("track_IP2Ds"	,    "2D IP significance of all tracks"	,1);   
   Draw("track_IP2Ds1tr" ,    "2D IP significance of the first track",1, move+1);	   
   Draw("track_IP2Ds2tr" ,    "2D IP significance of the second track" ,1);    
@@ -82,11 +87,9 @@ if (Draw_track_plots){
   Draw("track_IP2D1tr" ,     "2D IP of the first track"	,1, move+1);	   
   Draw("track_IP2D2tr" ,     "2D IP of the second track",1);		   
   Draw("track_IP2Derr1tr" ,  "2D IP error of the first track",1);  	   
-  Draw("track_IPerr1tr"   ,  "3D IP error of the first track" ,1); 	   
   Draw("track_IP2Derr2tr" ,  "2D IP error of the second track" ,1);	   
-  Draw("track_IPerr2tr"   ,  "3D IP error of the second track" ,1);	   
   Draw("track_IP2Derr" ,     "2D IP error of all tracks",1);				   
-  Draw("track_IPerr"   ,     "3D IP error of all tracks",1);				   
+
   Draw("track_len"     ,     "Track decay length",1);				   
   Draw("track_dist"    ,     "Track distance to the jet axis"	,1);	   
   Draw("track_dz"     ,      "Track transverse IP",1);				   
@@ -96,7 +99,7 @@ if (Draw_track_plots){
   Draw("track_IPs3tr" ,    "3D IP significance of the third track",1);	
   Draw("track_IP3tr"  ,      "3D IP of the third track"	,1);	
   Draw("track_IPerr3tr"   ,  "3D IP error of the third track" ,1); 	
-  Draw("track_IP2Ds3tr" ,    "2D IP significance of the second track" ,1);
+  Draw("track_IP2Ds3tr" ,    "2D IP significance of the third track" ,1);
   Draw("track_IP2D3tr" ,     "2D IP of the third track"	,1);	
   Draw("track_IP2Derr3tr" ,  "2D IP error of the third track",1);  	
   }  
@@ -165,6 +168,17 @@ if (Draw_discriminator_plots){
   Draw("CSV"	      ,"CSV Discriminator",1, move+2);
   
   }
+if (Draw_newdiscriminator_plots) {
+  Draw("RetCombSvx"         ,"Retrained CSV Discriminator",1,move+2);
+  Draw("CombCSVJP"          ,"Combined CSV+JP Discriminator",1,move);
+  Draw("CombCSVSL"          ,"Combined CSV+SL Discriminator",1,move);
+  Draw("CombCSVJP"          ,"Combined CSV+JP Discriminator",0,move+2);
+  Draw("CombCSVSL"          ,"Combined CSV+SL Discriminator",0,move+2);
+  Draw("CombCSVJPSL"        ,"Combined CSV+JP+SL Discriminator",1,move+2);
+  Draw("SoftMu"        ,"Soft Muon Discriminator",1,move+1);
+  Draw("SoftEl"        ,"Soft Electron Discriminator",1,move+1);
+}
+
   			    
 if (Draw_tagRate_plots){ 
   DrawTagRate("TCHE_extended1","TCHE (extended1)", 0);
@@ -395,7 +409,7 @@ void Draw(TString name, TString histotitle, bool log, int move_legend)
   
  TString name_plot=name+"_Linear"+format; 
  if(log) name_plot=name+"_Log"+format;
- c1->SaveAs("Commissioning_plots/"+name_plot);
+ c1->SaveAs("ttbar/Commissioning_plots/"+name_plot);
 
  if (log && web) {  // save also _Linear for web
  canvas_1 ->cd();
@@ -404,7 +418,7 @@ void Draw(TString name, TString histotitle, bool log, int move_legend)
     stack->SetMaximum( 1.1*stack->GetMaximum() ) ;
  }
  c1->cd();  
- c1->SaveAs("Commissioning_plots/"+name+"_Linear"+format);
+ c1->SaveAs("ttbar/Commissioning_plots/"+name+"_Linear"+format);
    
  }
 
@@ -585,7 +599,7 @@ void DrawTTbar(TString name, TString histotitle, bool log, int move_legend)
   
  TString name_plot="ttbar_"+name+"_Linear"+format; 
  if(log) name_plot="ttbar_"+name+"_Log"+format;
- c1->SaveAs("Commissioning_plots/"+name_plot);
+ c1->SaveAs("ttbar/Commissioning_plots/"+name_plot);
 
 
 }
@@ -808,7 +822,7 @@ void DrawTagRate(TString name, TString histotitle, bool log){
   
   TString name_plot="tag_"+name+"_Linear"+format;
   if(log) name_plot="tag_"+name+"_Log"+format;
-  c1->SaveAs("Commissioning_plots/"+name_plot);
+  c1->SaveAs("ttbar/Commissioning_plots/"+name_plot);
 }
 
 
@@ -966,7 +980,7 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
 
   TString name_plot=name+"_Linear"+format;
   if(log) name_plot=name+"_Log"+format;
-  canvas->SaveAs("Commissioning_plots/"+name_plot);
+  canvas->SaveAs("ttbar/Commissioning_plots/"+name_plot);
 
 }
 
