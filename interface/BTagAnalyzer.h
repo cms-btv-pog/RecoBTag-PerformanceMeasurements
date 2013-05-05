@@ -131,290 +131,284 @@ const UInt_t MAX_JETCOLLECTIONS=2;
 
 class BTagAnalyzer : public edm::EDAnalyzer
 {
-	public:
-		explicit BTagAnalyzer(const edm::ParameterSet&);
-		~BTagAnalyzer();
+  public:
+    explicit BTagAnalyzer(const edm::ParameterSet&);
+    ~BTagAnalyzer();
 
-		// auxiliary class holding simulated primary vertices
-		class simPrimaryVertex {
-			public:
-				simPrimaryVertex(double x1,double y1,double z1):x(x1),y(y1),z(z1),ptsq(0),nGenTrk(0){};
-				double x,y,z;
-				HepMC::FourVector ptot;
-				//HepLorentzVector ptot;
-				double ptsq;
-				int nGenTrk;
-				std::vector<int> finalstateParticles;
-				std::vector<int> simTrackIndex;
-				std::vector<int> genVertex;
-				const reco::Vertex *recVtx;
-		};
+    // auxiliary class holding simulated primary vertices
+    class simPrimaryVertex {
+      public:
+        simPrimaryVertex(double x1,double y1,double z1):x(x1),y(y1),z(z1),ptsq(0),nGenTrk(0){};
+        double x,y,z;
+        HepMC::FourVector ptot;
+        //HepLorentzVector ptot;
+        double ptsq;
+        int nGenTrk;
+        std::vector<int> finalstateParticles;
+        std::vector<int> simTrackIndex;
+        std::vector<int> genVertex;
+        const reco::Vertex *recVtx;
+    };
 
-	private:
-		virtual void beginJob() ;
-		virtual void analyze(const edm::Event&, const edm::EventSetup&);
-		virtual void endJob() ;
+  private:
+    virtual void beginJob() ;
+    virtual void analyze(const edm::Event&, const edm::EventSetup&);
+    virtual void endJob() ;
 
-		bool findCat(const reco::Track* ,CategoryFinder& );
-		std::vector< float > getTrackProbabilies(std::vector< float > , const int );
-		double calculProbability(std::vector< float > );
+    bool findCat(const reco::Track* ,CategoryFinder& );
+    std::vector< float > getTrackProbabilies(std::vector< float > , const int );
+    double calculProbability(std::vector< float > );
 
-		float calculPtRel(const reco::Track& theMuon, const pat::Jet& theJet);
+    float calculPtRel(const reco::Track& theMuon, const pat::Jet& theJet);
 
-		int matchMuon(const edm::RefToBase<reco::Track>& theMuon, const edm::View<reco::Muon>& muons);
+    int matchMuon(const edm::RefToBase<reco::Track>& theMuon, const edm::View<reco::Muon>& muons);
 
-		void setTracksPV( const reco::Vertex *pv, const bool isPV, const int );
+    void setTracksPV( const reco::Vertex *pv, const bool isPV, const int );
 
-		int getMuonTk(double pt, const int);
-		bool NameCompatible(const std::string& pattern, const std::string& name);
+    int getMuonTk(double pt, const int);
+    bool NameCompatible(const std::string& pattern, const std::string& name);
 
-		std::vector<simPrimaryVertex> getSimPVs(const edm::Handle<edm::HepMCProduct>& evtMC);
+    std::vector<simPrimaryVertex> getSimPVs(const edm::Handle<edm::HepMCProduct>& evtMC);
 
-		void processJets(const edm::Handle<PatJetCollection>&, const edm::Handle<PatJetCollection>&,
-                               const edm::Event&, const edm::EventSetup&, const JetToJetMap&, const int) ;
+    void processTrig(const edm::Handle<edm::TriggerResults>&) ; 
 
-		int isFromGSP(const reco::Candidate* c);
+    void processJets(const edm::Handle<PatJetCollection>&, const edm::Handle<PatJetCollection>&,
+        const edm::Event&, const edm::EventSetup&, const JetToJetMap&, const int) ;
 
-		// ----------member data ---------------------------
-		std::string outputFile_;
-		//std::vector< std::string > moduleLabel_;
+    int isFromGSP(const reco::Candidate* c);
 
-		bool runSubJets_ ;
+    // ----------member data ---------------------------
+    std::string outputFile_;
+    //std::vector< std::string > moduleLabel_;
 
-		edm::InputTag muonCollectionName_;
-              edm::InputTag patMuonCollectionName_;
-		edm::InputTag triggerTable_;
-		edm::InputTag SVComputer_;
+    bool runSubJets_ ;
 
-		edm::InputTag JetCollectionTag_;
-		edm::InputTag FatJetCollectionTag_;
-              edm::InputTag PrunedFatJetCollectionTag_;
+    edm::InputTag muonCollectionName_;
+    edm::InputTag patMuonCollectionName_;
+    edm::InputTag triggerTable_;
+    edm::InputTag SVComputer_;
 
-		std::string jetPBJetTags_;
-		std::string jetPNegBJetTags_;
-		std::string jetPPosBJetTags_;
+    edm::InputTag JetCollectionTag_;
+    edm::InputTag FatJetCollectionTag_;
+    edm::InputTag PrunedFatJetCollectionTag_;
 
-		std::string jetBPBJetTags_;
-		std::string jetBPNegBJetTags_;
-		std::string jetBPPosBJetTags_;
+    std::string jetPBJetTags_;
+    std::string jetPNegBJetTags_;
+    std::string jetPPosBJetTags_;
 
-		std::string trackCHEBJetTags_;
-		std::string trackCNegHEBJetTags_;
+    std::string jetBPBJetTags_;
+    std::string jetBPNegBJetTags_;
+    std::string jetBPPosBJetTags_;
 
-		std::string trackCHPBJetTags_;
-		std::string trackCNegHPBJetTags_;
+    std::string trackCHEBJetTags_;
+    std::string trackCNegHEBJetTags_;
 
-		std::string combinedSVBJetTags_;
-		std::string combinedSVNegBJetTags_;
-		std::string combinedSVPosBJetTags_;
+    std::string trackCHPBJetTags_;
+    std::string trackCNegHPBJetTags_;
 
-		std::string combinedSVRetrainedBJetTags_;
-		std::string combinedSVRetrainedNegBJetTags_;
-		std::string combinedSVRetrainedPosBJetTags_;
+    std::string combinedSVBJetTags_;
+    std::string combinedSVNegBJetTags_;
+    std::string combinedSVPosBJetTags_;
 
-		std::string combinedCSVJPBJetTags_;
-		std::string combinedCSVJPNegBJetTags_;
-		std::string combinedCSVJPPosBJetTags_;
+    std::string combinedSVRetrainedBJetTags_;
+    std::string combinedSVRetrainedNegBJetTags_;
+    std::string combinedSVRetrainedPosBJetTags_;
 
-		std::string combinedCSVSLBJetTags_;
-		std::string combinedCSVSLNegBJetTags_;
-		std::string combinedCSVSLPosBJetTags_;
+    std::string combinedCSVJPBJetTags_;
+    std::string combinedCSVJPNegBJetTags_;
+    std::string combinedCSVJPPosBJetTags_;
 
-		std::string combinedCSVJPSLBJetTags_;
-		std::string combinedCSVJPSLNegBJetTags_;
-		std::string combinedCSVJPSLPosBJetTags_;
+    std::string combinedCSVSLBJetTags_;
+    std::string combinedCSVSLNegBJetTags_;
+    std::string combinedCSVSLPosBJetTags_;
 
-		std::string simpleIVFSVHighPurBJetTags_;
-		std::string simpleIVFSVHighEffBJetTags_;
-		std::string doubleIVFSVHighEffBJetTags_;
-		std::string combinedIVFSVBJetTags_;
-		std::string combinedIVFSVPosBJetTags_;
+    std::string combinedCSVJPSLBJetTags_;
+    std::string combinedCSVJPSLNegBJetTags_;
+    std::string combinedCSVJPSLPosBJetTags_;
 
-		std::string simpleSVHighEffBJetTags_;
-		std::string simpleSVNegHighEffBJetTags_;
-		std::string simpleSVHighPurBJetTags_;
-		std::string simpleSVNegHighPurBJetTags_;
+    std::string simpleIVFSVHighPurBJetTags_;
+    std::string simpleIVFSVHighEffBJetTags_;
+    std::string doubleIVFSVHighEffBJetTags_;
+    std::string combinedIVFSVBJetTags_;
+    std::string combinedIVFSVPosBJetTags_;
 
-		//std::string softMuonBJetTags_;
-		//std::string softMuonNegBJetTags_;
-		//std::string softMuonTagInfoName_;
+    std::string simpleSVHighEffBJetTags_;
+    std::string simpleSVNegHighEffBJetTags_;
+    std::string simpleSVHighPurBJetTags_;
+    std::string simpleSVNegHighPurBJetTags_;
 
-		std::string softPFMuonBJetTags_;
-		std::string softPFMuonNegBJetTags_;
-		std::string softPFMuonPosBJetTags_;
+    std::string softPFMuonBJetTags_;
+    std::string softPFMuonNegBJetTags_;
+    std::string softPFMuonPosBJetTags_;
 
-		std::string softPFElectronBJetTags_;
-		std::string softPFElectronNegBJetTags_;
-		std::string softPFElectronPosBJetTags_;
+    std::string softPFElectronBJetTags_;
+    std::string softPFElectronNegBJetTags_;
+    std::string softPFElectronPosBJetTags_;
 
-		std::string softPFMuonTagInfos_;
-		std::string softPFElectronTagInfos_;
+    std::string softPFMuonTagInfos_;
+    std::string softPFElectronTagInfos_;
 
+    edm::InputTag primaryVertexColl_;
 
-		edm::InputTag primaryVertexColl_;
+    bool useTrackHistory_;
+    TFile*  rootFile_;
+    double minJetPt_;
+    double maxJetEta_;
 
-		bool useTrackHistory_;
-		TFile*  rootFile_;
-		double minJetPt_;
-		double maxJetEta_;
+    int selTagger_;
+    bool isData_;
+    bool use_selected_tracks_;
+    bool produceJetProbaTree_;
+    bool producePtRelTemplate_;
 
+    bool use_ttbar_filter_;
+    edm::InputTag channel_;
 
-		int selTagger_;
-		bool isData_;
-		bool use_selected_tracks_;
-		bool produceJetProbaTree_;
-		bool producePtRelTemplate_;
+    // trigger list
+    //std::vector<std::string> triggernames_; // Not used : consider for deletion? 
+    //bool TriggerInfo_;  // Not used : consider for deletion? 
 
-		bool use_ttbar_filter_;
-		edm::InputTag channel_;
+    // TNtuple* nTuplesJets; // Not used : consider for deletion?
 
-		// trigger list
-		std::vector<std::string> triggernames_;
-		bool TriggerInfo_;
+    TrackClassifier classifier_;
 
-		TNtuple* nTuplesJets;
-		TrackClassifier classifier_;
+    edm::Service<TFileService> fs;
 
-		///////////////
-		// Some Histograms
+    CategoryFinder cat0;
+    CategoryFinder cat1;
+    CategoryFinder cat2;
+    CategoryFinder cat3;
+    CategoryFinder cat4;
+    CategoryFinder cat5;
+    CategoryFinder cat6;
+    CategoryFinder cat7;
+    CategoryFinder cat8;
+    CategoryFinder cat9;
 
-		edm::Service<TFileService> fs;
+    ///////////////
+    // Ntuple info
 
-		CategoryFinder cat0;
-		CategoryFinder cat1;
-		CategoryFinder cat2;
-		CategoryFinder cat3;
-		CategoryFinder cat4;
-		CategoryFinder cat5;
-		CategoryFinder cat6;
-		CategoryFinder cat7;
-		CategoryFinder cat8;
-		CategoryFinder cat9;
+    TTree *smalltree;
 
-		///////////////
-		// Ntuple info
+    int   nPV;
+    float PV_x[nMaxPVs_];
+    float PV_y[nMaxPVs_];
+    float PV_z[nMaxPVs_];
+    float PV_ex[nMaxPVs_];
+    float PV_ey[nMaxPVs_];
+    float PV_ez[nMaxPVs_];
+    float PV_chi2[nMaxPVs_];
+    float PV_ndf[nMaxPVs_];
+    int   PV_isgood[nMaxPVs_];
+    int   PV_isfake[nMaxPVs_];
 
-		TTree *smalltree;
+    int   nPUtrue;                 // the true number of pileup interactions that have been added to the event
+    int   nPU;                     // the number of pileup interactions that have been added to the event
+    int   PU_bunch[nMaxPUs_];      // 0 if on time pileup, -1 or +1 if out-of-time
+    float PU_z[nMaxPUs_];          // the true primary vertex position along the z axis for each added interaction
+    float PU_sumpT_low[nMaxPUs_];  // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > low_cut
+    float PU_sumpT_high[nMaxPUs_]; // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > high_cut
+    int   PU_ntrks_low[nMaxPUs_];  // the number of tracks originating from each interaction, where track pT > low_cu
+    int   PU_ntrks_high[nMaxPUs_]; // the number of tracks originating from each interaction, where track pT > high_cut
+    float mcweight;
+    math::XYZVector jetVertex;
 
-		int nPV;
-		float PV_x[nMaxPVs_];
-		float PV_y[nMaxPVs_];
-		float PV_z[nMaxPVs_];
-		float PV_ex[nMaxPVs_];
-		float PV_ey[nMaxPVs_];
-		float PV_ez[nMaxPVs_];
-		float PV_chi2[nMaxPVs_];
-		float PV_ndf[nMaxPVs_];
-		int   PV_isgood[nMaxPVs_];
-		int   PV_isfake[nMaxPVs_];
+    int   ncQuarks;
+    float cQuark_pT[1000];
+    float cQuark_eta[1000];
+    float cQuark_phi[1000];
+    int   cQuark_fromGSP[1000];
 
-		int nPUtrue;                // the true number of pileup interactions that have been added to the event
-		int nPU;                    // the number of pileup interactions that have been added to the event
-		int   PU_bunch[nMaxPUs_];      // 0 if on time pileup, -1 or +1 if out-of-time
-		float PU_z[nMaxPUs_];          // the true primary vertex position along the z axis for each added interaction
-		float PU_sumpT_low[nMaxPUs_];  // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > low_cut
-		float PU_sumpT_high[nMaxPUs_]; // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > high_cut
-		int   PU_ntrks_low[nMaxPUs_];  // the number of tracks originating from each interaction, where track pT > low_cu
-		int   PU_ntrks_high[nMaxPUs_]; // the number of tracks originating from each interaction, where track pT > high_cut
-		float mcweight;
-		math::XYZVector jetVertex;
+    int   nbQuarks;
+    float bQuark_pT[1000];
+    float bQuark_eta[1000];
+    float bQuark_phi[1000];
+    int   bQuark_fromGSP[1000];
 
-		int ncQuarks;
-		float cQuark_pT[1000];
-		float cQuark_eta[1000];
-		float cQuark_phi[1000];
-		int   cQuark_fromGSP[1000];
+    int   nBHadrons;
+    float BHadron_pT[1000];
+    float BHadron_eta[1000];
+    float BHadron_phi[1000];
+    float BHadron_mass[1000];
+    int   BHadron_pdgID[1000];
+    int   BHadron_mother[1000];
+    int   BHadron_hasBdaughter[1000];
 
-		int nbQuarks;
-		float bQuark_pT[1000];
-		float bQuark_eta[1000];
-		float bQuark_phi[1000];
-		int   bQuark_fromGSP[1000];
+    //$$
+    int nGenlep;
+    float Genlep_pT[100];
+    float Genlep_eta[100];
+    float Genlep_phi[100];
+    int   Genlep_pdgID[100];
+    int   Genlep_mother[100];
 
-		int nBHadrons;
-		float BHadron_pT[1000];
-		float BHadron_eta[1000];
-		float BHadron_phi[1000];
-		float BHadron_mass[1000];
-		int   BHadron_pdgID[1000];
-		int   BHadron_mother[1000];
-		int   BHadron_hasBdaughter[1000];
+    int   nGenquark;
+    float Genquark_pT[100];
+    float Genquark_eta[100];
+    float Genquark_phi[100];
+    int   Genquark_pdgID[100];
+    int   Genquark_mother[100];
 
-		//$$
-		int nGenlep;
-		float Genlep_pT[100];
-		float Genlep_eta[100];
-		float Genlep_phi[100];
-		int   Genlep_pdgID[100];
-		int   Genlep_mother[100];
+    int   nPatMuon;
+    int   PatMuon_isGlobal[1000];
+    int   PatMuon_nTkHit[1000];
+    int   PatMuon_nPixHit[1000];
+    int   PatMuon_nOutHit[1000];
+    int   PatMuon_nMuHit[1000];
+    int   PatMuon_nMatched[1000];
+    float PatMuon_chi2[1000];
+    float PatMuon_chi2Tk[1000];
+    float PatMuon_pt[1000];
+    float PatMuon_eta[1000];
+    float PatMuon_phi[1000];
+    float PatMuon_vz[1000];
+    float PatMuon_IP[1000];
+    float PatMuon_IPsig[1000];
+    float PatMuon_IP2D[1000];
+    float PatMuon_IP2Dsig[1000];
 
-		int nGenquark;
-		float Genquark_pT[100];
-		float Genquark_eta[100];
-		float Genquark_phi[100];
-		int   Genquark_pdgID[100];
-		int   Genquark_mother[100];
+    //// Jet info
 
-              int   nPatMuon;
-              int   PatMuon_isGlobal[1000];
-              int   PatMuon_nTkHit[1000];
-              int   PatMuon_nPixHit[1000];
-              int   PatMuon_nOutHit[1000];
-              int   PatMuon_nMuHit[1000];
-              int   PatMuon_nMatched[1000];
-              float PatMuon_chi2[1000];
-              float PatMuon_chi2Tk[1000];
-              float PatMuon_pt[1000];
-              float PatMuon_eta[1000];
-              float PatMuon_phi[1000];
-              float PatMuon_vz[1000];
-              float PatMuon_IP[1000];
-              float PatMuon_IPsig[1000];
-              float PatMuon_IP2D[1000];
-              float PatMuon_IP2Dsig[1000];
+    JetInfoBranches JetInfo[MAX_JETCOLLECTIONS] ;
+    BookHistograms* Histos[MAX_JETCOLLECTIONS] ;
 
-		//// Jet info
+    unsigned int BitTrigger;
+    int Run;
+    int Evt;
+    int LumiBlock;
+    float PVz;
+    //float PVzSim; // Not used : consider for deletion? 
+    float pthat;
 
-		JetInfoBranches JetInfo[MAX_JETCOLLECTIONS] ;
-              BookHistograms* Histos[MAX_JETCOLLECTIONS] ;
+    int ttbar_chan;
+    float lepton1_pT;
+    float lepton2_pT;
+    float lepton1_eta;
+    float lepton2_eta;
+    float lepton1_phi;
+    float lepton2_phi;
+    float met;
+    float mll;
+    int trig_ttbar;
 
-		int BitTrigger;
-		int Run;
-		int Evt;
-		int LumiBlock;
-		float PVz;
-		float PVzSim;
-		float pthat;
+    const  reco::Vertex  *pv;
 
-		int ttbar_chan;
-		float lepton1_pT;
-		float lepton2_pT;
-		float lepton1_eta;
-		float lepton2_eta;
-		float lepton1_phi;
-		float lepton2_phi;
-		float met;
-		float mll;
-		int trig_ttbar;
+    bool PFJet80 ;
 
-		const  reco::Vertex  *pv;
+    TLorentzVector thelepton1;
+    TLorentzVector thelepton2;
 
-		bool PFJet80 ;
+    const GenericMVAJetTagComputer *computer ;
 
-		TLorentzVector thelepton1;
-		TLorentzVector thelepton2;
+    Njettiness nsubjettinessCalculator;
 
-		const GenericMVAJetTagComputer *computer ;
+    edm::View<reco::Muon> muons ;
 
-		Njettiness nsubjettinessCalculator;
+    edm::ESHandle<TransientTrackBuilder> trackBuilder ;
+    edm::Handle<reco::VertexCollection> primaryVertex ;
 
-		edm::View<reco::Muon> muons ;
-
-		edm::ESHandle<TransientTrackBuilder> trackBuilder ;
-		edm::Handle<reco::VertexCollection> primaryVertex ;
-
-		int cap0, cap1, cap2, cap3, cap4, cap5, cap6, cap7, cap8;
-		int can0, can1, can2, can3, can4, can5, can6, can7, can8;
+    int cap0, cap1, cap2, cap3, cap4, cap5, cap6, cap7, cap8;
+    int can0, can1, can2, can3, can4, can5, can6, can7, can8;
 };
 
 #endif
