@@ -3,8 +3,8 @@
 
 #include <TH2.h>
 #include <TStyle.h>
-#include "TH1F.h"
-#include "TH2F.h"
+#include "TH1D.h"
+#include "TH2D.h"
 #include "TGraph.h"
 #include "TCanvas.h"
 #include <iostream>
@@ -285,8 +285,8 @@ void CommPlotProducer::SetPV(){
   puweight=false;
   
   TFile *filepuest = new TFile("test/abcd/output_all.root","READ");
-  TH1F* npu_mc= (TH1F*) filepuest->Get("nPV_mc_unw");
-  TH1F* npu_dat= (TH1F*) filepuest->Get("nPV_data");
+  TH1D* npu_mc= (TH1D*) filepuest->Get("nPV_mc_unw");
+  TH1D* npu_dat= (TH1D*) filepuest->Get("nPV_data");
     
   float n_integral_mc = npu_mc->Integral();
   float n_integral_da = npu_dat->Integral();
@@ -378,7 +378,7 @@ void CommPlotProducer::SetSumXS(){
 //-------------Compute the event weight given the pthat-------------------------------------------//
 //------------------------------------------------------------------------------------------//
 
-float CommPlotProducer::GetEvtWeight(){
+ double CommPlotProducer::GetEvtWeight(){
 
   WeightXS=0.0;
   float  nevt  =0.0;
@@ -511,15 +511,15 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
   TFile *myfile=new TFile(output_name+".root",      "recreate");
   
   // --------------------------------------Histograms declaration------------------------------------------------//   
-  TH1F* nPU_mc                  = new TH1F("nPU_mc",                "nPU_mc",                60,-0.5,59.5);
-  TH1F* nPV_data                = new TH1F("nPV_data",              "nPV_data",              60,-0.5,59.5);
-  TH1F* nPV_mc                  = new TH1F("nPV_mc",                "nPV_mc",                60,-0.5,59.5);
-  TH1F* nPV_mc_unw              = new TH1F("nPV_mc_unw",            "nPV_mc_unw",                60,-0.5,59.5);
-  TH1F* pt_hat                  = new TH1F("pt_hat",                "pt_hat",                240,0,1200);
-  TH1F* pt_hat_fin              = new TH1F("pt_hat_fin",            "pt_hat_fin",                240,0,1200);
-  TH1F* jet_pt_mc               = new TH1F("jet_pt_mc",  	    "jet_pt_mc", 	     80,0,PtMax);
-  TH1F* nJet_data               = new TH1F("nJet_data",             "nJet_data",             100,0,100    );
-  TH1F* nJet_mc                 = new TH1F("nJet_mc",               "nJet_mc",               100,0,100    );
+  TH1D* nPU_mc                  = new TH1D("nPU_mc",                "nPU_mc",                60,-0.5,59.5);
+  TH1D* nPV_data                = new TH1D("nPV_data",              "nPV_data",              60,-0.5,59.5);
+  TH1D* nPV_mc                  = new TH1D("nPV_mc",                "nPV_mc",                60,-0.5,59.5);
+  TH1D* nPV_mc_unw              = new TH1D("nPV_mc_unw",            "nPV_mc_unw",                60,-0.5,59.5);
+  TH1D* pt_hat                  = new TH1D("pt_hat",                "pt_hat",                240,0,1200);
+  TH1D* pt_hat_fin              = new TH1D("pt_hat_fin",            "pt_hat_fin",                240,0,1200);
+  TH1D* jet_pt_mc               = new TH1D("jet_pt_mc",  	    "jet_pt_mc", 	     80,0,PtMax);
+  TH1D* nJet_data               = new TH1D("nJet_data",             "nJet_data",             100,0,100    );
+  TH1D* nJet_mc                 = new TH1D("nJet_mc",               "nJet_mc",               100,0,100    );
   
   // --------------------------------------Histograms declaration -----------------------------------------//
   
@@ -619,6 +619,8 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
   AddHisto("TCHP_extended2"	  ,"TCHP_extended2",				     100,-30.,30. );
   AddHisto("discri_ssche0",	 "SSVHE Discriminator",    80, -1., 7.   ); 
   AddHisto("discri_sschp0",	 "SSVHP Discriminator",    80, -1., 7.   ); 
+ 
+  int memoire_number = HistoBtag_map["discri_ssche0"] ;
    
   AddHisto("TCHE"	  ,"TCHE",				     50,0.,30. );
   AddHisto("TCHP"	  ,"TCHP",				     50,0.,30. );  
@@ -652,6 +654,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
   
   Long64_t nbytes = 0, nb = 0;
   
+//  nentries = 50000;
   cout << " in loop " << nentries <<endl;
   //------------------------------------------------------------------------------------------------------------------//  
   //----------------------------------------EVENT LOOP ---------------------------------------------------------------// 
@@ -673,7 +676,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     //-----------------------------------
     //initialaze the weight at 1
     //-----------------------------------
-    float ww=1; 
+    double ww=1; 
     
     //------------------------ cross section checks---------------------------------//
     if      ( pthat >=  15. && pthat <  20. ){
@@ -729,7 +732,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     //-----------------------------------//
 
     ww=GetEvtWeight();
-    float ww_unp=ww;
+    double ww_unp=ww;
     //--------------------------------------------//  
     //-------------pile-up reweighting------------//  
     //--------------------------------------------//  
@@ -809,6 +812,25 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
           
       if (   ptjet  < PtMin  || ptjet  > PtMax   ) continue;
       if (   fabs(etajet) > EtaCut               ) continue;
+
+      int   idxFirstMuon = -1;
+      int nselmuon = 0;
+      int nmu = 0;
+      if (nMuon>0){
+        for (int imu=0; imu< nMuon; imu++){
+          if (Muon_IdxJet[imu]==ijet ){
+	    nmu++;
+	    if (passMuonSelection(imu, ijet)){
+	      if(nselmuon == 0) {
+	        idxFirstMuon = imu;
+	      }
+	      nselmuon++;
+	    }
+          }
+	}
+      }
+      if (trigname=="btag" && nselmuon==0) continue;  // look at jet with muon for btag selection!
+
       finselect = true;
 
       float mass_sv        =0.;
@@ -832,7 +854,6 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
       float sv_nTrk        =0.;
       float sv_1st_nTrk    =0.;
       
-      int   idxFirstMuon = -1;
       
       float tche     = Jet_Ip2P[ijet];
       float tchp     = Jet_Ip3P[ijet];
@@ -1169,27 +1190,15 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
       FillHisto_floatFromMap("TCHE_extended2",  flav, isGluonSplit, tche  , ww);
       FillHisto_floatFromMap("TCHP_extended2",  flav, isGluonSplit, tchp  , ww);
       
+      if (HistoBtag_map["discri_ssche0"] != memoire_number) cout << " PROBLEME num " << HistoBtag_map["discri_ssche0"] << endl;
+      if (!isData && fabs(flav)>5 && fabs(flav)!=21) cout << " PROBLEME flav " <<  flav << endl;
+      if (!(ssvhe>-1.5 && ssvhe<10.)) cout << " PROBLEME ssvhe " << ssvhe << endl; 
       FillHisto_floatFromMap("discri_ssche0",   flav, isGluonSplit, ssvhe , ww);
       FillHisto_floatFromMap("discri_sschp0",   flav, isGluonSplit, ssvhp , ww);      
       
       //---------------------------------
       //fill information related to muons
       //---------------------------------
-      int nselmuon = 0;
-      int nmu = 0;
-      if (nMuon>0){
-        for (int imu=0; imu< nMuon; imu++){
-          if (Muon_IdxJet[imu]==ijet ){
-	    nmu++;
-	    if (passMuonSelection(imu, ijet)){
-	      if(nselmuon == 0) {
-	        idxFirstMuon = imu;
-	      }
-	      nselmuon++;
-	    }
-          }
-	}
-      }
          
       
       FillHisto_intFromMap(  "muon_multi_sel",  flav, isGluonSplit , nselmuon   ,ww);
@@ -1292,11 +1301,11 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
 
 void CommPlotProducer::AddHisto(TString name, TString title, int nbins, float min, float max)  {
   
-  TH1F* h_b      = new TH1F(name+"_b",title+"_b",nbins,min,max);
-  TH1F* h_bfromg = new TH1F(name+"_bfromg",title+"_bfromg",nbins,min,max);  
-  TH1F* h_c      = new TH1F(name+"_c",title+"_c",nbins,min,max);  
-  TH1F* h_l      = new TH1F(name+"_l",title+"_l",nbins,min,max);
-  TH1F* h_data   = new TH1F(name+"_data",title+"_data",nbins,min,max);
+  TH1D* h_b      = new TH1D(name+"_b",title+"_b",nbins,min,max);
+  TH1D* h_bfromg = new TH1D(name+"_bfromg",title+"_bfromg",nbins,min,max);  
+  TH1D* h_c      = new TH1D(name+"_c",title+"_c",nbins,min,max);  
+  TH1D* h_l      = new TH1D(name+"_l",title+"_l",nbins,min,max);
+  TH1D* h_data   = new TH1D(name+"_data",title+"_data",nbins,min,max);
   
   
   h_b        ->Sumw2();
@@ -1310,14 +1319,14 @@ void CommPlotProducer::AddHisto(TString name, TString title, int nbins, float mi
   HistoBtag.push_back(h_c);  
   HistoBtag.push_back(h_l);  
   HistoBtag.push_back(h_data);  
-  HistoBtag_map[name] = numb_histo;
+  HistoBtag_map[name.Data()] = numb_histo;
   
   numb_histo++;
   
 }
 
 
-void CommPlotProducer::FillHisto_float(int flavour, bool isGS, int number, float value, float weight)  {
+void CommPlotProducer::FillHisto_float(int flavour, bool isGS, int number, float value, double weight)  {
   
   if (!isData){
     if (fabs(flavour)==5 && !isGS)                  HistoBtag[number*5 +0]->Fill(value,weight);
@@ -1330,7 +1339,7 @@ void CommPlotProducer::FillHisto_float(int flavour, bool isGS, int number, float
   
   
 }
-void CommPlotProducer::FillHisto_int(int flavour, bool isGS, int number, int value, float weight)  {
+void CommPlotProducer::FillHisto_int(int flavour, bool isGS, int number, int value, double weight)  {
   
   if (!isData){
     if (fabs(flavour)==5 && !isGS)             HistoBtag[number*5 +0]->Fill(value,weight);
@@ -1343,10 +1352,10 @@ void CommPlotProducer::FillHisto_int(int flavour, bool isGS, int number, int val
 }
 
 
-void CommPlotProducer::FillHisto_floatFromMap(TString name, int flavour, bool isGS, float value, float weight)  {
+void CommPlotProducer::FillHisto_floatFromMap(TString name, int flavour, bool isGS, float value, double weight)  {
   
   
-  int number = HistoBtag_map[name] ;
+  int number = HistoBtag_map[name.Data()] ;
   if (!isData){
     if (fabs(flavour)==5 && !isGS)                  HistoBtag[number*5 +0]->Fill(value,weight);
     else if (fabs(flavour)==5 && isGS)              HistoBtag[number*5 +1]->Fill(value,weight);
@@ -1360,9 +1369,9 @@ void CommPlotProducer::FillHisto_floatFromMap(TString name, int flavour, bool is
 }
 
 
-void CommPlotProducer::FillHisto_intFromMap(TString name, int flavour, bool isGS, int value, float weight)  {
+void CommPlotProducer::FillHisto_intFromMap(TString name, int flavour, bool isGS, int value, double weight)  {
   
-  int number = HistoBtag_map[name] ;
+  int number = HistoBtag_map[name.Data()] ;
   if (!isData){
     if (fabs(flavour)==5 && !isGS)                  HistoBtag[number*5 +0]->Fill(value,weight);
     else if (fabs(flavour)==5 && isGS)              HistoBtag[number*5 +1]->Fill(value,weight);
@@ -1381,11 +1390,11 @@ void CommPlotProducer::FillHisto_intFromMap(TString name, int flavour, bool isGS
 void CommPlotProducer::AddHisto2D(TString name, TString title, int nbins, float min, float max, int nbins2, float
 min2, float max2)  {
   
-  TH2F* h_b      = new TH2F(name+"_b",title+"_b",nbins,min,max,nbins2,min2,max2);
-  TH2F* h_bfromg = new TH2F(name+"_bfromg",title+"_bfromg",nbins,min,max,nbins2,min2,max2);  
-  TH2F* h_c      = new TH2F(name+"_c",title+"_c",nbins,min,max,nbins2,min2,max2);  
-  TH2F* h_l      = new TH2F(name+"_l",title+"_l",nbins,min,max,nbins2,min2,max2);
-  TH2F* h_data   = new TH2F(name+"_data",title+"_data",nbins,min,max,nbins2,min2,max2);
+  TH2D* h_b      = new TH2D(name+"_b",title+"_b",nbins,min,max,nbins2,min2,max2);
+  TH2D* h_bfromg = new TH2D(name+"_bfromg",title+"_bfromg",nbins,min,max,nbins2,min2,max2);  
+  TH2D* h_c      = new TH2D(name+"_c",title+"_c",nbins,min,max,nbins2,min2,max2);  
+  TH2D* h_l      = new TH2D(name+"_l",title+"_l",nbins,min,max,nbins2,min2,max2);
+  TH2D* h_data   = new TH2D(name+"_data",title+"_data",nbins,min,max,nbins2,min2,max2);
   
   
   h_b        ->Sumw2();
@@ -1399,17 +1408,17 @@ min2, float max2)  {
   HistoBtag2D.push_back(h_c);  
   HistoBtag2D.push_back(h_l);  
   HistoBtag2D.push_back(h_data);  
-  HistoBtag2D_map[name] = numb_histo2D;
+  HistoBtag2D_map[name.Data()] = numb_histo2D;
   numb_histo2D++;
   
 }
 
 
 
-void CommPlotProducer::FillHisto2D_int_floatFromMap(TString name, int flavour, bool isGS, int value, float value2, float weight)  {
+void CommPlotProducer::FillHisto2D_int_floatFromMap(TString name, int flavour, bool isGS, int value, float value2, double weight)  {
   
   
-  int number = HistoBtag2D_map[name] ;
+  int number = HistoBtag2D_map[name.Data()] ;
   if (!isData){
     if (fabs(flavour)==5 && !isGS)                  HistoBtag2D[number*5 +0]->Fill(value,value2,weight);
     else if (fabs(flavour)==5 && isGS)              HistoBtag2D[number*5 +1]->Fill(value,value2,weight);
@@ -1422,10 +1431,10 @@ void CommPlotProducer::FillHisto2D_int_floatFromMap(TString name, int flavour, b
    
 }
 
-void CommPlotProducer::FillHisto2D_float_floatFromMap(TString name, int flavour, bool isGS, float value, float value2, float weight)  {
+void CommPlotProducer::FillHisto2D_float_floatFromMap(TString name, int flavour, bool isGS, float value, float value2, double weight)  {
   
   
-  int number = HistoBtag2D_map[name] ;
+  int number = HistoBtag2D_map[name.Data()] ;
   if (!isData){
     if (fabs(flavour)==5 && !isGS)                  HistoBtag2D[number*5 +0]->Fill(value,value2,weight);
     else if (fabs(flavour)==5 && isGS)              HistoBtag2D[number*5 +1]->Fill(value,value2,weight);

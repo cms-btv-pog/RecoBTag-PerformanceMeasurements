@@ -8,8 +8,8 @@
 #ifndef CommPlotProducer_h
 #define CommPlotProducer_h
 
-#include "TH1F.h"
-#include "TH2F.h"
+#include "TH1D.h"
+#include "TH2D.h"
 #include <iomanip>
 #include <TROOT.h>
 #include <TChain.h>
@@ -17,6 +17,7 @@
 #include <TFile.h>
 #include <iostream>
 #include <fstream>
+#include <map>
 #include "../../../../PhysicsTools/Utilities/interface/LumiReweightingStandAlone.h"
  
 // Header file for the classes stored in the TTree if any.
@@ -35,11 +36,14 @@ public :
    double           n15_30, n120_150, n150_inf;
    bool            use15_20,use20_30, use30_50,use50_80,use80_120,use120_170,use170_300,use300_470,use470_600,use600_800, use800_1000, use1000_inf;
    bool            use15_30, use120_150, use150_inf; 
-   std::vector<TH1F*>   HistoBtag;  
-   std::vector<TH2F*>   HistoBtag2D;  
+   std::vector<TH1D*>   HistoBtag;  
+   std::vector<TH2D*>   HistoBtag2D;  
     
-   std::map<TString, int>   HistoBtag_map; 
-   std::map<TString, int>   HistoBtag2D_map; 
+//   std::map<TString, int>   HistoBtag_map; 
+//   std::map<TString, int>   HistoBtag2D_map; 
+   std::map<std::string, int>   HistoBtag_map;
+   std::map<std::string, int>   HistoBtag2D_map;
+
    
    double x_section[12]; 
    double nmc_evt_vect[12];
@@ -493,19 +497,19 @@ public :
    virtual void     Show(Long64_t entry = -1);
    virtual void     AddHisto(TString name, TString title,  int nbins, float min, float max);
    virtual void     AddHisto2D(TString name,TString title,int nbins,float min,float max,int nbins2,float min2,float max2);   
-   virtual void     FillHisto_int(int flavour, bool isGS, int number, int value, float weight);
-   virtual void     FillHisto_float(int flavour, bool isGS, int number, float value, float weight);
-   virtual void     FillHisto_floatFromMap(TString name, int flavour, bool isGS, float value, float weight);
-   virtual void     FillHisto_intFromMap(TString name, int flavour, bool isGS, int value, float weight);
-   virtual void     FillHisto2D_int_floatFromMap(TString name, int flavour, bool isGS, int value, float value2, float weight);
-   virtual void     FillHisto2D_float_floatFromMap(TString name, int flavour, bool isGS, float value, float value2, float weight);
+   virtual void     FillHisto_int(int flavour, bool isGS, int number, int value, double weight);
+   virtual void     FillHisto_float(int flavour, bool isGS, int number, float value, double weight);
+   virtual void     FillHisto_floatFromMap(TString name, int flavour, bool isGS, float value, double weight);
+   virtual void     FillHisto_intFromMap(TString name, int flavour, bool isGS, int value, double weight);
+   virtual void     FillHisto2D_int_floatFromMap(TString name, int flavour, bool isGS, int value, float value2, double weight);
+   virtual void     FillHisto2D_float_floatFromMap(TString name, int flavour, bool isGS, float value, float value2, double weight);
    virtual void     SetPU(vector<float> PUvector, TString PUdataFile);
    virtual void     SetPU2012_S10(TString PUdataFile);
    virtual void     SetPU2012_S7(TString PUdataFile);   
    virtual void     SetPV();
    virtual void     SetXS();
    virtual void     Counter();
-   virtual float    GetEvtWeight() ; 
+   virtual double    GetEvtWeight() ; 
    virtual void     SetXS(TString generator, bool MuEnriched, int TeV) ;
    virtual void     SetInfo(TString generator, bool qcd, int TeV) ;
    virtual void     Fill_nevent(double n15,double n20, double n30,double n50,double n80,double n120,double n170,double n300,double n470,double n600, double n800, double n1000); 

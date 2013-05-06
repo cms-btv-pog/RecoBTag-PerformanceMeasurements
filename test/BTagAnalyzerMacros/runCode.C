@@ -88,7 +88,7 @@
    //The loop on tthe events takes 4 inputs: the trigger, the ptmin of the jets, the ptmax of the jets, and the output
    //file name 
    
-   m.Loop("jet",40, 60, 500, "output_mc1abcd");
+   m.Loop("jet",40, 60, 500, "output_jet");
 
    
 }

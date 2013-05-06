@@ -1,7 +1,7 @@
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
-#include "TH1F.h"
+#include "TH1D.h"
 #include "TMultiGraph.h"
 #include "TGraph.h"
 #include "TCanvas.h"
@@ -21,8 +21,15 @@
 
 using namespace std;
 
+TString filename="qcd_pythia/jet_40_60_500/output_all.root";
+//TString filename="qcd_pythia/jet_40_60_500/output_newalgo1.root";
+//TString filename="qcd_pythia/btag_40_65_300/output_btag_all.root";
+//TString filename="qcd_pythia/btag_40_65_300/output_btag_newalgo1.root";
+//TString filename="qcd_pythia/btag_40_65_300/output_btag_oldprocess.root";
+
 //TString filename="test_proof/save_proof_btag40_65_300_w_trigMC.root";
-TString filename="test_output_newalgo.root";
+//TString filename="qcd_pythia/btag_40_65_300/output_btag_newalgo.root";
+//TString filename="qcd_pythia/btag_40_65_300/output_btag_oldprocess.root";
 //TString filename="test_proof/save_proof_trig40_60_500.root";
 //TString filename="test/abcd_new/output_all.root";
 //TString filename="test/abcd_80_80_470/output_all.root";
@@ -32,6 +39,7 @@ TString filename="test_output_newalgo.root";
 //TString dir4plots="test_proof/Commissioning_btag40_65";
 TString dir4plots="Commissioning_plots";
 TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  19.7 fb^{-1}";
+//TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  old Process";
 //TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  14. fb^{-1}";
 //TString title= "OLD #sqrt{s} = 8 TeV";
 //TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  A:0.89 fb^{-1}";
@@ -46,12 +54,14 @@ TString format=".gif"; // .png or .pdf
 bool bOverflow=true;
 bool web = true;
 
+bool btag = true;
+
 
 void Draw(TString name, TString histotitle, bool log);
 void DrawMC(TString name, TString histotitle, bool log);
 void DrawTagRate(TString name, TString histotitle, bool log);
 void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY, bool log);
-void OverFlowBinFix(TH1F* );
+void OverFlowBinFix(TH1D* );
 
 //--------
 
@@ -126,8 +136,8 @@ if (Draw_sv_plots){
   Draw("sv_mass_3trk","SV mass if #tracks@SV >=3",0);
   Draw("sv_chi2norm","SV norm. #chi^{2}",1);
   Draw("sv_deltaR_jet","Delta R between the jet and the SV direction.",0);
-  Draw("sv_deltaR_sumJet","#Delta R between the jet and the SV",0);
-  Draw("sv_deltaR_sumDir","#Delta R between the jet direction and the SV",0);
+  Draw("sv_deltaR_sumJet","#Delta R between the jet and the SV {p}",0);
+  Draw("sv_deltaR_sumDir","#Delta R between the SV direction and the SV {p}",0);
   Draw("sv_en_ratio","SV energy ratio",0);	
   Draw("sv_aboveC","IP2D of the first track above the charm threshold",1);	
   Draw("sv_pt","SV p_{T}",1); 	
@@ -174,10 +184,12 @@ if (Draw_discriminator_plots){
   }
 if (Draw_newdiscriminator_plots) {
   Draw("RetCombSvx"         ,"Retrained CSV Discriminator",1);
+  Draw("RetCombSvx"         ,"Retrained CSV Discriminator",0);
   Draw("CombCSVJP"          ,"Combined CSV+JP Discriminator",1);
   Draw("CombCSVSL"          ,"Combined CSV+SL Discriminator",1);
   Draw("CombCSVJPSL"        ,"Combined CSV+JP+SL Discriminator",1);
   Draw("SoftMu"        ,"Soft Muon Discriminator",1);
+  Draw("SoftMu"        ,"Soft Muon Discriminator",0);
   Draw("SoftEl"        ,"Soft Electron Discriminator",1);
 }
   			    
@@ -218,21 +230,21 @@ void Draw(TString name, TString histotitle, bool log)
 {
 
  
- TH1F* hist_b;
- TH1F* hist_c;
- TH1F* hist_gsplit;
- TH1F* hist_l;
- TH1F* hist_data;
+ TH1D* hist_b;
+ TH1D* hist_c;
+ TH1D* hist_gsplit;
+ TH1D* hist_l;
+ TH1D* hist_data;
  
  
  TFile *myFile     = new TFile(filename);
  
  myFile->cd();
- hist_b         = (TH1F*)gROOT->FindObject(name+"_b");
- hist_c         = (TH1F*)gROOT->FindObject(name+"_c");
- hist_gsplit    = (TH1F*)gROOT->FindObject(name+"_bfromg");
- hist_l         = (TH1F*)gROOT->FindObject(name+"_l");
- hist_data      = (TH1F*)gROOT->FindObject(name+"_data");
+ hist_b         = (TH1D*)gROOT->FindObject(name+"_b");
+ hist_c         = (TH1D*)gROOT->FindObject(name+"_c");
+ hist_gsplit    = (TH1D*)gROOT->FindObject(name+"_bfromg");
+ hist_l         = (TH1D*)gROOT->FindObject(name+"_l");
+ hist_data      = (TH1D*)gROOT->FindObject(name+"_data");
  
 
  if (bOverflow && name!="SSV" && name!="SSVHP" && name!="sv_mass" 
@@ -246,7 +258,7 @@ void Draw(TString name, TString histotitle, bool log)
 
 
 
- TH1F* histo_tot = (TH1F*) hist_b->Clone();
+ TH1D* histo_tot = (TH1D*) hist_b->Clone();
  histo_tot->Sumw2();
  histo_tot ->Add(hist_c);
  histo_tot ->Add(hist_gsplit);
@@ -277,8 +289,8 @@ void Draw(TString name, TString histotitle, bool log)
  hist_b     ->GetYaxis()->SetTitleSize(titlesizey);
  hist_b     ->GetYaxis()->SetTitleOffset(titleoffsety);
   
- TH1F* histo_ratio;
- histo_ratio = (TH1F*) hist_data->Clone();
+ TH1D* histo_ratio;
+ histo_ratio = (TH1D*) hist_data->Clone();
  histo_ratio->SetName("histo_ratio");
  histo_ratio->SetTitle("");
   
@@ -337,11 +349,22 @@ void Draw(TString name, TString histotitle, bool log)
 
  int move_legend=0;
  if (name=="jet_phi" || name=="sv_phi" || name=="muon_phi" ) move_legend=1;
+ if (btag) {
+  if (name=="CSVJPSL" || name=="CSVSL" || (name=="SoftMu" && !log) ) move_legend=2;
+  if (name=="CSV" || name=="CSVJP" || (name=="RetCombSvx" && !log) ) move_legend=3;
+  if ((name=="RetCombSvx" || name=="SoftMu" ) && log) move_legend=1;
+ }
  if (log && name=="sv_en_ratio" ) move_legend=1;
 // TLegend* qw =  new TLegend(0.54,0.63,0.88,0.9);
  TLegend* qw;
  if (move_legend==1) {
    qw =  new TLegend(0.35,0.25,0.70,0.52);
+ }
+ else if (move_legend==2) {
+     qw =  new TLegend(0.10,0.63,0.45,0.90);
+ }
+ else if (move_legend==3) {
+     qw =  new TLegend(0.35,0.63,0.70,0.90);
  }
  else qw =  new TLegend(0.6,0.73,0.95,1.);
 
@@ -415,24 +438,24 @@ void Draw(TString name, TString histotitle, bool log)
 void DrawTagRate(TString name, TString histotitle, bool log){
 
 
- TH1F* hist_b;
- TH1F* hist_c;
- TH1F* hist_gsplit;
- TH1F* hist_l;
- TH1F* hist_data;
+ TH1D* hist_b;
+ TH1D* hist_c;
+ TH1D* hist_gsplit;
+ TH1D* hist_l;
+ TH1D* hist_data;
  
  
  TFile *myFile     = new TFile(filename);
  
  myFile->cd();
- hist_b         = (TH1F*)gROOT->FindObject(name+"_b");
- hist_c         = (TH1F*)gROOT->FindObject(name+"_c");
- hist_gsplit    = (TH1F*)gROOT->FindObject(name+"_bfromg");
- hist_l         = (TH1F*)gROOT->FindObject(name+"_l");
- hist_data      = (TH1F*)gROOT->FindObject(name+"_data");
+ hist_b         = (TH1D*)gROOT->FindObject(name+"_b");
+ hist_c         = (TH1D*)gROOT->FindObject(name+"_c");
+ hist_gsplit    = (TH1D*)gROOT->FindObject(name+"_bfromg");
+ hist_l         = (TH1D*)gROOT->FindObject(name+"_l");
+ hist_data      = (TH1D*)gROOT->FindObject(name+"_data");
  
 
- TH1F* histo_tot = (TH1F*) hist_b->Clone();
+ TH1D* histo_tot = (TH1D*) hist_b->Clone();
  histo_tot->Sumw2();
  histo_tot ->Add(hist_c);
  histo_tot ->Add(hist_gsplit);
@@ -450,12 +473,12 @@ void DrawTagRate(TString name, TString histotitle, bool log){
  float minx=hist_data->GetXaxis()->GetXmin();
  float maxx=hist_data->GetXaxis()->GetXmax();
  
- TH1F * TagRate_Data = new TH1F ("TagRate_Data",histotitle,nbinx,minx,maxx);
- TH1F * TagRate_MC   = new TH1F ("TagRate_MC",histotitle,nbinx,minx,maxx);
- TH1F * TagRate_MC_b = new TH1F ("TagRate_MC_b",histotitle,nbinx,minx,maxx);
- TH1F * TagRate_MC_c = new TH1F ("TagRate_MC_c",histotitle,nbinx,minx,maxx);
- TH1F * TagRate_MC_udsg = new TH1F ("TagRate_MC_udsg",histotitle,nbinx,minx,maxx);
- TH1F * TagRate_MC_gspl = new TH1F ("TagRate_MC_gspl",histotitle,nbinx,minx,maxx);
+ TH1D * TagRate_Data = new TH1D ("TagRate_Data",histotitle,nbinx,minx,maxx);
+ TH1D * TagRate_MC   = new TH1D ("TagRate_MC",histotitle,nbinx,minx,maxx);
+ TH1D * TagRate_MC_b = new TH1D ("TagRate_MC_b",histotitle,nbinx,minx,maxx);
+ TH1D * TagRate_MC_c = new TH1D ("TagRate_MC_c",histotitle,nbinx,minx,maxx);
+ TH1D * TagRate_MC_udsg = new TH1D ("TagRate_MC_udsg",histotitle,nbinx,minx,maxx);
+ TH1D * TagRate_MC_gspl = new TH1D ("TagRate_MC_gspl",histotitle,nbinx,minx,maxx);
 
  int nbin_max= hist_data->GetNbinsX();
 
@@ -504,8 +527,8 @@ void DrawTagRate(TString name, TString histotitle, bool log){
 
   // MAKE DATA/MC RATIO
   
-  TH1F* histo_ratio;
-  histo_ratio = (TH1F*) TagRate_Data->Clone();
+  TH1D* histo_ratio;
+  histo_ratio = (TH1D*) TagRate_Data->Clone();
   histo_ratio->SetName("histo0_ratio");
   histo_ratio->SetTitle("");
   histo_ratio->Divide(TagRate_MC);
@@ -626,24 +649,24 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
 
 
 
- TH2F* hist_b;
- TH2F* hist_c;
- TH2F* hist_gsplit;
- TH2F* hist_l;
- TH2F* hist_data;
+ TH2D* hist_b;
+ TH2D* hist_c;
+ TH2D* hist_gsplit;
+ TH2D* hist_l;
+ TH2D* hist_data;
  
  
  TFile *myFile     = new TFile(filename);
  
  myFile->cd();
- hist_b         = (TH2F*)gROOT->FindObject(name+"_b");
- hist_c         = (TH2F*)gROOT->FindObject(name+"_c");
- hist_gsplit    = (TH2F*)gROOT->FindObject(name+"_bfromg");
- hist_l         = (TH2F*)gROOT->FindObject(name+"_l");
- hist_data      = (TH2F*)gROOT->FindObject(name+"_data");
+ hist_b         = (TH2D*)gROOT->FindObject(name+"_b");
+ hist_c         = (TH2D*)gROOT->FindObject(name+"_c");
+ hist_gsplit    = (TH2D*)gROOT->FindObject(name+"_bfromg");
+ hist_l         = (TH2D*)gROOT->FindObject(name+"_l");
+ hist_data      = (TH2D*)gROOT->FindObject(name+"_data");
  
 
- TH2F* histo_tot = (TH2F*) hist_b->Clone();
+ TH2D* histo_tot = (TH2D*) hist_b->Clone();
  histo_tot ->Add(hist_c);
  histo_tot ->Add(hist_gsplit);
  histo_tot ->Add(hist_l); 
@@ -787,7 +810,7 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
 
 //------------
 
-void OverFlowBinFix(TH1F* histo){
+void OverFlowBinFix(TH1D* histo){
 
   Float_t val, errval;
 
@@ -823,16 +846,16 @@ void DrawMC(TString name, TString histotitle, bool log)
  
 {
  TFile *myFile     = new TFile(filename);
- TH1F* hist_mc;     
- TH1F* hist_data;  
+ TH1D* hist_mc;     
+ TH1D* hist_data;  
  if (name=="nPV") {
-//   hist_mc       = (TH1F*)gROOT->FindObject(name+"_mc_unw");
-   hist_mc       = (TH1F*)gROOT->FindObject(name+"_mc");
+//   hist_mc       = (TH1D*)gROOT->FindObject(name+"_mc_unw");
+   hist_mc       = (TH1D*)gROOT->FindObject(name+"_mc");
   }
  else {
-   hist_mc       = (TH1F*)gROOT->FindObject(name+"_mc");
+   hist_mc       = (TH1D*)gROOT->FindObject(name+"_mc");
  }
- hist_data     = (TH1F*)gROOT->FindObject(name+"_data");
+ hist_data     = (TH1D*)gROOT->FindObject(name+"_data");
  float scale_f = (hist_data->Integral())/(hist_mc->Integral());
  hist_mc       ->Scale(scale_f);
 
@@ -848,8 +871,8 @@ void DrawMC(TString name, TString histotitle, bool log)
  hist_mc     ->GetYaxis()->SetTitleSize(titlesizey);
  hist_mc     ->GetYaxis()->SetTitleOffset(titleoffsety);
   
- TH1F* histo_ratio;
- histo_ratio = (TH1F*) hist_data->Clone();
+ TH1D* histo_ratio;
+ histo_ratio = (TH1D*) hist_data->Clone();
  histo_ratio->Sumw2();
  histo_ratio->SetName("histo_ratio");
  histo_ratio->SetTitle("");
