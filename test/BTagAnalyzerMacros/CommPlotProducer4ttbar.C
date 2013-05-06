@@ -3,8 +3,8 @@
 
 #include <TH2.h>
 #include <TStyle.h>
-#include "TH1F.h"
-#include "TH2F.h"
+#include "TH1D.h"
+#include "TH2D.h"
 #include "TGraph.h"
 #include "TCanvas.h"
 #include <iostream>
@@ -262,7 +262,7 @@ void CommPlotProducer4ttbar::SetSumXS(){
 //-------------Compute the event weight given the pthat-------------------------------------------//
 //------------------------------------------------------------------------------------------//
 
-float CommPlotProducer4ttbar::GetEvtWeight(){
+double CommPlotProducer4ttbar::GetEvtWeight(){
 
   WeightXS=0.0;
   float  nevt  =0.0;
@@ -531,11 +531,11 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
   TFile *myfile=new TFile(output_name+".root",      "recreate");
   
   // --------------------------------------Histograms declaration------------------------------------------------//   
-  TH1F* nPU_mc                  = new TH1F("nPU_mc",                "nPU_mc",                50,-0.5,49.5);
-  TH1F* nPU_data                = new TH1F("nPU_data",              "nPU_data",              50,-0.5,49.5);
-  TH1F* nPV_mc                  = new TH1F("nPV_mc",                "nPV_mc",                50,-0.5,49.5);
-  TH1F* pt_hat                  = new TH1F("pt_hat",                "pt_hat",                80,0,800);
-  TH1F* jet_pt_mc               = new TH1F("jet_pt_mc",  	    "jet_pt_mc", 	     80,0,PtMax);
+  TH1D* nPU_mc                  = new TH1D("nPU_mc",                "nPU_mc",                50,-0.5,49.5);
+  TH1D* nPU_data                = new TH1D("nPU_data",              "nPU_data",              50,-0.5,49.5);
+  TH1D* nPV_mc                  = new TH1D("nPV_mc",                "nPV_mc",                50,-0.5,49.5);
+  TH1D* pt_hat                  = new TH1D("pt_hat",                "pt_hat",                80,0,800);
+  TH1D* jet_pt_mc               = new TH1D("jet_pt_mc",  	    "jet_pt_mc", 	     80,0,PtMax);
   
   // --------------------------------------Histograms declaration -----------------------------------------//
   
@@ -699,7 +699,7 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
     //-----------------------------------
     //initialaze the weight at 1
     //-----------------------------------
-    float ww=1; 
+    double ww=1; 
     
     //-----------------------------------//
     //-------xs reweighting--------------//
@@ -1251,11 +1251,11 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
 
 void CommPlotProducer4ttbar::AddHisto(TString name, TString title, int nbins, float min, float max)  {
   
-  TH1F* h_b      = new TH1F(name+"_b",title+"_b",nbins,min,max);
-  TH1F* h_bfromg = new TH1F(name+"_bfromg",title+"_bfromg",nbins,min,max);  
-  TH1F* h_c      = new TH1F(name+"_c",title+"_c",nbins,min,max);  
-  TH1F* h_l      = new TH1F(name+"_l",title+"_l",nbins,min,max);
-  TH1F* h_data   = new TH1F(name+"_data",title+"_data",nbins,min,max);
+  TH1D* h_b      = new TH1D(name+"_b",title+"_b",nbins,min,max);
+  TH1D* h_bfromg = new TH1D(name+"_bfromg",title+"_bfromg",nbins,min,max);  
+  TH1D* h_c      = new TH1D(name+"_c",title+"_c",nbins,min,max);  
+  TH1D* h_l      = new TH1D(name+"_l",title+"_l",nbins,min,max);
+  TH1D* h_data   = new TH1D(name+"_data",title+"_data",nbins,min,max);
   
   
   h_b        ->Sumw2();
@@ -1269,7 +1269,7 @@ void CommPlotProducer4ttbar::AddHisto(TString name, TString title, int nbins, fl
   HistoBtag.push_back(h_c);  
   HistoBtag.push_back(h_l);  
   HistoBtag.push_back(h_data);  
-  HistoBtag_map[name] = numb_histo;
+  HistoBtag_map[name.Data()] = numb_histo;
   
   numb_histo++;
   
@@ -1277,10 +1277,10 @@ void CommPlotProducer4ttbar::AddHisto(TString name, TString title, int nbins, fl
 
 void CommPlotProducer4ttbar::AddHistottbar(TString name, TString title, int nbins, float min, float max)  {
   
-  TH1F* h_ttbar   = new TH1F(name+"_ttbar",title+"_ttbar",nbins,min,max);
-  TH1F* h_dy      = new TH1F(name+"_dy",title+"_dy",nbins,min,max);  
-  TH1F* h_st      = new TH1F(name+"_st",title+"_st",nbins,min,max);  
-  TH1F* h_data    = new TH1F(name+"_data",title+"_data",nbins,min,max);
+  TH1D* h_ttbar   = new TH1D(name+"_ttbar",title+"_ttbar",nbins,min,max);
+  TH1D* h_dy      = new TH1D(name+"_dy",title+"_dy",nbins,min,max);  
+  TH1D* h_st      = new TH1D(name+"_st",title+"_st",nbins,min,max);  
+  TH1D* h_data    = new TH1D(name+"_data",title+"_data",nbins,min,max);
   
   
   h_ttbar     ->Sumw2();
@@ -1292,13 +1292,13 @@ void CommPlotProducer4ttbar::AddHistottbar(TString name, TString title, int nbin
   HistoTTbar.push_back(h_dy);  
   HistoTTbar.push_back(h_st);  
   HistoTTbar.push_back(h_data);  
-  HistoTTbar_map[name] = numb_histo2;
+  HistoTTbar_map[name.Data()] = numb_histo2;
   
   numb_histo2++;
   
 }
 
-void CommPlotProducer4ttbar::FillHisto_float(int flavour, bool isGS, int number, float value, float weight)  {
+void CommPlotProducer4ttbar::FillHisto_float(int flavour, bool isGS, int number, float value, double weight)  {
   
   if (!isData){
     if (fabs(flavour)==5 && !isGS)                  HistoBtag[number*5 +0]->Fill(value,weight);
@@ -1311,7 +1311,7 @@ void CommPlotProducer4ttbar::FillHisto_float(int flavour, bool isGS, int number,
   
   
 }
-void CommPlotProducer4ttbar::FillHisto_int(int flavour, bool isGS, int number, int value, float weight)  {
+void CommPlotProducer4ttbar::FillHisto_int(int flavour, bool isGS, int number, int value, double weight)  {
   
   if (!isData){
     if (fabs(flavour)==5 && !isGS)             HistoBtag[number*5 +0]->Fill(value,weight);
@@ -1324,10 +1324,10 @@ void CommPlotProducer4ttbar::FillHisto_int(int flavour, bool isGS, int number, i
 }
 
 
-void CommPlotProducer4ttbar::FillHisto_floatFromMap(TString name, int flavour, bool isGS, float value, float weight)  {
+void CommPlotProducer4ttbar::FillHisto_floatFromMap(TString name, int flavour, bool isGS, float value, double weight)  {
   
   
-  int number = HistoBtag_map[name] ;
+  int number = HistoBtag_map[name.Data()] ;
   if (!isData){
     if (fabs(flavour)==5 && !isGS)                  HistoBtag[number*5 +0]->Fill(value,weight);
     else if (fabs(flavour)==5 && isGS)              HistoBtag[number*5 +1]->Fill(value,weight);
@@ -1341,9 +1341,9 @@ void CommPlotProducer4ttbar::FillHisto_floatFromMap(TString name, int flavour, b
 }
 
 
-void CommPlotProducer4ttbar::FillHisto_intFromMap(TString name, int flavour, bool isGS, int value, float weight)  {
+void CommPlotProducer4ttbar::FillHisto_intFromMap(TString name, int flavour, bool isGS, int value, double weight)  {
   
-  int number = HistoBtag_map[name] ;
+  int number = HistoBtag_map[name.Data()] ;
   if (!isData){
     if (fabs(flavour)==5 && !isGS)                  HistoBtag[number*5 +0]->Fill(value,weight);
     else if (fabs(flavour)==5 && isGS)              HistoBtag[number*5 +1]->Fill(value,weight);
@@ -1354,10 +1354,10 @@ void CommPlotProducer4ttbar::FillHisto_intFromMap(TString name, int flavour, boo
   
 }
 
-void CommPlotProducer4ttbar::FillHistottbar_floatFromMap(TString name, int flavour, bool isGS, float value, float weight)  {
+void CommPlotProducer4ttbar::FillHistottbar_floatFromMap(TString name, int flavour, bool isGS, float value, double weight)  {
   
   
-  int number = HistoTTbar_map[name] ;
+  int number = HistoTTbar_map[name.Data()] ;
   if (!isData){
     if (flavour==1)                  HistoTTbar[number*4 +0]->Fill(value,weight);
     else if (flavour==2)             HistoTTbar[number*4 +1]->Fill(value,weight);
@@ -1369,9 +1369,9 @@ void CommPlotProducer4ttbar::FillHistottbar_floatFromMap(TString name, int flavo
 }
 
 
-void CommPlotProducer4ttbar::FillHistottbar_intFromMap(TString name, int flavour, bool isGS, int value, float weight)  {
+void CommPlotProducer4ttbar::FillHistottbar_intFromMap(TString name, int flavour, bool isGS, int value, double weight)  {
   
-  int number = HistoTTbar_map[name] ;
+  int number = HistoTTbar_map[name.Data()] ;
   if (!isData){
     if (flavour==1)                  HistoTTbar[number*4 +0]->Fill(value,weight);
     else if (flavour==2)             HistoTTbar[number*4 +1]->Fill(value,weight);
@@ -1388,11 +1388,11 @@ void CommPlotProducer4ttbar::FillHistottbar_intFromMap(TString name, int flavour
 void CommPlotProducer4ttbar::AddHisto2D(TString name, TString title, int nbins, float min, float max, int nbins2, float
 min2, float max2)  {
   
-  TH2F* h_b      = new TH2F(name+"_b",title+"_b",nbins,min,max,nbins2,min2,max2);
-  TH2F* h_bfromg = new TH2F(name+"_bfromg",title+"_bfromg",nbins,min,max,nbins2,min2,max2);  
-  TH2F* h_c      = new TH2F(name+"_c",title+"_c",nbins,min,max,nbins2,min2,max2);  
-  TH2F* h_l      = new TH2F(name+"_l",title+"_l",nbins,min,max,nbins2,min2,max2);
-  TH2F* h_data   = new TH2F(name+"_data",title+"_data",nbins,min,max,nbins2,min2,max2);
+  TH2D* h_b      = new TH2D(name+"_b",title+"_b",nbins,min,max,nbins2,min2,max2);
+  TH2D* h_bfromg = new TH2D(name+"_bfromg",title+"_bfromg",nbins,min,max,nbins2,min2,max2);  
+  TH2D* h_c      = new TH2D(name+"_c",title+"_c",nbins,min,max,nbins2,min2,max2);  
+  TH2D* h_l      = new TH2D(name+"_l",title+"_l",nbins,min,max,nbins2,min2,max2);
+  TH2D* h_data   = new TH2D(name+"_data",title+"_data",nbins,min,max,nbins2,min2,max2);
   
   
   h_b        ->Sumw2();
@@ -1406,17 +1406,17 @@ min2, float max2)  {
   HistoBtag2D.push_back(h_c);  
   HistoBtag2D.push_back(h_l);  
   HistoBtag2D.push_back(h_data);  
-  HistoBtag2D_map[name] = numb_histo2D;
+  HistoBtag2D_map[name.Data()] = numb_histo2D;
   numb_histo2D++;
   
 }
 
 
 
-void CommPlotProducer4ttbar::FillHisto2D_int_floatFromMap(TString name, int flavour, bool isGS, int value, float value2, float weight)  {
+void CommPlotProducer4ttbar::FillHisto2D_int_floatFromMap(TString name, int flavour, bool isGS, int value, float value2, double weight)  {
   
   
-  int number = HistoBtag2D_map[name] ;
+  int number = HistoBtag2D_map[name.Data()] ;
   if (!isData){
     if (fabs(flavour)==5 && !isGS)                  HistoBtag2D[number*5 +0]->Fill(value,value2,weight);
     else if (fabs(flavour)==5 && isGS)              HistoBtag2D[number*5 +1]->Fill(value,value2,weight);
@@ -1429,10 +1429,10 @@ void CommPlotProducer4ttbar::FillHisto2D_int_floatFromMap(TString name, int flav
    
 }
 
-void CommPlotProducer4ttbar::FillHisto2D_float_floatFromMap(TString name, int flavour, bool isGS, float value, float value2, float weight)  {
+void CommPlotProducer4ttbar::FillHisto2D_float_floatFromMap(TString name, int flavour, bool isGS, float value, float value2, double weight)  {
   
   
-  int number = HistoBtag2D_map[name] ;
+  int number = HistoBtag2D_map[name.Data()] ;
   if (!isData){
     if (fabs(flavour)==5 && !isGS)                  HistoBtag2D[number*5 +0]->Fill(value,value2,weight);
     else if (fabs(flavour)==5 && isGS)              HistoBtag2D[number*5 +1]->Fill(value,value2,weight);
