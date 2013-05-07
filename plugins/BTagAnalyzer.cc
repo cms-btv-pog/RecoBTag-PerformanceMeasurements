@@ -36,7 +36,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   //now do what ever initialization you need
   std::string module_type  = iConfig.getParameter<std::string>("@module_type");
   std::string module_label = iConfig.getParameter<std::string>("@module_label");
-  cout << "Constructing " << module_type << "::" << module_label << endl << "..." << endl;
+  cout << "Constructing " << module_type << "::" << module_label << endl;
 
   // Parameters
   runSubJets_ = iConfig.getParameter<bool>("runSubJets");
@@ -189,22 +189,27 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   smalltree->Branch("cQuark_pT",         cQuark_pT      ,"cQuark_pT[ncQuarks]/F");
   smalltree->Branch("cQuark_eta",        cQuark_eta     ,"cQuark_eta[ncQuarks]/F");
   smalltree->Branch("cQuark_phi",        cQuark_phi     ,"cQuark_phi[ncQuarks]/F");
+  smalltree->Branch("cQuark_pdgID",      cQuark_pdgID   ,"cQuark_pdgID[ncQuarks]/I");
+  smalltree->Branch("cQuark_status",     cQuark_status  ,"cQuark_status[ncQuarks]/I");
   smalltree->Branch("cQuark_fromGSP",    cQuark_fromGSP ,"cQuark_fromGSP[ncQuarks]/I");
 
   smalltree->Branch("nbQuarks",          &nbQuarks      ,"nbQuarks/I");
   smalltree->Branch("bQuark_pT",         bQuark_pT      ,"bQuark_pT[nbQuarks]/F");
   smalltree->Branch("bQuark_eta",        bQuark_eta     ,"bQuark_eta[nbQuarks]/F");
   smalltree->Branch("bQuark_phi",        bQuark_phi     ,"bQuark_phi[nbQuarks]/F");
+  smalltree->Branch("bQuark_pdgID",      bQuark_pdgID   ,"bQuark_pdgID[nbQuarks]/I");
+  smalltree->Branch("bQuark_status",     bQuark_status  ,"bQuark_status[nbQuarks]/I");
   smalltree->Branch("bQuark_fromGSP",    bQuark_fromGSP ,"bQuark_fromGSP[nbQuarks]/I");
 
   smalltree->Branch("mcweight",      &mcweight     ,"mcweight/F");
 
-  smalltree->Branch("nBHadrons",     &nBHadrons    ,"nBHadrons/I");
-  smalltree->Branch("BHadron_pT",    BHadron_pT    ,"BHadron_pT[nBHadrons]/F");
-  smalltree->Branch("BHadron_eta",   BHadron_eta   ,"BHadron_eta[nBHadrons]/F");
-  smalltree->Branch("BHadron_phi",   BHadron_phi   ,"BHadron_phi[nBHadrons]/F");
-  smalltree->Branch("BHadron_mass",  BHadron_mass  ,"BHadron_mass[nBHadrons]/F");
-  smalltree->Branch("BHadron_pdgID", BHadron_pdgID ,"BHadron_pdgID[nBHadrons]/I");
+  smalltree->Branch("nBHadrons",      &nBHadrons    ,"nBHadrons/I");
+  smalltree->Branch("BHadron_pT",     BHadron_pT    ,"BHadron_pT[nBHadrons]/F");
+  smalltree->Branch("BHadron_eta",    BHadron_eta   ,"BHadron_eta[nBHadrons]/F");
+  smalltree->Branch("BHadron_phi",    BHadron_phi   ,"BHadron_phi[nBHadrons]/F");
+  smalltree->Branch("BHadron_mass",   BHadron_mass  ,"BHadron_mass[nBHadrons]/F");
+  smalltree->Branch("BHadron_pdgID",  BHadron_pdgID ,"BHadron_pdgID[nBHadrons]/I");
+  smalltree->Branch("BHadron_status", BHadron_status ,"BHadron_status[nBHadrons]/I");
   smalltree->Branch("BHadron_mother", BHadron_mother ,"BHadron_mother[nBHadrons]/I");
   smalltree->Branch("BHadron_hasBdaughter", BHadron_hasBdaughter ,"BHadron_hasBdaughter[nBHadrons]/I");
 
@@ -214,6 +219,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   smalltree->Branch("Genlep_eta",   Genlep_eta   ,"Genlep_eta[nGenlep]/F");
   smalltree->Branch("Genlep_phi",   Genlep_phi   ,"Genlep_phi[nGenlep]/F");
   smalltree->Branch("Genlep_pdgID", Genlep_pdgID ,"Genlep_pdgID[nGenlep]/I");
+  smalltree->Branch("Genlep_status", Genlep_status ,"Genlep_status[nGenlep]/I");
   smalltree->Branch("Genlep_mother",Genlep_mother,"Genlep_mother[nGenlep]/I");
 
   smalltree->Branch("nGenquark",    &nGenquark      ,"nGenquark/I");
@@ -425,6 +431,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
               bQuark_pT[nbQuarks]  = genIt.p4().pt();
               bQuark_eta[nbQuarks] = genIt.p4().eta();
               bQuark_phi[nbQuarks] = genIt.p4().phi();
+              bQuark_pdgID[nbQuarks] = genIt.pdgId();
+              bQuark_status[nbQuarks] = genIt.status();
               bQuark_fromGSP[nbQuarks] = isFromGSP(&genIt);
               ++nbQuarks;
             }
@@ -433,6 +441,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
               cQuark_pT[ncQuarks]  = genIt.p4().pt();
               cQuark_eta[ncQuarks] = genIt.p4().eta();
               cQuark_phi[ncQuarks] = genIt.p4().phi();
+              cQuark_pdgID[ncQuarks] = genIt.pdgId();
+              cQuark_status[ncQuarks] = genIt.status();
               cQuark_fromGSP[ncQuarks] = isFromGSP(&genIt);
               ++ncQuarks;
             }
@@ -455,6 +465,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         BHadron_phi[nBHadrons]   = genIt.p4().phi();
         BHadron_mass[nBHadrons]  = genIt.mass();
         BHadron_pdgID[nBHadrons] = genIt.pdgId();
+        BHadron_status[nBHadrons] = genIt.status();
         BHadron_mother[nBHadrons] = genIt.mother()->pdgId();
         // check if any of the daughters is also B hadron
         int hasBHadronDaughter = 0;
@@ -475,6 +486,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
           Genlep_eta[nGenlep]   = genIt.p4().eta();
           Genlep_phi[nGenlep]   = genIt.p4().phi();
           Genlep_pdgID[nGenlep] = genIt.pdgId();
+          Genlep_status[nGenlep] = genIt.status();
           const Candidate * moth2 = moth1->mother();
           const Candidate * moth3 = moth2->mother();
           const Candidate * moth4 = moth3->mother();
@@ -1222,7 +1234,8 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       JetInfo[iJetColl].PFMuon_ratio[JetInfo[iJetColl].nPFMuon]     = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).ratio);
       JetInfo[iJetColl].PFMuon_ratioRel[JetInfo[iJetColl].nPFMuon]  = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).ratioRel);
       JetInfo[iJetColl].PFMuon_deltaR[JetInfo[iJetColl].nPFMuon]    = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).deltaR);
-      JetInfo[iJetColl].PFMuon_IPsig[JetInfo[iJetColl].nPFMuon]     = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).sip3d);
+      JetInfo[iJetColl].PFMuon_IP[JetInfo[iJetColl].nPFMuon]        = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).sip3d);
+      JetInfo[iJetColl].PFMuon_IP2D[JetInfo[iJetColl].nPFMuon]      = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).sip2d);
 
       JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 0;
       int muIdx = matchMuon( pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->lepton(leptIdx), muons );
@@ -1258,6 +1271,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
         JetInfo[iJetColl].Muon_eta[JetInfo[iJetColl].nMuon]      = muons[muIdx].eta();
         JetInfo[iJetColl].Muon_phi[JetInfo[iJetColl].nMuon]      = muons[muIdx].phi();
         JetInfo[iJetColl].Muon_ratio[JetInfo[iJetColl].nMuon]    = (pjet->tagInfoSoftLepton("softMuon")->properties(leptIdx).ratio);
+        JetInfo[iJetColl].Muon_ratioRel[JetInfo[iJetColl].nMuon] = (pjet->tagInfoSoftLepton("softMuon")->properties(leptIdx).ratioRel);
         JetInfo[iJetColl].Muon_deltaR[JetInfo[iJetColl].nMuon]   = (pjet->tagInfoSoftLepton("softMuon")->properties(leptIdx).deltaR);
 
         JetInfo[iJetColl].Muon_isGlobal[JetInfo[iJetColl].nMuon] = 1;
@@ -1317,7 +1331,8 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       JetInfo[iJetColl].PFElectron_ratio[JetInfo[iJetColl].nPFElectron]     = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).ratio);
       JetInfo[iJetColl].PFElectron_ratioRel[JetInfo[iJetColl].nPFElectron]  = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).ratioRel);
       JetInfo[iJetColl].PFElectron_deltaR[JetInfo[iJetColl].nPFElectron]    = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).deltaR);
-      JetInfo[iJetColl].PFElectron_IPsig[JetInfo[iJetColl].nPFElectron]     = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).sip3d);
+      JetInfo[iJetColl].PFElectron_IP[JetInfo[iJetColl].nPFElectron]        = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).sip3d);
+      JetInfo[iJetColl].PFElectron_IP2D[JetInfo[iJetColl].nPFElectron]      = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).sip2d);
       JetInfo[iJetColl].PFElectron_mva_e_pi[JetInfo[iJetColl].nPFElectron]  = -999.;//pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).mva_e_pi;
 
       ++JetInfo[iJetColl].nPFElectron;
@@ -1520,6 +1535,19 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     JetInfo[iJetColl].Jet_nFirstSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
     JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]  = pjet->tagInfoSecondaryVertex("secondaryVertex")->nVertices();
 
+    std::vector<const reco::BaseTagInfo*>  baseTagInfos;
+    JetTagComputer::TagInfoHelper helper(baseTagInfos);
+    baseTagInfos.push_back( pjet->tagInfoTrackIP("impactParameter") );
+    baseTagInfos.push_back( pjet->tagInfoSecondaryVertex("secondaryVertex") );
+
+    TaggingVariableList vars = computer->taggingVariables(helper);
+
+    float SVmass = 0.;
+    if ( JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet] > 0) {
+      SVmass = ( vars.checkTag(reco::btau::vertexMass) ? vars.get(reco::btau::vertexMass) : -9999 );
+    }
+    JetInfo[iJetColl].Jet_SvxMass[JetInfo[iJetColl].nJet] = SVmass;
+
     if ( produceJetProbaTree_  &&  JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]> 0) {
 
       JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).x();
@@ -1544,22 +1572,16 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 
       edm::RefToBase<Jet> jet = pjet->tagInfoTrackIP("impactParameter")->jet();
 
-      std::vector<const reco::BaseTagInfo*>  baseTagInfos;
-      JetTagComputer::TagInfoHelper helper(baseTagInfos);
-      baseTagInfos.push_back( pjet->tagInfoTrackIP("impactParameter") );
-      baseTagInfos.push_back( pjet->tagInfoSecondaryVertex("secondaryVertex") );
-
-      TaggingVariableList vars = computer->taggingVariables(helper);
       if(vars.checkTag(reco::btau::vertexEnergyRatio)) JetInfo[iJetColl].SV_energy_ratio[JetInfo[iJetColl].nSV] = ( vars.get(reco::btau::vertexEnergyRatio) );
       else JetInfo[iJetColl].SV_energy_ratio[JetInfo[iJetColl].nSV] = ( -9999 );
 
-      if(vars.checkTag(reco::btau::vertexJetDeltaR)) JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV] = (  vars.get( reco::btau::vertexJetDeltaR) );
+      if(vars.checkTag(reco::btau::vertexJetDeltaR)) JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV] = (  vars.get(reco::btau::vertexJetDeltaR) );
       else JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV] = ( -9999 );
 
-      if(vars.checkTag(reco::btau::trackSip3dSigAboveCharm) ) JetInfo[iJetColl].SV_aboveC[JetInfo[iJetColl].nSV] = (  vars.get( reco::btau::trackSip3dSigAboveCharm ));
+      if(vars.checkTag(reco::btau::trackSip3dSigAboveCharm) ) JetInfo[iJetColl].SV_aboveC[JetInfo[iJetColl].nSV] = (  vars.get(reco::btau::trackSip3dSigAboveCharm ));
       else JetInfo[iJetColl].SV_aboveC[JetInfo[iJetColl].nSV] = (  -9999 );
 
-      if(vars.checkTag(reco::btau::vertexMass)) JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV] = ( vars.get( reco::btau::vertexMass));
+      if(vars.checkTag(reco::btau::vertexMass)) JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV] = ( vars.get(reco::btau::vertexMass));
       else  JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV] = ( -9999 );
 
       Int_t totcharge=0;
@@ -1667,12 +1689,6 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
         + (cap5+can5)*100000   + (cap6+can6)*1000000
         + (cap7+can7)*10000000 + (cap8+can8)*100000000;
     }
-
-    float SVmass = 0.;
-    if ( pjet->tagInfoSecondaryVertex("secondaryVertex")->nVertices() > 0) {
-      SVmass = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).p4().mass();
-    }
-    JetInfo[iJetColl].Jet_SvxMass[JetInfo[iJetColl].nJet] = SVmass;
 
     //*********************************
     // Jet analysis
