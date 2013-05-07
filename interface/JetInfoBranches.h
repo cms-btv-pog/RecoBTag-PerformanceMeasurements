@@ -163,11 +163,12 @@ class JetInfoBranches {
     int   Muon_TrackIdx[nMaxMuons_];
     float Muon_IPsig[nMaxMuons_];
     float Muon_IP[nMaxMuons_];
-    float Muon_Proba[nMaxMuons_];
-    float Muon_IP2D[nMaxMuons_];
     float Muon_IP2Dsig[nMaxMuons_];
+    float Muon_IP2D[nMaxMuons_];
+    float Muon_Proba[nMaxMuons_];
     float Muon_deltaR[nMaxMuons_];
     float Muon_ratio[nMaxMuons_];
+    float Muon_ratioRel[nMaxMuons_];
 
     int nPFElectron;
     float PFElectron_IdxJet[nMaxElectrons_];
@@ -178,7 +179,8 @@ class JetInfoBranches {
     float PFElectron_ratio[nMaxElectrons_];
     float PFElectron_ratioRel[nMaxElectrons_];
     float PFElectron_deltaR[nMaxElectrons_];
-    float PFElectron_IPsig[nMaxElectrons_];
+    float PFElectron_IP[nMaxElectrons_];
+    float PFElectron_IP2D[nMaxElectrons_];
     float PFElectron_mva_e_pi[nMaxElectrons_];
 
     int nPFMuon;
@@ -190,7 +192,8 @@ class JetInfoBranches {
     float PFMuon_ratio[nMaxElectrons_];
     float PFMuon_ratioRel[nMaxElectrons_];
     float PFMuon_deltaR[nMaxElectrons_];
-    float PFMuon_IPsig[nMaxElectrons_];
+    float PFMuon_IP[nMaxElectrons_];
+    float PFMuon_IP2D[nMaxElectrons_];
     int   PFMuon_GoodQuality[nMaxElectrons_];
 
     int nSV;
@@ -336,6 +339,7 @@ class JetInfoBranches {
       tree->Branch((name+".Muon_Proba").c_str()    ,Muon_Proba    ,(name+".Muon_Proba["+name+".nMuon]/F").c_str());
       tree->Branch((name+".Muon_deltaR").c_str()   ,Muon_deltaR   ,(name+".Muon_deltaR["+name+".nMuon]/F").c_str());
       tree->Branch((name+".Muon_ratio").c_str()    ,Muon_ratio    ,(name+".Muon_ratio["+name+".nMuon]/F").c_str());
+      tree->Branch((name+".Muon_ratioRel").c_str() ,Muon_ratioRel ,(name+".Muon_ratioRel["+name+".nMuon]/F").c_str());
 
       //--------------------------------------
       // pf electron information
@@ -349,7 +353,8 @@ class JetInfoBranches {
       tree->Branch((name+".PFElectron_deltaR").c_str()   ,PFElectron_deltaR   ,(name+".PFElectron_deltaR["+name+".nPFElectron]/F").c_str());
       tree->Branch((name+".PFElectron_ratio").c_str()    ,PFElectron_ratio    ,(name+".PFElectron_ratio["+name+".nPFElectron]/F").c_str());
       tree->Branch((name+".PFElectron_ratioRel").c_str() ,PFElectron_ratioRel ,(name+".PFElectron_ratioRel["+name+".nPFElectron]/F").c_str());
-      tree->Branch((name+".PFElectron_IPsig").c_str()    ,PFElectron_IPsig    ,(name+".PFElectron_IPsig["+name+".nPFElectron]/F").c_str());
+      tree->Branch((name+".PFElectron_IP").c_str()       ,PFElectron_IP       ,(name+".PFElectron_IP["+name+".nPFElectron]/F").c_str());
+      tree->Branch((name+".PFElectron_IP2D").c_str()     ,PFElectron_IP2D     ,(name+".PFElectron_IP2D["+name+".nPFElectron]/F").c_str());
 
       //--------------------------------------
       // pf muon information
@@ -363,7 +368,8 @@ class JetInfoBranches {
       tree->Branch((name+".PFMuon_deltaR").c_str()      ,PFMuon_deltaR       ,(name+".PFMuon_deltaR["+name+".nPFMuon]/F").c_str());
       tree->Branch((name+".PFMuon_ratio").c_str()       ,PFMuon_ratio        ,(name+".PFMuon_ratio["+name+".nPFMuon]/F").c_str());
       tree->Branch((name+".PFMuon_ratioRel").c_str()    ,PFMuon_ratioRel     ,(name+".PFMuon_ratioRel["+name+".nPFMuon]/F").c_str());
-      tree->Branch((name+".PFMuon_IPsig").c_str()       ,PFMuon_IPsig        ,(name+".PFMuon_IPsig["+name+".nPFMuon]/F").c_str());
+      tree->Branch((name+".PFMuon_IP").c_str()          ,PFMuon_IP           ,(name+".PFMuon_IP["+name+".nPFMuon]/F").c_str());
+      tree->Branch((name+".PFMuon_IP2D").c_str()        ,PFMuon_IP2D         ,(name+".PFMuon_IP2D["+name+".nPFMuon]/F").c_str());
       tree->Branch((name+".PFMuon_GoodQuality").c_str() ,PFMuon_GoodQuality  ,(name+".PFMuon_GoodQuality["+name+".nPFMuon]/I").c_str());
 
     }
@@ -573,6 +579,7 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+".Muon_Proba").c_str()    ,Muon_Proba    ) ;
       tree->SetBranchAddress((name+".Muon_deltaR").c_str()   ,Muon_deltaR   ) ;
       tree->SetBranchAddress((name+".Muon_ratio").c_str()    ,Muon_ratio    ) ;
+      tree->SetBranchAddress((name+".Muon_ratioRel").c_str() ,Muon_ratioRel ) ;
 
       //--------------------------------------
       // pf electron information
@@ -586,7 +593,8 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+".PFElectron_deltaR").c_str()   ,PFElectron_deltaR  ) ;
       tree->SetBranchAddress((name+".PFElectron_ratio").c_str()    ,PFElectron_ratio   ) ;
       tree->SetBranchAddress((name+".PFElectron_ratioRel").c_str() ,PFElectron_ratioRel) ;
-      tree->SetBranchAddress((name+".PFElectron_IPsig").c_str()    ,PFElectron_IPsig   ) ;
+      tree->SetBranchAddress((name+".PFElectron_IP").c_str()       ,PFElectron_IP      ) ;
+      tree->SetBranchAddress((name+".PFElectron_IP2D").c_str()     ,PFElectron_IP2D    ) ;
 
       //--------------------------------------
       // pf muon information
@@ -600,7 +608,8 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+".PFMuon_deltaR").c_str()      ,PFMuon_deltaR       ) ;
       tree->SetBranchAddress((name+".PFMuon_ratio").c_str()       ,PFMuon_ratio        ) ;
       tree->SetBranchAddress((name+".PFMuon_ratioRel").c_str()    ,PFMuon_ratioRel     ) ;
-      tree->SetBranchAddress((name+".PFMuon_IPsig").c_str()       ,PFMuon_IPsig        ) ;
+      tree->SetBranchAddress((name+".PFMuon_IP").c_str()          ,PFMuon_IP           ) ;
+      tree->SetBranchAddress((name+".PFMuon_IP2D").c_str()        ,PFMuon_IP2D         ) ;
       tree->SetBranchAddress((name+".PFMuon_GoodQuality").c_str() ,PFMuon_GoodQuality  ) ;
     }
 

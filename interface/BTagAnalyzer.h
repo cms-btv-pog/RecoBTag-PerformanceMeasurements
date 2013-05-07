@@ -313,12 +313,16 @@ class BTagAnalyzer : public edm::EDAnalyzer
     float cQuark_pT[1000];
     float cQuark_eta[1000];
     float cQuark_phi[1000];
+    int   cQuark_pdgID[1000];
+    int   cQuark_status[1000];
     int   cQuark_fromGSP[1000];
 
     int   nbQuarks;
     float bQuark_pT[1000];
     float bQuark_eta[1000];
     float bQuark_phi[1000];
+    int   bQuark_pdgID[1000];
+    int   bQuark_status[1000];
     int   bQuark_fromGSP[1000];
 
     int   nBHadrons;
@@ -327,6 +331,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
     float BHadron_phi[1000];
     float BHadron_mass[1000];
     int   BHadron_pdgID[1000];
+    int   BHadron_status[1000];
     int   BHadron_mother[1000];
     int   BHadron_hasBdaughter[1000];
 
@@ -336,6 +341,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
     float Genlep_eta[100];
     float Genlep_phi[100];
     int   Genlep_pdgID[100];
+    int   Genlep_status[100];
     int   Genlep_mother[100];
 
     int   nGenquark;
