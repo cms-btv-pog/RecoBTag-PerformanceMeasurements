@@ -677,7 +677,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     {
       int triggerIdx = ( it - triggerPathNames_.begin() );
       int bitIdx = int(triggerIdx/32);
-      if ( BitTrigger[bitIdx] & ( 1 << triggerIdx ) ) PFJet80 = true;
+      if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) PFJet80 = true;
     }
   }
 
@@ -722,9 +722,9 @@ void BTagAnalyzer::processTrig(const edm::Handle<edm::TriggerResults>& trigRes, 
     for (std::vector<std::string>::const_iterator itTrigPathNames = triggerPathNames_.begin();
         itTrigPathNames != triggerPathNames_.end(); ++itTrigPathNames)
     {
-      int triggerIdx = itTrigPathNames - triggerPathNames_.begin();
+      int triggerIdx = ( itTrigPathNames - triggerPathNames_.begin() );
       int bitIdx = int(triggerIdx/32);
-      if ( NameCompatible(*itTrigPathNames,triggerList[i]) ) BitTrigger[bitIdx] |= ( 1 << triggerIdx );
+      if ( NameCompatible(*itTrigPathNames,triggerList[i]) ) BitTrigger[bitIdx] |= ( 1 << (triggerIdx - bitIdx*32) );
     }
 
     if (use_ttbar_filter_)
