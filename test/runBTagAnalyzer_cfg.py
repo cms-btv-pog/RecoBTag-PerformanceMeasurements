@@ -39,6 +39,11 @@ options.register('runSubJets', False,
     VarParsing.varType.bool,
     "Run subjets"
 )
+options.register('processStdAK5Jets', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Process standard AK5 jets"
+)
 options.register('fatJetPtMin', 150.0,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
@@ -934,15 +939,10 @@ if not options.runOnData:
 #-------------------------------------
 process.load("RecoBTag.PerformanceMeasurements.BTagAnalyzer_cff")
 
-process.btagana.use_selected_tracks  = True   ## False if you want to run on all tracks
-process.btagana.useTrackHistory      = False
-process.btagana.produceJetProbaTree  = False  ## True if you want to keep track and SV info!
+process.btagana.use_selected_tracks  = True  ## False if you want to run on all tracks : used for commissioning studies
+process.btagana.useTrackHistory      = False ## Can only be used with GEN-SIM-RECODEBUG files
+process.btagana.produceJetProbaTree  = False ## True if you want to keep track and SV info! : used for commissioning studies
 process.btagana.producePtRelTemplate = True  ## True for performance studies
-if options.runOnData:
-    process.btagana.use_selected_tracks  = False   ## False if you want to run on all tracks
-    process.btagana.useTrackHistory      = False
-    process.btagana.produceJetProbaTree  = True  ## True if you want to keep track and SV info!
-    process.btagana.producePtRelTemplate = False  ## True for performance studies
 process.btagana.primaryVertexColl = cms.InputTag('goodOfflinePrimaryVertices')
 process.btagana.Jets = cms.InputTag('selectedPatJets'+postfix)
 process.btagana.patMuonCollectionName = cms.InputTag('selectedPatMuons'+postfix)
@@ -1013,10 +1013,12 @@ if options.runSubJets:
     )
 
 ## Define analyzer sequence
-process.analyzerSeq = cms.Sequence( process.btagana )
+process.analyzerSeq = cms.Sequence( )
+if options.processStdAK5Jets:
+    process.analyzerSeq += process.btagana
 if options.runSubJets:
-    process.analyzerSeq = cms.Sequence( process.btagana + process.btaganaSubJets )
-if options.useTTbarFilter:
+    process.analyzerSeq += process.btaganaSubJets
+if options.processStdAK5Jets and options.useTTbarFilter:
     process.analyzerSeq.replace( process.btagana, process.ttbarselectionproducer * process.ttbarselectionfilter * process.btagana )
 #---------------------------------------
 
