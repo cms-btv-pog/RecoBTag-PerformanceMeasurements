@@ -702,7 +702,7 @@ newDiscriminatorSources = cms.VInputTag(
 )
 
 ## Add additional b-tag discriminators to the default jet collection
-getattr(process,'patJets'+postfix).discriminatorSources = getattr(process,'patJets'+postfix).discriminatorSources + newDiscriminatorSources
+getattr(process,'patJets'+postfix).discriminatorSources += newDiscriminatorSources
 #-------------------------------------
 
 #-------------------------------------

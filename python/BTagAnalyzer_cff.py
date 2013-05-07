@@ -67,10 +67,6 @@ btagana = cms.EDAnalyzer("BTagAnalyzer",
     simpleSVHighEffBJetTags     = cms.string('simpleSecondaryVertexHighEffBJetTags'),
     simpleSVNegHighEffBJetTags  = cms.string('simpleSecondaryVertexNegativeHighEffBJetTags'),
 
-    #softMuonBJetTags        = cms.string('positiveSoftLeptonByPtBJetTags'),
-    #softMuonNegBJetTags     = cms.string('negativeSoftLeptonByPtBJetTags'),
-    #softMuonTagInfoName       = cms.string('softMuonTagInfos'),
-
     softPFMuonBJetTags        = cms.string('softPFMuonRetrainedBJetTags'),
     softPFMuonNegBJetTags     = cms.string('negativeSoftPFMuonRetrainedBJetTags'),
     softPFMuonPosBJetTags     = cms.string('positiveSoftPFMuonRetrainedBJetTags'),
@@ -83,5 +79,66 @@ btagana = cms.EDAnalyzer("BTagAnalyzer",
     softPFElectronTagInfos   = cms.string('softPFElectrons'), # need to omit the 'TagInfos' part from the label
 
     use_ttbar_filter      = cms.bool(False),
-    channel       = cms.InputTag("ttbarselectionproducer")
+    channel       = cms.InputTag("ttbarselectionproducer"),
+    TriggerPathNames = cms.vstring(
+        "HLT_Jet15U*",
+        "HLT_Jet30_v*",
+        "HLT_PFJet40_v*",
+        "HLT_Jet30U*",
+        "HLT_Jet60_v*",
+        "HLT_Jet50U*",
+        "HLT_Jet80_v*",
+        "HLT_PFJet80_v*",
+        "HLT_Jet70U*",
+        "HLT_Jet110_v*",
+        "HLT_Jet100U*",
+        "HLT_Jet150_v*",
+        "HLT_PFJet140_v*",
+        "HLT_Jet140U*",
+        "HLT_Jet190_v*",
+        "HLT_PFJet200_v*",
+        "HLT_Jet240_v*",
+        "HLT_PFJet260_v*",
+        "HLT_Jet300_v*",
+        "HLT_PFJet320_v*",
+        "HLT_PFJet400_v*",
+        "HLT_DiJetAve15U*",
+        "HLT_DiJetAve30_v*",
+        "HLT_DiPFJetAve40_v*",
+        "HLT_DiJetAve30U*",
+        "HLT_DiJetAve60_v*",
+        "HLT_DiPFJetAve80_v*",
+        "HLT_DiJetAve50U*",
+        "HLT_DiJetAve80_v*",
+        "HLT_DiPFJetAve140_v*",
+        "HLT_BTagMu_Jet10U*",
+        "HLT_BTagMu_Jet20U*",
+        "HLT_BTagMu_DiJet20U*",
+        "HLT_BTagMu_DiJet20U_Mu5*",
+        "HLT_BTagMu_DiJet20_Mu5*",
+        "HLT_BTagMu_DiJet20_L1FastJet_Mu5_v*",
+        "HLT_BTagMu_DiJet30U",
+        "HLT_BTagMu_DiJet30U_v*",
+        "HLT_BTagMu_DiJet30U_Mu5*",
+        "HLT_BTagMu_DiJet60_Mu7*",
+        "HLT_BTagMu_DiJet40_Mu5*",
+        "HLT_BTagMu_DiJet20_L1FastJet_Mu5*",
+        "HLT_BTagMu_DiJet80_Mu9*",
+        "HLT_BTagMu_DiJet70_Mu5*",
+        "HLT_BTagMu_DiJet70_L1FastJet_Mu5*",
+        "HLT_BTagMu_DiJet100_Mu9_v*",
+        "HLT_BTagMu_DiJet110_Mu5*",
+        "HLT_BTagMu_DiJet110_L1FastJet_Mu5*",
+        "HLT_BTagMu_Jet300_L1FastJet_Mu5*",
+        "HLT_BTagMu_Jet300_Mu5*"
+    ),
+    TTbarTriggerPathNames = cms.vstring(
+        # trigger for ttbar: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiTopRefEventSel#Triggers
+        "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",  # 2-electron case
+        "HLT_Mu17_Mu8_v*",                                                                          # 2-muon case1
+        "HLT_Mu17_TkMu8_v*",                                                                        # 2-muon case2
+        "HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",                                      # muon + electron case1
+        "HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*"                                       # muon + electron case2
+    ),
+    PFJet80TriggerPathNames = cms.vstring("HLT_PFJet80_v*")
 )

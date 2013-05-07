@@ -69,7 +69,6 @@ Implementation:
 #include "Math/GenVector/VectorUtil.h"
 #include "Math/GenVector/PxPyPzE4D.h"
 #include "TGraphErrors.h"
-#include "TNtuple.h"
 
 #include "DataFormats/BTauReco/interface/SecondaryVertexTagInfo.h"
 
@@ -170,7 +169,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
 
     std::vector<simPrimaryVertex> getSimPVs(const edm::Handle<edm::HepMCProduct>& evtMC);
 
-    void processTrig(const edm::Handle<edm::TriggerResults>&) ; 
+    void processTrig(const edm::Handle<edm::TriggerResults>&, const std::vector<std::string>&) ;
 
     void processJets(const edm::Handle<PatJetCollection>&, const edm::Handle<PatJetCollection>&,
         const edm::Event&, const edm::EventSetup&, const JetToJetMap&, const int) ;
@@ -265,10 +264,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
     edm::InputTag channel_;
 
     // trigger list
-    //std::vector<std::string> triggernames_; // Not used : consider for deletion? 
-    //bool TriggerInfo_;  // Not used : consider for deletion? 
-
-    // TNtuple* nTuplesJets; // Not used : consider for deletion?
+    std::vector<std::string> triggerPathNames_;
 
     TrackClassifier classifier_;
 
@@ -372,12 +368,12 @@ class BTagAnalyzer : public edm::EDAnalyzer
     JetInfoBranches JetInfo[MAX_JETCOLLECTIONS] ;
     BookHistograms* Histos[MAX_JETCOLLECTIONS] ;
 
-    unsigned int BitTrigger;
+    int nBitTrigger;
+    int BitTrigger[100];
     int Run;
     int Evt;
     int LumiBlock;
     float PVz;
-    //float PVzSim; // Not used : consider for deletion? 
     float pthat;
 
     int ttbar_chan;
@@ -390,10 +386,12 @@ class BTagAnalyzer : public edm::EDAnalyzer
     float met;
     float mll;
     int trig_ttbar;
+    std::vector<std::string> ttbarTriggerPathNames_;
 
     const  reco::Vertex  *pv;
 
     bool PFJet80 ;
+    std::vector<std::string> PFJet80TriggerPathNames_;
 
     TLorentzVector thelepton1;
     TLorentzVector thelepton2;

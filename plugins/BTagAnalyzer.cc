@@ -1,4 +1,3 @@
-#include "RecoBTag/PerformanceMeasurements/interface/TriggerPaths.h"
 #include "RecoBTag/PerformanceMeasurements/interface/BTagAnalyzer.h"
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 
@@ -35,7 +34,9 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   can8(0)
 {
   //now do what ever initialization you need
-  cout << "construct BTagAnalyzer " << endl;
+  std::string module_type  = iConfig.getParameter<std::string>("@module_type");
+  std::string module_label = iConfig.getParameter<std::string>("@module_label");
+  cout << "Constructing " << module_type << "::" << module_label << endl << "..." << endl;
 
   // Parameters
   runSubJets_ = iConfig.getParameter<bool>("runSubJets");
@@ -50,7 +51,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   producePtRelTemplate_ = iConfig.getParameter<bool>("producePtRelTemplate");
 
   use_ttbar_filter_     = iConfig.getParameter<bool> ("use_ttbar_filter");
-  channel_      = iConfig.getParameter<edm::InputTag> ("channel");
+  channel_              = iConfig.getParameter<edm::InputTag> ("channel");
 
   // Modules
   primaryVertexColl_   = iConfig.getParameter<edm::InputTag>("primaryVertexColl");
@@ -126,19 +127,23 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
 
   SVComputer_               = iConfig.getParameter<edm::InputTag>( "svComputer");
 
+  triggerPathNames_        = iConfig.getParameter<std::vector<std::string> >("TriggerPathNames");
+  ttbarTriggerPathNames_   = iConfig.getParameter<std::vector<std::string> >("TTbarTriggerPathNames");
+  PFJet80TriggerPathNames_ = iConfig.getParameter<std::vector<std::string> >("PFJet80TriggerPathNames");
+
   ///////////////
   // TTree
 
   smalltree = fs->make<TTree>("ttree", "ttree");
 
-  smalltree->Branch("BitTrigger",&BitTrigger,"BitTrigger/I");
-  smalltree->Branch("Run"       ,&Run       ,"Run/I");
-  smalltree->Branch("Evt"       ,&Evt       ,"Evt/I");
-  smalltree->Branch("LumiBlock" ,&LumiBlock ,"LumiBlock/I");
-  smalltree->Branch("nPV"       ,&nPV       ,"nPV/I");
-  smalltree->Branch("PVz"       ,&PVz       ,"PVz/F");
-  smalltree->Branch("pthat"     ,&pthat     ,"pthat/F");
-  //smalltree->Branch("PVzSim"    ,&PVzSim    ,"PVzSim/F"); // Not used : consider for deletion?
+  smalltree->Branch("nBitTrigger",&nBitTrigger, "nBitTrigger/I");
+  smalltree->Branch("BitTrigger" ,BitTrigger,   "BitTrigger[nBitTrigger]/I");
+  smalltree->Branch("Run"        ,&Run       ,  "Run/I");
+  smalltree->Branch("Evt"        ,&Evt       ,  "Evt/I");
+  smalltree->Branch("LumiBlock"  ,&LumiBlock ,  "LumiBlock/I");
+  smalltree->Branch("nPV"        ,&nPV       ,  "nPV/I");
+  smalltree->Branch("PVz"        ,&PVz       ,  "PVz/F");
+  smalltree->Branch("pthat"      ,&pthat     ,  "pthat/F");
 
   smalltree->Branch("nPUtrue", &nPUtrue, "nPUtrue/I");
   smalltree->Branch("nPU"    , &nPU,     "nPU/I"    );
@@ -258,7 +263,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   Histos[0] = new BookHistograms(fs->mkdir( "HistJets" )) ;
   if (runSubJets_) Histos[1] = new BookHistograms(fs->mkdir( "HistFatJets" )) ;
 
-  cout << "BTagAnalyzer constructed " << endl;
+  cout << module_type << "::" << module_label << " constructed" << endl;
 }
 
 
@@ -349,12 +354,10 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   ncQuarks = 0;
   nbQuarks = 0;
   nBHadrons    = 0;
-  //$$
   nGenlep     = 0;
   nGenquark   = 0;
   nPatMuon    = 0;
-  //$$
-  //PVzSim = -10.; // Not used : consider for deletion? 
+
   mcweight=1.;
   if ( !isData_ ) {
     // pthat
@@ -371,7 +374,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     for (ipu = PupInfo->begin(); ipu != PupInfo->end(); ++ipu) {
       if ( ipu->getBunchCrossing() != 0 ) continue;
       for (unsigned int i=0; i<ipu->getPU_zpositions().size(); ++i) {
-        PU_bunch[nPU]	  =  ipu->getBunchCrossing();
+        PU_bunch[nPU]      =  ipu->getBunchCrossing();
         PU_z[nPU]          = (ipu->getPU_zpositions())[i];
         PU_sumpT_low[nPU]  = (ipu->getPU_sumpT_lowpT())[i];
         PU_sumpT_high[nPU] = (ipu->getPU_sumpT_highpT())[i];
@@ -403,7 +406,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       }
 
       // b and c quarks from the end of parton showering and before hadronization
-      if ( ( ID == 4 || ID == 5 ) && genIt.status() == 2 )
+      if ( ID == 4 || ID == 5 )
       {
         if( genIt.numberOfDaughters() > 0 )
         {
@@ -652,7 +655,31 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   edm::Handle<edm::TriggerResults> trigRes;
   iEvent.getByLabel(triggerTable_, trigRes);
 
-  processTrig(trigRes) ; 
+  nBitTrigger = int(triggerPathNames_.size()/32)+1;
+  for(int i=0; i<nBitTrigger; ++i) BitTrigger[i] = 0;
+  if (use_ttbar_filter_) trig_ttbar = 0;
+
+  std::vector<std::string> triggerList;
+  edm::Service<edm::service::TriggerNamesService> tns;
+  bool foundNames = tns->getTrigPaths(*trigRes,triggerList);
+  if ( !foundNames ) edm::LogError("TriggerNamesNotFound") << "Could not get trigger names!";
+  if ( trigRes->size() != triggerList.size() ) edm::LogError("TriggerPathLengthMismatch") << "Length of names and paths not the same: "
+    << triggerList.size() << "," << trigRes->size() ;
+
+  processTrig(trigRes, triggerList);
+
+  PFJet80 = false;
+  for(std::vector<std::string>::const_iterator itTrigPathNames = PFJet80TriggerPathNames_.begin();
+      itTrigPathNames != PFJet80TriggerPathNames_.end(); ++itTrigPathNames)
+  {
+    std::vector<std::string>::const_iterator it = std::find(triggerPathNames_.begin(), triggerPathNames_.end(), *itTrigPathNames);
+    if( it != triggerPathNames_.end() )
+    {
+      int triggerIdx = ( it - triggerPathNames_.begin() );
+      int bitIdx = int(triggerIdx/32);
+      if ( BitTrigger[bitIdx] & ( 1 << triggerIdx ) ) PFJet80 = true;
+    }
+  }
 
   //------------- added by Camille-----------------------------------------------------------//
   edm::ESHandle<JetTagComputer> computerHandle;
@@ -681,139 +708,38 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     smalltree->Fill();
   }
 
-  return ;
-
+  return;
 }
 
-float BTagAnalyzer::calculPtRel(const reco::Track& theMuon, const pat::Jet& theJet )
+
+void BTagAnalyzer::processTrig(const edm::Handle<edm::TriggerResults>& trigRes, const std::vector<std::string>& triggerList)
 {
-  double pmu = TMath::Sqrt( theMuon.px()*theMuon.px() + theMuon.py()*theMuon.py()  + theMuon.pz()*theMuon.pz() );
-
-  double jetpx = 0 ;
-  double jetpy = 0 ;
-  double jetpz = 0 ;
-
-  if( theJet.isCaloJet() ){
-    jetpx = theJet.px() + theMuon.px();
-    jetpy = theJet.py() + theMuon.py();
-    jetpz = theJet.pz() + theMuon.pz();
-  }else{
-    jetpx = theJet.px();
-    jetpy = theJet.py();
-    jetpz = theJet.pz();
-  }
-
-  double jetp = TMath::Sqrt(jetpx*jetpx + jetpy*jetpy + jetpz*jetpz);
-
-  double ptrel  = ( jetpx * theMuon.px()  + jetpy * theMuon.py() + jetpz * theMuon.pz() ) / jetp;
-  ptrel = TMath::Sqrt( pmu * pmu  - ptrel * ptrel );
-
-  return ptrel;
-}
-
-void BTagAnalyzer::processTrig(const edm::Handle<edm::TriggerResults>& trigRes) { 
-
-  BitTrigger = 0;
-  if (use_ttbar_filter_) trig_ttbar = 0;
-
-  vector<string> triggerList;
-  edm::Service<edm::service::TriggerNamesService> tns;
-  bool foundNames = tns->getTrigPaths(*trigRes,triggerList);
-  if ( !foundNames ) edm::LogError("TriggerNamesNotFound") << "Could not get trigger names!";
-  if ( trigRes->size() != triggerList.size() ) edm::LogError("TriggerPathLengthMismatch") << "Length of names and paths not the same: " 
-    << triggerList.size() << "," << trigRes->size() ; 
-
-  for (unsigned int i = 0; i < trigRes->size(); ++i) { 
+  for (unsigned int i = 0; i < trigRes->size(); ++i) {
 
     if ( !trigRes->at(i).accept() ) continue;
 
 
-    for (std::map<int, std::string>::const_iterator itTrigPathNames = TriggerPathNames.begin(); 
-        itTrigPathNames != TriggerPathNames.end(); ++itTrigPathNames) { 
-      if ( NameCompatible(itTrigPathNames->second,triggerList[i]) ) BitTrigger |= 1 << itTrigPathNames->first ; 
+    for (std::vector<std::string>::const_iterator itTrigPathNames = triggerPathNames_.begin();
+        itTrigPathNames != triggerPathNames_.end(); ++itTrigPathNames)
+    {
+      int triggerIdx = itTrigPathNames - triggerPathNames_.begin();
+      int bitIdx = int(triggerIdx/32);
+      if ( NameCompatible(*itTrigPathNames,triggerList[i]) ) BitTrigger[bitIdx] |= ( 1 << triggerIdx );
     }
 
-    if (use_ttbar_filter_) {
-      for (std::map<int, std::string>::const_iterator itTrigPathNames = TriggerPathNames_TTBar.begin(); 
-          itTrigPathNames != TriggerPathNames_TTBar.end(); ++itTrigPathNames) { 
-        if ( NameCompatible(itTrigPathNames->second,triggerList[i]) ) BitTrigger |= 1 << ( itTrigPathNames->first+TriggerPathNames.size() ) ; 
-      } 
-    } //// if use_ttbar_filter_ 
+    if (use_ttbar_filter_)
+    {
+      for (std::vector<std::string>::const_iterator itTrigPathNames = ttbarTriggerPathNames_.begin();
+          itTrigPathNames != ttbarTriggerPathNames_.end(); ++itTrigPathNames)
+      {
+        if ( NameCompatible(*itTrigPathNames,triggerList[i]) ) trig_ttbar |= ( 1 << ( itTrigPathNames - ttbarTriggerPathNames_.begin() ) );
+      }
+    } //// if use_ttbar_filter_
+  } //// Loop over trigger names
 
-    //if (NameCompatible("HLT_Jet15U*",triggerList[i]) || NameCompatible("HLT_Jet30_v*",triggerList[i])
-    //    ||NameCompatible("HLT_PFJet40_v*",triggerList[i]) ) BitTrigger +=10 ;
-
-    //if (NameCompatible("HLT_Jet30U*",triggerList[i]) || NameCompatible("HLT_Jet60_v*",triggerList[i]) ) BitTrigger +=20 ;
-
-    //if (NameCompatible("HLT_Jet50U*",triggerList[i]) || NameCompatible("HLT_Jet80_v*",triggerList[i])
-    //    ||NameCompatible("HLT_PFJet80_v*",triggerList[i]) ) BitTrigger +=40 ;
-
-    //if (NameCompatible("HLT_Jet70U*",triggerList[i]) || NameCompatible("HLT_Jet110_v*",triggerList[i]) ) BitTrigger +=100 ;
-
-    //if (NameCompatible("HLT_Jet100U*",triggerList[i]) || NameCompatible("HLT_Jet150_v*",triggerList[i])
-    //    ||NameCompatible("HLT_PFJet140_v*",triggerList[i]) ) BitTrigger +=200 ;
-
-    //if (NameCompatible("HLT_Jet140U*",triggerList[i]) || NameCompatible("HLT_Jet190_v*",triggerList[i])
-    //    ||NameCompatible("HLT_PFJet200_v*",triggerList[i]) ) BitTrigger +=400 ;
-
-    //if (NameCompatible("HLT_Jet240_v*",triggerList[i]) || NameCompatible("HLT_PFJet260_v*",triggerList[i]) ) BitTrigger +=1 ;
-
-    //if (NameCompatible("HLT_Jet300_v*",triggerList[i]) || NameCompatible("HLT_PFJet320_v*",triggerList[i]) ) BitTrigger +=2 ;
-
-    //if (NameCompatible("HLT_PFJet400_v*",triggerList[i]) ) BitTrigger +=4 ;
-
-    //if (NameCompatible("HLT_DiJetAve15U*",triggerList[i]) ||
-    //    NameCompatible("HLT_DiJetAve30_v*",triggerList[i])||NameCompatible("HLT_DiPFJetAve40_v*",triggerList[i])) BitTrigger +=1000 ;
-
-    //if (NameCompatible("HLT_DiJetAve30U*",triggerList[i]) ||
-    //    NameCompatible("HLT_DiJetAve60_v*",triggerList[i])||NameCompatible("HLT_DiPFJetAve80_v*",triggerList[i]) ) BitTrigger +=2000 ;
-
-    //if (NameCompatible("HLT_DiJetAve50U*",triggerList[i]) ||
-    //    NameCompatible("HLT_DiJetAve80_v*",triggerList[i])||NameCompatible("HLT_DiPFJetAve140_v*",triggerList[i])) BitTrigger +=4000 ;
-
-    //if (NameCompatible("HLT_BTagMu_Jet10U*",triggerList[i]) ||
-    //    NameCompatible("HLT_BTagMu_Jet20U*",triggerList[i])||NameCompatible("HLT_BTagMu_DiJet20U*",triggerList[i])
-    //    ||NameCompatible("HLT_BTagMu_DiJet20U_Mu5*",triggerList[i])||NameCompatible("HLT_BTagMu_DiJet20_Mu5*",triggerList[i])
-    //    ||NameCompatible("HLT_BTagMu_DiJet20_L1FastJet_Mu5_v*",triggerList[i])) BitTrigger +=10000 ;
-
-    //if (NameCompatible("HLT_BTagMu_DiJet30U",triggerList[i]) ||
-    //    NameCompatible("HLT_BTagMu_DiJet30U_v*",triggerList[i])||
-    //    NameCompatible("HLT_BTagMu_DiJet30U_Mu5*",triggerList[i])||NameCompatible("HLT_BTagMu_DiJet60_Mu7*",triggerList[i])
-    //    ||NameCompatible("HLT_BTagMu_DiJet40_Mu5*",triggerList[i])||NameCompatible("HLT_BTagMu_DiJet20_L1FastJet_Mu5*",triggerList[i])) BitTrigger +=20000 ;
-
-    //if (NameCompatible("HLT_BTagMu_DiJet80_Mu9*",triggerList[i]) ||
-    //    NameCompatible("HLT_BTagMu_DiJet70_Mu5*",triggerList[i]) ||NameCompatible("HLT_BTagMu_DiJet70_L1FastJet_Mu5*",triggerList[i]) )BitTrigger +=40000 ;
-
-    //if (NameCompatible("HLT_BTagMu_DiJet100_Mu9_v*",triggerList[i]) ||
-    //    NameCompatible("HLT_BTagMu_DiJet110_Mu5*",triggerList[i])
-    //    ||NameCompatible("HLT_BTagMu_DiJet110_L1FastJet_Mu5*",triggerList[i]) )BitTrigger +=100000 ;
-
-    //if (NameCompatible("HLT_BTagMu_Jet300_L1FastJet_Mu5*",triggerList[i]) ||
-    //    NameCompatible("HLT_BTagMu_Jet300_Mu5*",triggerList[i]) )BitTrigger +=200000 ;
-
-    //if (use_ttbar_filter_) {
-    // trigger for ttbar  : https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiTopRefEventSel#Triggers
-
-    //  if (NameCompatible("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",triggerList[i]) ) trig_ttbar +=1 ;  // 2-electron
-    //  if (NameCompatible("HLT_Mu17_Mu8_v*",triggerList[i]) )  trig_ttbar +=2 ;  // 2-muon case1
-    //  if (NameCompatible("HLT_Mu17_TkMu8_v*",triggerList[i]) ) trig_ttbar +=4 ;  // 2-muon case2
-    //  if (NameCompatible("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",triggerList[i]) ) trig_ttbar +=10;  //muon + electron case1
-    //  if (NameCompatible("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",triggerList[i]) ) trig_ttbar +=20 ;  // muon + electron
-
-    //} 
-
-  } //// Loop over trigger names 
-
-  //if (use_ttbar_filter_) {
-  //  if (trig_ttbar>0) BitTrigger+=1000000; // to fill the ntuple!
-  //}
-
-  PFJet80 = false;
-  //if ( (BitTrigger%100 - BitTrigger%10)/10 >= 4 ) PFJet80 = true;
-  if ( BitTrigger & (1 << TriggerPathNames.find(HLT_PFJet80)->first) ) PFJet80 = true; 
-
-  return ; 
+  return;
 }
+
 
 void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, const edm::Handle<PatJetCollection>& jetsColl2,
     const edm::Event& iEvent, const edm::EventSetup& iSetup, const JetToJetMap& fatJetToPrunedFatJetMap, const int iJetColl)
@@ -1959,6 +1885,34 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
   return;
 } // BTagAnalyzer:: processJets
 
+
+float BTagAnalyzer::calculPtRel(const reco::Track& theMuon, const pat::Jet& theJet )
+{
+  double pmu = TMath::Sqrt( theMuon.px()*theMuon.px() + theMuon.py()*theMuon.py()  + theMuon.pz()*theMuon.pz() );
+
+  double jetpx = 0 ;
+  double jetpy = 0 ;
+  double jetpz = 0 ;
+
+  if( theJet.isCaloJet() ){
+    jetpx = theJet.px() + theMuon.px();
+    jetpy = theJet.py() + theMuon.py();
+    jetpz = theJet.pz() + theMuon.pz();
+  }else{
+    jetpx = theJet.px();
+    jetpy = theJet.py();
+    jetpz = theJet.pz();
+  }
+
+  double jetp = TMath::Sqrt(jetpx*jetpx + jetpy*jetpy + jetpz*jetpz);
+
+  double ptrel  = ( jetpx * theMuon.px()  + jetpy * theMuon.py() + jetpz * theMuon.pz() ) / jetp;
+  ptrel = TMath::Sqrt( pmu * pmu  - ptrel * ptrel );
+
+  return ptrel;
+}
+
+
 void BTagAnalyzer::setTracksPV( const reco::Vertex *pv, const bool isPV, const int iJetColl )
 {
   for (reco::Vertex::trackRef_iterator itt = (*pv).tracks_begin(); itt != (*pv).tracks_end(); ++itt) {
@@ -2291,7 +2245,6 @@ int BTagAnalyzer::isFromGSP(const reco::Candidate* c)
 
   return isFromGSP;
 }
-
 
 // -------------------------------------------------------------------------
 // NameCompatible
