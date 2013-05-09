@@ -34,6 +34,16 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
+options.register('mcGlobalTag', 'START53_V7G',
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "MC global tag"
+)
+options.register('dataGlobalTag', 'FT_53_V21_AN3',
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "Data global tag"
+)
 options.register('runSubJets', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -43,6 +53,11 @@ options.register('processStdAK5Jets', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Process standard AK5 jets"
+)
+options.register('producePtRelTemplate', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Produce PtRel template"
 )
 options.register('fatJetPtMin', 150.0,
     VarParsing.multiplicity.singleton,
@@ -64,9 +79,9 @@ print "Running on data: %s"%('True' if options.runOnData else 'False')
 print "Using PFchs: %s"%('True' if options.usePFchs else 'False')
 
 ## Global tag
-globalTag = 'START53_V21'
+globalTag = options.mcGlobalTag
 if options.runOnData:
-    globalTag = 'FT_53_V21_AN3'
+    globalTag = options.dataGlobalTag
 
 ## Jet energy corrections
 jetCorrectionsAK5 = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'])
@@ -109,7 +124,6 @@ process.source = cms.Source(
         #'/store/mc/Summer12_DR53X/QCD_Pt-300to470_TuneZ2star_8TeV_pythia6/GEN-SIM-RECODEBUG/PU_S10_START53_V7A-v1/0000/0A4671D2-02F4-E111-9CD8-003048C69310.root'
         # /TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
         '/store/mc/Summer12_DR53X/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S10_START53_V7C-v1/00000/FE7C71D8-DB25-E211-A93B-0025901D4C74.root'
-        #'/store/mc/Summer12_DR53X/WH_ZH_TTH_HToTauTau_M-105_8TeV-pythia6-tauola/AODSIM/PU_S10_START53_V7C-v1/20000/F422BBED-FC77-E211-B2BE-E0CB4E19F98A.root'
     )
 )
 
@@ -122,15 +136,15 @@ if options.runOnData:
     ]
 
 if options.runOnData :
-	if options.runSubJets :
-		options.outFilename += '_data_subjets.root'
-	else :
-		options.outFilename += '_data.root'
+    if options.runSubJets :
+        options.outFilename += '_data_subjets.root'
+    else :
+        options.outFilename += '_data.root'
 else :
-	if options.runSubJets :
-		options.outFilename += '_mc_subjets.root'
-	else :
-		options.outFilename += '_mc.root'
+    if options.runSubJets :
+        options.outFilename += '_mc_subjets.root'
+    else :
+        options.outFilename += '_mc.root'
 
 ## Output file
 process.TFileService = cms.Service("TFileService",
@@ -942,7 +956,7 @@ process.load("RecoBTag.PerformanceMeasurements.BTagAnalyzer_cff")
 process.btagana.use_selected_tracks  = True  ## False if you want to run on all tracks : used for commissioning studies
 process.btagana.useTrackHistory      = False ## Can only be used with GEN-SIM-RECODEBUG files
 process.btagana.produceJetProbaTree  = False ## True if you want to keep track and SV info! : used for commissioning studies
-process.btagana.producePtRelTemplate = True  ## True for performance studies
+process.btagana.producePtRelTemplate = options.producePtRelTemplate  ## True for performance studies
 process.btagana.primaryVertexColl = cms.InputTag('goodOfflinePrimaryVertices')
 process.btagana.Jets = cms.InputTag('selectedPatJets'+postfix)
 process.btagana.patMuonCollectionName = cms.InputTag('selectedPatMuons'+postfix)
@@ -986,7 +1000,7 @@ process.filtSeq = cms.Sequence(
     *process.primaryVertexFilter
 )
 if options.runOnData:
-    process.filtSeq = cms.Sequence( process.filtSeq * process.hcalfilter )
+    process.filtSeq *= process.hcalfilter
 
 
 ## Define jet sequences
@@ -1032,4 +1046,4 @@ process.p = cms.Path(
 # Delete predefined output module (needed for running with CRAB)
 del process.out
 
-open('pydump.py','w').write(process.dumpPython())
+#open('pydump.py','w').write(process.dumpPython())
