@@ -964,6 +964,7 @@ process.btagana.use_ttbar_filter = cms.bool(options.useTTbarFilter)
 process.btagana.triggerTable = cms.InputTag('TriggerResults::HLT') # Data and MC
 
 process.btaganaSubJets = process.btagana.clone(
+    produceJetProbaTree = cms.bool(True),
     MinPt = cms.double(0.),
     Jets = cms.InputTag('selectedPatJetsCA8PrunedSubJetsPF'),
     FatJets = cms.InputTag('selectedPatJets'),
