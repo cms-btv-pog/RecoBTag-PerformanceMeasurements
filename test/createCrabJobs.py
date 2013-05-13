@@ -111,7 +111,7 @@ def main():
     else:
       crab_cfg_content = re.sub('CFG_PARAMETERS','noprint',crab_cfg_content)
     crab_cfg_content = re.sub('WORKING_DIR',os.path.join(main_workdir,dataset),crab_cfg_content)
-    crab_cfg_content = re.sub('OUTPUT_DIR',os.path.join(main_workdir,dataset,'output'),crab_cfg_content)
+    #crab_cfg_content = re.sub('OUTPUT_DIR',os.path.join(main_workdir,dataset,'output'),crab_cfg_content)
     crab_cfg_content = re.sub('USER_REMOTE_DIR',os.path.join(line_elements[9],dataset_elements[0],dataset_elements[1])+'/',crab_cfg_content)
 
     # create a CRAB cfg file
