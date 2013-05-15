@@ -109,6 +109,7 @@ Implementation:
 #include <boost/regex.hpp>
 
 #include "RecoBTag/PerformanceMeasurements/interface/JetInfoBranches.h"
+#include "RecoBTag/PerformanceMeasurements/interface/EventInfoBranches.h"
 #include "RecoBTag/PerformanceMeasurements/interface/BookHistograms.h"
 
 //
@@ -124,8 +125,6 @@ typedef std::map<const pat::Jet*,const pat::Jet*> JetToJetMap;
 using namespace std;
 using namespace reco;
 
-const UInt_t nMaxPVs_= 10000;
-const UInt_t nMaxPUs_= 10000;
 const UInt_t MAX_JETCOLLECTIONS=2;
 
 class BTagAnalyzer : public edm::EDAnalyzer
@@ -286,112 +285,13 @@ class BTagAnalyzer : public edm::EDAnalyzer
 
     TTree *smalltree;
 
-    int   nPV;
-    float PV_x[nMaxPVs_];
-    float PV_y[nMaxPVs_];
-    float PV_z[nMaxPVs_];
-    float PV_ex[nMaxPVs_];
-    float PV_ey[nMaxPVs_];
-    float PV_ez[nMaxPVs_];
-    float PV_chi2[nMaxPVs_];
-    float PV_ndf[nMaxPVs_];
-    int   PV_isgood[nMaxPVs_];
-    int   PV_isfake[nMaxPVs_];
-
-    int   nPUtrue;                 // the true number of pileup interactions that have been added to the event
-    int   nPU;                     // the number of pileup interactions that have been added to the event
-    int   PU_bunch[nMaxPUs_];      // 0 if on time pileup, -1 or +1 if out-of-time
-    float PU_z[nMaxPUs_];          // the true primary vertex position along the z axis for each added interaction
-    float PU_sumpT_low[nMaxPUs_];  // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > low_cut
-    float PU_sumpT_high[nMaxPUs_]; // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > high_cut
-    int   PU_ntrks_low[nMaxPUs_];  // the number of tracks originating from each interaction, where track pT > low_cu
-    int   PU_ntrks_high[nMaxPUs_]; // the number of tracks originating from each interaction, where track pT > high_cut
-    float mcweight;
-    math::XYZVector jetVertex;
-
-    int   ncQuarks;
-    float cQuark_pT[1000];
-    float cQuark_eta[1000];
-    float cQuark_phi[1000];
-    int   cQuark_pdgID[1000];
-    int   cQuark_status[1000];
-    int   cQuark_fromGSP[1000];
-
-    int   nbQuarks;
-    float bQuark_pT[1000];
-    float bQuark_eta[1000];
-    float bQuark_phi[1000];
-    int   bQuark_pdgID[1000];
-    int   bQuark_status[1000];
-    int   bQuark_fromGSP[1000];
-
-    int   nBHadrons;
-    float BHadron_pT[1000];
-    float BHadron_eta[1000];
-    float BHadron_phi[1000];
-    float BHadron_mass[1000];
-    int   BHadron_pdgID[1000];
-    int   BHadron_status[1000];
-    int   BHadron_mother[1000];
-    int   BHadron_hasBdaughter[1000];
-
-    //$$
-    int nGenlep;
-    float Genlep_pT[100];
-    float Genlep_eta[100];
-    float Genlep_phi[100];
-    int   Genlep_pdgID[100];
-    int   Genlep_status[100];
-    int   Genlep_mother[100];
-
-    int   nGenquark;
-    float Genquark_pT[100];
-    float Genquark_eta[100];
-    float Genquark_phi[100];
-    int   Genquark_pdgID[100];
-    int   Genquark_mother[100];
-
-    int   nPatMuon;
-    int   PatMuon_isGlobal[1000];
-    int   PatMuon_nTkHit[1000];
-    int   PatMuon_nPixHit[1000];
-    int   PatMuon_nOutHit[1000];
-    int   PatMuon_nMuHit[1000];
-    int   PatMuon_nMatched[1000];
-    float PatMuon_chi2[1000];
-    float PatMuon_chi2Tk[1000];
-    float PatMuon_pt[1000];
-    float PatMuon_eta[1000];
-    float PatMuon_phi[1000];
-    float PatMuon_vz[1000];
-    float PatMuon_IP[1000];
-    float PatMuon_IPsig[1000];
-    float PatMuon_IP2D[1000];
-    float PatMuon_IP2Dsig[1000];
+    //// Event info
+    EventInfoBranches EventInfo;
 
     //// Jet info
-
     JetInfoBranches JetInfo[MAX_JETCOLLECTIONS] ;
     BookHistograms* Histos[MAX_JETCOLLECTIONS] ;
 
-    int nBitTrigger;
-    int BitTrigger[100];
-    int Run;
-    int Evt;
-    int LumiBlock;
-    float PVz;
-    float pthat;
-
-    int ttbar_chan;
-    float lepton1_pT;
-    float lepton2_pT;
-    float lepton1_eta;
-    float lepton2_eta;
-    float lepton1_phi;
-    float lepton2_phi;
-    float met;
-    float mll;
-    int trig_ttbar;
     std::vector<std::string> ttbarTriggerPathNames_;
 
     const  reco::Vertex  *pv;

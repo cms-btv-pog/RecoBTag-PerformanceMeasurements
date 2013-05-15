@@ -136,129 +136,20 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
 
   smalltree = fs->make<TTree>("ttree", "ttree");
 
-  smalltree->Branch("nBitTrigger",&nBitTrigger, "nBitTrigger/I");
-  smalltree->Branch("BitTrigger" ,BitTrigger,   "BitTrigger[nBitTrigger]/I");
-  smalltree->Branch("Run"        ,&Run       ,  "Run/I");
-  smalltree->Branch("Evt"        ,&Evt       ,  "Evt/I");
-  smalltree->Branch("LumiBlock"  ,&LumiBlock ,  "LumiBlock/I");
-  smalltree->Branch("nPV"        ,&nPV       ,  "nPV/I");
-  smalltree->Branch("PVz"        ,&PVz       ,  "PVz/F");
-  smalltree->Branch("pthat"      ,&pthat     ,  "pthat/F");
-
-  smalltree->Branch("nPUtrue", &nPUtrue, "nPUtrue/I");
-  smalltree->Branch("nPU"    , &nPU,     "nPU/I"    );
-
-  //   smalltree->Branch("PU_bunch",      PU_bunch,      "PU_bunch[nPU]/I");
-  //   smalltree->Branch("PU_z",          PU_z,          "PU_z[nPU]/F");
-  //   smalltree->Branch("PU_sumpT_low",  PU_sumpT_low , "PU_sumpT_low[nPU]/F");
-  //   smalltree->Branch("PU_sumpT_high", PU_sumpT_high, "PU_sumpT_high[nPU]/F");
-  //   smalltree->Branch("PU_ntrks_low",  PU_ntrks_low , "PU_ntrks_low[nPU]/I");
-  //   smalltree->Branch("PU_ntrks_high", PU_ntrks_high, "PU_ntrks_high[nPU]/I");
-
-  if (use_ttbar_filter_) {
-    smalltree->Branch("ttbar_chan",  &ttbar_chan,  "ttbar_chan/I");
-    smalltree->Branch("lepton1_pT",  &lepton1_pT,  "lepton1_pT/F");
-    smalltree->Branch("lepton1_eta", &lepton1_eta, "lepton1_eta/F");
-    smalltree->Branch("lepton1_phi", &lepton1_phi, "lepton1_phi/F");
-    smalltree->Branch("lepton2_pT",  &lepton2_pT,  "lepton2_pT/F");
-    smalltree->Branch("lepton2_eta", &lepton2_eta, "lepton2_eta/F");
-    smalltree->Branch("lepton2_phi", &lepton2_phi, "lepton2_phi/F");
-    smalltree->Branch("met", &met, "met/F");
-    smalltree->Branch("mll", &mll, "mll/F");
-    smalltree->Branch("trig_ttbar", &trig_ttbar, "trig_ttbar/I");
-  }
-
-  if ( produceJetProbaTree_ ) {
-    //--------------------------------------
-    // primary vertex information
-    //--------------------------------------
-    smalltree->Branch("PV_x"	   ,PV_x	 ,"PV_x[nPV]/F");
-    smalltree->Branch("PV_y"	   ,PV_y	 ,"PV_y[nPV]/F");
-    smalltree->Branch("PV_z"	   ,PV_z	 ,"PV_z[nPV]/F");
-    smalltree->Branch("PV_ex"	   ,PV_ex	 ,"PV_ex[nPV]/F");
-    smalltree->Branch("PV_ey"	   ,PV_ey	 ,"PV_ey[nPV]/F");
-    smalltree->Branch("PV_ez"	   ,PV_ez	 ,"PV_ez[nPV]/F");
-    smalltree->Branch("PV_chi2"	   ,PV_chi2	 ,"PV_chi2[nPV]/F");
-    smalltree->Branch("PV_ndf"	   ,PV_ndf	 ,"PV_ndf[nPV]/F");
-    smalltree->Branch("PV_isgood"    ,PV_isgood	 ,"PV_isgood[nPV]/I");
-    smalltree->Branch("PV_isfake"    ,PV_isfake	 ,"PV_isfake[nPV]/I");
-
-  }
-
-  smalltree->Branch("ncQuarks",          &ncQuarks      ,"ncQuarks/I");
-  smalltree->Branch("cQuark_pT",         cQuark_pT      ,"cQuark_pT[ncQuarks]/F");
-  smalltree->Branch("cQuark_eta",        cQuark_eta     ,"cQuark_eta[ncQuarks]/F");
-  smalltree->Branch("cQuark_phi",        cQuark_phi     ,"cQuark_phi[ncQuarks]/F");
-  smalltree->Branch("cQuark_pdgID",      cQuark_pdgID   ,"cQuark_pdgID[ncQuarks]/I");
-  smalltree->Branch("cQuark_status",     cQuark_status  ,"cQuark_status[ncQuarks]/I");
-  smalltree->Branch("cQuark_fromGSP",    cQuark_fromGSP ,"cQuark_fromGSP[ncQuarks]/I");
-
-  smalltree->Branch("nbQuarks",          &nbQuarks      ,"nbQuarks/I");
-  smalltree->Branch("bQuark_pT",         bQuark_pT      ,"bQuark_pT[nbQuarks]/F");
-  smalltree->Branch("bQuark_eta",        bQuark_eta     ,"bQuark_eta[nbQuarks]/F");
-  smalltree->Branch("bQuark_phi",        bQuark_phi     ,"bQuark_phi[nbQuarks]/F");
-  smalltree->Branch("bQuark_pdgID",      bQuark_pdgID   ,"bQuark_pdgID[nbQuarks]/I");
-  smalltree->Branch("bQuark_status",     bQuark_status  ,"bQuark_status[nbQuarks]/I");
-  smalltree->Branch("bQuark_fromGSP",    bQuark_fromGSP ,"bQuark_fromGSP[nbQuarks]/I");
-
-  smalltree->Branch("mcweight",      &mcweight     ,"mcweight/F");
-
-  smalltree->Branch("nBHadrons",      &nBHadrons    ,"nBHadrons/I");
-  smalltree->Branch("BHadron_pT",     BHadron_pT    ,"BHadron_pT[nBHadrons]/F");
-  smalltree->Branch("BHadron_eta",    BHadron_eta   ,"BHadron_eta[nBHadrons]/F");
-  smalltree->Branch("BHadron_phi",    BHadron_phi   ,"BHadron_phi[nBHadrons]/F");
-  smalltree->Branch("BHadron_mass",   BHadron_mass  ,"BHadron_mass[nBHadrons]/F");
-  smalltree->Branch("BHadron_pdgID",  BHadron_pdgID ,"BHadron_pdgID[nBHadrons]/I");
-  smalltree->Branch("BHadron_status", BHadron_status ,"BHadron_status[nBHadrons]/I");
-  smalltree->Branch("BHadron_mother", BHadron_mother ,"BHadron_mother[nBHadrons]/I");
-  smalltree->Branch("BHadron_hasBdaughter", BHadron_hasBdaughter ,"BHadron_hasBdaughter[nBHadrons]/I");
-
-  //$$
-  smalltree->Branch("nGenlep",    &nGenlep      ,"nGenlep/I");
-  smalltree->Branch("Genlep_pT",    Genlep_pT    ,"Genlep_pT[nGenlep]/F");
-  smalltree->Branch("Genlep_eta",   Genlep_eta   ,"Genlep_eta[nGenlep]/F");
-  smalltree->Branch("Genlep_phi",   Genlep_phi   ,"Genlep_phi[nGenlep]/F");
-  smalltree->Branch("Genlep_pdgID", Genlep_pdgID ,"Genlep_pdgID[nGenlep]/I");
-  smalltree->Branch("Genlep_status", Genlep_status ,"Genlep_status[nGenlep]/I");
-  smalltree->Branch("Genlep_mother",Genlep_mother,"Genlep_mother[nGenlep]/I");
-
-  smalltree->Branch("nGenquark",    &nGenquark      ,"nGenquark/I");
-  smalltree->Branch("Genquark_pT",    Genquark_pT    ,"Genquark_pT[nGenquark]/F");
-  smalltree->Branch("Genquark_eta",   Genquark_eta   ,"Genquark_eta[nGenquark]/F");
-  smalltree->Branch("Genquark_phi",   Genquark_phi   ,"Genquark_phi[nGenquark]/F");
-  smalltree->Branch("Genquark_pdgID", Genquark_pdgID ,"Genquark_pdgID[nGenquark]/I");
-  smalltree->Branch("Genquark_mother",Genquark_mother,"Genquark_mother[nGenquark]/I");
-
-  if( runSubJets_ )
-  {
-    //--------------------------------------
-    // PAT muon information
-    //--------------------------------------
-    smalltree->Branch("nPatMuon"         ,&nPatMuon        ,"nPatMuon/I");
-    smalltree->Branch("PatMuon_nMuHit"   ,PatMuon_nMuHit   ,"PatMuon_nMuHit[nPatMuon]/I");
-    smalltree->Branch("PatMuon_nTkHit"   ,PatMuon_nTkHit   ,"PatMuon_nTkHit[nPatMuon]/I");
-    smalltree->Branch("PatMuon_nPixHit"  ,PatMuon_nPixHit  ,"PatMuon_nPixHit[nPatMuon]/I");
-    smalltree->Branch("PatMuon_nOutHit"  ,PatMuon_nOutHit  ,"PatMuon_nOutHit[nPatMuon]/I");
-    smalltree->Branch("PatMuon_isGlobal" ,PatMuon_isGlobal ,"PatMuon_isGlobal[nPatMuon]/I");
-    smalltree->Branch("PatMuon_nMatched" ,PatMuon_nMatched ,"PatMuon_nMatched[nPatMuon]/I");
-    smalltree->Branch("PatMuon_chi2"     ,PatMuon_chi2     ,"PatMuon_chi2[nPatMuon]/F");
-    smalltree->Branch("PatMuon_chi2Tk"   ,PatMuon_chi2Tk   ,"PatMuon_chi2Tk[nPatMuon]/F");
-    smalltree->Branch("PatMuon_pt"       ,PatMuon_pt       ,"PatMuon_pt[nPatMuon]/F");
-    smalltree->Branch("PatMuon_eta"      ,PatMuon_eta      ,"PatMuon_eta[nPatMuon]/F");
-    smalltree->Branch("PatMuon_phi"      ,PatMuon_phi      ,"PatMuon_phi[nPatMuon]/F");
-    smalltree->Branch("PatMuon_vz"       ,PatMuon_vz       ,"PatMuon_vz[nPatMuon]/F");
-    smalltree->Branch("PatMuon_IP"       ,PatMuon_IP       ,"PatMuon_IP[nPatMuon]/F");
-    smalltree->Branch("PatMuon_IPsig"    ,PatMuon_IPsig    ,"PatMuon_IPsig[nPatMuon]/F");
-    smalltree->Branch("PatMuon_IP2D"     ,PatMuon_IP2D     ,"PatMuon_IP2D[nPatMuon]/F");
-    smalltree->Branch("PatMuon_IP2Dsig"  ,PatMuon_IP2Dsig  ,"PatMuon_IP2Dsig[nPatMuon]/F");
-  }
+  //--------------------------------------
+  // event information
+  //--------------------------------------
+  EventInfo.RegisterTree(smalltree);
+  if ( runSubJets_ )          EventInfo.RegisterPatMuonTree(smalltree);
+  if ( use_ttbar_filter_ )    EventInfo.RegisterTTbarTree(smalltree);
+  if ( produceJetProbaTree_ ) EventInfo.RegisterJPTree(smalltree);
 
   //--------------------------------------
   // jet information
   //--------------------------------------
-  JetInfo[0].RegisterTree(smalltree,"JetInfo");
-  if ( runSubJets_ ) JetInfo[0].RegisterSubJetSpecificTree(smalltree,"JetInfo");
-  if ( produceJetProbaTree_ ) JetInfo[0].RegisterJPTree(smalltree,"JetInfo");
+  JetInfo[0].RegisterTree(smalltree,(runSubJets_ ? "JetInfo" : ""));
+  if ( runSubJets_ )          JetInfo[0].RegisterSubJetSpecificTree(smalltree,(runSubJets_ ? "JetInfo" : ""));
+  if ( produceJetProbaTree_ ) JetInfo[0].RegisterJPTree(smalltree,(runSubJets_ ? "JetInfo" : ""));
   if ( runSubJets_ ) {
     JetInfo[1].RegisterTree(smalltree,"FatJetInfo");
     JetInfo[1].RegisterFatJetSpecificTree(smalltree,"FatJetInfo");
@@ -307,13 +198,13 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //------------------------------------------------------
   //Event informations
   //------------------------------------------------------
-  Run = iEvent.id().run();
+  EventInfo.Run = iEvent.id().run();
   isData_ = iEvent.isRealData();
 
-  if ( !isData_ && Run > 0 ) Run = -Run;
+  if ( !isData_ && EventInfo.Run > 0 ) EventInfo.Run = -EventInfo.Run;
 
-  Evt  = iEvent.id().event();
-  LumiBlock  = iEvent.luminosityBlock();
+  EventInfo.Evt  = iEvent.id().event();
+  EventInfo.LumiBlock  = iEvent.luminosityBlock();
 
   // Tag Jets
   if ( useTrackHistory_ ) classifier_.newEvent(iEvent, iSetup);
@@ -354,23 +245,23 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //------------------------------------------------------
   // MC informations
   //------------------------------------------------------
-  pthat = -1.;
-  nPUtrue = -1;
-  nPU = 0;
-  ncQuarks = 0;
-  nbQuarks = 0;
-  nBHadrons    = 0;
-  nGenlep     = 0;
-  nGenquark   = 0;
-  nPatMuon    = 0;
+  EventInfo.pthat = -1.;
+  EventInfo.nPUtrue = -1;
+  EventInfo.nPU = 0;
+  EventInfo.ncQuarks = 0;
+  EventInfo.nbQuarks = 0;
+  EventInfo.nBHadrons    = 0;
+  EventInfo.nGenlep     = 0;
+  EventInfo.nGenquark   = 0;
+  EventInfo.nPatMuon    = 0;
 
-  mcweight=1.;
+  EventInfo.mcweight=1.;
   if ( !isData_ ) {
-    // pthat
+    // EventInfo.pthat
     edm::Handle<GenEventInfoProduct> geninfos;
     iEvent.getByLabel( "generator",geninfos );
-    mcweight=geninfos->weight();
-    if (geninfos->binningValues().size()>0) pthat = geninfos->binningValues()[0];
+    EventInfo.mcweight=geninfos->weight();
+    if (geninfos->binningValues().size()>0) EventInfo.pthat = geninfos->binningValues()[0];
     // pileup
 
     edm::Handle<std::vector <PileupSummaryInfo> > PupInfo;
@@ -380,15 +271,15 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     for (ipu = PupInfo->begin(); ipu != PupInfo->end(); ++ipu) {
       if ( ipu->getBunchCrossing() != 0 ) continue;
       for (unsigned int i=0; i<ipu->getPU_zpositions().size(); ++i) {
-        PU_bunch[nPU]      =  ipu->getBunchCrossing();
-        PU_z[nPU]          = (ipu->getPU_zpositions())[i];
-        PU_sumpT_low[nPU]  = (ipu->getPU_sumpT_lowpT())[i];
-        PU_sumpT_high[nPU] = (ipu->getPU_sumpT_highpT())[i];
-        PU_ntrks_low[nPU]  = (ipu->getPU_ntrks_lowpT())[i];
-        PU_ntrks_high[nPU] = (ipu->getPU_ntrks_highpT())[i];
-        ++nPU;
+        EventInfo.PU_bunch[EventInfo.nPU]      =  ipu->getBunchCrossing();
+        EventInfo.PU_z[EventInfo.nPU]          = (ipu->getPU_zpositions())[i];
+        EventInfo.PU_sumpT_low[EventInfo.nPU]  = (ipu->getPU_sumpT_lowpT())[i];
+        EventInfo.PU_sumpT_high[EventInfo.nPU] = (ipu->getPU_sumpT_highpT())[i];
+        EventInfo.PU_ntrks_low[EventInfo.nPU]  = (ipu->getPU_ntrks_lowpT())[i];
+        EventInfo.PU_ntrks_high[EventInfo.nPU] = (ipu->getPU_ntrks_highpT())[i];
+        ++EventInfo.nPU;
       }
-      nPUtrue = ipu->getTrueNumInteractions();
+      EventInfo.nPUtrue = ipu->getTrueNumInteractions();
     }
 
     edm::Handle<reco::GenParticleCollection> genParticles;
@@ -402,13 +293,13 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
       // prompt b and c
       if ( (ID == 4 || ID == 5) && genIt.status() == 3 ) {
-        Genquark_pT[nGenquark]     = genIt.p4().pt();
-        Genquark_eta[nGenquark]    = genIt.p4().eta();
-        Genquark_phi[nGenquark]    = genIt.p4().phi();
-        Genquark_pdgID[nGenquark]  = genIt.pdgId();
-        Genquark_mother[nGenquark] = genIt.mother()->pdgId();
+        EventInfo.Genquark_pT[EventInfo.nGenquark]     = genIt.p4().pt();
+        EventInfo.Genquark_eta[EventInfo.nGenquark]    = genIt.p4().eta();
+        EventInfo.Genquark_phi[EventInfo.nGenquark]    = genIt.p4().phi();
+        EventInfo.Genquark_pdgID[EventInfo.nGenquark]  = genIt.pdgId();
+        EventInfo.Genquark_mother[EventInfo.nGenquark] = genIt.mother()->pdgId();
         //  cout << " status " << genIt.status() << " pdgId " << genIt.pdgId()  << " pT " << genIt.p4().pt() << " mother " << moth->pdgId() << endl;
-        ++nGenquark;
+        ++EventInfo.nGenquark;
       }
 
       // b and c quarks from the end of parton showering and before hadronization
@@ -428,23 +319,23 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
           {
             if ( ID == 5 )
             {
-              bQuark_pT[nbQuarks]  = genIt.p4().pt();
-              bQuark_eta[nbQuarks] = genIt.p4().eta();
-              bQuark_phi[nbQuarks] = genIt.p4().phi();
-              bQuark_pdgID[nbQuarks] = genIt.pdgId();
-              bQuark_status[nbQuarks] = genIt.status();
-              bQuark_fromGSP[nbQuarks] = isFromGSP(&genIt);
-              ++nbQuarks;
+              EventInfo.bQuark_pT[EventInfo.nbQuarks]  = genIt.p4().pt();
+              EventInfo.bQuark_eta[EventInfo.nbQuarks] = genIt.p4().eta();
+              EventInfo.bQuark_phi[EventInfo.nbQuarks] = genIt.p4().phi();
+              EventInfo.bQuark_pdgID[EventInfo.nbQuarks] = genIt.pdgId();
+              EventInfo.bQuark_status[EventInfo.nbQuarks] = genIt.status();
+              EventInfo.bQuark_fromGSP[EventInfo.nbQuarks] = isFromGSP(&genIt);
+              ++EventInfo.nbQuarks;
             }
             if ( ID == 4 )
             {
-              cQuark_pT[ncQuarks]  = genIt.p4().pt();
-              cQuark_eta[ncQuarks] = genIt.p4().eta();
-              cQuark_phi[ncQuarks] = genIt.p4().phi();
-              cQuark_pdgID[ncQuarks] = genIt.pdgId();
-              cQuark_status[ncQuarks] = genIt.status();
-              cQuark_fromGSP[ncQuarks] = isFromGSP(&genIt);
-              ++ncQuarks;
+              EventInfo.cQuark_pT[EventInfo.ncQuarks]  = genIt.p4().pt();
+              EventInfo.cQuark_eta[EventInfo.ncQuarks] = genIt.p4().eta();
+              EventInfo.cQuark_phi[EventInfo.ncQuarks] = genIt.p4().phi();
+              EventInfo.cQuark_pdgID[EventInfo.ncQuarks] = genIt.pdgId();
+              EventInfo.cQuark_status[EventInfo.ncQuarks] = genIt.status();
+              EventInfo.cQuark_fromGSP[EventInfo.ncQuarks] = isFromGSP(&genIt);
+              ++EventInfo.ncQuarks;
             }
           }
         }
@@ -460,13 +351,13 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
           ID == 9000553 || ID == 9010553 )
       {
         //  cout << " pdgId " << genIt.pdgId()  << " pT " << genIt.p4().pt() << " mother " << mother->pdgId() << endl;
-        BHadron_pT[nBHadrons]    = genIt.p4().pt();
-        BHadron_eta[nBHadrons]   = genIt.p4().eta();
-        BHadron_phi[nBHadrons]   = genIt.p4().phi();
-        BHadron_mass[nBHadrons]  = genIt.mass();
-        BHadron_pdgID[nBHadrons] = genIt.pdgId();
-        BHadron_status[nBHadrons] = genIt.status();
-        BHadron_mother[nBHadrons] = genIt.mother()->pdgId();
+        EventInfo.BHadron_pT[EventInfo.nBHadrons]    = genIt.p4().pt();
+        EventInfo.BHadron_eta[EventInfo.nBHadrons]   = genIt.p4().eta();
+        EventInfo.BHadron_phi[EventInfo.nBHadrons]   = genIt.p4().phi();
+        EventInfo.BHadron_mass[EventInfo.nBHadrons]  = genIt.mass();
+        EventInfo.BHadron_pdgID[EventInfo.nBHadrons] = genIt.pdgId();
+        EventInfo.BHadron_status[EventInfo.nBHadrons] = genIt.status();
+        EventInfo.BHadron_mother[EventInfo.nBHadrons] = genIt.mother()->pdgId();
         // check if any of the daughters is also B hadron
         int hasBHadronDaughter = 0;
         for(unsigned d=0; d<genIt.numberOfDaughters(); ++d)
@@ -474,19 +365,19 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
           int daughterID = abs(genIt.daughter(d)->pdgId());
           if ( (daughterID/100)%10 == 5 || (daughterID/1000)%10 == 5 ) { hasBHadronDaughter = 1; break; }
         }
-        BHadron_hasBdaughter[nBHadrons] = hasBHadronDaughter;
-        ++nBHadrons;
+        EventInfo.BHadron_hasBdaughter[EventInfo.nBHadrons] = hasBHadronDaughter;
+        ++EventInfo.nBHadrons;
       }
 
       // Leptons
       if ( (ID == 11 || ID == 13) && genIt.p4().pt() > 3. ) {
         const Candidate * moth1 = genIt.mother();
         if ( moth1->pdgId() != genIt.pdgId() ) {
-          Genlep_pT[nGenlep]    = genIt.p4().pt();
-          Genlep_eta[nGenlep]   = genIt.p4().eta();
-          Genlep_phi[nGenlep]   = genIt.p4().phi();
-          Genlep_pdgID[nGenlep] = genIt.pdgId();
-          Genlep_status[nGenlep] = genIt.status();
+          EventInfo.Genlep_pT[EventInfo.nGenlep]    = genIt.p4().pt();
+          EventInfo.Genlep_eta[EventInfo.nGenlep]   = genIt.p4().eta();
+          EventInfo.Genlep_phi[EventInfo.nGenlep]   = genIt.p4().phi();
+          EventInfo.Genlep_pdgID[EventInfo.nGenlep] = genIt.pdgId();
+          EventInfo.Genlep_status[EventInfo.nGenlep] = genIt.status();
           const Candidate * moth2 = moth1->mother();
           const Candidate * moth3 = moth2->mother();
           const Candidate * moth4 = moth3->mother();
@@ -516,14 +407,14 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
           if ( ID4 == 511 || ID4 == 521 || ID4 == 531 || ID4 == 541 ||
               ID4 ==5112 || ID4 ==5122 || ID4 ==5132 ||
               ID4 ==5212 || ID4 ==5222 || ID4 ==5232 || ID4 ==5332 ) isB = 1;
-          if ( isB+isD != 0 ) Genlep_mother[nGenlep] = 5*isB + 4*isD;
-          else                Genlep_mother[nGenlep] = 10*istau + 100*isWZ;
-          //  cout << " lepton " << nGenlep << " pdgID " << Genlep_pdgID[nGenlep]
+          if ( isB+isD != 0 ) EventInfo.Genlep_mother[EventInfo.nGenlep] = 5*isB + 4*isD;
+          else                EventInfo.Genlep_mother[EventInfo.nGenlep] = 10*istau + 100*isWZ;
+          //  cout << " lepton " << EventInfo.nGenlep << " pdgID " << EventInfo.Genlep_pdgID[EventInfo.nGenlep]
           //       << " moth1 " << moth1->pdgId() << " moth2 " << moth2->pdgId()
           //       << " moth3 " << moth3->pdgId() << " moth4 " << moth4->pdgId()
-          //       << " pT " << Genlep_pT[nGenlep]
-          //       << " from " << Genlep_mother[nGenlep] << endl;
-          ++nGenlep;
+          //       << " pT " << EventInfo.Genlep_pT[EventInfo.nGenlep]
+          //       << " from " << EventInfo.Genlep_mother[EventInfo.nGenlep] << endl;
+          ++EventInfo.nGenlep;
         }
       }
 
@@ -539,8 +430,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       //       cout << "simpv.size() " << simpv.size() << endl;
     }
   } // end MC info
-  //   cout << "Evt:" <<Evt << endl;
-  //   cout << "pthat:" <<pthat << endl;
+  //   cout << "EventInfo.Evt:" <<EventInfo.Evt << endl;
+  //   cout << "EventInfo.pthat:" <<EventInfo.pthat << endl;
 
 
   //------------------------------------------------------
@@ -550,28 +441,28 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   if (use_ttbar_filter_) {
     edm::Handle<int> pIn;
     iEvent.getByLabel(channel_, pIn);
-    ttbar_chan=*pIn;
+    EventInfo.ttbar_chan=*pIn;
     edm::Handle<vector< double  >> pIn2;
     iEvent.getByLabel(channel_, pIn2);
     if (pIn2->size()==8) {
-      lepton1_pT=(*pIn2)[0];
-      lepton1_eta=(*pIn2)[1];
-      lepton1_phi=(*pIn2)[2];
-      lepton2_pT=(*pIn2)[3];
-      lepton2_eta=(*pIn2)[4];
-      lepton2_phi=(*pIn2)[5];
-      met=(*pIn2)[6];
-      mll=(*pIn2)[7];
+      EventInfo.lepton1_pT=(*pIn2)[0];
+      EventInfo.lepton1_eta=(*pIn2)[1];
+      EventInfo.lepton1_phi=(*pIn2)[2];
+      EventInfo.lepton2_pT=(*pIn2)[3];
+      EventInfo.lepton2_eta=(*pIn2)[4];
+      EventInfo.lepton2_phi=(*pIn2)[5];
+      EventInfo.met=(*pIn2)[6];
+      EventInfo.mll=(*pIn2)[7];
     }
     else {
-      lepton1_pT=-1;
-      lepton1_eta=-1;
-      lepton1_phi=-1;
-      lepton2_pT=-1;
-      lepton2_eta=-1;
-      lepton2_phi=-1;
-      met=-1;
-      mll=-1;
+      EventInfo.lepton1_pT=-1;
+      EventInfo.lepton1_eta=-1;
+      EventInfo.lepton1_phi=-1;
+      EventInfo.lepton2_pT=-1;
+      EventInfo.lepton2_eta=-1;
+      EventInfo.lepton2_phi=-1;
+      EventInfo.met=-1;
+      EventInfo.mll=-1;
     }
   }
 
@@ -587,24 +478,24 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     {
       if( !it->isGlobalMuon() ) continue;
 
-      PatMuon_isGlobal[nPatMuon] = 1;
-      PatMuon_nTkHit[nPatMuon]   = it->innerTrack()->hitPattern().numberOfValidHits();
-      PatMuon_nPixHit[nPatMuon]  = it->innerTrack()->hitPattern().numberOfValidPixelHits();
-      PatMuon_nOutHit[nPatMuon]  = it->innerTrack()->trackerExpectedHitsOuter().numberOfHits();
-      PatMuon_nMuHit[nPatMuon]   = it->outerTrack()->hitPattern().numberOfValidMuonHits();
-      PatMuon_nMatched[nPatMuon] = it->numberOfMatches();
-      PatMuon_chi2[nPatMuon]     = it->globalTrack()->normalizedChi2();
-      PatMuon_chi2Tk[nPatMuon]   = it->innerTrack()->normalizedChi2();
-      PatMuon_pt[nPatMuon]       = it->pt();
-      PatMuon_eta[nPatMuon]      = it->eta();
-      PatMuon_phi[nPatMuon]      = it->phi();
-      PatMuon_vz[nPatMuon]       = it->vz();
-      PatMuon_IP[nPatMuon]       = it->dB(pat::Muon::PV3D);
-      PatMuon_IPsig[nPatMuon]    = (it->dB(pat::Muon::PV3D))/(it->edB(pat::Muon::PV3D));
-      PatMuon_IP2D[nPatMuon]     = it->dB(pat::Muon::PV2D);
-      PatMuon_IP2Dsig[nPatMuon]  = (it->dB(pat::Muon::PV2D))/(it->edB(pat::Muon::PV2D));
+      EventInfo.PatMuon_isGlobal[EventInfo.nPatMuon] = 1;
+      EventInfo.PatMuon_nTkHit[EventInfo.nPatMuon]   = it->innerTrack()->hitPattern().numberOfValidHits();
+      EventInfo.PatMuon_nPixHit[EventInfo.nPatMuon]  = it->innerTrack()->hitPattern().numberOfValidPixelHits();
+      EventInfo.PatMuon_nOutHit[EventInfo.nPatMuon]  = it->innerTrack()->trackerExpectedHitsOuter().numberOfHits();
+      EventInfo.PatMuon_nMuHit[EventInfo.nPatMuon]   = it->outerTrack()->hitPattern().numberOfValidMuonHits();
+      EventInfo.PatMuon_nMatched[EventInfo.nPatMuon] = it->numberOfMatches();
+      EventInfo.PatMuon_chi2[EventInfo.nPatMuon]     = it->globalTrack()->normalizedChi2();
+      EventInfo.PatMuon_chi2Tk[EventInfo.nPatMuon]   = it->innerTrack()->normalizedChi2();
+      EventInfo.PatMuon_pt[EventInfo.nPatMuon]       = it->pt();
+      EventInfo.PatMuon_eta[EventInfo.nPatMuon]      = it->eta();
+      EventInfo.PatMuon_phi[EventInfo.nPatMuon]      = it->phi();
+      EventInfo.PatMuon_vz[EventInfo.nPatMuon]       = it->vz();
+      EventInfo.PatMuon_IP[EventInfo.nPatMuon]       = it->dB(pat::Muon::PV3D);
+      EventInfo.PatMuon_IPsig[EventInfo.nPatMuon]    = (it->dB(pat::Muon::PV3D))/(it->edB(pat::Muon::PV3D));
+      EventInfo.PatMuon_IP2D[EventInfo.nPatMuon]     = it->dB(pat::Muon::PV2D);
+      EventInfo.PatMuon_IP2Dsig[EventInfo.nPatMuon]  = (it->dB(pat::Muon::PV2D))/(it->edB(pat::Muon::PV2D));
 
-      ++nPatMuon;
+      ++EventInfo.nPatMuon;
     }
   }
 
@@ -642,22 +533,22 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     //newvertex = true;
   }
   //   GlobalPoint Pv_point = GlobalPoint((*pv).x(), (*pv).y(), (*pv).z());
-  PVz = (*primaryVertex)[0].z();
+  EventInfo.PVz = (*primaryVertex)[0].z();
 
-  nPV=0;
+  EventInfo.nPV=0;
   for (unsigned int i = 0; i< primaryVertex->size() ; ++i) {
-    PV_x[nPV]      = (*primaryVertex)[i].x();
-    PV_y[nPV]      = (*primaryVertex)[i].y();
-    PV_z[nPV]      = (*primaryVertex)[i].z();
-    PV_ex[nPV]     = (*primaryVertex)[i].xError();
-    PV_ey[nPV]     = (*primaryVertex)[i].yError();
-    PV_ez[nPV]     = (*primaryVertex)[i].zError();
-    PV_chi2[nPV]   = (*primaryVertex)[i].normalizedChi2();
-    PV_ndf[nPV]    = (*primaryVertex)[i].ndof();
-    PV_isgood[nPV] = (*primaryVertex)[i].isValid();
-    PV_isfake[nPV] = (*primaryVertex)[i].isFake();
+    EventInfo.PV_x[EventInfo.nPV]      = (*primaryVertex)[i].x();
+    EventInfo.PV_y[EventInfo.nPV]      = (*primaryVertex)[i].y();
+    EventInfo.PV_z[EventInfo.nPV]      = (*primaryVertex)[i].z();
+    EventInfo.PV_ex[EventInfo.nPV]     = (*primaryVertex)[i].xError();
+    EventInfo.PV_ey[EventInfo.nPV]     = (*primaryVertex)[i].yError();
+    EventInfo.PV_ez[EventInfo.nPV]     = (*primaryVertex)[i].zError();
+    EventInfo.PV_chi2[EventInfo.nPV]   = (*primaryVertex)[i].normalizedChi2();
+    EventInfo.PV_ndf[EventInfo.nPV]    = (*primaryVertex)[i].ndof();
+    EventInfo.PV_isgood[EventInfo.nPV] = (*primaryVertex)[i].isValid();
+    EventInfo.PV_isfake[EventInfo.nPV] = (*primaryVertex)[i].isFake();
 
-    ++nPV;
+    ++EventInfo.nPV;
   }
 
   //------------------------------------------------------
@@ -667,9 +558,9 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   edm::Handle<edm::TriggerResults> trigRes;
   iEvent.getByLabel(triggerTable_, trigRes);
 
-  nBitTrigger = int(triggerPathNames_.size()/32)+1;
-  for(int i=0; i<nBitTrigger; ++i) BitTrigger[i] = 0;
-  if (use_ttbar_filter_) trig_ttbar = 0;
+  EventInfo.nBitTrigger = int(triggerPathNames_.size()/32)+1;
+  for(int i=0; i<EventInfo.nBitTrigger; ++i) EventInfo.BitTrigger[i] = 0;
+  if (use_ttbar_filter_) EventInfo.trig_ttbar = 0;
 
   std::vector<std::string> triggerList;
   edm::Service<edm::service::TriggerNamesService> tns;
@@ -689,7 +580,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     {
       int triggerIdx = ( it - triggerPathNames_.begin() );
       int bitIdx = int(triggerIdx/32);
-      if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) PFJet80 = true;
+      if ( EventInfo.BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) PFJet80 = true;
     }
   }
 
@@ -703,8 +594,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //------------- end added-----------------------------------------------------------//
 
   if (use_ttbar_filter_) {
-    thelepton1.SetPtEtaPhiM(lepton1_pT, lepton1_eta, lepton1_phi, 0.);
-    thelepton2.SetPtEtaPhiM(lepton2_pT, lepton2_eta, lepton2_phi, 0.);
+    thelepton1.SetPtEtaPhiM(EventInfo.lepton1_pT, EventInfo.lepton1_eta, EventInfo.lepton1_phi, 0.);
+    thelepton2.SetPtEtaPhiM(EventInfo.lepton2_pT, EventInfo.lepton2_eta, EventInfo.lepton2_phi, 0.);
   }
 
   int iJetColl = 0 ;
@@ -716,7 +607,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   }
 
   //// Fill TTree
-  if ( BitTrigger > 0 || Run < 0 ) {
+  if ( EventInfo.BitTrigger > 0 || EventInfo.Run < 0 ) {
     smalltree->Fill();
   }
 
@@ -736,7 +627,7 @@ void BTagAnalyzer::processTrig(const edm::Handle<edm::TriggerResults>& trigRes, 
     {
       int triggerIdx = ( itTrigPathNames - triggerPathNames_.begin() );
       int bitIdx = int(triggerIdx/32);
-      if ( NameCompatible(*itTrigPathNames,triggerList[i]) ) BitTrigger[bitIdx] |= ( 1 << (triggerIdx - bitIdx*32) );
+      if ( NameCompatible(*itTrigPathNames,triggerList[i]) ) EventInfo.BitTrigger[bitIdx] |= ( 1 << (triggerIdx - bitIdx*32) );
     }
 
     if (use_ttbar_filter_)
@@ -744,7 +635,7 @@ void BTagAnalyzer::processTrig(const edm::Handle<edm::TriggerResults>& trigRes, 
       for (std::vector<std::string>::const_iterator itTrigPathNames = ttbarTriggerPathNames_.begin();
           itTrigPathNames != ttbarTriggerPathNames_.end(); ++itTrigPathNames)
       {
-        if ( NameCompatible(*itTrigPathNames,triggerList[i]) ) trig_ttbar |= ( 1 << ( itTrigPathNames - ttbarTriggerPathNames_.begin() ) );
+        if ( NameCompatible(*itTrigPathNames,triggerList[i]) ) EventInfo.trig_ttbar |= ( 1 << ( itTrigPathNames - ttbarTriggerPathNames_.begin() ) );
       }
     } //// if use_ttbar_filter_
   } //// Loop over trigger names
@@ -785,7 +676,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       thejet.SetPtEtaPhiM(ptjet, jeteta, jetphi, 0.);
       double deltaR1 = thejet.DeltaR(thelepton1);
       double deltaR2 = thejet.DeltaR(thelepton2);
-      if (ttbar_chan>=0 && (deltaR1 < 0.5 || deltaR2 < 0.5)) continue;
+      if (EventInfo.ttbar_chan>=0 && (deltaR1 < 0.5 || deltaR2 < 0.5)) continue;
     }
     //// end of removal
 
@@ -1626,7 +1517,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 
 
 
-      jetVertex = (math::XYZVector(jet->vx(),jet->vy(),jet->vz()));
+      math::XYZVector jetVertex = (math::XYZVector(jet->vx(),jet->vy(),jet->vz()));
 
       Line::PositionType pos(GlobalPoint(vertex.p4().x(),vertex.p4().y(),vertex.p4().z()));
       Line::DirectionType dir(GlobalVector(flightDir.px(),flightDir.py(),flightDir.pz()));
@@ -1935,7 +1826,7 @@ void BTagAnalyzer::setTracksPV( const reco::Vertex *pv, const bool isPV, const i
     for (int i=0; i<JetInfo[iJetColl].nTrack; ++i) {
       if ( fabs( (&**itt)->pt() - JetInfo[iJetColl].Track_pt[i] )  < 1.e-5 ) {
         if ( isPV ) {
-          JetInfo[iJetColl].Track_PV[i] = nPV + 1;
+          JetInfo[iJetColl].Track_PV[i] = EventInfo.nPV + 1;
           JetInfo[iJetColl].Track_PVweight[i] = (*pv).trackWeight(*itt);
         }
         else {
