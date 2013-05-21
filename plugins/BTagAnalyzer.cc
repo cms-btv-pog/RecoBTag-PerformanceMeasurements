@@ -246,7 +246,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   // MC informations
   //------------------------------------------------------
   EventInfo.pthat = -1.;
-  EventInfo.nPUtrue = -1;
+  EventInfo.nPUtrue = -1.;
   EventInfo.nPU = 0;
   EventInfo.ncQuarks = 0;
   EventInfo.nbQuarks = 0;
@@ -479,6 +479,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       if( !it->isGlobalMuon() ) continue;
 
       EventInfo.PatMuon_isGlobal[EventInfo.nPatMuon] = 1;
+      EventInfo.PatMuon_isPF[EventInfo.nPatMuon]     = it->isPFMuon();
       EventInfo.PatMuon_nTkHit[EventInfo.nPatMuon]   = it->innerTrack()->hitPattern().numberOfValidHits();
       EventInfo.PatMuon_nPixHit[EventInfo.nPatMuon]  = it->innerTrack()->hitPattern().numberOfValidPixelHits();
       EventInfo.PatMuon_nOutHit[EventInfo.nPatMuon]  = it->innerTrack()->trackerExpectedHitsOuter().numberOfHits();
