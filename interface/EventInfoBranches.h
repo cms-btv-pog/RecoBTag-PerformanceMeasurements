@@ -31,7 +31,7 @@ class EventInfoBranches {
     int   PV_isgood[nMaxPVs_];
     int   PV_isfake[nMaxPVs_];
 
-    int   nPUtrue;                 // the true number of pileup interactions that have been added to the event
+    float nPUtrue;                 // the true number of pileup interactions that have been added to the event
     int   nPU;                     // the number of pileup interactions that have been added to the event
     int   PU_bunch[nMaxPUs_];      // 0 if on time pileup, -1 or +1 if out-of-time
     float PU_z[nMaxPUs_];          // the true primary vertex position along the z axis for each added interaction
@@ -83,6 +83,7 @@ class EventInfoBranches {
 
     int   nPatMuon;
     int   PatMuon_isGlobal[1000];
+    int   PatMuon_isPF[1000];
     int   PatMuon_nTkHit[1000];
     int   PatMuon_nPixHit[1000];
     int   PatMuon_nOutHit[1000];
@@ -122,7 +123,7 @@ class EventInfoBranches {
       tree->Branch("nPV"        , &nPV        ,  "nPV/I");
       tree->Branch("PVz"        , &PVz        ,  "PVz/F");
 
-      tree->Branch("nPUtrue"      , &nPUtrue     , "nPUtrue/I");
+      tree->Branch("nPUtrue"      , &nPUtrue     , "nPUtrue/F");
       tree->Branch("nPU"          , &nPU         , "nPU/I"    );
       // tree->Branch("PU_bunch"     , PU_bunch     , "PU_bunch[nPU]/I");
       // tree->Branch("PU_z"         , PU_z         , "PU_z[nPU]/F");
@@ -208,6 +209,7 @@ class EventInfoBranches {
       tree->Branch("PatMuon_nPixHit" , PatMuon_nPixHit , "PatMuon_nPixHit[nPatMuon]/I");
       tree->Branch("PatMuon_nOutHit" , PatMuon_nOutHit , "PatMuon_nOutHit[nPatMuon]/I");
       tree->Branch("PatMuon_isGlobal", PatMuon_isGlobal, "PatMuon_isGlobal[nPatMuon]/I");
+      tree->Branch("PatMuon_isPF"    , PatMuon_isPF    , "PatMuon_isPF[nPatMuon]/I");
       tree->Branch("PatMuon_nMatched", PatMuon_nMatched, "PatMuon_nMatched[nPatMuon]/I");
       tree->Branch("PatMuon_chi2"    , PatMuon_chi2    , "PatMuon_chi2[nPatMuon]/F");
       tree->Branch("PatMuon_chi2Tk"  , PatMuon_chi2Tk  , "PatMuon_chi2Tk[nPatMuon]/F");
@@ -318,6 +320,7 @@ class EventInfoBranches {
       tree->SetBranchAddress("PatMuon_nPixHit" , PatMuon_nPixHit );
       tree->SetBranchAddress("PatMuon_nOutHit" , PatMuon_nOutHit );
       tree->SetBranchAddress("PatMuon_isGlobal", PatMuon_isGlobal);
+      tree->SetBranchAddress("PatMuon_isPF"    , PatMuon_isPF    );
       tree->SetBranchAddress("PatMuon_nMatched", PatMuon_nMatched);
       tree->SetBranchAddress("PatMuon_chi2"    , PatMuon_chi2    );
       tree->SetBranchAddress("PatMuon_chi2Tk"  , PatMuon_chi2Tk  );
