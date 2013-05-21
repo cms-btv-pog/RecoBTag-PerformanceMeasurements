@@ -7,6 +7,7 @@
 
 #ifndef CommPlotProducer4ttbar_h
 #define CommPlotProducer4ttbar_h
+#define ntrack_max 2000
 
 #include "TH1D.h"
 #include "TH2D.h"
@@ -215,7 +216,6 @@ public :
    
    
    Int_t nTrack; 
-   int ntrack_max=2000;
    Float_t Track_dxy[ntrack_max];            //[nTrack]
    Float_t Track_dz[ntrack_max];             //[nTrack]
    Float_t Track_zIP[ntrack_max];            //[nTrack]
