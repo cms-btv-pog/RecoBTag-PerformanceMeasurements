@@ -562,6 +562,9 @@ CommPlotProducer::CommPlotProducer(TChain *superTree, bool infotree1, bool infot
    produceJetProbaTree=infotree1;
    produceNewAlgoTree=infotree2;
 
+   if (produceJetProbaTree) use_selected_tracks=false;
+   else use_selected_tracks=true;
+
    puweight=true;
    
    if (superTree==0) {

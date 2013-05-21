@@ -573,6 +573,10 @@ CommPlotProducer4ttbar::CommPlotProducer4ttbar(TChain *superTree, bool infotree1
    n600_800 =0;
    produceJetProbaTree=infotree1;
    produceNewAlgoTree=infotree2;
+
+   if (produceJetProbaTree) use_selected_tracks=false;
+   else use_selected_tracks=true;
+
    
    if (superTree==0) {
       TChain *newchain = new TChain("btagana/ttree");
