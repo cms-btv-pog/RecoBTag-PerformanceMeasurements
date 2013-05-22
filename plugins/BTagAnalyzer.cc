@@ -36,7 +36,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   //now do what ever initialization you need
   std::string module_type  = iConfig.getParameter<std::string>("@module_type");
   std::string module_label = iConfig.getParameter<std::string>("@module_label");
-  cout << "Constructing " << module_type << "::" << module_label << endl;
+  cout << "Constructing " << module_type << ":" << module_label << endl;
 
   // Parameters
   runSubJets_ = iConfig.getParameter<bool>("runSubJets");
@@ -160,7 +160,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   Histos[0] = new BookHistograms(fs->mkdir( "HistJets" )) ;
   if (runSubJets_) Histos[1] = new BookHistograms(fs->mkdir( "HistFatJets" )) ;
 
-  cout << module_type << "::" << module_label << " constructed" << endl;
+  cout << module_type << ":" << module_label << " constructed" << endl;
 }
 
 
