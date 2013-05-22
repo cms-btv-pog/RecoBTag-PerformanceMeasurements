@@ -380,7 +380,7 @@ class JetInfoBranches {
       //--------------------------------------
       // track information
       //--------------------------------------
-      tree->Branch((name+"nTrack").c_str()           ,&nTrack          ,(name+"nTrack]/I").c_str());
+      tree->Branch((name+"nTrack").c_str()           ,&nTrack          ,(name+"nTrack/I").c_str());
       tree->Branch((name+"Track_dxy").c_str()        ,Track_dxy             ,(name+"Track_dxy["+name+"nTrack]/F").c_str());
       tree->Branch((name+"Track_dz").c_str()         ,Track_dz         ,(name+"Track_dz["+name+"nTrack]/F").c_str());
       tree->Branch((name+"Track_zIP").c_str()        ,Track_zIP             ,(name+"Track_zIP["+name+"nTrack]/F").c_str());
