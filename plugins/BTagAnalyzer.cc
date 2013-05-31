@@ -256,6 +256,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   EventInfo.nPatMuon    = 0;
 
   EventInfo.mcweight=1.;
+  //---------------------------- Start MC info ---------------------------------------//
   if ( !isData_ ) {
     // EventInfo.pthat
     edm::Handle<GenEventInfoProduct> geninfos;
@@ -429,7 +430,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       simpv=getSimPVs(theHepMCProduct);
       //       cout << "simpv.size() " << simpv.size() << endl;
     }
-  } // end MC info
+  }
+  //---------------------------- End MC info ---------------------------------------//
   //   cout << "EventInfo.Evt:" <<EventInfo.Evt << endl;
   //   cout << "EventInfo.pthat:" <<EventInfo.pthat << endl;
 
@@ -684,11 +686,9 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     ++numjet;
 
     int flavour  =-1  ;
-
     if ( !isData_ ) {
       flavour = abs( pjet->partonFlavour() );
       if ( flavour >= 1 && flavour <= 3 ) flavour = 1;
-      JetInfo[iJetColl].Jet_genpt[JetInfo[iJetColl].nJet]   = ( pjet->genJet()!=0 ? pjet->genJet()->pt() : -1. );
     }
 
     JetInfo[iJetColl].Jet_flavour[JetInfo[iJetColl].nJet] = flavour;
@@ -696,6 +696,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     JetInfo[iJetColl].Jet_phi[JetInfo[iJetColl].nJet]     = pjet->phi();
     JetInfo[iJetColl].Jet_pt[JetInfo[iJetColl].nJet]      = pjet->pt();
     JetInfo[iJetColl].Jet_mass[JetInfo[iJetColl].nJet]    = pjet->mass();
+    JetInfo[iJetColl].Jet_genpt[JetInfo[iJetColl].nJet]   = ( pjet->genJet()!=0 ? pjet->genJet()->pt() : -1. );
 
     retpf.set(false);
     JetInfo[iJetColl].Jet_looseID[JetInfo[iJetColl].nJet]  = ( pfjetIDLoose( *pjet, retpf ) ? 1 : 0 );
@@ -782,11 +783,11 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     int k=0;
 
     unsigned int trackSize = selected_tracks.size();
-    if(!use_selected_tracks_)trackSize = no_sel_tracks.size();
+    if(!use_selected_tracks_) trackSize = no_sel_tracks.size();
 
     if (trackSize==0) continue;
-    for (unsigned int itt=0; itt < trackSize; ++itt) {
-
+    for (unsigned int itt=0; itt < trackSize; ++itt)
+    {
       reco::Track  ptrack;
       if(use_selected_tracks_) ptrack = *selected_tracks[itt];
       else ptrack= *no_sel_tracks[itt];
@@ -796,19 +797,16 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 
       //--------------------------------
       Double_t decayLength=-1;
-      TrajectoryStateOnSurface closest =
-        IPTools::closestApproachToJet(transientTrack.impactPointState(), *pv, direction, transientTrack.field());
-      if (closest.isValid()){
-        decayLength =  (closest.globalPosition()-   RecoVertex::convertPos(pv->position())).mag() ;
-      }
-      else{
+      TrajectoryStateOnSurface closest = IPTools::closestApproachToJet(transientTrack.impactPointState(), *pv, direction, transientTrack.field());
+      if (closest.isValid())
+        decayLength =  (closest.globalPosition()-   RecoVertex::convertPos(pv->position())).mag();
+      else
         decayLength = -1;
-      }
 
       Double_t distJetAxis =  IPTools::jetTrackDistance(transientTrack, direction, *pv).second.value();
 
-      JetInfo[iJetColl].Track_dist[JetInfo[iJetColl].nTrack]     =distJetAxis;
-      JetInfo[iJetColl].Track_length[JetInfo[iJetColl].nTrack]   =decayLength;
+      JetInfo[iJetColl].Track_dist[JetInfo[iJetColl].nTrack]     = distJetAxis;
+      JetInfo[iJetColl].Track_length[JetInfo[iJetColl].nTrack]   = decayLength;
 
       JetInfo[iJetColl].Track_dxy[JetInfo[iJetColl].nTrack]      = ptrack.dxy(pv->position());
       JetInfo[iJetColl].Track_dz[JetInfo[iJetColl].nTrack]       = ptrack.dz(pv->position());
@@ -1045,12 +1043,12 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
             && ptrack.dz()-(*pv).z() < 1. ) {
 
           if ( use_selected_tracks_ ) {
-            JetInfo[iJetColl].TrkInc_IP[JetInfo[iJetColl].nTrkInc]	  = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.value();
+            JetInfo[iJetColl].TrkInc_IP[JetInfo[iJetColl].nTrkInc]    = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.value();
             JetInfo[iJetColl].TrkInc_IPsig[JetInfo[iJetColl].nTrkInc] = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.significance();
           }
 
-          JetInfo[iJetColl].TrkInc_pt[JetInfo[iJetColl].nTrkInc]	= ptrack.pt();
-          JetInfo[iJetColl].TrkInc_eta[JetInfo[iJetColl].nTrkInc]	= ptrack.eta();
+          JetInfo[iJetColl].TrkInc_pt[JetInfo[iJetColl].nTrkInc]    = ptrack.pt();
+          JetInfo[iJetColl].TrkInc_eta[JetInfo[iJetColl].nTrkInc]   = ptrack.eta();
           JetInfo[iJetColl].TrkInc_phi[JetInfo[iJetColl].nTrkInc]   = ptrack.phi();
           JetInfo[iJetColl].TrkInc_ptrel[JetInfo[iJetColl].nTrkInc] = calculPtRel( ptrack , *pjet);
 
@@ -1063,6 +1061,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 
     JetInfo[iJetColl].Jet_nLastTrack[JetInfo[iJetColl].nJet]   = JetInfo[iJetColl].nTrack;
     JetInfo[iJetColl].Jet_nLastTrkInc[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nTrkInc;
+
     // b-tagger discriminants
     float Proba  = pjet->bDiscriminator(jetPBJetTags_.c_str());
     float ProbaN = pjet->bDiscriminator(jetPNegBJetTags_.c_str());
@@ -1556,7 +1555,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
         if ( theFlag[TrackCategories::KsDecay] )            cap4 = 1;
         if ( theFlag[TrackCategories::LambdaDecay] )        cap5 = 1;
         if ( theFlag[TrackCategories::HadronicProcess] )    cap6 = 1;
-        if ( theFlag[TrackCategories::Fake] )	            cap7 = 1;
+        if ( theFlag[TrackCategories::Fake] )	           cap7 = 1;
         if ( theFlag[TrackCategories::SharedInnerHits] )    cap8 = 1;
       }
     }
@@ -1573,7 +1572,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
         if ( theFlag[TrackCategories::KsDecay] )            can4 = 2;
         if ( theFlag[TrackCategories::LambdaDecay] )        can5 = 2;
         if ( theFlag[TrackCategories::HadronicProcess] )    can6 = 2;
-        if ( theFlag[TrackCategories::Fake] )	            can7 = 2;
+        if ( theFlag[TrackCategories::Fake] )	           can7 = 2;
         if ( theFlag[TrackCategories::SharedInnerHits] )    can8 = 2;
       }
       JetInfo[iJetColl].Jet_histSvx[JetInfo[iJetColl].nJet] =  cap0+can0 + (cap1+can1)*10 + (cap2+can2)*100
@@ -1649,34 +1648,35 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     if ( JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet]  > 0 ) Histos[iJetColl]-> hData_Tagger_MU->Fill( 2.5*JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet] );
     if ( JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet] < 0 ) Histos[iJetColl]-> hData_Tagger_MU->Fill( 2.5*JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet] );
 
-    // MC only
-    if ( isData_ ) continue;
 
-    Histos[iJetColl]->hAllFlav_Flavour->Fill( flavour );
-    if ( varneg > 0 ) Histos[iJetColl]->hAllFlav_Tagger->Fill(-varneg );
-    if ( varpos > 0 ) Histos[iJetColl]->hAllFlav_Tagger->Fill( varpos );
-    if ( flavour == 1 || flavour == 21 ) { // light q+gluon
-      if ( varneg > 0 ) Histos[iJetColl]->hLightFlav_Tagger->Fill(-varneg );
-      if ( varpos > 0 ) Histos[iJetColl]->hLightFlav_Tagger->Fill( varpos );
-    } // light q+gluon
-    if ( flavour == 21 ) { // gluon jets
-      if ( varneg > 0 ) Histos[iJetColl]->hGluonFlav_Tagger->Fill(-varneg );
-      if ( varpos > 0 ) Histos[iJetColl]->hGluonFlav_Tagger->Fill( varpos );
-    } // gluon jets
-    else if ( flavour == 1 ) { // uds jets
-      if ( varneg > 0 ) Histos[iJetColl]->hUDSFlav_Tagger->Fill(-varneg );
-      if ( varpos > 0 ) Histos[iJetColl]->hUDSFlav_Tagger->Fill( varpos );
-    } // uds jets
-    else if ( flavour == 4 ) { // c jets
-      if ( varneg > 0 ) Histos[iJetColl]->hCFlav_Tagger->Fill(-varneg );
-      if ( varpos > 0 ) Histos[iJetColl]->hCFlav_Tagger->Fill( varpos );
-    } // c jets
-    else if ( flavour == 5 ) { // b jets
-      if ( varneg > 0 ) Histos[iJetColl]->hBFlav_Tagger->Fill(-varneg );
-      if ( varpos > 0 ) Histos[iJetColl]->hBFlav_Tagger->Fill( varpos );
-    } // b jets
+    if ( !isData_ )
+    {
+      Histos[iJetColl]->hAllFlav_Flavour->Fill( flavour );
+      if ( varneg > 0 ) Histos[iJetColl]->hAllFlav_Tagger->Fill(-varneg );
+      if ( varpos > 0 ) Histos[iJetColl]->hAllFlav_Tagger->Fill( varpos );
+      if ( flavour == 1 || flavour == 21 ) { // light q+gluon
+        if ( varneg > 0 ) Histos[iJetColl]->hLightFlav_Tagger->Fill(-varneg );
+        if ( varpos > 0 ) Histos[iJetColl]->hLightFlav_Tagger->Fill( varpos );
+      } // light q+gluon
+      if ( flavour == 21 ) { // gluon jets
+        if ( varneg > 0 ) Histos[iJetColl]->hGluonFlav_Tagger->Fill(-varneg );
+        if ( varpos > 0 ) Histos[iJetColl]->hGluonFlav_Tagger->Fill( varpos );
+      } // gluon jets
+      else if ( flavour == 1 ) { // uds jets
+        if ( varneg > 0 ) Histos[iJetColl]->hUDSFlav_Tagger->Fill(-varneg );
+        if ( varpos > 0 ) Histos[iJetColl]->hUDSFlav_Tagger->Fill( varpos );
+      } // uds jets
+      else if ( flavour == 4 ) { // c jets
+        if ( varneg > 0 ) Histos[iJetColl]->hCFlav_Tagger->Fill(-varneg );
+        if ( varpos > 0 ) Histos[iJetColl]->hCFlav_Tagger->Fill( varpos );
+      } // c jets
+      else if ( flavour == 5 ) { // b jets
+        if ( varneg > 0 ) Histos[iJetColl]->hBFlav_Tagger->Fill(-varneg );
+        if ( varpos > 0 ) Histos[iJetColl]->hBFlav_Tagger->Fill( varpos );
+      } // b jets
+    }
 
-    // Track Histosry
+    // Track History
     if ( useTrackHistory_ && indexes.size()!=0 && !isData_ ) {
 
       int cat1P = 0, cat2P = 0, cat3P = 0, catP = 0;
