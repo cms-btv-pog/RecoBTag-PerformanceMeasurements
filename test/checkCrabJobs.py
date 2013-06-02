@@ -3,10 +3,14 @@
 import sys, os, shutil, re
 from optparse import OptionParser
 
+# usage description
+usage = """Usage: checkCrabJobs.py [options]\n
+Example: ./checkCrabJobs.py -w CRAB_Jobs\n
+For more help: ./checkCrabJobs.py --help
+"""
 
 def main():
-  # usage description
-  usage = "Usage: checkCrabJobs.py [options] \nExample: ./checkCrabJobs.py -w CRAB_Jobs"
+
 
   # input parameters
   parser = OptionParser(usage=usage)

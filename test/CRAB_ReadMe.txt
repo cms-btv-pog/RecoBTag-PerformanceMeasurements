@@ -9,8 +9,12 @@ For a brief description of the input parameters, execute
 
 which will produce the following output
 
-Usage: createCrabJobs.py [options]
+Usage: ./createCrabJobs.py [options]
+
 Example: ./createCrabJobs.py -w CRAB_Jobs -d datasetList.txt -c runBTagAnalyzer_cfg.py -t crab_template.cfg
+
+For more help: ./createCrabJobs.py --help
+
 
 Options:
   -h, --help            show this help message and exit
@@ -58,9 +62,15 @@ MAIN_WORKDIR/ (Main working directory)
 
 The dataset list file contains the following entries
 
-# Dataset_name                                                                                                                                                                                  Unit(lumi:1,event:0)   Total_units   Number_of_jobs   Run_selection   Lumi_mask   Scheduler   Use_server             DBS_instance   Publication_name   PyCfg_parameters (optional)
-/BprimeBprimeToBHBHinc_M-600_TuneZ2star_8TeV-madgraph/cjenkins-BprimeBprimeToBHBHinc_M600_TuneZ2star_8TeVmadgraphSum12_DR53X_PU_S10_START53_V7A_TLBSMv2-fe5dcf8cf2a24180bf030f68a7d97dda/USER                      0            -1                1               -           -      condor            0   cms_dbs_ph_analysis_02                  -   wantSummary=True
-/BprimeBprimeToBHBHinc_M-800_TuneZ2star_8TeV-madgraph/cjenkins-BprimeBprimeToBHBHinc_M800_TuneZ2star_8TeVmadgraphSum12_DR53X_PU_S10_START53_V7A_TLBSMv2-fe5dcf8cf2a24180bf030f68a7d97dda/USER                      0            -1                1               -           -      condor            0   cms_dbs_ph_analysis_02                  -   wantSummary=True
+# DATA
+# Dataset_name                       Unit(lumi:1,event:0)   Total_units   Number_of_jobs   Run_selection                                                       Lumi_mask       Scheduler   Use_server   DBS_instance    User_remote_dir   PyCfg_parameters (optional)
+/BTag/Run2012A-22Jan2013-v1/AOD                         1            -1               75               -   Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt          condor            0              -   CMSSW_5_3_9/Data   runSubJets=True producePtRelTemplate=False runOnData=True dataGlobalTag=FT_53_V21_AN3 wantSummary=True
+/BTag/Run2012B-22Jan2013-v1/AOD                         1            -1              225               -   Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt          condor            0              -   CMSSW_5_3_9/Data   runSubJets=True producePtRelTemplate=False runOnData=True dataGlobalTag=FT_53_V21_AN3 wantSummary=True
+
+# MC
+# Dataset_name                                                                                        Unit(lumi:1,event:0)   Total_units   Number_of_jobs   Run_selection   Lumi_mask       Scheduler   Use_server   DBS_instance   User_remote_dir   PyCfg_parameters (optional)
+/QCD_Pt-120to170_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM                       0            -1              255               -           -   remoteGlidein            0              -    CMSSW_5_3_9/MC   runSubJets=True producePtRelTemplate=False runOnData=False mcGlobalTag=START53_V7G wantSummary=True
+/QCD_Pt-170to300_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM                       0            -1              225               -           -   remoteGlidein            0              -    CMSSW_5_3_9/MC   runSubJets=True producePtRelTemplate=False runOnData=False mcGlobalTag=START53_V7G wantSummary=True
 
 These entries are used to define the working directories and CRAB configuration files for different datasets. Note that
 the PyCfg_parameters entry is optional and can be left out. However, all other entries must be defined (if you don't want
@@ -118,7 +128,11 @@ available input parameters, execute
 which will produce the following output
 
 Usage: checkCrabJobs.py [options]
+
 Example: ./checkCrabJobs.py -w CRAB_Jobs
+
+For more help: ./checkCrabJobs.py --help
+
 
 Options:
   -h, --help            show this help message and exit
