@@ -18,13 +18,28 @@
 #include <TLatex.h>
 #include <TAxis.h>
 #include <TProfile.h>
+#include <TString.h>
 
 using namespace std;
 
-TString filename="qcd_pythia/jet_40_60_500/output_all.root";
+//TString filename="qcd_pythia/jet_40_60_500_bugfix/output_all.root";
 //TString filename="qcd_pythia/jet_40_60_500/output_newalgo1.root";
-//TString filename="qcd_pythia/btag_40_65_300/output_btag_all.root";
+TString filename="qcd_pythia/jet_40_60_500_bugfix/output_newpf1.root";
+//TString filename="qcd_herwig/jet40/output_herwig_jet40.root";
+TString datacaption = "HLT_PFJet40, jet pT>60 ";
+
+bool btag = false;
+//TString filename="qcd_pythia/btag_40_65_300_bugfix/output_btag_all.root";
 //TString filename="qcd_pythia/btag_40_65_300/output_btag_newalgo1.root";
+//TString filename="qcd_pythia/btag_40_binning2/output_btag_all.root";
+//TString filename="qcd_pythia/btag_40_binning2/output_btag_mcinclu.root";
+//TString datacaption = "HLT_BTag_Mu5_Dijet40, jet pT>65 ";
+
+//TString filename="qcd_pythia/btag_20_45_300/output_btag_all.root";
+
+//TString filename="qcd_herwig/btag20/output_btag20_herwig.root";
+//TString filename="qcd_pythia/btag_20_45_300/output_btag_newalgo1.root";
+bool test_bin= false;
 //TString filename="qcd_pythia/btag_40_65_300/output_btag_oldprocess.root";
 
 //TString filename="test_proof/save_proof_btag40_65_300_w_trigMC.root";
@@ -46,15 +61,13 @@ TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  19.7 fb^{-1}";
 //TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  B:4.43 fb^{-1}";
 //TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  C:7.15 fb^{-1}";
 //TString title= "CMS 2013 preliminary, #sqrt{s} = 8 TeV,  D:7.27 fb^{-1}";
-TString datacaption = "HLT_PFJet40, jet pT>60 ";
-//TString datacaption = "HLT_BTag_Mu5_Dijet40, jet pT>65 ";
+//TString datacaption = "HLT_BTag_Mu5_Dijet20, jet pT>45 ";
 //TString datacaption = "HLT_PFJet80, jet pT>100 ";
 //TString datacaption = "HLT_PFJet80, jet pT>80 ";
-TString format=".gif"; // .png or .pdf
+TString format=".pdf"; // .png or .pdf or .gif
 bool bOverflow=true;
-bool web = true;
+bool web = false;
 
-bool btag = true;
 
 
 void Draw(TString name, TString histotitle, bool log);
@@ -62,13 +75,15 @@ void DrawMC(TString name, TString histotitle, bool log);
 void DrawTagRate(TString name, TString histotitle, bool log);
 void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY, bool log);
 void OverFlowBinFix(TH1D* );
+void anplot();
+void anplot2();
 
 //--------
 
 void DrawCommPlot(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots, bool Draw_muons_plots, bool Draw_discriminator_plots , 
-bool Draw_newdiscriminator_plots, bool Draw_tagRate_plots, bool Draw_2D_plots){
+bool Draw_newdiscriminator_plots, bool Draw_tagRate_plots, bool Draw_2D_plots, bool Draw_pflepton){
 
-  TString action = "mkdir "+dir4plots;
+  TString action = "mkdir "+dir4plots+"/";
   system(action);
   
   
@@ -86,7 +101,7 @@ if (Draw_track_plots){
   Draw("track_HPix"   ,      "number of hits in the Pixel",1);		   
   Draw("track_len"     ,     "Track decay length",1);				   
   Draw("track_dist"    ,     "Track distance to the jet axis"	,1);	   
-  Draw("track_dz"     ,      "Track transverse IP",1);				   
+  Draw("track_dz"     ,      "Track IP_dz",1);				   
   Draw("track_pt"     ,      "pT of all the tracks",1);			   
   Draw("track_pt15"     ,      "pT of all the tracks",1);			   
   //Draw("track_isfromSV",     "Track is from SV",1);			   
@@ -145,6 +160,8 @@ if (Draw_sv_plots){
   Draw("sv_phi","SV #phi",0);	
   Draw("sv_flight3D","SV 3D flight distance",1);	
   Draw("sv_flight2D","SV 2D flight distance",1);	
+  Draw("sv_flight2D_3trk","SV 2D flight dist. if #tracks@SV >=3",1);	
+  Draw("sv_flight2DSig_3trk","SV 2D flight dist. sig. if #tracks@SV >=3",1);	
   Draw("sv_flight3DSig","SV 3D flight distance significance",1);
   Draw("sv_flightSig2D","SV 2D flight distance significance",1);
   Draw("sv_flight3Derr","SV 3D flight distance error",1);
@@ -183,11 +200,11 @@ if (Draw_discriminator_plots){
   
   }
 if (Draw_newdiscriminator_plots) {
-  Draw("RetCombSvx"         ,"Retrained CSV Discriminator",1);
-  Draw("RetCombSvx"         ,"Retrained CSV Discriminator",0);
-  Draw("CombCSVJP"          ,"Combined CSV+JP Discriminator",1);
-  Draw("CombCSVSL"          ,"Combined CSV+SL Discriminator",1);
-  Draw("CombCSVJPSL"        ,"Combined CSV+JP+SL Discriminator",1);
+  Draw("RetCombSvx"         ,"CSV_v1 Discriminator",1);
+  Draw("RetCombSvx"         ,"CSV_v1 Discriminator",0);
+  Draw("CombCSVJP"          ,"CSVJP Discriminator",1);
+  Draw("CombCSVSL"          ,"CSVSL_v1 Discriminator",1);
+  Draw("CombCSVJPSL"        ,"CSVJPSL Discriminator",1);
   Draw("SoftMu"        ,"Soft Muon Discriminator",1);
   Draw("SoftMu"        ,"Soft Muon Discriminator",0);
   Draw("SoftEl"        ,"Soft Electron Discriminator",1);
@@ -221,6 +238,112 @@ if (Draw_2D_plots){
   Draw2DPlot("muon_DeltaR_vs_jetpt","Muon #Delta R as a function of the jet p_{T}","jet p_{T}","Muon #Delta R",  0);	         
   }
 
+if (Draw_pflepton) {
+
+   Draw("pfelectron_multi","number of pfelectron",1);
+   Draw("pfelectron_pt","pfelectron p_{T}",1);
+   Draw("pfelectron_eta","pfelectron #eta",0);
+   Draw("pfelectron_phi","pfelectron #phi", 0);
+   Draw("pfelectron_Sip","3D IP significance of pfelectron",1);
+   Draw("pfelectron_ptrel","pT rel. of the pfelectron",0);
+   Draw("pfelectron_ratio","ratio of pfelectron", 1);
+   Draw("pfelectron_ratiorel",   "ratioRel of pfelectron",1);
+   Draw("pfelectron_deltar", "#DeltaR(pfelectron,jet)",0);
+
+   Draw("pfmuon_multi","number of pfmuon",1);
+   Draw("pfmuon_goodquality","quality of pfmuons",0);
+   Draw("pfmuon_pt","pfmuon p_{T}",1);
+   Draw("pfmuon_eta","pfmuon #eta",0);
+   Draw("pfmuon_phi","pfmuon #phi", 0);
+   Draw("pfmuon_Sip","3D IP significance of pfmuon",1);
+   Draw("pfmuon_ptrel","pT rel. of the pfmuon",0);
+   Draw("pfmuon_ratio","ratio of pfmuon", 1);
+   Draw("pfmuon_ratiorel",   "ratioRel of pfmuon",1);
+   Draw("pfmuon_deltar", "#DeltaR(pfmuon,jet)",0);
+
+}
+
+if (test_bin) {
+  for (int i=1;i<10;i++) {
+
+    char bbb[10];
+    sprintf(bbb,"bin%d",i);
+    TString bini = bbb;
+    cout <<" i " << i << "bin" << i << " "  << bini << endl;
+    Draw(bini+"_SSVHP",              "SSVHP ("+bini+")",                      1);
+    Draw(bini+"_JP",                 "JP ("+bini+")",                         1);
+    Draw(bini+"_CSV",                "CSV ("+bini+")",                        1);
+    Draw(bini+"_SVmass",             "SV_mass ("+bini+")",                    0);
+    Draw(bini+"_mu_ptrel",           "pT rel. of the muon ("+bini+")",        0);
+    Draw(bini+"_muon_DeltaR",        "DeltaR(jet,mu) ("+bini+")",             0);
+    Draw(bini+"_sv_flight3DSig",     "3D flight dist. sig ("+bini+")",        1);
+    Draw(bini+"_sv_pt",              "Vtx p_{T} ("+bini+")",                  0);
+    Draw(bini+"_sv_deltaR_jet",      "DeltaR(jet,SV) ("+bini+")",             0);
+   }
+
+
+}
+}
+void anplot() {
+
+  TString action = "mkdir "+dir4plots+"/";
+  system(action);
+  
+  
+Draw("jet_pt_all"   ,"pT of all jets",1);	    
+
+  Draw("track_IPs"    ,      "3D IP significance of all tracks",1);	   
+  Draw("track_IP"     ,      "3D IP of all tracks",1);			   
+  Draw("track_IPerr"   ,     "3D IP error of all tracks",1);				   
+  Draw("track_chi2_cut"    ,"Normalized #chi^{2} @N-1 step",1);	    
+  Draw("track_nHit_cut"  ," Number of hits @N-1 step",1);
+  Draw("track_HPix_cut"    ,"Number of hits in the Pixel @N-1 step",1);  
+  Draw("track_len_cut"     ,"Decay length @N-1 step",1);		    
+  Draw("track_dist_cut"    ,"Distance to the jet axis @N-1 step" ,1);  
+  Draw("track_dz_cut"     , "IP_dz @N-1 step",1);		    
+  Draw("track_pt_cut"	   ,"Track pT @N-1 step",1);
+  Draw("track_pt15_cut"	   ,"Track pT @N-1 step",1);
+  Draw("track_IP2D_cut"    ,"IP2D @N-1 step",1);
+
+/*
+  Draw("sv_multi_0","nr. of SV including bin 0",1); 
+  Draw("sv_mass","SV mass",0);
+  Draw("sv_deltaR_jet","Delta R between the jet and the SV direction.",0);
+  Draw("sv_pt","SV p_{T}",1); 	
+
+  Draw("mu_ptrel"     ,      "p_{T} rel. of the muon",0);    
+  Draw("muon_Pt",	     "Muon p_{T}",1);	       
+  Draw("muon_Sip3d",	     "Muon 3D IP significance",1);
+  Draw("muon_DeltaR",	     "Muon1 #Delta R",0);
+  
+  Draw("discri_ssche0",      "SSVHE Discriminator", 1);
+  Draw("discri_sschp0",      "SSVHP Discriminator", 1);
+
+  Draw("TCHE"	      ,"TCHE Discriminator", 1); 		    
+  Draw("TCHP"	      ,"TCHP Discriminator",1);  		    
+  Draw("JP"	      ,"JP Discriminator",1);			    
+  Draw("JBP"	      ,"JBP Discriminator",1);			    
+  Draw("CSV"	      ,"CSV Discriminator",1);
+*/
+}
+void anplot2() {
+
+  TString action = "mkdir "+dir4plots+"/";
+  system(action);
+  
+  
+  Draw("CSV"	      ,"CSV Discriminator",1);
+  Draw("CombCSVSL"          ,"CSVSL_v1 Discriminator",1);
+/*
+  Draw("RetCombSvx"         ,"CSV_v1 Discriminator",1);
+  Draw("RetCombSvx"         ,"CSV_v1 Discriminator",0);
+  Draw("CombCSVJP"          ,"CSVJP Discriminator",1);
+  Draw("CombCSVJPSL"        ,"CSVJPSL Discriminator",1);
+  Draw("SoftMu"        ,"Soft Muon Discriminator",1);
+  Draw("SoftEl"        ,"Soft Electron Discriminator",1);
+*/
+  			    
+
 }
 
 //--------------------------
@@ -246,9 +369,19 @@ void Draw(TString name, TString histotitle, bool log)
  hist_l         = (TH1D*)gROOT->FindObject(name+"_l");
  hist_data      = (TH1D*)gROOT->FindObject(name+"_data");
  
+ bool ovbin = true;
+  for (int i=1;i<10;i++) {
+    char ccc[10];
+    sprintf(ccc,"bin%d",i);
+    TString biccc = ccc;
+    if (name==biccc+"_SVmass" ||
+        name==biccc+"_sv_flight3DSig" ||
+        name==biccc+"_sv_pt" ||
+        name==biccc+"_sv_deltaR_jet" ) ovbin= false;
+  }
 
  if (bOverflow && name!="SSV" && name!="SSVHP" && name!="sv_mass" 
-     && name!="sv_mass_3trk") {
+     && name!="sv_mass_3trk" && ovbin) {
   OverFlowBinFix(hist_b);
   OverFlowBinFix(hist_c);
   OverFlowBinFix(hist_gsplit);
@@ -331,10 +464,31 @@ void Draw(TString name, TString histotitle, bool log)
  canvas_1->SetLogy(log);
  
  if (hist_data->GetMaximum() > stack->GetMaximum() ) stack->SetMaximum( hist_data->GetMaximum()*1.1) ;
+ if ((name=="CombCSVJP" || name=="CombCSVJPSL") && btag) stack->SetMaximum( hist_data->GetMaximum()*3.);
  if (name=="jet_phi" || name=="sv_phi" || name=="muon_phi") {
   if (log) stack->SetMinimum(0.01);
   else  stack->SetMinimum(0.); 
  }
+ if (test_bin) {
+ float minmin=hist_b->GetMinimum();
+ if (minmin<hist_l->GetMinimum()) minmin=hist_l->GetMinimum();
+ if (minmin<hist_c->GetMinimum()) minmin=hist_c->GetMinimum();
+ if (minmin<hist_gsplit->GetMinimum()) minmin=hist_gsplit->GetMinimum();
+ if (minmin>0) stack->SetMinimum(minmin/2);
+ else {
+  if (log) stack->SetMinimum(0.01);
+  else  stack->SetMinimum(0.); 
+ }
+ }
+
+
+ if (name=="CSV" || name=="CombCSVSL") {
+// stack->SetMaximum(2*stack->GetMaximum());
+ if (stack->GetMinimum()> hist_b->GetMinimum()) {
+ stack->SetMinimum(hist_b->GetMinimum());
+ }}
+
+ if (name=="pfelectron_eta" || name=="pfmuon_eta") stack->SetMaximum( hist_data->GetMaximum()*1.5);
 
  stack    ->Draw("hist");  
   
@@ -348,10 +502,10 @@ void Draw(TString name, TString histotitle, bool log)
 
 
  int move_legend=0;
- if (name=="jet_phi" || name=="sv_phi" || name=="muon_phi" ) move_legend=1;
+ if (name=="jet_phi" || name=="sv_phi" || name=="muon_phi" || name=="pfelectron_phi" || name=="pfmuon_phi") move_legend=1;
  if (btag) {
-  if (name=="CSVJPSL" || name=="CSVSL" || (name=="SoftMu" && !log) ) move_legend=2;
-  if (name=="CSV" || name=="CSVJP" || (name=="RetCombSvx" && !log) ) move_legend=3;
+  if (name=="CombCSVJPSL" || name=="CombCSVSL" || (name=="SoftMu" && !log) ) move_legend=2;
+  if (name=="CSV" || name=="CombCSVJP" || (name=="RetCombSvx" && !log) ) move_legend=3;
   if ((name=="RetCombSvx" || name=="SoftMu" ) && log) move_legend=1;
  }
  if (log && name=="sv_en_ratio" ) move_legend=1;
@@ -969,3 +1123,5 @@ void DrawMC(TString name, TString histotitle, bool log)
  
 
 }
+//--------------------------
+

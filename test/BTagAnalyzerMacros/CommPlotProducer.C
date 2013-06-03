@@ -637,6 +637,29 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
   AddHisto("CombCSVSL"	  ,"CombCSVSL",				     50,0.,1.  );
   AddHisto("CombCSVJPSL"  ,"CombCSVJPSL",				     50,0.,1.  );
   AddHisto("RetCombSvx"   ,"RetCombSvx",				     50,0.,1.  );
+  AddHisto("RetCombSvx_zo","RetCombSvx",                                     50,-0.04,1.  );
+  
+  AddHisto("pfmuon_multi",      "number of pfmuons",	   7,-0.5,6.5    );
+  AddHisto("pfmuon_goodquality","quality of pfmuons",3,-0.5,2.5   );
+  AddHisto("pfmuon_pt",		"pfmuon p_{T}",  	   50, 0, 100	 );
+  AddHisto("pfmuon_eta",   	"pfmuon #eta",  	  50, -2.5, 2.5 );  
+  AddHisto("pfmuon_phi",        "pfmuon #phi",              40, -1.*pi,pi);
+  AddHisto("pfmuon_Sip",	"3D IP significance of pfmuon",50, -35, 35   );
+  AddHisto("pfmuon_ptrel",      "pT rel. of the muon",	   50,0,5        );
+  AddHisto("pfmuon_ratio",      "ratio of pfmuon", 50,0,2       );  
+  AddHisto("pfmuon_ratiorel",   "ratioRel of pfmuon", 50,0,0.05       );  
+  AddHisto("pfmuon_deltar",	"#DeltaR(pfmuon,jet)",50,0,0.5);
+  
+  AddHisto("pfelectron_multi",      "number of pfelectron",	   7,-0.5,6.5    );
+  AddHisto("pfelectron_pt",		"pfelectron p_{T}",  	   50, 0, 100	 );
+  AddHisto("pfelectron_eta",   	"pfelectron #eta",  	           50, -2.5, 2.5 );  
+  AddHisto("pfelectron_phi",        "pfelectron #phi",              40, -1.*pi,pi);
+  AddHisto("pfelectron_Sip",	"3D IP significance of pfelectron",50, -35, 35   );
+  AddHisto("pfelectron_ptrel",      "pT rel. of the pfelectron",	   50,0,5        );
+  AddHisto("pfelectron_ratio",      "ratio of pfelectron", 50,0,2       );  
+  AddHisto("pfelectron_ratiorel",   "ratioRel of pfelectron", 50,0,0.05      );  
+  AddHisto("pfelectron_deltar",	"#DeltaR(pfelectron,jet)",50,0,0.5);  
+  
   
   AddHisto2D("seltrack_vs_jetpt", "sel track multiplicity vs jet pt",         PtMax/20,0,PtMax, 100,-0.5,99.5);
   AddHisto2D("sv_mass_vs_flightDist3D", " SVMass vs SV 3D flight distance ",  50,0, 10,60,0,6);			
@@ -1283,6 +1306,9 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
        FillHisto_floatFromMap("CombCSVSL",   flav, isGluonSplit, combsl  ,   ww);
        FillHisto_floatFromMap("CombCSVJPSL", flav, isGluonSplit, combjpsl  ,   ww);
        FillHisto_floatFromMap("RetCombSvx",  flav, isGluonSplit, retrainedcsv  ,   ww);
+       if (retrainedcsv<-9) retrainedcsv=-0.03;
+       else if (retrainedcsv<0.)  retrainedcsv=-0.01;
+       FillHisto_floatFromMap("RetCombSvx_zo",  flav, isGluonSplit, retrainedcsv  ,   ww);
       }
 
 
@@ -1347,6 +1373,51 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
 	
 	FillHisto2D_float_floatFromMap("muon_ptrel_vs_jetpt", flav, isGluonSplit,ptjet,Muon_ptrel[idxFirstMuon],ww);
         FillHisto2D_float_floatFromMap("muon_DeltaR_vs_jetpt",flav, isGluonSplit,ptjet,themuon.DeltaR(thejet),ww);
+      }
+      
+      if (produceNewAlgoTree) {
+            // PFMuon
+        int npfmu=0;
+        int indpfmu=-1;
+        for (int im=0; im<nPFMuon; im++) {
+         if (PFMuon_IdxJet[im]==ijet) {
+	    if (npfmu==0) indpfmu=im;
+	    npfmu++;
+	 }
+        }
+        FillHisto_intFromMap(  "pfmuon_multi",  flav, isGluonSplit , npfmu   ,ww);
+        if (indpfmu>-1) {
+          FillHisto_intFromMap(  "pfmuon_goodquality", flav, isGluonSplit, PFMuon_GoodQuality[indpfmu]        ,ww);
+ 	  FillHisto_floatFromMap("pfmuon_pt",          flav, isGluonSplit, PFMuon_pt[indpfmu],                 ww);
+ 	  FillHisto_floatFromMap("pfmuon_eta",   	     flav, isGluonSplit, PFMuon_eta[indpfmu],                ww);
+	  FillHisto_floatFromMap("pfmuon_phi",         flav, isGluonSplit, PFMuon_phi[indpfmu],                ww);
+	  FillHisto_floatFromMap("pfmuon_Sip",	     flav, isGluonSplit, PFMuon_IPsig[indpfmu],              ww);
+	  FillHisto_floatFromMap("pfmuon_ptrel",       flav, isGluonSplit, PFMuon_ptrel[indpfmu],              ww);
+	  FillHisto_floatFromMap("pfmuon_ratio",       flav, isGluonSplit, PFMuon_ratio[indpfmu],              ww);
+	  FillHisto_floatFromMap("pfmuon_ratiorel",    flav, isGluonSplit, PFMuon_ratioRel[indpfmu],           ww);
+	  FillHisto_floatFromMap("pfmuon_deltar",	     flav, isGluonSplit, PFMuon_deltaR[indpfmu],             ww);
+        }
+      
+        //PFElectron
+        int npfel=0;
+        int indpfel=-1;
+        for (int im=0; im<nPFElectron; im++) {
+           if (PFElectron_IdxJet[im]==ijet) {
+	      if (npfel==0) indpfel=im;
+	      npfel++;
+	   }
+        }
+        FillHisto_intFromMap(  "pfelectron_multi",  flav, isGluonSplit , npfel   ,ww);
+        if (indpfel>-1) {
+	  FillHisto_floatFromMap("pfelectron_pt",          flav, isGluonSplit, PFElectron_pt[indpfel],                ww);
+	  FillHisto_floatFromMap("pfelectron_eta",   	 flav, isGluonSplit, PFElectron_eta[indpfel],                ww);
+	  FillHisto_floatFromMap("pfelectron_phi",         flav, isGluonSplit, PFElectron_phi[indpfel],                ww);
+	  FillHisto_floatFromMap("pfelectron_Sip",	 flav, isGluonSplit, PFElectron_IPsig[indpfel],                ww);
+	  FillHisto_floatFromMap("pfelectron_ptrel",       flav, isGluonSplit, PFElectron_ptrel[indpfel],                ww);
+	  FillHisto_floatFromMap("pfelectron_ratio",       flav, isGluonSplit, PFElectron_ratio[indpfel],                ww);
+	  FillHisto_floatFromMap("pfelectron_ratiorel",    flav, isGluonSplit, PFElectron_ratioRel[indpfel],             ww);
+	  FillHisto_floatFromMap("pfelectron_deltar",	 flav, isGluonSplit, PFElectron_deltaR[indpfel],                ww);
+        }
       }
 
 

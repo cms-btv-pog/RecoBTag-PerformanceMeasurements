@@ -207,6 +207,28 @@ public :
    Int_t           BHadron_pdgID[1000];   //[nBHadrons]
 
    
+   Int_t           nPFElectron;
+   Int_t           PFElectron_IdxJet[100];   //[nPFElectron]
+   Float_t         PFElectron_pt[100];   //[nPFElectron]
+   Float_t         PFElectron_eta[100];   //[nPFElectron]
+   Float_t         PFElectron_phi[100];   //[nPFElectron]
+   Float_t         PFElectron_ptrel[100];   //[nPFElectron]
+   Float_t         PFElectron_deltaR[100];   //[nPFElectron]
+   Float_t         PFElectron_ratio[100];   //[nPFElectron]
+   Float_t         PFElectron_ratioRel[100];   //[nPFElectron]
+   Float_t         PFElectron_IPsig[100];   //[nPFElectron]
+   Int_t           nPFMuon;
+   Int_t           PFMuon_IdxJet[100];   //[nPFMuon]
+   Float_t         PFMuon_pt[100];   //[nPFMuon]
+   Float_t         PFMuon_eta[100];   //[nPFMuon]
+   Float_t         PFMuon_phi[100];   //[nPFMuon]
+   Float_t         PFMuon_ptrel[100];	//[nPFMuon]
+   Float_t         PFMuon_deltaR[100];   //[nPFMuon]
+   Float_t         PFMuon_ratio[100];	//[nPFMuon]
+   Float_t         PFMuon_ratioRel[100];   //[nPFMuon]
+   Float_t         PFMuon_IPsig[100];   //[nPFMuon]
+   Int_t           PFMuon_GoodQuality[100];   //[nPFMuon]
+   
    
    
    // List of branches for probatree
@@ -426,7 +448,27 @@ public :
    TBranch        *b_BHadron_pdgID;   //!
 
 
-   
+   TBranch        *b_nPFElectron;   //!
+   TBranch        *b_PFElectron_IdxJet;   //!
+   TBranch        *b_PFElectron_pt;   //!
+   TBranch        *b_PFElectron_eta;   //!
+   TBranch        *b_PFElectron_phi;   //!
+   TBranch        *b_PFElectron_ptrel;   //!
+   TBranch        *b_PFElectron_deltaR;   //!
+   TBranch        *b_PFElectron_ratio;   //!
+   TBranch        *b_PFElectron_ratioRel;   //!
+   TBranch        *b_PFElectron_IPsig;   //!
+   TBranch        *b_nPFMuon;   //!
+   TBranch        *b_PFMuon_IdxJet;   //!
+   TBranch        *b_PFMuon_pt;   //!
+   TBranch        *b_PFMuon_eta;   //!
+   TBranch        *b_PFMuon_phi;   //!
+   TBranch        *b_PFMuon_ptrel;   //!
+   TBranch        *b_PFMuon_deltaR;   //!
+   TBranch        *b_PFMuon_ratio;   //!
+   TBranch        *b_PFMuon_ratioRel;   //!
+   TBranch        *b_PFMuon_IPsig;   //!
+   TBranch        *b_PFMuon_GoodQuality;   //!   
    
   
 
@@ -846,6 +888,29 @@ void CommPlotProducer4ttbar::Init(TChain *tree)
    fChain->SetBranchAddress("Jet_SoftElN", Jet_SoftElN, &b_Jet_SoftElN);
    fChain->SetBranchAddress("Jet_SoftElP", Jet_SoftElP, &b_Jet_SoftElP);
    fChain->SetBranchAddress("Jet_SoftEl", Jet_SoftEl, &b_Jet_SoftEl);
+   
+   
+   fChain->SetBranchAddress("nPFElectron", &nPFElectron, &b_nPFElectron);
+   fChain->SetBranchAddress("PFElectron_IdxJet", PFElectron_IdxJet, &b_PFElectron_IdxJet);
+   fChain->SetBranchAddress("PFElectron_pt", PFElectron_pt, &b_PFElectron_pt);
+   fChain->SetBranchAddress("PFElectron_eta", PFElectron_eta, &b_PFElectron_eta);
+   fChain->SetBranchAddress("PFElectron_phi", PFElectron_phi, &b_PFElectron_phi);
+   fChain->SetBranchAddress("PFElectron_ptrel", PFElectron_ptrel, &b_PFElectron_ptrel);
+   fChain->SetBranchAddress("PFElectron_deltaR", PFElectron_deltaR, &b_PFElectron_deltaR);
+   fChain->SetBranchAddress("PFElectron_ratio", PFElectron_ratio, &b_PFElectron_ratio);
+   fChain->SetBranchAddress("PFElectron_ratioRel", PFElectron_ratioRel, &b_PFElectron_ratioRel);
+   fChain->SetBranchAddress("PFElectron_IPsig", PFElectron_IPsig, &b_PFElectron_IPsig);
+   fChain->SetBranchAddress("nPFMuon", &nPFMuon, &b_nPFMuon);
+   fChain->SetBranchAddress("PFMuon_IdxJet", PFMuon_IdxJet, &b_PFMuon_IdxJet);
+   fChain->SetBranchAddress("PFMuon_pt", PFMuon_pt, &b_PFMuon_pt);
+   fChain->SetBranchAddress("PFMuon_eta", PFMuon_eta, &b_PFMuon_eta);
+   fChain->SetBranchAddress("PFMuon_phi", PFMuon_phi, &b_PFMuon_phi);
+   fChain->SetBranchAddress("PFMuon_ptrel", PFMuon_ptrel, &b_PFMuon_ptrel);
+   fChain->SetBranchAddress("PFMuon_deltaR", PFMuon_deltaR, &b_PFMuon_deltaR);
+   fChain->SetBranchAddress("PFMuon_ratio", PFMuon_ratio, &b_PFMuon_ratio);
+   fChain->SetBranchAddress("PFMuon_ratioRel", PFMuon_ratioRel, &b_PFMuon_ratioRel);
+   fChain->SetBranchAddress("PFMuon_IPsig", PFMuon_IPsig, &b_PFMuon_IPsig);
+   fChain->SetBranchAddress("PFMuon_GoodQuality", PFMuon_GoodQuality, &b_PFMuon_GoodQuality);   
   }
 
    Notify();

@@ -659,6 +659,28 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
   AddHisto("CombCSVSL"    ,"CombCSVSL",                              50,0.,1.  );
   AddHisto("CombCSVJPSL"  ,"CombCSVJPSL",                                    50,0.,1.  );
   AddHisto("RetCombSvx"   ,"RetCombSvx",                                     50,0.,1.  );
+  AddHisto("RetCombSvx_zo","RetCombSvx",                                     50,-0.04,1.  );
+  
+  AddHisto("pfmuon_multi",      "number of pfmuons",	   7,-0.5,6.5    );
+  AddHisto("pfmuon_goodquality","quality of pfmuons",3,-0.5,2.5   );
+  AddHisto("pfmuon_pt",		"pfmuon p_{T}",  	   50, 0, 100	 );
+  AddHisto("pfmuon_eta",   	"pfmuon #eta",  	           50, -2.5, 2.5 );  
+  AddHisto("pfmuon_phi",        "pfmuon #phi",              40, -1.*pi,pi);
+  AddHisto("pfmuon_Sip",	"3D IP significance of pfmuon",50, -35, 35   );
+  AddHisto("pfmuon_ptrel",      "pT rel. of the muon",	   50,0,5        );
+  AddHisto("pfmuon_ratio",      "ratio of pfmuon", 50,0,2       );  
+  AddHisto("pfmuon_ratiorel",   "ratioRel of pfmuon", 50,0,0.05       );  
+  AddHisto("pfmuon_deltar",	"#DeltaR(pfmuon,jet)",50,0,0.5);
+  
+  AddHisto("pfelectron_multi",      "number of pfelectron",	   7,-0.5,6.5    );
+  AddHisto("pfelectron_pt",		"pfelectron p_{T}",  	   50, 0, 100	 );
+  AddHisto("pfelectron_eta",   	"pfelectron #eta",  	           50, -2.5, 2.5 );  
+  AddHisto("pfelectron_phi",        "pfelectron #phi",              40, -1.*pi,pi);
+  AddHisto("pfelectron_Sip",	"3D IP significance of pfelectron",50, -35, 35   );
+  AddHisto("pfelectron_ptrel",      "pT rel. of the pfelectron",	   50,0,5        );
+  AddHisto("pfelectron_ratio",      "ratio of pfelectron", 50,0,2       );  
+  AddHisto("pfelectron_ratiorel",   "ratioRel of pfelectron", 50,0,0.05       );  
+  AddHisto("pfelectron_deltar",	"#DeltaR(pfelectron,jet)",50,0,0.5);  
 
   
   AddHisto2D("seltrack_vs_jetpt", "sel track multiplicity vs jet pt",         30,60,1000, 100,-0.5,99.5);
@@ -670,6 +692,102 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
   AddHisto2D("muon_ptrel_vs_jetpt","Muon_p{T}^{rel} vs jet pt",               30,60,1000,50,0,5);  
   AddHisto2D("muon_DeltaR_vs_jetpt","Muon1 DeltaR vs jet pt",                 30,60,1000,50,0,0.5);
 
+  bool test_bin = true;
+  if (test_bin) {
+
+    AddHisto("bin1_SSVHP",              "SSVHP",                                         70,0.,7.  );
+    AddHisto("bin1_JP",                 "JP",                                            50,0.,2.5 );
+    AddHisto("bin1_CSV",                "CSV",                                        50,0.,1. );
+    AddHisto("bin1_SVmass",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin1_mu_ptrel",           "pT rel. of the muon",                           50,0,5    );
+    AddHisto("bin1_muon_DeltaR",        "Muon1 deltaR",                                  50,0,0.5  );
+    AddHisto("bin1_sv_flight3DSig",     "flight distance significance 3D",               50,0.,80. );
+    AddHisto("bin1_sv_pt",              "Vtx p_{T}",                                     50,0.,100.);
+    AddHisto("bin1_sv_deltaR_jet",      "sv_deltaR_jet",                                 50,0.,0.5 );
+    AddHisto("bin2_SSVHP",              "SSVHP",                                         70,0.,7.  );
+    AddHisto("bin2_JP",                 "JP",                                            50,0.,2.5 );
+    AddHisto("bin2_CSV",                "CSV",                                        50,0.,1. );
+    AddHisto("bin2_SVmass",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin2_mu_ptrel",           "pT rel. of the muon",                           50,0,5    );
+    AddHisto("bin2_muon_DeltaR",        "Muon1 deltaR",                                  50,0,0.5  );
+    AddHisto("bin2_sv_flight3DSig",     "flight distance significance 3D",               50,0.,80. );
+    AddHisto("bin2_sv_pt",              "Vtx p_{T}",                                     50,0.,100.);
+    AddHisto("bin2_sv_deltaR_jet",      "sv_deltaR_jet",                                 50,0.,0.5 );
+
+    AddHisto("bin3_SSVHP",              "SSVHP",                                         70,0.,7.  );
+    AddHisto("bin3_JP",                 "JP",                                            50,0.,2.5 );
+    AddHisto("bin3_CSV",                "CSV",                                        50,0.,1. );
+    AddHisto("bin3_SVmass",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin3_mu_ptrel",           "pT rel. of the muon",                           50,0,5    );
+    AddHisto("bin3_muon_DeltaR",        "Muon1 deltaR",                                  50,0,0.5  );
+    AddHisto("bin3_sv_flight3DSig",     "flight distance significance 3D",               50,0.,80. );
+    AddHisto("bin3_sv_pt",              "Vtx p_{T}",                                     50,0.,100.);
+    AddHisto("bin3_sv_deltaR_jet",      "sv_deltaR_jet",                                 50,0.,0.5 );
+
+    AddHisto("bin4_SSVHP",              "SSVHP",                                         70,0.,7.  );
+    AddHisto("bin4_JP",                 "JP",                                            50,0.,2.5 );
+    AddHisto("bin4_CSV",                "CSV",                                        50,0.,1. );
+    AddHisto("bin4_SVmass",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin4_mu_ptrel",           "pT rel. of the muon",                           50,0,5    );
+    AddHisto("bin4_muon_DeltaR",        "Muon1 deltaR",                                  50,0,0.5  );
+    AddHisto("bin4_sv_flight3DSig",     "flight distance significance 3D",               50,0.,80. );
+    AddHisto("bin4_sv_pt",              "Vtx p_{T}",                                     50,0.,100.);
+    AddHisto("bin4_sv_deltaR_jet",      "sv_deltaR_jet",                                 50,0.,0.5 );
+    
+    AddHisto("bin5_SSVHP",              "SSVHP",                                         70,0.,7.  );
+    AddHisto("bin5_JP",                 "JP",                                            50,0.,2.5 );
+    AddHisto("bin5_CSV",                "CSV",                                        50,0.,1. );
+    AddHisto("bin5_SVmass",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin5_mu_ptrel",           "pT rel. of the muon",                           50,0,5    );
+    AddHisto("bin5_muon_DeltaR",        "Muon1 deltaR",                                  50,0,0.5  );
+    AddHisto("bin5_sv_flight3DSig",     "flight distance significance 3D",               50,0.,80. );
+    AddHisto("bin5_sv_pt",              "Vtx p_{T}",                                     50,0.,100.);
+    AddHisto("bin5_sv_deltaR_jet",      "sv_deltaR_jet",                                 50,0.,0.5 );
+    
+    AddHisto("bin6_SSVHP",              "SSVHP",                                         70,0.,7.  );
+    AddHisto("bin6_JP",                 "JP",                                            50,0.,2.5 );
+    AddHisto("bin6_CSV",                "CSV",                                        50,0.,1. );
+    AddHisto("bin6_SVmass",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin6_mu_ptrel",           "pT rel. of the muon",                           50,0,5    );
+    AddHisto("bin6_muon_DeltaR",        "Muon1 deltaR",                                  50,0,0.5  );
+    AddHisto("bin6_sv_flight3DSig",     "flight distance significance 3D",               50,0.,80. );
+    AddHisto("bin6_sv_pt",              "Vtx p_{T}",                                     50,0.,100.);
+    AddHisto("bin6_sv_deltaR_jet",      "sv_deltaR_jet",                                 50,0.,0.5 );
+
+    AddHisto("bin7_SSVHP",              "SSVHP",                                         70,0.,7.  );
+    AddHisto("bin7_JP",                 "JP",                                            50,0.,2.5 );
+    AddHisto("bin7_CSV",                "CSV",                                        50,0.,1. );
+    AddHisto("bin7_SVmass",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin7_mu_ptrel",           "pT rel. of the muon",                           50,0,5    );
+    AddHisto("bin7_muon_DeltaR",        "Muon1 deltaR",                                  50,0,0.5  );
+    AddHisto("bin7_sv_flight3DSig",     "flight distance significance 3D",               50,0.,80. );
+    AddHisto("bin7_sv_pt",              "Vtx p_{T}",                                     50,0.,100.);
+    AddHisto("bin7_sv_deltaR_jet",      "sv_deltaR_jet",                                 50,0.,0.5 );
+
+    AddHisto("bin8_SSVHP",              "SSVHP",                                         70,0.,7.  );
+    AddHisto("bin8_JP",                 "JP",                                            50,0.,2.5 );
+    AddHisto("bin8_CSV",                "CSV",                                        50,0.,1. );
+    AddHisto("bin8_SVmass",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin8_mu_ptrel",           "pT rel. of the muon",                           50,0,5    );
+    AddHisto("bin8_muon_DeltaR",        "Muon1 deltaR",                                  50,0,0.5  );
+    AddHisto("bin8_sv_flight3DSig",     "flight distance significance 3D",               50,0.,80. );
+    AddHisto("bin8_sv_pt",              "Vtx p_{T}",                                     50,0.,100.);
+    AddHisto("bin8_sv_deltaR_jet",      "sv_deltaR_jet",                                 50,0.,0.5 );
+    
+    AddHisto("bin9_SSVHP",              "SSVHP",                                         70,0.,7.  );
+    AddHisto("bin9_JP",                 "JP",                                            50,0.,2.5 );
+    AddHisto("bin9_CSV",                "CSV",                                        50,0.,1. );
+    AddHisto("bin9_SVmass",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin9_mu_ptrel",           "pT rel. of the muon",                           50,0,5    );
+    AddHisto("bin9_muon_DeltaR",        "Muon1 deltaR",                                  50,0,0.5  );
+    AddHisto("bin9_sv_flight3DSig",     "flight distance significance 3D",               50,0.,80. );
+    AddHisto("bin9_sv_pt",              "Vtx p_{T}",                                     50,0.,100.);
+    AddHisto("bin9_sv_deltaR_jet",      "sv_deltaR_jet",                                 50,0.,0.5 );
+  }
+
+
+
+
   
   Nevent = 0;
   if (fChain == 0) return;
@@ -678,6 +796,14 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
   
   Long64_t nbytes = 0, nb = 0;
   
+  bool btag = false;
+  if (btag) {
+  cout << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << endl;
+  cout << " Special selection :  " << endl;
+  cout << " to compare with MuonEnriched sample      " << endl; 
+  cout << " + weight of the jet pt distri      " << endl; 
+  cout << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << endl;
+  }
   //------------------------------------------------------------------------------------------------------------------//  
   //----------------------------------------EVENT LOOP ---------------------------------------------------------------// 
   //------------------------------------------------------------------------------------------------------------------//  
@@ -762,6 +888,16 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
     if ( trig_data ==  2 && !trig_mumu )  continue;
     if ( trig_data ==  3 && !trig_emu )  continue;
     
+    //  event with at least two jets!
+    
+    if (btag) {
+      int nj=0;
+      for (int ijet = 0; ijet < nJet; ijet++) {
+       if (Jet_pt[ijet]>40) nj++;
+      }
+      if (nj<2) continue;
+    }      
+   
     
     //-----------------------------------
     //Fill control plot
@@ -788,7 +924,9 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
     int njet_ttbar =0;
     int nbjet_ttbar =0;
     float ptjet_ttbar=0;
-      
+
+
+    double wwkeep = ww;
     //-----------------------------------
     //Loop on jets 
     //-----------------------------------
@@ -804,31 +942,93 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
       if (   ptjet  < PtMin  || ptjet  > PtMax   ) continue;
       if (   fabs(etajet) > EtaCut               ) continue;
 
+      int   idxFirstMuon = -1;
+      int nselmuon = 0;
+      int nmu = 0;
+      if (nMuon>0){
+        for (int imu=0; imu< nMuon; imu++){
+          if (Muon_IdxJet[imu]==ijet ){
+	    nmu++;
+	    if (passMuonSelection(imu, ijet)){
+	      if(nselmuon == 0) {
+	        idxFirstMuon = imu;
+	      }
+	      nselmuon++;
+	    }
+          }
+	}
+      }
+      // check specific case : muon in jet! 
+      //if (btag && nselmuon==0) continue;
+
+
+     // modify the pt distributio 
+     if (btag) {
+      float qcd_pt_shape[30]; 
+      qcd_pt_shape[0]=0;
+      qcd_pt_shape[1]=0;
+      qcd_pt_shape[2]=0;
+      qcd_pt_shape[3]=0;
+      qcd_pt_shape[4]=2.54155;
+      qcd_pt_shape[5]=1.91738;
+      qcd_pt_shape[6]=1.26726;
+      qcd_pt_shape[7]=0.887378;
+      qcd_pt_shape[8]=0.630131;
+      qcd_pt_shape[9]=0.483487;
+      qcd_pt_shape[10]=0.369058;
+      qcd_pt_shape[11]=0.299248;
+      qcd_pt_shape[12]=0.243378;
+      qcd_pt_shape[13]=0.20949;
+      qcd_pt_shape[14]=0.17883;
+      qcd_pt_shape[15]=0.158677;
+      qcd_pt_shape[16]=0.141487;
+      qcd_pt_shape[17]=0.150485;
+      qcd_pt_shape[18]=0.12189;
+      qcd_pt_shape[19]=0.121328;
+      qcd_pt_shape[20]=0.123342;
+      qcd_pt_shape[21]=0.112546;
+      qcd_pt_shape[22]=0.1039;
+      qcd_pt_shape[23]=0.11186;
+      qcd_pt_shape[24]=0.102418;
+      qcd_pt_shape[25]=0.111617;
+      qcd_pt_shape[26]=0.102314;
+      qcd_pt_shape[27]=0.0977706;
+      qcd_pt_shape[28]=0.0866023;
+      qcd_pt_shape[29]=0.123143;
+      int nn=0;
+      for (int inn=0; inn<30; inn++) {
+        float xptmin = inn*10;
+        float xptmax = inn*10+10;
+        if (xptmin<ptjet && ptjet<=xptmax) nn=inn; 
+      }
+      ww=wwkeep*qcd_pt_shape[nn];
+     }
+     if (nTrack>1000) cout << " data nTrack " << nTrack << endl;
+
       njet_ttbar++;
       if (ptjet>ptjet_ttbar) ptjet_ttbar=ptjet;
 
-      float mass_sv        =0.;
       int n_sv             =0.;
-      float chi2norm_sv    =0.;
-      float flightSig_sv   =0.;    
-      float flight2DSig_sv =0.;    
-      float sv_dR_jet      =0.;
-      float sv_dR_dir_sum  =0.; 
-      float sv_dR_jet_sum  =0.;
-      float sv_en_rat      =0.; 
-      float sv_abovC       =0.;  
-      float sv_pt	   =0.;      
-      float sveta         =0.; 
-      float svphi         =0.; 
-      float sv_flight3D    =0.;
-      float sv_flight3Derr =0.;
-      float sv_flight2D    =0.;
-      float sv_flight2Derr =0.;
-      int   sv_totchar     =0.;
+      float mass_sv        =-1.;
+      float chi2norm_sv    =-1.;
+      float flightSig_sv   =-1.;    
+      float flight2DSig_sv =-1.;    
+      float sv_dR_jet      =-1.;
+      float sv_dR_dir_sum  =-1.; 
+      float sv_dR_jet_sum  =-1.;
+      float sv_en_rat      =-1.; 
+      float sv_abovC       =-1.;  
+      float sv_pt	   =-1.;      
+      float sveta         =-1000.; 
+      float svphi         =-1000.; 
+      float sv_flight3D    =-1.;
+      float sv_flight3Derr =-1.;
+      float sv_flight2D    =-1.;
+      float sv_flight2Derr =-1.;
+      int   sv_totchar     =-1.;
       float sv_nTrk        =0.;
       float sv_1st_nTrk    =0.;
       
-      int   idxFirstMuon = -1;
       
       float tche     = Jet_Ip2P[ijet];
       float tchp     = Jet_Ip3P[ijet];
@@ -1143,6 +1343,9 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
        FillHisto_floatFromMap("CombCSVSL",   flav, isGluonSplit, combsl  ,   ww);
        FillHisto_floatFromMap("CombCSVJPSL", flav, isGluonSplit, combjpsl  ,   ww);
        FillHisto_floatFromMap("RetCombSvx",  flav, isGluonSplit, retrainedcsv  ,   ww);
+       if (retrainedcsv<-9) retrainedcsv=-0.03;
+       else if (retrainedcsv<0.)  retrainedcsv=-0.01;
+       FillHisto_floatFromMap("RetCombSvx_zo",  flav, isGluonSplit, retrainedcsv  ,   ww);
       }
 
 
@@ -1167,29 +1370,18 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
       //---------------------------------
       //fill information related to muons
       //---------------------------------
-      int nselmuon = 0;
-      int nmu = 0;
-      if (nMuon>0){
-        for (int imu=0; imu< nMuon; imu++){
-          if (Muon_IdxJet[imu]==ijet ){
-	    nmu++;
-	    if (passMuonSelection(imu, ijet)){
-	      if(nselmuon == 0) {
-	        idxFirstMuon = imu;
-	      }
-	      nselmuon++;
-	    }
-          }
-	}
-      }
          
       
       FillHisto_intFromMap(  "muon_multi_sel",  flav, isGluonSplit , nselmuon   ,ww);
       FillHisto_intFromMap(  "muon_multi",      flav, isGluonSplit , nmu        ,ww);
       
       
+      float xmu_deltaR=-1.;
+      float xmu_ptrel=-1.;
+
       if(idxFirstMuon > -1){
         FillHisto_floatFromMap("mu_ptrel",    flav, isGluonSplit ,Muon_ptrel[idxFirstMuon] ,ww);
+        xmu_ptrel=Muon_ptrel[idxFirstMuon];
         FillHisto_floatFromMap("mu_chi2",     flav, isGluonSplit ,Muon_chi2[idxFirstMuon]  ,ww);
         FillHisto_floatFromMap("muon_Pt",     flav, isGluonSplit, Muon_pt[idxFirstMuon] ,     ww);
 	FillHisto_floatFromMap("muon_eta",    flav, isGluonSplit, Muon_eta[idxFirstMuon] ,    ww);
@@ -1210,12 +1402,164 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
         themuon.SetPtEtaPhiM(Muon_pt[idxFirstMuon], Muon_eta[idxFirstMuon], Muon_phi[idxFirstMuon], 0);
 	
         FillHisto_floatFromMap("muon_DeltaR",         flav, isGluonSplit, themuon.DeltaR(thejet) , ww);
+        xmu_deltaR=themuon.DeltaR(thejet);
 	//cout << "muon_DeltaR :" << themuon.DeltaR(thejet) <<endl;
 	
 	
 	FillHisto2D_float_floatFromMap("muon_ptrel_vs_jetpt", flav, isGluonSplit,ptjet,Muon_ptrel[idxFirstMuon],ww);
         FillHisto2D_float_floatFromMap("muon_DeltaR_vs_jetpt",flav, isGluonSplit,ptjet,themuon.DeltaR(thejet),ww);
       }
+      
+      if (produceNewAlgoTree) {
+        // PFMuon
+        int npfmu=0;
+        int indpfmu=-1;
+        for (int im=0; im<nPFMuon; im++) {
+           if (PFMuon_IdxJet[im]==ijet) {
+	      if (npfmu==0) indpfmu=im;
+	      npfmu++;
+	   }
+        }
+        FillHisto_intFromMap(  "pfmuon_multi",  flav, isGluonSplit , npfmu   ,ww);
+        if (indpfmu>-1) {
+          FillHisto_intFromMap(  "pfmuon_goodquality", flav, isGluonSplit, PFMuon_GoodQuality[indpfmu]        ,ww);
+	  FillHisto_floatFromMap("pfmuon_pt",          flav, isGluonSplit, PFMuon_pt[indpfmu],                 ww);
+	  FillHisto_floatFromMap("pfmuon_eta",   	     flav, isGluonSplit, PFMuon_eta[indpfmu],                ww);
+	  FillHisto_floatFromMap("pfmuon_phi",         flav, isGluonSplit, PFMuon_phi[indpfmu],                ww);
+	  FillHisto_floatFromMap("pfmuon_Sip",	     flav, isGluonSplit, PFMuon_IPsig[indpfmu],              ww);
+	  FillHisto_floatFromMap("pfmuon_ptrel",       flav, isGluonSplit, PFMuon_ptrel[indpfmu],              ww);
+	  FillHisto_floatFromMap("pfmuon_ratio",       flav, isGluonSplit, PFMuon_ratio[indpfmu],              ww);
+	  FillHisto_floatFromMap("pfmuon_ratiorel",    flav, isGluonSplit, PFMuon_ratioRel[indpfmu],           ww);
+	  FillHisto_floatFromMap("pfmuon_deltar",	     flav, isGluonSplit, PFMuon_deltaR[indpfmu],             ww);
+        }
+        
+        //PFElectron
+        int npfel=0;
+        int indpfel=-1;
+        for (int im=0; im<nPFElectron; im++) {
+           if (PFElectron_IdxJet[im]==ijet) {
+	      if (npfel==0) indpfel=im;
+	      npfel++;
+	   }
+        }
+        FillHisto_intFromMap(  "pfelectron_multi",  flav, isGluonSplit , npfel   ,ww);
+        if (indpfel>-1) {
+	  FillHisto_floatFromMap("pfelectron_pt",          flav, isGluonSplit, PFElectron_pt[indpfel],                ww);
+	  FillHisto_floatFromMap("pfelectron_eta",   	 flav, isGluonSplit, PFElectron_eta[indpfel],                ww);
+	  FillHisto_floatFromMap("pfelectron_phi",         flav, isGluonSplit, PFElectron_phi[indpfel],                ww);
+	  FillHisto_floatFromMap("pfelectron_Sip",	 flav, isGluonSplit, PFElectron_IPsig[indpfel],                ww);
+	  FillHisto_floatFromMap("pfelectron_ptrel",       flav, isGluonSplit, PFElectron_ptrel[indpfel],                ww);
+	  FillHisto_floatFromMap("pfelectron_ratio",       flav, isGluonSplit, PFElectron_ratio[indpfel],                ww);
+	  FillHisto_floatFromMap("pfelectron_ratiorel",    flav, isGluonSplit, PFElectron_ratioRel[indpfel],                ww);
+	  FillHisto_floatFromMap("pfelectron_deltar",	 flav, isGluonSplit, PFElectron_deltaR[indpfel],                ww);
+        }
+      }
+      
+
+              
+      if (test_bin) {
+        if (jetproba<0.2) {
+              FillHisto_floatFromMap("bin1_SSVHP",           flav, isGluonSplit, ssvhp,                   ww);
+              FillHisto_floatFromMap("bin1_JP",              flav, isGluonSplit, jetproba,                ww);
+              FillHisto_floatFromMap("bin1_CSV",             flav, isGluonSplit, csv,            ww);
+              FillHisto_floatFromMap("bin1_SVmass",          flav, isGluonSplit, mass_sv,             ww);
+              FillHisto_floatFromMap("bin1_mu_ptrel",        flav, isGluonSplit, xmu_ptrel,               ww);
+              FillHisto_floatFromMap("bin1_muon_DeltaR",     flav, isGluonSplit, xmu_deltaR,              ww);
+              FillHisto_floatFromMap("bin1_sv_flight3DSig",  flav, isGluonSplit, flightSig_sv,            ww);
+              FillHisto_floatFromMap("bin1_sv_pt",           flav, isGluonSplit, sv_pt,                   ww);
+              FillHisto_floatFromMap("bin1_sv_deltaR_jet",   flav, isGluonSplit, sv_dR_jet,               ww);
+        }
+        else if (jetproba<0.5) {
+              FillHisto_floatFromMap("bin2_SSVHP",           flav, isGluonSplit, ssvhp,                   ww);
+              FillHisto_floatFromMap("bin2_JP",              flav, isGluonSplit, jetproba,                ww);
+              FillHisto_floatFromMap("bin2_CSV",             flav, isGluonSplit, csv,            ww);
+              FillHisto_floatFromMap("bin2_SVmass",          flav, isGluonSplit, mass_sv,             ww);
+              FillHisto_floatFromMap("bin2_mu_ptrel",        flav, isGluonSplit, xmu_ptrel,               ww);
+              FillHisto_floatFromMap("bin2_muon_DeltaR",     flav, isGluonSplit, xmu_deltaR,              ww);
+              FillHisto_floatFromMap("bin2_sv_flight3DSig",  flav, isGluonSplit, flightSig_sv,            ww);
+              FillHisto_floatFromMap("bin2_sv_pt",           flav, isGluonSplit, sv_pt,                   ww);
+              FillHisto_floatFromMap("bin2_sv_deltaR_jet",   flav, isGluonSplit, sv_dR_jet,               ww);
+        }
+        else if (jetproba<1.2) {
+              FillHisto_floatFromMap("bin3_SSVHP",           flav, isGluonSplit, ssvhp,                   ww);
+              FillHisto_floatFromMap("bin3_JP",              flav, isGluonSplit, jetproba,                ww);
+              FillHisto_floatFromMap("bin3_CSV",             flav, isGluonSplit, csv,            ww);
+              FillHisto_floatFromMap("bin3_SVmass",          flav, isGluonSplit, mass_sv,             ww);
+              FillHisto_floatFromMap("bin3_mu_ptrel",        flav, isGluonSplit, xmu_ptrel,               ww);
+              FillHisto_floatFromMap("bin3_muon_DeltaR",     flav, isGluonSplit, xmu_deltaR,              ww);
+              FillHisto_floatFromMap("bin3_sv_flight3DSig",  flav, isGluonSplit, flightSig_sv,            ww);
+              FillHisto_floatFromMap("bin3_sv_pt",           flav, isGluonSplit, sv_pt,                   ww);
+              FillHisto_floatFromMap("bin3_sv_deltaR_jet",   flav, isGluonSplit, sv_dR_jet,               ww);
+        }
+        else {
+              FillHisto_floatFromMap("bin4_SSVHP",           flav, isGluonSplit, ssvhp,                   ww);
+              FillHisto_floatFromMap("bin4_JP",              flav, isGluonSplit, jetproba,                ww);
+              FillHisto_floatFromMap("bin4_CSV",             flav, isGluonSplit, csv,            ww);
+              FillHisto_floatFromMap("bin4_SVmass",          flav, isGluonSplit, mass_sv,             ww);
+              FillHisto_floatFromMap("bin4_mu_ptrel",        flav, isGluonSplit, xmu_ptrel,               ww);
+              FillHisto_floatFromMap("bin4_muon_DeltaR",     flav, isGluonSplit, xmu_deltaR,              ww);
+              FillHisto_floatFromMap("bin4_sv_flight3DSig",  flav, isGluonSplit, flightSig_sv,            ww);
+              FillHisto_floatFromMap("bin4_sv_pt",           flav, isGluonSplit, sv_pt,                   ww);
+              FillHisto_floatFromMap("bin4_sv_deltaR_jet",   flav, isGluonSplit, sv_dR_jet,               ww);
+        }     
+        if (idxFirstMuon > -1) {
+          if (xmu_deltaR<0.04) {
+              FillHisto_floatFromMap("bin5_SSVHP",           flav, isGluonSplit, ssvhp,                   ww);
+              FillHisto_floatFromMap("bin5_JP",              flav, isGluonSplit, jetproba,                ww);
+              FillHisto_floatFromMap("bin5_CSV",             flav, isGluonSplit, csv,            ww);
+              FillHisto_floatFromMap("bin5_SVmass",          flav, isGluonSplit, mass_sv,             ww);
+              FillHisto_floatFromMap("bin5_mu_ptrel",        flav, isGluonSplit, xmu_ptrel,               ww);
+              FillHisto_floatFromMap("bin5_muon_DeltaR",     flav, isGluonSplit, xmu_deltaR,              ww);
+              FillHisto_floatFromMap("bin5_sv_flight3DSig",  flav, isGluonSplit, flightSig_sv,            ww);
+              FillHisto_floatFromMap("bin5_sv_pt",           flav, isGluonSplit, sv_pt,                   ww);
+              FillHisto_floatFromMap("bin5_sv_deltaR_jet",   flav, isGluonSplit, sv_dR_jet,               ww);
+          }
+          else if (xmu_deltaR<0.07) {
+              FillHisto_floatFromMap("bin6_SSVHP",           flav, isGluonSplit, ssvhp,                   ww);
+              FillHisto_floatFromMap("bin6_JP",              flav, isGluonSplit, jetproba,                ww);
+              FillHisto_floatFromMap("bin6_CSV",             flav, isGluonSplit, csv,            ww); 
+              FillHisto_floatFromMap("bin6_SVmass",          flav, isGluonSplit, mass_sv,             ww);
+              FillHisto_floatFromMap("bin6_mu_ptrel",        flav, isGluonSplit, xmu_ptrel,               ww);
+              FillHisto_floatFromMap("bin6_muon_DeltaR",     flav, isGluonSplit, xmu_deltaR,              ww);
+              FillHisto_floatFromMap("bin6_sv_flight3DSig",  flav, isGluonSplit, flightSig_sv,            ww);
+              FillHisto_floatFromMap("bin6_sv_pt",           flav, isGluonSplit, sv_pt,                   ww);
+              FillHisto_floatFromMap("bin6_sv_deltaR_jet",   flav, isGluonSplit, sv_dR_jet,               ww);
+          }
+          else if (xmu_deltaR<0.1) {
+              FillHisto_floatFromMap("bin7_SSVHP",           flav, isGluonSplit, ssvhp,                   ww);
+              FillHisto_floatFromMap("bin7_JP",              flav, isGluonSplit, jetproba,                ww);
+              FillHisto_floatFromMap("bin7_CSV",             flav, isGluonSplit, csv,            ww); 
+              FillHisto_floatFromMap("bin7_SVmass",          flav, isGluonSplit, mass_sv,             ww);
+              FillHisto_floatFromMap("bin7_mu_ptrel",        flav, isGluonSplit, xmu_ptrel,               ww);
+              FillHisto_floatFromMap("bin7_muon_DeltaR",     flav, isGluonSplit, xmu_deltaR,              ww);
+              FillHisto_floatFromMap("bin7_sv_flight3DSig",  flav, isGluonSplit, flightSig_sv,            ww);
+              FillHisto_floatFromMap("bin7_sv_pt",           flav, isGluonSplit, sv_pt,                   ww);
+              FillHisto_floatFromMap("bin7_sv_deltaR_jet",   flav, isGluonSplit, sv_dR_jet,               ww);
+          }
+          else if (xmu_deltaR<0.15) {
+              FillHisto_floatFromMap("bin8_SSVHP",           flav, isGluonSplit, ssvhp,                   ww);
+              FillHisto_floatFromMap("bin8_JP",              flav, isGluonSplit, jetproba,                ww);
+              FillHisto_floatFromMap("bin8_CSV",             flav, isGluonSplit, csv,            ww); 
+              FillHisto_floatFromMap("bin8_SVmass",          flav, isGluonSplit, mass_sv,             ww);
+              FillHisto_floatFromMap("bin8_mu_ptrel",        flav, isGluonSplit, xmu_ptrel,               ww);
+              FillHisto_floatFromMap("bin8_muon_DeltaR",     flav, isGluonSplit, xmu_deltaR,              ww);
+              FillHisto_floatFromMap("bin8_sv_flight3DSig",  flav, isGluonSplit, flightSig_sv,            ww);
+              FillHisto_floatFromMap("bin8_sv_pt",           flav, isGluonSplit, sv_pt,                   ww);
+              FillHisto_floatFromMap("bin8_sv_deltaR_jet",   flav, isGluonSplit, sv_dR_jet,               ww);
+          }   
+          else {
+              FillHisto_floatFromMap("bin9_SSVHP",           flav, isGluonSplit, ssvhp,                   ww);
+              FillHisto_floatFromMap("bin9_JP",              flav, isGluonSplit, jetproba,                ww);
+              FillHisto_floatFromMap("bin9_CSV",             flav, isGluonSplit, csv,            ww);
+              FillHisto_floatFromMap("bin9_SVmass",          flav, isGluonSplit, mass_sv,             ww);
+              FillHisto_floatFromMap("bin9_mu_ptrel",        flav, isGluonSplit, xmu_ptrel,               ww);
+              FillHisto_floatFromMap("bin9_muon_DeltaR",     flav, isGluonSplit, xmu_deltaR,              ww);
+              FillHisto_floatFromMap("bin9_sv_flight3DSig",  flav, isGluonSplit, flightSig_sv,            ww);
+              FillHisto_floatFromMap("bin9_sv_pt",           flav, isGluonSplit, sv_pt,                   ww);
+              FillHisto_floatFromMap("bin9_sv_deltaR_jet",   flav, isGluonSplit, sv_dR_jet,               ww);
+          }   
+        } 
+      } // end of test_bin
 
       
     }
