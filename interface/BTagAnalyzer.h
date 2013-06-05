@@ -525,7 +525,7 @@ private:
     float Muon_ratio[nMaxMuons_]; 
 
     int nPFElectron;
-    float PFElectron_IdxJet[nMaxElectrons_];
+    int PFElectron_IdxJet[nMaxElectrons_];
     float PFElectron_pt[nMaxElectrons_];
     float PFElectron_eta[nMaxElectrons_];
     float PFElectron_phi[nMaxElectrons_];
@@ -537,7 +537,7 @@ private:
     float PFElectron_mva_e_pi[nMaxElectrons_];
 
     int nPFMuon;
-    float PFMuon_IdxJet[nMaxElectrons_];
+    int PFMuon_IdxJet[nMaxElectrons_];
     float PFMuon_pt[nMaxElectrons_];
     float PFMuon_eta[nMaxElectrons_];
     float PFMuon_phi[nMaxElectrons_];
@@ -547,7 +547,7 @@ private:
     float PFMuon_deltaR[nMaxElectrons_];
     float PFMuon_IPsig[nMaxElectrons_];
     int   PFMuon_GoodQuality[nMaxElectrons_];
-    
+
     int   nTrkInc;
     float TrkInc_pt[nMaxTrk_];
     float TrkInc_eta[nMaxTrk_];
