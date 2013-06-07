@@ -450,7 +450,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     }
  
   // gluon spliting
-    edm:Handle<reco::GenParticleCollection> genParticles;
+    edm::Handle<reco::GenParticleCollection> genParticles;
     iEvent.getByLabel ("genParticles", genParticles);
 
     for (size_t i = 0; i < genParticles->size (); ++i) {

@@ -16,7 +16,7 @@ Implementation:
 //
 // Original Author:  Andrea Jeremy
 //         Created:  Tue Jul 15 16:55:19 CEST 2008
-// $Id: MistagAnalyzer.h,v 1.25 2011/10/04 11:34:35 jandrea Exp $
+// $Id: MistagAnalyzer.h,v 1.26.2.1 2013/04/25 19:50:36 ferencek Exp $
 //
 //
 
@@ -118,6 +118,7 @@ struct ltstr
 // class declaration
 //
 //using BTagMCTools::JetFlavour;
+using namespace std;
 using namespace edm;
 using namespace reco;
 //using namespace BTagMCTools;

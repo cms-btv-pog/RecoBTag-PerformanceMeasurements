@@ -2,17 +2,12 @@
 #define CategoryFinder_H
 
 
-
-using namespace edm;
-using namespace std;
-
-
 class CategoryFinder {
   public :
-    
-    CategoryFinder() {};
+
+   CategoryFinder() {};
   ~CategoryFinder() {};
-  
+
   double    pMin;
   double    pMax;
   double    etaMin;
@@ -27,6 +22,5 @@ class CategoryFinder {
 
 
 };
-
 
 #endif
