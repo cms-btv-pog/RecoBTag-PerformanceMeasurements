@@ -613,6 +613,9 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
   AddHisto("track_pt_cut"       ,"pT ",	                                        80,0.,200.);
   AddHisto("track_pt15_cut"     , "pT of all the tracks",                       150,0.,15.    );
   AddHisto("track_IP2D_cut"     ,"IP2D ",	                                100,-1.,1.);
+
+  AddHisto("track_len_sel_zoom"     ,     "decay length",		                100,0,0.25     );
+  AddHisto("track_len_all_zoom"     ,     "decay length",		                100,0,0.25     );
    
   AddHisto("TCHE_extended1"	  ,"TCHE_extended1",				     70, -30.,30. );
   AddHisto("TCHP_extended1"	  ,"TCHP_extended1",				     70, -30.,30. );
@@ -646,8 +649,8 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
   AddHisto("pfmuon_phi",        "pfmuon #phi",              40, -1.*pi,pi);
   AddHisto("pfmuon_Sip",	"3D IP significance of pfmuon",50, -35, 35   );
   AddHisto("pfmuon_ptrel",      "pT rel. of the muon",	   50,0,5        );
-  AddHisto("pfmuon_ratio",      "ratio of pfmuon", 50,0,2       );  
-  AddHisto("pfmuon_ratiorel",   "ratioRel of pfmuon", 50,0,0.05       );  
+  AddHisto("pfmuon_ratio",      "ratio of pfmuon", 50,0,1       );  
+  AddHisto("pfmuon_ratiorel",   "ratioRel of pfmuon", 50,0,0.03       );  
   AddHisto("pfmuon_deltar",	"#DeltaR(pfmuon,jet)",50,0,0.5);
   
   AddHisto("pfelectron_multi",      "number of pfelectron",	   7,-0.5,6.5    );
@@ -656,8 +659,8 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
   AddHisto("pfelectron_phi",        "pfelectron #phi",              40, -1.*pi,pi);
   AddHisto("pfelectron_Sip",	"3D IP significance of pfelectron",50, -35, 35   );
   AddHisto("pfelectron_ptrel",      "pT rel. of the pfelectron",	   50,0,5        );
-  AddHisto("pfelectron_ratio",      "ratio of pfelectron", 50,0,2       );  
-  AddHisto("pfelectron_ratiorel",   "ratioRel of pfelectron", 50,0,0.05      );  
+  AddHisto("pfelectron_ratio",      "ratio of pfelectron", 50,0,1       );  
+  AddHisto("pfelectron_ratiorel",   "ratioRel of pfelectron", 50,0,0.03      );  
   AddHisto("pfelectron_deltar",	"#DeltaR(pfelectron,jet)",50,0,0.5);  
   
   
@@ -774,7 +777,22 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     AddHisto("bin10_sv_pt",              "Vtx p_{T}",                                     50,0.,100.);
     AddHisto("bin10_sv_deltaR_jet",      "sv_deltaR_jet",                                 50,0.,0.5 );
 */
-
+    AddHisto("bin1_SVmass105",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin1_SVmass110",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin1_SVmass115",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin1_SVmass120",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin2_SVmass105",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin2_SVmass110",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin2_SVmass115",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin2_SVmass120",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin3_SVmass105",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin3_SVmass110",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin3_SVmass115",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin3_SVmass120",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin4_SVmass105",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin4_SVmass110",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin4_SVmass115",             "invariant mass of the secondary vertex",  50,0.,8.  );
+    AddHisto("bin4_SVmass120",             "invariant mass of the secondary vertex",  50,0.,8.  );
   }
   
   Nevent = 0;
@@ -1086,6 +1104,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
 	  
 	  if (!use_selected_tracks){
 	    
+            FillHisto_floatFromMap("track_len_all_zoom",          flav, isGluonSplit ,Track_length[itrk] , ww);
 	    if (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrkdist && passTrackIP2D){
 	      FillHisto_floatFromMap("track_len_cut",          flav, isGluonSplit ,Track_length[itrk] , ww);
 	    }
@@ -1133,6 +1152,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
 	    FillHisto_floatFromMap("track_dist",    flav, isGluonSplit ,fabs(Track_dist[itrk])    , ww);
 	    FillHisto_floatFromMap("track_pt",      flav, isGluonSplit ,Track_pt[itrk]      , ww);	  
             FillHisto_floatFromMap("track_pt15",      flav, isGluonSplit ,Track_pt[itrk]      , ww);
+            FillHisto_floatFromMap("track_len_sel_zoom",  flav, isGluonSplit ,Track_length[itrk] , ww);
 	    //           cout << "track_chi2 :" << Track_chi2[itrk]<<endl;
 	    //           cout << "track_HStrip :" << Track_nHitStrip[itrk]<<endl;
 	    //           cout << "track_HPix :" << Track_nHitPixel[itrk]<<endl;
@@ -1379,12 +1399,36 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             // PFMuon
         int npfmu=0;
         int indpfmu=-1;
+/*
+
+// bug in the actual ntuple production
         for (int im=0; im<nPFMuon; im++) {
          if (PFMuon_IdxJet[im]==ijet) {
 	    if (npfmu==0) indpfmu=im;
 	    npfmu++;
 	 }
         }
+*/
+        TLorentzVector thejet;
+        thejet.SetPtEtaPhiM(Jet_pt[ijet], Jet_eta[ijet], Jet_phi[ijet], 0);
+	
+        float minpf=0;
+        for (int im=0; im<nPFMuon; im++) {
+          TLorentzVector thepfmu;
+          thepfmu.SetPtEtaPhiM(PFMuon_pt[im],PFMuon_eta[im],PFMuon_phi[im],0);
+          float drpfj=thepfmu.DeltaR(thejet);
+          float diffdr = drpfj-PFMuon_deltaR[im];
+          if (diffdr<0.) diffdr*=-1.;
+          if (drpfj< 0.5 && diffdr<0.05 && PFMuon_GoodQuality[im]>0) {
+               if (PFMuon_pt[im]> minpf) {
+                 indpfmu=im;
+                 minpf=PFMuon_pt[im];
+               }
+               npfmu++;
+          } 
+        }
+
+
         FillHisto_intFromMap(  "pfmuon_multi",  flav, isGluonSplit , npfmu   ,ww);
         if (indpfmu>-1) {
           FillHisto_intFromMap(  "pfmuon_goodquality", flav, isGluonSplit, PFMuon_GoodQuality[indpfmu]        ,ww);
@@ -1401,12 +1445,35 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
         //PFElectron
         int npfel=0;
         int indpfel=-1;
+/*
+  // bug in the actual production
         for (int im=0; im<nPFElectron; im++) {
            if (PFElectron_IdxJet[im]==ijet) {
 	      if (npfel==0) indpfel=im;
 	      npfel++;
 	   }
         }
+*/
+
+        minpf=0;
+        for (int im=0; im<nPFElectron; im++) {
+          TLorentzVector thepfel;
+          thepfel.SetPtEtaPhiM(PFElectron_pt[im],PFElectron_eta[im],PFElectron_phi[im],0);
+          float drpfj=thepfel.DeltaR(thejet);
+          float diffdr = drpfj-PFElectron_deltaR[im];
+          if (diffdr<0.) diffdr*=-1.;
+          if (drpfj< 0.5 && diffdr<0.05 && PFElectron_pt[im]>2.) {
+               if (PFElectron_pt[im]> minpf) {
+                 indpfel=im;
+                 minpf=PFElectron_pt[im];
+               }
+               npfel++;
+          } 
+        }
+
+
+
+
         FillHisto_intFromMap(  "pfelectron_multi",  flav, isGluonSplit , npfel   ,ww);
         if (indpfel>-1) {
 	  FillHisto_floatFromMap("pfelectron_pt",          flav, isGluonSplit, PFElectron_pt[indpfel],                ww);
@@ -1420,6 +1487,16 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
         }
       }
 
+      float mass_sv1=mass_sv;
+      float mass_sv2=mass_sv;
+      float mass_sv3=mass_sv;
+      float mass_sv4=mass_sv;
+      if (fabs(flav)==4)  {
+          mass_sv1*=1.05;
+          mass_sv2*=1.10;
+          mass_sv3*=1.15;
+          mass_sv4*=1.20;
+      }
 
       if (test_bin) {
         if (jetproba<0.2) {
@@ -1432,6 +1509,11 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
               FillHisto_floatFromMap("bin1_sv_flight3DSig",  flav, isGluonSplit, flightSig_sv,            ww);
               FillHisto_floatFromMap("bin1_sv_pt",           flav, isGluonSplit, sv_pt,                   ww);
               FillHisto_floatFromMap("bin1_sv_deltaR_jet",   flav, isGluonSplit, sv_dR_jet,               ww);
+
+              FillHisto_floatFromMap("bin1_SVmass105",          flav, isGluonSplit, mass_sv1,             ww);
+              FillHisto_floatFromMap("bin1_SVmass110",          flav, isGluonSplit, mass_sv2,             ww);
+              FillHisto_floatFromMap("bin1_SVmass115",          flav, isGluonSplit, mass_sv3,             ww);
+              FillHisto_floatFromMap("bin1_SVmass120",          flav, isGluonSplit, mass_sv4,             ww);
         }
         else if (jetproba<0.5) {
               FillHisto_floatFromMap("bin2_SSVHP",           flav, isGluonSplit, ssvhp,                   ww);
@@ -1443,6 +1525,11 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
               FillHisto_floatFromMap("bin2_sv_flight3DSig",  flav, isGluonSplit, flightSig_sv,            ww);
               FillHisto_floatFromMap("bin2_sv_pt",           flav, isGluonSplit, sv_pt,                   ww);
               FillHisto_floatFromMap("bin2_sv_deltaR_jet",   flav, isGluonSplit, sv_dR_jet,               ww);
+
+              FillHisto_floatFromMap("bin2_SVmass105",          flav, isGluonSplit, mass_sv1,             ww);
+              FillHisto_floatFromMap("bin2_SVmass110",          flav, isGluonSplit, mass_sv2,             ww);
+              FillHisto_floatFromMap("bin2_SVmass115",          flav, isGluonSplit, mass_sv3,             ww);
+              FillHisto_floatFromMap("bin2_SVmass120",          flav, isGluonSplit, mass_sv4,             ww);
         }
         else if (jetproba<1.2) {
               FillHisto_floatFromMap("bin3_SSVHP",           flav, isGluonSplit, ssvhp,                   ww);
@@ -1454,6 +1541,11 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
               FillHisto_floatFromMap("bin3_sv_flight3DSig",  flav, isGluonSplit, flightSig_sv,            ww);
               FillHisto_floatFromMap("bin3_sv_pt",           flav, isGluonSplit, sv_pt,                   ww);
               FillHisto_floatFromMap("bin3_sv_deltaR_jet",   flav, isGluonSplit, sv_dR_jet,               ww);
+
+              FillHisto_floatFromMap("bin3_SVmass105",          flav, isGluonSplit, mass_sv1,             ww);
+              FillHisto_floatFromMap("bin3_SVmass110",          flav, isGluonSplit, mass_sv2,             ww);
+              FillHisto_floatFromMap("bin3_SVmass115",          flav, isGluonSplit, mass_sv3,             ww);
+              FillHisto_floatFromMap("bin3_SVmass120",          flav, isGluonSplit, mass_sv4,             ww);
         }
         else {
               FillHisto_floatFromMap("bin4_SSVHP",           flav, isGluonSplit, ssvhp,                   ww);
@@ -1465,6 +1557,11 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
               FillHisto_floatFromMap("bin4_sv_flight3DSig",  flav, isGluonSplit, flightSig_sv,            ww);
               FillHisto_floatFromMap("bin4_sv_pt",           flav, isGluonSplit, sv_pt,                   ww);
               FillHisto_floatFromMap("bin4_sv_deltaR_jet",   flav, isGluonSplit, sv_dR_jet,               ww);
+
+              FillHisto_floatFromMap("bin4_SVmass105",          flav, isGluonSplit, mass_sv1,             ww);
+              FillHisto_floatFromMap("bin4_SVmass110",          flav, isGluonSplit, mass_sv2,             ww);
+              FillHisto_floatFromMap("bin4_SVmass115",          flav, isGluonSplit, mass_sv3,             ww);
+              FillHisto_floatFromMap("bin4_SVmass120",          flav, isGluonSplit, mass_sv4,             ww);
         }
         if (idxFirstMuon > -1) {
           if (xmu_deltaR<0.04) {

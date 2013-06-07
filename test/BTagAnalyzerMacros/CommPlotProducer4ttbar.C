@@ -1414,45 +1414,93 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
         // PFMuon
         int npfmu=0;
         int indpfmu=-1;
+/*
+
+// bug in the actual ntuple production
         for (int im=0; im<nPFMuon; im++) {
-           if (PFMuon_IdxJet[im]==ijet) {
-	      if (npfmu==0) indpfmu=im;
-	      npfmu++;
-	   }
+         if (PFMuon_IdxJet[im]==ijet) {
+            if (npfmu==0) indpfmu=im;
+            npfmu++;
+         }
         }
+*/
+        TLorentzVector thejet;
+        thejet.SetPtEtaPhiM(Jet_pt[ijet], Jet_eta[ijet], Jet_phi[ijet], 0);
+
+        float minpf=0;
+        for (int im=0; im<nPFMuon; im++) {
+          TLorentzVector thepfmu;
+          thepfmu.SetPtEtaPhiM(PFMuon_pt[im],PFMuon_eta[im],PFMuon_phi[im],0);
+          float drpfj=thepfmu.DeltaR(thejet);
+          float diffdr = drpfj-PFMuon_deltaR[im];
+          if (diffdr<0.) diffdr*=-1.;
+          if (drpfj< 0.5 && diffdr<0.05 && PFMuon_GoodQuality[im]>0) {
+               if (PFMuon_pt[im]> minpf) {
+                 indpfmu=im;
+                 minpf=PFMuon_pt[im];
+               }
+               npfmu++;
+          }
+        }
+
+
         FillHisto_intFromMap(  "pfmuon_multi",  flav, isGluonSplit , npfmu   ,ww);
         if (indpfmu>-1) {
           FillHisto_intFromMap(  "pfmuon_goodquality", flav, isGluonSplit, PFMuon_GoodQuality[indpfmu]        ,ww);
-	  FillHisto_floatFromMap("pfmuon_pt",          flav, isGluonSplit, PFMuon_pt[indpfmu],                 ww);
-	  FillHisto_floatFromMap("pfmuon_eta",   	     flav, isGluonSplit, PFMuon_eta[indpfmu],                ww);
-	  FillHisto_floatFromMap("pfmuon_phi",         flav, isGluonSplit, PFMuon_phi[indpfmu],                ww);
-	  FillHisto_floatFromMap("pfmuon_Sip",	     flav, isGluonSplit, PFMuon_IPsig[indpfmu],              ww);
-	  FillHisto_floatFromMap("pfmuon_ptrel",       flav, isGluonSplit, PFMuon_ptrel[indpfmu],              ww);
-	  FillHisto_floatFromMap("pfmuon_ratio",       flav, isGluonSplit, PFMuon_ratio[indpfmu],              ww);
-	  FillHisto_floatFromMap("pfmuon_ratiorel",    flav, isGluonSplit, PFMuon_ratioRel[indpfmu],           ww);
-	  FillHisto_floatFromMap("pfmuon_deltar",	     flav, isGluonSplit, PFMuon_deltaR[indpfmu],             ww);
+          FillHisto_floatFromMap("pfmuon_pt",          flav, isGluonSplit, PFMuon_pt[indpfmu],                 ww);
+          FillHisto_floatFromMap("pfmuon_eta",               flav, isGluonSplit, PFMuon_eta[indpfmu],                ww);
+          FillHisto_floatFromMap("pfmuon_phi",         flav, isGluonSplit, PFMuon_phi[indpfmu],                ww);
+          FillHisto_floatFromMap("pfmuon_Sip",       flav, isGluonSplit, PFMuon_IPsig[indpfmu],              ww);
+          FillHisto_floatFromMap("pfmuon_ptrel",       flav, isGluonSplit, PFMuon_ptrel[indpfmu],              ww);
+          FillHisto_floatFromMap("pfmuon_ratio",       flav, isGluonSplit, PFMuon_ratio[indpfmu],              ww);
+          FillHisto_floatFromMap("pfmuon_ratiorel",    flav, isGluonSplit, PFMuon_ratioRel[indpfmu],           ww);
+          FillHisto_floatFromMap("pfmuon_deltar",            flav, isGluonSplit, PFMuon_deltaR[indpfmu],             ww);
         }
-        
+
         //PFElectron
         int npfel=0;
         int indpfel=-1;
+/*
+  // bug in the actual production
         for (int im=0; im<nPFElectron; im++) {
            if (PFElectron_IdxJet[im]==ijet) {
-	      if (npfel==0) indpfel=im;
-	      npfel++;
-	   }
+              if (npfel==0) indpfel=im;
+              npfel++;
+           }
         }
+*/
+
+        minpf=0;
+        for (int im=0; im<nPFElectron; im++) {
+          TLorentzVector thepfel;
+          thepfel.SetPtEtaPhiM(PFElectron_pt[im],PFElectron_eta[im],PFElectron_phi[im],0);
+          float drpfj=thepfel.DeltaR(thejet);
+          float diffdr = drpfj-PFElectron_deltaR[im];
+          if (diffdr<0.) diffdr*=-1.;
+          if (drpfj< 0.5 && diffdr<0.05 && PFElectron_pt[im]>2.) {
+               if (PFElectron_pt[im]> minpf) {
+                 indpfel=im;
+                 minpf=PFElectron_pt[im];
+               }
+               npfel++;
+          }
+        }
+
+
+
+
         FillHisto_intFromMap(  "pfelectron_multi",  flav, isGluonSplit , npfel   ,ww);
         if (indpfel>-1) {
-	  FillHisto_floatFromMap("pfelectron_pt",          flav, isGluonSplit, PFElectron_pt[indpfel],                ww);
-	  FillHisto_floatFromMap("pfelectron_eta",   	 flav, isGluonSplit, PFElectron_eta[indpfel],                ww);
-	  FillHisto_floatFromMap("pfelectron_phi",         flav, isGluonSplit, PFElectron_phi[indpfel],                ww);
-	  FillHisto_floatFromMap("pfelectron_Sip",	 flav, isGluonSplit, PFElectron_IPsig[indpfel],                ww);
-	  FillHisto_floatFromMap("pfelectron_ptrel",       flav, isGluonSplit, PFElectron_ptrel[indpfel],                ww);
-	  FillHisto_floatFromMap("pfelectron_ratio",       flav, isGluonSplit, PFElectron_ratio[indpfel],                ww);
-	  FillHisto_floatFromMap("pfelectron_ratiorel",    flav, isGluonSplit, PFElectron_ratioRel[indpfel],                ww);
-	  FillHisto_floatFromMap("pfelectron_deltar",	 flav, isGluonSplit, PFElectron_deltaR[indpfel],                ww);
-        }
+          FillHisto_floatFromMap("pfelectron_pt",          flav, isGluonSplit, PFElectron_pt[indpfel],                ww);
+          FillHisto_floatFromMap("pfelectron_eta",       flav, isGluonSplit, PFElectron_eta[indpfel],                ww);
+          FillHisto_floatFromMap("pfelectron_phi",         flav, isGluonSplit, PFElectron_phi[indpfel],                ww);
+          FillHisto_floatFromMap("pfelectron_Sip",       flav, isGluonSplit, PFElectron_IPsig[indpfel],                ww);
+          FillHisto_floatFromMap("pfelectron_ptrel",       flav, isGluonSplit, PFElectron_ptrel[indpfel],                ww);
+          FillHisto_floatFromMap("pfelectron_ratio",       flav, isGluonSplit, PFElectron_ratio[indpfel],                ww);
+          FillHisto_floatFromMap("pfelectron_ratiorel",    flav, isGluonSplit, PFElectron_ratioRel[indpfel],             ww);
+          FillHisto_floatFromMap("pfelectron_deltar",    flav, isGluonSplit, PFElectron_deltaR[indpfel],                ww);
+        } 
+
       }
       
 
