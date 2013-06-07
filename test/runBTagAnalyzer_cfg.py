@@ -134,9 +134,9 @@ process.source = cms.Source(
         # /QCD_Pt-300to470_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/GEN-SIM-RECODEBUG
         #'/store/mc/Summer12_DR53X/QCD_Pt-300to470_TuneZ2star_8TeV_pythia6/GEN-SIM-RECODEBUG/PU_S10_START53_V7A-v1/0000/0A4671D2-02F4-E111-9CD8-003048C69310.root'
         # /QCD_Pt-170to300_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-        '/store/mc/Summer12_DR53X/QCD_Pt-170to300_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/AODSIM/PU_S10_START53_V7A-v1/0000/FEB355DA-8EE7-E111-BA8A-001EC9D83165.root'
+        #'/store/mc/Summer12_DR53X/QCD_Pt-170to300_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/AODSIM/PU_S10_START53_V7A-v1/0000/FEB355DA-8EE7-E111-BA8A-001EC9D83165.root'
         # /TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
-        #'/store/mc/Summer12_DR53X/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S10_START53_V7C-v1/00000/FE7C71D8-DB25-E211-A93B-0025901D4C74.root'
+        '/store/mc/Summer12_DR53X/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S10_START53_V7C-v1/00000/FE7C71D8-DB25-E211-A93B-0025901D4C74.root'
     )
 )
 
@@ -471,7 +471,10 @@ getattr(process,"pfNoJet"+postfix).enable = True
 
 from PhysicsTools.PatAlgos.tools.coreTools import *
 ## Remove objects not used from the PAT sequences to speed up processing
-removeSpecificPATObjects(process,names=['Electrons', 'Muons', 'Taus'],postfix=postfix)
+if options.useTTbarFilter:
+    removeSpecificPATObjects(process,names=['Taus'],postfix=postfix)
+else:
+    removeSpecificPATObjects(process,names=['Electrons', 'Muons', 'Taus'],postfix=postfix)
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
 ## Switch the default jet collection (done in order to use the above specified b-tag infos and discriminators)
