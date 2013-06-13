@@ -477,6 +477,7 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_jes").c_str(),         Jet_jes         );
       tree->SetBranchAddress((name+"Jet_eta").c_str(),         Jet_eta         );
       tree->SetBranchAddress((name+"Jet_phi").c_str(),         Jet_phi         );
+      tree->SetBranchAddress((name+"Jet_mass").c_str(),        Jet_mass        );
       tree->SetBranchAddress((name+"Jet_ntracks").c_str(),     Jet_ntracks     );
       tree->SetBranchAddress((name+"Jet_flavour").c_str(),     Jet_flavour     );
       tree->SetBranchAddress((name+"Jet_Ip2N").c_str(),        Jet_Ip2N        );
