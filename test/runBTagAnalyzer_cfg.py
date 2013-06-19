@@ -274,7 +274,7 @@ process.negativeCombinedCSVJPBJetTags = process.negativeCombinedMVABJetTags.clon
   jetTagComputer = 'negativeCombinedCSVJP',
   tagInfos = cms.VInputTag(
     cms.InputTag("impactParameterTagInfosAODPFlow"),
-    cms.InputTag("secondaryVertexTagInfosAODPFlow"),
+    cms.InputTag("secondaryVertexNegativeTagInfosAODPFlow"),
     cms.InputTag("softPFMuonsTagInfosAODPFlow"),
     cms.InputTag("softPFElectronsTagInfosAODPFlow")
   )
@@ -394,7 +394,7 @@ process.negativeCombinedCSVJPSLBJetTags = process.negativeCombinedMVABJetTags.cl
   jetTagComputer = 'negativeCombinedCSVJPSL',
   tagInfos = cms.VInputTag(
     cms.InputTag("impactParameterTagInfosAODPFlow"),
-    cms.InputTag("secondaryVertexTagInfosAODPFlow"),
+    cms.InputTag("secondaryVertexNegativeTagInfosAODPFlow"),
     cms.InputTag("softPFMuonsTagInfosAODPFlow"),
     cms.InputTag("softPFElectronsTagInfosAODPFlow")
   )
