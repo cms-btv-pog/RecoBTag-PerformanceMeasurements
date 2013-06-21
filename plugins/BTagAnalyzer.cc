@@ -251,6 +251,10 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   EventInfo.ncQuarks = 0;
   EventInfo.nbQuarks = 0;
   EventInfo.nBHadrons    = 0;
+  //new
+  EventInfo.nDHadrons    = 0;
+  EventInfo.nDaughters   = 0;
+  //new
   EventInfo.nGenlep     = 0;
   EventInfo.nGenquark   = 0;
   EventInfo.nPatMuon    = 0;
@@ -369,6 +373,66 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         EventInfo.BHadron_hasBdaughter[EventInfo.nBHadrons] = hasBHadronDaughter;
         ++EventInfo.nBHadrons;
       }
+      
+//new
+      //DHadrons: Charmed Mesons and Charmed Baryons
+      if((ID>=411 && ID<=435)||(ID>=10411 && ID<=10433)||(ID>=20413 && ID<=20433)||
+         (ID>=4112 && ID<=4444)){
+         //check if daughter is not a DHadron
+	 int numberOfDaughters = genIt.numberOfDaughters();
+	 bool hasNoDHadronAsDaughter = true;
+	 for(int d=0; d<numberOfDaughters; d++){
+	   const Candidate* daughter = genIt.daughter(d);
+	   int IDdaughter = abs(daughter->pdgId());
+	   
+	   bool hasDHadron = (IDdaughter>=411 && IDdaughter<=435)||(IDdaughter>=10411 && IDdaughter<=10433)||
+	                     (IDdaughter>=20413 && IDdaughter<=20433)||
+                             (IDdaughter>=4112 && IDdaughter<=4444);
+	   if(hasDHadron){
+	     hasNoDHadronAsDaughter = false;
+	   }	   
+	 }
+	 
+	 //variables
+	 if(hasNoDHadronAsDaughter){
+	   EventInfo.DHadron_pT[EventInfo.nDHadrons]    = genIt.p4().pt();
+	   EventInfo.DHadron_eta[EventInfo.nDHadrons]   = genIt.p4().eta();
+	   EventInfo.DHadron_phi[EventInfo.nDHadrons]   = genIt.p4().phi();
+	   EventInfo.DHadron_mass[EventInfo.nDHadrons]  = genIt.mass();
+	   EventInfo.DHadron_pdgID[EventInfo.nDHadrons] = genIt.pdgId();
+	   
+	   EventInfo.DHadron_vx[EventInfo.nDHadrons] = genIt.vx();
+           EventInfo.DHadron_vy[EventInfo.nDHadrons] = genIt.vy();
+           EventInfo.DHadron_vz[EventInfo.nDHadrons] = genIt.vz();	   
+	   
+	   //Loop over daughters
+	   int numberChargedDaughters = 0;
+	   for(int d=0; d<numberOfDaughters; d++){
+	     const Candidate* daughter = genIt.daughter(d);
+	     int IDdaughter = abs(daughter->pdgId());	     
+	     EventInfo.DHadron_DaughtersPdgID[EventInfo.nDaughters] = IDdaughter;
+	     
+	     //take vertex of first daughter for SV
+	     if(d==0){
+	       EventInfo.DHadron_daughterVx[EventInfo.nDHadrons] = daughter->vx();
+   	       EventInfo.DHadron_daughterVy[EventInfo.nDHadrons] = daughter->vy();
+    	       EventInfo.DHadron_daughterVz[EventInfo.nDHadrons] = daughter->vz();
+	     }
+
+	     EventInfo.nDaughters++;
+	     
+	     int charge = daughter->charge();
+	     if(charge!=0){
+	       numberChargedDaughters++;
+	     }
+	   }
+	   EventInfo.DHadron_nDaughters[EventInfo.nDHadrons] = numberOfDaughters;
+	   EventInfo.DHadron_nChargedDaughters[EventInfo.nDHadrons] = numberChargedDaughters;
+	   EventInfo.nDHadrons++;
+	 }
+      }
+      
+//new      
 
       // Leptons
       if ( (ID == 11 || ID == 13) && genIt.p4().pt() > 3. ) {
@@ -2167,4 +2231,5 @@ bool BTagAnalyzer::NameCompatible(const std::string& pattern, const std::string&
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(BTagAnalyzer);
+
 

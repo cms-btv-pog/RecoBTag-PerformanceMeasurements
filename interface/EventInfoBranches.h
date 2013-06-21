@@ -65,6 +65,26 @@ class EventInfoBranches {
     int   BHadron_status[1000];
     int   BHadron_mother[1000];
     int   BHadron_hasBdaughter[1000];
+    
+//new
+    int   nDHadrons;
+    int   nDaughters;    
+    float DHadron_pT[100];
+    float DHadron_eta[100];
+    float DHadron_phi[100];
+    float DHadron_mass[100];
+    float DHadron_vx[100];
+    float DHadron_vy[100];
+    float DHadron_vz[100];
+    float DHadron_daughterVx[100];
+    float DHadron_daughterVy[100];
+    float DHadron_daughterVz[100];
+    int   DHadron_pdgID[100];
+    int   DHadron_nDaughters[100];
+    //sum(DHadron_nDaughters[i]): needed for daughter pdgIDs
+    int   DHadron_DaughtersPdgID[1500];
+    int   DHadron_nChargedDaughters[100];
+//new    
 
     int   nGenlep;
     float Genlep_pT[100];
@@ -157,6 +177,25 @@ class EventInfoBranches {
       tree->Branch("BHadron_status",       BHadron_status      , "BHadron_status[nBHadrons]/I");
       tree->Branch("BHadron_mother",       BHadron_mother      , "BHadron_mother[nBHadrons]/I");
       tree->Branch("BHadron_hasBdaughter", BHadron_hasBdaughter, "BHadron_hasBdaughter[nBHadrons]/I");
+      
+//new
+      tree->Branch("nDHadrons",            &nDHadrons          , "nDHadrons/I");
+      tree->Branch("nDaughters",    &nDaughters   ,"nDaughters/I");
+      tree->Branch("DHadron_pT",    DHadron_pT    ,"DHadron_pT[nDHadrons]/F");
+      tree->Branch("DHadron_eta",   DHadron_eta   ,"DHadron_eta[nDHadrons]/F");
+      tree->Branch("DHadron_phi",   DHadron_phi   ,"DHadron_phi[nDHadrons]/F");
+      tree->Branch("DHadron_mass",  DHadron_mass  ,"DHadron_mass[nDHadrons]/F");
+      tree->Branch("DHadron_vx",    DHadron_vx    ,"DHadron_vx[nDHadrons]/F");
+      tree->Branch("DHadron_vy",    DHadron_vy    ,"DHadron_vy[nDHadrons]/F");
+      tree->Branch("DHadron_vz",    DHadron_vz    ,"DHadron_vz[nDHadrons]/F");
+      tree->Branch("DHadron_daughterVx",  DHadron_daughterVx  ,"DHadron_daughterVx[nDHadrons]/F");
+      tree->Branch("DHadron_daughterVy",  DHadron_daughterVy  ,"DHadron_daughterVy[nDHadrons]/F");
+      tree->Branch("DHadron_daughterVz",  DHadron_daughterVz  ,"DHadron_daughterVz[nDHadrons]/F");
+      tree->Branch("DHadron_pdgID", DHadron_pdgID ,"DHadron_pdgID[nDHadrons]/I");
+      tree->Branch("DHadron_nDaughters", DHadron_nDaughters ,"DHadron_nDaughters[nDHadrons]/I");
+      tree->Branch("DHadron_DaughtersPdgID", DHadron_DaughtersPdgID,"DHadron_DaughtersPdgID[nDaughters]/I");
+      tree->Branch("DHadron_nChargedDaughters",     &DHadron_nChargedDaughters    ,"DHadron_nChargedDaughters[nDHadrons]/I");
+//new      
 
       tree->Branch("nGenlep",       &nGenlep     , "nGenlep/I");
       tree->Branch("Genlep_pT",     Genlep_pT    , "Genlep_pT[nGenlep]/F");
@@ -336,3 +375,4 @@ class EventInfoBranches {
 };
 
 #endif
+
