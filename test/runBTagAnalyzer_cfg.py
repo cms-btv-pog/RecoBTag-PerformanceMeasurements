@@ -135,6 +135,8 @@ process.source = cms.Source(
         #'/store/mc/Summer12_DR53X/QCD_Pt-300to470_TuneZ2star_8TeV_pythia6/GEN-SIM-RECODEBUG/PU_S10_START53_V7A-v1/0000/0A4671D2-02F4-E111-9CD8-003048C69310.root'
         # /QCD_Pt-170to300_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
         #'/store/mc/Summer12_DR53X/QCD_Pt-170to300_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/AODSIM/PU_S10_START53_V7A-v1/0000/FEB355DA-8EE7-E111-BA8A-001EC9D83165.root'
+        # /QCD_Pt-470to600_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v2/AODSIM
+        #'/store/mc/Summer12_DR53X/QCD_Pt-470to600_TuneZ2star_8TeV_pythia6/AODSIM/PU_S10_START53_V7A-v2/00000/FADB0913-1708-E211-BBB1-00261894383C.root'
         # /TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
         '/store/mc/Summer12_DR53X/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S10_START53_V7C-v1/00000/FE7C71D8-DB25-E211-A93B-0025901D4C74.root'
     )
@@ -735,24 +737,24 @@ if not options.runOnData:
 #-------------------------------------
 process.load("RecoBTag.PerformanceMeasurements.BTagAnalyzer_cff")
 
-process.btagana.use_selected_tracks  = True  ## False if you want to run on all tracks : used for commissioning studies
-process.btagana.useTrackHistory      = False ## Can only be used with GEN-SIM-RECODEBUG files
-process.btagana.produceJetProbaTree  = False ## True if you want to keep track and SV info! : used for commissioning studies
-process.btagana.producePtRelTemplate = options.producePtRelTemplate  ## True for performance studies
-process.btagana.primaryVertexColl = cms.InputTag('goodOfflinePrimaryVertices')
-process.btagana.Jets = cms.InputTag('selectedPatJets'+postfix)
+process.btagana.use_selected_tracks   = True  ## False if you want to run on all tracks : used for commissioning studies
+process.btagana.useTrackHistory       = False ## Can only be used with GEN-SIM-RECODEBUG files
+process.btagana.produceJetProbaTree   = False ## True if you want to keep track and SV info! : used for commissioning studies
+process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
+process.btagana.primaryVertexColl     = cms.InputTag('goodOfflinePrimaryVertices')
+process.btagana.Jets                  = cms.InputTag('selectedPatJets'+postfix)
 process.btagana.patMuonCollectionName = cms.InputTag('selectedPatMuons')
-process.btagana.use_ttbar_filter = cms.bool(options.useTTbarFilter)
-process.btagana.triggerTable = cms.InputTag('TriggerResults::HLT') # Data and MC
+process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
+process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
 
 process.btaganaSubJets = process.btagana.clone(
     produceJetProbaTree = cms.bool(True),
-    MinPt = cms.double(0.),
-    Jets = cms.InputTag('selectedPatJetsCA8PrunedSubJetsPF'),
-    FatJets = cms.InputTag('selectedPatJets'),
-    PrunedFatJets = cms.InputTag('selectedPatJetsCA8PrunedPFPacked'),
-    runSubJets = options.runSubJets,
-    use_ttbar_filter = cms.bool(False)
+    allowJetSkipping    = cms.bool(False),
+    Jets                = cms.InputTag('selectedPatJetsCA8PrunedSubJetsPF'),
+    FatJets             = cms.InputTag('selectedPatJets'),
+    PrunedFatJets       = cms.InputTag('selectedPatJetsCA8PrunedPFPacked'),
+    runSubJets          = options.runSubJets,
+    use_ttbar_filter    = cms.bool(False)
 )
 #---------------------------------------
 

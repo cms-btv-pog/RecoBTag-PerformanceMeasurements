@@ -180,6 +180,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
     //std::vector< std::string > moduleLabel_;
 
     bool runSubJets_ ;
+    bool allowJetSkipping_ ;
 
     edm::InputTag muonCollectionName_;
     edm::InputTag patMuonCollectionName_;

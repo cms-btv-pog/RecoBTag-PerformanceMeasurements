@@ -40,6 +40,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
 
   // Parameters
   runSubJets_ = iConfig.getParameter<bool>("runSubJets");
+  allowJetSkipping_ = iConfig.getParameter<bool>("allowJetSkipping");
   minJetPt_  = iConfig.getParameter<double>("MinPt");
   maxJetEta_ = iConfig.getParameter<double>("MaxEta");
 
@@ -251,10 +252,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   EventInfo.ncQuarks = 0;
   EventInfo.nbQuarks = 0;
   EventInfo.nBHadrons    = 0;
-  //new
   EventInfo.nDHadrons    = 0;
   EventInfo.nDaughters   = 0;
-  //new
   EventInfo.nGenlep     = 0;
   EventInfo.nGenquark   = 0;
   EventInfo.nPatMuon    = 0;
@@ -373,9 +372,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         EventInfo.BHadron_hasBdaughter[EventInfo.nBHadrons] = hasBHadronDaughter;
         ++EventInfo.nBHadrons;
       }
-      
-//new
-      //DHadrons: Charmed Mesons and Charmed Baryons
+
+      // DHadrons: Charmed Mesons and Charmed Baryons
       if((ID>=411 && ID<=435)||(ID>=10411 && ID<=10433)||(ID>=20413 && ID<=20433)||
          (ID>=4112 && ID<=4444)){
          //check if daughter is not a DHadron
@@ -384,15 +382,15 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	 for(int d=0; d<numberOfDaughters; d++){
 	   const Candidate* daughter = genIt.daughter(d);
 	   int IDdaughter = abs(daughter->pdgId());
-	   
+
 	   bool hasDHadron = (IDdaughter>=411 && IDdaughter<=435)||(IDdaughter>=10411 && IDdaughter<=10433)||
 	                     (IDdaughter>=20413 && IDdaughter<=20433)||
                              (IDdaughter>=4112 && IDdaughter<=4444);
 	   if(hasDHadron){
 	     hasNoDHadronAsDaughter = false;
-	   }	   
+	   }
 	 }
-	 
+
 	 //variables
 	 if(hasNoDHadronAsDaughter){
 	   EventInfo.DHadron_pT[EventInfo.nDHadrons]    = genIt.p4().pt();
@@ -400,18 +398,18 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	   EventInfo.DHadron_phi[EventInfo.nDHadrons]   = genIt.p4().phi();
 	   EventInfo.DHadron_mass[EventInfo.nDHadrons]  = genIt.mass();
 	   EventInfo.DHadron_pdgID[EventInfo.nDHadrons] = genIt.pdgId();
-	   
+
 	   EventInfo.DHadron_vx[EventInfo.nDHadrons] = genIt.vx();
            EventInfo.DHadron_vy[EventInfo.nDHadrons] = genIt.vy();
-           EventInfo.DHadron_vz[EventInfo.nDHadrons] = genIt.vz();	   
-	   
+           EventInfo.DHadron_vz[EventInfo.nDHadrons] = genIt.vz();
+
 	   //Loop over daughters
 	   int numberChargedDaughters = 0;
 	   for(int d=0; d<numberOfDaughters; d++){
 	     const Candidate* daughter = genIt.daughter(d);
-	     int IDdaughter = abs(daughter->pdgId());	     
+	     int IDdaughter = abs(daughter->pdgId());
 	     EventInfo.DHadron_DaughtersPdgID[EventInfo.nDaughters] = IDdaughter;
-	     
+
 	     //take vertex of first daughter for SV
 	     if(d==0){
 	       EventInfo.DHadron_daughterVx[EventInfo.nDHadrons] = daughter->vx();
@@ -420,7 +418,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	     }
 
 	     EventInfo.nDaughters++;
-	     
+
 	     int charge = daughter->charge();
 	     if(charge!=0){
 	       numberChargedDaughters++;
@@ -431,8 +429,6 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	   EventInfo.nDHadrons++;
 	 }
       }
-      
-//new      
 
       // Leptons
       if ( (ID == 11 || ID == 13) && genIt.p4().pt() > 3. ) {
@@ -728,14 +724,11 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
   //// Loop over the jets
   for ( PatJetCollection::const_iterator pjet = jetsColl->begin(); pjet != jetsColl->end(); ++pjet ) {
 
-    double JES = pjet->pt()/pjet->correctedJet("Uncorrected").pt();
-
-    double jetpt  = pjet->pt()  ;
+    double ptjet  = pjet->pt()  ;
     double jeteta = pjet->eta() ;
     double jetphi = pjet->phi() ;
-    double ptjet  = jetpt;
 
-    if ( ptjet < minJetPt_ || std::fabs( jeteta ) > maxJetEta_ ) continue;
+    if ( allowJetSkipping_ && ( ptjet < minJetPt_ || std::fabs( jeteta ) > maxJetEta_ ) ) continue;
 
     //// overlap removal with lepton from ttbar selection
     if (use_ttbar_filter_) {
@@ -746,8 +739,6 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       if (EventInfo.ttbar_chan>=0 && (deltaR1 < 0.5 || deltaR2 < 0.5)) continue;
     }
     //// end of removal
-
-    ++numjet;
 
     int flavour  =-1  ;
     if ( !isData_ ) {
@@ -767,7 +758,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     retpf.set(false);
     JetInfo[iJetColl].Jet_tightID[JetInfo[iJetColl].nJet]  = ( pfjetIDTight( *pjet, retpf ) ? 1 : 0 );
 
-    JetInfo[iJetColl].Jet_jes[JetInfo[iJetColl].nJet]      = JES;
+    JetInfo[iJetColl].Jet_jes[JetInfo[iJetColl].nJet]      = pjet->pt()/pjet->correctedJet("Uncorrected").pt();
     JetInfo[iJetColl].Jet_residual[JetInfo[iJetColl].nJet] = pjet->pt()/pjet->correctedJet("L3Absolute").pt();
 
     if( runSubJets_ && iJetColl==0 )
@@ -783,6 +774,13 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
         }
       }
       JetInfo[iJetColl].Jet_FatJetIdx[JetInfo[iJetColl].nJet] = fatjetIdx;
+
+      if( ptjet==0. ) // special treatment for pT=0 subjets
+      {
+        ++numjet;
+        ++JetInfo[iJetColl].nJet;
+        continue;
+      }
     }
 
     if( runSubJets_ && iJetColl==1 )
@@ -849,7 +847,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     unsigned int trackSize = selected_tracks.size();
     if(!use_selected_tracks_) trackSize = no_sel_tracks.size();
 
-    if (trackSize==0) continue;
+    if ( allowJetSkipping_ && trackSize==0 ) continue;
     for (unsigned int itt=0; itt < trackSize; ++itt)
     {
       reco::Track  ptrack;
@@ -1848,6 +1846,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       }
     }
 
+    ++numjet;
     ++JetInfo[iJetColl].nJet;
   } // end loop on jet
 
