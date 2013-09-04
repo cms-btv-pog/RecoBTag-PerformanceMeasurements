@@ -249,16 +249,23 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   EventInfo.pthat = -1.;
   EventInfo.nPUtrue = -1.;
   EventInfo.nPU = 0;
-  EventInfo.ncQuarks = 0;
-  EventInfo.nbQuarks = 0;
-  EventInfo.nBHadrons    = 0;
-  EventInfo.nDHadrons    = 0;
-  EventInfo.nDaughters   = 0;
-  EventInfo.nGenlep     = 0;
-  EventInfo.nGenquark   = 0;
-  EventInfo.nPatMuon    = 0;
+  EventInfo.ncQuarks   = 0;
+  EventInfo.nbQuarks   = 0;
+  EventInfo.nBHadrons  = 0;
+  EventInfo.nDHadrons  = 0;
+  EventInfo.nDaughters = 0;
+//$$
+  EventInfo.nGenV0     = 0;
+//$$
+  EventInfo.nGenlep    = 0;
+  EventInfo.nGenquark  = 0;
+  EventInfo.nPatMuon   = 0;
+  EventInfo.mcweight   = 1.;
 
-  EventInfo.mcweight=1.;
+//$$
+  bool AreBHadrons = false;
+//$$
+
   //---------------------------- Start MC info ---------------------------------------//
   if ( !isData_ ) {
     // EventInfo.pthat
@@ -286,14 +293,24 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       EventInfo.nPUtrue = ipu->getTrueNumInteractions();
     }
 
+  //------------------------------------------------------
+  // generated particles
+  //------------------------------------------------------
     edm::Handle<reco::GenParticleCollection> genParticles;
     iEvent.getByLabel ("genParticles", genParticles);
 
-    //$$
-    // generated particles
-    for (size_t i = 0; i < genParticles->size (); ++i) {
+//$$
+    EventInfo.GenPVz = -1000.;
+//$$
+
+    for (size_t i = 0; i < genParticles->size(); ++i) {
       const GenParticle & genIt = (*genParticles)[i];
       int ID = abs(genIt.pdgId());
+      unsigned int nDaughters = genIt.numberOfDaughters();
+
+//$$
+      if ( genIt.status() == 3 ) EventInfo.GenPVz = genIt.vz();
+//$$
 
       // prompt b and c
       if ( (ID == 4 || ID == 5) && genIt.status() == 3 ) {
@@ -307,22 +324,17 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       }
 
       // b and c quarks from the end of parton showering and before hadronization
-      if ( ID == 4 || ID == 5 )
-      {
-        if( genIt.numberOfDaughters() > 0 )
-        {
+      if ( ID == 4 || ID == 5 ) {
+        if( nDaughters > 0 ) {
           int nparton_daughters = 0;
-          for (unsigned d=0; d<genIt.numberOfDaughters(); ++d)
-          {
+          for (unsigned int d=0; d<nDaughters; ++d) {
             int daughterID = abs(genIt.daughter(d)->pdgId());
             if( (daughterID == 1 || daughterID == 2 || daughterID == 3 ||
-                  daughterID == 4 || daughterID == 5 || daughterID == 6 || daughterID == 21))
+                 daughterID == 4 || daughterID == 5 || daughterID == 6 || daughterID == 21))
               nparton_daughters++;
           }
-          if(nparton_daughters == 0)
-          {
-            if ( ID == 5 )
-            {
+          if( nparton_daughters == 0 ) {
+            if ( ID == 5 ) {
               EventInfo.bQuark_pT[EventInfo.nbQuarks]  = genIt.p4().pt();
               EventInfo.bQuark_eta[EventInfo.nbQuarks] = genIt.p4().eta();
               EventInfo.bQuark_phi[EventInfo.nbQuarks] = genIt.p4().phi();
@@ -331,8 +343,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
               EventInfo.bQuark_fromGSP[EventInfo.nbQuarks] = isFromGSP(&genIt);
               ++EventInfo.nbQuarks;
             }
-            if ( ID == 4 )
-            {
+            if ( ID == 4 ) {
               EventInfo.cQuark_pT[EventInfo.ncQuarks]  = genIt.p4().pt();
               EventInfo.cQuark_eta[EventInfo.ncQuarks] = genIt.p4().eta();
               EventInfo.cQuark_phi[EventInfo.ncQuarks] = genIt.p4().phi();
@@ -345,90 +356,105 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         }
       }
 
-      // BHadrons
-      if ( (ID >=  511 && ID <=  557) || (ID >= 5114 && ID <= 5554) ||
-          (ID >=10511 && ID <=10555) || (ID >=20513 && ID <=20555) || ID ==30553 ||
-          (ID>=100551 && ID<=100557) || (ID>=110551 && ID<=110557) ||
-          (ID>=120551 && ID<=120557) || (ID>=130551 && ID<=130557) ||
-          (ID>=200551 && ID<=200557) || (ID>=210551 && ID<=210557) ||
-          (ID>=220551 && ID<=220557) || (ID>=300551 && ID<=300557) ||
-          ID == 9000553 || ID == 9010553 )
-      {
-        //  cout << " pdgId " << genIt.pdgId()  << " pT " << genIt.p4().pt() << " mother " << mother->pdgId() << endl;
-        EventInfo.BHadron_pT[EventInfo.nBHadrons]    = genIt.p4().pt();
-        EventInfo.BHadron_eta[EventInfo.nBHadrons]   = genIt.p4().eta();
-        EventInfo.BHadron_phi[EventInfo.nBHadrons]   = genIt.p4().phi();
-        EventInfo.BHadron_mass[EventInfo.nBHadrons]  = genIt.mass();
-        EventInfo.BHadron_pdgID[EventInfo.nBHadrons] = genIt.pdgId();
-        EventInfo.BHadron_status[EventInfo.nBHadrons] = genIt.status();
-        EventInfo.BHadron_mother[EventInfo.nBHadrons] = genIt.mother()->pdgId();
-        // check if any of the daughters is also B hadron
-        int hasBHadronDaughter = 0;
-        for(unsigned d=0; d<genIt.numberOfDaughters(); ++d)
-        {
-          int daughterID = abs(genIt.daughter(d)->pdgId());
-          if ( (daughterID/100)%10 == 5 || (daughterID/1000)%10 == 5 ) { hasBHadronDaughter = 1; break; }
-        }
-        EventInfo.BHadron_hasBdaughter[EventInfo.nBHadrons] = hasBHadronDaughter;
-        ++EventInfo.nBHadrons;
-      }
+//$$
+      if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) AreBHadrons = true; 
+//$$
+//       // Primary b Hadrons
+//       if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) {
+//         //  cout << " pdgId " << genIt.pdgId()  << " pT " << genIt.p4().pt() << " mother " << mother->pdgId() << endl;
+//         EventInfo.BHadron_pT[EventInfo.nBHadrons]    = genIt.p4().pt();
+//         EventInfo.BHadron_eta[EventInfo.nBHadrons]   = genIt.p4().eta();
+//         EventInfo.BHadron_phi[EventInfo.nBHadrons]   = genIt.p4().phi();
+//         EventInfo.BHadron_mass[EventInfo.nBHadrons]  = genIt.mass();
+//         EventInfo.BHadron_pdgID[EventInfo.nBHadrons] = genIt.pdgId();
+//         EventInfo.BHadron_status[EventInfo.nBHadrons] = genIt.status();
+//         EventInfo.BHadron_mother[EventInfo.nBHadrons] = genIt.mother()->pdgId();
+//         // check if any of the daughters is also B hadron
+//         int hasBHadronDaughter = 0;
+//         for (unsigned int d=0; d<nDaughters; ++d) {
+//           int daughterID = abs(genIt.daughter(d)->pdgId());
+//           if ( (daughterID/100)%10 == 5 || (daughterID/1000)%10 == 5 ) { hasBHadronDaughter = 1; break; }
+//         }
+//         EventInfo.BHadron_hasBdaughter[EventInfo.nBHadrons] = hasBHadronDaughter;
+//         ++EventInfo.nBHadrons;
+//       }
+//$$
 
-      // DHadrons: Charmed Mesons and Charmed Baryons
-      if((ID>=411 && ID<=435)||(ID>=10411 && ID<=10433)||(ID>=20413 && ID<=20433)||
-         (ID>=4112 && ID<=4444)){
-         //check if daughter is not a DHadron
-	 int numberOfDaughters = genIt.numberOfDaughters();
-	 bool hasNoDHadronAsDaughter = true;
-	 for(int d=0; d<numberOfDaughters; d++){
-	   const Candidate* daughter = genIt.daughter(d);
-	   int IDdaughter = abs(daughter->pdgId());
+      // Final c Hadrons
+      if ( (ID/100)%10 == 4 || (ID/1000)%10 == 4 ) {
+        // check if daughter is not a DHadron
+	bool hasNoDHadronAsDaughter = true;
+	for (unsigned int d=0; d<nDaughters; d++) {
+	  const Candidate* daughter = genIt.daughter(d);
+	  int IDdaughter = abs(daughter->pdgId());
+	  bool hasDHadron = (IDdaughter/100)%10 == 4 || (IDdaughter/1000)%10 == 4;
+	  if ( hasDHadron ) hasNoDHadronAsDaughter = false;
+	}
 
-	   bool hasDHadron = (IDdaughter>=411 && IDdaughter<=435)||(IDdaughter>=10411 && IDdaughter<=10433)||
-	                     (IDdaughter>=20413 && IDdaughter<=20433)||
-                             (IDdaughter>=4112 && IDdaughter<=4444);
-	   if(hasDHadron){
-	     hasNoDHadronAsDaughter = false;
-	   }
-	 }
+	// variables
+	if ( hasNoDHadronAsDaughter ) {
+	  EventInfo.DHadron_pT[EventInfo.nDHadrons]    = genIt.p4().pt();
+	  EventInfo.DHadron_eta[EventInfo.nDHadrons]   = genIt.p4().eta();
+	  EventInfo.DHadron_phi[EventInfo.nDHadrons]   = genIt.p4().phi();
+	  EventInfo.DHadron_mass[EventInfo.nDHadrons]  = genIt.mass();
+	  EventInfo.DHadron_pdgID[EventInfo.nDHadrons] = genIt.pdgId();
 
-	 //variables
-	 if(hasNoDHadronAsDaughter){
-	   EventInfo.DHadron_pT[EventInfo.nDHadrons]    = genIt.p4().pt();
-	   EventInfo.DHadron_eta[EventInfo.nDHadrons]   = genIt.p4().eta();
-	   EventInfo.DHadron_phi[EventInfo.nDHadrons]   = genIt.p4().phi();
-	   EventInfo.DHadron_mass[EventInfo.nDHadrons]  = genIt.mass();
-	   EventInfo.DHadron_pdgID[EventInfo.nDHadrons] = genIt.pdgId();
+	  EventInfo.DHadron_vx[EventInfo.nDHadrons] = genIt.vx();
+          EventInfo.DHadron_vy[EventInfo.nDHadrons] = genIt.vy();
+          EventInfo.DHadron_vz[EventInfo.nDHadrons] = genIt.vz();
 
-	   EventInfo.DHadron_vx[EventInfo.nDHadrons] = genIt.vx();
-           EventInfo.DHadron_vy[EventInfo.nDHadrons] = genIt.vy();
-           EventInfo.DHadron_vz[EventInfo.nDHadrons] = genIt.vz();
+//$$
+	  int nCharged = 0;
+//$$
+	  // Loop on daughters
+	  int numberChargedDaughters = 0;
+	  for (unsigned int d=0; d<nDaughters; d++) {
+	    const Candidate* daughter = genIt.daughter(d);
+	    int IDdaughter = abs(daughter->pdgId());
+	    EventInfo.DHadron_DaughtersPdgID[EventInfo.nDaughters] = IDdaughter;
+	    // take vertex of first daughter for SV
+	    if ( d == 0 ) {
+	      EventInfo.DHadron_SVx[EventInfo.nDHadrons] = daughter->vx();
+   	      EventInfo.DHadron_SVy[EventInfo.nDHadrons] = daughter->vy();
+    	      EventInfo.DHadron_SVz[EventInfo.nDHadrons] = daughter->vz();
+	    }
+	    EventInfo.nDaughters++;
+	    if ( daughter->charge() != 0 ) numberChargedDaughters++;
+//$$
+	    // charged track multiplicity
+	    unsigned int nDaughters2 = daughter->numberOfDaughters();
+	    if (nDaughters2 == 0 && daughter->charge() != 0
+				 && daughter->p4().pt()>1.) nCharged++;
+	    for (unsigned int d2=0; d2<nDaughters2; d2++) {
+	      const Candidate* daughter2 = daughter->daughter(d2);
+	      unsigned int nDaughters3 = daughter2->numberOfDaughters();
+	      if (nDaughters3 == 0 && daughter2->charge() != 0
+	        		   && daughter2->p4().pt()>1.) nCharged++;
+	      for (unsigned int d3=0; d3<nDaughters3; d3++) {
+		const Candidate* daughter3 = daughter2->daughter(d3);
+		unsigned int nDaughters4 = daughter3->numberOfDaughters();
+		if (nDaughters4 == 0 && daughter3->charge() != 0
+				     && daughter3->p4().pt()>1.) nCharged++;
+		for (unsigned int d4=0; d4<nDaughters4; d4++) {
+		  const Candidate* daughter4 = daughter3->daughter(d4);
+		  unsigned int nDaughters5 = daughter4->numberOfDaughters();
+		  if (nDaughters5 == 0 && daughter4->charge() != 0
+				       && daughter4->p4().pt()>1.) nCharged++;
+		} // D -> X -> X -> X -> X
+	      } // D -> X -> X -> X
+	    } // D -> X -> X
+//$$
+	  } // loop on daughters from final c hadron
 
-	   //Loop over daughters
-	   int numberChargedDaughters = 0;
-	   for(int d=0; d<numberOfDaughters; d++){
-	     const Candidate* daughter = genIt.daughter(d);
-	     int IDdaughter = abs(daughter->pdgId());
-	     EventInfo.DHadron_DaughtersPdgID[EventInfo.nDaughters] = IDdaughter;
-
-	     //take vertex of first daughter for SV
-	     if(d==0){
-	       EventInfo.DHadron_daughterVx[EventInfo.nDHadrons] = daughter->vx();
-   	       EventInfo.DHadron_daughterVy[EventInfo.nDHadrons] = daughter->vy();
-    	       EventInfo.DHadron_daughterVz[EventInfo.nDHadrons] = daughter->vz();
-	     }
-
-	     EventInfo.nDaughters++;
-
-	     int charge = daughter->charge();
-	     if(charge!=0){
-	       numberChargedDaughters++;
-	     }
-	   }
-	   EventInfo.DHadron_nDaughters[EventInfo.nDHadrons] = numberOfDaughters;
-	   EventInfo.DHadron_nChargedDaughters[EventInfo.nDHadrons] = numberChargedDaughters;
-	   EventInfo.nDHadrons++;
-	 }
-      }
+	  EventInfo.DHadron_nDaughters[EventInfo.nDHadrons] = nDaughters;
+	  EventInfo.DHadron_nChargedDaughters[EventInfo.nDHadrons] = numberChargedDaughters;
+//$$
+	  EventInfo.DHadron_nCharged[EventInfo.nDHadrons] = nCharged;
+// cout << " D hadron " << EventInfo.nDHadrons << "  id " << EventInfo.DHadron_pdgID[EventInfo.nDHadrons] << "  pT " << EventInfo.DHadron_pT[EventInfo.nDHadrons] << "  eta " << EventInfo.DHadron_eta[EventInfo.nDHadrons] << "  phi " << EventInfo.DHadron_phi[EventInfo.nDHadrons] << endl;
+//$$
+	  EventInfo.nDHadrons++;
+	} // final c hadron
+      } // c hadron 
 
       // Leptons
       if ( (ID == 11 || ID == 13) && genIt.p4().pt() > 3. ) {
@@ -479,10 +505,191 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         }
       }
 
-    } // end loop on generated particles
-    //$$
+//$$
+      // V0: K0s and Lambda
+      if ( ID == 310 || ID == 3122 ) {
+	 int nCharged = 0;
+	 float SVx = 0., SVy = 0., SVz = 0.;
+	 for (unsigned int d=0; d<nDaughters; d++) {
+	   const Candidate* daughter = genIt.daughter(d);
+	   if ( daughter->charge() != 0 && daughter->pt() > 1. ) {
+	     nCharged++;
+   	     SVx = daughter->vx();
+   	     SVy = daughter->vy();
+   	     SVz = daughter->vz();
+	   }
+	 }
+	 bool inAcceptance = false;
+	 if ( nCharged > 0 ) {
+	   float Radius = TMath::Sqrt( SVx*SVx + SVy*SVy );
+	   float AbsEta = abs( genIt.p4().eta() );
+	   if ( (AbsEta < 2.0 && Radius < 7.3) || 
+	        (AbsEta < 2.5 && Radius < 4.4) ||
+	        (AbsEta > 1.8 && AbsEta < 2.5 && abs(SVz) < 34.5 ) )
+	     inAcceptance = true;
+	 }
+	 if ( inAcceptance ) {
+	   EventInfo.GenV0_pT[EventInfo.nGenV0]    = genIt.p4().pt();
+	   EventInfo.GenV0_eta[EventInfo.nGenV0]   = genIt.p4().eta();
+	   EventInfo.GenV0_phi[EventInfo.nGenV0]   = genIt.p4().phi();
+	   EventInfo.GenV0_pdgID[EventInfo.nGenV0] = genIt.pdgId();
+	   EventInfo.GenV0_SVx[EventInfo.nGenV0] = SVx;
+	   EventInfo.GenV0_SVy[EventInfo.nGenV0] = SVy;
+   	   EventInfo.GenV0_SVz[EventInfo.nGenV0] = SVz;
+	   EventInfo.GenV0_nCharged[EventInfo.nGenV0] = nCharged;
+	   EventInfo.nGenV0++;
+	 }
+      }
+//$$
 
-    // simulated PV
+    } // end loop on generated particles
+
+//$$
+  //------------------------------------------------------
+  // generated particles: looking for b hadrons only
+  //------------------------------------------------------
+    if ( AreBHadrons ) {
+    for (size_t i = 0; i < genParticles->size(); ++i) {
+      const GenParticle & genIt = (*genParticles)[i];
+      int ID = abs(genIt.pdgId());
+      unsigned int nDaughters = genIt.numberOfDaughters();
+
+      // b Hadrons
+      if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) {
+        //  cout << " pdgId " << genIt.pdgId()  << " pT " << genIt.p4().pt() << " mother " << mother->pdgId() << endl;
+        EventInfo.BHadron_pT[EventInfo.nBHadrons]    = genIt.p4().pt();
+        EventInfo.BHadron_eta[EventInfo.nBHadrons]   = genIt.p4().eta();
+        EventInfo.BHadron_phi[EventInfo.nBHadrons]   = genIt.p4().phi();
+        EventInfo.BHadron_mass[EventInfo.nBHadrons]  = genIt.mass();
+        EventInfo.BHadron_pdgID[EventInfo.nBHadrons] = genIt.pdgId();
+        EventInfo.BHadron_mother[EventInfo.nBHadrons] = genIt.mother()->pdgId();
+        // check if any of the daughters is also B hadron
+        int hasBHadronDaughter = 0;
+        for (unsigned int d=0; d<nDaughters; ++d) {
+          int daughterID = abs(genIt.daughter(d)->pdgId());
+          if ( (daughterID/100)%10 == 5 || (daughterID/1000)%10 == 5 ) { hasBHadronDaughter = 1; break; }
+        }
+        EventInfo.BHadron_hasBdaughter[EventInfo.nBHadrons] = hasBHadronDaughter;
+	int idD1 = -1, idD2 = -1;
+	int nCharged = 0;
+	// take vertex of first daughter for SV
+  	EventInfo.BHadron_SVx[EventInfo.nBHadrons] = genIt.daughter(0)->vx();
+   	EventInfo.BHadron_SVy[EventInfo.nBHadrons] = genIt.daughter(0)->vy();
+    	EventInfo.BHadron_SVz[EventInfo.nBHadrons] = genIt.daughter(0)->vz();
+
+	if ( !hasBHadronDaughter ) {
+	  // Loop on daughters: B -> X
+	  for (unsigned int d=0; d<nDaughters; d++) {
+	    const Candidate* daughter = genIt.daughter(d);
+	    int IDdaughter = abs(daughter->pdgId());
+	    bool isDHadron = (IDdaughter/100)%10 == 4 || (IDdaughter/1000)%10 == 4;
+	    bool hasNoDHadronAsDaughter = true;
+	    bool isDHadron2, hasNoDHadronAsDaughter2, isDHadron3;
+	    unsigned int nDaughters2 = daughter->numberOfDaughters();
+
+            // B -> D
+	    if ( isDHadron ) {
+	      for (unsigned int d2=0; d2<nDaughters2; d2++) {
+	        const Candidate* daughter2 = daughter->daughter(d2);
+	        int IDdaughter2 = abs(daughter2->pdgId());
+	        isDHadron2 = (IDdaughter2/100)%10 == 4 || (IDdaughter2/1000)%10 == 4;
+	        if ( isDHadron2 ) hasNoDHadronAsDaughter = false;
+	      }
+	      if ( hasNoDHadronAsDaughter ) {
+	        for (int c=0; c<EventInfo.nDHadrons; c++) {
+	          if ( abs( daughter->p4().pt()
+		                   - EventInfo.DHadron_pT[c] ) < 0.0001 ) {
+		    if ( idD1 < 0 ) idD1 = c;
+		    else if ( idD2 < 0 ) idD2 = c;
+// cout << " D hadron from B " << c << "  id " << daughter->pdgId() << "  pT " << daughter->p4().pt()  << "  eta " << daughter->p4().eta() << "  phi " << daughter->p4().phi() << endl;
+		  }
+	        }
+	      }
+	    }
+	    
+	    if ( !isDHadron || !hasNoDHadronAsDaughter ) { 
+	      if (nDaughters2 == 0 && daughter->charge() != 0
+	  	    		   && daughter->p4().pt() > 1.) nCharged++;
+	      // B -> X -> X
+	      for (unsigned int d2=0; d2<nDaughters2; d2++) {
+	        const Candidate* daughter2 = daughter->daughter(d2);
+	        int IDdaughter2 = abs(daughter2->pdgId());
+	        isDHadron2 = (IDdaughter2/100)%10 == 4 || (IDdaughter2/1000)%10 == 4;
+	        hasNoDHadronAsDaughter2 = true;
+	        unsigned int nDaughters3 = daughter2->numberOfDaughters();
+
+	        // B -> D*(*) -> D
+	        if ( isDHadron2 ) {
+	          for (unsigned int d3=0; d3<nDaughters3; d3++) {
+	            const Candidate* daughter3 = daughter2->daughter(d3);
+	            int IDdaughter3 = abs(daughter3->pdgId());
+	            isDHadron3 = (IDdaughter3/100)%10 == 4 || (IDdaughter3/1000)%10 == 4;
+	            if ( isDHadron3 ) hasNoDHadronAsDaughter2 = false;
+	          }
+	          if ( hasNoDHadronAsDaughter2 ) {
+	            for (int c=0; c<EventInfo.nDHadrons; c++) {
+	              if ( abs( daughter2->p4().pt()
+		                       - EventInfo.DHadron_pT[c] ) < 0.0001 ) {
+		        if ( idD1 < 0 ) idD1 = c;
+		        else if ( idD2 < 0 ) idD2 = c;
+// cout << " D hadron from B->D*(*) " << c << "  id " << daughter2->pdgId() << "  pT " << daughter2->p4().pt() << "  eta " << daughter2->p4().eta() << "  phi " << daughter2->p4().phi() << endl;
+		      }
+	            }
+	          }
+	        }
+
+	        if ( !isDHadron2 || !hasNoDHadronAsDaughter2 ) { 
+	          if (nDaughters3 == 0 && daughter2->charge() != 0
+	        		       && daughter2->p4().pt() > 1.) nCharged++;
+	          // B -> X -> X -> X
+	          for (unsigned int d3=0; d3<nDaughters3; d3++) {
+	            const Candidate* daughter3 = daughter2->daughter(d3);
+	            int IDdaughter3 = abs(daughter3->pdgId());
+	            isDHadron3 = (IDdaughter3/100)%10 == 4 || (IDdaughter3/1000)%10 == 4;
+	            unsigned int nDaughters4 = daughter3->numberOfDaughters();
+
+	            // B -> D** -> D* -> D
+	            if ( isDHadron3 ) {
+	              for (int c=0; c<EventInfo.nDHadrons; c++) {
+	                if ( abs( daughter3->p4().pt()
+		                         - EventInfo.DHadron_pT[c] ) < 0.0001 ) {
+		          if ( idD1 < 0 ) idD1 = c;
+		          else if ( idD2 < 0 ) idD2 = c;
+// cout << " D hadron from B->D**->D* " << c << "  id " << daughter3->pdgId() << "  pT " << daughter3->p4().pt() << "  eta " << daughter3->p4().eta() << "  phi " << daughter3->p4().phi() << endl;
+		        }
+	              }
+	            }
+                    else {
+	              if (nDaughters4 == 0 && daughter3->charge() != 0
+	        	  	           && daughter3->p4().pt() > 1.) nCharged++;
+	              // B -> X -> X -> X -> X 
+	              for (unsigned int d4=0; d4<nDaughters4; d4++) {
+	                const Candidate* daughter4 = daughter3->daughter(d4);
+	                unsigned int nDaughters5 = daughter4->numberOfDaughters();
+	                if (nDaughters5 == 0 && daughter4->charge() != 0
+	        	   	             && daughter4->p4().pt()>1.) nCharged++;
+	              }
+	            }
+	          } // B -> X -> X -> X
+	        }
+	      } // B -> X -> X
+	    }
+	  } // loop on daughters from final b hadron
+// cout << " B hadron " << EventInfo.nBHadrons << "  id " << EventInfo.BHadron_pdgID[EventInfo.nBHadrons] << "  pT " << EventInfo.BHadron_pT[EventInfo.nBHadrons] << "  eta " << EventInfo.BHadron_eta[EventInfo.nBHadrons]<< "  phi " << EventInfo.BHadron_phi[EventInfo.nBHadrons] << "  ->D " << idD1 << " " << idD2 << "  nCh " << nCharged << endl;
+	} // final b hadron
+
+    	EventInfo.BHadron_nCharged[EventInfo.nBHadrons] = nCharged;
+    	EventInfo.BHadron_DHadron1[EventInfo.nBHadrons] = idD1;
+    	EventInfo.BHadron_DHadron2[EventInfo.nBHadrons] = idD2;
+ 	EventInfo.nBHadrons++;
+      } // b hadron
+    } // end loop on generated particles
+    }
+//$$
+
+  //------------------------------------------------------
+  // simulated PV
+  //------------------------------------------------------
     if ( useTrackHistory_ ) {
       edm::Handle<edm::HepMCProduct> theHepMCProduct;
       iEvent.getByLabel("generator",theHepMCProduct);
@@ -499,7 +706,6 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //------------------------------------------------------
   // ttbar information
   //------------------------------------------------------
-
   if (use_ttbar_filter_) {
     edm::Handle<int> pIn;
     iEvent.getByLabel(channel_, pIn);
@@ -597,6 +803,9 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   }
   //   GlobalPoint Pv_point = GlobalPoint((*pv).x(), (*pv).y(), (*pv).z());
   EventInfo.PVz = (*primaryVertex)[0].z();
+//$$
+  EventInfo.PVez = (*primaryVertex)[0].zError();
+//$$
 
   EventInfo.nPV=0;
   for (unsigned int i = 0; i< primaryVertex->size() ; ++i) {
@@ -761,7 +970,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     JetInfo[iJetColl].Jet_jes[JetInfo[iJetColl].nJet]      = pjet->pt()/pjet->correctedJet("Uncorrected").pt();
     JetInfo[iJetColl].Jet_residual[JetInfo[iJetColl].nJet] = pjet->pt()/pjet->correctedJet("L3Absolute").pt();
 
-    if( runSubJets_ && iJetColl==0 )
+    if( runSubJets_ && iJetColl == 0 )
     {
       int fatjetIdx=-1;
       for( PatJetCollection::const_iterator jIt = jetsColl2->begin(); jIt != jetsColl2->end(); ++jIt )
@@ -783,7 +992,10 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       }
     }
 
-    if( runSubJets_ && iJetColl==1 )
+//$$
+    int subjet1Idx = -1, subjet2Idx = -1;
+//$$
+    if ( runSubJets_ && iJetColl == 1 )
     {
       // N-subjettiness
       std::vector<fastjet::PseudoJet> fjConstituents;
@@ -810,7 +1022,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       JetInfo[iJetColl].Jet_phiPruned[JetInfo[iJetColl].nJet]  = fatJetToPrunedFatJetMap.find(&(*pjet))->second->phi();
       JetInfo[iJetColl].Jet_massPruned[JetInfo[iJetColl].nJet] = fatJetToPrunedFatJetMap.find(&(*pjet))->second->mass();
 
-      int subjet1Idx=-1, subjet2Idx=-1;
+//$$      int subjet1Idx=-1, subjet2Idx=-1;
       for( PatJetCollection::const_iterator jIt = jetsColl2->begin(); jIt != jetsColl2->end(); ++jIt )
       {
         if( &(*jIt) == fatJetToPrunedFatJetMap.find(&(*pjet))->second->daughter(0) ) subjet1Idx = int( jIt - jetsColl2->begin() );
@@ -844,8 +1056,13 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     JetInfo[iJetColl].Jet_nFirstTrkInc[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkInc;
     int k=0;
 
+//$$
+    int nseltracks = 0;
+    int nsharedtracks = 0;
+//$$
+
     unsigned int trackSize = selected_tracks.size();
-    if(!use_selected_tracks_) trackSize = no_sel_tracks.size();
+    if ( !use_selected_tracks_ ) trackSize = no_sel_tracks.size();
 
     if ( allowJetSkipping_ && trackSize==0 ) continue;
     for (unsigned int itt=0; itt < trackSize; ++itt)
@@ -880,10 +1097,28 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       if ( dphi > TMath::Pi() ) dphi = 2.*TMath::Pi() - dphi;
       float deltaR = TMath::Sqrt(deta*deta + dphi*dphi);
 
-      bool pass_cut_trk =false;
+      bool pass_cut_trk = false;
+      if (std::fabs(distJetAxis) < 0.07 && decayLength < 5.0) pass_cut_trk = true;
 
-      //if (std::fabs(distJetAxis) < 0.07 && decayLength < 5.0 && deltaR < 0.3)  pass_cut_trk=true;
-      if (std::fabs(distJetAxis) < 0.07 && decayLength < 5.0)  pass_cut_trk=true;
+//$$
+      if (std::fabs(distJetAxis) < 0.07 && decayLength < 5.0 
+                                        && deltaR < 0.3) nseltracks++;
+
+      if ( pass_cut_trk && subjet1Idx >= 0 && subjet2Idx >= 0 ) {
+  
+        deta = ptrack.eta() - JetInfo[0].Jet_eta[subjet1Idx];
+        dphi = ptrack.phi() - JetInfo[0].Jet_phi[subjet1Idx];
+        if ( dphi > TMath::Pi() ) dphi = 2.*TMath::Pi() - dphi;
+        float dR1 = TMath::Sqrt(deta*deta + dphi*dphi);
+
+        deta = ptrack.eta() - JetInfo[0].Jet_eta[subjet2Idx];
+        dphi = ptrack.phi() - JetInfo[0].Jet_phi[subjet2Idx];
+        if ( dphi > TMath::Pi() ) dphi = 2.*TMath::Pi() - dphi;
+        float dR2 = TMath::Sqrt(deta*deta + dphi*dphi);
+
+        if ( dR1 < 0.3 && dR2 < 0.3 ) nsharedtracks++;
+      }
+//$$
 
       // track selection
       if ( (use_selected_tracks_ && pass_cut_trk) ||  !use_selected_tracks_) {
@@ -961,7 +1196,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
         jet4P.SetPtEtaPhiM( pjet->pt(), pjet->eta(), pjet->phi(), pjet->energy() );
 
 
-        if(jet4P.DeltaR(track4P) < 0.3 && std::fabs(distJetAxis) < 0.07 && decayLength < 5.0 ){
+        if ( jet4P.DeltaR(track4P) < 0.3 && std::fabs(distJetAxis) < 0.07 && decayLength < 5.0 ) {
 
           if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) Histos[iJetColl]->TrackProbaNeg->Fill(-JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack]);
           if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 && PFJet80 ) Histos[iJetColl]->TrackProbJet80->Fill(-JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack]);
@@ -1104,22 +1339,33 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
             && ptrack.trackerExpectedHitsOuter().numberOfHits() <= 2
             && ptrack.dz()-(*pv).z() < 1. ) {
 
-          if ( use_selected_tracks_ ) {
-            JetInfo[iJetColl].TrkInc_IP[JetInfo[iJetColl].nTrkInc]    = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.value();
-            JetInfo[iJetColl].TrkInc_IPsig[JetInfo[iJetColl].nTrkInc] = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.significance();
+//$$
+          if ( iJetColl != 1 ) {
+//$$
+            if ( use_selected_tracks_ ) {
+              JetInfo[iJetColl].TrkInc_IP[JetInfo[iJetColl].nTrkInc]    = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.value();
+              JetInfo[iJetColl].TrkInc_IPsig[JetInfo[iJetColl].nTrkInc] = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.significance();
+            }
+            JetInfo[iJetColl].TrkInc_pt[JetInfo[iJetColl].nTrkInc]    = ptrack.pt();
+            JetInfo[iJetColl].TrkInc_eta[JetInfo[iJetColl].nTrkInc]   = ptrack.eta();
+            JetInfo[iJetColl].TrkInc_phi[JetInfo[iJetColl].nTrkInc]   = ptrack.phi();
+            JetInfo[iJetColl].TrkInc_ptrel[JetInfo[iJetColl].nTrkInc] = calculPtRel( ptrack , *pjet);
+
+            ++JetInfo[iJetColl].nTrkInc;
+//$$
           }
-
-          JetInfo[iJetColl].TrkInc_pt[JetInfo[iJetColl].nTrkInc]    = ptrack.pt();
-          JetInfo[iJetColl].TrkInc_eta[JetInfo[iJetColl].nTrkInc]   = ptrack.eta();
-          JetInfo[iJetColl].TrkInc_phi[JetInfo[iJetColl].nTrkInc]   = ptrack.phi();
-          JetInfo[iJetColl].TrkInc_ptrel[JetInfo[iJetColl].nTrkInc] = calculPtRel( ptrack , *pjet);
-
-          ++JetInfo[iJetColl].nTrkInc;
+//$$
         }
       }
       ++k;
 
     } //// end loop on tracks
+
+//$$
+    JetInfo[iJetColl].Jet_nseltracks[JetInfo[iJetColl].nJet] = nseltracks;
+    if ( runSubJets_ && iJetColl == 1 )
+      JetInfo[1].Jet_nsharedtracks[JetInfo[1].nJet] = nsharedtracks;
+//$$
 
     JetInfo[iJetColl].Jet_nLastTrack[JetInfo[iJetColl].nJet]   = JetInfo[iJetColl].nTrack;
     JetInfo[iJetColl].Jet_nLastTrkInc[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nTrkInc;
@@ -1501,7 +1747,9 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     }
     JetInfo[iJetColl].Jet_SvxMass[JetInfo[iJetColl].nJet] = SVmass;
 
-    if ( produceJetProbaTree_  &&  JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]> 0) {
+//$$    if ( produceJetProbaTree_  &&  JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]> 0) {
+    if ( ( produceJetProbaTree_ || use_selected_tracks_ ) 
+         && JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet] > 0) {
 
       JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).x();
       JetInfo[iJetColl].SV_y[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).y();
@@ -1562,7 +1810,6 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
         }
       }
 
-
       math::XYZVector jetDir = jet->momentum().Unit();
 
       Bool_t useTrackWeights = true;
@@ -1577,8 +1824,6 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       JetInfo[iJetColl].SV_vtx_eta[JetInfo[iJetColl].nSV] = vertex.p4().eta();
       JetInfo[iJetColl].SV_vtx_phi[JetInfo[iJetColl].nSV] = vertex.p4().phi();
 
-
-
       math::XYZVector jetVertex = (math::XYZVector(jet->vx(),jet->vy(),jet->vz()));
 
       Line::PositionType pos(GlobalPoint(vertex.p4().x(),vertex.p4().y(),vertex.p4().z()));
@@ -1591,22 +1836,25 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       // now compute the distance between the two lines
       JetInfo[iJetColl].SV_vtxDistJetAxis[JetInfo[iJetColl].nSV] = (jetline.distance(trackline)).mag();
 
-
       // total charge at the secondary vertex
       JetInfo[iJetColl].SV_totCharge[JetInfo[iJetColl].nSV]=totcharge;
       // ------------------------end added ---------------------------------------------------------------------------------------//
 
-
       setTracksPV( &pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0), false, iJetColl );
       ++JetInfo[iJetColl].nSV;
+
     } //// if produceJetProbaTree_
-    JetInfo[iJetColl].Jet_nLastSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
+    JetInfo[iJetColl].Jet_nLastSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSV;
+
 
     cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
     can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
 
-    TrackRefVector  svxPostracks( pjet->tagInfoSecondaryVertex("secondaryVertex")->vertexTracks(0) );
+    TrackRefVector svxPostracks( pjet->tagInfoSecondaryVertex("secondaryVertex")->vertexTracks(0) );
 
+    //*****************************************************************
+    // for Mistag studies
+    //*****************************************************************
     if ( useTrackHistory_ && !isData_ ) {
       for (unsigned int i=0; i<svxPostracks.size(); ++i) {
         TrackCategories::Flags theFlag = classifier_.evaluate( svxPostracks[i] ).flags();
@@ -1617,7 +1865,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
         if ( theFlag[TrackCategories::KsDecay] )            cap4 = 1;
         if ( theFlag[TrackCategories::LambdaDecay] )        cap5 = 1;
         if ( theFlag[TrackCategories::HadronicProcess] )    cap6 = 1;
-        if ( theFlag[TrackCategories::Fake] )	           cap7 = 1;
+        if ( theFlag[TrackCategories::Fake] )	            cap7 = 1;
         if ( theFlag[TrackCategories::SharedInnerHits] )    cap8 = 1;
       }
     }
@@ -1634,7 +1882,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
         if ( theFlag[TrackCategories::KsDecay] )            can4 = 2;
         if ( theFlag[TrackCategories::LambdaDecay] )        can5 = 2;
         if ( theFlag[TrackCategories::HadronicProcess] )    can6 = 2;
-        if ( theFlag[TrackCategories::Fake] )	           can7 = 2;
+        if ( theFlag[TrackCategories::Fake] )	            can7 = 2;
         if ( theFlag[TrackCategories::SharedInnerHits] )    can8 = 2;
       }
       JetInfo[iJetColl].Jet_histSvx[JetInfo[iJetColl].nJet] =  cap0+can0 + (cap1+can1)*10 + (cap2+can2)*100
@@ -1744,67 +1992,67 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       int cat1P = 0, cat2P = 0, cat3P = 0, catP = 0;
       int cat1N = 0, cat2N = 0, cat3N = 0, catN = 0;
       flags1P[TrackCategories::ConversionsProcess] ;
-      if ( flags1P[TrackCategories::BWeakDecay] )  cat1P = 1;
-      else if ( flags1P[TrackCategories::CWeakDecay] )  cat1P = 2;
-      else if ( flags1P[TrackCategories::TauDecay] )    cat1P = 3;
-      else if ( flags1P[TrackCategories::ConversionsProcess] )  cat1P = 4;
-      else if ( flags1P[TrackCategories::KsDecay] )     cat1P = 5;
-      else if ( flags1P[TrackCategories::LambdaDecay] ) cat1P = 6;
-      else if ( flags1P[TrackCategories::HadronicProcess] ) cat1P = 7;
-      else if ( flags1P[TrackCategories::Fake] )        cat1P = 8;
-      else if ( flags1P[TrackCategories::SharedInnerHits] )         cat1P = 9;
+      if ( flags1P[TrackCategories::BWeakDecay] )              cat1P = 1;
+      else if ( flags1P[TrackCategories::CWeakDecay] )         cat1P = 2;
+      else if ( flags1P[TrackCategories::TauDecay] )           cat1P = 3;
+      else if ( flags1P[TrackCategories::ConversionsProcess] ) cat1P = 4;
+      else if ( flags1P[TrackCategories::KsDecay] )            cat1P = 5;
+      else if ( flags1P[TrackCategories::LambdaDecay] )        cat1P = 6;
+      else if ( flags1P[TrackCategories::HadronicProcess] )    cat1P = 7;
+      else if ( flags1P[TrackCategories::Fake] )               cat1P = 8;
+      else if ( flags1P[TrackCategories::SharedInnerHits] )    cat1P = 9;
       if(idSize > 1){
-        if ( flags2P[TrackCategories::BWeakDecay] )  cat2P = 1;
-        else if ( flags2P[TrackCategories::CWeakDecay] )  cat2P = 2;
-        else if ( flags2P[TrackCategories::TauDecay] )    cat2P = 3;
-        else if ( flags2P[TrackCategories::ConversionsProcess] )  cat2P = 4;
-        else if ( flags2P[TrackCategories::KsDecay] )     cat2P = 5;
-        else if ( flags2P[TrackCategories::LambdaDecay] ) cat2P = 6;
-        else if ( flags2P[TrackCategories::HadronicProcess] ) cat2P = 7;
-        else if ( flags2P[TrackCategories::Fake] )        cat2P = 8;
-        else if ( flags2P[TrackCategories::SharedInnerHits] )         cat2P = 9;
+        if ( flags2P[TrackCategories::BWeakDecay] )              cat2P = 1;
+        else if ( flags2P[TrackCategories::CWeakDecay] )         cat2P = 2;
+        else if ( flags2P[TrackCategories::TauDecay] )           cat2P = 3;
+        else if ( flags2P[TrackCategories::ConversionsProcess] ) cat2P = 4;
+        else if ( flags2P[TrackCategories::KsDecay] )            cat2P = 5;
+        else if ( flags2P[TrackCategories::LambdaDecay] )        cat2P = 6;
+        else if ( flags2P[TrackCategories::HadronicProcess] )    cat2P = 7;
+        else if ( flags2P[TrackCategories::Fake] )               cat2P = 8;
+        else if ( flags2P[TrackCategories::SharedInnerHits] )    cat2P = 9;
       }
       if(idSize > 2){
-        if ( flags3P[TrackCategories::BWeakDecay] )  cat3P = 1;
-        else if ( flags3P[TrackCategories::CWeakDecay] )  cat3P = 2;
-        else if ( flags3P[TrackCategories::TauDecay] )    cat3P = 3;
-        else if ( flags3P[TrackCategories::ConversionsProcess] )  cat3P = 4;
-        else if ( flags3P[TrackCategories::KsDecay] )     cat3P = 5;
-        else if ( flags3P[TrackCategories::LambdaDecay] ) cat3P = 6;
-        else if ( flags3P[TrackCategories::HadronicProcess] ) cat3P = 7;
-        else if ( flags3P[TrackCategories::Fake] )        cat3P = 8;
-        else if ( flags3P[TrackCategories::SharedInnerHits] )         cat3P = 9;
+        if ( flags3P[TrackCategories::BWeakDecay] )              cat3P = 1;
+        else if ( flags3P[TrackCategories::CWeakDecay] )         cat3P = 2;
+        else if ( flags3P[TrackCategories::TauDecay] )           cat3P = 3;
+        else if ( flags3P[TrackCategories::ConversionsProcess] ) cat3P = 4;
+        else if ( flags3P[TrackCategories::KsDecay] )            cat3P = 5;
+        else if ( flags3P[TrackCategories::LambdaDecay] )        cat3P = 6;
+        else if ( flags3P[TrackCategories::HadronicProcess] )    cat3P = 7;
+        else if ( flags3P[TrackCategories::Fake] )               cat3P = 8;
+        else if ( flags3P[TrackCategories::SharedInnerHits] )    cat3P = 9;
       }
-      if ( flags1N[TrackCategories::BWeakDecay] )  cat1N = 1;
-      else if ( flags1N[TrackCategories::CWeakDecay] )  cat1N = 2;
-      else if ( flags1N[TrackCategories::TauDecay] )    cat1N = 3;
-      else if ( flags1N[TrackCategories::ConversionsProcess] )  cat1N = 4;
-      else if ( flags1N[TrackCategories::KsDecay] )     cat1N = 5;
-      else if ( flags1N[TrackCategories::LambdaDecay] ) cat1N = 6;
-      else if ( flags1N[TrackCategories::HadronicProcess] ) cat1N = 7;
-      else if ( flags1N[TrackCategories::Fake] )        cat1N = 8;
-      else if ( flags1N[TrackCategories::SharedInnerHits] )         cat1N = 9;
+      if ( flags1N[TrackCategories::BWeakDecay] )              cat1N = 1;
+      else if ( flags1N[TrackCategories::CWeakDecay] )         cat1N = 2;
+      else if ( flags1N[TrackCategories::TauDecay] )           cat1N = 3;
+      else if ( flags1N[TrackCategories::ConversionsProcess] ) cat1N = 4;
+      else if ( flags1N[TrackCategories::KsDecay] )            cat1N = 5;
+      else if ( flags1N[TrackCategories::LambdaDecay] )        cat1N = 6;
+      else if ( flags1N[TrackCategories::HadronicProcess] )    cat1N = 7;
+      else if ( flags1N[TrackCategories::Fake] )               cat1N = 8;
+      else if ( flags1N[TrackCategories::SharedInnerHits] )    cat1N = 9;
       if(idSize > 1){
-        if ( flags2N[TrackCategories::BWeakDecay] )  cat2N = 1;
-        else if ( flags2N[TrackCategories::CWeakDecay] )  cat2N = 2;
-        else if ( flags2N[TrackCategories::TauDecay] )    cat2N = 3;
-        else if ( flags2N[TrackCategories::ConversionsProcess] )  cat2N = 4;
-        else if ( flags2N[TrackCategories::KsDecay] )     cat2N = 5;
-        else if ( flags2N[TrackCategories::LambdaDecay] ) cat2N = 6;
-        else if ( flags2N[TrackCategories::HadronicProcess] ) cat2N = 7;
-        else if ( flags2N[TrackCategories::Fake] )        cat2N = 8;
-        else if ( flags2N[TrackCategories::SharedInnerHits] )         cat2N = 9;
+        if ( flags2N[TrackCategories::BWeakDecay] )              cat2N = 1;
+        else if ( flags2N[TrackCategories::CWeakDecay] )         cat2N = 2;
+        else if ( flags2N[TrackCategories::TauDecay] )           cat2N = 3;
+        else if ( flags2N[TrackCategories::ConversionsProcess] ) cat2N = 4;
+        else if ( flags2N[TrackCategories::KsDecay] )            cat2N = 5;
+        else if ( flags2N[TrackCategories::LambdaDecay] )        cat2N = 6;
+        else if ( flags2N[TrackCategories::HadronicProcess] )    cat2N = 7;
+        else if ( flags2N[TrackCategories::Fake] )               cat2N = 8;
+        else if ( flags2N[TrackCategories::SharedInnerHits] )    cat2N = 9;
       }
       if(idSize > 2){
-        if ( flags3N[TrackCategories::BWeakDecay] )  cat3N = 1;
-        else if ( flags3N[TrackCategories::CWeakDecay] )  cat3N = 2;
-        else if ( flags3N[TrackCategories::TauDecay] )    cat3N = 3;
-        else if ( flags3N[TrackCategories::ConversionsProcess] )  cat3N = 4;
-        else if ( flags3N[TrackCategories::KsDecay] )     cat3N = 5;
-        else if ( flags3N[TrackCategories::LambdaDecay] ) cat3N = 6;
-        else if ( flags3N[TrackCategories::HadronicProcess] ) cat3N = 7;
-        else if ( flags3N[TrackCategories::Fake] )        cat3N = 8;
-        else if ( flags3N[TrackCategories::SharedInnerHits] )         cat3N = 9;
+        if ( flags3N[TrackCategories::BWeakDecay] )              cat3N = 1;
+        else if ( flags3N[TrackCategories::CWeakDecay] )         cat3N = 2;
+        else if ( flags3N[TrackCategories::TauDecay] )           cat3N = 3;
+        else if ( flags3N[TrackCategories::ConversionsProcess] ) cat3N = 4;
+        else if ( flags3N[TrackCategories::KsDecay] )            cat3N = 5;
+        else if ( flags3N[TrackCategories::LambdaDecay] )        cat3N = 6;
+        else if ( flags3N[TrackCategories::HadronicProcess] )    cat3N = 7;
+        else if ( flags3N[TrackCategories::Fake] )               cat3N = 8;
+        else if ( flags3N[TrackCategories::SharedInnerHits] )    cat3N = 9;
       }
 
       if ( selTagger_ == 0 || selTagger_ == 3 ) {
@@ -2112,9 +2360,9 @@ bool BTagAnalyzer::findCat(const reco::Track* track, CategoryFinder& d) {
   int   nhit = track->numberOfValidHits();
   int   npix = track->hitPattern().numberOfValidPixelHits();
 
-  bool result = ( p > d.pMin	          &&  p  < d.pMax	      &&
-      fabs(eta) > d.etaMin	  &&  fabs(eta) < d.etaMax    &&
-      nhit >= d.nHitsMin	  &&  nhit <= d.nHitsMax      &&
+  bool result = ( p > d.pMin  &&  p  < d.pMax		  &&
+      fabs(eta) > d.etaMin    &&  fabs(eta) < d.etaMax    &&
+      nhit >= d.nHitsMin      &&  nhit <= d.nHitsMax	  &&
       npix >= d.nPixelHitsMin &&  npix <= d.nPixelHitsMax &&
       chi >= d.chiMin         &&  chi <= d.chiMax );
 

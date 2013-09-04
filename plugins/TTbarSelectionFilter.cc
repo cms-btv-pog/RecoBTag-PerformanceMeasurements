@@ -13,7 +13,7 @@
 //
 // Original Author:  Andrea Jeremy,B25/117,6262,
 //         Created:  Tue Dec  4 15:46:22 CET 2012
-// $Id$
+// $Id: TTbarSelectionFilter.cc,v 1.1 2013/03/05 11:13:13 ccollard Exp $
 //
 //
 
@@ -58,6 +58,7 @@ class TTbarSelectionFilter : public edm::EDFilter {
       bool select_ee_ ;
       bool select_mumu_ ;
       bool select_emu_ ;
+      bool select_all_ ;
 };
 
 //
@@ -78,6 +79,7 @@ TTbarSelectionFilter::TTbarSelectionFilter(const edm::ParameterSet& iConfig)
    select_ee_            = iConfig.getParameter<bool > ("select_ee");
    select_mumu_            = iConfig.getParameter<bool > ("select_mumu");
    select_emu_            = iConfig.getParameter<bool > ("select_emu");
+   select_all_            = iConfig.getParameter<bool > ("Keep_all_events");
 }
 
 
@@ -110,6 +112,7 @@ TTbarSelectionFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    if (*pIn==0 && select_ee_)   isTTbar = true;
    if (*pIn==1 && select_mumu_) isTTbar = true;
    if (*pIn==2 && select_emu_)  isTTbar = true;
+   if (select_all_)             isTTbar = true;
 
 
    return isTTbar;

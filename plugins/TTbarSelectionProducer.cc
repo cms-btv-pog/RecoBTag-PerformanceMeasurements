@@ -385,7 +385,7 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
       
       const pat::MET    *met = 0;
       met = &(metHa->front());
-      themet = sqrt(pow(met->px(), 2) + pow(met->px(), 2) );
+      themet = sqrt(pow(met->px(), 2) + pow(met->py(), 2) );
       
       
       if( Mll > 20 && ( channel ==2 || ( channel <=1 && (Mll < 76 || Mll > 116 )  ) ) ) {

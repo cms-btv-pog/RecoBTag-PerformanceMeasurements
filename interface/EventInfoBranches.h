@@ -16,6 +16,10 @@ class EventInfoBranches {
     int   Evt;
     int   LumiBlock;
     float PVz;
+//$$
+    float PVez;
+    float GenPVz;
+//$$
     float pthat;
     float mcweight;
 
@@ -57,14 +61,22 @@ class EventInfoBranches {
     int   bQuark_fromGSP[1000];
 
     int   nBHadrons;
-    float BHadron_pT[1000];
-    float BHadron_eta[1000];
-    float BHadron_phi[1000];
-    float BHadron_mass[1000];
-    int   BHadron_pdgID[1000];
-    int   BHadron_status[1000];
-    int   BHadron_mother[1000];
-    int   BHadron_hasBdaughter[1000];
+    float BHadron_pT[100];
+    float BHadron_eta[100];
+    float BHadron_phi[100];
+    float BHadron_mass[100];
+    int   BHadron_pdgID[100];
+    int   BHadron_status[100];
+    int   BHadron_mother[100];
+    int   BHadron_hasBdaughter[100];
+//$$
+    float BHadron_SVx[100];
+    float BHadron_SVy[100];
+    float BHadron_SVz[100];
+    int   BHadron_nCharged[100];
+    int   BHadron_DHadron1[100];
+    int   BHadron_DHadron2[100];
+//$$
 
     int   nDHadrons;
     int   nDaughters;
@@ -75,13 +87,16 @@ class EventInfoBranches {
     float DHadron_vx[100];
     float DHadron_vy[100];
     float DHadron_vz[100];
-    float DHadron_daughterVx[100];
-    float DHadron_daughterVy[100];
-    float DHadron_daughterVz[100];
+    float DHadron_SVx[100];
+    float DHadron_SVy[100];
+    float DHadron_SVz[100];
     int   DHadron_pdgID[100];
     int   DHadron_nDaughters[100];
     int   DHadron_DaughtersPdgID[1500]; // sum(DHadron_nDaughters[i]): needed for daughter pdgIDs
     int   DHadron_nChargedDaughters[100];
+//$$
+    int   DHadron_nCharged[100];
+//$$
 
     int   nGenlep;
     float Genlep_pT[100];
@@ -97,6 +112,18 @@ class EventInfoBranches {
     float Genquark_phi[100];
     int   Genquark_pdgID[100];
     int   Genquark_mother[100];
+
+//$$
+    int   nGenV0;
+    float GenV0_pT[1000];
+    float GenV0_eta[1000];
+    float GenV0_phi[1000];
+    int   GenV0_pdgID[1000];
+    float GenV0_SVx[1000];
+    float GenV0_SVy[1000];
+    float GenV0_SVz[1000];
+    int   GenV0_nCharged[1000];
+//$$
 
     int   nPatMuon;
     int   PatMuon_isGlobal[1000];
@@ -139,6 +166,10 @@ class EventInfoBranches {
       tree->Branch("mcweight"   , &mcweight   ,  "mcweight/F");
       tree->Branch("nPV"        , &nPV        ,  "nPV/I");
       tree->Branch("PVz"        , &PVz        ,  "PVz/F");
+//$$
+      tree->Branch("PVez"       , &PVez       ,  "PVez/F");
+      tree->Branch("GenPVz"     , &GenPVz     ,  "GenPVz/F");
+//$$
 
       tree->Branch("nPUtrue"      , &nPUtrue     , "nPUtrue/F");
       tree->Branch("nPU"          , &nPU         , "nPU/I"    );
@@ -149,7 +180,7 @@ class EventInfoBranches {
       // tree->Branch("PU_ntrks_low" , PU_ntrks_low , "PU_ntrks_low[nPU]/I");
       // tree->Branch("PU_ntrks_high", PU_ntrks_high, "PU_ntrks_high[nPU]/I");
 
-      tree->Branch("ncQuarks"      , &ncQuarks     , "ncQuarks/I");
+      tree->Branch("ncQuarks"    , &ncQuarks       ,"ncQuarks/I");
       tree->Branch("cQuark_pT"     , cQuark_pT     , "cQuark_pT[ncQuarks]/F");
       tree->Branch("cQuark_eta"    , cQuark_eta    , "cQuark_eta[ncQuarks]/F");
       tree->Branch("cQuark_phi"    , cQuark_phi    , "cQuark_phi[ncQuarks]/F");
@@ -157,7 +188,7 @@ class EventInfoBranches {
       tree->Branch("cQuark_status" , cQuark_status , "cQuark_status[ncQuarks]/I");
       tree->Branch("cQuark_fromGSP", cQuark_fromGSP, "cQuark_fromGSP[ncQuarks]/I");
 
-      tree->Branch("nbQuarks",          &nbQuarks     , "nbQuarks/I");
+      tree->Branch("nbQuarks",        &nbQuarks       ,"nbQuarks/I");
       tree->Branch("bQuark_pT",         bQuark_pT     , "bQuark_pT[nbQuarks]/F");
       tree->Branch("bQuark_eta",        bQuark_eta    , "bQuark_eta[nbQuarks]/F");
       tree->Branch("bQuark_phi",        bQuark_phi    , "bQuark_phi[nbQuarks]/F");
@@ -165,34 +196,45 @@ class EventInfoBranches {
       tree->Branch("bQuark_status",     bQuark_status , "bQuark_status[nbQuarks]/I");
       tree->Branch("bQuark_fromGSP",    bQuark_fromGSP, "bQuark_fromGSP[nbQuarks]/I");
 
-      tree->Branch("nBHadrons",            &nBHadrons          , "nBHadrons/I");
+      tree->Branch("nBHadrons",          &nBHadrons            ,"nBHadrons/I");
       tree->Branch("BHadron_pT",           BHadron_pT          , "BHadron_pT[nBHadrons]/F");
       tree->Branch("BHadron_eta",          BHadron_eta         , "BHadron_eta[nBHadrons]/F");
       tree->Branch("BHadron_phi",          BHadron_phi         , "BHadron_phi[nBHadrons]/F");
       tree->Branch("BHadron_mass",         BHadron_mass        , "BHadron_mass[nBHadrons]/F");
       tree->Branch("BHadron_pdgID",        BHadron_pdgID       , "BHadron_pdgID[nBHadrons]/I");
-      tree->Branch("BHadron_status",       BHadron_status      , "BHadron_status[nBHadrons]/I");
+//$$      tree->Branch("BHadron_status",       BHadron_status      , "BHadron_status[nBHadrons]/I");
       tree->Branch("BHadron_mother",       BHadron_mother      , "BHadron_mother[nBHadrons]/I");
       tree->Branch("BHadron_hasBdaughter", BHadron_hasBdaughter, "BHadron_hasBdaughter[nBHadrons]/I");
+//$$
+      tree->Branch("BHadron_SVx",          BHadron_SVx         ,"BHadron_SVx[nBHadrons]/F");
+      tree->Branch("BHadron_SVy",          BHadron_SVy         ,"BHadron_SVy[nBHadrons]/F");
+      tree->Branch("BHadron_SVz",          BHadron_SVz         ,"BHadron_SVz[nBHadrons]/F");
+      tree->Branch("BHadron_nCharged",     BHadron_nCharged    ,"BHadron_nCharged[nBHadrons]/I");
+      tree->Branch("BHadron_DHadron1",     BHadron_DHadron1    ,"BHadron_DHadron1[nBHadrons]/I");
+      tree->Branch("BHadron_DHadron2",     BHadron_DHadron2    ,"BHadron_DHadron2[nBHadrons]/I");
+//$$
 
-      tree->Branch("nDHadrons",            &nDHadrons          , "nDHadrons/I");
-      tree->Branch("nDaughters",    &nDaughters   ,"nDaughters/I");
+      tree->Branch("nDHadrons",    &nDHadrons    ,"nDHadrons/I");
+      tree->Branch("nDaughters",   &nDaughters   ,"nDaughters/I");
       tree->Branch("DHadron_pT",    DHadron_pT    ,"DHadron_pT[nDHadrons]/F");
       tree->Branch("DHadron_eta",   DHadron_eta   ,"DHadron_eta[nDHadrons]/F");
       tree->Branch("DHadron_phi",   DHadron_phi   ,"DHadron_phi[nDHadrons]/F");
-      tree->Branch("DHadron_mass",  DHadron_mass  ,"DHadron_mass[nDHadrons]/F");
-      tree->Branch("DHadron_vx",    DHadron_vx    ,"DHadron_vx[nDHadrons]/F");
-      tree->Branch("DHadron_vy",    DHadron_vy    ,"DHadron_vy[nDHadrons]/F");
-      tree->Branch("DHadron_vz",    DHadron_vz    ,"DHadron_vz[nDHadrons]/F");
-      tree->Branch("DHadron_daughterVx",  DHadron_daughterVx  ,"DHadron_daughterVx[nDHadrons]/F");
-      tree->Branch("DHadron_daughterVy",  DHadron_daughterVy  ,"DHadron_daughterVy[nDHadrons]/F");
-      tree->Branch("DHadron_daughterVz",  DHadron_daughterVz  ,"DHadron_daughterVz[nDHadrons]/F");
       tree->Branch("DHadron_pdgID", DHadron_pdgID ,"DHadron_pdgID[nDHadrons]/I");
-      tree->Branch("DHadron_nDaughters", DHadron_nDaughters ,"DHadron_nDaughters[nDHadrons]/I");
-      tree->Branch("DHadron_DaughtersPdgID", DHadron_DaughtersPdgID,"DHadron_DaughtersPdgID[nDaughters]/I");
-      tree->Branch("DHadron_nChargedDaughters",     &DHadron_nChargedDaughters    ,"DHadron_nChargedDaughters[nDHadrons]/I");
+      tree->Branch("DHadron_mass",  DHadron_mass  ,"DHadron_mass[nDHadrons]/F");
+//$$      tree->Branch("DHadron_vx",    DHadron_vx    ,"DHadron_vx[nDHadrons]/F");
+//$$      tree->Branch("DHadron_vy",    DHadron_vy    ,"DHadron_vy[nDHadrons]/F");
+//$$      tree->Branch("DHadron_vz",    DHadron_vz    ,"DHadron_vz[nDHadrons]/F");
+      tree->Branch("DHadron_SVx",   DHadron_SVx   ,"DHadron_SVx[nDHadrons]/F");
+      tree->Branch("DHadron_SVy",   DHadron_SVy   ,"DHadron_SVy[nDHadrons]/F");
+      tree->Branch("DHadron_SVz",   DHadron_SVz   ,"DHadron_SVz[nDHadrons]/F");
+      tree->Branch("DHadron_nDaughters",         DHadron_nDaughters        ,"DHadron_nDaughters[nDHadrons]/I");
+      tree->Branch("DHadron_DaughtersPdgID",     DHadron_DaughtersPdgID    ,"DHadron_DaughtersPdgID[nDaughters]/I");
+      tree->Branch("DHadron_nChargedDaughters",  DHadron_nChargedDaughters ,"DHadron_nChargedDaughters[nDHadrons]/I");
+//$$
+      tree->Branch("DHadron_nCharged", DHadron_nCharged ,"DHadron_nCharged[nDHadrons]/I");
+//$$
 
-      tree->Branch("nGenlep",       &nGenlep     , "nGenlep/I");
+      tree->Branch("nGenlep",     &nGenlep       ,"nGenlep/I");
       tree->Branch("Genlep_pT",     Genlep_pT    , "Genlep_pT[nGenlep]/F");
       tree->Branch("Genlep_eta",    Genlep_eta   , "Genlep_eta[nGenlep]/F");
       tree->Branch("Genlep_phi",    Genlep_phi   , "Genlep_phi[nGenlep]/F");
@@ -200,13 +242,24 @@ class EventInfoBranches {
       tree->Branch("Genlep_status", Genlep_status, "Genlep_status[nGenlep]/I");
       tree->Branch("Genlep_mother", Genlep_mother, "Genlep_mother[nGenlep]/I");
 
-      tree->Branch("nGenquark",       &nGenquark     , "nGenquark/I");
+      tree->Branch("nGenquark",     &nGenquark       ,"nGenquark/I");
       tree->Branch("Genquark_pT",     Genquark_pT    , "Genquark_pT[nGenquark]/F");
       tree->Branch("Genquark_eta",    Genquark_eta   , "Genquark_eta[nGenquark]/F");
       tree->Branch("Genquark_phi",    Genquark_phi   , "Genquark_phi[nGenquark]/F");
       tree->Branch("Genquark_pdgID",  Genquark_pdgID , "Genquark_pdgID[nGenquark]/I");
       tree->Branch("Genquark_mother", Genquark_mother, "Genquark_mother[nGenquark]/I");
 
+//$$
+      tree->Branch("nGenV0",        &nGenV0	    ,"nGenV0/I");
+      tree->Branch("GenV0_pT",        GenV0_pT       ,"GenV0_pT[nGenV0]/F");
+      tree->Branch("GenV0_eta",       GenV0_eta      ,"GenV0_eta[nGenV0]/F");
+      tree->Branch("GenV0_phi",       GenV0_phi      ,"GenV0_phi[nGenV0]/F");
+      tree->Branch("GenV0_pdgID",     GenV0_pdgID    ,"GenV0_pdgID[nGenV0]/I");
+      tree->Branch("GenV0_SVx",       GenV0_SVx      ,"GenV0_SVx[nGenV0]/F");
+      tree->Branch("GenV0_SVy",       GenV0_SVy      ,"GenV0_SVy[nGenV0]/F");
+      tree->Branch("GenV0_SVz",       GenV0_SVz      ,"GenV0_SVz[nGenV0]/F");
+      tree->Branch("GenV0_nCharged",  GenV0_nCharged ,"GenV0_nCharged[nGenV0]/I");
+//$$
     }
 
     void RegisterJPTree(TTree *tree) {
@@ -220,7 +273,6 @@ class EventInfoBranches {
       tree->Branch("PV_ndf"   , PV_ndf   , "PV_ndf[nPV]/F");
       tree->Branch("PV_isgood", PV_isgood, "PV_isgood[nPV]/I");
       tree->Branch("PV_isfake", PV_isfake, "PV_isfake[nPV]/I");
-
     }
 
     void RegisterTTbarTree(TTree *tree) {
@@ -269,6 +321,10 @@ class EventInfoBranches {
       tree->SetBranchAddress("mcweight"   , &mcweight   );
       tree->SetBranchAddress("nPV"        , &nPV        );
       tree->SetBranchAddress("PVz"        , &PVz        );
+//$$
+      tree->SetBranchAddress("PVez"       , &PVez       );
+      tree->SetBranchAddress("GenPVz"     , &GenPVz     );
+//$$
 
       tree->SetBranchAddress("nPUtrue"      , &nPUtrue     );
       tree->SetBranchAddress("nPU"          , &nPU         );
@@ -301,9 +357,32 @@ class EventInfoBranches {
       tree->SetBranchAddress("BHadron_phi",          BHadron_phi         );
       tree->SetBranchAddress("BHadron_mass",         BHadron_mass        );
       tree->SetBranchAddress("BHadron_pdgID",        BHadron_pdgID       );
-      tree->SetBranchAddress("BHadron_status",       BHadron_status      );
+//$$      tree->SetBranchAddress("BHadron_status",       BHadron_status      );
       tree->SetBranchAddress("BHadron_mother",       BHadron_mother      );
       tree->SetBranchAddress("BHadron_hasBdaughter", BHadron_hasBdaughter);
+//$$
+      tree->SetBranchAddress("BHadron_SVx",          BHadron_SVx);
+      tree->SetBranchAddress("BHadron_SVy",          BHadron_SVy);
+      tree->SetBranchAddress("BHadron_SVz",          BHadron_SVz);
+      tree->SetBranchAddress("BHadron_nCharged",     BHadron_nCharged);
+      tree->SetBranchAddress("BHadron_DHadron1",     BHadron_DHadron1);
+      tree->SetBranchAddress("BHadron_DHadron2",     BHadron_DHadron2);
+
+      tree->SetBranchAddress("nDHadrons",    &nDHadrons    );
+      tree->SetBranchAddress("nDaughters",   &nDaughters   );
+      tree->SetBranchAddress("DHadron_pT",    DHadron_pT    );
+      tree->SetBranchAddress("DHadron_eta",   DHadron_eta   );
+      tree->SetBranchAddress("DHadron_phi",   DHadron_phi   );
+      tree->SetBranchAddress("DHadron_pdgID", DHadron_pdgID );
+      tree->SetBranchAddress("DHadron_mass",  DHadron_mass  );
+      tree->SetBranchAddress("DHadron_SVx",   DHadron_SVx   );
+      tree->SetBranchAddress("DHadron_SVy",   DHadron_SVy   );
+      tree->SetBranchAddress("DHadron_SVz",   DHadron_SVz   );
+      tree->SetBranchAddress("DHadron_nDaughters",         DHadron_nDaughters        );
+      tree->SetBranchAddress("DHadron_DaughtersPdgID",     DHadron_DaughtersPdgID    );
+      tree->SetBranchAddress("DHadron_nChargedDaughters",  DHadron_nChargedDaughters );
+      tree->SetBranchAddress("DHadron_nCharged", DHadron_nCharged );
+//$$
 
       tree->SetBranchAddress("nGenlep",       &nGenlep     );
       tree->SetBranchAddress("Genlep_pT",     Genlep_pT    );
@@ -319,6 +398,18 @@ class EventInfoBranches {
       tree->SetBranchAddress("Genquark_phi",    Genquark_phi   );
       tree->SetBranchAddress("Genquark_pdgID",  Genquark_pdgID );
       tree->SetBranchAddress("Genquark_mother", Genquark_mother);
+
+//$$
+      tree->SetBranchAddress("nGenV0",       &nGenV0 );
+      tree->SetBranchAddress("GenV0_pT",       GenV0_pT );
+      tree->SetBranchAddress("GenV0_eta",      GenV0_eta );
+      tree->SetBranchAddress("GenV0_phi",      GenV0_phi );
+      tree->SetBranchAddress("GenV0_pdgID",    GenV0_pdgID );
+      tree->SetBranchAddress("GenV0_SVx",      GenV0_SVx );
+      tree->SetBranchAddress("GenV0_SVy",      GenV0_SVy );
+      tree->SetBranchAddress("GenV0_SVz",      GenV0_SVz );
+      tree->SetBranchAddress("GenV0_nCharged", GenV0_nCharged );
+//$$
     }
 
     void ReadJPTree(TTree *tree) {
