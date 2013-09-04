@@ -357,7 +357,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       }
 
 //$$
-      if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) AreBHadrons = true; 
+      if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) AreBHadrons = true;
 //$$
 //       // Primary b Hadrons
 //       if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) {
@@ -454,7 +454,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 //$$
 	  EventInfo.nDHadrons++;
 	} // final c hadron
-      } // c hadron 
+      } // c hadron
 
       // Leptons
       if ( (ID == 11 || ID == 13) && genIt.p4().pt() > 3. ) {
@@ -523,7 +523,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	 if ( nCharged > 0 ) {
 	   float Radius = TMath::Sqrt( SVx*SVx + SVy*SVy );
 	   float AbsEta = abs( genIt.p4().eta() );
-	   if ( (AbsEta < 2.0 && Radius < 7.3) || 
+	   if ( (AbsEta < 2.0 && Radius < 7.3) ||
 	        (AbsEta < 2.5 && Radius < 4.4) ||
 	        (AbsEta > 1.8 && AbsEta < 2.5 && abs(SVz) < 34.5 ) )
 	     inAcceptance = true;
@@ -606,8 +606,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	        }
 	      }
 	    }
-	    
-	    if ( !isDHadron || !hasNoDHadronAsDaughter ) { 
+
+	    if ( !isDHadron || !hasNoDHadronAsDaughter ) {
 	      if (nDaughters2 == 0 && daughter->charge() != 0
 	  	    		   && daughter->p4().pt() > 1.) nCharged++;
 	      // B -> X -> X
@@ -638,7 +638,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	          }
 	        }
 
-	        if ( !isDHadron2 || !hasNoDHadronAsDaughter2 ) { 
+	        if ( !isDHadron2 || !hasNoDHadronAsDaughter2 ) {
 	          if (nDaughters3 == 0 && daughter2->charge() != 0
 	        		       && daughter2->p4().pt() > 1.) nCharged++;
 	          // B -> X -> X -> X
@@ -662,7 +662,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
                     else {
 	              if (nDaughters4 == 0 && daughter3->charge() != 0
 	        	  	           && daughter3->p4().pt() > 1.) nCharged++;
-	              // B -> X -> X -> X -> X 
+	              // B -> X -> X -> X -> X
 	              for (unsigned int d4=0; d4<nDaughters4; d4++) {
 	                const Candidate* daughter4 = daughter3->daughter(d4);
 	                unsigned int nDaughters5 = daughter4->numberOfDaughters();
@@ -992,9 +992,6 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       }
     }
 
-//$$
-    int subjet1Idx = -1, subjet2Idx = -1;
-//$$
     if ( runSubJets_ && iJetColl == 1 )
     {
       // N-subjettiness
@@ -1022,7 +1019,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       JetInfo[iJetColl].Jet_phiPruned[JetInfo[iJetColl].nJet]  = fatJetToPrunedFatJetMap.find(&(*pjet))->second->phi();
       JetInfo[iJetColl].Jet_massPruned[JetInfo[iJetColl].nJet] = fatJetToPrunedFatJetMap.find(&(*pjet))->second->mass();
 
-//$$      int subjet1Idx=-1, subjet2Idx=-1;
+      int subjet1Idx=-1, subjet2Idx=-1;
       for( PatJetCollection::const_iterator jIt = jetsColl2->begin(); jIt != jetsColl2->end(); ++jIt )
       {
         if( &(*jIt) == fatJetToPrunedFatJetMap.find(&(*pjet))->second->daughter(0) ) subjet1Idx = int( jIt - jetsColl2->begin() );
@@ -1031,6 +1028,30 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       }
       JetInfo[iJetColl].Jet_SubJet1Idx[JetInfo[iJetColl].nJet] = subjet1Idx;
       JetInfo[iJetColl].Jet_SubJet2Idx[JetInfo[iJetColl].nJet] = subjet2Idx;
+
+      int nsubjettracks = 0, nsharedsubjettracks = 0;
+
+      for(int sj=0; sj<2; ++sj)
+      {
+        int subjetIdx = (sj==0 ? subjet1Idx : subjet2Idx); // subjet index
+        int compSubjetIdx = (sj==0 ? subjet2Idx : subjet1Idx); // companion subjet index
+        int nTracks = ( jetsColl2->at(subjetIdx).hasTagInfo("impactParameter") ? jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().size() : 0 );
+
+        for(int t=0; t<nTracks; ++t)
+        {
+          if( reco::deltaR( jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().at(t)->eta(), jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().at(t)->phi(), jetsColl2->at(subjetIdx).eta(), jetsColl2->at(subjetIdx).phi() ) < 0.3 )
+          {
+            ++nsubjettracks;
+            if( reco::deltaR( jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().at(t)->eta(), jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().at(t)->phi(), jetsColl2->at(compSubjetIdx).eta(), jetsColl2->at(compSubjetIdx).phi() ) < 0.3 )
+            {
+              if(sj==0) ++nsharedsubjettracks;
+            }
+          }
+        }
+      }
+
+      JetInfo[iJetColl].Jet_nsubjettracks[JetInfo[iJetColl].nJet] = nsubjettracks-nsharedsubjettracks;
+      JetInfo[iJetColl].Jet_nsharedsubjettracks[JetInfo[iJetColl].nJet] = nsharedsubjettracks;
     }
 
     float etajet = TMath::Abs( pjet->eta() );
@@ -1058,7 +1079,6 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 
 //$$
     int nseltracks = 0;
-    int nsharedtracks = 0;
 //$$
 
     unsigned int trackSize = selected_tracks.size();
@@ -1101,23 +1121,8 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       if (std::fabs(distJetAxis) < 0.07 && decayLength < 5.0) pass_cut_trk = true;
 
 //$$
-      if (std::fabs(distJetAxis) < 0.07 && decayLength < 5.0 
+      if (std::fabs(distJetAxis) < 0.07 && decayLength < 5.0
                                         && deltaR < 0.3) nseltracks++;
-
-      if ( pass_cut_trk && subjet1Idx >= 0 && subjet2Idx >= 0 ) {
-  
-        deta = ptrack.eta() - JetInfo[0].Jet_eta[subjet1Idx];
-        dphi = ptrack.phi() - JetInfo[0].Jet_phi[subjet1Idx];
-        if ( dphi > TMath::Pi() ) dphi = 2.*TMath::Pi() - dphi;
-        float dR1 = TMath::Sqrt(deta*deta + dphi*dphi);
-
-        deta = ptrack.eta() - JetInfo[0].Jet_eta[subjet2Idx];
-        dphi = ptrack.phi() - JetInfo[0].Jet_phi[subjet2Idx];
-        if ( dphi > TMath::Pi() ) dphi = 2.*TMath::Pi() - dphi;
-        float dR2 = TMath::Sqrt(deta*deta + dphi*dphi);
-
-        if ( dR1 < 0.3 && dR2 < 0.3 ) nsharedtracks++;
-      }
 //$$
 
       // track selection
@@ -1363,8 +1368,6 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 
 //$$
     JetInfo[iJetColl].Jet_nseltracks[JetInfo[iJetColl].nJet] = nseltracks;
-    if ( runSubJets_ && iJetColl == 1 )
-      JetInfo[1].Jet_nsharedtracks[JetInfo[1].nJet] = nsharedtracks;
 //$$
 
     JetInfo[iJetColl].Jet_nLastTrack[JetInfo[iJetColl].nJet]   = JetInfo[iJetColl].nTrack;
@@ -1748,7 +1751,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     JetInfo[iJetColl].Jet_SvxMass[JetInfo[iJetColl].nJet] = SVmass;
 
 //$$    if ( produceJetProbaTree_  &&  JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]> 0) {
-    if ( ( produceJetProbaTree_ || use_selected_tracks_ ) 
+    if ( ( produceJetProbaTree_ || use_selected_tracks_ )
          && JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet] > 0) {
 
       JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).x();

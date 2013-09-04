@@ -78,7 +78,8 @@ class JetInfoBranches {
     int   Jet_ntracks[nMaxJets_];
 //$$
     int   Jet_nseltracks[nMaxJets_];
-    int   Jet_nsharedtracks[nMaxJets_];
+    int   Jet_nsubjettracks[nMaxJets_];
+    int   Jet_nsharedsubjettracks[nMaxJets_];
 //$$
     int   Jet_flavour[nMaxJets_];
     int   Jet_nFirstTrack[nMaxJets_];
@@ -380,7 +381,7 @@ class JetInfoBranches {
       tree->Branch((name+"PFMuon_IP2D").c_str()        ,PFMuon_IP2D         ,(name+"PFMuon_IP2D["+name+"nPFMuon]/F").c_str());
       tree->Branch((name+"PFMuon_GoodQuality").c_str() ,PFMuon_GoodQuality  ,(name+"PFMuon_GoodQuality["+name+"nPFMuon]/I").c_str());
 
-//$$ 
+//$$
       //--------------------------------------
       // secondary vertex information
       //--------------------------------------
@@ -410,7 +411,7 @@ class JetInfoBranches {
       tree->Branch((name+"SV_mass").c_str()            ,SV_mass            ,(name+"SV_mass["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_vtx_eta").c_str()         ,SV_vtx_eta         ,(name+"SV_vtx_eta["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_vtx_phi").c_str()         ,SV_vtx_phi         ,(name+"SV_vtx_phi["+name+"nSV]/F").c_str());
-//$$ 
+//$$
     }
 
     void RegisterJPTree(TTree *tree, std::string name="") {
@@ -455,7 +456,7 @@ class JetInfoBranches {
       tree->Branch((name+"Track_isfromSV").c_str()   ,Track_isfromSV   ,(name+"Track_isfromSV["+name+"nTrack]/I").c_str());
       tree->Branch((name+"Track_category").c_str()   ,Track_category   ,(name+"Track_category["+name+"nTrack]/I").c_str());
 
-//$$ 
+//$$
 //       //--------------------------------------
 //       // secondary vertex information
 //       //--------------------------------------
@@ -485,7 +486,7 @@ class JetInfoBranches {
 //       tree->Branch((name+"SV_mass").c_str()            ,SV_mass            ,(name+"SV_mass["+name+"nSV]/F").c_str());
 //       tree->Branch((name+"SV_vtx_eta").c_str()         ,SV_vtx_eta         ,(name+"SV_vtx_eta["+name+"nSV]/F").c_str());
 //       tree->Branch((name+"SV_vtx_phi").c_str()         ,SV_vtx_phi         ,(name+"SV_vtx_phi["+name+"nSV]/F").c_str());
-//$$ 
+//$$
     }
 
     void RegisterSubJetSpecificTree(TTree *tree, std::string name="") {
@@ -505,7 +506,8 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_tau1").c_str(),        Jet_tau1        ,(name+"Jet_tau1["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_tau2").c_str(),        Jet_tau2        ,(name+"Jet_tau2["+name+"nJet]/F").c_str());
 //$$
-      tree->Branch((name+"Jet_nsharedtracks").c_str(), Jet_nsharedtracks ,(name+"Jet_nsharedtracks["+name+"nJet]/I").c_str());
+      tree->Branch((name+"Jet_nsubjettracks").c_str(), Jet_nsubjettracks ,(name+"Jet_nsubjettracks["+name+"nJet]/I").c_str());
+      tree->Branch((name+"Jet_nsharedsubjettracks").c_str(), Jet_nsharedsubjettracks ,(name+"Jet_nsharedsubjettracks["+name+"nJet]/I").c_str());
 //$$
     }
 
@@ -664,7 +666,7 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"PFMuon_IP2D").c_str()        ,PFMuon_IP2D         ) ;
       tree->SetBranchAddress((name+"PFMuon_GoodQuality").c_str() ,PFMuon_GoodQuality  ) ;
 
-//$$ 
+//$$
       //--------------------------------------
       // secondary vertex information
       //--------------------------------------
@@ -694,7 +696,7 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"SV_mass").c_str()            ,SV_mass            ) ;
       tree->SetBranchAddress((name+"SV_vtx_eta").c_str()         ,SV_vtx_eta         ) ;
       tree->SetBranchAddress((name+"SV_vtx_phi").c_str()         ,SV_vtx_phi         ) ;
-//$$ 
+//$$
     }
 
     void ReadJPTree(TTree *tree, std::string name="") {
@@ -739,7 +741,7 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Track_isfromSV").c_str()  ,Track_isfromSV ) ;
       tree->SetBranchAddress((name+"Track_category").c_str()  ,Track_category ) ;
 
-//$$ 
+//$$
 //       //--------------------------------------
 //       // secondary vertex information
 //       //--------------------------------------
@@ -769,7 +771,7 @@ class JetInfoBranches {
 //       tree->SetBranchAddress((name+"SV_mass").c_str()            ,SV_mass            ) ;
 //       tree->SetBranchAddress((name+"SV_vtx_eta").c_str()         ,SV_vtx_eta         ) ;
 //       tree->SetBranchAddress((name+"SV_vtx_phi").c_str()         ,SV_vtx_phi         ) ;
-//$$ 
+//$$
     }
 
    void ReadSubJetSpecificTree(TTree *tree, std::string name="") {
@@ -789,7 +791,8 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_tau1").c_str(),        Jet_tau1        );
       tree->SetBranchAddress((name+"Jet_tau2").c_str(),        Jet_tau2        );
 //$$
-      tree->SetBranchAddress((name+"Jet_nsharedtracks").c_str(), Jet_nsharedtracks );
+      tree->SetBranchAddress((name+"Jet_nsubjettracks").c_str(), Jet_nsubjettracks );
+      tree->SetBranchAddress((name+"Jet_nsharedsubjettracks").c_str(), Jet_nsharedsubjettracks );
 //$$
     }
 };

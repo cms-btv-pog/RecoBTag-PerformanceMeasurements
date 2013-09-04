@@ -35,12 +35,12 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
-options.register('mcGlobalTag', 'START53_V7G',
+options.register('mcGlobalTag', 'START53_V27',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', 'FT_53_V21_AN3',
+options.register('dataGlobalTag', 'FT53_V21A_AN6',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
@@ -465,6 +465,7 @@ usePF2PAT(process,runPF2PAT=True, jetAlgo=jetAlgo, runOnMC=not options.runOnData
           jetCorrections=jetCorrectionsAK5, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'))
 
 ## Top projections in PF2PAT
+getattr(process,"pfPileUp"+postfix).checkClosestZVertex = False
 getattr(process,"pfNoPileUp"+postfix).enable = options.usePFchs
 getattr(process,"pfNoMuon"+postfix).enable = True
 getattr(process,"pfNoElectron"+postfix).enable = True
@@ -772,9 +773,23 @@ process.btaganaSubJets = process.btagana.clone(
 #---------------------------------------
 
 #---------------------------------------
+## Optional MET filters:
+## https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters
+process.load("RecoMET.METFilters.metFilters_cff")
+process.trackingFailureFilter.VertexSource = cms.InputTag('goodOfflinePrimaryVertices')
+#---------------------------------------
+
+#---------------------------------------
 ## Filter for HCAL laser events in prompt 2012A+B+C, snippet for "Datasets from the 2013 rereco and Multijet parked":
 ## https://twiki.cern.ch/twiki/bin/view/CMS/PdmVKnowFeatures#HCAL_laser_events_in_prompt_2012
 process.load("EventFilter.HcalRawToDigi.hcallaserFilterFromTriggerResult_cff")
+#---------------------------------------
+
+#---------------------------------------
+## Event counter
+from MyAnalysis.EventCounter.eventcounter_cfi import eventCounter
+process.allEvents = eventCounter.clone()
+process.selectedEvents = eventCounter.clone()
 #---------------------------------------
 
 #---------------------------------------
@@ -782,7 +797,15 @@ process.load("EventFilter.HcalRawToDigi.hcallaserFilterFromTriggerResult_cff")
 process.filtSeq = cms.Sequence(
     #process.JetHLTFilter*
     process.noscraping
-    *process.primaryVertexFilter
+    * process.primaryVertexFilter
+    * process.goodOfflinePrimaryVertices
+    * process.HBHENoiseFilter
+    * process.CSCTightHaloFilter
+    * process.EcalDeadCellTriggerPrimitiveFilter
+    * process.eeBadScFilter
+    * process.ecalLaserCorrFilter
+    * process.trackingFailureFilter
+    * process.trkPOGFilters
 )
 if options.runOnData:
     process.filtSeq *= process.hcalfilter
@@ -822,8 +845,9 @@ if options.processStdAK5Jets and options.useTTbarFilter:
 #---------------------------------------
 
 process.p = cms.Path(
-    process.filtSeq
-    * process.goodOfflinePrimaryVertices
+    process.allEvents
+    * process.filtSeq
+    * process.selectedEvents
     * process.combPF2PATSubJetSeq
     * process.analyzerSeq
 )
