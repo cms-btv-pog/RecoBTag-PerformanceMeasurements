@@ -1031,20 +1031,23 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 
       int nsubjettracks = 0, nsharedsubjettracks = 0;
 
-      for(int sj=0; sj<2; ++sj)
+      if( subjet1Idx>=0 && subjet2Idx>=0 ) // protection for pathological cases of pruned fat jets with only one constituent which results in an undefined subjet 2 index
       {
-        int subjetIdx = (sj==0 ? subjet1Idx : subjet2Idx); // subjet index
-        int compSubjetIdx = (sj==0 ? subjet2Idx : subjet1Idx); // companion subjet index
-        int nTracks = ( jetsColl2->at(subjetIdx).hasTagInfo("impactParameter") ? jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().size() : 0 );
-
-        for(int t=0; t<nTracks; ++t)
+        for(int sj=0; sj<2; ++sj)
         {
-          if( reco::deltaR( jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().at(t)->eta(), jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().at(t)->phi(), jetsColl2->at(subjetIdx).eta(), jetsColl2->at(subjetIdx).phi() ) < 0.3 )
+          int subjetIdx = (sj==0 ? subjet1Idx : subjet2Idx); // subjet index
+          int compSubjetIdx = (sj==0 ? subjet2Idx : subjet1Idx); // companion subjet index
+          int nTracks = ( jetsColl2->at(subjetIdx).hasTagInfo("impactParameter") ? jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().size() : 0 );
+
+          for(int t=0; t<nTracks; ++t)
           {
-            ++nsubjettracks;
-            if( reco::deltaR( jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().at(t)->eta(), jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().at(t)->phi(), jetsColl2->at(compSubjetIdx).eta(), jetsColl2->at(compSubjetIdx).phi() ) < 0.3 )
+            if( reco::deltaR( jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().at(t)->eta(), jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().at(t)->phi(), jetsColl2->at(subjetIdx).eta(), jetsColl2->at(subjetIdx).phi() ) < 0.3 )
             {
-              if(sj==0) ++nsharedsubjettracks;
+              ++nsubjettracks;
+              if( reco::deltaR( jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().at(t)->eta(), jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().at(t)->phi(), jetsColl2->at(compSubjetIdx).eta(), jetsColl2->at(compSubjetIdx).phi() ) < 0.3 )
+              {
+                if(sj==0) ++nsharedsubjettracks;
+              }
             }
           }
         }
