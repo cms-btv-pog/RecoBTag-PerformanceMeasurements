@@ -992,6 +992,9 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       }
     }
 
+//$$$$
+    int subjet1Idx = -1, subjet2Idx = -1;
+//$$$$
     if ( runSubJets_ && iJetColl == 1 )
     {
       // N-subjettiness
@@ -1019,7 +1022,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       JetInfo[iJetColl].Jet_phiPruned[JetInfo[iJetColl].nJet]  = fatJetToPrunedFatJetMap.find(&(*pjet))->second->phi();
       JetInfo[iJetColl].Jet_massPruned[JetInfo[iJetColl].nJet] = fatJetToPrunedFatJetMap.find(&(*pjet))->second->mass();
 
-      int subjet1Idx=-1, subjet2Idx=-1;
+//$$$$      int subjet1Idx=-1, subjet2Idx=-1;
       for( PatJetCollection::const_iterator jIt = jetsColl2->begin(); jIt != jetsColl2->end(); ++jIt )
       {
         if( &(*jIt) == fatJetToPrunedFatJetMap.find(&(*pjet))->second->daughter(0) ) subjet1Idx = int( jIt - jetsColl2->begin() );
@@ -1082,7 +1085,9 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 
 //$$
     int nseltracks = 0;
-//$$
+//$$$$
+    int nsharedtracks = 0;
+//$$$$
 
     unsigned int trackSize = selected_tracks.size();
     if ( !use_selected_tracks_ ) trackSize = no_sel_tracks.size();
@@ -1127,6 +1132,23 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       if (std::fabs(distJetAxis) < 0.07 && decayLength < 5.0
                                         && deltaR < 0.3) nseltracks++;
 //$$
+
+//$$$$
+      if ( runSubJets_ && iJetColl == 1 && pass_cut_trk && subjet1Idx >= 0 && subjet2Idx >= 0 ) {
+
+        deta = ptrack.eta() - JetInfo[0].Jet_eta[subjet1Idx];
+        dphi = ptrack.phi() - JetInfo[0].Jet_phi[subjet1Idx];
+        if ( dphi > TMath::Pi() ) dphi = 2.*TMath::Pi() - dphi;
+        float dR1 = TMath::Sqrt(deta*deta + dphi*dphi);
+
+        deta = ptrack.eta() - JetInfo[0].Jet_eta[subjet2Idx];
+        dphi = ptrack.phi() - JetInfo[0].Jet_phi[subjet2Idx];
+        if ( dphi > TMath::Pi() ) dphi = 2.*TMath::Pi() - dphi;
+        float dR2 = TMath::Sqrt(deta*deta + dphi*dphi);
+
+        if ( dR1 < 0.3 && dR2 < 0.3 ) nsharedtracks++;
+      }
+//$$$$
 
       // track selection
       if ( (use_selected_tracks_ && pass_cut_trk) ||  !use_selected_tracks_) {
@@ -1371,7 +1393,10 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 
 //$$
     JetInfo[iJetColl].Jet_nseltracks[JetInfo[iJetColl].nJet] = nseltracks;
-//$$
+//$$$$
+    if ( runSubJets_ && iJetColl == 1 )
+      JetInfo[iJetColl].Jet_nsharedtracks[JetInfo[iJetColl].nJet] = nsharedtracks;
+//$$$$
 
     JetInfo[iJetColl].Jet_nLastTrack[JetInfo[iJetColl].nJet]   = JetInfo[iJetColl].nTrack;
     JetInfo[iJetColl].Jet_nLastTrkInc[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nTrkInc;

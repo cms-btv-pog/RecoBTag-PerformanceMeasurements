@@ -80,7 +80,9 @@ class JetInfoBranches {
     int   Jet_nseltracks[nMaxJets_];
     int   Jet_nsubjettracks[nMaxJets_];
     int   Jet_nsharedsubjettracks[nMaxJets_];
-//$$
+//$$$$
+    int   Jet_nsharedtracks[nMaxJets_];
+//$$$$
     int   Jet_flavour[nMaxJets_];
     int   Jet_nFirstTrack[nMaxJets_];
     int   Jet_nLastTrack[nMaxJets_];
@@ -505,7 +507,9 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_massPruned").c_str(),  Jet_massPruned  ,(name+"Jet_massPruned["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_tau1").c_str(),        Jet_tau1        ,(name+"Jet_tau1["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_tau2").c_str(),        Jet_tau2        ,(name+"Jet_tau2["+name+"nJet]/F").c_str());
-//$$
+//$$$$
+      tree->Branch((name+"Jet_nsharedtracks").c_str(), Jet_nsharedtracks ,(name+"Jet_nsharedtracks["+name+"nJet]/I").c_str());
+//$$$$
       tree->Branch((name+"Jet_nsubjettracks").c_str(), Jet_nsubjettracks ,(name+"Jet_nsubjettracks["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_nsharedsubjettracks").c_str(), Jet_nsharedsubjettracks ,(name+"Jet_nsharedsubjettracks["+name+"nJet]/I").c_str());
 //$$
@@ -790,7 +794,9 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_massPruned").c_str(),  Jet_massPruned  );
       tree->SetBranchAddress((name+"Jet_tau1").c_str(),        Jet_tau1        );
       tree->SetBranchAddress((name+"Jet_tau2").c_str(),        Jet_tau2        );
-//$$
+//$$$$
+      tree->SetBranchAddress((name+"Jet_nsharedtracks").c_str(), Jet_nsharedtracks );
+//$$$$
       tree->SetBranchAddress((name+"Jet_nsubjettracks").c_str(), Jet_nsubjettracks );
       tree->SetBranchAddress((name+"Jet_nsharedsubjettracks").c_str(), Jet_nsharedsubjettracks );
 //$$
