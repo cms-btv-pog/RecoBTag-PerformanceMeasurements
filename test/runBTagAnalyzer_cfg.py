@@ -467,10 +467,16 @@ usePF2PAT(process,runPF2PAT=True, jetAlgo=jetAlgo, runOnMC=not options.runOnData
 ## Top projections in PF2PAT
 getattr(process,"pfPileUp"+postfix).checkClosestZVertex = False
 getattr(process,"pfNoPileUp"+postfix).enable = options.usePFchs
-getattr(process,"pfNoMuon"+postfix).enable = True
-getattr(process,"pfNoElectron"+postfix).enable = True
-getattr(process,"pfNoTau"+postfix).enable = False
-getattr(process,"pfNoJet"+postfix).enable = True
+if options.useTTbarFilter:
+    getattr(process,"pfNoMuon"+postfix).enable = False
+    getattr(process,"pfNoElectron"+postfix).enable = False
+    getattr(process,"pfNoTau"+postfix).enable = False
+    getattr(process,"pfNoJet"+postfix).enable = False
+else:
+    getattr(process,"pfNoMuon"+postfix).enable = True
+    getattr(process,"pfNoElectron"+postfix).enable = True
+    getattr(process,"pfNoTau"+postfix).enable = False
+    getattr(process,"pfNoJet"+postfix).enable = True
 
 from PhysicsTools.PatAlgos.tools.coreTools import *
 ## Remove objects not used from the PAT sequences to speed up processing
@@ -661,6 +667,7 @@ if options.useTTbarFilter:
     process.ttbarselectionfilter.select_ee   = True
     process.ttbarselectionfilter.select_mumu = True
     process.ttbarselectionfilter.select_emu  = True
+    process.ttbarselectionfilter.Keep_all_events  = False
 
     ## Change the cone size of muon isolation to 0.3
     getattr(process,"pfIsolatedMuons"+postfix).isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'muPFIsoValueCharged03'+postfix ) )
