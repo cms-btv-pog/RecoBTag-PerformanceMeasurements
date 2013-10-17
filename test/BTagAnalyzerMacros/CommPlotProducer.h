@@ -765,6 +765,7 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("BHadron_phi", BHadron_phi, &b_BHadron_phi);
    fChain->SetBranchAddress("BHadron_mass", BHadron_mass, &b_BHadron_mass);
    fChain->SetBranchAddress("BHadron_pdgID", BHadron_pdgID, &b_BHadron_pdgID);
+   fChain->SetBranchAddress("BHadron_status", BHadron_status, &b_BHadron_status);
    fChain->SetBranchAddress("BHadron_mother", BHadron_mother, &b_BHadron_mother);
    fChain->SetBranchAddress("BHadron_hasBdaughter", BHadron_hasBdaughter, &b_BHadron_hasBdaughter);
    fChain->SetBranchAddress("nDHadrons", &nDHadrons, &b_nDHadrons);
@@ -773,6 +774,12 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("DHadron_eta", DHadron_eta, &b_DHadron_eta);
    fChain->SetBranchAddress("DHadron_phi", DHadron_phi, &b_DHadron_phi);
    fChain->SetBranchAddress("DHadron_mass", DHadron_mass, &b_DHadron_mass);
+   fChain->SetBranchAddress("DHadron_vx", DHadron_vx, &b_DHadron_vx);
+   fChain->SetBranchAddress("DHadron_vy", DHadron_vy, &b_DHadron_vy);
+   fChain->SetBranchAddress("DHadron_vz", DHadron_vz, &b_DHadron_vz);
+   fChain->SetBranchAddress("DHadron_daughterVx", DHadron_daughterVx, &b_DHadron_daughterVx);
+   fChain->SetBranchAddress("DHadron_daughterVy", DHadron_daughterVy, &b_DHadron_daughterVy);
+   fChain->SetBranchAddress("DHadron_daughterVz", DHadron_daughterVz, &b_DHadron_daughterVz);
    fChain->SetBranchAddress("DHadron_pdgID", DHadron_pdgID, &b_DHadron_pdgID);
    fChain->SetBranchAddress("DHadron_nDaughters", DHadron_nDaughters, &b_DHadron_nDaughters);
    fChain->SetBranchAddress("DHadron_DaughtersPdgID", DHadron_DaughtersPdgID, &b_DHadron_DaughtersPdgID);
@@ -814,6 +821,7 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("Jet_Svx", Jet_Svx, &b_Jet_Svx);
    fChain->SetBranchAddress("Jet_SvxNHP", Jet_SvxNHP, &b_Jet_SvxNHP);
    fChain->SetBranchAddress("Jet_SvxHP", Jet_SvxHP, &b_Jet_SvxHP);
+   fChain->SetBranchAddress("Jet_SvxMass", Jet_SvxMass, &b_Jet_SvxMass);
    fChain->SetBranchAddress("Jet_CombSvxN", Jet_CombSvxN, &b_Jet_CombSvxN);
    fChain->SetBranchAddress("Jet_CombSvxP", Jet_CombSvxP, &b_Jet_CombSvxP);
    fChain->SetBranchAddress("Jet_CombSvx", Jet_CombSvx, &b_Jet_CombSvx);
@@ -829,6 +837,11 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("Jet_CombCSVJPSL_N", Jet_CombCSVJPSL_N, &b_Jet_CombCSVJPSL_N);
    fChain->SetBranchAddress("Jet_CombCSVJPSL_P", Jet_CombCSVJPSL_P, &b_Jet_CombCSVJPSL_P);
    fChain->SetBranchAddress("Jet_CombCSVJPSL", Jet_CombCSVJPSL, &b_Jet_CombCSVJPSL);
+   fChain->SetBranchAddress("Jet_SimpIVF_HP", Jet_SimpIVF_HP, &b_Jet_SimpIVF_HP);
+   fChain->SetBranchAddress("Jet_SimpIVF_HE", Jet_SimpIVF_HE, &b_Jet_SimpIVF_HE);
+   fChain->SetBranchAddress("Jet_DoubIVF_HE", Jet_DoubIVF_HE, &b_Jet_DoubIVF_HE);
+   fChain->SetBranchAddress("Jet_CombIVF", Jet_CombIVF, &b_Jet_CombIVF);
+   fChain->SetBranchAddress("Jet_CombIVF_P", Jet_CombIVF_P, &b_Jet_CombIVF_P);
    fChain->SetBranchAddress("Jet_SoftMuN", Jet_SoftMuN, &b_Jet_SoftMuN);
    fChain->SetBranchAddress("Jet_SoftMuP", Jet_SoftMuP, &b_Jet_SoftMuP);
    fChain->SetBranchAddress("Jet_SoftMu", Jet_SoftMu, &b_Jet_SoftMu);
