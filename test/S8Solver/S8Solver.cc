@@ -108,7 +108,7 @@ void S8Solver::LoadHistos()
     int ith_max_bin = -1;
     if (fMaxPtrel != -1) ith_max_bin = (int) fnHistoBase->GetYaxis()->FindBin(fMaxPtrel);
     std::cout << " Max. ptrel= " << fMaxPtrel << ", bin = " << ith_max_bin << std::endl;
-    
+
     fnHisto = (TH1D*) fnHistoBase->ProjectionX("fnHisto",-1,ith_max_bin,"e");
     fpHisto = (TH1D*) fpHistoBase->ProjectionX("fpHisto",-1,ith_max_bin,"e");
     fnHistoMu = (TH1D*) fnHistoBase->ProjectionX("fnHistoMu",ith_ptrel_bin,ith_max_bin,"e");
@@ -132,11 +132,11 @@ void S8Solver::LoadHistos()
     _solverInput.p.muTag = fpHistoAll;
     */
     std::cout << " got projections" << std::endl;
-    
+
     // rebin correlation factors
     const int ncorrptarray = 3;
     const int ncorretaarray = 3;
-    Double_t corrptbins[ncorrptarray] = {30., 80.,230.};
+    //Double_t corrptbins[ncorrptarray] = {30., 80.,230.};
     Double_t corretabins[ncorrptarray] = {0.,1.5,2.5};
 
     // recalculate correlation factors
@@ -144,10 +144,10 @@ void S8Solver::LoadHistos()
     if (frecalculateFactors)
     {
         std::cout << " recalculate correlation factors " << std::endl;
-        
+
         std::map< TString, TH1*> h1;
         std::map< TString, TH2*> h2;
-        
+
         if (fisCorrFile)
             finputCorrFile->cd();
         else
@@ -165,7 +165,7 @@ void S8Solver::LoadHistos()
         h2["cl_pcmbpT"] = (TH2F*) gDirectory->Get("MCTruth/ptag_"+fcategory+"_cl");
 
         std::cout << " got initial truth dist." << std::endl;
-                
+
         halljets_b           = h2["b_npT"]->ProjectionX("halljets_b", -1 , ith_max_bin,"e");
         halljets_cl          = h2["cl_npT"]->ProjectionX("halljets_cl", -1 , ith_max_bin,"e");
         htagjets_b           = h2["b_ncmbpT"]->ProjectionX("htagjets_b", -1 , ith_max_bin,"e");
@@ -182,7 +182,7 @@ void S8Solver::LoadHistos()
         halloppjets_cl_ptrel = h2["cl_ppT"]->ProjectionX("halloppjets_cl_ptrel", ith_ptrel_bin , ith_max_bin,"e");
         htagoppjets_b_ptrel  = h2["b_pcmbpT"]->ProjectionX("htagoppjets_b_ptrel", ith_ptrel_bin , ith_max_bin,"e");
         htagoppjets_cl_ptrel = h2["cl_pcmbpT"]->ProjectionX("htagoppjets_cl_ptrel", ith_ptrel_bin , ith_max_bin,"e");
-        
+
         b_halljets_ptrel     = h2["b_npT"]->ProjectionX("b_halljets_ptrel", ith_ptrel_bin , ith_max_bin,"e");
         cl_halljets_ptrel    = h2["cl_npT"]->ProjectionX("cl_halljets_ptrel", ith_ptrel_bin , ith_max_bin,"e");
         b_halljets_tagged    = h2["b_ncmbpT"]->ProjectionX("b_halljets_tagged", -1 , ith_max_bin,"e");
@@ -217,40 +217,40 @@ void S8Solver::LoadHistos()
         _flavouredInput.p.muTag.cl = htagoppjets_cl_ptrel;
 	*/
         std::cout << " got projections" << std::endl;
-        
+
         if (frebin) {
             std::cout << " Rebin distributions" << std::endl;
 
-            TH1D* tmphalljets_b           = (TH1D*) halljets_b->Rebin(fnbins,"tmphalljets_b",fxbins);          
-            TH1D* tmphalljets_cl          = (TH1D*) halljets_cl->Rebin(fnbins,"tmphalljets_cl",fxbins);         
-            TH1D* tmphtagjets_b           = (TH1D*) htagjets_b->Rebin(fnbins,"tmphtagjets_b",fxbins);          
-            TH1D* tmphtagjets_cl          = (TH1D*) htagjets_cl->Rebin(fnbins,"tmphtagjets_cl",fxbins);         
-            TH1D* tmphalljets_b_ptrel     = (TH1D*) halljets_b_ptrel->Rebin(fnbins,"tmphalljets_b_ptrel",fxbins);    
-            TH1D* tmphalljets_cl_ptrel    = (TH1D*) halljets_cl_ptrel->Rebin(fnbins,"tmphalljets_cl_ptrel",fxbins);   
-            TH1D* tmphtagjets_b_ptrel     = (TH1D*) htagjets_b_ptrel->Rebin(fnbins,"tmphtagjets_b_ptrel",fxbins);    
-            TH1D* tmphtagjets_cl_ptrel    = (TH1D*) htagjets_cl_ptrel->Rebin(fnbins,"tmphtagjets_cl_ptrel",fxbins);    
-            TH1D* tmphalloppjets_b        = (TH1D*) halloppjets_b->Rebin(fnbins,"tmphalloppjets_b",fxbins);        
-            TH1D* tmphalloppjets_cl       = (TH1D*) halloppjets_cl->Rebin(fnbins,"tmp halloppjets_cl",fxbins);       
-            TH1D* tmphtagoppjets_b        = (TH1D*) htagoppjets_b->Rebin(fnbins,"tmphtagoppjets_b",fxbins);         
-            TH1D* tmphtagoppjets_cl       = (TH1D*) htagoppjets_cl->Rebin(fnbins,"tmphtagoppjets_cl",fxbins);       
-            TH1D* tmphalloppjets_b_ptrel  = (TH1D*) halloppjets_b_ptrel->Rebin(fnbins,"tmphalloppjets_b_ptrel",fxbins); 
+            TH1D* tmphalljets_b           = (TH1D*) halljets_b->Rebin(fnbins,"tmphalljets_b",fxbins);
+            TH1D* tmphalljets_cl          = (TH1D*) halljets_cl->Rebin(fnbins,"tmphalljets_cl",fxbins);
+            TH1D* tmphtagjets_b           = (TH1D*) htagjets_b->Rebin(fnbins,"tmphtagjets_b",fxbins);
+            TH1D* tmphtagjets_cl          = (TH1D*) htagjets_cl->Rebin(fnbins,"tmphtagjets_cl",fxbins);
+            TH1D* tmphalljets_b_ptrel     = (TH1D*) halljets_b_ptrel->Rebin(fnbins,"tmphalljets_b_ptrel",fxbins);
+            TH1D* tmphalljets_cl_ptrel    = (TH1D*) halljets_cl_ptrel->Rebin(fnbins,"tmphalljets_cl_ptrel",fxbins);
+            TH1D* tmphtagjets_b_ptrel     = (TH1D*) htagjets_b_ptrel->Rebin(fnbins,"tmphtagjets_b_ptrel",fxbins);
+            TH1D* tmphtagjets_cl_ptrel    = (TH1D*) htagjets_cl_ptrel->Rebin(fnbins,"tmphtagjets_cl_ptrel",fxbins);
+            TH1D* tmphalloppjets_b        = (TH1D*) halloppjets_b->Rebin(fnbins,"tmphalloppjets_b",fxbins);
+            TH1D* tmphalloppjets_cl       = (TH1D*) halloppjets_cl->Rebin(fnbins,"tmp halloppjets_cl",fxbins);
+            TH1D* tmphtagoppjets_b        = (TH1D*) htagoppjets_b->Rebin(fnbins,"tmphtagoppjets_b",fxbins);
+            TH1D* tmphtagoppjets_cl       = (TH1D*) htagoppjets_cl->Rebin(fnbins,"tmphtagoppjets_cl",fxbins);
+            TH1D* tmphalloppjets_b_ptrel  = (TH1D*) halloppjets_b_ptrel->Rebin(fnbins,"tmphalloppjets_b_ptrel",fxbins);
             TH1D* tmphalloppjets_cl_ptrel = (TH1D*) halloppjets_cl_ptrel->Rebin(fnbins,"tmphalloppjets_cl_ptrel",fxbins);
-            TH1D* tmphtagoppjets_b_ptrel  = (TH1D*) htagoppjets_b_ptrel->Rebin(fnbins,"tmphtagoppjets_b_ptrel",fxbins); 
+            TH1D* tmphtagoppjets_b_ptrel  = (TH1D*) htagoppjets_b_ptrel->Rebin(fnbins,"tmphtagoppjets_b_ptrel",fxbins);
             TH1D* tmphtagoppjets_cl_ptrel = (TH1D*) htagoppjets_cl_ptrel->Rebin(fnbins,"tmphtagoppjets_cl_ptrel",fxbins);
 
-        
+
             TH1D* tmpb_halljets_ptrel        = (TH1D*) b_halljets_ptrel->Rebin(fnbins,"tmpb_halljets_ptrel",fxbins);
             TH1D* tmpcl_halljets_ptrel       = (TH1D*) cl_halljets_ptrel->Rebin(fnbins,"tmpcl_halljets_ptrel",fxbins);
-            TH1D* tmpb_halljets_tagged       = (TH1D*) b_halljets_tagged->Rebin(fnbins,"tmpb_halljets_tagged",fxbins); 
-            TH1D* tmpcl_halljets_tagged      = (TH1D*) cl_halljets_tagged->Rebin(fnbins,"tmpcl_halljets_tagged",fxbins); 
-            TH1D* tmpb_halljets_ptreltagged  = (TH1D*) b_halljets_ptreltagged->Rebin(fnbins,"tmpb_halljets_ptreltagged",fxbins);     
-            TH1D* tmpcl_halljets_ptreltagged = (TH1D*) cl_halljets_ptreltagged->Rebin(fnbins,"tmpcl_halljets_ptreltagged",fxbins);       
-            TH1D* tmpb_halloppjets_tagged    = (TH1D*) b_halloppjets_tagged->Rebin(fnbins,"tmpb_halloppjets_tagged",fxbins);         
-            TH1D* tmpcl_halloppjets_tagged   = (TH1D*) cl_halloppjets_tagged->Rebin(fnbins,"tmpcl_halloppjets_tagged",fxbins);           
+            TH1D* tmpb_halljets_tagged       = (TH1D*) b_halljets_tagged->Rebin(fnbins,"tmpb_halljets_tagged",fxbins);
+            TH1D* tmpcl_halljets_tagged      = (TH1D*) cl_halljets_tagged->Rebin(fnbins,"tmpcl_halljets_tagged",fxbins);
+            TH1D* tmpb_halljets_ptreltagged  = (TH1D*) b_halljets_ptreltagged->Rebin(fnbins,"tmpb_halljets_ptreltagged",fxbins);
+            TH1D* tmpcl_halljets_ptreltagged = (TH1D*) cl_halljets_ptreltagged->Rebin(fnbins,"tmpcl_halljets_ptreltagged",fxbins);
+            TH1D* tmpb_halloppjets_tagged    = (TH1D*) b_halloppjets_tagged->Rebin(fnbins,"tmpb_halloppjets_tagged",fxbins);
+            TH1D* tmpcl_halloppjets_tagged   = (TH1D*) cl_halloppjets_tagged->Rebin(fnbins,"tmpcl_halloppjets_tagged",fxbins);
             TH1D* tmpb_halloppjets_ptrel     = (TH1D*) b_halloppjets_ptrel->Rebin(fnbins,"tmpb_halloppjets_ptrel",fxbins);
             TH1D* tmpcl_halloppjets_ptrel    = (TH1D*) cl_halloppjets_ptrel->Rebin(fnbins,"tmpcl_halloppjets_ptrel",fxbins);
 
-            
+
             delete halljets_b;
             delete halljets_cl;
             delete htagjets_b;
@@ -268,7 +268,7 @@ void S8Solver::LoadHistos()
             delete htagoppjets_b_ptrel;
             delete htagoppjets_cl_ptrel;
 
-        
+
             delete b_halljets_ptrel;
             delete cl_halljets_ptrel;
             delete b_halljets_tagged;
@@ -281,25 +281,25 @@ void S8Solver::LoadHistos()
             delete cl_halloppjets_ptrel;
 
 
-            halljets_b           =  (TH1D*) tmphalljets_b->Clone("halljets_b");           
-            halljets_cl          =  (TH1D*) tmphalljets_cl->Clone("halljets_cl");      
-            htagjets_b           =  (TH1D*) tmphtagjets_b->Clone("htagjets_b");       
-            htagjets_cl          =  (TH1D*) tmphtagjets_cl->Clone("htagjets_cl");         
-            halljets_b_ptrel     =  (TH1D*) tmphalljets_b_ptrel->Clone("halljets_b_ptrel");    
-            halljets_cl_ptrel    =  (TH1D*) tmphalljets_cl_ptrel->Clone("halljets_cl_ptrel");   
-            htagjets_b_ptrel     =  (TH1D*) tmphtagjets_b_ptrel->Clone("htagjets_b_ptrel");    
-            htagjets_cl_ptrel    =  (TH1D*) tmphtagjets_cl_ptrel->Clone("htagjets_cl_ptrel");   
-            halloppjets_b        =  (TH1D*) tmphalloppjets_b->Clone("halloppjets_b");       
-            halloppjets_cl       =  (TH1D*) tmphalloppjets_cl->Clone("halloppjets_cl");      
-            htagoppjets_b        =  (TH1D*) tmphtagoppjets_b->Clone("htagoppjets_b ");      
-            htagoppjets_cl       =  (TH1D*) tmphtagoppjets_cl->Clone("htagoppjets_cl");      
-            halloppjets_b_ptrel  =  (TH1D*) tmphalloppjets_b_ptrel->Clone("halloppjets_b_ptrel"); 
+            halljets_b           =  (TH1D*) tmphalljets_b->Clone("halljets_b");
+            halljets_cl          =  (TH1D*) tmphalljets_cl->Clone("halljets_cl");
+            htagjets_b           =  (TH1D*) tmphtagjets_b->Clone("htagjets_b");
+            htagjets_cl          =  (TH1D*) tmphtagjets_cl->Clone("htagjets_cl");
+            halljets_b_ptrel     =  (TH1D*) tmphalljets_b_ptrel->Clone("halljets_b_ptrel");
+            halljets_cl_ptrel    =  (TH1D*) tmphalljets_cl_ptrel->Clone("halljets_cl_ptrel");
+            htagjets_b_ptrel     =  (TH1D*) tmphtagjets_b_ptrel->Clone("htagjets_b_ptrel");
+            htagjets_cl_ptrel    =  (TH1D*) tmphtagjets_cl_ptrel->Clone("htagjets_cl_ptrel");
+            halloppjets_b        =  (TH1D*) tmphalloppjets_b->Clone("halloppjets_b");
+            halloppjets_cl       =  (TH1D*) tmphalloppjets_cl->Clone("halloppjets_cl");
+            htagoppjets_b        =  (TH1D*) tmphtagoppjets_b->Clone("htagoppjets_b ");
+            htagoppjets_cl       =  (TH1D*) tmphtagoppjets_cl->Clone("htagoppjets_cl");
+            halloppjets_b_ptrel  =  (TH1D*) tmphalloppjets_b_ptrel->Clone("halloppjets_b_ptrel");
             halloppjets_cl_ptrel =  (TH1D*) tmphalloppjets_cl_ptrel->Clone("halloppjets_cl_ptrel");
-            htagoppjets_b_ptrel  =  (TH1D*) tmphtagoppjets_b_ptrel->Clone("htagoppjets_b_ptrel"); 
-            htagoppjets_cl_ptrel =  (TH1D*) tmphtagoppjets_cl_ptrel->Clone("htagoppjets_cl_ptrel");  
+            htagoppjets_b_ptrel  =  (TH1D*) tmphtagoppjets_b_ptrel->Clone("htagoppjets_b_ptrel");
+            htagoppjets_cl_ptrel =  (TH1D*) tmphtagoppjets_cl_ptrel->Clone("htagoppjets_cl_ptrel");
 
-        
-            b_halljets_ptrel        = (TH1D*) tmpb_halljets_ptrel->Clone("b_halljets_ptrel");    
+
+            b_halljets_ptrel        = (TH1D*) tmpb_halljets_ptrel->Clone("b_halljets_ptrel");
             cl_halljets_ptrel       = (TH1D*) tmpcl_halljets_ptrel->Clone("cl_halljets_ptrel");
             b_halljets_tagged       = (TH1D*) tmpb_halljets_tagged->Clone("b_halljets_tagged");
             cl_halljets_tagged      = (TH1D*) tmpcl_halljets_tagged->Clone("cl_halljets_tagged");
@@ -308,9 +308,9 @@ void S8Solver::LoadHistos()
             b_halloppjets_tagged    = (TH1D*) tmpb_halloppjets_tagged->Clone("b_halloppjets_tagged");
             cl_halloppjets_tagged   = (TH1D*) tmpcl_halloppjets_tagged->Clone("cl_halloppjets_tagged");
             b_halloppjets_ptrel     = (TH1D*) tmpb_halloppjets_ptrel->Clone("b_halloppjets_ptrel");
-            cl_halloppjets_ptrel    = (TH1D*) tmpcl_halloppjets_ptrel->Clone("cl_halloppjets_ptrel");      
+            cl_halloppjets_ptrel    = (TH1D*) tmpcl_halloppjets_ptrel->Clone("cl_halloppjets_ptrel");
 
-            
+
             TH1D* tmpfnHisto = (TH1D*) fnHisto->Rebin(fnbins,"tmpfnHisto",fxbins);
             TH1D* tmpfpHisto = (TH1D*) fpHisto->Rebin(fnbins,"tmpfpHisto",fxbins);
             TH1D* tmpfnHistoMu = (TH1D*) fnHistoMu->Rebin(fnbins,"tmpfnHistoMu",fxbins);
@@ -328,8 +328,8 @@ void S8Solver::LoadHistos()
             delete fpHistoSvx;
             delete fnHistoAll;
             delete fpHistoAll;
-            
-            
+
+
             fnHisto = (TH1D*) tmpfnHisto->Clone("fnHisto");
             fpHisto = (TH1D*) tmpfpHisto->Clone("fpHisto");
             fnHistoMu = (TH1D*) tmpfnHistoMu->Clone("fnHistoMu");
@@ -338,10 +338,10 @@ void S8Solver::LoadHistos()
             fpHistoSvx = (TH1D*) tmpfpHistoSvx->Clone("fpHistoSvx");
             fnHistoAll = (TH1D*) tmpfnHistoAll->Clone("fnHistoAll");
             fpHistoAll = (TH1D*) tmpfpHistoAll->Clone("fpHistoAll");
-        
+
         }
-      
-	// Save input plots in the SolverInput                                                                                                                                                                                 
+
+	// Save input plots in the SolverInput
 	_solverInput.n.all = fnHisto;
 	_solverInput.n.mu = fnHistoMu;
 	_solverInput.n.tag = fnHistoSvx;
@@ -350,7 +350,7 @@ void S8Solver::LoadHistos()
 	_solverInput.p.mu = fpHistoMu;
 	_solverInput.p.tag = fpHistoSvx;
 	_solverInput.p.muTag = fpHistoAll;
-        
+
 	_flavouredInput.n.b = halljets_b;
         _flavouredInput.n.tag.b = htagjets_b;
         _flavouredInput.n.mu.b = halljets_b_ptrel;
@@ -386,8 +386,8 @@ void S8Solver::LoadHistos()
         h1["eff_pTrel_b"]->Reset();
         h1["eff_pTrel_cl"]->Reset();
         h1["eff_pTrel_TaggedJet_b"]->Reset();
-        h1["eff_pTrel_TaggedJet_cl"]->Reset(); 
-        h1["eff_TaggedJet_b"]->Reset(); 
+        h1["eff_pTrel_TaggedJet_cl"]->Reset();
+        h1["eff_TaggedJet_b"]->Reset();
         h1["eff_TaggedJet_cl"]->Reset();
         h1["eff_TaggedBothJets_b"]->Reset();
         h1["eff_TaggedBothJets_cl"]->Reset();
@@ -399,8 +399,8 @@ void S8Solver::LoadHistos()
         halljets_cl->Print("all");
         halloppjets_b->Print("all");
         halloppjets_cl->Print("all");
-        
-            
+
+
         h1["eff_pTrel_b"]->Divide(b_halljets_ptrel , halljets_b ,1.,1.,"B");
         h1["eff_pTrel_cl"]->Divide(cl_halljets_ptrel, halljets_cl ,1.,1.,"B");
         h1["eff_TaggedJet_b"]->Divide(b_halljets_tagged , halljets_b ,1.,1.,"B");
@@ -414,7 +414,7 @@ void S8Solver::LoadHistos()
 
 	if (! fMCtruthAwayTag )
 	  {
-	    feffTag_b = (TH1D*) h1["eff_TaggedJet_b"]->Clone("feffTag_b"); 
+	    feffTag_b = (TH1D*) h1["eff_TaggedJet_b"]->Clone("feffTag_b");
 	    feffTag_cl = (TH1D*) h1["eff_TaggedJet_cl"]->Clone("feffTag_cl");
 	  }
 	else
@@ -423,9 +423,9 @@ void S8Solver::LoadHistos()
             feffTag_cl = (TH1D*) h1["eff_TaggedBothJets_cl"]->Clone("feffTag_cl");
 	  }
 
-        feffmu_b = (TH1D*) h1["eff_pTrel_b"]->Clone("feffmu_b"); 
+        feffmu_b = (TH1D*) h1["eff_pTrel_b"]->Clone("feffmu_b");
         feffmu_cl = (TH1D*) h1["eff_pTrel_cl"]->Clone("feffmu_cl");
-        
+
 
         fh_alpha = (TH1D*) fnHisto->Clone("fh_alpha");
         fh_beta = (TH1D*) fnHisto->Clone("fh_beta");
@@ -442,17 +442,17 @@ void S8Solver::LoadHistos()
 
         fh_alpha->Divide( h1["eff_TaggedBothJets_cl"], h1["eff_TaggedJet_cl"]);
         fh_beta->Divide( h1["eff_TaggedBothJets_b"], h1["eff_TaggedJet_b"]);
-        
+
         fh_kb->Divide( h1["eff_pTrel_TaggedJet_b"], h1["eff_pTrel_b"]);
         fh_kb->Divide( h1["eff_TaggedJet_b"]);
 
         fh_kcl->Divide( h1["eff_pTrel_TaggedJet_cl"], h1["eff_pTrel_cl"] );
         fh_kcl->Divide(  h1["eff_TaggedJet_cl"] );
-            
+
         fh_delta->Divide( h1["eff_mu_taggedaway_b"], h1["eff_pTrel_b"] );
         fh_gamma->Divide( h1["eff_mu_taggedaway_cl"], h1["eff_pTrel_cl"] );
 
-            
+
         // fit to pol0
         fh_alpha->Fit("pol0","0");
         std::cout << "Fit to pol0 fh_alpha: Chi2 = " << fh_alpha->GetFunction("pol0")->GetChisquare() << std::endl;
@@ -517,19 +517,19 @@ void S8Solver::LoadHistos()
         feffmu_cl = (TH1D*) gDirectory->Get("eff_pTrel_cl");
         feffTagmu_b = (TH1D*) gDirectory->Get("eff_pTrel_TaggedJet_b");
         feffTagmu_cl = (TH1D*) gDirectory->Get("eff_pTrel_TaggedJet_cl");
-        
+
         if (fisCorrFile) finputCorrFile->cd();
-        
+
         if (fcategory=="pT")
         {
             if (frebin)
             {
-                
+
                 TH1D* tmpfh_alpha = (TH1D*) gDirectory->Get("alpha");
                 TH1D* tmpfh_beta = (TH1D*) gDirectory->Get("beta");
                 TH1D* tmpfh_kb = (TH1D*) gDirectory->Get("kappa_b");
                 TH1D* tmpfh_kcl = (TH1D*) gDirectory->Get("kappa_cl");
-                
+
                 fh_alpha = (TH1D*) tmpfh_alpha->Rebin(fnbins,"fh_alpha",fxbins);
                 fh_beta = (TH1D*)tmpfh_beta->Rebin(fnbins,"fh_beta",fxbins);
                 fh_kb = (TH1D*)tmpfh_kb->Rebin(fnbins,"fh_kb",fxbins);
@@ -545,7 +545,7 @@ void S8Solver::LoadHistos()
                 fh_kb = (TH1D*) gDirectory->Get("kappa_b");
                 fh_kcl = (TH1D*) gDirectory->Get("kappa_cl");
             }
-        
+
         }
         else
         {
@@ -555,7 +555,7 @@ void S8Solver::LoadHistos()
                 TH1D* tmpfh_beta = (TH1D*) gDirectory->Get("beta_eta");
                 TH1D* tmpfh_kb = (TH1D*) gDirectory->Get("kappa_eta_b");
                 TH1D* tmpfh_kcl = (TH1D*) gDirectory->Get("kappa_eta_cl");
-                
+
                 tmpfh_alpha->Rebin(ncorretaarray-1,"fh_alpha_eta",corretabins);
                 tmpfh_beta->Rebin(ncorretaarray-1,"fh_beta_eta",corretabins);
                 tmpfh_kb->Rebin(ncorretaarray-1,"fh_kb_eta",corretabins);
@@ -565,7 +565,7 @@ void S8Solver::LoadHistos()
                 fh_beta->Fit("pol0","0");
                 fh_kb->Fit("pol0","0");
                 fh_kcl->Fit("pol0","0");
-                
+
             } else {
                 fh_alpha = (TH1D*) gDirectory->Get("alpha_eta");
                 fh_beta = (TH1D*) gDirectory->Get("beta_eta");
@@ -581,7 +581,7 @@ void S8Solver::LoadHistos()
 void S8Solver::GetInput()
 {
     LoadHistos();
-    
+
     // integrated input
     if (fusemctrue)
     {
@@ -677,7 +677,7 @@ void S8Solver::GetInput()
 
         // Done binned input preparation
         //
-        
+
         std::map<TString, double> tmpmap;
 
         double pt = fnHisto->GetXaxis()->GetBinCenter(ibin);
@@ -698,25 +698,25 @@ void S8Solver::GetInput()
                         tmpmap[name[ihisto]] = TotalInput["beta"];
                     }
                 }
-                else if(name[ihisto]=="alpha") { 
-                    if (!fAlphaConst) { 
+                else if(name[ihisto]=="alpha") {
+                    if (!fAlphaConst) {
                         tmpmap[name[ihisto]] = fAlphaf * F_alpha->Eval(pt,0,0);
-                    } else { 
-                        tmpmap[name[ihisto]] = TotalInput["alpha"]; 
-                    } 
+                    } else {
+                        tmpmap[name[ihisto]] = TotalInput["alpha"];
+                    }
                 }
                 else if(name[ihisto]=="kappa_b") {
                   if (!fKappabConst) {
                     tmpmap[name[ihisto]] = fKappabf * F_kb->Eval(pt,0,0);
                   } else {
-                    tmpmap[name[ihisto]] = TotalInput["kappa_b"]; 
+                    tmpmap[name[ihisto]] = TotalInput["kappa_b"];
                   }
                 }
                 else if(name[ihisto]=="kappa_cl") {
                   if (!fKappaclConst) {
-                    tmpmap[name[ihisto]] = fKappaclf * F_kcl->Eval(pt,0,0);  
+                    tmpmap[name[ihisto]] = fKappaclf * F_kcl->Eval(pt,0,0);
                   } else {
-                    tmpmap[name[ihisto]] = TotalInput["kappa_cl"]; 
+                    tmpmap[name[ihisto]] = TotalInput["kappa_cl"];
                   }
                 }
                 else if(name[ihisto]=="delta") {
@@ -739,7 +739,7 @@ void S8Solver::GetInput()
             }
         }
 
-        BinnedInput[ibin] = tmpmap;     
+        BinnedInput[ibin] = tmpmap;
     }
 
     cout << _binnedInput.size() << " binned inputs stored" << endl;
@@ -748,11 +748,11 @@ void S8Solver::GetInput()
 void S8Solver::Solve()
 {
     GetInput();
-    
+
     if (fmethod=="analytic" || fmethod=="fit" )
     {
         S8AnalyticSolver sol;
-        
+
         sol.Solve(TotalInput);
 
         fTotalSolution = sol.GetSolution();
@@ -778,7 +778,7 @@ void S8Solver::Solve()
             sol.Solve(ibin->second);
             fBinnedSolution[ibin->first] = sol.GetSolution();
             fBinnedSolutionErr[ibin->first] = sol.GetSolutionErr();
-            
+
             // now fit
             //
             if (fmethod=="fit") {
@@ -812,7 +812,7 @@ void S8Solver::doAverageSolution()
 
     sol.SetError(System8Solver::STAT, 1000);
     sol.SetInitialOrder(1, 1);
-    
+
     // Force solution manually if requested
     //
     /*
@@ -821,7 +821,7 @@ void S8Solver::doAverageSolution()
         ++ipick)
     {
         if (0 == ipick->first)
-        { 
+        {
             std::cout << "> Force average solution # " << ipick->second << std::endl;
             sol.SetSolution(ipick->second);
 
@@ -851,7 +851,7 @@ void S8Solver::doBinnedSolution()
 {
     if (!_doBinnedSolution)
         return;
-    
+
     _binnedSolution.clear();
 
     // binned solutions
@@ -899,7 +899,7 @@ void S8Solver::doBinnedSolution()
             }
         }
         */
-        
+
         if (!solu.Solve())
             continue;
 
@@ -949,7 +949,7 @@ void S8Solver::PrintData(TString option)
     std::cout << " beta scale factor: " << fBetaf << std::endl;
     std::cout << " k_b scale factor: " << fKappabf << std::endl;
     std::cout << " k_cl scale factor: " << fKappaclf << std::endl;
-    
+
     if (_doAverageSolution)
     {
         cout << " [Average]" << endl
@@ -1032,40 +1032,40 @@ void S8Solver::DumpTable(std::string filename)
 
         double etamin = 0.;
         double etamax = 2.5;
-        
+
         double beff = feffTag_b->GetBinContent(ibin);
         double befferr = feffTag_b->GetBinError(ibin);
-        
+
         double cleff = feffTag_cl->GetBinContent(ibin);
         double clefferr = feffTag_cl->GetBinError(ibin);
 
         ff << ptcenter - ptdelta << sp << ptcenter + ptdelta << sp << etamin << sp << etamax << sp << beff << sp << befferr << sp << cleff << sp << clefferr << std::endl;
-        
+
     }
 
     int bbin = 1;
     for( std::map<int,std::map<TString,double> >::const_iterator ibin = fBinnedSolution.begin(); ibin!=fBinnedSolution.end(); ++ibin) {
 
         if (fcategory == "pT") {
-            
+
             double ptcenter = fnHisto->GetXaxis()->GetBinCenter(bbin);
             double ptdelta = 0.5 * (fnHisto->GetXaxis())->GetBinWidth(bbin);
 
             double etamin = 0.;
             double etamax = 2.5;
-            
+
             double beff = 0.;
             double befferr = 0.;
-        
+
             double cleff = 0.;
             double clefferr = 0.;
-            
+
             double bPtreleff = 0.;
             double bPtrelefferr = 0.;
-        
+
             double clPtreleff = 0.;
             double clPtrelefferr = 0.;
-            
+
             std::map<TString, double> tmpmap = ibin->second;
             std::map<TString, double> tmpmaperr = fBinnedSolutionErr[ibin->first];
             for( std::map<TString,double>::const_iterator i = tmpmap.begin(); i!=tmpmap.end(); ++i) {
@@ -1074,7 +1074,7 @@ void S8Solver::DumpTable(std::string filename)
                 if (i->first == "effTag_cl") { cleff = i->second; clefferr = tmpmaperr[i->first]; }
                 if (i->first == "effMu_b") { bPtreleff = i->second; bPtrelefferr = tmpmaperr[i->first]; }
                 if (i->first == "effMu_cl") { clPtreleff = i->second; clPtrelefferr = tmpmaperr[i->first]; }
-                
+
             }
             ff << ptcenter - ptdelta << sp << ptcenter + ptdelta << sp << etamin << sp << etamax << sp
                << beff << sp << befferr << sp << cleff << sp << clefferr <<sp
@@ -1083,25 +1083,25 @@ void S8Solver::DumpTable(std::string filename)
             bbin++;
         }
         if (fcategory == "eta") {
-            
+
             double etacenter = fnHisto->GetXaxis()->GetBinCenter(bbin);
             double etadelta = 0.5 * fnHisto->GetXaxis()->GetBinWidth(bbin);
 
             double ptmin = 30.;
             double ptmax = 230.;
-            
+
             double beff = 0.;
             double befferr = 0.;
-        
+
             double cleff = 0.;
             double clefferr = 0.;
 
             double bPtreleff = 0.;
             double bPtrelefferr = 0.;
-        
+
             double clPtreleff = 0.;
             double clPtrelefferr = 0.;
-            
+
             std::map<TString, double> tmpmap = ibin->second;
             std::map<TString, double> tmpmaperr = fBinnedSolutionErr[ibin->first];
             for( std::map<TString,double>::const_iterator i = tmpmap.begin(); i!=tmpmap.end(); ++i) {
@@ -1110,8 +1110,8 @@ void S8Solver::DumpTable(std::string filename)
                 if (i->first == "effTag_cl") { cleff = i->second; clefferr = tmpmaperr[i->first]; }
                 if (i->first == "effMu_b") { bPtreleff = i->second; bPtrelefferr = tmpmaperr[i->first]; }
                 if (i->first == "effMu_cl") { clPtreleff = i->second; clPtrelefferr = tmpmaperr[i->first]; }
-                
-                
+
+
             }
             ff << ptmin << sp << ptmax << sp << etacenter - etadelta << sp << etacenter + etadelta << sp << beff << sp
                << befferr << sp << cleff << sp << clefferr << sp
@@ -1148,7 +1148,7 @@ void S8Solver::generateGraphs()
         return;
 
     cout << "Generate Group" << endl;
-    
+
     if ("eta" == fcategory)
         _graphs.reset(new GraphGroup(_binnedInput, _binnedSolution,
                                      Graph::ETA));
@@ -1183,7 +1183,7 @@ void saveSolution(Solution &solution,
     //
     //const double n_cl = solver.GetResult(1) * inputGroup.input.n.all.first;
     const double n_cl = solver.getCentralValue(1) * inputGroup.input.n.all.first;
-    solution["n_cl"] = 
+    solution["n_cl"] =
         make_pair(n_cl,
                   pow(solver.getError(1) * inputGroup.input.n.all.first, 2));
 
@@ -1203,7 +1203,7 @@ void saveSolution(Solution &solution,
 
     // Eff_tag_b
     //
-    solution["eff_tag_b"] = 
+    solution["eff_tag_b"] =
         //make_pair(solver.GetResult(4),
         make_pair(solver.getCentralValue(4),
                   pow(solver.getError(4), 2));
@@ -1217,14 +1217,14 @@ void saveSolution(Solution &solution,
 
     // p_b
     //
-    solution["p_b"] = 
+    solution["p_b"] =
         //make_pair(solver.GetResult(6) * n_b,
         make_pair(solver.getCentralValue(6) * n_b,
                   pow(solver.getError(6) * n_b, 2));
 
     // p_cl
     //
-    solution["p_cl"] = 
+    solution["p_cl"] =
         //make_pair(solver.GetResult(7) * n_cl,
         make_pair(solver.getCentralValue(7) * n_cl,
                   pow(solver.getError(7) * n_cl, 2));
@@ -1283,7 +1283,7 @@ NumericInputGroup inputGroup(const SolverInput &input,
 {
     NumericInputGroup group;
 
-    group.bin = 
+    group.bin =
             make_pair(input.n.all->GetBinCenter(bin),
                       pow(input.n.all->GetBinWidth(bin) / 2, 2));
 ;

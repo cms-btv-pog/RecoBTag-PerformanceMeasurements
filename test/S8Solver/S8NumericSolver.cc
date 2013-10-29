@@ -176,7 +176,7 @@ void S8NumericSolver::setInput(const NumericInputGroup &inputGroup)
              input.p.muTag.first);
 
     const Coefficients &coef = inputGroup.coefficients;
-        
+
     SetCorr(coef.kappaB.first,
             coef.beta.first,
             coef.delta.first,
@@ -247,7 +247,7 @@ Int_t S8NumericSolver::Solve()
 
     MakeSystem(shift);
 
-    fverbose = true; 
+    fverbose = true;
     if(!FindSolution(res,SolveSystem(res)))
     {
         std::cout << "[S8Numeric] SOLUTION NOT FOUND, leaving ...." << std::endl;
@@ -274,7 +274,7 @@ Int_t S8NumericSolver::FindSolution(Double_t* res, int n)
     int npositiveSols = 0;
     int nphysicalSols = 0;
     int thesols = -1;
-    int thesols2 = -1;
+    //int thesols2 = -1;
     double deltares = 9999999;
 
     if (fForceSol)
@@ -352,7 +352,7 @@ Int_t S8NumericSolver::FindSolution(Double_t* res, int n)
                 }
                 else if (!fAveResSetup &&
                          tmpcounter == 4 )
-                { 
+                {
                     thesols = j-1;
                 }
                 else if (!fAveResSetup &&
@@ -372,8 +372,8 @@ Int_t S8NumericSolver::FindSolution(Double_t* res, int n)
             tmpsol[4]>tmpsol[5] &&
             tmpsol[2]>tmpsol[3])
 
-            thesols2= j-1;
-        
+            //thesols2= j-1;
+
         if (fverbose)
         {
             std::cout << "\n";
@@ -381,7 +381,7 @@ Int_t S8NumericSolver::FindSolution(Double_t* res, int n)
                 << nphysicalSols << std::endl;
         }
     }
-        
+
     if (nphysicalSols==0)
     {
         return 0;
@@ -520,7 +520,7 @@ void S8NumericSolver::ComputeErrors()
                 fMapErrorInf_Stat[i] /= *(Ninf + i);
 
             if (0 < *(Nsup + i))
-                fMapErrorSup_Stat[i] /= *(Nsup + i);   
+                fMapErrorSup_Stat[i] /= *(Nsup + i);
         }
     }
 
@@ -573,7 +573,7 @@ void S8NumericSolver::ComputeErrors()
                 fMapErrorInf_Stat[i] /= *(Ninf + i);
 
             if (0 < *(Nsup + i))
-                fMapErrorSup_Stat[i] /= *(Nsup + i);   
+                fMapErrorSup_Stat[i] /= *(Nsup + i);
         }
     }
 
@@ -900,7 +900,7 @@ Double_t S8NumericSolver::E(Int_t i,Int_t j) // i=0..1 : sample , j=0..3 : tag
     {
         if(i==0)
             e = -V(); // first fraction
-        else    
+        else
             e = W();
     }
     else
