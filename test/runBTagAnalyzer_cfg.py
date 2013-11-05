@@ -35,12 +35,12 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
-options.register('mcGlobalTag', 'START53_V27',
+options.register('mcGlobalTag', 'START62_V1',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', 'FT53_V21A_AN6',
+options.register('dataGlobalTag', 'GR_R_62_V1',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
@@ -85,12 +85,12 @@ if options.runOnData:
     globalTag = options.dataGlobalTag
 
 ## Jet energy corrections
-jetCorrectionsAK5 = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'])
-jetCorrectionsAK7 = ('AK7PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'])
+jetCorrectionsAK5 = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
+jetCorrectionsAK7 = ('AK7PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 
 if not options.usePFchs:
-    jetCorrectionsAK5 = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute'])
-    jetCorrectionsAK7 = ('AK7PF', ['L1FastJet', 'L2Relative', 'L3Absolute'])
+    jetCorrectionsAK5 = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
+    jetCorrectionsAK7 = ('AK7PF', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 
 if options.runOnData:
     jetCorrectionsAK5[1].append('L2L3Residual')
@@ -106,12 +106,14 @@ bTagDiscriminators = ['jetBProbabilityBJetTags','jetProbabilityBJetTags','trackC
     'negativeTrackCountingHighPurJetTags','positiveOnlyJetBProbabilityJetTags','positiveOnlyJetProbabilityJetTags',
     'simpleSecondaryVertexHighEffBJetTags','simpleSecondaryVertexHighPurBJetTags','simpleSecondaryVertexNegativeHighEffBJetTags',
     'simpleSecondaryVertexNegativeHighPurBJetTags','combinedSecondaryVertexBJetTags','combinedSecondaryVertexPositiveBJetTags',
-    'combinedSecondaryVertexV1BJetTags','combinedSecondaryVertexV1PositiveBJetTags','combinedSecondaryVertexNegativeBJetTags',
-    'combinedSecondaryVertexV1NegativeBJetTags','softPFMuonBJetTags','positiveSoftPFMuonBJetTags','negativeSoftPFMuonBJetTags',
+    #'combinedSecondaryVertexV1BJetTags','combinedSecondaryVertexV1PositiveBJetTags',
+    'combinedSecondaryVertexNegativeBJetTags',
+    #'combinedSecondaryVertexV1NegativeBJetTags',
+    'softPFMuonBJetTags','positiveSoftPFMuonBJetTags','negativeSoftPFMuonBJetTags',
     'softPFElectronBJetTags','positiveSoftPFElectronBJetTags','negativeSoftPFElectronBJetTags','simpleInclusiveSecondaryVertexHighEffBJetTags',
     'simpleInclusiveSecondaryVertexHighPurBJetTags','doubleSecondaryVertexHighEffBJetTags','combinedInclusiveSecondaryVertexBJetTags',
-    'combinedInclusiveSecondaryVertexPositiveBJetTags','combinedSecondaryVertexSoftPFLeptonV1BJetTags','positiveCombinedSecondaryVertexSoftPFLeptonV1BJetTags',
-    'negativeCombinedSecondaryVertexSoftPFLeptonV1BJetTags'
+    'combinedInclusiveSecondaryVertexPositiveBJetTags'#,'combinedSecondaryVertexSoftPFLeptonV1BJetTags','positiveCombinedSecondaryVertexSoftPFLeptonV1BJetTags',
+    #'negativeCombinedSecondaryVertexSoftPFLeptonV1BJetTags'
 ]
 bTagDiscriminatorsSubJets = copy.deepcopy(bTagDiscriminators)
 bTagDiscriminatorsSubJets.remove('doubleSecondaryVertexHighEffBJetTags')
@@ -129,25 +131,15 @@ process.MessageLogger.cerr.default.limit = 10
 process.source = cms.Source(
     "PoolSource",
     fileNames = cms.untracked.vstring(
-        # /QCD_Pt-80to120_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v2/GEN-SIM-RECODEBUG
-        #'/store/mc/Summer12_DR53X/QCD_Pt-80to120_TuneZ2star_8TeV_pythia6/GEN-SIM-RECODEBUG/PU_S10_START53_V7A-v2/0000/041C8D66-05F4-E111-B16E-003048D43656.root'
-        # /QCD_Pt-300to470_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/GEN-SIM-RECODEBUG
-        #'/store/mc/Summer12_DR53X/QCD_Pt-300to470_TuneZ2star_8TeV_pythia6/GEN-SIM-RECODEBUG/PU_S10_START53_V7A-v1/0000/0A4671D2-02F4-E111-9CD8-003048C69310.root'
-        # /QCD_Pt-170to300_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-        #'/store/mc/Summer12_DR53X/QCD_Pt-170to300_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/AODSIM/PU_S10_START53_V7A-v1/0000/FEB355DA-8EE7-E111-BA8A-001EC9D83165.root'
-        # /QCD_Pt-470to600_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v2/AODSIM
-        #'/store/mc/Summer12_DR53X/QCD_Pt-470to600_TuneZ2star_8TeV_pythia6/AODSIM/PU_S10_START53_V7A-v2/00000/FADB0913-1708-E211-BBB1-00261894383C.root'
-        # /TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
-        '/store/mc/Summer12_DR53X/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S10_START53_V7C-v1/00000/FE7C71D8-DB25-E211-A93B-0025901D4C74.root'
+        # /RelValQCD_Pt_80to120/CMSSW_6_2_3-PU_START62_V1_rundepMC_dvmc-v9/GEN-SIM-RECO
+        '/store/relval/CMSSW_6_2_3/RelValQCD_Pt_80to120/GEN-SIM-RECO/PU_START62_V1_rundepMC_dvmc-v9/00000/0461F2B9-8A3D-E311-85B1-00261894396B.root'
     )
 )
 
 if options.runOnData:
     process.source.fileNames = [
-        # /Jet/Run2012A-22Jan2013-v1/AOD
-        #'/store/data/Run2012A/Jet/AOD/22Jan2013-v1/20000/30B21345-4172-E211-9EF3-00304867BEC0.root'
-        # /BTag/Run2012A-22Jan2013-v1/AOD
-        '/store/data/Run2012A/BTag/AOD/22Jan2013-v1/30000/E6959DA6-7081-E211-ABD3-002590596498.root'
+        # /JetHT/CMSSW_6_2_1-GR_R_62_V1_dvmc_RelVal_jetHT2012Cdvmc-v1/RECO
+        '/store/relval/CMSSW_6_2_1/JetHT/RECO/GR_R_62_V1_dvmc_RelVal_jetHT2012Cdvmc-v1/00000/0030D71C-1E38-E311-BA7A-0025905964BE.root'
     ]
 
 if options.runOnData :
@@ -170,7 +162,10 @@ process.TFileService = cms.Service("TFileService",
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents) )
 
 ## Options and Output Report
-process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(options.wantSummary) )
+process.options   = cms.untracked.PSet(
+    wantSummary = cms.untracked.bool(options.wantSummary),
+    allowUnscheduled = cms.untracked.bool(True)
+)
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = globalTag + '::All'
@@ -234,10 +229,10 @@ process.combinedCSVJP = process.combinedMVA.clone(
 process.combinedCSVJPBJetTags = process.combinedMVABJetTags.clone(
   jetTagComputer = 'combinedCSVJP',
   tagInfos = cms.VInputTag(
-    cms.InputTag("impactParameterTagInfosAODPFlow"),
-    cms.InputTag("secondaryVertexTagInfosAODPFlow"),
-    cms.InputTag("softPFMuonsTagInfosAODPFlow"),
-    cms.InputTag("softPFElectronsTagInfosAODPFlow")
+    cms.InputTag("impactParameterTagInfosPFlow"),
+    cms.InputTag("secondaryVertexTagInfosPFlow"),
+    cms.InputTag("softPFMuonsTagInfosPFlow"),
+    cms.InputTag("softPFElectronsTagInfosPFlow")
   )
 )
 
@@ -275,10 +270,10 @@ process.load("RecoBTau.JetTagComputer.negativeCombinedMVABJetTags_cfi")
 process.negativeCombinedCSVJPBJetTags = process.negativeCombinedMVABJetTags.clone(
   jetTagComputer = 'negativeCombinedCSVJP',
   tagInfos = cms.VInputTag(
-    cms.InputTag("impactParameterTagInfosAODPFlow"),
-    cms.InputTag("secondaryVertexNegativeTagInfosAODPFlow"),
-    cms.InputTag("softPFMuonsTagInfosAODPFlow"),
-    cms.InputTag("softPFElectronsTagInfosAODPFlow")
+    cms.InputTag("impactParameterTagInfosPFlow"),
+    cms.InputTag("secondaryVertexNegativeTagInfosPFlow"),
+    cms.InputTag("softPFMuonsTagInfosPFlow"),
+    cms.InputTag("softPFElectronsTagInfosPFlow")
   )
 )
 
@@ -316,10 +311,10 @@ process.load("RecoBTau.JetTagComputer.positiveCombinedMVABJetTags_cfi")
 process.positiveCombinedCSVJPBJetTags = process.positiveCombinedMVABJetTags.clone(
   jetTagComputer = 'positiveCombinedCSVJP',
   tagInfos = cms.VInputTag(
-    cms.InputTag("impactParameterTagInfosAODPFlow"),
-    cms.InputTag("secondaryVertexTagInfosAODPFlow"),
-    cms.InputTag("softPFMuonsTagInfosAODPFlow"),
-    cms.InputTag("softPFElectronsTagInfosAODPFlow")
+    cms.InputTag("impactParameterTagInfosPFlow"),
+    cms.InputTag("secondaryVertexTagInfosPFlow"),
+    cms.InputTag("softPFMuonsTagInfosPFlow"),
+    cms.InputTag("softPFElectronsTagInfosPFlow")
   )
 )
 
@@ -356,10 +351,10 @@ process.combinedCSVJPSL = process.combinedMVA.clone(
 process.combinedCSVJPSLBJetTags = process.combinedMVABJetTags.clone(
   jetTagComputer = 'combinedCSVJPSL',
   tagInfos = cms.VInputTag(
-    cms.InputTag("impactParameterTagInfosAODPFlow"),
-    cms.InputTag("secondaryVertexTagInfosAODPFlow"),
-    cms.InputTag("softPFMuonsTagInfosAODPFlow"),
-    cms.InputTag("softPFElectronsTagInfosAODPFlow")
+    cms.InputTag("impactParameterTagInfosPFlow"),
+    cms.InputTag("secondaryVertexTagInfosPFlow"),
+    cms.InputTag("softPFMuonsTagInfosPFlow"),
+    cms.InputTag("softPFElectronsTagInfosPFlow")
   )
 )
 
@@ -395,10 +390,10 @@ process.negativeCombinedCSVJPSL = process.negativeCombinedMVA.clone(
 process.negativeCombinedCSVJPSLBJetTags = process.negativeCombinedMVABJetTags.clone(
   jetTagComputer = 'negativeCombinedCSVJPSL',
   tagInfos = cms.VInputTag(
-    cms.InputTag("impactParameterTagInfosAODPFlow"),
-    cms.InputTag("secondaryVertexNegativeTagInfosAODPFlow"),
-    cms.InputTag("softPFMuonsTagInfosAODPFlow"),
-    cms.InputTag("softPFElectronsTagInfosAODPFlow")
+    cms.InputTag("impactParameterTagInfosPFlow"),
+    cms.InputTag("secondaryVertexNegativeTagInfosPFlow"),
+    cms.InputTag("softPFMuonsTagInfosPFlow"),
+    cms.InputTag("softPFElectronsTagInfosPFlow")
   )
 )
 
@@ -434,10 +429,10 @@ process.positiveCombinedCSVJPSL = process.positiveCombinedMVA.clone(
 process.positiveCombinedCSVJPSLBJetTags = process.positiveCombinedMVABJetTags.clone(
   jetTagComputer = 'positiveCombinedCSVJPSL',
   tagInfos = cms.VInputTag(
-    cms.InputTag("impactParameterTagInfosAODPFlow"),
-    cms.InputTag("secondaryVertexTagInfosAODPFlow"),
-    cms.InputTag("softPFMuonsTagInfosAODPFlow"),
-    cms.InputTag("softPFElectronsTagInfosAODPFlow")
+    cms.InputTag("impactParameterTagInfosPFlow"),
+    cms.InputTag("secondaryVertexTagInfosPFlow"),
+    cms.InputTag("softPFMuonsTagInfosPFlow"),
+    cms.InputTag("softPFElectronsTagInfosPFlow")
   )
 )
 
@@ -454,9 +449,7 @@ process.out = cms.OutputModule("PoolOutputModule",
 )
 
 #-------------------------------------
-## Standard PAT Configuration File
-process.load("PhysicsTools.PatAlgos.patSequences_cff")
-
+## PAT Configuration
 postfix = "PFlow"
 jetAlgo="AK5"
 
@@ -472,34 +465,19 @@ getattr(process,"pfNoElectron"+postfix).enable = True
 getattr(process,"pfNoTau"+postfix).enable = False
 getattr(process,"pfNoJet"+postfix).enable = True
 
-from PhysicsTools.PatAlgos.tools.coreTools import *
-## Remove objects not used from the PAT sequences to speed up processing
-if options.useTTbarFilter:
-    removeSpecificPATObjects(process,names=['Taus'],postfix=postfix)
-else:
-    removeSpecificPATObjects(process,names=['Electrons', 'Muons', 'Taus'],postfix=postfix)
-
 from PhysicsTools.PatAlgos.tools.jetTools import *
 ## Switch the default jet collection (done in order to use the above specified b-tag infos and discriminators)
-switchJetCollection(process,
-    cms.InputTag('pfNoTau'+postfix),
-    doJTA        = True,
-    doBTagging   = True,
-    btagInfo     = bTagInfos,
-    btagdiscriminators = bTagDiscriminators,
-    jetCorrLabel = jetCorrectionsAK5,
-    doType1MET   = False,
-    genJetCollection = cms.InputTag('ak5GenJetsNoNu'),
-    doJetID      = False,
-    postfix      = postfix
+switchJetCollection(
+    process,
+    cms.InputTag('pfNoTauClones'+postfix),
+    btagInfos = bTagInfos,
+    btagDiscriminators = bTagDiscriminators,
+    jetCorrections = jetCorrectionsAK5,
+    postfix = postfix
 )
+process.patJetGenJetMatchPFlow.matched = cms.InputTag('ak5GenJetsNoNu'+postfix)
 
 ## Add additional b-tag discriminators
-getattr(process,'patPF2PATSequence'+postfix).replace( getattr(process,'negativeCombinedSecondaryVertexSoftPFLeptonV1BJetTagsAOD'+postfix),
-    getattr(process,'negativeCombinedSecondaryVertexSoftPFLeptonV1BJetTagsAOD'+postfix)
-    + process.combinedCSVJPBJetTags + process.negativeCombinedCSVJPBJetTags + process.positiveCombinedCSVJPBJetTags
-    + process.combinedCSVJPSLBJetTags + process.negativeCombinedCSVJPSLBJetTags + process.positiveCombinedCSVJPSLBJetTags
-)
 getattr(process,'patJets'+postfix).discriminatorSources += cms.VInputTag(
     cms.InputTag("combinedCSVJPBJetTags"),
     cms.InputTag("negativeCombinedCSVJPBJetTags"),
@@ -508,6 +486,10 @@ getattr(process,'patJets'+postfix).discriminatorSources += cms.VInputTag(
     cms.InputTag("negativeCombinedCSVJPSLBJetTags"),
     cms.InputTag("positiveCombinedCSVJPSLBJetTags")
 )
+
+## Load standard PAT objects (here we only need PAT muons but the framework will figure out what it needs to run using the unscheduled mode)
+process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
+process.load("PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff")
 #-------------------------------------
 
 #-------------------------------------
@@ -515,7 +497,7 @@ getattr(process,'patJets'+postfix).discriminatorSources += cms.VInputTag(
 from RecoJets.JetProducers.ca4GenJets_cfi import ca4GenJets
 process.ca8GenJetsNoNu = ca4GenJets.clone(
     rParam = cms.double(0.8),
-    src = cms.InputTag("genParticlesForJetsNoNu")
+    src = cms.InputTag("genParticlesForJetsNoNu"+postfix)
 )
 
 from RecoJets.JetProducers.ca4PFJets_cfi import ca4PFJets
@@ -533,7 +515,7 @@ from RecoJets.JetProducers.SubJetParameters_cfi import SubJetParameters
 process.ca8GenJetsNoNuPruned = ca4GenJets.clone(
     SubJetParameters,
     rParam = cms.double(0.8),
-    src = cms.InputTag("genParticlesForJetsNoNu"),
+    src = cms.InputTag("genParticlesForJetsNoNu"+postfix),
     usePruning = cms.bool(True),
     writeCompound = cms.bool(True),
     jetCollInstanceName=cms.string("SubJets")
@@ -552,61 +534,50 @@ process.ca8PFJetsPruned = ak5PFJetsPruned.clone(
 
 if options.runSubJets:
     ## PATify CA8 jets
-    switchJetCollection(process,
-        cms.InputTag('ca8PFJets'),
-        doJTA        = True,
-        doBTagging   = True,
-        btagInfo     = bTagInfos,
-        btagdiscriminators = bTagDiscriminators,
-        jetCorrLabel = jetCorrectionsAK7,
-        doType1MET   = False,
-        genJetCollection = cms.InputTag('ca8GenJetsNoNu'),
-        doJetID      = False
-    )
     addJetCollection(
         process,
-        cms.InputTag('ca8PFJetsPruned'),
-        'CA8Pruned','PF',
-        doJTA=False,
-        doBTagging=False,
-        btagInfo=bTagInfos,
-        btagdiscriminators=bTagDiscriminators,
-        jetCorrLabel=jetCorrectionsAK7,
-        doType1MET=False,
-        doL1Cleaning=False,
-        doL1Counters=False,
-        doJetID=False,
-        genJetCollection=cms.InputTag('ca8GenJetsNoNu')
+        labelName = 'CA8',
+        jetSource = cms.InputTag('ca8PFJets'),
+        btagInfos = bTagInfos,
+        btagDiscriminators = bTagDiscriminators,
+        jetCorrections = jetCorrectionsAK7,
+        postfix = postfix
     )
+    process.patJetGenJetMatchPatJetsCA8PFlow.matched = cms.InputTag('ca8GenJetsNoNu')
+    process.patJetPartonAssociationPatJetsCA8PFlow.partons = cms.InputTag("patJetPartonsPFlow")
+
     addJetCollection(
         process,
-        cms.InputTag('ca8PFJetsPruned','SubJets'),
-        'CA8PrunedSubJets', 'PF',
-        doJTA=True,
-        doBTagging=True,
-        btagInfo=bTagInfos,
-        btagdiscriminators=bTagDiscriminatorsSubJets,
-        jetCorrLabel=jetCorrectionsAK5,
-        doType1MET=False,
-        doL1Cleaning=False,
-        doL1Counters=False,
-        doJetID=False,
-        genJetCollection=cms.InputTag('ca8GenJetsNoNuPruned','SubJets')
+        labelName = 'CA8Pruned',
+        jetSource = cms.InputTag('ca8PFJetsPruned'),
+        btagInfos=['None'],
+        btagDiscriminators=['None'],
+        jetCorrections=jetCorrectionsAK7,
+        postfix = postfix
     )
+    process.patJetGenJetMatchPatJetsCA8PrunedPFlow.matched = cms.InputTag('ca8GenJetsNoNu')
+    process.patJetPartonAssociationPatJetsCA8PrunedPFlow.partons = cms.InputTag("patJetPartonsPFlow")
+
+    addJetCollection(
+        process,
+        labelName = 'CA8PrunedSubJets',
+        jetSource = cms.InputTag('ca8PFJetsPruned','SubJets'),
+        btagInfos=bTagInfos,
+        btagDiscriminators=bTagDiscriminatorsSubJets,
+        jetCorrections=jetCorrectionsAK5,
+        postfix = postfix
+    )
+    process.patJetGenJetMatchPatJetsCA8PrunedSubJetsPFlow.matched = cms.InputTag('ca8GenJetsNoNuPruned','SubJets')
+    process.patJetPartonAssociationPatJetsCA8PrunedSubJetsPFlow.partons = cms.InputTag("patJetPartonsPFlow")
 
 ## Establish references between PAT fat jets and PAT subjets using the BoostedJetMerger
-process.selectedPatJetsCA8PrunedPFPacked = cms.EDProducer("BoostedJetMerger",
-    jetSrc=cms.InputTag("selectedPatJetsCA8PrunedPF"),
-    subjetSrc=cms.InputTag("selectedPatJetsCA8PrunedSubJetsPF")
+process.selectedPatJetsCA8PrunedPFlowPacked = cms.EDProducer("BoostedJetMerger",
+    jetSrc=cms.InputTag("selectedPatJetsCA8PrunedPFlow"),
+    subjetSrc=cms.InputTag("selectedPatJetsCA8PrunedSubJetsPFlow")
 )
 #-------------------------------------
 
 #-------------------------------------
-#from PhysicsTools.PatAlgos.tools.coreTools import * # Already imported above
-## Remove objects not used from the PAT sequences to speed up processing
-if options.runSubJets:
-    removeAllPATObjectsBut(process, ['Jets', 'Muons'])
-
 if options.runOnData and options.runSubJets:
     ## Remove MC matching when running over data
     removeMCMatching( process, ['All'] )
@@ -614,7 +585,7 @@ if options.runOnData and options.runSubJets:
 ## Add TagInfos to PAT jets
 patJets = ['patJets'+postfix]
 if options.runSubJets:
-    patJets += ['patJets','patJetsCA8PrunedSubJetsPF']
+    patJets += ['patJetsCA8PFlow','patJetsCA8PrunedSubJetsPFlow']
 
 for m in patJets:
     if hasattr(process,m):
@@ -669,10 +640,13 @@ if options.useTTbarFilter:
     getattr(process,"pfIsolatedMuons"+postfix).combinedIsolationCut = cms.double(9999.)
     getattr(process,"pfIsolatedMuons"+postfix).isolationCut = cms.double(9999.)
 
-    getattr(process,"patMuons"+postfix).isolationValues.pfNeutralHadrons = cms.InputTag( 'muPFIsoValueNeutral03'+postfix )
-    getattr(process,"patMuons"+postfix).isolationValues.pfPhotons = cms.InputTag( 'muPFIsoValueGamma03'+postfix )
-    getattr(process,"patMuons"+postfix).isolationValues.pfChargedHadrons = cms.InputTag( 'muPFIsoValueCharged03'+postfix )
-    getattr(process,"patMuons"+postfix).isolationValues.pfPUChargedHadrons = cms.InputTag( 'muPFIsoValuePU03'+postfix )
+    getattr(process,"patMuons"+postfix).isolationValues = cms.PSet(
+        pfNeutralHadrons = cms.InputTag('muPFIsoValueNeutral03'+postfix),
+        pfPhotons = cms.InputTag('muPFIsoValueGamma03'+postfix),
+        pfChargedHadrons = cms.InputTag('muPFIsoValueCharged03'+postfix),
+        pfChargedAll = cms.InputTag('muPFIsoValueChargedAll03'+postfix),
+        pfPUChargedHadrons = cms.InputTag('muPFIsoValuePU03'+postfix)
+    )
 
     ## Change the cone size of electron isolation to 0.3
     getattr(process,'pfElectrons'+postfix).isolationValueMapsCharged  = cms.VInputTag(cms.InputTag('elPFIsoValueCharged03PFId'+postfix))
@@ -698,22 +672,18 @@ if options.useTTbarFilter:
         pfNeutralHadrons = cms.InputTag('elPFIsoValueNeutral03PFId'+postfix),
         pfPhotons = cms.InputTag('elPFIsoValueGamma03PFId'+postfix)
     )
-    getattr(process,'patPF2PATSequence'+postfix).replace( getattr(process,'patElectrons'+postfix), process.eidMVASequence * getattr(process,'patElectrons'+postfix) )
 
     ## Conversion rejection
     ## This should be your last selected electron collection name since currently index is used to match with electron later. We can fix this using reference pointer.
     #setattr(process,'patConversions'+postfix) = cms.EDProducer("PATConversionProducer",
         #electronSource = cms.InputTag('selectedPatElectrons'+postfix)
     #)
-    #getattr(process,'patPF2PATSequence'+postfix) += getattr(process,'patConversions'+postfix)
 #-------------------------------------
 
 #-------------------------------------
 from RecoBTag.PerformanceMeasurements.patTools import *
 ## Adapt primary vertex collection
-adaptPVs(process, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'), postfix=postfix, sequence='patPF2PATSequence')
-if options.runSubJets:
-    adaptPVs(process, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'), postfix='', sequence='patDefaultSequence')
+adaptPVs(process, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'))
 #-------------------------------------
 
 #-------------------------------------
@@ -748,15 +718,16 @@ process.btagana.patMuonCollectionName = cms.InputTag('selectedPatMuons')
 process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
 process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
 
-process.btaganaSubJets = process.btagana.clone(
-    produceJetProbaTree = cms.bool(True),
-    allowJetSkipping    = cms.bool(False),
-    Jets                = cms.InputTag('selectedPatJetsCA8PrunedSubJetsPF'),
-    FatJets             = cms.InputTag('selectedPatJets'),
-    PrunedFatJets       = cms.InputTag('selectedPatJetsCA8PrunedPFPacked'),
-    runSubJets          = options.runSubJets,
-    use_ttbar_filter    = cms.bool(False)
-)
+if options.runSubJets:
+    process.btaganaSubJets = process.btagana.clone(
+        produceJetProbaTree = cms.bool(True),
+        allowJetSkipping    = cms.bool(False),
+        Jets                = cms.InputTag('selectedPatJetsCA8PrunedSubJetsPFlow'),
+        FatJets             = cms.InputTag('selectedPatJetsCA8PFlow'),
+        PrunedFatJets       = cms.InputTag('selectedPatJetsCA8PrunedPFlowPacked'),
+        runSubJets          = options.runSubJets,
+        use_ttbar_filter    = cms.bool(False)
+    )
 #---------------------------------------
 
 #---------------------------------------
@@ -782,7 +753,7 @@ process.trackingFailureFilter.VertexSource = cms.InputTag('goodOfflinePrimaryVer
 #---------------------------------------
 ## Filter for HCAL laser events in prompt 2012A+B+C, snippet for "Datasets from the 2013 rereco and Multijet parked":
 ## https://twiki.cern.ch/twiki/bin/view/CMS/PdmVKnowFeatures#HCAL_laser_events_in_prompt_2012
-process.load("EventFilter.HcalRawToDigi.hcallaserFilterFromTriggerResult_cff")
+#process.load("EventFilter.HcalRawToDigi.hcallaserFilterFromTriggerResult_cff")  # ---------->  Does not seem to work with CMSSW_6_2_X rereco !!!
 #---------------------------------------
 
 #---------------------------------------
@@ -807,32 +778,9 @@ process.filtSeq = cms.Sequence(
     * process.trackingFailureFilter
     * process.trkPOGFilters
 )
-if options.runOnData:
-    process.filtSeq *= process.hcalfilter
+#if options.runOnData:
+    #process.filtSeq *= process.hcalfilter # ---------->  Does not seem to work with CMSSW_6_2_X rereco !!!
 
-
-## Define jet sequences
-process.genJetSeq = cms.Sequence(
-    process.ca8GenJetsNoNu
-    + process.ca8GenJetsNoNuPruned
-)
-process.jetSeq = cms.Sequence(
-    process.ca8PFJets
-    + process.ca8PFJetsPruned
-)
-if not options.runOnData:
-    process.jetSeq = cms.Sequence( process.genJetSeq + process.jetSeq )
-
-
-## Define combined PF2PAT + subjet sequence
-process.combPF2PATSubJetSeq = cms.Sequence( getattr(process,"patPF2PATSequence"+postfix) )
-if options.runSubJets:
-    process.combPF2PATSubJetSeq = cms.Sequence(
-        getattr(process,"patPF2PATSequence"+postfix)
-        * process.jetSeq
-        * getattr(process,"patDefaultSequence")
-        * process.selectedPatJetsCA8PrunedPFPacked
-    )
 
 ## Define analyzer sequence
 process.analyzerSeq = cms.Sequence( )
@@ -848,7 +796,6 @@ process.p = cms.Path(
     process.allEvents
     * process.filtSeq
     * process.selectedEvents
-    * process.combPF2PATSubJetSeq
     * process.analyzerSeq
 )
 
