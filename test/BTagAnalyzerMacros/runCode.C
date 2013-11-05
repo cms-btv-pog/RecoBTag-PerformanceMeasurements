@@ -3,26 +3,28 @@
    
    // Declare the root files on which you want to run  (MC & Data) :
    TChain *superTree = new TChain("btagana/ttree");
+//   superTree->Add("/opt/sbg/cms/ui2_data1/blochd/NTUPLES/CMSSW_5_3_11_patch1/MC/QCD_MuEnrichedPt5_TuneZ2star_8TeV_pythia6_Summer12_DR53X-PU_S10_START53_V7A_V02-02-07/JetTree_subjets_Pt-50to80_403on415.root");
+
    // Data
-   superTree->Add("/opt/sbg/cms/ui8_data1/ccollard/BTAG/Data_Winter13/Jet/Run2012A-v1/TrackTree_*.root");
-   superTree->Add("/opt/sbg/cms/ui8_data1/ccollard/BTAG/Data_Winter13/Jet/Run2012B-v1/TrackTree_*.root");
-   superTree->Add("/opt/sbg/cms/ui8_data1/ccollard/BTAG/Data_Winter13/Jet/Run2012C-v1/TrackTree_*.root");
-   superTree->Add("/opt/sbg/cms/ui8_data1/ccollard/BTAG/Data_Winter13/Jet/Run2012D-v1/TrackTree_*.root");
+
+   superTree->Add("/opt/sbg/cms/ui2_data2/blochd/NTUPLES/CMSSW_5_3_11_V02-03-02/Data/Jet_Run2012A-22Jan2013/*root");
+   superTree->Add("/opt/sbg/cms/ui2_data2/blochd/NTUPLES/CMSSW_5_3_11_V02-03-02/Data/JetMon_Run2012B-22Jan2013/*root");
+   superTree->Add("/opt/sbg/cms/ui2_data2/blochd/NTUPLES/CMSSW_5_3_11_V02-03-02/Data/JetMon_Run2012C-22Jan2013/*root");
+   superTree->Add("/opt/sbg/cms/ui2_data2/blochd/NTUPLES/CMSSW_5_3_11_V02-03-02/Data/JetMon_Run2012D-22Jan2013/*root");
+
    // MC
-   //superTree->Add("/opt/sbg/cms/ui8_data1/ccollard/BTAG/MC_Dan_2013April/PythiaQCD/QCD_Pt-15to30_Inclusive_8TeV_pythia6_Summer12_DR53X-PU_S10_AODSIM/TrackTree_*.root");
-   superTree->Add("/opt/sbg/cms/ui8_data1/ccollard/BTAG/MC_Dan_2013April/PythiaQCD/QCD_Pt-30to50_Inclusive_8TeV_pythia6_Summer12_DR53X-PU_S10_AODSIM/TrackTree_*.root");
-   superTree->Add("/opt/sbg/cms/ui8_data1/ccollard/BTAG/MC_Dan_2013April/PythiaQCD/QCD_Pt-50to80_Inclusive_8TeV_pythia6_Summer12_DR53X-PU_S10_AODSIM/TrackTree_*.root");
-   superTree->Add("/opt/sbg/cms/ui8_data1/ccollard/BTAG/MC_Dan_2013April/PythiaQCD/QCD_Pt-80to120_Inclusive_8TeV_pythia6_Summer12_DR53X-PU_S10_AODSIM/TrackTree_*.root");
-   superTree->Add("/opt/sbg/cms/ui8_data2/ccollard/BTAG/MC_Dan_2013April/PythiaQCD/QCD_Pt-120to170_Inclusive_8TeV_pythia6_Summer12_DR53X-PU_S10_AODSIM/TrackTree_*.root");
-   superTree->Add("/opt/sbg/cms/ui8_data2/ccollard/BTAG/MC_Dan_2013April/PythiaQCD/QCD_Pt-170to300_Inclusive_8TeV_pythia6_Summer12_DR53X-PU_S10_AODSIM/TrackTree_*.root");
-   superTree->Add("/opt/sbg/cms/ui8_data1/ccollard/BTAG/MC_Dan_2013April/PythiaQCD/QCD_Pt-300to470_Inclusive_8TeV_pythia6_Summer12_DR53X-PU_S10_AODSIM/TrackTree_*.root");
-   superTree->Add("/opt/sbg/cms/ui8_data1/ccollard/BTAG/MC_Dan_2013April/PythiaQCD/QCD_Pt-470to600_Inclusive_8TeV_pythia6_Summer12_DR53X-PU_S10_AODSIM/TrackTree_*.root");
-   superTree->Add("/opt/sbg/cms/ui8_data2/ccollard/BTAG/MC_Dan_2013April/PythiaQCD/QCD_Pt-600to800_Inclusive_8TeV_pythia6_Summer12_DR53X-PU_S10_AODSIM/TrackTree_*.root");
-   superTree->Add("/opt/sbg/cms/ui8_data2/ccollard/BTAG/MC_Dan_2013April/PythiaQCD/QCD_Pt-800to1000_Inclusive_8TeV_pythia6_Summer12_DR53X-PU_S10_AODSIM/TrackTree_*.root");
+  superTree->Add("/opt/sbg/cms/ui2_data2/blochd/NTUPLES/CMSSW_5_3_11_V02-03-02/MC/QCD_TuneZ2star_8TeV_pythia6_Summer12_DR53X-PU_S10_START53_V7A/JetTree_mc_subjets_Pt-30to50_TP.root");
+  superTree->Add("/opt/sbg/cms/ui2_data2/blochd/NTUPLES/CMSSW_5_3_11_V02-03-02/MC/QCD_TuneZ2star_8TeV_pythia6_Summer12_DR53X-PU_S10_START53_V7A/JetTree_mc_subjets_Pt-50to80_TP.root");
+  superTree->Add("/opt/sbg/cms/ui2_data2/blochd/NTUPLES/CMSSW_5_3_11_V02-03-02/MC/QCD_TuneZ2star_8TeV_pythia6_Summer12_DR53X-PU_S10_START53_V7A/JetTree_mc_subjets_Pt-80to120_TP.root");
+  superTree->Add("/opt/sbg/cms/ui2_data2/blochd/NTUPLES/CMSSW_5_3_11_V02-03-02/MC/QCD_TuneZ2star_8TeV_pythia6_Summer12_DR53X-PU_S10_START53_V7A/JetTree_mc_subjets_Pt-120to170_TP.root");
+  superTree->Add("/opt/sbg/cms/ui2_data2/blochd/NTUPLES/CMSSW_5_3_11_V02-03-02/MC/QCD_TuneZ2star_8TeV_pythia6_Summer12_DR53X-PU_S10_START53_V7A/JetTree_mc_subjets_Pt-170to300_TP.root");
+  superTree->Add("/opt/sbg/cms/ui2_data2/blochd/NTUPLES/CMSSW_5_3_11_V02-03-02/MC/QCD_TuneZ2star_8TeV_pythia6_Summer12_DR53X-PU_S10_START53_V7A/JetTree_mc_subjets_Pt-300to470_TP.root");
+  superTree->Add("/opt/sbg/cms/ui2_data2/blochd/NTUPLES/CMSSW_5_3_11_V02-03-02/MC/QCD_TuneZ2star_8TeV_pythia6_Summer12_DR53X-PU_S10_START53_V7A/JetTree_mc_subjets_Pt-470to600_TP.root");
+  superTree->Add("/opt/sbg/cms/ui2_data2/blochd/NTUPLES/CMSSW_5_3_11_V02-03-02/MC/QCD_TuneZ2star_8TeV_pythia6_Summer12_DR53X-PU_S10_START53_V7A/JetTree_mc_subjets_Pt-600to800_TP.root");
 
    // JetProbaTree : Oui
    // NewAlgoTree : Non
-   CommPlotProducer m(superTree,1,0);
+   CommPlotProducer m(superTree,0,1);
 
    // Provide MC information. use SetXS(TString generator, bool qcdtype, int TeV) ;
    // with generator = pythia or herwig, qcdtype =0 for inclusive or 1 for MuEnriched, and TeV =7 or 8.
@@ -51,23 +53,18 @@
    // if you don't know how many events you have in your datasets
    // m.Counter(); --> TAKES 4 HOURS ON DATA+MC :(
 
-    double   n15    = 6.97142e+06;
-    double   n20    = 2.93092e+06;
-    double   n15to30 = n15+n20;
-    double   n30    = 5.96571e+06;
-    double   n50    = 5.98172e+06;
-    double   n80   = 5.89208e+06;
-    double   n120  = 5.91732e+06;
-    double   n170  = 5.81438e+06;
-    double   n300  = 5.89309e+06;
-    double   n470  = 3.93778e+06;
-    double   n600  = 3.98544e+06;
-    double   n800 = 3.98713e+06;
+    double   n20    = 0.;
+    double   n30    = 408047; 
+    double   n50    = 380139;
+    double   n80   =  841606;
+    double   n120  =  878681;
+    double   n170  =  293229;
+    double   n300  =  312488;
+    double   n470  =  319603;
+    double   n600  =  265460;
+    double   n800 =  0.;
     double   n1000     = 0;
-    m.Fill_nevent(0.,n15to30,n30,n50,n80,n120,n170,n300,n470,n600,n800,n1000);
-   // m.Fill_nevent(0.,0.,n30,n50,n80,n120,n170,n300,n470,0.,0., 0.);
-
-   
+    m.Fill_nevent(0.,n20,n30,n50,n80,n120,n170,n300,n470,n600,n800, 0.);
 
    // Set.XS() will automatically put the cross sections depending on the choice make above with SetInfo().
    // if nothing was defined, the default is to use inclusive pythia x-sections for 8 TeV.
@@ -77,7 +74,7 @@
    m.SetSumXS();  
    
    // Here put the name of the PU data root file for the PU reweighting
-   TString PUdataFile="../Production_data/lumiSum/PileUp_jet_abcd.root";
+   TString PUdataFile="PileUp_jet_abcd.root";
 
    // For the PU reweighting, you can use the 2012 MC distribution with PU sceanrio S7 (SetPU2012_S7(PUdataFile)),
    // with PU scenario S10 (SetPU2012_S10(PUdataFile)), or with your own PU vector. Be carefull this vector has to be
@@ -88,7 +85,9 @@
    //The loop on tthe events takes 4 inputs: the trigger, the ptmin of the jets, the ptmax of the jets, and the output
    //file name 
    
-   m.Loop("jet",40, 60, 500, "output_jet");
+   m.Loop("jet",80, 100, 500, "output_test80");
+//   m.Loop("btag",20, 45, 300, "output_btag_newalgo1");
+
 
    
 }
