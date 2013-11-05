@@ -318,7 +318,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         EventInfo.Genquark_eta[EventInfo.nGenquark]    = genIt.p4().eta();
         EventInfo.Genquark_phi[EventInfo.nGenquark]    = genIt.p4().phi();
         EventInfo.Genquark_pdgID[EventInfo.nGenquark]  = genIt.pdgId();
-        EventInfo.Genquark_mother[EventInfo.nGenquark] = genIt.mother()->pdgId();
+        if (genIt.numberOfMothers()>0) EventInfo.Genquark_mother[EventInfo.nGenquark] = genIt.mother()->pdgId();   // protection
+        else EventInfo.Genquark_mother[EventInfo.nGenquark] = -99999;
         //  cout << " status " << genIt.status() << " pdgId " << genIt.pdgId()  << " pT " << genIt.p4().pt() << " mother " << moth->pdgId() << endl;
         ++EventInfo.nGenquark;
       }
@@ -458,6 +459,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
       // Leptons
       if ( (ID == 11 || ID == 13) && genIt.p4().pt() > 3. ) {
+       if (genIt.numberOfMothers()>0) {  // protection for herwig ttbar mc
         const Candidate * moth1 = genIt.mother();
         if ( moth1->pdgId() != genIt.pdgId() ) {
           EventInfo.Genlep_pT[EventInfo.nGenlep]    = genIt.p4().pt();
@@ -465,14 +467,23 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
           EventInfo.Genlep_phi[EventInfo.nGenlep]   = genIt.p4().phi();
           EventInfo.Genlep_pdgID[EventInfo.nGenlep] = genIt.pdgId();
           EventInfo.Genlep_status[EventInfo.nGenlep] = genIt.status();
-          const Candidate * moth2 = moth1->mother();
-          const Candidate * moth3 = moth2->mother();
-          const Candidate * moth4 = moth3->mother();
-          int isWZ = 0, istau = 0, isB = 0, isD = 0;
           int ID1 = abs( moth1->pdgId() );
-          int ID2 = abs( moth2->pdgId() );
-          int ID3 = abs( moth3->pdgId() );
-          int ID4 = abs( moth4->pdgId() );
+          int ID2 = -9999;
+          int ID3 = -9999;
+          int ID4 = -9999;
+          int isWZ = 0, istau = 0, isB = 0, isD = 0;
+          if (moth1->numberOfMothers()>0) {   // protection for herwig ttbar mc
+            const Candidate * moth2 = moth1->mother();
+            ID2 = abs( moth2->pdgId() );
+            if (moth2->numberOfMothers()>0) {
+              const Candidate * moth3 = moth2->mother();
+              ID3 = abs( moth3->pdgId() );
+              if (moth3->numberOfMothers()>0) {
+                const Candidate * moth4 = moth3->mother();
+                ID4 = abs( moth4->pdgId() );
+              }
+            }
+          }
           if ( ID1 == 15 ) istau = 1;
           if ( ID1 == 24 || ID2 == 24 || ID3 == 24 || ID4 == 24 ||
               ID1 == 25 || ID2 == 25 || ID3 == 25 || ID4 == 25 ) isWZ = 1;
@@ -503,6 +514,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
           //       << " from " << EventInfo.Genlep_mother[EventInfo.nGenlep] << endl;
           ++EventInfo.nGenlep;
         }
+       }
       }
 
 //$$
@@ -562,7 +574,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         EventInfo.BHadron_phi[EventInfo.nBHadrons]   = genIt.p4().phi();
         EventInfo.BHadron_mass[EventInfo.nBHadrons]  = genIt.mass();
         EventInfo.BHadron_pdgID[EventInfo.nBHadrons] = genIt.pdgId();
-        EventInfo.BHadron_mother[EventInfo.nBHadrons] = genIt.mother()->pdgId();
+        if (genIt.numberOfMothers()>0) EventInfo.BHadron_mother[EventInfo.nBHadrons] = genIt.mother()->pdgId();
+        else EventInfo.BHadron_mother[EventInfo.nBHadrons] = -99999;
         // check if any of the daughters is also B hadron
         int hasBHadronDaughter = 0;
         for (unsigned int d=0; d<nDaughters; ++d) {
