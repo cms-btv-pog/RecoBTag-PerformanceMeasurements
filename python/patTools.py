@@ -9,11 +9,12 @@ def adaptPVs(process, pvCollection=cms.InputTag('offlinePrimaryVertices'), postf
     print "***********************************"
 
     # PV sources to be exchanged:
-    pvExchange = ['Vertices','vertices','pvSrc','primaryVertices','primaryVertex','srcPVs','primaryVertex']
+    pvExchange = ['Vertices','vertices','pvSrc','primaryVertices','srcPVs','primaryVertex']
 
     # exchange the primary vertex source of all relevant modules
     for m in getattr(process,sequence+postfix).moduleNames():
         # only if the module has a source with a relevant name
         for namePvSrc in pvExchange:
             if hasattr(getattr(process,m),namePvSrc):
+                #print m
                 setattr(getattr(process,m),namePvSrc,deepcopy(pvCollection))
