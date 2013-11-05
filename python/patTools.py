@@ -9,7 +9,7 @@ def adaptPVs(process, pvCollection=cms.InputTag('offlinePrimaryVertices')):
     print "***********************************"
 
     # PV sources to be exchanged:
-    pvExchange = ['Vertices','vertices','pvSrc','primaryVertices','primaryVertex','srcPVs','primaryVertex']
+    pvExchange = ['Vertices','vertices','pvSrc','primaryVertices','srcPVs','primaryVertex']
 
     # exchange the primary vertex source of all relevant modules
     for m in (process.producerNames().split(' ') + process.filterNames().split(' ')):
