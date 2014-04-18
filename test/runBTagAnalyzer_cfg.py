@@ -131,8 +131,10 @@ process.MessageLogger.cerr.default.limit = 10
 process.source = cms.Source(
     "PoolSource",
     fileNames = cms.untracked.vstring(
-        # /RelValQCD_Pt_80to120/CMSSW_6_2_3-PU_START62_V1_rundepMC_dvmc-v9/GEN-SIM-RECO
-        '/store/relval/CMSSW_6_2_3/RelValQCD_Pt_80to120/GEN-SIM-RECO/PU_START62_V1_rundepMC_dvmc-v9/00000/0461F2B9-8A3D-E311-85B1-00261894396B.root'
+        # /RelValQCD_FlatPt_15_3000/CMSSW_6_2_0-PRE_ST62_V8-v3/GEN-SIM-RECO
+        #'/store/relval/CMSSW_6_2_0/RelValQCD_FlatPt_15_3000/GEN-SIM-RECO/PRE_ST62_V8-v3/00000/68DC246F-56EC-E211-B2E5-003048CF94A4.root'
+        # /RelValTTbar/CMSSW_6_2_0-PRE_ST62_V8-v3/GEN-SIM-RECO
+        '/store/relval/CMSSW_6_2_0/RelValTTbar/GEN-SIM-RECO/PRE_ST62_V8-v3/00000/1A4CBAAC-48EC-E211-8A00-001E67397EB8.root'
     )
 )
 
@@ -458,24 +460,24 @@ usePF2PAT(process,runPF2PAT=True, jetAlgo=jetAlgo, runOnMC=not options.runOnData
           jetCorrections=jetCorrectionsAK5, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'))
 
 ## Top projections in PF2PAT
-getattr(process,"pfPileUp"+postfix).checkClosestZVertex = False
-getattr(process,"pfNoPileUp"+postfix).enable = options.usePFchs
+getattr(process,"pfPileUpJME"+postfix).checkClosestZVertex = False
+getattr(process,"pfNoPileUpJME"+postfix).enable = options.usePFchs
 if options.useTTbarFilter:
-    getattr(process,"pfNoMuon"+postfix).enable = False
-    getattr(process,"pfNoElectron"+postfix).enable = False
+    getattr(process,"pfNoMuonJME"+postfix).enable = False
+    getattr(process,"pfNoElectronJME"+postfix).enable = False
     getattr(process,"pfNoTau"+postfix).enable = False
     getattr(process,"pfNoJet"+postfix).enable = False
 else:
-    getattr(process,"pfNoMuon"+postfix).enable = True
-    getattr(process,"pfNoElectron"+postfix).enable = True
+    getattr(process,"pfNoMuonJME"+postfix).enable = False
+    getattr(process,"pfNoElectronJME"+postfix).enable = False
     getattr(process,"pfNoTau"+postfix).enable = False
-    getattr(process,"pfNoJet"+postfix).enable = True
+    getattr(process,"pfNoJet"+postfix).enable = False
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
 ## Switch the default jet collection (done in order to use the above specified b-tag infos and discriminators)
 switchJetCollection(
     process,
-    cms.InputTag('pfNoTauClones'+postfix),
+    cms.InputTag('pfJets'+postfix),
     btagInfos = bTagInfos,
     btagDiscriminators = bTagDiscriminators,
     jetCorrections = jetCorrectionsAK5,
@@ -601,11 +603,7 @@ for m in patJets:
 
 #-------------------------------------
 ## Produce a collection of good primary vertices
-from PhysicsTools.SelectorUtils.pvSelector_cfi import pvSelector
-process.goodOfflinePrimaryVertices = cms.EDFilter("PrimaryVertexObjectFilter",
-    filterParams = pvSelector.clone( minNdof = cms.double(4.0), maxZ = cms.double(24.0) ),
-    src=cms.InputTag('offlinePrimaryVertices')
-)
+process.load('CommonTools.ParticleFlow.goodOfflinePrimaryVertices_cfi')
 
 ## Filter for removing scraping events
 process.noscraping = cms.EDFilter("FilterOutScraping",
@@ -616,7 +614,6 @@ process.noscraping = cms.EDFilter("FilterOutScraping",
 )
 
 ## Filter for good primary vertex
-process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi")
 process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
     vertexCollection = cms.InputTag('offlinePrimaryVertices'),
     minimumNDOF = cms.uint32(4) ,
