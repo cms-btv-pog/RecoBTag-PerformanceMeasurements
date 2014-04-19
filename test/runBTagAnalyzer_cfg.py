@@ -35,7 +35,7 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
-options.register('mcGlobalTag', 'STAR17_61_V1A',
+options.register('mcGlobalTag', 'DES17_62_V8',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
@@ -134,8 +134,8 @@ process.MessageLogger.cerr.default.limit = 10
 process.source = cms.Source(
     "PoolSource",
     fileNames = cms.untracked.vstring(
-        # /RelValTTbar_14TeV/CMSSW_6_1_2_SLHC8_patch3-PU_STAR17_61_V1A_GaussBS_SpecialTRK_NoDL-v1/GEN-SIM-RECO
-        '/store/relval/CMSSW_6_1_2_SLHC8_patch5/RelValTTbar_14TeV/GEN-SIM-RECO/PU_STAR17_61_V1A_GaussBS_SpecialTRK_NoDL-v1/00000/12F3231B-EAAA-E311-9306-02163E00E5F5.root'
+        # /RelValTTbar_14TeV/CMSSW_6_2_0_SLHC7-DES17_62_V8_UPG2017-v2/GEN-SIM-RECO
+        '/store/relval/CMSSW_6_2_0_SLHC7/RelValTTbar_14TeV/GEN-SIM-RECO/DES17_62_V8_UPG2017-v2/00000/04D56E72-4390-E311-A322-02163E008D7C.root'
     )
 )
 
