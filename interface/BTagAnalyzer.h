@@ -185,6 +185,8 @@ class BTagAnalyzer : public edm::EDAnalyzer
 
     bool runSubJets_ ;
     bool allowJetSkipping_ ;
+    bool storeTagVariables_;
+    bool storeCSVTagVariables_;
 
     edm::InputTag src_;  // Generator/handronizer module label
     edm::InputTag muonCollectionName_;
