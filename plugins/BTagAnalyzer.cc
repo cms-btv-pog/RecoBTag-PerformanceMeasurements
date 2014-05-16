@@ -67,7 +67,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
 
   JetCollectionTag_ = iConfig.getParameter<edm::InputTag>("Jets");
   FatJetCollectionTag_ = iConfig.getParameter<edm::InputTag>("FatJets");
-  PrunedFatJetCollectionTag_ = iConfig.getParameter<edm::InputTag>("PrunedFatJets");
+  GroomedFatJetCollectionTag_ = iConfig.getParameter<edm::InputTag>("GroomedFatJets");
 
   trackCHEBJetTags_    = iConfig.getParameter<std::string>("trackCHEBJetTags");
   trackCNegHEBJetTags_ = iConfig.getParameter<std::string>("trackCNegHEBJetTags");
@@ -227,33 +227,20 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   iEvent.getByLabel (JetCollectionTag_, jetsColl);
 
   edm::Handle <PatJetCollection> fatjetsColl;
-  edm::Handle <PatJetCollection> prunedfatjetsColl;
+  edm::Handle <PatJetCollection> groomedfatjetsColl;
   if (runSubJets_) {
     iEvent.getByLabel(FatJetCollectionTag_, fatjetsColl) ;
-    iEvent.getByLabel(PrunedFatJetCollectionTag_, prunedfatjetsColl) ;
+    iEvent.getByLabel(GroomedFatJetCollectionTag_, groomedfatjetsColl) ;
   }
 
-  JetToJetMap fatJetToPrunedFatJetMap;
-  if( runSubJets_ )
+  // match groomed and original fat jets
+  std::vector<int> groomedIndices;
+  if (runSubJets_)
   {
-    for(PatJetCollection::const_iterator it = fatjetsColl->begin(); it != fatjetsColl->end(); ++it)
-    {
-      PatJetCollection::const_iterator prunedJetMatch;
-      bool prunedJetMatchFound = false;
-      float dR = 0.8;
-      for(PatJetCollection::const_iterator pjIt = prunedfatjetsColl->begin(); pjIt != prunedfatjetsColl->end(); ++pjIt)
-      {
-        float dR_temp = reco::deltaR( it->p4(), pjIt->p4() );
-        if( dR_temp < dR )
-        {
-          prunedJetMatchFound = true;
-          dR = dR_temp;
-          prunedJetMatch = pjIt;
-        }
-      }
-      if( !prunedJetMatchFound ) edm::LogError("NoMatchingGroomedJet") << "Matching pruned jet not found."; // This should never happen but just in case
-      fatJetToPrunedFatJetMap[&(*it)] = &(*prunedJetMatch);
-    }
+    if( groomedfatjetsColl->size() > fatjetsColl->size() )
+      edm::LogError("TooManyGroomedJets") << "There are more groomed (" << groomedfatjetsColl->size() << ") than original fat jets (" << fatjetsColl->size() << "). Please check that the two jet collections belong to each other.";
+
+    matchGroomedJets(fatjetsColl,groomedfatjetsColl,groomedIndices);
   }
 
   //------------------------------------------------------
@@ -937,10 +924,10 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //------------------------------------------------------
   int iJetColl = 0 ;
   //// Do jets
-  processJets(jetsColl, fatjetsColl, iEvent, iSetup, fatJetToPrunedFatJetMap, iJetColl) ;
+  processJets(jetsColl, fatjetsColl, iEvent, iSetup, groomedfatjetsColl, groomedIndices, iJetColl) ;
   if (runSubJets_) {
     iJetColl = 1 ;
-    processJets(fatjetsColl, jetsColl, iEvent, iSetup, fatJetToPrunedFatJetMap, iJetColl) ;
+    processJets(fatjetsColl, jetsColl, iEvent, iSetup, groomedfatjetsColl, groomedIndices, iJetColl) ;
   }
   //------------------------------------------------------
 
@@ -983,7 +970,8 @@ void BTagAnalyzer::processTrig(const edm::Handle<edm::TriggerResults>& trigRes, 
 
 
 void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, const edm::Handle<PatJetCollection>& jetsColl2,
-    const edm::Event& iEvent, const edm::EventSetup& iSetup, const JetToJetMap& fatJetToPrunedFatJetMap, const int iJetColl)
+                               const edm::Event& iEvent, const edm::EventSetup& iSetup,
+                               const edm::Handle<PatJetCollection>& jetsColl3, std::vector<int>& jetIndices, const int iJetColl)
 {
 
   int numjet = 0;
@@ -999,6 +987,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
   JetInfo[iJetColl].nSVTagVar = 0;
   JetInfo[iJetColl].nTrkTagVarCSV = 0;
   JetInfo[iJetColl].nTrkEtaRelTagVarCSV = 0;
+  JetInfo[iJetColl].nSubJet = 0;
 
   //// Loop over the jets
   for ( PatJetCollection::const_iterator pjet = jetsColl->begin(); pjet != jetsColl->end(); ++pjet ) {
@@ -1046,14 +1035,28 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     if( runSubJets_ && iJetColl == 0 )
     {
       int fatjetIdx=-1;
-      for( PatJetCollection::const_iterator jIt = jetsColl2->begin(); jIt != jetsColl2->end(); ++jIt )
+      bool fatJetFound = false;
+      // loop over fat jets
+      for( int fjIt = 0; fjIt < (int)jetIndices.size(); ++fjIt )
       {
-        if( &(*pjet) == fatJetToPrunedFatJetMap.find(&(*jIt))->second->daughter(0) ||
-            &(*pjet) == fatJetToPrunedFatJetMap.find(&(*jIt))->second->daughter(1) )
+        int gfjIdx = jetIndices.at(fjIt);
+        if( gfjIdx < 0 ) // skip fat jets with no matching groomed fat jet
+          continue;
+
+        int nSJ = jetsColl3->at(gfjIdx).numberOfDaughters();
+        const edm::Ptr<reco::Jet> originalObjRef = edm::Ptr<reco::Jet>( jetsColl3->at(gfjIdx).originalObjectRef() );
+        // loop over subjets
+        for( int sjIt = 0; sjIt < nSJ; ++sjIt )
         {
-          fatjetIdx = int( jIt - jetsColl2->begin() );
-          break;
+          if( pjet->originalObjectRef() == originalObjRef->daughterPtr(sjIt) )
+          {
+            fatjetIdx = fjIt;
+            fatJetFound = true;
+            break;
+          }
         }
+        if( fatJetFound )
+          break;
       }
       JetInfo[iJetColl].Jet_FatJetIdx[JetInfo[iJetColl].nJet] = fatjetIdx;
 
@@ -1088,24 +1091,62 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet] = nsubjettinessCalculator.getTau(1,fjConstituents);
       JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet] = nsubjettinessCalculator.getTau(2,fjConstituents);
 
-      JetInfo[iJetColl].Jet_ptPruned[JetInfo[iJetColl].nJet]   = fatJetToPrunedFatJetMap.find(&(*pjet))->second->pt();
-      JetInfo[iJetColl].Jet_jesPruned[JetInfo[iJetColl].nJet]  = ( fatJetToPrunedFatJetMap.find(&(*pjet))->second->availableJECSets().size()>0 ? fatJetToPrunedFatJetMap.find(&(*pjet))->second->pt()/fatJetToPrunedFatJetMap.find(&(*pjet))->second->correctedJet("Uncorrected").pt() : 1. );
-      JetInfo[iJetColl].Jet_etaPruned[JetInfo[iJetColl].nJet]  = fatJetToPrunedFatJetMap.find(&(*pjet))->second->eta();
-      JetInfo[iJetColl].Jet_phiPruned[JetInfo[iJetColl].nJet]  = fatJetToPrunedFatJetMap.find(&(*pjet))->second->phi();
-      JetInfo[iJetColl].Jet_massPruned[JetInfo[iJetColl].nJet] = fatJetToPrunedFatJetMap.find(&(*pjet))->second->mass();
+      int gfjIdx = jetIndices.at(numjet);
+      int nSJ = 0;
+      JetInfo[iJetColl].Jet_nFirstSJ[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSubJet;
+      std::vector<PatJetCollection::const_iterator> subjetIters;
 
-      for( PatJetCollection::const_iterator jIt = jetsColl2->begin(); jIt != jetsColl2->end(); ++jIt )
+      if ( gfjIdx >= 0 )
       {
-        if( &(*jIt) == fatJetToPrunedFatJetMap.find(&(*pjet))->second->daughter(0) ) subjet1Idx = int( jIt - jetsColl2->begin() );
-        if( &(*jIt) == fatJetToPrunedFatJetMap.find(&(*pjet))->second->daughter(1) ) subjet2Idx = int( jIt - jetsColl2->begin() );
-        if( subjet1Idx>=0 && subjet2Idx>=0 ) break;
+        nSJ = jetsColl3->at(gfjIdx).numberOfDaughters();
+
+        JetInfo[iJetColl].Jet_ptGroomed[JetInfo[iJetColl].nJet]   = jetsColl3->at(gfjIdx).pt();
+        JetInfo[iJetColl].Jet_jesGroomed[JetInfo[iJetColl].nJet]  = jetsColl3->at(gfjIdx).pt()/jetsColl3->at(gfjIdx).correctedJet("Uncorrected").pt();
+        JetInfo[iJetColl].Jet_etaGroomed[JetInfo[iJetColl].nJet]  = jetsColl3->at(gfjIdx).eta();
+        JetInfo[iJetColl].Jet_phiGroomed[JetInfo[iJetColl].nJet]  = jetsColl3->at(gfjIdx).phi();
+        JetInfo[iJetColl].Jet_massGroomed[JetInfo[iJetColl].nJet] = jetsColl3->at(gfjIdx).mass();
+
+        const edm::Ptr<reco::Jet> originalObjRef = edm::Ptr<reco::Jet>( jetsColl3->at(gfjIdx).originalObjectRef() );
+        // loop over subjets
+        for( int sjIt = 0; sjIt < nSJ; ++sjIt )
+        {
+          JetInfo[iJetColl].SubJetIdx[JetInfo[iJetColl].nSubJet] = -1;
+
+          for( PatJetCollection::const_iterator jIt = jetsColl2->begin(); jIt != jetsColl2->end(); ++jIt )
+          {
+            if( jIt->originalObjectRef() == originalObjRef->daughterPtr(sjIt) )
+            {
+              JetInfo[iJetColl].SubJetIdx[JetInfo[iJetColl].nSubJet] = ( jIt - jetsColl2->begin() );
+              subjetIters.push_back( jIt );
+              break;
+            }
+          }
+          ++JetInfo[iJetColl].nSubJet;
+        }
       }
-      JetInfo[iJetColl].Jet_SubJet1Idx[JetInfo[iJetColl].nJet] = subjet1Idx;
-      JetInfo[iJetColl].Jet_SubJet2Idx[JetInfo[iJetColl].nJet] = subjet2Idx;
+      else
+      {
+        JetInfo[iJetColl].Jet_ptGroomed[JetInfo[iJetColl].nJet]   = -9999;
+        JetInfo[iJetColl].Jet_jesGroomed[JetInfo[iJetColl].nJet]  = -9999;
+        JetInfo[iJetColl].Jet_etaGroomed[JetInfo[iJetColl].nJet]  = -9999;
+        JetInfo[iJetColl].Jet_phiGroomed[JetInfo[iJetColl].nJet]  = -9999;
+        JetInfo[iJetColl].Jet_massGroomed[JetInfo[iJetColl].nJet] = -9999;
+      }
+      JetInfo[iJetColl].Jet_nSubJets[JetInfo[iJetColl].nJet] = nSJ;
+      JetInfo[iJetColl].Jet_nLastSJ[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSubJet;
+
+      // sort subjets by uncorrected Pt
+      std::sort(subjetIters.begin(), subjetIters.end(), orderByPt("Uncorrected"));
+      // take two leading subjets
+      if( subjetIters.size()>1 )
+      {
+         subjet1Idx = ( subjetIters.at(0) - jetsColl2->begin() );
+         subjet2Idx = ( subjetIters.at(1) - jetsColl2->begin() );
+      }
 
       int nsubjettracks = 0, nsharedsubjettracks = 0;
 
-      if( subjet1Idx>=0 && subjet2Idx>=0 ) // protection for pathological cases of pruned fat jets with only one constituent which results in an undefined subjet 2 index
+      if( subjet1Idx>=0 && subjet2Idx>=0 ) // protection for pathological cases of groomed fat jets with only one constituent which results in an undefined subjet 2 index
       {
         for(int sj=0; sj<2; ++sj)
         {
@@ -2805,6 +2846,45 @@ bool BTagAnalyzer::NameCompatible(const std::string& pattern, const std::string&
   return boost::regex_match(name,regexp);
 }
 
+// ------------ method that matches groomed and original jets based on minimum dR ------------
+void BTagAnalyzer::matchGroomedJets(const edm::Handle<PatJetCollection>& jets,
+                                    const edm::Handle<PatJetCollection>& groomedJets,
+                                    std::vector<int>& matchedIndices)
+{
+   std::vector<bool> jetLocks(jets->size(),false);
+   std::vector<int>  jetIndices;
+
+   for(size_t gj=0; gj<groomedJets->size(); ++gj)
+   {
+     double matchedDR = 1e9;
+     int matchedIdx = -1;
+
+     for(size_t j=0; j<jets->size(); ++j)
+     {
+       if( jetLocks.at(j) ) continue; // skip jets that have already been matched
+
+       double tempDR = reco::deltaR( jets->at(j).rapidity(), jets->at(j).phi(), groomedJets->at(gj).rapidity(), groomedJets->at(gj).phi() );
+       if( tempDR < matchedDR )
+       {
+         matchedDR = tempDR;
+         matchedIdx = j;
+       }
+     }
+
+     if( matchedIdx>=0 ) jetLocks.at(matchedIdx) = true;
+     jetIndices.push_back(matchedIdx);
+   }
+
+   if( std::find( jetIndices.begin(), jetIndices.end(), -1 ) != jetIndices.end() )
+     edm::LogError("JetMatchingFailed") << "Matching groomed to original jets failed. Please check that the two jet collections belong to each other.";
+
+   for(size_t j=0; j<jets->size(); ++j)
+   {
+     std::vector<int>::iterator matchedIndex = std::find( jetIndices.begin(), jetIndices.end(), j );
+
+     matchedIndices.push_back( matchedIndex != jetIndices.end() ? std::distance(jetIndices.begin(),matchedIndex) : -1 );
+   }
+}
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(BTagAnalyzer);

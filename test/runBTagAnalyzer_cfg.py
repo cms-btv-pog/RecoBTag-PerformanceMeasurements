@@ -783,7 +783,7 @@ process.btaganaSubJets = process.btagana.clone(
     allowJetSkipping    = cms.bool(False),
     Jets                = cms.InputTag('selectedPatJetsCA8PrunedSubJetsPF'),
     FatJets             = cms.InputTag('selectedPatJets'),
-    PrunedFatJets       = cms.InputTag('selectedPatJetsCA8PrunedPFPacked'),
+    GroomedFatJets      = cms.InputTag('selectedPatJetsCA8PrunedPFPacked'),
     runSubJets          = options.runSubJets,
     use_ttbar_filter    = cms.bool(False)
 )
