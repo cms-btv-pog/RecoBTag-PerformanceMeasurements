@@ -524,7 +524,7 @@ if options.runSubJets:
         allowJetSkipping    = cms.bool(False),
         Jets                = cms.InputTag('selectedPatJetsCA8PrunedSubJetsPFlow'),
         FatJets             = cms.InputTag('selectedPatJetsCA8PFlow'),
-        PrunedFatJets       = cms.InputTag('selectedPatJetsCA8PrunedPFlowPacked'),
+        GroomedFatJets      = cms.InputTag('selectedPatJetsCA8PrunedPFlowPacked'),
         runSubJets          = options.runSubJets,
         use_ttbar_filter    = cms.bool(False)
     )
