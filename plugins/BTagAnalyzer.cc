@@ -132,6 +132,9 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   ttbarTriggerPathNames_   = iConfig.getParameter<std::vector<std::string> >("TTbarTriggerPathNames");
   PFJet80TriggerPathNames_ = iConfig.getParameter<std::vector<std::string> >("PFJet80TriggerPathNames");
 
+  maxPixelBarrelLayer_     = iConfig.getParameter<uint32_t>("maxPixelBarrelLayer");
+  maxPixelEndcapLayer_     = iConfig.getParameter<uint32_t>("maxPixelEndcapLayer");
+
   ///////////////
   // TTree
 
@@ -762,7 +765,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       EventInfo.PatMuon_isGlobal[EventInfo.nPatMuon] = 1;
       EventInfo.PatMuon_isPF[EventInfo.nPatMuon]     = it->isPFMuon();
       EventInfo.PatMuon_nTkHit[EventInfo.nPatMuon]   = it->innerTrack()->hitPattern().numberOfValidHits();
-      EventInfo.PatMuon_nPixHit[EventInfo.nPatMuon]  = it->innerTrack()->hitPattern().numberOfValidPixelHits();
+      EventInfo.PatMuon_nPixHit[EventInfo.nPatMuon]  = it->innerTrack()->hitPattern().numberOfValidPixelHits(maxPixelBarrelLayer_, maxPixelEndcapLayer_);
       EventInfo.PatMuon_nOutHit[EventInfo.nPatMuon]  = it->innerTrack()->trackerExpectedHitsOuter().numberOfHits();
       EventInfo.PatMuon_nMuHit[EventInfo.nPatMuon]   = it->outerTrack()->hitPattern().numberOfValidMuonHits();
       EventInfo.PatMuon_nMatched[EventInfo.nPatMuon] = it->numberOfMatches();
@@ -1198,14 +1201,14 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
         JetInfo[iJetColl].Track_charge[JetInfo[iJetColl].nTrack]   = ptrack.charge();
 
         JetInfo[iJetColl].Track_nHitAll[JetInfo[iJetColl].nTrack]  = ptrack.numberOfValidHits();
-        JetInfo[iJetColl].Track_nHitPixel[JetInfo[iJetColl].nTrack]= ptrack.hitPattern().numberOfValidPixelHits();
+        JetInfo[iJetColl].Track_nHitPixel[JetInfo[iJetColl].nTrack]= ptrack.hitPattern().numberOfValidPixelHits(maxPixelBarrelLayer_, maxPixelEndcapLayer_);
         JetInfo[iJetColl].Track_nHitStrip[JetInfo[iJetColl].nTrack]= ptrack.hitPattern().numberOfValidStripHits();
         JetInfo[iJetColl].Track_nHitTIB[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidStripTIBHits();
         JetInfo[iJetColl].Track_nHitTID[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidStripTIDHits();
         JetInfo[iJetColl].Track_nHitTOB[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidStripTOBHits();
         JetInfo[iJetColl].Track_nHitTEC[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidStripTECHits();
-        JetInfo[iJetColl].Track_nHitPXB[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidPixelBarrelHits();
-        JetInfo[iJetColl].Track_nHitPXF[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidPixelEndcapHits();
+        JetInfo[iJetColl].Track_nHitPXB[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidPixelBarrelHits(maxPixelBarrelLayer_);
+        JetInfo[iJetColl].Track_nHitPXF[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidPixelEndcapHits(maxPixelEndcapLayer_);
         JetInfo[iJetColl].Track_isHitL1[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().hasValidHitInFirstPixelBarrel();
 
         JetInfo[iJetColl].Track_PV[JetInfo[iJetColl].nTrack] = 0;
@@ -1377,7 +1380,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
             && deltaR < 0.4
             && ptrack.pt() > 5.
             && ptrack.numberOfValidHits() >= 11
-            && ptrack.hitPattern().numberOfValidPixelHits() >= 2
+            && ptrack.hitPattern().numberOfValidPixelHits(maxPixelBarrelLayer_, maxPixelEndcapLayer_) >= 2
             && ptrack.normalizedChi2() < 10
             && ptrack.trackerExpectedHitsOuter().numberOfHits() <= 2
             && ptrack.dz()-(*pv).z() < 1. ) {
@@ -1488,7 +1491,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 
         if (muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits()>0 &&
             muons[muIdx].numberOfMatches()>1 && muons[muIdx].innerTrack()->hitPattern().numberOfValidHits()>10 &&
-            muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits()>1 &&
+            muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits(maxPixelBarrelLayer_, maxPixelEndcapLayer_)>1 &&
             muons[muIdx].innerTrack()->trackerExpectedHitsOuter().numberOfHits()<3 &&
             muons[muIdx].globalTrack()->normalizedChi2()<10. && muons[muIdx].innerTrack()->normalizedChi2()<10.)
           JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 2;
@@ -1505,7 +1508,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
         JetInfo[iJetColl].Muon_IdxJet[JetInfo[iJetColl].nMuon]   = JetInfo[iJetColl].nJet;
         JetInfo[iJetColl].Muon_ptrel[JetInfo[iJetColl].nMuon]    = calculPtRel( *(pjet->tagInfoSoftLepton("softMuon")->lepton(leptIdx)), *pjet );
         JetInfo[iJetColl].Muon_nTkHit[JetInfo[iJetColl].nMuon]   = muons[muIdx].innerTrack()->hitPattern().numberOfValidHits();
-        JetInfo[iJetColl].Muon_nPixHit[JetInfo[iJetColl].nMuon]  = muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits();
+        JetInfo[iJetColl].Muon_nPixHit[JetInfo[iJetColl].nMuon]  = muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits(maxPixelBarrelLayer_, maxPixelEndcapLayer_);
         JetInfo[iJetColl].Muon_nOutHit[JetInfo[iJetColl].nMuon]  = muons[muIdx].innerTrack()->trackerExpectedHitsOuter().numberOfHits();
         JetInfo[iJetColl].Muon_nMuHit[JetInfo[iJetColl].nMuon]   = muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits();
         JetInfo[iJetColl].Muon_chi2[JetInfo[iJetColl].nMuon]     = muons[muIdx].globalTrack()->normalizedChi2();
@@ -2402,7 +2405,7 @@ bool BTagAnalyzer::findCat(const reco::Track* track, CategoryFinder& d) {
   double eta = track->eta();
   double chi = track->normalizedChi2();
   int   nhit = track->numberOfValidHits();
-  int   npix = track->hitPattern().numberOfValidPixelHits();
+  int   npix = track->hitPattern().numberOfValidPixelHits(maxPixelBarrelLayer_, maxPixelEndcapLayer_);
 
   bool result = ( p > d.pMin  &&  p  < d.pMax		  &&
       fabs(eta) > d.etaMin    &&  fabs(eta) < d.etaMax    &&

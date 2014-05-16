@@ -1,8 +1,10 @@
 import FWCore.ParameterSet.Config as cms
 from SimTracker.TrackHistory.TrackClassifier_cff import *
+from RecoBTag.Configuration.SLHCPixelBarrelLayerDef_cfi import *
 
 
 btagana = cms.EDAnalyzer("BTagAnalyzer",
+    PixelBarrelLayerDefBlock,
     trackClassifier,
     use_selected_tracks      = cms.bool(True),
     useTrackHistory          = cms.bool(False),

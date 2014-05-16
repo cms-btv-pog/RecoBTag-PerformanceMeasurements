@@ -314,6 +314,9 @@ class BTagAnalyzer : public edm::EDAnalyzer
 
     int cap0, cap1, cap2, cap3, cap4, cap5, cap6, cap7, cap8;
     int can0, can1, can2, can3, can4, can5, can6, can7, can8;
+
+    // for correct counting of the number of pixel hits in SLHC detector geometries
+    uint32_t maxPixelBarrelLayer_, maxPixelEndcapLayer_;
 };
 
 #endif
