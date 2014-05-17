@@ -357,11 +357,23 @@ if options.runSubJets:
 
     ## New jet flavor still requires some cfg-level adjustments for subjets until it is better integrated into PAT
     ## Adjust the jet flavor for pruned subjets
-    setattr(process,'patJetFlavourAssociationCA8PrunedSubJetsPFlow', getattr(process,'patJetFlavourAssociationCA8PFlow').clone(
+    setattr(process,'patJetFlavourAssociationCA8PrunedSubJets'+postfix, getattr(process,'patJetFlavourAssociationCA8'+postfix).clone(
         groomedJets = cms.InputTag('ca8PFJetsPruned'),
         subjets = cms.InputTag('ca8PFJetsPruned','SubJets')
     ))
-    getattr(process,'patJetsCA8PrunedSubJetsPFlow').JetFlavourInfoSource = cms.InputTag('patJetFlavourAssociationCA8PrunedSubJetsPFlow','SubJets')
+    getattr(process,'patJetsCA8PrunedSubJets'+postfix).JetFlavourInfoSource = cms.InputTag('patJetFlavourAssociationCA8PrunedSubJets'+postfix,'SubJets')
+#-------------------------------------
+
+#-------------------------------------
+## N-subjettiness
+if options.runSubJets:
+    from RecoJets.JetProducers.nJettinessAdder_cfi import Njettiness
+
+    process.NjettinessCA8 = Njettiness.clone(
+        src = cms.InputTag("ca8PFJets"),
+        cone = cms.double(0.8)
+    )
+    getattr(process,'patJetsCA8'+postfix).userData.userFloats.src += ['NjettinessCA8:tau1','NjettinessCA8:tau2','NjettinessCA8:tau3']
 #-------------------------------------
 
 #-------------------------------------
@@ -372,7 +384,7 @@ if options.runOnData and options.runSubJets:
 ## Add TagInfos to PAT jets
 patJets = ['patJets'+postfix]
 if options.runSubJets:
-    patJets += ['patJetsCA8PFlow','patJetsCA8PrunedSubJetsPFlow']
+    patJets += ['patJetsCA8'+postfix,'patJetsCA8PrunedSubJets'+postfix]
 
 for m in patJets:
     if hasattr(process,m):
@@ -522,8 +534,8 @@ if options.runSubJets:
     process.btaganaSubJets = process.btagana.clone(
         produceJetTrackTree = cms.bool(True),
         allowJetSkipping    = cms.bool(False),
-        Jets                = cms.InputTag('selectedPatJetsCA8PrunedSubJetsPFlow'),
-        FatJets             = cms.InputTag('selectedPatJetsCA8PFlow'),
+        Jets                = cms.InputTag('selectedPatJetsCA8PrunedSubJets'+postfix),
+        FatJets             = cms.InputTag('selectedPatJetsCA8'+postfix),
         GroomedFatJets      = cms.InputTag('selectedPatJetsCA8PrunedPFlowPacked'),
         runSubJets          = options.runSubJets,
         use_ttbar_filter    = cms.bool(False)

@@ -15,7 +15,6 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   thelepton1(0.,0.,0.,0.),
   thelepton2(0.,0.,0.,0.),
   computer(0),
-  nsubjettinessCalculator(Njettiness::onepass_kt_axes, NsubParameters(1.0, 0.8, 0.8)),
   cap0(0),
   cap1(0),
   cap2(0),
@@ -1074,23 +1073,8 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     if ( runSubJets_ && iJetColl == 1 )
     {
       // N-subjettiness
-      std::vector<fastjet::PseudoJet> fjConstituents;
-      std::vector<edm::Ptr<reco::PFCandidate> > constituents = pjet->getPFConstituents();
-      std::vector<edm::Ptr<reco::PFCandidate> >::const_iterator m;
-      for ( m = constituents.begin(); m != constituents.end(); ++m )
-      {
-        reco::PFCandidatePtr constit = *m;
-        if (constit->pt() == 0)
-        {
-          edm::LogWarning("NullTransverseMomentum") << "dropping input candidate with pt=0";
-          continue;
-        }
-        fjConstituents.push_back(fastjet::PseudoJet(constit->px(),constit->py(),constit->pz(),constit->energy()));
-        fjConstituents.back().set_user_index(m - constituents.begin());
-      }
-
-      JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet] = nsubjettinessCalculator.getTau(1,fjConstituents);
-      JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet] = nsubjettinessCalculator.getTau(2,fjConstituents);
+      JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet] = pjet->userFloat("NjettinessCA8:tau1");;
+      JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet] = pjet->userFloat("NjettinessCA8:tau2");;
 
       int gfjIdx = jetIndices.at(numjet);
       int nSJ = 0;
