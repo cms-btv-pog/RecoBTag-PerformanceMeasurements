@@ -608,6 +608,19 @@ process.selectedPatJetsCA8PrunedPFPacked = cms.EDProducer("BoostedJetMerger",
 #-------------------------------------
 
 #-------------------------------------
+## N-subjettiness
+from RecoJets.JetProducers.nJettinessAdder_cfi import Njettiness
+
+process.NjettinessCA8 = Njettiness.clone(
+    src = cms.InputTag("ca8PFJets"),
+    cone = cms.double(0.8)
+)
+
+if options.runSubJets:
+    process.patJets.userData.userFloats.src += ['NjettinessCA8:tau1','NjettinessCA8:tau2','NjettinessCA8:tau3']
+#-------------------------------------
+
+#-------------------------------------
 #from PhysicsTools.PatAlgos.tools.coreTools import * # Already imported above
 ## Remove objects not used from the PAT sequences to speed up processing
 if options.runSubJets:
@@ -860,6 +873,7 @@ if options.runSubJets:
     process.combPF2PATSubJetSeq = cms.Sequence(
         getattr(process,"patPF2PATSequence"+postfix)
         * process.jetSeq
+        * process.NjettinessCA8
         * getattr(process,"patDefaultSequence")
         * process.selectedPatJetsCA8PrunedPFPacked
     )

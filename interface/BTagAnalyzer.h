@@ -24,11 +24,6 @@ Implementation:
 #include <memory>
 
 // user include files
-// FastJet
-#include "fastjet/PseudoJet.hh"
-// N-subjettiness
-#include "RecoBTag/PerformanceMeasurements/interface/Njettiness.hh"
-
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
@@ -328,8 +323,6 @@ class BTagAnalyzer : public edm::EDAnalyzer
     TLorentzVector thelepton2;
 
     const GenericMVAJetTagComputer *computer ;
-
-    Njettiness nsubjettinessCalculator;
 
     edm::View<reco::Muon> muons ;
 
