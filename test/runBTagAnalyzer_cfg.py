@@ -729,7 +729,7 @@ if options.useTTbarFilter:
 #-------------------------------------
 
 #-------------------------------------
-from RecoBTag.PerformanceMeasurements.patTools import *
+from PhysicsTools.PatAlgos.tools.pfTools import *
 ## Adapt primary vertex collection
 adaptPVs(process, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'), postfix=postfix, sequence='patPF2PATSequence')
 if options.runSubJets:
