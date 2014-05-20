@@ -175,6 +175,8 @@ class BTagAnalyzer : public edm::EDAnalyzer
 
     int isFromGSP(const reco::Candidate* c);
 
+    bool isHardProcess(const int status);
+
     // ----------member data ---------------------------
     std::string outputFile_;
     //std::vector< std::string > moduleLabel_;
@@ -182,6 +184,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
     bool runSubJets_ ;
     bool allowJetSkipping_ ;
 
+    edm::InputTag src_;  // Generator/handronizer module label
     edm::InputTag muonCollectionName_;
     edm::InputTag patMuonCollectionName_;
     edm::InputTag triggerTable_;
@@ -317,6 +320,9 @@ class BTagAnalyzer : public edm::EDAnalyzer
 
     // for correct counting of the number of pixel hits in SLHC detector geometries
     uint32_t maxPixelBarrelLayer_, maxPixelEndcapLayer_;
+
+    // Generator/hadronizer type (information stored bitwise)
+    unsigned int hadronizerType_;
 };
 
 #endif
