@@ -175,6 +175,8 @@ class BTagAnalyzer : public edm::EDAnalyzer
 
     int isFromGSP(const reco::Candidate* c);
 
+    bool isHardProcess(const int status);
+
     // ----------member data ---------------------------
     std::string outputFile_;
     //std::vector< std::string > moduleLabel_;
@@ -182,6 +184,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
     bool runSubJets_ ;
     bool allowJetSkipping_ ;
 
+    edm::InputTag src_;  // Generator/handronizer module label
     edm::InputTag muonCollectionName_;
     edm::InputTag patMuonCollectionName_;
     edm::InputTag triggerTable_;
@@ -314,6 +317,9 @@ class BTagAnalyzer : public edm::EDAnalyzer
 
     int cap0, cap1, cap2, cap3, cap4, cap5, cap6, cap7, cap8;
     int can0, can1, can2, can3, can4, can5, can6, can7, can8;
+
+    // Generator/hadronizer type (information stored bitwise)
+    unsigned int hadronizerType_;
 };
 
 #endif

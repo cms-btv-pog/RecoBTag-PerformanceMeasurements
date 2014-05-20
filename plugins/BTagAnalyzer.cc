@@ -1,4 +1,5 @@
 #include "RecoBTag/PerformanceMeasurements/interface/BTagAnalyzer.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 
 PFJetIDSelectionFunctor pfjetIDLoose( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE );
@@ -31,7 +32,8 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   can5(0),
   can6(0),
   can7(0),
-  can8(0)
+  can8(0),
+  hadronizerType_(0)
 {
   //now do what ever initialization you need
   std::string module_type  = iConfig.getParameter<std::string>("@module_type");
@@ -56,6 +58,8 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
 
   // Modules
   primaryVertexColl_   = iConfig.getParameter<edm::InputTag>("primaryVertexColl");
+
+  src_                 = iConfig.getParameter<edm::InputTag>("src");
 
   JetCollectionTag_ = iConfig.getParameter<edm::InputTag>("Jets");
   FatJetCollectionTag_ = iConfig.getParameter<edm::InputTag>("FatJets");
@@ -244,6 +248,25 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   }
 
   //------------------------------------------------------
+  // Determine hadronizer type (done only once per job)
+  //------------------------------------------------------
+  if( !isData_ && hadronizerType_ == 0 )
+  {
+    edm::Handle<GenEventInfoProduct> genEvtInfoProduct;
+    iEvent.getByLabel(src_, genEvtInfoProduct);
+
+    std::string moduleName = "";
+    const edm::Provenance& prov = iEvent.getProvenance(genEvtInfoProduct.id());
+    if( genEvtInfoProduct.isValid() )
+      moduleName = prov.moduleName();
+
+    if( moduleName.find("Pythia8")!=std::string::npos )
+      hadronizerType_ |= ( 1 << 1 ); // set the 2nd bit
+    else // assuming Pythia6
+      hadronizerType_ |= ( 1 << 0 ); // set the 1st bit
+  }
+
+  //------------------------------------------------------
   // MC informations
   //------------------------------------------------------
   EventInfo.pthat = -1.;
@@ -309,11 +332,11 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       unsigned int nDaughters = genIt.numberOfDaughters();
 
 //$$
-      if ( genIt.status() == 3 ) EventInfo.GenPVz = genIt.vz();
+      if ( isHardProcess(genIt.status()) ) EventInfo.GenPVz = genIt.vz();
 //$$
 
       // prompt b and c
-      if ( (ID == 4 || ID == 5) && genIt.status() == 3 ) {
+      if ( (ID == 4 || ID == 5) && isHardProcess(genIt.status()) ) {
         EventInfo.Genquark_pT[EventInfo.nGenquark]     = genIt.p4().pt();
         EventInfo.Genquark_eta[EventInfo.nGenquark]    = genIt.p4().eta();
         EventInfo.Genquark_phi[EventInfo.nGenquark]    = genIt.p4().phi();
@@ -2495,7 +2518,7 @@ int BTagAnalyzer::isFromGSP(const reco::Candidate* c)
   if( c->numberOfMothers() == 1 ) {
     const reco::Candidate* dau = c;
     const reco::Candidate* mom = c->mother();
-    while( dau->numberOfMothers() == 1 && !( mom->status()==3 && (abs(mom->pdgId())==4 || abs(mom->pdgId())==5) ) ) {
+    while( dau->numberOfMothers() == 1 && !( isHardProcess(mom->status()) && (abs(mom->pdgId())==4 || abs(mom->pdgId())==5) ) ) {
       if( abs(mom->pdgId())==21 )
       {
         isFromGSP = 1;
@@ -2507,6 +2530,24 @@ int BTagAnalyzer::isFromGSP(const reco::Candidate* c)
   }
 
   return isFromGSP;
+}
+
+
+bool BTagAnalyzer::isHardProcess(const int status)
+{
+  // if Pythia8
+  if( hadronizerType_ & (1 << 1) )
+  {
+    if( status>=21 && status<=29 )
+      return true;
+  }
+  else // assuming Pythia6
+  {
+    if( status==3 )
+      return true;
+  }
+
+  return false;
 }
 
 // -------------------------------------------------------------------------
