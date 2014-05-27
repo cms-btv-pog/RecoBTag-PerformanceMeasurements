@@ -161,7 +161,9 @@ class BTagAnalyzer : public edm::EDAnalyzer
 
     int matchMuon(const edm::RefToBase<reco::Track>& theMuon, const edm::View<reco::Muon>& muons);
 
-    void setTracksPV( const reco::Vertex *pv, const bool isPV, const int );
+    void setTracksPV( const reco::TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight );
+
+    void setTracksSV( const reco::TrackRef & trackRef, const reco::SecondaryVertexTagInfo *, int & isFromSV, int & iSV, float & SVweight );
 
     int getMuonTk(double pt, const int);
     bool NameCompatible(const std::string& pattern, const std::string& name);
