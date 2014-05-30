@@ -261,8 +261,8 @@ class BTagAnalyzer : public edm::EDAnalyzer
 
     int selTagger_;
     bool isData_;
-    bool use_selected_tracks_;
-    bool produceJetProbaTree_;
+    bool useSelectedTracks_;
+    bool produceJetTrackTree_;
     bool producePtRelTemplate_;
 
     bool use_ttbar_filter_;
