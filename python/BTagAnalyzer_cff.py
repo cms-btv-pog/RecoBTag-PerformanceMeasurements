@@ -4,10 +4,10 @@ from SimTracker.TrackHistory.TrackClassifier_cff import *
 
 btagana = cms.EDAnalyzer("BTagAnalyzer",
     trackClassifier,
-    use_selected_tracks      = cms.bool(True),
+    useSelectedTracks        = cms.bool(True),
     useTrackHistory          = cms.bool(False),
-    produceJetProbaTree      = cms.bool(True),
-    producePtRelTemplate     = cms.bool(True),
+    produceJetTrackTree      = cms.bool(False),
+    producePtRelTemplate     = cms.bool(False),
     runSubJets               = cms.bool(False),
     allowJetSkipping         = cms.bool(True),
     selTagger                = cms.int32(2),

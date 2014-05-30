@@ -745,9 +745,9 @@ if not options.runOnData:
 #-------------------------------------
 process.load("RecoBTag.PerformanceMeasurements.BTagAnalyzer_cff")
 
-process.btagana.use_selected_tracks   = True  ## False if you want to run on all tracks : used for commissioning studies
+process.btagana.useSelectedTracks   = True  ## False if you want to run on all tracks : used for commissioning studies
 process.btagana.useTrackHistory       = False ## Can only be used with GEN-SIM-RECODEBUG files
-process.btagana.produceJetProbaTree   = False ## True if you want to keep track and SV info! : used for commissioning studies
+process.btagana.produceJetTrackTree   = False ## True if you want to keep info for tracks associated to jets : used for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 process.btagana.primaryVertexColl     = cms.InputTag('goodOfflinePrimaryVertices')
 process.btagana.Jets                  = cms.InputTag('selectedPatJets'+postfix)
@@ -756,7 +756,7 @@ process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
 process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
 
 process.btaganaSubJets = process.btagana.clone(
-    produceJetProbaTree = cms.bool(True),
+    produceJetTrackTree = cms.bool(True),
     allowJetSkipping    = cms.bool(False),
     Jets                = cms.InputTag('selectedPatJetsCA8PrunedSubJetsPF'),
     FatJets             = cms.InputTag('selectedPatJets'),
