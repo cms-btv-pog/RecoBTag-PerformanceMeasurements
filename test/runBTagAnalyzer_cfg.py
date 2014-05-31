@@ -459,7 +459,7 @@ jetAlgo="AK5"
 
 from PhysicsTools.PatAlgos.tools.pfTools import *
 usePF2PAT(process,runPF2PAT=True, jetAlgo=jetAlgo, runOnMC=not options.runOnData, postfix=postfix,
-          jetCorrections=jetCorrectionsAK5, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'))
+          jetCorrections=jetCorrectionsAK5, pvCollection=cms.InputTag('sortedGoodOfflinePrimaryVertices'))
 
 ## Top projections in PF2PAT
 getattr(process,"pfPileUpJME"+postfix).checkClosestZVertex = False
@@ -479,7 +479,7 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 ## Switch the default jet collection (done in order to use the above specified b-tag infos and discriminators)
 switchJetCollection(
     process,
-    cms.InputTag('pfJets'+postfix),
+    jetSource = cms.InputTag('pfJets'+postfix),
     btagInfos = bTagInfos,
     btagDiscriminators = bTagDiscriminators,
     jetCorrections = jetCorrectionsAK5,
@@ -625,6 +625,15 @@ process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
 #-------------------------------------
 
 #-------------------------------------
+## Load modules for primary vertex sorting
+process.load("RecoVertex.PrimaryVertexSorter.sortedOfflinePrimaryVertices_cff")
+
+process.sortedGoodOfflinePrimaryVertices = process.sortedOfflinePrimaryVertices.clone(
+    src = cms.InputTag('goodOfflinePrimaryVertices')
+)
+#-------------------------------------
+
+#-------------------------------------
 if options.useTTbarFilter:
     process.load("RecoBTag.PerformanceMeasurements.TTbarSelectionFilter_cfi")
     process.load("RecoBTag.PerformanceMeasurements.TTbarSelectionProducer_cfi")
@@ -689,7 +698,10 @@ if options.useTTbarFilter:
 #-------------------------------------
 from RecoBTag.PerformanceMeasurements.patTools import *
 ## Adapt primary vertex collection
-adaptPVs(process, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'))
+adaptPVs(process, pvCollection=cms.InputTag('sortedGoodOfflinePrimaryVertices'))
+
+## Need to update impactParameterTagInfosForPVSorting to remove circular module dependency
+getattr(process,'impactParameterTagInfosForPVSorting').primaryVertex = cms.InputTag("goodOfflinePrimaryVertices")
 #-------------------------------------
 
 #-------------------------------------
@@ -739,7 +751,7 @@ process.btagana.produceJetTrackTree   = False ## True if you want to keep info f
 process.btagana.produceAllTrackTree   = False ## True if you want to keep info for tracks associated to jets : for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
-process.btagana.primaryVertexColl     = cms.InputTag('goodOfflinePrimaryVertices')
+process.btagana.primaryVertexColl     = cms.InputTag('sortedGoodOfflinePrimaryVertices')
 process.btagana.Jets                  = cms.InputTag('selectedPatJets'+postfix)
 process.btagana.patMuonCollectionName = cms.InputTag('selectedPatMuons')
 process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
