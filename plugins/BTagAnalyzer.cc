@@ -276,7 +276,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   // MC informations
   //------------------------------------------------------
   EventInfo.pthat      = -1.;
-  EventInfo.nPUtrue    = -1;
+  EventInfo.nPUtrue    = -1.;
   EventInfo.nPU        = 0;
   EventInfo.ncQuarks   = 0;
   EventInfo.nbQuarks   = 0;
@@ -307,7 +307,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
     std::vector<PileupSummaryInfo>::const_iterator ipu;
     for (ipu = PupInfo->begin(); ipu != PupInfo->end(); ++ipu) {
-      if ( ipu->getBunchCrossing() != 0 ) continue;
+      if ( ipu->getBunchCrossing() != 0 ) continue; // storing detailed PU info only for BX=0
       for (unsigned int i=0; i<ipu->getPU_zpositions().size(); ++i) {
         EventInfo.PU_bunch[EventInfo.nPU]      =  ipu->getBunchCrossing();
         EventInfo.PU_z[EventInfo.nPU]          = (ipu->getPU_zpositions())[i];
@@ -318,6 +318,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         ++EventInfo.nPU;
       }
       EventInfo.nPUtrue = ipu->getTrueNumInteractions();
+      if(EventInfo.nPU==0) EventInfo.nPU = ipu->getPU_NumInteractions(); // needed in case getPU_zpositions() is empty
     }
 
   //------------------------------------------------------
