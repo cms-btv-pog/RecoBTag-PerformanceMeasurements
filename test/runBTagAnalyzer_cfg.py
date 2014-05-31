@@ -470,7 +470,7 @@ jetAlgo="AK5"
 
 from PhysicsTools.PatAlgos.tools.pfTools import *
 usePF2PAT(process,runPF2PAT=True, jetAlgo=jetAlgo, runOnMC=not options.runOnData, postfix=postfix,
-          jetCorrections=jetCorrectionsAK5, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'))
+          jetCorrections=jetCorrectionsAK5, pvCollection=cms.InputTag('sortedGoodOfflinePrimaryVertices'))
 
 ## Top projections in PF2PAT
 getattr(process,"pfPileUpJME"+postfix).checkClosestZVertex = False
@@ -490,13 +490,13 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 ## Switch the default jet collection (done in order to use the above specified b-tag infos and discriminators)
 switchJetCollection(
     process,
-    cms.InputTag('pfJets'+postfix),
+    jetSource = cms.InputTag('pfJets'+postfix),
     btagInfos = bTagInfos,
     btagDiscriminators = bTagDiscriminators,
     jetCorrections = jetCorrectionsAK5,
+    genJetCollection = cms.InputTag('ak5GenJetsNoNu'+postfix),
     postfix = postfix
 )
-process.patJetGenJetMatchPFlow.matched = cms.InputTag('ak5GenJetsNoNu'+postfix)
 
 ## Add additional b-tag discriminators
 #getattr(process,'patJets'+postfix).discriminatorSources += cms.VInputTag(
@@ -636,6 +636,15 @@ process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
 #-------------------------------------
 
 #-------------------------------------
+## Load modules for primary vertex sorting
+process.load("RecoVertex.PrimaryVertexSorter.sortedOfflinePrimaryVertices_cff")
+
+process.sortedGoodOfflinePrimaryVertices = process.sortedOfflinePrimaryVertices.clone(
+    src = cms.InputTag('goodOfflinePrimaryVertices')
+)
+#-------------------------------------
+
+#-------------------------------------
 if options.useTTbarFilter:
     process.load("RecoBTag.PerformanceMeasurements.TTbarSelectionFilter_cfi")
     process.load("RecoBTag.PerformanceMeasurements.TTbarSelectionProducer_cfi")
@@ -700,7 +709,10 @@ if options.useTTbarFilter:
 #-------------------------------------
 from RecoBTag.PerformanceMeasurements.patTools import *
 ## Adapt primary vertex collection
-adaptPVs(process, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'))
+adaptPVs(process, pvCollection=cms.InputTag('sortedGoodOfflinePrimaryVertices'))
+
+## Need to update impactParameterTagInfosForPVSorting to remove circular module dependency
+getattr(process,'impactParameterTagInfosForPVSorting').primaryVertex = cms.InputTag("goodOfflinePrimaryVertices")
 #-------------------------------------
 
 #-------------------------------------
