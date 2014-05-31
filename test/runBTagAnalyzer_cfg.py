@@ -762,7 +762,7 @@ process.btagana.produceJetTrackTree   = False ## True if you want to keep info f
 process.btagana.produceAllTrackTree   = False ## True if you want to keep info for tracks associated to jets : for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
-process.btagana.primaryVertexColl     = cms.InputTag('goodOfflinePrimaryVertices')
+process.btagana.primaryVertexColl     = cms.InputTag('sortedGoodOfflinePrimaryVertices')
 process.btagana.Jets                  = cms.InputTag('selectedPatJets'+postfix)
 process.btagana.patMuonCollectionName = cms.InputTag('selectedPatMuons')
 process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
