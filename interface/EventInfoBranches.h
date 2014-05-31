@@ -5,6 +5,7 @@
 
 const UInt_t nMaxPVs_= 1000;
 const UInt_t nMaxPUs_= 1000;
+const UInt_t nMaxTrkAll_ = 100000;
 
 class EventInfoBranches {
 
@@ -112,6 +113,30 @@ class EventInfoBranches {
     float GenV0_SVy[1000];
     float GenV0_SVz[1000];
     int   GenV0_nCharged[1000];
+
+    int   nTrkAll;
+    float TrkAll_d0[nMaxTrk_];
+    float TrkAll_dz[nMaxTrk_];
+    float TrkAll_p[nMaxTrk_];
+    float TrkAll_pt[nMaxTrk_];
+    float TrkAll_eta[nMaxTrk_];
+    float TrkAll_phi[nMaxTrk_];
+    float TrkAll_chi2[nMaxTrk_];
+    int   TrkAll_charge[nMaxTrk_];
+    int   TrkAll_nHitAll[nMaxTrk_];
+    int   TrkAll_nHitPixel[nMaxTrk_];
+    int   TrkAll_nHitStrip[nMaxTrk_];
+    int   TrkAll_nHitTIB[nMaxTrk_];
+    int   TrkAll_nHitTID[nMaxTrk_];
+    int   TrkAll_nHitTOB[nMaxTrk_];
+    int   TrkAll_nHitTEC[nMaxTrk_];
+    int   TrkAll_nHitPXB[nMaxTrk_];
+    int   TrkAll_nHitPXF[nMaxTrk_];
+    int   TrkAll_isHitL1[nMaxTrk_];
+    int   TrkAll_nSiLayers[nMaxTrk_];
+    int   TrkAll_nPxLayers[nMaxTrk_];
+    int   TrkAll_PV[nMaxTrk_];
+    float TrkAll_PVweight[nMaxTrk_];
 
     int   nPatMuon;
     int   PatMuon_isGlobal[1000];
@@ -249,6 +274,32 @@ class EventInfoBranches {
       tree->Branch("PV_ndf"   , PV_ndf   , "PV_ndf[nPV]/F");
       tree->Branch("PV_isgood", PV_isgood, "PV_isgood[nPV]/I");
       tree->Branch("PV_isfake", PV_isfake, "PV_isfake[nPV]/I");
+    }
+
+    void RegisterAllTrackTree(TTree *tree) {
+      tree->Branch("nTrkAll",          &nTrkAll,         "nTrkAll/I"                  );
+      tree->Branch("TrkAll_d0",        TrkAll_d0,        "TrkAll_d0[nTrkAll]/F"       );
+      tree->Branch("TrkAll_dz",        TrkAll_dz,        "TrkAll_dz[nTrkAll]/F"       );
+      tree->Branch("TrkAll_p",         TrkAll_p,         "TrkAll_p[nTrkAll]/F"        );
+      tree->Branch("TrkAll_pt",        TrkAll_pt,        "TrkAll_pt[nTrkAll]/F"       );
+      tree->Branch("TrkAll_eta",       TrkAll_eta,       "TrkAll_eta[nTrkAll]/F"      );
+      tree->Branch("TrkAll_phi",       TrkAll_phi,       "TrkAll_phi[nTrkAll]/F"      );
+      tree->Branch("TrkAll_chi2",      TrkAll_chi2,      "TrkAll_chi2[nTrkAll]/F"     );
+      tree->Branch("TrkAll_charge",    TrkAll_charge,    "TrkAll_charge[nTrkAll]/I"   );
+      tree->Branch("TrkAll_nHitAll",   TrkAll_nHitAll,   "TrkAll_nHitAll[nTrkAll]/I"  );
+      tree->Branch("TrkAll_nHitPixel", TrkAll_nHitPixel, "TrkAll_nHitPixel[nTrkAll]/I");
+      tree->Branch("TrkAll_nHitStrip", TrkAll_nHitStrip, "TrkAll_nHitStrip[nTrkAll]/I");
+      tree->Branch("TrkAll_nHitTIB",   TrkAll_nHitTIB,   "TrkAll_nHitTIB[nTrkAll]/I"  );
+      tree->Branch("TrkAll_nHitTID",   TrkAll_nHitTID,   "TrkAll_nHitTID[nTrkAll]/I"  );
+      tree->Branch("TrkAll_nHitTOB",   TrkAll_nHitTOB,   "TrkAll_nHitTOB[nTrkAll]/I"  );
+      tree->Branch("TrkAll_nHitTEC",   TrkAll_nHitTEC,   "TrkAll_nHitTEC[nTrkAll]/I"  );
+      tree->Branch("TrkAll_nHitPXB",   TrkAll_nHitPXB,   "TrkAll_nHitPXB[nTrkAll]/I"  );
+      tree->Branch("TrkAll_nHitPXF",   TrkAll_nHitPXF,   "TrkAll_nHitPXF[nTrkAll]/I"  );
+      tree->Branch("TrkAll_isHitL1",   TrkAll_isHitL1,   "TrkAll_isHitL1[nTrkAll]/I"  );
+      tree->Branch("TrkAll_nSiLayers", TrkAll_nSiLayers, "TrkAll_nSiLayers[nTrkAll]/I");
+      tree->Branch("TrkAll_nPxLayers", TrkAll_nPxLayers, "TrkAll_nPxLayers[nTrkAll]/I");
+      tree->Branch("TrkAll_PV",        TrkAll_PV,        "TrkAll_PV[nTrkAll]/I"       );
+      tree->Branch("TrkAll_PVweight",  TrkAll_PVweight,  "TrkAll_PVweight[nTrkAll]/F" );
     }
 
     void RegisterTTbarTree(TTree *tree) {
@@ -394,7 +445,33 @@ class EventInfoBranches {
       tree->SetBranchAddress("PV_isfake", PV_isfake);
     }
 
-   void ReadTTbarTree(TTree *tree) {
+   void ReadAllTrackTree(TTree *tree) {
+      tree->SetBranchAddress("nTrkAll",          &nTrkAll         );
+      tree->SetBranchAddress("TrkAll_d0",        TrkAll_d0        );
+      tree->SetBranchAddress("TrkAll_dz",        TrkAll_dz        );
+      tree->SetBranchAddress("TrkAll_p",         TrkAll_p         );
+      tree->SetBranchAddress("TrkAll_pt",        TrkAll_pt        );
+      tree->SetBranchAddress("TrkAll_eta",       TrkAll_eta       );
+      tree->SetBranchAddress("TrkAll_phi",       TrkAll_phi       );
+      tree->SetBranchAddress("TrkAll_chi2",      TrkAll_chi2      );
+      tree->SetBranchAddress("TrkAll_charge",    TrkAll_charge    );
+      tree->SetBranchAddress("TrkAll_nHitAll",   TrkAll_nHitAll   );
+      tree->SetBranchAddress("TrkAll_nHitPixel", TrkAll_nHitPixel );
+      tree->SetBranchAddress("TrkAll_nHitStrip", TrkAll_nHitStrip );
+      tree->SetBranchAddress("TrkAll_nHitTIB",   TrkAll_nHitTIB   );
+      tree->SetBranchAddress("TrkAll_nHitTID",   TrkAll_nHitTID   );
+      tree->SetBranchAddress("TrkAll_nHitTOB",   TrkAll_nHitTOB   );
+      tree->SetBranchAddress("TrkAll_nHitTEC",   TrkAll_nHitTEC   );
+      tree->SetBranchAddress("TrkAll_nHitPXB",   TrkAll_nHitPXB   );
+      tree->SetBranchAddress("TrkAll_nHitPXF",   TrkAll_nHitPXF   );
+      tree->SetBranchAddress("TrkAll_isHitL1",   TrkAll_isHitL1   );
+      tree->SetBranchAddress("TrkAll_nSiLayers", TrkAll_nSiLayers );
+      tree->SetBranchAddress("TrkAll_nPxLayers", TrkAll_nPxLayers );
+      tree->SetBranchAddress("TrkAll_PV",        TrkAll_PV        );
+      tree->SetBranchAddress("TrkAll_PVweight",  TrkAll_PVweight  );
+    }
+
+    void ReadTTbarTree(TTree *tree) {
       tree->SetBranchAddress("ttbar_chan" , &ttbar_chan );
       tree->SetBranchAddress("lepton1_pT" , &lepton1_pT );
       tree->SetBranchAddress("lepton1_eta", &lepton1_eta);

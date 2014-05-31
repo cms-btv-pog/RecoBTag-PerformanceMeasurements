@@ -51,13 +51,15 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   useSelectedTracks_    = iConfig.getParameter<bool> ("useSelectedTracks");
   useTrackHistory_      = iConfig.getParameter<bool> ("useTrackHistory");
   produceJetTrackTree_  = iConfig.getParameter<bool> ("produceJetTrackTree");
-  producePtRelTemplate_ = iConfig.getParameter<bool>("producePtRelTemplate");
+  produceAllTrackTree_  = iConfig.getParameter<bool> ("produceAllTrackTree");
+  producePtRelTemplate_ = iConfig.getParameter<bool> ("producePtRelTemplate");
 
   use_ttbar_filter_     = iConfig.getParameter<bool> ("use_ttbar_filter");
   channel_              = iConfig.getParameter<edm::InputTag> ("channel");
 
   // Modules
   primaryVertexColl_   = iConfig.getParameter<edm::InputTag>("primaryVertexColl");
+  tracksColl_          = iConfig.getParameter<edm::InputTag>("tracksColl");
 
   src_                 = iConfig.getParameter<edm::InputTag>("src");
 
@@ -148,6 +150,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   if ( runSubJets_ )          EventInfo.RegisterPatMuonTree(smalltree);
   if ( use_ttbar_filter_ )    EventInfo.RegisterTTbarTree(smalltree);
   if ( produceJetTrackTree_ ) EventInfo.RegisterJetTrackTree(smalltree);
+  if ( produceAllTrackTree_ ) EventInfo.RegisterAllTrackTree(smalltree);
 
   //--------------------------------------
   // jet information
@@ -269,9 +272,9 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //------------------------------------------------------
   // MC informations
   //------------------------------------------------------
-  EventInfo.pthat = -1.;
-  EventInfo.nPUtrue = -1.;
-  EventInfo.nPU = 0;
+  EventInfo.pthat      = -1.;
+  EventInfo.nPUtrue    = -1;
+  EventInfo.nPU        = 0;
   EventInfo.ncQuarks   = 0;
   EventInfo.nbQuarks   = 0;
   EventInfo.nBHadrons  = 0;
@@ -280,6 +283,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   EventInfo.nGenV0     = 0;
   EventInfo.nGenlep    = 0;
   EventInfo.nGenquark  = 0;
+  EventInfo.nTrkAll    = 0;
   EventInfo.nPatMuon   = 0;
   EventInfo.mcweight   = 1.;
 
@@ -328,8 +332,8 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
       if ( isHardProcess(genIt.status()) ) EventInfo.GenPVz = genIt.vz();
 
-      // prompt b and c
-      if ( (ID == 4 || ID == 5) && isHardProcess(genIt.status()) ) {
+      // prompt parton
+      if ( isHardProcess(genIt.status()) && genIt.p4().pt() > 10. ) {
         EventInfo.Genquark_pT[EventInfo.nGenquark]     = genIt.p4().pt();
         EventInfo.Genquark_eta[EventInfo.nGenquark]    = genIt.p4().eta();
         EventInfo.Genquark_phi[EventInfo.nGenquark]    = genIt.p4().phi();
@@ -880,6 +884,50 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     thelepton2.SetPtEtaPhiM(EventInfo.lepton2_pT, EventInfo.lepton2_eta, EventInfo.lepton2_phi, 0.);
   }
 
+  //------------------------------------------------------
+  // All tracks info
+  //------------------------------------------------------
+  edm::Handle<reco::TrackCollection> tracksHandle;
+  if( produceAllTrackTree_ )
+  {
+    iEvent.getByLabel(tracksColl_,tracksHandle);
+
+    for(reco::TrackCollection::const_iterator trk = tracksHandle->begin(); trk != tracksHandle->end(); ++trk)
+    {
+      EventInfo.TrkAll_d0[EventInfo.nTrkAll]        = trk->d0();
+      EventInfo.TrkAll_dz[EventInfo.nTrkAll]        = trk->dz();
+      EventInfo.TrkAll_p[EventInfo.nTrkAll]         = trk->p();
+      EventInfo.TrkAll_pt[EventInfo.nTrkAll]        = trk->pt();
+      EventInfo.TrkAll_eta[EventInfo.nTrkAll]       = trk->eta();
+      EventInfo.TrkAll_phi[EventInfo.nTrkAll]       = trk->phi();
+      EventInfo.TrkAll_chi2[EventInfo.nTrkAll]      = trk->normalizedChi2();
+      EventInfo.TrkAll_charge[EventInfo.nTrkAll]    = trk->charge();
+      EventInfo.TrkAll_nHitAll[EventInfo.nTrkAll]   = trk->numberOfValidHits();
+      EventInfo.TrkAll_nHitPixel[EventInfo.nTrkAll] = trk->hitPattern().numberOfValidPixelHits();
+      EventInfo.TrkAll_nHitStrip[EventInfo.nTrkAll] = trk->hitPattern().numberOfValidStripHits();
+      EventInfo.TrkAll_nHitTIB[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidStripTIBHits();
+      EventInfo.TrkAll_nHitTID[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidStripTIDHits();
+      EventInfo.TrkAll_nHitTOB[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidStripTOBHits();
+      EventInfo.TrkAll_nHitTEC[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidStripTECHits();
+      EventInfo.TrkAll_nHitPXB[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidPixelBarrelHits();
+      EventInfo.TrkAll_nHitPXF[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidPixelEndcapHits();
+      EventInfo.TrkAll_isHitL1[EventInfo.nTrkAll]   = trk->hitPattern().hasValidHitInFirstPixelBarrel();
+      EventInfo.TrkAll_nSiLayers[EventInfo.nTrkAll] = trk->hitPattern().trackerLayersWithMeasurement();
+      EventInfo.TrkAll_nPxLayers[EventInfo.nTrkAll] = trk->hitPattern().pixelLayersWithMeasurement();
+
+      reco::TrackRef trkRef(tracksHandle, trk - tracksHandle->begin() );
+
+      setTracksPV(trkRef, primaryVertex,
+                  EventInfo.TrkAll_PV[EventInfo.nTrkAll],
+                  EventInfo.TrkAll_PVweight[EventInfo.nTrkAll]);
+      ++EventInfo.nTrkAll;
+    }
+  }
+  //------------------------------------------------------
+
+  //------------------------------------------------------
+  // Jet info
+  //------------------------------------------------------
   int iJetColl = 0 ;
   //// Do jets
   processJets(jetsColl, fatjetsColl, iEvent, iSetup, fatJetToPrunedFatJetMap, iJetColl) ;
@@ -887,6 +935,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     iJetColl = 1 ;
     processJets(fatjetsColl, jetsColl, iEvent, iSetup, fatJetToPrunedFatJetMap, iJetColl) ;
   }
+  //------------------------------------------------------
 
   //// Fill TTree
   if ( EventInfo.BitTrigger > 0 || EventInfo.Run < 0 ) {

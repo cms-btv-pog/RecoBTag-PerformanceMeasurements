@@ -253,6 +253,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
     std::string softPFElectronTagInfos_;
 
     edm::InputTag primaryVertexColl_;
+    edm::InputTag tracksColl_;
 
     bool useTrackHistory_;
     TFile*  rootFile_;
@@ -263,6 +264,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
     bool isData_;
     bool useSelectedTracks_;
     bool produceJetTrackTree_;
+    bool produceAllTrackTree_;
     bool producePtRelTemplate_;
 
     bool use_ttbar_filter_;
