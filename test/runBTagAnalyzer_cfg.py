@@ -70,6 +70,11 @@ options.register('useTTbarFilter', False,
     VarParsing.varType.bool,
     "Use TTbar filter"
 )
+options.register('usePVSorting', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Use PV sorting"
+)
 
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', 100)
@@ -120,6 +125,11 @@ bTagDiscriminators = ['jetBProbabilityBJetTags','jetProbabilityBJetTags','trackC
 ]
 bTagDiscriminatorsSubJets = copy.deepcopy(bTagDiscriminators)
 #bTagDiscriminatorsSubJets.remove('doubleSecondaryVertexHighEffBJetTags')
+
+## PV collection
+pvCollection = 'goodOfflinePrimaryVertices'
+if options.usePVSorting:
+    pvCollection = 'sortedGoodOfflinePrimaryVertices'
 
 process = cms.Process("BTagAna")
 
@@ -459,7 +469,7 @@ jetAlgo="AK5"
 
 from PhysicsTools.PatAlgos.tools.pfTools import *
 usePF2PAT(process,runPF2PAT=True, jetAlgo=jetAlgo, runOnMC=not options.runOnData, postfix=postfix,
-          jetCorrections=jetCorrectionsAK5, pvCollection=cms.InputTag('sortedGoodOfflinePrimaryVertices'))
+          jetCorrections=jetCorrectionsAK5, pvCollection=cms.InputTag(pvCollection))
 
 ## Top projections in PF2PAT
 getattr(process,"pfPileUpJME"+postfix).checkClosestZVertex = False
@@ -698,7 +708,7 @@ if options.useTTbarFilter:
 #-------------------------------------
 from RecoBTag.PerformanceMeasurements.patTools import *
 ## Adapt primary vertex collection
-adaptPVs(process, pvCollection=cms.InputTag('sortedGoodOfflinePrimaryVertices'))
+adaptPVs(process, pvCollection=cms.InputTag(pvCollection))
 
 ## Need to update impactParameterTagInfosForPVSorting to remove circular module dependency
 getattr(process,'impactParameterTagInfosForPVSorting').primaryVertex = cms.InputTag("goodOfflinePrimaryVertices")
@@ -751,11 +761,12 @@ process.btagana.produceJetTrackTree   = False ## True if you want to keep info f
 process.btagana.produceAllTrackTree   = False ## True if you want to keep info for tracks associated to jets : for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
-process.btagana.primaryVertexColl     = cms.InputTag('sortedGoodOfflinePrimaryVertices')
+process.btagana.primaryVertexColl     = cms.InputTag(pvCollection)
 process.btagana.Jets                  = cms.InputTag('selectedPatJets'+postfix)
 process.btagana.patMuonCollectionName = cms.InputTag('selectedPatMuons')
 process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
-#process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
+process.btagana.MaxEta                = cms.double(4.0) ## for extended forward pixel coverage
+#process.btagana.triggerTable         = cms.InputTag('TriggerResults::HLT') # Data and MC
 
 if options.runSubJets:
     process.btaganaSubJets = process.btagana.clone(
