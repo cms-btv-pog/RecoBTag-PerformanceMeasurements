@@ -1022,13 +1022,16 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     JetInfo[iJetColl].Jet_mass[JetInfo[iJetColl].nJet]    = pjet->mass();
     JetInfo[iJetColl].Jet_genpt[JetInfo[iJetColl].nJet]   = ( pjet->genJet()!=0 ? pjet->genJet()->pt() : -1. );
 
+    // available JEC sets
+    unsigned int nJECSets = pjet->availableJECSets().size();
+    // PF jet ID
     retpf.set(false);
-    JetInfo[iJetColl].Jet_looseID[JetInfo[iJetColl].nJet]  = ( pfjetIDLoose( *pjet, retpf ) ? 1 : 0 );
+    JetInfo[iJetColl].Jet_looseID[JetInfo[iJetColl].nJet]  = ( ( nJECSets>0 && pjet->isPFJet() ) ? ( pfjetIDLoose( *pjet, retpf ) ? 1 : 0 ) : 0 );
     retpf.set(false);
-    JetInfo[iJetColl].Jet_tightID[JetInfo[iJetColl].nJet]  = ( pfjetIDTight( *pjet, retpf ) ? 1 : 0 );
+    JetInfo[iJetColl].Jet_tightID[JetInfo[iJetColl].nJet]  = ( ( nJECSets>0 && pjet->isPFJet() ) ? ( pfjetIDTight( *pjet, retpf ) ? 1 : 0 ) : 0 );
 
-    JetInfo[iJetColl].Jet_jes[JetInfo[iJetColl].nJet]      = pjet->pt()/pjet->correctedJet("Uncorrected").pt();
-    JetInfo[iJetColl].Jet_residual[JetInfo[iJetColl].nJet] = pjet->pt()/pjet->correctedJet("L3Absolute").pt();
+    JetInfo[iJetColl].Jet_jes[JetInfo[iJetColl].nJet]      = ( nJECSets>0 ? pjet->pt()/pjet->correctedJet("Uncorrected").pt() : 1. );
+    JetInfo[iJetColl].Jet_residual[JetInfo[iJetColl].nJet] = ( nJECSets>0 ? pjet->pt()/pjet->correctedJet("L3Absolute").pt() : 1. );
 
     if( runSubJets_ && iJetColl == 0 )
     {
@@ -1076,7 +1079,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet] = nsubjettinessCalculator.getTau(2,fjConstituents);
 
       JetInfo[iJetColl].Jet_ptPruned[JetInfo[iJetColl].nJet]   = fatJetToPrunedFatJetMap.find(&(*pjet))->second->pt();
-      JetInfo[iJetColl].Jet_jesPruned[JetInfo[iJetColl].nJet]  = fatJetToPrunedFatJetMap.find(&(*pjet))->second->pt()/fatJetToPrunedFatJetMap.find(&(*pjet))->second->correctedJet("Uncorrected").pt();
+      JetInfo[iJetColl].Jet_jesPruned[JetInfo[iJetColl].nJet]  = ( fatJetToPrunedFatJetMap.find(&(*pjet))->second->availableJECSets().size()>0 ? fatJetToPrunedFatJetMap.find(&(*pjet))->second->pt()/fatJetToPrunedFatJetMap.find(&(*pjet))->second->correctedJet("Uncorrected").pt() : 1. );
       JetInfo[iJetColl].Jet_etaPruned[JetInfo[iJetColl].nJet]  = fatJetToPrunedFatJetMap.find(&(*pjet))->second->eta();
       JetInfo[iJetColl].Jet_phiPruned[JetInfo[iJetColl].nJet]  = fatJetToPrunedFatJetMap.find(&(*pjet))->second->phi();
       JetInfo[iJetColl].Jet_massPruned[JetInfo[iJetColl].nJet] = fatJetToPrunedFatJetMap.find(&(*pjet))->second->mass();
