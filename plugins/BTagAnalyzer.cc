@@ -133,7 +133,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
 
   triggerTable_             = iConfig.getParameter<edm::InputTag>("triggerTable");
 
-  SVComputer_               = iConfig.getParameter<edm::InputTag>( "svComputer");
+  SVComputer_               = iConfig.getParameter<std::string>( "svComputer");
 
   triggerPathNames_        = iConfig.getParameter<std::vector<std::string> >("TriggerPathNames");
   ttbarTriggerPathNames_   = iConfig.getParameter<std::vector<std::string> >("TTbarTriggerPathNames");
@@ -865,7 +865,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   //------------- added by Camille-----------------------------------------------------------//
   edm::ESHandle<JetTagComputer> computerHandle;
-  iSetup.get<JetTagComputerRecord>().get( SVComputer_.label(), computerHandle );
+  iSetup.get<JetTagComputerRecord>().get( SVComputer_.c_str(), computerHandle );
 
   computer = dynamic_cast<const GenericMVAJetTagComputer*>( computerHandle.product() );
 
@@ -2029,61 +2029,44 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     JetInfo[iJetColl].Jet_nFirstSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
     JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]  = pjet->tagInfoSecondaryVertex("secondaryVertex")->nVertices();
 
-    float SVmass = 0.;
-    if ( JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet] > 0) {
-      SVmass = ( vars.checkTag(reco::btau::vertexMass) ? vars.get(reco::btau::vertexMass) : -9999 );
-    }
-    JetInfo[iJetColl].Jet_SvxMass[JetInfo[iJetColl].nJet] = SVmass;
+    JetInfo[iJetColl].Jet_SvxMass[JetInfo[iJetColl].nJet] = ( vars.checkTag(reco::btau::vertexMass) ? vars.get(reco::btau::vertexMass) : -9999 );
 
     // if secondary vertices present
-    if ( JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet] > 0 )
+    for (int vtx = 0; vtx < JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]; ++vtx )
     {
 
-      JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).x();
-      JetInfo[iJetColl].SV_y[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).y();
-      JetInfo[iJetColl].SV_z[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).z();
-      JetInfo[iJetColl].SV_ex[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).xError();
-      JetInfo[iJetColl].SV_ey[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).yError();
-      JetInfo[iJetColl].SV_ez[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).zError();
-      JetInfo[iJetColl].SV_chi2[JetInfo[iJetColl].nSV] = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).chi2();
-      JetInfo[iJetColl].SV_ndf[JetInfo[iJetColl].nSV]  = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).ndof();
+      JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).x();
+      JetInfo[iJetColl].SV_y[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).y();
+      JetInfo[iJetColl].SV_z[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).z();
+      JetInfo[iJetColl].SV_ex[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).xError();
+      JetInfo[iJetColl].SV_ey[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).yError();
+      JetInfo[iJetColl].SV_ez[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).zError();
+      JetInfo[iJetColl].SV_chi2[JetInfo[iJetColl].nSV] = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).chi2();
+      JetInfo[iJetColl].SV_ndf[JetInfo[iJetColl].nSV]  = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).ndof();
 
-      //cout << "pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).ndof() " << pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).ndof() << endl;
+      JetInfo[iJetColl].SV_flight[JetInfo[iJetColl].nSV]      = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(vtx).value();
+      JetInfo[iJetColl].SV_flightErr[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(vtx).error();
+      JetInfo[iJetColl].SV_flight2D[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(vtx, true).value();
+      JetInfo[iJetColl].SV_flight2DErr[JetInfo[iJetColl].nSV] = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(vtx, true).error();
+      JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).nTracks();
 
-      JetInfo[iJetColl].SV_flight[JetInfo[iJetColl].nSV]	  = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(0).value();
-      JetInfo[iJetColl].SV_flightErr[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(0).error();
-      JetInfo[iJetColl].SV_flight2D[JetInfo[iJetColl].nSV]	  = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(0, true).value();
-      JetInfo[iJetColl].SV_flight2DErr[JetInfo[iJetColl].nSV] = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(0, true).error();
-      JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = pjet->tagInfoSecondaryVertex("secondaryVertex")->nVertexTracks();
-      JetInfo[iJetColl].SV_nTrk_firstVxt[JetInfo[iJetColl].nSV] =  pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).tracksSize();
 
-      // ------------------------added by Camille ---------------------------------------------------------------------------------------//
+      const Vertex &vertex = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx);
 
-      edm::RefToBase<Jet> jet = pjet->tagInfoTrackIP("impactParameter")->jet();
-
-      if(vars.checkTag(reco::btau::vertexEnergyRatio)) JetInfo[iJetColl].SV_energy_ratio[JetInfo[iJetColl].nSV] = ( vars.get(reco::btau::vertexEnergyRatio) );
-      else JetInfo[iJetColl].SV_energy_ratio[JetInfo[iJetColl].nSV] = ( -9999 );
-
-      if(vars.checkTag(reco::btau::vertexJetDeltaR)) JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV] = (  vars.get(reco::btau::vertexJetDeltaR) );
-      else JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV] = ( -9999 );
-
-      if(vars.checkTag(reco::btau::trackSip3dSigAboveCharm) ) JetInfo[iJetColl].SV_aboveC[JetInfo[iJetColl].nSV] = (  vars.get(reco::btau::trackSip3dSigAboveCharm ));
-      else JetInfo[iJetColl].SV_aboveC[JetInfo[iJetColl].nSV] = (  -9999 );
-
-      if(vars.checkTag(reco::btau::vertexMass)) JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV] = ( vars.get(reco::btau::vertexMass));
-      else  JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV] = ( -9999 );
+      JetInfo[iJetColl].SV_vtx_pt[JetInfo[iJetColl].nSV]  = vertex.p4().pt();
+      JetInfo[iJetColl].SV_vtx_eta[JetInfo[iJetColl].nSV] = vertex.p4().eta();
+      JetInfo[iJetColl].SV_vtx_phi[JetInfo[iJetColl].nSV] = vertex.p4().phi();
+      JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV]    = vertex.p4().mass();
 
       Int_t totcharge=0;
       TrackKinematics vertexKinematics;
 
-      const Vertex &vertex = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0);
-
       Bool_t hasRefittedTracks = vertex.hasRefittedTracks();
 
-      TrackRefVector vertexTracks = pjet->tagInfoSecondaryVertex("secondaryVertex")->vertexTracks(0);
+      TrackRefVector vertexTracks = pjet->tagInfoSecondaryVertex("secondaryVertex")->vertexTracks(vtx);
       for(TrackRefVector::const_iterator track = vertexTracks.begin();
           track != vertexTracks.end(); ++track) {
-        Double_t w = pjet->tagInfoSecondaryVertex("secondaryVertex")->trackWeight(0, *track);
+        Double_t w = pjet->tagInfoSecondaryVertex("secondaryVertex")->trackWeight(vtx, *track);
         if (w < 0.5)
           continue;
         if (hasRefittedTracks) {
@@ -2097,36 +2080,27 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
           totcharge+=mytrack.charge();
         }
       }
+      // total charge at the secondary vertex
+      JetInfo[iJetColl].SV_totCharge[JetInfo[iJetColl].nSV]=totcharge;
 
+      math::XYZTLorentzVector vertexSum = vertexKinematics.weightedVectorSum();
+      edm::RefToBase<Jet> jet = pjet->tagInfoTrackIP("impactParameter")->jet();
       math::XYZVector jetDir = jet->momentum().Unit();
+      GlobalVector flightDir = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDirection(vtx);
 
-      Bool_t useTrackWeights = true;
-      math::XYZTLorentzVector vertexSum = useTrackWeights
-        ? vertexKinematics.weightedVectorSum()
-        : vertexKinematics.vectorSum();
+      JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV]     = ( reco::deltaR(flightDir, jetDir) );
+      JetInfo[iJetColl].SV_deltaR_sum_jet[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, jetDir) );
+      JetInfo[iJetColl].SV_deltaR_sum_dir[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, flightDir) );
 
-      math::XYZTLorentzVector flightDir( pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDirection(0).x(), pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDirection(0).y(), pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDirection(0).z(), 0  );
-      JetInfo[iJetColl].SV_deltaR_sum_jet[JetInfo[iJetColl].nSV] = ( Geom::deltaR(vertexSum, jetDir) );
-      JetInfo[iJetColl].SV_deltaR_sum_dir[JetInfo[iJetColl].nSV] = ( Geom::deltaR( flightDir, vertexSum ) );
-      JetInfo[iJetColl].SV_vtx_pt[JetInfo[iJetColl].nSV] = vertex.p4().pt();
-      JetInfo[iJetColl].SV_vtx_eta[JetInfo[iJetColl].nSV] = vertex.p4().eta();
-      JetInfo[iJetColl].SV_vtx_phi[JetInfo[iJetColl].nSV] = vertex.p4().phi();
-
-      math::XYZVector jetVertex = (math::XYZVector(jet->vx(),jet->vy(),jet->vz()));
-
-      Line::PositionType pos(GlobalPoint(vertex.p4().x(),vertex.p4().y(),vertex.p4().z()));
-      Line::DirectionType dir(GlobalVector(flightDir.px(),flightDir.py(),flightDir.pz()));
-      Line trackline(pos,dir);
+      Line::PositionType pos(GlobalPoint(vertex.x(),vertex.y(),vertex.z()));
+      Line trackline(pos,flightDir);
       // get the Jet  line
-      Line::PositionType pos2(GlobalPoint(jetVertex.x(),jetVertex.y(),jetVertex.z()));
+      Line::PositionType pos2(GlobalPoint(jet->vx(),jet->vy(),jet->vz()));
       Line::DirectionType dir2(GlobalVector(jetDir.x(),jetDir.y(),jetDir.z()));
       Line jetline(pos2,dir2);
       // now compute the distance between the two lines
       JetInfo[iJetColl].SV_vtxDistJetAxis[JetInfo[iJetColl].nSV] = (jetline.distance(trackline)).mag();
 
-      // total charge at the secondary vertex
-      JetInfo[iJetColl].SV_totCharge[JetInfo[iJetColl].nSV]=totcharge;
-      // ------------------------end added ---------------------------------------------------------------------------------------//
 
       ++JetInfo[iJetColl].nSV;
 

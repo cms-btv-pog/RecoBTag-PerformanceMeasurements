@@ -25,7 +25,7 @@ btagana = cms.EDAnalyzer("BTagAnalyzer",
     muonCollectionName       = cms.InputTag('muons'),
     patMuonCollectionName    = cms.InputTag('selectedPatMuons'),
     triggerTable             = cms.InputTag('TriggerResults'),
-    svComputer               = cms.InputTag('combinedSecondaryVertex'),
+    svComputer               = cms.string('combinedSecondaryVertex'),
 
     # list of taggers
     trackCHEBJetTags      = cms.string('trackCountingHighEffBJetTags'),
