@@ -1015,12 +1015,14 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       if ( flavour >= 1 && flavour <= 3 ) flavour = 1;
     }
 
-    JetInfo[iJetColl].Jet_flavour[JetInfo[iJetColl].nJet] = flavour;
-    JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet]     = pjet->eta();
-    JetInfo[iJetColl].Jet_phi[JetInfo[iJetColl].nJet]     = pjet->phi();
-    JetInfo[iJetColl].Jet_pt[JetInfo[iJetColl].nJet]      = pjet->pt();
-    JetInfo[iJetColl].Jet_mass[JetInfo[iJetColl].nJet]    = pjet->mass();
-    JetInfo[iJetColl].Jet_genpt[JetInfo[iJetColl].nJet]   = ( pjet->genJet()!=0 ? pjet->genJet()->pt() : -1. );
+    JetInfo[iJetColl].Jet_flavour[JetInfo[iJetColl].nJet]   = pjet->partonFlavour();
+    JetInfo[iJetColl].Jet_nbHadrons[JetInfo[iJetColl].nJet] = pjet->jetFlavourInfo().getbHadrons().size();
+    JetInfo[iJetColl].Jet_ncHadrons[JetInfo[iJetColl].nJet] = pjet->jetFlavourInfo().getcHadrons().size();
+    JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet]       = pjet->eta();
+    JetInfo[iJetColl].Jet_phi[JetInfo[iJetColl].nJet]       = pjet->phi();
+    JetInfo[iJetColl].Jet_pt[JetInfo[iJetColl].nJet]        = pjet->pt();
+    JetInfo[iJetColl].Jet_mass[JetInfo[iJetColl].nJet]      = pjet->mass();
+    JetInfo[iJetColl].Jet_genpt[JetInfo[iJetColl].nJet]     = ( pjet->genJet()!=0 ? pjet->genJet()->pt() : -1. );
 
     // available JEC sets
     unsigned int nJECSets = pjet->availableJECSets().size();
