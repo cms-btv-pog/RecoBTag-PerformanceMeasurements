@@ -63,7 +63,7 @@ options.register('producePtRelTemplate', True,
 options.register('fatJetPtMin', 150.0,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
-    "Minimum pT for fat jets (default is 100 GeV)"
+    "Minimum pT for fat jets (default is 150 GeV)"
 )
 options.register('useTTbarFilter', False,
     VarParsing.multiplicity.singleton,
@@ -488,7 +488,10 @@ else:
 from PhysicsTools.PatAlgos.tools.jetTools import *
 ## Switch the default jet collection (done in order to use the above specified b-tag infos and discriminators)
 switchJetCollection(process,
-    cms.InputTag('pfNoTau'+postfix),
+    jetCollection=cms.InputTag('pfNoTau'+postfix),
+    jetIdLabel='ak',
+    rParam = 0.5,
+    useLegacyFlavour=False,
     doJTA        = True,
     doBTagging   = True,
     btagInfo     = bTagInfos,
@@ -559,7 +562,10 @@ process.ca8PFJetsPruned = ak5PFJetsPruned.clone(
 if options.runSubJets:
     ## PATify CA8 jets
     switchJetCollection(process,
-        cms.InputTag('ca8PFJets'),
+        jetCollection=cms.InputTag('ca8PFJets'),
+        jetIdLabel='ca',
+        rParam = 0.8,
+        useLegacyFlavour=False,
         doJTA        = True,
         doBTagging   = True,
         btagInfo     = bTagInfos,
@@ -571,8 +577,10 @@ if options.runSubJets:
     )
     addJetCollection(
         process,
-        cms.InputTag('ca8PFJetsPruned'),
-        'CA8Pruned','PF',
+        jetCollection=cms.InputTag('ca8PFJetsPruned'),
+        algoLabel='CA8',
+        typeLabel='PrunedPF',
+        getJetMCFlavour=False,
         doJTA=False,
         doBTagging=False,
         btagInfo=bTagInfos,
@@ -586,8 +594,11 @@ if options.runSubJets:
     )
     addJetCollection(
         process,
-        cms.InputTag('ca8PFJetsPruned','SubJets'),
-        'CA8PrunedSubJets', 'PF',
+        jetCollection=cms.InputTag('ca8PFJetsPruned','SubJets'),
+        algoLabel='CA8',
+        typeLabel='PrunedSubJetsPF',
+        rParam = 0.8,
+        useLegacyFlavour=False,
         doJTA=True,
         doBTagging=True,
         btagInfo=bTagInfos,
@@ -605,6 +616,17 @@ process.selectedPatJetsCA8PrunedPFPacked = cms.EDProducer("BoostedJetMerger",
     jetSrc=cms.InputTag("selectedPatJetsCA8PrunedPF"),
     subjetSrc=cms.InputTag("selectedPatJetsCA8PrunedSubJetsPF")
 )
+#-------------------------------------
+
+#-------------------------------------
+if options.runSubJets:
+    ## New jet flavor still requires some cfg-level adjustments for subjets until it is better integrated into PAT
+    ## Adjust the jet flavor for CA8 pruned subjets
+    process.patJetFlavourAssociationCA8PrunedSubJetsPF = process.patJetFlavourAssociation.clone(
+        groomedJets = cms.InputTag("ca8PFJetsPruned"),
+        subjets = cms.InputTag("ca8PFJetsPruned", "SubJets")
+    )
+    process.patJetsCA8PrunedSubJetsPF.JetFlavourInfoSource = cms.InputTag("patJetFlavourAssociationCA8PrunedSubJetsPF","SubJets")
 #-------------------------------------
 
 #-------------------------------------
@@ -630,7 +652,7 @@ if options.runOnData and options.runSubJets:
     ## Remove MC matching when running over data
     removeMCMatching( process, ['All'] )
 
-## Add TagInfos to PAT jets
+## Add full JetFlavourInfo and TagInfos to PAT jets
 patJets = ['patJets'+postfix]
 if options.runSubJets:
     patJets += ['patJets','patJetsCA8PrunedSubJetsPF']
@@ -639,6 +661,8 @@ for m in patJets:
     if hasattr(process,m):
         print "Switching 'addTagInfos' for " + m + " to 'True'"
         setattr( getattr(process,m), 'addTagInfos', cms.bool(True) )
+        print "Switching 'addJetFlavourInfo' for " + m + " to 'True'"
+        setattr( getattr(process,m), 'addJetFlavourInfo', cms.bool(True) )
 #-------------------------------------
 
 #-------------------------------------
@@ -887,6 +911,14 @@ if options.runSubJets:
 if options.processStdAK5Jets and options.useTTbarFilter:
     process.analyzerSeq.replace( process.btagana, process.ttbarselectionproducer * process.ttbarselectionfilter * process.btagana )
 #---------------------------------------
+
+#-------------------------------------
+## Remove tau stuff that really shouldn't be there (probably a bug in PAT)
+process.patDefaultSequence.remove(process.kt6PFJetsForRhoComputationVoronoi)
+for m in getattr(process,"patDefaultSequence").moduleNames():
+    if m.startswith('hpsPFTau'):
+        getattr(process,"patDefaultSequence").remove(getattr(process,m))
+#-------------------------------------
 
 process.p = cms.Path(
     process.allEvents
