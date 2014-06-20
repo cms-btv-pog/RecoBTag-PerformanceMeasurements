@@ -36,7 +36,6 @@ Implementation:
 
 #include "DataFormats/GeometrySurface/interface/Line.h"
 #include "DataFormats/GeometryCommonDetAlgo/interface/Measurement1D.h"
-#include "DataFormats/GeometryVector/interface/VectorUtil.h"
 
 #include "SimTracker/Records/interface/TrackAssociatorRecord.h"
 #include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
@@ -202,7 +201,6 @@ class BTagAnalyzer : public edm::EDAnalyzer
     edm::InputTag muonCollectionName_;
     edm::InputTag patMuonCollectionName_;
     edm::InputTag triggerTable_;
-    edm::InputTag SVComputer_;
 
     edm::InputTag JetCollectionTag_;
     edm::InputTag FatJetCollectionTag_;
@@ -266,6 +264,8 @@ class BTagAnalyzer : public edm::EDAnalyzer
 
     edm::InputTag primaryVertexColl_;
     edm::InputTag tracksColl_;
+
+    std::string   SVComputer_;
 
     bool useTrackHistory_;
     TFile*  rootFile_;
