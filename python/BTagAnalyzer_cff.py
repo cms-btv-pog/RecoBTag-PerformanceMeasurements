@@ -81,6 +81,8 @@ btagana = cms.EDAnalyzer("BTagAnalyzer",
     softPFElectronNegBJetTags = cms.string('negativeSoftPFElectronBJetTags'),
     softPFElectronPosBJetTags = cms.string('positiveSoftPFElectronBJetTags'),
 
+    ipTagInfos               = cms.string('impactParameter'), # need to omit the 'TagInfos' part from the label
+    svTagInfos               = cms.string('secondaryVertex'), # need to omit the 'TagInfos' part from the label
     softPFMuonTagInfos       = cms.string('softPFMuons'),     # need to omit the 'TagInfos' part from the label
     softPFElectronTagInfos   = cms.string('softPFElectrons'), # need to omit the 'TagInfos' part from the label
 

@@ -259,6 +259,8 @@ class BTagAnalyzer : public edm::EDAnalyzer
     std::string softPFElectronNegBJetTags_;
     std::string softPFElectronPosBJetTags_;
 
+    std::string ipTagInfos_;
+    std::string svTagInfos_;
     std::string softPFMuonTagInfos_;
     std::string softPFElectronTagInfos_;
 
