@@ -126,6 +126,8 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   softPFElectronNegBJetTags_    = iConfig.getParameter<std::string>("softPFElectronNegBJetTags");
   softPFElectronPosBJetTags_    = iConfig.getParameter<std::string>("softPFElectronPosBJetTags");
 
+  ipTagInfos_              = iConfig.getParameter<std::string>("ipTagInfos");
+  svTagInfos_              = iConfig.getParameter<std::string>("svTagInfos");
   softPFMuonTagInfos_      = iConfig.getParameter<std::string>("softPFMuonTagInfos");
   softPFElectronTagInfos_  = iConfig.getParameter<std::string>("softPFElectronTagInfos");
 
@@ -1137,14 +1139,14 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
         {
           int subjetIdx = (sj==0 ? subjet1Idx : subjet2Idx); // subjet index
           int compSubjetIdx = (sj==0 ? subjet2Idx : subjet1Idx); // companion subjet index
-          int nTracks = ( jetsColl2->at(subjetIdx).hasTagInfo("impactParameter") ? jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().size() : 0 );
+          int nTracks = ( jetsColl2->at(subjetIdx).hasTagInfo(ipTagInfos_.c_str()) ? jetsColl2->at(subjetIdx).tagInfoTrackIP(ipTagInfos_.c_str())->selectedTracks().size() : 0 );
 
           for(int t=0; t<nTracks; ++t)
           {
-            if( reco::deltaR( jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().at(t)->eta(), jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().at(t)->phi(), jetsColl2->at(subjetIdx).eta(), jetsColl2->at(subjetIdx).phi() ) < 0.3 )
+            if( reco::deltaR( jetsColl2->at(subjetIdx).tagInfoTrackIP(ipTagInfos_.c_str())->selectedTracks().at(t)->eta(), jetsColl2->at(subjetIdx).tagInfoTrackIP(ipTagInfos_.c_str())->selectedTracks().at(t)->phi(), jetsColl2->at(subjetIdx).eta(), jetsColl2->at(subjetIdx).phi() ) < 0.3 )
             {
               ++nsubjettracks;
-              if( reco::deltaR( jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().at(t)->eta(), jetsColl2->at(subjetIdx).tagInfoTrackIP("impactParameter")->selectedTracks().at(t)->phi(), jetsColl2->at(compSubjetIdx).eta(), jetsColl2->at(compSubjetIdx).phi() ) < 0.3 )
+              if( reco::deltaR( jetsColl2->at(subjetIdx).tagInfoTrackIP(ipTagInfos_.c_str())->selectedTracks().at(t)->eta(), jetsColl2->at(subjetIdx).tagInfoTrackIP(ipTagInfos_.c_str())->selectedTracks().at(t)->phi(), jetsColl2->at(compSubjetIdx).eta(), jetsColl2->at(compSubjetIdx).phi() ) < 0.3 )
               {
                 if(sj==0) ++nsharedsubjettracks;
               }
@@ -1157,14 +1159,20 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       JetInfo[iJetColl].Jet_nsharedsubjettracks[JetInfo[iJetColl].nJet] = nsharedsubjettracks;
     }
 
+    // Get all TagInfo pointers
+    const reco::TrackIPTagInfo *ipTagInfo          = pjet->tagInfoTrackIP(ipTagInfos_.c_str());
+    const reco::SecondaryVertexTagInfo *svTagInfo  = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str());
+    const reco::SoftLeptonTagInfo *softPFMuTagInfo = pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str());
+    const reco::SoftLeptonTagInfo *softPFElTagInfo = pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str());
+    const reco::SoftLeptonTagInfo *softMuTagInfo   = pjet->tagInfoSoftLepton("softMuon");
     //*****************************************************************
     // Taggers
     //*****************************************************************
 
     // Loop on Selected Tracks
 
-    const reco::TrackRefVector & selectedTracks( pjet->tagInfoTrackIP("impactParameter")->selectedTracks() );
-    const reco::TrackRefVector & tracks( pjet->tagInfoTrackIP("impactParameter")->tracks() );
+    const reco::TrackRefVector & selectedTracks( ipTagInfo->selectedTracks() );
+    const reco::TrackRefVector & tracks( ipTagInfo->tracks() );
 
     int ntagtracks = 0;
     if (useSelectedTracks_) ntagtracks = selectedTracks.size();
@@ -1250,13 +1258,13 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       if ( (useSelectedTracks_ && pass_cut_trk) ||  !useSelectedTracks_) {
 
         if ( useSelectedTracks_ ) {
-          JetInfo[iJetColl].Track_IP2D[JetInfo[iJetColl].nTrack]     = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip2d.value();
-          JetInfo[iJetColl].Track_IP2Dsig[JetInfo[iJetColl].nTrack]  = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip2d.significance();
-          JetInfo[iJetColl].Track_IP[JetInfo[iJetColl].nTrack]       = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.value();
-          JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack]    = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.significance();
-          JetInfo[iJetColl].Track_IP2Derr[JetInfo[iJetColl].nTrack]  = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip2d.error();
-          JetInfo[iJetColl].Track_IPerr[JetInfo[iJetColl].nTrack]    = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.error();
-          JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack]    = pjet->tagInfoTrackIP("impactParameter")->probabilities(0)[k];
+          JetInfo[iJetColl].Track_IP2D[JetInfo[iJetColl].nTrack]     = ipTagInfo->impactParameterData()[k].ip2d.value();
+          JetInfo[iJetColl].Track_IP2Dsig[JetInfo[iJetColl].nTrack]  = ipTagInfo->impactParameterData()[k].ip2d.significance();
+          JetInfo[iJetColl].Track_IP[JetInfo[iJetColl].nTrack]       = ipTagInfo->impactParameterData()[k].ip3d.value();
+          JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack]    = ipTagInfo->impactParameterData()[k].ip3d.significance();
+          JetInfo[iJetColl].Track_IP2Derr[JetInfo[iJetColl].nTrack]  = ipTagInfo->impactParameterData()[k].ip2d.error();
+          JetInfo[iJetColl].Track_IPerr[JetInfo[iJetColl].nTrack]    = ipTagInfo->impactParameterData()[k].ip3d.error();
+          JetInfo[iJetColl].Track_Proba[JetInfo[iJetColl].nTrack]    = ipTagInfo->probabilities(0)[k];
         }
         else {
           Measurement1D ip2d    = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;
@@ -1295,9 +1303,9 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
                     JetInfo[iJetColl].Track_PV[JetInfo[iJetColl].nTrack],
                     JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]);
 
-        if( pjet->hasTagInfo("secondaryVertex") )
+        if( pjet->hasTagInfo(svTagInfos_.c_str()) )
         {
-          setTracksSV(ptrackRef, pjet->tagInfoSecondaryVertex("secondaryVertex"),
+          setTracksSV(ptrackRef, svTagInfo,
                       JetInfo[iJetColl].Track_isfromSV[JetInfo[iJetColl].nTrack],
                       JetInfo[iJetColl].Track_SV[JetInfo[iJetColl].nTrack],
                       JetInfo[iJetColl].Track_SVweight[JetInfo[iJetColl].nTrack]);
@@ -1313,8 +1321,8 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 
         if ( useTrackHistory_ && !isData_ ) {
           TrackCategories::Flags theFlag ;
-          if(useSelectedTracks_) theFlag  = classifier_.evaluate( pjet->tagInfoTrackIP("impactParameter")->selectedTracks()[k] ).flags();
-          else                     theFlag  = classifier_.evaluate( pjet->tagInfoTrackIP("impactParameter")->tracks()[k] ).flags();
+          if(useSelectedTracks_) theFlag  = classifier_.evaluate( ipTagInfo->selectedTracks()[k] ).flags();
+          else                     theFlag  = classifier_.evaluate( ipTagInfo->tracks()[k] ).flags();
 
           if ( theFlag[TrackCategories::BWeakDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 1);
           if ( theFlag[TrackCategories::CWeakDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 2);
@@ -1479,8 +1487,8 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 
           if ( iJetColl != 1 ) {
             if ( useSelectedTracks_ ) {
-              JetInfo[iJetColl].TrkInc_IP[JetInfo[iJetColl].nTrkInc]    = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.value();
-              JetInfo[iJetColl].TrkInc_IPsig[JetInfo[iJetColl].nTrkInc] = pjet->tagInfoTrackIP("impactParameter")->impactParameterData()[k].ip3d.significance();
+              JetInfo[iJetColl].TrkInc_IP[JetInfo[iJetColl].nTrkInc]    = ipTagInfo->impactParameterData()[k].ip3d.value();
+              JetInfo[iJetColl].TrkInc_IPsig[JetInfo[iJetColl].nTrkInc] = ipTagInfo->impactParameterData()[k].ip3d.significance();
             }
             JetInfo[iJetColl].TrkInc_pt[JetInfo[iJetColl].nTrkInc]    = ptrack.pt();
             JetInfo[iJetColl].TrkInc_eta[JetInfo[iJetColl].nTrkInc]   = ptrack.eta();
@@ -1518,8 +1526,8 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 
     std::vector<const reco::BaseTagInfo*>  baseTagInfos;
     JetTagComputer::TagInfoHelper helper(baseTagInfos);
-    baseTagInfos.push_back( pjet->tagInfoTrackIP("impactParameter") );
-    baseTagInfos.push_back( pjet->tagInfoSecondaryVertex("secondaryVertex") );
+    baseTagInfos.push_back( ipTagInfo );
+    baseTagInfos.push_back( svTagInfo );
     // TaggingVariables
     TaggingVariableList vars = computer->taggingVariables(helper);
 
@@ -1558,21 +1566,21 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     float SoftMP = pjet->bDiscriminator(softPFMuonPosBJetTags_.c_str());
 
     // PFMuon information
-    for (unsigned int leptIdx = 0; leptIdx < (pjet->hasTagInfo(softPFMuonTagInfos_.c_str()) ? pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->leptons() : 0); ++leptIdx) {
+    for (unsigned int leptIdx = 0; leptIdx < (pjet->hasTagInfo(softPFMuonTagInfos_.c_str()) ? softPFMuTagInfo->leptons() : 0); ++leptIdx) {
 
       JetInfo[iJetColl].PFMuon_IdxJet[JetInfo[iJetColl].nPFMuon]    = JetInfo[iJetColl].nJet;
-      JetInfo[iJetColl].PFMuon_pt[JetInfo[iJetColl].nPFMuon]        = pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->lepton(leptIdx)->pt();
-      JetInfo[iJetColl].PFMuon_eta[JetInfo[iJetColl].nPFMuon]       = pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->lepton(leptIdx)->eta();
-      JetInfo[iJetColl].PFMuon_phi[JetInfo[iJetColl].nPFMuon]       = pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->lepton(leptIdx)->phi();
-      JetInfo[iJetColl].PFMuon_ptrel[JetInfo[iJetColl].nPFMuon]     = calculPtRel( *(pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->lepton(leptIdx)), *pjet );
-      JetInfo[iJetColl].PFMuon_ratio[JetInfo[iJetColl].nPFMuon]     = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).ratio);
-      JetInfo[iJetColl].PFMuon_ratioRel[JetInfo[iJetColl].nPFMuon]  = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).ratioRel);
-      JetInfo[iJetColl].PFMuon_deltaR[JetInfo[iJetColl].nPFMuon]    = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).deltaR);
-      JetInfo[iJetColl].PFMuon_IP[JetInfo[iJetColl].nPFMuon]        = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).sip3d);
-      JetInfo[iJetColl].PFMuon_IP2D[JetInfo[iJetColl].nPFMuon]      = (pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->properties(leptIdx).sip2d);
+      JetInfo[iJetColl].PFMuon_pt[JetInfo[iJetColl].nPFMuon]        = softPFMuTagInfo->lepton(leptIdx)->pt();
+      JetInfo[iJetColl].PFMuon_eta[JetInfo[iJetColl].nPFMuon]       = softPFMuTagInfo->lepton(leptIdx)->eta();
+      JetInfo[iJetColl].PFMuon_phi[JetInfo[iJetColl].nPFMuon]       = softPFMuTagInfo->lepton(leptIdx)->phi();
+      JetInfo[iJetColl].PFMuon_ptrel[JetInfo[iJetColl].nPFMuon]     = calculPtRel( *(softPFMuTagInfo->lepton(leptIdx)), *pjet );
+      JetInfo[iJetColl].PFMuon_ratio[JetInfo[iJetColl].nPFMuon]     = (softPFMuTagInfo->properties(leptIdx).ratio);
+      JetInfo[iJetColl].PFMuon_ratioRel[JetInfo[iJetColl].nPFMuon]  = (softPFMuTagInfo->properties(leptIdx).ratioRel);
+      JetInfo[iJetColl].PFMuon_deltaR[JetInfo[iJetColl].nPFMuon]    = (softPFMuTagInfo->properties(leptIdx).deltaR);
+      JetInfo[iJetColl].PFMuon_IP[JetInfo[iJetColl].nPFMuon]        = (softPFMuTagInfo->properties(leptIdx).sip3d);
+      JetInfo[iJetColl].PFMuon_IP2D[JetInfo[iJetColl].nPFMuon]      = (softPFMuTagInfo->properties(leptIdx).sip2d);
 
       JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 0;
-      int muIdx = matchMuon( pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str())->lepton(leptIdx), muons );
+      int muIdx = matchMuon( softPFMuTagInfo->lepton(leptIdx), muons );
       if ( muIdx != -1 && muons[muIdx].isGlobalMuon() == 1 ) {
 
         JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 1;
@@ -1589,12 +1597,12 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     }
 
     // Old soft muon information for perfomance study safety
-    for (unsigned int leptIdx = 0; leptIdx < pjet->tagInfoSoftLepton("softMuon")->leptons(); ++leptIdx){
+    for (unsigned int leptIdx = 0; leptIdx < softMuTagInfo->leptons(); ++leptIdx){
 
-      int muIdx = matchMuon( pjet->tagInfoSoftLepton("softMuon")->lepton(leptIdx), muons );
+      int muIdx = matchMuon( softMuTagInfo->lepton(leptIdx), muons );
       if ( muIdx != -1 && muons[muIdx].isGlobalMuon() ) {
         JetInfo[iJetColl].Muon_IdxJet[JetInfo[iJetColl].nMuon]   = JetInfo[iJetColl].nJet;
-        JetInfo[iJetColl].Muon_ptrel[JetInfo[iJetColl].nMuon]    = calculPtRel( *(pjet->tagInfoSoftLepton("softMuon")->lepton(leptIdx)), *pjet );
+        JetInfo[iJetColl].Muon_ptrel[JetInfo[iJetColl].nMuon]    = calculPtRel( *(softMuTagInfo->lepton(leptIdx)), *pjet );
         JetInfo[iJetColl].Muon_nTkHit[JetInfo[iJetColl].nMuon]   = muons[muIdx].innerTrack()->hitPattern().numberOfValidHits();
         JetInfo[iJetColl].Muon_nPixHit[JetInfo[iJetColl].nMuon]  = muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits();
         JetInfo[iJetColl].Muon_nOutHit[JetInfo[iJetColl].nMuon]  = muons[muIdx].innerTrack()->trackerExpectedHitsOuter().numberOfHits();
@@ -1604,9 +1612,9 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
         JetInfo[iJetColl].Muon_pt[JetInfo[iJetColl].nMuon]       = muons[muIdx].pt();
         JetInfo[iJetColl].Muon_eta[JetInfo[iJetColl].nMuon]      = muons[muIdx].eta();
         JetInfo[iJetColl].Muon_phi[JetInfo[iJetColl].nMuon]      = muons[muIdx].phi();
-        JetInfo[iJetColl].Muon_ratio[JetInfo[iJetColl].nMuon]    = (pjet->tagInfoSoftLepton("softMuon")->properties(leptIdx).ratio);
-        JetInfo[iJetColl].Muon_ratioRel[JetInfo[iJetColl].nMuon] = (pjet->tagInfoSoftLepton("softMuon")->properties(leptIdx).ratioRel);
-        JetInfo[iJetColl].Muon_deltaR[JetInfo[iJetColl].nMuon]   = (pjet->tagInfoSoftLepton("softMuon")->properties(leptIdx).deltaR);
+        JetInfo[iJetColl].Muon_ratio[JetInfo[iJetColl].nMuon]    = (softMuTagInfo->properties(leptIdx).ratio);
+        JetInfo[iJetColl].Muon_ratioRel[JetInfo[iJetColl].nMuon] = (softMuTagInfo->properties(leptIdx).ratioRel);
+        JetInfo[iJetColl].Muon_deltaR[JetInfo[iJetColl].nMuon]   = (softMuTagInfo->properties(leptIdx).deltaR);
 
         JetInfo[iJetColl].Muon_isGlobal[JetInfo[iJetColl].nMuon] = 1;
         JetInfo[iJetColl].Muon_nMatched[JetInfo[iJetColl].nMuon] = muons[muIdx].numberOfMatches() ;
@@ -1621,7 +1629,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 
         JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] = 0;
         if ( useTrackHistory_ && !isData_ ) {
-          TrackCategories::Flags theFlagP = classifier_.evaluate( pjet->tagInfoSoftLepton("softMuon")->lepton(leptIdx) ).flags();
+          TrackCategories::Flags theFlagP = classifier_.evaluate( softMuTagInfo->lepton(leptIdx) ).flags();
           if ( theFlagP[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 1));
           if ( theFlagP[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 2));
           if ( theFlagP[TrackCategories::TauDecay] )           JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 3));
@@ -1655,19 +1663,19 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     float SoftEP = pjet->bDiscriminator(softPFElectronPosBJetTags_.c_str());
 
     // PFElectron information
-    for (unsigned int leptIdx = 0; leptIdx < (pjet->hasTagInfo(softPFElectronTagInfos_.c_str()) ? pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->leptons() : 0); ++leptIdx) {
+    for (unsigned int leptIdx = 0; leptIdx < (pjet->hasTagInfo(softPFElectronTagInfos_.c_str()) ? softPFElTagInfo->leptons() : 0); ++leptIdx) {
 
       JetInfo[iJetColl].PFElectron_IdxJet[JetInfo[iJetColl].nPFElectron]    = JetInfo[iJetColl].nJet;
-      JetInfo[iJetColl].PFElectron_pt[JetInfo[iJetColl].nPFElectron]        = pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->lepton(leptIdx)->pt();
-      JetInfo[iJetColl].PFElectron_eta[JetInfo[iJetColl].nPFElectron]       = pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->lepton(leptIdx)->eta();
-      JetInfo[iJetColl].PFElectron_phi[JetInfo[iJetColl].nPFElectron]       = pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->lepton(leptIdx)->phi();
-      JetInfo[iJetColl].PFElectron_ptrel[JetInfo[iJetColl].nPFElectron]     = calculPtRel( *(pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->lepton(leptIdx)), *pjet );
-      JetInfo[iJetColl].PFElectron_ratio[JetInfo[iJetColl].nPFElectron]     = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).ratio);
-      JetInfo[iJetColl].PFElectron_ratioRel[JetInfo[iJetColl].nPFElectron]  = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).ratioRel);
-      JetInfo[iJetColl].PFElectron_deltaR[JetInfo[iJetColl].nPFElectron]    = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).deltaR);
-      JetInfo[iJetColl].PFElectron_IP[JetInfo[iJetColl].nPFElectron]        = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).sip3d);
-      JetInfo[iJetColl].PFElectron_IP2D[JetInfo[iJetColl].nPFElectron]      = (pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).sip2d);
-      JetInfo[iJetColl].PFElectron_mva_e_pi[JetInfo[iJetColl].nPFElectron]  = -999.;//pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str())->properties(leptIdx).mva_e_pi;
+      JetInfo[iJetColl].PFElectron_pt[JetInfo[iJetColl].nPFElectron]        = softPFElTagInfo->lepton(leptIdx)->pt();
+      JetInfo[iJetColl].PFElectron_eta[JetInfo[iJetColl].nPFElectron]       = softPFElTagInfo->lepton(leptIdx)->eta();
+      JetInfo[iJetColl].PFElectron_phi[JetInfo[iJetColl].nPFElectron]       = softPFElTagInfo->lepton(leptIdx)->phi();
+      JetInfo[iJetColl].PFElectron_ptrel[JetInfo[iJetColl].nPFElectron]     = calculPtRel( *(softPFElTagInfo->lepton(leptIdx)), *pjet );
+      JetInfo[iJetColl].PFElectron_ratio[JetInfo[iJetColl].nPFElectron]     = (softPFElTagInfo->properties(leptIdx).ratio);
+      JetInfo[iJetColl].PFElectron_ratioRel[JetInfo[iJetColl].nPFElectron]  = (softPFElTagInfo->properties(leptIdx).ratioRel);
+      JetInfo[iJetColl].PFElectron_deltaR[JetInfo[iJetColl].nPFElectron]    = (softPFElTagInfo->properties(leptIdx).deltaR);
+      JetInfo[iJetColl].PFElectron_IP[JetInfo[iJetColl].nPFElectron]        = (softPFElTagInfo->properties(leptIdx).sip3d);
+      JetInfo[iJetColl].PFElectron_IP2D[JetInfo[iJetColl].nPFElectron]      = (softPFElTagInfo->properties(leptIdx).sip2d);
+      JetInfo[iJetColl].PFElectron_mva_e_pi[JetInfo[iJetColl].nPFElectron]  = -999.;//softPFElTagInfo->properties(leptIdx).mva_e_pi;
 
       ++JetInfo[iJetColl].nPFElectron;
     }
@@ -1715,10 +1723,10 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     // TagInfo TaggingVariables
     if ( storeTagVariables_ )
     {
-      TaggingVariableList ipVars = pjet->tagInfoTrackIP("impactParameter")->taggingVariables();
-      TaggingVariableList svVars = pjet->tagInfoSecondaryVertex("secondaryVertex")->taggingVariables();
-      int nTracks = pjet->tagInfoTrackIP("impactParameter")->selectedTracks().size();
-      int nSVs = pjet->tagInfoSecondaryVertex("secondaryVertex")->nVertices();
+      TaggingVariableList ipVars = ipTagInfo->taggingVariables();
+      TaggingVariableList svVars = svTagInfo->taggingVariables();
+      int nTracks = ipTagInfo->selectedTracks().size();
+      int nSVs = svTagInfo->nVertices();
       // per jet
       JetInfo[iJetColl].TagVar_jetNTracks[JetInfo[iJetColl].nJet]                  = nTracks;
       JetInfo[iJetColl].TagVar_jetNSecondaryVertices[JetInfo[iJetColl].nJet]       = nSVs;
@@ -1786,8 +1794,8 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 
       for(int svIdx=0; svIdx < nSVs; ++svIdx)
       {
-        JetInfo[iJetColl].TagVar_vertexMass[JetInfo[iJetColl].nSVTagVar + svIdx]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(svIdx).p4().mass();
-        JetInfo[iJetColl].TagVar_vertexNTracks[JetInfo[iJetColl].nSVTagVar + svIdx] = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(svIdx).nTracks();
+        JetInfo[iJetColl].TagVar_vertexMass[JetInfo[iJetColl].nSVTagVar + svIdx]    = svTagInfo->secondaryVertex(svIdx).p4().mass();
+        JetInfo[iJetColl].TagVar_vertexNTracks[JetInfo[iJetColl].nSVTagVar + svIdx] = svTagInfo->secondaryVertex(svIdx).nTracks();
       }
       tagValList = svVars.getList(reco::btau::vertexJetDeltaR,false);
       if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].TagVar_vertexJetDeltaR[JetInfo[iJetColl].nSVTagVar] );
@@ -1877,7 +1885,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 	    
     }
 
-    std::vector<TrackIPTagInfo::TrackIPData>  ipdata = pjet->tagInfoTrackIP("impactParameter")->impactParameterData();
+    std::vector<TrackIPTagInfo::TrackIPData>  ipdata = ipTagInfo->impactParameterData();
     std::vector<std::size_t> indexes( sortedIndexes(ipdata) );
 
     TrackCategories::Flags flags1P;
@@ -1984,13 +1992,13 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     JetInfo[iJetColl].Jet_histJet[JetInfo[iJetColl].nJet] = 0;
 
     if(useTrackHistory_ && !isData_){
-      TrackRefVector jetProbTracks( pjet->tagInfoTrackIP("impactParameter")->selectedTracks() );
+      TrackRefVector jetProbTracks( ipTagInfo->selectedTracks() );
 
       cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
       can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
 
       for (unsigned int i=0; i<jetProbTracks.size(); ++i) {
-        reco::TrackIPTagInfo::TrackIPData ip = (pjet->tagInfoTrackIP("impactParameter")->impactParameterData())[i];
+        reco::TrackIPTagInfo::TrackIPData ip = (ipTagInfo->impactParameterData())[i];
 
         if ( ip.ip3d.significance() > 0 ) {
           TrackCategories::Flags theFlag = classifier_.evaluate( jetProbTracks[i] ).flags();
@@ -2028,7 +2036,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     //*****************************************************************
     JetInfo[iJetColl].Jet_histSvx[JetInfo[iJetColl].nJet] = 0;
     JetInfo[iJetColl].Jet_nFirstSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
-    JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]  = pjet->tagInfoSecondaryVertex("secondaryVertex")->nVertices();
+    JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]  = svTagInfo->nVertices();
 
     JetInfo[iJetColl].Jet_SvxMass[JetInfo[iJetColl].nJet] = ( vars.checkTag(reco::btau::vertexMass) ? vars.get(reco::btau::vertexMass) : -9999 );
 
@@ -2036,23 +2044,23 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     for (int vtx = 0; vtx < JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]; ++vtx )
     {
 
-      JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).x();
-      JetInfo[iJetColl].SV_y[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).y();
-      JetInfo[iJetColl].SV_z[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).z();
-      JetInfo[iJetColl].SV_ex[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).xError();
-      JetInfo[iJetColl].SV_ey[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).yError();
-      JetInfo[iJetColl].SV_ez[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).zError();
-      JetInfo[iJetColl].SV_chi2[JetInfo[iJetColl].nSV] = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).chi2();
-      JetInfo[iJetColl].SV_ndf[JetInfo[iJetColl].nSV]  = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).ndof();
+      JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = svTagInfo->secondaryVertex(vtx).x();
+      JetInfo[iJetColl].SV_y[JetInfo[iJetColl].nSV]    = svTagInfo->secondaryVertex(vtx).y();
+      JetInfo[iJetColl].SV_z[JetInfo[iJetColl].nSV]    = svTagInfo->secondaryVertex(vtx).z();
+      JetInfo[iJetColl].SV_ex[JetInfo[iJetColl].nSV]   = svTagInfo->secondaryVertex(vtx).xError();
+      JetInfo[iJetColl].SV_ey[JetInfo[iJetColl].nSV]   = svTagInfo->secondaryVertex(vtx).yError();
+      JetInfo[iJetColl].SV_ez[JetInfo[iJetColl].nSV]   = svTagInfo->secondaryVertex(vtx).zError();
+      JetInfo[iJetColl].SV_chi2[JetInfo[iJetColl].nSV] = svTagInfo->secondaryVertex(vtx).chi2();
+      JetInfo[iJetColl].SV_ndf[JetInfo[iJetColl].nSV]  = svTagInfo->secondaryVertex(vtx).ndof();
 
-      JetInfo[iJetColl].SV_flight[JetInfo[iJetColl].nSV]      = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(vtx).value();
-      JetInfo[iJetColl].SV_flightErr[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(vtx).error();
-      JetInfo[iJetColl].SV_flight2D[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(vtx, true).value();
-      JetInfo[iJetColl].SV_flight2DErr[JetInfo[iJetColl].nSV] = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(vtx, true).error();
-      JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx).nTracks();
+      JetInfo[iJetColl].SV_flight[JetInfo[iJetColl].nSV]      = svTagInfo->flightDistance(vtx).value();
+      JetInfo[iJetColl].SV_flightErr[JetInfo[iJetColl].nSV]   = svTagInfo->flightDistance(vtx).error();
+      JetInfo[iJetColl].SV_flight2D[JetInfo[iJetColl].nSV]    = svTagInfo->flightDistance(vtx, true).value();
+      JetInfo[iJetColl].SV_flight2DErr[JetInfo[iJetColl].nSV] = svTagInfo->flightDistance(vtx, true).error();
+      JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = svTagInfo->secondaryVertex(vtx).nTracks();
 
 
-      const Vertex &vertex = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(vtx);
+      const Vertex &vertex = svTagInfo->secondaryVertex(vtx);
 
       JetInfo[iJetColl].SV_vtx_pt[JetInfo[iJetColl].nSV]  = vertex.p4().pt();
       JetInfo[iJetColl].SV_vtx_eta[JetInfo[iJetColl].nSV] = vertex.p4().eta();
@@ -2064,10 +2072,10 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 
       Bool_t hasRefittedTracks = vertex.hasRefittedTracks();
 
-      TrackRefVector vertexTracks = pjet->tagInfoSecondaryVertex("secondaryVertex")->vertexTracks(vtx);
+      TrackRefVector vertexTracks = svTagInfo->vertexTracks(vtx);
       for(TrackRefVector::const_iterator track = vertexTracks.begin();
           track != vertexTracks.end(); ++track) {
-        Double_t w = pjet->tagInfoSecondaryVertex("secondaryVertex")->trackWeight(vtx, *track);
+        Double_t w = svTagInfo->trackWeight(vtx, *track);
         if (w < 0.5)
           continue;
         if (hasRefittedTracks) {
@@ -2085,9 +2093,9 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       JetInfo[iJetColl].SV_totCharge[JetInfo[iJetColl].nSV]=totcharge;
 
       math::XYZTLorentzVector vertexSum = vertexKinematics.weightedVectorSum();
-      edm::RefToBase<Jet> jet = pjet->tagInfoTrackIP("impactParameter")->jet();
+      edm::RefToBase<Jet> jet = ipTagInfo->jet();
       math::XYZVector jetDir = jet->momentum().Unit();
-      GlobalVector flightDir = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDirection(vtx);
+      GlobalVector flightDir = svTagInfo->flightDirection(vtx);
 
       JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV]     = ( reco::deltaR(flightDir, jetDir) );
       JetInfo[iJetColl].SV_deltaR_sum_jet[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, jetDir) );
@@ -2112,7 +2120,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
     can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
 
-    TrackRefVector svxPostracks( pjet->tagInfoSecondaryVertex("secondaryVertex")->vertexTracks(0) );
+    TrackRefVector svxPostracks( svTagInfo->vertexTracks(0) );
 
     //*****************************************************************
     // for Mistag studies
