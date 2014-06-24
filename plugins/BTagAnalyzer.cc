@@ -132,6 +132,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
 
   muonCollectionName_       = iConfig.getParameter<edm::InputTag>("muonCollectionName");
   patMuonCollectionName_    = iConfig.getParameter<edm::InputTag>("patMuonCollectionName");
+  prunedGenParticleCollectionName_ = iConfig.getParameter<edm::InputTag>("prunedGenParticles");
 
   triggerTable_             = iConfig.getParameter<edm::InputTag>("triggerTable");
 
@@ -277,6 +278,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   EventInfo.nGenV0     = 0;
   EventInfo.nGenlep    = 0;
   EventInfo.nGenquark  = 0;
+  EventInfo.nGenPruned = 0;
   EventInfo.nTrkAll    = 0;
   EventInfo.nPatMuon   = 0;
   EventInfo.mcweight   = 1.;
@@ -318,6 +320,41 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     edm::Handle<reco::GenParticleCollection> genParticles;
     iEvent.getByLabel ("genParticles", genParticles);
 
+    edm::Handle<reco::GenParticleCollection> prunedGenParticles;
+    iEvent.getByLabel(prunedGenParticleCollectionName_, prunedGenParticles);
+
+    //loop over pruned GenParticles to fill branches for MC hard process particles and muons
+    for(size_t i = 0; i < prunedGenParticles->size(); ++i){
+      const GenParticle & iGenPart = (*prunedGenParticles)[i];
+      int status = iGenPart.status();
+      int pdgid = iGenPart.pdgId();
+      int numMothers = iGenPart.numberOfMothers();
+
+      //fill all the branches
+      EventInfo.GenPruned_pT[EventInfo.nGenPruned] = iGenPart.pt();
+      EventInfo.GenPruned_eta[EventInfo.nGenPruned] = iGenPart.eta();
+      EventInfo.GenPruned_phi[EventInfo.nGenPruned] = iGenPart.phi();
+      EventInfo.GenPruned_mass[EventInfo.nGenPruned] = iGenPart.mass();
+      EventInfo.GenPruned_status[EventInfo.nGenPruned] = status;
+      EventInfo.GenPruned_pdgID[EventInfo.nGenPruned] = pdgid;
+      // if no mothers, set mother index to -1 (just so it's not >=0)
+      if (numMothers == 0)
+        EventInfo.GenPruned_mother[EventInfo.nGenPruned] = -1;
+      else{
+        //something new to distinguish from the no mothers case
+        int idx = -100;
+        //loop over the pruned genparticle list to get the mother's index
+        for( reco::GenParticleCollection::const_iterator mit = prunedGenParticles->begin(); mit != prunedGenParticles->end(); ++mit ) {
+          if( iGenPart.mother(0)==&(*mit) ) {
+            idx = std::distance(prunedGenParticles->begin(),mit);
+            break;
+          }
+        }
+        EventInfo.GenPruned_mother[EventInfo.nGenPruned] = idx;
+      }
+      ++EventInfo.nGenPruned;
+    } //end loop over pruned genparticles
+    
     EventInfo.GenPVz = -1000.;
 
     for (size_t i = 0; i < genParticles->size(); ++i) {

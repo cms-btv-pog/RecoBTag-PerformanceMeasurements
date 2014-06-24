@@ -114,6 +114,16 @@ class EventInfoBranches {
     float GenV0_SVz[1000];
     int   GenV0_nCharged[1000];
 
+    // HP means hard process
+    int   nGenPruned;
+    float GenPruned_pT[1000];
+    float GenPruned_eta[1000];
+    float GenPruned_phi[1000];
+    float GenPruned_mass[1000];
+    int   GenPruned_status[1000];
+    int   GenPruned_pdgID[1000];
+    int   GenPruned_mother[1000];
+
     int   nTrkAll;
     float TrkAll_d0[nMaxTrk_];
     float TrkAll_dz[nMaxTrk_];
@@ -251,6 +261,15 @@ class EventInfoBranches {
       tree->Branch("Genquark_phi",    Genquark_phi   , "Genquark_phi[nGenquark]/F");
       tree->Branch("Genquark_pdgID",  Genquark_pdgID , "Genquark_pdgID[nGenquark]/I");
       tree->Branch("Genquark_mother", Genquark_mother, "Genquark_mother[nGenquark]/I");
+
+      tree->Branch("nGenPruned",     &nGenPruned       ,"nGenPruned/I");
+      tree->Branch("GenPruned_pT",     GenPruned_pT    , "GenPruned_pT[nGenPruned]/F");
+      tree->Branch("GenPruned_eta",    GenPruned_eta   , "GenPruned_eta[nGenPruned]/F");
+      tree->Branch("GenPruned_phi",    GenPruned_phi   , "GenPruned_phi[nGenPruned]/F");
+      tree->Branch("GenPruned_mass",    GenPruned_mass   , "GenPruned_mass[nGenPruned]/F");
+      tree->Branch("GenPruned_pdgID",  GenPruned_pdgID , "GenPruned_pdgID[nGenPruned]/I");
+      tree->Branch("GenPruned_status", GenPruned_status, "GenPruned_status[nGenPruned]/I");
+      tree->Branch("GenPruned_mother", GenPruned_mother, "GenPruned_mother[nGenPruned]/I");
 
       tree->Branch("nGenV0",        &nGenV0	    ,"nGenV0/I");
       tree->Branch("GenV0_pT",        GenV0_pT       ,"GenV0_pT[nGenV0]/F");
@@ -420,6 +439,15 @@ class EventInfoBranches {
       tree->SetBranchAddress("Genquark_phi",    Genquark_phi   );
       tree->SetBranchAddress("Genquark_pdgID",  Genquark_pdgID );
       tree->SetBranchAddress("Genquark_mother", Genquark_mother);
+
+      tree->SetBranchAddress("nGenPruned",       &nGenPruned     );
+      tree->SetBranchAddress("GenPruned_pT",     GenPruned_pT    );
+      tree->SetBranchAddress("GenPruned_eta",    GenPruned_eta   );
+      tree->SetBranchAddress("GenPruned_phi",    GenPruned_phi   );
+      tree->SetBranchAddress("GenPruned_mass",    GenPruned_mass   );
+      tree->SetBranchAddress("GenPruned_pdgID",  GenPruned_pdgID );
+      tree->SetBranchAddress("GenPruned_status", GenPruned_status);
+      tree->SetBranchAddress("GenPruned_mother", GenPruned_mother);
 
       tree->SetBranchAddress("nGenV0",       &nGenV0 );
       tree->SetBranchAddress("GenV0_pT",       GenV0_pT );
