@@ -200,6 +200,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
     edm::InputTag src_;  // Generator/handronizer module label
     edm::InputTag muonCollectionName_;
     edm::InputTag patMuonCollectionName_;
+    edm::InputTag prunedGenParticleCollectionName_;
     edm::InputTag triggerTable_;
 
     edm::InputTag JetCollectionTag_;

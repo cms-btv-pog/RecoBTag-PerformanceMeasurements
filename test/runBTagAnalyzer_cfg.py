@@ -176,6 +176,18 @@ process.options   = cms.untracked.PSet(
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = globalTag + '::All'
 
+##############################################
+# Add GenParticlePruner for Boosted b-Tagging Studies
+##############################################
+process.prunedGenParticlesBoost = cms.EDProducer('GenParticlePruner',
+    src = cms.InputTag("genParticles"),
+    select = cms.vstring(
+    "drop  *  ", #by default
+    "keep ( status = 3 || (status>=21 && status<=29) )", #keep hard process particles
+    "keep abs(pdgId) = 13 || abs(pdgId) = 15" #keep muons and taus
+    )
+)
+
 ########################################################
 # Get calibrations for the CSVV1 and CSVSLV1 taggers
 ########################################################
@@ -531,6 +543,7 @@ process.btagana.Jets                  = cms.InputTag('selectedPatJets'+postfix)
 process.btagana.patMuonCollectionName = cms.InputTag('selectedPatMuons')
 process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
 process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
+process.btagana.prunedGenParticles    = cms.InputTag('prunedGenParticlesBoost')
 
 if options.runSubJets:
     process.btaganaSubJets = process.btagana.clone(
