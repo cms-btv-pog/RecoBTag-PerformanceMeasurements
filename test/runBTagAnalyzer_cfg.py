@@ -75,6 +75,16 @@ options.register('usePVSorting', False,
     VarParsing.varType.bool,
     "Use PV sorting"
 )
+options.register('changeMinNumberOfHits', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Change minimum number of tracker hits"
+)
+options.register('minNumberOfHits', 6,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.int,
+    "Minimum number of tracker hits"
+)
 
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', 100)
@@ -104,7 +114,8 @@ if options.runOnData:
 ## b-tag infos
 bTagInfos = ['impactParameterTagInfos','secondaryVertexTagInfos','secondaryVertexNegativeTagInfos','softMuonTagInfos'
      #,'softPFMuonsTagInfos','softPFElectronsTagInfos'
-     #,'inclusiveSecondaryVertexFinderTagInfos','inclusiveSecondaryVertexFinderFilteredTagInfos'
+     ,'inclusiveSecondaryVertexFinderTagInfos'
+     #,'inclusiveSecondaryVertexFinderFilteredTagInfos'
 ]
 ## b-tag discriminators
 bTagDiscriminators = ['jetBProbabilityBJetTags','jetProbabilityBJetTags','trackCountingHighPurBJetTags','trackCountingHighEffBJetTags'
@@ -112,7 +123,7 @@ bTagDiscriminators = ['jetBProbabilityBJetTags','jetProbabilityBJetTags','trackC
      ,'negativeTrackCountingHighEffJetTags','negativeTrackCountingHighPurJetTags'
      #,'positiveOnlyJetBProbabilityJetTags','positiveOnlyJetProbabilityJetTags'
     ,'simpleSecondaryVertexHighEffBJetTags','simpleSecondaryVertexHighPurBJetTags','simpleSecondaryVertexNegativeHighEffBJetTags'
-    ,'simpleSecondaryVertexNegativeHighPurBJetTags','combinedSecondaryVertexBJetTags'
+    ,'simpleSecondaryVertexNegativeHighPurBJetTags','combinedSecondaryVertexBJetTags', 'combinedSecondaryVertexV2BJetTags'
     #,'combinedSecondaryVertexPositiveBJetTags',
     #,'combinedSecondaryVertexV1BJetTags','combinedSecondaryVertexV1PositiveBJetTags'
     #,'combinedSecondaryVertexNegativeBJetTags'
@@ -201,6 +212,23 @@ process.GlobalTag.globaltag = globalTag + '::All'
 #)
 
 #process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
+
+##############################################
+# Get calibrations for the CSVV2 tagger
+##############################################
+process.load('CondCore.DBCommon.CondDBSetup_cfi')
+process.BTauMVAJetTagComputerRecord = cms.ESSource('PoolDBESSource',
+    process.CondDBSetup,
+    timetype = cms.string('runnumber'),
+    toGet = cms.VPSet(cms.PSet(
+        record = cms.string('BTauGenericMVAJetTagComputerRcd'),
+        tag = cms.string('MVAComputerContainer_53X_JetTags_v2')
+    )),
+    connect = cms.string('frontier://FrontierProd/CMS_COND_PAT_000'),
+    BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
+)
+process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer('PoolDBESSource','BTauMVAJetTagComputerRecord')
+
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
 #----------------------------------------------------------------------
@@ -717,7 +745,16 @@ if options.useTTbarFilter:
 #-------------------------------------
 
 #-------------------------------------
-from RecoBTag.PerformanceMeasurements.patTools import *
+## Change the minimum number of tracker hits used in the track selection
+if options.changeMinNumberOfHits:
+    for m in process.producerNames().split(' '):
+        if m.startswith('impactParameterTagInfos'):
+            print "Changing 'minimumNumberOfHits' for " + m + " to " + str(options.minNumberOfHits)
+            getattr(process, m).minimumNumberOfHits = cms.int32(options.minNumberOfHits)
+#-------------------------------------
+
+#-------------------------------------
+from PhysicsTools.PatAlgos.tools.pfTools import *
 ## Adapt primary vertex collection
 adaptPVs(process, pvCollection=cms.InputTag(pvCollection))
 
