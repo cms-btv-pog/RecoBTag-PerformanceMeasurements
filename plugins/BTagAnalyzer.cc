@@ -1,6 +1,7 @@
 #include "RecoBTag/PerformanceMeasurements/interface/BTagAnalyzer.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
+#include "FWCore/Common/interface/Provenance.h"
 
 PFJetIDSelectionFunctor pfjetIDLoose( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE );
 PFJetIDSelectionFunctor pfjetIDTight( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT );
@@ -261,7 +262,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     std::string moduleName = "";
     const edm::Provenance& prov = iEvent.getProvenance(genEvtInfoProduct.id());
     if( genEvtInfoProduct.isValid() )
-      moduleName = prov.moduleName();
+      moduleName = edm::moduleName(prov);
 
     if( moduleName.find("Pythia8")!=std::string::npos )
       hadronizerType_ |= ( 1 << 1 ); // set the 2nd bit
