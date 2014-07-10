@@ -35,12 +35,12 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
-options.register('mcGlobalTag', 'START62_V1',
+options.register('mcGlobalTag', 'START70_V7',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', 'GR_R_62_V1',
+options.register('dataGlobalTag', 'GR_R_70_V2',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
@@ -63,7 +63,7 @@ options.register('producePtRelTemplate', True,
 options.register('fatJetPtMin', 150.0,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
-    "Minimum pT for fat jets (default is 100 GeV)"
+    "Minimum pT for fat jets (default is 150 GeV)"
 )
 options.register('useTTbarFilter', False,
     VarParsing.multiplicity.singleton,
@@ -131,10 +131,10 @@ process.MessageLogger.cerr.default.limit = 10
 process.source = cms.Source(
     "PoolSource",
     fileNames = cms.untracked.vstring(
-        # /RelValQCD_FlatPt_15_3000/CMSSW_6_2_0-PRE_ST62_V8-v3/GEN-SIM-RECO
-        #'/store/relval/CMSSW_6_2_0/RelValQCD_FlatPt_15_3000/GEN-SIM-RECO/PRE_ST62_V8-v3/00000/68DC246F-56EC-E211-B2E5-003048CF94A4.root'
-        # /RelValTTbar/CMSSW_6_2_0-PRE_ST62_V8-v3/GEN-SIM-RECO
-        '/store/relval/CMSSW_6_2_0/RelValTTbar/GEN-SIM-RECO/PRE_ST62_V8-v3/00000/1A4CBAAC-48EC-E211-8A00-001E67397EB8.root'
+        # /QCD_Pt-80to120_MuEnrichedPt5_Tune4C_13TeV_pythia8/Spring14dr-PU20bx25_POSTLS170_V5-v1/AODSIM
+        #'/store/mc/Spring14dr/QCD_Pt-80to120_MuEnrichedPt5_Tune4C_13TeV_pythia8/AODSIM/PU20bx25_POSTLS170_V5-v1/00000/00A2284F-D5D0-E311-BE96-002590A3A3D2.root'
+        # /TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM
+        '/store/mc/Spring14dr/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/AODSIM/PU_S14_POSTLS170_V6-v1/00000/00120F7A-84F5-E311-9FBE-002618943910.root'
     )
 )
 
@@ -477,13 +477,13 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 ## Switch the default jet collection (done in order to use the above specified b-tag infos and discriminators)
 switchJetCollection(
     process,
-    cms.InputTag('pfJets'+postfix),
+    jetSource = cms.InputTag('pfJets'+postfix),
     btagInfos = bTagInfos,
     btagDiscriminators = bTagDiscriminators,
     jetCorrections = jetCorrectionsAK5,
+    genJetCollection = cms.InputTag('ak5GenJetsNoNu'+postfix),
     postfix = postfix
 )
-process.patJetGenJetMatchPFlow.matched = cms.InputTag('ak5GenJetsNoNu'+postfix)
 
 ## Add additional b-tag discriminators
 getattr(process,'patJets'+postfix).discriminatorSources += cms.VInputTag(
@@ -549,11 +549,11 @@ if options.runSubJets:
         btagInfos = bTagInfos,
         btagDiscriminators = bTagDiscriminators,
         jetCorrections = jetCorrectionsAK7,
+        genJetCollection = cms.InputTag('ca8GenJetsNoNu'),
+        algo = 'CA',
+        rParam = 0.8,
         postfix = postfix
     )
-    process.patJetGenJetMatchPatJetsCA8PFlow.matched = cms.InputTag('ca8GenJetsNoNu')
-    process.patJetPartonAssociationPatJetsCA8PFlow.partons = cms.InputTag("patJetPartonsPFlow")
-
     addJetCollection(
         process,
         labelName = 'CA8Pruned',
@@ -561,11 +561,10 @@ if options.runSubJets:
         btagInfos=['None'],
         btagDiscriminators=['None'],
         jetCorrections=jetCorrectionsAK7,
+        genJetCollection = cms.InputTag('ca8GenJetsNoNu'),
+        getJetMCFlavour = False,
         postfix = postfix
     )
-    process.patJetGenJetMatchPatJetsCA8PrunedPFlow.matched = cms.InputTag('ca8GenJetsNoNu')
-    process.patJetPartonAssociationPatJetsCA8PrunedPFlow.partons = cms.InputTag("patJetPartonsPFlow")
-
     addJetCollection(
         process,
         labelName = 'CA8PrunedSubJets',
@@ -573,16 +572,25 @@ if options.runSubJets:
         btagInfos=bTagInfos,
         btagDiscriminators=bTagDiscriminatorsSubJets,
         jetCorrections=jetCorrectionsAK5,
+        genJetCollection = cms.InputTag('ca8GenJetsNoNuPruned','SubJets'),
+        algo = 'CA',
+        rParam = 0.8,
         postfix = postfix
     )
-    process.patJetGenJetMatchPatJetsCA8PrunedSubJetsPFlow.matched = cms.InputTag('ca8GenJetsNoNuPruned','SubJets')
-    process.patJetPartonAssociationPatJetsCA8PrunedSubJetsPFlow.partons = cms.InputTag("patJetPartonsPFlow")
 
-## Establish references between PAT fat jets and PAT subjets using the BoostedJetMerger
-process.selectedPatJetsCA8PrunedPFlowPacked = cms.EDProducer("BoostedJetMerger",
-    jetSrc=cms.InputTag("selectedPatJetsCA8PrunedPFlow"),
-    subjetSrc=cms.InputTag("selectedPatJetsCA8PrunedSubJetsPFlow")
-)
+    ## Establish references between PATified fat jets and subjets using the BoostedJetMerger
+    process.selectedPatJetsCA8PrunedPFlowPacked = cms.EDProducer("BoostedJetMerger",
+        jetSrc=cms.InputTag("selectedPatJetsCA8PrunedPFlow"),
+        subjetSrc=cms.InputTag("selectedPatJetsCA8PrunedSubJetsPFlow")
+    )
+
+    ## New jet flavor still requires some cfg-level adjustments for subjets until it is better integrated into PAT
+    ## Adjust the jet flavor for pruned subjets
+    setattr(process,'patJetFlavourAssociationCA8PrunedSubJetsPFlow', getattr(process,'patJetFlavourAssociationCA8PFlow').clone(
+        groomedJets = cms.InputTag('ca8PFJetsPruned'),
+        subjets = cms.InputTag('ca8PFJetsPruned','SubJets')
+    ))
+    getattr(process,'patJetsCA8PrunedSubJetsPFlow').JetFlavourInfoSource = cms.InputTag('patJetFlavourAssociationCA8PrunedSubJetsPFlow','SubJets')
 #-------------------------------------
 
 #-------------------------------------
@@ -685,20 +693,14 @@ if options.useTTbarFilter:
 #-------------------------------------
 
 #-------------------------------------
-from RecoBTag.PerformanceMeasurements.patTools import *
+from PhysicsTools.PatAlgos.tools.pfTools import *
 ## Adapt primary vertex collection
 adaptPVs(process, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'))
 #-------------------------------------
 
 #-------------------------------------
 if not options.runOnData:
-    ## JP calibration for cmsRun only :
-    #from CondCore.DBCommon.CondDBCommon_cfi import *
-    #process.load("RecoBTag.TrackProbability.trackProbabilityFakeCond_cfi")
-    #process.trackProbabilityFakeCond.connect =cms.string( "sqlite_fip:RecoBTag/PerformanceMeasurements/test/btagnew_Data_2011_41X.db")
-    #process.es_prefer_trackProbabilityFakeCond = cms.ESPrefer("PoolDBESSource","trackProbabilityFakeCond")
-
-    ## JP calibration for crab only:
+    ## JP calibrations:
     process.GlobalTag.toGet = cms.VPSet(
       cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
            tag = cms.string("TrackProbabilityCalibration_2D_MC53X_v2"),
@@ -771,14 +773,8 @@ if options.runSubJets:
 #---------------------------------------
 ## Optional MET filters:
 ## https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters
-process.load("RecoMET.METFilters.metFilters_cff")
-process.trackingFailureFilter.VertexSource = cms.InputTag('goodOfflinePrimaryVertices')
-#---------------------------------------
-
-#---------------------------------------
-## Filter for HCAL laser events in prompt 2012A+B+C, snippet for "Datasets from the 2013 rereco and Multijet parked":
-## https://twiki.cern.ch/twiki/bin/view/CMS/PdmVKnowFeatures#HCAL_laser_events_in_prompt_2012
-#process.load("EventFilter.HcalRawToDigi.hcallaserFilterFromTriggerResult_cff")  # ---------->  Does not seem to work with CMSSW_6_2_X rereco !!!
+#process.load("RecoMET.METFilters.metFilters_cff")
+#process.trackingFailureFilter.VertexSource = cms.InputTag('goodOfflinePrimaryVertices')
 #---------------------------------------
 
 #---------------------------------------
@@ -792,19 +788,17 @@ process.selectedEvents = eventCounter.clone()
 ## Define event filter sequence
 process.filtSeq = cms.Sequence(
     #process.JetHLTFilter*
-    process.noscraping
-    * process.primaryVertexFilter
+    #process.noscraping
+    process.primaryVertexFilter
     * process.goodOfflinePrimaryVertices
-    * process.HBHENoiseFilter
-    * process.CSCTightHaloFilter
-    * process.EcalDeadCellTriggerPrimitiveFilter
-    * process.eeBadScFilter
-    * process.ecalLaserCorrFilter
-    * process.trackingFailureFilter
-    * process.trkPOGFilters
+    #* process.HBHENoiseFilter
+    #* process.CSCTightHaloFilter
+    #* process.EcalDeadCellTriggerPrimitiveFilter
+    #* process.eeBadScFilter
+    #* process.ecalLaserCorrFilter
+    #* process.trackingFailureFilter
+    #* process.trkPOGFilters
 )
-#if options.runOnData:
-    #process.filtSeq *= process.hcalfilter # ---------->  Does not seem to work with CMSSW_6_2_X rereco !!!
 
 
 ## Define analyzer sequence
