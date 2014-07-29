@@ -55,7 +55,7 @@ options.register('processStdAK5Jets', True,
     VarParsing.varType.bool,
     "Process standard AK5 jets"
 )
-options.register('producePtRelTemplate', True,
+options.register('producePtRelTemplate', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Produce PtRel template"
@@ -75,12 +75,12 @@ options.register('usePVSorting', False,
     VarParsing.varType.bool,
     "Use PV sorting"
 )
-options.register('changeMinNumberOfHits', True,
+options.register('changeMinNumberOfHits', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Change minimum number of tracker hits"
 )
-options.register('minNumberOfHits', 6,
+options.register('minNumberOfHits', 8,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.int,
     "Minimum number of tracker hits"
@@ -826,7 +826,8 @@ process.btagana.primaryVertexColl     = cms.InputTag(pvCollection)
 process.btagana.Jets                  = cms.InputTag('selectedPatJets'+postfix)
 process.btagana.patMuonCollectionName = cms.InputTag('selectedPatMuons')
 process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
-process.btagana.MaxEta                = cms.double(4.0) ## for extended forward pixel coverage
+process.btagana.MaxEta                = cms.double(4.2) ## for extended forward pixel coverage
+process.btagana.MinPt                 = cms.double(20.0)
 #process.btagana.triggerTable         = cms.InputTag('TriggerResults::HLT') # Data and MC
 
 if options.runSubJets:
