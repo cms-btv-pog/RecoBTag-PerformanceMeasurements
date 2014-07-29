@@ -1024,6 +1024,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     JetInfo[iJetColl].Jet_pt[JetInfo[iJetColl].nJet]      = pjet->pt();
     JetInfo[iJetColl].Jet_mass[JetInfo[iJetColl].nJet]    = pjet->mass();
     JetInfo[iJetColl].Jet_genpt[JetInfo[iJetColl].nJet]   = ( pjet->genJet()!=0 ? pjet->genJet()->pt() : -1. );
+    JetInfo[iJetColl].Jet_isPU[JetInfo[iJetColl].nJet]    = ( pjet->genJet()==0 ? 1 : 0 );
 
     // available JEC sets
     unsigned int nJECSets = pjet->availableJECSets().size();

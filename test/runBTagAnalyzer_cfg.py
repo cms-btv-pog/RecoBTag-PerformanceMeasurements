@@ -674,6 +674,19 @@ process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
 #-------------------------------------
 
 #-------------------------------------
+## For MC PU jet ID
+## Select GenJets for MC PU jet ID
+process.ak5GenJetsForMCPUJetID = cms.EDFilter("GenJetSelector",
+    src = cms.InputTag('ak5GenJetsNoNu'+postfix),
+    cut = cms.string('pt > 8.0'),
+    filter = cms.bool(False) # in case no GenJets pass the selection, do not filter events, just produce an empty GenJet collection
+)
+## Adjust dR cut and GenJet collection name
+getattr(process,'patJetGenJetMatch'+postfix).maxDeltaR = cms.double(0.25)
+getattr(process,'patJetGenJetMatch'+postfix).matched = cms.InputTag("ak5GenJetsForMCPUJetID")
+#-------------------------------------
+
+#-------------------------------------
 ## Load modules for primary vertex sorting
 process.load("RecoVertex.PrimaryVertexSorter.sortedOfflinePrimaryVertices_cff")
 
