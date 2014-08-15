@@ -1563,16 +1563,6 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     float CombinedSvtxN = pjet->bDiscriminator(combinedSVNegBJetTags_.c_str());
     float CombinedSvtxP = pjet->bDiscriminator(combinedSVPosBJetTags_.c_str());
 
-    std::vector<const reco::BaseTagInfo*>  baseTagInfos;
-    JetTagComputer::TagInfoHelper helper(baseTagInfos);
-    baseTagInfos.push_back( ipTagInfo );
-    baseTagInfos.push_back( svTagInfo );
-    // TaggingVariables
-    TaggingVariableList vars = computer->taggingVariables(helper);
-
-    float JetVtxCategory = -9999.;
-    if(vars.checkTag(reco::btau::vertexCategory)) JetVtxCategory = ( vars.get(reco::btau::vertexCategory) );
-
     float RetCombinedSvtx  = pjet->bDiscriminator(combinedSVRetrainedBJetTags_.c_str());
     float RetCombinedSvtxN = pjet->bDiscriminator(combinedSVRetrainedNegBJetTags_.c_str());
     float RetCombinedSvtxP = pjet->bDiscriminator(combinedSVRetrainedPosBJetTags_.c_str());
@@ -1757,8 +1747,6 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     JetInfo[iJetColl].Jet_SoftElP[JetInfo[iJetColl].nJet]  = SoftEP;
     JetInfo[iJetColl].Jet_SoftEl[JetInfo[iJetColl].nJet]   = SoftE;
 
-    JetInfo[iJetColl].Jet_VtxCat[JetInfo[iJetColl].nJet] = JetVtxCategory;
-
     // TagInfo TaggingVariables
     if ( storeTagVariables_ )
     {
@@ -1766,6 +1754,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       TaggingVariableList svVars = svTagInfo->taggingVariables();
       int nTracks = ipTagInfo->selectedTracks().size();
       int nSVs = svTagInfo->nVertices();
+
       // per jet
       JetInfo[iJetColl].TagVar_jetNTracks[JetInfo[iJetColl].nJet]                  = nTracks;
       JetInfo[iJetColl].TagVar_jetNSecondaryVertices[JetInfo[iJetColl].nJet]       = nSVs;
@@ -1854,6 +1843,13 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     // CSV TaggingVariables
     if ( storeCSVTagVariables_ )
     {
+      std::vector<const reco::BaseTagInfo*>  baseTagInfos;
+      JetTagComputer::TagInfoHelper helper(baseTagInfos);
+      baseTagInfos.push_back( ipTagInfo );
+      baseTagInfos.push_back( svTagInfo );
+      // TaggingVariables
+      TaggingVariableList vars = computer->taggingVariables(helper);
+
       // per jet
       JetInfo[iJetColl].TagVarCSV_trackJetPt[JetInfo[iJetColl].nJet]                  = ( vars.checkTag(reco::btau::trackJetPt) ? vars.get(reco::btau::trackJetPt) : -9999 );
       JetInfo[iJetColl].TagVarCSV_vertexCategory[JetInfo[iJetColl].nJet]              = ( vars.checkTag(reco::btau::vertexCategory) ? vars.get(reco::btau::vertexCategory) : -9999 );
@@ -2076,8 +2072,6 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     JetInfo[iJetColl].Jet_histSvx[JetInfo[iJetColl].nJet] = 0;
     JetInfo[iJetColl].Jet_nFirstSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
     JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]  = svTagInfo->nVertices();
-
-    JetInfo[iJetColl].Jet_SvxMass[JetInfo[iJetColl].nJet] = ( vars.checkTag(reco::btau::vertexMass) ? vars.get(reco::btau::vertexMass) : -9999 );
 
     // if secondary vertices present
     for (int vtx = 0; vtx < JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]; ++vtx )
