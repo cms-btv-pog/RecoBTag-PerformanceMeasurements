@@ -41,7 +41,6 @@ class JetInfoBranches {
     float Jet_Svx[nMaxJets_];
     float Jet_SvxNHP[nMaxJets_];
     float Jet_SvxHP[nMaxJets_];
-    float Jet_SvxMass[nMaxJets_];
     float Jet_CombSvxN[nMaxJets_];
     float Jet_CombSvxP[nMaxJets_];
     float Jet_CombSvx[nMaxJets_];
@@ -88,7 +87,6 @@ class JetInfoBranches {
     int   Jet_nFirstTrkInc[nMaxJets_];
     int   Jet_nLastTrkInc[nMaxJets_];
     int   Jet_SV_multi[nMaxJets_];
-    int   Jet_VtxCat[nMaxJets_];
     int   Jet_looseID[nMaxJets_];
     int   Jet_tightID[nMaxJets_];
     int   Jet_FatJetIdx[nMaxJets_];
@@ -354,7 +352,6 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_Svx").c_str(),         Jet_Svx        ,(name+"Jet_Svx["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_SvxNHP").c_str(),      Jet_SvxNHP     ,(name+"Jet_SvxNHP["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_SvxHP").c_str(),       Jet_SvxHP      ,(name+"Jet_SvxHP["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_SvxMass").c_str(),     Jet_SvxMass    ,(name+"Jet_SvxMass["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_CombSvxN").c_str(),    Jet_CombSvxN   ,(name+"Jet_CombSvxN["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_CombSvxP").c_str(),    Jet_CombSvxP   ,(name+"Jet_CombSvxP["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_CombSvx").c_str(),     Jet_CombSvx    ,(name+"Jet_CombSvx["+name+"nJet]/F").c_str());
@@ -403,7 +400,6 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_nFirstTrkInc").c_str(), Jet_nFirstTrkInc ,(name+"Jet_nFirstTrkInc["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_nLastTrkInc").c_str(),  Jet_nLastTrkInc  ,(name+"Jet_nLastTrkInc["+name+"nJet]/I").c_str());
 
-      tree->Branch((name+"Jet_VtxCat").c_str(),      Jet_VtxCat    ,(name+"Jet_VtxCat["+name+"nJet]/I").c_str() );
       tree->Branch((name+"Jet_looseID").c_str(),      Jet_looseID  ,(name+"Jet_looseID["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_tightID").c_str(),      Jet_tightID  ,(name+"Jet_tightID["+name+"nJet]/I").c_str());
 
@@ -711,7 +707,6 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_Svx").c_str(),         Jet_Svx         );
       tree->SetBranchAddress((name+"Jet_SvxNHP").c_str(),      Jet_SvxNHP      );
       tree->SetBranchAddress((name+"Jet_SvxHP").c_str(),       Jet_SvxHP       );
-      tree->SetBranchAddress((name+"Jet_SvxMass").c_str(),     Jet_SvxMass     );
       tree->SetBranchAddress((name+"Jet_CombSvxN").c_str(),    Jet_CombSvxN    );
       tree->SetBranchAddress((name+"Jet_CombSvxP").c_str(),    Jet_CombSvxP    );
       tree->SetBranchAddress((name+"Jet_CombSvx").c_str(),     Jet_CombSvx     );
@@ -760,7 +755,6 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_nFirstTrkInc").c_str(),Jet_nFirstTrkInc );
       tree->SetBranchAddress((name+"Jet_nLastTrkInc").c_str(), Jet_nLastTrkInc  );
 
-      tree->SetBranchAddress((name+"Jet_VtxCat").c_str(),      Jet_VtxCat  );
       tree->SetBranchAddress((name+"Jet_looseID").c_str(),     Jet_looseID);
       tree->SetBranchAddress((name+"Jet_tightID").c_str(),     Jet_tightID);
 
