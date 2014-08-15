@@ -190,6 +190,22 @@ process.prunedGenParticlesBoost = cms.EDProducer('GenParticlePruner',
     )
 )
 
+########################################################
+# Get calibrations for the CSVV1 and CSVSLV1 taggers
+########################################################
+#process.load("CondCore.DBCommon.CondDBSetup_cfi")
+#process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
+   #process.CondDBSetup,
+   #timetype = cms.string('runnumber'),
+   #toGet = cms.VPSet(cms.PSet(
+      #record = cms.string('BTauGenericMVAJetTagComputerRcd'),
+                #tag = cms.string('MVAComputerContainer_Retrained53X_JetTags_v2')
+   #)),
+   #connect = cms.string('frontier://FrontierProd/CMS_COND_PAT_000'),
+   #BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
+#)
+#process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
+
 ##############################################
 # Get calibrations for the CSVV2 tagger
 ##############################################
@@ -523,13 +539,7 @@ if options.runSubJets:
 
 #-------------------------------------
 if not options.runOnData:
-    ## JP calibration for cmsRun only :
-    #from CondCore.DBCommon.CondDBCommon_cfi import *
-    #process.load("RecoBTag.TrackProbability.trackProbabilityFakeCond_cfi")
-    #process.trackProbabilityFakeCond.connect =cms.string( "sqlite_fip:RecoBTag/PerformanceMeasurements/test/btagnew_Data_2011_41X.db")
-    #process.es_prefer_trackProbabilityFakeCond = cms.ESPrefer("PoolDBESSource","trackProbabilityFakeCond")
-
-    ## JP calibration for crab only:
+    ## JP calibration for 53X MC
     process.GlobalTag.toGet = cms.VPSet(
       cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
            tag = cms.string("TrackProbabilityCalibration_2D_MC53X_v2"),
