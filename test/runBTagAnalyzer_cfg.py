@@ -390,6 +390,8 @@ for m in patJets:
     if hasattr(process,m):
         print "Switching 'addTagInfos' for " + m + " to 'True'"
         setattr( getattr(process,m), 'addTagInfos', cms.bool(True) )
+        print "Switching 'addJetFlavourInfo' for " + m + " to 'True'"
+        setattr( getattr(process,m), 'addJetFlavourInfo', cms.bool(True) )
 #-------------------------------------
 
 #-------------------------------------
