@@ -35,7 +35,7 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
-options.register('mcGlobalTag', 'DES19_62_V8', #PH1_1K_FB_V2, DES17_62_V8, DES23_62_V1
+options.register('mcGlobalTag', 'DES19_62_V8', #2017: DES17_62_V8; 2019: DES19_62_V8, PH1_1K_FB_V2; 20123: DES23_62_V1
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
@@ -100,10 +100,12 @@ if options.runOnData:
     globalTag = options.dataGlobalTag
 
 ## Jet energy corrections
+jetCorrectionsAK4 = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 jetCorrectionsAK5 = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 jetCorrectionsAK7 = ('AK7PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 
 if not options.usePFchs:
+    jetCorrectionsAK4 = ('AK4PF', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
     jetCorrectionsAK5 = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
     jetCorrectionsAK7 = ('AK7PF', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 
@@ -275,7 +277,7 @@ jetAlgo="AK5"
 
 from PhysicsTools.PatAlgos.tools.pfTools import *
 usePF2PAT(process,runPF2PAT=True, jetAlgo=jetAlgo, runOnMC=not options.runOnData, postfix=postfix,
-          jetCorrections=jetCorrectionsAK5, pvCollection=cms.InputTag(pvCollection))
+          jetCorrections=jetCorrectionsAK4, pvCollection=cms.InputTag(pvCollection))
 
 ## Top projections in PF2PAT
 getattr(process,"pfPileUpJME"+postfix).checkClosestZVertex = False
@@ -298,7 +300,7 @@ switchJetCollection(
     jetSource = cms.InputTag('pfJets'+postfix),
     btagInfos = bTagInfos,
     btagDiscriminators = bTagDiscriminators,
-    jetCorrections = jetCorrectionsAK5,
+    jetCorrections = jetCorrectionsAK4,
     genJetCollection = cms.InputTag('ak5GenJetsNoNu'+postfix),
     postfix = postfix
 )
@@ -624,6 +626,42 @@ if options.runSubJets:
 from MyAnalysis.EventCounter.eventcounter_cfi import eventCounter
 process.allEvents = eventCounter.clone()
 process.selectedEvents = eventCounter.clone()
+#---------------------------------------
+
+#---------------------------------------
+## Switching from AK5 to AK4 jets
+print 'Switching from AK5 to AK4 jets'
+print '******************************'
+
+## Change cone sizes (note that only the cose sizes are changed, but not the collection names)
+process.ak5GenJetsNoNuPFlow.rParam = cms.double(0.4)
+process.pfJetsPFlow.rParam = cms.double(0.4)
+process.jetTracksAssociatorAtVertexPFlow.coneSize = cms.double(0.4)
+
+## Select JEC version
+jec = 'DES19_V1'
+#jec = 'AGE1K_V1'
+
+## Get AK4PFchs JECs from a sqlite file
+process.load("CondCore.DBCommon.CondDBCommon_cfi")
+process.jec = cms.ESSource("PoolDBESSource",
+    DBParameters = cms.PSet(
+        messageLevel = cms.untracked.int32(0)
+    ),
+    timetype = cms.string('runnumber'),
+    toGet = cms.VPSet(
+    cms.PSet(
+         record = cms.string('JetCorrectionsRecord'),
+         tag    = cms.string('JetCorrectorParametersCollection_' + jec + '_MC_AK4PFchs'),
+         label  = cms.untracked.string('AK4PFchs')
+    ),
+    ## here you add as many jet types as you need
+    ## note that the tag name is specific for the particular sqlite file
+    ),
+    connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/' + jec + '_MC.db')
+)
+## add an es_prefer statement to resolve a possible conflict from simultaneous connection to a global tag
+process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 #---------------------------------------
 
 #---------------------------------------
