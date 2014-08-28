@@ -35,7 +35,7 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
-options.register('mcGlobalTag', 'DES23_62_V1', #DES17_62_V8, DES19_62_V8
+options.register('mcGlobalTag', 'DES19_62_V8', #PH1_1K_FB_V2, DES17_62_V8, DES23_62_V1
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
@@ -157,8 +157,15 @@ process.source = cms.Source(
     fileNames = cms.untracked.vstring(
         # /RelValTTbar_14TeV/CMSSW_6_2_0_SLHC7-DES17_62_V8_UPG2017-v2/GEN-SIM-RECO
         #'/store/relval/CMSSW_6_2_0_SLHC7/RelValTTbar_14TeV/GEN-SIM-RECO/DES17_62_V8_UPG2017-v2/00000/04D56E72-4390-E311-A322-02163E008D7C.root'
+
+        # /PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/GEM2019Upg14DR-final_phase1_PU50bx25_DES19_62_V8-v1/AODSIM
+        '/store/mc/GEM2019Upg14DR/PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/AODSIM/final_phase1_PU50bx25_DES19_62_V8-v1/00000/009500C4-A821-E411-8E47-02163E00E7E0.root'
+
+        # /PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/GEM2019Upg14DR-final_phase1_age1k_PU140bx25_PH1_1K_FB_V2-v1/AODSIM
+        #'/store/mc/GEM2019Upg14DR/PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/AODSIM/final_phase1_age1k_PU140bx25_PH1_1K_FB_V2-v1/00000/00746114-E31F-E411-B4BC-002618FDA211.root'
+
         # /RelValTTbar_14TeV/CMSSW_6_2_0_SLHC11-DES23_62_V1_UPG2023Muon-v1/GEN-SIM-RECO
-        '/store/relval/CMSSW_6_2_0_SLHC11/RelValTTbar_14TeV/GEN-SIM-RECO/DES23_62_V1_UPG2023Muon-v1/00000/2AEE7860-67C6-E311-AEB4-0025905964B4.root'
+        #'/store/relval/CMSSW_6_2_0_SLHC11/RelValTTbar_14TeV/GEN-SIM-RECO/DES23_62_V1_UPG2023Muon-v1/00000/2AEE7860-67C6-E311-AEB4-0025905964B4.root'
     )
 )
 
@@ -235,11 +242,11 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 #process.load('Configuration.Geometry.GeometryExtended2017Reco_cff')
 #process.load('Configuration.Geometry.GeometryExtended2017_cff')
 # 2019 geometry:
-#process.load('Configuration.Geometry.GeometryExtended2019Reco_cff')
-#process.load('Configuration.Geometry.GeometryExtended2019_cff')
+process.load('Configuration.Geometry.GeometryExtended2019Reco_cff')
+process.load('Configuration.Geometry.GeometryExtended2019_cff')
 # 2023 geometry:
-process.load('Configuration.Geometry.GeometryExtended2023MuonReco_cff')
-process.load('Configuration.Geometry.GeometryExtended2023Muon_cff')
+#process.load('Configuration.Geometry.GeometryExtended2023MuonReco_cff')
+#process.load('Configuration.Geometry.GeometryExtended2023Muon_cff')
 #----------------------------------------------------------------------
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.load("SimTracker.TrackAssociation.TrackAssociatorByChi2_cfi")
