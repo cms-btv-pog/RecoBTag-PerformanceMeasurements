@@ -469,7 +469,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       } // c hadron
 
       // Leptons
-      if ( (ID == 11 || ID == 13) && genIt.p4().pt() > 3. ) {
+      if ( (ID == 11 || ID == 13 || ID == 15) && genIt.p4().pt() > 3. ) {
        if (genIt.numberOfMothers()>0) {  // protection for herwig ttbar mc
         const Candidate * moth1 = genIt.mother();
         if ( moth1->pdgId() != genIt.pdgId() ) {
