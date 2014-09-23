@@ -624,9 +624,9 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	int idD1 = -1, idD2 = -1;
 	int nCharged = 0;
 	// take vertex of first daughter for SV
-  	EventInfo.BHadron_SVx[EventInfo.nBHadrons] = genIt.daughter(0)->vx();
-   	EventInfo.BHadron_SVy[EventInfo.nBHadrons] = genIt.daughter(0)->vy();
-    	EventInfo.BHadron_SVz[EventInfo.nBHadrons] = genIt.daughter(0)->vz();
+	EventInfo.BHadron_SVx[EventInfo.nBHadrons] = (nDaughters>0 ? genIt.daughter(0)->vx() : -9999);
+	EventInfo.BHadron_SVy[EventInfo.nBHadrons] = (nDaughters>0 ? genIt.daughter(0)->vy() : -9999);
+	EventInfo.BHadron_SVz[EventInfo.nBHadrons] = (nDaughters>0 ? genIt.daughter(0)->vz() : -9999);
 
 	if ( !hasBHadronDaughter ) {
 	  // Loop on daughters: B -> X
