@@ -133,6 +133,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
 
   muonCollectionName_       = iConfig.getParameter<edm::InputTag>("muonCollectionName");
   patMuonCollectionName_    = iConfig.getParameter<edm::InputTag>("patMuonCollectionName");
+  genParticleCollectionName_ = iConfig.getParameter<edm::InputTag>("genParticles");
   prunedGenParticleCollectionName_ = iConfig.getParameter<edm::InputTag>("prunedGenParticles");
 
   triggerTable_             = iConfig.getParameter<edm::InputTag>("triggerTable");
@@ -319,7 +320,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   // generated particles
   //------------------------------------------------------
     edm::Handle<reco::GenParticleCollection> genParticles;
-    iEvent.getByLabel ("genParticles", genParticles);
+    iEvent.getByLabel (genParticleCollectionName_, genParticles);
 
     edm::Handle<reco::GenParticleCollection> prunedGenParticles;
     iEvent.getByLabel(prunedGenParticleCollectionName_, prunedGenParticles);

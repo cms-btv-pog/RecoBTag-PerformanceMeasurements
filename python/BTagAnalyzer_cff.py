@@ -25,6 +25,8 @@ btagana = cms.EDAnalyzer("BTagAnalyzer",
     muonCollectionName       = cms.InputTag('muons'),
     patMuonCollectionName    = cms.InputTag('selectedPatMuons'),
     triggerTable             = cms.InputTag('TriggerResults'),
+    genParticles             = cms.InputTag('genParticles'),
+    prunedGenParticles       = cms.InputTag('prunedGenParticlesBoost'),
     svComputer               = cms.string('combinedSecondaryVertex'),
 
     # list of taggers
