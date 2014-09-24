@@ -139,9 +139,8 @@ postfix = "PFlow"
 genParticles = 'genParticles'
 jetSource = 'pfJets'+postfix
 genJetCollection = 'ak5GenJetsNoNu'+postfix
-offlinePrimaryVertices = 'offlinePrimaryVertices'
 trackSource = 'generalTracks'
-pvSource = offlinePrimaryVertices
+pvSource = 'offlinePrimaryVertices'
 muons = 'muons'
 selectedPatMuons = 'selectedPatMuons'
 ## If running on miniAOD
@@ -149,7 +148,6 @@ if options.miniAOD:
     genParticles = 'prunedGenParticles'
     jetSource = 'ak5PFJets'
     genJetCollection = 'ak5GenJetsNoNu'
-    offlinePrimaryVertices = 'offlineSlimmedPrimaryVertices'
     trackSource = 'unpackedTracksAndVertices'
     pvSource = 'unpackedTracksAndVertices'
     muons = 'slimmedMuons'
@@ -523,7 +521,7 @@ process.noscraping = cms.EDFilter("FilterOutScraping",
 
 ## Filter for good primary vertex
 process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
-    vertexCollection = cms.InputTag(offlinePrimaryVertices),
+    vertexCollection = cms.InputTag(pvSource),
     minimumNDOF = cms.uint32(4) ,
     maxAbsZ = cms.double(24),
     maxd0 = cms.double(2)
