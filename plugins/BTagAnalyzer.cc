@@ -909,8 +909,6 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   iSetup.get<JetTagComputerRecord>().get( SVComputer_.c_str(), computerHandle );
 
   computer = dynamic_cast<const GenericMVAJetTagComputer*>( computerHandle.product() );
-
-  computer->passEventSetup(iSetup);
   //------------- end added-----------------------------------------------------------//
 
   if (use_ttbar_filter_) {
