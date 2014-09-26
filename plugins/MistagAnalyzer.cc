@@ -353,7 +353,7 @@ MistagAnalyzer::~MistagAnalyzer()
 }
 
 
-static std::vector<std::size_t> sortedIndexes(std::vector<TrackIPTagInfo::TrackIPData > const & values)
+static std::vector<std::size_t> sortedIndexes(std::vector<btag::TrackIPData > const & values)
 {
   std::multimap<float, std::size_t> sortedIdx;
   std::vector<std::size_t> result;
@@ -1459,7 +1459,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     Jet_SoftMu[nJet]   = SoftM;
 
     ith_tagged = this->TaggedJet(jetsColl.at(ijet),jetTags_TCHighEff);
-    std::vector<TrackIPTagInfo::TrackIPData>  ipdata = (*tagInfo)[ith_tagged].impactParameterData();
+    std::vector<btag::TrackIPData>  ipdata = (*tagInfo)[ith_tagged].impactParameterData();
     TrackRefVector tracks( (*tagInfo)[ith_tagged].selectedTracks() );
     std::vector<std::size_t> indexes( sortedIndexes(ipdata) );
 
@@ -1494,7 +1494,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 //$$
     Jet_Ip1P[nJet]  = -100;
     Jet_Ip1N[nJet]  =  100;
-    for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
+    for (std::vector<btag::TrackIPData>::const_iterator itipdata = ipdata.begin();
       itipdata != ipdata.end(); itipdata++) {
 
       float decayLen = ((*itipdata).closestToJetAxis - (Pv_point)).mag();
@@ -1614,7 +1614,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
 
       for (unsigned int i=0; i<jetProbTracks.size(); i++) {
-	reco::TrackIPTagInfo::TrackIPData ip = ((*tagInfo)[ith_tagged].impactParameterData())[i];
+	reco::btag::TrackIPData ip = ((*tagInfo)[ith_tagged].impactParameterData())[i];
 
 	if ( ip.ip3d.significance() > 0 ) {
 	  TrackCategories::Flags theFlag = classifier_.evaluate( jetProbTracks[i] ).flags();

@@ -1208,7 +1208,7 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
             // Get a vector of reference to the selected tracks in each jet
             TrackRefVector tracks( (*bTagTrackEventIPTagInfos)[jetIndex].selectedTracks() );
 
-            std::vector<reco::TrackIPTagInfo::TrackIPData> const & ipdata = (*tagInfo)[jetIndex].impactParameterData();
+            std::vector<reco::btag::TrackIPData> const & ipdata = (*tagInfo)[jetIndex].impactParameterData();
 
             // Create a new BTagTrackEvent
             BTagTrackEvent trackEvent;
@@ -1307,9 +1307,9 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
                 //			  std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
                 std::vector< Measurement1D  > trackIP;
 
-                std::vector<TrackIPTagInfo::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
+                std::vector<btag::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
 
-                for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
+                for (std::vector<btag::TrackIPData>::const_iterator itipdata = ipdata.begin();
                         itipdata != ipdata.end(); itipdata++)
                 {
                     trackIP.push_back((*itipdata).ip3d );
@@ -1334,9 +1334,9 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
             {
                 //			  std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
                 std::vector< Measurement1D  > trackIP;
-                std::vector<TrackIPTagInfo::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
+                std::vector<btag::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
 
-                for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
+                for (std::vector<btag::TrackIPData>::const_iterator itipdata = ipdata.begin();
                         itipdata != ipdata.end(); itipdata++)
                 {
                     trackIP.push_back((*itipdata).ip3d );
@@ -1360,9 +1360,9 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
             {
                 //			    std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
                 std::vector< Measurement1D  > trackIP;
-                std::vector<TrackIPTagInfo::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
+                std::vector<btag::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
 
-                for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
+                for (std::vector<btag::TrackIPData>::const_iterator itipdata = ipdata.begin();
                         itipdata != ipdata.end(); itipdata++)
                 {
                     trackIP.push_back((*itipdata).ip3d );
@@ -1384,9 +1384,9 @@ PerformanceAnalyzer::analyze(const Event& iEvent, const EventSetup& iSetup)
                 std::vector< Measurement1D  > trackIP;
 
 
-                std::vector<TrackIPTagInfo::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
+                std::vector<btag::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
 
-                for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
+                for (std::vector<btag::TrackIPData>::const_iterator itipdata = ipdata.begin();
                         itipdata != ipdata.end(); itipdata++)
                 {
                     trackIP.push_back((*itipdata).ip3d );

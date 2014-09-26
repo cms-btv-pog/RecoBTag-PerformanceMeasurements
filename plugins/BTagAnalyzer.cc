@@ -187,7 +187,7 @@ BTagAnalyzer::~BTagAnalyzer()
 }
 
 
-static std::vector<std::size_t> sortedIndexes(const std::vector<TrackIPTagInfo::TrackIPData >& values)
+static std::vector<std::size_t> sortedIndexes(const std::vector<btag::TrackIPData >& values)
 {
   std::multimap<float, std::size_t> sortedIdx;
   std::vector<std::size_t> result;
@@ -1921,7 +1921,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
 	    
     }
 
-    std::vector<TrackIPTagInfo::TrackIPData>  ipdata = ipTagInfo->impactParameterData();
+    std::vector<btag::TrackIPData>  ipdata = ipTagInfo->impactParameterData();
     std::vector<std::size_t> indexes( sortedIndexes(ipdata) );
 
     TrackCategories::Flags flags1P;
@@ -2034,7 +2034,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
 
       for (unsigned int i=0; i<jetProbTracks.size(); ++i) {
-        reco::TrackIPTagInfo::TrackIPData ip = (ipTagInfo->impactParameterData())[i];
+        reco::btag::TrackIPData ip = (ipTagInfo->impactParameterData())[i];
 
         if ( ip.ip3d.significance() > 0 ) {
           TrackCategories::Flags theFlag = classifier_.evaluate( jetProbTracks[i] ).flags();
