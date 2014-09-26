@@ -119,13 +119,11 @@ bTagDiscriminators = ['jetBProbabilityBJetTags','jetProbabilityBJetTags','trackC
     'simpleSecondaryVertexHighEffBJetTags','simpleSecondaryVertexHighPurBJetTags','simpleSecondaryVertexNegativeHighEffBJetTags',
     'simpleSecondaryVertexNegativeHighPurBJetTags','combinedSecondaryVertexBJetTags','combinedSecondaryVertexPositiveBJetTags',
     'combinedSecondaryVertexNegativeBJetTags',
-    #'combinedSecondaryVertexV1BJetTags','combinedSecondaryVertexV1PositiveBJetTags',
-    #'combinedSecondaryVertexV1NegativeBJetTags',
-    'combinedSecondaryVertexV2BJetTags',
     #'softPFMuonBJetTags','positiveSoftPFMuonBJetTags','negativeSoftPFMuonBJetTags',
     #'softPFElectronBJetTags','positiveSoftPFElectronBJetTags','negativeSoftPFElectronBJetTags',
     #'simpleInclusiveSecondaryVertexHighEffBJetTags','simpleInclusiveSecondaryVertexHighPurBJetTags','doubleSecondaryVertexHighEffBJetTags',
     #'combinedInclusiveSecondaryVertexBJetTags','combinedInclusiveSecondaryVertexPositiveBJetTags',
+    'combinedInclusiveSecondaryVertexV2BJetTags'
     #'combinedSecondaryVertexSoftPFLeptonV1BJetTags','positiveCombinedSecondaryVertexSoftPFLeptonV1BJetTags',
     #'negativeCombinedSecondaryVertexSoftPFLeptonV1BJetTags'
 ]
