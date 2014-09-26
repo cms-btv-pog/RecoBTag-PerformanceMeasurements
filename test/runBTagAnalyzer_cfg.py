@@ -35,7 +35,7 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
-options.register('mcGlobalTag', 'START70_V7',
+options.register('mcGlobalTag', 'PRE_LS172_V12',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
@@ -50,10 +50,10 @@ options.register('runSubJets', False,
     VarParsing.varType.bool,
     "Run subjets"
 )
-options.register('processStdAK5Jets', True,
+options.register('processStdAK4Jets', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    "Process standard AK5 jets"
+    "Process standard AK4 jets"
 )
 options.register('producePtRelTemplate', True,
     VarParsing.multiplicity.singleton,
@@ -96,15 +96,15 @@ if options.runOnData:
     globalTag = options.dataGlobalTag
 
 ## Jet energy corrections
-jetCorrectionsAK5 = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
+jetCorrectionsAK4 = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 jetCorrectionsAK7 = ('AK7PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 
 if not options.usePFchs:
-    jetCorrectionsAK5 = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
+    jetCorrectionsAK4 = ('AK4PF', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
     jetCorrectionsAK7 = ('AK7PF', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 
 if options.runOnData:
-    jetCorrectionsAK5[1].append('L2L3Residual')
+    jetCorrectionsAK4[1].append('L2L3Residual')
     jetCorrectionsAK7[1].append('L2L3Residual')
 
 ## b-tag infos
@@ -136,7 +136,7 @@ postfix = "PFlow"
 ## Various collection names
 genParticles = 'genParticles'
 jetSource = 'pfJets'+postfix
-genJetCollection = 'ak5GenJetsNoNu'+postfix
+genJetCollection = 'ak4GenJetsNoNu'+postfix
 trackSource = 'generalTracks'
 pvSource = 'offlinePrimaryVertices'
 muons = 'muons'
@@ -144,8 +144,8 @@ selectedPatMuons = 'selectedPatMuons'
 ## If running on miniAOD
 if options.miniAOD:
     genParticles = 'prunedGenParticles'
-    jetSource = 'ak5PFJets'
-    genJetCollection = 'ak5GenJetsNoNu'
+    jetSource = 'ak4PFJets'
+    genJetCollection = 'ak4GenJetsNoNu'
     trackSource = 'unpackedTracksAndVertices'
     pvSource = 'unpackedTracksAndVertices'
     muons = 'slimmedMuons'
@@ -167,7 +167,9 @@ process.source = cms.Source(
         # /QCD_Pt-80to120_MuEnrichedPt5_Tune4C_13TeV_pythia8/Spring14dr-PU20bx25_POSTLS170_V5-v1/AODSIM
         #'/store/mc/Spring14dr/QCD_Pt-80to120_MuEnrichedPt5_Tune4C_13TeV_pythia8/AODSIM/PU20bx25_POSTLS170_V5-v1/00000/00A2284F-D5D0-E311-BE96-002590A3A3D2.root'
         # /TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM
-        '/store/mc/Spring14dr/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/AODSIM/PU_S14_POSTLS170_V6-v1/00000/00120F7A-84F5-E311-9FBE-002618943910.root'
+        #'/store/mc/Spring14dr/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/AODSIM/PU_S14_POSTLS170_V6-v1/00000/00120F7A-84F5-E311-9FBE-002618943910.root'
+        # /RelValTTbar_13/CMSSW_7_2_0_pre5-POSTLS172_V3-v1/GEN-SIM-RECO
+        '/store/relval/CMSSW_7_2_0_pre5/RelValTTbar_13/GEN-SIM-RECO/POSTLS172_V3-v1/00000/281FA423-6730-E411-97D1-003048FFCC0A.root'
     )
 )
 
@@ -281,11 +283,11 @@ process.out = cms.OutputModule("PoolOutputModule",
 #-------------------------------------
 if not options.miniAOD:
     ## PAT Configuration
-    jetAlgo="AK5"
+    jetAlgo="AK4"
 
     from PhysicsTools.PatAlgos.tools.pfTools import *
     usePF2PAT(process,runPF2PAT=True, jetAlgo=jetAlgo, runOnMC=not options.runOnData, postfix=postfix,
-	      jetCorrections=jetCorrectionsAK5, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'))
+	      jetCorrections=jetCorrectionsAK4, pvCollection=cms.InputTag('goodOfflinePrimaryVertices'))
 
     ## Top projections in PF2PAT
     getattr(process,"pfPileUpJME"+postfix).checkClosestZVertex = False
@@ -303,8 +305,8 @@ if not options.miniAOD:
 else:
     ## Recreate tracks and PVs for b tagging
     process.load('PhysicsTools.PatAlgos.slimming.unpackedTracksAndVertices_cfi')
-    from RecoJets.JetProducers.ak5PFJets_cfi import ak5PFJets
-    from RecoJets.JetProducers.ak5GenJets_cfi import ak5GenJets
+    from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
+    from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
     ## Select isolated collections
     process.selectedMuons = cms.EDFilter("CandPtrSelector", src = cms.InputTag("slimmedMuons"), cut = cms.string('''abs(eta)<2.5 && pt>10. &&
        (pfIsolationR04().sumChargedHadronPt+
@@ -329,24 +331,24 @@ else:
     process.pfNoElectrons = cms.EDProducer("CandPtrProjector", src = cms.InputTag("pfNoMuon"), veto =  cms.InputTag("selectedElectrons"))
 
     process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedGenParticles"), cut = cms.string("abs(pdgId) != 12 && abs(pdgId) != 14 && abs(pdgId) != 16"))
-    process.ak5GenJetsNoNu = ak5GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
+    process.ak4GenJetsNoNu = ak4GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
 
     if options.useTTbarFilter:
         if options.usePFchs:
-            process.ak5PFJets = ak5PFJets.clone(src = 'pfCHS', doAreaFastjet = True)
+            process.ak4PFJets = ak4PFJets.clone(src = 'pfCHS', doAreaFastjet = True)
         else:
-            process.ak5PFJets = ak5PFJets.clone(src = 'packedPFCandidates', doAreaFastjet = True)
+            process.ak4PFJets = ak4PFJets.clone(src = 'packedPFCandidates', doAreaFastjet = True)
     else:
         if options.usePFchs:
             if options.useTopProjections:
-                process.ak5PFJets = ak5PFJets.clone(src = 'pfNoElectronsCHS', doAreaFastjet = True)
+                process.ak4PFJets = ak4PFJets.clone(src = 'pfNoElectronsCHS', doAreaFastjet = True)
             else:
-                process.ak5PFJets = ak5PFJets.clone(src = 'pfCHS', doAreaFastjet = True)
+                process.ak4PFJets = ak4PFJets.clone(src = 'pfCHS', doAreaFastjet = True)
         else:
             if options.useTopProjections:
-                process.ak5PFJets = ak5PFJets.clone(src = 'pfNoElectrons', doAreaFastjet = True)
+                process.ak4PFJets = ak4PFJets.clone(src = 'pfNoElectrons', doAreaFastjet = True)
             else:
-                process.ak5PFJets = ak5PFJets.clone(src = 'packedPFCandidates', doAreaFastjet = True)
+                process.ak4PFJets = ak4PFJets.clone(src = 'packedPFCandidates', doAreaFastjet = True)
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
 ## Switch the default jet collection (done in order to use the above specified b-tag infos and discriminators)
@@ -357,7 +359,7 @@ switchJetCollection(
     pvSource = cms.InputTag(pvSource),
     btagInfos = bTagInfos,
     btagDiscriminators = bTagDiscriminators,
-    jetCorrections = jetCorrectionsAK5,
+    jetCorrections = jetCorrectionsAK4,
     genJetCollection = cms.InputTag(genJetCollection),
     postfix = postfix
 )
@@ -383,8 +385,8 @@ process.ca8GenJetsNoNu = ca4GenJets.clone(
 from RecoJets.JetProducers.ca4PFJets_cfi import ca4PFJets
 process.ca8PFJets = ca4PFJets.clone(
     rParam = cms.double(0.8),
-    src = (getattr(process,"ak5PFJets").src if options.miniAOD else getattr(process,"pfJets"+postfix).src),
-    srcPVs = (getattr(process,"ak5PFJets").srcPVs if options.miniAOD else getattr(process,"pfJets"+postfix).srcPVs),
+    src = (getattr(process,"ak4PFJets").src if options.miniAOD else getattr(process,"pfJets"+postfix).src),
+    srcPVs = (getattr(process,"ak4PFJets").srcPVs if options.miniAOD else getattr(process,"pfJets"+postfix).srcPVs),
     doAreaFastjet = cms.bool(True),
     jetPtMin = cms.double(options.fatJetPtMin)
 )
@@ -400,12 +402,12 @@ process.ca8GenJetsNoNuPruned = ca4GenJets.clone(
     writeCompound = cms.bool(True),
     jetCollInstanceName=cms.string("SubJets")
 )
-from RecoJets.JetProducers.ak5PFJetsPruned_cfi import ak5PFJetsPruned
-process.ca8PFJetsPruned = ak5PFJetsPruned.clone(
+from RecoJets.JetProducers.ak4PFJetsPruned_cfi import ak4PFJetsPruned
+process.ca8PFJetsPruned = ak4PFJetsPruned.clone(
     jetAlgorithm = cms.string("CambridgeAachen"),
     rParam = cms.double(0.8),
-    src = (getattr(process,"ak5PFJets").src if options.miniAOD else getattr(process,"pfJets"+postfix).src),
-    srcPVs = (getattr(process,"ak5PFJets").srcPVs if options.miniAOD else getattr(process,"pfJets"+postfix).srcPVs),
+    src = (getattr(process,"ak4PFJets").src if options.miniAOD else getattr(process,"pfJets"+postfix).src),
+    srcPVs = (getattr(process,"ak4PFJets").srcPVs if options.miniAOD else getattr(process,"pfJets"+postfix).srcPVs),
     doAreaFastjet = cms.bool(True),
     writeCompound = cms.bool(True),
     jetCollInstanceName=cms.string("SubJets"),
@@ -450,7 +452,7 @@ if options.runSubJets:
         pvSource = cms.InputTag(pvSource),
         btagInfos=bTagInfos,
         btagDiscriminators=bTagDiscriminatorsSubJets,
-        jetCorrections=jetCorrectionsAK5,
+        jetCorrections=jetCorrectionsAK4,
         genJetCollection = cms.InputTag('ca8GenJetsNoNuPruned','SubJets'),
         algo = 'CA',
         rParam = 0.8,
@@ -705,11 +707,11 @@ process.filtSeq = cms.Sequence(
 
 ## Define analyzer sequence
 process.analyzerSeq = cms.Sequence( )
-if options.processStdAK5Jets:
+if options.processStdAK4Jets:
     process.analyzerSeq += process.btagana
 if options.runSubJets:
     process.analyzerSeq += process.btaganaSubJets
-if options.processStdAK5Jets and options.useTTbarFilter:
+if options.processStdAK4Jets and options.useTTbarFilter:
     process.analyzerSeq.replace( process.btagana, process.ttbarselectionproducer * process.ttbarselectionfilter * process.btagana )
 #---------------------------------------
 
