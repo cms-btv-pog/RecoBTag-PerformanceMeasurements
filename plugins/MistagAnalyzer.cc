@@ -1160,7 +1160,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
             && (assotracks[itt])->numberOfValidHits() >= 11
             && (assotracks[itt])->hitPattern().numberOfValidPixelHits() >= 2
             && (assotracks[itt])->normalizedChi2() < 10
-            && (assotracks[itt])->trackerExpectedHitsOuter().numberOfHits() <= 2
+            && (assotracks[itt])->hitPattern().numberOfHits(reco::HitPattern::MISSING_OUTER_HITS) <= 2
             && (assotracks[itt])->dz()-(*pv).z() < 1. ) {
 
 	    TrkInc_IP[nTrkInc]	  = (*tagInfo)[ith_tagged].impactParameterData()[k].ip3d.value();
@@ -1381,7 +1381,7 @@ void MistagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	Muon_nTkHit[nMuon]    = muons[muIdx].innerTrack()->hitPattern().numberOfValidHits();
 	Muon_nPixHit[nMuon]   = muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits();
 	Muon_nMuHit[nMuon]    = muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits();
-	Muon_nOutHit[nMuon]   = muons[muIdx].innerTrack()->trackerExpectedHitsOuter().numberOfHits();
+	Muon_nOutHit[nMuon]   = muons[muIdx].innerTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_OUTER_HITS);
 	Muon_nMuHit[nMuon]    = muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits();
 
 	Muon_chi2[nMuon]    = muons[muIdx].globalTrack()->normalizedChi2() ;

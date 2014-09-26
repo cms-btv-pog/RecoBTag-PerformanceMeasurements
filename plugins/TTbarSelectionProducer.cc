@@ -242,13 +242,13 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
        ConversionFinder convFinder;
        ConversionInfo convInfo = convFinder.getConversionInfo(*patelec, tracks, bField);
 
-       //std::cout << " conversion " << convInfo.dist() << " " << convInfo.dcot() << " " <<  patelec->gsfTrack()-> trackerExpectedHitsInner().numberOfLostHits() << std::endl;
+       //std::cout << " conversion " << convInfo.dist() << " " << convInfo.dcot() << " " <<  patelec->gsfTrack()-> hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) << std::endl;
 
        // fill informations
        if( (convInfo.dist() >= 0.02 ||  convInfo.dcot() >= 0.02 ) &&
-        patelec->gsfTrack()-> trackerExpectedHitsInner().numberOfLostHits() <2) passConvReject = true;;
+        patelec->gsfTrack()-> hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) <2) passConvReject = true;;
 */
-        if (patelec->passConversionVeto() && patelec->gsfTrack()-> trackerExpectedHitsInner().numberOfLostHits() <1) passConvReject = true;
+        if (patelec->passConversionVeto() && patelec->gsfTrack()-> hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) <1) passConvReject = true;
 
 
        // --------------------- eID ---------------------
