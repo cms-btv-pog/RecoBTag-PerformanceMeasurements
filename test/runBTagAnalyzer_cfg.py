@@ -481,11 +481,11 @@ if options.runSubJets:
 if options.runSubJets:
     from RecoJets.JetProducers.nJettinessAdder_cfi import Njettiness
 
-    process.NjettinessCA8 = Njettiness.clone(
+    process.Njettiness = Njettiness.clone(
         src = cms.InputTag("ca8PFJets"),
         cone = cms.double(0.8)
     )
-    getattr(process,'patJetsCA8'+postfix).userData.userFloats.src += ['NjettinessCA8:tau1','NjettinessCA8:tau2','NjettinessCA8:tau3']
+    getattr(process,'patJetsCA8'+postfix).userData.userFloats.src += ['Njettiness:tau1','Njettiness:tau2','Njettiness:tau3']
 #-------------------------------------
 
 #-------------------------------------
