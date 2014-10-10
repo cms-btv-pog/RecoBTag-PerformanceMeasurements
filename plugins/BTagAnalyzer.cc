@@ -43,6 +43,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   // Parameters
   runSubJets_ = iConfig.getParameter<bool>("runSubJets");
   allowJetSkipping_ = iConfig.getParameter<bool>("allowJetSkipping");
+  storeEventInfo_ = iConfig.getParameter<bool>("storeEventInfo");
   storeTagVariables_ = iConfig.getParameter<bool>("storeTagVariables");
   storeCSVTagVariables_ = iConfig.getParameter<bool>("storeCSVTagVariables");
   minJetPt_  = iConfig.getParameter<double>("MinPt");
@@ -138,7 +139,8 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
 
   triggerTable_             = iConfig.getParameter<edm::InputTag>("triggerTable");
 
-  SVComputer_               = iConfig.getParameter<std::string>( "svComputer");
+  SVComputer_               = iConfig.getParameter<std::string>("svComputer");
+  SVComputerFatJets_        = iConfig.getParameter<std::string>("svComputerFatJets");
 
   triggerPathNames_        = iConfig.getParameter<std::vector<std::string> >("TriggerPathNames");
   ttbarTriggerPathNames_   = iConfig.getParameter<std::vector<std::string> >("TTbarTriggerPathNames");
@@ -152,11 +154,14 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   //--------------------------------------
   // event information
   //--------------------------------------
-  EventInfo.RegisterTree(smalltree);
-  if ( runSubJets_ )          EventInfo.RegisterPatMuonTree(smalltree);
-  if ( use_ttbar_filter_ )    EventInfo.RegisterTTbarTree(smalltree);
-  if ( produceJetTrackTree_ ) EventInfo.RegisterJetTrackTree(smalltree);
-  if ( produceAllTrackTree_ ) EventInfo.RegisterAllTrackTree(smalltree);
+  if( storeEventInfo_ )
+  {
+    EventInfo.RegisterTree(smalltree);
+    if ( use_ttbar_filter_ )    EventInfo.RegisterTTbarTree(smalltree);
+    if ( produceJetTrackTree_ ) EventInfo.RegisterJetTrackTree(smalltree);
+    if ( produceAllTrackTree_ ) EventInfo.RegisterAllTrackTree(smalltree);
+  }
+  if ( runSubJets_ ) EventInfo.RegisterPatMuonTree(smalltree);
 
   //--------------------------------------
   // jet information
@@ -289,7 +294,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 
   //---------------------------- Start MC info ---------------------------------------//
-  if ( !isData_ ) {
+  if ( !isData_ && storeEventInfo_ ) {
     // EventInfo.pthat
     edm::Handle<GenEventInfoProduct> geninfos;
     iEvent.getByLabel( "generator",geninfos );
@@ -320,7 +325,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   // generated particles
   //------------------------------------------------------
     edm::Handle<reco::GenParticleCollection> genParticles;
-    iEvent.getByLabel (genParticleCollectionName_, genParticles);
+    iEvent.getByLabel(genParticleCollectionName_, genParticles);
 
     edm::Handle<reco::GenParticleCollection> prunedGenParticles;
     iEvent.getByLabel(prunedGenParticleCollectionName_, prunedGenParticles);
@@ -595,9 +600,9 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
     } // end loop on generated particles
 
-  //------------------------------------------------------
-  // generated particles: looking for b hadrons only
-  //------------------------------------------------------
+    //------------------------------------------------------
+    // generated particles: looking for b hadrons only
+    //------------------------------------------------------
     if ( AreBHadrons ) {
     for (size_t i = 0; i < genParticles->size(); ++i) {
       const GenParticle & genIt = (*genParticles)[i];
@@ -735,18 +740,18 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
  	EventInfo.nBHadrons++;
       } // b hadron
     } // end loop on generated particles
-    }
+    } // end if ( AreBHadrons )
+  }
 
   //------------------------------------------------------
   // simulated PV
   //------------------------------------------------------
-    if ( useTrackHistory_ ) {
-      edm::Handle<edm::HepMCProduct> theHepMCProduct;
-      iEvent.getByLabel("generator",theHepMCProduct);
-      std::vector<simPrimaryVertex> simpv;
-      simpv=getSimPVs(theHepMCProduct);
-      //       cout << "simpv.size() " << simpv.size() << endl;
-    }
+  if ( !isData_ && useTrackHistory_ ) {
+    edm::Handle<edm::HepMCProduct> theHepMCProduct;
+    iEvent.getByLabel("generator",theHepMCProduct);
+    std::vector<simPrimaryVertex> simpv;
+    simpv=getSimPVs(theHepMCProduct);
+    //       cout << "simpv.size() " << simpv.size() << endl;
   }
   //---------------------------- End MC info ---------------------------------------//
   //   cout << "EventInfo.Evt:" <<EventInfo.Evt << endl;
@@ -922,7 +927,7 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   // All tracks info
   //------------------------------------------------------
   edm::Handle<reco::TrackCollection> tracksHandle;
-  if( produceAllTrackTree_ )
+  if( produceAllTrackTree_ && storeEventInfo_ )
   {
     iEvent.getByLabel(tracksColl_,tracksHandle);
 
@@ -967,6 +972,16 @@ void BTagAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   processJets(jetsColl, fatjetsColl, iEvent, iSetup, groomedfatjetsColl, groomedIndices, iJetColl) ;
   if (runSubJets_) {
     iJetColl = 1 ;
+    // for fat jets we might have a different jet tag computer
+    // if so, grab the fat jet tag computer
+    if(SVComputerFatJets_!=SVComputer_)
+    {
+      iSetup.get<JetTagComputerRecord>().get( SVComputerFatJets_.c_str(), computerHandle );
+
+      computer = dynamic_cast<const GenericMVAJetTagComputer*>( computerHandle.product() );
+
+      computer->passEventSetup(iSetup);
+    }
     processJets(fatjetsColl, jetsColl, iEvent, iSetup, groomedfatjetsColl, groomedIndices, iJetColl) ;
   }
   //------------------------------------------------------

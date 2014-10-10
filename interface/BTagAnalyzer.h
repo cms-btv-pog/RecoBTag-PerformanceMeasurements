@@ -194,6 +194,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
 
     bool runSubJets_ ;
     bool allowJetSkipping_ ;
+    bool storeEventInfo_;
     bool storeTagVariables_;
     bool storeCSVTagVariables_;
 
@@ -270,6 +271,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
     edm::InputTag tracksColl_;
 
     std::string   SVComputer_;
+    std::string   SVComputerFatJets_;
 
     bool useTrackHistory_;
     TFile*  rootFile_;
