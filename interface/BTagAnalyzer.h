@@ -194,12 +194,14 @@ class BTagAnalyzer : public edm::EDAnalyzer
 
     bool runSubJets_ ;
     bool allowJetSkipping_ ;
+    bool storeEventInfo_;
     bool storeTagVariables_;
     bool storeCSVTagVariables_;
 
     edm::InputTag src_;  // Generator/handronizer module label
     edm::InputTag muonCollectionName_;
     edm::InputTag patMuonCollectionName_;
+    edm::InputTag genParticleCollectionName_;
     edm::InputTag prunedGenParticleCollectionName_;
     edm::InputTag triggerTable_;
 
@@ -269,6 +271,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
     edm::InputTag tracksColl_;
 
     std::string   SVComputer_;
+    std::string   SVComputerFatJets_;
 
     bool useTrackHistory_;
     TFile*  rootFile_;

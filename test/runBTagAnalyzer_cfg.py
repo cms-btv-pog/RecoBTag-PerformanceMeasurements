@@ -575,7 +575,7 @@ process.load("RecoBTag.PerformanceMeasurements.BTagAnalyzer_cff")
 process.btagana.useSelectedTracks     = True  ## False if you want to run on all tracks : for commissioning studies
 process.btagana.useTrackHistory       = False ## Can only be used with GEN-SIM-RECODEBUG files
 process.btagana.produceJetTrackTree   = False ## True if you want to keep info for tracks associated to jets : for commissioning studies
-process.btagana.produceAllTrackTree   = False ## True if you want to keep info for tracks associated to jets : for commissioning studies
+process.btagana.produceAllTrackTree   = False ## True if you want to keep info for all tracks : for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
 process.btagana.storeTagVariables     = False ## True if you want to keep TagInfo TaggingVariables
@@ -585,9 +585,9 @@ process.btagana.Jets                  = cms.InputTag('selectedPatJets'+postfix)
 process.btagana.patMuonCollectionName = cms.InputTag('selectedPatMuons')
 process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
 process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
-process.btagana.prunedGenParticles    = cms.InputTag('prunedGenParticlesBoost')
 
 process.btaganaSubJets = process.btagana.clone(
+    storeEventInfo      = cms.bool(False),
     produceJetTrackTree = cms.bool(True),
     allowJetSkipping    = cms.bool(False),
     Jets                = cms.InputTag('selectedPatJetsCA8PrunedSubJetsPF'),
