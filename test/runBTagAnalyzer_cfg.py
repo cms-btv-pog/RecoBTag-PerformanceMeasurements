@@ -35,7 +35,7 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
-options.register('mcGlobalTag', 'PRE_LS172_V12',
+options.register('mcGlobalTag', 'MCRUN2_72_V0',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
@@ -168,8 +168,8 @@ process.source = cms.Source(
         #'/store/mc/Spring14dr/QCD_Pt-80to120_MuEnrichedPt5_Tune4C_13TeV_pythia8/AODSIM/PU20bx25_POSTLS170_V5-v1/00000/00A2284F-D5D0-E311-BE96-002590A3A3D2.root'
         # /TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM
         #'/store/mc/Spring14dr/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/AODSIM/PU_S14_POSTLS170_V6-v1/00000/00120F7A-84F5-E311-9FBE-002618943910.root'
-        # /RelValTTbar_13/CMSSW_7_2_0_pre5-POSTLS172_V3-v1/GEN-SIM-RECO
-        '/store/relval/CMSSW_7_2_0_pre5/RelValTTbar_13/GEN-SIM-RECO/POSTLS172_V3-v1/00000/281FA423-6730-E411-97D1-003048FFCC0A.root'
+        # /RelValTTbar_13/CMSSW_7_2_0-PU50ns_PHYS14_25_V1_Phys14-v2/GEN-SIM-RECO
+        '/store/relval/CMSSW_7_2_0/RelValTTbar_13/GEN-SIM-RECO/PU50ns_PHYS14_25_V1_Phys14-v2/00000/0E8D62AF-9059-E411-9066-0025905B85D0.root'
     )
 )
 
