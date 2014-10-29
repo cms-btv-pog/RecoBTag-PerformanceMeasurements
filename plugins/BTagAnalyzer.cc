@@ -2150,7 +2150,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       Line::PositionType pos(GlobalPoint(vertex.x(),vertex.y(),vertex.z()));
       Line trackline(pos,flightDir);
       // get the Jet  line
-      Line::PositionType pos2(GlobalPoint(jet->vx(),jet->vy(),jet->vz()));
+      Line::PositionType pos2(GlobalPoint(pv->x(),pv->y(),pv->z()));
       Line::DirectionType dir2(GlobalVector(jetDir.x(),jetDir.y(),jetDir.z()));
       Line jetline(pos2,dir2);
       // now compute the distance between the two lines
