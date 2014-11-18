@@ -139,6 +139,7 @@ jetSource = 'pfJets'+postfix
 genJetCollection = 'ak4GenJetsNoNu'+postfix
 trackSource = 'generalTracks'
 pvSource = 'offlinePrimaryVertices'
+svSource = cms.InputTag('inclusiveSecondaryVertices')
 muons = 'muons'
 selectedPatMuons = 'selectedPatMuons'
 ## If running on miniAOD
@@ -148,6 +149,7 @@ if options.miniAOD:
     genJetCollection = 'ak4GenJetsNoNu'
     trackSource = 'unpackedTracksAndVertices'
     pvSource = 'unpackedTracksAndVertices'
+    svSource = cms.InputTag('unpackedTracksAndVertices','secondary')
     muons = 'slimmedMuons'
     selectedPatMuons = muons
 
@@ -357,6 +359,7 @@ switchJetCollection(
     jetSource = cms.InputTag(jetSource),
     trackSource = cms.InputTag(trackSource),
     pvSource = cms.InputTag(pvSource),
+    svSource = svSource,
     btagInfos = bTagInfos,
     btagDiscriminators = bTagDiscriminators,
     jetCorrections = jetCorrectionsAK4,
@@ -422,6 +425,7 @@ if options.runSubJets:
         jetSource = cms.InputTag('ca8PFJets'),
         trackSource = cms.InputTag(trackSource),
         pvSource = cms.InputTag(pvSource),
+        svSource = svSource,
         btagInfos = bTagInfos,
         btagDiscriminators = bTagDiscriminators,
         jetCorrections = jetCorrectionsAK7,
@@ -450,6 +454,7 @@ if options.runSubJets:
         jetSource = cms.InputTag('ca8PFJetsPruned','SubJets'),
         trackSource = cms.InputTag(trackSource),
         pvSource = cms.InputTag(pvSource),
+        svSource = svSource,
         btagInfos=bTagInfos,
         btagDiscriminators=bTagDiscriminatorsSubJets,
         jetCorrections=jetCorrectionsAK4,
