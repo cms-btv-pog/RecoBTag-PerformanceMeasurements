@@ -35,7 +35,7 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
-options.register('mcGlobalTag', 'MCRUN2_72_V0',
+options.register('mcGlobalTag', 'PHYS14_25_V1',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
@@ -177,8 +177,8 @@ process.source = cms.Source(
 
 if options.miniAOD:
     process.source.fileNames = [
-        # /TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU_S14_POSTLS170_V6-v1/MINIAODSIM
-        '/store/mc/Spring14miniaod/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU_S14_POSTLS170_V6-v1/00000/00080927-67FD-E311-B049-0025901D4854.root'
+        # /RelValTTbar_13/CMSSW_7_2_0-PU50ns_PHYS14_25_V1_Phys14-v2/MINIAODSIM
+        '/store/relval/CMSSW_7_2_0/RelValTTbar_13/MINIAODSIM/PU50ns_PHYS14_25_V1_Phys14-v2/00000/206F2CD1-9C59-E411-B789-00261894388A.root'
     ]
 
 if options.runOnData:
