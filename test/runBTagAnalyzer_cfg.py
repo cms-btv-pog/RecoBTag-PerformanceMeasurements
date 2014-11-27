@@ -108,7 +108,7 @@ bTagDiscriminators = ['jetBProbabilityBJetTags','jetProbabilityBJetTags','trackC
     'negativeTrackCountingHighPurJetTags','positiveOnlyJetBProbabilityJetTags','positiveOnlyJetProbabilityJetTags',
     'simpleSecondaryVertexHighEffBJetTags','simpleSecondaryVertexHighPurBJetTags','simpleSecondaryVertexNegativeHighEffBJetTags',
     'simpleSecondaryVertexNegativeHighPurBJetTags','combinedSecondaryVertexBJetTags','combinedSecondaryVertexPositiveBJetTags',
-    'combinedSecondaryVertexV2BJetTags'
+    'combinedInclusiveSecondaryVertexV2BJetTags'
     #'combinedSecondaryVertexV1BJetTags','combinedSecondaryVertexV1PositiveBJetTags','combinedSecondaryVertexNegativeBJetTags',
     #'combinedSecondaryVertexV1NegativeBJetTags','softPFMuonBJetTags','positiveSoftPFMuonBJetTags','negativeSoftPFMuonBJetTags',
     #'softPFElectronBJetTags','positiveSoftPFElectronBJetTags','negativeSoftPFElectronBJetTags','simpleInclusiveSecondaryVertexHighEffBJetTags',
