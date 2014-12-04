@@ -1244,8 +1244,6 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     unsigned int trackSize = selectedTracks.size();
     if ( !useSelectedTracks_ ) trackSize = tracks.size();
 
-    if ( allowJetSkipping_ && trackSize==0 ) continue;
-
     for (unsigned int itt=0; itt < trackSize; ++itt)
     {
       reco::Track  ptrack;
