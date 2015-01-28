@@ -70,11 +70,18 @@ options.register('useTTbarFilter', False,
     VarParsing.varType.bool,
     "Use TTbar filter"
 )
-options.register('usePVSorting', False,
+options.register('usePVSorting', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Use PV sorting"
 )
+
+options.register('useBetterPVSorting', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Use better PV sorting"
+)
+
 options.register('changeMinNumberOfHits', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -139,12 +146,15 @@ bTagDiscriminators = ['jetBProbabilityBJetTags','jetProbabilityBJetTags','trackC
 bTagDiscriminatorsSubJets = copy.deepcopy(bTagDiscriminators)
 #bTagDiscriminatorsSubJets.remove('doubleSecondaryVertexHighEffBJetTags')
 
+process = cms.Process("BTagAna")
+
 ## PV collection
 pvCollection = 'goodOfflinePrimaryVertices'
+if options.useBetterPVSorting and options.usePVSorting:
+    print "Conficting PV Sorting configuration, choosing the Better PV Sorting"
+    options.usePVSorting = False
 if options.usePVSorting:
     pvCollection = 'sortedGoodOfflinePrimaryVertices'
-
-process = cms.Process("BTagAna")
 
 ## MessageLogger
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
@@ -161,8 +171,8 @@ process.source = cms.Source(
         #'/store/relval/CMSSW_6_2_0_SLHC7/RelValTTbar_14TeV/GEN-SIM-RECO/DES17_62_V8_UPG2017-v2/00000/04D56E72-4390-E311-A322-02163E008D7C.root'
 
         # /PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/GEM2019Upg14DR-final_phase1_PU50bx25_DES19_62_V8-v1/AODSIM
-        '/store/mc/GEM2019Upg14DR/PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/AODSIM/final_phase1_PU50bx25_DES19_62_V8-v1/00000/009500C4-A821-E411-8E47-02163E00E7E0.root'
-
+        ##'/store/mc/GEM2019Upg14DR/PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/AODSIM/final_phase1_PU50bx25_DES19_62_V8-v1/00000/009500C4-A821-E411-8E47-02163E00E7E0.root'
+        '/store/mc/GEM2019Upg14DR/DYToMuMu_M-20_TuneZ2star_14TeV-pythia6-tauola/AODSIM/final_phase1_age1k_PU140bx25_PH1_1K_FB_V2-v1/00000/007B34CC-331F-E411-BD67-002618943918.root'
         # /PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/GEM2019Upg14DR-final_phase1_age1k_PU140bx25_PH1_1K_FB_V2-v1/AODSIM
         #'/store/mc/GEM2019Upg14DR/PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/AODSIM/final_phase1_age1k_PU140bx25_PH1_1K_FB_V2-v1/00000/00746114-E31F-E411-B4BC-002618FDA211.root'
 
@@ -430,6 +440,7 @@ process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
     maxAbsZ = cms.double(24),
     maxd0 = cms.double(2)
 )
+
 #-------------------------------------
 
 #-------------------------------------
@@ -452,6 +463,7 @@ process.load("RecoVertex.PrimaryVertexSorter.sortedOfflinePrimaryVertices_cff")
 process.sortedGoodOfflinePrimaryVertices = process.sortedOfflinePrimaryVertices.clone(
     src = cms.InputTag('goodOfflinePrimaryVertices')
 )
+
 #-------------------------------------
 
 #-------------------------------------
@@ -664,12 +676,27 @@ process.jec = cms.ESSource("PoolDBESSource",
 process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 #---------------------------------------
 
+if options.useBetterPVSorting:
+    from CommonTools.RecoAlgos.sortedPrimaryVertices_cfi import *
+    from CommonTools.RecoAlgos.TrackWithVertexRefSelector_cfi import *
+    from RecoJets.JetProducers.TracksForJets_cff import *
+    process.betterOfflinePrimaryVertices=sortedPrimaryVertices.clone(vertices="offlinePrimaryVertices", particles="trackRefsForJetsBeforeSorting", jets = "ak5CaloJets")
+    process.trackWithVertexRefSelectorBeforeSorting = trackWithVertexRefSelector.clone(vertexTag="offlinePrimaryVertices")
+    process.trackRefsForJetsBeforeSorting = trackRefsForJets.clone(src="trackWithVertexRefSelectorBeforeSorting")
+    process.vertSeq = cms.Sequence(
+        process.trackWithVertexRefSelectorBeforeSorting
+        *process.trackRefsForJetsBeforeSorting
+        *process.betterOfflinePrimaryVertices
+        )
+    process.primaryVertexFilter.vertexCollection= cms.InputTag('betterOfflinePrimaryVertices')
+    process.goodOfflinePrimaryVertices.src = cms.InputTag('betterOfflinePrimaryVertices')
+
 #---------------------------------------
 ## Define event filter sequence
 process.filtSeq = cms.Sequence(
     #process.JetHLTFilter*
     process.noscraping
-    * process.primaryVertexFilter
+    *process.primaryVertexFilter
     * process.goodOfflinePrimaryVertices
     #* process.HBHENoiseFilter
     #* process.CSCTightHaloFilter
@@ -693,12 +720,21 @@ if options.processStdAK5Jets and options.useTTbarFilter:
     process.analyzerSeq.replace( process.btagana, process.ttbarselectionproducer * process.ttbarselectionfilter * process.btagana )
 #---------------------------------------
 
-process.p = cms.Path(
-    process.allEvents
-    * process.filtSeq
-    * process.selectedEvents
-    * process.analyzerSeq
-)
+if options.useBetterPVSorting:
+    process.p = cms.Path(
+        process.allEvents
+        *process.vertSeq
+        * process.filtSeq
+        * process.selectedEvents
+        * process.analyzerSeq
+        )
+else:
+    process.p = cms.Path(
+        process.allEvents
+        * process.filtSeq
+        * process.selectedEvents
+        * process.analyzerSeq
+        )
 
 # Delete predefined output module (needed for running with CRAB)
 del process.out
