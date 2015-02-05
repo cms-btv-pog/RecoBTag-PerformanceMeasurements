@@ -70,7 +70,7 @@ options.register('useTTbarFilter', False,
     VarParsing.varType.bool,
     "Use TTbar filter"
 )
-options.register('usePVSorting', True,
+options.register('usePVSorting', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Use PV sorting"
@@ -80,6 +80,12 @@ options.register('useBetterPVSorting', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Use better PV sorting"
+)
+
+options.register('useBetterPVSortingPF', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Use better PV sorting PF"
 )
 
 options.register('changeMinNumberOfHits', False,
@@ -153,6 +159,12 @@ pvCollection = 'goodOfflinePrimaryVertices'
 if options.useBetterPVSorting and options.usePVSorting:
     print "Conficting PV Sorting configuration, choosing the Better PV Sorting"
     options.usePVSorting = False
+if options.useBetterPVSortingPF and options.usePVSorting:
+    print "Conficting PV Sorting configuration, choosing the Better PV Sorting"
+    options.usePVSorting = False
+if options.useBetterPVSorting and options.useBetterPVSortingPF:
+    print "Both Better PV sorting and Better PV sorting PF-based required. Choosing the PF-based sorting"
+    options.useBetterPVSorting = False
 if options.usePVSorting:
     pvCollection = 'sortedGoodOfflinePrimaryVertices'
 
@@ -678,15 +690,18 @@ process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 
 if options.useBetterPVSorting:
     from CommonTools.RecoAlgos.sortedPrimaryVertices_cfi import *
-    from CommonTools.RecoAlgos.TrackWithVertexRefSelector_cfi import *
-    from RecoJets.JetProducers.TracksForJets_cff import *
-    process.betterOfflinePrimaryVertices=sortedPrimaryVertices.clone(vertices="offlinePrimaryVertices", particles="trackRefsForJetsBeforeSorting", jets = "ak5CaloJets")
-    process.trackWithVertexRefSelectorBeforeSorting = trackWithVertexRefSelector.clone(vertexTag="offlinePrimaryVertices")
-    process.trackRefsForJetsBeforeSorting = trackRefsForJets.clone(src="trackWithVertexRefSelectorBeforeSorting")
+    process.betterOfflinePrimaryVertices=sortedPrimaryVertices.clone(jets = "ak5CaloJets")
     process.vertSeq = cms.Sequence(
-        process.trackWithVertexRefSelectorBeforeSorting
-        *process.trackRefsForJetsBeforeSorting
-        *process.betterOfflinePrimaryVertices
+        process.betterOfflinePrimaryVertices
+        )
+    process.primaryVertexFilter.vertexCollection= cms.InputTag('betterOfflinePrimaryVertices')
+    process.goodOfflinePrimaryVertices.src = cms.InputTag('betterOfflinePrimaryVertices')
+
+if options.useBetterPVSortingPF:
+    from CommonTools.RecoAlgos.sortedPFPrimaryVertices_cfi import *
+    process.betterOfflinePrimaryVertices=sortedPFPrimaryVertices.clone(jets = "ak5PFJets")
+    process.vertSeq = cms.Sequence(
+        process.betterOfflinePrimaryVertices
         )
     process.primaryVertexFilter.vertexCollection= cms.InputTag('betterOfflinePrimaryVertices')
     process.goodOfflinePrimaryVertices.src = cms.InputTag('betterOfflinePrimaryVertices')
@@ -720,7 +735,7 @@ if options.processStdAK5Jets and options.useTTbarFilter:
     process.analyzerSeq.replace( process.btagana, process.ttbarselectionproducer * process.ttbarselectionfilter * process.btagana )
 #---------------------------------------
 
-if options.useBetterPVSorting:
+if options.useBetterPVSorting or options.useBetterPVSortingPF:
     process.p = cms.Path(
         process.allEvents
         *process.vertSeq
