@@ -97,7 +97,6 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   combinedCSVJPBJetTags_     = iConfig.getParameter<std::string>("combinedCSVJPBJetTags");
   combinedCSVJPNegBJetTags_  = iConfig.getParameter<std::string>("combinedCSVJPNegBJetTags");
   combinedCSVJPPosBJetTags_  = iConfig.getParameter<std::string>("combinedCSVJPPosBJetTags");
-
   combinedCSVSLBJetTags_     = iConfig.getParameter<std::string>("combinedCSVSLBJetTags");
   combinedCSVSLNegBJetTags_  = iConfig.getParameter<std::string>("combinedCSVSLNegBJetTags");
   combinedCSVSLPosBJetTags_  = iConfig.getParameter<std::string>("combinedCSVSLPosBJetTags");
@@ -111,6 +110,13 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   doubleIVFSVHighEffBJetTags_ = iConfig.getParameter<std::string>("doubleIVFSVHighEffBJetTags");
   combinedIVFSVBJetTags_      = iConfig.getParameter<std::string>("combinedIVFSVBJetTags");
   combinedIVFSVPosBJetTags_   = iConfig.getParameter<std::string>("combinedIVFSVPosBJetTags");
+
+  //FormultipleCSVv2
+  combinedIVFSVNewBJetTags_      = iConfig.getParameter<std::string>("combinedIVFSVNewBJetTags");
+  combinedIVFPhaseIMidPUBJetTags_ = iConfig.getParameter<std::string>("combinedIVFV2PhaseIMidPUBJetTags");
+  combinedIVFPhaseIHighPUBJetTags_ = iConfig.getParameter<std::string>("combinedIVFV2PhaseIHighPUBJetTags");
+  combinedIVFPhaseIIHighPUBJetTags_ = iConfig.getParameter<std::string>("combinedIVFV2PhaseIIHighPUBJetTags");
+  //FormultipleCSVv2:end                                                                                  
 
   //softMuonBJetTags_       = iConfig.getParameter<std::string>("softMuonBJetTags");
   //softMuonNegBJetTags_    = iConfig.getParameter<std::string>("softMuonNegBJetTags");
@@ -1518,6 +1524,13 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     float CombinedIVF     = pjet->bDiscriminator(combinedIVFSVBJetTags_.c_str());
     float CombinedIVF_P   = pjet->bDiscriminator(combinedIVFSVPosBJetTags_.c_str());
 
+    //FormultipleCSVv2
+    float CombinedIVFNew     = pjet->bDiscriminator(combinedIVFSVNewBJetTags_.c_str());
+    float CombinedIVFV2PhaseIMidPU = pjet->bDiscriminator(combinedIVFPhaseIMidPUBJetTags_.c_str());
+    float CombinedIVFV2PhaseIHighPU = pjet->bDiscriminator(combinedIVFPhaseIHighPUBJetTags_.c_str());
+    float CombinedIVFV2PhaseIIHighPU = pjet->bDiscriminator(combinedIVFPhaseIIHighPUBJetTags_.c_str());
+    //FormultipleCSVv2:end
+    
     float Svtx    = pjet->bDiscriminator(simpleSVHighEffBJetTags_.c_str());
     float SvtxN   = pjet->bDiscriminator(simpleSVNegHighEffBJetTags_.c_str());
     float SvtxHP  = pjet->bDiscriminator(simpleSVHighPurBJetTags_.c_str());
@@ -1673,6 +1686,12 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     JetInfo[iJetColl].Jet_DoubIVF_HE[JetInfo[iJetColl].nJet]  = DoubleIVF_HE;
     JetInfo[iJetColl].Jet_CombIVF[JetInfo[iJetColl].nJet]     = CombinedIVF;
     JetInfo[iJetColl].Jet_CombIVF_P[JetInfo[iJetColl].nJet]   = CombinedIVF_P;
+    //FormultipleCSVv2
+    JetInfo[iJetColl].Jet_CombIVFNew[JetInfo[iJetColl].nJet]     = CombinedIVFNew;
+    JetInfo[iJetColl].Jet_CombIVFV2PhaseIMidPU[JetInfo[iJetColl].nJet] =  CombinedIVFV2PhaseIMidPU;
+    JetInfo[iJetColl].Jet_CombIVFV2PhaseIHighPU[JetInfo[iJetColl].nJet] =  CombinedIVFV2PhaseIHighPU;
+    JetInfo[iJetColl].Jet_CombIVFV2PhaseIIHighPU[JetInfo[iJetColl].nJet] =  CombinedIVFV2PhaseIIHighPU;
+    //FormultipleCSVv2:end
     JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet]  = SoftMN;
     JetInfo[iJetColl].Jet_SoftMuP[JetInfo[iJetColl].nJet]  = SoftMP;
     JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet]   = SoftM;

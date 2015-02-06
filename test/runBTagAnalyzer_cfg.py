@@ -100,7 +100,7 @@ options.register('minNumberOfHits', 8,
 )
 
 ## 'maxEvents' is already registered by the Framework, changing default value
-options.setDefault('maxEvents', 100)
+options.setDefault('maxEvents', 10)
 
 options.parseArguments()
 
@@ -138,7 +138,9 @@ bTagDiscriminators = ['jetBProbabilityBJetTags','jetProbabilityBJetTags','trackC
      ,'negativeTrackCountingHighEffJetTags','negativeTrackCountingHighPurJetTags'
      #,'positiveOnlyJetBProbabilityJetTags','positiveOnlyJetProbabilityJetTags'
     ,'simpleSecondaryVertexHighEffBJetTags','simpleSecondaryVertexHighPurBJetTags','simpleSecondaryVertexNegativeHighEffBJetTags'
-    ,'simpleSecondaryVertexNegativeHighPurBJetTags','combinedSecondaryVertexBJetTags', 'combinedSecondaryVertexV2BJetTags'
+    ,'simpleSecondaryVertexNegativeHighPurBJetTags','combinedSecondaryVertexBJetTags'
+    ,'combinedSecondaryVertexV2BJetTags'
+    #,'combinedSecondaryVertexIVFV2Phase1MidPUBJetTags'
     #,'combinedSecondaryVertexPositiveBJetTags',
     #,'combinedSecondaryVertexV1BJetTags','combinedSecondaryVertexV1PositiveBJetTags'
     #,'combinedSecondaryVertexNegativeBJetTags'
@@ -184,10 +186,8 @@ process.source = cms.Source(
 
         # /PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/GEM2019Upg14DR-final_phase1_PU50bx25_DES19_62_V8-v1/AODSIM
         ##'/store/mc/GEM2019Upg14DR/PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/AODSIM/final_phase1_PU50bx25_DES19_62_V8-v1/00000/009500C4-A821-E411-8E47-02163E00E7E0.root'
-        '/store/mc/GEM2019Upg14DR/DYToMuMu_M-20_TuneZ2star_14TeV-pythia6-tauola/AODSIM/final_phase1_age1k_PU140bx25_PH1_1K_FB_V2-v1/00000/007B34CC-331F-E411-BD67-002618943918.root'
         # /PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/GEM2019Upg14DR-final_phase1_age1k_PU140bx25_PH1_1K_FB_V2-v1/AODSIM
-        #'/store/mc/GEM2019Upg14DR/PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/AODSIM/final_phase1_age1k_PU140bx25_PH1_1K_FB_V2-v1/00000/00746114-E31F-E411-B4BC-002618FDA211.root'
-
+        '/store/mc/GEM2019Upg14DR/PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/AODSIM/final_phase1_age1k_PU140bx25_PH1_1K_FB_V2-v1/00000/00746114-E31F-E411-B4BC-002618FDA211.root'
         # /RelValTTbar_14TeV/CMSSW_6_2_0_SLHC11-DES23_62_V1_UPG2023Muon-v1/GEN-SIM-RECO
         #'/store/relval/CMSSW_6_2_0_SLHC11/RelValTTbar_14TeV/GEN-SIM-RECO/DES23_62_V1_UPG2023Muon-v1/00000/2AEE7860-67C6-E311-AEB4-0025905964B4.root'
     )
@@ -227,38 +227,24 @@ process.options   = cms.untracked.PSet(
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = globalTag + '::All'
 
-########################################################
-# Get calibrations for the CSVV1 and CSVSLV1 taggers
-########################################################
-#process.load("CondCore.DBCommon.CondDBSetup_cfi")
-#process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
-   #process.CondDBSetup,
-   #timetype = cms.string('runnumber'),
-   #toGet = cms.VPSet(cms.PSet(
-      #record = cms.string('BTauGenericMVAJetTagComputerRcd'),
-                #tag = cms.string('MVAComputerContainer_Retrained53X_JetTags_v2')
-   #)),
-   #connect = cms.string('frontier://FrontierProd/CMS_COND_PAT_000'),
-   #BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
-#)
-#process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
-
+###FormultipleCSVv2
 ##############################################
-# Get calibrations for the CSVV2 tagger
+# Get calibrations for the CSVV2 tagger: Phase I, II and retrained 72X
 ##############################################
-process.load('CondCore.DBCommon.CondDBSetup_cfi')
-process.BTauMVAJetTagComputerRecord = cms.ESSource('PoolDBESSource',
-    process.CondDBSetup,
-    timetype = cms.string('runnumber'),
-    toGet = cms.VPSet(cms.PSet(
-        record = cms.string('BTauGenericMVAJetTagComputerRcd'),
-        tag = cms.string('MVAComputerContainer_53X_JetTags_v3')
-    )),
-    connect = cms.string('frontier://FrontierProd/CMS_COND_PAT_000'),
-    BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
+process.load("Configuration.StandardSequences.MagneticField_cff")
+process.load("CondCore.DBCommon.CondDBSetup_cfi")
+process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
+process.CondDBSetup,
+timetype = cms.string('runnumber'),
+toGet = cms.VPSet(cms.PSet(
+record = cms.string('BTauGenericMVAJetTagComputerRcd'),
+                tag = cms.string('MVAJetTags_620SLHCX')
+)),
+connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags_620SLHCX_Phase1And2Upgrade.db'),
+BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
 )
-process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer('PoolDBESSource','BTauMVAJetTagComputerRecord')
-
+process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
+###FormultipleCSVv2:end
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
 #----------------------------------------------------------------------
@@ -571,6 +557,77 @@ if not options.runOnData:
     )
 #---------------------------------------
 
+###FormultipleCSVv2
+#Forcing some selection configurations used during the training
+process.inclusiveSecondaryVertexFinderTagInfosPFlowSelection = process.inclusiveSecondaryVertexFinderTagInfosPFlow.clone()
+#Uncomment to change the selection on the qualityClass
+#process.inclusiveSecondaryVertexFinderTagInfosPFlowSelection.trackSelection.qualityClass = cms.string('any')
+## Add additional b-tag discriminators
+getattr(process,'patJets'+postfix).discriminatorSources += cms.VInputTag(
+cms.InputTag("combinedSecondaryVertexIVFV2Phase1MidPUBJetTags"),
+cms.InputTag("combinedSecondaryVertexIVFV2NewBJetTags"),
+cms.InputTag("combinedSecondaryVertexIVFV2Phase1HighPUBJetTags"),
+cms.InputTag("combinedSecondaryVertexIVFV2Phase2HighPUBJetTags")
+)
+#CSVIVFV2: MLP-based
+process.combinedSecondaryVertexIVFV2=process.combinedSecondaryVertexV2.clone(
+calibrationRecords = cms.vstring(
+'CombinedSVIVFV2RecoVertex_53x',
+'CombinedSVIVFV2PseudoVertex_53x',
+'CombinedSVIVFV2NoVertex_53x'
+)
+)
+getattr(process,'combinedSecondaryVertexV2BJetTags'+postfix).jetTagComputer = cms.string('combinedSecondaryVertexIVFV2')
+#CSVIVFV2: 50Pu
+process.combinedSecondaryVertexIVFV2Phase1MidPU=process.combinedSecondaryVertexV2.clone(
+calibrationRecords = cms.vstring(
+'CombinedSVIVFV2Phase1_50PU_RecoVertex',
+'CombinedSVIVFV2Phase1_50PU_PseudoVertex',
+'CombinedSVIVFV2Phase1_50PU_NoVertex'
+)
+)
+process.combinedSecondaryVertexIVFV2Phase1MidPUBJetTags = process.combinedSecondaryVertexV2BJetTagsPFlow.clone(
+jetTagComputer = cms.string('combinedSecondaryVertexIVFV2Phase1MidPU'),
+tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosPFlow"), cms.InputTag("inclusiveSecondaryVertexFinderTagInfosPFlowSelection"))
+)
+###CSVIVFV2: 140PU +aging
+process.combinedSecondaryVertexIVFV2Phase1HighPU=process.combinedSecondaryVertexV2.clone(
+calibrationRecords = cms.vstring(
+'CombinedSVIVFV2Phase1_140PU_RecoVertex',
+'CombinedSVIVFV2Phase1_140PU_PseudoVertex',
+'CombinedSVIVFV2Phase1_140PU_NoVertex'
+)
+)
+process.combinedSecondaryVertexIVFV2Phase1HighPUBJetTags = process.combinedSecondaryVertexV2BJetTagsPFlow.clone(
+jetTagComputer = cms.string('combinedSecondaryVertexIVFV2Phase1HighPU'),
+tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosPFlow"), cms.InputTag("inclusiveSecondaryVertexFinderTagInfosPFlowSelection"))
+)
+###CSVIVFV2: PHASE2 140PU +aging
+process.combinedSecondaryVertexIVFV2Phase2HighPU=process.combinedSecondaryVertexV2.clone(
+calibrationRecords = cms.vstring(
+'CombinedSVIVFV2Phase2_140PU_RecoVertex',
+'CombinedSVIVFV2Phase2_140PU_PseudoVertex',
+'CombinedSVIVFV2Phase2_140PU_NoVertex'
+)
+)
+process.combinedSecondaryVertexIVFV2Phase2HighPUBJetTags = process.combinedSecondaryVertexV2BJetTagsPFlow.clone(
+jetTagComputer = cms.string('combinedSecondaryVertexIVFV2Phase2HighPU'),
+tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosPFlow"), cms.InputTag("inclusiveSecondaryVertexFinderTagInfosPFlowSelection"))
+)
+###CSVIVFV2: new csv from Shimaa
+process.combinedSecondaryVertexIVFV2New=process.combinedSecondaryVertexV2.clone(
+calibrationRecords = cms.vstring(
+'CombinedSVV2MVA_RecoVertex',
+'CombinedSVV2MVA_PseudoVertex',
+'CombinedSVV2MVA_NoVertex'
+)
+)
+process.combinedSecondaryVertexIVFV2NewBJetTags = process.combinedSecondaryVertexV2BJetTagsPFlow.clone(
+jetTagComputer = cms.string('combinedSecondaryVertexIVFV2New'),
+tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosPFlow"), cms.InputTag("inclusiveSecondaryVertexFinderTagInfosPFlowSelection"))
+)
+###FormultipleCSVv2:end
+
 #-------------------------------------
 process.load("RecoBTag.PerformanceMeasurements.BTagAnalyzer_cff")
 # The following combinations should be considered:
@@ -754,4 +811,4 @@ else:
 # Delete predefined output module (needed for running with CRAB)
 del process.out
 
-#open('pydump.py','w').write(process.dumpPython())
+open('pydump.py','w').write(process.dumpPython())

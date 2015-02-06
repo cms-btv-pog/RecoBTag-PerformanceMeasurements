@@ -68,6 +68,13 @@ btagana = cms.EDAnalyzer("BTagAnalyzer",
     combinedIVFSVBJetTags      = cms.string('combinedSecondaryVertexV2BJetTags'),
     combinedIVFSVPosBJetTags   = cms.string('combinedInclusiveSecondaryVertexPositiveBJetTags'),
 
+    ###FormultipleCSVv2
+    combinedIVFSVNewBJetTags      = cms.string('combinedSecondaryVertexIVFV2NewBJetTags'),
+    combinedIVFV2PhaseIMidPUBJetTags = cms.string('combinedSecondaryVertexIVFV2Phase1MidPUBJetTags'),
+    combinedIVFV2PhaseIHighPUBJetTags = cms.string('combinedSecondaryVertexIVFV2Phase1HighPUBJetTags'),
+    combinedIVFV2PhaseIIHighPUBJetTags = cms.string('combinedSecondaryVertexIVFV2Phase2HighPUBJetTags'),
+    ###FormultipleCSVv2:end
+
     simpleSVHighPurBJetTags     = cms.string('simpleSecondaryVertexHighPurBJetTags'),
     simpleSVNegHighPurBJetTags  = cms.string('simpleSecondaryVertexNegativeHighPurBJetTags'),
     simpleSVHighEffBJetTags     = cms.string('simpleSecondaryVertexHighEffBJetTags'),
