@@ -720,8 +720,9 @@ process.pfJetsPFlow.rParam = cms.double(0.4)
 process.jetTracksAssociatorAtVertexPFlow.coneSize = cms.double(0.4)
 
 ## Select JEC version
-jec = 'DES19_V1'
-#jec = 'AGE1K_V1'
+jec='PhaseII_Shashlik140PU'
+#jec = 'DES19_V1_MC'
+#jec = 'AGE1K_V1_MC'
 
 ## Get AK4PFchs JECs from a sqlite file
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
@@ -733,13 +734,13 @@ process.jec = cms.ESSource("PoolDBESSource",
     toGet = cms.VPSet(
     cms.PSet(
          record = cms.string('JetCorrectionsRecord'),
-         tag    = cms.string('JetCorrectorParametersCollection_' + jec + '_MC_AK4PFchs'),
+         tag    = cms.string('JetCorrectorParametersCollection_' + jec + '_AK4PFchs'),
          label  = cms.untracked.string('AK4PFchs')
     ),
     ## here you add as many jet types as you need
     ## note that the tag name is specific for the particular sqlite file
     ),
-    connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/' + jec + '_MC.db')
+    connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/' + jec + '.db')
 )
 ## add an es_prefer statement to resolve a possible conflict from simultaneous connection to a global tag
 process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
