@@ -96,7 +96,7 @@ public :
    Float_t         BHadron_phi[50];   //[nBHadrons]
    Float_t         BHadron_mass[50];   //[nBHadrons]
    Int_t           BHadron_pdgID[50];   //[nBHadrons]
-   Int_t           BHadron_status[50];   //[nBHadrons]
+   //Int_t           BHadron_status[50];   //[nBHadrons]
    Int_t           BHadron_mother[50];   //[nBHadrons]
    Int_t           BHadron_hasBdaughter[50];   //[nBHadrons]
    Int_t           nDHadrons;
@@ -105,12 +105,12 @@ public :
    Float_t         DHadron_eta[50];   //[nDHadrons]
    Float_t         DHadron_phi[50];   //[nDHadrons]
    Float_t         DHadron_mass[50];   //[nDHadrons]
-   Float_t         DHadron_vx[50];   //[nDHadrons]
-   Float_t         DHadron_vy[50];   //[nDHadrons]
-   Float_t         DHadron_vz[50];   //[nDHadrons]
-   Float_t         DHadron_daughterVx[50];   //[nDHadrons]
-   Float_t         DHadron_daughterVy[50];   //[nDHadrons]
-   Float_t         DHadron_daughterVz[50];   //[nDHadrons]
+   //Float_t         DHadron_vx[50];   //[nDHadrons]
+   //Float_t         DHadron_vy[50];   //[nDHadrons]
+   //Float_t         DHadron_vz[50];   //[nDHadrons]
+   //Float_t         DHadron_daughterVx[50];   //[nDHadrons]
+   //Float_t         DHadron_daughterVy[50];   //[nDHadrons]
+   //Float_t         DHadron_daughterVz[50];   //[nDHadrons]
    Int_t           DHadron_pdgID[50];   //[nDHadrons]
    Int_t           DHadron_nDaughters[50];   //[nDHadrons]
    Int_t           DHadron_DaughtersPdgID[100];   //[nDaughters]
@@ -159,20 +159,20 @@ public :
    Float_t         Jet_RetCombSvxN[1000];   //[nJet]
    Float_t         Jet_RetCombSvxP[1000];   //[nJet]
    Float_t         Jet_RetCombSvx[1000];   //[nJet]
-   Float_t         Jet_CombCSVJP_N[1000];   //[nJet]
-   Float_t         Jet_CombCSVJP_P[1000];   //[nJet]
-   Float_t         Jet_CombCSVJP[1000];   //[nJet]
+   //Float_t         Jet_CombCSVJP_N[1000];   //[nJet]
+   //Float_t         Jet_CombCSVJP_P[1000];   //[nJet]
+   //Float_t         Jet_CombCSVJP[1000];   //[nJet]
    Float_t         Jet_CombCSVSL_N[1000];   //[nJet]
    Float_t         Jet_CombCSVSL_P[1000];   //[nJet]
    Float_t         Jet_CombCSVSL[1000];   //[nJet]
-   Float_t         Jet_CombCSVJPSL_N[1000];   //[nJet]
-   Float_t         Jet_CombCSVJPSL_P[1000];   //[nJet]
-   Float_t         Jet_CombCSVJPSL[1000];   //[nJet]
-   Float_t         Jet_SimpIVF_HP[1000];   //[nJet]
-   Float_t         Jet_SimpIVF_HE[1000];   //[nJet]
-   Float_t         Jet_DoubIVF_HE[1000];   //[nJet]
+   //Float_t         Jet_CombCSVJPSL_N[1000];   //[nJet]
+   //Float_t         Jet_CombCSVJPSL_P[1000];   //[nJet]
+   //Float_t         Jet_CombCSVJPSL[1000];   //[nJet]
+   //Float_t         Jet_SimpIVF_HP[1000];   //[nJet]
+   //Float_t         Jet_SimpIVF_HE[1000];   //[nJet]
+   //Float_t         Jet_DoubIVF_HE[1000];   //[nJet]
    Float_t         Jet_CombIVF[1000];   //[nJet]
-   Float_t         Jet_CombIVF_P[1000];   //[nJet]
+   //Float_t         Jet_CombIVF_P[1000];   //[nJet]
    Float_t         Jet_SoftMuN[1000];   //[nJet]
    Float_t         Jet_SoftMuP[1000];   //[nJet]
    Float_t         Jet_SoftMu[1000];   //[nJet]
@@ -365,7 +365,7 @@ public :
    TBranch        *b_BHadron_phi;   //!
    TBranch        *b_BHadron_mass;   //!
    TBranch        *b_BHadron_pdgID;   //!
-   TBranch        *b_BHadron_status;   //!
+   //TBranch        *b_BHadron_status;   //!
    TBranch        *b_BHadron_mother;   //!
    TBranch        *b_BHadron_hasBdaughter;   //!
    TBranch        *b_nDHadrons;   //!
@@ -374,12 +374,12 @@ public :
    TBranch        *b_DHadron_eta;   //!
    TBranch        *b_DHadron_phi;   //!
    TBranch        *b_DHadron_mass;   //!
-   TBranch        *b_DHadron_vx;   //!
-   TBranch        *b_DHadron_vy;   //!
-   TBranch        *b_DHadron_vz;   //!
-   TBranch        *b_DHadron_daughterVx;   //!
-   TBranch        *b_DHadron_daughterVy;   //!
-   TBranch        *b_DHadron_daughterVz;   //!
+   //TBranch        *b_DHadron_vx;   //!
+   //TBranch        *b_DHadron_vy;   //!
+   //TBranch        *b_DHadron_vz;   //!
+   //TBranch        *b_DHadron_daughterVx;   //!
+   //TBranch        *b_DHadron_daughterVy;   //!
+   //TBranch        *b_DHadron_daughterVz;   //!
    TBranch        *b_DHadron_pdgID;   //!
    TBranch        *b_DHadron_nDaughters;   //!
    TBranch        *b_DHadron_DaughtersPdgID;   //!
@@ -428,20 +428,20 @@ public :
    TBranch        *b_Jet_RetCombSvxN;   //!
    TBranch        *b_Jet_RetCombSvxP;   //!
    TBranch        *b_Jet_RetCombSvx;   //!
-   TBranch        *b_Jet_CombCSVJP_N;   //!
-   TBranch        *b_Jet_CombCSVJP_P;   //!
-   TBranch        *b_Jet_CombCSVJP;   //!
+   //TBranch        *b_Jet_CombCSVJP_N;   //!
+   //TBranch        *b_Jet_CombCSVJP_P;   //!
+   //TBranch        *b_Jet_CombCSVJP;   //!
    TBranch        *b_Jet_CombCSVSL_N;   //!
    TBranch        *b_Jet_CombCSVSL_P;   //!
    TBranch        *b_Jet_CombCSVSL;   //!
-   TBranch        *b_Jet_CombCSVJPSL_N;   //!
-   TBranch        *b_Jet_CombCSVJPSL_P;   //!
-   TBranch        *b_Jet_CombCSVJPSL;   //!
-   TBranch        *b_Jet_SimpIVF_HP;   //!
-   TBranch        *b_Jet_SimpIVF_HE;   //!
-   TBranch        *b_Jet_DoubIVF_HE;   //!
+   //TBranch        *b_Jet_CombCSVJPSL_N;   //!
+   //TBranch        *b_Jet_CombCSVJPSL_P;   //!
+   //TBranch        *b_Jet_CombCSVJPSL;   //!
+   //TBranch        *b_Jet_SimpIVF_HP;   //!
+   //TBranch        *b_Jet_SimpIVF_HE;   //!
+   //TBranch        *b_Jet_DoubIVF_HE;   //!
    TBranch        *b_Jet_CombIVF;   //!
-   TBranch        *b_Jet_CombIVF_P;   //!
+   //TBranch        *b_Jet_CombIVF_P;   //!
    TBranch        *b_Jet_SoftMuN;   //!
    TBranch        *b_Jet_SoftMuP;   //!
    TBranch        *b_Jet_SoftMu;   //!
@@ -602,7 +602,7 @@ public :
   TBranch *b_PV_isgood;
   TBranch *b_PV_isfake;
   
-   CommPlotProducer(TChain *supertree=0, bool infotree1=true, bool infotree2=false);
+   CommPlotProducer(TChain *supertree=0, bool infotree1=true, bool infotree2=false, int sqrts=13);
    virtual ~CommPlotProducer();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -638,7 +638,7 @@ public :
 #endif
 
 #ifdef CommPlotProducer_cxx
-CommPlotProducer::CommPlotProducer(TChain *superTree, bool infotree1, bool infotree2)
+CommPlotProducer::CommPlotProducer(TChain *superTree, bool infotree1, bool infotree2, int sqrts)
 {  
 
    numb_histo = 0;
@@ -674,14 +674,14 @@ CommPlotProducer::CommPlotProducer(TChain *superTree, bool infotree1, bool infot
    n15_30   =0;
    n120_150 =0;
    n150_inf =0;
-   sqrtstev=-1;
+   sqrtstev=sqrts;
    produceJetProbaTree=infotree1;
    produceNewAlgoTree=infotree2;
 
    if (produceJetProbaTree) use_selected_tracks=false;
    else use_selected_tracks=true;
 
-   puweight=true;
+   puweight=false;
    
    if (superTree==0) {
       TChain *newchain = new TChain("btagana/ttree");
@@ -765,7 +765,7 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("BHadron_phi", BHadron_phi, &b_BHadron_phi);
    fChain->SetBranchAddress("BHadron_mass", BHadron_mass, &b_BHadron_mass);
    fChain->SetBranchAddress("BHadron_pdgID", BHadron_pdgID, &b_BHadron_pdgID);
-   fChain->SetBranchAddress("BHadron_status", BHadron_status, &b_BHadron_status);
+   //fChain->SetBranchAddress("BHadron_status", BHadron_status, &b_BHadron_status);
    fChain->SetBranchAddress("BHadron_mother", BHadron_mother, &b_BHadron_mother);
    fChain->SetBranchAddress("BHadron_hasBdaughter", BHadron_hasBdaughter, &b_BHadron_hasBdaughter);
    fChain->SetBranchAddress("nDHadrons", &nDHadrons, &b_nDHadrons);
@@ -774,12 +774,12 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("DHadron_eta", DHadron_eta, &b_DHadron_eta);
    fChain->SetBranchAddress("DHadron_phi", DHadron_phi, &b_DHadron_phi);
    fChain->SetBranchAddress("DHadron_mass", DHadron_mass, &b_DHadron_mass);
-   fChain->SetBranchAddress("DHadron_vx", DHadron_vx, &b_DHadron_vx);
-   fChain->SetBranchAddress("DHadron_vy", DHadron_vy, &b_DHadron_vy);
-   fChain->SetBranchAddress("DHadron_vz", DHadron_vz, &b_DHadron_vz);
-   fChain->SetBranchAddress("DHadron_daughterVx", DHadron_daughterVx, &b_DHadron_daughterVx);
-   fChain->SetBranchAddress("DHadron_daughterVy", DHadron_daughterVy, &b_DHadron_daughterVy);
-   fChain->SetBranchAddress("DHadron_daughterVz", DHadron_daughterVz, &b_DHadron_daughterVz);
+   //fChain->SetBranchAddress("DHadron_vx", DHadron_vx, &b_DHadron_vx);
+   //fChain->SetBranchAddress("DHadron_vy", DHadron_vy, &b_DHadron_vy);
+   //fChain->SetBranchAddress("DHadron_vz", DHadron_vz, &b_DHadron_vz);
+   //fChain->SetBranchAddress("DHadron_daughterVx", DHadron_daughterVx, &b_DHadron_daughterVx);
+   //fChain->SetBranchAddress("DHadron_daughterVy", DHadron_daughterVy, &b_DHadron_daughterVy);
+   //fChain->SetBranchAddress("DHadron_daughterVz", DHadron_daughterVz, &b_DHadron_daughterVz);
    fChain->SetBranchAddress("DHadron_pdgID", DHadron_pdgID, &b_DHadron_pdgID);
    fChain->SetBranchAddress("DHadron_nDaughters", DHadron_nDaughters, &b_DHadron_nDaughters);
    fChain->SetBranchAddress("DHadron_DaughtersPdgID", DHadron_DaughtersPdgID, &b_DHadron_DaughtersPdgID);
@@ -821,27 +821,27 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("Jet_Svx", Jet_Svx, &b_Jet_Svx);
    fChain->SetBranchAddress("Jet_SvxNHP", Jet_SvxNHP, &b_Jet_SvxNHP);
    fChain->SetBranchAddress("Jet_SvxHP", Jet_SvxHP, &b_Jet_SvxHP);
-   fChain->SetBranchAddress("Jet_SvxMass", Jet_SvxMass, &b_Jet_SvxMass);
+//   fChain->SetBranchAddress("Jet_SvxMass", Jet_SvxMass, &b_Jet_SvxMass);
    fChain->SetBranchAddress("Jet_CombSvxN", Jet_CombSvxN, &b_Jet_CombSvxN);
    fChain->SetBranchAddress("Jet_CombSvxP", Jet_CombSvxP, &b_Jet_CombSvxP);
    fChain->SetBranchAddress("Jet_CombSvx", Jet_CombSvx, &b_Jet_CombSvx);
    fChain->SetBranchAddress("Jet_RetCombSvxN", Jet_RetCombSvxN, &b_Jet_RetCombSvxN);
    fChain->SetBranchAddress("Jet_RetCombSvxP", Jet_RetCombSvxP, &b_Jet_RetCombSvxP);
    fChain->SetBranchAddress("Jet_RetCombSvx", Jet_RetCombSvx, &b_Jet_RetCombSvx);
-   fChain->SetBranchAddress("Jet_CombCSVJP_N", Jet_CombCSVJP_N, &b_Jet_CombCSVJP_N);
-   fChain->SetBranchAddress("Jet_CombCSVJP_P", Jet_CombCSVJP_P, &b_Jet_CombCSVJP_P);
-   fChain->SetBranchAddress("Jet_CombCSVJP", Jet_CombCSVJP, &b_Jet_CombCSVJP);
+   //fChain->SetBranchAddress("Jet_CombCSVJP_N", Jet_CombCSVJP_N, &b_Jet_CombCSVJP_N);
+   //fChain->SetBranchAddress("Jet_CombCSVJP_P", Jet_CombCSVJP_P, &b_Jet_CombCSVJP_P);
+   //fChain->SetBranchAddress("Jet_CombCSVJP", Jet_CombCSVJP, &b_Jet_CombCSVJP);
    fChain->SetBranchAddress("Jet_CombCSVSL_N", Jet_CombCSVSL_N, &b_Jet_CombCSVSL_N);
    fChain->SetBranchAddress("Jet_CombCSVSL_P", Jet_CombCSVSL_P, &b_Jet_CombCSVSL_P);
    fChain->SetBranchAddress("Jet_CombCSVSL", Jet_CombCSVSL, &b_Jet_CombCSVSL);
-   fChain->SetBranchAddress("Jet_CombCSVJPSL_N", Jet_CombCSVJPSL_N, &b_Jet_CombCSVJPSL_N);
-   fChain->SetBranchAddress("Jet_CombCSVJPSL_P", Jet_CombCSVJPSL_P, &b_Jet_CombCSVJPSL_P);
-   fChain->SetBranchAddress("Jet_CombCSVJPSL", Jet_CombCSVJPSL, &b_Jet_CombCSVJPSL);
-   fChain->SetBranchAddress("Jet_SimpIVF_HP", Jet_SimpIVF_HP, &b_Jet_SimpIVF_HP);
-   fChain->SetBranchAddress("Jet_SimpIVF_HE", Jet_SimpIVF_HE, &b_Jet_SimpIVF_HE);
-   fChain->SetBranchAddress("Jet_DoubIVF_HE", Jet_DoubIVF_HE, &b_Jet_DoubIVF_HE);
-   fChain->SetBranchAddress("Jet_CombIVF", Jet_CombIVF, &b_Jet_CombIVF);
-   fChain->SetBranchAddress("Jet_CombIVF_P", Jet_CombIVF_P, &b_Jet_CombIVF_P);
+   //fChain->SetBranchAddress("Jet_CombCSVJPSL_N", Jet_CombCSVJPSL_N, &b_Jet_CombCSVJPSL_N);
+   //fChain->SetBranchAddress("Jet_CombCSVJPSL_P", Jet_CombCSVJPSL_P, &b_Jet_CombCSVJPSL_P);
+   //fChain->SetBranchAddress("Jet_CombCSVJPSL", Jet_CombCSVJPSL, &b_Jet_CombCSVJPSL);
+   //fChain->SetBranchAddress("Jet_SimpIVF_HP", Jet_SimpIVF_HP, &b_Jet_SimpIVF_HP);
+   //fChain->SetBranchAddress("Jet_SimpIVF_HE", Jet_SimpIVF_HE, &b_Jet_SimpIVF_HE);
+   //fChain->SetBranchAddress("Jet_DoubIVF_HE", Jet_DoubIVF_HE, &b_Jet_DoubIVF_HE);
+   if (sqrtstev==13) fChain->SetBranchAddress("Jet_CombIVF", Jet_CombIVF, &b_Jet_CombIVF);
+   //fChain->SetBranchAddress("Jet_CombIVF_P", Jet_CombIVF_P, &b_Jet_CombIVF_P);
    fChain->SetBranchAddress("Jet_SoftMuN", Jet_SoftMuN, &b_Jet_SoftMuN);
    fChain->SetBranchAddress("Jet_SoftMuP", Jet_SoftMuP, &b_Jet_SoftMuP);
    fChain->SetBranchAddress("Jet_SoftMu", Jet_SoftMu, &b_Jet_SoftMu);
@@ -860,7 +860,7 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("Jet_SV_multi", Jet_SV_multi, &b_Jet_SV_multi);
    fChain->SetBranchAddress("Jet_nFirstTrkInc", Jet_nFirstTrkInc, &b_Jet_nFirstTrkInc);
    fChain->SetBranchAddress("Jet_nLastTrkInc", Jet_nLastTrkInc, &b_Jet_nLastTrkInc);
-   fChain->SetBranchAddress("Jet_VtxCat", Jet_VtxCat, &b_Jet_VtxCat);
+//   fChain->SetBranchAddress("Jet_VtxCat", Jet_VtxCat, &b_Jet_VtxCat);
    fChain->SetBranchAddress("Jet_looseID", Jet_looseID, &b_Jet_looseID);
    fChain->SetBranchAddress("Jet_tightID", Jet_tightID, &b_Jet_tightID);
    fChain->SetBranchAddress("nTrkInc", &nTrkInc, &b_nTrkInc);
@@ -932,15 +932,15 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("SV_deltaR_jet", SV_deltaR_jet, &b_SV_deltaR_jet);
    fChain->SetBranchAddress("SV_deltaR_sum_jet", SV_deltaR_sum_jet, &b_SV_deltaR_sum_jet);
    fChain->SetBranchAddress("SV_deltaR_sum_dir", SV_deltaR_sum_dir, &b_SV_deltaR_sum_dir);
-   fChain->SetBranchAddress("SV_energy_ratio", SV_energy_ratio, &b_SV_energy_ratio);
-   fChain->SetBranchAddress("SV_aboveC", SV_aboveC, &b_SV_aboveC);
+//   fChain->SetBranchAddress("SV_energy_ratio", SV_energy_ratio, &b_SV_energy_ratio);
+//   fChain->SetBranchAddress("SV_aboveC", SV_aboveC, &b_SV_aboveC);
    fChain->SetBranchAddress("SV_vtx_pt", SV_vtx_pt, &b_SV_vtx_pt);
    fChain->SetBranchAddress("SV_flight2D", SV_flight2D, &b_SV_flight2D);
    fChain->SetBranchAddress("SV_flight2DErr", SV_flight2DErr, &b_SV_flight2DErr);
    fChain->SetBranchAddress("SV_totCharge", SV_totCharge, &b_SV_totCharge);
    fChain->SetBranchAddress("SV_vtxDistJetAxis", SV_vtxDistJetAxis, &b_SV_vtxDistJetAxis);
    fChain->SetBranchAddress("SV_nTrk", SV_nTrk, &b_SV_nTrk);
-   fChain->SetBranchAddress("SV_nTrk_firstVxt", SV_nTrk_firstVxt, &b_SV_nTrk_firstVxt);
+//   fChain->SetBranchAddress("SV_nTrk_firstVxt", SV_nTrk_firstVxt, &b_SV_nTrk_firstVxt);
    fChain->SetBranchAddress("SV_mass", SV_mass, &b_SV_mass);
    fChain->SetBranchAddress("SV_vtx_eta", SV_vtx_eta, &b_SV_vtx_eta);
    fChain->SetBranchAddress("SV_vtx_phi", SV_vtx_phi, &b_SV_vtx_phi);
