@@ -9,7 +9,7 @@ PFJetIDSelectionFunctor pfjetIDTight( PFJetIDSelectionFunctor::FIRSTDATA, PFJetI
 pat::strbitset retpf = pfjetIDLoose.getBitTemplate();
 
 BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
-  classifier_(iConfig) ,
+  classifier_(iConfig, consumesCollector()) ,
   pv(0),
   PFJet80(0),
   thelepton1(0.,0.,0.,0.),
