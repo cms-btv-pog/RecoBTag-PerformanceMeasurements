@@ -1524,8 +1524,8 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       if ( producePtRelTemplate_ ) {
         if ( ptrack.quality(reco::TrackBase::highPurity)
             // Remove the tracks that are pixel-less
-            && ptrack.algo()!=(reco::TrackBase::iter4)
-            && ptrack.algo()!=(reco::TrackBase::iter5)
+            && ptrack.algo()!=(reco::TrackBase::pixelLessStep)
+            && ptrack.algo()!=(reco::TrackBase::tobTecStep)
             && deltaR < 0.4
             && ptrack.pt() > 5.
             && ptrack.numberOfValidHits() >= 11
