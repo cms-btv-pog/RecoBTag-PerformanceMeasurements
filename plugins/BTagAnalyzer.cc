@@ -1,4 +1,4 @@
-#include "RecoBTag/PerformanceMeasurements/interface/BTagAnalyzer.h"
+#include "RecoBTag/PerformanceMeasurements/plugins/BTagAnalyzer.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 #include "FWCore/Common/interface/Provenance.h"
