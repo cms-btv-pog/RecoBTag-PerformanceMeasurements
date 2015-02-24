@@ -240,7 +240,7 @@ toGet = cms.VPSet(cms.PSet(
 record = cms.string('BTauGenericMVAJetTagComputerRcd'),
                 tag = cms.string('MVAJetTags_620SLHCX')
 )),
-connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags_620SLHCX_Phase1And2Upgrade.db'),
+connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags_620SLHCX_Phase1And2Upgrade_v2.db'),
 BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
 )
 process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
@@ -720,7 +720,7 @@ process.pfJetsPFlow.rParam = cms.double(0.4)
 process.jetTracksAssociatorAtVertexPFlow.coneSize = cms.double(0.4)
 
 ## Select JEC version
-jec='PhaseII_Shashlik140PU'
+jec='PhaseII_Shashlik140PU_v2'
 #jec = 'DES19_V1_MC'
 #jec = 'AGE1K_V1_MC'
 
