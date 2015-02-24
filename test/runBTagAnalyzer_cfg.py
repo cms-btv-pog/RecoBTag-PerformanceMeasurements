@@ -187,7 +187,8 @@ process.source = cms.Source(
         # /PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/GEM2019Upg14DR-final_phase1_PU50bx25_DES19_62_V8-v1/AODSIM
         ##'/store/mc/GEM2019Upg14DR/PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/AODSIM/final_phase1_PU50bx25_DES19_62_V8-v1/00000/009500C4-A821-E411-8E47-02163E00E7E0.root'
         # /PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/GEM2019Upg14DR-final_phase1_age1k_PU140bx25_PH1_1K_FB_V2-v1/AODSIM
-        '/store/mc/GEM2019Upg14DR/PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/AODSIM/final_phase1_age1k_PU140bx25_PH1_1K_FB_V2-v1/00000/00746114-E31F-E411-B4BC-002618FDA211.root'
+        #'/store/mc/GEM2019Upg14DR/PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/AODSIM/final_phase1_age1k_PU140bx25_PH1_1K_FB_V2-v1/00000/00746114-E31F-E411-B4BC-002618FDA211.root'
+        '/store/mc/GEM2019Upg14DR/DYToMuMu_M-20_TuneZ2star_14TeV-pythia6-tauola/AODSIM/final_phase1_age1k_PU140bx25_PH1_1K_FB_V2-v1/00000/007B34CC-331F-E411-BD67-002618943918.root'
         # /RelValTTbar_14TeV/CMSSW_6_2_0_SLHC11-DES23_62_V1_UPG2023Muon-v1/GEN-SIM-RECO
         #'/store/relval/CMSSW_6_2_0_SLHC11/RelValTTbar_14TeV/GEN-SIM-RECO/DES23_62_V1_UPG2023Muon-v1/00000/2AEE7860-67C6-E311-AEB4-0025905964B4.root'
     )
@@ -240,7 +241,7 @@ toGet = cms.VPSet(cms.PSet(
 record = cms.string('BTauGenericMVAJetTagComputerRcd'),
                 tag = cms.string('MVAJetTags_620SLHCX')
 )),
-connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags_620SLHCX_Phase1And2Upgrade.db'),
+connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags_620SLHCX_Phase1And2Upgrade_v2.db'),
 BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
 )
 process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
