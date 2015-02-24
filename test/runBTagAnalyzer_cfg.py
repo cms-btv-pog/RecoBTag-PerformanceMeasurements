@@ -721,7 +721,7 @@ process.pfJetsPFlow.rParam = cms.double(0.4)
 process.jetTracksAssociatorAtVertexPFlow.coneSize = cms.double(0.4)
 
 ## Select JEC version
-jec='PhaseII_Shashlik140PU'
+jec='PhaseII_Shashlik140PU_v2'
 #jec = 'DES19_V1_MC'
 #jec = 'AGE1K_V1_MC'
 
