@@ -142,7 +142,7 @@ class simPrimaryVertex {
     std::vector<int> simTrackIndex;
     std::vector<int> genVertex;
     const reco::Vertex *recVtx;
-  };
+};
 
 const math::XYZPoint & position(const reco::Vertex & sv) {return sv.position();}
 const math::XYZPoint & position(const reco::VertexCompositePtrCandidate & sv) {return sv.vertex();}
@@ -253,27 +253,9 @@ private:
   std::string combinedSVNegBJetTags_;
   std::string combinedSVPosBJetTags_;
   
-  std::string combinedSVRetrainedBJetTags_;
-  std::string combinedSVRetrainedNegBJetTags_;
-  std::string combinedSVRetrainedPosBJetTags_;
-  
-  std::string combinedCSVJPBJetTags_;
-  std::string combinedCSVJPNegBJetTags_;
-  std::string combinedCSVJPPosBJetTags_;
-  
-  std::string combinedCSVSLBJetTags_;
-  std::string combinedCSVSLNegBJetTags_;
-  std::string combinedCSVSLPosBJetTags_;
-  
-  std::string combinedCSVJPSLBJetTags_;
-  std::string combinedCSVJPSLNegBJetTags_;
-  std::string combinedCSVJPSLPosBJetTags_;
-  
-  std::string simpleIVFSVHighPurBJetTags_;
-  std::string simpleIVFSVHighEffBJetTags_;
-  std::string doubleIVFSVHighEffBJetTags_;
   std::string combinedIVFSVBJetTags_;
   std::string combinedIVFSVPosBJetTags_;
+  std::string combinedIVFSVNegBJetTags_;
   
   std::string simpleSVHighEffBJetTags_;
   std::string simpleSVNegHighEffBJetTags_;
@@ -356,7 +338,7 @@ private:
 
   const GenericMVAJetTagComputer *computer ;
   
-  edm::View<reco::Muon> muons ;
+  //edm::View<reco::Muon> muons ;
 
   edm::ESHandle<TransientTrackBuilder> trackBuilder ;
   edm::Handle<reco::VertexCollection> primaryVertex ;
@@ -461,27 +443,9 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   combinedSVNegBJetTags_  = iConfig.getParameter<std::string>("combinedSVNegBJetTags");
   combinedSVPosBJetTags_  = iConfig.getParameter<std::string>("combinedSVPosBJetTags");
 
-  combinedSVRetrainedBJetTags_     = iConfig.getParameter<std::string>("combinedSVRetrainedBJetTags");
-  combinedSVRetrainedNegBJetTags_  = iConfig.getParameter<std::string>("combinedSVRetrainedNegBJetTags");
-  combinedSVRetrainedPosBJetTags_  = iConfig.getParameter<std::string>("combinedSVRetrainedPosBJetTags");
-
-  combinedCSVJPBJetTags_     = iConfig.getParameter<std::string>("combinedCSVJPBJetTags");
-  combinedCSVJPNegBJetTags_  = iConfig.getParameter<std::string>("combinedCSVJPNegBJetTags");
-  combinedCSVJPPosBJetTags_  = iConfig.getParameter<std::string>("combinedCSVJPPosBJetTags");
-
-  combinedCSVSLBJetTags_     = iConfig.getParameter<std::string>("combinedCSVSLBJetTags");
-  combinedCSVSLNegBJetTags_  = iConfig.getParameter<std::string>("combinedCSVSLNegBJetTags");
-  combinedCSVSLPosBJetTags_  = iConfig.getParameter<std::string>("combinedCSVSLPosBJetTags");
-
-  combinedCSVJPSLBJetTags_     = iConfig.getParameter<std::string>("combinedCSVJPSLBJetTags");
-  combinedCSVJPSLNegBJetTags_  = iConfig.getParameter<std::string>("combinedCSVJPSLNegBJetTags");
-  combinedCSVJPSLPosBJetTags_  = iConfig.getParameter<std::string>("combinedCSVJPSLPosBJetTags");
-
-  simpleIVFSVHighPurBJetTags_ = iConfig.getParameter<std::string>("simpleIVFSVHighPurBJetTags");
-  simpleIVFSVHighEffBJetTags_ = iConfig.getParameter<std::string>("simpleIVFSVHighEffBJetTags");
-  doubleIVFSVHighEffBJetTags_ = iConfig.getParameter<std::string>("doubleIVFSVHighEffBJetTags");
   combinedIVFSVBJetTags_      = iConfig.getParameter<std::string>("combinedIVFSVBJetTags");
   combinedIVFSVPosBJetTags_   = iConfig.getParameter<std::string>("combinedIVFSVPosBJetTags");
+  combinedIVFSVNegBJetTags_   = iConfig.getParameter<std::string>("combinedIVFSVNegBJetTags");
 
   //softMuonBJetTags_       = iConfig.getParameter<std::string>("softMuonBJetTags");
   //softMuonNegBJetTags_    = iConfig.getParameter<std::string>("softMuonNegBJetTags");
@@ -1195,9 +1159,9 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   //------------------------------------------------------
   // Muons
   //------------------------------------------------------
-  edm::Handle<edm::View<reco::Muon> >  muonsHandle;
-  iEvent.getByLabel(muonCollectionName_,muonsHandle);
-  muons = *muonsHandle;
+  //edm::Handle<edm::View<reco::Muon> >  muonsHandle;
+  //iEvent.getByLabel(muonCollectionName_,muonsHandle);
+  //muons = *muonsHandle;
 
   //----------------------------------------
   // Transient track for IP calculation
@@ -1916,7 +1880,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
             JetInfo[iJetColl].TrkInc_pt[JetInfo[iJetColl].nTrkInc]    = ptrack.pt();
             JetInfo[iJetColl].TrkInc_eta[JetInfo[iJetColl].nTrkInc]   = ptrack.eta();
             JetInfo[iJetColl].TrkInc_phi[JetInfo[iJetColl].nTrkInc]   = ptrack.phi();
-            //soft//JetInfo[iJetColl].TrkInc_ptrel[JetInfo[iJetColl].nTrkInc] = calculPtRel( ptrack , *pjet);
+            JetInfo[iJetColl].TrkInc_ptrel[JetInfo[iJetColl].nTrkInc] = 0; //softcalculPtRel( ptrack , *pjet);
 
             ++JetInfo[iJetColl].nTrkInc;
           }
@@ -1947,27 +1911,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float CombinedSvtxN = pjet->bDiscriminator(combinedSVNegBJetTags_.c_str());
     float CombinedSvtxP = pjet->bDiscriminator(combinedSVPosBJetTags_.c_str());
 
-    float RetCombinedSvtx  = pjet->bDiscriminator(combinedSVRetrainedBJetTags_.c_str());
-    float RetCombinedSvtxN = pjet->bDiscriminator(combinedSVRetrainedNegBJetTags_.c_str());
-    float RetCombinedSvtxP = pjet->bDiscriminator(combinedSVRetrainedPosBJetTags_.c_str());
-
-    float CombinedCSVJP  = pjet->bDiscriminator(combinedCSVJPBJetTags_.c_str());
-    float CombinedCSVJPN = pjet->bDiscriminator(combinedCSVJPNegBJetTags_.c_str());
-    float CombinedCSVJPP = pjet->bDiscriminator(combinedCSVJPPosBJetTags_.c_str());
-
-    float CombinedCSVSL  = pjet->bDiscriminator(combinedCSVSLBJetTags_.c_str());
-    float CombinedCSVSLN = pjet->bDiscriminator(combinedCSVSLNegBJetTags_.c_str());
-    float CombinedCSVSLP = pjet->bDiscriminator(combinedCSVSLPosBJetTags_.c_str());
-
-    float CombinedCSVJPSL  = pjet->bDiscriminator(combinedCSVJPSLBJetTags_.c_str());
-    float CombinedCSVJPSLN = pjet->bDiscriminator(combinedCSVJPSLNegBJetTags_.c_str());
-    float CombinedCSVJPSLP = pjet->bDiscriminator(combinedCSVJPSLPosBJetTags_.c_str());
-
-    float SimpleIVF_HP    = pjet->bDiscriminator(simpleIVFSVHighPurBJetTags_.c_str());
-    float SimpleIVF_HE    = pjet->bDiscriminator(simpleIVFSVHighEffBJetTags_.c_str());
-    float DoubleIVF_HE    = pjet->bDiscriminator(doubleIVFSVHighEffBJetTags_.c_str());
     float CombinedIVF     = pjet->bDiscriminator(combinedIVFSVBJetTags_.c_str());
     float CombinedIVF_P   = pjet->bDiscriminator(combinedIVFSVPosBJetTags_.c_str());
+    float CombinedIVF_N   = pjet->bDiscriminator(combinedIVFSVNegBJetTags_.c_str());
 
     float Svtx    = pjet->bDiscriminator(simpleSVHighEffBJetTags_.c_str());
     float SvtxN   = pjet->bDiscriminator(simpleSVNegHighEffBJetTags_.c_str());
@@ -1985,7 +1931,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].PFMuon_pt[JetInfo[iJetColl].nPFMuon]        = softPFMuTagInfo->lepton(leptIdx)->pt();
       JetInfo[iJetColl].PFMuon_eta[JetInfo[iJetColl].nPFMuon]       = softPFMuTagInfo->lepton(leptIdx)->eta();
       JetInfo[iJetColl].PFMuon_phi[JetInfo[iJetColl].nPFMuon]       = softPFMuTagInfo->lepton(leptIdx)->phi();
-      //soft//JetInfo[iJetColl].PFMuon_ptrel[JetInfo[iJetColl].nPFMuon]     = calculPtRel( *(softPFMuTagInfo->lepton(leptIdx)), *pjet );
+      JetInfo[iJetColl].PFMuon_ptrel[JetInfo[iJetColl].nPFMuon]     = 0; //softcalculPtRel( *(softPFMuTagInfo->lepton(leptIdx)), *pjet );
       JetInfo[iJetColl].PFMuon_ratio[JetInfo[iJetColl].nPFMuon]     = (softPFMuTagInfo->properties(leptIdx).ratio);
       JetInfo[iJetColl].PFMuon_ratioRel[JetInfo[iJetColl].nPFMuon]  = (softPFMuTagInfo->properties(leptIdx).ratioRel);
       JetInfo[iJetColl].PFMuon_deltaR[JetInfo[iJetColl].nPFMuon]    = (softPFMuTagInfo->properties(leptIdx).deltaR);
@@ -1993,54 +1939,57 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].PFMuon_IP2D[JetInfo[iJetColl].nPFMuon]      = (softPFMuTagInfo->properties(leptIdx).sip2d);
 
       JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 0;
-      //soft//int muIdx = matchMuon( softPFMuTagInfo->lepton(leptIdx), muons );
-      //soft//if ( muIdx != -1 && muons[muIdx].isGlobalMuon() == 1 ) {
+      //FIXME muons int muIdx = -1;//soft matchMuon( softPFMuTagInfo->lepton(leptIdx), muons );
+      //FIXME muons
+      /*if ( muIdx != -1 && muons[muIdx].isGlobalMuon() == 1 ) {
 
-        //soft//JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 1;
+        JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 1;
 
-        //soft//if (muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits()>0 &&
-        //soft//    muons[muIdx].numberOfMatches()>1 && muons[muIdx].innerTrack()->hitPattern().numberOfValidHits()>10 &&
-       //soft//     muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits()>1 &&
-        //soft//    muons[muIdx].innerTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_OUTER_HITS)<3 &&
-        //soft//    muons[muIdx].globalTrack()->normalizedChi2()<10. && muons[muIdx].innerTrack()->normalizedChi2()<10.)
-       //soft//   JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 2;
+        if (muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits()>0 &&
+            muons[muIdx].numberOfMatches()>1 && muons[muIdx].innerTrack()->hitPattern().numberOfValidHits()>10 &&
+	    muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits()>1 &&
+	    muons[muIdx].innerTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_OUTER_HITS)<3 &&
+	    muons[muIdx].globalTrack()->normalizedChi2()<10. && muons[muIdx].innerTrack()->normalizedChi2()<10.)
+          JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 2;
 
-      //soft//}
+	  }*/
       ++JetInfo[iJetColl].nPFMuon;
     }
 
     // Old soft muon information for perfomance study safety
     for (unsigned int leptIdx = 0; leptIdx < softMuTagInfo->leptons(); ++leptIdx){
 
-     //soft// int muIdx = matchMuon( softMuTagInfo->lepton(leptIdx), muons );
-      //soft//if ( muIdx != -1 && muons[muIdx].isGlobalMuon() ) {
-      //soft//  JetInfo[iJetColl].Muon_IdxJet[JetInfo[iJetColl].nMuon]   = JetInfo[iJetColl].nJet;
-        //soft//JetInfo[iJetColl].Muon_ptrel[JetInfo[iJetColl].nMuon]    = calculPtRel( *(softMuTagInfo->lepton(leptIdx)), *pjet );
-      //soft//  JetInfo[iJetColl].Muon_nTkHit[JetInfo[iJetColl].nMuon]   = muons[muIdx].innerTrack()->hitPattern().numberOfValidHits();
-       //soft// JetInfo[iJetColl].Muon_nPixHit[JetInfo[iJetColl].nMuon]  = muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits();
-        //soft//JetInfo[iJetColl].Muon_nOutHit[JetInfo[iJetColl].nMuon]  = muons[muIdx].innerTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_OUTER_HITS);
-        //soft//JetInfo[iJetColl].Muon_nMuHit[JetInfo[iJetColl].nMuon]   = muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits();
-        //soft//JetInfo[iJetColl].Muon_chi2[JetInfo[iJetColl].nMuon]     = muons[muIdx].globalTrack()->normalizedChi2();
-        //soft//JetInfo[iJetColl].Muon_chi2Tk[JetInfo[iJetColl].nMuon]   = muons[muIdx].innerTrack()->normalizedChi2();
-        //soft//JetInfo[iJetColl].Muon_pt[JetInfo[iJetColl].nMuon]       = muons[muIdx].pt();
-        //soft//JetInfo[iJetColl].Muon_eta[JetInfo[iJetColl].nMuon]      = muons[muIdx].eta();
-        //soft//JetInfo[iJetColl].Muon_phi[JetInfo[iJetColl].nMuon]      = muons[muIdx].phi();
-        //soft//JetInfo[iJetColl].Muon_ratio[JetInfo[iJetColl].nMuon]    = (softMuTagInfo->properties(leptIdx).ratio);
-        //soft//JetInfo[iJetColl].Muon_ratioRel[JetInfo[iJetColl].nMuon] = (softMuTagInfo->properties(leptIdx).ratioRel);
-        //soft//JetInfo[iJetColl].Muon_deltaR[JetInfo[iJetColl].nMuon]   = (softMuTagInfo->properties(leptIdx).deltaR);
+      //FIXME muonsint muIdx = -1;//soft matchMuon( softMuTagInfo->lepton(leptIdx), muons );
+      //FIXME muons
+      /*
+      if ( muIdx != -1 && muons[muIdx].isGlobalMuon() ) {
+        JetInfo[iJetColl].Muon_IdxJet[JetInfo[iJetColl].nMuon]   = JetInfo[iJetColl].nJet;
+        JetInfo[iJetColl].Muon_ptrel[JetInfo[iJetColl].nMuon]    = 0;//softcalculPtRel( *(softMuTagInfo->lepton(leptIdx)), *pjet );
+        JetInfo[iJetColl].Muon_nTkHit[JetInfo[iJetColl].nMuon]   = muons[muIdx].innerTrack()->hitPattern().numberOfValidHits();
+        JetInfo[iJetColl].Muon_nPixHit[JetInfo[iJetColl].nMuon]  = muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits();
+        JetInfo[iJetColl].Muon_nOutHit[JetInfo[iJetColl].nMuon]  = muons[muIdx].innerTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_OUTER_HITS);
+        JetInfo[iJetColl].Muon_nMuHit[JetInfo[iJetColl].nMuon]   = muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits();
+        JetInfo[iJetColl].Muon_chi2[JetInfo[iJetColl].nMuon]     = muons[muIdx].globalTrack()->normalizedChi2();
+        JetInfo[iJetColl].Muon_chi2Tk[JetInfo[iJetColl].nMuon]   = muons[muIdx].innerTrack()->normalizedChi2();
+        JetInfo[iJetColl].Muon_pt[JetInfo[iJetColl].nMuon]       = muons[muIdx].pt();
+        JetInfo[iJetColl].Muon_eta[JetInfo[iJetColl].nMuon]      = muons[muIdx].eta();
+        JetInfo[iJetColl].Muon_phi[JetInfo[iJetColl].nMuon]      = muons[muIdx].phi();
+        JetInfo[iJetColl].Muon_ratio[JetInfo[iJetColl].nMuon]    = (softMuTagInfo->properties(leptIdx).ratio);
+        JetInfo[iJetColl].Muon_ratioRel[JetInfo[iJetColl].nMuon] = (softMuTagInfo->properties(leptIdx).ratioRel);
+        JetInfo[iJetColl].Muon_deltaR[JetInfo[iJetColl].nMuon]   = (softMuTagInfo->properties(leptIdx).deltaR);
 
-       //soft// JetInfo[iJetColl].Muon_isGlobal[JetInfo[iJetColl].nMuon] = 1;
-        //soft//JetInfo[iJetColl].Muon_nMatched[JetInfo[iJetColl].nMuon] = muons[muIdx].numberOfMatches() ;
-        //soft//JetInfo[iJetColl].Muon_vz[JetInfo[iJetColl].nMuon]       = muons[muIdx].vz();
-        //soft//int mutkid = getMuonTk(muons[muIdx].innerTrack()->pt(), iJetColl);
-        //soft//JetInfo[iJetColl].Muon_TrackIdx[JetInfo[iJetColl].nMuon] = ( mutkid>=0 ? mutkid: -1 );
+        JetInfo[iJetColl].Muon_isGlobal[JetInfo[iJetColl].nMuon] = 1;
+        JetInfo[iJetColl].Muon_nMatched[JetInfo[iJetColl].nMuon] = muons[muIdx].numberOfMatches() ;
+        JetInfo[iJetColl].Muon_vz[JetInfo[iJetColl].nMuon]       = muons[muIdx].vz();
+        int mutkid = -1;//soft getMuonTk(muons[muIdx].innerTrack()->pt(), iJetColl);
+        JetInfo[iJetColl].Muon_TrackIdx[JetInfo[iJetColl].nMuon] = ( mutkid>=0 ? mutkid: -1 );
 
-        //soft//JetInfo[iJetColl].Muon_Proba[JetInfo[iJetColl].nMuon] = -100.;
-        //soft//if ( mutkid >= 0 ) {
-          //soft//JetInfo[iJetColl].Muon_Proba[JetInfo[iJetColl].nMuon] = JetInfo[iJetColl].Track_Proba[mutkid];
-        //soft//}
+        JetInfo[iJetColl].Muon_Proba[JetInfo[iJetColl].nMuon] = -100.;
+        if ( mutkid >= 0 ) {
+          JetInfo[iJetColl].Muon_Proba[JetInfo[iJetColl].nMuon] = JetInfo[iJetColl].Track_Proba[mutkid];
+	  }
 
-        //soft//JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] = 0;
+	  JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] = 0;*/
         //history//if ( useTrackHistory_ && !isData_ ) {
            //history//TrackCategories::Flags theFlagP = classifier_.evaluate( softMuTagInfo->lepton(leptIdx) ).flags();
            //history//if ( theFlagP[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 1));
@@ -2057,18 +2006,20 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         //---------------------------------
         // calculate IP/s of muons' tracks
         //---------------------------------
-        //soft//reco::TransientTrack tt = trackBuilder->build(muons[muIdx].innerTrack());
-        //soft//GlobalVector direction(pjet->px(), pjet->py(), pjet->pz());
-        //soft//Measurement1D ip   = IPTools::signedImpactParameter3D(tt, direction, (*primaryVertex)[0]).second;
-        //soft//Measurement1D ip2d = IPTools::signedTransverseImpactParameter(tt, direction, (*primaryVertex)[0]).second;
+	/*FIXME muons
+        reco::TransientTrack tt = trackBuilder->build(muons[muIdx].innerTrack());
+        GlobalVector direction(pjet->px(), pjet->py(), pjet->pz());
+        Measurement1D ip   = IPTools::signedImpactParameter3D(tt, direction, (*primaryVertex)[0]).second;
+        Measurement1D ip2d = IPTools::signedTransverseImpactParameter(tt, direction, (*primaryVertex)[0]).second;
 
-        //soft//JetInfo[iJetColl].Muon_IP[JetInfo[iJetColl].nMuon]   = ip.value();
-        //soft//JetInfo[iJetColl].Muon_IP2D[JetInfo[iJetColl].nMuon] = ip2d.value();
-        //soft//JetInfo[iJetColl].Muon_IPsig[JetInfo[iJetColl].nMuon]   = (ip.value())/(ip.error());
-       //soft// JetInfo[iJetColl].Muon_IP2Dsig[JetInfo[iJetColl].nMuon] = (ip2d.value())/(ip2d.error());
-
-        //soft//++JetInfo[iJetColl].nMuon;
-      //soft//}
+        JetInfo[iJetColl].Muon_IP[JetInfo[iJetColl].nMuon]   = ip.value();
+        JetInfo[iJetColl].Muon_IP2D[JetInfo[iJetColl].nMuon] = ip2d.value();
+        JetInfo[iJetColl].Muon_IPsig[JetInfo[iJetColl].nMuon]   = (ip.value())/(ip.error());
+        JetInfo[iJetColl].Muon_IP2Dsig[JetInfo[iJetColl].nMuon] = (ip2d.value())/(ip2d.error());
+	
+        ++JetInfo[iJetColl].nMuon;
+	}*/
+  
     }
 
     float SoftE  = pjet->bDiscriminator(softPFElectronBJetTags_.c_str());
@@ -2082,7 +2033,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].PFElectron_pt[JetInfo[iJetColl].nPFElectron]        = softPFElTagInfo->lepton(leptIdx)->pt();
       JetInfo[iJetColl].PFElectron_eta[JetInfo[iJetColl].nPFElectron]       = softPFElTagInfo->lepton(leptIdx)->eta();
       JetInfo[iJetColl].PFElectron_phi[JetInfo[iJetColl].nPFElectron]       = softPFElTagInfo->lepton(leptIdx)->phi();
-      //soft//JetInfo[iJetColl].PFElectron_ptrel[JetInfo[iJetColl].nPFElectron]     = calculPtRel( *(softPFElTagInfo->lepton(leptIdx)), *pjet );
+      JetInfo[iJetColl].PFElectron_ptrel[JetInfo[iJetColl].nPFElectron]     = 0;//soft calculPtRel( *(softPFElTagInfo->lepton(leptIdx)), *pjet );
       JetInfo[iJetColl].PFElectron_ratio[JetInfo[iJetColl].nPFElectron]     = (softPFElTagInfo->properties(leptIdx).ratio);
       JetInfo[iJetColl].PFElectron_ratioRel[JetInfo[iJetColl].nPFElectron]  = (softPFElTagInfo->properties(leptIdx).ratioRel);
       JetInfo[iJetColl].PFElectron_deltaR[JetInfo[iJetColl].nPFElectron]    = (softPFElTagInfo->properties(leptIdx).deltaR);
@@ -2107,23 +2058,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] = CombinedSvtxN;
     JetInfo[iJetColl].Jet_CombSvxP[JetInfo[iJetColl].nJet] = CombinedSvtxP;
     JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet]  = CombinedSvtx;
-    JetInfo[iJetColl].Jet_RetCombSvxN[JetInfo[iJetColl].nJet] = RetCombinedSvtxN;
-    JetInfo[iJetColl].Jet_RetCombSvxP[JetInfo[iJetColl].nJet] = RetCombinedSvtxP;
-    JetInfo[iJetColl].Jet_RetCombSvx[JetInfo[iJetColl].nJet]  = RetCombinedSvtx;
-    JetInfo[iJetColl].Jet_CombCSVJP_N[JetInfo[iJetColl].nJet] = CombinedCSVJPN;
-    JetInfo[iJetColl].Jet_CombCSVJP_P[JetInfo[iJetColl].nJet] = CombinedCSVJPP;
-    JetInfo[iJetColl].Jet_CombCSVJP[JetInfo[iJetColl].nJet]  = CombinedCSVJP;
-    JetInfo[iJetColl].Jet_CombCSVSL_N[JetInfo[iJetColl].nJet] = CombinedCSVSLN;
-    JetInfo[iJetColl].Jet_CombCSVSL_P[JetInfo[iJetColl].nJet] = CombinedCSVSLP;
-    JetInfo[iJetColl].Jet_CombCSVSL[JetInfo[iJetColl].nJet]  = CombinedCSVSL;
-    JetInfo[iJetColl].Jet_CombCSVJPSL_N[JetInfo[iJetColl].nJet] = CombinedCSVJPSLN;
-    JetInfo[iJetColl].Jet_CombCSVJPSL_P[JetInfo[iJetColl].nJet] = CombinedCSVJPSLP;
-    JetInfo[iJetColl].Jet_CombCSVJPSL[JetInfo[iJetColl].nJet]  = CombinedCSVJPSL;
-    JetInfo[iJetColl].Jet_SimpIVF_HP[JetInfo[iJetColl].nJet]  = SimpleIVF_HP;
-    JetInfo[iJetColl].Jet_SimpIVF_HE[JetInfo[iJetColl].nJet]  = SimpleIVF_HE;
-    JetInfo[iJetColl].Jet_DoubIVF_HE[JetInfo[iJetColl].nJet]  = DoubleIVF_HE;
     JetInfo[iJetColl].Jet_CombIVF[JetInfo[iJetColl].nJet]     = CombinedIVF;
     JetInfo[iJetColl].Jet_CombIVF_P[JetInfo[iJetColl].nJet]   = CombinedIVF_P;
+    JetInfo[iJetColl].Jet_CombIVF_N[JetInfo[iJetColl].nJet]   = CombinedIVF_N;
     JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet]  = SoftMN;
     JetInfo[iJetColl].Jet_SoftMuP[JetInfo[iJetColl].nJet]  = SoftMP;
     JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet]   = SoftM;
@@ -2207,8 +2144,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       for(int svIdx=0; svIdx < nSVs; ++svIdx)
       {
         JetInfo[iJetColl].TagVar_vertexMass[JetInfo[iJetColl].nSVTagVar + svIdx]    = svTagInfo->secondaryVertex(svIdx).p4().mass();
-	//FIXME 
-        //JetInfo[iJetColl].TagVar_vertexNTracks[JetInfo[iJetColl].nSVTagVar + svIdx] = svTagInfo->secondaryVertex(svIdx).nTracks();
+        JetInfo[iJetColl].TagVar_vertexNTracks[JetInfo[iJetColl].nSVTagVar + svIdx] = 0;//FIXMEnTracks(svTagInfo->secondaryVertex(svIdx));
       }
       tagValList = svVars.getList(reco::btau::vertexJetDeltaR,false);
       if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].TagVar_vertexJetDeltaR[JetInfo[iJetColl].nSVTagVar] );
@@ -2476,7 +2412,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].SV_flightErr[JetInfo[iJetColl].nSV]   = svTagInfo->flightDistance(vtx).error();
       JetInfo[iJetColl].SV_flight2D[JetInfo[iJetColl].nSV]    = svTagInfo->flightDistance(vtx, true).value();
       JetInfo[iJetColl].SV_flight2DErr[JetInfo[iJetColl].nSV] = svTagInfo->flightDistance(vtx, true).error();
-      JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = nTracks(svTagInfo->secondaryVertex(vtx));
+      JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = 0;//FIXMEnTracks(svTagInfo->secondaryVertex(vtx));
 
 
       const Vertex &vertex = svTagInfo->secondaryVertex(vtx);
@@ -2542,7 +2478,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       //history//}
     //history//}
 
-    reco::TrackRefVector svxNegtracks( pjet->tagInfoSecondaryVertex("secondaryVertexNegative")->vertexTracks(0) );
+    //reco::TrackRefVector svxNegtracks( pjet->tagInfoSecondaryVertex("secondaryVertexNegative")->vertexTracks(0) );
 
     //history//if ( useTrackHistory_ && !isData_ ) {
       //history//for (unsigned int i=0; i<svxNegtracks.size(); ++i) {

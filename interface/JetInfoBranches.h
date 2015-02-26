@@ -44,23 +44,9 @@ class JetInfoBranches {
     float Jet_CombSvxN[nMaxJets_];
     float Jet_CombSvxP[nMaxJets_];
     float Jet_CombSvx[nMaxJets_];
-    float Jet_RetCombSvxN[nMaxJets_];
-    float Jet_RetCombSvxP[nMaxJets_];
-    float Jet_RetCombSvx[nMaxJets_];
-    float Jet_CombCSVJP_N[nMaxJets_];
-    float Jet_CombCSVJP_P[nMaxJets_];
-    float Jet_CombCSVJP[nMaxJets_];
-    float Jet_CombCSVSL_N[nMaxJets_];
-    float Jet_CombCSVSL_P[nMaxJets_];
-    float Jet_CombCSVSL[nMaxJets_];
-    float Jet_CombCSVJPSL_N[nMaxJets_];
-    float Jet_CombCSVJPSL_P[nMaxJets_];
-    float Jet_CombCSVJPSL[nMaxJets_];
-    float Jet_SimpIVF_HP[nMaxJets_];
-    float Jet_SimpIVF_HE[nMaxJets_];
-    float Jet_DoubIVF_HE[nMaxJets_];
     float Jet_CombIVF[nMaxJets_];
     float Jet_CombIVF_P[nMaxJets_];
+    float Jet_CombIVF_N[nMaxJets_];
     float Jet_SoftMuN[nMaxJets_];
     float Jet_SoftMuP[nMaxJets_];
     float Jet_SoftMu[nMaxJets_];
@@ -356,27 +342,9 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_CombSvxP").c_str(),    Jet_CombSvxP   ,(name+"Jet_CombSvxP["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_CombSvx").c_str(),     Jet_CombSvx    ,(name+"Jet_CombSvx["+name+"nJet]/F").c_str());
 
-      tree->Branch((name+"Jet_RetCombSvxN").c_str(), Jet_RetCombSvxN   ,(name+"Jet_RetCombSvxN["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_RetCombSvxP").c_str(), Jet_RetCombSvxP   ,(name+"Jet_RetCombSvxP["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_RetCombSvx").c_str(),  Jet_RetCombSvx    ,(name+"Jet_RetCombSvx["+name+"nJet]/F").c_str());
-
-      // tree->Branch((name+"Jet_CombCSVJP_N").c_str(), Jet_CombCSVJP_N   ,(name+"Jet_CombCSVJP_N["+name+"nJet]/F").c_str());
-      // tree->Branch((name+"Jet_CombCSVJP_P").c_str(), Jet_CombCSVJP_P   ,(name+"Jet_CombCSVJP_P["+name+"nJet]/F").c_str());
-      // tree->Branch((name+"Jet_CombCSVJP").c_str(),   Jet_CombCSVJP      ,(name+"Jet_CombCSVJP["+name+"nJet]/F").c_str());
-
-      tree->Branch((name+"Jet_CombCSVSL_N").c_str(), Jet_CombCSVSL_N    ,(name+"Jet_CombCSVSL_N["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_CombCSVSL_P").c_str(), Jet_CombCSVSL_P    ,(name+"Jet_CombCSVSL_P["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_CombCSVSL").c_str(),   Jet_CombCSVSL ,(name+"Jet_CombCSVSL["+name+"nJet]/F").c_str());
-
-      // tree->Branch((name+"Jet_CombCSVJPSL_N").c_str(), Jet_CombCSVJPSL_N  ,(name+"Jet_CombCSVJPSL_N["+name+"nJet]/F").c_str());
-      // tree->Branch((name+"Jet_CombCSVJPSL_P").c_str(), Jet_CombCSVJPSL_P  ,(name+"Jet_CombCSVJPSL_P["+name+"nJet]/F").c_str());
-      // tree->Branch((name+"Jet_CombCSVJPSL").c_str(), Jet_CombCSVJPSL    ,(name+"Jet_CombCSVJPSL["+name+"nJet]/F").c_str());
-
-      // tree->Branch((name+"Jet_SimpIVF_HP").c_str(),  Jet_SimpIVF_HP  ,(name+"Jet_SimpIVF_HP["+name+"nJet]/F").c_str());
-      // tree->Branch((name+"Jet_SimpIVF_HE").c_str(),  Jet_SimpIVF_HE  ,(name+"Jet_SimpIVF_HE["+name+"nJet]/F").c_str());
-      // tree->Branch((name+"Jet_DoubIVF_HE").c_str(),  Jet_DoubIVF_HE  ,(name+"Jet_DoubIVF_HE["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_CombIVF").c_str(),     Jet_CombIVF     ,(name+"Jet_CombIVF["+name+"nJet]/F").c_str());
-      // tree->Branch((name+"Jet_CombIVF_P").c_str(), Jet_CombIVF_P   ,(name+"Jet_CombIVF_P["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_CombIVF_P").c_str(), Jet_CombIVF_P   ,(name+"Jet_CombIVF_P["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_CombIVF_N").c_str(), Jet_CombIVF_N   ,(name+"Jet_CombIVF_N["+name+"nJet]/F").c_str());
 
       tree->Branch((name+"Jet_SoftMuN").c_str(),     Jet_SoftMuN     ,(name+"Jet_SoftMuN["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_SoftMuP").c_str(),     Jet_SoftMuP     ,(name+"Jet_SoftMuP["+name+"nJet]/F").c_str());
@@ -711,27 +679,9 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_CombSvxP").c_str(),    Jet_CombSvxP    );
       tree->SetBranchAddress((name+"Jet_CombSvx").c_str(),     Jet_CombSvx     );
 
-      tree->SetBranchAddress((name+"Jet_RetCombSvxN").c_str(), Jet_RetCombSvxN    );
-      tree->SetBranchAddress((name+"Jet_RetCombSvxP").c_str(), Jet_RetCombSvxP    );
-      tree->SetBranchAddress((name+"Jet_RetCombSvx").c_str(), Jet_RetCombSvx     );
-
-      // tree->SetBranchAddress((name+"Jet_CombCSVJP_N").c_str(), Jet_CombCSVJP_N    );
-      // tree->SetBranchAddress((name+"Jet_CombCSVJP_P").c_str(), Jet_CombCSVJP_P    );
-      // tree->SetBranchAddress((name+"Jet_CombCSVJP").c_str(),    Jet_CombCSVJP      );
-
-      tree->SetBranchAddress((name+"Jet_CombCSVSL_N").c_str(), Jet_CombCSVSL_N    );
-      tree->SetBranchAddress((name+"Jet_CombCSVSL_P").c_str(), Jet_CombCSVSL_P    );
-      tree->SetBranchAddress((name+"Jet_CombCSVSL").c_str(), Jet_CombCSVSL      );
-
-      // tree->SetBranchAddress((name+"Jet_CombCSVJPSL_N").c_str(), Jet_CombCSVJPSL_N  );
-      // tree->SetBranchAddress((name+"Jet_CombCSVJPSL_P").c_str(), Jet_CombCSVJPSL_P  );
-      // tree->SetBranchAddress((name+"Jet_CombCSVJPSL").c_str(), Jet_CombCSVJPSL    );
-
-      // tree->SetBranchAddress((name+"Jet_SimpIVF_HP").c_str(),  Jet_SimpIVF_HP  );
-      // tree->SetBranchAddress((name+"Jet_SimpIVF_HE").c_str(),  Jet_SimpIVF_HE  );
-      // tree->SetBranchAddress((name+"Jet_DoubIVF_HE").c_str(),  Jet_DoubIVF_HE  );
       tree->SetBranchAddress((name+"Jet_CombIVF").c_str(),     Jet_CombIVF     );
-      // tree->SetBranchAddress((name+"Jet_CombIVF_P").c_str(), Jet_CombIVF_P   );
+      tree->SetBranchAddress((name+"Jet_CombIVF_P").c_str(), Jet_CombIVF_P   );
+      tree->SetBranchAddress((name+"Jet_CombIVF_N").c_str(), Jet_CombIVF_N   );
 
       tree->SetBranchAddress((name+"Jet_SoftMuN").c_str(), Jet_SoftMuN     );
       tree->SetBranchAddress((name+"Jet_SoftMuP").c_str(), Jet_SoftMuP     );
