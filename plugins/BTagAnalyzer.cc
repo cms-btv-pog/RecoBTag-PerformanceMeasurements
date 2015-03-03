@@ -1355,7 +1355,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 {
 
   int numjet = 0;
-  JetInfo[iJetColl].nMuon = 0;
+  //JetInfo[iJetColl].nMuon = 0;
   JetInfo[iJetColl].nPFElectron = 0;
   JetInfo[iJetColl].nPFMuon = 0;
 
