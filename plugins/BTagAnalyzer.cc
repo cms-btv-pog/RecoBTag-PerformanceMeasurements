@@ -185,17 +185,16 @@ private:
   std::vector< float > getTrackProbabilies(std::vector< float > , const int );
   double calculProbability(std::vector< float > );
   
-  //soft//float calculPtRel(const reco::Track& theMuon, const pat::Jet& theJet);
+  float calculPtRel(const reco::Track& theMuon, const pat::Jet& theJet);
   
-  //soft//int matchMuon(const edm::RefToBase<reco::Track>& theMuon, const edm::View<reco::Muon>& muons);
+  int matchMuon(const edm::Ptr<reco::Candidate>& theMuon, const edm::View<reco::Muon>& muons);
   
   void setTracksPVBase(const reco::TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight);
   void setTracksPV(const TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight);
 
   void setTracksSV(const TrackRef & trackRef, const SVTagInfo *, int & isFromSV, int & iSV, float & SVweight);
   void vertexKinematicsAndChange(const Vertex & vertex, reco::TrackKinematics & vertexKinematics, Int_t & charge);
-  
-  //soft//int getMuonTk(double pt, const int);
+
   bool NameCompatible(const std::string& pattern, const std::string& name);
   
   std::vector<simPrimaryVertex> getSimPVs(const edm::Handle<edm::HepMCProduct>& evtMC);
@@ -338,7 +337,7 @@ private:
 
   const GenericMVAJetTagComputer *computer ;
   
-  //edm::View<reco::Muon> muons ;
+  edm::View<reco::Muon> muons ;
 
   edm::ESHandle<TransientTrackBuilder> trackBuilder ;
   edm::Handle<reco::VertexCollection> primaryVertex ;
@@ -446,10 +445,6 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   combinedIVFSVBJetTags_      = iConfig.getParameter<std::string>("combinedIVFSVBJetTags");
   combinedIVFSVPosBJetTags_   = iConfig.getParameter<std::string>("combinedIVFSVPosBJetTags");
   combinedIVFSVNegBJetTags_   = iConfig.getParameter<std::string>("combinedIVFSVNegBJetTags");
-
-  //softMuonBJetTags_       = iConfig.getParameter<std::string>("softMuonBJetTags");
-  //softMuonNegBJetTags_    = iConfig.getParameter<std::string>("softMuonNegBJetTags");
-  //softMuonTagInfoName_    = iConfig.getParameter<std::string>("softMuonTagInfoName");
 
   softPFMuonBJetTags_       = iConfig.getParameter<std::string>("softPFMuonBJetTags");
   softPFMuonNegBJetTags_    = iConfig.getParameter<std::string>("softPFMuonNegBJetTags");
@@ -1159,9 +1154,9 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   //------------------------------------------------------
   // Muons
   //------------------------------------------------------
-  //edm::Handle<edm::View<reco::Muon> >  muonsHandle;
-  //iEvent.getByLabel(muonCollectionName_,muonsHandle);
-  //muons = *muonsHandle;
+  edm::Handle<edm::View<reco::Muon> >  muonsHandle;
+  iEvent.getByLabel(muonCollectionName_,muonsHandle);
+  muons = *muonsHandle;
 
   //----------------------------------------
   // Transient track for IP calculation
@@ -1263,7 +1258,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
 
     //all//for(reco::TrackCollection::const_iterator trk = tracksHandle->begin(); trk != tracksHandle->end(); ++trk)
     //all//{
-      //all//EventInfo.TrkAll_d0[EventInfo.nTrkAll]        = trk->d0();
+      //all/EventInfo.TrkAll_d0[EventInfo.nTrkAll]        = trk->d0();
       //all//EventInfo.TrkAll_dz[EventInfo.nTrkAll]        = trk->dz();
       //all//EventInfo.TrkAll_p[EventInfo.nTrkAll]         = trk->p();
       //all//EventInfo.TrkAll_pt[EventInfo.nTrkAll]        = trk->pt();
@@ -1549,8 +1544,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     const SVTagInfo *svTagInfo = toSVTagInfo(*pjet,svTagInfos_);
     const reco::CandSoftLeptonTagInfo *softPFMuTagInfo = pjet->tagInfoCandSoftLepton(softPFMuonTagInfos_.c_str());
     const reco::CandSoftLeptonTagInfo *softPFElTagInfo = pjet->tagInfoCandSoftLepton(softPFElectronTagInfos_.c_str());
-    //FIXME
-    const reco::SoftLeptonTagInfo *softMuTagInfo   = pjet->tagInfoSoftLepton("softMuon");
+
     //*****************************************************************
     // Taggers
     //*****************************************************************
@@ -1612,7 +1606,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
       JetInfo[iJetColl].Track_dxy[JetInfo[iJetColl].nTrack]      = ptrack.dxy(pv->position());
       JetInfo[iJetColl].Track_dz[JetInfo[iJetColl].nTrack]       = ptrack.dz(pv->position());
-      JetInfo[iJetColl].Track_zIP[JetInfo[iJetColl].nTrack]      = ptrack.dz()-(*pv).z();
 
       float deta = ptrack.eta() - JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet];
       float dphi = ptrack.phi() - JetInfo[iJetColl].Jet_phi[JetInfo[iJetColl].nJet];
@@ -1870,7 +1863,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
             && ptrack.hitPattern().numberOfValidPixelHits() >= 2
             && ptrack.normalizedChi2() < 10
             && ptrack.hitPattern().numberOfHits(reco::HitPattern::MISSING_OUTER_HITS) <= 2
-            && ptrack.dz()-(*pv).z() < 1. ) {
+	     && ptrack.dz( pv->position() ) < 1. ) {
 
           if ( iJetColl != 1 ) {
             if ( useSelectedTracks_ ) {
@@ -1880,7 +1873,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
             JetInfo[iJetColl].TrkInc_pt[JetInfo[iJetColl].nTrkInc]    = ptrack.pt();
             JetInfo[iJetColl].TrkInc_eta[JetInfo[iJetColl].nTrkInc]   = ptrack.eta();
             JetInfo[iJetColl].TrkInc_phi[JetInfo[iJetColl].nTrkInc]   = ptrack.phi();
-            JetInfo[iJetColl].TrkInc_ptrel[JetInfo[iJetColl].nTrkInc] = 0; //softcalculPtRel( ptrack , *pjet);
+            JetInfo[iJetColl].TrkInc_ptrel[JetInfo[iJetColl].nTrkInc] = calculPtRel( ptrack , *pjet);
 
             ++JetInfo[iJetColl].nTrkInc;
           }
@@ -1931,7 +1924,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].PFMuon_pt[JetInfo[iJetColl].nPFMuon]        = softPFMuTagInfo->lepton(leptIdx)->pt();
       JetInfo[iJetColl].PFMuon_eta[JetInfo[iJetColl].nPFMuon]       = softPFMuTagInfo->lepton(leptIdx)->eta();
       JetInfo[iJetColl].PFMuon_phi[JetInfo[iJetColl].nPFMuon]       = softPFMuTagInfo->lepton(leptIdx)->phi();
-      JetInfo[iJetColl].PFMuon_ptrel[JetInfo[iJetColl].nPFMuon]     = 0; //softcalculPtRel( *(softPFMuTagInfo->lepton(leptIdx)), *pjet );
+      JetInfo[iJetColl].PFMuon_ptrel[JetInfo[iJetColl].nPFMuon]     = (softPFMuTagInfo->properties(leptIdx).ptRel);
       JetInfo[iJetColl].PFMuon_ratio[JetInfo[iJetColl].nPFMuon]     = (softPFMuTagInfo->properties(leptIdx).ratio);
       JetInfo[iJetColl].PFMuon_ratioRel[JetInfo[iJetColl].nPFMuon]  = (softPFMuTagInfo->properties(leptIdx).ratioRel);
       JetInfo[iJetColl].PFMuon_deltaR[JetInfo[iJetColl].nPFMuon]    = (softPFMuTagInfo->properties(leptIdx).deltaR);
@@ -1939,9 +1932,8 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].PFMuon_IP2D[JetInfo[iJetColl].nPFMuon]      = (softPFMuTagInfo->properties(leptIdx).sip2d);
 
       JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 0;
-      //FIXME muons int muIdx = -1;//soft matchMuon( softPFMuTagInfo->lepton(leptIdx), muons );
-      //FIXME muons
-      /*if ( muIdx != -1 && muons[muIdx].isGlobalMuon() == 1 ) {
+      int muIdx = matchMuon( softPFMuTagInfo->lepton(leptIdx), muons );
+      if ( muIdx != -1 && muons[muIdx].isGlobalMuon() == 1 ) {
 
         JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 1;
 
@@ -1952,74 +1944,8 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 	    muons[muIdx].globalTrack()->normalizedChi2()<10. && muons[muIdx].innerTrack()->normalizedChi2()<10.)
           JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 2;
 
-	  }*/
+      }
       ++JetInfo[iJetColl].nPFMuon;
-    }
-
-    // Old soft muon information for perfomance study safety
-    for (unsigned int leptIdx = 0; leptIdx < softMuTagInfo->leptons(); ++leptIdx){
-
-      //FIXME muonsint muIdx = -1;//soft matchMuon( softMuTagInfo->lepton(leptIdx), muons );
-      //FIXME muons
-      /*
-      if ( muIdx != -1 && muons[muIdx].isGlobalMuon() ) {
-        JetInfo[iJetColl].Muon_IdxJet[JetInfo[iJetColl].nMuon]   = JetInfo[iJetColl].nJet;
-        JetInfo[iJetColl].Muon_ptrel[JetInfo[iJetColl].nMuon]    = 0;//softcalculPtRel( *(softMuTagInfo->lepton(leptIdx)), *pjet );
-        JetInfo[iJetColl].Muon_nTkHit[JetInfo[iJetColl].nMuon]   = muons[muIdx].innerTrack()->hitPattern().numberOfValidHits();
-        JetInfo[iJetColl].Muon_nPixHit[JetInfo[iJetColl].nMuon]  = muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits();
-        JetInfo[iJetColl].Muon_nOutHit[JetInfo[iJetColl].nMuon]  = muons[muIdx].innerTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_OUTER_HITS);
-        JetInfo[iJetColl].Muon_nMuHit[JetInfo[iJetColl].nMuon]   = muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits();
-        JetInfo[iJetColl].Muon_chi2[JetInfo[iJetColl].nMuon]     = muons[muIdx].globalTrack()->normalizedChi2();
-        JetInfo[iJetColl].Muon_chi2Tk[JetInfo[iJetColl].nMuon]   = muons[muIdx].innerTrack()->normalizedChi2();
-        JetInfo[iJetColl].Muon_pt[JetInfo[iJetColl].nMuon]       = muons[muIdx].pt();
-        JetInfo[iJetColl].Muon_eta[JetInfo[iJetColl].nMuon]      = muons[muIdx].eta();
-        JetInfo[iJetColl].Muon_phi[JetInfo[iJetColl].nMuon]      = muons[muIdx].phi();
-        JetInfo[iJetColl].Muon_ratio[JetInfo[iJetColl].nMuon]    = (softMuTagInfo->properties(leptIdx).ratio);
-        JetInfo[iJetColl].Muon_ratioRel[JetInfo[iJetColl].nMuon] = (softMuTagInfo->properties(leptIdx).ratioRel);
-        JetInfo[iJetColl].Muon_deltaR[JetInfo[iJetColl].nMuon]   = (softMuTagInfo->properties(leptIdx).deltaR);
-
-        JetInfo[iJetColl].Muon_isGlobal[JetInfo[iJetColl].nMuon] = 1;
-        JetInfo[iJetColl].Muon_nMatched[JetInfo[iJetColl].nMuon] = muons[muIdx].numberOfMatches() ;
-        JetInfo[iJetColl].Muon_vz[JetInfo[iJetColl].nMuon]       = muons[muIdx].vz();
-        int mutkid = -1;//soft getMuonTk(muons[muIdx].innerTrack()->pt(), iJetColl);
-        JetInfo[iJetColl].Muon_TrackIdx[JetInfo[iJetColl].nMuon] = ( mutkid>=0 ? mutkid: -1 );
-
-        JetInfo[iJetColl].Muon_Proba[JetInfo[iJetColl].nMuon] = -100.;
-        if ( mutkid >= 0 ) {
-          JetInfo[iJetColl].Muon_Proba[JetInfo[iJetColl].nMuon] = JetInfo[iJetColl].Track_Proba[mutkid];
-	  }
-
-	  JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] = 0;*/
-        //history//if ( useTrackHistory_ && !isData_ ) {
-           //history//TrackCategories::Flags theFlagP = classifier_.evaluate( softMuTagInfo->lepton(leptIdx) ).flags();
-           //history//if ( theFlagP[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 1));
-           //history//if ( theFlagP[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 2));
-          //history//if ( theFlagP[TrackCategories::TauDecay] )           JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 3));
-          //history//if ( theFlagP[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 4));
-          //history//if ( theFlagP[TrackCategories::KsDecay] )            JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 5));
-          //history//if ( theFlagP[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 6));
-          //history//if ( theFlagP[TrackCategories::HadronicProcess] )    JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 7));
-          //history//if ( theFlagP[TrackCategories::Fake] )               JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 8));
-          //history//if ( theFlagP[TrackCategories::SharedInnerHits] )    JetInfo[iJetColl].Muon_hist[JetInfo[iJetColl].nMuon] += int(pow(10., -1 + 9));
-        //history//}
-
-        //---------------------------------
-        // calculate IP/s of muons' tracks
-        //---------------------------------
-	/*FIXME muons
-        reco::TransientTrack tt = trackBuilder->build(muons[muIdx].innerTrack());
-        GlobalVector direction(pjet->px(), pjet->py(), pjet->pz());
-        Measurement1D ip   = IPTools::signedImpactParameter3D(tt, direction, (*primaryVertex)[0]).second;
-        Measurement1D ip2d = IPTools::signedTransverseImpactParameter(tt, direction, (*primaryVertex)[0]).second;
-
-        JetInfo[iJetColl].Muon_IP[JetInfo[iJetColl].nMuon]   = ip.value();
-        JetInfo[iJetColl].Muon_IP2D[JetInfo[iJetColl].nMuon] = ip2d.value();
-        JetInfo[iJetColl].Muon_IPsig[JetInfo[iJetColl].nMuon]   = (ip.value())/(ip.error());
-        JetInfo[iJetColl].Muon_IP2Dsig[JetInfo[iJetColl].nMuon] = (ip2d.value())/(ip2d.error());
-	
-        ++JetInfo[iJetColl].nMuon;
-	}*/
-  
     }
 
     float SoftE  = pjet->bDiscriminator(softPFElectronBJetTags_.c_str());
@@ -2033,13 +1959,13 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].PFElectron_pt[JetInfo[iJetColl].nPFElectron]        = softPFElTagInfo->lepton(leptIdx)->pt();
       JetInfo[iJetColl].PFElectron_eta[JetInfo[iJetColl].nPFElectron]       = softPFElTagInfo->lepton(leptIdx)->eta();
       JetInfo[iJetColl].PFElectron_phi[JetInfo[iJetColl].nPFElectron]       = softPFElTagInfo->lepton(leptIdx)->phi();
-      JetInfo[iJetColl].PFElectron_ptrel[JetInfo[iJetColl].nPFElectron]     = 0;//soft calculPtRel( *(softPFElTagInfo->lepton(leptIdx)), *pjet );
+      JetInfo[iJetColl].PFElectron_ptrel[JetInfo[iJetColl].nPFElectron]     = (softPFElTagInfo->properties(leptIdx).ptRel);
       JetInfo[iJetColl].PFElectron_ratio[JetInfo[iJetColl].nPFElectron]     = (softPFElTagInfo->properties(leptIdx).ratio);
       JetInfo[iJetColl].PFElectron_ratioRel[JetInfo[iJetColl].nPFElectron]  = (softPFElTagInfo->properties(leptIdx).ratioRel);
       JetInfo[iJetColl].PFElectron_deltaR[JetInfo[iJetColl].nPFElectron]    = (softPFElTagInfo->properties(leptIdx).deltaR);
       JetInfo[iJetColl].PFElectron_IP[JetInfo[iJetColl].nPFElectron]        = (softPFElTagInfo->properties(leptIdx).sip3d);
       JetInfo[iJetColl].PFElectron_IP2D[JetInfo[iJetColl].nPFElectron]      = (softPFElTagInfo->properties(leptIdx).sip2d);
-      JetInfo[iJetColl].PFElectron_mva_e_pi[JetInfo[iJetColl].nPFElectron]  = -999.;//softPFElTagInfo->properties(leptIdx).mva_e_pi;
+      JetInfo[iJetColl].PFElectron_mva_e_pi[JetInfo[iJetColl].nPFElectron]  = (softPFElTagInfo->properties(leptIdx).elec_mva);
 
       ++JetInfo[iJetColl].nPFElectron;
     }
@@ -2714,32 +2640,32 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
   return;
 } // BTagAnalyzerT:: processJets
 
-//soft//template<typename IPTI,typename VTX>
-//soft//float BTagAnalyzerT<IPTI,VTX>::calculPtRel(const reco::Track& theMuon, const pat::Jet& theJet )
-//soft//{
-//soft//  double pmu = TMath::Sqrt( theMuon.px()*theMuon.px() + theMuon.py()*theMuon.py()  + theMuon.pz()*theMuon.pz() );
+template<typename IPTI,typename VTX>
+float BTagAnalyzerT<IPTI,VTX>::calculPtRel(const reco::Track& theMuon, const pat::Jet& theJet )
+{
+  double pmu = TMath::Sqrt( theMuon.px()*theMuon.px() + theMuon.py()*theMuon.py()  + theMuon.pz()*theMuon.pz() );
 
-//soft//  double jetpx = 0 ;
-//soft//  double jetpy = 0 ;
-//soft//  double jetpz = 0 ;
+  double jetpx = 0 ;
+  double jetpy = 0 ;
+  double jetpz = 0 ;
 
-//soft//  if( theJet.isCaloJet() ){
-//soft//    jetpx = theJet.px() + theMuon.px();
-//soft//    jetpy = theJet.py() + theMuon.py();
-//soft//    jetpz = theJet.pz() + theMuon.pz();
-//soft//  }else{
-//soft//    jetpx = theJet.px();
-//soft//    jetpy = theJet.py();
-//soft//    jetpz = theJet.pz();
-//soft//  }
+  if( theJet.isCaloJet() ){
+    jetpx = theJet.px() + theMuon.px();
+    jetpy = theJet.py() + theMuon.py();
+    jetpz = theJet.pz() + theMuon.pz();
+  }else{
+    jetpx = theJet.px();
+    jetpy = theJet.py();
+    jetpz = theJet.pz();
+  }
 
-//soft//  double jetp = TMath::Sqrt(jetpx*jetpx + jetpy*jetpy + jetpz*jetpz);
+  double jetp = TMath::Sqrt(jetpx*jetpx + jetpy*jetpy + jetpz*jetpz);
 
-//soft//  double ptrel  = ( jetpx * theMuon.px()  + jetpy * theMuon.py() + jetpz * theMuon.pz() ) / jetp;
-//soft//  ptrel = TMath::Sqrt( pmu * pmu  - ptrel * ptrel );
+  double ptrel  = ( jetpx * theMuon.px()  + jetpy * theMuon.py() + jetpz * theMuon.pz() ) / jetp;
+  ptrel = TMath::Sqrt( pmu * pmu  - ptrel * ptrel );
 
-//soft//  return ptrel;
-//soft//}
+  return ptrel;
+}
 
 template<typename IPTI,typename VTX>
 void BTagAnalyzerT<IPTI,VTX>::setTracksPVBase( const reco::TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight )
@@ -2994,20 +2920,20 @@ bool BTagAnalyzerT<IPTI,VTX>::findCat(const reco::Track* track, CategoryFinder& 
   return result;
 }
 
-//soft//template<typename IPTI,typename VTX>
-//soft//int BTagAnalyzerT<IPTI,VTX>::matchMuon(const edm::RefToBase<reco::Track>& theMuon, const edm::View<reco::Muon>& muons ){
-//soft//  double small = 1.e-3;
-//soft//  int matchedMu = -1;
-//soft//  for(unsigned int i=0; i<muons.size(); ++i){
-//soft//    double muonpt = -10000;
-//soft//    if( muons[i].isGlobalMuon() )                               muonpt = muons[i].globalTrack()->pt() ;
-//soft//    if(!muons[i].isGlobalMuon() &&  muons[i].isTrackerMuon())   muonpt = muons[i].innerTrack()->pt() ;
+template<typename IPTI,typename VTX>
+int BTagAnalyzerT<IPTI,VTX>::matchMuon(const edm::Ptr<reco::Candidate>& theMuon, const edm::View<reco::Muon>& muons ){
+  double small = 1.e-3;
+  int matchedMu = -1;
+  for(unsigned int i=0; i<muons.size(); ++i){
+    double muonpt = -10000;
+    if( muons[i].isGlobalMuon() )                               muonpt = muons[i].globalTrack()->pt() ;
+    if(!muons[i].isGlobalMuon() &&  muons[i].isTrackerMuon())   muonpt = muons[i].innerTrack()->pt() ;
 
-//soft//    if ( fabs(theMuon->pt() - muonpt )  < small  ){ matchedMu = i; }
+    if ( fabs(theMuon->pt() - muonpt )  < small  ){ matchedMu = i; }
 
-//soft//  }
-//soft//  return matchedMu;
-//soft//}
+  }
+  return matchedMu;
+}
 
 template<typename IPTI,typename VTX>
 std::vector<simPrimaryVertex> BTagAnalyzerT<IPTI,VTX>::getSimPVs(const edm::Handle<edm::HepMCProduct>& evtMC){
@@ -3058,15 +2984,6 @@ std::vector<simPrimaryVertex> BTagAnalyzerT<IPTI,VTX>::getSimPVs(const edm::Hand
   }
   return simpv;
 }
-
-//soft//template<typename IPTI,typename VTX>
-//soft//int BTagAnalyzerT<IPTI,VTX>::getMuonTk(double pt, const int iJetColl) {
-//soft//  int idxTk = -1;
-//soft//  for (int itk = 0; itk < JetInfo[iJetColl].nTrack ; ++itk) {
-//soft//    if ( fabs(pt-JetInfo[iJetColl].Track_pt[itk]) < 1e-5 ) idxTk = itk;
-//soft//  }
-//soft//  return idxTk;
-//soft//}
 
 template<typename IPTI,typename VTX>
 int BTagAnalyzerT<IPTI,VTX>::isFromGSP(const reco::Candidate* c)

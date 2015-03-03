@@ -75,13 +75,13 @@ options.register('useTopProjections', False,
     VarParsing.varType.bool,
     "Use top projections"
 )
-options.register('miniAOD', True,
+options.register('miniAOD', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Running on miniAOD"
 )
 
-options.register('useLegacyTaggers', False,
+options.register('useLegacyTaggers', True,
 VarParsing.multiplicity.singleton,
 VarParsing.varType.bool,
 "Use legacy taggers"
@@ -677,7 +677,7 @@ process.btagana.storeCSVTagVariables  = True  ## True if you want to keep CSV Ta
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag('selectedPatJets'+postfix)
 #FIXME it used to be muons, slimmedMuons from miniAOD
-process.btagana.muonCollectionName    = cms.InputTag(patMuons)
+process.btagana.muonCollectionName    = cms.InputTag(muSource)
 process.btagana.patMuonCollectionName = cms.InputTag(patMuons)
 process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
 process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
