@@ -8,6 +8,7 @@ bTagAnalyzer = cms.EDAnalyzer("BTagAnalyzer",
     # TagInfos (need to omit the 'TagInfos' part from the label)
     ipTagInfos = cms.string('pfImpactParameter'),
     svTagInfos = cms.string('pfInclusiveSecondaryVertexFinder'),
+    svNegTagInfos = cms.string('pfInclusiveSecondaryVertexFinderNegative'),
     softPFMuonTagInfos = cms.string('softPFMuons'),
     softPFElectronTagInfos = cms.string('softPFElectrons'),
     # taggers
