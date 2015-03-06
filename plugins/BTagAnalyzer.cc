@@ -26,6 +26,7 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
+#include "DataFormats/Common/interface/RefToPtr.h"
 #include "DataFormats/JetReco/interface/JetTracksAssociation.h"
 #include "DataFormats/BTauReco/interface/CandIPTagInfo.h"
 #include "DataFormats/BTauReco/interface/CandSoftLeptonTagInfo.h"
@@ -187,7 +188,7 @@ private:
   
   float calculPtRel(const reco::Track& theMuon, const pat::Jet& theJet);
   
-  int matchMuon(const edm::Ptr<reco::Candidate>& theMuon, const edm::View<reco::Muon>& muons);
+  const edm::Ptr<reco::Muon> matchMuon(const edm::Ptr<reco::Candidate>& theMuon, const edm::View<reco::Muon>& muons);
   
   void setTracksPVBase(const reco::TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight);
   void setTracksPV(const TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight);
@@ -1932,16 +1933,16 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].PFMuon_IP2D[JetInfo[iJetColl].nPFMuon]      = (softPFMuTagInfo->properties(leptIdx).sip2d);
 
       JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 0;
-      int muIdx = matchMuon( softPFMuTagInfo->lepton(leptIdx), muons );
-      if ( muIdx != -1 && muons[muIdx].isGlobalMuon() == 1 ) {
+      const edm::Ptr<reco::Muon> muonPtr = matchMuon( softPFMuTagInfo->lepton(leptIdx), muons );
+      if ( muonPtr.isNonnull() && muonPtr.isAvailable() && muonPtr->isGlobalMuon() ) {
 
         JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 1;
 
-        if (muons[muIdx].outerTrack()->hitPattern().numberOfValidMuonHits()>0 &&
-            muons[muIdx].numberOfMatches()>1 && muons[muIdx].innerTrack()->hitPattern().numberOfValidHits()>10 &&
-	    muons[muIdx].innerTrack()->hitPattern().numberOfValidPixelHits()>1 &&
-	    muons[muIdx].innerTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_OUTER_HITS)<3 &&
-	    muons[muIdx].globalTrack()->normalizedChi2()<10. && muons[muIdx].innerTrack()->normalizedChi2()<10.)
+        if (muonPtr->outerTrack()->hitPattern().numberOfValidMuonHits()>0 &&
+            muonPtr->numberOfMatches()>1 && muonPtr->innerTrack()->hitPattern().numberOfValidHits()>10 &&
+	    muonPtr->innerTrack()->hitPattern().numberOfValidPixelHits()>1 &&
+	    muonPtr->innerTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_OUTER_HITS)<3 &&
+	    muonPtr->globalTrack()->normalizedChi2()<10. && muonPtr->innerTrack()->normalizedChi2()<10.)
           JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 2;
 
       }
@@ -2921,18 +2922,30 @@ bool BTagAnalyzerT<IPTI,VTX>::findCat(const reco::Track* track, CategoryFinder& 
 }
 
 template<typename IPTI,typename VTX>
-int BTagAnalyzerT<IPTI,VTX>::matchMuon(const edm::Ptr<reco::Candidate>& theMuon, const edm::View<reco::Muon>& muons ){
-  double small = 1.e-3;
-  int matchedMu = -1;
-  for(unsigned int i=0; i<muons.size(); ++i){
-    double muonpt = -10000;
-    if( muons[i].isGlobalMuon() )                               muonpt = muons[i].globalTrack()->pt() ;
-    if(!muons[i].isGlobalMuon() &&  muons[i].isTrackerMuon())   muonpt = muons[i].innerTrack()->pt() ;
+const edm::Ptr<reco::Muon> BTagAnalyzerT<IPTI,VTX>::matchMuon(const edm::Ptr<reco::Candidate>& theMuon, const edm::View<reco::Muon>& muons ){
 
-    if ( fabs(theMuon->pt() - muonpt )  < small  ){ matchedMu = i; }
+  const pat::PackedCandidate * pcand = dynamic_cast<const pat::PackedCandidate *>(theMuon.get());
 
+  if(pcand) // MiniAOD case
+  {
+    for(edm::View<reco::Muon>::const_iterator muon = muons.begin(); muon != muons.end(); ++muon )
+    {
+       const pat::Muon * patmuon = dynamic_cast<const pat::Muon *>(&(*muon));
+
+       if(patmuon)
+       {
+         if(patmuon->originalObjectRef()==theMuon)
+           return muons.ptrAt(muon - muons.begin());
+       }
+    }
+    return edm::Ptr<reco::Muon>();
   }
-  return matchedMu;
+  else
+  {
+    const reco::PFCandidate * pfcand = dynamic_cast<const reco::PFCandidate *>(theMuon.get());
+
+    return edm::refToPtr( pfcand->muonRef() );
+  }
 }
 
 template<typename IPTI,typename VTX>
