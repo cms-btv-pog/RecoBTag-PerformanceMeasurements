@@ -35,7 +35,7 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
-options.register('mcGlobalTag', 'DES19_62_V8', #2017: DES17_62_V8; 2019: DES19_62_V8, PH1_1K_FB_V2; 20123: DES23_62_V1
+options.register('mcGlobalTag', 'PH2_1K_FB_V6', #2017: DES17_62_V8; 2019: DES19_62_V8, PH1_1K_FB_V2; 20123: DES23_62_V1
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
@@ -241,7 +241,7 @@ toGet = cms.VPSet(cms.PSet(
 record = cms.string('BTauGenericMVAJetTagComputerRcd'),
                 tag = cms.string('MVAJetTags_620SLHCX')
 )),
-connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags_620SLHCX_Phase1And2Upgrade_v2.db'),
+connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags_620SLHCX_Phase1And2Upgrade_v3.db'),
 BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
 )
 process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
@@ -258,6 +258,8 @@ process.load('Configuration.Geometry.GeometryExtended2019_cff')
 # 2023 geometry:
 #process.load('Configuration.Geometry.GeometryExtended2023MuonReco_cff')
 #process.load('Configuration.Geometry.GeometryExtended2023Muon_cff')
+process.load('Configuration.Geometry.GeometryExtended2023SHCalNoTaperReco_cff')
+process.load('Configuration.Geometry.GeometryExtended2023SHCalNoTaper_cff')
 #----------------------------------------------------------------------
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.load("SimTracker.TrackAssociation.TrackAssociatorByChi2_cfi")
@@ -606,9 +608,9 @@ tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosPFlow"), cms.Input
 ###CSVIVFV2: PHASE2 140PU +aging
 process.combinedSecondaryVertexIVFV2Phase2HighPU=process.combinedSecondaryVertexV2.clone(
 calibrationRecords = cms.vstring(
-'CombinedSVIVFV2Phase2_140PU_RecoVertex',
-'CombinedSVIVFV2Phase2_140PU_PseudoVertex',
-'CombinedSVIVFV2Phase2_140PU_NoVertex'
+'CombinedSVIVFV2Phase2JEC_140PU_RecoVertex',
+'CombinedSVIVFV2Phase2JEC_140PU_PseudoVertex',
+'CombinedSVIVFV2Phase2JEC_140PU_NoVertex'
 )
 )
 process.combinedSecondaryVertexIVFV2Phase2HighPUBJetTags = process.combinedSecondaryVertexV2BJetTagsPFlow.clone(
@@ -721,9 +723,19 @@ process.pfJetsPFlow.rParam = cms.double(0.4)
 process.jetTracksAssociatorAtVertexPFlow.coneSize = cms.double(0.4)
 
 ## Select JEC version
-jec='PhaseII_Shashlik140PU'
-#jec = 'DES19_V1_MC'
-#jec = 'AGE1K_V1_MC'
+#JEC from https://hypernews.cern.ch/HyperNews/CMS/get/upgrade-tp-studies/154.html
+#jec='PhaseII_Shashlik140PU_v1'
+#JEC from https://hypernews.cern.ch/HyperNews/CMS/get/upgrade-tp-studies/157.html
+#jec='PhaseII_Shashlik140PU_v2'
+#JEC from https://hypernews.cern.ch/HyperNews/CMS/get/upgrade-tp-studies/160.html
+jec='PhaseI_140PU_V2'
+
+jechera=jec
+
+if jec == 'PhaseII_Shashlik140PU_v2' or jec == 'PhaseII_Shashlik140PU_v1':
+    jechera='PhaseII_Shashlik140PU'
+
+print 'Using jec', jec ,' with hera name ', jechera
 
 ## Get AK4PFchs JECs from a sqlite file
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
@@ -735,7 +747,7 @@ process.jec = cms.ESSource("PoolDBESSource",
     toGet = cms.VPSet(
     cms.PSet(
          record = cms.string('JetCorrectionsRecord'),
-         tag    = cms.string('JetCorrectorParametersCollection_' + jec + '_AK4PFchs'),
+         tag    = cms.string('JetCorrectorParametersCollection_' + jechera + '_AK4PFchs'),
          label  = cms.untracked.string('AK4PFchs')
     ),
     ## here you add as many jet types as you need
