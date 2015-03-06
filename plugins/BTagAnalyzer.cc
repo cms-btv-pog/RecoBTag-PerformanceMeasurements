@@ -3083,143 +3083,165 @@ template<>
 const BTagAnalyzerT<reco::TrackIPTagInfo,reco::Vertex>::IPTagInfo *
 BTagAnalyzerT<reco::TrackIPTagInfo,reco::Vertex>::toIPTagInfo(const pat::Jet & jet, const std::string & tagInfos)
 {
-return jet.tagInfoTrackIP(tagInfos.c_str());
+  return jet.tagInfoTrackIP(tagInfos.c_str());
 }
+
 template<>
 const BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::IPTagInfo *
 BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::toIPTagInfo(const pat::Jet & jet, const std::string & tagInfos)
 {
-return jet.tagInfoCandIP(tagInfos.c_str());
+  return jet.tagInfoCandIP(tagInfos.c_str());
 }
+
 // -------------- toSVTagInfo ----------------
 template<>
 const BTagAnalyzerT<reco::TrackIPTagInfo,reco::Vertex>::SVTagInfo *
 BTagAnalyzerT<reco::TrackIPTagInfo,reco::Vertex>::toSVTagInfo(const pat::Jet & jet, const std::string & tagInfos)
 {
-return jet.tagInfoSecondaryVertex(tagInfos.c_str());
+  return jet.tagInfoSecondaryVertex(tagInfos.c_str());
 }
+
 template<>
 const BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::SVTagInfo *
 BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::toSVTagInfo(const pat::Jet & jet, const std::string & tagInfos)
 {
-return jet.tagInfoCandSecondaryVertex(tagInfos.c_str());
+  return jet.tagInfoCandSecondaryVertex(tagInfos.c_str());
 }
+
 // -------------- setTracksPV ----------------
 template<>
 void BTagAnalyzerT<reco::TrackIPTagInfo,reco::Vertex>::setTracksPV(const TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight)
 {
-setTracksPVBase(trackRef, pvHandle, iPV, PVweight);
+  setTracksPVBase(trackRef, pvHandle, iPV, PVweight);
 }
+
 template<>
 void BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::setTracksPV(const TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight)
 {
-iPV = -1;
-PVweight = 0.;
-const pat::PackedCandidate * pcand = dynamic_cast<const pat::PackedCandidate *>(trackRef.get());
-if(pcand) // MiniAOD case
-{
-if( pcand->fromPV() == pat::PackedCandidate::PVUsedInFit )
-{
-iPV = 0;
-PVweight = 1.;
+  iPV = -1;
+  PVweight = 0.;
+
+  const pat::PackedCandidate * pcand = dynamic_cast<const pat::PackedCandidate *>(trackRef.get());
+
+  if(pcand) // MiniAOD case
+  {
+    if( pcand->fromPV() == pat::PackedCandidate::PVUsedInFit )
+    {
+      iPV = 0;
+      PVweight = 1.;
+    }
+  }
+  else
+  {
+    const reco::PFCandidate * pfcand = dynamic_cast<const reco::PFCandidate *>(trackRef.get());
+
+    setTracksPVBase(pfcand->trackRef(), pvHandle, iPV, PVweight);
+  }
 }
-}
-else
-{
-const reco::PFCandidate * pfcand = dynamic_cast<const reco::PFCandidate *>(trackRef.get());
-setTracksPVBase(pfcand->trackRef(), pvHandle, iPV, PVweight);
-}
-}
+
 // -------------- setTracksSV ----------------
 template<>
 void BTagAnalyzerT<reco::TrackIPTagInfo,reco::Vertex>::setTracksSV(const TrackRef & trackRef, const SVTagInfo * svTagInfo, int & isFromSV, int & iSV, float & SVweight)
 {
-isFromSV = 0;
-iSV = -1;
-SVweight = 0.;
-const reco::TrackBaseRef trackBaseRef( trackRef );
-typedef reco::Vertex::trackRef_iterator IT;
-size_t nSV = svTagInfo->nVertices();
-for(size_t iv=0; iv<nSV; ++iv)
-{
-const reco::Vertex & vtx = svTagInfo->secondaryVertex(iv);
-// loop over tracks in vertices
-for(IT it=vtx.tracks_begin(); it!=vtx.tracks_end(); ++it)
-{
-const reco::TrackBaseRef & baseRef = *it;
-// one of the tracks in the vertex is the same as the track considered in the function
-if( baseRef == trackBaseRef )
-{
-float w = vtx.trackWeight(baseRef);
-// select the vertex for which the track has the highest weight
-if( w > SVweight )
-{
-SVweight = w;
-isFromSV = 1;
-iSV = iv;
-break;
+  isFromSV = 0;
+  iSV = -1;
+  SVweight = 0.;
+
+  const reco::TrackBaseRef trackBaseRef( trackRef );
+
+  typedef reco::Vertex::trackRef_iterator IT;
+
+  size_t nSV = svTagInfo->nVertices();
+  for(size_t iv=0; iv<nSV; ++iv)
+  {
+    const reco::Vertex & vtx = svTagInfo->secondaryVertex(iv);
+    // loop over tracks in vertices
+    for(IT it=vtx.tracks_begin(); it!=vtx.tracks_end(); ++it)
+    {
+      const reco::TrackBaseRef & baseRef = *it;
+      // one of the tracks in the vertex is the same as the track considered in the function
+      if( baseRef == trackBaseRef )
+      {
+        float w = vtx.trackWeight(baseRef);
+        // select the vertex for which the track has the highest weight
+        if( w > SVweight )
+        {
+          SVweight = w;
+          isFromSV = 1;
+          iSV = iv;
+          break;
+        }
+      }
+    }
+  }
 }
-}
-}
-}
-}
+
 template<>
 void BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::setTracksSV(const TrackRef & trackRef, const SVTagInfo * svTagInfo, int & isFromSV, int & iSV, float & SVweight)
 {
-isFromSV = 0;
-iSV = -1;
-SVweight = 0.;
-typedef std::vector<reco::CandidatePtr>::const_iterator IT;
-size_t nSV = svTagInfo->nVertices();
-for(size_t iv=0; iv<nSV; ++iv)
-{
-const Vertex & vtx = svTagInfo->secondaryVertex(iv);
-const std::vector<reco::CandidatePtr> & tracks = vtx.daughterPtrVector();
-// one of the tracks in the vertex is the same as the track considered in the function
-if( std::find(tracks.begin(),tracks.end(),trackRef) != tracks.end() )
-{
-SVweight = 1.;
-isFromSV = 1;
-iSV = iv;
+  isFromSV = 0;
+  iSV = -1;
+  SVweight = 0.;
+
+  typedef std::vector<reco::CandidatePtr>::const_iterator IT;
+
+  size_t nSV = svTagInfo->nVertices();
+  for(size_t iv=0; iv<nSV; ++iv)
+  {
+    const Vertex & vtx = svTagInfo->secondaryVertex(iv);
+    const std::vector<reco::CandidatePtr> & tracks = vtx.daughterPtrVector();
+
+    // one of the tracks in the vertex is the same as the track considered in the function
+    if( std::find(tracks.begin(),tracks.end(),trackRef) != tracks.end() )
+    {
+      SVweight = 1.;
+      isFromSV = 1;
+      iSV = iv;
+    }
+
+    // select the first vertex for which the track is used in the fit
+    // (reco::VertexCompositePtrCandidate does not store track weights so can't select the vertex for which the track has the highest weight)
+    if(iSV>=0)
+      break;
+  }
 }
-// select the first vertex for which the track is used in the fit
-// (reco::VertexCompositePtrCandidate does not store track weights so can't select the vertex for which the track has the highest weight)
-if(iSV>=0)
-break;
-}
-}
+
 // -------------- vertexKinematicsAndChange ----------------
 template<>
 void BTagAnalyzerT<reco::TrackIPTagInfo,reco::Vertex>::vertexKinematicsAndChange(const Vertex & vertex, reco::TrackKinematics & vertexKinematics, Int_t & charge)
 {
-Bool_t hasRefittedTracks = vertex.hasRefittedTracks();
-for(reco::Vertex::trackRef_iterator track = vertex.tracks_begin();
-track != vertex.tracks_end(); ++track) {
-Double_t w = vertex.trackWeight(*track);
-if (w < 0.5)
-continue;
-if (hasRefittedTracks) {
-reco::Track actualTrack = vertex.refittedTrack(*track);
-vertexKinematics.add(actualTrack, w);
-charge+=actualTrack.charge();
+  Bool_t hasRefittedTracks = vertex.hasRefittedTracks();
+
+  for(reco::Vertex::trackRef_iterator track = vertex.tracks_begin();
+      track != vertex.tracks_end(); ++track) {
+    Double_t w = vertex.trackWeight(*track);
+    if (w < 0.5)
+      continue;
+    if (hasRefittedTracks) {
+      reco::Track actualTrack = vertex.refittedTrack(*track);
+      vertexKinematics.add(actualTrack, w);
+      charge+=actualTrack.charge();
+    }
+    else {
+      const reco::Track& mytrack = **track;
+      vertexKinematics.add(mytrack, w);
+      charge+=mytrack.charge();
+    }
+  }
 }
-else {
-const reco::Track& mytrack = **track;
-vertexKinematics.add(mytrack, w);
-charge+=mytrack.charge();
-}
-}
-}
+
 template<>
 void BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::vertexKinematicsAndChange(const Vertex & vertex, reco::TrackKinematics & vertexKinematics, Int_t & charge)
 {
-const std::vector<reco::CandidatePtr> tracks = vertex.daughterPtrVector();
-for(std::vector<reco::CandidatePtr>::const_iterator track = tracks.begin(); track != tracks.end(); ++track) {
-const reco::Track& mytrack = *(*track)->bestTrack();
-vertexKinematics.add(mytrack, 1.0);
-charge+=mytrack.charge();
+  const std::vector<reco::CandidatePtr> tracks = vertex.daughterPtrVector();
+
+  for(std::vector<reco::CandidatePtr>::const_iterator track = tracks.begin(); track != tracks.end(); ++track) {
+    const reco::Track& mytrack = *(*track)->bestTrack();
+    vertexKinematics.add(mytrack, 1.0);
+    charge+=mytrack.charge();
+  }
 }
-}
+
 // define specific instances of the templated BTagAnalyzer
 typedef BTagAnalyzerT<reco::TrackIPTagInfo,reco::Vertex> BTagAnalyzerLegacy;
 typedef BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate> BTagAnalyzer;
