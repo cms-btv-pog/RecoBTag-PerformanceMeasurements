@@ -1274,43 +1274,43 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   //------------------------------------------------------
   // All tracks info
   //------------------------------------------------------
-  //all//edm::Handle<reco::TrackCollection> tracksHandle;
- //all// if( produceAllTrackTree_ && storeEventInfo_ )
-  //all//{
-   //all// iEvent.getByLabel(tracksColl_,tracksHandle);
+  edm::Handle<reco::TrackCollection> tracksHandle;
+  if( produceAllTrackTree_ && storeEventInfo_ )
+  {
+    iEvent.getByLabel(tracksColl_,tracksHandle);
 
-    //all//for(reco::TrackCollection::const_iterator trk = tracksHandle->begin(); trk != tracksHandle->end(); ++trk)
-    //all//{
-      //all/EventInfo.TrkAll_d0[EventInfo.nTrkAll]        = trk->d0();
-      //all//EventInfo.TrkAll_dz[EventInfo.nTrkAll]        = trk->dz();
-      //all//EventInfo.TrkAll_p[EventInfo.nTrkAll]         = trk->p();
-      //all//EventInfo.TrkAll_pt[EventInfo.nTrkAll]        = trk->pt();
-      //all//EventInfo.TrkAll_eta[EventInfo.nTrkAll]       = trk->eta();
-      //all//EventInfo.TrkAll_phi[EventInfo.nTrkAll]       = trk->phi();
-      //all//EventInfo.TrkAll_chi2[EventInfo.nTrkAll]      = trk->normalizedChi2();
-      //all//EventInfo.TrkAll_charge[EventInfo.nTrkAll]    = trk->charge();
-      //all//EventInfo.TrkAll_nHitAll[EventInfo.nTrkAll]   = trk->numberOfValidHits();
-      //all//EventInfo.TrkAll_nHitPixel[EventInfo.nTrkAll] = trk->hitPattern().numberOfValidPixelHits();
-     //all// EventInfo.TrkAll_nHitStrip[EventInfo.nTrkAll] = trk->hitPattern().numberOfValidStripHits();
-      //all//EventInfo.TrkAll_nHitTIB[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidStripTIBHits();
-      //all//EventInfo.TrkAll_nHitTID[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidStripTIDHits();
-      //all//EventInfo.TrkAll_nHitTOB[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidStripTOBHits();
-      //all//EventInfo.TrkAll_nHitTEC[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidStripTECHits();
-      //all//EventInfo.TrkAll_nHitPXB[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidPixelBarrelHits();
-      //all//EventInfo.TrkAll_nHitPXF[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidPixelEndcapHits();
-      //all//EventInfo.TrkAll_isHitL1[EventInfo.nTrkAll]   = trk->hitPattern().hasValidHitInFirstPixelBarrel();
-      //all//EventInfo.TrkAll_nSiLayers[EventInfo.nTrkAll] = trk->hitPattern().trackerLayersWithMeasurement();
-      //all//EventInfo.TrkAll_nPxLayers[EventInfo.nTrkAll] = trk->hitPattern().pixelLayersWithMeasurement();
+    for(reco::TrackCollection::const_iterator trk = tracksHandle->begin(); trk != tracksHandle->end(); ++trk)
+    {
+      EventInfo.TrkAll_d0[EventInfo.nTrkAll]        = trk->d0();
+      EventInfo.TrkAll_dz[EventInfo.nTrkAll]        = trk->dz();
+      EventInfo.TrkAll_p[EventInfo.nTrkAll]         = trk->p();
+      EventInfo.TrkAll_pt[EventInfo.nTrkAll]        = trk->pt();
+      EventInfo.TrkAll_eta[EventInfo.nTrkAll]       = trk->eta();
+      EventInfo.TrkAll_phi[EventInfo.nTrkAll]       = trk->phi();
+      EventInfo.TrkAll_chi2[EventInfo.nTrkAll]      = trk->normalizedChi2();
+      EventInfo.TrkAll_charge[EventInfo.nTrkAll]    = trk->charge();
+      EventInfo.TrkAll_nHitAll[EventInfo.nTrkAll]   = trk->numberOfValidHits();
+      EventInfo.TrkAll_nHitPixel[EventInfo.nTrkAll] = trk->hitPattern().numberOfValidPixelHits();
+      EventInfo.TrkAll_nHitStrip[EventInfo.nTrkAll] = trk->hitPattern().numberOfValidStripHits();
+      EventInfo.TrkAll_nHitTIB[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidStripTIBHits();
+      EventInfo.TrkAll_nHitTID[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidStripTIDHits();
+      EventInfo.TrkAll_nHitTOB[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidStripTOBHits();
+      EventInfo.TrkAll_nHitTEC[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidStripTECHits();
+      EventInfo.TrkAll_nHitPXB[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidPixelBarrelHits();
+      EventInfo.TrkAll_nHitPXF[EventInfo.nTrkAll]   = trk->hitPattern().numberOfValidPixelEndcapHits();
+      EventInfo.TrkAll_isHitL1[EventInfo.nTrkAll]   = trk->hitPattern().hasValidHitInFirstPixelBarrel();
+      EventInfo.TrkAll_nSiLayers[EventInfo.nTrkAll] = trk->hitPattern().trackerLayersWithMeasurement();
+      EventInfo.TrkAll_nPxLayers[EventInfo.nTrkAll] = trk->hitPattern().pixelLayersWithMeasurement();
 
-      //all//TrackRef trkRef(tracksHandle, trk - tracksHandle->begin() );
+      reco::TrackRef trkRef( tracksHandle, trk - tracksHandle->begin() );
 
-      //all//setTracksPV(trkRef, primaryVertex,
-                  //all//EventInfo.TrkAll_PV[EventInfo.nTrkAll],
-                  //all//EventInfo.TrkAll_PVweight[EventInfo.nTrkAll]);
+      setTracksPVBase(trkRef, primaryVertex,
+                      EventInfo.TrkAll_PV[EventInfo.nTrkAll],
+                      EventInfo.TrkAll_PVweight[EventInfo.nTrkAll]);
 
-      //all//++EventInfo.nTrkAll;
-    //all//}
-  //all//}
+      ++EventInfo.nTrkAll;
+    }
+  }
   //------------------------------------------------------
 
   //------------------------------------------------------
