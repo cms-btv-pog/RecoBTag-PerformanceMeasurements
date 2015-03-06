@@ -23,19 +23,21 @@
 #include <TString.h>
 
 using namespace std;
-bool use8TeV=true;
-bool useCSAp6=false;
-bool use8Tp8=false;
-bool usett=false;
 
-TString adddir = "gen30_200_28jan/";
+TString adddir = "rootfiles/";
 TString filename_1=adddir+"phys14.root";
 TString filename_2=adddir+"csa14.root";
-//TString filename_3=adddir+"8tev_new.root";
-TString filename_3="test100k.root";
+
+bool use8TeV=true;
+TString filename_3=adddir+"8tev_new.root";
+
+bool useCSAp6=true;
 TString filename_4=adddir+"csa14_pythia6.root";
+
+bool use8Tp8=true;
 TString filename_5=adddir+"8tev_pythia8.root";
-TString filename_6="ttbar.root";
+
+bool merge_g=false;
 
 TString dir4plots="perf_plots";
 
@@ -49,14 +51,14 @@ TString titlePhys2 = "Performance for PHYS14 QCD samples (Jet gen pT 500-1000 Ge
 
 TString format=".gif"; // .png or .pdf or .gif
 
-//void DrawPlot(TString name, bool log, int markstyle, int markcolor);
 void DrawPlot(TString name, bool log, TString titlename=titlePhys);
 void DrawEff(TString name, bool log, TString titlename=titlePhys);
 void DrawEffvsPt(TString name, bool log, TString titlename=titlePhys, int icase1=1);
 void DrawAllPlot(bool log, int case1=0);
 void DrawTest(bool log, int case1=0);
 void ComputeEffAndErr(TH1D* disc_b, TH1D* disc_c, TH1D* disc_l, Double_t * eff_b, Double_t * err_b, Double_t * eff_c, Double_t * err_c, Double_t * eff_l, Double_t * err_l);
-
+void DefinePerfTGraph( TString  filename_x, TString name, TGraphErrors* & BvsUDSG_1, TString ytitle_for_BvsUDSG_1, TGraphErrors* &  BvsC_1, TString ytitle_for_BvsC_1, int iMstyle, float xMsize, int iColor);
+void DefineEffHist(TString filename_x, TString name, TH1D * & Eff1_b, TH1D * & Eff1_c, TH1D * & Eff1_l, int iColor);
 
 //--------
 
@@ -76,345 +78,42 @@ void ComparePerformance(){
 
 }
 
-//void DrawPlot(TString name, bool log, int markstyle, int markcolor){
 void DrawPlot(TString name, bool log, TString titlename){
 
     cout << "Name of histo:" << name << '\n';
 
-    // File1
-    TH1D* hist_b_1;
-    TH1D* hist_c_1;
-    TH1D* hist_l_1; 
+    TString mistag;
+    if (!merge_g) mistag = "uds-jet misid. probability";
+    else mistag = "udsg-jet misid. probability";
 
-    TFile *myFile_1     = new TFile(filename_1);
-    myFile_1->cd();
-    
-    hist_b_1         = (TH1D*)gROOT->FindObject(name+"_b");
-    hist_c_1         = (TH1D*)gROOT->FindObject(name+"_c");
-    hist_l_1         = (TH1D*)gROOT->FindObject(name+"_l");
+    TGraphErrors* BvsUDSG_1 = 0;
+    TGraphErrors* BvsC_1 = 0;
+    DefinePerfTGraph(filename_1, name, BvsUDSG_1, mistag, BvsC_1, "c-jet misid. probability", 20, 0.75, kBlue); 
 
-    int nbin_max_1= hist_b_1->GetNbinsX();
+    TGraphErrors* BvsUDSG_2 =0;
+    TGraphErrors* BvsC_2 =0;
+    DefinePerfTGraph(filename_2, name, BvsUDSG_2, mistag, BvsC_2, "c-jet misid. probability", 21, 0.75, kRed); 
 
-    Double_t eff_b_1[nbin_max_1];
-    Double_t eff_l_1[nbin_max_1];
-    Double_t eff_c_1[nbin_max_1];
-    Double_t err_b_1[nbin_max_1];
-    Double_t err_l_1[nbin_max_1];
-    Double_t err_c_1[nbin_max_1];
-    ComputeEffAndErr(hist_b_1, hist_c_1, hist_l_1, eff_b_1, err_b_1, eff_c_1, err_c_1, eff_l_1, err_l_1);
+    TGraphErrors* BvsUDSG_3 =0;
+    TGraphErrors* BvsC_3 =0;
+    if (use8TeV) DefinePerfTGraph(filename_3, name, BvsUDSG_3, mistag, BvsC_3, "c-jet misid. probability", 22, 0.75, kGreen+2); 
 
-    TGraphErrors* BvsUDSG_1 = new TGraphErrors(nbin_max_1,eff_b_1,eff_l_1,err_b_1,err_l_1);
-    TGraphErrors* BvsC_1    = new TGraphErrors(nbin_max_1,eff_b_1,eff_c_1,err_b_1,err_c_1);
+    TGraphErrors* BvsUDSG_4 =0;
+    TGraphErrors* BvsC_4 =0;
+    if (useCSAp6) DefinePerfTGraph(filename_4, name, BvsUDSG_4, mistag, BvsC_4, "c-jet misid. probability", 21, 0.75, kOrange); 
 
-    // SET COSMETICS
-    BvsUDSG_1->SetMarkerStyle(20);
-    BvsUDSG_1->SetMarkerSize(0.75);
-    BvsUDSG_1->SetMarkerColor(kBlue);
-    BvsUDSG_1->SetLineColor(kBlue);
-    BvsUDSG_1->GetXaxis()->SetTitle("b-jet efficiency");  
-    BvsUDSG_1->GetYaxis()->SetTitle("udsg-jet misid. probability");
-
-    BvsC_1->SetMarkerStyle(20);
-    BvsC_1->SetMarkerSize(0.75);
-    BvsC_1->SetMarkerColor(kBlue);
-    BvsC_1->SetLineColor(kBlue);
-    BvsC_1->GetXaxis()->SetTitle("b-jet efficiency");  
-    BvsC_1->GetYaxis()->SetTitle("c-jet misid. probability");
-
-    BvsUDSG_1->GetXaxis()->SetLimits(0.,1.);
-    BvsUDSG_1->GetHistogram()->SetMaximum(1.);        
-    BvsUDSG_1->GetHistogram()->SetMinimum(0.0001);
-    
-    BvsC_1->GetXaxis()->SetLimits(0.,1.);
-    BvsC_1->GetHistogram()->SetMaximum(1.);        
-    BvsC_1->GetHistogram()->SetMinimum(0.001);
-
-    // File2
-    TH1D* hist_b_2;
-    TH1D* hist_c_2;
-    TH1D* hist_l_2; 
-
-    TFile *myFile_2     = new TFile(filename_2);
-    myFile_2->cd();
-    
-    hist_b_2         = (TH1D*)gROOT->FindObject(name+"_b");
-    hist_c_2         = (TH1D*)gROOT->FindObject(name+"_c");
-    hist_l_2         = (TH1D*)gROOT->FindObject(name+"_l");
-
-    int nbin_max_2= hist_b_2->GetNbinsX();
-
-    Double_t eff_b_2[nbin_max_2];
-    Double_t eff_l_2[nbin_max_2];
-    Double_t eff_c_2[nbin_max_2];
-    Double_t err_b_2[nbin_max_2];
-    Double_t err_l_2[nbin_max_2];
-    Double_t err_c_2[nbin_max_2];
-    ComputeEffAndErr(hist_b_2, hist_c_2, hist_l_2, eff_b_2, err_b_2, eff_c_2, err_c_2, eff_l_2, err_l_2);
-
-    TGraphErrors* BvsUDSG_2 = new TGraphErrors(nbin_max_2,eff_b_2,eff_l_2,err_b_2,err_l_2);
-    TGraphErrors* BvsC_2    = new TGraphErrors(nbin_max_2,eff_b_2,eff_c_2,err_b_2,err_c_2);
+    TGraphErrors* BvsUDSG_5 =0;
+    TGraphErrors* BvsC_5 =0;
+    if (use8Tp8) DefinePerfTGraph(filename_5, name, BvsUDSG_5, mistag, BvsC_5, "c-jet misid. probability", 22, 0.75, 13); 
 
 
-    // SET COSMETICS
-    BvsUDSG_2->SetMarkerStyle(21);
-    BvsUDSG_2->SetMarkerSize(0.75);
-    BvsUDSG_2->SetMarkerColor(kRed);
-    BvsUDSG_2->SetLineColor(kRed);
-    BvsUDSG_2->GetXaxis()->SetTitle("b-jet efficiency");  
-    BvsUDSG_2->GetYaxis()->SetTitle("udsg-jet misid. probability");
-
-    BvsC_2->SetMarkerStyle(21);
-    BvsC_2->SetMarkerSize(0.75);
-    BvsC_2->SetMarkerColor(kRed);
-    BvsC_2->SetLineColor(kRed);
-    BvsC_2->GetXaxis()->SetTitle("b-jet efficiency");  
-    BvsC_2->GetYaxis()->SetTitle("c-jet misid. probability");
-
-    BvsUDSG_2->GetXaxis()->SetLimits(0.,1.);
-    BvsUDSG_2->GetHistogram()->SetMaximum(1.);        
-    BvsUDSG_2->GetHistogram()->SetMinimum(0.0001);
-    
-    BvsC_2->GetXaxis()->SetLimits(0.,1.);
-    BvsC_2->GetHistogram()->SetMaximum(1.);        
-    BvsC_2->GetHistogram()->SetMinimum(0.001);
-
-    // File3
-    TH1D* hist_b_3;
-    TH1D* hist_c_3;
-    TH1D* hist_l_3; 
-
-    if (use8TeV) {
-     TFile *myFile_3     = new TFile(filename_3);
-     myFile_3->cd();
-     
-     hist_b_3         = (TH1D*)gROOT->FindObject(name+"_b");
-     hist_c_3         = (TH1D*)gROOT->FindObject(name+"_c");
-     hist_l_3         = (TH1D*)gROOT->FindObject(name+"_l");
-    }
-    else {
-     myFile_2->cd();
-    
-     hist_b_3         = (TH1D*)gROOT->FindObject(name+"_b");
-     hist_c_3         = (TH1D*)gROOT->FindObject(name+"_c");
-     hist_l_3         = (TH1D*)gROOT->FindObject(name+"_l");
-    }
-
-    int nbin_max_3= hist_b_3->GetNbinsX();
-
-    Double_t eff_b_3[nbin_max_3];
-    Double_t eff_l_3[nbin_max_3];
-    Double_t eff_c_3[nbin_max_3];
-    Double_t err_b_3[nbin_max_3];
-    Double_t err_l_3[nbin_max_3];
-    Double_t err_c_3[nbin_max_3];
-    ComputeEffAndErr(hist_b_3, hist_c_3, hist_l_3, eff_b_3, err_b_3, eff_c_3, err_c_3, eff_l_3, err_l_3);
-
-    TGraphErrors* BvsUDSG_3 = new TGraphErrors(nbin_max_3,eff_b_3,eff_l_3,err_b_3,err_l_3);
-    TGraphErrors* BvsC_3    = new TGraphErrors(nbin_max_3,eff_b_3,eff_c_3,err_b_3,err_c_3);
-
-    // SET COSMETICS
-    BvsUDSG_3->SetMarkerStyle(22);
-    BvsUDSG_3->SetMarkerSize(0.75);
-    BvsUDSG_3->SetMarkerColor(kGreen+2);
-    BvsUDSG_3->SetLineColor(kGreen+2);
-    BvsUDSG_3->GetXaxis()->SetTitle("b-jet efficiency");  
-    BvsUDSG_3->GetYaxis()->SetTitle("udsg-jet misid. probability");
-
-    BvsC_3->SetMarkerStyle(22);
-    BvsC_3->SetMarkerSize(0.75);
-    BvsC_3->SetMarkerColor(kGreen+2);
-    BvsC_3->SetLineColor(kGreen+2);
-    BvsC_3->GetXaxis()->SetTitle("b-jet efficiency");  
-    BvsC_3->GetYaxis()->SetTitle("c-jet misid. probability");
-
-    BvsUDSG_3->GetXaxis()->SetLimits(0.,1.);
-    BvsUDSG_3->GetHistogram()->SetMaximum(1.);        
-    BvsUDSG_3->GetHistogram()->SetMinimum(0.0001);
-    
-    BvsC_3->GetXaxis()->SetLimits(0.,1.);
-    BvsC_3->GetHistogram()->SetMaximum(1.);        
-    BvsC_3->GetHistogram()->SetMinimum(0.001);
-
-    // File3
-    TH1D* hist_b_4;
-    TH1D* hist_c_4;
-    TH1D* hist_l_4; 
-
-    if (useCSAp6) {
-     TFile *myFile_4     = new TFile(filename_4);
-     myFile_4->cd();
-     
-     hist_b_4         = (TH1D*)gROOT->FindObject(name+"_b");
-     hist_c_4         = (TH1D*)gROOT->FindObject(name+"_c");
-     hist_l_4         = (TH1D*)gROOT->FindObject(name+"_l");
-    }
-    else {
-     myFile_2->cd();
-    
-     hist_b_4         = (TH1D*)gROOT->FindObject(name+"_b");
-     hist_c_4         = (TH1D*)gROOT->FindObject(name+"_c");
-     hist_l_4         = (TH1D*)gROOT->FindObject(name+"_l");
-    }
-
-    int nbin_max_4= hist_b_4->GetNbinsX();
-
-    Double_t eff_b_4[nbin_max_4];
-    Double_t eff_l_4[nbin_max_4];
-    Double_t eff_c_4[nbin_max_4];
-    Double_t err_b_4[nbin_max_4];
-    Double_t err_l_4[nbin_max_4];
-    Double_t err_c_4[nbin_max_4];
-    ComputeEffAndErr(hist_b_4, hist_c_4, hist_l_4, eff_b_4, err_b_4, eff_c_4, err_c_4, eff_l_4, err_l_4);
-
-    TGraphErrors* BvsUDSG_4 = new TGraphErrors(nbin_max_4,eff_b_4,eff_l_4,err_b_4,err_l_4);
-    TGraphErrors* BvsC_4    = new TGraphErrors(nbin_max_4,eff_b_4,eff_c_4,err_b_4,err_c_4);
-
-    // SET COSMETICS
-    BvsUDSG_4->SetMarkerStyle(21);
-    BvsUDSG_4->SetMarkerSize(0.75);
-    BvsUDSG_4->SetMarkerColor(kOrange);
-    BvsUDSG_4->SetLineColor(kOrange);
-    BvsUDSG_4->GetXaxis()->SetTitle("b-jet efficiency");  
-    BvsUDSG_4->GetYaxis()->SetTitle("udsg-jet misid. probability");
-
-    BvsC_4->SetMarkerStyle(21);
-    BvsC_4->SetMarkerSize(0.75);
-    BvsC_4->SetMarkerColor(kOrange);
-    BvsC_4->SetLineColor(kOrange);
-    BvsC_4->GetXaxis()->SetTitle("b-jet efficiency");  
-    BvsC_4->GetYaxis()->SetTitle("c-jet misid. probability");
-
-    BvsUDSG_4->GetXaxis()->SetLimits(0.,1.);
-    BvsUDSG_4->GetHistogram()->SetMaximum(1.);        
-    BvsUDSG_4->GetHistogram()->SetMinimum(0.0001);
-    
-    BvsC_4->GetXaxis()->SetLimits(0.,1.);
-    BvsC_4->GetHistogram()->SetMaximum(1.);        
-    BvsC_4->GetHistogram()->SetMinimum(0.001);
-
-    // File5
-    TH1D* hist_b_5;
-    TH1D* hist_c_5;
-    TH1D* hist_l_5; 
-
-    if (use8Tp8) {
-     TFile *myFile_5     = new TFile(filename_5);
-     myFile_5->cd();
-     
-     hist_b_5         = (TH1D*)gROOT->FindObject(name+"_b");
-     hist_c_5         = (TH1D*)gROOT->FindObject(name+"_c");
-     hist_l_5         = (TH1D*)gROOT->FindObject(name+"_l");
-    }
-    else {
-     myFile_2->cd();
-    
-     hist_b_5         = (TH1D*)gROOT->FindObject(name+"_b");
-     hist_c_5         = (TH1D*)gROOT->FindObject(name+"_c");
-     hist_l_5         = (TH1D*)gROOT->FindObject(name+"_l");
-    }
-
-    int nbin_max_5= hist_b_5->GetNbinsX();
-
-    Double_t eff_b_5[nbin_max_5];
-    Double_t eff_l_5[nbin_max_5];
-    Double_t eff_c_5[nbin_max_5];
-    Double_t err_b_5[nbin_max_5];
-    Double_t err_l_5[nbin_max_5];
-    Double_t err_c_5[nbin_max_5];
-    ComputeEffAndErr(hist_b_5, hist_c_5, hist_l_5, eff_b_5, err_b_5, eff_c_5, err_c_5, eff_l_5, err_l_5);
-
-    TGraphErrors* BvsUDSG_5 = new TGraphErrors(nbin_max_5,eff_b_5,eff_l_5,err_b_5,err_l_5);
-    TGraphErrors* BvsC_5    = new TGraphErrors(nbin_max_5,eff_b_5,eff_c_5,err_b_5,err_c_5);
-
-    // SET COSMETICS
-    BvsUDSG_5->SetMarkerStyle(22);
-    BvsUDSG_5->SetMarkerSize(0.75);
-    BvsUDSG_5->SetMarkerColor(13);
-    BvsUDSG_5->SetLineColor(13);
-    BvsUDSG_5->GetXaxis()->SetTitle("b-jet efficiency");  
-    BvsUDSG_5->GetYaxis()->SetTitle("udsg-jet misid. probability");
-
-    BvsC_5->SetMarkerStyle(22);
-    BvsC_5->SetMarkerSize(0.75);
-    BvsC_5->SetMarkerColor(13);
-    BvsC_5->SetLineColor(13);
-    BvsC_5->GetXaxis()->SetTitle("b-jet efficiency");  
-    BvsC_5->GetYaxis()->SetTitle("c-jet misid. probability");
-
-    BvsUDSG_5->GetXaxis()->SetLimits(0.,1.);
-    BvsUDSG_5->GetHistogram()->SetMaximum(1.);        
-    BvsUDSG_5->GetHistogram()->SetMinimum(0.0001);
-    
-    BvsC_5->GetXaxis()->SetLimits(0.,1.);
-    BvsC_5->GetHistogram()->SetMaximum(1.);        
-    BvsC_5->GetHistogram()->SetMinimum(0.001);
-
-    // File6
-    TH1D* hist_b_6;
-    TH1D* hist_c_6;
-    TH1D* hist_l_6; 
-
-    if (use8Tp8) {
-     TFile *myFile_6     = new TFile(filename_6);
-     myFile_6->cd();
-     
-     hist_b_6         = (TH1D*)gROOT->FindObject(name+"_b");
-     hist_c_6         = (TH1D*)gROOT->FindObject(name+"_c");
-     hist_l_6         = (TH1D*)gROOT->FindObject(name+"_l");
-    }
-    else {
-     myFile_2->cd();
-    
-     hist_b_6         = (TH1D*)gROOT->FindObject(name+"_b");
-     hist_c_6         = (TH1D*)gROOT->FindObject(name+"_c");
-     hist_l_6         = (TH1D*)gROOT->FindObject(name+"_l");
-    }
-
-    int nbin_max_6= hist_b_6->GetNbinsX();
-
-    Double_t eff_b_6[nbin_max_6];
-    Double_t eff_l_6[nbin_max_6];
-    Double_t eff_c_6[nbin_max_6];
-    Double_t err_b_6[nbin_max_6];
-    Double_t err_l_6[nbin_max_6];
-    Double_t err_c_6[nbin_max_6];
-    ComputeEffAndErr(hist_b_6, hist_c_6, hist_l_6, eff_b_6, err_b_6, eff_c_6, err_c_6, eff_l_6, err_l_6);
-
-    TGraphErrors* BvsUDSG_6 = new TGraphErrors(nbin_max_6,eff_b_6,eff_l_6,err_b_6,err_l_6);
-    TGraphErrors* BvsC_6    = new TGraphErrors(nbin_max_6,eff_b_6,eff_c_6,err_b_6,err_c_6);
-
-    // SET COSMETICS
-    BvsUDSG_6->SetMarkerStyle(24);
-    BvsUDSG_6->SetMarkerSize(0.75);
-    BvsUDSG_6->SetMarkerColor(7);
-    BvsUDSG_6->SetLineColor(7);
-    BvsUDSG_6->GetXaxis()->SetTitle("b-jet efficiency");  
-    BvsUDSG_6->GetYaxis()->SetTitle("udsg-jet misid. probability");
-
-    BvsC_6->SetMarkerStyle(24);
-    BvsC_6->SetMarkerSize(0.75);
-    BvsC_6->SetMarkerColor(7);
-    BvsC_6->SetLineColor(7);
-    BvsC_6->GetXaxis()->SetTitle("b-jet efficiency");  
-    BvsC_6->GetYaxis()->SetTitle("c-jet misid. probability");
-
-    BvsUDSG_6->GetXaxis()->SetLimits(0.,1.);
-    BvsUDSG_6->GetHistogram()->SetMaximum(1.);        
-    BvsUDSG_6->GetHistogram()->SetMinimum(0.0001);
-    
-    BvsC_6->GetXaxis()->SetLimits(0.,1.);
-    BvsC_6->GetHistogram()->SetMaximum(1.);        
-    BvsC_6->GetHistogram()->SetMinimum(0.001);
-
-
-    gStyle->SetOptTitle(0);
 
     // CREATE CANVAS
+    gStyle->SetOptTitle(0);
   
     TCanvas *c1 = new TCanvas("c1", "c1",10,32,782,552);
     c1->cd();
 
-    // FIRST MC & DATA
     TPad *c1_1 = new TPad("canvas_1", "canvas_1",0,0,1.0,1.0);
     c1_1->Draw();
     c1_1->cd(); 
@@ -425,10 +124,9 @@ void DrawPlot(TString name, bool log, TString titlename){
     qw->SetFillColor(kWhite);
     qw->AddEntry(BvsUDSG_1, "13TeV 20PU25ns Phys14 (P8)", "p");
     qw->AddEntry(BvsUDSG_2, "13TeV 20PU25ns CSA14 (P8)", "p");
-    if (useCSAp6 ) qw->AddEntry(BvsUDSG_4, "13TeV 20PU25ns CSA14 (P6)", "p");
+    if (useCSAp6) qw->AddEntry(BvsUDSG_4, "13TeV 20PU25ns CSA14 (P6)", "p");
     if (use8Tp8 and (name != "CSVIVF" && name != "CSVIVF_1" && name != "CSVIVF_2")) qw->AddEntry(BvsUDSG_5, "8TeV nPUtrue17-23 53X (P8)", "p");
     if (use8TeV and (name != "CSVIVF" && name != "CSVIVF_1" && name != "CSVIVF_2")) qw->AddEntry(BvsUDSG_3, "8TeV nPUtrue17-23 53X (P6)", "p");
-    if (usett ) qw->AddEntry(BvsUDSG_6, "13TeV ttbar 20PU25ns Phys14 ", "p");
 
     TLatex *latex = new TLatex();
     latex->SetNDC();
@@ -436,25 +134,22 @@ void DrawPlot(TString name, bool log, TString titlename){
     latex->SetTextFont(42); //22
     latex->SetTextAlign(13);
     
-/*
+
     BvsUDSG_1->Draw("ALP");
     BvsUDSG_2->Draw("LPsame");
     if (use8TeV and (name != "CSVIVF" && name != "CSVIVF_1" && name != "CSVIVF_2")) BvsUDSG_3->Draw("LPsame");
     if (useCSAp6) BvsUDSG_4->Draw("LPsame");
     if (use8Tp8 and (name != "CSVIVF" && name != "CSVIVF_1" && name != "CSVIVF_2")) BvsUDSG_5->Draw("LPsame");
-    if (usett) BvsUDSG_6->Draw("LPsame");
     latex->DrawLatex(0.1, 0.94, titlename);
     qw->Draw();
-*/
-    BvsUDSG_3->Draw("ALP");
-    BvsC_3->SetMarkerStyle(24);
-    BvsC_3->Draw("LPsame");
 
-    TString name_plot="bvsudsg_"+name+"_Linear"+format;
-    if(log) name_plot="bvsudsg_"+name+"_Log"+format;
+    TString nameuuu="bvsuds_";
+    if (merge_g) nameuuu="bvsudsg_";
+    TString name_plot=nameuuu+name+"_Linear"+format;
+    if(log) name_plot=nameuuu+name+"_Log"+format;
     c1->SaveAs(dir4plots+"/"+name_plot);
 
-/*
+
     TCanvas *c2 = new TCanvas("c2", "c2",10,32,782,552);
     c2->cd();
     TPad *c2_1 = new TPad("canvas_2", "canvas_2",0,0,1.0,1.0);
@@ -467,188 +162,46 @@ void DrawPlot(TString name, bool log, TString titlename){
     if (use8TeV and (name != "CSVIVF" && name != "CSVIVF_1" && name != "CSVIVF_2")) BvsC_3->Draw("LPsame");
     if (useCSAp6) BvsC_4->Draw("LPsame");
     if (use8Tp8 and (name != "CSVIVF" && name != "CSVIVF_1" && name != "CSVIVF_2")) BvsC_5->Draw("LPsame");
-    if (usett) BvsC_6->Draw("LPsame");
     latex->DrawLatex(0.1, 0.94, titlename);
     qw->Draw();
-    BvsC_3->Draw("LPsame");
+
     name_plot="bvsc_"+name+"_Linear"+format;
     if(log) name_plot="bvsc_"+name+"_Log"+format;
     c2->SaveAs(dir4plots+"/"+name_plot);
-*/
+
   
 }
+
 void DrawEff(TString name, bool log, TString titlename){
 
     cout << "Name of histo:" << name << '\n';
 
-    // File1
-    TH1D* hist_b_1;
-    TH1D* hist_c_1;
-    TH1D* hist_l_1; 
+    TH1D * Eff1_b = 0;
+    TH1D * Eff1_c = 0;
+    TH1D * Eff1_l = 0;
+    DefineEffHist(filename_1, name, Eff1_b, Eff1_c, Eff1_l, kBlue);
 
-    TFile *myFile_1     = new TFile(filename_1);
-    myFile_1->cd();
-    
-    hist_b_1         = (TH1D*)gROOT->FindObject(name+"_b");
-    hist_c_1         = (TH1D*)gROOT->FindObject(name+"_c");
-    hist_l_1         = (TH1D*)gROOT->FindObject(name+"_l");
+    TH1D * Eff2_b = 0;
+    TH1D * Eff2_c = 0;
+    TH1D * Eff2_l = 0;
+    DefineEffHist(filename_2, name, Eff2_b, Eff2_c, Eff2_l, kRed);
+
+    TH1D * Eff3_b = 0;
+    TH1D * Eff3_c = 0;
+    TH1D * Eff3_l = 0;
+    if (use8TeV) DefineEffHist(filename_3, name, Eff3_b, Eff3_c, Eff3_l, kGreen+2);
+
+    TH1D * Eff4_b = 0;
+    TH1D * Eff4_c = 0;
+    TH1D * Eff4_l = 0;
+    if (useCSAp6) DefineEffHist(filename_4, name, Eff4_b, Eff4_c, Eff4_l, kOrange);
 
 
-    int nbin_max_1= hist_b_1->GetNbinsX();
-    float minx=hist_b_1->GetXaxis()->GetXmin();
-    float maxx=hist_b_1->GetXaxis()->GetXmax();
+    TH1D * Eff5_b = 0;
+    TH1D * Eff5_c = 0;
+    TH1D * Eff5_l = 0;
+    if (use8Tp8) DefineEffHist(filename_5, name, Eff5_b, Eff5_c, Eff5_l, 13);
 
-    TH1D * Eff1_b= new TH1D ("Eff1_b",name,nbin_max_1,minx,maxx);
-    TH1D * Eff1_c = new TH1D ("Eff1_c",name,nbin_max_1,minx,maxx);
-    TH1D * Eff1_l = new TH1D ("Eff1_l",name,nbin_max_1,minx,maxx);
-
-    Double_t eff_b_1[nbin_max_1];
-    Double_t eff_l_1[nbin_max_1];
-    Double_t eff_c_1[nbin_max_1];
-    Double_t err_b_1[nbin_max_1];
-    Double_t err_l_1[nbin_max_1];
-    Double_t err_c_1[nbin_max_1];
-    ComputeEffAndErr(hist_b_1, hist_c_1, hist_l_1, eff_b_1, err_b_1, eff_c_1, err_c_1, eff_l_1, err_l_1);
-
-    for (int ii=0; ii<nbin_max_1; ii++) {
-        Eff1_b->SetBinContent(ii+1, eff_b_1[ii]);
-        Eff1_b->SetBinError(ii+1,   err_b_1[ii]);
-        Eff1_c->SetBinContent(ii+1, eff_c_1[ii]);
-        Eff1_c->SetBinError(ii+1,   err_c_1[ii]);
-        Eff1_l->SetBinContent(ii+1, eff_l_1[ii]);
-        Eff1_l->SetBinError(ii+1,   err_l_1[ii]);
-    }
-
-    Eff1_b->SetLineColor(kBlue);
-    Eff1_c->SetLineColor(kBlue);
-    Eff1_l->SetLineColor(kBlue);
-    Eff1_b->SetMarkerColor(kBlue);
-    Eff1_c->SetMarkerColor(kBlue);
-    Eff1_l->SetMarkerColor(kBlue);
-
-    Eff1_b->GetYaxis()->SetTitle("b-jet efficiency");  
-    Eff1_l->GetYaxis()->SetTitle("udsg-jet misid. probability");
-    Eff1_c->GetYaxis()->SetTitle("c-jet misid. probability");
-
-    Eff1_b->SetMaximum(1.);        
-//    Eff1_b->SetMinimum(0.1);
-    Eff1_c->SetMaximum(1.);        
-//    Eff1_c->SetMinimum(0.001);
-    Eff1_l->SetMaximum(1.);        
-//    Eff1_l->SetMinimum(0.0001);
-    
-    // File2
-    TH1D* hist_b_2;
-    TH1D* hist_c_2;
-    TH1D* hist_l_2; 
-
-    TFile *myFile_2     = new TFile(filename_2);
-    myFile_2->cd();
-    
-    hist_b_2         = (TH1D*)gROOT->FindObject(name+"_b");
-    hist_c_2         = (TH1D*)gROOT->FindObject(name+"_c");
-    hist_l_2         = (TH1D*)gROOT->FindObject(name+"_l");
-
-    int nbin_max_2= hist_b_2->GetNbinsX();
-    TH1D * Eff2_b= new TH1D ("Eff2_b",name,nbin_max_2,minx,maxx);
-    TH1D * Eff2_c = new TH1D ("Eff2_c",name,nbin_max_2,minx,maxx);
-    TH1D * Eff2_l = new TH1D ("Eff2_l",name,nbin_max_2,minx,maxx);
-
-    Double_t eff_b_2[nbin_max_2];
-    Double_t eff_l_2[nbin_max_2];
-    Double_t eff_c_2[nbin_max_2];
-    Double_t err_b_2[nbin_max_2];
-    Double_t err_l_2[nbin_max_2];
-    Double_t err_c_2[nbin_max_2];
-    ComputeEffAndErr(hist_b_2, hist_c_2, hist_l_2, eff_b_2, err_b_2, eff_c_2, err_c_2, eff_l_2, err_l_2);
-
-    for (int ii=0; ii<nbin_max_2; ii++) {
-        Eff2_b->SetBinContent(ii+1, eff_b_2[ii]);
-        Eff2_b->SetBinError(ii+1,   err_b_2[ii]);
-        Eff2_c->SetBinContent(ii+1, eff_c_2[ii]);
-        Eff2_c->SetBinError(ii+1,   err_c_2[ii]);
-        Eff2_l->SetBinContent(ii+1, eff_l_2[ii]);
-        Eff2_l->SetBinError(ii+1,   err_l_2[ii]);
-    }
-
-    Eff2_b->SetLineColor(kRed);
-    Eff2_c->SetLineColor(kRed);
-    Eff2_l->SetLineColor(kRed);
-    Eff2_b->SetMarkerColor(kRed);
-    Eff2_c->SetMarkerColor(kRed);
-    Eff2_l->SetMarkerColor(kRed);
-
-    Eff2_b->GetYaxis()->SetTitle("b-jet efficiency");  
-    Eff2_l->GetYaxis()->SetTitle("udsg-jet misid. probability");
-    Eff2_c->GetYaxis()->SetTitle("c-jet misid. probability");
-
-    Eff2_b->SetMaximum(1.);        
-//    Eff2_b->SetMinimum(0.1);
-    Eff2_c->SetMaximum(1.);        
-//    Eff2_c->SetMinimum(0.001);
-    Eff2_l->SetMaximum(1.);        
-//    Eff2_l->SetMinimum(0.0001);
-
-    // File3
-    TH1D* hist_b_3;
-    TH1D* hist_c_3;
-    TH1D* hist_l_3; 
-
-    if (use8TeV) {
-     TFile *myFile_3     = new TFile(filename_3);
-     myFile_3->cd();
-     
-     hist_b_3         = (TH1D*)gROOT->FindObject(name+"_b");
-     hist_c_3         = (TH1D*)gROOT->FindObject(name+"_c");
-     hist_l_3         = (TH1D*)gROOT->FindObject(name+"_l");
-    }
-    else {
-     myFile_2->cd();
-    
-     hist_b_3         = (TH1D*)gROOT->FindObject(name+"_b");
-     hist_c_3         = (TH1D*)gROOT->FindObject(name+"_c");
-     hist_l_3         = (TH1D*)gROOT->FindObject(name+"_l");
-    }
-
-    int nbin_max_3= hist_b_3->GetNbinsX();
-    TH1D * Eff3_b= new TH1D ("Eff3_b",name,nbin_max_3,minx,maxx);
-    TH1D * Eff3_c = new TH1D ("Eff3_c",name,nbin_max_3,minx,maxx);
-    TH1D * Eff3_l = new TH1D ("Eff3_l",name,nbin_max_3,minx,maxx);
-
-    Double_t eff_b_3[nbin_max_3];
-    Double_t eff_l_3[nbin_max_3];
-    Double_t eff_c_3[nbin_max_3];
-    Double_t err_b_3[nbin_max_3];
-    Double_t err_l_3[nbin_max_3];
-    Double_t err_c_3[nbin_max_3];
-    ComputeEffAndErr(hist_b_3, hist_c_3, hist_l_3, eff_b_3, err_b_3, eff_c_3, err_c_3, eff_l_3, err_l_3);
-
-    for (int ii=0; ii<nbin_max_3; ii++) {
-        Eff3_b->SetBinContent(ii+1, eff_b_3[ii]);
-        Eff3_b->SetBinError(ii+1,   err_b_3[ii]);
-        Eff3_c->SetBinContent(ii+1, eff_c_3[ii]);
-        Eff3_c->SetBinError(ii+1,   err_c_3[ii]);
-        Eff3_l->SetBinContent(ii+1, eff_l_3[ii]);
-        Eff3_l->SetBinError(ii+1,   err_l_3[ii]);
-    }
-
-    Eff3_b->SetLineColor(kGreen+2);
-    Eff3_c->SetLineColor(kGreen+2);
-    Eff3_l->SetLineColor(kGreen+2);
-    Eff3_b->SetMarkerColor(kGreen+2);
-    Eff3_c->SetMarkerColor(kGreen+2);
-    Eff3_l->SetMarkerColor(kGreen+2);
-
-    Eff3_b->GetYaxis()->SetTitle("b-jet efficiency");  
-    Eff3_l->GetYaxis()->SetTitle("udsg-jet misid. probability");
-    Eff3_c->GetYaxis()->SetTitle("c-jet misid. probability");
-
-    Eff3_b->SetMaximum(1.);        
-//    Eff3_b->SetMinimum(0.1);
-    Eff3_c->SetMaximum(1.);        
-//    Eff3_c->SetMinimum(0.001);
-    Eff3_l->SetMaximum(1.);        
-//    Eff3_l->SetMinimum(0.0001);
 
     gStyle->SetOptTitle(0);
     gStyle->SetOptStat(0);
@@ -658,7 +211,6 @@ void DrawEff(TString name, bool log, TString titlename){
     TCanvas *c1 = new TCanvas("c1", "c1",10,32,782,552);
     c1->cd();
 
-    // FIRST MC & DATA
     TPad *c1_1 = new TPad("canvas_1", "canvas_1",0,0,1.0,1.0);
     c1_1->Draw();
     c1_1->cd(); 
@@ -667,9 +219,11 @@ void DrawEff(TString name, bool log, TString titlename){
     TLegend* qw = 0;
     qw = new TLegend(0.15,0.15,0.45,0.32);
     qw->SetFillColor(kWhite);
-    qw->AddEntry(Eff1_b, "13TeV 20PU25ns Phys14", "l");
-    qw->AddEntry(Eff2_b, "13TeV 20PU25ns CSA14", "l");
-    if (use8TeV and (name != "CSVIVF" && name != "CSVIVF_1" && name != "CSVIVF_2")) qw->AddEntry(Eff3_b, "8TeV nPUtrue17-23 53X", "l");
+    qw->AddEntry(Eff1_b, "13TeV 20PU25ns Phys14 (P8)", "l");
+    qw->AddEntry(Eff2_b, "13TeV 20PU25ns CSA14 (P8)", "l");
+    if (useCSAp6 ) qw->AddEntry(Eff4_b, "13TeV 20PU25ns CSA14 (P6)", "l");
+    if (use8Tp8 and (name != "CSVIVF" && name != "CSVIVF_1" && name != "CSVIVF_2")) qw->AddEntry(Eff5_b, "8TeV nPUtrue17-23 53X (P8)", "l");
+    if (use8TeV and (name != "CSVIVF" && name != "CSVIVF_1" && name != "CSVIVF_2")) qw->AddEntry(Eff3_b, "8TeV nPUtrue17-23 53X (P6)", "l");
 
     TLatex *latex = new TLatex();
     latex->SetNDC();
@@ -680,10 +234,13 @@ void DrawEff(TString name, bool log, TString titlename){
     Eff1_b->Draw();
     Eff2_b->Draw("same");
     if (use8TeV and (name != "CSVIVF" && name != "CSVIVF_1" && name != "CSVIVF_2")) Eff3_b->Draw("same");
+    if (useCSAp6) Eff4_b->Draw("same");
+    if (use8Tp8 and (name != "CSVIVF" && name != "CSVIVF_1" && name != "CSVIVF_2")) Eff5_b->Draw("same");
     latex->DrawLatex(0.1, 0.94, titlename);
     qw->Draw();
+
     TString name_plot="effb_"+name+"_Linear"+format;
-    if(log) name_plot="effb"+name+"_Log"+format;
+    if(log) name_plot="effb_"+name+"_Log"+format;
     c1->SaveAs(dir4plots+"/"+name_plot);
 
     TCanvas *c2 = new TCanvas("c2", "c2",10,32,782,552);
@@ -696,6 +253,8 @@ void DrawEff(TString name, bool log, TString titlename){
     Eff1_c->Draw();
     Eff2_c->Draw("same");
     if (use8TeV and (name != "CSVIVF" && name != "CSVIVF_1" && name != "CSVIVF_2")) Eff3_c->Draw("same");
+    if (useCSAp6) Eff4_c->Draw("same");
+    if (use8Tp8 and (name != "CSVIVF" && name != "CSVIVF_1" && name != "CSVIVF_2")) Eff5_c->Draw("same");
     latex->DrawLatex(0.1, 0.94, titlename);
     qw->Draw();
     name_plot="effc_"+name+"_Linear"+format;
@@ -712,10 +271,14 @@ void DrawEff(TString name, bool log, TString titlename){
     Eff1_l->Draw();
     Eff2_l->Draw("same");
     if (use8TeV and (name != "CSVIVF" && name != "CSVIVF_1" && name != "CSVIVF_2")) Eff3_l->Draw("same");
+    if (useCSAp6) Eff4_l->Draw("same");
+    if (use8Tp8 and (name != "CSVIVF" && name != "CSVIVF_1" && name != "CSVIVF_2")) Eff5_l->Draw("same");
     latex->DrawLatex(0.1, 0.94, titlename);
     qw->Draw();
-    name_plot="effl_"+name+"_Linear"+format;
-    if(log) name_plot="effl_"+name+"_Log"+format;
+    TString nameuuu="effl_";
+    if (merge_g) nameuuu="effl_wg_";
+    name_plot=nameuuu+name+"_Linear"+format;
+    if(log) name_plot=nameuuu+name+"_Log"+format;
     c3->SaveAs(dir4plots+"/"+name_plot);
 }
 
@@ -1025,6 +588,9 @@ void DrawEffvsPt(TString name, bool log, TString titlename, int icase1){
     if(log) name_plot="effvspt_l_"+name+"_Log_"+scase1+format;
     c3->SaveAs(dir4plots+"/"+name_plot);
 }
+
+
+
 void DrawAllPlot(bool log, int case1){
 
 
@@ -1441,4 +1007,126 @@ void DrawTest(bool log, int case1){
     if(log) name_plot="bvsc_test_Log"+format;
     c2->SaveAs(dir4plots+"/"+name_plot);
 
+}
+
+void DefinePerfTGraph( TString  filename_x, TString name, TGraphErrors* & BvsUDSG_1, TString ytitle_for_BvsUDSG_1, TGraphErrors* &  BvsC_1, TString ytitle_for_BvsC_1, int iMstyle, float xMsize, int iColor) 
+{
+    
+    // File1
+    TH1D* hist_b_1;
+    TH1D* hist_c_1;
+    TH1D* hist_l_1; 
+    TH1D* hist_g_1; 
+
+    TFile *myFile_1     = new TFile(filename_x);
+    myFile_1->cd();
+    
+    hist_b_1         = (TH1D*)gROOT->FindObject(name+"_b");
+    hist_c_1         = (TH1D*)gROOT->FindObject(name+"_c");
+    hist_l_1         = (TH1D*)gROOT->FindObject(name+"_l");
+    if (merge_g) {
+     hist_g_1         = (TH1D*)gROOT->FindObject(name+"_g");
+     hist_l_1->Add(hist_g_1);
+    }
+
+
+    int nbin_max_1= hist_b_1->GetNbinsX();
+
+
+    Double_t eff_b_1[nbin_max_1];
+    Double_t eff_l_1[nbin_max_1];
+    Double_t eff_c_1[nbin_max_1];
+    Double_t err_b_1[nbin_max_1];
+    Double_t err_l_1[nbin_max_1];
+    Double_t err_c_1[nbin_max_1];
+    ComputeEffAndErr(hist_b_1, hist_c_1, hist_l_1, eff_b_1, err_b_1, eff_c_1, err_c_1, eff_l_1, err_l_1);
+
+    BvsUDSG_1 = new TGraphErrors(nbin_max_1,eff_b_1,eff_l_1,err_b_1,err_l_1);
+    BvsC_1    = new TGraphErrors(nbin_max_1,eff_b_1,eff_c_1,err_b_1,err_c_1);
+
+    // SET COSMETICS
+    BvsUDSG_1->SetMarkerStyle(iMstyle);
+    BvsUDSG_1->SetMarkerSize(xMsize);
+    BvsUDSG_1->SetMarkerColor(iColor);
+    BvsUDSG_1->SetLineColor(iColor);
+    BvsUDSG_1->GetXaxis()->SetTitle("b-jet efficiency");  
+    BvsUDSG_1->GetYaxis()->SetTitle(ytitle_for_BvsUDSG_1);
+
+    BvsC_1->SetMarkerStyle(iMstyle);
+    BvsC_1->SetMarkerSize(xMsize);
+    BvsC_1->SetMarkerColor(iColor);
+    BvsC_1->SetLineColor(iColor);
+    BvsC_1->GetXaxis()->SetTitle("b-jet efficiency");  
+    BvsC_1->GetYaxis()->SetTitle(ytitle_for_BvsC_1);
+
+    BvsUDSG_1->GetXaxis()->SetLimits(0.,1.);
+    BvsUDSG_1->GetHistogram()->SetMaximum(1.);        
+    BvsUDSG_1->GetHistogram()->SetMinimum(0.0001);
+    
+    BvsC_1->GetXaxis()->SetLimits(0.,1.);
+    BvsC_1->GetHistogram()->SetMaximum(1.);        
+    BvsC_1->GetHistogram()->SetMinimum(0.001);
+
+}
+
+void DefineEffHist(TString filename_x, TString name, TH1D * & Eff1_b, TH1D * & Eff1_c, TH1D * & Eff1_l, int iColor)
+{
+    // File1
+    TH1D* hist_b_1;
+    TH1D* hist_c_1;
+    TH1D* hist_l_1; 
+    TH1D* hist_g_1; 
+
+    TFile *myFile_1     = new TFile(filename_x);
+    myFile_1->cd();
+    
+    hist_b_1         = (TH1D*)gROOT->FindObject(name+"_b");
+    hist_c_1         = (TH1D*)gROOT->FindObject(name+"_c");
+    hist_l_1         = (TH1D*)gROOT->FindObject(name+"_l");
+    if (merge_g) {
+     hist_g_1         = (TH1D*)gROOT->FindObject(name+"_g");
+     hist_l_1->Add(hist_g_1);
+    }
+
+
+    int nbin_max_1= hist_b_1->GetNbinsX();
+    float minx=hist_b_1->GetXaxis()->GetXmin();
+    float maxx=hist_b_1->GetXaxis()->GetXmax();
+
+    Eff1_b= new TH1D ("Eff1_b",name,nbin_max_1,minx,maxx);
+    Eff1_c = new TH1D ("Eff1_c",name,nbin_max_1,minx,maxx);
+    Eff1_l = new TH1D ("Eff1_l",name,nbin_max_1,minx,maxx);
+
+    Double_t eff_b_1[nbin_max_1];
+    Double_t eff_l_1[nbin_max_1];
+    Double_t eff_c_1[nbin_max_1];
+    Double_t err_b_1[nbin_max_1];
+    Double_t err_l_1[nbin_max_1];
+    Double_t err_c_1[nbin_max_1];
+    ComputeEffAndErr(hist_b_1, hist_c_1, hist_l_1, eff_b_1, err_b_1, eff_c_1, err_c_1, eff_l_1, err_l_1);
+
+    for (int ii=0; ii<nbin_max_1; ii++) {
+        Eff1_b->SetBinContent(ii+1, eff_b_1[ii]);
+        Eff1_b->SetBinError(ii+1,   err_b_1[ii]);
+        Eff1_c->SetBinContent(ii+1, eff_c_1[ii]);
+        Eff1_c->SetBinError(ii+1,   err_c_1[ii]);
+        Eff1_l->SetBinContent(ii+1, eff_l_1[ii]);
+        Eff1_l->SetBinError(ii+1,   err_l_1[ii]);
+    }
+
+    Eff1_b->SetLineColor(iColor);
+    Eff1_c->SetLineColor(iColor);
+    Eff1_l->SetLineColor(iColor);
+    Eff1_b->SetMarkerColor(iColor);
+    Eff1_c->SetMarkerColor(iColor);
+    Eff1_l->SetMarkerColor(iColor);
+
+    Eff1_b->GetYaxis()->SetTitle("b-jet efficiency");  
+    if (!merge_g) Eff1_l->GetYaxis()->SetTitle("uds-jet misid. probability");
+    else Eff1_l->GetYaxis()->SetTitle("udsg-jet misid. probability");
+    Eff1_c->GetYaxis()->SetTitle("c-jet misid. probability");
+
+    Eff1_b->SetMaximum(1.);        
+    Eff1_c->SetMaximum(1.);        
+    Eff1_l->SetMaximum(1.);        
 }

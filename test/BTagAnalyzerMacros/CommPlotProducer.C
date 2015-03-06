@@ -563,6 +563,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     AddHisto("jet_phi"    ,"phi of all jets",                40,-1.*pi,pi);
     AddHisto("jet_diffpt"  ,"abs(pTgen-pTreco) of jets",		     100,0,100 );
     AddHisto("jet_diffrel"  ,"(pTgen-pTreco)/pTreco of jets",		     80,-2,2 );
+    AddHisto("jet_flav"  ,"flavour of jets",		     28,-5.5, 22.5);
 
     AddHisto("jet1_ptgen"	  ,"pTgen of jets",		     PtMax/10,50,200 );
     AddHisto("jet1_pt_all"	  ,"pT of jets",		     PtMax/10,0,300 );
@@ -692,12 +693,12 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     AddHisto("discri_sschp0",	 "SSVHP Discriminator",    80, -1., 7.   ); 
  
    
-    int nDiscbins = 100; //50
+    int nDiscbins = 100; 
     AddHisto("TCHE"	  ,"TCHE",				     nDiscbins,0.,30. );
     AddHisto("TCHP"	  ,"TCHP",				     nDiscbins,0.,30. );  
     AddHisto("JP" 	  ,"JP",				     nDiscbins,0.,2.5 );
     AddHisto("JBP"	  ,"JBP",				     nDiscbins,0.,8.  );
-    AddHisto("SSV"	  ,"SSVHE",				     nDiscbins+40,0.,7.  ); 
+    AddHisto("SSV"	  ,"SSVHE",				     nDiscbins+40,0.,7.  );
     AddHisto("SSVHP"  ,"SSVHP",				     nDiscbins+40,0.,7.  ); 
     AddHisto("CSV"	  ,"CSV",				     nDiscbins,0.,1.  );
     AddHisto("CSVIVF" ,"CSVIVF",                 nDiscbins,0.,1.  );
@@ -714,7 +715,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     AddHisto("TCHP_2"	  ,"TCHP",				     nDiscbins,0.,30. );  
     AddHisto("JP_2" 	  ,"JP",				     nDiscbins,0.,2.5 );
     AddHisto("JBP_2"	  ,"JBP",				     nDiscbins,0.,8.  );
-    AddHisto("SSV_2"	  ,"SSVHE",				     nDiscbins+40,0.,7.  );
+    AddHisto("SSV_2"	  ,"SSVHE",				     nDiscbins+40,0.,7.  ); 
     AddHisto("SSVHP_2"  ,"SSVHP",				     nDiscbins+40,0.,7.  ); 
     AddHisto("CSV_2"	  ,"CSV",				     nDiscbins,0.,1.  );
     AddHisto("CSVIVF_2" ,"CSVIVF",                 nDiscbins,0.,1.  );
@@ -832,6 +833,97 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
         ww=GetEvtWeight();
         
 
+
+        // reweighting to have the same pthat distribution at 8 TeV than at 13 TeV
+        if (sqrtstev==8) {
+          if (pthat<30) ww*=1;
+          else if (pthat<40) ww*=0.976294;
+          else if (pthat<50) ww*=1.01541;
+          else if (pthat<60) ww*=1.07855;
+          else if (pthat<70) ww*=1.11816;
+          else if (pthat<80) ww*=1.14682;
+          else if (pthat<90) ww*=1.15081;
+          else if (pthat<100) ww*=1.18087;
+          else if (pthat<110) ww*=1.20429;
+          else if (pthat<120) ww*=1.22826;
+          else if (pthat<130) ww*=1.24829;
+          else if (pthat<140) ww*=1.27395;
+          else if (pthat<150) ww*=1.2954;
+          else if (pthat<160) ww*=1.31888;
+          else if (pthat<170) ww*=1.34134;
+       }
+/*
+        if (sqrtstev==8) {
+          if (pthat<50) ww*=1;
+          else if (pthat<60) ww*=0.975669;
+          else if (pthat<70) ww*=1.00478;
+          else if (pthat<80) ww*=1.02902;
+          else if (pthat<90) ww*=1.04015;
+          else if (pthat<100) ww*=1.06193;
+          else if (pthat<110) ww*=1.08189;
+          else if (pthat<120) ww*=1.10735;
+          else if (pthat<130) ww*=1.12469;
+          else if (pthat<140) ww*=1.14716;
+          else if (pthat<150) ww*=1.16819;
+          else if (pthat<160) ww*=1.18393;
+          else if (pthat<170) ww*=1.18393;
+          else if (pthat<470) ww*=1.;
+          else if (pthat<480) ww*=1.79;
+          else if (pthat<490) ww*=1.80172;
+          else if (pthat<500) ww*=1.83285;
+          else if (pthat<510) ww*=1.84635;
+          else if (pthat<520) ww*=1.8745;
+          else if (pthat<530) ww*=1.90015;
+          else if (pthat<540) ww*=1.91784;
+          else if (pthat<550) ww*=1.93765;
+          else if (pthat<560) ww*=1.96998;
+          else if (pthat<570) ww*=1.98841;
+          else if (pthat<580) ww*=2.00571;
+          else if (pthat<590) ww*=2.04887;
+          else if (pthat<600) ww*=2.06236;
+          else if (pthat<610) ww*=2.08986;
+          else if (pthat<620) ww*=2.11926;
+          else if (pthat<630) ww*=2.1489;
+          else if (pthat<640) ww*=2.18014;
+          else if (pthat<650) ww*=2.18985;
+          else if (pthat<660) ww*=2.21246;
+          else if (pthat<670) ww*=2.24133;
+          else if (pthat<680) ww*=2.28596;
+          else if (pthat<690) ww*=2.30367;
+          else if (pthat<700) ww*=2.33695;
+          else if (pthat<710) ww*=2.34348;
+          else if (pthat<720) ww*=2.38283;
+          else if (pthat<730) ww*=2.41769;
+          else if (pthat<740) ww*=2.44088;
+          else if (pthat<750) ww*=2.47955;
+          else if (pthat<760) ww*=2.51384;
+          else if (pthat<770) ww*=2.54629;
+          else if (pthat<780) ww*=2.57973;
+          else if (pthat<790) ww*=2.5965;
+          else if (pthat<800) ww*=2.61759;
+          else if (pthat<810) ww*=2.66169;
+          else if (pthat<820) ww*=2.69976;
+          else if (pthat<830) ww*=2.73976;
+          else if (pthat<840) ww*=2.76758;
+          else if (pthat<850) ww*=2.79714;
+          else if (pthat<860) ww*=2.81252;
+          else if (pthat<870) ww*=2.88612;
+          else if (pthat<880) ww*=2.90749;
+          else if (pthat<890) ww*=2.94866;
+          else if (pthat<900) ww*=2.96274;
+          else if (pthat<910) ww*=3.01957;
+          else if (pthat<920) ww*=3.07051;
+          else if (pthat<930) ww*=3.10424;
+          else if (pthat<940) ww*=3.14339;
+          else if (pthat<950) ww*=3.20024;
+          else if (pthat<960) ww*=3.21801;
+          else if (pthat<970) ww*=3.28194;
+          else if (pthat<980) ww*=3.29407;
+          else if (pthat<990) ww*=3.38315;
+          else if (pthat<1000) ww*=3.4031;
+        }
+*/
+    
         if (!isData)  pt_hat         ->Fill(pthat,ww);
 
     
@@ -899,7 +991,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             float phijet   = Jet_phi[ijet];      
             float ntrkjet  = Jet_ntracks[ijet];  
             int   flav     = Jet_flavour[ijet];
-            if (Jet_genpt[ijet]<8) flav=28; // au hasard pour le PU
+            if (Jet_genpt[ijet]<8) flav=22; // au hasard pour le PU
 
             FillHisto_floatFromMap("incjet_ptgen",   flav, 0 ,Jet_genpt[ijet]    ,ww);
             FillHisto_floatFromMap("incjet_pt_all",  flav, 0 ,ptjet    ,ww);
@@ -1065,6 +1157,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             FillHisto_floatFromMap("jet_eta",     flav, isGluonSplit ,etajet   ,ww);
             FillHisto_floatFromMap("jet_phi",     flav, isGluonSplit ,phijet   ,ww);
             FillHisto_intFromMap(  "track_multi", flav, isGluonSplit ,ntrkjet  ,ww);
+            FillHisto_intFromMap(  "jet_flav", flav, isGluonSplit ,flav  ,ww);
 
             
             int n1_ip=-1;
@@ -1466,6 +1559,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
                     }
                 }
 
+
                 FillHisto_intFromMap(  "pfmuon_multi",  flav, isGluonSplit , npfmu   ,ww);
                 if (indpfmu>-1) {
                     FillHisto_intFromMap(  "pfmuon_goodquality", flav, isGluonSplit, PFMuon_GoodQuality[indpfmu]        ,ww);
@@ -1583,6 +1677,7 @@ void CommPlotProducer::AddHisto(TString name, TString title, int nbins, float mi
     TH1D* h_bfromg = new TH1D(name+"_bfromg",title+"_bfromg",nbins,min,max);  
     TH1D* h_c      = new TH1D(name+"_c",title+"_c",nbins,min,max);  
     TH1D* h_l      = new TH1D(name+"_l",title+"_l",nbins,min,max);
+    TH1D* h_g      = new TH1D(name+"_g",title+"_g",nbins,min,max);
     TH1D* h_data   = new TH1D(name+"_data",title+"_data",nbins,min,max);
     TH1D* h_cfromg = new TH1D(name+"_cfromg",title+"_cfromg",nbins,min,max);  
     TH1D* h_puu = new TH1D(name+"_puu",title+"_puu",nbins,min,max);  
@@ -1595,6 +1690,7 @@ void CommPlotProducer::AddHisto(TString name, TString title, int nbins, float mi
     h_l        ->Sumw2(); 
     h_data     ->Sumw2();
     h_puu     ->Sumw2();
+    h_g     ->Sumw2();
   
     HistoBtag.push_back(h_b);
     HistoBtag.push_back(h_bfromg);  
@@ -1602,6 +1698,7 @@ void CommPlotProducer::AddHisto(TString name, TString title, int nbins, float mi
     HistoBtag.push_back(h_l);  
     HistoBtag.push_back(h_data);  
     HistoBtag.push_back(h_cfromg);  
+    HistoBtag.push_back(h_g);  
     HistoBtag.push_back(h_puu);  
     HistoBtag_map[name.Data()] = numb_histo;
   
@@ -1613,29 +1710,32 @@ void CommPlotProducer::AddHisto(TString name, TString title, int nbins, float mi
 void CommPlotProducer::FillHisto_float(int flavour, bool isGS, int number, float value, double weight)  {
   
     if (!isData){
-        if (fabs(flavour)==5 && !isGS)                  HistoBtag[number*7 +0]->Fill(value,weight);
-        else if (fabs(flavour)==5 && isGS)              HistoBtag[number*7 +1]->Fill(value,weight);
-        else if (fabs(flavour)==4 && !isGS)             HistoBtag[number*7 +2]->Fill(value,weight); 
-        else if (fabs(flavour)==4 && isGS)              HistoBtag[number*7 +5]->Fill(value,weight); 
-        else if (fabs(flavour)< 4 || fabs(flavour)==21) HistoBtag[number*7 +3]->Fill(value,weight);
-        else                                            HistoBtag[number*7 +6]->Fill(value,weight); 
+        if (fabs(flavour)==5 && !isGS)                  HistoBtag[number*8 +0]->Fill(value,weight);
+        else if (fabs(flavour)==5 && isGS)              HistoBtag[number*8 +1]->Fill(value,weight);
+        else if (fabs(flavour)==4 && !isGS)             HistoBtag[number*8 +2]->Fill(value,weight); 
+        else if (fabs(flavour)==4 && isGS)              HistoBtag[number*8 +5]->Fill(value,weight); 
+        else if (fabs(flavour)< 4)                      HistoBtag[number*8 +3]->Fill(value,weight);
+        else if (fabs(flavour)==21)                     HistoBtag[number*8 +6]->Fill(value,weight);
+        else                                            HistoBtag[number*8 +7]->Fill(value,weight); 
     
     }  
-    else                                              HistoBtag[number*7 +4]->Fill(value);
+    else                                              HistoBtag[number*8 +4]->Fill(value);
   
   
 }
 void CommPlotProducer::FillHisto_int(int flavour, bool isGS, int number, int value, double weight)  {
   
     if (!isData){
-        if (fabs(flavour)==5 && !isGS)             HistoBtag[number*7 +0]->Fill(value,weight);
-        else if (fabs(flavour)==5 && isGS)              HistoBtag[number*7 +1]->Fill(value,weight);
-        else if (fabs(flavour)==4 && !isGS)             HistoBtag[number*7 +2]->Fill(value,weight); 
-        else if (fabs(flavour)==4 && isGS)              HistoBtag[number*7 +5]->Fill(value,weight); 
-        else if (fabs(flavour)< 4 || fabs(flavour)==21) HistoBtag[number*7 +3]->Fill(value,weight);
-        else                                            HistoBtag[number*7 +6]->Fill(value,weight); 
+        if (fabs(flavour)==5 && !isGS)             HistoBtag[number*8 +0]->Fill(value,weight);
+        else if (fabs(flavour)==5 && isGS)              HistoBtag[number*8 +1]->Fill(value,weight);
+        else if (fabs(flavour)==4 && !isGS)             HistoBtag[number*8 +2]->Fill(value,weight); 
+        else if (fabs(flavour)==4 && isGS)              HistoBtag[number*8 +5]->Fill(value,weight); 
+        else if (fabs(flavour)< 4)                      HistoBtag[number*8 +3]->Fill(value,weight);
+        else if (fabs(flavour)==21)                     HistoBtag[number*8 +6]->Fill(value,weight);
+        else                                            HistoBtag[number*8 +7]->Fill(value,weight);
+
     }  
-    else                                         HistoBtag[number*7 +4]->Fill(value);
+    else                                         HistoBtag[number*8 +4]->Fill(value);
   
 }
 
@@ -1645,15 +1745,17 @@ void CommPlotProducer::FillHisto_floatFromMap(TString name, int flavour, bool is
   
     int number = HistoBtag_map[name.Data()] ;
     if (!isData){
-        if (fabs(flavour)==5 && !isGS)                  HistoBtag[number*7 +0]->Fill(value,weight);
-        else if (fabs(flavour)==5 && isGS)              HistoBtag[number*7 +1]->Fill(value,weight);
-        else if (fabs(flavour)==4 && !isGS)             HistoBtag[number*7 +2]->Fill(value,weight); 
-        else if (fabs(flavour)==4 && isGS)              HistoBtag[number*7 +5]->Fill(value,weight); 
-        else if (fabs(flavour)< 4 || fabs(flavour)==21) HistoBtag[number*7 +3]->Fill(value,weight);
-        else                                            HistoBtag[number*7 +6]->Fill(value,weight); 
+        if (fabs(flavour)==5 && !isGS)                  HistoBtag[number*8 +0]->Fill(value,weight);
+        else if (fabs(flavour)==5 && isGS)              HistoBtag[number*8 +1]->Fill(value,weight);
+        else if (fabs(flavour)==4 && !isGS)             HistoBtag[number*8 +2]->Fill(value,weight); 
+        else if (fabs(flavour)==4 && isGS)              HistoBtag[number*8 +5]->Fill(value,weight); 
+        else if (fabs(flavour)< 4)                      HistoBtag[number*8 +3]->Fill(value,weight);
+        else if (fabs(flavour)==21)                     HistoBtag[number*8 +6]->Fill(value,weight);
+        else                                            HistoBtag[number*8 +7]->Fill(value,weight);
+
     
     }  
-    else                                              HistoBtag[number*7 +4]->Fill(value);
+    else                                              HistoBtag[number*8 +4]->Fill(value);
   
    
 }
@@ -1663,14 +1765,16 @@ void CommPlotProducer::FillHisto_intFromMap(TString name, int flavour, bool isGS
   
     int number = HistoBtag_map[name.Data()] ;
     if (!isData){
-        if (fabs(flavour)==5 && !isGS)                  HistoBtag[number*7 +0]->Fill(value,weight);
-        else if (fabs(flavour)==5 && isGS)              HistoBtag[number*7 +1]->Fill(value,weight);
-        else if (fabs(flavour)==4 && !isGS)             HistoBtag[number*7 +2]->Fill(value,weight); 
-        else if (fabs(flavour)==4 && isGS)              HistoBtag[number*7 +5]->Fill(value,weight); 
-        else if (fabs(flavour)< 4 || fabs(flavour)==21) HistoBtag[number*7 +3]->Fill(value,weight);
-        else                                            HistoBtag[number*7 +6]->Fill(value,weight); 
+        if (fabs(flavour)==5 && !isGS)                  HistoBtag[number*8 +0]->Fill(value,weight);
+        else if (fabs(flavour)==5 && isGS)              HistoBtag[number*8 +1]->Fill(value,weight);
+        else if (fabs(flavour)==4 && !isGS)             HistoBtag[number*8 +2]->Fill(value,weight); 
+        else if (fabs(flavour)==4 && isGS)              HistoBtag[number*8 +5]->Fill(value,weight); 
+        else if (fabs(flavour)< 4)                      HistoBtag[number*8 +3]->Fill(value,weight);
+        else if (fabs(flavour)==21)                     HistoBtag[number*8 +6]->Fill(value,weight);
+        else                                            HistoBtag[number*8 +7]->Fill(value,weight);
+
     }  
-    else                                         HistoBtag[number*7 +4]->Fill(value);
+    else                                         HistoBtag[number*8 +4]->Fill(value);
   
 }
 

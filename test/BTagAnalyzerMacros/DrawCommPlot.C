@@ -38,7 +38,7 @@ TString dir4plots="plots";
 
 //TString title = "CMS Simulation, HLT_BTagMu_DiJet40_Mu5, Jet pT > 60 GeV/c";
 TString title = "CMS Simulation";
-TString adddir = "gen50_200_27jan/";
+TString adddir = "rootfiles/";
 TString filenameAOD = adddir+"phys14.root";
 TString filenameMini = adddir+"csa14.root";
 TString filename8tev = adddir+"8tev_new.root";
@@ -64,6 +64,12 @@ void DrawMCgen(TString name, TString histotitle, bool log);
 void DrawTagRate(TString name, TString histotitle, bool log);
 void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY, bool log);
 void OverFlowBinFix(TH1D* );
+void DefineHstack(TString filename_x, TString name, TH1D*& hist_fill, THStack * & hs_fill, TH1D* & hist_fill_b, TH1D* & hist_fill_c, TH1D* & hist_fill_l, TH1D* & hist_fill_g, TH1D* & hist_fill_bfromg, TH1D* & hist_fill_cfromg, TH1D* & hist_fill_puu );
+void DefineHline(TString filename_x, TString name, TH1D* & hist_line, int iMcolor, float xMsize, int iMstyle, int iLwidth);
+void DefineHratio(TString nameRatio, TH1D* & histo_ratio1, TH1D* hnum, TH1D* hdenum, int iMcolor, float xMsize, int iMstyle, int iLwidth );
+void DefineHgen(TString filename_x, TString name, TH1D* & hist_fill, int iColor);
+
+
 void anplot();
 void anplot2();
 
@@ -961,12 +967,15 @@ void OverFlowBinFix(TH1D* histo){
     Float_t val, errval;
 
     val=histo->GetBinContent(1)+histo->GetBinContent(0);
+/*
     errval=0;
     if(histo->GetBinContent(1)!=0.)
         errval+=pow(histo->GetBinError(1)/histo->GetBinContent(1),2);
     if(histo->GetBinContent(0)!=0.)
         errval+=pow(histo->GetBinError(0)/histo->GetBinContent(0),2);
     errval=sqrt(errval)*val;
+*/
+    errval=sqrt( histo->GetBinError(1)*histo->GetBinError(1) + histo->GetBinError(0)*histo->GetBinError(0));
     histo->SetBinContent(1,val);
     histo->SetBinError(1,errval);
     histo->SetBinContent(0,0);
@@ -975,12 +984,15 @@ void OverFlowBinFix(TH1D* histo){
     Int_t highbin=histo->GetNbinsX();
 
     val=histo->GetBinContent(highbin)+histo->GetBinContent(highbin+1);
+/*  
     errval=0;
     if(histo->GetBinContent(highbin)!=0.)
         errval+=pow(histo->GetBinError(highbin)/histo->GetBinContent(highbin),2);
     if(histo->GetBinContent(highbin+1)!=0.)
         errval+=pow(histo->GetBinError(highbin+1)/histo->GetBinContent(highbin+1),2);
     errval=sqrt(errval)*val;
+*/
+    errval=sqrt( histo->GetBinError(highbin)*histo->GetBinError(highbin) + histo->GetBinError(highbin+1)*histo->GetBinError(highbin+1));
     histo->SetBinContent(highbin,val);
     histo->SetBinError(highbin,errval);
     histo->SetBinContent(highbin+1,0);
@@ -1122,352 +1134,52 @@ void DrawMC(TString name, TString histotitle, bool log)
 void DrawMCCompare(TString name, TString histotitle, bool log)
  
 {
-    TFile *fileFill     = new TFile(filenameAOD);
+
 
     TH1D* hist_fill;
+    THStack *hs_fill;
     TH1D* hist_fill_b;
     TH1D* hist_fill_c;
     TH1D* hist_fill_l;
+    TH1D* hist_fill_g;
     TH1D* hist_fill_bfromg;
     TH1D* hist_fill_cfromg;
     TH1D* hist_fill_puu;
+    DefineHstack(filenameAOD, name, hist_fill, hs_fill, hist_fill_b, hist_fill_c, hist_fill_l, hist_fill_g, hist_fill_bfromg, hist_fill_cfromg, hist_fill_puu);
 
-    fileFill->cd();
 
-    hist_fill_b       = (TH1D*)gROOT->FindObject(name+"_b");
-    hist_fill_c       = (TH1D*)gROOT->FindObject(name+"_c");
-    hist_fill_l       = (TH1D*)gROOT->FindObject(name+"_l");
-    hist_fill_bfromg  = (TH1D*)gROOT->FindObject(name+"_bfromg");
-    hist_fill_cfromg  = (TH1D*)gROOT->FindObject(name+"_cfromg");
-    hist_fill_puu  = (TH1D*)gROOT->FindObject(name+"_puu");
-    hist_fill = (TH1D*) hist_fill_b->Clone();
-    hist_fill->Add(hist_fill_bfromg);
-    hist_fill->Add(hist_fill_c);
-    hist_fill->Add(hist_fill_cfromg);
-    hist_fill->Add(hist_fill_l);
-    hist_fill->Add(hist_fill_puu);
 
-    //cout << "Getting 4050 file\n";
-    TFile *fileLine     = new TFile(filenameMini);
 
     TH1D* hist_line;
-    TH1D* hist_line_b;
-    TH1D* hist_line_c;
-    TH1D* hist_line_l;
-    TH1D* hist_line_bfromg;
-    TH1D* hist_line_cfromg;
-    TH1D* hist_line_puu;
-
-    fileLine->cd();
-
-    hist_line_b       = (TH1D*)gROOT->FindObject(name+"_b");
-    hist_line_c       = (TH1D*)gROOT->FindObject(name+"_c");
-    hist_line_l       = (TH1D*)gROOT->FindObject(name+"_l");
-    hist_line_bfromg  = (TH1D*)gROOT->FindObject(name+"_bfromg");
-    hist_line_cfromg  = (TH1D*)gROOT->FindObject(name+"_cfromg");
-    hist_line_puu  = (TH1D*)gROOT->FindObject(name+"_puu");
-    
-    hist_line = (TH1D*) hist_line_b->Clone();
-    hist_line->Add(hist_line_bfromg);
-    hist_line->Add(hist_line_c);
-    hist_line->Add(hist_line_cfromg);
-    hist_line->Add(hist_line_l);
-    hist_line->Add(hist_line_puu);
+    DefineHline(filenameMini, name, hist_line,  kGray+2, 0.75, 20, 2) ;
 
 
-
-    TFile *file8tev = new TFile(filename8tev);
-    TH1D* hist_line_2;
-    TH1D* hist_line_b_2;
-    TH1D* hist_line_bfromg_2;
-    TH1D* hist_line_c_2;
-    TH1D* hist_line_cfromg_2;
-    TH1D* hist_line_l_2;
-    TH1D* hist_line_puu_2;
+    TH1D* hist_line2;
+    DefineHline(filename8tev, name, hist_line2, kOrange, 1,1,1 );
 
 
-    file8tev->cd();
-
-    hist_line_b_2       = (TH1D*)gROOT->FindObject(name+"_b");
-    hist_line_c_2       = (TH1D*)gROOT->FindObject(name+"_c");
-    hist_line_l_2       = (TH1D*)gROOT->FindObject(name+"_l");
-    hist_line_puu_2     = (TH1D*)gROOT->FindObject(name+"_puu");
-    hist_line_bfromg_2  = (TH1D*)gROOT->FindObject(name+"_bfromg");
-    hist_line_cfromg_2  = (TH1D*)gROOT->FindObject(name+"_cfromg");
-    
-    hist_line_2 = (TH1D*) hist_line_b_2->Clone();
-    hist_line_2->Add(hist_line_bfromg_2);
-    hist_line_2->Add(hist_line_c_2);
-    hist_line_2->Add(hist_line_cfromg_2);
-    hist_line_2->Add(hist_line_l_2);
-    hist_line_2->Add(hist_line_puu_2);
-
-    float int_line_2 = hist_line_2->Integral();
-
-    TFile *file_4 = new TFile(filename_4);
-    TH1D* hist_line_4;
-    TH1D* hist_line_b_4;
-    TH1D* hist_line_bfromg_4;
-    TH1D* hist_line_c_4;
-    TH1D* hist_line_cfromg_4;
-    TH1D* hist_line_l_4;
-    TH1D* hist_line_puu_4;
+    TH1D* hist_line4;
+    DefineHline(filename_4, name, hist_line4, kViolet, 1,1,1);
 
 
-    file_4->cd();
+    TH1D* hist_line5;
+    DefineHline(filename_5, name, hist_line5, kCyan-6, 1,1,1);
 
-    hist_line_b_4       = (TH1D*)gROOT->FindObject(name+"_b");
-    hist_line_c_4       = (TH1D*)gROOT->FindObject(name+"_c");
-    hist_line_l_4       = (TH1D*)gROOT->FindObject(name+"_l");
-    hist_line_puu_4     = (TH1D*)gROOT->FindObject(name+"_puu");
-    hist_line_bfromg_4  = (TH1D*)gROOT->FindObject(name+"_bfromg");
-    hist_line_cfromg_4  = (TH1D*)gROOT->FindObject(name+"_cfromg");
-    
-    hist_line_4 = (TH1D*) hist_line_b_4->Clone();
-    hist_line_4->Add(hist_line_bfromg_4);
-    hist_line_4->Add(hist_line_c_4);
-    hist_line_4->Add(hist_line_cfromg_4);
-    hist_line_4->Add(hist_line_l_4);
-    hist_line_4->Add(hist_line_puu_4);
-
-    float int_line_4 = hist_line_4->Integral();
-
-
-    TFile *file_5 = new TFile(filename_5);
-    TH1D* hist_line_5;
-    TH1D* hist_line_b_5;
-    TH1D* hist_line_bfromg_5;
-    TH1D* hist_line_c_5;
-    TH1D* hist_line_cfromg_5;
-    TH1D* hist_line_l_5; 
-    TH1D* hist_line_puu_5;
-
-
-    file_5->cd();
-
-    hist_line_b_5       = (TH1D*)gROOT->FindObject(name+"_b");
-    hist_line_c_5       = (TH1D*)gROOT->FindObject(name+"_c");
-    hist_line_l_5       = (TH1D*)gROOT->FindObject(name+"_l");
-    hist_line_puu_5     = (TH1D*)gROOT->FindObject(name+"_puu");
-    hist_line_bfromg_5  = (TH1D*)gROOT->FindObject(name+"_bfromg");
-    hist_line_cfromg_5  = (TH1D*)gROOT->FindObject(name+"_cfromg");
-
-    hist_line_5 = (TH1D*) hist_line_b_5->Clone();
-    hist_line_5->Add(hist_line_bfromg_5);
-    hist_line_5->Add(hist_line_c_5);
-    hist_line_5->Add(hist_line_cfromg_5);
-    hist_line_5->Add(hist_line_l_5);
-    hist_line_5->Add(hist_line_puu_5);
-
-    float int_line_5 = hist_line_5->Integral();
-
-
-    
-    float int_fill = hist_fill->Integral();
-    float int_line = hist_line->Integral();
-
-    cout << " integral " << int_fill << " " << int_line << "  " << int_line_2 << endl;
-
-
-
-    if (int_fill > 0.){
-        hist_fill->Scale(1./int_fill);
-        hist_fill_b->Scale(1./int_fill);
-        hist_fill_c->Scale(1./int_fill);
-        hist_fill_l->Scale(1./int_fill);
-        hist_fill_puu->Scale(1./int_fill);
-        hist_fill_bfromg->Scale(1./int_fill);
-        hist_fill_cfromg->Scale(1./int_fill);
-    }
-    if (int_line > 0.){
-        hist_line->Scale(1./int_line);
-        hist_line_b->Scale(1./int_line);
-        hist_line_c->Scale(1./int_line);
-        hist_line_l->Scale(1./int_line);
-        hist_line_puu->Scale(1./int_line);
-        hist_line_bfromg->Scale(1./int_line);
-        hist_line_cfromg->Scale(1./int_line);
-    }
-    if (int_line_2 > 0.){
-        hist_line_2->Scale(1./int_line_2);
-        hist_line_b_2->Scale(1./int_line_2);
-        hist_line_c_2->Scale(1./int_line_2);
-        hist_line_l_2->Scale(1./int_line_2);
-        hist_line_puu_2->Scale(1./int_line_2);
-        hist_line_bfromg_2->Scale(1./int_line_2);
-        hist_line_cfromg_2->Scale(1./int_line_2);
-    }
-    if (int_line_4 > 0.){
-        hist_line_4->Scale(1./int_line_4);
-        hist_line_b_4->Scale(1./int_line_4);
-        hist_line_c_4->Scale(1./int_line_4);
-        hist_line_l_4->Scale(1./int_line_4);
-        hist_line_puu_4->Scale(1./int_line_4);
-        hist_line_bfromg_4->Scale(1./int_line_4);
-        hist_line_cfromg_4->Scale(1./int_line_4);
-    }
-    if (int_line_5 > 0.){
-        hist_line_5->Scale(1./int_line_5);
-        hist_line_b_5->Scale(1./int_line_5);
-        hist_line_c_5->Scale(1./int_line_5);
-        hist_line_l_5->Scale(1./int_line_5);
-        hist_line_puu_5->Scale(1./int_line_5);
-        hist_line_bfromg_5->Scale(1./int_line_5);
-        hist_line_cfromg_5->Scale(1./int_line_5);
-    }
-
-
-    double titleoffsety=0.2;
-    double titlesizex=0.17;
-    double titlesizey=0.2;
-    double labelsizex=0.14;
-     
-    hist_fill->GetYaxis()->SetTitleSize(titlesizey);
-    hist_fill->GetYaxis()->SetTitleOffset(titleoffsety);
-  
-    hist_line->GetYaxis()->SetTitleSize(titlesizey);
-    hist_line->GetYaxis()->SetTitleOffset(titleoffsety);
-
-    hist_fill_b->SetFillColor(kRed);
-    hist_fill_bfromg->SetFillColor(kCyan);
-    hist_fill_c->SetFillColor(8);
-    hist_fill_cfromg->SetFillColor(kMagenta);
-    hist_fill_l->SetFillColor(kBlue);
-    hist_fill_puu->SetFillColor(kYellow);
-
-    hist_fill_b->SetLineColor(kRed);
-    hist_fill_bfromg->SetLineColor(kCyan);
-    hist_fill_c->SetLineColor(8);
-    hist_fill_cfromg->SetLineColor(kMagenta);
-    hist_fill_l->SetLineColor(kBlue);
-    hist_fill_puu->SetLineColor(kYellow);
-
-    THStack *hs_fill = new THStack("hs_fill","Stacked histograms AOD");
-    hs_fill->Add(hist_fill_b);
-    hs_fill->Add(hist_fill_bfromg);
-    hs_fill->Add(hist_fill_c);
-    hs_fill->Add(hist_fill_cfromg);
-    hs_fill->Add(hist_fill_l);
-    hs_fill->Add(hist_fill_puu);
-
-    hist_line_b->SetLineColor(kRed+2);
-    hist_line_b->SetMarkerColor(kRed+2);
-    hist_line_b->SetLineWidth(2);
-    hist_line_b->SetFillStyle(0);
-    hist_line_bfromg->SetLineColor(kCyan+2);
-    hist_line_bfromg->SetMarkerColor(kCyan+2);
-    hist_line_bfromg->SetLineWidth(2);
-    hist_line_bfromg->SetFillStyle(0);
-    hist_line_c->SetLineColor(kGreen+2);
-    hist_line_c->SetMarkerColor(kGreen+2);
-    hist_line_c->SetLineWidth(2);
-    hist_line_c->SetFillStyle(0);
-    hist_line_cfromg->SetLineColor(kMagenta+3);
-    hist_line_cfromg->SetMarkerColor(kMagenta+3);
-    hist_line_cfromg->SetLineWidth(2);
-    hist_line_cfromg->SetFillStyle(0);
-    hist_line_l->SetLineColor(kBlack);
-    hist_line_l->SetMarkerColor(kBlack);
-    hist_line_l->SetLineWidth(2);
-    hist_line_l->SetFillStyle(0);
-    hist_line_puu->SetLineColor(kYellow);
-    hist_line_puu->SetMarkerColor(kYellow);
-    hist_line_puu->SetLineWidth(2);
-    hist_line_puu->SetFillStyle(0);
-
-    THStack *hs_line = new THStack("hs_line","Stacked histograms Mini");
-    hs_line->Add(hist_line_b);
-    hs_line->Add(hist_line_bfromg);
-    hs_line->Add(hist_line_c);
-    hs_line->Add(hist_line_cfromg);
-    hs_line->Add(hist_line_l);
-    hs_line->Add(hist_line_puu);
-
-
-    hist_line_b_2->SetLineColor(kRed+2);
-    hist_line_b_2->SetMarkerColor(kRed+2);
-    hist_line_b_2->SetLineWidth(2);
-    hist_line_b_2->SetFillStyle(0);
-    hist_line_b_2->SetLineStyle(2);
-    hist_line_bfromg_2->SetLineColor(kCyan+2);
-    hist_line_bfromg_2->SetMarkerColor(kCyan+2);
-    hist_line_bfromg_2->SetLineWidth(2);
-    hist_line_bfromg_2->SetFillStyle(0);
-    hist_line_bfromg_2->SetLineStyle(2);
-    hist_line_c_2->SetLineColor(kGreen+2);
-    hist_line_c_2->SetMarkerColor(kGreen+2);
-    hist_line_c_2->SetLineWidth(2);
-    hist_line_c_2->SetFillStyle(0);
-    hist_line_c_2->SetLineStyle(2);
-    hist_line_cfromg_2->SetLineColor(kMagenta+3);
-    hist_line_cfromg_2->SetMarkerColor(kMagenta+3);
-    hist_line_cfromg_2->SetLineWidth(2);
-    hist_line_cfromg_2->SetFillStyle(0);
-    hist_line_cfromg_2->SetLineStyle(2);
-    hist_line_l_2->SetLineColor(kBlack);
-    hist_line_l_2->SetMarkerColor(kBlack);
-    hist_line_l_2->SetLineWidth(2);
-    hist_line_l_2->SetFillStyle(0);
-    hist_line_l_2->SetLineStyle(2);
-
-
-
-
-/*
-    THStack *hs_line_2 = new THStack("hs_line_2","Stacked histograms 8 tev");
-    hs_line_2->Add(hist_line_b_2);
-    hs_line_2->Add(hist_line_bfromg_2);
-    hs_line_2->Add(hist_line_c_2);
-    hs_line_2->Add(hist_line_cfromg_2);
-    hs_line_2->Add(hist_line_l_2);
-*/
-
-  
-    hist_fill->SetLineWidth(2);
-    hist_fill->SetLineColor(kBlack);
-    hist_fill->SetMarkerStyle(20);  
-    hist_fill->SetMarkerSize(0.75);
-    hist_fill->SetMarkerColor(kBlack);
 
     TH1D* histo_ratio1;
-    histo_ratio1 = (TH1D*) hist_line->Clone();
-    //histo_ratio1->Sumw2();
-    histo_ratio1->SetName("histo_ratio1");
-    histo_ratio1->SetTitle(""); 
-    histo_ratio1->Divide(hist_fill);
+    DefineHratio("histo_ratio1", histo_ratio1, hist_line, hist_fill,   kGray+2, 0.75, 20, 2) ;
+
+
 
     TH1D* histo_ratio2;
-    histo_ratio2 = (TH1D*) hist_line_2->Clone();
-    histo_ratio2->SetName("histo_ratio2");
-    histo_ratio2->SetTitle(""); 
-    histo_ratio2->Divide(hist_fill);
+    DefineHratio("histo_ratio2", histo_ratio2, hist_line2, hist_fill, kOrange, 1,1,1 );
     TH1D* histo_ratio4;
-    histo_ratio4 = (TH1D*) hist_line_4->Clone();
-    histo_ratio4->SetName("histo_ratio4");
-    histo_ratio4->SetTitle(""); 
-    histo_ratio4->Divide(hist_fill);
+    DefineHratio("histo_ratio4", histo_ratio4, hist_line4, hist_fill, kViolet, 1,1,1);
     TH1D* histo_ratio5;
-    histo_ratio5 = (TH1D*) hist_line_5->Clone();
-    histo_ratio5->SetName("histo_ratio5");
-    histo_ratio5->SetTitle(""); 
-    histo_ratio5->Divide(hist_fill);
+    DefineHratio("histo_ratio5", histo_ratio5, hist_line5, hist_fill, kCyan-6, 1,1,1);
 
-    hist_line->SetLineWidth(2);
-    hist_line->SetLineColor(kGray+2);
-    hist_line->SetMarkerStyle(20);  
-    hist_line->SetMarkerSize(0.75);
-    hist_line->SetMarkerColor(kGray+2);
 
-    hist_line_2->SetLineWidth(1);
-    hist_line_2->SetLineColor(kOrange);
-    hist_line_2->SetMarkerStyle(1);  
-    hist_line_2->SetMarkerSize(1);
-    hist_line_2->SetMarkerColor(kOrange);
 
-    hist_line_4->SetLineColor(kViolet);
-    hist_line_5->SetLineColor(kCyan-6);
-    hist_line_4->SetMarkerColor(kViolet);
-    hist_line_5->SetMarkerColor(kCyan-6);
     gStyle->SetOptTitle(0);
     gStyle->SetOptStat(0);  
   
@@ -1482,25 +1194,23 @@ void DrawMCCompare(TString name, TString histotitle, bool log)
  
     canvas_1->SetLogy(log);
  
+
     if (hist_line->GetMaximum() > hs_fill->GetMaximum()) hs_fill->SetMaximum(hist_line->GetMaximum()*1.1);
-//    if (hist_line_b->GetMinimum() < hist_fill_b->GetMinimum()) hs_fill->SetMinimum(hist_line_b->GetMinimum()*0.5);
-//    else hs_fill->SetMinimum(hist_fill_b->GetMinimum()*0.5);
-//    if (log && hs_fill->GetMinimum()<0.000001) hs_fill->SetMinimum(0.000001);
+
     hs_fill->Draw("hist");
-  
     hs_fill->GetXaxis()->SetTitle(name);
     hs_fill->GetYaxis()->SetTitle("entries");
     hs_fill->GetYaxis()->SetLabelSize(0.05);
-
     hs_fill->GetYaxis()->SetTitleSize(0.08);
     hs_fill->GetYaxis()->SetTitleOffset(0.65); 
 
-    hist_line->Draw("hist error same");
-    hist_line_2->Draw("hist same");
-    hist_line_4->Draw("hist same");
-    hist_line_5->Draw("hist same");
+  
 
-    //hs_line->Draw("same");
+    hist_line->Draw("hist error same");
+    hist_line2->Draw("hist same");
+    hist_line4->Draw("hist same");
+    hist_line5->Draw("hist same");
+
 
     TLegend* qw =  new TLegend(0.825,0.65,0.975,1.);
     //Legend
@@ -1510,10 +1220,11 @@ void DrawMCCompare(TString name, TString histotitle, bool log)
     qw->AddEntry(hist_fill_cfromg, "cfromg", "f");
     qw->AddEntry(hist_fill_l, "light", "f");
     qw->AddEntry(hist_fill_puu, "PU", "f");
+
     qw->AddEntry(hist_line, "CSA14 Pythia8","f");
-    qw->AddEntry(hist_line_5, "8 TeV Pythia8","f");
-    qw->AddEntry(hist_line_4, "CSA14 Pythia6","f");
-    qw->AddEntry(hist_line_2, "8 TeV Pythia6","f");
+    qw->AddEntry(hist_line5, "8 TeV Pythia8","f");
+    qw->AddEntry(hist_line4, "CSA14 Pythia6","f");
+    qw->AddEntry(hist_line2, "8 TeV Pythia6","f");
  
     qw->SetFillColor(0);
     qw->Draw();
@@ -1545,47 +1256,25 @@ void DrawMCCompare(TString name, TString histotitle, bool log)
 
     histo_ratio1->GetXaxis()->SetTitle(histotitle);
     histo_ratio1->GetYaxis()->SetTitle("ratio");
-    histo_ratio1->GetYaxis()->SetNdivisions( 505 );
-
-    histo_ratio1->GetXaxis()->SetLabelSize( labelsizex);
-    histo_ratio1->GetXaxis()->SetTitleSize( titlesizex );
-    histo_ratio1->GetYaxis()->SetLabelSize( 0.1);
-
-    histo_ratio1->SetLineWidth(2);
-    histo_ratio1->SetLineColor(kGray+2);
-    histo_ratio1->SetMarkerStyle(20);
-    histo_ratio1->SetMarkerSize(0.75);
-    histo_ratio1->SetMarkerColor(kGray+2);
-
-    histo_ratio2->SetLineWidth(1);
-    histo_ratio2->SetLineColor(kOrange);
-    histo_ratio2->SetMarkerStyle(1);
-    histo_ratio2->SetMarkerSize(1);
-    histo_ratio2->SetMarkerColor(kOrange);
-
-    histo_ratio4->SetLineColor(kViolet);
-    histo_ratio5->SetLineColor(kCyan-6);
-    histo_ratio4->SetMarkerColor(kViolet);
-    histo_ratio5->SetMarkerColor(kCyan-6);
-
-
     histo_ratio1->SetMinimum(0.5);
     histo_ratio1->SetMaximum(2.0);
+
     histo_ratio1->Draw("E1X0");
     
     histo_ratio2->Draw("E1X0 same");
     histo_ratio4->Draw("E1X0 same");
     histo_ratio5->Draw("E1X0 same");
-    //histo_ratio3->Draw("E1X0 same");
+
     TLegend* hrl =  new TLegend(0.8,0.7,1.,1.);
     //Legend
     hrl->AddEntry(histo_ratio1, "CSA14 (P8)/PHYS14", "pl");
     hrl->AddEntry(histo_ratio5, "8tev (P8)/PHYS14", "pl");
     hrl->AddEntry(histo_ratio4, "CSA14 (P6)/PHYS14", "pl");
     hrl->AddEntry(histo_ratio2, "8tev (P6)/PHYS14", "pl");
-    //hrl->AddEntry(histo_ratio3, "fill vs 8tev", "pl");
     hrl->SetFillColor(0);
     hrl->Draw();
+
+
     /*
       if (name=="nPV") {
       cout << " nPV ratio Data/MC " << endl;
@@ -1594,6 +1283,7 @@ void DrawMCCompare(TString name, TString histotitle, bool log)
       }
       }
     */
+
 
     c1->cd();  
   
@@ -1608,6 +1298,7 @@ void DrawMCCompare(TString name, TString histotitle, bool log)
       c1->SaveAs(dir4plots+"/"+name+"_Linear"+format);
     }
 
+
  
 
 }
@@ -1616,122 +1307,38 @@ void DrawMCCompare(TString name, TString histotitle, bool log)
 void DrawMCgen(TString name, TString histotitle, bool log)
 {
     //cout << "Getting 2025 file\n";
-    TFile *fileFill     = new TFile(filenameAOD);
-
+    
     TH1D* hist_fill;
-    fileFill->cd();
-    hist_fill       = (TH1D*)gROOT->FindObject(name);
-/*
-    TH1D* hist_fill2;
-    hist_fill2      = (TH1D*)gROOT->FindObject(name+"fromg");
-    hist_fill->Add(hist_fill2);
-*/
+    DefineHgen(filenameAOD, name, hist_fill,  2);
+
 
     //cout << "Getting 4050 file\n";
-    TFile *fileLine     = new TFile(filenameMini);
-
     TH1D* hist_line;
-    fileLine->cd();
-    hist_line       = (TH1D*)gROOT->FindObject(name);
-/*
-    TH1D* hist_line2;
-    hist_line2      = (TH1D*)gROOT->FindObject(name+"fromg");
-    hist_line->Add(hist_line2);
-*/
+    DefineHgen(filenameMini, name, hist_line, 4);
 
-
-    TFile *file8tev = new TFile(filename8tev);
     TH1D* hist_line_2;
-    file8tev->cd();
-    hist_line_2       = (TH1D*)gROOT->FindObject(name);
+    DefineHgen(filename8tev, name, hist_line_2, 8);
 
-    TFile *file_4 = new TFile(filename_4);
     TH1D* hist_line_4;
-    file_4->cd();
-    hist_line_4       = (TH1D*)gROOT->FindObject(name);
-    TFile *file_5 = new TFile(filename_5);
+    DefineHgen(filename_4, name, hist_line_4, kViolet);
+
     TH1D* hist_line_5;
-    file_5->cd();
-    hist_line_5       = (TH1D*)gROOT->FindObject(name);
-    
-    float int_fill = hist_fill->Integral();
-    float int_line = hist_line->Integral();
-
-    hist_fill->Scale(1./int_fill);
-    hist_line->Scale(1./int_line);
-
-    float int_line_2 = hist_line_2->Integral();
-    hist_line_2->Scale(1./int_line_2);
-    float int_line_4 = hist_line_4->Integral();
-    hist_line_4->Scale(1./int_line_4);
-    float int_line_5 = hist_line_5->Integral();
-    hist_line_5->Scale(1./int_line_5);
-
-    cout << " integral " << int_fill << " " << int_line << " " << int_line_2 << endl;
-
-
-    double titleoffsety=0.2;
-    double titlesizex=0.17;
-    double titlesizey=0.2;
-    double labelsizex=0.14;
-     
-    hist_fill->GetYaxis()->SetTitleSize(titlesizey);
-    hist_fill->GetYaxis()->SetTitleOffset(titleoffsety);
-  
-    hist_line->GetYaxis()->SetTitleSize(titlesizey);
-    hist_line->GetYaxis()->SetTitleOffset(titleoffsety);
-
-    float max = hist_fill->GetMaximum();
-    if (hist_line->GetMaximum() > max) max= hist_line->GetMaximum();
-    if (hist_line_2->GetMaximum() > max) max= hist_line_2->GetMaximum();
-    hist_fill->SetMaximum(max*1.1);
-
-    hist_fill->SetLineColor(2);
-    hist_line->SetLineColor(4);
-    hist_line_2->SetLineColor(8);
-    hist_line_4->SetLineColor(kViolet);
-    hist_line_5->SetLineColor(kCyan-6);
+    DefineHgen(filename_5, name, hist_line_5, kCyan-6);
 
     TH1D* histo_ratio1;
-    histo_ratio1 = (TH1D*) hist_line->Clone();
-    histo_ratio1->Sumw2();
-    histo_ratio1->SetName("histo_ratio1");
-    histo_ratio1->SetTitle(""); 
-    histo_ratio1->Divide(hist_fill);
-    histo_ratio1->SetLineColor(4);
-    histo_ratio1->SetMarkerStyle(20);  
-    histo_ratio1->SetMarkerSize(0.75);
-    histo_ratio1->SetMarkerColor(4);
-
+    DefineHratio("histo_ratio1", histo_ratio1, hist_line, hist_fill,   4, 0.75, 20, 1) ;
 
     TH1D* histo_ratio2;
-    histo_ratio2 = (TH1D*) hist_line_2->Clone();
-    histo_ratio2->Sumw2();
-    histo_ratio2->SetName("histo_ratio2");
-    histo_ratio2->SetTitle(""); 
-    histo_ratio2->Divide(hist_fill);
-    histo_ratio2->SetLineColor(8);
-    histo_ratio2->SetMarkerStyle(1);  
-    histo_ratio2->SetMarkerSize(1);
-    histo_ratio2->SetMarkerColor(8);
+    DefineHratio("histo_ratio2", histo_ratio2, hist_line_2, hist_fill,   8, 1, 1, 1) ;
 
     TH1D* histo_ratio3;
-    histo_ratio3 = (TH1D*) hist_fill->Clone();
-    histo_ratio3->Sumw2();
-    histo_ratio3->SetName("histo_ratio3");
-    histo_ratio3->Divide(hist_line_5); // 8 tev pythia8
+    DefineHratio("histo_ratio3", histo_ratio3, hist_fill, hist_line_5,   1, 1, 1, 1) ;
 
     TH1D* histo_ratio4;
-    histo_ratio4 = (TH1D*) hist_line_4->Clone();
-    histo_ratio4->Sumw2();
-    histo_ratio4->SetName("histo_ratio4");
-    histo_ratio4->Divide(hist_fill);
+    DefineHratio("histo_ratio4", histo_ratio4, hist_line_4, hist_fill,   kViolet, 1, 1, 1) ;
 
     TH1D* histo_ratio5;
-    histo_ratio5 = (TH1D*) hist_line_5->Clone();
-    histo_ratio5->Sumw2();
-    histo_ratio5->SetName("histo_ratio5");
-    histo_ratio5->Divide(hist_fill);
+    DefineHratio("histo_ratio5", histo_ratio5, hist_line_5, hist_fill,   kCyan-6, 1, 1, 1) ;
 
 /*
     cout << "histo_ratio1" << endl;
@@ -1757,6 +1364,11 @@ void DrawMCgen(TString name, TString histotitle, bool log)
     canvas_1 ->cd();
  
     canvas_1->SetLogy(log);
+
+    float max = hist_fill->GetMaximum();
+    if (hist_line->GetMaximum() > max) max= hist_line->GetMaximum();
+    if (hist_line_2->GetMaximum() > max) max= hist_line_2->GetMaximum();
+    hist_fill->SetMaximum(max*1.1);
  
     hist_fill->Draw("hist");
     hist_line->Draw("hist, same");
@@ -1764,10 +1376,6 @@ void DrawMCgen(TString name, TString histotitle, bool log)
     hist_line_4->Draw("hist, same");
     hist_line_5->Draw("hist, same");
   
-
-    hist_fill->GetYaxis()->SetTitleSize(0.08);
-    hist_fill->GetYaxis()->SetTitleOffset(0.65); 
-
     TLegend* qw =  new TLegend(0.825,0.65,0.975,1.);
     //Legend
     qw->AddEntry(hist_fill, "Phys14", "f");
@@ -1797,14 +1405,9 @@ void DrawMCgen(TString name, TString histotitle, bool log)
     gPad->SetGridy();
 
     histo_ratio1->GetXaxis()->SetTitle(histotitle);
-    histo_ratio1->GetYaxis()->SetNdivisions( 505 );
-
-    histo_ratio1->GetXaxis()->SetLabelSize( labelsizex);
-    histo_ratio1->GetXaxis()->SetTitleSize( titlesizex );
-    histo_ratio1->GetYaxis()->SetLabelSize( 0.1);
-
     histo_ratio1->SetMinimum(0.5);
     histo_ratio1->SetMaximum(2.0);
+
     histo_ratio1->Draw("E1X0");
     
     histo_ratio2->Draw("E1X0 same");
@@ -1822,3 +1425,220 @@ void DrawMCgen(TString name, TString histotitle, bool log)
 }
 //--------------------------
 
+void DefineHstack(TString filename_x, TString name, TH1D*& hist_fill, THStack * & hs_fill, TH1D* & hist_fill_b, TH1D* & hist_fill_c, TH1D* & hist_fill_l, TH1D* & hist_fill_g, TH1D* & hist_fill_bfromg, TH1D* & hist_fill_cfromg, TH1D* & hist_fill_puu )
+{
+
+    TFile *fileFill     = new TFile(filename_x);
+
+
+    fileFill->cd();
+
+    hist_fill_b       = (TH1D*)gROOT->FindObject(name+"_b");
+    hist_fill_c       = (TH1D*)gROOT->FindObject(name+"_c");
+    hist_fill_l       = (TH1D*)gROOT->FindObject(name+"_l");
+    hist_fill_g       = (TH1D*)gROOT->FindObject(name+"_g");
+    hist_fill_bfromg  = (TH1D*)gROOT->FindObject(name+"_bfromg");
+    hist_fill_cfromg  = (TH1D*)gROOT->FindObject(name+"_cfromg");
+    hist_fill_puu     = (TH1D*)gROOT->FindObject(name+"_puu");
+
+    hist_fill = (TH1D*) hist_fill_b->Clone();
+    hist_fill->Add(hist_fill_bfromg);
+    hist_fill->Add(hist_fill_c);
+    hist_fill->Add(hist_fill_cfromg);
+    hist_fill->Add(hist_fill_l);
+    hist_fill->Add(hist_fill_g);
+    hist_fill->Add(hist_fill_puu);
+
+    float int_fill = hist_fill->Integral();
+    if (int_fill > 0.){
+        hist_fill->Scale(1./int_fill);
+        hist_fill_b->Scale(1./int_fill);
+        hist_fill_c->Scale(1./int_fill);
+        hist_fill_l->Scale(1./int_fill);
+        hist_fill_g->Scale(1./int_fill);
+        hist_fill_puu->Scale(1./int_fill);
+        hist_fill_bfromg->Scale(1./int_fill);
+        hist_fill_cfromg->Scale(1./int_fill);
+    }
+/*
+    cout << filename_x << "     " << hist_fill_b->Integral() 
+    << "     " << hist_fill_c->Integral()  
+    << "     " << hist_fill_l->Integral()
+    << "     " << hist_fill_g->Integral()
+    << "     " << hist_fill_bfromg->Integral()
+    << "     " << hist_fill_cfromg->Integral() <<endl;
+*/
+
+    double titleoffsety=0.2;
+    double titlesizey=0.2;
+    hist_fill->GetYaxis()->SetTitleSize(titlesizey);
+    hist_fill->GetYaxis()->SetTitleOffset(titleoffsety);
+
+    hist_fill_b->SetFillColor(kRed);
+    hist_fill_bfromg->SetFillColor(kCyan);
+    hist_fill_c->SetFillColor(8);
+    hist_fill_cfromg->SetFillColor(kMagenta);
+    hist_fill_l->SetFillColor(kBlue);
+    hist_fill_g->SetFillColor(kBlue);
+    hist_fill_puu->SetFillColor(kYellow);
+    hist_fill_b->SetLineColor(kRed);
+    hist_fill_bfromg->SetLineColor(kCyan);
+    hist_fill_c->SetLineColor(8);
+    hist_fill_cfromg->SetLineColor(kMagenta);
+    hist_fill_l->SetLineColor(kBlue);
+    hist_fill_g->SetLineColor(kBlue);
+    hist_fill_puu->SetLineColor(kYellow);
+
+    hist_fill->SetLineWidth(2);
+    hist_fill->SetLineColor(kBlack);
+    hist_fill->SetMarkerStyle(20);  
+    hist_fill->SetMarkerSize(0.75);
+    hist_fill->SetMarkerColor(kBlack);
+
+    hs_fill = new THStack("hs_fill","Stacked histograms AOD");
+    hs_fill->Add(hist_fill_b);
+    hs_fill->Add(hist_fill_bfromg);
+    hs_fill->Add(hist_fill_c);
+    hs_fill->Add(hist_fill_cfromg);
+    hs_fill->Add(hist_fill_l);
+    hs_fill->Add(hist_fill_g);
+    hs_fill->Add(hist_fill_puu);
+
+
+}
+
+void DefineHline(TString filename_x, TString name, TH1D* & hist_line, int icolor, float xMsize, int iMstyle, int iLwidth )
+{
+
+    TFile *fileLine     = new TFile(filename_x);
+
+    TH1D* hist_line_b;
+    TH1D* hist_line_c;
+    TH1D* hist_line_l;
+    TH1D* hist_line_g;
+    TH1D* hist_line_bfromg;
+    TH1D* hist_line_cfromg;
+    TH1D* hist_line_puu;
+
+    fileLine->cd();
+
+    hist_line_b       = (TH1D*)gROOT->FindObject(name+"_b");
+    hist_line_c       = (TH1D*)gROOT->FindObject(name+"_c");
+    hist_line_l       = (TH1D*)gROOT->FindObject(name+"_l");
+    hist_line_g       = (TH1D*)gROOT->FindObject(name+"_g");
+    hist_line_bfromg  = (TH1D*)gROOT->FindObject(name+"_bfromg");
+    hist_line_cfromg  = (TH1D*)gROOT->FindObject(name+"_cfromg");
+    hist_line_puu  = (TH1D*)gROOT->FindObject(name+"_puu");
+    
+    hist_line = (TH1D*) hist_line_b->Clone();
+    hist_line->Add(hist_line_bfromg);
+    hist_line->Add(hist_line_c);
+    hist_line->Add(hist_line_cfromg);
+    hist_line->Add(hist_line_l);
+    hist_line->Add(hist_line_g);
+    hist_line->Add(hist_line_puu);
+
+    float int_line = hist_line->Integral();
+    if (int_line > 0.){
+        hist_line->Scale(1./int_line);
+        hist_line_b->Scale(1./int_line);
+        hist_line_c->Scale(1./int_line);
+        hist_line_l->Scale(1./int_line);
+        hist_line_g->Scale(1./int_line);
+        hist_line_puu->Scale(1./int_line);
+        hist_line_bfromg->Scale(1./int_line);
+        hist_line_cfromg->Scale(1./int_line);
+    }
+
+/*
+    cout << filename_x << "     " << hist_line_b->Integral() 
+    << "     " << hist_line_c->Integral()  
+    << "     " << hist_line_l->Integral()
+    << "     " << hist_line_g->Integral()
+    << "     " << hist_line_bfromg->Integral()
+    << "     " << hist_line_cfromg->Integral() <<endl;
+*/
+
+    double titleoffsety=0.2;
+    double titlesizey=0.2;
+    hist_line->GetYaxis()->SetTitleSize(titlesizey);
+    hist_line->GetYaxis()->SetTitleOffset(titleoffsety);
+
+    hist_line->SetLineWidth(iLwidth);
+    hist_line->SetLineColor(icolor);
+    hist_line->SetMarkerStyle(iMstyle);  
+    hist_line->SetMarkerSize(xMsize);
+    hist_line->SetMarkerColor(icolor);
+
+/*
+    hist_line_b->SetLineColor(kRed+2);
+    hist_line_b->SetMarkerColor(kRed+2);
+    hist_line_b->SetLineWidth(2);
+    hist_line_b->SetFillStyle(0);
+    hist_line_bfromg->SetLineColor(kCyan+2);
+    hist_line_bfromg->SetMarkerColor(kCyan+2);
+    hist_line_bfromg->SetLineWidth(2);
+    hist_line_bfromg->SetFillStyle(0);
+    hist_line_c->SetLineColor(kGreen+2);
+    hist_line_c->SetMarkerColor(kGreen+2);
+    hist_line_c->SetLineWidth(2);
+    hist_line_c->SetFillStyle(0);
+    hist_line_cfromg->SetLineColor(kMagenta+3);
+    hist_line_cfromg->SetMarkerColor(kMagenta+3);
+    hist_line_cfromg->SetLineWidth(2);
+    hist_line_cfromg->SetFillStyle(0);
+    hist_line_l->SetLineColor(kBlack);
+    hist_line_l->SetMarkerColor(kBlack);
+    hist_line_l->SetLineWidth(2);
+    hist_line_l->SetFillStyle(0);
+    hist_line_g->SetLineColor(kBlack);
+    hist_line_g->SetMarkerColor(kBlack);
+    hist_line_g->SetLineWidth(2);
+    hist_line_g->SetFillStyle(0);
+    hist_line_puu->SetLineColor(kYellow);
+    hist_line_puu->SetMarkerColor(kYellow);
+    hist_line_puu->SetLineWidth(2);
+    hist_line_puu->SetFillStyle(0);
+*/
+
+}
+
+void DefineHratio(TString nameRatio, TH1D* & histo_ratio1, TH1D* hnum, TH1D* hdenum, int icolor, float xMsize, int iMstyle, int iLwidth )
+{
+    histo_ratio1 = (TH1D*) hnum->Clone();
+    histo_ratio1->SetName(nameRatio);
+    histo_ratio1->SetTitle(""); 
+    histo_ratio1->Divide(hdenum);
+
+    double titlesizex=0.17;
+    double labelsizex=0.14;
+    histo_ratio1->GetYaxis()->SetNdivisions( 505 );
+    histo_ratio1->GetXaxis()->SetLabelSize( labelsizex);
+    histo_ratio1->GetXaxis()->SetTitleSize( titlesizex );
+    histo_ratio1->GetYaxis()->SetLabelSize( 0.1);
+
+    histo_ratio1->SetLineWidth(iLwidth);
+    histo_ratio1->SetLineColor(icolor);
+    histo_ratio1->SetMarkerStyle(iMstyle);  
+    histo_ratio1->SetMarkerSize(xMsize);
+    histo_ratio1->SetMarkerColor(icolor);
+}
+
+void DefineHgen(TString filename_x, TString name, TH1D* & hist_fill, int iColor)
+{
+
+    TFile *fileFill     = new TFile(filename_x);
+    fileFill->cd();
+    hist_fill       = (TH1D*)gROOT->FindObject(name);
+
+    float int_fill = hist_fill->Integral();
+    hist_fill->Scale(1./int_fill);
+
+    double titleoffsety=0.65;
+    double titlesizey=0.08;
+     
+    hist_fill->GetYaxis()->SetTitleSize(titlesizey);
+    hist_fill->GetYaxis()->SetTitleOffset(titleoffsety);
+  
+    hist_fill->SetLineColor(iColor);
+}
