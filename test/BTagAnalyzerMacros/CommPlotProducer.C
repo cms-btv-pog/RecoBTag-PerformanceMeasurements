@@ -55,7 +55,6 @@ void CommPlotProducer::Counter(){
     if (fChain == 0) return;
   
     Long64_t nentries = fChain->GetEntriesFast();
-    //  Long64_t nentries = fChain->GetEntries();
   
     Long64_t nbytes = 0, nb = 0;
   
@@ -603,7 +602,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     AddHisto("muon_Ip2d", 	 "Muon 2D IP",  	   50, -0.1, 0.1 );
     AddHisto("muon_Sip3d",	 "Muon 3D IP significance",50, -35, 35   );
     AddHisto("muon_Sip2d",	 "Muon 2D IP significance",50, -35, 35   );
-    AddHisto("muon_DeltaR",	 "Muon1 deltaR",50,0,0.5); //90
+    AddHisto("muon_DeltaR",	 "Muon1 deltaR",50,0,0.5); 
   
     int nSVbins = 50; //50
     AddHisto("sv_deltaR_jet",      "sv_deltaR_jet",                                   nSVbins,0.,0.5    );
@@ -631,7 +630,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     AddHisto("sv_flight2Derr",     "Flight distance error 2D",                            nSVbins,0.,0.2);
     AddHisto("sv_mass_3trk"	,"invariant mass of the secondary vertex with at least 3 SV tracks",  nSVbins,0.,8.     );
   
-    int nTrackbins = 100; //100
+    int nTrackbins = 100; 
     AddHisto("track_multi"  ,      "number of tracks in the jets",                40,-0.5,39.5 );
     AddHisto("track_multi04"  ,      "number of tracks in the jets04",                40,-0.5,39.5 );
     if (produceJetProbaTree) {
@@ -693,15 +692,14 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     AddHisto("discri_ssche0",	 "SSVHE Discriminator",    80, -1., 7.   ); 
     AddHisto("discri_sschp0",	 "SSVHP Discriminator",    80, -1., 7.   ); 
  
-//    int memoire_number = HistoBtag_map["discri_ssche0"] ;
    
-    int nDiscbins = 100; //50
+    int nDiscbins = 100; 
     AddHisto("TCHE"	  ,"TCHE",				     nDiscbins,0.,30. );
     AddHisto("TCHP"	  ,"TCHP",				     nDiscbins,0.,30. );  
     AddHisto("JP" 	  ,"JP",				     nDiscbins,0.,2.5 );
     AddHisto("JBP"	  ,"JBP",				     nDiscbins,0.,8.  );
-    AddHisto("SSV"	  ,"SSVHE",				     nDiscbins+40,0.,7.  ); //+20
-    AddHisto("SSVHP"  ,"SSVHP",				     nDiscbins+40,0.,7.  ); //+20
+    AddHisto("SSV"	  ,"SSVHE",				     nDiscbins+40,0.,7.  );
+    AddHisto("SSVHP"  ,"SSVHP",				     nDiscbins+40,0.,7.  ); 
     AddHisto("CSV"	  ,"CSV",				     nDiscbins,0.,1.  );
     AddHisto("CSVIVF" ,"CSVIVF",                 nDiscbins,0.,1.  );
 
@@ -709,16 +707,16 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     AddHisto("TCHP_1"	  ,"TCHP",				     nDiscbins,0.,30. );  
     AddHisto("JP_1" 	  ,"JP",				     nDiscbins,0.,2.5 );
     AddHisto("JBP_1"	  ,"JBP",				     nDiscbins,0.,8.  );
-    AddHisto("SSV_1"	  ,"SSVHE",				     nDiscbins+40,0.,7.  ); //+20
-    AddHisto("SSVHP_1"  ,"SSVHP",				     nDiscbins+40,0.,7.  ); //+20
+    AddHisto("SSV_1"	  ,"SSVHE",				     nDiscbins+40,0.,7.  ); 
+    AddHisto("SSVHP_1"  ,"SSVHP",				     nDiscbins+40,0.,7.  ); 
     AddHisto("CSV_1"	  ,"CSV",				     nDiscbins,0.,1.  );
     AddHisto("CSVIVF_1" ,"CSVIVF",                 nDiscbins,0.,1.  );
     AddHisto("TCHE_2"	  ,"TCHE",				     nDiscbins,0.,30. );
     AddHisto("TCHP_2"	  ,"TCHP",				     nDiscbins,0.,30. );  
     AddHisto("JP_2" 	  ,"JP",				     nDiscbins,0.,2.5 );
     AddHisto("JBP_2"	  ,"JBP",				     nDiscbins,0.,8.  );
-    AddHisto("SSV_2"	  ,"SSVHE",				     nDiscbins+40,0.,7.  ); //+20
-    AddHisto("SSVHP_2"  ,"SSVHP",				     nDiscbins+40,0.,7.  ); //+20
+    AddHisto("SSV_2"	  ,"SSVHE",				     nDiscbins+40,0.,7.  ); 
+    AddHisto("SSVHP_2"  ,"SSVHP",				     nDiscbins+40,0.,7.  ); 
     AddHisto("CSV_2"	  ,"CSV",				     nDiscbins,0.,1.  );
     AddHisto("CSVIVF_2" ,"CSVIVF",                 nDiscbins,0.,1.  );
 
@@ -835,6 +833,8 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
         ww=GetEvtWeight();
         
 
+
+        // reweighting to have the same pthat distribution at 8 TeV than at 13 TeV
         if (sqrtstev==8) {
           if (pthat<30) ww*=1;
           else if (pthat<40) ww*=0.976294;
@@ -933,9 +933,6 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
         Nevent++;
         if(Nevent%100000 ==0 && Nevent!=0) cout << " number of processed events is " << Nevent <<  " = " << (100.*Nevent)/(1.*nentries) << "%" <<endl;
         int njet_c     =0;
-//        int njet_b     =0;   
-//        int njet_bfromg=0;    
-//        int njet_cfromg=0;    
         int njet_l     =0;  
         int njet_mc    =0; 
         int njet_data  =0; 
@@ -951,7 +948,6 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
         //bool isTrigOK = passTrigger(trigname, trigger);
         //if (!isTrigOK) continue;
         ++Ntrigevent;
-        //if (Ntrigevent%1000 == 0 && Ntrigevent!=0) cout << " number of triggered events is " << Ntrigevent << " = " << (100.*Ntrigevent)/(1.*nentries) << "%" << endl;
 
 
         //-----------------------------------
@@ -973,7 +969,6 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             nPV_data       ->Fill(nPV);
         }
         else{
-            //N_event_mc+=ww;      
             N_event_mc_after_sel++;
             nPU_mc         ->Fill(nPUtrue,ww);
             nPV_mc         ->Fill(nPV,ww);
@@ -1564,27 +1559,6 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
                     }
                 }
 
-                /* OLD code when bug in the previous version of the code with PFMuon_IdxJet
-                   TLorentzVector thejet;
-                   thejet.SetPtEtaPhiM(Jet_pt[ijet], Jet_eta[ijet], Jet_phi[ijet], 0);
-	
-                   float minpf=0;
-                   for (int im=0; im<nPFMuon; im++) {
-                   TLorentzVector thepfmu;
-                   thepfmu.SetPtEtaPhiM(PFMuon_pt[im],PFMuon_eta[im],PFMuon_phi[im],0);
-                   float drpfj=thepfmu.DeltaR(thejet);
-                   float diffdr = drpfj-PFMuon_deltaR[im];
-                   if (diffdr<0.) diffdr*=-1.;
-                   if (drpfj< 0.5 && diffdr<0.05 && PFMuon_GoodQuality[im]>0) {
-                   if (PFMuon_pt[im]> minpf) {
-                   indpfmu=im;
-                   minpf=PFMuon_pt[im];
-                   }
-                   npfmu++;
-                   } 
-                   }
-                */
-
 
                 FillHisto_intFromMap(  "pfmuon_multi",  flav, isGluonSplit , npfmu   ,ww);
                 if (indpfmu>-1) {
@@ -1615,27 +1589,6 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
                         npfel++;
                     }
                 }
-
-                /* OLD code when bug in the previous version of the code with nPFElectron
-
-                   minpf=0;
-                   for (int im=0; im<nPFElectron; im++) {
-                   TLorentzVector thepfel;
-                   thepfel.SetPtEtaPhiM(PFElectron_pt[im],PFElectron_eta[im],PFElectron_phi[im],0);
-                   float drpfj=thepfel.DeltaR(thejet);
-                   float diffdr = drpfj-PFElectron_deltaR[im];
-                   if (diffdr<0.) diffdr*=-1.;
-                   if (drpfj< 0.5 && diffdr<0.05 && PFElectron_pt[im]>2.) {
-                   if (PFElectron_pt[im]> minpf) {
-                   indpfel=im;
-                   minpf=PFElectron_pt[im];
-                   }
-                   npfel++;
-                   } 
-                   }
-                */
-
-
 
 
                 FillHisto_intFromMap(  "pfelectron_multi",  flav, isGluonSplit , npfel   ,ww);
@@ -2057,111 +2010,6 @@ bool CommPlotProducer::passTrigger(TString trigger, int pttrig) {
     return false;
 
 
-    /* OLD code
-
-       int trig100 = BitTrigger%100;
-       int trig1000 = BitTrigger%1000;
-
-       int trig1 = BitTrigger%10;
-       int trig2 = (trig100 - trig1) / 10;
-       int trig3 = (trig1000 - trig100) / 100;
-       int trig5 = int(BitTrigger/100000);
-
-       bool Jet20 = false, Jet30  = false, Jet40  = false, Jet60  = false, Jet70=false, Jet80  = false;
-       bool Jet110 = false, Jet140 = false, Jet150 = false, Jet190 = false;
-       bool Jet200 = false, Jet240 = false, Jet260 = false;
-       bool Jet300 = false, Jet320 = false;
-
-       if (trigger=="jet") {  // SinglePFJet Trigger
-       if ( trig2==1 || trig2==3 || trig2==5 || trig2==7 )  Jet40  = true;
-       if ( trig2 >= 4 )                                    Jet80  = true;
-       if ( trig3==2 || trig3==3 || trig3==6 || trig3==7 )  Jet140 = true;
-       if ( trig3 >= 4 )                                    Jet200 = true;
-       if ( trig1==1 || trig1==3 || trig1==5 || trig1==7 )  Jet260 = true;
-       if ( trig1==2 || trig1==3 || trig1==6 || trig1==7 )  Jet320 = true;
-
-       if ( pttrig ==  30 && Jet30 )  passTrig=true;
-       if ( pttrig ==  40 && Jet40 )  passTrig=true;
-       if ( pttrig ==  60 && Jet60 )  passTrig=true;
-       if ( pttrig ==  80 && Jet80 )  passTrig=true;
-       if ( pttrig == 110 && Jet110 ) passTrig=true;
-       if ( pttrig == 140 && Jet140 ) passTrig=true;
-       if ( pttrig == 150 && Jet150 ) passTrig=true;
-       if ( pttrig == 190 && Jet190 ) passTrig=true;
-       if ( pttrig == 200 && Jet200 ) passTrig=true;
-       if ( pttrig == 240 && Jet240 ) passTrig=true;
-       if ( pttrig == 260 && Jet260 ) passTrig=true;
-       if ( pttrig == 300 && Jet300 ) passTrig=true;
-       if ( pttrig == 320 && Jet320 ) passTrig=true;
-
-       if (!passTrig) { return false; }
-
-       //-----------------------------------
-       //Determine if there is at least 
-       //one jet which pass the trigger
-       //in the event => away from the TO
-       //-----------------------------------
-
-       bool JetPtCut = false;
-       for (int ijet=0; ijet<nJet ; ijet++) {
-       float ptjet = Jet_pt[ijet];
-       float etajet = fabs(Jet_eta[ijet]);
-       if (      pttrig ==  40 && ptjet >  60. && etajet < 2.4 ) JetPtCut = true;
-       else if ( pttrig ==  80 && ptjet > 100. && etajet < 2.4 ) JetPtCut = true;
-       else if ( pttrig == 140 && ptjet > 160. && etajet < 2.4 ) JetPtCut = true;
-       else if ( pttrig == 200 && ptjet > 220. && etajet < 2.4 ) JetPtCut = true;
-       else if ( pttrig == 260 && ptjet > 300. && etajet < 2.4 ) JetPtCut = true;
-       else if ( pttrig == 320 && ptjet > 360. && etajet < 2.4 ) JetPtCut = true;
-       
-       }
-       if (passTrig && JetPtCut) {return true;}
-       else {return false;}
-       }
-       else if (trigger=="btag") { // Btag_Mu_Dijet Trigger 
-       int trig = int(BitTrigger/10000);
-       trig1 = trig%10;
-       if ( trig1==1 || trig1==3 || trig1==5 || trig1==7 ) Jet20  = true;
-       if ( trig1==2 || trig1==3 || trig1==6 || trig1==7 ) Jet40  = true;
-       if ( trig1 >= 4 )                                   Jet70  = true;
-       if ( trig5 == 1 || trig5 == 3 )                     Jet110 = true;
-       if ( trig5 >= 2 )                                   Jet300 = true;
-    
-       if ( Run > 0 && Run < 162803 ) {                     
-       Jet40  = false;
-       Jet70  = false;
-       Jet110 = false;
-       }
-       if ( pttrig ==  20 && Jet20 )  passTrig=true;
-       if ( pttrig ==  40 && Jet40 )  passTrig=true;
-       if ( pttrig ==  70 && Jet70 )  passTrig=true;
-       if ( pttrig == 110 && Jet110 ) passTrig=true;
-       if ( pttrig == 300 && Jet300 ) passTrig=true;
-    
-    
-       if (!passTrig) { return false; }
-    
-       //-----------------------------------
-       //Determine if there is at least 
-       //two jets which pass the trigger
-       //in the event => away from the TO
-       //-----------------------------------
-
-       int njtrig=0;
-       for (int ijet = 0; ijet < nJet; ijet++) {
-       float ptjet = Jet_pt[ijet];
-       float etajet = fabs(Jet_eta[ijet]);
-       if ( pttrig ==20  &&  ptjet > 40. && etajet < 2.4 )  njtrig++;
-       if ( pttrig ==40  &&  ptjet > 60. && etajet < 2.4 )  njtrig++;
-       if ( pttrig ==70  &&  ptjet > 100. && etajet < 2.4 )  njtrig++;
-       if ( pttrig ==110  &&  ptjet > 120. && etajet < 2.4 ) njtrig++;
-       if ( pttrig ==300  &&  ptjet > 320. && etajet < 2.4 ) njtrig++;
-       }
-       if (passTrig && njtrig>1) {return true;}
-       else {return false;}
-
-       }
-       return false;
-    */
 }
 
 
