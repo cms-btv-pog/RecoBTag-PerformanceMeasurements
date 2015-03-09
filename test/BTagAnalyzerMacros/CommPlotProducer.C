@@ -604,7 +604,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     AddHisto("muon_Sip2d",	 "Muon 2D IP significance",50, -35, 35   );
     AddHisto("muon_DeltaR",	 "Muon1 deltaR",50,0,0.5); 
   
-    int nSVbins = 50; //50
+    int nSVbins = 50; 
     AddHisto("sv_deltaR_jet",      "sv_deltaR_jet",                                   nSVbins,0.,0.5    );
     AddHisto("sv_deltaR_sumJet",   "SVvtxSumJetDeltaR",                                   nSVbins,0.,0.5    );
     AddHisto("sv_deltaR_sumDir",   "SVvtxSumVtxDirDeltaR",                                nSVbins,0.,0.5    );
@@ -633,6 +633,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     int nTrackbins = 100; 
     AddHisto("track_multi"  ,      "number of tracks in the jets",                40,-0.5,39.5 );
     AddHisto("track_multi04"  ,      "number of tracks in the jets04",                40,-0.5,39.5 );
+
     if (produceJetProbaTree) {
     AddHisto("trk_multi_sel"  ,    "number of selected tracks in the jets",       30,-0.5,29.5 );
     AddHisto("track_dr"   ,      "Delta R (jet, track)",               50,0.,0.5   );
@@ -722,7 +723,6 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
 
 
 
-    if (produceNewAlgoTree) {
 
     AddHisto("SoftMu"	  ,"SoftMu",				     nDiscbins,0.,1.  );
     AddHisto("SoftEl"	  ,"SoftEl",				     nDiscbins,0.,1.  );
@@ -752,6 +752,23 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     AddHisto("pfelectron_ratio",      "ratio of pfelectron", 50,0,1       );  
     AddHisto("pfelectron_ratiorel",   "ratioRel of pfelectron", 50,0,0.03      );  
     AddHisto("pfelectron_deltar",	"#DeltaR(pfelectron,jet)",50,0,0.5);  
+
+    if (produceTagVarTree) {
+      AddHisto("tagvar_vertexNTracks",  "# SV tracks",  13,-0.5,12.5 );
+      AddHisto("tagvar_vertexmass",     "SV mass", nSVbins,0.,8.     );
+      AddHisto("tagvar_vertexmass3trk", "SV mass (at least 3 SV tracks)",nSVbins,0.,8.     );
+      AddHisto("tagvar_vertexJetDeltaR","DeltaR(SV,jet) ",               nSVbins,0.,0.5    );
+    }
+    if (produceTagVarCSVTree) { 
+      AddHisto("tagvarCSV_vertexCategory","vertex category",4,-0.5, 3.5);
+      AddHisto("tagvarCSV_Sig2dAboveCharm",   "IP significance 2D charm",                            nSVbins,-35.,35.  );
+      AddHisto("tagvarCSV_trackEtaRel",   "Track etaRel",100,0.,8.);
+      AddHisto("tagvarCSV_vertexmass",    "SV mass", nSVbins,0.,8.     );
+      AddHisto("tagvarCSV_vertexmass3trk",    "SV mass (at least 3 SV tracks)", nSVbins,0.,8.     );
+      AddHisto("tagvarCSV_vertexNTracks",  "# SV tracks",  13,-0.5,12.5 );
+      AddHisto("tagvarCSV_energyratio","Fractional energy",                                   nSVbins,0.,1.     ); 
+      AddHisto("tagvarCSV_trackSip3dSig","3D IP significance",       nTrackbins,-35.,35.  );
+      AddHisto("tagvarCSV_2DsigFlightDist",     "Flight distance significance 2D",                     nSVbins,0.,80.    );
     }
   
  
@@ -766,6 +783,8 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     AddHisto2D("sv_deltar_sum_dir_vs_jetpt","SVvtxSumVtxDirDeltaR vs jet pt",   PtMax/20,0,PtMax, 50,0.,0.5); 
     AddHisto2D("muon_ptrel_vs_jetpt","Muon_p{T}^{rel} vs jet pt",               PtMax/20,0,PtMax,50,0,5);  
     AddHisto2D("muon_DeltaR_vs_jetpt","Muon1 DeltaR vs jet pt",                 PtMax/20,0,PtMax,50,0,0.5);
+
+
 
     
     Nevent = 0;
@@ -1064,9 +1083,6 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             if (sqrtstev==13) csvivf   = Jet_CombIVF[ijet];
       
       
-            //cout << "tche " << tche << endl;
-            //cout << "tchp " << tchp << endl;
-      
             bool isGluonSplit=false;
       
       
@@ -1253,13 +1269,8 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
                         FillHisto_floatFromMap("track_pt",      flav, isGluonSplit ,Track_pt[itrk]      , ww);	  
                         FillHisto_floatFromMap("track_pt15",      flav, isGluonSplit ,Track_pt[itrk]      , ww);
                         FillHisto_floatFromMap("track_len_sel_zoom",  flav, isGluonSplit ,Track_length[itrk] , ww);
-                        //           cout << "track_chi2 :" << Track_chi2[itrk]<<endl;
-                        //           cout << "track_HStrip :" << Track_nHitStrip[itrk]<<endl;
-                        //           cout << "track_HPix :" << Track_nHitPixel[itrk]<<endl;
-                        //           cout << "track_IP :" << Track_IP[itrk]<<endl;	
 	    
                         //Tracks sorted by IP
-	
                         Float_t sig  =Track_IP[itrk]/Track_IPerr[itrk];
                         Float_t sig2D=Track_IP2D[itrk]/Track_IP2Derr[itrk];
                         if (sig>sig1_ip) {
@@ -1356,6 +1367,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
 	     
                 sv_nTrk        =SV_nTrk[Jet_nFirstSV[ijet]] ;  
                 sv_1st_nTrk    =SV_nTrk_firstVxt[Jet_nFirstSV[ijet]];
+
                 //-------------------------//
                 //-----SV histograms-----//
                 //-------------------------//   
@@ -1386,27 +1398,21 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
                     FillHisto_floatFromMap("sv_flight2DSig_3trk",  flav, isGluonSplit ,flight2DSig_sv,        ww);
                 }
 
-	
                 FillHisto2D_float_floatFromMap("sv_mass_vs_flightDist3D"     ,flav,isGluonSplit ,sv_flight3D,mass_sv,ww);	
                 FillHisto2D_float_floatFromMap("avg_sv_mass_vs_jetpt"        ,flav,isGluonSplit ,ptjet,mass_sv,ww);
                 FillHisto2D_float_floatFromMap("sv_deltar_jet_vs_jetpt"      ,flav,isGluonSplit ,ptjet,sv_dR_jet,ww);
                 FillHisto2D_float_floatFromMap("sv_deltar_sum_jet_vs_jetpt"  ,flav,isGluonSplit ,ptjet,sv_dR_dir_sum,ww);
                 FillHisto2D_float_floatFromMap("sv_deltar_sum_dir_vs_jetpt"  ,flav,isGluonSplit ,ptjet,sv_dR_jet_sum,ww);	    
 	    
-	    
             }
 	    
 
 	
-            //FillHisto_floatFromMap("sv_dist_jet_axis",flav, isGluonSplit ,SV_vtxDistJetAxis[0],ww);
-	
-            //         cout << " sv_multi:" << n_sv<<endl;
-            //         cout << " sv_chi2norm:" << chi2norm_sv<<endl;
-            //         cout << " sv_mass:" << Jet_SvxMass[0]<<endl;
-            //         cout << " sv_flightSig:" << flightSig_sv<<endl;		      
-	
             
-            //Taggers
+            //-------------------------//
+            //-----Tagger histograms-----//
+            //-------------------------// 
+            
             FillHisto_floatFromMap("TCHE",  flav, isGluonSplit, tche	  ,   ww);
             FillHisto_floatFromMap("TCHP",  flav, isGluonSplit, tchp	  ,   ww);
             FillHisto_floatFromMap("JP",    flav, isGluonSplit, jetproba  , ww);
@@ -1415,79 +1421,6 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             FillHisto_floatFromMap("SSVHP", flav, isGluonSplit, ssvhp	  ,   ww);
             FillHisto_floatFromMap("CSV",   flav, isGluonSplit, csv	  ,   ww);
             FillHisto_floatFromMap("CSVIVF",   flav, isGluonSplit, csvivf         ,   ww);
-
-            if (goforjet1) {
-            FillHisto_floatFromMap("jet1_ptgen",                 flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
-            FillHisto_floatFromMap("jet1_pt_all",                 flav, isGluonSplit ,ptjet    ,ww);
-            FillHisto_floatFromMap("jet1_diffpt",   flav, isGluonSplit ,abs(Jet_genpt[ijet]-ptjet)    ,ww);
-            FillHisto_floatFromMap("jet1_diffrel",   flav, isGluonSplit ,(Jet_genpt[ijet]-ptjet)/ptjet   ,ww);
-            FillHisto_floatFromMap("jet1_eta",     flav, isGluonSplit ,etajet   ,ww);
-            FillHisto_floatFromMap("jet1_phi",     flav, isGluonSplit ,phijet   ,ww);
-            FillHisto_floatFromMap("TCHE_1",  flav, isGluonSplit, tche	  ,   ww);
-            FillHisto_floatFromMap("TCHP_1",  flav, isGluonSplit, tchp	  ,   ww);
-            FillHisto_floatFromMap("JP_1",    flav, isGluonSplit, jetproba  , ww);
-            FillHisto_floatFromMap("JBP_1",   flav, isGluonSplit, jetbproba , ww);
-            FillHisto_floatFromMap("SSV_1",   flav, isGluonSplit, ssvhe	  ,   ww);
-            FillHisto_floatFromMap("SSVHP_1", flav, isGluonSplit, ssvhp	  ,   ww);
-            FillHisto_floatFromMap("CSV_1",   flav, isGluonSplit, csv	  ,   ww);
-            FillHisto_floatFromMap("CSVIVF_1",   flav, isGluonSplit, csvivf         ,   ww);
-            if (csv>0.244) FillHisto_floatFromMap("jet1_pt_csvl",                 flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
-            if (csv>0.679) FillHisto_floatFromMap("jet1_pt_csvm",                 flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
-            if (csvivf>0.423) FillHisto_floatFromMap("jet1_pt_csvivfl",           flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
-            if (csvivf>0.814) FillHisto_floatFromMap("jet1_pt_csvivfm",           flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
-            if (jetproba>0.275) FillHisto_floatFromMap("jet1_pt_jpl",             flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
-            if (tchp>3.41 ) FillHisto_floatFromMap("jet1_pt_tchpt",               flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
-            }
-            if (goforjet2) {
-            FillHisto_floatFromMap("jet2_ptgen",                 flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
-            FillHisto_floatFromMap("jet2_pt_all",                 flav, isGluonSplit ,ptjet    ,ww);
-            FillHisto_floatFromMap("jet2_diffpt",   flav, isGluonSplit ,abs(Jet_genpt[ijet]-ptjet)    ,ww);
-            FillHisto_floatFromMap("jet2_diffrel",   flav, isGluonSplit ,(Jet_genpt[ijet]-ptjet)/ptjet   ,ww);
-            FillHisto_floatFromMap("jet2_eta",     flav, isGluonSplit ,etajet   ,ww);
-            FillHisto_floatFromMap("jet2_phi",     flav, isGluonSplit ,phijet   ,ww);
-            FillHisto_floatFromMap("TCHE_2",  flav, isGluonSplit, tche    ,   ww);
-            FillHisto_floatFromMap("TCHP_2",  flav, isGluonSplit, tchp    ,   ww);
-            FillHisto_floatFromMap("JP_2",    flav, isGluonSplit, jetproba  , ww);
-            FillHisto_floatFromMap("JBP_2",   flav, isGluonSplit, jetbproba , ww);
-            FillHisto_floatFromMap("SSV_2",   flav, isGluonSplit, ssvhe   ,   ww);
-            FillHisto_floatFromMap("SSVHP_2", flav, isGluonSplit, ssvhp   ,   ww);
-            FillHisto_floatFromMap("CSV_2",   flav, isGluonSplit, csv     ,   ww);
-            FillHisto_floatFromMap("CSVIVF_2",   flav, isGluonSplit, csvivf         ,   ww);
-            if (csv>0.244) FillHisto_floatFromMap("jet2_pt_csvl",                 flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
-            if (csv>0.679) FillHisto_floatFromMap("jet2_pt_csvm",                 flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
-            if (csvivf>0.423) FillHisto_floatFromMap("jet2_pt_csvivfl",           flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
-            if (csvivf>0.814) FillHisto_floatFromMap("jet2_pt_csvivfm",           flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
-            if (jetproba>0.275) FillHisto_floatFromMap("jet2_pt_jpl",             flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
-            if (tchp>3.41 ) FillHisto_floatFromMap("jet2_pt_tchpt",               flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
-            }
-
-            if (produceNewAlgoTree) {
-                float softmu   = Jet_SoftMu[ijet]  ;
-                float solfel   = Jet_SoftEl[ijet];
-                //float combjp   = Jet_CombCSVJP[ijet];
-                float combsl   = Jet_CombCSVSL[ijet];
-                //float combjpsl = Jet_CombCSVJPSL[ijet];
-                float retrainedcsv= Jet_RetCombSvx[ijet];
-                FillHisto_floatFromMap("SoftMu",      flav, isGluonSplit, softmu  ,   ww);
-                FillHisto_floatFromMap("SoftEl",      flav, isGluonSplit, solfel  ,   ww);
-                //FillHisto_floatFromMap("CombCSVJP",   flav, isGluonSplit, combjp  ,   ww);
-                FillHisto_floatFromMap("CombCSVSL",   flav, isGluonSplit, combsl  ,   ww);
-                //FillHisto_floatFromMap("CombCSVJPSL", flav, isGluonSplit, combjpsl  ,   ww);
-                FillHisto_floatFromMap("RetCombSvx",  flav, isGluonSplit, retrainedcsv  ,   ww);
-                if (retrainedcsv<-9) retrainedcsv=-0.03;
-                else if (retrainedcsv<0.)  retrainedcsv=-0.01;
-                FillHisto_floatFromMap("RetCombSvx_zo",  flav, isGluonSplit, retrainedcsv  ,   ww);
-            }
-
-
-            //       cout << " TCHE:" << tche<<endl;
-            //       cout << " TCHP:" << tchp<<endl;
-            //       cout << " JP:" << jetproba<<endl;
-            //       cout << " JBP:" << jetbproba<<endl;      
-            //       cout << " SSV:" << ssvhe<<endl;
-            //       cout << " SSVHP:" << ssvhp<<endl;
-            //       cout << " CSV:" << csv<<endl;
-      
       
             FillHisto_floatFromMap("TCHE_extended1",  flav, isGluonSplit, tche  , ww);
             FillHisto_floatFromMap("TCHP_extended1",  flav, isGluonSplit, tchp  , ww);
@@ -1495,11 +1428,67 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             FillHisto_floatFromMap("TCHE_extended2",  flav, isGluonSplit, tche  , ww);
             FillHisto_floatFromMap("TCHP_extended2",  flav, isGluonSplit, tchp  , ww);
       
-//            if (HistoBtag_map["discri_ssche0"] != memoire_number) cout << " PROBLEME num " << HistoBtag_map["discri_ssche0"] << endl;
-//            if (!isData && fabs(flav)>5 && fabs(flav)!=21) cout << " PROBLEME flav " <<  flav << endl;
-//            if (!(ssvhe>-1.5 && ssvhe<10.)) cout << " PROBLEME ssvhe " << ssvhe << endl; 
             FillHisto_floatFromMap("discri_ssche0",   flav, isGluonSplit, ssvhe , ww);
             FillHisto_floatFromMap("discri_sschp0",   flav, isGluonSplit, ssvhp , ww);      
+
+            if (goforjet1) {
+                  FillHisto_floatFromMap("jet1_ptgen",                 flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
+                  FillHisto_floatFromMap("jet1_pt_all",                 flav, isGluonSplit ,ptjet    ,ww);
+                  FillHisto_floatFromMap("jet1_diffpt",   flav, isGluonSplit ,abs(Jet_genpt[ijet]-ptjet)    ,ww);
+                  FillHisto_floatFromMap("jet1_diffrel",   flav, isGluonSplit ,(Jet_genpt[ijet]-ptjet)/ptjet   ,ww);
+                  FillHisto_floatFromMap("jet1_eta",     flav, isGluonSplit ,etajet   ,ww);
+                  FillHisto_floatFromMap("jet1_phi",     flav, isGluonSplit ,phijet   ,ww);
+                  FillHisto_floatFromMap("TCHE_1",  flav, isGluonSplit, tche	  ,   ww);
+                  FillHisto_floatFromMap("TCHP_1",  flav, isGluonSplit, tchp	  ,   ww);
+                  FillHisto_floatFromMap("JP_1",    flav, isGluonSplit, jetproba  , ww);
+                  FillHisto_floatFromMap("JBP_1",   flav, isGluonSplit, jetbproba , ww);
+                  FillHisto_floatFromMap("SSV_1",   flav, isGluonSplit, ssvhe	  ,   ww);
+                  FillHisto_floatFromMap("SSVHP_1", flav, isGluonSplit, ssvhp	  ,   ww);
+                  FillHisto_floatFromMap("CSV_1",   flav, isGluonSplit, csv	  ,   ww);
+                  FillHisto_floatFromMap("CSVIVF_1",   flav, isGluonSplit, csvivf         ,   ww);
+                  if (csv>0.244) FillHisto_floatFromMap("jet1_pt_csvl",                 flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
+                  if (csv>0.679) FillHisto_floatFromMap("jet1_pt_csvm",                 flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
+                  if (csvivf>0.423) FillHisto_floatFromMap("jet1_pt_csvivfl",           flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
+                  if (csvivf>0.814) FillHisto_floatFromMap("jet1_pt_csvivfm",           flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
+                  if (jetproba>0.275) FillHisto_floatFromMap("jet1_pt_jpl",             flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
+                  if (tchp>3.41 ) FillHisto_floatFromMap("jet1_pt_tchpt",               flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
+            }
+            if (goforjet2) {
+                  FillHisto_floatFromMap("jet2_ptgen",                 flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
+                  FillHisto_floatFromMap("jet2_pt_all",                 flav, isGluonSplit ,ptjet    ,ww);
+                  FillHisto_floatFromMap("jet2_diffpt",   flav, isGluonSplit ,abs(Jet_genpt[ijet]-ptjet)    ,ww);
+                  FillHisto_floatFromMap("jet2_diffrel",   flav, isGluonSplit ,(Jet_genpt[ijet]-ptjet)/ptjet   ,ww);
+                  FillHisto_floatFromMap("jet2_eta",     flav, isGluonSplit ,etajet   ,ww);
+                  FillHisto_floatFromMap("jet2_phi",     flav, isGluonSplit ,phijet   ,ww);
+                  FillHisto_floatFromMap("TCHE_2",  flav, isGluonSplit, tche    ,   ww);
+                  FillHisto_floatFromMap("TCHP_2",  flav, isGluonSplit, tchp    ,   ww);
+                  FillHisto_floatFromMap("JP_2",    flav, isGluonSplit, jetproba  , ww);
+                  FillHisto_floatFromMap("JBP_2",   flav, isGluonSplit, jetbproba , ww);
+                  FillHisto_floatFromMap("SSV_2",   flav, isGluonSplit, ssvhe   ,   ww);
+                  FillHisto_floatFromMap("SSVHP_2", flav, isGluonSplit, ssvhp   ,   ww);
+                  FillHisto_floatFromMap("CSV_2",   flav, isGluonSplit, csv     ,   ww);
+                  FillHisto_floatFromMap("CSVIVF_2",   flav, isGluonSplit, csvivf         ,   ww);
+                  if (csv>0.244) FillHisto_floatFromMap("jet2_pt_csvl",                 flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
+                  if (csv>0.679) FillHisto_floatFromMap("jet2_pt_csvm",                 flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
+                  if (csvivf>0.423) FillHisto_floatFromMap("jet2_pt_csvivfl",           flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
+                  if (csvivf>0.814) FillHisto_floatFromMap("jet2_pt_csvivfm",           flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
+                  if (jetproba>0.275) FillHisto_floatFromMap("jet2_pt_jpl",             flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
+                  if (tchp>3.41 ) FillHisto_floatFromMap("jet2_pt_tchpt",               flav, isGluonSplit ,Jet_genpt[ijet]    ,ww);
+            }
+
+            float softmu   = Jet_SoftMu[ijet]  ;
+            float solfel   = Jet_SoftEl[ijet];
+            float combsl   = Jet_CombCSVSL[ijet];
+            float retrainedcsv= Jet_RetCombSvx[ijet];
+            FillHisto_floatFromMap("SoftMu",      flav, isGluonSplit, softmu  ,   ww);
+            FillHisto_floatFromMap("SoftEl",      flav, isGluonSplit, solfel  ,   ww);
+            FillHisto_floatFromMap("CombCSVSL",   flav, isGluonSplit, combsl  ,   ww);
+            FillHisto_floatFromMap("RetCombSvx",  flav, isGluonSplit, retrainedcsv  ,   ww);
+            if (retrainedcsv<-9) retrainedcsv=-0.03;
+            else if (retrainedcsv<0.)  retrainedcsv=-0.01;
+            FillHisto_floatFromMap("RetCombSvx_zo",  flav, isGluonSplit, retrainedcsv  ,   ww);
+
+
       
             //---------------------------------
             //fill information related to muons
@@ -1510,11 +1499,8 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             FillHisto_intFromMap(  "muon_multi",      flav, isGluonSplit , nmu        ,ww);
       
       
-            //float xmu_deltaR=-1.;
-            //float xmu_ptrel=-1.;
             if(idxFirstMuon > -1){
                 FillHisto_floatFromMap("mu_ptrel",    flav, isGluonSplit ,Muon_ptrel[idxFirstMuon] ,ww);
-                //xmu_ptrel=Muon_ptrel[idxFirstMuon];
                 FillHisto_floatFromMap("mu_chi2",     flav, isGluonSplit ,Muon_chi2[idxFirstMuon]  ,ww);
                 FillHisto_floatFromMap("muon_Pt",     flav, isGluonSplit, Muon_pt[idxFirstMuon] ,     ww);
                 FillHisto_floatFromMap("muon_eta",    flav, isGluonSplit, Muon_eta[idxFirstMuon] ,    ww);
@@ -1523,33 +1509,22 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
                 FillHisto_floatFromMap("muon_Ip2d",   flav, isGluonSplit, Muon_IP2D[idxFirstMuon] ,   ww);     
                 FillHisto_floatFromMap("muon_Sip3d",  flav, isGluonSplit, Muon_IPsig[idxFirstMuon] ,  ww);     
                 FillHisto_floatFromMap("muon_Sip2d",  flav, isGluonSplit, Muon_IP2Dsig[idxFirstMuon] ,ww); 
-                //         cout << "muon_Pt :" <<Muon_pt[idxFirstMuon] <<endl;
-                // 	cout << "muon_eta :" <<Muon_eta[idxFirstMuon] <<endl;
-                // 	cout << "muon_phi :" <<Muon_phi[idxFirstMuon] <<endl;
-                // 	
-	
 	
                 TLorentzVector themuon, thejet;
-	
                 thejet.SetPtEtaPhiM(Jet_pt[ijet], Jet_eta[ijet], Jet_phi[ijet], 0);
                 themuon.SetPtEtaPhiM(Muon_pt[idxFirstMuon], Muon_eta[idxFirstMuon], Muon_phi[idxFirstMuon], 0);
-	
                 FillHisto_floatFromMap("muon_DeltaR",         flav, isGluonSplit, themuon.DeltaR(thejet) , ww);
-                //xmu_deltaR=themuon.DeltaR(thejet);
-                //cout << "muon_DeltaR :" << themuon.DeltaR(thejet) <<endl;
-	
-	
+
                 FillHisto2D_float_floatFromMap("muon_ptrel_vs_jetpt", flav, isGluonSplit,ptjet,Muon_ptrel[idxFirstMuon],ww);
                 FillHisto2D_float_floatFromMap("muon_DeltaR_vs_jetpt",flav, isGluonSplit,ptjet,themuon.DeltaR(thejet),ww);
             }
       
-            if (produceNewAlgoTree) {
-                // PFMuon
-                int npfmu=0;
-                int indpfmu=-1;
-                float minpf=0;
+            // PFMuon
+            int npfmu=0;
+            int indpfmu=-1;
+            float minpf=0;
 
-                for (int im=0; im<nPFMuon; im++) {
+            for (int im=0; im<nPFMuon; im++) {
                     if (PFMuon_IdxJet[im]==ijet && PFMuon_GoodQuality[im]>0) {
                         if (PFMuon_pt[im]> minpf) {
                             indpfmu=im;
@@ -1557,11 +1532,11 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
                         }
                         npfmu++;
                     }
-                }
+            }
 
 
-                FillHisto_intFromMap(  "pfmuon_multi",  flav, isGluonSplit , npfmu   ,ww);
-                if (indpfmu>-1) {
+            FillHisto_intFromMap(  "pfmuon_multi",  flav, isGluonSplit , npfmu   ,ww);
+            if (indpfmu>-1) {
                     FillHisto_intFromMap(  "pfmuon_goodquality", flav, isGluonSplit, PFMuon_GoodQuality[indpfmu]        ,ww);
                     FillHisto_floatFromMap("pfmuon_pt",          flav, isGluonSplit, PFMuon_pt[indpfmu],                 ww);
                     FillHisto_floatFromMap("pfmuon_eta",   	     flav, isGluonSplit, PFMuon_eta[indpfmu],                ww);
@@ -1571,16 +1546,19 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
                     FillHisto_floatFromMap("pfmuon_ratio",       flav, isGluonSplit, PFMuon_ratio[indpfmu],              ww);
                     FillHisto_floatFromMap("pfmuon_ratiorel",    flav, isGluonSplit, PFMuon_ratioRel[indpfmu],           ww);
                     FillHisto_floatFromMap("pfmuon_deltar",	     flav, isGluonSplit, PFMuon_deltaR[indpfmu],             ww);
-                }
+            }
       
-                //PFElectron
-                int npfel=0;
-                int indpfel=-1;
+            //--------------------------------------
+            //fill information related to electrons
+            //---------------------------------------
 
-                minpf=0;
+            //PFElectron
+            int npfel=0;
+            int indpfel=-1;
+            minpf=0;
 
 
-                for (int im=0; im<nPFElectron; im++) {
+            for (int im=0; im<nPFElectron; im++) {
                     if (PFElectron_IdxJet[im]==ijet && PFElectron_pt[im]>2.) {
                         if (PFElectron_pt[im]> minpf) {  
                             indpfel=im;
@@ -1588,11 +1566,11 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
                         }
                         npfel++;
                     }
-                }
+            }
 
 
-                FillHisto_intFromMap(  "pfelectron_multi",  flav, isGluonSplit , npfel   ,ww);
-                if (indpfel>-1) {
+            FillHisto_intFromMap(  "pfelectron_multi",  flav, isGluonSplit , npfel   ,ww);
+            if (indpfel>-1) {
                     FillHisto_floatFromMap("pfelectron_pt",          flav, isGluonSplit, PFElectron_pt[indpfel],                ww);
                     FillHisto_floatFromMap("pfelectron_eta",   	 flav, isGluonSplit, PFElectron_eta[indpfel],                ww);
                     FillHisto_floatFromMap("pfelectron_phi",         flav, isGluonSplit, PFElectron_phi[indpfel],                ww);
@@ -1601,21 +1579,42 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
                     FillHisto_floatFromMap("pfelectron_ratio",       flav, isGluonSplit, PFElectron_ratio[indpfel],                ww);
                     FillHisto_floatFromMap("pfelectron_ratiorel",    flav, isGluonSplit, PFElectron_ratioRel[indpfel],             ww);
                     FillHisto_floatFromMap("pfelectron_deltar",	 flav, isGluonSplit, PFElectron_deltaR[indpfel],                ww);
+            }
+
+            //------------------------------------
+            //fill information related to TagVar 
+            //------------------------------------
+
+
+            if (produceTagVarTree) {
+                FillHisto_floatFromMap("tagvar_vertexNTracks",      flav, isGluonSplit, TagVar_vertexNTracks[ijet],   ww);
+                FillHisto_floatFromMap("tagvar_vertexmass",         flav, isGluonSplit, TagVar_vertexMass[ijet],   ww);
+                if (TagVar_vertexNTracks[ijet]>=3) FillHisto_floatFromMap("tagvar_vertexmass3trk",     flav, isGluonSplit, TagVar_vertexMass[ijet],   ww);
+                FillHisto_floatFromMap("tagvar_vertexJetDeltaR",    flav, isGluonSplit, TagVar_vertexJetDeltaR[ijet],   ww);
+
+            }
+
+            //--------------------------------------
+            //fill information related to TagVarCSV
+            //--------------------------------------
+
+            if (produceTagVarCSVTree) { 
+                FillHisto_floatFromMap("tagvarCSV_vertexCategory", flav, isGluonSplit, TagVarCSV_vertexCategory[ijet],   ww);
+                FillHisto_floatFromMap("tagvarCSV_Sig2dAboveCharm", flav, isGluonSplit, TagVarCSV_trackSip2dSigAboveCharm[ijet],   ww);
+                for (int inrel=0; inrel<nTrkEtaRelTagVarCSV; inrel++) {
+                   FillHisto_floatFromMap("tagvarCSV_trackEtaRel", flav, isGluonSplit, TagVarCSV_trackEtaRel[inrel],ww);
                 }
+                FillHisto_floatFromMap("tagvarCSV_vertexmass", flav, isGluonSplit, TagVarCSV_vertexMass[ijet],ww);
+                if (TagVarCSV_vertexNTracks[ijet]>=3) FillHisto_floatFromMap("tagvarCSV_vertexmass3trk",     flav, isGluonSplit, TagVarCSV_vertexMass[ijet],   ww);
+                FillHisto_floatFromMap("tagvarCSV_vertexNTracks", flav, isGluonSplit, TagVarCSV_vertexNTracks[ijet],ww);
+                FillHisto_floatFromMap("tagvarCSV_energyratio", flav, isGluonSplit, TagVarCSV_vertexEnergyRatio[ijet],   ww);
+                for (int inrel=0; inrel<nTrkTagVarCSV; inrel++) {
+                   FillHisto_floatFromMap("tagvarCSV_trackSip3dSig", flav, isGluonSplit, TagVarCSV_trackSip3dSig[inrel],ww);
+                }
+                FillHisto_floatFromMap("tagvarCSV_2DsigFlightDist", flav, isGluonSplit, TagVarCSV_flightDistance2dSig[ijet],   ww);
             }
+ 
 
-            float mass_sv1=mass_sv;
-            float mass_sv2=mass_sv;
-            float mass_sv3=mass_sv;
-            float mass_sv4=mass_sv;
-            if (fabs(flav)==4)  {
-                mass_sv1*=1.05;
-                mass_sv2*=1.10;
-                mass_sv3*=1.15;
-                mass_sv4*=1.20;
-            }
-
-      
         }
         //----------------------------------
         //End Loop on jets 

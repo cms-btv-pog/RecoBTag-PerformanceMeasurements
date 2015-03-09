@@ -33,7 +33,9 @@ public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
    bool            produceJetProbaTree;
-   bool            produceNewAlgoTree;
+//   bool            produceNewAlgoTree;
+   bool            produceTagVarTree;
+   bool            produceTagVarCSVTree;
    double           n15_20, n20_30, n30_50,n50_80,n80_120,n120_170,n170_300,n300_470,n470_600,n600_800, n800_1000, n1000_inf;
    double           n15_30, n120_150, n150_inf;
    bool            use15_20,use20_30, use30_50,use50_80,use80_120,use120_170,use170_300,use300_470,use470_600,use600_800, use800_1000, use1000_inf;
@@ -41,8 +43,6 @@ public :
    std::vector<TH1D*>   HistoBtag;  
    std::vector<TH2D*>   HistoBtag2D;  
     
-//   std::map<TString, int>   HistoBtag_map; 
-//   std::map<TString, int>   HistoBtag2D_map; 
    std::map<std::string, int>   HistoBtag_map;
    std::map<std::string, int>   HistoBtag2D_map;
 
@@ -73,8 +73,10 @@ public :
    Float_t         mcweight;
    Int_t           nPV;
    Float_t         PVz;
+   Float_t         GenPVz;
    Float_t         nPUtrue;
    Int_t           nPU;
+   
 
    Int_t           ncQuarks;
    Float_t         cQuark_pT[50];   //[ncQuarks]
@@ -83,6 +85,7 @@ public :
    Int_t           cQuark_pdgID[50];   //[ncQuarks]
    Int_t           cQuark_status[50];   //[ncQuarks]
    Int_t           cQuark_fromGSP[50];   //[ncQuarks]
+
    Int_t           nbQuarks;
    Float_t         bQuark_pT[50];   //[nbQuarks]
    Float_t         bQuark_eta[50];   //[nbQuarks]
@@ -90,31 +93,27 @@ public :
    Int_t           bQuark_pdgID[50];   //[nbQuarks]
    Int_t           bQuark_status[50];   //[nbQuarks]
    Int_t           bQuark_fromGSP[50];   //[nbQuarks]
+
    Int_t           nBHadrons;
    Float_t         BHadron_pT[50];   //[nBHadrons]
    Float_t         BHadron_eta[50];   //[nBHadrons]
    Float_t         BHadron_phi[50];   //[nBHadrons]
    Float_t         BHadron_mass[50];   //[nBHadrons]
    Int_t           BHadron_pdgID[50];   //[nBHadrons]
-   //Int_t           BHadron_status[50];   //[nBHadrons]
    Int_t           BHadron_mother[50];   //[nBHadrons]
    Int_t           BHadron_hasBdaughter[50];   //[nBHadrons]
-   Int_t           nDHadrons;
+
    Int_t           nDaughters;
+   Int_t           nDHadrons;
    Float_t         DHadron_pT[50];   //[nDHadrons]
    Float_t         DHadron_eta[50];   //[nDHadrons]
    Float_t         DHadron_phi[50];   //[nDHadrons]
    Float_t         DHadron_mass[50];   //[nDHadrons]
-   //Float_t         DHadron_vx[50];   //[nDHadrons]
-   //Float_t         DHadron_vy[50];   //[nDHadrons]
-   //Float_t         DHadron_vz[50];   //[nDHadrons]
-   //Float_t         DHadron_daughterVx[50];   //[nDHadrons]
-   //Float_t         DHadron_daughterVy[50];   //[nDHadrons]
-   //Float_t         DHadron_daughterVz[50];   //[nDHadrons]
    Int_t           DHadron_pdgID[50];   //[nDHadrons]
    Int_t           DHadron_nDaughters[50];   //[nDHadrons]
    Int_t           DHadron_DaughtersPdgID[100];   //[nDaughters]
    Int_t           DHadron_nChargedDaughters[50];   //[nDHadrons]
+   
    Int_t           nGenlep;
    Float_t         Genlep_pT[50];   //[nGenlep]
    Float_t         Genlep_eta[50];   //[nGenlep]
@@ -122,12 +121,14 @@ public :
    Int_t           Genlep_pdgID[50];   //[nGenlep]
    Int_t           Genlep_status[50];   //[nGenlep]
    Int_t           Genlep_mother[50];   //[nGenlep]
+
    Int_t           nGenquark;
    Float_t         Genquark_pT[50];   //[nGenquark]
    Float_t         Genquark_eta[50];   //[nGenquark]
    Float_t         Genquark_phi[50];   //[nGenquark]
    Int_t           Genquark_pdgID[50];   //[nGenquark]
    Int_t           Genquark_mother[50];   //[nGenquark]
+
    Int_t           nJet;
    Float_t         Jet_pt[1000];   //[nJet]
    Float_t         Jet_genpt[1000];   //[nJet]
@@ -137,6 +138,7 @@ public :
    Float_t         Jet_phi[1000];   //[nJet]
    Float_t         Jet_mass[1000];   //[nJet]
    Int_t           Jet_ntracks[1000];   //[nJet]
+   Int_t           Jet_nseltracks[1000];   //[nJet]
    Int_t           Jet_flavour[1000];   //[nJet]
    Float_t         Jet_Ip2N[1000];   //[nJet]
    Float_t         Jet_Ip2P[1000];   //[nJet]
@@ -152,48 +154,42 @@ public :
    Float_t         Jet_Svx[1000];   //[nJet]
    Float_t         Jet_SvxNHP[1000];   //[nJet]
    Float_t         Jet_SvxHP[1000];   //[nJet]
-   Float_t         Jet_SvxMass[1000];   //[nJet]
+   Float_t         Jet_SvxMass[1000];   //[nJet]   <----- a disparu dasn le ntuple de Phys14?
    Float_t         Jet_CombSvxN[1000];   //[nJet]
    Float_t         Jet_CombSvxP[1000];   //[nJet]
    Float_t         Jet_CombSvx[1000];   //[nJet]
    Float_t         Jet_RetCombSvxN[1000];   //[nJet]
    Float_t         Jet_RetCombSvxP[1000];   //[nJet]
    Float_t         Jet_RetCombSvx[1000];   //[nJet]
-   //Float_t         Jet_CombCSVJP_N[1000];   //[nJet]
-   //Float_t         Jet_CombCSVJP_P[1000];   //[nJet]
-   //Float_t         Jet_CombCSVJP[1000];   //[nJet]
    Float_t         Jet_CombCSVSL_N[1000];   //[nJet]
    Float_t         Jet_CombCSVSL_P[1000];   //[nJet]
    Float_t         Jet_CombCSVSL[1000];   //[nJet]
-   //Float_t         Jet_CombCSVJPSL_N[1000];   //[nJet]
-   //Float_t         Jet_CombCSVJPSL_P[1000];   //[nJet]
-   //Float_t         Jet_CombCSVJPSL[1000];   //[nJet]
-   //Float_t         Jet_SimpIVF_HP[1000];   //[nJet]
-   //Float_t         Jet_SimpIVF_HE[1000];   //[nJet]
-   //Float_t         Jet_DoubIVF_HE[1000];   //[nJet]
    Float_t         Jet_CombIVF[1000];   //[nJet]
-   //Float_t         Jet_CombIVF_P[1000];   //[nJet]
    Float_t         Jet_SoftMuN[1000];   //[nJet]
    Float_t         Jet_SoftMuP[1000];   //[nJet]
    Float_t         Jet_SoftMu[1000];   //[nJet]
    Float_t         Jet_SoftElN[1000];   //[nJet]
    Float_t         Jet_SoftElP[1000];   //[nJet]
    Float_t         Jet_SoftEl[1000];   //[nJet]
-   Int_t           Jet_hist1[1000];   //[nJet]
-   Int_t           Jet_hist2[1000];   //[nJet]
-   Int_t           Jet_hist3[1000];   //[nJet]
-   Int_t           Jet_histJet[1000];   //[nJet]
-   Int_t           Jet_histSvx[1000];   //[nJet]
+   Int_t           Jet_SV_multi[1000];   //[nJet]
+   Int_t           Jet_looseID[1000];   //[nJet]
+   Int_t           Jet_tightID[1000];   //[nJet]
    Int_t           Jet_nFirstTrack[1000];   //[nJet]
    Int_t           Jet_nLastTrack[1000];   //[nJet]
    Int_t           Jet_nFirstSV[1000];   //[nJet]
    Int_t           Jet_nLastSV[1000];   //[nJet]
-   Int_t           Jet_SV_multi[1000];   //[nJet]
    Int_t           Jet_nFirstTrkInc[1000];   //[nJet]
    Int_t           Jet_nLastTrkInc[1000];   //[nJet]
-   Int_t           Jet_VtxCat[1000];   //[nJet]
-   Int_t           Jet_looseID[1000];   //[nJet]
-   Int_t           Jet_tightID[1000];   //[nJet]
+   Int_t           Jet_nFirstTrkTagVar[1000];   //[nJet]
+   Int_t           Jet_nLastTrkTagVar[1000];   //[nJet]
+   Int_t           Jet_nFirstSVTagVar[1000];   //[nJet]
+   Int_t           Jet_nLastSVTagVar[1000];   //[nJet]
+   Int_t           Jet_nFirstTrkTagVarCSV[1000];   //[nJet]
+   Int_t           Jet_nLastTrkTagVarCSV[1000];   //[nJet]
+   Int_t           Jet_nFirstTrkEtaRelTagVarCSV[1000];   //[nJet]
+   Int_t           Jet_nLastTrkEtaRelTagVarCSV[1000];   //[nJet]
+
+
    Int_t           nTrkInc;
    Float_t         TrkInc_pt[50];   //[nTrkInc]
    Float_t         TrkInc_eta[50];   //[nTrkInc]
@@ -201,6 +197,7 @@ public :
    Float_t         TrkInc_ptrel[50];   //[nTrkInc]
    Float_t         TrkInc_IPsig[50];   //[nTrkInc]
    Float_t         TrkInc_IP[50];   //[nTrkInc]
+
    Int_t           nMuon;
    Int_t           Muon_IdxJet[50];   //[nMuon]
    Int_t           Muon_nMuHit[50];   //[nMuon]
@@ -226,6 +223,7 @@ public :
    Float_t         Muon_deltaR[50];   //[nMuon]
    Float_t         Muon_ratio[50];   //[nMuon]
    Float_t         Muon_ratioRel[50];   //[nMuon]
+
    Int_t           nPFElectron;
    Int_t           PFElectron_IdxJet[50];   //[nPFElectron]
    Float_t         PFElectron_pt[50];   //[nPFElectron]
@@ -237,6 +235,7 @@ public :
    Float_t         PFElectron_ratioRel[50];   //[nPFElectron]
    Float_t         PFElectron_IP[50];   //[nPFElectron]
    Float_t         PFElectron_IP2D[50];   //[nPFElectron]
+
    Int_t           nPFMuon;
    Int_t           PFMuon_IdxJet[50];   //[nPFMuon]
    Float_t         PFMuon_pt[50];   //[nPFMuon]
@@ -249,6 +248,7 @@ public :
    Float_t         PFMuon_IP[50];   //[nPFMuon]
    Float_t         PFMuon_IP2D[50];   //[nPFMuon]
    Int_t           PFMuon_GoodQuality[50];   //[nPFMuon]
+
    Int_t           nSV;
    Float_t         SV_x[50];   //[nSV]
    Float_t         SV_y[50];   //[nSV]
@@ -263,8 +263,8 @@ public :
    Float_t         SV_deltaR_jet[50];   //[nSV]
    Float_t         SV_deltaR_sum_jet[50];   //[nSV]
    Float_t         SV_deltaR_sum_dir[50];   //[nSV]
-   Float_t         SV_energy_ratio[50];   //[nSV]
-   Float_t         SV_aboveC[50];   //[nSV]
+   Float_t         SV_energy_ratio[50];   //[nSV]  <--- disparu dans phys14
+   Float_t         SV_aboveC[50];   //[nSV]   <---- disparu dans phys14
    Float_t         SV_vtx_pt[50];   //[nSV]
    Float_t         SV_flight2D[50];   //[nSV]
    Float_t         SV_flight2DErr[50];   //[nSV]
@@ -276,13 +276,6 @@ public :
    Float_t         SV_vtx_eta[50];   //[nSV]
    Float_t         SV_vtx_phi[50];   //[nSV]
 
-   
-   
-   // List of branches for probatree
-   
-   
-   
-   
    
    Int_t nTrack; 
    Float_t Track_dxy[ntrack_max];            //[nTrack]
@@ -302,24 +295,24 @@ public :
    Float_t Track_eta[ntrack_max];           //[nTrack]
    Float_t Track_phi[ntrack_max];           //[nTrack]
    Float_t Track_chi2[ntrack_max];           //[nTrack]
-   Int_t Track_charge[ntrack_max];           //[nTrack]
-   Int_t Track_history[ntrack_max];           //[nTrack]
-   Int_t Track_nHitStrip[ntrack_max];           //[nTrack]
-   Int_t Track_nHitPixel[ntrack_max];           //[nTrack]
-   Int_t Track_nHitAll[ntrack_max];           //[nTrack]
-   Int_t Track_nHitTIB[ntrack_max];           //[nTrack]
-   Int_t Track_nHitTID[ntrack_max];           //[nTrack]
-   Int_t Track_nHitTOB[ntrack_max];           //[nTrack]
-   Int_t Track_nHitTEC[ntrack_max];           //[nTrack]
-   Int_t Track_nHitPXB[ntrack_max];           //[nTrack]
-   Int_t Track_nHitPXF[ntrack_max];           //[nTrack]
-   Int_t Track_isHitL1[ntrack_max];           //[nTrack]
-   Int_t Track_PV[ntrack_max];               //[nTrack] 
-   Int_t Track_SV[ntrack_max];            //[nTrack]     
+   Int_t   Track_charge[ntrack_max];           //[nTrack]
+   Int_t   Track_history[ntrack_max];           //[nTrack]
+   Int_t   Track_nHitStrip[ntrack_max];           //[nTrack]
+   Int_t   Track_nHitPixel[ntrack_max];           //[nTrack]
+   Int_t   Track_nHitAll[ntrack_max];           //[nTrack]
+   Int_t   Track_nHitTIB[ntrack_max];           //[nTrack]
+   Int_t   Track_nHitTID[ntrack_max];           //[nTrack]
+   Int_t   Track_nHitTOB[ntrack_max];           //[nTrack]
+   Int_t   Track_nHitTEC[ntrack_max];           //[nTrack]
+   Int_t   Track_nHitPXB[ntrack_max];           //[nTrack]
+   Int_t   Track_nHitPXF[ntrack_max];           //[nTrack]
+   Int_t   Track_isHitL1[ntrack_max];           //[nTrack]
+   Int_t   Track_PV[ntrack_max];               //[nTrack] 
+   Int_t   Track_SV[ntrack_max];            //[nTrack]     
    Float_t Track_PVweight[ntrack_max];           //[nTrack]
    Float_t Track_SVweight[ntrack_max];           //[nTrack]
-   Int_t Track_category[ntrack_max];           //[nTrack]
-   Int_t Track_isfromSV[ntrack_max];            //[nTrack]     
+   Int_t   Track_category[ntrack_max];           //[nTrack]
+   Int_t   Track_isfromSV[ntrack_max];            //[nTrack]     
 
    Float_t PV_x[1000];          //[nPV]
    Float_t PV_y[1000];          //[nPV]
@@ -331,6 +324,92 @@ public :
    Float_t PV_ndf[1000];          //[nPV]
    Int_t PV_isgood[1000];          //[nPV]
    Int_t PV_isfake[1000];          //[nPV]
+
+   Float_t         TagVar_jetNTracks[1000];   //[nJet]
+   Float_t         TagVar_jetNSecondaryVertices[1000];   //[nJet]
+   Float_t         TagVar_chargedHadronEnergyFraction[1000];   //[nJet]
+   Float_t         TagVar_neutralHadronEnergyFraction[1000];   //[nJet]
+   Float_t         TagVar_photonEnergyFraction[1000];   //[nJet]
+   Float_t         TagVar_electronEnergyFraction[1000];   //[nJet]
+   Float_t         TagVar_muonEnergyFraction[1000];   //[nJet]
+   Float_t         TagVar_chargedHadronMultiplicity[1000];   //[nJet]
+   Float_t         TagVar_neutralHadronMultiplicity[1000];   //[nJet]
+   Float_t         TagVar_photonMultiplicity[1000];   //[nJet]
+   Float_t         TagVar_electronMultiplicity[1000];   //[nJet]
+   Float_t         TagVar_muonMultiplicity[1000];   //[nJet]
+
+   Int_t           nTrkTagVar;
+   Float_t         TagVar_trackMomentum[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackEta[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackPhi[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackPtRel[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackPPar[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackEtaRel[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackDeltaR[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackPtRatio[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackPParRatio[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackSip2dVal[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackSip2dSig[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackSip3dVal[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackSip3dSig[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackDecayLenVal[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackDecayLenSig[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackJetDistVal[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackJetDistSig[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackChi2[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackNTotalHits[ntrack_max];   //[nTrkTagVar]
+   Float_t         TagVar_trackNPixelHits[ntrack_max];   //[nTrkTagVar]
+
+   Int_t           nSVTagVar;
+   Float_t         TagVar_vertexMass[50];   //[nSVTagVar]
+   Float_t         TagVar_vertexNTracks[50];   //[nSVTagVar]
+   Float_t         TagVar_vertexJetDeltaR[50];   //[nSVTagVar]
+   Float_t         TagVar_flightDistance2dVal[50];   //[nSVTagVar]
+   Float_t         TagVar_flightDistance2dSig[50];   //[nSVTagVar]
+   Float_t         TagVar_flightDistance3dVal[50];   //[nSVTagVar]
+   Float_t         TagVar_flightDistance3dSig[50];   //[nSVTagVar]
+
+   Float_t         TagVarCSV_trackJetPt[1000];   //[nJet]
+   Float_t         TagVarCSV_jetNTracks[1000];   //[nJet]
+   Float_t         TagVarCSV_jetNTracksEtaRel[1000];   //[nJet]
+   Float_t         TagVarCSV_trackSumJetEtRatio[1000];   //[nJet]
+   Float_t         TagVarCSV_trackSumJetDeltaR[1000];   //[nJet]
+   Float_t         TagVarCSV_trackSip2dValAboveCharm[1000];   //[nJet]
+   Float_t         TagVarCSV_trackSip2dSigAboveCharm[1000];   //[nJet]
+   Float_t         TagVarCSV_trackSip3dValAboveCharm[1000];   //[nJet]
+   Float_t         TagVarCSV_trackSip3dSigAboveCharm[1000];   //[nJet]
+   Float_t         TagVarCSV_vertexCategory[1000];   //[nJet]
+   Float_t         TagVarCSV_jetNSecondaryVertices[1000];   //[nJet]
+   Float_t         TagVarCSV_vertexMass[1000];   //[nJet]
+   Float_t         TagVarCSV_vertexNTracks[1000];   //[nJet]
+   Float_t         TagVarCSV_vertexEnergyRatio[1000];   //[nJet]
+   Float_t         TagVarCSV_vertexJetDeltaR[1000];   //[nJet]
+   Float_t         TagVarCSV_flightDistance2dVal[1000];   //[nJet]
+   Float_t         TagVarCSV_flightDistance2dSig[1000];   //[nJet]
+   Float_t         TagVarCSV_flightDistance3dVal[1000];   //[nJet]
+   Float_t         TagVarCSV_flightDistance3dSig[1000];   //[nJet]
+
+   Int_t           nTrkTagVarCSV;
+   Int_t           nTrkEtaRelTagVarCSV;
+   Float_t         TagVarCSV_trackMomentum[ntrack_max];   //[nTrkTagVarCSV]
+   Float_t         TagVarCSV_trackEta[ntrack_max];   //[nTrkTagVarCSV]
+   Float_t         TagVarCSV_trackPhi[ntrack_max];   //[nTrkTagVarCSV]
+   Float_t         TagVarCSV_trackPtRel[ntrack_max];   //[nTrkTagVarCSV]
+   Float_t         TagVarCSV_trackPPar[ntrack_max];   //[nTrkTagVarCSV]
+   Float_t         TagVarCSV_trackDeltaR[ntrack_max];   //[nTrkTagVarCSV]
+   Float_t         TagVarCSV_trackPtRatio[ntrack_max];   //[nTrkTagVarCSV]
+   Float_t         TagVarCSV_trackPParRatio[ntrack_max];   //[nTrkTagVarCSV]
+   Float_t         TagVarCSV_trackSip2dVal[ntrack_max];   //[nTrkTagVarCSV]
+   Float_t         TagVarCSV_trackSip2dSig[ntrack_max];   //[nTrkTagVarCSV]
+   Float_t         TagVarCSV_trackSip3dVal[ntrack_max];   //[nTrkTagVarCSV]
+   Float_t         TagVarCSV_trackSip3dSig[ntrack_max];   //[nTrkTagVarCSV]
+   Float_t         TagVarCSV_trackDecayLenVal[ntrack_max];   //[nTrkTagVarCSV]
+   Float_t         TagVarCSV_trackDecayLenSig[ntrack_max];   //[nTrkTagVarCSV]
+   Float_t         TagVarCSV_trackJetDistVal[ntrack_max];   //[nTrkTagVarCSV]
+   Float_t         TagVarCSV_trackJetDistSig[ntrack_max];   //[nTrkTagVarCSV]
+   Float_t         TagVarCSV_trackEtaRel[ntrack_max];   //[nTrkEtaRelTagVarCSV]
+
+
    
 
    // List of branches
@@ -343,6 +422,7 @@ public :
    TBranch        *b_mcweight;   //!
    TBranch        *b_nPV;   //!
    TBranch        *b_PVz;   //!
+   TBranch        *b_GenPVz;   //!
    TBranch        *b_nPUtrue;   //!
    TBranch        *b_nPU;   //!
    TBranch        *b_ncQuarks;   //!
@@ -365,7 +445,6 @@ public :
    TBranch        *b_BHadron_phi;   //!
    TBranch        *b_BHadron_mass;   //!
    TBranch        *b_BHadron_pdgID;   //!
-   //TBranch        *b_BHadron_status;   //!
    TBranch        *b_BHadron_mother;   //!
    TBranch        *b_BHadron_hasBdaughter;   //!
    TBranch        *b_nDHadrons;   //!
@@ -374,12 +453,6 @@ public :
    TBranch        *b_DHadron_eta;   //!
    TBranch        *b_DHadron_phi;   //!
    TBranch        *b_DHadron_mass;   //!
-   //TBranch        *b_DHadron_vx;   //!
-   //TBranch        *b_DHadron_vy;   //!
-   //TBranch        *b_DHadron_vz;   //!
-   //TBranch        *b_DHadron_daughterVx;   //!
-   //TBranch        *b_DHadron_daughterVy;   //!
-   //TBranch        *b_DHadron_daughterVz;   //!
    TBranch        *b_DHadron_pdgID;   //!
    TBranch        *b_DHadron_nDaughters;   //!
    TBranch        *b_DHadron_DaughtersPdgID;   //!
@@ -406,6 +479,7 @@ public :
    TBranch        *b_Jet_phi;   //!
    TBranch        *b_Jet_mass;   //!
    TBranch        *b_Jet_ntracks;   //!
+   TBranch        *b_Jet_nseltracks;   //!
    TBranch        *b_Jet_flavour;   //!
    TBranch        *b_Jet_Ip2N;   //!
    TBranch        *b_Jet_Ip2P;   //!
@@ -421,38 +495,22 @@ public :
    TBranch        *b_Jet_Svx;   //!
    TBranch        *b_Jet_SvxNHP;   //!
    TBranch        *b_Jet_SvxHP;   //!
-   TBranch        *b_Jet_SvxMass;   //!
    TBranch        *b_Jet_CombSvxN;   //!
    TBranch        *b_Jet_CombSvxP;   //!
    TBranch        *b_Jet_CombSvx;   //!
    TBranch        *b_Jet_RetCombSvxN;   //!
    TBranch        *b_Jet_RetCombSvxP;   //!
    TBranch        *b_Jet_RetCombSvx;   //!
-   //TBranch        *b_Jet_CombCSVJP_N;   //!
-   //TBranch        *b_Jet_CombCSVJP_P;   //!
-   //TBranch        *b_Jet_CombCSVJP;   //!
    TBranch        *b_Jet_CombCSVSL_N;   //!
    TBranch        *b_Jet_CombCSVSL_P;   //!
    TBranch        *b_Jet_CombCSVSL;   //!
-   //TBranch        *b_Jet_CombCSVJPSL_N;   //!
-   //TBranch        *b_Jet_CombCSVJPSL_P;   //!
-   //TBranch        *b_Jet_CombCSVJPSL;   //!
-   //TBranch        *b_Jet_SimpIVF_HP;   //!
-   //TBranch        *b_Jet_SimpIVF_HE;   //!
-   //TBranch        *b_Jet_DoubIVF_HE;   //!
    TBranch        *b_Jet_CombIVF;   //!
-   //TBranch        *b_Jet_CombIVF_P;   //!
    TBranch        *b_Jet_SoftMuN;   //!
    TBranch        *b_Jet_SoftMuP;   //!
    TBranch        *b_Jet_SoftMu;   //!
    TBranch        *b_Jet_SoftElN;   //!
    TBranch        *b_Jet_SoftElP;   //!
    TBranch        *b_Jet_SoftEl;   //!
-   TBranch        *b_Jet_hist1;   //!  
-   TBranch        *b_Jet_hist2;   //!   
-   TBranch        *b_Jet_hist3;   //!   
-   TBranch        *b_Jet_histJet;   //!
-   TBranch        *b_Jet_histSvx;   //! 
    TBranch        *b_Jet_nFirstTrack;   //!
    TBranch        *b_Jet_nLastTrack;   //!
    TBranch        *b_Jet_nFirstSV;   //!  
@@ -460,9 +518,98 @@ public :
    TBranch        *b_Jet_SV_multi;   //!
    TBranch        *b_Jet_nFirstTrkInc;   //!
    TBranch        *b_Jet_nLastTrkInc;   //!
-   TBranch        *b_Jet_VtxCat;   //! 
    TBranch        *b_Jet_looseID;   //!
    TBranch        *b_Jet_tightID;   //!
+   TBranch        *b_Jet_nFirstTrkTagVar;   //!
+   TBranch        *b_Jet_nLastTrkTagVar;   //!
+   TBranch        *b_Jet_nFirstSVTagVar;   //!
+   TBranch        *b_Jet_nLastSVTagVar;   //!
+   TBranch        *b_TagVar_jetNTracks;   //!
+   TBranch        *b_TagVar_jetNSecondaryVertices;   //!
+   TBranch        *b_TagVar_chargedHadronEnergyFraction;   //!
+   TBranch        *b_TagVar_neutralHadronEnergyFraction;   //!
+   TBranch        *b_TagVar_photonEnergyFraction;   //!
+   TBranch        *b_TagVar_electronEnergyFraction;   //!
+   TBranch        *b_TagVar_muonEnergyFraction;   //!
+   TBranch        *b_TagVar_chargedHadronMultiplicity;   //!
+   TBranch        *b_TagVar_neutralHadronMultiplicity;   //!
+   TBranch        *b_TagVar_photonMultiplicity;   //!
+   TBranch        *b_TagVar_electronMultiplicity;   //!
+   TBranch        *b_TagVar_muonMultiplicity;   //!
+   TBranch        *b_nTrkTagVar;   //!
+   TBranch        *b_TagVar_trackMomentum;   //!
+   TBranch        *b_TagVar_trackEta;   //!
+   TBranch        *b_TagVar_trackPhi;   //!
+   TBranch        *b_TagVar_trackPtRel;   //!
+   TBranch        *b_TagVar_trackPPar;   //!
+   TBranch        *b_TagVar_trackEtaRel;   //!
+   TBranch        *b_TagVar_trackDeltaR;   //!
+   TBranch        *b_TagVar_trackPtRatio;   //!
+   TBranch        *b_TagVar_trackPParRatio;   //!
+   TBranch        *b_TagVar_trackSip2dVal;   //!
+   TBranch        *b_TagVar_trackSip2dSig;   //!
+   TBranch        *b_TagVar_trackSip3dVal;   //!
+   TBranch        *b_TagVar_trackSip3dSig;   //!
+   TBranch        *b_TagVar_trackDecayLenVal;   //!
+   TBranch        *b_TagVar_trackDecayLenSig;   //!
+   TBranch        *b_TagVar_trackJetDistVal;   //!
+   TBranch        *b_TagVar_trackJetDistSig;   //!
+   TBranch        *b_TagVar_trackChi2;   //!
+   TBranch        *b_TagVar_trackNTotalHits;   //!
+   TBranch        *b_TagVar_trackNPixelHits;   //!
+   TBranch        *b_nSVTagVar;   //!
+   TBranch        *b_TagVar_vertexMass;   //!
+   TBranch        *b_TagVar_vertexNTracks;   //!
+   TBranch        *b_TagVar_vertexJetDeltaR;   //!
+   TBranch        *b_TagVar_flightDistance2dVal;   //!
+   TBranch        *b_TagVar_flightDistance2dSig;   //!
+   TBranch        *b_TagVar_flightDistance3dVal;   //!
+   TBranch        *b_TagVar_flightDistance3dSig;   //!
+   TBranch        *b_Jet_nFirstTrkTagVarCSV;   //!
+   TBranch        *b_Jet_nLastTrkTagVarCSV;   //!
+   TBranch        *b_Jet_nFirstTrkEtaRelTagVarCSV;   //!
+   TBranch        *b_Jet_nLastTrkEtaRelTagVarCSV;   //!
+   TBranch        *b_TagVarCSV_trackJetPt;   //!
+   TBranch        *b_TagVarCSV_jetNTracks;   //!
+   TBranch        *b_TagVarCSV_jetNTracksEtaRel;   //!
+   TBranch        *b_TagVarCSV_trackSumJetEtRatio;   //!
+   TBranch        *b_TagVarCSV_trackSumJetDeltaR;   //!
+   TBranch        *b_TagVarCSV_trackSip2dValAboveCharm;   //!
+   TBranch        *b_TagVarCSV_trackSip2dSigAboveCharm;   //!
+   TBranch        *b_TagVarCSV_trackSip3dValAboveCharm;   //!
+   TBranch        *b_TagVarCSV_trackSip3dSigAboveCharm;   //!
+   TBranch        *b_TagVarCSV_vertexCategory;   //!
+   TBranch        *b_TagVarCSV_jetNSecondaryVertices;   //!
+   TBranch        *b_TagVarCSV_vertexMass;   //!
+   TBranch        *b_TagVarCSV_vertexNTracks;   //!
+   TBranch        *b_TagVarCSV_vertexEnergyRatio;   //!
+   TBranch        *b_TagVarCSV_vertexJetDeltaR;   //!
+   TBranch        *b_TagVarCSV_flightDistance2dVal;   //!
+   TBranch        *b_TagVarCSV_flightDistance2dSig;   //!
+   TBranch        *b_TagVarCSV_flightDistance3dVal;   //!
+   TBranch        *b_TagVarCSV_flightDistance3dSig;   //!
+   TBranch        *b_nTrkTagVarCSV;   //!
+   TBranch        *b_nTrkEtaRelTagVarCSV;   //!
+   TBranch        *b_TagVarCSV_trackMomentum;   //!
+   TBranch        *b_TagVarCSV_trackEta;   //!
+   TBranch        *b_TagVarCSV_trackPhi;   //!
+   TBranch        *b_TagVarCSV_trackPtRel;   //!
+   TBranch        *b_TagVarCSV_trackPPar;   //!
+   TBranch        *b_TagVarCSV_trackDeltaR;   //!
+   TBranch        *b_TagVarCSV_trackPtRatio;   //!
+   TBranch        *b_TagVarCSV_trackPParRatio;   //!
+   TBranch        *b_TagVarCSV_trackSip2dVal;   //!
+   TBranch        *b_TagVarCSV_trackSip2dSig;   //!
+   TBranch        *b_TagVarCSV_trackSip3dVal;   //!
+   TBranch        *b_TagVarCSV_trackSip3dSig;   //!
+   TBranch        *b_TagVarCSV_trackDecayLenVal;   //!
+   TBranch        *b_TagVarCSV_trackDecayLenSig;   //!
+   TBranch        *b_TagVarCSV_trackJetDistVal;   //!
+   TBranch        *b_TagVarCSV_trackJetDistSig;   //!
+   TBranch        *b_TagVarCSV_trackEtaRel;   //!
+
+
+
    TBranch        *b_nTrkInc;   //! 
    TBranch        *b_TrkInc_pt;   //!
    TBranch        *b_TrkInc_eta;   //!
@@ -602,7 +749,8 @@ public :
   TBranch *b_PV_isgood;
   TBranch *b_PV_isfake;
   
-   CommPlotProducer(TChain *supertree=0, bool infotree1=true, bool infotree2=false, int sqrts=13);
+//   CommPlotProducer(TChain *supertree=0, bool infotree1=true, bool infotree2=false, int sqrts=13);
+   CommPlotProducer(TChain *supertree=0);
    virtual ~CommPlotProducer();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -638,7 +786,8 @@ public :
 #endif
 
 #ifdef CommPlotProducer_cxx
-CommPlotProducer::CommPlotProducer(TChain *superTree, bool infotree1, bool infotree2, int sqrts)
+//CommPlotProducer::CommPlotProducer(TChain *superTree, bool infotree1, bool infotree2, int sqrts)
+CommPlotProducer::CommPlotProducer(TChain *superTree)
 {  
 
    numb_histo = 0;
@@ -674,12 +823,15 @@ CommPlotProducer::CommPlotProducer(TChain *superTree, bool infotree1, bool infot
    n15_30   =0;
    n120_150 =0;
    n150_inf =0;
-   sqrtstev=sqrts;
-   produceJetProbaTree=infotree1;
-   produceNewAlgoTree=infotree2;
+//   sqrtstev=sqrts;
+//   produceJetProbaTree=infotree1;
+//   produceNewAlgoTree=infotree2;
+ 
 
-   if (produceJetProbaTree) use_selected_tracks=false;
-   else use_selected_tracks=true;
+   produceJetProbaTree =false;
+//   produceNewAlgoTree  =false;
+   produceTagVarTree   =false;
+   produceTagVarCSVTree=false;
 
    puweight=false;
    
@@ -742,6 +894,7 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("mcweight", &mcweight, &b_mcweight);
    fChain->SetBranchAddress("nPV", &nPV, &b_nPV);
    fChain->SetBranchAddress("PVz", &PVz, &b_PVz);
+   fChain->SetBranchAddress("GenPVz", &GenPVz, &b_GenPVz);
    fChain->SetBranchAddress("nPUtrue", &nPUtrue, &b_nPUtrue);
    fChain->SetBranchAddress("nPU", &nPU, &b_nPU);
    fChain->SetBranchAddress("ncQuarks", &ncQuarks, &b_ncQuarks);
@@ -765,7 +918,6 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("BHadron_phi", BHadron_phi, &b_BHadron_phi);
    fChain->SetBranchAddress("BHadron_mass", BHadron_mass, &b_BHadron_mass);
    fChain->SetBranchAddress("BHadron_pdgID", BHadron_pdgID, &b_BHadron_pdgID);
-   //fChain->SetBranchAddress("BHadron_status", BHadron_status, &b_BHadron_status);
    fChain->SetBranchAddress("BHadron_mother", BHadron_mother, &b_BHadron_mother);
    fChain->SetBranchAddress("BHadron_hasBdaughter", BHadron_hasBdaughter, &b_BHadron_hasBdaughter);
    fChain->SetBranchAddress("nDHadrons", &nDHadrons, &b_nDHadrons);
@@ -774,12 +926,6 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("DHadron_eta", DHadron_eta, &b_DHadron_eta);
    fChain->SetBranchAddress("DHadron_phi", DHadron_phi, &b_DHadron_phi);
    fChain->SetBranchAddress("DHadron_mass", DHadron_mass, &b_DHadron_mass);
-   //fChain->SetBranchAddress("DHadron_vx", DHadron_vx, &b_DHadron_vx);
-   //fChain->SetBranchAddress("DHadron_vy", DHadron_vy, &b_DHadron_vy);
-   //fChain->SetBranchAddress("DHadron_vz", DHadron_vz, &b_DHadron_vz);
-   //fChain->SetBranchAddress("DHadron_daughterVx", DHadron_daughterVx, &b_DHadron_daughterVx);
-   //fChain->SetBranchAddress("DHadron_daughterVy", DHadron_daughterVy, &b_DHadron_daughterVy);
-   //fChain->SetBranchAddress("DHadron_daughterVz", DHadron_daughterVz, &b_DHadron_daughterVz);
    fChain->SetBranchAddress("DHadron_pdgID", DHadron_pdgID, &b_DHadron_pdgID);
    fChain->SetBranchAddress("DHadron_nDaughters", DHadron_nDaughters, &b_DHadron_nDaughters);
    fChain->SetBranchAddress("DHadron_DaughtersPdgID", DHadron_DaughtersPdgID, &b_DHadron_DaughtersPdgID);
@@ -806,6 +952,7 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("Jet_phi", Jet_phi, &b_Jet_phi);
    fChain->SetBranchAddress("Jet_mass", Jet_mass, &b_Jet_mass);
    fChain->SetBranchAddress("Jet_ntracks", Jet_ntracks, &b_Jet_ntracks);
+   fChain->SetBranchAddress("Jet_nseltracks", Jet_nseltracks, &b_Jet_nseltracks);
    fChain->SetBranchAddress("Jet_flavour", Jet_flavour, &b_Jet_flavour);
    fChain->SetBranchAddress("Jet_Ip2N", Jet_Ip2N, &b_Jet_Ip2N);
    fChain->SetBranchAddress("Jet_Ip2P", Jet_Ip2P, &b_Jet_Ip2P);
@@ -821,38 +968,22 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("Jet_Svx", Jet_Svx, &b_Jet_Svx);
    fChain->SetBranchAddress("Jet_SvxNHP", Jet_SvxNHP, &b_Jet_SvxNHP);
    fChain->SetBranchAddress("Jet_SvxHP", Jet_SvxHP, &b_Jet_SvxHP);
-//   fChain->SetBranchAddress("Jet_SvxMass", Jet_SvxMass, &b_Jet_SvxMass);
    fChain->SetBranchAddress("Jet_CombSvxN", Jet_CombSvxN, &b_Jet_CombSvxN);
    fChain->SetBranchAddress("Jet_CombSvxP", Jet_CombSvxP, &b_Jet_CombSvxP);
    fChain->SetBranchAddress("Jet_CombSvx", Jet_CombSvx, &b_Jet_CombSvx);
    fChain->SetBranchAddress("Jet_RetCombSvxN", Jet_RetCombSvxN, &b_Jet_RetCombSvxN);
    fChain->SetBranchAddress("Jet_RetCombSvxP", Jet_RetCombSvxP, &b_Jet_RetCombSvxP);
    fChain->SetBranchAddress("Jet_RetCombSvx", Jet_RetCombSvx, &b_Jet_RetCombSvx);
-   //fChain->SetBranchAddress("Jet_CombCSVJP_N", Jet_CombCSVJP_N, &b_Jet_CombCSVJP_N);
-   //fChain->SetBranchAddress("Jet_CombCSVJP_P", Jet_CombCSVJP_P, &b_Jet_CombCSVJP_P);
-   //fChain->SetBranchAddress("Jet_CombCSVJP", Jet_CombCSVJP, &b_Jet_CombCSVJP);
    fChain->SetBranchAddress("Jet_CombCSVSL_N", Jet_CombCSVSL_N, &b_Jet_CombCSVSL_N);
    fChain->SetBranchAddress("Jet_CombCSVSL_P", Jet_CombCSVSL_P, &b_Jet_CombCSVSL_P);
    fChain->SetBranchAddress("Jet_CombCSVSL", Jet_CombCSVSL, &b_Jet_CombCSVSL);
-   //fChain->SetBranchAddress("Jet_CombCSVJPSL_N", Jet_CombCSVJPSL_N, &b_Jet_CombCSVJPSL_N);
-   //fChain->SetBranchAddress("Jet_CombCSVJPSL_P", Jet_CombCSVJPSL_P, &b_Jet_CombCSVJPSL_P);
-   //fChain->SetBranchAddress("Jet_CombCSVJPSL", Jet_CombCSVJPSL, &b_Jet_CombCSVJPSL);
-   //fChain->SetBranchAddress("Jet_SimpIVF_HP", Jet_SimpIVF_HP, &b_Jet_SimpIVF_HP);
-   //fChain->SetBranchAddress("Jet_SimpIVF_HE", Jet_SimpIVF_HE, &b_Jet_SimpIVF_HE);
-   //fChain->SetBranchAddress("Jet_DoubIVF_HE", Jet_DoubIVF_HE, &b_Jet_DoubIVF_HE);
-   if (sqrtstev==13) fChain->SetBranchAddress("Jet_CombIVF", Jet_CombIVF, &b_Jet_CombIVF);
-   //fChain->SetBranchAddress("Jet_CombIVF_P", Jet_CombIVF_P, &b_Jet_CombIVF_P);
+   if (fChain->GetBranch("Jet_CombIVF")) fChain->SetBranchAddress("Jet_CombIVF", Jet_CombIVF, &b_Jet_CombIVF);
    fChain->SetBranchAddress("Jet_SoftMuN", Jet_SoftMuN, &b_Jet_SoftMuN);
    fChain->SetBranchAddress("Jet_SoftMuP", Jet_SoftMuP, &b_Jet_SoftMuP);
    fChain->SetBranchAddress("Jet_SoftMu", Jet_SoftMu, &b_Jet_SoftMu);
    fChain->SetBranchAddress("Jet_SoftElN", Jet_SoftElN, &b_Jet_SoftElN);
    fChain->SetBranchAddress("Jet_SoftElP", Jet_SoftElP, &b_Jet_SoftElP);
    fChain->SetBranchAddress("Jet_SoftEl", Jet_SoftEl, &b_Jet_SoftEl);
-   fChain->SetBranchAddress("Jet_hist1", Jet_hist1, &b_Jet_hist1);
-   fChain->SetBranchAddress("Jet_hist2", Jet_hist2, &b_Jet_hist2);
-   fChain->SetBranchAddress("Jet_hist3", Jet_hist3, &b_Jet_hist3);
-   fChain->SetBranchAddress("Jet_histJet", Jet_histJet, &b_Jet_histJet);
-   fChain->SetBranchAddress("Jet_histSvx", Jet_histSvx, &b_Jet_histSvx);
    fChain->SetBranchAddress("Jet_nFirstTrack", Jet_nFirstTrack, &b_Jet_nFirstTrack);
    fChain->SetBranchAddress("Jet_nLastTrack", Jet_nLastTrack, &b_Jet_nLastTrack);
    fChain->SetBranchAddress("Jet_nFirstSV", Jet_nFirstSV, &b_Jet_nFirstSV);
@@ -860,7 +991,6 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("Jet_SV_multi", Jet_SV_multi, &b_Jet_SV_multi);
    fChain->SetBranchAddress("Jet_nFirstTrkInc", Jet_nFirstTrkInc, &b_Jet_nFirstTrkInc);
    fChain->SetBranchAddress("Jet_nLastTrkInc", Jet_nLastTrkInc, &b_Jet_nLastTrkInc);
-//   fChain->SetBranchAddress("Jet_VtxCat", Jet_VtxCat, &b_Jet_VtxCat);
    fChain->SetBranchAddress("Jet_looseID", Jet_looseID, &b_Jet_looseID);
    fChain->SetBranchAddress("Jet_tightID", Jet_tightID, &b_Jet_tightID);
    fChain->SetBranchAddress("nTrkInc", &nTrkInc, &b_nTrkInc);
@@ -932,81 +1062,172 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("SV_deltaR_jet", SV_deltaR_jet, &b_SV_deltaR_jet);
    fChain->SetBranchAddress("SV_deltaR_sum_jet", SV_deltaR_sum_jet, &b_SV_deltaR_sum_jet);
    fChain->SetBranchAddress("SV_deltaR_sum_dir", SV_deltaR_sum_dir, &b_SV_deltaR_sum_dir);
-//   fChain->SetBranchAddress("SV_energy_ratio", SV_energy_ratio, &b_SV_energy_ratio);
-//   fChain->SetBranchAddress("SV_aboveC", SV_aboveC, &b_SV_aboveC);
    fChain->SetBranchAddress("SV_vtx_pt", SV_vtx_pt, &b_SV_vtx_pt);
    fChain->SetBranchAddress("SV_flight2D", SV_flight2D, &b_SV_flight2D);
    fChain->SetBranchAddress("SV_flight2DErr", SV_flight2DErr, &b_SV_flight2DErr);
    fChain->SetBranchAddress("SV_totCharge", SV_totCharge, &b_SV_totCharge);
    fChain->SetBranchAddress("SV_vtxDistJetAxis", SV_vtxDistJetAxis, &b_SV_vtxDistJetAxis);
    fChain->SetBranchAddress("SV_nTrk", SV_nTrk, &b_SV_nTrk);
-//   fChain->SetBranchAddress("SV_nTrk_firstVxt", SV_nTrk_firstVxt, &b_SV_nTrk_firstVxt);
    fChain->SetBranchAddress("SV_mass", SV_mass, &b_SV_mass);
    fChain->SetBranchAddress("SV_vtx_eta", SV_vtx_eta, &b_SV_vtx_eta);
    fChain->SetBranchAddress("SV_vtx_phi", SV_vtx_phi, &b_SV_vtx_phi);
 
-   
-   
-   
-  if ( produceJetProbaTree ) {
-//      
-//     //--------------------------------------
-//   // track information 
-//   //--------------------------------------
-  fChain->SetBranchAddress("nTrack",	      &nTrack, 	     &b_nTrack);
-  fChain->SetBranchAddress("Track_dxy",       Track_dxy,     &b_Trackdxy);	
-  fChain->SetBranchAddress("Track_dz",        Track_dz, &b_Track_dz);
-  fChain->SetBranchAddress("Track_zIP",       Track_zIP, &b_Track_zIP);
-  fChain->SetBranchAddress("Track_length",    Track_length,  &b_Tracklength);
-  fChain->SetBranchAddress("Track_dist",      Track_dist,    &b_Trackdist);
-  fChain->SetBranchAddress("Track_IP2D",      Track_IP2D,    &b_TrackIP2D);
-  fChain->SetBranchAddress("Track_IP2Dsig",   Track_IP2Dsig, &b_TrackIP2Dsig);
-  fChain->SetBranchAddress("Track_IP",        Track_IP,	     &b_TrackIP	);
-  fChain->SetBranchAddress("Track_IP2Derr",   Track_IP2Derr, &b_TrackIP2Derr);
-  fChain->SetBranchAddress("Track_IPerr",     Track_IPerr,   &b_TrackIPerr);  
-  fChain->SetBranchAddress("Track_IPsig",     Track_IPsig,   &b_TrackIPsig);
-  fChain->SetBranchAddress("Track_Proba",     Track_Proba,   &b_TrackProba);
-  fChain->SetBranchAddress("Track_p",         Track_p,	     &b_Trackp );   
-  fChain->SetBranchAddress("Track_pt",        Track_pt,	     &b_Trackpt);
-  fChain->SetBranchAddress("Track_eta",       Track_eta,     &b_Tracketa);
-  fChain->SetBranchAddress("Track_phi",       Track_phi,     &b_Trackphi);
-  fChain->SetBranchAddress("Track_chi2",      Track_chi2,    &b_Trackchi2);
-  fChain->SetBranchAddress("Track_charge",    Track_charge,  &b_Trackcharge);
-  fChain->SetBranchAddress("Track_history",   Track_history, &b_Trackhistory);
-  fChain->SetBranchAddress("Track_nHitStrip", Track_nHitStrip,  &b_TracknHitStrip);
-  fChain->SetBranchAddress("Track_nHitPixel", Track_nHitPixel,  &b_TracknHitPixel);
-  fChain->SetBranchAddress("Track_nHitAll",   Track_nHitAll,    &b_TracknHitAll);
-  fChain->SetBranchAddress("Track_nHitTIB",   Track_nHitTIB,    &b_TracknHitTIB);
-  fChain->SetBranchAddress("Track_nHitTID",   Track_nHitTID,    &b_TracknHitTID);
-  fChain->SetBranchAddress("Track_nHitTOB",   Track_nHitTOB,    &b_TracknHitTOB);
-  fChain->SetBranchAddress("Track_nHitTEC",   Track_nHitTEC,    &b_TracknHitTEC);
-  fChain->SetBranchAddress("Track_nHitPXB",   Track_nHitPXB,    &b_TracknHitPXB);
-  fChain->SetBranchAddress("Track_nHitPXF",   Track_nHitPXF,    &b_TracknHitPXF);
-  fChain->SetBranchAddress("Track_isHitL1",   Track_isHitL1,    &b_TrackisHitL1);
-  fChain->SetBranchAddress("Track_PV",        Track_PV,         &b_TrackPV );    
-  fChain->SetBranchAddress("Track_SV",        Track_SV,         &b_TrackSV);     
-  fChain->SetBranchAddress("Track_PVweight",  Track_PVweight,   &b_TrackPVweight );
-  fChain->SetBranchAddress("Track_SVweight",  Track_SVweight,   &b_TrackSVweight);
-  fChain->SetBranchAddress("Track_category",  Track_category,   &b_Trackcategory );
-  fChain->SetBranchAddress("Track_isfromSV",  Track_isfromSV,   &b_TrackisfromSV);     
+   if (fChain->GetBranch("TagVar_jetNTracks")) produceTagVarTree = true;
+   if (produceTagVarTree) {
+    fChain->SetBranchAddress("Jet_nFirstTrkTagVar", Jet_nFirstTrkTagVar, &b_Jet_nFirstTrkTagVar);
+    fChain->SetBranchAddress("Jet_nLastTrkTagVar", Jet_nLastTrkTagVar, &b_Jet_nLastTrkTagVar);
+    fChain->SetBranchAddress("Jet_nFirstSVTagVar", Jet_nFirstSVTagVar, &b_Jet_nFirstSVTagVar);
+    fChain->SetBranchAddress("Jet_nLastSVTagVar", Jet_nLastSVTagVar, &b_Jet_nLastSVTagVar);
+    fChain->SetBranchAddress("TagVar_jetNTracks", TagVar_jetNTracks, &b_TagVar_jetNTracks);
+    fChain->SetBranchAddress("TagVar_jetNSecondaryVertices", TagVar_jetNSecondaryVertices, &b_TagVar_jetNSecondaryVertices);
+    fChain->SetBranchAddress("TagVar_chargedHadronEnergyFraction", TagVar_chargedHadronEnergyFraction, &b_TagVar_chargedHadronEnergyFraction);
+    fChain->SetBranchAddress("TagVar_neutralHadronEnergyFraction", TagVar_neutralHadronEnergyFraction, &b_TagVar_neutralHadronEnergyFraction);
+    fChain->SetBranchAddress("TagVar_photonEnergyFraction", TagVar_photonEnergyFraction, &b_TagVar_photonEnergyFraction);
+    fChain->SetBranchAddress("TagVar_electronEnergyFraction", TagVar_electronEnergyFraction, &b_TagVar_electronEnergyFraction);
+    fChain->SetBranchAddress("TagVar_muonEnergyFraction", TagVar_muonEnergyFraction, &b_TagVar_muonEnergyFraction);
+    fChain->SetBranchAddress("TagVar_chargedHadronMultiplicity", TagVar_chargedHadronMultiplicity, &b_TagVar_chargedHadronMultiplicity);
+    fChain->SetBranchAddress("TagVar_neutralHadronMultiplicity", TagVar_neutralHadronMultiplicity, &b_TagVar_neutralHadronMultiplicity);
+    fChain->SetBranchAddress("TagVar_photonMultiplicity", TagVar_photonMultiplicity, &b_TagVar_photonMultiplicity);
+    fChain->SetBranchAddress("TagVar_electronMultiplicity", TagVar_electronMultiplicity, &b_TagVar_electronMultiplicity);
+    fChain->SetBranchAddress("TagVar_muonMultiplicity", TagVar_muonMultiplicity, &b_TagVar_muonMultiplicity);
+    fChain->SetBranchAddress("nTrkTagVar", &nTrkTagVar, &b_nTrkTagVar);
+    fChain->SetBranchAddress("TagVar_trackMomentum", TagVar_trackMomentum, &b_TagVar_trackMomentum);
+    fChain->SetBranchAddress("TagVar_trackEta", TagVar_trackEta, &b_TagVar_trackEta);
+    fChain->SetBranchAddress("TagVar_trackPhi", TagVar_trackPhi, &b_TagVar_trackPhi);
+    fChain->SetBranchAddress("TagVar_trackPtRel", TagVar_trackPtRel, &b_TagVar_trackPtRel);
+    fChain->SetBranchAddress("TagVar_trackPPar", TagVar_trackPPar, &b_TagVar_trackPPar);
+    fChain->SetBranchAddress("TagVar_trackEtaRel", TagVar_trackEtaRel, &b_TagVar_trackEtaRel);
+    fChain->SetBranchAddress("TagVar_trackDeltaR", TagVar_trackDeltaR, &b_TagVar_trackDeltaR);
+    fChain->SetBranchAddress("TagVar_trackPtRatio", TagVar_trackPtRatio, &b_TagVar_trackPtRatio);
+    fChain->SetBranchAddress("TagVar_trackPParRatio", TagVar_trackPParRatio, &b_TagVar_trackPParRatio);
+    fChain->SetBranchAddress("TagVar_trackSip2dVal", TagVar_trackSip2dVal, &b_TagVar_trackSip2dVal);
+    fChain->SetBranchAddress("TagVar_trackSip2dSig", TagVar_trackSip2dSig, &b_TagVar_trackSip2dSig);
+    fChain->SetBranchAddress("TagVar_trackSip3dVal", TagVar_trackSip3dVal, &b_TagVar_trackSip3dVal);
+    fChain->SetBranchAddress("TagVar_trackSip3dSig", TagVar_trackSip3dSig, &b_TagVar_trackSip3dSig);
+    fChain->SetBranchAddress("TagVar_trackDecayLenVal", TagVar_trackDecayLenVal, &b_TagVar_trackDecayLenVal);
+    fChain->SetBranchAddress("TagVar_trackDecayLenSig", TagVar_trackDecayLenSig, &b_TagVar_trackDecayLenSig);
+    fChain->SetBranchAddress("TagVar_trackJetDistVal", TagVar_trackJetDistVal, &b_TagVar_trackJetDistVal);
+    fChain->SetBranchAddress("TagVar_trackJetDistSig", TagVar_trackJetDistSig, &b_TagVar_trackJetDistSig);
+    fChain->SetBranchAddress("TagVar_trackChi2", TagVar_trackChi2, &b_TagVar_trackChi2);
+    fChain->SetBranchAddress("TagVar_trackNTotalHits", TagVar_trackNTotalHits, &b_TagVar_trackNTotalHits);
+    fChain->SetBranchAddress("TagVar_trackNPixelHits", TagVar_trackNPixelHits, &b_TagVar_trackNPixelHits);
+    fChain->SetBranchAddress("nSVTagVar", &nSVTagVar, &b_nSVTagVar);
+    fChain->SetBranchAddress("TagVar_vertexMass", TagVar_vertexMass, &b_TagVar_vertexMass);
+    fChain->SetBranchAddress("TagVar_vertexNTracks", TagVar_vertexNTracks, &b_TagVar_vertexNTracks);
+    fChain->SetBranchAddress("TagVar_vertexJetDeltaR", TagVar_vertexJetDeltaR, &b_TagVar_vertexJetDeltaR);
+    fChain->SetBranchAddress("TagVar_flightDistance2dVal", TagVar_flightDistance2dVal, &b_TagVar_flightDistance2dVal);
+    fChain->SetBranchAddress("TagVar_flightDistance2dSig", TagVar_flightDistance2dSig, &b_TagVar_flightDistance2dSig);
+    fChain->SetBranchAddress("TagVar_flightDistance3dVal", TagVar_flightDistance3dVal, &b_TagVar_flightDistance3dVal);
+    fChain->SetBranchAddress("TagVar_flightDistance3dSig", TagVar_flightDistance3dSig, &b_TagVar_flightDistance3dSig);
+   }
+   if (fChain->GetBranch("TagVarCSV_jetNTracks")) produceTagVarCSVTree = true;
+   if (produceTagVarCSVTree) {
+    fChain->SetBranchAddress("Jet_nFirstTrkTagVarCSV", Jet_nFirstTrkTagVarCSV, &b_Jet_nFirstTrkTagVarCSV);
+    fChain->SetBranchAddress("Jet_nLastTrkTagVarCSV", Jet_nLastTrkTagVarCSV, &b_Jet_nLastTrkTagVarCSV);
+    fChain->SetBranchAddress("Jet_nFirstTrkEtaRelTagVarCSV", Jet_nFirstTrkEtaRelTagVarCSV, &b_Jet_nFirstTrkEtaRelTagVarCSV);
+    fChain->SetBranchAddress("Jet_nLastTrkEtaRelTagVarCSV", Jet_nLastTrkEtaRelTagVarCSV, &b_Jet_nLastTrkEtaRelTagVarCSV);
+    fChain->SetBranchAddress("TagVarCSV_trackJetPt", TagVarCSV_trackJetPt, &b_TagVarCSV_trackJetPt);
+    fChain->SetBranchAddress("TagVarCSV_jetNTracks", TagVarCSV_jetNTracks, &b_TagVarCSV_jetNTracks);
+    fChain->SetBranchAddress("TagVarCSV_jetNTracksEtaRel", TagVarCSV_jetNTracksEtaRel, &b_TagVarCSV_jetNTracksEtaRel);
+    fChain->SetBranchAddress("TagVarCSV_trackSumJetEtRatio", TagVarCSV_trackSumJetEtRatio, &b_TagVarCSV_trackSumJetEtRatio);
+    fChain->SetBranchAddress("TagVarCSV_trackSumJetDeltaR", TagVarCSV_trackSumJetDeltaR, &b_TagVarCSV_trackSumJetDeltaR);
+    fChain->SetBranchAddress("TagVarCSV_trackSip2dValAboveCharm", TagVarCSV_trackSip2dValAboveCharm, &b_TagVarCSV_trackSip2dValAboveCharm);
+    fChain->SetBranchAddress("TagVarCSV_trackSip2dSigAboveCharm", TagVarCSV_trackSip2dSigAboveCharm, &b_TagVarCSV_trackSip2dSigAboveCharm);
+    fChain->SetBranchAddress("TagVarCSV_trackSip3dValAboveCharm", TagVarCSV_trackSip3dValAboveCharm, &b_TagVarCSV_trackSip3dValAboveCharm);
+    fChain->SetBranchAddress("TagVarCSV_trackSip3dSigAboveCharm", TagVarCSV_trackSip3dSigAboveCharm, &b_TagVarCSV_trackSip3dSigAboveCharm);
+    fChain->SetBranchAddress("TagVarCSV_vertexCategory", TagVarCSV_vertexCategory, &b_TagVarCSV_vertexCategory);
+    fChain->SetBranchAddress("TagVarCSV_jetNSecondaryVertices", TagVarCSV_jetNSecondaryVertices, &b_TagVarCSV_jetNSecondaryVertices);
+    fChain->SetBranchAddress("TagVarCSV_vertexMass", TagVarCSV_vertexMass, &b_TagVarCSV_vertexMass);
+    fChain->SetBranchAddress("TagVarCSV_vertexNTracks", TagVarCSV_vertexNTracks, &b_TagVarCSV_vertexNTracks);
+    fChain->SetBranchAddress("TagVarCSV_vertexEnergyRatio", TagVarCSV_vertexEnergyRatio, &b_TagVarCSV_vertexEnergyRatio);
+    fChain->SetBranchAddress("TagVarCSV_vertexJetDeltaR", TagVarCSV_vertexJetDeltaR, &b_TagVarCSV_vertexJetDeltaR);
+    fChain->SetBranchAddress("TagVarCSV_flightDistance2dVal", TagVarCSV_flightDistance2dVal, &b_TagVarCSV_flightDistance2dVal);
+    fChain->SetBranchAddress("TagVarCSV_flightDistance2dSig", TagVarCSV_flightDistance2dSig, &b_TagVarCSV_flightDistance2dSig);
+    fChain->SetBranchAddress("TagVarCSV_flightDistance3dVal", TagVarCSV_flightDistance3dVal, &b_TagVarCSV_flightDistance3dVal);
+    fChain->SetBranchAddress("TagVarCSV_flightDistance3dSig", TagVarCSV_flightDistance3dSig, &b_TagVarCSV_flightDistance3dSig);
+    fChain->SetBranchAddress("nTrkTagVarCSV", &nTrkTagVarCSV, &b_nTrkTagVarCSV);
+    fChain->SetBranchAddress("nTrkEtaRelTagVarCSV", &nTrkEtaRelTagVarCSV, &b_nTrkEtaRelTagVarCSV);
+    fChain->SetBranchAddress("TagVarCSV_trackMomentum", TagVarCSV_trackMomentum, &b_TagVarCSV_trackMomentum);
+    fChain->SetBranchAddress("TagVarCSV_trackEta", TagVarCSV_trackEta, &b_TagVarCSV_trackEta);
+    fChain->SetBranchAddress("TagVarCSV_trackPhi", TagVarCSV_trackPhi, &b_TagVarCSV_trackPhi);
+    fChain->SetBranchAddress("TagVarCSV_trackPtRel", TagVarCSV_trackPtRel, &b_TagVarCSV_trackPtRel);
+    fChain->SetBranchAddress("TagVarCSV_trackPPar", TagVarCSV_trackPPar, &b_TagVarCSV_trackPPar);
+    fChain->SetBranchAddress("TagVarCSV_trackDeltaR", TagVarCSV_trackDeltaR, &b_TagVarCSV_trackDeltaR);
+    fChain->SetBranchAddress("TagVarCSV_trackPtRatio", TagVarCSV_trackPtRatio, &b_TagVarCSV_trackPtRatio);
+    fChain->SetBranchAddress("TagVarCSV_trackPParRatio", TagVarCSV_trackPParRatio, &b_TagVarCSV_trackPParRatio);
+    fChain->SetBranchAddress("TagVarCSV_trackSip2dVal", TagVarCSV_trackSip2dVal, &b_TagVarCSV_trackSip2dVal);
+    fChain->SetBranchAddress("TagVarCSV_trackSip2dSig", TagVarCSV_trackSip2dSig, &b_TagVarCSV_trackSip2dSig);
+    fChain->SetBranchAddress("TagVarCSV_trackSip3dVal", TagVarCSV_trackSip3dVal, &b_TagVarCSV_trackSip3dVal);
+    fChain->SetBranchAddress("TagVarCSV_trackSip3dSig", TagVarCSV_trackSip3dSig, &b_TagVarCSV_trackSip3dSig);
+    fChain->SetBranchAddress("TagVarCSV_trackDecayLenVal", TagVarCSV_trackDecayLenVal, &b_TagVarCSV_trackDecayLenVal);
+    fChain->SetBranchAddress("TagVarCSV_trackDecayLenSig", TagVarCSV_trackDecayLenSig, &b_TagVarCSV_trackDecayLenSig);
+    fChain->SetBranchAddress("TagVarCSV_trackJetDistVal", TagVarCSV_trackJetDistVal, &b_TagVarCSV_trackJetDistVal);
+    fChain->SetBranchAddress("TagVarCSV_trackJetDistSig", TagVarCSV_trackJetDistSig, &b_TagVarCSV_trackJetDistSig);
+    fChain->SetBranchAddress("TagVarCSV_trackEtaRel", TagVarCSV_trackEtaRel, &b_TagVarCSV_trackEtaRel);
+   }
 
-  //--------------------------------------
-  // primary vertex information 
-  //--------------------------------------
-  fChain->SetBranchAddress("PV_x"	   ,PV_x  ,  &b_PV_x );
-  fChain->SetBranchAddress("PV_y"	   ,PV_y  ,  &b_PV_y );	
-  fChain->SetBranchAddress("PV_z"	   ,PV_z  ,  &b_PV_z );	
-  fChain->SetBranchAddress("PV_ex"	   ,PV_ex ,  &b_PV_ex );	
-  fChain->SetBranchAddress("PV_ey"	   ,PV_ey ,  &b_PV_ey );	
-  fChain->SetBranchAddress("PV_ez"	   ,PV_ez ,  &b_PV_ez );	
-  fChain->SetBranchAddress("PV_chi2"	   ,PV_chi2 ,&b_PV_chi2 );
-  fChain->SetBranchAddress("PV_ndf"	   ,PV_ndf , &b_PV_ndf );	
-  fChain->SetBranchAddress("PV_isgood"    ,PV_isgood,&b_PV_isgood	 );
-  fChain->SetBranchAddress("PV_isfake"    ,PV_isfake,&b_PV_isfake );
-  
+   
+   
+   
+   if (fChain->GetBranch("nTrack")) produceJetProbaTree = true;
+   if ( produceJetProbaTree ) {
+    fChain->SetBranchAddress("nTrack",	      &nTrack, 	     &b_nTrack);
+    fChain->SetBranchAddress("Track_dxy",       Track_dxy,     &b_Trackdxy);	
+    fChain->SetBranchAddress("Track_dz",        Track_dz, &b_Track_dz);
+    fChain->SetBranchAddress("Track_zIP",       Track_zIP, &b_Track_zIP);
+    fChain->SetBranchAddress("Track_length",    Track_length,  &b_Tracklength);
+    fChain->SetBranchAddress("Track_dist",      Track_dist,    &b_Trackdist);
+    fChain->SetBranchAddress("Track_IP2D",      Track_IP2D,    &b_TrackIP2D);
+    fChain->SetBranchAddress("Track_IP2Dsig",   Track_IP2Dsig, &b_TrackIP2Dsig);
+    fChain->SetBranchAddress("Track_IP",        Track_IP,	     &b_TrackIP	);
+    fChain->SetBranchAddress("Track_IP2Derr",   Track_IP2Derr, &b_TrackIP2Derr);
+    fChain->SetBranchAddress("Track_IPerr",     Track_IPerr,   &b_TrackIPerr);  
+    fChain->SetBranchAddress("Track_IPsig",     Track_IPsig,   &b_TrackIPsig);
+    fChain->SetBranchAddress("Track_Proba",     Track_Proba,   &b_TrackProba);
+    fChain->SetBranchAddress("Track_p",         Track_p,	     &b_Trackp );   
+    fChain->SetBranchAddress("Track_pt",        Track_pt,	     &b_Trackpt);
+    fChain->SetBranchAddress("Track_eta",       Track_eta,     &b_Tracketa);
+    fChain->SetBranchAddress("Track_phi",       Track_phi,     &b_Trackphi);
+    fChain->SetBranchAddress("Track_chi2",      Track_chi2,    &b_Trackchi2);
+    fChain->SetBranchAddress("Track_charge",    Track_charge,  &b_Trackcharge);
+    fChain->SetBranchAddress("Track_history",   Track_history, &b_Trackhistory);
+    fChain->SetBranchAddress("Track_nHitStrip", Track_nHitStrip,  &b_TracknHitStrip);
+    fChain->SetBranchAddress("Track_nHitPixel", Track_nHitPixel,  &b_TracknHitPixel);
+    fChain->SetBranchAddress("Track_nHitAll",   Track_nHitAll,    &b_TracknHitAll);
+    fChain->SetBranchAddress("Track_nHitTIB",   Track_nHitTIB,    &b_TracknHitTIB);
+    fChain->SetBranchAddress("Track_nHitTID",   Track_nHitTID,    &b_TracknHitTID);
+    fChain->SetBranchAddress("Track_nHitTOB",   Track_nHitTOB,    &b_TracknHitTOB);
+    fChain->SetBranchAddress("Track_nHitTEC",   Track_nHitTEC,    &b_TracknHitTEC);
+    fChain->SetBranchAddress("Track_nHitPXB",   Track_nHitPXB,    &b_TracknHitPXB);
+    fChain->SetBranchAddress("Track_nHitPXF",   Track_nHitPXF,    &b_TracknHitPXF);
+    fChain->SetBranchAddress("Track_isHitL1",   Track_isHitL1,    &b_TrackisHitL1);
+    fChain->SetBranchAddress("Track_PV",        Track_PV,         &b_TrackPV );    
+    fChain->SetBranchAddress("Track_SV",        Track_SV,         &b_TrackSV);     
+    fChain->SetBranchAddress("Track_PVweight",  Track_PVweight,   &b_TrackPVweight );
+    fChain->SetBranchAddress("Track_SVweight",  Track_SVweight,   &b_TrackSVweight);
+    fChain->SetBranchAddress("Track_category",  Track_category,   &b_Trackcategory );
+    fChain->SetBranchAddress("Track_isfromSV",  Track_isfromSV,   &b_TrackisfromSV);     
+
+    //--------------------------------------
+    // primary vertex information 
+    //--------------------------------------
+    fChain->SetBranchAddress("PV_x"	   ,PV_x  ,  &b_PV_x );
+    fChain->SetBranchAddress("PV_y"	   ,PV_y  ,  &b_PV_y );	
+    fChain->SetBranchAddress("PV_z"	   ,PV_z  ,  &b_PV_z );	
+    fChain->SetBranchAddress("PV_ex"	   ,PV_ex ,  &b_PV_ex );	
+    fChain->SetBranchAddress("PV_ey"	   ,PV_ey ,  &b_PV_ey );	
+    fChain->SetBranchAddress("PV_ez"	   ,PV_ez ,  &b_PV_ez );	
+    fChain->SetBranchAddress("PV_chi2"	   ,PV_chi2 ,&b_PV_chi2 );
+    fChain->SetBranchAddress("PV_ndf"	   ,PV_ndf , &b_PV_ndf );	
+    fChain->SetBranchAddress("PV_isgood"    ,PV_isgood,&b_PV_isgood	 );
+    fChain->SetBranchAddress("PV_isfake"    ,PV_isfake,&b_PV_isfake );
+    
   
   }
-   Notify();
+  if (produceJetProbaTree) use_selected_tracks=false;
+  else use_selected_tracks=true;
+
+  Notify();
 }
 
 Bool_t CommPlotProducer::Notify()
@@ -1033,6 +1254,7 @@ Int_t CommPlotProducer::Cut(Long64_t entry)
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.
+   cout << " Cut applied for entry = " << entry << endl;
    return 1;
 }
 

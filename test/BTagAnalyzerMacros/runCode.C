@@ -40,14 +40,6 @@
 
     }
     else if (config_ch==5) {
-      // 8 Tev Pythia6
-      superTree->Add("/opt/sbg/cms/ui8_data1/ccollard/BTAG/MC_Dan_2013April/PythiaQCD/QCD_Pt-30to50_Inclusive_8TeV_pythia6_Summer12_DR53X-PU_S10_AODSIM/TrackTree_*.root");
-      superTree->Add("/opt/sbg/cms/ui8_data1/ccollard/BTAG/MC_Dan_2013April/PythiaQCD/QCD_Pt-50to80_Inclusive_8TeV_pythia6_Summer12_DR53X-PU_S10_AODSIM/TrackTree_*.root");
-      superTree->Add("/opt/sbg/cms/ui8_data1/ccollard/BTAG/MC_Dan_2013April/PythiaQCD/QCD_Pt-80to120_Inclusive_8TeV_pythia6_Summer12_DR53X-PU_S10_AODSIM/TrackTree_*.root");
-      superTree->Add("/opt/sbg/cms/ui8_data2/ccollard/BTAG/MC_Dan_2013April/PythiaQCD/QCD_Pt-120to170_Inclusive_8TeV_pythia6_Summer12_DR53X-PU_S10_AODSIM/TrackTree_*.root");
-
-    }
-    else if (config_ch==6) {
       // 8 Tev Pythia8
       superTree->Add("/opt/sbg/data/data2/cms/ccollard/BTAG/prod_pythia8/pythia8_hadd/JetTree_mc_qcd30.root");
       superTree->Add("/opt/sbg/data/data2/cms/ccollard/BTAG/prod_pythia8/pythia8_hadd/JetTree_mc_qcd50.root");
@@ -56,14 +48,7 @@
     }
 
 
-    // JetProbaTree : Oui
-    // NewAlgoTree : Non
-    if (config_ch!=3 && config_ch<5) {
-      CommPlotProducer m(superTree,1,1);
-    }
-    else {
-      CommPlotProducer m(superTree,1,1,8);
-    }
+      CommPlotProducer m(superTree);
 
     // Provide MC information. use SetXS(TString generator, bool qcdtype, int TeV) ;
     // with generator = pythia or herwig, qcdtype =0 for inclusive or 1 for MuEnriched, and TeV = 8 or 13.
@@ -135,12 +120,6 @@
         n120   = 596768;
     }
     else if (config_ch==5) {
-        n30    = 5.96571e+06;
-        n50    = 5.98172e+06;
-        n80   = 5.89208e+06;
-        n120  = 5.91732e+06;
-    }   
-    else if (config_ch==6) {
         n30   = 1000080;
         n50    = 1000026;
         n80   =  1000054;
@@ -175,8 +154,7 @@
     else if (config_ch==2) {  name_root = "csa14"; }
     else if (config_ch==3) {  name_root = "8tev_new"; }
     else if (config_ch==4) {  name_root = "csa14_pythia6"; }
-    else if (config_ch==5) {  name_root = "8tev_pythia6"; }
-    else if (config_ch==6) {  name_root = "8tev_pythia8"; }
+    else if (config_ch==5) {  name_root = "8tev_pythia8"; }
     m.Loop("jet", 20, 30, 200,   name_root);
    
 }
