@@ -45,196 +45,196 @@ void S8Plotter::Book() {
 	cut_label["cut1"] = "";
 	cut_label["cut1"] = "";
 	cut_label["cut1"] = "";
-	
+
 	std::string hname;
 	std::string htitle;
 
-	hname = "njets"; 
+	hname = "njets";
 	htitle = "number of jets";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),40,0.,40.);
-	
-	hname = "nmuons"; 
+
+	hname = "nmuons";
 	htitle = "number of muons";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),12,0.,12.);
 
-	hname = "muon_pt"; 
+	hname = "muon_pt";
 	htitle = "muon p_{T} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,80.);
-	
-	hname = "muon_eta"; 
+
+	hname = "muon_eta";
 	htitle = "muon |#eta|";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,-5., 5.);
 
 	htitle = "jet p_{T} [GeV/c]";
 	for( size_t i = 0; i != quark_label.size(); ++i ) {
-		hname = "jet_pt"; 
+		hname = "jet_pt";
 		if (i!=0) hname += "_"+quark_label[i];
 		h1[hname] = new TH1D(hname.c_str(),htitle.c_str(), fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray() );
 		h1[hname]->SetLineColor( quark_color[quark_label[i]] );
 	}
 	htitle = "jet p_{T} [GeV/c]";
 	for( size_t i = 0; i != quark_label.size(); ++i ) {
-		hname = "taggedjet_pt"; 
+		hname = "taggedjet_pt";
 		if (i!=0) hname += "_"+quark_label[i];
 		h1[hname] = new TH1D(hname.c_str(),htitle.c_str(), fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray() );
 		h1[hname]->SetLineColor( quark_color[quark_label[i]] );
 	}
 	htitle = "jet |#eta|";
 	for( size_t i = 0; i != quark_label.size(); ++i ) {
-		hname = "jet_eta"; 
+		hname = "jet_eta";
 		if (i!=0) hname += "_"+quark_label[i];
 		h1[hname] = new TH1D(hname.c_str(),htitle.c_str(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() );
 		h1[hname]->SetLineColor( quark_color[quark_label[i]] );
 	}
 	htitle = "jet |#eta|";
 	for( size_t i = 0; i != quark_label.size(); ++i ) {
-		hname = "taggedjet_eta"; 
+		hname = "taggedjet_eta";
 		if (i!=0) hname += "_"+quark_label[i];
 		h1[hname] = new TH1D(hname.c_str(),htitle.c_str(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() );
 		h1[hname]->SetLineColor( quark_color[quark_label[i]] );
 	}
-	
-	hname = "jet_deltaR"; 
+
+	hname = "jet_deltaR";
 	htitle = "#Delta R";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),60,0.,0.55);
 
-	hname = "jet_deltaR_b"; 
+	hname = "jet_deltaR_b";
 	htitle = "#Delta R";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),60,0.,0.55);
 	h1[hname]->SetLineColor(quark_color["b"]);
 
-	hname = "jet_deltaR_c"; 
+	hname = "jet_deltaR_c";
 	htitle = "#Delta R";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),60,0.,0.55);
 	h1[hname]->SetLineColor(quark_color["c"]);
 
-	hname = "jet_deltaR_udsg"; 
+	hname = "jet_deltaR_udsg";
 	htitle = "#Delta R";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),60,0.,0.55);
 	h1[hname]->SetLineColor(quark_color["udsg"]);
 
-	hname = "jet_deltaphi"; 
+	hname = "jet_deltaphi";
 	htitle = "#Delta #phi";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,3.2);
 
-	hname = "jet_deltaphi_b"; 
+	hname = "jet_deltaphi_b";
 	htitle = "#Delta #phi";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,3.2);
 	h1[hname]->SetLineColor(quark_color["b"]);
-	
-	hname = "jet_pTrel"; 
-	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
-	
-	hname = "jet_pTrel_b"; 
-	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
-	
-	hname = "jet_pTrel_c"; 
+
+	hname = "jet_pTrel";
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
-	hname = "jet_pTrel_udsg"; 
+	hname = "jet_pTrel_b";
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
-	hname = "jet_pTrel_pt50"; 
-	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
-	
-	hname = "jet_pTrel_pt100"; 
+	hname = "jet_pTrel_c";
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
-	hname = "jet_pTrel_pt150"; 
+	hname = "jet_pTrel_udsg";
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
-	hname = "jet_pTrel_b_pt50"; 
-	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
-	
-	hname = "jet_pTrel_b_pt100"; 
+	hname = "jet_pTrel_pt50";
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
-	hname = "jet_pTrel_b_pt150"; 
-	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
-	
-	hname = "jet_pTrel_c_pt50"; 
-	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
-	
-	hname = "jet_pTrel_c_pt100"; 
+	hname = "jet_pTrel_pt100";
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
-	hname = "jet_pTrel_c_pt150"; 
+	hname = "jet_pTrel_pt150";
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
-	hname = "jet_pTrel_udsg_pt50"; 
-	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
-	
-	hname = "jet_pTrel_udsg_pt100"; 
+	hname = "jet_pTrel_b_pt50";
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
-	hname = "jet_pTrel_udsg_pt150"; 
+	hname = "jet_pTrel_b_pt100";
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
-	hname = "jet_pTrel_mupt6"; 
-	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
-	
-	hname = "jet_pTrel_mupt10"; 
+	hname = "jet_pTrel_b_pt150";
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
-	hname = "jet_pTrel_mupt20"; 
+	hname = "jet_pTrel_c_pt50";
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
-	hname = "jet_pTrel_b_mupt6"; 
-	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
-	
-	hname = "jet_pTrel_b_mupt10"; 
+	hname = "jet_pTrel_c_pt100";
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
-	hname = "jet_pTrel_b_mupt20"; 
-	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
-	
-	hname = "jet_pTrel_c_mupt6"; 
-	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
-	
-	hname = "jet_pTrel_c_mupt10"; 
+	hname = "jet_pTrel_c_pt150";
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
-	hname = "jet_pTrel_c_mupt20"; 
+	hname = "jet_pTrel_udsg_pt50";
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
-	hname = "jet_pTrel_udsg_mupt6"; 
-	htitle = "p_{Trel} [GeV/c]";
-	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
-	
-	hname = "jet_pTrel_udsg_mupt10"; 
+	hname = "jet_pTrel_udsg_pt100";
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
-	hname = "jet_pTrel_udsg_mupt20"; 
+	hname = "jet_pTrel_udsg_pt150";
 	htitle = "p_{Trel} [GeV/c]";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
 
-	hname = "jet_ntrks"; 
+	hname = "jet_pTrel_mupt6";
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
+
+	hname = "jet_pTrel_mupt10";
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
+
+	hname = "jet_pTrel_mupt20";
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
+
+	hname = "jet_pTrel_b_mupt6";
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
+
+	hname = "jet_pTrel_b_mupt10";
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
+
+	hname = "jet_pTrel_b_mupt20";
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
+
+	hname = "jet_pTrel_c_mupt6";
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
+
+	hname = "jet_pTrel_c_mupt10";
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
+
+	hname = "jet_pTrel_c_mupt20";
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
+
+	hname = "jet_pTrel_udsg_mupt6";
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
+
+	hname = "jet_pTrel_udsg_mupt10";
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
+
+	hname = "jet_pTrel_udsg_mupt20";
+	htitle = "p_{Trel} [GeV/c]";
+	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),50,0.,5.);
+
+	hname = "jet_ntrks";
 	htitle = "jet_ntrks";
 	h1[hname] = new TH1D(hname.c_str(),htitle.c_str(),130,0.,260.);
 }
@@ -256,7 +256,7 @@ void S8Plotter::Loop()
 	// const Double_t *corrptbins = (fCorrPtAxis.GetXbins())->GetArray();
 	// int ncorretabins = fCorrEtaAxis.GetNbins();
 	// const Double_t *corretabins = (fCorrEtaAxis.GetXbins())->GetArray();
-	
+
 	h2["npT"] = new TH2F("npT","MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["ppT"] = new TH2F("ppT","MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["ncmbpT"] = new TH2F("ncmbpT","opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
@@ -264,8 +264,8 @@ void S8Plotter::Loop()
 
 	h2["qpT"] = new TH2F("qpT","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["qcmbpT"] = new TH2F("qcmbpT","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.);
-	
-	
+
+
 	h2["nEta"] = new TH2F("nEta","MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["pEta"] = new TH2F("pEta","MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["ncmbEta"] = new TH2F("ncmbEta","opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
@@ -273,7 +273,7 @@ void S8Plotter::Loop()
 
 	h2["qEta"] = new TH2F("qEta","other MuTag pT vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["qcmbEta"] = new TH2F("qcmbEta","other MuTag && Tagger pT vs pTrel",netabins,jetetabins,50,0.,5.);
-	
+
 	h2["b_npT"] = new TH2F("b_npT","b MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["b_ppT"] = new TH2F("b_ppT","b MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["b_ncmbpT"] = new TH2F("b_ncmbpT","b opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
@@ -281,7 +281,7 @@ void S8Plotter::Loop()
 
 	h2["b_qpT"] = new TH2F("b_qpT","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["b_qcmbpT"] = new TH2F("b_qcmbpT","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.);
-	
+
 	h2["b_nEta"] = new TH2F("b_nEta","b MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["b_pEta"] = new TH2F("b_pEta","b MuTag && CMBtag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["b_ncmbEta"] = new TH2F("b_ncmbEta","b opp tag: MuTag Eta vs pTrel",netabins,jetetabins,50,0.,5.);
@@ -289,8 +289,8 @@ void S8Plotter::Loop()
 
 	h2["b_qEta"] = new TH2F("b_qEta","other MuTag pT vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["b_qcmbEta"] = new TH2F("b_qcmbEta","other MuTag && Tagger pT vs pTrel",netabins,jetetabins,50,0.,5.);
-	
-	
+
+
 	h2["cl_npT"] = new TH2F("cl_npT","cl MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["cl_ppT"] = new TH2F("cl_ppT","cl MuTag && CMBtag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["cl_ncmbpT"] = new TH2F("cl_ncmbpT","cl opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
@@ -298,7 +298,7 @@ void S8Plotter::Loop()
 
 	h2["cl_qpT"] = new TH2F("cl_qpT","other MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["cl_qcmbpT"] = new TH2F("cl_qcmbpT","other MuTag && Tagger pT vs pTrel",nptbins,jetptbins,50,0.,5.);
-	
+
 	h2["c_npT"] = new TH2F("c_npT","c MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["c_ncmbpT"] = new TH2F("c_ncmbpT","c opp tag: MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
 	h2["g_npT"] = new TH2F("g_npT","g MuTag pT vs pTrel",nptbins,jetptbins,50,0.,5.);
@@ -313,7 +313,7 @@ void S8Plotter::Loop()
 
 	h2["cl_qEta"] = new TH2F("cl_qEta","other MuTag pT vs pTrel",netabins,jetetabins,50,0.,5.);
 	h2["cl_qcmbEta"] = new TH2F("cl_qcmbEta","other MuTag && Tagger pT vs pTrel",netabins,jetetabins,50,0.,5.);
-	
+
 	h2["ptVsEta"] = new TH2F("ptVsEta","pt vs Eta",fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() );
 	h2["ptVsEta_b"] = new TH2F("ptVsEta_b","pt vs Eta",fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() );
 	h2["taggedjet_ptVsEta"] = new TH2F("taggedjet_ptVsEta","taggedjet pt vs Eta",fJetPtAxis.GetNbins() , (fJetPtAxis.GetXbins())->GetArray(), fJetEtaAxis.GetNbins() , (fJetEtaAxis.GetXbins())->GetArray() );
@@ -359,7 +359,7 @@ void S8Plotter::Loop()
 	int count_multiple_mu = 0; // number of events with multiple muons in jet
 	int count_mu_jets = 0;     // number of events with multiple jets with good muons
 
-	
+
 	if (fChain == 0) return;
 	Long64_t nentries = fChain->GetEntriesFast();
 	std::cout << " Total entries = " << fChain->GetEntries() << std::endl;
@@ -382,13 +382,13 @@ void S8Plotter::Loop()
 				}
 		}
 		else if ( jentry%10000 == 0 ) std::cout << "### processing entry: " << jentry << std::endl;
-		
-		
+
+
 		if (fVerbose) std::cout << " fill njets and nmuons histograms" << std::endl;
 		h1["njets"]->Fill(fS8evt->njets);
 		h1["nmuons"]->Fill(fS8evt->nmuons);
 
-			
+
 		std::vector<float> jet_pt_vec = fS8evt->jet_pt;
 		int vec_size = jet_pt_vec.size();
 
@@ -396,7 +396,7 @@ void S8Plotter::Loop()
 		bool event_with_mult_mu = 0;
 		int njets_with_lepton = 0;
 		//int nopposite_jets = 0;
-		
+
 		double ptrel = 0.;
 		//bool isTaggability = false;
 		//bool isOppositeJetSample = false;
@@ -404,26 +404,26 @@ void S8Plotter::Loop()
 		//bool passJetbTagger = false;
 		//bool passOppJetbTagger = false;
 		//bool passptrel = false;
-		
-		
+
+
 		TLorentzVector p4Jet;
 		TLorentzVector p4MuJet;
 		TLorentzVector p4OppJet;
 		int JetFlavor = -1;
 		//int OppJetFlavor = -1;
-				
-		int ntagtracks = 0;
+
+		//int ntagtracks = 0;
 		////////// Loop over jets ////////////////////////
 		for ( int ijet =0; ijet != vec_size; ++ijet) {
 
-			ntagtracks = fS8evt->jet_ntrks[ijet]; //taggability
+			//ntagtracks = fS8evt->jet_ntrks[ijet]; //taggability
 			h1["jet_ntrks"]->Fill(fS8evt->jet_ntrks[ijet]);
 			double jetcorr = fS8evt->jetcorrection[ijet];
-						
+
 			//if ( fS8evt->jet_hasLepton[ijet] == 1 && ntagtracks>=1 ) { // no taggability for the moment
-			
+
 			//isMuonJetSample = true;
-				
+
 			p4Jet.SetPtEtaPhiE(fS8evt->jet_pt[ijet], fS8evt->jet_eta[ijet], fS8evt->jet_phi[ijet], fS8evt->jet_e[ijet] );
 			p4Jet = jetcorr * p4Jet;
 
@@ -435,23 +435,23 @@ void S8Plotter::Loop()
 			nmultiple_muons = 0;
 			bool passGoodMuon = false;
 			if ( fS8evt->jet_hasLepton[ijet] == 1 && fS8evt->njets>0 ) {
-			//if ( fS8evt->jet_hasLepton[ijet] == 1 ) {		
+			//if ( fS8evt->jet_hasLepton[ijet] == 1 ) {
 			  // get a muon
-			  BTagLeptonEvent Muons = fS8evt->lepton[ijet];	
-					
+			  BTagLeptonEvent Muons = fS8evt->lepton[ijet];
+
 					if ( fVerbose ) std::cout << " Muons in jet = " << Muons.pt.size() << std::endl;
 					int ith_mu_highest_pt = -1;
 					double mu_highest_pt = 0;
-				
+
 					for ( size_t imu = 0; imu != Muons.pt.size(); ++imu ) {
-						
+
 					  //// Muon Selection /////
 					  //if ( ( Muons.trkrechits[imu] >= 8 ) && ( Muons.chi2[imu]/Muons.ndof[imu] <5 ) ) {
 							passGoodMuon = true;
 							nmultiple_muons++;
-							
+
 							if (Muons.pt[imu] > mu_highest_pt ) { mu_highest_pt = Muons.pt[imu]; ith_mu_highest_pt = imu; }
-						
+
 							ptrel = Muons.jet_ptrel[imu];
 							// double deltaR = Muons.jet_deltaR[imu];
 							//std::cout << "ptrel and deltaR " << ptrel << " and " << deltaR <<std::endl;
@@ -463,8 +463,8 @@ void S8Plotter::Loop()
 							if ( fVerbose) std::cout << " muon " << imu << " pt= " << Muons.pt[imu] << " eta= " << Muons.eta[imu] << " chamber hits= " << Muons.SArechits[imu] << " chi2/ndof = " << Muons.chi2[imu]/Muons.ndof[imu] << " IPS= " << Muons.d0sigma[imu] << " mcpdgid= " << Muons.mc_pdgid[imu] << std::endl;
 					//}
 					}// select only one muon in jet, the one with the highest pt
-					
-							
+
+
 					h1["muon_pt"]->Fill(Muons.pt[ith_mu_highest_pt]);
 					h1["muon_eta"]->Fill(Muons.eta[ith_mu_highest_pt]);
 					h1["jet_deltaR"]->Fill(Muons.jet_deltaR[ith_mu_highest_pt]);
@@ -559,7 +559,7 @@ void S8Plotter::Loop()
 					}
 					if (Muons.pt[ith_mu_highest_pt] > 20 ) {
 						h1["jet_pTrel_mupt20"]->Fill( Muons.jet_ptrel[ith_mu_highest_pt]);
-					}	
+					}
 					//h1["muon_pt"]->Fill(Muons.pt[ith_mu_highest_pt]);
 					//h1["muon_eta"]->Fill(Muons.eta[ith_mu_highest_pt]);
 					//std::cout << "filled muon_pt and eta " << std::endl;
@@ -593,7 +593,7 @@ void S8Plotter::Loop()
 					  }
 
 					  FillHistos("n",p4MuJet, ptrel, JetFlavor,isbTaggedJet);
-					  
+
 					  ///// find away jet /////
 					  bool OtherTaggedJet = false;
 					  bool OtherMuonJet = false;
@@ -607,9 +607,9 @@ void S8Plotter::Loop()
 					    p4OppJet = ojetcorr * p4OppJet;
 					    //int OppJetFlavor = fS8evt->jet_flavour_alg[kjet];
 						if ( p4OppJet.Pt() < 20. || TMath::Abs( p4OppJet.Eta() ) >= 2.5 ) continue;
-						
+
 					    if ( !OtherTaggedJet ) {
-					      
+
 							bool isbTaggedOtherJet = false;
 							if ( fAwaytagger == "TrackCounting" ) {
 								if ( fAwaylevel == "Tight" ) {
@@ -623,7 +623,7 @@ void S8Plotter::Loop()
 							if ( fAwaytagger == "TrackProbability" ) {
 								if ( fS8evt->btag_JetProb_disc3D[kjet] > fbAwayTaggerMap[fAwaylevel] ) isbTaggedOtherJet = true;
 							}
-					      
+
 							if (isbTaggedOtherJet) {
 
 								FillHistos("p",p4MuJet, ptrel, JetFlavor, isbTaggedJet);
@@ -647,9 +647,9 @@ void S8Plotter::Loop()
 								  //// Muon Selection /////
 								  //if ( ( oMuons.trkrechits[imu] >= 8 ) && ( oMuons.chi2[imu]/oMuons.ndof[imu] <5 ) ) {
 									  pass2GoodMuon = true;
-									  
+
 									  if (oMuons.pt[imu] > omu_highest_pt ) { omu_highest_pt = oMuons.pt[imu]; ith_omu_highest_pt = imu; }
-									  
+
 									  //}
 							  }
 							  // select only one muon in jet, the one with the highest pt
@@ -659,17 +659,17 @@ void S8Plotter::Loop()
 								  p4oMuJet.SetPtEtaPhiE(fS8evt->jet_pt[kjet]*fS8evt->jetcorrection[kjet],
 														fS8evt->jet_eta[kjet], fS8evt->jet_phi[kjet],
 														fS8evt->jet_e[kjet]*fS8evt->jetcorrection[kjet]);
-						  
+
 								  //TLorentzVector vmu, vtot;
 								  vmu.SetPtEtaPhiE(oMuons.pt[ith_omu_highest_pt], Muons.eta[ith_omu_highest_pt], Muons.phi[ith_omu_highest_pt], Muons.e[ith_omu_highest_pt]);
-								  
+
 								  vtot = vmu + p4MuJet;
-								  double optrel = ( vmu.Px() * vtot.Px()
-													+ vmu.Py() * vtot.Py()
-													+ vmu.Pz() * vtot.Pz() ) / vtot.P();
-								  optrel = TMath::Sqrt( vmu.P() * vmu.P() - ptrel * ptrel );
+								  //double optrel = ( vmu.Px() * vtot.Px()
+									//				+ vmu.Py() * vtot.Py()
+									//				+ vmu.Pz() * vtot.Pz() ) / vtot.P();
+								  //optrel = TMath::Sqrt( vmu.P() * vmu.P() - ptrel * ptrel );
 								  // do we need ptrel of this muon?
-								  
+
 								  // check btagging
 								  bool isbTaggedOtherMuJet = false;
 								  if ( fAwaytagger == "TrackCounting" ) {
@@ -678,7 +678,7 @@ void S8Plotter::Loop()
 									  } else {
 										  if (fVerbose) std::cout << "discriminator= " << fbAwayTaggerMap[fAwaylevel] << std::endl;
 										  if ( fS8evt->btag_TrkCounting_disc3D_2trk[kjet] > fbAwayTaggerMap[fAwaylevel] ) isbTaggedOtherMuJet = true;
-										  
+
 									  }
 								  }
 								  if ( fAwaytagger == "TrackProbability" ) {
@@ -690,13 +690,13 @@ void S8Plotter::Loop()
 					      }
 					    }// otherMuonJet
 					  }// second loop over jets
-					  
+
 					  njets_with_lepton++;
 					  if (nmultiple_muons>1) event_with_mult_mu = true;
-					  
+
 					} // first MuonJet
 			}
-	       		
+
 			// Fill histograms for all jets
 			h1["jet_pt"]->Fill( p4Jet.Pt() );
 			h1["jet_eta"]->Fill( p4Jet.Eta() );
@@ -729,7 +729,7 @@ void S8Plotter::Loop()
 			  } else {
 			    if (fVerbose) std::cout << "discriminator= " << fbTaggerMap[flevel] << std::endl;
 			    if ( fS8evt->btag_TrkCounting_disc3D_2trk[ijet] > fbTaggerMap[flevel] ) ataggedjet = true;
-			    
+
 			  }
 			}
 			if ( ftagger == "TrackProbability" ) {
@@ -761,67 +761,67 @@ void S8Plotter::Loop()
 				h1["taggedjet_eta_g"]->Fill( p4Jet.Eta() );
 			  }
 			}
-			
+
 			// performance plots
 			fperformanceTC2.Add(fS8evt->btag_TrkCounting_disc3D_2trk[ijet],JetFlavor);
 			fperformanceTC3.Add(fS8evt->btag_TrkCounting_disc3D_3trk[ijet],JetFlavor);
 			fperformanceTP.Add(fS8evt->btag_JetProb_disc3D[ijet],JetFlavor);
-			
+
 		}//// end loop over jets
-		
+
 		if (event_with_mult_mu) count_multiple_mu++;
 		if (njets_with_lepton>1) count_mu_jets++;
-			
+
 	}// end loop over entries
 
 	//recover b performace plots
 	fperformanceTC2.Eval();
 	fperformanceTC3.Eval();
 	fperformanceTP.Eval();
-	
+
 	gTC2_b = new TGraphErrors(fperformanceTC2.GetN(),
 											fperformanceTC2.GetArray("b").GetArray(),fperformanceTC2.GetArray("b").GetArray(),
 											fperformanceTC2.GetArray("bErr").GetArray(),fperformanceTC2.GetArray("bErr").GetArray());
-	
+
 	gTC2_c = new TGraphErrors(fperformanceTC2.GetN(),
 											fperformanceTC2.GetArray("b").GetArray(),fperformanceTC2.GetArray("c").GetArray(),
 											fperformanceTC2.GetArray("bErr").GetArray(),fperformanceTC2.GetArray("cErr").GetArray());
-	
+
 	gTC2_udsg = new TGraphErrors(fperformanceTC2.GetN(),
 											fperformanceTC2.GetArray("b").GetArray(),fperformanceTC2.GetArray("udsg").GetArray(),
 											fperformanceTC2.GetArray("bErr").GetArray(),fperformanceTC2.GetArray("udsgErr").GetArray());
-	
+
 	gTC3_b = new TGraphErrors(fperformanceTC3.GetN(),
 											fperformanceTC3.GetArray("b").GetArray(),fperformanceTC3.GetArray("b").GetArray(),
 											fperformanceTC3.GetArray("bErr").GetArray(),fperformanceTC3.GetArray("bErr").GetArray());
-	
+
 	gTC3_c = new TGraphErrors(fperformanceTC3.GetN(),
 											fperformanceTC3.GetArray("b").GetArray(),fperformanceTC3.GetArray("c").GetArray(),
 											fperformanceTC3.GetArray("bErr").GetArray(),fperformanceTC3.GetArray("cErr").GetArray());
-	
+
 	gTC3_udsg = new TGraphErrors(fperformanceTC3.GetN(),
 											fperformanceTC3.GetArray("b").GetArray(),fperformanceTC3.GetArray("udsg").GetArray(),
 											fperformanceTC3.GetArray("bErr").GetArray(),fperformanceTC3.GetArray("udsgErr").GetArray());
-	
+
 	gTP_b = new TGraphErrors(fperformanceTP.GetN(),
 											fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("b").GetArray(),
 											fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("bErr").GetArray());
-	
+
 	gTP_c = new TGraphErrors(fperformanceTP.GetN(),
 											fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("c").GetArray(),
 											fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("cErr").GetArray());
-	
+
 	gTP_udsg = new TGraphErrors(fperformanceTP.GetN(),
 											fperformanceTP.GetArray("b").GetArray(),fperformanceTP.GetArray("udsg").GetArray(),
 											fperformanceTP.GetArray("bErr").GetArray(),fperformanceTP.GetArray("udsgErr").GetArray());
-	
-	
+
+
 	//multiTC2 = new TMultiGraph();
 	multiTC3 = new TMultiGraph();
 	multiTP = new TMultiGraph();
 
 	// put TC2 and TC3 in one plot
-	
+
 	//multiTC2->Add(gTC2_b,"p");
 	multiTC3->Add(gTC2_c,"p");
 	multiTC3->Add(gTC2_udsg,"p");
@@ -840,7 +840,7 @@ void S8Plotter::Loop()
 	gTP_b->SetMarkerColor(quark_color["b"]);
 	gTP_c->SetMarkerColor(quark_color["c"]);
 	gTP_udsg->SetMarkerColor(quark_color["uds"]);
-	
+
 	gTC2_b->SetMarkerStyle(20);
 	gTC2_c->SetMarkerStyle(24);
 	gTC2_udsg->SetMarkerStyle(26);
@@ -899,7 +899,7 @@ void S8Plotter::Loop()
 	gPad->SetLogy();
 	gPad->SetGrid();
 	legtp->Draw();
-	
+
 	std::cout << std::setfill('#') << std::setw(100) << "#" << std::endl;
 	std::cout << std::setfill(' ');
 	std::cout << " Total entries = " << fChain->GetEntries() << std::endl;
@@ -930,13 +930,13 @@ void S8Plotter::Loop()
 	h1["muon_pt"]->SetXTitle("muon p_{T} [GeV/c]");
 	h1["muon_pt"]->Draw();
 
-		
+
 	//______________________________________________________
 	cv_map["deltaphi"] = new TCanvas("deltaphi","deltaphi",700,700);
 	h1["jet_deltaphi"]->SetXTitle( h1["jet_deltaphi"]->GetTitle() );
 	h1["jet_deltaphi"]->Draw();
 	h1["jet_deltaphi_b"]->Draw("same");
-		
+
 	//______________________________________________________
 
 	h1["eff_pTrel"] = new TH1D("eff_pTrel","eff_pTrel",nptbins,jetptbins);
@@ -949,7 +949,7 @@ void S8Plotter::Loop()
 
 	h1["eff_TaggedJet_c"] = new TH1D("eff_TaggedJet_c","eff_TaggedJet_c",nptbins,jetptbins);
 	h1["eff_TaggedJet_uds"] = new TH1D("eff_TaggedJet_uds","eff_TaggedJet_uds",nptbins,jetptbins);
-	
+
 	h1["eff_OppTaggedJet"] = new TH1D("eff_OppTaggedJet","eff_OppTaggedJet",nptbins,jetptbins);
 	h1["eff_OppTaggedJet_b"] = new TH1D("eff_OppTaggedJet_b","eff_OppTaggedJet_b",nptbins,jetptbins);
 	h1["eff_OppTaggedJet_cl"] = new TH1D("eff_OppTaggedJet_cl","eff_OppTaggedJet_cl",nptbins,jetptbins);
@@ -1019,7 +1019,7 @@ void S8Plotter::Loop()
 	h1["eff_pTrel"]->Divide( h2["npT"]->ProjectionX("halljets_ptrel", 9 , -1,"e") , halljets ,1.,1.,"B");
 	h1["eff_pTrel_b"]->Divide( h2["b_npT"]->ProjectionX("b_halljets_ptrel", 9 , -1,"e") , halljets_b ,1.,1.,"B");
 	h1["eff_pTrel_cl"]->Divide( h2["cl_npT"]->ProjectionX("cl_halljets_ptrel", 9 , -1,"e") , halljets_cl ,1.,1.,"B");
-	
+
 	h1["eff_TaggedJet"]->Divide( h2["ncmbpT"]->ProjectionX("halljets_tagged", -1 , -1,"e") , halljets ,1.,1.,"B");
 	h1["eff_TaggedJet_b"]->Divide( h2["b_ncmbpT"]->ProjectionX("b_halljets_tagged", -1 , -1,"e") , halljets_b ,1.,1.,"B");
 	h1["eff_TaggedJet_cl"]->Divide( h2["cl_ncmbpT"]->ProjectionX("cl_halljets_tagged", -1 , -1,"e") , halljets_cl ,1.,1.,"B");
@@ -1027,8 +1027,8 @@ void S8Plotter::Loop()
 
 	h1["eff_TaggedJet_c"]->Divide( h2["c_ncmbpT"]->ProjectionX("c_halljets_tagged", -1 , -1,"e") , halljets_c ,1.,1.,"B");
 	h1["eff_TaggedJet_uds"]->Divide( h2["uds_ncmbpT"]->ProjectionX("uds_halljets_tagged", -1 , -1,"e") , halljets_uds ,1.,1.,"B");
-	
-	
+
+
 	h1["eff_pTrel_TaggedJet"]->Divide( h2["ncmbpT"]->ProjectionX("halljets_ptreltagged", 9 , -1,"e") , halljets ,1.,1.,"B");
 	h1["eff_pTrel_TaggedJet_b"]->Divide( h2["b_ncmbpT"]->ProjectionX("b_halljets_ptreltagged", 9 , -1,"e") , halljets_b ,1.,1.,"B");
 	h1["eff_pTrel_TaggedJet_cl"]->Divide( h2["cl_ncmbpT"]->ProjectionX("cl_halljets_ptrelltagged", 9 , -1,"e") , halljets_cl ,1.,1.,"B");
@@ -1079,7 +1079,7 @@ void S8Plotter::Loop()
 //i am here
 //	h1["eff_mu_taggedaway_eta_b"]->Divide( h2["b_ppT"]->ProjectionX("b_halloppjetseta_ptrel", 9 , -1,"e"), halloppjets_eta_b, 1.,1.,"B");
 //	h1["eff_mu_taggedaway_eta_cl"]->Divide(h2["cl_ppT"]->ProjectionX("cl_halloppjetseta_ptrel", 9, -1,"e"), halloppjets_eta_cl, 1.,1.,"B");
-		
+
 	// alpha
 	h1["alpha"]->Divide( h1["eff_TaggedBothJets_cl"], h1["eff_TaggedJet_cl"]);
 	//h1["alpha"]->Divide( halloppjets_cl, h1["eff_TaggedJet_cl"]);
@@ -1087,14 +1087,14 @@ void S8Plotter::Loop()
 	h1["beta"]->Divide( h1["eff_TaggedBothJets_b"], h1["eff_TaggedJet_b"]);
 	//h1["beta"]->Divide( halloppjets_b, h1["eff_TaggedJet_b"]);
 
-	
+
 	// kappa_b
 	h1["kappa_b"]->Divide( h1["eff_pTrel_TaggedJet_b"], h1["eff_pTrel_b"]  );
 	h1["kappa_b"]->Divide( h1["eff_TaggedJet_b"] );
 	// kappa_cl
 	h1["kappa_cl"]->Divide( h1["eff_pTrel_TaggedJet_cl"], h1["eff_pTrel_cl"] );
 	h1["kappa_cl"]->Divide(  h1["eff_TaggedJet_cl"] );
-	
+
 	h1["delta"]->Divide( h1["eff_mu_taggedaway_b"], h1["eff_pTrel_b"] );
 	h1["gamma"]->Divide( h1["eff_mu_taggedaway_cl"], h1["eff_pTrel_cl"] );
 	        // eta dependency for the correlations
@@ -1115,7 +1115,7 @@ void S8Plotter::Loop()
 
 //		h1["delta_eta"]->Divide( h1["eff_mu_taggedaway_eta_b"], h1["eff_pTrel_eta_b"] );
 //		h1["gamma_eta"]->Divide( h1["eff_mu_taggedaway_eta_cl"], h1["eff_pTrel_eta_cl"] );
-	
+
 	//______________________________________________________
 
 	cv_map["eff_pTrel"] = new TCanvas("eff_pTrel","eff_pTrel",700,700);
@@ -1125,7 +1125,7 @@ void S8Plotter::Loop()
 	h1["eff_pTrel"]->Draw("PE1");
 	gPad->SetGrid();
 	//______________________________________________________
-	
+
 	cv_map["eff_TaggedJet"] = new TCanvas("eff_TaggedJet","eff_TaggedJet",700,700);
 	h1["eff_TaggedJet"]->SetYTitle("Efficiency");
 	h1["eff_TaggedJet"]->SetMarkerStyle(8);
@@ -1133,7 +1133,7 @@ void S8Plotter::Loop()
 	h1["eff_TaggedJet"]->Draw("PE1");
 	gPad->SetGrid();
 	//______________________________________________________
-	
+
 	cv_map["eff_pTrel_TaggedJet"] = new TCanvas("eff_pTrel_TaggedJet","eff_pTrel_TaggedJet",700,700);
 	h1["eff_TaggedBothJets"]->SetYTitle("Efficiency");
 	h1["eff_TaggedBothJets"]->SetMarkerStyle(8);
@@ -1206,7 +1206,7 @@ void S8Plotter::Loop()
 	legkc->Draw();
 	gPad->SetGrid();
     //______________________________________________________
-	
+
 	cv_map["alpha"] = new TCanvas("alpha","alpha",700,700);
 	h1["alpha"]->SetMarkerStyle(8);
 	h1["alpha"]->SetMarkerSize(1.5);
@@ -1234,7 +1234,7 @@ void S8Plotter::Loop()
 	gPad->SetGrid();
 
     //______________________________________________________
-	
+
 	cv_map["beta"] = new TCanvas("beta","beta",700,700);
 	h1["beta"]->SetMarkerStyle(8);
 	h1["beta"]->SetMarkerSize(1.5);
@@ -1260,14 +1260,14 @@ void S8Plotter::Loop()
         legb->AddEntry(h1["eff_TaggedBothJets_b"],"#epsilon("+strTag+"-"+flevel+")_{b}^{#mu-jet-away-jet}","P");
         legb->Draw();
 	gPad->SetGrid();
-	
+
 }
 
 void S8Plotter::FillHistos(std::string type, TLorentzVector p4Jet, double ptrel, int flavor, bool tagged) {
 
   if ( ( p4Jet.Pt() >= fMinPt ) && ( TMath::Abs(p4Jet.Eta()) >= fMinEta ) && (TMath::Abs(p4Jet.Eta()) < fMaxEta ) ) {
-			
-		
+
+
 	h2[type+"pT"]->Fill( p4Jet.Pt() , ptrel );
 	h2[type+"Eta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
 	if ( flavor == 5 ) {
@@ -1278,16 +1278,16 @@ void S8Plotter::FillHistos(std::string type, TLorentzVector p4Jet, double ptrel,
 		h2["cl_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel);
 		h2["cl_"+type+"Eta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
 	}
-	if ( flavor == 4 ) { 
-		//h2["c_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel ); 
+	if ( flavor == 4 ) {
+		//h2["c_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel );
 	}
-	if ( flavor>0 && flavor<4 ) { 
-		//h2["uds_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel ); 
+	if ( flavor>0 && flavor<4 ) {
+		//h2["uds_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel );
 	}
 	if ( flavor==21 ) {
 		//h2["g_"+type+"pT"]->Fill( p4Jet.Pt() , ptrel );
 	}
-	
+
 	if ( tagged ) {
 		h2[type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel );
 		h2[type+"cmbEta"]->Fill(TMath::Abs( p4Jet.Eta() ), ptrel );
@@ -1308,7 +1308,7 @@ void S8Plotter::FillHistos(std::string type, TLorentzVector p4Jet, double ptrel,
 		if ( flavor==21 ) {
 			//h2["g_"+type+"cmbpT"]->Fill( p4Jet.Pt() , ptrel );
 		}
-		
+
 	}
 
 	}

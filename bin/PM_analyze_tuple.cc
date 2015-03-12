@@ -50,10 +50,10 @@ bool jsonContainsEvent (const std::vector< edm::LuminosityBlockRange > &jsonVec,
 
     bool (*funcPtr)(edm::LuminosityBlockRange const &,
                     edm::LuminosityBlockID const &) = &edm::contains;
-                    edm::LuminosityBlockID lumiID (event.id().run(), 
+                    edm::LuminosityBlockID lumiID (event.id().run(),
                     event.id().luminosityBlock());
 
-    std::vector< edm::LuminosityBlockRange >::const_iterator iter = 
+    std::vector< edm::LuminosityBlockRange >::const_iterator iter =
         std::find_if(jsonVec.begin(), jsonVec.end(),
                      boost::bind(funcPtr, _1, lumiID) );
 
@@ -119,7 +119,7 @@ int main (int argc, char* argv[])
             std::copy(jsonVector.begin(), jsonVector.end(), lumiVector.begin());
         }
     }
-    
+
 
     //___________________
     // FWLite setup
@@ -135,17 +135,17 @@ int main (int argc, char* argv[])
     btagMap["SSV"] = "simpleSecondaryVertexBJetTags";
     btagMap["SSVHP"] = "simpleSecondaryVertexHighPurBJetTags";
     btagMap["SSVHE"] = "simpleSecondaryVertexHighEffBJetTags";
-    
+
     std::string Tagger =  btagMap.find( parser.stringValue( "Tagger" ) )->second;
-    std::string awayTagger = btagMap.find(parser.stringValue( "AwayTagger" ) )->second; 
+    std::string awayTagger = btagMap.find(parser.stringValue( "AwayTagger" ) )->second;
     double btag_cut_Tagger = parser.doubleValue( "TaggerCut" );
     double btag_cut_awayTagger = parser.doubleValue( "AwayTaggerCut" );
-    std::string jetCollection = parser.stringValue( "JetCollection" ) ; 
-    std::string triggername = parser.stringValue( "TriggerName" ) ; 
+    std::string jetCollection = parser.stringValue( "JetCollection" ) ;
+    std::string triggername = parser.stringValue( "TriggerName" ) ;
 
     int outputEvery = parser.integerValue ( "outputEvery" );
     int maxNevents = parser.integerValue ( "maxevents" );
-    
+
     cout << "outputEvery = " << outputEvery << endl;
 
     //__________________
@@ -173,7 +173,7 @@ int main (int argc, char* argv[])
 
         ++nentry;
 
-        if ( outputEvery!=0 && (nentry % outputEvery) == 0 ) 
+        if ( outputEvery!=0 && (nentry % outputEvery) == 0 )
             cout << "Processing Event: " << nentry << endl;
 
         if ( outputEvery == 0 )
@@ -341,7 +341,7 @@ int main (int argc, char* argv[])
                                                     trackMuon->py(),
                                                     trackMuon->pz(),
                                                     sqrt(trackMuon->p() * trackMuon->p() + 0.1057*0.1057));
-                
+
                 // find a muon in a jet
                 //check deltar
                 double deltaR  = ROOT::Math::VectorUtil::DeltaR(jetIter->p4().Vect(),
@@ -464,10 +464,10 @@ int main (int argc, char* argv[])
             // find away jet
             ////////////////////////////
             bool AwayTaggedJet = false;
-            bool AwayMuonJet = false;
+            //bool AwayMuonJet = false;
             TLorentzVector p4AwayMuon;
             TLorentzVector p4AwayTagged;
-        
+
             for (vector< pat::Jet >::const_iterator awayjetIter = jetHandle->begin();
                  awayjetIter != jetHandle->end(); ++awayjetIter)
             {
@@ -540,7 +540,7 @@ int main (int argc, char* argv[])
     }//events
 
     std::cout << " done. " << std::endl;
-    
+
     std::string m_outputName  = parser.stringValue  ("outputFile");
     if (optutl::CommandLineParser::kStringVector ==
         parser.hasOption("inputFiles"))
@@ -554,8 +554,8 @@ int main (int argc, char* argv[])
         hstore->write (m_outputName,
                        parser.argVec());
     }
-    
-    
+
+
     return 0;
-    
+
 }

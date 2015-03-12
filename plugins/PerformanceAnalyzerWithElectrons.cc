@@ -173,7 +173,7 @@ PerformanceAnalyzerWithElectrons::PerformanceAnalyzerWithElectrons(const Paramet
     // get operating points
     std::vector<edm::ParameterSet> config = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet > >("OperatingPointsList");
     if (fdebug) std::cout << " get operating points, total list: " << config.size() << std::endl;
-	
+
     for (std::vector<edm::ParameterSet>::const_iterator it = config.begin(); it != config.end() ; ++it)
     {
         std::string aalias = (*it).getUntrackedParameter<std::string> ("alias");
@@ -201,7 +201,7 @@ PerformanceAnalyzerWithElectrons::PerformanceAnalyzerWithElectrons(const Paramet
 		TaggerPerformances_[aalias].Set(aalias);
         TaggerPerformances_[aalias].SetMinDiscriminator(min);
         TaggerPerformances_[aalias].SetMaxDiscriminator(max);
-		
+
 		//double acut = (*it).getUntrackedParameter<double> ("cut");
 		//WorkingPoint tmp(atag, aname, acut);
         //wp.push_back( tmp );
@@ -231,7 +231,7 @@ PerformanceAnalyzerWithElectrons::PerformanceAnalyzerWithElectrons(const Paramet
     topdir->mkdir("electron_in_jet");
     topdir->cd();
 	if (fdebug) std::cout<< " ROOT directories created." << std::endl;
-	
+
     histcounterf = new TH1I("histcounterf","counter",5,0,5);
     histcounterf->SetBit(TH1::kCanRebin);
     rootFile_->cd();
@@ -268,7 +268,7 @@ PerformanceAnalyzerWithElectrons::PerformanceAnalyzerWithElectrons(const Paramet
 			std::string aalias = icut->first;
 			EffHistos->Init("efficiencies",aalias);
 			PtrelHistos->Init("ptrel",aalias);
-			
+
 			TaggedElecjetHistos->Init("ntag",aalias);
 			TaggedAwayjetHistos->Init("ptag",aalias);
 			TaggedElecjetHistos_mc->Init("ntag","b",aalias);
@@ -281,9 +281,9 @@ PerformanceAnalyzerWithElectrons::PerformanceAnalyzerWithElectrons(const Paramet
 			TaggedAwayjetHistos_mc->Init("ptag","l",aalias);
 		}
     }
-	
+
 	if (fdebug) std::cout << "Histograms initialized" << std::endl;
-		
+
 	/*
     fperformanceTC2trk.Set("TC2trk");
     fperformanceTC3trk.Set("TC3trk");
@@ -363,7 +363,7 @@ PerformanceAnalyzerWithElectrons::~PerformanceAnalyzerWithElectrons()
 			(*iv)->Write();
 		}
 	}
-	
+
     topdir->cd("ptrel");
     PtrelHistos->Save();
     topdir->cd("electron_in_jet");
@@ -431,27 +431,27 @@ void PerformanceAnalyzerWithElectrons::FillPerformance(reco::CaloJet jet, int Je
 		edm::Handle<reco::JetTagCollection > jetTags;
 		event.getByLabel((*it).inputTag(),jetTags);
 		std::string alias = (*it).alias();
-		
+
 		std::string moduleLabel = (jetTags).provenance()->moduleLabel();
 		if (mymap.find(moduleLabel) != mymap.end()) continue;
 		mymap[moduleLabel] = true;
-		
+
 		ith_tagged = PFTools::TaggedJet(jet,jetTags);
-		
+
 		if (ith_tagged == -1) continue;
-		
+
 		TaggerPerformances_[alias].Add( (*jetTags)[ith_tagged].second, JetFlavor );
-			
+
 		/*
         edm::Handle<reco::JetTagCollection > jetTags;
-        
+
         event.getByLabel((*it).inputTag(),jetTags);
         std::string moduleLabel = (jetTags).provenance()->moduleLabel();
         if (mymap.find(moduleLabel) != mymap.end()) continue;
 
         mymap[moduleLabel] = true;
 
-        
+
         ith_tagged = PFTools::TaggedJet(jet,jetTags);
 
 
@@ -824,7 +824,7 @@ reco::JetFlavour PerformanceAnalyzerWithElectrons::getMatchedParton(const reco::
         }
 
         return jetFlavour;
-   
+
 
     }
 
@@ -971,7 +971,7 @@ PerformanceAnalyzerWithElectrons::analyze(const Event& iEvent, const EventSetup&
     int ijet = 0;
 
 	if (fdebug) std::cout << " begin loop over jets" << std::endl;
-	
+
     for ( jet = recoJets.begin(); jet != recoJets.end(); ++jet )
     {
 
@@ -1016,7 +1016,7 @@ PerformanceAnalyzerWithElectrons::analyze(const Event& iEvent, const EventSetup&
             GsfTrack electronTrk = *(mt.get());
             //TrackingParticleRef TrueHitsTrk;
             int nhit = electronTrk.numberOfValidHits();//electronTrk.recHitsSize();
-            
+
             // electron cuts
             double normChi2 = electronTrk.normalizedChi2();//(*(electron->combinedElectron())).chi2() / (*(electron->combinedElectron())).ndof();// use global fit
             bool fails = nhit <= MinElectronNHits_;
@@ -1157,7 +1157,7 @@ PerformanceAnalyzerWithElectrons::analyze(const Event& iEvent, const EventSetup&
 
             // find an away tagged jet
 			if (fdebug) std::cout << " find an away tagged jet" << std::endl;
-			
+
             if ( !AwayTaggedJet )
             {
 
@@ -1240,7 +1240,7 @@ PerformanceAnalyzerWithElectrons::analyze(const Event& iEvent, const EventSetup&
 		if (fdebug) std::cout << " done efficiency plots" << std::endl;
         FillPerformance(*jet, JetFlavor, iEvent );
 		if (fdebug) std::cout << " done performance plots" << std::endl;
-		
+
         if ( hasLepton == 1 )
         {
             p4ElecJet.SetPtEtaPhiE(jet->pt(), jet->eta(), jet->phi(), jet->energy() );
@@ -1306,7 +1306,7 @@ PerformanceAnalyzerWithElectrons::analyze(const Event& iEvent, const EventSetup&
             // Get a vector of reference to the selected tracks in each jet
             TrackRefVector tracks( (*bTagTrackEventIPTagInfos)[jetIndex].selectedTracks() );
 
-            std::vector<reco::TrackIPTagInfo::TrackIPData> const & ipdata = (*tagInfo)[jetIndex].impactParameterData();
+            std::vector<reco::btag::TrackIPData> const & ipdata = (*tagInfo)[jetIndex].impactParameterData();
 
             // Create a new BTagTrackEvent
             BTagTrackEvent trackEvent;
@@ -1362,7 +1362,7 @@ PerformanceAnalyzerWithElectrons::analyze(const Event& iEvent, const EventSetup&
         bool gotJP       = false;
         bool gotJPneg    = false;
         bool gotJPpos    = false;
-        bool gotSMT      = false;
+        //bool gotSMT      = false;
         bool gotMTCHE     = false;
         bool gotMTCHP     = false;
 
@@ -1374,7 +1374,7 @@ PerformanceAnalyzerWithElectrons::analyze(const Event& iEvent, const EventSetup&
         std::map<std::string, bool> mymap;
 
 		if (fdebug) std::cout << " btag operating points" << std::endl;
-		
+
         for (std::vector<WorkingPoint>::const_iterator it = wp.begin(); it != wp.end(); ++it)
         {
             //    for (size_t k=0; k<jetTags_testManyByType.size(); k++)
@@ -1405,9 +1405,9 @@ PerformanceAnalyzerWithElectrons::analyze(const Event& iEvent, const EventSetup&
                 //			  std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
                 std::vector< Measurement1D  > trackIP;
 
-                std::vector<TrackIPTagInfo::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
+                std::vector<btag::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
 
-                for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
+                for (std::vector<btag::TrackIPData>::const_iterator itipdata = ipdata.begin();
                         itipdata != ipdata.end(); itipdata++)
                 {
                     trackIP.push_back((*itipdata).ip3d );
@@ -1432,9 +1432,9 @@ PerformanceAnalyzerWithElectrons::analyze(const Event& iEvent, const EventSetup&
             {
                 //			  std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
                 std::vector< Measurement1D  > trackIP;
-                std::vector<TrackIPTagInfo::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
+                std::vector<btag::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
 
-                for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
+                for (std::vector<btag::TrackIPData>::const_iterator itipdata = ipdata.begin();
                         itipdata != ipdata.end(); itipdata++)
                 {
                     trackIP.push_back((*itipdata).ip3d );
@@ -1458,9 +1458,9 @@ PerformanceAnalyzerWithElectrons::analyze(const Event& iEvent, const EventSetup&
             {
                 //			    std::vector< Measurement1D  > trackIP = (*tagInfo)[ith_tagged].impactParameters(0);
                 std::vector< Measurement1D  > trackIP;
-                std::vector<TrackIPTagInfo::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
+                std::vector<btag::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
 
-                for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
+                for (std::vector<btag::TrackIPData>::const_iterator itipdata = ipdata.begin();
                         itipdata != ipdata.end(); itipdata++)
                 {
                     trackIP.push_back((*itipdata).ip3d );
@@ -1482,9 +1482,9 @@ PerformanceAnalyzerWithElectrons::analyze(const Event& iEvent, const EventSetup&
                 std::vector< Measurement1D  > trackIP;
 
 
-                std::vector<TrackIPTagInfo::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
+                std::vector<btag::TrackIPData>  ipdata =  (*tagInfo)[ith_tagged].impactParameterData();
 
-                for (std::vector<TrackIPTagInfo::TrackIPData>::const_iterator itipdata = ipdata.begin();
+                for (std::vector<btag::TrackIPData>::const_iterator itipdata = ipdata.begin();
                         itipdata != ipdata.end(); itipdata++)
                 {
                     trackIP.push_back((*itipdata).ip3d );
@@ -1555,7 +1555,7 @@ PerformanceAnalyzerWithElectrons::analyze(const Event& iEvent, const EventSetup&
 
                 fS8evt->btag_SoftElectron_disc.push_back( (*jetTags)[ith_tagged].second);
 
-                gotSMT = true;
+                //gotSMT = true;
 
             }
 
