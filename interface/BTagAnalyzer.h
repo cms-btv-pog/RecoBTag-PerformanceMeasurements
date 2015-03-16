@@ -241,6 +241,7 @@ class BTagAnalyzer : public edm::EDAnalyzer
     std::string combinedIVFPhaseIMidPUBJetTags_;
     std::string combinedIVFPhaseIHighPUBJetTags_;
     std::string combinedIVFPhaseIIHighPUBJetTags_;
+    std::string combinedIVFPhaseIIHighPUMaxEta4BJetTags_;
     //FormultipleCSVv2:end
 
     std::string simpleSVHighEffBJetTags_;

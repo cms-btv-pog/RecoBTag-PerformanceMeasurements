@@ -116,6 +116,7 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
   combinedIVFPhaseIMidPUBJetTags_ = iConfig.getParameter<std::string>("combinedIVFV2PhaseIMidPUBJetTags");
   combinedIVFPhaseIHighPUBJetTags_ = iConfig.getParameter<std::string>("combinedIVFV2PhaseIHighPUBJetTags");
   combinedIVFPhaseIIHighPUBJetTags_ = iConfig.getParameter<std::string>("combinedIVFV2PhaseIIHighPUBJetTags");
+  combinedIVFPhaseIIHighPUMaxEta4BJetTags_ = iConfig.getParameter<std::string>("combinedIVFV2PhaseIIHighPUMaxEta4BJetTags");
   //FormultipleCSVv2:end                                                                                  
 
   //softMuonBJetTags_       = iConfig.getParameter<std::string>("softMuonBJetTags");
@@ -1529,6 +1530,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     float CombinedIVFV2PhaseIMidPU = pjet->bDiscriminator(combinedIVFPhaseIMidPUBJetTags_.c_str());
     float CombinedIVFV2PhaseIHighPU = pjet->bDiscriminator(combinedIVFPhaseIHighPUBJetTags_.c_str());
     float CombinedIVFV2PhaseIIHighPU = pjet->bDiscriminator(combinedIVFPhaseIIHighPUBJetTags_.c_str());
+    float CombinedIVFV2PhaseIIHighPUMaxEta4 = pjet->bDiscriminator(combinedIVFPhaseIIHighPUMaxEta4BJetTags_.c_str());
     //FormultipleCSVv2:end
     
     float Svtx    = pjet->bDiscriminator(simpleSVHighEffBJetTags_.c_str());
@@ -1691,6 +1693,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     JetInfo[iJetColl].Jet_CombIVFV2PhaseIMidPU[JetInfo[iJetColl].nJet] =  CombinedIVFV2PhaseIMidPU;
     JetInfo[iJetColl].Jet_CombIVFV2PhaseIHighPU[JetInfo[iJetColl].nJet] =  CombinedIVFV2PhaseIHighPU;
     JetInfo[iJetColl].Jet_CombIVFV2PhaseIIHighPU[JetInfo[iJetColl].nJet] =  CombinedIVFV2PhaseIIHighPU;
+    JetInfo[iJetColl].Jet_CombIVFV2PhaseIIHighPUMaxEta4[JetInfo[iJetColl].nJet] =  CombinedIVFV2PhaseIIHighPUMaxEta4;
     //FormultipleCSVv2:end
     JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet]  = SoftMN;
     JetInfo[iJetColl].Jet_SoftMuP[JetInfo[iJetColl].nJet]  = SoftMP;

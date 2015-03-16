@@ -241,7 +241,7 @@ toGet = cms.VPSet(cms.PSet(
 record = cms.string('BTauGenericMVAJetTagComputerRcd'),
                 tag = cms.string('MVAJetTags_620SLHCX')
 )),
-connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags_620SLHCX_Phase1And2Upgrade_v3.db'),
+connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags_620SLHCX_Phase1And2Upgrade_v5.db'),
 BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
 )
 process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
@@ -570,7 +570,8 @@ getattr(process,'patJets'+postfix).discriminatorSources += cms.VInputTag(
 cms.InputTag("combinedSecondaryVertexIVFV2Phase1MidPUBJetTags"),
 cms.InputTag("combinedSecondaryVertexIVFV2NewBJetTags"),
 cms.InputTag("combinedSecondaryVertexIVFV2Phase1HighPUBJetTags"),
-cms.InputTag("combinedSecondaryVertexIVFV2Phase2HighPUBJetTags")
+cms.InputTag("combinedSecondaryVertexIVFV2Phase2HighPUBJetTags"),
+cms.InputTag("combinedSecondaryVertexIVFV2Phase2HighPUMaxEta4BJetTags")
 )
 #CSVIVFV2: MLP-based
 process.combinedSecondaryVertexIVFV2=process.combinedSecondaryVertexV2.clone(
@@ -616,6 +617,18 @@ calibrationRecords = cms.vstring(
 process.combinedSecondaryVertexIVFV2Phase2HighPUBJetTags = process.combinedSecondaryVertexV2BJetTagsPFlow.clone(
 jetTagComputer = cms.string('combinedSecondaryVertexIVFV2Phase2HighPU'),
 tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosPFlow"), cms.InputTag("inclusiveSecondaryVertexFinderTagInfosPFlowSelection"))
+)
+###CSVIVFV2: PHASE2 140PU +aging MaxEta4  
+process.combinedSecondaryVertexIVFV2Phase2HighPUMaxEta4=process.combinedSecondaryVertexV2.clone(
+calibrationRecords = cms.vstring(                                                                                                                                                 
+'CombinedSVIVFV2Phase2JEC_140PU_MaxEta4_RecoVertex',
+'CombinedSVIVFV2Phase2JEC_140PU_MaxEta4_PseudoVertex',
+'CombinedSVIVFV2Phase2JEC_140PU_MaxEta4_NoVertex'
+)                                                                                                                                                                                 
+)                                                                                                                                                                           
+process.combinedSecondaryVertexIVFV2Phase2HighPUMaxEta4BJetTags = process.combinedSecondaryVertexV2BJetTagsPFlow.clone(                                                          
+jetTagComputer = cms.string('combinedSecondaryVertexIVFV2Phase2HighPUMaxEta4'),                                                                                     
+tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosPFlow"), cms.InputTag("inclusiveSecondaryVertexFinderTagInfosPFlowSelection"))                                      
 )
 ###CSVIVFV2: new csv from Shimaa
 process.combinedSecondaryVertexIVFV2New=process.combinedSecondaryVertexV2.clone(

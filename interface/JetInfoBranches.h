@@ -69,6 +69,7 @@ class JetInfoBranches {
     float Jet_CombIVFV2PhaseIMidPU[nMaxJets_];
     float Jet_CombIVFV2PhaseIHighPU[nMaxJets_];
     float Jet_CombIVFV2PhaseIIHighPU[nMaxJets_];
+    float Jet_CombIVFV2PhaseIIHighPUMaxEta4[nMaxJets_];
     //FormultipleCSVv2:end
     float Jet_SoftMuN[nMaxJets_];
     float Jet_SoftMuP[nMaxJets_];
@@ -293,6 +294,7 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_CombIVFV2PhaseIMidPU").c_str(),  Jet_CombIVFV2PhaseIMidPU  ,(name+"Jet_CombIVFV2PhaseIMidPU["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_CombIVFV2PhaseIHighPU").c_str(),  Jet_CombIVFV2PhaseIHighPU  ,(name+"Jet_CombIVFV2PhaseIHighPU["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_CombIVFV2PhaseIIHighPU").c_str(),  Jet_CombIVFV2PhaseIIHighPU  ,(name+"Jet_CombIVFV2PhaseIIHighPU["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_CombIVFV2PhaseIIHighPUMaxEta4").c_str(),  Jet_CombIVFV2PhaseIIHighPUMaxEta4  ,(name+"Jet_CombIVFV2PhaseIIHighPUMaxEta4["+name+"nJet]/F").c_str());
       //FormultipleCSVv2:end
 
       tree->Branch((name+"Jet_SoftMuN").c_str(),     Jet_SoftMuN     ,(name+"Jet_SoftMuN["+name+"nJet]/F").c_str());
@@ -548,6 +550,7 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"CombIVFV2PhaseIMidPU").c_str(),     Jet_CombIVFV2PhaseIMidPU    );
       tree->SetBranchAddress((name+"CombIVFV2PhaseIHighPU").c_str(),     Jet_CombIVFV2PhaseIHighPU    );
       tree->SetBranchAddress((name+"CombIVFV2PhaseIIHighPU").c_str(),     Jet_CombIVFV2PhaseIIHighPU    );
+      tree->SetBranchAddress((name+"CombIVFV2PhaseIIHighPUMaxEta4").c_str(),     Jet_CombIVFV2PhaseIIHighPUMaxEta4    );
       //FormultipleCSVv2:end
 
       tree->SetBranchAddress((name+"Jet_SoftMuN").c_str(), Jet_SoftMuN     );
