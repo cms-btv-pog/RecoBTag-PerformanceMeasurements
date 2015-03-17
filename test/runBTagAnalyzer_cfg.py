@@ -680,6 +680,7 @@ process.btagana.patMuonCollectionName = cms.InputTag(patMuons)
 process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
 process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
 process.btagana.genParticles          = cms.InputTag(genParticles)
+process.btagana.candidates            = cms.InputTag(pfCandidates) 
 
 if options.runSubJets:
     process.btaganaSubJets = process.btagana.clone(
