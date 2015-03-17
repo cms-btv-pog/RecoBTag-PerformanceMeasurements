@@ -472,8 +472,6 @@ if options.runSubJets:
         rParam = 0.8,
         postfix = postfix
     )
-    getattr(process,'patJetPartonMatchCA8'+postfix).matched = cms.InputTag(genParticles)
-    getattr(process,'softPFMuonsTagInfosCA8'+postfix).leptons = cms.InputTag(muSource)
     addJetCollection(
         process,
         labelName = 'CA8Pruned',
