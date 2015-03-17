@@ -381,7 +381,6 @@ private:
 
   // helper classes for associating PF candidates to jets
   IPProducerHelpers::FromJetAndCands m_helper;
-  IPProducerHelpers::FromJetAndCands m_helperFat;
 };
 
 template<typename IPTI,typename VTX>
@@ -413,8 +412,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   hadronizerType_(0),
   pfjetIDLoose_( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE ),
   pfjetIDTight_( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT ),
-  m_helper(iConfig, consumesCollector(),"Jets"),
-  m_helperFat(iConfig, consumesCollector(),"FatJets")
+  m_helper(iConfig, consumesCollector(),"Jets")
 {
   //now do what ever initialization you need
   std::string module_type  = iConfig.getParameter<std::string>("@module_type");
@@ -3123,9 +3121,6 @@ template<>
 void BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::fillHelpers(const edm::Event& iEvent)
 {
   std::vector<reco::JetTagInfo> jetTagInfos = m_helper.makeBaseVector(iEvent);
-  std::vector<reco::JetTagInfo> fatJetTagInfos;
-  if (runSubJets_)
-    fatJetTagInfos = m_helperFat.makeBaseVector(iEvent);
 }
 
 // -------------- toIPTagInfo ----------------
@@ -3173,7 +3168,7 @@ BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::toAllTrack
   const reco::JetTagInfo * tagInfo = dynamic_cast<const reco::JetTagInfo *>( toIPTagInfo(jet,tagInfos) );
 
   if( iJetColl == 1)
-    return m_helperFat.tracks(*tagInfo);
+    return toIPTagInfo(jet,tagInfos)->selectedTracks();
   else
     return m_helper.tracks(*tagInfo);
 }
