@@ -80,17 +80,15 @@ options.register('miniAOD', False,
     VarParsing.varType.bool,
     "Running on miniAOD"
 )
-
-options.register('useLegacyTaggers', True,
-VarParsing.multiplicity.singleton,
-VarParsing.varType.bool,
-"Use legacy taggers"
+options.register('useLegacyTaggers', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Use legacy taggers"
 )
-
 options.register('useExplicitJTA', False,
-VarParsing.multiplicity.singleton,
-VarParsing.varType.bool,
-"Use explicit jet-track association"
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Use explicit jet-track association"
 )
 
 ## 'maxEvents' is already registered by the Framework, changing default value
