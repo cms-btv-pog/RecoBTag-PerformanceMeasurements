@@ -1,7 +1,7 @@
 # RecoBTag-PerformanceMeasurements
 =========================
-cmsrel CMSSW_7_4_0_pre7
-cd CMSSW_7_4_0_pre7/src
+cmsrel CMSSW_7_4_0_pre8
+cd CMSSW_7_4_0_pre8/src
 cmsenv
 
 git cms-merge-topic -u cms-btv-pog:PATBTaggingUpdates_from-CMSSW_7_4_0_pre7
