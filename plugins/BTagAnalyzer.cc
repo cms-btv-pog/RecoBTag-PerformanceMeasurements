@@ -3298,7 +3298,7 @@ void BTagAnalyzerT<reco::TrackIPTagInfo,reco::Vertex>::vertexKinematicsAndChange
 template<>
 void BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::vertexKinematicsAndChange(const Vertex & vertex, reco::TrackKinematics & vertexKinematics, Int_t & charge)
 {
-  const std::vector<reco::CandidatePtr> tracks = vertex.daughterPtrVector();
+  const std::vector<reco::CandidatePtr> & tracks = vertex.daughterPtrVector();
 
   for(std::vector<reco::CandidatePtr>::const_iterator track = tracks.begin(); track != tracks.end(); ++track) {
     const reco::Track& mytrack = *(*track)->bestTrack();
