@@ -412,15 +412,15 @@ process.load("PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff")
 #-------------------------------------
 
 #-------------------------------------
-## CA8 jets (Gen and Reco)
-from RecoJets.JetProducers.ca4GenJets_cfi import ca4GenJets
-process.ca8GenJetsNoNu = ca4GenJets.clone(
+## AK8 jets (Gen and Reco)
+from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
+process.ak8GenJetsNoNu = ak4GenJets.clone(
     rParam = cms.double(0.8),
     src = (cms.InputTag("packedGenParticlesForJetsNoNu") if options.miniAOD else cms.InputTag("genParticlesForJetsNoNu"+postfix))
 )
 
-from RecoJets.JetProducers.ca4PFJets_cfi import ca4PFJets
-process.ca8PFJets = ca4PFJets.clone(
+from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
+process.ak8PFJets = ak4PFJets.clone(
     rParam = cms.double(0.8),
     src = (getattr(process,"ak4PFJets").src if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).src),
     srcPVs = (getattr(process,"ak4PFJets").srcPVs if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).srcPVs),
@@ -428,10 +428,10 @@ process.ca8PFJets = ca4PFJets.clone(
     jetPtMin = cms.double(options.fatJetPtMin)
 )
 
-## CA8 pruned jets (Gen and Reco)
-from RecoJets.JetProducers.ca4GenJets_cfi import ca4GenJets
+## AK8 pruned jets (Gen and Reco)
+from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
 from RecoJets.JetProducers.SubJetParameters_cfi import SubJetParameters
-process.ca8GenJetsNoNuPruned = ca4GenJets.clone(
+process.ak8GenJetsNoNuPruned = ak4GenJets.clone(
     SubJetParameters,
     rParam = cms.double(0.8),
     src = (cms.InputTag("packedGenParticlesForJetsNoNu") if options.miniAOD else cms.InputTag("genParticlesForJetsNoNu"+postfix)),
@@ -440,8 +440,8 @@ process.ca8GenJetsNoNuPruned = ca4GenJets.clone(
     jetCollInstanceName=cms.string("SubJets")
 )
 from RecoJets.JetProducers.ak4PFJetsPruned_cfi import ak4PFJetsPruned
-process.ca8PFJetsPruned = ak4PFJetsPruned.clone(
-    jetAlgorithm = cms.string("CambridgeAachen"),
+process.ak8PFJetsPruned = ak4PFJetsPruned.clone(
+    #jetAlgorithm = cms.string("CambridgeAachen"),
     rParam = cms.double(0.8),
     src = (getattr(process,"ak4PFJets").src if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).src),
     srcPVs = (getattr(process,"ak4PFJets").srcPVs if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).srcPVs),
@@ -452,11 +452,11 @@ process.ca8PFJetsPruned = ak4PFJetsPruned.clone(
 )
 
 if options.runSubJets:
-    ## PATify CA8 jets
+    ## PATify AK8 jets
     addJetCollection(
         process,
-        labelName = 'CA8',
-        jetSource = cms.InputTag('ca8PFJets'),
+        labelName = 'AK8',
+        jetSource = cms.InputTag('ak8PFJets'),
         pfCandidates = cms.InputTag(pfCandidates),
         pvSource = cms.InputTag(pvSource),
         svSource = cms.InputTag(svSource),
@@ -465,29 +465,29 @@ if options.runSubJets:
         btagInfos = bTagInfos,
         btagDiscriminators = bTagDiscriminators,
         jetCorrections = jetCorrectionsAK8,
-        genJetCollection = cms.InputTag('ca8GenJetsNoNu'),
+        genJetCollection = cms.InputTag('ak8GenJetsNoNu'),
         genParticles = cms.InputTag(genParticles),
         explicitJTA = options.useExplicitJTA,
-        algo = 'CA',
+        algo = 'AK',
         rParam = 0.8,
         postfix = postfix
     )
     addJetCollection(
         process,
-        labelName = 'CA8Pruned',
-        jetSource = cms.InputTag('ca8PFJetsPruned'),
+        labelName = 'AK8Pruned',
+        jetSource = cms.InputTag('ak8PFJetsPruned'),
         btagInfos=['None'],
         btagDiscriminators=['None'],
         jetCorrections=jetCorrectionsAK8,
-        genJetCollection = cms.InputTag('ca8GenJetsNoNu'),
+        genJetCollection = cms.InputTag('ak8GenJetsNoNu'),
         genParticles = cms.InputTag(genParticles),
         getJetMCFlavour = False,
         postfix = postfix
     )
     addJetCollection(
         process,
-        labelName = 'CA8PrunedSubJets',
-        jetSource = cms.InputTag('ca8PFJetsPruned','SubJets'),
+        labelName = 'AK8PrunedSubJets',
+        jetSource = cms.InputTag('ak8PFJetsPruned','SubJets'),
         pfCandidates = cms.InputTag(pfCandidates),
         pvSource = cms.InputTag(pvSource),
         svSource = cms.InputTag(svSource),
@@ -496,30 +496,30 @@ if options.runSubJets:
         btagInfos = bTagInfos,
         btagDiscriminators = bTagDiscriminators,
         jetCorrections = jetCorrectionsAK4,
-        genJetCollection = cms.InputTag('ca8GenJetsNoNuPruned','SubJets'),
+        genJetCollection = cms.InputTag('ak8GenJetsNoNuPruned','SubJets'),
         genParticles = cms.InputTag(genParticles),
         explicitJTA = True, # needed for subjet b tagging
         svClustering = True, # needed for subjet b tagging
-        algo = 'CA',
+        algo = 'AK',
         rParam = 0.8,
-        fatJets = cms.InputTag('ca8PFJets'), # needed for subjet flavor clustering
-        groomedFatJets = cms.InputTag('ca8PFJetsPruned'),
+        fatJets = cms.InputTag('ak8PFJets'), # needed for subjet flavor clustering
+        groomedFatJets = cms.InputTag('ak8PFJetsPruned'),
         postfix = postfix
     )
 
     ## Establish references between PATified fat jets and subjets using the BoostedJetMerger
-    process.selectedPatJetsCA8PrunedPFlowPacked = cms.EDProducer("BoostedJetMerger",
-        jetSrc=cms.InputTag("selectedPatJetsCA8Pruned"+postfix),
-        subjetSrc=cms.InputTag("selectedPatJetsCA8PrunedSubJets"+postfix)
+    process.selectedPatJetsAK8PrunedPFlowPacked = cms.EDProducer("BoostedJetMerger",
+        jetSrc=cms.InputTag("selectedPatJetsAK8Pruned"+postfix),
+        subjetSrc=cms.InputTag("selectedPatJetsAK8PrunedSubJets"+postfix)
     )
 
     ## New jet flavor still requires some cfg-level adjustments for subjets until it is better integrated into PAT
     ## Adjust the jet flavor for pruned subjets
-    setattr(process,'patJetFlavourAssociationCA8PrunedSubJets'+postfix, getattr(process,'patJetFlavourAssociationCA8'+postfix).clone(
-        groomedJets = cms.InputTag('ca8PFJetsPruned'),
-        subjets = cms.InputTag('ca8PFJetsPruned','SubJets')
+    setattr(process,'patJetFlavourAssociationAK8PrunedSubJets'+postfix, getattr(process,'patJetFlavourAssociationAK8'+postfix).clone(
+        groomedJets = cms.InputTag('ak8PFJetsPruned'),
+        subjets = cms.InputTag('ak8PFJetsPruned','SubJets')
     ))
-    getattr(process,'patJetsCA8PrunedSubJets'+postfix).JetFlavourInfoSource = cms.InputTag('patJetFlavourAssociationCA8PrunedSubJets'+postfix,'SubJets')
+    getattr(process,'patJetsAK8PrunedSubJets'+postfix).JetFlavourInfoSource = cms.InputTag('patJetFlavourAssociationAK8PrunedSubJets'+postfix,'SubJets')
 #-------------------------------------
 
 #-------------------------------------
@@ -528,10 +528,10 @@ if options.runSubJets:
     from RecoJets.JetProducers.nJettinessAdder_cfi import Njettiness
 
     process.Njettiness = Njettiness.clone(
-        src = cms.InputTag("ca8PFJets"),
+        src = cms.InputTag("ak8PFJets"),
         cone = cms.double(0.8)
     )
-    getattr(process,'patJetsCA8'+postfix).userData.userFloats.src += ['Njettiness:tau1','Njettiness:tau2','Njettiness:tau3']
+    getattr(process,'patJetsAK8'+postfix).userData.userFloats.src += ['Njettiness:tau1','Njettiness:tau2','Njettiness:tau3']
 #-------------------------------------
 
 #-------------------------------------
@@ -542,7 +542,7 @@ if options.runOnData and options.runSubJets:
 ## Add TagInfos to PAT jets
 patJets = ['patJets'+postfix]
 if options.runSubJets:
-    patJets += ['patJetsCA8'+postfix,'patJetsCA8PrunedSubJets'+postfix]
+    patJets += ['patJetsAK8'+postfix,'patJetsAK8PrunedSubJets'+postfix]
 
 for m in patJets:
     if hasattr(process,m):
@@ -686,9 +686,9 @@ if options.runSubJets:
         storeEventInfo      = cms.bool(False),
         produceJetTrackTree = cms.bool(True),
         allowJetSkipping    = cms.bool(False),
-        Jets                = cms.InputTag('selectedPatJetsCA8PrunedSubJets'+postfix),
-        FatJets             = cms.InputTag('selectedPatJetsCA8'+postfix),
-        GroomedFatJets      = cms.InputTag('selectedPatJetsCA8PrunedPFlowPacked'),
+        Jets                = cms.InputTag('selectedPatJetsAK8PrunedSubJets'+postfix),
+        FatJets             = cms.InputTag('selectedPatJetsAK8'+postfix),
+        GroomedFatJets      = cms.InputTag('selectedPatJetsAK8PrunedPFlowPacked'),
         runSubJets          = options.runSubJets,
         use_ttbar_filter    = cms.bool(False)
     )
