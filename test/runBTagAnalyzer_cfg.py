@@ -585,18 +585,35 @@ if options.runSubJets:
         subjets = cms.InputTag('ak8PFJetsPruned','SubJets')
     ))
     getattr(process,'patJetsAK8PrunedSubJets'+postfix).JetFlavourInfoSource = cms.InputTag('patJetFlavourAssociationAK8PrunedSubJets'+postfix,'SubJets')
+
+
 #-------------------------------------
 
 #-------------------------------------
-## N-subjettiness
 if options.runSubJets:
-    from RecoJets.JetProducers.nJettinessAdder_cfi import Njettiness
+  #### Add groomed masses to jet userData
+  from RecoJets.JetProducers.ak8PFJetsCHS_groomingValueMaps_cfi import *
+  process.ak8PFJetsSoftDropMass = cms.EDProducer("RecoJetDeltaRValueMapProducer",
+      src = cms.InputTag("ak8PFJets"),
+      matched = cms.InputTag("selectedPatJetsAK8SoftDropPFlowPacked"),
+      distMax = cms.double(0.8),
+      value = cms.string('mass')
+      ) 
+  process.ak8PFJetsPrunedMass = cms.EDProducer("RecoJetDeltaRValueMapProducer",
+      src = cms.InputTag("ak8PFJets"),
+      matched = cms.InputTag("selectedPatJetsAK8PrunedPFlowPacked"),
+      distMax = cms.double(0.8),
+      value = cms.string('mass')
+      ) 
+  getattr(process,'patJetsAK8'+postfix).userData.userFloats.src += ['ak8PFJetsSoftDropMass', 'ak8PFJetsPrunedMass']
+  ## N-subjettiness
+  from RecoJets.JetProducers.nJettinessAdder_cfi import Njettiness
 
-    process.Njettiness = Njettiness.clone(
-        src = cms.InputTag("ak8PFJets"),
-        cone = cms.double(0.8)
-    )
-    getattr(process,'patJetsAK8'+postfix).userData.userFloats.src += ['Njettiness:tau1','Njettiness:tau2','Njettiness:tau3']
+  process.Njettiness = Njettiness.clone(
+      src = cms.InputTag("ak8PFJets"),
+      cone = cms.double(0.8)
+  )
+  getattr(process,'patJetsAK8'+postfix).userData.userFloats.src += ['Njettiness:tau1','Njettiness:tau2','Njettiness:tau3']
 #-------------------------------------
 
 #-------------------------------------
