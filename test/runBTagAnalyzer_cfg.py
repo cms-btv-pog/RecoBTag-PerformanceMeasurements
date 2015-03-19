@@ -428,9 +428,31 @@ process.ak8PFJets = ak4PFJets.clone(
     jetPtMin = cms.double(options.fatJetPtMin)
 )
 
-## AK8 pruned jets (Gen and Reco)
 from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
 from RecoJets.JetProducers.SubJetParameters_cfi import SubJetParameters
+## AK8 soft drop jets
+process.ak8GenJetsNoNuSoftDrop = ak4GenJets.clone(
+    SubJetParameters,
+    rParam = cms.double(0.8),
+    src = (cms.InputTag("packedGenParticlesForJetsNoNu") if options.miniAOD else cms.InputTag("genParticlesForJetsNoNu"+postfix)),
+    useSoftDrop = cms.bool(True),
+    beta = cms.double(0.0),
+    writeCompound = cms.bool(True),
+    jetCollInstanceName=cms.string("SubJets")
+    )
+
+from RecoJets.JetProducers.ak4PFJetsSoftDrop_cfi import ak4PFJetsSoftDrop
+process.ak8PFJetsSoftDrop = ak4PFJetsSoftDrop.clone(
+    rParam = cms.double(0.8),
+    src = (getattr(process,"ak4PFJets").src if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).src),
+    srcPVs = (getattr(process,"ak4PFJets").srcPVs if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).srcPVs),
+    doAreaFastjet = cms.bool(True),
+    writeCompound = cms.bool(True),
+    jetCollInstanceName=cms.string("SubJets"),
+    jetPtMin = cms.double(options.fatJetPtMin)
+    )
+
+## AK8 pruned jets (Gen and Reco)
 process.ak8GenJetsNoNuPruned = ak4GenJets.clone(
     SubJetParameters,
     rParam = cms.double(0.8),
@@ -474,6 +496,40 @@ if options.runSubJets:
     )
     addJetCollection(
         process,
+        labelName = 'AK8SoftDrop',
+        jetSource = cms.InputTag('ak8PFJetsSoftDrop'),
+        btagInfos=['None'],
+        btagDiscriminators=['None'],
+        jetCorrections=jetCorrectionsAK8,
+        genJetCollection = cms.InputTag('ak8GenJetsNoNu'),
+        genParticles = cms.InputTag(genParticles),
+        getJetMCFlavour = False,
+        postfix = postfix
+    )
+    addJetCollection(
+        process,
+        labelName = 'AK8SoftDropSubJets',
+        jetSource = cms.InputTag('ak8PFJetsSoftDrop','SubJets'),
+        pfCandidates = cms.InputTag(pfCandidates),
+        pvSource = cms.InputTag(pvSource),
+        svSource = cms.InputTag(svSource),
+        muSource = cms.InputTag(muSource),
+        elSource = cms.InputTag(elSource),
+        btagInfos = bTagInfos,
+        btagDiscriminators = bTagDiscriminators,
+        jetCorrections = jetCorrectionsAK4,
+        genJetCollection = cms.InputTag('ak8GenJetsNoNuSoftDrop','SubJets'),
+        genParticles = cms.InputTag(genParticles),
+        explicitJTA = True, # needed for subjet b tagging
+        svClustering = True, # needed for subjet b tagging
+        algo = 'AK',
+        rParam = 0.8,
+        fatJets = cms.InputTag('ak8PFJets'), # needed for subjet flavor clustering
+        groomedFatJets = cms.InputTag('ak8PFJetsSoftDrop'),
+        postfix = postfix
+    )
+    addJetCollection(
+        process,
         labelName = 'AK8Pruned',
         jetSource = cms.InputTag('ak8PFJetsPruned'),
         btagInfos=['None'],
@@ -508,6 +564,10 @@ if options.runSubJets:
     )
 
     ## Establish references between PATified fat jets and subjets using the BoostedJetMerger
+    process.selectedPatJetsAK8SoftDropPFlowPacked = cms.EDProducer("BoostedJetMerger",
+        jetSrc=cms.InputTag("selectedPatJetsAK8SoftDrop"+postfix),
+        subjetSrc=cms.InputTag("selectedPatJetsAK8SoftDropSubJets"+postfix)
+    )
     process.selectedPatJetsAK8PrunedPFlowPacked = cms.EDProducer("BoostedJetMerger",
         jetSrc=cms.InputTag("selectedPatJetsAK8Pruned"+postfix),
         subjetSrc=cms.InputTag("selectedPatJetsAK8PrunedSubJets"+postfix)
@@ -515,6 +575,11 @@ if options.runSubJets:
 
     ## New jet flavor still requires some cfg-level adjustments for subjets until it is better integrated into PAT
     ## Adjust the jet flavor for pruned subjets
+    setattr(process,'patJetFlavourAssociationAK8SoftDropSubJets'+postfix, getattr(process,'patJetFlavourAssociationAK8'+postfix).clone(
+        groomedJets = cms.InputTag('ak8PFJetsSoftDrop'),
+        subjets = cms.InputTag('ak8PFJetsSoftDrop','SubJets')
+    ))
+    getattr(process,'patJetsAK8SoftDropSubJets'+postfix).JetFlavourInfoSource = cms.InputTag('patJetFlavourAssociationAK8SoftDropSubJets'+postfix,'SubJets')
     setattr(process,'patJetFlavourAssociationAK8PrunedSubJets'+postfix, getattr(process,'patJetFlavourAssociationAK8'+postfix).clone(
         groomedJets = cms.InputTag('ak8PFJetsPruned'),
         subjets = cms.InputTag('ak8PFJetsPruned','SubJets')
@@ -542,7 +607,7 @@ if options.runOnData and options.runSubJets:
 ## Add TagInfos to PAT jets
 patJets = ['patJets'+postfix]
 if options.runSubJets:
-    patJets += ['patJetsAK8'+postfix,'patJetsAK8PrunedSubJets'+postfix]
+    patJets += ['patJetsAK8'+postfix,'patJetsAK8SoftDropSubJets'+postfix,'patJetsAK8PrunedSubJets'+postfix]
 
 for m in patJets:
     if hasattr(process,m):
@@ -682,7 +747,17 @@ process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Da
 process.btagana.genParticles          = cms.InputTag(genParticles)
 
 if options.runSubJets:
-    process.btaganaSubJets = process.btagana.clone(
+    process.btaganaSoftDropSubJets = process.btagana.clone(
+        storeEventInfo      = cms.bool(False),
+        produceJetTrackTree = cms.bool(True),
+        allowJetSkipping    = cms.bool(False),
+        Jets                = cms.InputTag('selectedPatJetsAK8SoftDropSubJets'+postfix),
+        FatJets             = cms.InputTag('selectedPatJetsAK8'+postfix),
+        GroomedFatJets      = cms.InputTag('selectedPatJetsAK8SoftDropPFlowPacked'),
+        runSubJets          = options.runSubJets,
+        use_ttbar_filter    = cms.bool(False)
+    )
+    process.btaganaPrunedSubJets = process.btagana.clone(
         storeEventInfo      = cms.bool(False),
         produceJetTrackTree = cms.bool(True),
         allowJetSkipping    = cms.bool(False),
@@ -736,7 +811,8 @@ process.analyzerSeq = cms.Sequence( )
 if options.processStdAK4Jets:
     process.analyzerSeq += process.btagana
 if options.runSubJets:
-    process.analyzerSeq += process.btaganaSubJets
+    process.analyzerSeq += process.btaganaSoftDropSubJets
+    process.analyzerSeq += process.btaganaPrunedSubJets
 if options.processStdAK4Jets and options.useTTbarFilter:
     process.analyzerSeq.replace( process.btagana, process.ttbarselectionproducer * process.ttbarselectionfilter * process.btagana )
 #---------------------------------------
