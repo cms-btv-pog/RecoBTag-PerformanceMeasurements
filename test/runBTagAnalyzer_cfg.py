@@ -241,7 +241,7 @@ toGet = cms.VPSet(cms.PSet(
 record = cms.string('BTauGenericMVAJetTagComputerRcd'),
                 tag = cms.string('MVAJetTags_620SLHCX')
 )),
-connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags_620SLHCX_Phase1And2Upgrade_v5.db'),
+connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags_620SLHCX_Phase1And2Upgrade_v9.db'),
 BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
 )
 process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
@@ -737,15 +737,16 @@ process.jetTracksAssociatorAtVertexPFlow.coneSize = cms.double(0.4)
 
 ## Select JEC version
 #JEC from https://hypernews.cern.ch/HyperNews/CMS/get/upgrade-tp-studies/154.html
-#jec='PhaseII_Shashlik140PU_v1'
+#jec='PhaseII_Shashlik140PU_V1'
 #JEC from https://hypernews.cern.ch/HyperNews/CMS/get/upgrade-tp-studies/157.html
-#jec='PhaseII_Shashlik140PU_v2'
+#Note fix with respect to the one circulated in the HN above, which had a bug
+jec='PhaseII_Shashlik140PU_V2'
 #JEC from https://hypernews.cern.ch/HyperNews/CMS/get/upgrade-tp-studies/160.html
-jec='PhaseI_140PU_V2'
+#jec='PhaseI_140PU_V2'
 
 jechera=jec
 
-if jec == 'PhaseII_Shashlik140PU_v2' or jec == 'PhaseII_Shashlik140PU_v1':
+if jec == 'PhaseII_Shashlik140PU_V1':
     jechera='PhaseII_Shashlik140PU'
 
 print 'Using jec', jec ,' with hera name ', jechera
