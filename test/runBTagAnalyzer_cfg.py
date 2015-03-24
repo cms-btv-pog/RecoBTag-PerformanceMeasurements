@@ -435,6 +435,7 @@ process.ak8GenJetsNoNuSoftDrop = ak4GenJets.clone(
     src = (cms.InputTag("packedGenParticlesForJetsNoNu") if options.miniAOD else cms.InputTag("genParticlesForJetsNoNu"+postfix)),
     useSoftDrop = cms.bool(True),
     beta = cms.double(0.0),
+    R0 = cms.double(0.8),
     writeCompound = cms.bool(True),
     jetCollInstanceName=cms.string("SubJets")
     )
