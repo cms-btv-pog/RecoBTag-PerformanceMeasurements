@@ -221,7 +221,7 @@ if options.miniAOD:
     svSource = 'slimmedSecondaryVertices'
     muSource = 'slimmedMuons'
     elSource = 'slimmedElectrons'
-    patMuons = 'selectedMuons'
+    patMuons = 'slimmedMuons'
 
 process = cms.Process("BTagAna")
 
