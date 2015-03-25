@@ -329,14 +329,14 @@ if not options.miniAOD:
     getattr(process,"pfPileUpJME"+postfix).checkClosestZVertex = False
     getattr(process,"pfNoPileUpJME"+postfix).enable = options.usePFchs
     if options.useTTbarFilter:
-	getattr(process,"pfNoMuonJME"+postfix).enable = False
-	getattr(process,"pfNoElectronJME"+postfix).enable = False
-	getattr(process,"pfNoTau"+postfix).enable = False
+	getattr(process,"pfNoMuonJMEPFBRECO"+postfix).enable = False
+	getattr(process,"pfNoElectronJMEPFBRECO"+postfix).enable = False
+	getattr(process,"pfNoTauPFBRECO"+postfix).enable = False
 	getattr(process,"pfNoJet"+postfix).enable = False
     else:
-	getattr(process,"pfNoMuonJME"+postfix).enable = options.useTopProjections
-	getattr(process,"pfNoElectronJME"+postfix).enable = options.useTopProjections
-	getattr(process,"pfNoTau"+postfix).enable = False
+	getattr(process,"pfNoMuonJMEPFBRECO"+postfix).enable = options.useTopProjections
+	getattr(process,"pfNoElectronJMEPFBRECO"+postfix).enable = options.useTopProjections
+	getattr(process,"pfNoTauPFBRECO"+postfix).enable = False
 	getattr(process,"pfNoJet"+postfix).enable = False
 else:
     ## Recreate tracks and PVs for b tagging
