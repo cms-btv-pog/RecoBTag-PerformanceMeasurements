@@ -331,13 +331,9 @@ if not options.miniAOD:
     if options.useTTbarFilter:
 	getattr(process,"pfNoMuonJMEPFBRECO"+postfix).enable = False
 	getattr(process,"pfNoElectronJMEPFBRECO"+postfix).enable = False
-	getattr(process,"pfNoTauPFBRECO"+postfix).enable = False
-	getattr(process,"pfNoJet"+postfix).enable = False
     else:
 	getattr(process,"pfNoMuonJMEPFBRECO"+postfix).enable = options.useTopProjections
 	getattr(process,"pfNoElectronJMEPFBRECO"+postfix).enable = options.useTopProjections
-	getattr(process,"pfNoTauPFBRECO"+postfix).enable = False
-	getattr(process,"pfNoJet"+postfix).enable = False
 else:
     ## Recreate tracks and PVs for b tagging
     from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
