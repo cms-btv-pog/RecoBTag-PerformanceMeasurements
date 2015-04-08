@@ -80,6 +80,13 @@ options.register('miniAOD', False,
     VarParsing.varType.bool,
     "Running on miniAOD"
 )
+
+options.register('fastSim', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Running using fastSim"
+)
+
 options.register('useLegacyTaggers', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -97,6 +104,7 @@ options.setDefault('maxEvents', 10)
 options.parseArguments()
 
 print "Running on data: %s"%('True' if options.runOnData else 'False')
+print "Running using fastSim samples: %s"%('True' if options.fastSim else 'False')
 print "Running on miniAOD: %s"%('True' if options.miniAOD else 'False')
 print "Using PFchs: %s"%('True' if options.usePFchs else 'False')
 
@@ -249,6 +257,11 @@ if options.runOnData:
     process.source.fileNames = [
         '/store/relval/CMSSW_7_4_0_pre7/SingleMu/RECO/GR_R_74_V8A_RelVal_mu2012D-v1/00000/004E151D-D8B6-E411-A889-0025905B859E.root'
         ]
+if options.fastSim:
+    process.source.fileNames = [
+        '/store/relval/CMSSW_7_4_0_pre9_ROOT6/RelValTTbar_13/GEN-SIM-DIGI-RECO/MCRUN2_74_V7_FastSim-v1/00000/026EF5C1-89D1-E411-9EBD-002590596490.root',
+]
+
     
 if options.runOnData :
     if options.runSubJets :
@@ -260,6 +273,9 @@ else :
         options.outFilename += '_mc_subjets.root'
     else :
         options.outFilename += '_mc.root'
+
+if options.fastSim :
+    options.outFilename = 'JetTree_fastSim.root'
 
 ## Output file
 process.TFileService = cms.Service("TFileService",
