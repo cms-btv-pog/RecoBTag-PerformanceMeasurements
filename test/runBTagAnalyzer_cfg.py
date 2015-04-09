@@ -740,9 +740,11 @@ process.jetTracksAssociatorAtVertexPFlow.coneSize = cms.double(0.4)
 #jec='PhaseII_Shashlik140PU_V1'
 #JEC from https://hypernews.cern.ch/HyperNews/CMS/get/upgrade-tp-studies/157.html
 #Note fix with respect to the one circulated in the HN above, which had a bug
-jec='PhaseII_Shashlik140PU_V2'
+#jec='PhaseII_Shashlik140PU_V2'
 #JEC from https://hypernews.cern.ch/HyperNews/CMS/get/upgrade-tp-studies/160.html
 #jec='PhaseI_140PU_V2'
+#JEC from https://owa.desy.de/exchweb/bin/redir.asp?URL=https://hypernews.cern.ch/HyperNews/CMS/get/upgrade-tp-studies/157/1.html
+jec='PhaseI_50PU_V2'
 
 jechera=jec
 
