@@ -660,7 +660,7 @@ process.jetSeq = cms.Sequence(
     + process.ca8PFJetsPruned
 )
 if not options.runOnData:
-    process.jetSeq = cms.Sequence( process.genJetSeq + process.jetSeq )
+    process.jetSeq = cms.Sequence( process.prunedGenParticlesBoost + process.genJetSeq + process.jetSeq )
 
 
 ## Define combined PF2PAT + subjet sequence
@@ -693,8 +693,7 @@ for m in getattr(process,"patDefaultSequence").moduleNames():
 #-------------------------------------
 
 process.p = cms.Path(
-    process.prunedGenParticlesBoost
-    * process.allEvents
+    process.allEvents
     * process.filtSeq
     * process.selectedEvents
     * process.combPF2PATSubJetSeq
