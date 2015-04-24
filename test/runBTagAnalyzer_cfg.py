@@ -583,21 +583,6 @@ if options.runSubJets:
         jetSrc=cms.InputTag("selectedPatJetsAK8Pruned"+postfix),
         subjetSrc=cms.InputTag("selectedPatJetsAK8PrunedSubJets"+postfix)
     )
-
-    ## New jet flavor still requires some cfg-level adjustments for subjets until it is better integrated into PAT
-    ## Adjust the jet flavor for pruned subjets
-    setattr(process,'patJetFlavourAssociationAK8SoftDropSubJets'+postfix, getattr(process,'patJetFlavourAssociationAK8'+postfix).clone(
-        groomedJets = cms.InputTag('ak8PFJetsSoftDrop'),
-        subjets = cms.InputTag('ak8PFJetsSoftDrop','SubJets')
-    ))
-    getattr(process,'patJetsAK8SoftDropSubJets'+postfix).JetFlavourInfoSource = cms.InputTag('patJetFlavourAssociationAK8SoftDropSubJets'+postfix,'SubJets')
-    setattr(process,'patJetFlavourAssociationAK8PrunedSubJets'+postfix, getattr(process,'patJetFlavourAssociationAK8'+postfix).clone(
-        groomedJets = cms.InputTag('ak8PFJetsPruned'),
-        subjets = cms.InputTag('ak8PFJetsPruned','SubJets')
-    ))
-    getattr(process,'patJetsAK8PrunedSubJets'+postfix).JetFlavourInfoSource = cms.InputTag('patJetFlavourAssociationAK8PrunedSubJets'+postfix,'SubJets')
-
-
 #-------------------------------------
 
 #-------------------------------------
