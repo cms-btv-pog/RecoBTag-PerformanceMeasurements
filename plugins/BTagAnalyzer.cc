@@ -141,6 +141,8 @@ BTagAnalyzer::BTagAnalyzer(const edm::ParameterSet& iConfig):
 
   SVComputer_               = iConfig.getParameter<edm::InputTag>( "svComputer");
 
+  svTagInfos_              = iConfig.getParameter<std::string>("svTagInfos");
+
   triggerPathNames_        = iConfig.getParameter<std::vector<std::string> >("TriggerPathNames");
   ttbarTriggerPathNames_   = iConfig.getParameter<std::vector<std::string> >("TTbarTriggerPathNames");
   PFJet80TriggerPathNames_ = iConfig.getParameter<std::vector<std::string> >("PFJet80TriggerPathNames");
@@ -1274,9 +1276,9 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
                     JetInfo[iJetColl].Track_PV[JetInfo[iJetColl].nTrack],
                     JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]);
 
-        if( pjet->hasTagInfo("secondaryVertex") )
+        if( pjet->hasTagInfo(svTagInfos_.c_str()) )
         {
-          setTracksSV(ptrackRef, pjet->tagInfoSecondaryVertex("secondaryVertex"),
+          setTracksSV(ptrackRef, pjet->tagInfoSecondaryVertex(svTagInfos_.c_str()),
                       JetInfo[iJetColl].Track_isfromSV[JetInfo[iJetColl].nTrack],
                       JetInfo[iJetColl].Track_SV[JetInfo[iJetColl].nTrack],
                       JetInfo[iJetColl].Track_SVweight[JetInfo[iJetColl].nTrack]);
@@ -1498,7 +1500,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     std::vector<const reco::BaseTagInfo*>  baseTagInfos_test;
     JetTagComputer::TagInfoHelper helper_test(baseTagInfos_test);
     baseTagInfos_test.push_back( pjet->tagInfoTrackIP("impactParameter") );
-    baseTagInfos_test.push_back( pjet->tagInfoSecondaryVertex("secondaryVertex") );
+    baseTagInfos_test.push_back( pjet->tagInfoSecondaryVertex(svTagInfos_.c_str()) );
     TaggingVariableList vars_test = computer->taggingVariables(helper_test);
     float JetVtxCategory = -9999.;
     if(vars_test.checkTag(reco::btau::vertexCategory)) JetVtxCategory = ( vars_test.get(reco::btau::vertexCategory) );
@@ -1851,16 +1853,16 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     }
 
     //*****************************************************************
-    //get track Histories  associated to sec. vertex (for simple SV)
+    //get track Histories  associated to sec. vertex
     //*****************************************************************
     JetInfo[iJetColl].Jet_histSvx[JetInfo[iJetColl].nJet] = 0;
     JetInfo[iJetColl].Jet_nFirstSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
-    JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]  = pjet->tagInfoSecondaryVertex("secondaryVertex")->nVertices();
+    JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]  = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->nVertices();
 
     std::vector<const reco::BaseTagInfo*>  baseTagInfos;
     JetTagComputer::TagInfoHelper helper(baseTagInfos);
     baseTagInfos.push_back( pjet->tagInfoTrackIP("impactParameter") );
-    baseTagInfos.push_back( pjet->tagInfoSecondaryVertex("secondaryVertex") );
+    baseTagInfos.push_back( pjet->tagInfoSecondaryVertex(svTagInfos_.c_str()) );
 
     TaggingVariableList vars = computer->taggingVariables(helper);
 
@@ -1874,23 +1876,23 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     if ( JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet] > 0 )
     {
 
-      JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).x();
-      JetInfo[iJetColl].SV_y[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).y();
-      JetInfo[iJetColl].SV_z[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).z();
-      JetInfo[iJetColl].SV_ex[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).xError();
-      JetInfo[iJetColl].SV_ey[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).yError();
-      JetInfo[iJetColl].SV_ez[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).zError();
-      JetInfo[iJetColl].SV_chi2[JetInfo[iJetColl].nSV] = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).chi2();
-      JetInfo[iJetColl].SV_ndf[JetInfo[iJetColl].nSV]  = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).ndof();
+      JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->secondaryVertex(0).x();
+      JetInfo[iJetColl].SV_y[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->secondaryVertex(0).y();
+      JetInfo[iJetColl].SV_z[JetInfo[iJetColl].nSV]    = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->secondaryVertex(0).z();
+      JetInfo[iJetColl].SV_ex[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->secondaryVertex(0).xError();
+      JetInfo[iJetColl].SV_ey[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->secondaryVertex(0).yError();
+      JetInfo[iJetColl].SV_ez[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->secondaryVertex(0).zError();
+      JetInfo[iJetColl].SV_chi2[JetInfo[iJetColl].nSV] = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->secondaryVertex(0).chi2();
+      JetInfo[iJetColl].SV_ndf[JetInfo[iJetColl].nSV]  = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->secondaryVertex(0).ndof();
 
-      //cout << "pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).ndof() " << pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).ndof() << endl;
+      //cout << "pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->secondaryVertex(0).ndof() " << pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->secondaryVertex(0).ndof() << endl;
 
-      JetInfo[iJetColl].SV_flight[JetInfo[iJetColl].nSV]	  = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(0).value();
-      JetInfo[iJetColl].SV_flightErr[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(0).error();
-      JetInfo[iJetColl].SV_flight2D[JetInfo[iJetColl].nSV]	  = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(0, true).value();
-      JetInfo[iJetColl].SV_flight2DErr[JetInfo[iJetColl].nSV] = pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDistance(0, true).error();
-      JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = pjet->tagInfoSecondaryVertex("secondaryVertex")->nVertexTracks();
-      JetInfo[iJetColl].SV_nTrk_firstVxt[JetInfo[iJetColl].nSV] =  pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0).tracksSize();
+      JetInfo[iJetColl].SV_flight[JetInfo[iJetColl].nSV]	  = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->flightDistance(0).value();
+      JetInfo[iJetColl].SV_flightErr[JetInfo[iJetColl].nSV]   = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->flightDistance(0).error();
+      JetInfo[iJetColl].SV_flight2D[JetInfo[iJetColl].nSV]	  = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->flightDistance(0, true).value();
+      JetInfo[iJetColl].SV_flight2DErr[JetInfo[iJetColl].nSV] = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->flightDistance(0, true).error();
+      JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->nVertexTracks();
+      JetInfo[iJetColl].SV_nTrk_firstVxt[JetInfo[iJetColl].nSV] =  pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->secondaryVertex(0).tracksSize();
 
       // ------------------------added by Camille ---------------------------------------------------------------------------------------//
 
@@ -1911,14 +1913,14 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
       Int_t totcharge=0;
       TrackKinematics vertexKinematics;
 
-      const Vertex &vertex = pjet->tagInfoSecondaryVertex("secondaryVertex")->secondaryVertex(0);
+      const Vertex &vertex = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->secondaryVertex(0);
 
       Bool_t hasRefittedTracks = vertex.hasRefittedTracks();
 
-      TrackRefVector vertexTracks = pjet->tagInfoSecondaryVertex("secondaryVertex")->vertexTracks(0);
+      TrackRefVector vertexTracks = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->vertexTracks(0);
       for(TrackRefVector::const_iterator track = vertexTracks.begin();
           track != vertexTracks.end(); ++track) {
-        Double_t w = pjet->tagInfoSecondaryVertex("secondaryVertex")->trackWeight(0, *track);
+        Double_t w = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->trackWeight(0, *track);
         if (w < 0.5)
           continue;
         if (hasRefittedTracks) {
@@ -1940,7 +1942,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
         ? vertexKinematics.weightedVectorSum()
         : vertexKinematics.vectorSum();
 
-      math::XYZTLorentzVector flightDir( pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDirection(0).x(), pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDirection(0).y(), pjet->tagInfoSecondaryVertex("secondaryVertex")->flightDirection(0).z(), 0  );
+      math::XYZTLorentzVector flightDir( pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->flightDirection(0).x(), pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->flightDirection(0).y(), pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->flightDirection(0).z(), 0  );
       JetInfo[iJetColl].SV_deltaR_sum_jet[JetInfo[iJetColl].nSV] = ( Geom::deltaR(vertexSum, jetDir) );
       JetInfo[iJetColl].SV_deltaR_sum_dir[JetInfo[iJetColl].nSV] = ( Geom::deltaR( flightDir, vertexSum ) );
       JetInfo[iJetColl].SV_vtx_pt[JetInfo[iJetColl].nSV] = vertex.p4().pt();
@@ -1972,7 +1974,7 @@ void BTagAnalyzer::processJets(const edm::Handle<PatJetCollection>& jetsColl, co
     cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
     can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
 
-    TrackRefVector svxPostracks( pjet->tagInfoSecondaryVertex("secondaryVertex")->vertexTracks(0) );
+    TrackRefVector svxPostracks( pjet->tagInfoSecondaryVertex(svTagInfos_.c_str())->vertexTracks(0) );
 
     //*****************************************************************
     // for Mistag studies

@@ -100,7 +100,7 @@ options.register('minNumberOfHits', 8,
 )
 
 ## 'maxEvents' is already registered by the Framework, changing default value
-options.setDefault('maxEvents', 10)
+options.setDefault('maxEvents', 100)
 
 options.parseArguments()
 
@@ -679,6 +679,9 @@ process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
 process.btagana.MaxEta                = cms.double(4.2) ## for extended forward pixel coverage
 process.btagana.MinPt                 = cms.double(20.0)
 #process.btagana.triggerTable         = cms.InputTag('TriggerResults::HLT') # Data and MC
+#Configure here which sv taginfos to store in the SV_xxx branches
+process.btagana.svTagInfos = cms.string('inclusiveSecondaryVertexFinder')
+process.btagana.svComputer = cms.InputTag('combinedSecondaryVertexIVFV2')
 
 if options.runSubJets:
     process.btaganaSubJets = process.btagana.clone(

@@ -196,6 +196,8 @@ class BTagAnalyzer : public edm::EDAnalyzer
     edm::InputTag FatJetCollectionTag_;
     edm::InputTag PrunedFatJetCollectionTag_;
 
+    std::string svTagInfos_;
+
     std::string jetPBJetTags_;
     std::string jetPNegBJetTags_;
     std::string jetPPosBJetTags_;
