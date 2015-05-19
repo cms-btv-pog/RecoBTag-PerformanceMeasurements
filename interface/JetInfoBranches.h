@@ -85,6 +85,12 @@ class JetInfoBranches {
     float Jet_jecF0Pruned[nMaxJets_];
     float Jet_tau1[nMaxJets_];
     float Jet_tau2[nMaxJets_];
+    float Jet_tauAxis1_px[nMaxJets_];
+    float Jet_tauAxis1_py[nMaxJets_];
+    float Jet_tauAxis1_pz[nMaxJets_];
+    float Jet_tauAxis2_px[nMaxJets_];
+    float Jet_tauAxis2_py[nMaxJets_];
+    float Jet_tauAxis2_pz[nMaxJets_];
     int   Jet_nFirstTrkTagVar[nMaxJets_];
     int   Jet_nLastTrkTagVar[nMaxJets_];
     int   Jet_nFirstSVTagVar[nMaxJets_];
@@ -200,6 +206,10 @@ class JetInfoBranches {
     float SV_mass[nMaxSVs_];
     float SV_vtx_eta[nMaxSVs_];
     float SV_vtx_phi[nMaxSVs_];
+    float SV_EnergyRatio[nMaxSVs_];
+    float SV_dir_x[nMaxSVs_];
+    float SV_dir_y[nMaxSVs_];
+    float SV_dir_z[nMaxSVs_];
 
     // TagInfo TaggingVariables
     // per jet
@@ -432,6 +442,10 @@ class JetInfoBranches {
       tree->Branch((name+"SV_mass").c_str()            ,SV_mass            ,(name+"SV_mass["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_vtx_eta").c_str()         ,SV_vtx_eta         ,(name+"SV_vtx_eta["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_vtx_phi").c_str()         ,SV_vtx_phi         ,(name+"SV_vtx_phi["+name+"nSV]/F").c_str());
+      tree->Branch((name+"SV_EnergyRatio").c_str()     ,SV_EnergyRatio     ,(name+"SV_EnergyRatio ["+name+"nSV]/F").c_str());
+      tree->Branch((name+"SV_dir_x").c_str()           ,SV_dir_x           ,(name+"SV_dir_x ["+name+"nSV]/F").c_str());
+      tree->Branch((name+"SV_dir_y").c_str()           ,SV_dir_y           ,(name+"SV_dir_y ["+name+"nSV]/F").c_str());
+      tree->Branch((name+"SV_dir_z").c_str()           ,SV_dir_z           ,(name+"SV_dir_z ["+name+"nSV]/F").c_str());
     }
 
     void RegisterJetTrackTree(TTree *tree, std::string name="") {
@@ -602,6 +616,12 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_jecF0Pruned").c_str(), Jet_jecF0Pruned ,(name+"Jet_jecF0Pruned["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_tau1").c_str(),        Jet_tau1        ,(name+"Jet_tau1["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_tau2").c_str(),        Jet_tau2        ,(name+"Jet_tau2["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_tauAxis1_px").c_str(), Jet_tauAxis1_px ,(name+"Jet_tauAxis1_px["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_tauAxis1_py").c_str(), Jet_tauAxis1_py ,(name+"Jet_tauAxis1_py["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_tauAxis1_pz").c_str(), Jet_tauAxis1_pz ,(name+"Jet_tauAxis1_pz["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_tauAxis2_px").c_str(), Jet_tauAxis2_px ,(name+"Jet_tauAxis2_px["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_tauAxis2_py").c_str(), Jet_tauAxis2_py ,(name+"Jet_tauAxis2_py["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_tauAxis2_pz").c_str(), Jet_tauAxis2_pz ,(name+"Jet_tauAxis2_pz["+name+"nJet]/F").c_str());
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -748,6 +768,10 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"SV_mass").c_str()            ,SV_mass            ) ;
       tree->SetBranchAddress((name+"SV_vtx_eta").c_str()         ,SV_vtx_eta         ) ;
       tree->SetBranchAddress((name+"SV_vtx_phi").c_str()         ,SV_vtx_phi         ) ;
+      tree->SetBranchAddress((name+"SV_EnergyRatio").c_str()     ,SV_EnergyRatio     ) ;
+      tree->SetBranchAddress((name+"SV_dir_x").c_str()           ,SV_dir_x           ) ;
+      tree->SetBranchAddress((name+"SV_dir_y").c_str()           ,SV_dir_y           ) ;
+      tree->SetBranchAddress((name+"SV_dir_z").c_str()           ,SV_dir_z           ) ;
     }
 
     void ReadJetTrackTree(TTree *tree, std::string name="") {
@@ -919,6 +943,12 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_jecF0Pruned").c_str(), Jet_jecF0Pruned );
       tree->SetBranchAddress((name+"Jet_tau1").c_str(),        Jet_tau1        );
       tree->SetBranchAddress((name+"Jet_tau2").c_str(),        Jet_tau2        );
+      tree->SetBranchAddress((name+"Jet_tauAxis1_px").c_str(),  Jet_tauAxis1_px  );
+      tree->SetBranchAddress((name+"Jet_tauAxis1_py").c_str(),  Jet_tauAxis1_py  );
+      tree->SetBranchAddress((name+"Jet_tauAxis1_pz").c_str(),  Jet_tauAxis1_pz  );
+      tree->SetBranchAddress((name+"Jet_tauAxis2_px").c_str(),  Jet_tauAxis2_px  );
+      tree->SetBranchAddress((name+"Jet_tauAxis2_py").c_str(),  Jet_tauAxis2_py  );
+      tree->SetBranchAddress((name+"Jet_tauAxis2_pz").c_str(),  Jet_tauAxis2_pz  );
     }
 };
 

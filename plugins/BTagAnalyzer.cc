@@ -112,6 +112,9 @@
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
+
+#include "fastjet/contrib/Njettiness.hh"
+
 //
 // constants, enums and typedefs
 //
@@ -230,6 +233,8 @@ private:
   void processJets(const edm::Handle<PatJetCollection>&, const edm::Handle<PatJetCollection>&,
 		   const std::vector<edm::Handle<PatJetCollection> >&,
 		   const edm::Event&, const edm::EventSetup&, const int) ;
+  
+  void recalcNsubjettiness(const pat::Jet & jet, float & tau1, float & tau2, std::vector<fastjet::PseudoJet> & currentAxes) const;
   
   int isFromGSP(const reco::Candidate* c);
   
@@ -382,8 +387,13 @@ private:
   PFJetIDSelectionFunctor pfjetIDLoose_;
   PFJetIDSelectionFunctor pfjetIDTight_;
 
-  // helper classes for associating PF candidates to jets
+  // helper class for associating PF candidates to jets
   IPProducerHelpers::FromJetAndCands m_helper;
+
+  const double beta_;
+  const double R0_;
+  // N-subjettiness calculator
+  fastjet::contrib::Njettiness njettiness_;
 };
 
 template<typename IPTI,typename VTX>
@@ -415,7 +425,10 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   hadronizerType_(0),
   pfjetIDLoose_( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE ),
   pfjetIDTight_( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT ),
-  m_helper(iConfig, consumesCollector(),"Jets")
+  m_helper(iConfig, consumesCollector(),"Jets"),
+  beta_(iConfig.getParameter<double>("beta")),
+  R0_(iConfig.getParameter<double>("R0")),
+  njettiness_(fastjet::contrib::OnePass_KT_Axes(), fastjet::contrib::NormalizedMeasure(beta_,R0_))
 {
   //now do what ever initialization you need
   std::string module_type  = iConfig.getParameter<std::string>("@module_type");
@@ -1589,6 +1602,31 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     const reco::CandSoftLeptonTagInfo *softPFMuTagInfo = pjet->tagInfoCandSoftLepton(softPFMuonTagInfos_.c_str());
     const reco::CandSoftLeptonTagInfo *softPFElTagInfo = pjet->tagInfoCandSoftLepton(softPFElectronTagInfos_.c_str());
 
+    // Re-calculate N-subjettiness
+    if ( runFatJets_ && iJetColl == 0 )
+    {
+      float tau1 = JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet];
+      float tau2 = JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet];
+      std::vector<fastjet::PseudoJet> currentAxes;
+
+      // re-calculate N-subjettiness
+      recalcNsubjettiness(*pjet,tau1,tau2,currentAxes);
+
+      // store N-subjettiness axes
+      if(currentAxes.size()>0)
+      {
+        JetInfo[iJetColl].Jet_tauAxis1_px[JetInfo[iJetColl].nJet] = currentAxes[0].px();
+        JetInfo[iJetColl].Jet_tauAxis1_py[JetInfo[iJetColl].nJet] = currentAxes[0].py();
+        JetInfo[iJetColl].Jet_tauAxis1_pz[JetInfo[iJetColl].nJet] = currentAxes[0].pz();
+      }
+      if(currentAxes.size()>1)
+      {
+        JetInfo[iJetColl].Jet_tauAxis2_px[JetInfo[iJetColl].nJet] = currentAxes[1].px();
+        JetInfo[iJetColl].Jet_tauAxis2_py[JetInfo[iJetColl].nJet] = currentAxes[1].py();
+        JetInfo[iJetColl].Jet_tauAxis2_pz[JetInfo[iJetColl].nJet] = currentAxes[1].pz();
+      }
+    }
+
     //*****************************************************************
     // Taggers
     //*****************************************************************
@@ -1607,6 +1645,8 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         std::sort(subjets[SubJetLabels_[i]].begin(), subjets[SubJetLabels_[i]].end(), orderByPt("Uncorrected"));
       }
     }
+
+    reco::TrackKinematics allKinematics;
 
     const Tracks & selectedTracks( ipTagInfo->selectedTracks() );
     const Tracks & tracks = toAllTracks(*pjet,ipTagInfos_,iJetColl);
@@ -1720,6 +1760,10 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         setTracksPV(ptrackRef, primaryVertex,
                     JetInfo[iJetColl].Track_PV[JetInfo[iJetColl].nTrack],
                     JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]);
+
+        if(JetInfo[iJetColl].Track_PV[JetInfo[iJetColl].nTrack]==0 &&
+           JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]>0) { allKinematics.add(ptrack, JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]); }
+
 
         if( pjet->hasTagInfo(svTagInfos_.c_str()) )
         {
@@ -2449,6 +2493,12 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       // now compute the distance between the two lines
       JetInfo[iJetColl].SV_vtxDistJetAxis[JetInfo[iJetColl].nSV] = (jetline.distance(trackline)).mag();
 
+      math::XYZTLorentzVector allSum = allKinematics.weightedVectorSum() ; // allKinematics.vectorSum()
+      JetInfo[iJetColl].SV_EnergyRatio[JetInfo[iJetColl].nSV]= vertexSum.E() / allSum.E();
+
+      JetInfo[iJetColl].SV_dir_x[JetInfo[iJetColl].nSV]= flightDir.x();
+      JetInfo[iJetColl].SV_dir_y[JetInfo[iJetColl].nSV]= flightDir.y();
+      JetInfo[iJetColl].SV_dir_z[JetInfo[iJetColl].nSV]= flightDir.z();
 
       ++JetInfo[iJetColl].nSV;
 
@@ -3162,6 +3212,27 @@ void BTagAnalyzerT<IPTI,VTX>::matchGroomedJets(const edm::Handle<PatJetCollectio
 
      matchedIndices.push_back( matchedIndex != jetIndices.end() ? std::distance(jetIndices.begin(),matchedIndex) : -1 );
    }
+}
+
+// -------------- recalcNsubjettiness ----------------
+template<typename IPTI,typename VTX>
+void BTagAnalyzerT<IPTI,VTX>::recalcNsubjettiness(const pat::Jet & jet, float & tau1, float & tau2, std::vector<fastjet::PseudoJet> & currentAxes) const
+{
+  std::vector<fastjet::PseudoJet> fjParticles;
+
+  // loop over jet constituents and push them in the vector of FastJet constituents
+  for(const reco::CandidatePtr & daughter : jet.daughterPtrVector())
+  {
+    if ( daughter.isNonnull() && daughter.isAvailable() )
+      fjParticles.push_back( fastjet::PseudoJet( daughter->px(), daughter->py(), daughter->pz(), daughter->energy() ) );
+    else
+      edm::LogWarning("MissingJetConstituent") << "Jet constituent required for N-subjettiness computation is missing!";
+  }
+
+  // calculate N-subjettiness
+  tau1 = njettiness_.getTau(1, fjParticles);
+  tau2 = njettiness_.getTau(2, fjParticles);
+  currentAxes = njettiness_.currentAxes();
 }
 
 // -------------- template specializations --------------------

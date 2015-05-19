@@ -33,6 +33,8 @@ bTagAnalyzerCommon = cms.PSet(
     explicitJTA              = cms.bool(False),
     use_ttbar_filter         = cms.bool(False),
     channel                  = cms.InputTag("ttbarselectionproducer"),
+    beta                     = cms.double(1.0),
+    R0                       = cms.double(0.8),
     TriggerPathNames = cms.vstring(
         "HLT_Jet15U*",
         "HLT_Jet30_v*",

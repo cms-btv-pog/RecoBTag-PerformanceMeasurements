@@ -883,6 +883,7 @@ if options.runFatJets:
         allowJetSkipping    = cms.bool(False),
         useSelectedTracks   = cms.bool(True),
         maxDeltaR           = cms.double(options.jetRadius),
+        R0                  = cms.double(options.jetRadius),
         BranchNamePrefix    = cms.string('FatJetInfo'),
         Jets                = cms.InputTag('packedPatJetsPFCHS'),
         SubJets             = cms.VInputTag(),
