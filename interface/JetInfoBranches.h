@@ -324,8 +324,8 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_CombSvx").c_str(),     Jet_CombSvx    ,(name+"Jet_CombSvx["+name+"nJet]/F").c_str());
 
       tree->Branch((name+"Jet_CombIVF").c_str(),     Jet_CombIVF     ,(name+"Jet_CombIVF["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_CombIVF_P").c_str(), Jet_CombIVF_P   ,(name+"Jet_CombIVF_P["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_CombIVF_N").c_str(), Jet_CombIVF_N   ,(name+"Jet_CombIVF_N["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_CombIVF_P").c_str(),   Jet_CombIVF_P   ,(name+"Jet_CombIVF_P["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_CombIVF_N").c_str(),   Jet_CombIVF_N   ,(name+"Jet_CombIVF_N["+name+"nJet]/F").c_str());
 
       tree->Branch((name+"Jet_SoftMuN").c_str(),     Jet_SoftMuN     ,(name+"Jet_SoftMuN["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_SoftMuP").c_str(),     Jet_SoftMuP     ,(name+"Jet_SoftMuP["+name+"nJet]/F").c_str());
@@ -640,12 +640,12 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_CombSvx").c_str(),     Jet_CombSvx     );
 
       tree->SetBranchAddress((name+"Jet_CombIVF").c_str(),     Jet_CombIVF     );
-      tree->SetBranchAddress((name+"Jet_CombIVF_P").c_str(), Jet_CombIVF_P   );
-      tree->SetBranchAddress((name+"Jet_CombIVF_N").c_str(), Jet_CombIVF_N   );
+      tree->SetBranchAddress((name+"Jet_CombIVF_P").c_str(),   Jet_CombIVF_P   );
+      tree->SetBranchAddress((name+"Jet_CombIVF_N").c_str(),   Jet_CombIVF_N   );
 
-      tree->SetBranchAddress((name+"Jet_SoftMuN").c_str(), Jet_SoftMuN     );
-      tree->SetBranchAddress((name+"Jet_SoftMuP").c_str(), Jet_SoftMuP     );
-      tree->SetBranchAddress((name+"Jet_SoftMu").c_str(),  Jet_SoftMu      );
+      tree->SetBranchAddress((name+"Jet_SoftMuN").c_str(),     Jet_SoftMuN     );
+      tree->SetBranchAddress((name+"Jet_SoftMuP").c_str(),     Jet_SoftMuP     );
+      tree->SetBranchAddress((name+"Jet_SoftMu").c_str(),      Jet_SoftMu      );
 
       tree->SetBranchAddress((name+"Jet_SoftElN").c_str(),     Jet_SoftElN     );
       tree->SetBranchAddress((name+"Jet_SoftElP").c_str(),     Jet_SoftElP     );
