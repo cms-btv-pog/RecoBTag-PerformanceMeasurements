@@ -524,7 +524,7 @@ if options.runFatJets:
         muSource = cms.InputTag(muSource),
         elSource = cms.InputTag(elSource),
         btagInfos = bTagInfos,
-        btagDiscriminators = bTagDiscriminators,
+        btagDiscriminators = (bTagDiscriminators + ([] if options.useLegacyTaggers else ['pfBoostedDoubleSecondaryVertexAK8BJetTags'])),
         jetCorrections = jetCorrectionsAK8,
         genJetCollection = cms.InputTag('genJetsNoNu'),
         genParticles = cms.InputTag(genParticles),
