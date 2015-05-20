@@ -120,7 +120,7 @@ options.register('runIVF', False, # needs to be set to True when running over 7X
     VarParsing.varType.bool,
     "Run IVF"
 )
-options.register('useSoftDrop', False,
+options.register('useSoftDrop', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Use SoftDrop jets"
