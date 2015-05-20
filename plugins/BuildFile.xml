@@ -24,6 +24,7 @@
   <use name="RecoBTag/PerformanceMeasurements"/>
   <use name="DataFormats/PatCandidates"/>
   <use name="fastjet"/>
+  <use name="fastjet-contrib"/>
   <flags EDM_PLUGIN="1"/>
   #<flags CXXFLAGS="-O0 -g -fno-inline"/>
 </library>
