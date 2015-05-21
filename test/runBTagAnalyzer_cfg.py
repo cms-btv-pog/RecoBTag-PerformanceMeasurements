@@ -120,7 +120,7 @@ options.register('runIVF', False, # needs to be set to True when running over 7X
     VarParsing.varType.bool,
     "Run IVF"
 )
-options.register('useSoftDrop', False,
+options.register('useSoftDrop', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Use SoftDrop jets"
@@ -887,6 +887,7 @@ if options.runFatJets:
         useSelectedTracks   = cms.bool(True),
         maxDeltaR           = cms.double(options.jetRadius),
         R0                  = cms.double(options.jetRadius),
+        maxSVDeltaRToJet    = cms.double(options.jetRadius-(0.1+(options.jetRadius-0.8)*(0.1/0.7))), # linear interpolation from 0.7 at R=0.8 to 1.3 at R=1.5
         BranchNamePrefix    = cms.string('FatJetInfo'),
         Jets                = cms.InputTag('packedPatJetsPFCHS'),
         SubJets             = cms.VInputTag(),

@@ -303,7 +303,6 @@ private:
   std::string softPFElectronPosBJetTags_;
   
   std::string doubleSVBJetTags_;
-
   std::string ipTagInfos_;
   std::string svTagInfos_;
   std::string svNegTagInfos_;
@@ -432,7 +431,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   m_helper(iConfig, consumesCollector(),"Jets"),
   beta_(iConfig.getParameter<double>("beta")),
   R0_(iConfig.getParameter<double>("R0")),
-  njettiness_(fastjet::contrib::OnePass_KT_Axes(), fastjet::contrib::NormalizedMeasure(beta_,R0_)), 
+  njettiness_(fastjet::contrib::OnePass_KT_Axes(), fastjet::contrib::NormalizedMeasure(beta_,R0_)),
   maxSVDeltaRToJet_(iConfig.getParameter<double>("maxSVDeltaRToJet"))
 {
   //now do what ever initialization you need
@@ -1610,11 +1609,11 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     const reco::CandSoftLeptonTagInfo *softPFElTagInfo = pjet->tagInfoCandSoftLepton(softPFElectronTagInfos_.c_str());
 
     // Re-calculate N-subjettiness
+    std::vector<fastjet::PseudoJet> currentAxes;
     if ( runFatJets_ && iJetColl == 0 )
     {
       float tau1 = JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet];
       float tau2 = JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet];
-      std::vector<fastjet::PseudoJet> currentAxes;
 
       // re-calculate N-subjettiness
       recalcNsubjettiness(*pjet,tau1,tau2,currentAxes);
@@ -1980,13 +1979,14 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_nLastTrack[JetInfo[iJetColl].nJet]   = JetInfo[iJetColl].nTrack;
     JetInfo[iJetColl].Jet_nLastTrkInc[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nTrkInc;
 
-    int nSM = (pjet->hasTagInfo(softPFMuonTagInfos_.c_str()) ? softPFMuTagInfo->leptons() : 0);
-    JetInfo[iJetColl].Jet_nSM[JetInfo[iJetColl].nJet] = nSM;
-
     float PFLepton_ptrel = -1., PFLepton_IP2D = -1.;
 
     // PFMuon information
-    for (unsigned int leptIdx = 0; leptIdx < (pjet->hasTagInfo(softPFMuonTagInfos_.c_str()) ? softPFMuTagInfo->leptons() : 0); ++leptIdx) {
+    int nSM = (pjet->hasTagInfo(softPFMuonTagInfos_.c_str()) ? softPFMuTagInfo->leptons() : 0);
+    JetInfo[iJetColl].Jet_nSM[JetInfo[iJetColl].nJet] = nSM;
+    JetInfo[iJetColl].Jet_nFirstSM[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFMuon;
+
+    for (size_t leptIdx = 0; leptIdx < (size_t)nSM; ++leptIdx) {
 
       JetInfo[iJetColl].PFMuon_IdxJet[JetInfo[iJetColl].nPFMuon]    = JetInfo[iJetColl].nJet;
       JetInfo[iJetColl].PFMuon_pt[JetInfo[iJetColl].nPFMuon]        = softPFMuTagInfo->lepton(leptIdx)->pt();
@@ -2059,15 +2059,21 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       ++JetInfo[iJetColl].nPFMuon;
     }
 
-    int nSE = (pjet->hasTagInfo(softPFElectronTagInfos_.c_str()) ? softPFElTagInfo->leptons() : 0);
-    JetInfo[iJetColl].Jet_nSE[JetInfo[iJetColl].nJet] = nSE;
 
     float SoftE  = pjet->bDiscriminator(softPFElectronBJetTags_.c_str());
     float SoftEN = pjet->bDiscriminator(softPFElectronNegBJetTags_.c_str());
     float SoftEP = pjet->bDiscriminator(softPFElectronPosBJetTags_.c_str());
 
+    JetInfo[iJetColl].Jet_nLastSM[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFMuon;
+
+    float DoubleSV = pjet->bDiscriminator(doubleSVBJetTags_.c_str());
+
     // PFElectron information
-    for (unsigned int leptIdx = 0; leptIdx < (pjet->hasTagInfo(softPFElectronTagInfos_.c_str()) ? softPFElTagInfo->leptons() : 0); ++leptIdx) {
+    int nSE = (pjet->hasTagInfo(softPFElectronTagInfos_.c_str()) ? softPFElTagInfo->leptons() : 0);
+    JetInfo[iJetColl].Jet_nSE[JetInfo[iJetColl].nJet] = nSE;
+    JetInfo[iJetColl].Jet_nFirstSE[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFElectron;
+
+    for (size_t leptIdx = 0; leptIdx < (size_t)nSE; ++leptIdx) {
 
       JetInfo[iJetColl].PFElectron_IdxJet[JetInfo[iJetColl].nPFElectron]    = JetInfo[iJetColl].nJet;
       JetInfo[iJetColl].PFElectron_pt[JetInfo[iJetColl].nPFElectron]        = softPFElTagInfo->lepton(leptIdx)->pt();
@@ -2089,6 +2095,10 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
       ++JetInfo[iJetColl].nPFElectron;
     }
+    JetInfo[iJetColl].Jet_nLastSE[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFElectron;
+
+    JetInfo[iJetColl].Jet_PFLepton_ptrel[JetInfo[iJetColl].nJet] = PFLepton_ptrel;
+    JetInfo[iJetColl].Jet_PFLepton_IP2D[JetInfo[iJetColl].nJet]  = PFLepton_IP2D;
 
     JetInfo[iJetColl].Jet_PFLepton_ptrel[JetInfo[iJetColl].nJet] = PFLepton_ptrel;
     JetInfo[iJetColl].Jet_PFLepton_IP2D[JetInfo[iJetColl].nJet]  = PFLepton_IP2D;
@@ -2118,8 +2128,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float SoftM  = pjet->bDiscriminator(softPFMuonBJetTags_.c_str());
     float SoftMN = pjet->bDiscriminator(softPFMuonNegBJetTags_.c_str());
     float SoftMP = pjet->bDiscriminator(softPFMuonPosBJetTags_.c_str());
-
-    float DoubleSV = pjet->bDiscriminator(doubleSVBJetTags_.c_str());
 
     // Jet information
     JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet]   = ProbaN;
@@ -2473,9 +2481,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_nFirstSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
     JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]  = svTagInfo->nVertices();
 
-    std::map<double, size_t> VTXmass;
     // if secondary vertices present
-    for (int vtx = 0; vtx < JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]; ++vtx )
+    std::map<double, size_t> VTXmass;
+    for (size_t vtx = 0; vtx < (size_t)JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]; ++vtx)
     {
 
       JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).x();
