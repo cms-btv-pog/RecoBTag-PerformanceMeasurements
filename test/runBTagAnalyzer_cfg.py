@@ -282,18 +282,21 @@ process.MessageLogger.cerr.default.limit = 10
 ## Input files
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        '/store/relval/CMSSW_7_4_0_pre8/RelValZpTT_1500_13TeV/GEN-SIM-RECO/MCRUN2_74_V7-v1/00000/58F8AA88-4BBD-E411-95D4-0025905A48F0.root'
+        #'/store/relval/CMSSW_7_4_0_pre8/RelValZpTT_1500_13TeV/GEN-SIM-RECO/MCRUN2_74_V7-v1/00000/58F8AA88-4BBD-E411-95D4-0025905A48F0.root'
         #'file:/nfs/dust/cms/user/marchesi/74Xdev/testfile/22E552FD-23B7-E411-B680-002618943911.root'
+        '/store/user/devdatta/TprimeJetToTH_M800GeV_Tune4C_13TeV-madgraph-tauola/TprimeJetToTH_M800GeV_NewRECO/150520_081248/0000/TprimeJetToTH_M800GeV_Tune4C_13TeV-madgraph-tauola_RECO_1.root'
     )
 )
 if options.miniAOD:
     process.source.fileNames = [
-        '/store/relval/CMSSW_7_4_0_pre8/RelValZpTT_1500_13TeV/MINIAODSIM/MCRUN2_74_V7-v1/00000/9008F5B0-54BD-E411-96FB-0025905A6110.root'
+        #'/store/relval/CMSSW_7_4_0_pre8/RelValZpTT_1500_13TeV/MINIAODSIM/MCRUN2_74_V7-v1/00000/9008F5B0-54BD-E411-96FB-0025905A6110.root'
         #'file:/nfs/dust/cms/user/marchesi/74Xdev/testfile/B62A3865-39B7-E411-B76A-002618943880.root'
+        '/store/user/devdatta/TprimeJetToTH_M800GeV_Tune4C_13TeV-madgraph-tauola/TprimeJetToTH_M800GeV_miniAOD/150521_093434/0000/TprimeJetToTH_M800GeV_Tune4C_13TeV-madgraph-tauola_MiniAOD_1.root'
     ]
 if options.runOnData:
     process.source.fileNames = [
-        '/store/relval/CMSSW_7_4_0_pre7/SingleMu/RECO/GR_R_74_V8A_RelVal_mu2012D-v1/00000/004E151D-D8B6-E411-A889-0025905B859E.root'
+        #'/store/relval/CMSSW_7_4_0_pre7/SingleMu/RECO/GR_R_74_V8A_RelVal_mu2012D-v1/00000/004E151D-D8B6-E411-A889-0025905B859E.root'
+        '/store/relval/CMSSW_7_4_0_pre9_ROOT6/JetHT/RECO/GR_R_74_V8_1Apr_RelVal_jht2012D-v1/00000/00D54B37-5BD9-E411-9BC0-002618943807.root'
     ]
 if options.fastSim:
     process.source.fileNames = [
@@ -524,7 +527,7 @@ if options.runFatJets:
         muSource = cms.InputTag(muSource),
         elSource = cms.InputTag(elSource),
         btagInfos = bTagInfos,
-        btagDiscriminators = bTagDiscriminators,
+        btagDiscriminators = (bTagDiscriminators + ([] if options.useLegacyTaggers else ['pfBoostedDoubleSecondaryVertexAK8BJetTags'])),
         jetCorrections = jetCorrectionsAK8,
         genJetCollection = cms.InputTag('genJetsNoNu'),
         genParticles = cms.InputTag(genParticles),
