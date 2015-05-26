@@ -3,12 +3,13 @@
     // Declare the root files on which you want to run  (MC & Data) :
     TChain *superTree = new TChain("btagana/ttree");
 
-    int config_ch = 2;
+    int config_ch = 1;
     cout << " which config? from 1 to 6 for QCD and from 7 to 9 for TTbar " << endl;
     cin >> config_ch ;
     cout << " config choisie " << config_ch << endl;
     // MC
-    if (config_ch==1) superTree->Add("/opt/sbg/data/data5/cms/ccollard/BTag/BTagAnalyzerNtuples/RunIWinter15DR/QCD/QCD50to80_8TeVPythia6_NoPU.root");
+    if (config_ch==1) superTree->Add("root://cms-xrd-global.cern.ch///store/user/eschmitz/BTV/RecoBTag/QCD_Pt-15TTo7000_TuneZ2star-Flat_13TeV_pythia6/crab_RecoBTag_QCD_15To7000_50ns_3/150523_215640/0000/JetTree_mc_subjets_9.root");
+    //if (config_ch==1) superTree->Add("/opt/sbg/data/data5/cms/ccollard/BTag/BTagAnalyzerNtuples/RunIWinter15DR/QCD/QCD50to80_8TeVPythia6_NoPU.root");
     else if (config_ch==2) superTree->Add("/opt/sbg/data/data5/cms/ccollard/BTag/BTagAnalyzerNtuples/RunIWinter15DR/QCD/QCD50to80_8TeVPythia6_PU.root");
     else if (config_ch==3) superTree->Add("/opt/sbg/data/data5/cms/ccollard/BTag/BTagAnalyzerNtuples/RunIWinter15DR/QCD/QCD50to80_8TeVPythia8_NoPU.root");
     else if (config_ch==4) superTree->Add("/opt/sbg/data/data5/cms/ccollard/BTag/BTagAnalyzerNtuples/RunIWinter15DR/QCD/QCD50to80_8TeVPythia8_PU.root");
