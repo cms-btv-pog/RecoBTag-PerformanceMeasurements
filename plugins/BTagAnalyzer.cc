@@ -324,6 +324,7 @@ private:
   int selTagger_;
   bool isData_;
   bool useSelectedTracks_;
+  bool fillsvTagInfo_;
   bool produceJetTrackTree_;
   bool produceAllTrackTree_;
   bool producePtRelTemplate_;
@@ -453,6 +454,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   selTagger_ = iConfig.getParameter<int>("selTagger");
 
   useSelectedTracks_    = iConfig.getParameter<bool> ("useSelectedTracks");
+  fillsvTagInfo_    = iConfig.getParameter<bool> ("fillsvTagInfo");
   useTrackHistory_      = iConfig.getParameter<bool> ("useTrackHistory");
   produceJetTrackTree_  = iConfig.getParameter<bool> ("produceJetTrackTree");
   produceAllTrackTree_  = iConfig.getParameter<bool> ("produceAllTrackTree");
@@ -674,16 +676,16 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   //------------------------------------------------------
   EventInfo.pthat      = -1.;
   EventInfo.nPUtrue    = -1.;
-  EventInfo.nPU        = 0;
-  EventInfo.ncQuarks   = 0;
-  EventInfo.nbQuarks   = 0;
+  //  EventInfo.nPU        = 0;
+  //EventInfo.ncQuarks   = 0;
+  ///EventInfo.nbQuarks   = 0;
   EventInfo.nBHadrons  = 0;
   EventInfo.nDHadrons  = 0;
   EventInfo.nDaughters = 0;
   EventInfo.nGenV0     = 0;
   EventInfo.nGenlep    = 0;
   EventInfo.nGenquark  = 0;
-  EventInfo.nGenPruned = 0;
+  //EventInfo.nGenPruned = 0;
   EventInfo.nTrkAll    = 0;
   EventInfo.nPatMuon   = 0;
   EventInfo.mcweight   = 1.;
@@ -706,7 +708,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     std::vector<PileupSummaryInfo>::const_iterator ipu;
     for (ipu = PupInfo->begin(); ipu != PupInfo->end(); ++ipu) {
       if ( ipu->getBunchCrossing() != 0 ) continue; // storing detailed PU info only for BX=0
-      for (unsigned int i=0; i<ipu->getPU_zpositions().size(); ++i) {
+      /*for (unsigned int i=0; i<ipu->getPU_zpositions().size(); ++i) {
         EventInfo.PU_bunch[EventInfo.nPU]      =  ipu->getBunchCrossing();
         EventInfo.PU_z[EventInfo.nPU]          = (ipu->getPU_zpositions())[i];
         EventInfo.PU_sumpT_low[EventInfo.nPU]  = (ipu->getPU_sumpT_lowpT())[i];
@@ -714,9 +716,9 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
         EventInfo.PU_ntrks_low[EventInfo.nPU]  = (ipu->getPU_ntrks_lowpT())[i];
         EventInfo.PU_ntrks_high[EventInfo.nPU] = (ipu->getPU_ntrks_highpT())[i];
         ++EventInfo.nPU;
-      }
+	}*/
       EventInfo.nPUtrue = ipu->getTrueNumInteractions();
-      if(EventInfo.nPU==0) EventInfo.nPU = ipu->getPU_NumInteractions(); // needed in case getPU_zpositions() is empty
+      //if(EventInfo.nPU==0) EventInfo.nPU = ipu->getPU_NumInteractions(); // needed in case getPU_zpositions() is empty
     }
 
   //------------------------------------------------------
@@ -728,6 +730,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     edm::Handle<reco::GenParticleCollection> prunedGenParticles;
     iEvent.getByLabel(prunedGenParticleCollectionName_, prunedGenParticles);
 
+    /*
     //loop over pruned GenParticles to fill branches for MC hard process particles and muons
     for(size_t i = 0; i < prunedGenParticles->size(); ++i){
       const GenParticle & iGenPart = (*prunedGenParticles)[i];
@@ -758,7 +761,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
         EventInfo.GenPruned_mother[EventInfo.nGenPruned] = idx;
       }
       ++EventInfo.nGenPruned;
-    } //end loop over pruned genparticles
+      } //end loop over pruned genparticles*/
     
     EventInfo.GenPVz = -1000.;
 
@@ -782,7 +785,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
       }
 
       // b and c quarks from the end of parton showering and before hadronization
-      if ( ID == 4 || ID == 5 ) {
+      /*if ( ID == 4 || ID == 5 ) {
         if( nDaughters > 0 ) {
           int nparton_daughters = 0;
           for (unsigned int d=0; d<nDaughters; ++d) {
@@ -812,7 +815,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
             }
           }
         }
-      }
+	}*/
 
       if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) AreBHadrons = true;
 //       // Primary b Hadrons
@@ -2474,79 +2477,87 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     // get track histories associated to sec. vertex (for simple SV)
     //*****************************************************************
     JetInfo[iJetColl].Jet_histSvx[JetInfo[iJetColl].nJet] = 0;
-    JetInfo[iJetColl].Jet_nFirstSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
-    JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]  = svTagInfo->nVertices();
+    if (fillsvTagInfo_) JetInfo[iJetColl].Jet_nFirstSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
+    if (fillsvTagInfo_) JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]  = svTagInfo->nVertices();
 
     // if secondary vertices present
     std::map<double, size_t> VTXmass;
-    for (size_t vtx = 0; vtx < (size_t)JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]; ++vtx)
-    {
+    
+    for (size_t vtx = 0; vtx < (size_t)svTagInfo->nVertices(); ++vtx)
+      {
 
-      JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).x();
-      JetInfo[iJetColl].SV_y[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).y();
-      JetInfo[iJetColl].SV_z[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).z();
-      JetInfo[iJetColl].SV_ex[JetInfo[iJetColl].nSV]   = xError(svTagInfo->secondaryVertex(vtx));
-      JetInfo[iJetColl].SV_ey[JetInfo[iJetColl].nSV]   = yError(svTagInfo->secondaryVertex(vtx));
-      JetInfo[iJetColl].SV_ez[JetInfo[iJetColl].nSV]   = zError(svTagInfo->secondaryVertex(vtx));
-      JetInfo[iJetColl].SV_chi2[JetInfo[iJetColl].nSV] = chi2(svTagInfo->secondaryVertex(vtx));
-      JetInfo[iJetColl].SV_ndf[JetInfo[iJetColl].nSV]  = ndof(svTagInfo->secondaryVertex(vtx));
+	if (fillsvTagInfo_){
+	  JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).x();
+	  JetInfo[iJetColl].SV_y[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).y();
+	  JetInfo[iJetColl].SV_z[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).z();
+	  JetInfo[iJetColl].SV_ex[JetInfo[iJetColl].nSV]   = xError(svTagInfo->secondaryVertex(vtx));
+	  JetInfo[iJetColl].SV_ey[JetInfo[iJetColl].nSV]   = yError(svTagInfo->secondaryVertex(vtx));
+	  JetInfo[iJetColl].SV_ez[JetInfo[iJetColl].nSV]   = zError(svTagInfo->secondaryVertex(vtx));
+	  JetInfo[iJetColl].SV_chi2[JetInfo[iJetColl].nSV] = chi2(svTagInfo->secondaryVertex(vtx));
+	  JetInfo[iJetColl].SV_ndf[JetInfo[iJetColl].nSV]  = ndof(svTagInfo->secondaryVertex(vtx));
+	  
+	  JetInfo[iJetColl].SV_flight[JetInfo[iJetColl].nSV]      = svTagInfo->flightDistance(vtx).value();
+	  JetInfo[iJetColl].SV_flightErr[JetInfo[iJetColl].nSV]   = svTagInfo->flightDistance(vtx).error();
+	  JetInfo[iJetColl].SV_flight2D[JetInfo[iJetColl].nSV]    = svTagInfo->flightDistance(vtx, true).value();
+	  JetInfo[iJetColl].SV_flight2DErr[JetInfo[iJetColl].nSV] = svTagInfo->flightDistance(vtx, true).error();
+	  JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = vtxTracks(svTagInfo->secondaryVertex(vtx));
+	}
+	
+	const Vertex &vertex = svTagInfo->secondaryVertex(vtx);
 
-      JetInfo[iJetColl].SV_flight[JetInfo[iJetColl].nSV]      = svTagInfo->flightDistance(vtx).value();
-      JetInfo[iJetColl].SV_flightErr[JetInfo[iJetColl].nSV]   = svTagInfo->flightDistance(vtx).error();
-      JetInfo[iJetColl].SV_flight2D[JetInfo[iJetColl].nSV]    = svTagInfo->flightDistance(vtx, true).value();
-      JetInfo[iJetColl].SV_flight2DErr[JetInfo[iJetColl].nSV] = svTagInfo->flightDistance(vtx, true).error();
-      JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = vtxTracks(svTagInfo->secondaryVertex(vtx));
-
-
-      const Vertex &vertex = svTagInfo->secondaryVertex(vtx);
-
-      JetInfo[iJetColl].SV_vtx_pt[JetInfo[iJetColl].nSV]  = vertex.p4().pt();
-      JetInfo[iJetColl].SV_vtx_eta[JetInfo[iJetColl].nSV] = vertex.p4().eta();
-      JetInfo[iJetColl].SV_vtx_phi[JetInfo[iJetColl].nSV] = vertex.p4().phi();
-      JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV]    = vertex.p4().mass();
-
-      Int_t totcharge=0;
-      reco::TrackKinematics vertexKinematics;
-
-      // get the vertex kinematics and charge
-      vertexKinematicsAndChange(vertex, vertexKinematics, totcharge);
-      // total charge at the secondary vertex
-      JetInfo[iJetColl].SV_totCharge[JetInfo[iJetColl].nSV]=totcharge;
-
-      math::XYZTLorentzVector vertexSum = vertexKinematics.weightedVectorSum();
-      edm::RefToBase<reco::Jet> jet = ipTagInfo->jet();
-      math::XYZVector jetDir = jet->momentum().Unit();
-      GlobalVector flightDir = svTagInfo->flightDirection(vtx);
-
-      JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV]     = ( reco::deltaR(flightDir, jetDir) );
-      JetInfo[iJetColl].SV_deltaR_sum_jet[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, jetDir) );
-      JetInfo[iJetColl].SV_deltaR_sum_dir[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, flightDir) );
-
-      Line::PositionType pos(GlobalPoint(position(vertex).x(),position(vertex).y(),position(vertex).z()));
-      Line trackline(pos,flightDir);
-      // get the Jet  line
-      Line::PositionType pos2(GlobalPoint(pv->x(),pv->y(),pv->z()));
-      Line::DirectionType dir2(GlobalVector(jetDir.x(),jetDir.y(),jetDir.z()));
-      Line jetline(pos2,dir2);
-      // now compute the distance between the two lines
-      JetInfo[iJetColl].SV_vtxDistJetAxis[JetInfo[iJetColl].nSV] = (jetline.distance(trackline)).mag();
-
-      math::XYZTLorentzVector allSum = allKinematics.weightedVectorSum() ; // allKinematics.vectorSum()
-      JetInfo[iJetColl].SV_EnergyRatio[JetInfo[iJetColl].nSV]= vertexSum.E() / allSum.E();
-
-      JetInfo[iJetColl].SV_dir_x[JetInfo[iJetColl].nSV]= flightDir.x();
-      JetInfo[iJetColl].SV_dir_y[JetInfo[iJetColl].nSV]= flightDir.y();
-      JetInfo[iJetColl].SV_dir_z[JetInfo[iJetColl].nSV]= flightDir.z();
-
-      if (runFatJets_ && iJetColl == 0 && reco::deltaR2(flightDir, jetDir)<(maxSVDeltaRToJet_*maxSVDeltaRToJet_))
-        VTXmass[vertex.p4().mass()]=vtx;
-
-      ++JetInfo[iJetColl].nSV;
-
-    } //// if secondary vertices present
-    JetInfo[iJetColl].Jet_nLastSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSV;
+	if (fillsvTagInfo_){
+	  JetInfo[iJetColl].SV_vtx_pt[JetInfo[iJetColl].nSV]  = vertex.p4().pt();
+	  JetInfo[iJetColl].SV_vtx_eta[JetInfo[iJetColl].nSV] = vertex.p4().eta();
+	  JetInfo[iJetColl].SV_vtx_phi[JetInfo[iJetColl].nSV] = vertex.p4().phi();
+	  JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV]    = vertex.p4().mass();
+	}	  
 
 
+	Int_t totcharge=0;
+	reco::TrackKinematics vertexKinematics;
+	
+	// get the vertex kinematics and charge
+	vertexKinematicsAndChange(vertex, vertexKinematics, totcharge);
+	// total charge at the secondary vertex
+	if (fillsvTagInfo_) JetInfo[iJetColl].SV_totCharge[JetInfo[iJetColl].nSV]=totcharge;
+
+	math::XYZTLorentzVector vertexSum = vertexKinematics.weightedVectorSum();
+	edm::RefToBase<reco::Jet> jet = ipTagInfo->jet();
+	math::XYZVector jetDir = jet->momentum().Unit();
+	GlobalVector flightDir = svTagInfo->flightDirection(vtx);
+
+	if (fillsvTagInfo_){
+	  JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV]     = ( reco::deltaR(flightDir, jetDir) );
+	  JetInfo[iJetColl].SV_deltaR_sum_jet[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, jetDir) );
+	  JetInfo[iJetColl].SV_deltaR_sum_dir[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, flightDir) );
+	}
+
+	Line::PositionType pos(GlobalPoint(position(vertex).x(),position(vertex).y(),position(vertex).z()));
+	Line trackline(pos,flightDir);
+	// get the Jet  line
+	Line::PositionType pos2(GlobalPoint(pv->x(),pv->y(),pv->z()));
+	Line::DirectionType dir2(GlobalVector(jetDir.x(),jetDir.y(),jetDir.z()));
+	Line jetline(pos2,dir2);
+	// now compute the distance between the two lines
+	if (fillsvTagInfo_) JetInfo[iJetColl].SV_vtxDistJetAxis[JetInfo[iJetColl].nSV] = (jetline.distance(trackline)).mag();
+
+	math::XYZTLorentzVector allSum = allKinematics.weightedVectorSum() ; // allKinematics.vectorSum()
+	if (fillsvTagInfo_){
+	  JetInfo[iJetColl].SV_EnergyRatio[JetInfo[iJetColl].nSV]= vertexSum.E() / allSum.E();
+	  JetInfo[iJetColl].SV_dir_x[JetInfo[iJetColl].nSV]= flightDir.x();
+	  JetInfo[iJetColl].SV_dir_y[JetInfo[iJetColl].nSV]= flightDir.y();
+	  JetInfo[iJetColl].SV_dir_z[JetInfo[iJetColl].nSV]= flightDir.z();
+	}	  
+
+	if (runFatJets_ && iJetColl == 0 && reco::deltaR2(flightDir, jetDir)<(maxSVDeltaRToJet_*maxSVDeltaRToJet_))
+	  VTXmass[vertex.p4().mass()]=vtx;
+	
+	if (fillsvTagInfo_) ++JetInfo[iJetColl].nSV;
+
+      } //// if secondary vertices present
+    if (fillsvTagInfo_) JetInfo[iJetColl].Jet_nLastSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSV;
+
+    
     float z_ratio = -1. , tau_dot = -1., SV_mass_0 = -1., SV_EnergyRatio_0 = -1., SV_EnergyRatio_1 = -1.;
     if ( runFatJets_ && iJetColl == 0 )
     {

@@ -35,15 +35,15 @@ class EventInfoBranches {
     int   PV_isfake[nMaxPVs_];
 
     float nPUtrue;                 // the true number of pileup interactions that have been added to the event
-    int   nPU;                     // the number of pileup interactions that have been added to the event
+    /*int   nPU;                     // the number of pileup interactions that have been added to the event
     int   PU_bunch[nMaxPUs_];      // 0 if on time pileup, -1 or +1 if out-of-time
     float PU_z[nMaxPUs_];          // the true primary vertex position along the z axis for each added interaction
     float PU_sumpT_low[nMaxPUs_];  // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > low_cut
     float PU_sumpT_high[nMaxPUs_]; // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > high_cut
     int   PU_ntrks_low[nMaxPUs_];  // the number of tracks originating from each interaction, where track pT > low_cu
-    int   PU_ntrks_high[nMaxPUs_]; // the number of tracks originating from each interaction, where track pT > high_cut
+    int   PU_ntrks_high[nMaxPUs_]; // the number of tracks originating from each interaction, where track pT > high_cut*/
 
-    int   ncQuarks;
+    /*int   ncQuarks;
     float cQuark_pT[1000];
     float cQuark_eta[1000];
     float cQuark_phi[1000];
@@ -57,7 +57,7 @@ class EventInfoBranches {
     float bQuark_phi[1000];
     int   bQuark_pdgID[1000];
     int   bQuark_status[1000];
-    int   bQuark_fromGSP[1000];
+    int   bQuark_fromGSP[1000];*/
 
     int   nBHadrons;
     float BHadron_pT[100];
@@ -115,14 +115,14 @@ class EventInfoBranches {
     int   GenV0_nCharged[1000];
 
     // HP means hard process
-    int   nGenPruned;
+    /*int   nGenPruned;
     float GenPruned_pT[1000];
     float GenPruned_eta[1000];
     float GenPruned_phi[1000];
     float GenPruned_mass[1000];
     int   GenPruned_status[1000];
     int   GenPruned_pdgID[1000];
-    int   GenPruned_mother[1000];
+    int   GenPruned_mother[1000];*/
 
     int   nTrkAll;
     float TrkAll_d0[nMaxTrk_];
@@ -193,15 +193,15 @@ class EventInfoBranches {
       tree->Branch("GenPVz"     , &GenPVz     ,  "GenPVz/F");
 
       tree->Branch("nPUtrue"      , &nPUtrue     , "nPUtrue/F");
-      tree->Branch("nPU"          , &nPU         , "nPU/I"    );
+      /**      tree->Branch("nPU"          , &nPU         , "nPU/I"    );
       tree->Branch("PU_bunch"     , PU_bunch     , "PU_bunch[nPU]/I");
       tree->Branch("PU_z"         , PU_z         , "PU_z[nPU]/F");
       tree->Branch("PU_sumpT_low" , PU_sumpT_low , "PU_sumpT_low[nPU]/F");
       tree->Branch("PU_sumpT_high", PU_sumpT_high, "PU_sumpT_high[nPU]/F");
       tree->Branch("PU_ntrks_low" , PU_ntrks_low , "PU_ntrks_low[nPU]/I");
-      tree->Branch("PU_ntrks_high", PU_ntrks_high, "PU_ntrks_high[nPU]/I");
+      tree->Branch("PU_ntrks_high", PU_ntrks_high, "PU_ntrks_high[nPU]/I");*/
 
-      tree->Branch("ncQuarks"    , &ncQuarks       ,"ncQuarks/I");
+      /*tree->Branch("ncQuarks"    , &ncQuarks       ,"ncQuarks/I");
       tree->Branch("cQuark_pT"     , cQuark_pT     , "cQuark_pT[ncQuarks]/F");
       tree->Branch("cQuark_eta"    , cQuark_eta    , "cQuark_eta[ncQuarks]/F");
       tree->Branch("cQuark_phi"    , cQuark_phi    , "cQuark_phi[ncQuarks]/F");
@@ -215,7 +215,7 @@ class EventInfoBranches {
       tree->Branch("bQuark_phi",        bQuark_phi    , "bQuark_phi[nbQuarks]/F");
       tree->Branch("bQuark_pdgID",      bQuark_pdgID  , "bQuark_pdgID[nbQuarks]/I");
       tree->Branch("bQuark_status",     bQuark_status , "bQuark_status[nbQuarks]/I");
-      tree->Branch("bQuark_fromGSP",    bQuark_fromGSP, "bQuark_fromGSP[nbQuarks]/I");
+      tree->Branch("bQuark_fromGSP",    bQuark_fromGSP, "bQuark_fromGSP[nbQuarks]/I");*/
 
       tree->Branch("nBHadrons",          &nBHadrons            ,"nBHadrons/I");
       tree->Branch("BHadron_pT",           BHadron_pT          , "BHadron_pT[nBHadrons]/F");
@@ -262,14 +262,14 @@ class EventInfoBranches {
       tree->Branch("Genquark_pdgID",  Genquark_pdgID , "Genquark_pdgID[nGenquark]/I");
       tree->Branch("Genquark_mother", Genquark_mother, "Genquark_mother[nGenquark]/I");
 
-      tree->Branch("nGenPruned",     &nGenPruned       ,"nGenPruned/I");
+      /*tree->Branch("nGenPruned",     &nGenPruned       ,"nGenPruned/I");
       tree->Branch("GenPruned_pT",     GenPruned_pT    , "GenPruned_pT[nGenPruned]/F");
       tree->Branch("GenPruned_eta",    GenPruned_eta   , "GenPruned_eta[nGenPruned]/F");
       tree->Branch("GenPruned_phi",    GenPruned_phi   , "GenPruned_phi[nGenPruned]/F");
       tree->Branch("GenPruned_mass",    GenPruned_mass   , "GenPruned_mass[nGenPruned]/F");
       tree->Branch("GenPruned_pdgID",  GenPruned_pdgID , "GenPruned_pdgID[nGenPruned]/I");
       tree->Branch("GenPruned_status", GenPruned_status, "GenPruned_status[nGenPruned]/I");
-      tree->Branch("GenPruned_mother", GenPruned_mother, "GenPruned_mother[nGenPruned]/I");
+      tree->Branch("GenPruned_mother", GenPruned_mother, "GenPruned_mother[nGenPruned]/I");*/
 
       tree->Branch("nGenV0",        &nGenV0	    ,"nGenV0/I");
       tree->Branch("GenV0_pT",        GenV0_pT       ,"GenV0_pT[nGenV0]/F");
@@ -371,15 +371,15 @@ class EventInfoBranches {
       tree->SetBranchAddress("GenPVz"     , &GenPVz     );
 
       tree->SetBranchAddress("nPUtrue"      , &nPUtrue     );
-      tree->SetBranchAddress("nPU"          , &nPU         );
+      /*tree->SetBranchAddress("nPU"          , &nPU         );
       tree->SetBranchAddress("PU_bunch"     , PU_bunch     );
       tree->SetBranchAddress("PU_z"         , PU_z         );
       tree->SetBranchAddress("PU_sumpT_low" , PU_sumpT_low );
       tree->SetBranchAddress("PU_sumpT_high", PU_sumpT_high);
       tree->SetBranchAddress("PU_ntrks_low" , PU_ntrks_low );
-      tree->SetBranchAddress("PU_ntrks_high", PU_ntrks_high);
+      tree->SetBranchAddress("PU_ntrks_high", PU_ntrks_high);*/
 
-      tree->SetBranchAddress("ncQuarks"      , &ncQuarks     );
+      /*tree->SetBranchAddress("ncQuarks"      , &ncQuarks     );
       tree->SetBranchAddress("cQuark_pT"     , cQuark_pT     );
       tree->SetBranchAddress("cQuark_eta"    , cQuark_eta    );
       tree->SetBranchAddress("cQuark_phi"    , cQuark_phi    );
@@ -393,7 +393,7 @@ class EventInfoBranches {
       tree->SetBranchAddress("bQuark_phi",        bQuark_phi    );
       tree->SetBranchAddress("bQuark_pdgID",      bQuark_pdgID  );
       tree->SetBranchAddress("bQuark_status",     bQuark_status );
-      tree->SetBranchAddress("bQuark_fromGSP",    bQuark_fromGSP);
+      tree->SetBranchAddress("bQuark_fromGSP",    bQuark_fromGSP);*/
 
       tree->SetBranchAddress("nBHadrons",            &nBHadrons          );
       tree->SetBranchAddress("BHadron_pT",           BHadron_pT          );
@@ -440,14 +440,14 @@ class EventInfoBranches {
       tree->SetBranchAddress("Genquark_pdgID",  Genquark_pdgID );
       tree->SetBranchAddress("Genquark_mother", Genquark_mother);
 
-      tree->SetBranchAddress("nGenPruned",       &nGenPruned     );
+      /*tree->SetBranchAddress("nGenPruned",       &nGenPruned     );
       tree->SetBranchAddress("GenPruned_pT",     GenPruned_pT    );
       tree->SetBranchAddress("GenPruned_eta",    GenPruned_eta   );
       tree->SetBranchAddress("GenPruned_phi",    GenPruned_phi   );
       tree->SetBranchAddress("GenPruned_mass",    GenPruned_mass   );
       tree->SetBranchAddress("GenPruned_pdgID",  GenPruned_pdgID );
       tree->SetBranchAddress("GenPruned_status", GenPruned_status);
-      tree->SetBranchAddress("GenPruned_mother", GenPruned_mother);
+      tree->SetBranchAddress("GenPruned_mother", GenPruned_mother);*/
 
       tree->SetBranchAddress("nGenV0",       &nGenV0 );
       tree->SetBranchAddress("GenV0_pT",       GenV0_pT );

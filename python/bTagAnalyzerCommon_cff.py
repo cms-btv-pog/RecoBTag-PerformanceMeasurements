@@ -13,6 +13,7 @@ bTagAnalyzerCommon = cms.PSet(
     storeEventInfo           = cms.bool(True),
     storeTagVariables        = cms.bool(False),
     storeCSVTagVariables     = cms.bool(False),
+    fillsvTagInfo               = cms.bool(False),
     selTagger                = cms.int32(2),
     MaxEta                   = cms.double(2.5),
     MinPt                    = cms.double(20.0),
