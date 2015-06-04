@@ -258,6 +258,7 @@ svSource = 'inclusiveCandidateSecondaryVertices'
 muSource = 'muons'
 elSource = 'gedGsfElectrons'
 patMuons = 'selectedPatMuons'
+trackSource = 'generalTracks'
 ## If running on miniAOD
 if options.miniAOD:
     genParticles = 'prunedGenParticles'
@@ -266,6 +267,7 @@ if options.miniAOD:
     pfCandidates = 'packedPFCandidates'
     pvSource = 'offlineSlimmedPrimaryVertices'
     svSource = 'slimmedSecondaryVertices'
+    trackSource = 'unpackedTracksAndVertices'
     muSource = 'slimmedMuons'
     elSource = 'slimmedElectrons'
     patMuons = 'slimmedMuons'
@@ -835,6 +837,9 @@ if options.runFatJets:
         process.candidateCombinedSecondaryVertexV2ComputerFat.trackPseudoSelection.jetDeltaRMax = cms.double(options.jetRadius) # default is 0.3
         getattr(process,'pfCombinedInclusiveSecondaryVertexV2BJetTagsPFCHS'+postfix).jetTagComputer = cms.string('candidateCombinedSecondaryVertexV2ComputerFat')
 
+if options.miniAOD:
+  process.load('PhysicsTools.PatAlgos.slimming.unpackedTracksAndVertices_cfi')
+
 #-------------------------------------
 from RecoBTag.PerformanceMeasurements.BTagAnalyzer_cff import *
 process.btagana = bTagAnalyzer.clone()
@@ -860,13 +865,14 @@ if options.useLegacyTaggers:
 #   process.btagana.produceAllTrackTree  = True
 #   process.btagana.producePtRelTemplate = False
 #------------------
+process.btagana.tracksColl            = cms.InputTag(trackSource) 
 process.btagana.useSelectedTracks     = True  ## False if you want to run on all tracks : for commissioning studies
 process.btagana.useTrackHistory       = False ## Can only be used with GEN-SIM-RECODEBUG files
-process.btagana.produceJetTrackTree   = False ## True if you want to keep info for tracks associated to jets : for commissioning studies
-process.btagana.produceAllTrackTree   = False ## True if you want to keep info for all tracks : for commissioning studies
+process.btagana.produceJetTrackTree   = True  ## True if you want to keep info for tracks associated to jets : for commissioning studies
+process.btagana.produceAllTrackTree   = True  ## True if you want to keep info for all tracks : for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
-process.btagana.storeTagVariables     = False ## True if you want to keep TagInfo TaggingVariables
+process.btagana.storeTagVariables     = True  ## True if you want to keep TagInfo TaggingVariables
 process.btagana.storeCSVTagVariables  = True  ## True if you want to keep CSV TaggingVariables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag('selectedPatJets'+postfix)
