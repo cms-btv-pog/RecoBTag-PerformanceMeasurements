@@ -125,7 +125,12 @@ options.register('usePruned', True,
     VarParsing.varType.bool,
     "Use pruned jets"
 )
-
+#Generally leave to False unless you know what you are doing
+options.register('runIVF', False, 
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Run IVF, currently leave to False!"
+)
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', 10)
 
@@ -525,6 +530,7 @@ if options.runFatJets:
         genJetCollection = cms.InputTag('genJetsNoNu'),
         genParticles = cms.InputTag(genParticles),
         explicitJTA = options.useExplicitJTA,
+        runIVF = options.runIVF,
         postfix = postfix
     )
     getattr(process,'selectedPatJetsPFCHS'+postfix).cut = cms.string("abs(eta) < " + str(options.fatJetAbsEtaMax))
@@ -561,6 +567,7 @@ if options.runFatJets:
         svClustering = True, # needed for subjet b tagging
         fatJets = cms.InputTag('PFJetsCHS'),              # needed for subjet flavor clustering
         groomedFatJets = cms.InputTag('PFJetsCHSSoftDrop'), # needed for subjet flavor clustering
+        runIVF = options.runIVF,
         postfix = postfix
     )
 
@@ -603,6 +610,7 @@ if options.runFatJets:
         svClustering = True, # needed for subjet b tagging
         fatJets = cms.InputTag('PFJetsCHS'),              # needed for subjet flavor clustering
         groomedFatJets = cms.InputTag('PFJetsCHSPruned'), # needed for subjet flavor clustering
+        runIVF = options.runIVF,
         postfix = postfix
     )
 
@@ -879,6 +887,7 @@ if options.runFatJets:
     process.btaganaFatJets = process.btagana.clone(
         storeEventInfo      = cms.bool(not options.processStdAK4Jets),
         allowJetSkipping    = cms.bool(False),
+        fillsvTagInfo = cms.bool(True),
         useSelectedTracks   = cms.bool(True),
         maxDeltaR           = cms.double(options.fatJetRadius),
         R0                  = cms.double(options.fatJetRadius),

@@ -325,6 +325,9 @@ private:
   bool isData_;
   bool useSelectedTracks_;
   bool fillsvTagInfo_;
+  bool fillPU_;
+  bool fillQuarks_;
+  bool fillGenPruned_;
   bool produceJetTrackTree_;
   bool produceAllTrackTree_;
   bool producePtRelTemplate_;
@@ -455,6 +458,9 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
 
   useSelectedTracks_    = iConfig.getParameter<bool> ("useSelectedTracks");
   fillsvTagInfo_    = iConfig.getParameter<bool> ("fillsvTagInfo");
+  fillPU_    = iConfig.getParameter<bool> ("fillPU");
+  fillQuarks_    = iConfig.getParameter<bool> ("fillQuarks");
+  fillGenPruned_    = iConfig.getParameter<bool> ("fillGenPruned");
   useTrackHistory_      = iConfig.getParameter<bool> ("useTrackHistory");
   produceJetTrackTree_  = iConfig.getParameter<bool> ("produceJetTrackTree");
   produceAllTrackTree_  = iConfig.getParameter<bool> ("produceAllTrackTree");
@@ -676,16 +682,16 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   //------------------------------------------------------
   EventInfo.pthat      = -1.;
   EventInfo.nPUtrue    = -1.;
-  //  EventInfo.nPU        = 0;
-  //EventInfo.ncQuarks   = 0;
-  ///EventInfo.nbQuarks   = 0;
+  EventInfo.nPU        = 0;
+  EventInfo.ncQuarks   = 0;
+  EventInfo.nbQuarks   = 0;
   EventInfo.nBHadrons  = 0;
   EventInfo.nDHadrons  = 0;
   EventInfo.nDaughters = 0;
   EventInfo.nGenV0     = 0;
   EventInfo.nGenlep    = 0;
   EventInfo.nGenquark  = 0;
-  //EventInfo.nGenPruned = 0;
+  EventInfo.nGenPruned = 0;
   EventInfo.nTrkAll    = 0;
   EventInfo.nPatMuon   = 0;
   EventInfo.mcweight   = 1.;
@@ -708,17 +714,21 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     std::vector<PileupSummaryInfo>::const_iterator ipu;
     for (ipu = PupInfo->begin(); ipu != PupInfo->end(); ++ipu) {
       if ( ipu->getBunchCrossing() != 0 ) continue; // storing detailed PU info only for BX=0
-      /*for (unsigned int i=0; i<ipu->getPU_zpositions().size(); ++i) {
-        EventInfo.PU_bunch[EventInfo.nPU]      =  ipu->getBunchCrossing();
-        EventInfo.PU_z[EventInfo.nPU]          = (ipu->getPU_zpositions())[i];
-        EventInfo.PU_sumpT_low[EventInfo.nPU]  = (ipu->getPU_sumpT_lowpT())[i];
-        EventInfo.PU_sumpT_high[EventInfo.nPU] = (ipu->getPU_sumpT_highpT())[i];
-        EventInfo.PU_ntrks_low[EventInfo.nPU]  = (ipu->getPU_ntrks_lowpT())[i];
-        EventInfo.PU_ntrks_high[EventInfo.nPU] = (ipu->getPU_ntrks_highpT())[i];
-        ++EventInfo.nPU;
-	}*/
+      if(fillPU_){
+	for (unsigned int i=0; i<ipu->getPU_zpositions().size(); ++i) {
+	  EventInfo.PU_bunch[EventInfo.nPU]      =  ipu->getBunchCrossing();
+	  EventInfo.PU_z[EventInfo.nPU]          = (ipu->getPU_zpositions())[i];
+	  EventInfo.PU_sumpT_low[EventInfo.nPU]  = (ipu->getPU_sumpT_lowpT())[i];
+	  EventInfo.PU_sumpT_high[EventInfo.nPU] = (ipu->getPU_sumpT_highpT())[i];
+	  EventInfo.PU_ntrks_low[EventInfo.nPU]  = (ipu->getPU_ntrks_lowpT())[i];
+	  EventInfo.PU_ntrks_high[EventInfo.nPU] = (ipu->getPU_ntrks_highpT())[i];
+	  ++EventInfo.nPU;
+	}
+      }
       EventInfo.nPUtrue = ipu->getTrueNumInteractions();
-      //if(EventInfo.nPU==0) EventInfo.nPU = ipu->getPU_NumInteractions(); // needed in case getPU_zpositions() is empty
+      if(fillPU_){
+	if(EventInfo.nPU==0) EventInfo.nPU = ipu->getPU_NumInteractions(); // needed in case getPU_zpositions() is empty
+      }
     }
 
   //------------------------------------------------------
@@ -730,46 +740,47 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     edm::Handle<reco::GenParticleCollection> prunedGenParticles;
     iEvent.getByLabel(prunedGenParticleCollectionName_, prunedGenParticles);
 
-    /*
-    //loop over pruned GenParticles to fill branches for MC hard process particles and muons
-    for(size_t i = 0; i < prunedGenParticles->size(); ++i){
-      const GenParticle & iGenPart = (*prunedGenParticles)[i];
-      int status = iGenPart.status();
-      int pdgid = iGenPart.pdgId();
-      int numMothers = iGenPart.numberOfMothers();
-
-      //fill all the branches
-      EventInfo.GenPruned_pT[EventInfo.nGenPruned] = iGenPart.pt();
-      EventInfo.GenPruned_eta[EventInfo.nGenPruned] = iGenPart.eta();
-      EventInfo.GenPruned_phi[EventInfo.nGenPruned] = iGenPart.phi();
-      EventInfo.GenPruned_mass[EventInfo.nGenPruned] = iGenPart.mass();
-      EventInfo.GenPruned_status[EventInfo.nGenPruned] = status;
-      EventInfo.GenPruned_pdgID[EventInfo.nGenPruned] = pdgid;
-      // if no mothers, set mother index to -1 (just so it's not >=0)
-      if (numMothers == 0)
-        EventInfo.GenPruned_mother[EventInfo.nGenPruned] = -1;
-      else{
-        //something new to distinguish from the no mothers case
-        int idx = -100;
-        //loop over the pruned genparticle list to get the mother's index
-        for( reco::GenParticleCollection::const_iterator mit = prunedGenParticles->begin(); mit != prunedGenParticles->end(); ++mit ) {
-          if( iGenPart.mother(0)==&(*mit) ) {
-            idx = std::distance(prunedGenParticles->begin(),mit);
-            break;
-          }
-        }
-        EventInfo.GenPruned_mother[EventInfo.nGenPruned] = idx;
-      }
-      ++EventInfo.nGenPruned;
-      } //end loop over pruned genparticles*/
+    if(fillGenPruned_){
+      //loop over pruned GenParticles to fill branches for MC hard process particles and muons
+      for(size_t i = 0; i < prunedGenParticles->size(); ++i){
+	const GenParticle & iGenPart = (*prunedGenParticles)[i];
+	int status = iGenPart.status();
+	int pdgid = iGenPart.pdgId();
+	int numMothers = iGenPart.numberOfMothers();
+	
+	//fill all the branches
+	EventInfo.GenPruned_pT[EventInfo.nGenPruned] = iGenPart.pt();
+	EventInfo.GenPruned_eta[EventInfo.nGenPruned] = iGenPart.eta();
+	EventInfo.GenPruned_phi[EventInfo.nGenPruned] = iGenPart.phi();
+	EventInfo.GenPruned_mass[EventInfo.nGenPruned] = iGenPart.mass();
+	EventInfo.GenPruned_status[EventInfo.nGenPruned] = status;
+	EventInfo.GenPruned_pdgID[EventInfo.nGenPruned] = pdgid;
+	// if no mothers, set mother index to -1 (just so it's not >=0)
+	if (numMothers == 0)
+	  EventInfo.GenPruned_mother[EventInfo.nGenPruned] = -1;
+	else{
+	  //something new to distinguish from the no mothers case
+	  int idx = -100;
+	  //loop over the pruned genparticle list to get the mother's index
+	  for( reco::GenParticleCollection::const_iterator mit = prunedGenParticles->begin(); mit != prunedGenParticles->end(); ++mit ) {
+	    if( iGenPart.mother(0)==&(*mit) ) {
+	      idx = std::distance(prunedGenParticles->begin(),mit);
+	      break;
+	    }
+	  }
+	  EventInfo.GenPruned_mother[EventInfo.nGenPruned] = idx;
+	}
+	++EventInfo.nGenPruned;
+      } //end loop over pruned genparticles
+    }//fillGenPruned_
     
     EventInfo.GenPVz = -1000.;
-
+    
     for (size_t i = 0; i < genParticles->size(); ++i) {
       const GenParticle & genIt = (*genParticles)[i];
       int ID = abs(genIt.pdgId());
       unsigned int nDaughters = genIt.numberOfDaughters();
-
+      
       if ( isHardProcess(genIt.status()) ) EventInfo.GenPVz = genIt.vz();
 
       // prompt parton
@@ -785,37 +796,39 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
       }
 
       // b and c quarks from the end of parton showering and before hadronization
-      /*if ( ID == 4 || ID == 5 ) {
-        if( nDaughters > 0 ) {
-          int nparton_daughters = 0;
-          for (unsigned int d=0; d<nDaughters; ++d) {
-            int daughterID = abs(genIt.daughter(d)->pdgId());
-            if( (daughterID == 1 || daughterID == 2 || daughterID == 3 ||
-                 daughterID == 4 || daughterID == 5 || daughterID == 6 || daughterID == 21))
-              nparton_daughters++;
-          }
-          if( nparton_daughters == 0 ) {
-            if ( ID == 5 ) {
-              EventInfo.bQuark_pT[EventInfo.nbQuarks]  = genIt.p4().pt();
-              EventInfo.bQuark_eta[EventInfo.nbQuarks] = genIt.p4().eta();
-              EventInfo.bQuark_phi[EventInfo.nbQuarks] = genIt.p4().phi();
-              EventInfo.bQuark_pdgID[EventInfo.nbQuarks] = genIt.pdgId();
-              EventInfo.bQuark_status[EventInfo.nbQuarks] = genIt.status();
-              EventInfo.bQuark_fromGSP[EventInfo.nbQuarks] = isFromGSP(&genIt);
-              ++EventInfo.nbQuarks;
-            }
-            if ( ID == 4 ) {
-              EventInfo.cQuark_pT[EventInfo.ncQuarks]  = genIt.p4().pt();
-              EventInfo.cQuark_eta[EventInfo.ncQuarks] = genIt.p4().eta();
-              EventInfo.cQuark_phi[EventInfo.ncQuarks] = genIt.p4().phi();
-              EventInfo.cQuark_pdgID[EventInfo.ncQuarks] = genIt.pdgId();
-              EventInfo.cQuark_status[EventInfo.ncQuarks] = genIt.status();
-              EventInfo.cQuark_fromGSP[EventInfo.ncQuarks] = isFromGSP(&genIt);
-              ++EventInfo.ncQuarks;
-            }
-          }
-        }
-	}*/
+      if(fillQuarks_){
+	if ( ID == 4 || ID == 5 ) {
+	  if( nDaughters > 0 ) {
+	    int nparton_daughters = 0;
+	    for (unsigned int d=0; d<nDaughters; ++d) {
+	      int daughterID = abs(genIt.daughter(d)->pdgId());
+	      if( (daughterID == 1 || daughterID == 2 || daughterID == 3 ||
+		   daughterID == 4 || daughterID == 5 || daughterID == 6 || daughterID == 21))
+		nparton_daughters++;
+	    }
+	    if( nparton_daughters == 0 ) {
+	      if ( ID == 5 ) {
+		EventInfo.bQuark_pT[EventInfo.nbQuarks]  = genIt.p4().pt();
+		EventInfo.bQuark_eta[EventInfo.nbQuarks] = genIt.p4().eta();
+		EventInfo.bQuark_phi[EventInfo.nbQuarks] = genIt.p4().phi();
+		EventInfo.bQuark_pdgID[EventInfo.nbQuarks] = genIt.pdgId();
+		EventInfo.bQuark_status[EventInfo.nbQuarks] = genIt.status();
+		EventInfo.bQuark_fromGSP[EventInfo.nbQuarks] = isFromGSP(&genIt);
+		++EventInfo.nbQuarks;
+	      }
+	      if ( ID == 4 ) {
+		EventInfo.cQuark_pT[EventInfo.ncQuarks]  = genIt.p4().pt();
+		EventInfo.cQuark_eta[EventInfo.ncQuarks] = genIt.p4().eta();
+		EventInfo.cQuark_phi[EventInfo.ncQuarks] = genIt.p4().phi();
+		EventInfo.cQuark_pdgID[EventInfo.ncQuarks] = genIt.pdgId();
+		EventInfo.cQuark_status[EventInfo.ncQuarks] = genIt.status();
+		EventInfo.cQuark_fromGSP[EventInfo.ncQuarks] = isFromGSP(&genIt);
+		++EventInfo.ncQuarks;
+	      }
+	    }
+	  }
+	}
+      }//fillQuarks_
 
       if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) AreBHadrons = true;
 //       // Primary b Hadrons
