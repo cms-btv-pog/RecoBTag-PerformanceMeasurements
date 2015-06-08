@@ -1794,7 +1794,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         if ( useTrackHistory_ && !isData_ ) {
            TrackCategories::Flags theFlag ;
            if(useSelectedTracks_) theFlag  = classifier_.evaluate( toTrackRef(ipTagInfo->selectedTracks()[itt]) ).flags();
-           else                   theFlag  = classifier_.evaluate( toTrackRef(ipTagInfo->tracks()[itt]) ).flags();
+	   else                   theFlag  = classifier_.evaluate( toTrackRef(tracks[itt]) ).flags();
 
            if ( theFlag[TrackCategories::BWeakDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 1);
            if ( theFlag[TrackCategories::CWeakDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 2);
