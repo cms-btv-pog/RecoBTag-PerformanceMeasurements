@@ -118,7 +118,7 @@
 //
 // constants, enums and typedefs
 //
-typedef std::vector<pat::Jet> PatJetCollection;
+typedef edm::View<pat::Jet> PatJetCollection;
 typedef std::vector<edm::Ptr<pat::Jet> > PatJetPtrCollection;
 
 //
@@ -208,7 +208,7 @@ private:
   const IPTagInfo * toIPTagInfo(const pat::Jet & jet, const std::string & tagInfos);
   const SVTagInfo * toSVTagInfo(const pat::Jet & jet, const std::string & tagInfos);
 
-  const Tracks toAllTracks(const pat::Jet & jet, const std::string & tagInfos, const int & iJetColl);
+  const Tracks toAllTracks(const pat::Jet & jet, const std::string & tagInfos, const reco::JetTagInfo & jetTagInfo, const int & iJetColl);
 
   bool findCat(const reco::Track* ,CategoryFinder& );
   std::vector< float > getTrackProbabilies(std::vector< float > , const int );
@@ -1671,8 +1671,12 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
     reco::TrackKinematics allKinematics;
 
+    edm::RefToBase<pat::Jet> patJetRef = jetsColl->refAt(pjet - jetsColl->begin());
+    edm::RefToBase<reco::Jet> jetRef(patJetRef);
+    reco::JetTagInfo jetTagInfo(jetRef);
+
     const Tracks & selectedTracks( ipTagInfo->selectedTracks() );
-    const Tracks & tracks = toAllTracks(*pjet,ipTagInfos_,iJetColl);
+    const Tracks & tracks = toAllTracks(*pjet,ipTagInfos_,jetTagInfo,iJetColl);
 
     int ntagtracks = 0;
     if (useSelectedTracks_) ntagtracks = selectedTracks.size();
@@ -3390,21 +3394,20 @@ BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::toSVTagInf
 // -------------- toAllTracks ----------------
 template<>
 const BTagAnalyzerT<reco::TrackIPTagInfo,reco::Vertex>::Tracks
-BTagAnalyzerT<reco::TrackIPTagInfo,reco::Vertex>::toAllTracks(const pat::Jet & jet, const std::string & tagInfos, const int & iJetColl)
+BTagAnalyzerT<reco::TrackIPTagInfo,reco::Vertex>::toAllTracks(const pat::Jet & jet, const std::string & tagInfos, const reco::JetTagInfo & jetTagInfo, const int & iJetColl)
 {
   return toIPTagInfo(jet,tagInfos)->tracks();
 }
 
 template<>
 const BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::Tracks
-BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::toAllTracks(const pat::Jet & jet, const std::string & tagInfos, const int & iJetColl)
+BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::toAllTracks(const pat::Jet & jet, const std::string & tagInfos, const reco::JetTagInfo & jetTagInfo, const int & iJetColl)
 {
-  const reco::JetTagInfo * tagInfo = dynamic_cast<const reco::JetTagInfo *>( toIPTagInfo(jet,tagInfos) );
-
+  // getting all tracks currently not supported for subjets (could be implemented in the future)
   if( iJetColl > 0)
     return toIPTagInfo(jet,tagInfos)->selectedTracks();
   else
-    return m_helper.tracks(*tagInfo);
+    return m_helper.tracks(jetTagInfo);
 }
 
 // -------------- setTracksPV ----------------
