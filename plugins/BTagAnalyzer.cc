@@ -645,7 +645,8 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   if ( useTrackHistory_ ) classifier_.newEvent(iEvent, iSetup);
 
   // fill the helper classes
-  fillHelpers(iEvent);
+  if( !useSelectedTracks_ )
+    fillHelpers(iEvent);
 
   edm::Handle <PatJetCollection> jetsColl;
   iEvent.getByLabel (JetCollectionTag_, jetsColl);
@@ -1676,7 +1677,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     reco::JetTagInfo jetTagInfo(jetRef);
 
     const Tracks & selectedTracks( ipTagInfo->selectedTracks() );
-    const Tracks & tracks = toAllTracks(*pjet,ipTagInfos_,jetTagInfo,iJetColl);
+    const Tracks & tracks = ( useSelectedTracks_ ? Tracks() : toAllTracks(*pjet,ipTagInfos_,jetTagInfo,iJetColl) );
 
     int ntagtracks = 0;
     if (useSelectedTracks_) ntagtracks = selectedTracks.size();
