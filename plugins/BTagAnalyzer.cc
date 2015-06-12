@@ -395,6 +395,7 @@ private:
 
   // helper class for associating PF candidates to jets
   IPProducerHelpers::FromJetAndCands m_helper;
+  std::vector<IPProducerHelpers::FromJetAndCands> m_subjetHelper;
 
   const double beta_;
   const double R0_;
@@ -581,6 +582,14 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
       if ( produceJetTrackTree_ ) JetInfo[1+i].RegisterJetTrackTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       if ( storeTagVariables_)    JetInfo[1+i].RegisterTagVarTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       if ( storeCSVTagVariables_) JetInfo[1+i].RegisterCSVTagVarTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
+
+      // set up subjet helper classes
+      edm::ParameterSet iConfigCopy(iConfig);
+      iConfigCopy.insert( true, "Jets",        edm::Entry("Jets",        SubJetCollectionTags_[i],                        true) );
+      iConfigCopy.insert( true, "maxDeltaR",   edm::Entry("maxDeltaR",   iConfig.getParameter<double>("subJetMaxDeltaR"), true) );
+      iConfigCopy.insert( true, "explicitJTA", edm::Entry("explicitJTA", iConfig.getParameter<bool>("subJetExplicitJTA"), true) );
+
+      m_subjetHelper.push_back(IPProducerHelpers::FromJetAndCands(iConfigCopy, consumesCollector(), "Jets"));
     }
   }
 
@@ -3360,6 +3369,10 @@ template<>
 void BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::fillHelpers(const edm::Event& iEvent)
 {
   std::vector<reco::JetTagInfo> jetTagInfos = m_helper.makeBaseVector(iEvent);
+  if ( runSubJets_ ) {
+    for ( size_t i = 0; i < SubJetLabels_.size(); ++i )
+      std::vector<reco::JetTagInfo> subJetTagInfos = m_subjetHelper[i].makeBaseVector(iEvent);
+  }
 }
 
 // -------------- toIPTagInfo ----------------
@@ -3404,9 +3417,8 @@ template<>
 const BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::Tracks
 BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::toAllTracks(const pat::Jet & jet, const std::string & tagInfos, const reco::JetTagInfo & jetTagInfo, const int & iJetColl)
 {
-  // getting all tracks currently not supported for subjets (could be implemented in the future)
   if( iJetColl > 0)
-    return toIPTagInfo(jet,tagInfos)->selectedTracks();
+    return m_subjetHelper[iJetColl-1].tracks(jetTagInfo);
   else
     return m_helper.tracks(jetTagInfo);
 }
