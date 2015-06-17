@@ -106,6 +106,7 @@
 #include "RecoBTag/PerformanceMeasurements/interface/JetInfoBranches.h"
 #include "RecoBTag/PerformanceMeasurements/interface/EventInfoBranches.h"
 #include "RecoBTag/PerformanceMeasurements/interface/BookHistograms.h"
+#include "RecoBTag/PerformanceMeasurements/interface/MVAEvaluator.h"
 
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "FWCore/Common/interface/Provenance.h"
@@ -403,6 +404,11 @@ private:
   fastjet::contrib::Njettiness njettiness_;
 
   const double maxSVDeltaRToJet_;
+
+  // MVA evaluators
+  std::unique_ptr<MVAEvaluator> evaluator_SV_;
+  std::unique_ptr<MVAEvaluator> evaluator_SL_;
+  std::unique_ptr<MVAEvaluator> evaluator_cascade_;
 };
 
 template<typename IPTI,typename VTX>
@@ -480,6 +486,24 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   JetCollectionTag_ = iConfig.getParameter<edm::InputTag>("Jets");
   SubJetCollectionTags_ = iConfig.getParameter<std::vector<edm::InputTag> >("SubJets");
   SubJetLabels_         = iConfig.getParameter<std::vector<std::string> >("SubJetLabels");
+
+  if ( runFatJets_ )
+  {
+    // initialize MVA evaluators
+    evaluator_SV_.reset( new MVAEvaluator("BDTG", edm::FileInPath("RecoBTag/PerformanceMeasurements/data/TMVA_SV.weights.xml.gz").fullPath()) );
+    evaluator_SL_.reset( new MVAEvaluator("BDTG", edm::FileInPath("RecoBTag/PerformanceMeasurements/data/TMVA_SL.weights.xml.gz").fullPath()) );
+    evaluator_cascade_.reset( new MVAEvaluator("BDTG", edm::FileInPath("RecoBTag/PerformanceMeasurements/data/TMVA_cascade.weights.xml.gz").fullPath()) );
+
+    // book TMVA readers
+    std::vector<std::string> variables_SV({"z_ratio1", "tau_dot", "SV_mass_0", "SV_vtx_EnergyRatio_0", "SV_vtx_EnergyRatio_1", "jetNTracksEtaRel"});
+    std::vector<std::string> variables_SL({"PFLepton_ptrel", "PFLepton_IP2D", "nSL"});
+    std::vector<std::string> variables_cascade({"BDTGSV", "BDTGSL", "tau2/tau1"});
+    std::vector<std::string> spectators({"massPruned", "flavour", "nbHadrons", "ptPruned", "etaPruned"});
+
+    evaluator_SV_->bookReader(variables_SV, spectators);
+    evaluator_SL_->bookReader(variables_SL, spectators);
+    evaluator_cascade_->bookReader(variables_cascade, spectators);
+  }
 
   if( runSubJets_ && ( SubJetCollectionTags_.size()>0 || SubJetLabels_.size()>0 ) )
   {
@@ -2586,6 +2610,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
     
     float z_ratio = -1. , tau_dot = -1., SV_mass_0 = -1., SV_EnergyRatio_0 = -1., SV_EnergyRatio_1 = -1.;
+    float BDTG_SV = -1., BDTG_SL = -1., BDTG_Cascade = -1.;
     if ( runFatJets_ && iJetColl == 0 )
     {
       int cont=0;
@@ -2620,12 +2645,41 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
           break;
         }
       }
+
+
+      std::map<std::string,float> variables;
+      variables["z_ratio1"] = z_ratio;
+      variables["tau_dot"] = tau_dot;
+      variables["SV_mass_0"] = SV_mass_0;
+      variables["SV_vtx_EnergyRatio_0"] = SV_EnergyRatio_0;
+      variables["SV_vtx_EnergyRatio_1"] = SV_EnergyRatio_1;
+      variables["jetNTracksEtaRel"] = JetInfo[iJetColl].TagVarCSV_jetNTracksEtaRel[JetInfo[iJetColl].nJet];
+      variables["PFLepton_ptrel"] = JetInfo[iJetColl].Jet_PFLepton_ptrel[JetInfo[iJetColl].nJet];
+      variables["PFLepton_IP2D"] = JetInfo[iJetColl].Jet_PFLepton_IP2D[JetInfo[iJetColl].nJet];
+      variables["nSL"] = (JetInfo[iJetColl].Jet_nSM[JetInfo[iJetColl].nJet] + JetInfo[iJetColl].Jet_nSE[JetInfo[iJetColl].nJet]);
+
+      BDTG_SV = evaluator_SV_->evaluate(variables);
+      BDTG_SL = evaluator_SL_->evaluate(variables);
+      float tau1 = JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet];
+      float tau2 = JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet];
+      float tau21 = ( tau1 != 0. ? tau2/tau1 : -1. );
+
+      std::map<std::string,float> variables_cascade;
+      variables_cascade["BDTGSV"] = BDTG_SV;
+      variables_cascade["BDTGSL"] = BDTG_SL;
+      variables_cascade["tau2/tau1"] = tau21;
+
+      BDTG_Cascade = evaluator_cascade_->evaluate(variables_cascade);
     }
     JetInfo[iJetColl].Jet_z_ratio[JetInfo[iJetColl].nJet]          = z_ratio;
     JetInfo[iJetColl].Jet_tau_dot[JetInfo[iJetColl].nJet]          = tau_dot;
     JetInfo[iJetColl].Jet_SV_mass_0[JetInfo[iJetColl].nJet]        = SV_mass_0;
     JetInfo[iJetColl].Jet_SV_EnergyRatio_0[JetInfo[iJetColl].nJet] = SV_EnergyRatio_0;
     JetInfo[iJetColl].Jet_SV_EnergyRatio_1[JetInfo[iJetColl].nJet] = SV_EnergyRatio_1;
+    JetInfo[iJetColl].Jet_SV_EnergyRatio_1[JetInfo[iJetColl].nJet] = SV_EnergyRatio_1;
+    JetInfo[iJetColl].Jet_BDTG_SV[JetInfo[iJetColl].nJet]          = BDTG_SV;
+    JetInfo[iJetColl].Jet_BDTG_SL[JetInfo[iJetColl].nJet]          = BDTG_SL;
+    JetInfo[iJetColl].Jet_BDTG_Cascade[JetInfo[iJetColl].nJet]     = BDTG_Cascade;
 
 
     cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
