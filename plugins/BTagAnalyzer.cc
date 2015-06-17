@@ -2676,7 +2676,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_SV_mass_0[JetInfo[iJetColl].nJet]        = SV_mass_0;
     JetInfo[iJetColl].Jet_SV_EnergyRatio_0[JetInfo[iJetColl].nJet] = SV_EnergyRatio_0;
     JetInfo[iJetColl].Jet_SV_EnergyRatio_1[JetInfo[iJetColl].nJet] = SV_EnergyRatio_1;
-    JetInfo[iJetColl].Jet_SV_EnergyRatio_1[JetInfo[iJetColl].nJet] = SV_EnergyRatio_1;
     JetInfo[iJetColl].Jet_BDTG_SV[JetInfo[iJetColl].nJet]          = BDTG_SV;
     JetInfo[iJetColl].Jet_BDTG_SL[JetInfo[iJetColl].nJet]          = BDTG_SL;
     JetInfo[iJetColl].Jet_BDTG_Cascade[JetInfo[iJetColl].nJet]     = BDTG_Cascade;
