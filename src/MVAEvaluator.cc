@@ -13,14 +13,14 @@ void MVAEvaluator::bookReader(const std::vector<std::string> & variables, const 
   // add input variables
   for(std::vector<std::string>::const_iterator it = variables.begin(); it!=variables.end(); ++it)
   {
-    mva_variables_.insert( std::pair<std::string,size_t>(*it,0.) );
+    mva_variables_.insert( std::pair<std::string,float>(*it,0.) );
     mva_reader_->AddVariable((*it).c_str(), &mva_variables_.at(*it));
   }
 
   // add spectator variables
   for(std::vector<std::string>::const_iterator it = spectators.begin(); it!=spectators.end(); ++it)
   {
-    mva_spectators_.insert( std::pair<std::string,size_t>(*it,0.) );
+    mva_spectators_.insert( std::pair<std::string,float>(*it,0.) );
     mva_reader_->AddSpectator(it->c_str(), &mva_spectators_.at(*it));
   }
 
