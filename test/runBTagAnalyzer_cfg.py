@@ -337,6 +337,20 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_' + ('data' if options.runOnData else 'mc'))
 
+#Loading calibrations: as default, but with new cMVA training
+#Only in 74X: to be revomed in 75X
+process.load("CondCore.DBCommon.CondDBSetup_cfi")
+process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
+process.CondDBSetup,
+timetype = cms.string('runnumber'),
+toGet = cms.VPSet(cms.PSet(
+record = cms.string('BTauGenericMVAJetTagComputerRcd'),
+tag = cms.string('MVAJetTags')
+)),
+connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags.db'),
+BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
+)
+process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.Geometry.GeometryRecoDB_cff")
