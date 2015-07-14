@@ -35,16 +35,16 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
-#options.register('mcGlobalTag', 'PHYS14_25_V1',
-#    VarParsing.multiplicity.singleton,
-#    VarParsing.varType.string,
-#    "MC global tag"
-#)
-#options.register('dataGlobalTag', 'GR_R_70_V2',
-#    VarParsing.multiplicity.singleton,
-#    VarParsing.varType.string,
-#    "Data global tag"
-#)
+options.register('mcGlobalTag', 'MCRUN2_74_V9',
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "MC global tag"
+)
+options.register('dataGlobalTag', 'GR_R_70_V2',
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "Data global tag"
+)
 options.register('runFatJets', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -142,9 +142,9 @@ print "Running on miniAOD: %s"%('True' if options.miniAOD else 'False')
 print "Using PFchs: %s"%('True' if options.usePFchs else 'False')
 
 ## Global tag
-#globalTag = options.mcGlobalTag
-#if options.runOnData:
-#    globalTag = options.dataGlobalTag
+globalTag = options.mcGlobalTag
+if options.runOnData:
+    globalTag = options.dataGlobalTag
 
 ## Jet energy corrections
 jetCorrectionsAK4 = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
@@ -332,10 +332,14 @@ process.options   = cms.untracked.PSet(
     allowUnscheduled = cms.untracked.bool(True)
 )
 
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-#process.GlobalTag.globaltag = globalTag + '::All'
+#In 74X:
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_' + ('data' if options.runOnData else 'mc'))
+process.GlobalTag.globaltag = globalTag
+#In 75X possible to use:
+# process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+# from Configuration.AlCa.GlobalTag import GlobalTag
+# process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_' + ('data' if options.runOnData else 'mc'))
 
 #Loading calibrations: as default, but with new cMVA training
 #Only in 74X: to be revomed in 75X
@@ -350,7 +354,13 @@ tag = cms.string('MVAJetTags')
 connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags.db'),
 BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
 )
+### to activate the new JP calibration: using the data base
 process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
+process.GlobalTag.toGet = cms.VPSet(
+ cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
+      tag = cms.string("TrackProbabilityCalibration_3D_MC74X_50ns_v1"),
+      connect = cms.untracked.string("frontier://FrontierPrep/CMS_CONDITIONS"))
+)
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.Geometry.GeometryRecoDB_cff")
