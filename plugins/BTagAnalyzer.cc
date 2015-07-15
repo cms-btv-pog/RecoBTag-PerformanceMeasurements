@@ -252,10 +252,6 @@ private:
   bool runFatJets_ ;
   bool runSubJets_ ;
   bool allowJetSkipping_ ;
-  bool storeEventInfo_;
-  bool storePatMuons_;
-  bool storeTagVariables_;
-  bool storeCSVTagVariables_;
   
   edm::InputTag src_;  // Generator/handronizer module label
   edm::InputTag muonCollectionName_;
@@ -335,6 +331,12 @@ private:
   bool produceJetTrackTree_;
   bool produceAllTrackTree_;
   bool producePtRelTemplate_;
+  bool storeEventInfo_;
+  bool storePatMuons_;
+  bool storeTagVariables_;
+  bool storeTagVariablesSubJets_;
+  bool storeCSVTagVariables_;
+  bool storeCSVTagVariablesSubJets_;
   
   bool use_ttbar_filter_;
   edm::InputTag channel_;
@@ -458,10 +460,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   runFatJets_ = iConfig.getParameter<bool>("runFatJets");
   runSubJets_ = iConfig.getParameter<bool>("runSubJets");
   allowJetSkipping_ = iConfig.getParameter<bool>("allowJetSkipping");
-  storeEventInfo_ = iConfig.getParameter<bool>("storeEventInfo");
-  storePatMuons_ = iConfig.getParameter<bool>("storePatMuons");
-  storeTagVariables_ = iConfig.getParameter<bool>("storeTagVariables");
-  storeCSVTagVariables_ = iConfig.getParameter<bool>("storeCSVTagVariables");
+
   minJetPt_  = iConfig.getParameter<double>("MinPt");
   maxJetEta_ = iConfig.getParameter<double>("MaxEta");
 
@@ -476,6 +475,12 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   produceJetTrackTree_  = iConfig.getParameter<bool> ("produceJetTrackTree");
   produceAllTrackTree_  = iConfig.getParameter<bool> ("produceAllTrackTree");
   producePtRelTemplate_ = iConfig.getParameter<bool> ("producePtRelTemplate");
+  storeEventInfo_ = iConfig.getParameter<bool>("storeEventInfo");
+  storePatMuons_ = iConfig.getParameter<bool>("storePatMuons");
+  storeTagVariables_ = iConfig.getParameter<bool>("storeTagVariables");
+  storeTagVariablesSubJets_ = iConfig.getParameter<bool>("storeTagVariablesSubJets");
+  storeCSVTagVariables_ = iConfig.getParameter<bool>("storeCSVTagVariables");
+  storeCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("storeCSVTagVariablesSubJets");
 
   use_ttbar_filter_     = iConfig.getParameter<bool> ("use_ttbar_filter");
   channel_              = iConfig.getParameter<edm::InputTag> ("channel");
@@ -609,9 +614,9 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
       if ( runFatJets_ ) SubJetInfo[SubJetLabels_[i]].RegisterTree(smalltree,branchNamePrefix_,SubJetLabels_[i]);
       JetInfo[1+i].RegisterTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       JetInfo[1+i].RegisterSubJetSpecificTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
-      if ( produceJetTrackTree_ ) JetInfo[1+i].RegisterJetTrackTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
-      if ( storeTagVariables_)    JetInfo[1+i].RegisterTagVarTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
-      if ( storeCSVTagVariables_) JetInfo[1+i].RegisterCSVTagVarTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
+      if ( produceJetTrackTree_ )         JetInfo[1+i].RegisterJetTrackTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
+      if ( storeTagVariablesSubJets_ )    JetInfo[1+i].RegisterTagVarTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
+      if ( storeCSVTagVariablesSubJets_ ) JetInfo[1+i].RegisterCSVTagVarTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
 
       // set up subjet helper classes
       edm::ParameterSet iConfigCopy(iConfig);
@@ -1503,6 +1508,14 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       SubJetInfo[SubJetLabels_[i]].nSubJet = 0;
   }
 
+  bool storeTagVariables    = storeTagVariables_;
+  bool storeCSVTagVariables = storeCSVTagVariables_;
+  if ( runSubJets_ && iJetColl > 0 )
+  {
+    storeTagVariables    = storeTagVariablesSubJets_;
+    storeCSVTagVariables = storeCSVTagVariablesSubJets_;
+  }
+
   //// Loop over the jets
   for ( PatJetCollection::const_iterator pjet = jetsColl->begin(); pjet != jetsColl->end(); ++pjet ) {
 
@@ -2214,7 +2227,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_cMVA[JetInfo[iJetColl].nJet] = cMVA;
 
     // TagInfo TaggingVariables
-    if ( storeTagVariables_ )
+    if ( storeTagVariables )
     {
       reco::TaggingVariableList ipVars = ipTagInfo->taggingVariables();
       reco::TaggingVariableList svVars = svTagInfo->taggingVariables();
@@ -2307,7 +2320,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     }
 
     // CSV TaggingVariables
-    if ( storeCSVTagVariables_ )
+    if ( storeCSVTagVariables )
     {
       std::vector<const reco::BaseTagInfo*>  baseTagInfos;
       JetTagComputer::TagInfoHelper helper(baseTagInfos);
