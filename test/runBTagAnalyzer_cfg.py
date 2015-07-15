@@ -934,7 +934,10 @@ if options.runFatJets:
     process.btaganaFatJets = process.btagana.clone(
         storeEventInfo      = cms.bool(not options.processStdAK4Jets),
         allowJetSkipping    = cms.bool(False),
-        fillsvTagInfo = cms.bool(True),
+        storeTagVariables   = cms.bool(True),
+        storeCSVTagVariables = cms.bool(False),
+        storeTagVariablesSubJets = cms.bool(False),
+        storeCSVTagVariablesSubJets = cms.bool(True),
         useSelectedTracks   = cms.bool(True),
         maxDeltaR           = cms.double(options.fatJetRadius),
         R0                  = cms.double(options.fatJetRadius),
