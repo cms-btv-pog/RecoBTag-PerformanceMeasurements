@@ -253,6 +253,7 @@ private:
   bool runSubJets_ ;
   bool allowJetSkipping_ ;
   bool storeEventInfo_;
+  bool storePatMuons_;
   bool storeTagVariables_;
   bool storeCSVTagVariables_;
   
@@ -458,6 +459,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   runSubJets_ = iConfig.getParameter<bool>("runSubJets");
   allowJetSkipping_ = iConfig.getParameter<bool>("allowJetSkipping");
   storeEventInfo_ = iConfig.getParameter<bool>("storeEventInfo");
+  storePatMuons_ = iConfig.getParameter<bool>("storePatMuons");
   storeTagVariables_ = iConfig.getParameter<bool>("storeTagVariables");
   storeCSVTagVariables_ = iConfig.getParameter<bool>("storeCSVTagVariables");
   minJetPt_  = iConfig.getParameter<double>("MinPt");
@@ -589,8 +591,8 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
     if ( use_ttbar_filter_ )    EventInfo.RegisterTTbarTree(smalltree);
     if ( produceJetTrackTree_ ) EventInfo.RegisterJetTrackTree(smalltree);
     if ( produceAllTrackTree_ ) EventInfo.RegisterAllTrackTree(smalltree);
+    if ( storePatMuons_ )       EventInfo.RegisterPatMuonTree(smalltree);
   }
-  if ( runSubJets_ ) EventInfo.RegisterPatMuonTree(smalltree);
 
   //--------------------------------------
   // jet information
@@ -1245,7 +1247,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   // PAT Muons
   //------------------------------------------------------
   edm::Handle<std::vector<pat::Muon> >  patMuonsHandle;
-  if( runSubJets_ )
+  if( storePatMuons_ )
   {
     iEvent.getByLabel(patMuonCollectionName_,patMuonsHandle);
 
