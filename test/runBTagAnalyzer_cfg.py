@@ -352,21 +352,24 @@ process.GlobalTag.globaltag = globalTag
 #Only in 74X: to be revomed in 75X
 process.load("CondCore.DBCommon.CondDBSetup_cfi")
 process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
-process.CondDBSetup,
-timetype = cms.string('runnumber'),
-toGet = cms.VPSet(cms.PSet(
-record = cms.string('BTauGenericMVAJetTagComputerRcd'),
-tag = cms.string('MVAJetTags')
-)),
-connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags.db'),
-BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
+    process.CondDBSetup,
+    timetype = cms.string('runnumber'),
+    toGet = cms.VPSet(
+        cms.PSet(
+            record = cms.string('BTauGenericMVAJetTagComputerRcd'),
+            tag = cms.string('MVAJetTags')
+        )
+    ),
+    connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags.db'),
+    BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
 )
-### to activate the new JP calibration: using the data base
 process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
+### to activate the new JP calibration: using the data base
 process.GlobalTag.toGet = cms.VPSet(
- cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-      tag = cms.string("TrackProbabilityCalibration_3D_MC74X_50ns_v1"),
-      connect = cms.untracked.string("frontier://FrontierPrep/CMS_CONDITIONS"))
+    cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
+        tag = cms.string("TrackProbabilityCalibration_3D_MC74X_50ns_v1"),
+        connect = cms.untracked.string("frontier://FrontierPrep/CMS_CONDITIONS")
+    )
 )
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
@@ -902,7 +905,7 @@ if options.useLegacyTaggers:
 process.btagana.tracksColl            = cms.InputTag(trackSource) 
 process.btagana.useSelectedTracks     = True  ## False if you want to run on all tracks : for commissioning studies
 process.btagana.useTrackHistory       = False ## Can only be used with GEN-SIM-RECODEBUG files
-process.btagana.fillsvTagInfo = False ## True if you want to store information relative to the svTagInfos, set to False if produceJetTrackTree is set to False
+process.btagana.fillsvTagInfo         = False ## True if you want to store information relative to the svTagInfos, set to False if produceJetTrackTree is set to False
 process.btagana.produceJetTrackTree   = False ## True if you want to keep info for tracks associated to jets : for commissioning studies
 process.btagana.produceAllTrackTree   = False ## True if you want to keep info for all tracks : for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
