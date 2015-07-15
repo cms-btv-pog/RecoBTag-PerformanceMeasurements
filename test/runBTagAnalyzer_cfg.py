@@ -93,7 +93,7 @@ options.register('miniAOD', False,
 options.register('fastSim', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    "Running using fastSim"
+    "Running using FastSim"
 )
 options.register('useExplicitJTA', False,
     VarParsing.multiplicity.singleton,
@@ -137,9 +137,14 @@ options.setDefault('maxEvents', 10)
 options.parseArguments()
 
 print "Running on data: %s"%('True' if options.runOnData else 'False')
-print "Running using fastSim samples: %s"%('True' if options.fastSim else 'False')
-print "Running on miniAOD: %s"%('True' if options.miniAOD else 'False')
+print "Running using FastSim samples: %s"%('True' if options.fastSim else 'False')
+print "Running on MiniAOD: %s"%('True' if options.miniAOD else 'False')
 print "Using PFchs: %s"%('True' if options.usePFchs else 'False')
+
+## Subjets only stored when also running over fat jets
+if options.runSubJets and not options.runFatJets:
+    print "WARNING: You are attempting to store subjet information without running over fat jets. Please enable running over fat jets in order to store the subjet information."
+    options.runSubJets = False
 
 ## Global tag
 globalTag = options.mcGlobalTag
@@ -288,7 +293,6 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
         '/store/relval/CMSSW_7_4_0_pre8/RelValZpTT_1500_13TeV/GEN-SIM-RECO/MCRUN2_74_V7-v1/00000/58F8AA88-4BBD-E411-95D4-0025905A48F0.root'
         #'/store/mc/RunIISpring15DR74/QCD_Pt_1800to2400_TuneCUETP8M1_13TeV_pythia8/GEN-SIM-RECODEBUG/Asympt25nsRecodebug_MCRUN2_74_V9-v1/70000/0409C04E-CD02-E511-80FE-00266CFCC860.root'
-
     )
 )
 if options.miniAOD:
@@ -304,19 +308,22 @@ if options.fastSim:
         '/store/relval/CMSSW_7_4_0_pre9_ROOT6/RelValTTbar_13/GEN-SIM-DIGI-RECO/MCRUN2_74_V7_FastSim-v1/00000/026EF5C1-89D1-E411-9EBD-002590596490.root',
     ]
 
+## Define the output file name
 if options.runOnData :
-    if options.runSubJets :
-        options.outFilename += '_data_subjets.root'
-    else :
-        options.outFilename += '_data.root'
+    options.outFilename += '_data'
 else :
-    if options.runSubJets :
-        options.outFilename += '_mc_subjets.root'
-    else :
-        options.outFilename += '_mc.root'
+    options.outFilename += '_mc'
+
+if options.runFatJets :
+    options.outFilename += '_FatJets'
+
+if options.runSubJets :
+    options.outFilename += '_Subjets'
 
 if options.fastSim :
-    options.outFilename = 'JetTree_fastSim.root'
+    options.outFilename += '_FastSim'
+
+options.outFilename += '.root'
 
 ## Output file
 process.TFileService = cms.Service("TFileService",
