@@ -65,10 +65,15 @@ options.register('producePtRelTemplate', False,
     VarParsing.varType.bool,
     "Produce PtRel template"
 )
-options.register('fatJetPtMin', 150.0,
+options.register('fatJetRawPtMin', 150.0,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
-    "Minimum pT for fat jets (default is 150 GeV)"
+    "Minimum raw pT for fat jets (default is 150 GeV)"
+)
+options.register('fatJetPtMin', 200.0,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.float,
+    "Minimum pT for fat jets (default is 200 GeV)"
 )
 options.register('fatJetAbsEtaMax', 2.5,
     VarParsing.multiplicity.singleton,
@@ -500,7 +505,7 @@ process.PFJetsCHS = ak4PFJets.clone(
     src = (getattr(process,"ak4PFJets").src if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).src),
     srcPVs = (getattr(process,"ak4PFJets").srcPVs if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).srcPVs),
     doAreaFastjet = cms.bool(True),
-    jetPtMin = cms.double(options.fatJetPtMin)
+    jetPtMin = cms.double(options.fatJetRawPtMin)
 )
 ## Pruned fat jets (Gen and Reco) (each module produces two jet collections, fat jets and subjets)
 from RecoJets.JetProducers.SubJetParameters_cfi import SubJetParameters
@@ -522,7 +527,7 @@ process.PFJetsCHSPruned = ak4PFJetsPruned.clone(
     doAreaFastjet = cms.bool(True),
     writeCompound = cms.bool(True),
     jetCollInstanceName=cms.string("SubJets"),
-    jetPtMin = cms.double(options.fatJetPtMin)
+    jetPtMin = cms.double(options.fatJetRawPtMin)
 )
 ## SoftDrop fat jets (Gen and Reco) (each module produces two jet collections, fat jets and subjets)
 process.genJetsNoNuSoftDrop = ak4GenJets.clone(
@@ -546,7 +551,7 @@ process.PFJetsCHSSoftDrop = ak4PFJetsSoftDrop.clone(
     doAreaFastjet = cms.bool(True),
     writeCompound = cms.bool(True),
     jetCollInstanceName=cms.string("SubJets"),
-    jetPtMin = cms.double(options.fatJetPtMin)
+    jetPtMin = cms.double(options.fatJetRawPtMin)
 )
 
 if options.runFatJets:
@@ -571,7 +576,7 @@ if options.runFatJets:
         runIVF = options.runIVF,
         postfix = postfix
     )
-    getattr(process,'selectedPatJetsPFCHS'+postfix).cut = cms.string("abs(eta) < " + str(options.fatJetAbsEtaMax))
+    getattr(process,'selectedPatJetsPFCHS'+postfix).cut = cms.string("pt > %f && abs(eta) < %f"%(float(options.fatJetPtMin), float(options.fatJetAbsEtaMax)))
     addJetCollection(
         process,
         labelName='SoftDropPFCHS',
