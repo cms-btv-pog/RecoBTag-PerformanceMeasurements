@@ -4,6 +4,7 @@ ATTENTION: the excution of the command "git cms-merge-topic -u cms-btv-pog:FixSo
 cmsrel CMSSW_7_4_7
 cd CMSSW_7_4_7/src
 cmsenv
+setenv CMSSW_GIT_REFERENCE /cvmfs/cms.cern.ch/cmssw.git.daily
 git cms-init
 git remote add btv-cmssw https://github.com/cms-btv-pog/cmssw.git
 git fetch btv-cmssw
