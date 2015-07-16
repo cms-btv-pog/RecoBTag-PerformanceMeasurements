@@ -45,7 +45,7 @@ options.register('dataGlobalTag', 'GR_R_70_V2',
     VarParsing.varType.string,
     "Data global tag"
 )
-options.register('runFatJets', False,
+options.register('runFatJets', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Run fat jets"
@@ -934,10 +934,10 @@ if options.runFatJets:
     process.btaganaFatJets = process.btagana.clone(
         storeEventInfo      = cms.bool(not options.processStdAK4Jets),
         allowJetSkipping    = cms.bool(False),
-        storeTagVariables   = cms.bool(True),
+        storeTagVariables   = cms.bool(False),
         storeCSVTagVariables = cms.bool(False),
         storeTagVariablesSubJets = cms.bool(False),
-        storeCSVTagVariablesSubJets = cms.bool(True),
+        storeCSVTagVariablesSubJets = cms.bool(False),
         useSelectedTracks   = cms.bool(True),
         maxDeltaR           = cms.double(options.fatJetRadius),
         R0                  = cms.double(options.fatJetRadius),
