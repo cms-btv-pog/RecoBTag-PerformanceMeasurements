@@ -45,7 +45,7 @@ options.register('dataGlobalTag', 'GR_R_70_V2',
     VarParsing.varType.string,
     "Data global tag"
 )
-options.register('runFatJets', True,
+options.register('runFatJets', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Run fat jets"
