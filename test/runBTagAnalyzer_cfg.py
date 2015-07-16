@@ -926,7 +926,7 @@ process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Da
 process.btagana.genParticles          = cms.InputTag(genParticles)
 process.btagana.candidates            = cms.InputTag(pfCandidates)
 
-#fillsvTagInfo set to False independently from the choices above, if produceJetTrackTree is set to False
+## fillsvTagInfo set to False independently from the choices above, if produceJetTrackTree is set to False
 if not process.btagana.produceJetTrackTree:
     process.btagana.fillsvTagInfo = False
 

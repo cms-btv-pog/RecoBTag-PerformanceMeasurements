@@ -390,17 +390,6 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_tightID").c_str(),      Jet_tightID  ,(name+"Jet_tightID["+name+"nJet]/I").c_str());
 
       //--------------------------------------
-      // Inclusive Track information for PtRel template
-      //--------------------------------------
-      tree->Branch((name+"nTrkInc").c_str()      ,&nTrkInc     ,(name+"nTrkInc/I").c_str());
-      tree->Branch((name+"TrkInc_pt").c_str()    ,TrkInc_pt    ,(name+"TrkInc_pt["+name+"nTrkInc]/F").c_str());
-      tree->Branch((name+"TrkInc_eta").c_str()   ,TrkInc_eta   ,(name+"TrkInc_eta["+name+"nTrkInc]/F").c_str());
-      tree->Branch((name+"TrkInc_phi").c_str()   ,TrkInc_phi   ,(name+"TrkInc_phi["+name+"nTrkInc]/F").c_str());
-      tree->Branch((name+"TrkInc_ptrel").c_str() ,TrkInc_ptrel ,(name+"TrkInc_ptrel["+name+"nTrkInc]/F").c_str());
-      tree->Branch((name+"TrkInc_IPsig").c_str() ,TrkInc_IPsig ,(name+"TrkInc_IPsig["+name+"nTrkInc]/F").c_str());
-      tree->Branch((name+"TrkInc_IP").c_str()    ,TrkInc_IP    ,(name+"TrkInc_IP["+name+"nTrkInc]/F").c_str());
-
-      //--------------------------------------
       // pf electron information
       //--------------------------------------
       tree->Branch((name+"nPFElectron").c_str()         ,&nPFElectron        ,(name+"nPFElectron/I").c_str());
@@ -442,7 +431,10 @@ class JetInfoBranches {
       tree->Branch((name+"PFMuon_IP2D").c_str()        ,PFMuon_IP2D         ,(name+"PFMuon_IP2D["+name+"nPFMuon]/F").c_str());
       tree->Branch((name+"PFMuon_dz").c_str()          ,PFMuon_dz           ,(name+"PFMuon_dz["+name+"nPFMuon]/F").c_str());
       tree->Branch((name+"PFMuon_GoodQuality").c_str() ,PFMuon_GoodQuality  ,(name+"PFMuon_GoodQuality["+name+"nPFMuon]/I").c_str());
+    }
 
+    void RegisterJetSVTree(TTree *tree, std::string name="") {
+      if(name!="") name += ".";
       //--------------------------------------
       // secondary vertex information
       //--------------------------------------
@@ -515,6 +507,20 @@ class JetInfoBranches {
       tree->Branch((name+"Track_SVweight").c_str()   ,Track_SVweight   ,(name+"Track_SVweight["+name+"nTrack]/F").c_str());
       tree->Branch((name+"Track_isfromSV").c_str()   ,Track_isfromSV   ,(name+"Track_isfromSV["+name+"nTrack]/I").c_str());
       tree->Branch((name+"Track_category").c_str()   ,Track_category   ,(name+"Track_category["+name+"nTrack]/I").c_str());
+    }
+
+    void RegisterJetTrackIncTree(TTree *tree, std::string name="") {
+      if(name!="") name += ".";
+      //--------------------------------------
+      // Inclusive Track information for PtRel template
+      //--------------------------------------
+      tree->Branch((name+"nTrkInc").c_str()      ,&nTrkInc     ,(name+"nTrkInc/I").c_str());
+      tree->Branch((name+"TrkInc_pt").c_str()    ,TrkInc_pt    ,(name+"TrkInc_pt["+name+"nTrkInc]/F").c_str());
+      tree->Branch((name+"TrkInc_eta").c_str()   ,TrkInc_eta   ,(name+"TrkInc_eta["+name+"nTrkInc]/F").c_str());
+      tree->Branch((name+"TrkInc_phi").c_str()   ,TrkInc_phi   ,(name+"TrkInc_phi["+name+"nTrkInc]/F").c_str());
+      tree->Branch((name+"TrkInc_ptrel").c_str() ,TrkInc_ptrel ,(name+"TrkInc_ptrel["+name+"nTrkInc]/F").c_str());
+      tree->Branch((name+"TrkInc_IPsig").c_str() ,TrkInc_IPsig ,(name+"TrkInc_IPsig["+name+"nTrkInc]/F").c_str());
+      tree->Branch((name+"TrkInc_IP").c_str()    ,TrkInc_IP    ,(name+"TrkInc_IP["+name+"nTrkInc]/F").c_str());
     }
 
     void RegisterTagVarTree(TTree *tree, std::string name=""){
@@ -736,17 +742,6 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_tightID").c_str(),     Jet_tightID);
 
       //--------------------------------------
-      // Inclusive Track information for PtRel template
-      //--------------------------------------
-      tree->SetBranchAddress((name+"nTrkInc").c_str()      ,&nTrkInc     ) ;
-      tree->SetBranchAddress((name+"TrkInc_pt").c_str()    ,TrkInc_pt    ) ;
-      tree->SetBranchAddress((name+"TrkInc_eta").c_str()   ,TrkInc_eta   ) ;
-      tree->SetBranchAddress((name+"TrkInc_phi").c_str()   ,TrkInc_phi   ) ;
-      tree->SetBranchAddress((name+"TrkInc_ptrel").c_str() ,TrkInc_ptrel ) ;
-      tree->SetBranchAddress((name+"TrkInc_IPsig").c_str() ,TrkInc_IPsig ) ;
-      tree->SetBranchAddress((name+"TrkInc_IP").c_str()    ,TrkInc_IP    ) ;
-
-      //--------------------------------------
       // pf electron information
       //--------------------------------------
       tree->SetBranchAddress((name+"nPFElectron").c_str()         ,&nPFElectron        ) ;
@@ -788,7 +783,10 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"PFMuon_IP2D").c_str()        ,PFMuon_IP2D         ) ;
       tree->SetBranchAddress((name+"PFMuon_dz").c_str()          ,PFMuon_dz           ) ;
       tree->SetBranchAddress((name+"PFMuon_GoodQuality").c_str() ,PFMuon_GoodQuality  ) ;
+    }
 
+    void ReadJetSVTree(TTree *tree, std::string name="") {
+      if (name!="") name += ".";
       //--------------------------------------
       // secondary vertex information
       //--------------------------------------
@@ -861,6 +859,20 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Track_SVweight").c_str()  ,Track_SVweight ) ;
       tree->SetBranchAddress((name+"Track_isfromSV").c_str()  ,Track_isfromSV ) ;
       tree->SetBranchAddress((name+"Track_category").c_str()  ,Track_category ) ;
+    }
+
+    void ReadJetTrackIncTree(TTree *tree, std::string name="") {
+      if (name!="") name += ".";
+      //--------------------------------------
+      // Inclusive Track information for PtRel template
+      //--------------------------------------
+      tree->SetBranchAddress((name+"nTrkInc").c_str()      ,&nTrkInc     ) ;
+      tree->SetBranchAddress((name+"TrkInc_pt").c_str()    ,TrkInc_pt    ) ;
+      tree->SetBranchAddress((name+"TrkInc_eta").c_str()   ,TrkInc_eta   ) ;
+      tree->SetBranchAddress((name+"TrkInc_phi").c_str()   ,TrkInc_phi   ) ;
+      tree->SetBranchAddress((name+"TrkInc_ptrel").c_str() ,TrkInc_ptrel ) ;
+      tree->SetBranchAddress((name+"TrkInc_IPsig").c_str() ,TrkInc_IPsig ) ;
+      tree->SetBranchAddress((name+"TrkInc_IP").c_str()    ,TrkInc_IP    ) ;
     }
 
     void ReadTagVarTree(TTree *tree, std::string name=""){
