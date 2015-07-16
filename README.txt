@@ -1,13 +1,12 @@
 # RecoBTag-PerformanceMeasurements
 ATTENTION: the excution of the command "git cms-merge-topic -u cms-btv-pog:FixSoftElectronTagger_from-CMSSW_7_4_5" in the following recipe fixes a bug in the soft-electron tagger in 74X. This bug is not fixed in the official 74X reconstruction, so one is effectively running an algorithm different from what is in the standard reconstruction! 
 =========================
-cmsrel CMSSW_7_4_5
-cd CMSSW_7_4_5/src
+cmsrel CMSSW_7_4_7
+cd CMSSW_7_4_7/src
 cmsenv
 git cms-init
 git remote add btv-cmssw https://github.com/cms-btv-pog/cmssw.git
 git fetch btv-cmssw
-git cms-merge-topic -u cms-btv-pog:BoostedDoubleSVTagger-WithWeightFiles-v2_from-CMSSW_7_4_1
 git cms-merge-topic -u cms-btv-pog:FixSoftElectronTagger-v1_from-CMSSW_7_4_1
 git cms-merge-topic -u cms-btv-pog:CSVv2InCombinedMVA-v1_from-CMSSW_7_4_5
 
