@@ -35,12 +35,12 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
-options.register('mcGlobalTag', 'MCRUN2_74_V9',
+options.register('mcGlobalTag', 'MCRUN2_74_V9A',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', 'GR_R_70_V2',
+options.register('dataGlobalTag', '74X_dataRun2_Prompt_v0',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
