@@ -12,7 +12,7 @@ git cms-merge-topic -u cms-btv-pog:FixSoftElectronTagger-v1_from-CMSSW_7_4_1
 git cms-merge-topic -u cms-btv-pog:CSVv2InCombinedMVA-v1_from-CMSSW_7_4_5
 
 git clone -b V00-00-01 git://github.com/cms-btv-pog/cms-EventCounter.git MyAnalysis/EventCounter
-git clone -b 7_4_X_v1.11 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b 7_4_X_v1.12 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
