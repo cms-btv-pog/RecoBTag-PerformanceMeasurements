@@ -55,10 +55,8 @@ class TTbarSelectionFilter : public edm::EDFilter {
       virtual bool endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
 
       // ----------member data ---------------------------
-      bool select_ee_ ;
-      bool select_mumu_ ;
-      bool select_emu_ ;
-      bool select_all_ ;
+     std::vector<int> selectChannels_;
+     bool selectAll_;
 };
 
 //
@@ -75,11 +73,9 @@ class TTbarSelectionFilter : public edm::EDFilter {
 TTbarSelectionFilter::TTbarSelectionFilter(const edm::ParameterSet& iConfig)
 {
    //now do what ever initialization is needed
-   channel_      = iConfig.getParameter<edm::InputTag> ("channel");
-   select_ee_            = iConfig.getParameter<bool > ("select_ee");
-   select_mumu_            = iConfig.getParameter<bool > ("select_mumu");
-   select_emu_            = iConfig.getParameter<bool > ("select_emu");
-   select_all_            = iConfig.getParameter<bool > ("Keep_all_events");
+   channel_        = iConfig.getParameter<edm::InputTag> ("channel");
+   selectChannels_ = iConfig.getParameter<std::vector<int> > ("selectChannels");
+   selectAll_     = iConfig.getParameter<bool > ("selectAll");
 }
 
 
@@ -101,21 +97,10 @@ bool
 TTbarSelectionFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
-   
    Handle<int> pIn;
    iEvent.getByLabel(channel_, pIn);
-   
-   bool isTTbar = false;
-
-   //std::cout << " valeur de la selection ttbar " << *pIn << std::endl;
-   //if(   *pIn>= 0 ) isTTbar = true;
-   if (*pIn==0 && select_ee_)   isTTbar = true;
-   if (*pIn==1 && select_mumu_) isTTbar = true;
-   if (*pIn==2 && select_emu_)  isTTbar = true;
-   if (select_all_)             isTTbar = true;
-
-
-   return isTTbar;
+   std::vector<int>::iterator it = find (selectChannels_.begin(), selectChannels_.end(), *pIn);
+   return ( it!=selectChannels_.end() || selectAll_);
 }
 
 // ------------ method called once each job just before starting event loop  ------------
