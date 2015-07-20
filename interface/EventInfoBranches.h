@@ -168,15 +168,12 @@ class EventInfoBranches {
     float PatMuon_IP2Dsig[1000];
 
     int   ttbar_chan;
-    float lepton1_pT;
-    float lepton2_pT;
-    float lepton1_eta;
-    float lepton2_eta;
-    float lepton1_phi;
-    float lepton2_phi;
-    float met;
-    float mll;
-    int   trig_ttbar;
+    int   ttbar_nl, ttbar_lid[10], ttbar_lgid[10], ttbar_lch[10];
+    float ttbar_lpt[10], ttbar_leta[10], ttbar_lphi[10], ttbar_lm[10];
+    float ttbar_metpt,ttbar_metphi;
+    float ttbar_rho;
+    int   ttbar_nw;
+    float ttbar_w[500];
 
 
     void RegisterTree(TTree *tree) {
@@ -322,16 +319,20 @@ class EventInfoBranches {
     }
 
     void RegisterTTbarTree(TTree *tree) {
-      tree->Branch("ttbar_chan" , &ttbar_chan , "ttbar_chan/I");
-      tree->Branch("lepton1_pT" , &lepton1_pT , "lepton1_pT/F");
-      tree->Branch("lepton1_eta", &lepton1_eta, "lepton1_eta/F");
-      tree->Branch("lepton1_phi", &lepton1_phi, "lepton1_phi/F");
-      tree->Branch("lepton2_pT" , &lepton2_pT , "lepton2_pT/F");
-      tree->Branch("lepton2_eta", &lepton2_eta, "lepton2_eta/F");
-      tree->Branch("lepton2_phi", &lepton2_phi, "lepton2_phi/F");
-      tree->Branch("met"        , &met        , "met/F");
-      tree->Branch("mll"        , &mll        , "mll/F");
-      tree->Branch("trig_ttbar" , &trig_ttbar , "trig_ttbar/I");
+      tree->Branch("ttbar_chan" , &ttbar_chan  , "ttbar_chan/I");
+      tree->Branch("ttbar_nl"   , &ttbar_nl    , "ttbar_nl/I");
+      tree->Branch("ttbar_lpt"  ,  ttbar_lpt   , "ttbar_lpt[ttbar_nl]/F");
+      tree->Branch("ttbar_leta" ,  ttbar_leta  , "ttbar_leta[ttbar_nl]/F");
+      tree->Branch("ttbar_lphi" ,  ttbar_lphi  , "ttbar_lphi[ttbar_nl]/F");
+      tree->Branch("ttbar_lm"   ,  ttbar_lm    , "ttbar_lm[ttbar_nl]/F");
+      tree->Branch("ttbar_lid"  ,  ttbar_lid   , "ttbar_lid[ttbar_nl]/I");
+      tree->Branch("ttbar_lgid" ,  ttbar_lgid  , "ttbar_lgid[ttbar_nl]/I");
+      tree->Branch("ttbar_lch"  ,  ttbar_lch   , "ttbar_lch[ttbar_nl]/I");
+      tree->Branch("ttbar_metpt",  &ttbar_metpt,  "ttbar_metpt/F");
+      tree->Branch("ttbar_metphi", &ttbar_metphi, "ttbar_metphi/F");
+      tree->Branch("ttbar_rho"  , &ttbar_rho   , "ttbar_rho/F");
+      tree->Branch("ttbar_nw"  ,  &ttbar_nw    , "ttbar_nw/I");
+      tree->Branch("ttbar_w"    ,  ttbar_w     , "ttbar_w[ttbar_nw]/F");
     }
 
     void RegisterPatMuonTree(TTree *tree) {
@@ -500,16 +501,20 @@ class EventInfoBranches {
     }
 
     void ReadTTbarTree(TTree *tree) {
-      tree->SetBranchAddress("ttbar_chan" , &ttbar_chan );
-      tree->SetBranchAddress("lepton1_pT" , &lepton1_pT );
-      tree->SetBranchAddress("lepton1_eta", &lepton1_eta);
-      tree->SetBranchAddress("lepton1_phi", &lepton1_phi);
-      tree->SetBranchAddress("lepton2_pT" , &lepton2_pT );
-      tree->SetBranchAddress("lepton2_eta", &lepton2_eta);
-      tree->SetBranchAddress("lepton2_phi", &lepton2_phi);
-      tree->SetBranchAddress("met"        , &met        );
-      tree->SetBranchAddress("mll"        , &mll        );
-      tree->SetBranchAddress("trig_ttbar" , &trig_ttbar );
+      tree->SetBranchAddress("ttbar_chan" , &ttbar_chan);
+      tree->SetBranchAddress("ttbar_nl"   , &ttbar_nl);
+      tree->SetBranchAddress("ttbar_lpt"  ,  ttbar_lpt); 
+      tree->SetBranchAddress("ttbar_leta" ,  ttbar_leta);
+      tree->SetBranchAddress("ttbar_lphi" ,  ttbar_lphi);
+      tree->SetBranchAddress("ttbar_lm"   ,  ttbar_lm);
+      tree->SetBranchAddress("ttbar_lid"  ,  ttbar_lid);
+      tree->SetBranchAddress("ttbar_lgid" ,  ttbar_lgid);
+      tree->SetBranchAddress("ttbar_lch"  ,  ttbar_lch);
+      tree->SetBranchAddress("ttbar_metpt"  , &ttbar_metpt);
+      tree->SetBranchAddress("ttbar_metphi"  , &ttbar_metphi);
+      tree->SetBranchAddress("ttbar_rho"  , &ttbar_rho);
+      tree->SetBranchAddress("ttbar_nw"  ,  &ttbar_nw);
+      tree->SetBranchAddress("ttbar_w"    ,  ttbar_w);
     }
 
     void ReadPatMuonTree(TTree *tree) {

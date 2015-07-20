@@ -1,6 +1,3 @@
-
-
-
 // -*- C++ -*-
 //
 // Package:    TTbarSelectionProducer
@@ -33,6 +30,7 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Framework/interface/ESHandle.h"
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
 //--------------------PAT includes
 #include "DataFormats/PatCandidates/interface/Particle.h"
@@ -40,7 +38,12 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
 
+#include "DataFormats/Common/interface/ValueMap.h"
+#include "DataFormats/EgammaCandidates/interface/ConversionFwd.h"
+#include "DataFormats/EgammaCandidates/interface/Conversion.h"
+#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionFinder.h"
@@ -82,58 +85,48 @@ class TTbarSelectionProducer : public edm::EDProducer {
       virtual void endRun(edm::Run&, edm::EventSetup const&);
       virtual void beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
       virtual void endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
-      
-      
-      bool isData_;
-      
-      //Configuration for electrons
-      
+
+      //triggers
+      edm::EDGetTokenT<edm::TriggerResults> triggerBits_;
+      HLTConfigProvider hltConfig;
+      std::vector<std::string> trigNamesToSel_;
+      bool doTrigSel_;
+
+      //Configuration for electrons      
+      edm::EDGetTokenT<edm::View<pat::Electron> > electronToken_;
       edm::InputTag electronColl_;
-      
+      edm::EDGetTokenT<reco::ConversionCollection> conversionsToken_;
+      edm::EDGetTokenT<edm::ValueMap<bool> > electronIdMapToken_;
       double electron_cut_pt_ ; 
       double electron_cut_eta_;
       double electron_cut_iso_;
    
       //Configuration for muons
-   
-   
+      edm::EDGetTokenT<pat::MuonCollection> muonToken_;
       edm::InputTag muonColl_ ;
       double muon_cut_pt_ ;
       double muon_cut_eta_ ;
       double muon_cut_iso_;
    
       //Configuration for jets 
-   
+      edm::EDGetTokenT<pat::JetCollection> jetToken_;
       edm::InputTag jetColl_;
       double jet_cut_pt_ ;
       double jet_cut_eta_ ;
    
       //Configuration for met 
+      edm::EDGetTokenT<pat::METCollection> metToken_;
       edm::InputTag metColl_;
       double met_cut_ ;
    
-      // Extract info for BeamSpot
-      //bool doBeamSpot_  ;  
-      //edm::InputTag beamSpotProducer_;
-      
-      
-      //Configuration for tracks 
-      
-      edm::InputTag trackColl_;
-      // ----------member data ---------------------------
-      
-      void GetLeptonPair(std::vector<TLorentzVector> electrons, std::vector<TLorentzVector> muons, 
-                          std::vector<int> electronCharges, std::vector<int> muonCharges, 
-			  int &idxLept1, int &idxLept2, int &thechannel);
-
       // ----- histo -------
-      edm::Service<TFileService> fs;
-      TH1F* hcheck_cutflow        ;
-      TH1F* hcheck_m_ee           ;
-      TH1F* hcheck_m_emu          ;
-      TH1F* hcheck_m_mumu         ;
-      TH1F* hcheck_met_ee         ;
-      TH1F* hcheck_met_emu        ;
-      TH1F* hcheck_met_mumu       ;
-			  
+      std::map<std::string, TH1F *> histos_;
+  
+      //verbose level
+      int verbose_;
+
+      //return the channel selected
+      int AssignChannel(std::vector<pat::Electron> &selElectrons,
+			std::vector<pat::Muon> &selMuons,
+			int trigWord);
 };
