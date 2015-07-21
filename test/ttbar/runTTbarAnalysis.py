@@ -150,6 +150,8 @@ def runTTbarAnalysis(inFile, outFile, wgt, taggers, tmvaWgts=None):
                 #if never in kinematic range forget this jet
                 if not canBeSelected : del selJets[ij]
 
+        #generator level weight
+        wgt=1.0 if tree.ttbar_nw==0 else tree.ttbar_w[0]
 
         #n-1 plots
         zCand   = True if 'll' in ch and ROOT.TMath.Abs(mll-91)<15 else False

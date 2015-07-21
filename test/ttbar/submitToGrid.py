@@ -25,7 +25,7 @@ def submitProduction(tag,lfnDirBase,dataset,isData,cfg,workDir,lumiMask,submit=F
     config_file.write('config.JobType.pluginName = "Analysis"\n')
     config_file.write('config.JobType.psetName = "'+cfg+'"\n')
     config_file.write('config.JobType.disableAutomaticOutputCollection = False\n')
-    config_file.write('config.JobType.pyCfgParams = [\'useTTbarFilter=True\', \'miniAOD=True\', \'usePFchs=True\', \'maxEvents=-1\', \'runOnData=%s\']\n' % bool(isData))    
+    config_file.write('config.JobType.pyCfgParams = [\'useTTbarFilter=True\', \'miniAOD=True\', \'maxEvents=-1\', \'runOnData=%s\']\n' % bool(isData))    
     config_file.write('\n')
     config_file.write('config.section_("Data")\n')
     config_file.write('config.Data.inputDataset = "%s"\n' % dataset)

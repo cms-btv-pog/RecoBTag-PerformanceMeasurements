@@ -1276,15 +1276,17 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     if(!isData_)
       {
 	try{
-	  edm::Handle<LHEEventProduct> evet;
-	  iEvent.getByLabel("externalLHEProducer","", evet);
 	  edm::Handle<GenEventInfoProduct> evt;
 	  iEvent.getByLabel("generator","", evt);
-	  const std::vector< double > w = evt->weights();
+	  EventInfo.ttbar_w[0]=evt->weight();
+	  EventInfo.ttbar_nw++;
+
+	  edm::Handle<LHEEventProduct> evet;
+	  iEvent.getByLabel("externalLHEProducer","", evet);
+	  double asdd=evet->originalXWGTUP();
 	  for(unsigned int i=0; i<evet->weights().size();i++){
-	    double asdd=evet->originalXWGTUP();
 	    double asdde=evet->weights()[i].wgt;
-	    EventInfo.ttbar_w[EventInfo.ttbar_nw]=evt->weight()*asdde/asdd;
+	    EventInfo.ttbar_w[EventInfo.ttbar_nw]=EventInfo.ttbar_w[0]*asdde/asdd;
 	    EventInfo.ttbar_nw++;
 	  }
 	}catch(...){
