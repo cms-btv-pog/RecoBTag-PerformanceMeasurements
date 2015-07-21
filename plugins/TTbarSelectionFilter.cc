@@ -98,7 +98,7 @@ TTbarSelectionFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
    Handle<int> pIn;
-   iEvent.getByLabel(channel_, pIn);
+   iEvent.getByLabel(edm::InputTag("ttbarselectionproducer:topChannel"), pIn);
    std::vector<int>::iterator it = find (selectChannels_.begin(), selectChannels_.end(), *pIn);
    return ( it!=selectChannels_.end() || selectAll_);
 }

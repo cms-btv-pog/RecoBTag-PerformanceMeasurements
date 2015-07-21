@@ -89,6 +89,7 @@ class TTbarSelectionProducer : public edm::EDProducer {
       //triggers
       edm::EDGetTokenT<edm::TriggerResults> triggerBits_;
       HLTConfigProvider hltConfig;
+      std::vector<int> trigChannels_;
       std::vector<std::string> trigNamesToSel_;
       bool doTrigSel_;
 

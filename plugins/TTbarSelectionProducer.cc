@@ -21,6 +21,7 @@ TTbarSelectionProducer::TTbarSelectionProducer(const edm::ParameterSet& iConfig)
   verbose_           = iConfig.getParameter<int > ("verbose");
   
   trigNamesToSel_     = iConfig.getParameter<std::vector<std::string> >("trigNamesToSel");
+  trigChannels_       = iConfig.getParameter<std::vector<int> >("trigChannels");
   doTrigSel_          = iConfig.getParameter<bool>("doTrigSel");
 
   //Configuration for electrons
@@ -41,12 +42,12 @@ TTbarSelectionProducer::TTbarSelectionProducer(const edm::ParameterSet& iConfig)
   met_cut_   = iConfig.getParameter<double>        ("met_cut");
   
   //produce
-  produces<int>();
+  produces<int>("topChannel");
+  produces<int>("topTrigger");
   produces<std::vector<pat::Electron> >();
   produces<std::vector<pat::Muon> >();
   produces<std::vector<pat::Jet> >();
   produces<std::vector<pat::MET> >();
-  
 
   // some histograms
   edm::Service<TFileService> fs;
@@ -96,6 +97,7 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
        std::cout << "Initialization of HLTConfigProvider failed!!" << std::endl;
        return;
      }   
+   std::vector<bool> passTriggers(trigNamesToSel_.size(),false);
    for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) 
      {
        if(!triggerBits->accept(i)) continue;
@@ -107,10 +109,14 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	 {
 	   if(trigName.find(*trigIt)==std::string::npos) continue;
 	   trigWord |= (1<<tctr);
+	   passTriggers[tctr];
 	 }
      }
    if(verbose_>5) std::cout << "Trigger word is: " << trigWord << std::endl;
-
+   
+   //disabel trigger selection in MC, only trigger word will be stored
+   bool isData=iEvent.isRealData();
+   if(!isData) doTrigSel_=false;
    
    //------------------------------------------
    //get beam spot
@@ -283,8 +289,10 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
      }
    else if(verbose_>5) std::cout << "\t Event is selected " << std::endl;
 
+   std::auto_ptr<int> trigWordOut( new int(trigWord) );
+   iEvent.put(trigWordOut,"topTrigger");
    std::auto_ptr<int > chOut( new int (chsel) );
-   iEvent.put(chOut);
+   iEvent.put(chOut,"topChannel");
    auto_ptr<vector<pat::Electron> > eleColl( new vector<pat::Electron>(selElectrons) );
    iEvent.put( eleColl );
    auto_ptr<vector<pat::Muon> > muColl( new vector<pat::Muon>(selMuons) );
@@ -371,8 +379,32 @@ TTbarSelectionProducer::AssignChannel(std::vector<pat::Electron> &selElectrons,
 {
   int chsel(0);
 
-  if(selMuons.size()==1 && selElectrons.size()==0) chsel=selMuons[0].charge()*(-13);
-  if(selMuons.size()==0 && selElectrons.size()==1) chsel=selElectrons[0].charge()*(-11);
+  //check which triggers fired
+  bool triggerSingleMu(false), triggerSingleEle(false), triggerDoubleMu(false), triggerMuEG(false), triggerDoubleEle(false);
+  if(doTrigSel_)
+    {
+      for(size_t i=0; i<trigChannels_.size(); i++)
+	{
+	  bool hasTrigger((trigWord>>i) & 0x1);
+	  triggerSingleMu  |= ( abs(trigChannels_[i])==13 && hasTrigger);
+	  triggerSingleEle |= ( abs(trigChannels_[i])==11 && hasTrigger);
+	  triggerDoubleMu  |= ( abs(trigChannels_[i])==13*13 && hasTrigger);
+	  triggerMuEG      |= ( abs(trigChannels_[i])==11*13 && hasTrigger);
+	  triggerDoubleEle |= ( abs(trigChannels_[i])==11*11 && hasTrigger);
+	}
+    }
+  else
+    {
+      triggerSingleMu=true;
+      triggerSingleEle=true;
+      triggerDoubleMu=true; 
+      triggerMuEG=true; 
+      triggerDoubleEle=true;
+    }
+
+  //assign dilepton channel
+  if(selMuons.size()==1 && selElectrons.size()==0 && triggerSingleMu) chsel=selMuons[0].charge()*(-13);
+  if(selMuons.size()==0 && selElectrons.size()==1 && triggerSingleEle) chsel=selElectrons[0].charge()*(-11);
   if(selMuons.size()+selElectrons.size()>=2)
     {
       float sumPt_ee(0.);
@@ -408,19 +440,19 @@ TTbarSelectionProducer::AssignChannel(std::vector<pat::Electron> &selElectrons,
 	    iem[0]=i; iem[1]=j;
 	  }
 
-      if(sumPt_em>=sumPt_ee && sumPt_em>=sumPt_mm)
+      if(sumPt_em>=sumPt_ee && sumPt_em>=sumPt_mm && triggerMuEG)
 	{
 	  std::vector<pat::Muon> newSelMuons(1,selMuons[iem[0]]);             selMuons=newSelMuons;
 	  std::vector<pat::Electron> newSelElectrons(1,selElectrons[iem[1]]); selElectrons=newSelElectrons;
 	  chsel=selElectrons[0].charge()*(-11)*selMuons[0].charge()*(-13);
 	}
-      else if(sumPt_mm>=sumPt_ee && sumPt_mm>=sumPt_em)
+      else if(sumPt_mm>=sumPt_ee && sumPt_mm>=sumPt_em && triggerDoubleMu)
 	{
 	  selElectrons.clear();
 	  std::vector<pat::Muon> newSelMuons(2); newSelMuons[0]=selMuons[imm[0]]; newSelMuons[1]=selMuons[imm[1]]; selMuons=newSelMuons;
 	  chsel=selMuons[0].charge()*(-13)*selMuons[1].charge()*(-13);
 	}
-      else if(sumPt_ee>=sumPt_mm && sumPt_ee>=sumPt_em)
+      else if(sumPt_ee>=sumPt_mm && sumPt_ee>=sumPt_em && triggerDoubleEle)
 	{
 	  selMuons.clear();
 	  std::vector<pat::Electron> newSelElectrons(2); newSelElectrons[0]=selElectrons[iee[0]]; newSelElectrons[1]=selElectrons[iee[1]]; selElectrons=newSelElectrons;

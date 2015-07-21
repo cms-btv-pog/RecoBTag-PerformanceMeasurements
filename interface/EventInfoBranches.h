@@ -167,7 +167,7 @@ class EventInfoBranches {
     float PatMuon_IP2D[1000];
     float PatMuon_IP2Dsig[1000];
 
-    int   ttbar_chan;
+    int   ttbar_chan, ttbar_trigWord;
     int   ttbar_nl, ttbar_lid[10], ttbar_lgid[10], ttbar_lch[10];
     float ttbar_lpt[10], ttbar_leta[10], ttbar_lphi[10], ttbar_lm[10];
     float ttbar_metpt,ttbar_metphi;
@@ -320,6 +320,7 @@ class EventInfoBranches {
 
     void RegisterTTbarTree(TTree *tree) {
       tree->Branch("ttbar_chan" , &ttbar_chan  , "ttbar_chan/I");
+      tree->Branch("ttbar_trigWord" , &ttbar_trigWord, "ttbar_trigWord/I");
       tree->Branch("ttbar_nl"   , &ttbar_nl    , "ttbar_nl/I");
       tree->Branch("ttbar_lpt"  ,  ttbar_lpt   , "ttbar_lpt[ttbar_nl]/F");
       tree->Branch("ttbar_leta" ,  ttbar_leta  , "ttbar_leta[ttbar_nl]/F");
@@ -502,6 +503,7 @@ class EventInfoBranches {
 
     void ReadTTbarTree(TTree *tree) {
       tree->SetBranchAddress("ttbar_chan" , &ttbar_chan);
+      tree->SetBranchAddress("ttbar_trigWord" , &ttbar_trigWord);
       tree->SetBranchAddress("ttbar_nl"   , &ttbar_nl);
       tree->SetBranchAddress("ttbar_lpt"  ,  ttbar_lpt); 
       tree->SetBranchAddress("ttbar_leta" ,  ttbar_leta);

@@ -397,7 +397,8 @@ process.out = cms.OutputModule("PoolOutputModule",
     SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
     # save PAT Layer 1 output; you need a '*' to
     # unpack the list of commands 'patEventContent'
-    outputCommands = cms.untracked.vstring('drop *', *patEventContent)
+#    outputCommands = cms.untracked.vstring('drop *', *patEventContent)
+    outputCommands = cms.untracked.vstring('keep *', *patEventContent)
 )
 
 #-------------------------------------
@@ -715,9 +716,9 @@ if options.runFatJets:
 #-------------------------------------
 
 #-------------------------------------
-if options.runOnData:
+#if options.runOnData:
     ## Remove MC matching when running over data
-    removeMCMatching( process, ['All'] )
+    #removeMCMatching( process, ['All'] )
 
 #-------------------------------------
 ## Add GenParticlePruner for boosted b-tagging studies
