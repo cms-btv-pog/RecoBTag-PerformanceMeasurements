@@ -307,7 +307,8 @@ if options.miniAOD:
     ]
 if options.runOnData:
     process.source.fileNames = [
-        '/store/relval/CMSSW_7_4_0_pre7/SingleMu/RECO/GR_R_74_V8A_RelVal_mu2012D-v1/00000/004E151D-D8B6-E411-A889-0025905B859E.root'
+        '/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/168/00000/60FF8405-EA26-E511-A892-02163E01387D.root'
+        #'/store/relval/CMSSW_7_4_0_pre7/SingleMu/RECO/GR_R_74_V8A_RelVal_mu2012D-v1/00000/004E151D-D8B6-E411-A889-0025905B859E.root'
     ]
 if options.fastSim:
     process.source.fileNames = [
@@ -398,8 +399,7 @@ process.out = cms.OutputModule("PoolOutputModule",
     SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
     # save PAT Layer 1 output; you need a '*' to
     # unpack the list of commands 'patEventContent'
-#    outputCommands = cms.untracked.vstring('drop *', *patEventContent)
-    outputCommands = cms.untracked.vstring('keep *', *patEventContent)
+    outputCommands = cms.untracked.vstring('drop *', *patEventContent)
 )
 
 #-------------------------------------
@@ -717,9 +717,10 @@ if options.runFatJets:
 #-------------------------------------
 
 #-------------------------------------
-#if options.runOnData:
-    ## Remove MC matching when running over data
-    #removeMCMatching( process, ['All'] )
+if options.runOnData:
+    # Remove MC matching when running over data
+    from PhysicsTools.PatAlgos.tools.coreTools import removeMCMatching
+    removeMCMatching( process, ['All'] )
 
 #-------------------------------------
 ## Add GenParticlePruner for boosted b-tagging studies

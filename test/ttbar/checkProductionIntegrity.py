@@ -11,9 +11,9 @@ def main():
     #configuration
     usage = 'usage: %prog [options]'
     parser = optparse.OptionParser(usage)
-    parser.add_option('-i', '--inDir',       dest='inDir',       help='input directory with files',      default=None,   type='string')
-    parser.add_option('-c', '--cleanup',     dest='cleanup',     help='removes original crab directory', default =False, action='store_true')
-    parser.add_option(      '--nocheck',     dest='nocheck',     help='do not prompt user',              default=False,  action='store_true')
+    parser.add_option('-i', '--inDir',       dest='inDir',       help='input directory with files',               default=None,   type='string')
+    parser.add_option('-c', '--cleanup',     dest='cleanup',     help='removes original crab directory',          default =False, action='store_true')
+    parser.add_option(      '--nocheck',     dest='nocheck',     help='do not prompt user',                       default=False,  action='store_true')
     (opt, args) = parser.parse_args()
 
     dset_list=getEOSlslist(directory=opt.inDir,prepend='')
@@ -42,11 +42,33 @@ def main():
         if not opt.nocheck:
             choice = raw_input('Will move to %s current output directory. [y/n] ?' % newDir ).lower()
             if not 'y' in choice : continue
-
         os.system('cmsMkdir %s' % newDir)
-        for f in file_list : os.system('cmsStage -f %s %s/' % (f, newDir) )
+
+        moveIndividualFiles=True
+        if len(file_list)>5:
+            subgroupMerge = int( raw_input('This set has %d files. Merge into groups? (enter 0 if no merging)' % len(file_list)) )
+            if subgroupMerge>0:
+                moveIndividualFiles=False
+
+                splitFunc = lambda A, n=5: [A[i:i+n] for i in range(0, len(A), n)]
+                split_file_lists = splitFunc( file_list )
+                
+                for ilist in xrange(0,len(split_file_lists)):
+                    mergedFileName='/tmp/MergedJetTree_%d.root '%ilist
+                    toAdd='%s ' % mergedFileName
+                    for f in split_file_lists[ilist]:
+                        os.system('cmsStage -f %s /tmp/' % f)
+                        toAdd += '/tmp/'+os.path.basename(f) + ' '
+                    os.system('hadd -f %s'%toAdd)
+                    os.system('cmsStage -f %s %s/' %(mergedFileName,newDir))
+                    os.system('rm %s' % toAdd)
+
+        #if still needed copy individual files
+        if moveIndividualFiles:
+            for f in file_list : os.system('cmsStage -f %s %s/' % (f, newDir) )
+
         if not opt.nocheck and opt.cleanup : 
-            choce = raw_input('Will remove output directory. [y/n] ?').lower()
+            choice = raw_input('Will remove output directory. [y/n] ?').lower()
             if 'y' in choice: os.system('cmsRm -r %s' % dset)
 
         print 'Crab outputs may now be found in %s' % newDir
