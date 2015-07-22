@@ -9,13 +9,20 @@ from array import array
 from storeTools import getEOSlslist
 from systTools import smearJetEnergyResolution
 
-LUMI=1000
 CHANNELS={-11*11:'ll', -13*13:'ll', -11*13:'emu'}
 
 """
 Perform the analysis on a single file
 """
 def runTTbarAnalysis(inFile, outFile, wgt, taggers, tmvaWgts=None):
+
+    useOnlySignOfGenWeight=False
+    if 'MC13TeV_DYJetsToLL' in inFile or 'MC13TeV_WJets' in inFile : useOnlySignOfGenWeight=True
+    allowedChannels=[]
+    if 'Data13TeV_DoubleMu' in inFile : allowedChannels.append(-13*13)
+    if 'Data13TeV_MuonEG'   in inFile : allowedChannels.append(-11*13)
+    if 'Data13TeV_DoubleEG' in inFile : allowedChannels.append(-11*11)
+
 
     #prepare output and histograms
     outF=ROOT.TFile.Open(outFile,'RECREATE')
@@ -73,14 +80,13 @@ def runTTbarAnalysis(inFile, outFile, wgt, taggers, tmvaWgts=None):
     #init a tmva reader
     tmvaReader=None if tmvaWgts is None else ROOT.TMVA.Reader()
     tmvaVars={}
-    if not tmvaReader is None :
-        ivar=0
-        for v in ['close_mlj[0]', 'close_ptrel', 'close_dphi', 'close_deta',
-                  'far_mlj',      'far_ptrel',   'far_dphi',   'far_deta']:
-            tmvaVars[v]=array('f',[0.])
-            tmvaReader.AddVariable(v,tmvaVars[v])
-            ivar+=1
-        tmvaReader.BookMVA('BDT',tmvaWgts)
+    ivar=0
+    for v in ['close_mlj[0]', 'close_ptrel', 'close_dphi', 'close_deta',
+              'far_mlj',      'far_ptrel',   'far_dphi',   'far_deta']:
+        tmvaVars[v]=array('f',[0.])
+        if not tmvaReader is None : tmvaReader.AddVariable(v,tmvaVars[v])
+        ivar+=1
+    if not tmvaReader is None : tmvaReader.BookMVA('BDT',tmvaWgts)
 
     #replicate histos per channel
     histos={}
@@ -98,6 +104,14 @@ def runTTbarAnalysis(inFile, outFile, wgt, taggers, tmvaWgts=None):
     print '....opened %s -> analysing %d events -> %s' % (inFile,nentries,outFile)
     for i in xrange(0,nentries): 
         tree.GetEntry(i)
+        
+        #progress bar
+        if i%100==0 : print '\r[ %3d/100 ] to completion' % int(100.*i/nentries),
+
+        #make sure data is orthogonal
+        if len(allowedChannels)>0:
+            if not tree.ttbar_chan in allowedChannels:
+                continue
 
         #channel name
         ch=''
@@ -151,14 +165,20 @@ def runTTbarAnalysis(inFile, outFile, wgt, taggers, tmvaWgts=None):
                 if not canBeSelected : del selJets[ij]
 
         #generator level weight
-        wgt=1.0 if tree.ttbar_nw==0 else tree.ttbar_w[0]
+        genWgt=1.0 if tree.ttbar_nw==0 else tree.ttbar_w[0]
+        if useOnlySignOfGenWeight:
+            genWgt=1.0 
+            if tree.ttbar_w[0]<0: genWgt=-1
+
+        #event weight
+        evWgt = wgt*genWgt
 
         #n-1 plots
         zCand   = True if 'll' in ch and ROOT.TMath.Abs(mll-91)<15 else False
         passMet = True if 'emu' in ch or tree.ttbar_metpt>40 else False
         passJets = True if len(selJets)>=2 else False
-        if passMet and passJets   : histos[ch+'_mll'].Fill(mll,wgt)
-        if not zCand and passJets : histos[ch+'_met'].Fill(tree.ttbar_metpt,wgt)
+        if passMet and passJets   : histos[ch+'_mll'].Fill(mll,evWgt)
+        if not zCand and passJets : histos[ch+'_met'].Fill(tree.ttbar_metpt,evWgt)
         if zCand        : continue
         if not passMet  : continue
         if not passJets : continue
@@ -166,16 +186,16 @@ def runTTbarAnalysis(inFile, outFile, wgt, taggers, tmvaWgts=None):
         #update weights
         for iSystVar in xrange(0,len(jetCount)):
             selWeight=1 if jetCount[iSystVar]>=2 else 0
-            kinVars['weight'][0][iSystVar]=wgt*selWeight
-        puWgtUp   = 1.0 if tree.nPV > 17 else 0.0
-        puWgtDown = 1.0 if tree.nPV <= 17 else 0.0
-        kinVars['weight'][0][5]=wgt*puWgtUp
-        kinVars['weight'][0][6]=wgt*puWgtDown
+            kinVars['weight'][0][iSystVar]=evWgt*selWeight
+        puWgtUp   = 1.0
+        puWgtDown = 1.0
+        kinVars['weight'][0][5]=evWgt*puWgtUp
+        kinVars['weight'][0][6]=evWgt*puWgtDown
 
         #plots in control region
-        histos[ch+'_npv'].Fill(tree.nPV-1,wgt)
-        histos[ch+'_rho'].Fill(tree.ttbar_rho,wgt)        
-        histos[ch+'_njets'].Fill(len(selJets),wgt)
+        histos[ch+'_npv'].Fill(tree.nPV-1,evWgt)
+        histos[ch+'_rho'].Fill(tree.ttbar_rho,evWgt)        
+        histos[ch+'_njets'].Fill(len(selJets),evWgt)
 
         #save jet tree
         for ij in selJets:
@@ -192,7 +212,7 @@ def runTTbarAnalysis(inFile, outFile, wgt, taggers, tmvaWgts=None):
             for tag,tagDef in taggersList :
                 tagVal=getattr(tree,tagDef[1])[ij]
                 kinVars[tag+'Tagger'][0][0]=tagVal
-                histos['%s_%sTagger' % (ch,tag) ].Fill(tagVal,wgt)
+                histos['%s_%sTagger' % (ch,tag) ].Fill(tagVal,evWgt)
 
             for iSystVar in xrange(0,len(selJets[ij])):
 
@@ -232,7 +252,7 @@ def runTTbarAnalysis(inFile, outFile, wgt, taggers, tmvaWgts=None):
             #fill histos, when available
             for v in kinVars :
                 try:
-                    histos[ch+'_'+v].Fill(kinVars[v][0][0],wgt)
+                    histos[ch+'_'+v].Fill(kinVars[v][0][0],evWgt)
                 except:
                     pass
 
@@ -271,21 +291,18 @@ def main():
     #configuration
     usage = 'usage: %prog [options]'
     parser = optparse.OptionParser(usage)
-    parser.add_option('-t', '--taggers',     dest='taggers'  ,   help='json with list of taggers',      default=None,        type='string')
+    parser.add_option('-t', '--taggers',     dest='taggers'  ,   help='json with list of taggers',    default=None,        type='string')
     parser.add_option('-j', '--json',        dest='json'  ,      help='json with list of files',      default=None,        type='string')
     parser.add_option('-i', '--inDir',       dest='inDir',       help='input directory with files',   default=None,        type='string')
-    parser.add_option('-l', '--lumi',        dest='lumi',        help='integrated luminosity to use', default=None,        type='float')
     parser.add_option('-o', '--outDir',      dest='outDir',      help='output directory',             default='analysis',  type='string')
+    parser.add_option(      '--only',        dest='only',        help='process only matching (csv)',  default='',          type='string')
     parser.add_option(      '--tmvaWgts',    dest='tmvaWgts',    help='tmva weights',             default=None,  type='string')
     parser.add_option('-n', '--njobs',       dest='njobs',       help='# jobs to run in parallel',    default=0,           type='int')
     (opt, args) = parser.parse_args()
 
-    #update luminosity
-    if opt.lumi:
-        global LUMI
-        LUMI=opt.lumi
     
     #read list of samples
+    print opt.json
     jsonFile = open(opt.json,'r')
     samplesList=json.load(jsonFile,encoding='utf-8').items()
     jsonFile.close()
@@ -293,6 +310,9 @@ def main():
     #prepare output
     if len(opt.outDir) : os.system('mkdir -p %s' % opt.outDir)
 
+    #only list
+    onlyList=opt.only.split(',')
+    
     #read normalization
     xsecWgts, integLumi = {}, {}
     cache='%s/.xsecweights.pck'%opt.outDir
@@ -317,8 +337,8 @@ def main():
                 fIn=ROOT.TFile.Open(f)
                 norigEvents+=fIn.Get('allEvents/hEventCount').GetBinContent(1)
                 fIn.Close()
-            xsecWgts[tag]  = LUMI*xsec/norigEvents if norigEvents>0 else 0
-            integLumi[tag] = norigEvents/xsec      if norigEvents>0 else 0
+            xsecWgts[tag]  = xsec/norigEvents  if norigEvents>0 else 0
+            integLumi[tag] = norigEvents/xsec  if norigEvents>0 else 0
             print '... %s cross section=%f pb #orig events=%d lumi=%3.2f/fb' % (tag,xsec,norigEvents,integLumi[tag]/1000.)
 
         #dump to file
@@ -329,13 +349,24 @@ def main():
         print 'Produced normalization cache (%s)'%cache
 
     #create the analysis jobs
+    runTags = []
     task_list = []
     for tag,_ in samplesList:
+
+        #check if in list
+        if len(onlyList)>0:
+            veto=True
+            for selTag in onlyList:
+                if selTag in tag: veto=False
+            if veto : continue
+
+        runTags.append(tag)
         input_list=getEOSlslist(directory=opt.inDir+'/'+tag)
         wgt = xsecWgts[tag]
         for nf in xrange(0,len(input_list)) : 
             outF='%s/%s_%d.root'%(opt.outDir,tag,nf)
             task_list.append( (input_list[nf],outF,wgt, opt.taggers, opt.tmvaWgts) )
+
     task_list=list(set(task_list))
     print '%s jobs to run in %d parallel threads' % (len(task_list), opt.njobs)
 
@@ -349,7 +380,7 @@ def main():
         pool.map(runTTbarAnalysisPacked, task_list)
 
     #merge the outputs
-    for tag,_ in samplesList:
+    for tag in runTags:
         os.system('hadd -f %s/%s.root %s/%s_*.root' % (opt.outDir,tag,opt.outDir,tag) )
         os.system('rm %s/%s_*.root' % (opt.outDir,tag) )
     print 'Analysis results are available in %s' % opt.outDir

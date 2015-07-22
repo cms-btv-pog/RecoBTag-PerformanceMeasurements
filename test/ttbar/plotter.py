@@ -4,8 +4,6 @@ import json
 import ROOT
 import math
 
-from runTTbarAnalysis import LUMI
-
 """
 A wrapper to store data and MC histograms for comparison
 """
@@ -19,7 +17,7 @@ class Plot(object):
         self._garbageList = []
         self.plotformats = ['pdf','png']
         self.savelog = False
-        self.pullrange = (-3.8,3.8)
+        self.ratiorange = (0.46,1.54)
 
     def add(self, h, title, color, isData):
         h.SetTitle(title)
@@ -75,7 +73,7 @@ class Plot(object):
             except:
                 pass
 
-    def show(self, outDir):
+    def show(self, outDir,lumi):
 
         if len(self.mc)==0:
             print '%s has no MC!' % self.name
@@ -137,7 +135,11 @@ class Plot(object):
 
         frame = totalMC.Clone('frame') if totalMC is not None else self.dataH.Clone('frame')
         frame.Reset('ICE')
-        maxY = totalMC.GetMaximum() if totalMC is not None else self.dataH.GetMaximum()
+        if totalMC:
+            maxY = totalMC.GetMaximum() 
+        if self.dataH:
+            if maxY<self.dataH.GetMaximum():
+                maxY=self.dataH.GetMaximum()
         frame.GetYaxis().SetRangeUser(0.1,maxY*1.3)
         frame.SetDirectory(0)
         frame.Reset('ICE')
@@ -157,9 +159,12 @@ class Plot(object):
         txt.SetTextFont(43)
         txt.SetTextSize(16)
         txt.SetTextAlign(12)
-        txt.DrawLatex(0.18,0.95,'#bf{CMS} #it{Preliminary} %3.1f fb^{-1} (13 TeV)' % (LUMI/1000.) )
+        if lumi<100:
+            txt.DrawLatex(0.18,0.95,'#bf{CMS} #it{Preliminary} %3.1f pb^{-1} (13 TeV)' % (lumi) )
+        else:
+            txt.DrawLatex(0.18,0.95,'#bf{CMS} #it{Preliminary} %3.1f fb^{-1} (13 TeV)' % (lumi/1000.) )
 
-        #holds the pull
+        #holds the ratio
         c.cd()
         p2 = ROOT.TPad('p2','p2',0.0,0.85,1.0,1.0)
         p2.Draw()
@@ -171,32 +176,25 @@ class Plot(object):
         p2.SetGridy(True)
         self._garbageList.append(p2)
         p2.cd()
-        pullframe=frame.Clone('pullframe')
-        pullframe.GetYaxis().SetTitle('Pull')
-        pullframe.GetYaxis().SetRangeUser(self.pullrange[0], self.pullrange[1])
+        ratioframe=frame.Clone('ratioframe')
+        ratioframe.GetYaxis().SetTitle('Ratio')
+        ratioframe.GetYaxis().SetRangeUser(self.ratiorange[0], self.ratiorange[1])
         self._garbageList.append(frame)
-        pullframe.GetYaxis().SetNdivisions(5)
-        pullframe.GetYaxis().SetLabelSize(0.18)        
-        pullframe.GetYaxis().SetTitleSize(0.2)
-        pullframe.GetYaxis().SetTitleOffset(0.2)
-        pullframe.GetXaxis().SetLabelSize(0)
-        pullframe.GetXaxis().SetTitleSize(0)
-        pullframe.GetXaxis().SetTitleOffset(0)
-        pullframe.Draw()
+        ratioframe.GetYaxis().SetNdivisions(5)
+        ratioframe.GetYaxis().SetLabelSize(0.18)        
+        ratioframe.GetYaxis().SetTitleSize(0.2)
+        ratioframe.GetYaxis().SetTitleOffset(0.2)
+        ratioframe.GetXaxis().SetLabelSize(0)
+        ratioframe.GetXaxis().SetTitleSize(0)
+        ratioframe.GetXaxis().SetTitleOffset(0)
+        ratioframe.Draw()
 
         try:
-            pull=self.dataH.Clone('pull')
-            pull.SetDirectory(0)
-            self._garbageList.append(pull)
-            pull.Add(totalMC,-1)
-            for xbin in xrange(1,totalMC.GetXaxis().GetNbins()):
-                diff=pull.GetBinContent(xbin)
-                diffErr=pull.GetBinError(xbin)
-                err=totalMC.GetBinError(xbin)            
-                if err==0: continue
-                pull.SetBinContent(xbin,diff/err)
-                pull.SetBinError(xbin,diffErr/err)
-            gr=ROOT.TGraphAsymmErrors(pull)
+            ratio=self.dataH.Clone('ratio')
+            ratio.SetDirectory(0)
+            self._garbageList.append(ratio)
+            ratio.Divide(totalMC)
+            gr=ROOT.TGraphAsymmErrors(ratio)
             gr.SetMarkerStyle(self.data.GetMarkerStyle())
             gr.SetMarkerSize(self.data.GetMarkerSize())
             gr.SetMarkerColor(self.data.GetMarkerColor())
@@ -260,6 +258,9 @@ def main():
     parser.add_option('-i', '--inDir',       dest='inDir' ,      help='input directory',                default=None,    type='string')
     parser.add_option(      '--saveLog',     dest='saveLog' ,    help='save log versions of the plots', default=False,   action='store_true')
     parser.add_option(      '--silent',      dest='silent' ,     help='only dump to ROOT file',         default=False,   action='store_true')
+    parser.add_option(      '--rebin',       dest='rebin',       help='rebin factor',                   default=1,       type=int)
+    parser.add_option('-l', '--lumi',        dest='lumi' ,       help='lumi to print out',              default=1,       type=float)
+    parser.add_option(      '--only',        dest='only',        help='plot only these (csv)',          default='',      type='string')
     (opt, args) = parser.parse_args()
 
     #read list of samples
@@ -267,15 +268,22 @@ def main():
     samplesList=json.load(jsonFile,encoding='utf-8').items()
     jsonFile.close()
 
+    onlyList=opt.only.split(',')
+
     #read plots 
     plots={}
     for tag,sample in samplesList: 
         fIn=ROOT.TFile.Open('%s/%s.root' % ( opt.inDir, tag) )
         for tkey in fIn.GetListOfKeys():
             key=tkey.GetName()
+            keep=False
+            for tag in onlyList: 
+                if tag in key: keep=True
+            if not keep: continue
             obj=fIn.Get(key)
             if not obj.InheritsFrom('TH1') : continue
             if not key in plots : plots[key]=Plot(key)
+            if opt.rebin>1:  obj.Rebin(opt.rebin)
             plots[key].add(h=obj,title=sample[3],color=sample[4],isData=sample[1])
     
     #show plots
@@ -286,7 +294,7 @@ def main():
     os.system('mkdir -p %s' % outDir)
     for p in plots : 
         if opt.saveLog    : plots[p].savelog=True
-        if not opt.silent : plots[p].show(outDir=outDir)
+        if not opt.silent : plots[p].show(outDir=outDir,lumi=opt.lumi)
         plots[p].appendTo(outDir+'/plotter.root')
         plots[p].reset()
 

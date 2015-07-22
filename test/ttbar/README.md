@@ -30,12 +30,14 @@ python runTTbarAnalysis.py -i /store/group/phys_btag/performance/TTbar/ -j ttbar
 ```
 Once grid jobs are run, and ntuples are stored in a given directory, you can run the local analysis to produce the slimmed ntuples for the efficiency measurement.
 MC will be weighted by cross section. The number after -n indicates how many threads should be used.
-NB The first time the script will produce a pickle file with the weights to be used according to the number of files found, xsec specified in the json file and 
-integrated luminosity.
+NB The first time the script will produce a pickle file with the weights to be used according to the number of files found, xsec specified in the json file.
+Yields are normalized to 1/pb of integrated luminosity.
+The integrated luminosity has to be computed using the json reported by crab using the directories under grid.
+See https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookCRAB3Tutorial and https://twiki.cern.ch/twiki/bin/view/CMS/Lcr2 on how to do these intermediate operations
 It prints out s.th. like "Produced normalization cache (analysis/.xsecweights.pck)"
 In case you update the trees, xsec or lumi you have to remove by hand the pickle file.
 ```
-python plotter.py -i analysis/ -j ttbar_50ns.json
+python plotter.py -i analysis/ -j ttbar_50ns.json  -l 5.59
 ```
 Makes control plots and stores all in a ROOT file. Different options may be passed to filter plots, and show differently the plots. 
 

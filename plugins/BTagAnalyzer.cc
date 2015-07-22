@@ -1275,11 +1275,13 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     EventInfo.ttbar_nw=0;
     if(!isData_)
       {
-	  edm::Handle<GenEventInfoProduct> evt;
+			  edm::Handle<GenEventInfoProduct> evt;
 	  iEvent.getByLabel("generator","", evt);
 	  if(evt.isValid())
 	    {
-	      EventInfo.ttbar_w[0]=evt->weight();
+	      EventInfo.ttbar_allmepartons   = genEvtInfo->nMEPartons();
+	      EventInfo.ttbar_matchmepartons = genEvtInfo->nMEPartonsFiltered();
+	      EventInfo.ttbar_w[0]           = evt->weight();
 	      EventInfo.ttbar_nw++;
 	    }
 
