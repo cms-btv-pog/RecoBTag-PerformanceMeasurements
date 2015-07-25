@@ -747,12 +747,16 @@ process.jetTracksAssociatorAtVertexPFlow.coneSize = cms.double(0.4)
 #JEC from https://hypernews.cern.ch/HyperNews/CMS/get/upgrade-tp-studies/160.html
 #jec='PhaseI_140PU_V2'
 #JEC from https://hypernews.cern.ch/HyperNews/CMS/get/upgrade-tp-studies/157/1.html
-jec='PhaseI_50PU_V2'
+#jec='PhaseI_50PU_V2'
+jec='PhaseII_HGCal200PU'
 
 jechera=jec
 
 if jec == 'PhaseII_Shashlik140PU_V1':
     jechera='PhaseII_Shashlik140PU'
+
+if jec == 'PhaseII_HGCal200PU':                                                                                                                                             
+    jechera='PhaseII_HGCal200PU_MC'
 
 print 'Using jec', jec ,' with hera name ', jechera
 
