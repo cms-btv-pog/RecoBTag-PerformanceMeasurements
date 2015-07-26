@@ -17,6 +17,7 @@ class JetInfoBranches {
     float Jet_pt[nMaxJets_];
     float Jet_genpt[nMaxJets_];
     float Jet_residual[nMaxJets_];
+    float Jet_area[nMaxJets_];
     float Jet_jes[nMaxJets_];
     float Jet_eta[nMaxJets_];
     float Jet_phi[nMaxJets_];
@@ -63,6 +64,7 @@ class JetInfoBranches {
     int   Jet_ntracks[nMaxJets_];
     int   Jet_nseltracks[nMaxJets_];
     int   Jet_flavour[nMaxJets_];
+    int   Jet_partonid[nMaxJets_];
     int   Jet_nbHadrons[nMaxJets_];
     int   Jet_ncHadrons[nMaxJets_];
     int   Jet_nFirstTrack[nMaxJets_];
@@ -324,6 +326,7 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_pt").c_str(),          Jet_pt        ,(name+"Jet_pt["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_genpt").c_str(),       Jet_genpt       ,(name+"Jet_genpt["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_residual").c_str(),    Jet_residual    ,(name+"Jet_residual["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_area").c_str(),        Jet_area        ,(name+"Jet_area["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_jes").c_str(),         Jet_jes         ,(name+"Jet_jes["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_eta").c_str(),         Jet_eta         ,(name+"Jet_eta["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_phi").c_str(),         Jet_phi         ,(name+"Jet_phi["+name+"nJet]/F").c_str());
@@ -681,6 +684,7 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_pt").c_str(),          Jet_pt          );
       tree->SetBranchAddress((name+"Jet_genpt").c_str(),       Jet_genpt       );
       tree->SetBranchAddress((name+"Jet_residual").c_str(),    Jet_residual    );
+      tree->SetBranchAddress((name+"Jet_area").c_str(),        Jet_area        );
       tree->SetBranchAddress((name+"Jet_jes").c_str(),         Jet_jes         );
       tree->SetBranchAddress((name+"Jet_eta").c_str(),         Jet_eta         );
       tree->SetBranchAddress((name+"Jet_phi").c_str(),         Jet_phi         );

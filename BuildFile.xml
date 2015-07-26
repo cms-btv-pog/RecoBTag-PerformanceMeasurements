@@ -10,6 +10,7 @@
 <use   name="DataFormats/Math"/>
 <use   name="DataFormats/MuonReco"/>
 <use   name="DataFormats/TrackReco"/>
+<use   name="DataFormats/EgammaCandidates"/>
 <use   name="DataFormats/PatCandidates"/>
 <use   name="FWCore/Framework"/>
 <use   name="FWCore/PluginManager"/>

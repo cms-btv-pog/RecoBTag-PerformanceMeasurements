@@ -1,0 +1,6 @@
+{
+"jp"     : ["Jet probability",                 "Jet_Proba",    0.275, 0.545, 0.790, 3.0], 
+"svhe"   : ["Simple secondary vertex (HE)",    "Jet_Svx",      1.74,  3.05,  6.0],
+"csv"    : ["Combined secondary vertex",       "Jet_CombSvx",  0.244, 0.679, 0.898, 1.1],
+"csvivf" : ["Combined secondary vertex (IVF)", "Jet_CombIVF",  0.423, 0.814, 0.941, 1.1]
+}
