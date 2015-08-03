@@ -2470,10 +2470,10 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       double trackSip3dSig_3, trackSip3dSig_0, trackSip3dSig_1,trackSip3dSig_2, trackEtaRel_0,trackEtaRel_1,trackEtaRel_2;
       std::vector<float> IP3Ds, etaRels;
       for (int iTrk = JetInfo[iJetColl].Jet_nFirstTrkTagVarCSV[JetInfo[iJetColl].nJet]; iTrk < JetInfo[iJetColl].Jet_nLastTrkTagVarCSV[JetInfo[iJetColl].nJet]; ++iTrk){
-	IP3Ds.push_back( JetInfo[iJetColl].TagVarCSV_trackSip3dSig[iTrk] );
+              IP3Ds.push_back( JetInfo[iJetColl].TagVarCSV_trackSip3dSig[iTrk] );
       }
       for (int iTrk = JetInfo[iJetColl].Jet_nFirstTrkEtaRelTagVarCSV[JetInfo[iJetColl].nJet]; iTrk < JetInfo[iJetColl].Jet_nLastTrkEtaRelTagVarCSV[JetInfo[iJetColl].nJet]; ++iTrk){
-	etaRels.push_back( TMath::Abs(JetInfo[iJetColl].TagVarCSV_trackEtaRel[iTrk]) );
+                                        etaRels.push_back( TMath::Abs(JetInfo[iJetColl].TagVarCSV_trackEtaRel[iTrk]) );
       }
       double dummyTrack = 99.;
       int numTracks = JetInfo[iJetColl].TagVarCSV_jetNTracks[JetInfo[iJetColl].nJet];
@@ -2484,95 +2484,95 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       std::sort( IP3Ds.begin(),IP3Ds.end(),std::greater<float>() );
       std::sort( etaRels.begin(),etaRels.end() ); //std::sort sorts in ascending order by default
 
-      switch(numTracks){
-      case 0:
+                                switch(numTracks){
+                                        case 0:
 
 
-	trackSip3dSig_0 = dummyTrack;
-	trackSip3dSig_1 = dummyTrack;
-	trackSip3dSig_2 = dummyTrack;
-	trackSip3dSig_3 = dummyTrack;
+                                                trackSip3dSig_0 = dummyTrack;
+                                                trackSip3dSig_1 = dummyTrack;
+                                                trackSip3dSig_2 = dummyTrack;
+                                                trackSip3dSig_3 = dummyTrack;
 
-	break;
+                                                break;
 
-      case 1:
+                                        case 1:
 
-	trackSip3dSig_0 = IP3Ds.at(0);
-	trackSip3dSig_1 = dummyTrack;
-	trackSip3dSig_2 = dummyTrack;
-	trackSip3dSig_3 = dummyTrack;
+                                                trackSip3dSig_0 = IP3Ds.at(0);
+                                                trackSip3dSig_1 = dummyTrack;
+                                                trackSip3dSig_2 = dummyTrack;
+                                                trackSip3dSig_3 = dummyTrack;
 
-	break;
+                                                break;
 
-      case 2:
+                                        case 2:
 
-	trackSip3dSig_0 = IP3Ds.at(0);
-	trackSip3dSig_1 = IP3Ds.at(1);
-	trackSip3dSig_2 = dummyTrack;
-	trackSip3dSig_3 = dummyTrack;
+                                                trackSip3dSig_0 = IP3Ds.at(0);
+                                                trackSip3dSig_1 = IP3Ds.at(1);
+                                                trackSip3dSig_2 = dummyTrack;
+                                                trackSip3dSig_3 = dummyTrack;
 
-	break;
+                                               break;
 
-      case 3:
+                                        case 3:
 
-	trackSip3dSig_0 = IP3Ds.at(0);
-	trackSip3dSig_1 = IP3Ds.at(1);
-	trackSip3dSig_2 = IP3Ds.at(2);
-	trackSip3dSig_3 = dummyTrack;
+                                                trackSip3dSig_0 = IP3Ds.at(0);
+                                                trackSip3dSig_1 = IP3Ds.at(1);
+                                                trackSip3dSig_2 = IP3Ds.at(2);
+                                                trackSip3dSig_3 = dummyTrack;
 
-	break;
+                                                break;
 
-      default:
+                                        default:
 
-	trackSip3dSig_0 = IP3Ds.at(0);
-	trackSip3dSig_1 = IP3Ds.at(1);
-	trackSip3dSig_2 = IP3Ds.at(2);
-	trackSip3dSig_3 = IP3Ds.at(3);
+                                                trackSip3dSig_0 = IP3Ds.at(0);
+                                                trackSip3dSig_1 = IP3Ds.at(1);
+                                                trackSip3dSig_2 = IP3Ds.at(2);
+                                                trackSip3dSig_3 = IP3Ds.at(3);
 
-      }
+                                 }
 
-      switch(numEtaRelTracks){
-      case 0:
+                                switch(numEtaRelTracks){
+                                        case 0:
 
-	trackEtaRel_0 = dummyEtaRel;
-	trackEtaRel_1 = dummyEtaRel;
-	trackEtaRel_2 = dummyEtaRel;
+                                                trackEtaRel_0 = dummyEtaRel;
+                                                trackEtaRel_1 = dummyEtaRel;
+                                                trackEtaRel_2 = dummyEtaRel;
 
-	break;
+                                                break;
 
-      case 1:
+                                        case 1:
 
-	trackEtaRel_0 = etaRels.at(0);
-	trackEtaRel_1 = dummyEtaRel;
-	trackEtaRel_2 = dummyEtaRel;
+                                                trackEtaRel_0 = etaRels.at(0);
+                                                trackEtaRel_1 = dummyEtaRel;
+                                                trackEtaRel_2 = dummyEtaRel;
 
-	break;
+                                                break;
 
-      case 2:
+                                        case 2:
 
-	trackEtaRel_0 = etaRels.at(0);
-	trackEtaRel_1 = etaRels.at(1);
-	trackEtaRel_2 = dummyEtaRel;
+                                                trackEtaRel_0 = etaRels.at(0);
+                                                trackEtaRel_1 = etaRels.at(1);
+                                                trackEtaRel_2 = dummyEtaRel;
 
-	break;
+                                                break;
 
-      default:
+                                        default:
 
-	trackEtaRel_0 = etaRels.at(0);
-	trackEtaRel_1 = etaRels.at(1);
-	trackEtaRel_2 = etaRels.at(2);
+                                                trackEtaRel_0 = etaRels.at(0);
+                                                trackEtaRel_1 = etaRels.at(1);
+                                                trackEtaRel_2 = etaRels.at(2);
 
-      }
+                                }
 
 
 
-      JetInfo[iJetColl].Jet_trackSip3dSig_3[JetInfo[iJetColl].nJet] =trackSip3dSig_3;
-      JetInfo[iJetColl].Jet_trackSip3dSig_2[JetInfo[iJetColl].nJet] =trackSip3dSig_2;
-      JetInfo[iJetColl].Jet_trackSip3dSig_1[JetInfo[iJetColl].nJet] =trackSip3dSig_1;
-      JetInfo[iJetColl].Jet_trackSip3dSig_0[JetInfo[iJetColl].nJet] =trackSip3dSig_0;
-      JetInfo[iJetColl].Jet_trackEtaRel_2[JetInfo[iJetColl].nJet] =trackEtaRel_2;
-      JetInfo[iJetColl].Jet_trackEtaRel_1[JetInfo[iJetColl].nJet] =trackEtaRel_1;
-      JetInfo[iJetColl].Jet_trackEtaRel_0[JetInfo[iJetColl].nJet] =trackEtaRel_0;
+       JetInfo[iJetColl].Jet_trackSip3dSig_3[JetInfo[iJetColl].nJet] =trackSip3dSig_3;
+       JetInfo[iJetColl].Jet_trackSip3dSig_2[JetInfo[iJetColl].nJet] =trackSip3dSig_2;
+       JetInfo[iJetColl].Jet_trackSip3dSig_1[JetInfo[iJetColl].nJet] =trackSip3dSig_1;
+       JetInfo[iJetColl].Jet_trackSip3dSig_0[JetInfo[iJetColl].nJet] =trackSip3dSig_0;
+       JetInfo[iJetColl].Jet_trackEtaRel_2[JetInfo[iJetColl].nJet] =trackEtaRel_2;
+       JetInfo[iJetColl].Jet_trackEtaRel_1[JetInfo[iJetColl].nJet] =trackEtaRel_1;
+       JetInfo[iJetColl].Jet_trackEtaRel_0[JetInfo[iJetColl].nJet] =trackEtaRel_0;
     }
 
     std::vector<reco::btag::TrackIPData>  ipdata = ipTagInfo->impactParameterData();
