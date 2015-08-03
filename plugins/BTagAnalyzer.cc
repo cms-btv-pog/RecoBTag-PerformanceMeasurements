@@ -514,10 +514,10 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
     std::vector<std::string> variables_all({"SubJet_csv","PFLepton_ratio", "PFLepton_ptrel","trackSip3dSig_3","trackSip3dSig_2","trackSip3dSig_1","trackSip3dSig_0","TagVarCSV1_trackSip2dSigAboveCharm","trackEtaRel_0","trackEtaRel_1","trackEtaRel_2","TagVarCSV1_vertexMass","TagVarCSV1_vertexEnergyRatio" ,"TagVarCSV1_vertexJetDeltaR" ,"TagVarCSV1_flightDistance2dSig","nSL_3","TagVarCSV1_jetNTracks" ,"TagVarCSV1_jetNTracksEtaRel" ,"TagVarCSV1_jetNSecondaryVertices","TagVarCSV1_vertexNTracks"});
     std::vector<std::string> spectators({"massPruned", "flavour", "nbHadrons", "ptPruned", "etaPruned"});
 
-    evaluator_SV_->initialize("Color:Silent:Error", "BDTG", edm::FileInPath("RecoBTag/BTagAnalyzerLite/data/TMVA_SV_spring15.weights.xml.gz").fullPath(), variables_SV, spectators);
-    evaluator_SL_->initialize("Color:Silent:Error", "BDTG", edm::FileInPath("RecoBTag/BTagAnalyzerLite/data/TMVA_SL_spring15.weights.xml.gz").fullPath(), variables_SL, spectators);
-    evaluator_cascade_->initialize("Color:Silent:Error", "BDTG", edm::FileInPath("RecoBTag/BTagAnalyzerLite/data/TMVA_cascade_spring15.weights.xml.gz").fullPath(), variables_cascade, spectators);
-    evaluator_all_->initialize("Color:Silent:Error", "BDTG", edm::FileInPath("RecoBTag/BTagAnalyzerLite/data/TMVA_all_spring15.weights.xml.gz").fullPath(), variables_all, spectators);
+    evaluator_SV_->initialize("Color:Silent:Error", "BDTG", edm::FileInPath("RecoBTag/PerformanceMeasurements/data/TMVA_SV_spring15.weights.xml.gz").fullPath(), variables_SV, spectators);
+    evaluator_SL_->initialize("Color:Silent:Error", "BDTG", edm::FileInPath("RecoBTag/PerformanceMeasurements/data/TMVA_SL_spring15.weights.xml.gz").fullPath(), variables_SL, spectators);
+    evaluator_cascade_->initialize("Color:Silent:Error", "BDTG", edm::FileInPath("RecoBTag/PerformanceMeasurements/data/TMVA_cascade_spring15.weights.xml.gz").fullPath(), variables_cascade, spectators);
+    evaluator_all_->initialize("Color:Silent:Error", "BDTG", edm::FileInPath("RecoBTag/PerformanceMeasurements/data/TMVA_all_spring15.weights.xml.gz").fullPath(), variables_all, spectators);
   }
 
   if( runSubJets_ && ( SubJetCollectionTags_.size()>0 || SubJetLabels_.size()>0 ) )
