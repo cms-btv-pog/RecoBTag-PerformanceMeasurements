@@ -2146,7 +2146,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       if ( muonPtr.isNonnull() && muonPtr.isAvailable() && muonPtr->isGlobalMuon() ) {
 
 	//NOTE: temporary workaround for an issue in https://github.com/cms-btv-pog/cmssw/blob/CMSSW_7_5_X/DataFormats/BTauReco/interface/TemplatedSoftLeptonTagInfo.h#L166
-	//where the signed IP is actually filled with the IP significance. To be changed when this is fixed in 76X and tthe IP branches cab be fileed directly from the taginfos
+	//where the signed IP is actually filled with the IP significance. To be changed when this is fixed in 76X and the IP branches can be filled directly from the taginfos
 
 	reco::TrackRef bestTrackmuon  = muonPtr->muonBestTrack();
 	reco::TransientTrack tmuon = trackBuilder->build(bestTrackmuon);
