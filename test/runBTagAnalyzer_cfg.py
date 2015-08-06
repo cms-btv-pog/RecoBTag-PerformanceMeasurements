@@ -55,7 +55,7 @@ options.register('runSubJets', True,
     VarParsing.varType.bool,
     "Run subjets"
 )
-options.register('processStdAK4Jets', True,
+options.register('processStdAK4Jets', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Process standard AK4 jets"
@@ -90,7 +90,7 @@ options.register('useTopProjections', False,
     VarParsing.varType.bool,
     "Use top projections"
 )
-options.register('miniAOD', False,
+options.register('miniAOD', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Running on miniAOD"
@@ -372,9 +372,13 @@ process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
 )
 process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
 ### to activate the new JP calibration: using the data base
+trkProbaCalibTag = "TrackProbabilityCalibration_3D_MC74X_50ns_v1"
+if options.runOnData:
+  trkProbaCalibTag = "JPcalib_Data74X_2015B_v1"
+
 process.GlobalTag.toGet = cms.VPSet(
     cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-        tag = cms.string("TrackProbabilityCalibration_3D_MC74X_50ns_v1"),
+        tag = cms.string(trkProbaCalibTag),
         connect = cms.untracked.string("frontier://FrontierPrep/CMS_CONDITIONS")
     )
 )
@@ -935,7 +939,7 @@ process.btagana.tracksColl            = cms.InputTag(trackSource)
 process.btagana.useSelectedTracks     = True  ## False if you want to run on all tracks : for commissioning studies
 process.btagana.useTrackHistory       = False ## Can only be used with GEN-SIM-RECODEBUG files
 process.btagana.fillsvTagInfo         = False ## True if you want to store information relative to the svTagInfos, set to False if produceJetTrackTree is set to False
-process.btagana.produceJetTrackTree   = False ## True if you want to keep info for tracks associated to jets : for commissioning studies
+process.btagana.produceJetTrackTree   = True ## True if you want to keep info for tracks associated to jets : for commissioning studies
 process.btagana.produceAllTrackTree   = False ## True if you want to keep info for all tracks : for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
@@ -959,9 +963,9 @@ if options.runFatJets:
         storeEventInfo      = cms.bool(not options.processStdAK4Jets),
         allowJetSkipping    = cms.bool(False),
         storeTagVariables   = cms.bool(False),
-        storeCSVTagVariables = cms.bool(False),
+        storeCSVTagVariables = cms.bool(True),
         storeTagVariablesSubJets = cms.bool(False),
-        storeCSVTagVariablesSubJets = cms.bool(False),
+        storeCSVTagVariablesSubJets = cms.bool(True),
         useSelectedTracks   = cms.bool(True),
         maxDeltaR           = cms.double(options.fatJetRadius),
         R0                  = cms.double(options.fatJetRadius),
