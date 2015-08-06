@@ -209,6 +209,8 @@ class JetInfoBranches {
     float PFMuon_deltaR[nMaxMuons_];
     float PFMuon_IP[nMaxMuons_];
     float PFMuon_IP2D[nMaxMuons_];
+    float PFMuon_IPsig[nMaxMuons_];
+    float PFMuon_IP2Dsig[nMaxMuons_];
     float PFMuon_dz[nMaxMuons_];
     int   PFMuon_GoodQuality[nMaxMuons_];
 
@@ -437,6 +439,8 @@ class JetInfoBranches {
       tree->Branch((name+"PFMuon_ratioRel").c_str()    ,PFMuon_ratioRel     ,(name+"PFMuon_ratioRel["+name+"nPFMuon]/F").c_str());
       tree->Branch((name+"PFMuon_IP").c_str()          ,PFMuon_IP           ,(name+"PFMuon_IP["+name+"nPFMuon]/F").c_str());
       tree->Branch((name+"PFMuon_IP2D").c_str()        ,PFMuon_IP2D         ,(name+"PFMuon_IP2D["+name+"nPFMuon]/F").c_str());
+      tree->Branch((name+"PFMuon_IPsig").c_str()          ,PFMuon_IPsig           ,(name+"PFMuon_IPsig["+name+"nPFMuon]/F").c_str());
+      tree->Branch((name+"PFMuon_IP2Dsig").c_str()        ,PFMuon_IP2Dsig         ,(name+"PFMuon_IP2Dsig["+name+"nPFMuon]/F").c_str());
       tree->Branch((name+"PFMuon_dz").c_str()          ,PFMuon_dz           ,(name+"PFMuon_dz["+name+"nPFMuon]/F").c_str());
       tree->Branch((name+"PFMuon_GoodQuality").c_str() ,PFMuon_GoodQuality  ,(name+"PFMuon_GoodQuality["+name+"nPFMuon]/I").c_str());
     }
@@ -803,6 +807,8 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"PFMuon_ratioRel").c_str()    ,PFMuon_ratioRel     ) ;
       tree->SetBranchAddress((name+"PFMuon_IP").c_str()          ,PFMuon_IP           ) ;
       tree->SetBranchAddress((name+"PFMuon_IP2D").c_str()        ,PFMuon_IP2D         ) ;
+      tree->SetBranchAddress((name+"PFMuon_IPsig").c_str()          ,PFMuon_IPsig           ) ;
+      tree->SetBranchAddress((name+"PFMuon_IP2Dsig").c_str()        ,PFMuon_IP2Dsig         ) ;
       tree->SetBranchAddress((name+"PFMuon_dz").c_str()          ,PFMuon_dz           ) ;
       tree->SetBranchAddress((name+"PFMuon_GoodQuality").c_str() ,PFMuon_GoodQuality  ) ;
     }
