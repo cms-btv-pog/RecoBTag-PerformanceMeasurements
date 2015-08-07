@@ -45,12 +45,12 @@ options.register('dataGlobalTag', '74X_dataRun2_Prompt_v0',
     VarParsing.varType.string,
     "Data global tag"
 )
-options.register('runFatJets', True,
+options.register('runFatJets', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Run fat jets"
 )
-options.register('runSubJets', True,
+options.register('runSubJets', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Run subjets"
@@ -136,6 +136,12 @@ options.register('runIVF', False,
     VarParsing.varType.bool,
     "Run IVF, currently leave to False!"
 )
+### Master switch for boosted b tag commissioning: overrider several other switches
+options.register('doBoostedCommissioning', False, 
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Make NTuples with branches for boosted b tag commissioning: overrider several other switches"
+)
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', 10)
 
@@ -150,6 +156,16 @@ print "Using PFchs: %s"%('True' if options.usePFchs else 'False')
 if options.runSubJets and not options.runFatJets:
     print "WARNING: You are attempting to store subjet information without running over fat jets. Please enable running over fat jets in order to store the subjet information."
     options.runSubJets = False
+
+if options.doBoostedCommissioning:
+    print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
+    options.processStdAK4Jets=False
+    print "Option processStdAK4Jets will be set to '",options.processStdAK4Jets,"'"
+    options.runFatJets=True  
+    options.runSubJets = True
+    print "Option runFatJets will be set to '",options.runFatJets,"'"
+    print "Option runSubJets  will be set to '",options.runSubJets,"'"
+    print "********************"
 
 ## Global tag
 globalTag = options.mcGlobalTag
@@ -329,6 +345,9 @@ if options.runSubJets :
 
 if options.fastSim :
     options.outFilename += '_FastSim'
+
+if options.doBoostedCommissioning:
+  options.outFilename += '_BoostedCommissioning' 
 
 options.outFilename += '.root'
 
@@ -986,6 +1005,18 @@ if options.runFatJets:
         process.btaganaFatJets.SubJets.append( cms.InputTag('selectedPatJetsPrunedPFCHSPacked','SubJets') )
         process.btaganaFatJets.SubJetLabels.append( 'Pruned' )
 
+if options.doBoostedCommissioning:
+    process.btaganaFatJets.produceJetTrackTree  = True 
+    process.btaganaFatJets.fillsvTagInfo = True  
+    process.btaganaFatJets.storeCSVTagVariablesSubJets = True  
+    process.btaganaFatJets.storeCSVTagVariables = True  
+    process.btaganaFatJets.storeCSVTagVariablesSubJets = True 
+    print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
+    print "produceJetTrackTree set to '",process.btaganaFatJets.produceJetTrackTree,"'" 
+    print "fillsvTagInfo set to '",process.btaganaFatJets.fillsvTagInfo,"'" 
+    print "For fat jets: storeCSVTagVariables set to '",process.btaganaFatJets.storeCSVTagVariables,"'"
+    print "For subjets:  storeCSVTagVariablesSubJet set to '",process.btaganaFatJets.storeCSVTagVariablesSubJets,"'"
+    print "********************"
 
 #---------------------------------------
 
