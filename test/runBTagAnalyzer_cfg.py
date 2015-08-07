@@ -372,9 +372,13 @@ process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
 )
 process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
 ### to activate the new JP calibration: using the data base
+trkProbaCalibTag = "TrackProbabilityCalibration_3D_MC74X_50ns_v1"
+if options.runOnData:
+  trkProbaCalibTag = "JPcalib_Data74X_2015B_v1"
+
 process.GlobalTag.toGet = cms.VPSet(
     cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-        tag = cms.string("TrackProbabilityCalibration_3D_MC74X_50ns_v1"),
+        tag = cms.string(trkProbaCalibTag),
         connect = cms.untracked.string("frontier://FrontierPrep/CMS_CONDITIONS")
     )
 )
