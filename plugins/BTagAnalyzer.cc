@@ -2148,9 +2148,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 	//NOTE: temporary workaround for an issue in https://github.com/cms-btv-pog/cmssw/blob/CMSSW_7_5_X/DataFormats/BTauReco/interface/TemplatedSoftLeptonTagInfo.h#L166
 	//where the signed IP is actually filled with the IP significance. To be changed when this is fixed in 76X and the IP branches can be filled directly from the taginfos
 
-	reco::TrackRef bestTrackmuon  = muonPtr->muonBestTrack();
-	reco::TransientTrack tmuon = trackBuilder->build(bestTrackmuon);
-	
+	reco::TrackRef innerTrackmuon( muonPtr->innerTrack() );  
+	reco::TransientTrack tmuon = trackBuilder->build(innerTrackmuon);  
+ 	
 	GlobalVector directionformuon(pjet->px(), pjet->py(), pjet->pz());
 
 	Measurement1D ip2dmuon    = IPTools::signedTransverseImpactParameter(tmuon, directionformuon, *pv).second;
@@ -2158,8 +2158,8 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 	
  	JetInfo[iJetColl].PFMuon_IP[JetInfo[iJetColl].nPFMuon]        = (ip3dmuon.value());
 	JetInfo[iJetColl].PFMuon_IP2D[JetInfo[iJetColl].nPFMuon]      = (ip2dmuon.value());
-	JetInfo[iJetColl].PFMuon_IPsig[JetInfo[iJetColl].nPFMuon]        = (ip3dmuon.value())/(ip3dmuon.error());
-	JetInfo[iJetColl].PFMuon_IP2Dsig[JetInfo[iJetColl].nPFMuon]      = (ip2dmuon.value())/(ip2dmuon.error());
+	JetInfo[iJetColl].PFMuon_IPsig[JetInfo[iJetColl].nPFMuon]        = (ip3dmuon.significance());
+	JetInfo[iJetColl].PFMuon_IP2Dsig[JetInfo[iJetColl].nPFMuon]      = (ip2dmuon.significance());
 
         JetInfo[iJetColl].PFMuon_nMuHit[JetInfo[iJetColl].nPFMuon] = muonPtr->outerTrack()->hitPattern().numberOfValidMuonHits();
         JetInfo[iJetColl].PFMuon_nTkHit[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().numberOfValidHits();
