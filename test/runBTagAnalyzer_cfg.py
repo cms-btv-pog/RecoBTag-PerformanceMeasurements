@@ -1008,7 +1008,6 @@ if options.runFatJets:
 if options.doBoostedCommissioning:
     process.btaganaFatJets.produceJetTrackTree  = True 
     process.btaganaFatJets.fillsvTagInfo = True  
-    process.btaganaFatJets.storeCSVTagVariablesSubJets = True  
     process.btaganaFatJets.storeCSVTagVariables = True  
     process.btaganaFatJets.storeCSVTagVariablesSubJets = True 
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
