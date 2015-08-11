@@ -1,7 +1,6 @@
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
-
 #include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h" 
-
+#include "DataFormats/VertexReco/interface/Vertex.h"
 #include "RecoBTag/PerformanceMeasurements/interface/TTbarSelectionProducer.h"
 
 using namespace std;
@@ -118,6 +117,13 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
    bool isData=iEvent.isRealData();
    if(!isData) doTrigSel_=false;
    
+   // ----------------
+   // Primary vertex
+   //------------------ 
+   edm::Handle<reco::VertexCollection> primaryVertices;
+   iEvent.getByLabel("offlinePrimaryVertices",primaryVertices);
+   const reco::Vertex &pVtx = *(primaryVertices->begin());
+
    //------------------------------------------
    //get beam spot
    //------------------------------------------
@@ -136,15 +142,9 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
        bool passKin( mu.pt() > muon_cut_pt_  && fabs(mu.eta()) < muon_cut_eta_ );
        if(!passKin) continue;
 
-       //cf. https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonId2015
-       bool goodGlobalMuon(mu.isGlobalMuon() && 
-			   mu.globalTrack()->normalizedChi2() < 3 && 
-			   mu.combinedQuality().chi2LocalPosition < 12 && 
-			   mu.combinedQuality().trkKink < 20); 
-       bool isMedium (muon::isLooseMuon(mu) && 
-                      mu.innerTrack()->validFraction() > 0.8 && 
-                      muon::segmentCompatibility(mu) > (goodGlobalMuon ? 0.303 : 0.451)); 
-       bool passID (goodGlobalMuon && isMedium);
+       //cf. https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2
+       bool isTight(muon::isTightMuon(mu,pVtx));
+       bool passID(isTight);
        if(!passID) continue;
 
        double nhIso   = mu.neutralHadronIso();
