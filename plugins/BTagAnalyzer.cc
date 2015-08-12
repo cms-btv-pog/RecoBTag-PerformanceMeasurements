@@ -1256,7 +1256,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
 	EventInfo.ttbar_lphi[lctr] = l->phi();
 	EventInfo.ttbar_lm[lctr]   = 0;
 	EventInfo.ttbar_lch[lctr]  = l->charge();
-	EventInfo.ttbar_lid[lctr]  = 11;
+	EventInfo.ttbar_lid[lctr]  = 13;
 	EventInfo.ttbar_lgid[lctr] = l->genParticle() ? l->genParticle()->pdgId() : 0;
 	lctr++;
       }

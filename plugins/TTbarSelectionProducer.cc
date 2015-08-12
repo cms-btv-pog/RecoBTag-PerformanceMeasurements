@@ -1,6 +1,5 @@
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
 #include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h" 
-#include "DataFormats/VertexReco/interface/Vertex.h"
 #include "RecoBTag/PerformanceMeasurements/interface/TTbarSelectionProducer.h"
 
 using namespace std;
@@ -10,6 +9,7 @@ using namespace edm;
 
 TTbarSelectionProducer::TTbarSelectionProducer(const edm::ParameterSet& iConfig) :
   triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("triggerColl"))),
+  vtxToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vtxColl"))),
   electronToken_(consumes<edm::View<pat::Electron> >(iConfig.getParameter<edm::InputTag>("electronColl"))),
   conversionsToken_(mayConsume< reco::ConversionCollection >(iConfig.getParameter<edm::InputTag>("conversions"))),
   electronIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("electronIdMap"))),
@@ -121,7 +121,7 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
    // Primary vertex
    //------------------ 
    edm::Handle<reco::VertexCollection> primaryVertices;
-   iEvent.getByLabel("offlinePrimaryVertices",primaryVertices);
+   iEvent.getByToken(vtxToken_, primaryVertices);
    const reco::Vertex &pVtx = *(primaryVertices->begin());
 
    //------------------------------------------
@@ -143,6 +143,7 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
        if(!passKin) continue;
 
        //cf. https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2
+       //bool isMedium(muon::isMediumMuon(mu));
        bool isTight(muon::isTightMuon(mu,pVtx));
        bool passID(isTight);
        if(!passID) continue;

@@ -3,6 +3,7 @@ import FWCore.ParameterSet.Config as cms
 ttbarselectionproducer = cms.EDProducer("TTbarSelectionProducer",
                                         verbose          = cms.int32(0),
                                         triggerColl      = cms.InputTag("TriggerResults","","HLT"),
+                                        vtxColl          = cms.InputTag("offlineSlimmedPrimaryVertices"),
                                         #cf https://twiki.cern.ch/twiki/bin/view/CMS/TopTrigger
                                         trigNamesToSel   = cms.vstring('HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',
                                                                        'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v',
