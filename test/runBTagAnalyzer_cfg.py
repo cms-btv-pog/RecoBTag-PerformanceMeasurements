@@ -40,7 +40,7 @@ options.register('mcGlobalTag', 'MCRUN2_74_V9A',
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', '74X_dataRun2_Prompt_v0',
+options.register('dataGlobalTag', '74X_dataRun2_Prompt_v1',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
@@ -307,7 +307,8 @@ if options.miniAOD:
     ]
 if options.runOnData:
     process.source.fileNames = [
-        '/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/168/00000/60FF8405-EA26-E511-A892-02163E01387D.root'
+        '/store/data/Run2015B/MuonEG/MINIAOD/PromptReco-v1/000/252/126/00000/DCFBC64C-1031-E511-A70C-02163E01441A.root'
+        #'/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/168/00000/60FF8405-EA26-E511-A892-02163E01387D.root'
         #'/store/relval/CMSSW_7_4_0_pre7/SingleMu/RECO/GR_R_74_V8A_RelVal_mu2012D-v1/00000/004E151D-D8B6-E411-A889-0025905B859E.root'
     ]
 if options.fastSim:

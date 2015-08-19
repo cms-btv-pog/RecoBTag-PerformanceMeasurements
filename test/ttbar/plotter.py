@@ -114,6 +114,7 @@ class Plot(object):
             leg.AddEntry( self.data, self.data.GetTitle(),'p')
             nlegCols += 1
         for h in self.mc:
+            self.mc[h].Scale(lumi)
             leg.AddEntry(self.mc[h], self.mc[h].GetTitle(), 'f')
             nlegCols += 1
         if nlegCols ==0 :

@@ -383,11 +383,11 @@ void KIN_trainClassifier( TString myMethodList = "", TString inputFile="", Int_t
   if (Use["BDT"])  // Adaptive Boost
     {
       TString Default ="!H:!V:NTrees=850:MinNodeSize=2.5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:nCuts=20";
-      TString Settings = "!H:!V:NTrees=450:nEventsMin=550:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.15:SeparationType=MisClassificationError:nCuts=25:PruneMethod=NoPruning";
+      TString Settings = "!H:!V:NTrees=450:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.15:SeparationType=MisClassificationError:nCuts=25:PruneMethod=NoPruning";
       if(BDTTrainMode==BDT_CONFIG1)
-	Settings = "!H:!V:NTrees=400:nEventsMin=500:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.1:SeparationType=MisClassificationError:nCuts=25:PruneMethod=NoPruning";
+	Settings = "!H:!V:NTrees=400:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.1:SeparationType=MisClassificationError:nCuts=25:PruneMethod=NoPruning";
       if(BDTTrainMode==BDT_CONFIG2)
-	Settings = "!H:!V:NTrees=300:nEventsMin=300:MaxDepth=2:BoostType=AdaBoost:AdaBoostBeta=0.12:SeparationType=MisClassificationError:nCuts=25:PruneMethod=NoPruning";
+	Settings = "!H:!V:NTrees=300:MinNodeSize=3%:MaxDepth=2:BoostType=AdaBoost:AdaBoostBeta=0.12:SeparationType=MisClassificationError:nCuts=25:PruneMethod=NoPruning";
       factory->BookMethod( TMVA::Types::kBDT, "BDT", Settings);
     }
 

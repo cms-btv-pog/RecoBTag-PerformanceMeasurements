@@ -201,7 +201,7 @@ public:
   typedef typename IPTI::input_container::value_type TrackRef;
   typedef VTX Vertex;
   typedef reco::TemplatedSecondaryVertexTagInfo<IPTI,VTX> SVTagInfo;
- 
+
 private:
   virtual void beginJob() ;
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
@@ -1224,12 +1224,19 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   // ttbar information
   //------------------------------------------------------
   if (use_ttbar_filter_) {
+
     edm::Handle<int> pIn;
     iEvent.getByLabel(edm::InputTag("ttbarselectionproducer:topChannel"), pIn);
+    EventInfo.ttbar_chan=*pIn;
+
     edm::Handle<int> triggerIn;
     iEvent.getByLabel(edm::InputTag("ttbarselectionproducer:topTrigger"),triggerIn);
     EventInfo.ttbar_trigWord=*triggerIn;
-    EventInfo.ttbar_chan=*pIn;
+
+    edm::Handle<int> metfilterIn;
+    iEvent.getByLabel(edm::InputTag("ttbarselectionproducer:topMETFilter"),metfilterIn);
+    EventInfo.ttbar_metfilterWord=*metfilterIn;
+
     int lctr(0);
     edm::Handle<edm::View<pat::Electron> > selElectrons;
     iEvent.getByLabel(ttbarproducer_,selElectrons);

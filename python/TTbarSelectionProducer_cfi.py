@@ -3,6 +3,10 @@ import FWCore.ParameterSet.Config as cms
 ttbarselectionproducer = cms.EDProducer("TTbarSelectionProducer",
                                         verbose          = cms.int32(0),
                                         triggerColl      = cms.InputTag("TriggerResults","","HLT"),
+                                        metFilters       = cms.VInputTag(cms.InputTag('TriggerResults','','RECO'),
+                                                                         cms.InputTag('TriggerResults','','PAT')),
+                                        RecoHBHENoiseFilter = cms.InputTag('hcalnoise','','RECO'),
+                                        metFiltersToApply= cms.vstring("Flag_HBHENoiseFilter","Flag_CSCTightHaloFilter","Flag_goodVertices","Flag_eeBadScFilter"),
                                         vtxColl          = cms.InputTag("offlineSlimmedPrimaryVertices"),
                                         #cf https://twiki.cern.ch/twiki/bin/view/CMS/TopTrigger
                                         trigNamesToSel   = cms.vstring('HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',

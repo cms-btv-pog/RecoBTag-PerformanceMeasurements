@@ -35,6 +35,7 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 
 //--------------------PAT includes
+#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "DataFormats/PatCandidates/interface/Particle.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
@@ -75,7 +76,8 @@ class TTbarSelectionProducer : public edm::EDProducer {
    public:
       explicit TTbarSelectionProducer(const edm::ParameterSet&);
       ~TTbarSelectionProducer();
-
+      virtual void beginRun(const edm::Run & iRun, edm::EventSetup const & iSetup);
+      virtual void endRun(const edm::Run & iRun, edm::EventSetup const & iSetup);
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
    private:
@@ -83,17 +85,21 @@ class TTbarSelectionProducer : public edm::EDProducer {
       virtual void produce(edm::Event&, const edm::EventSetup&);
       virtual void endJob() ;
       
-      virtual void beginRun(edm::Run&, edm::EventSetup const&);
-      virtual void endRun(edm::Run&, edm::EventSetup const&);
       virtual void beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
       virtual void endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
 
       //triggers
       edm::EDGetTokenT<edm::TriggerResults> triggerBits_;
+
       HLTConfigProvider hltConfig;
       std::vector<int> trigChannels_;
       std::vector<std::string> trigNamesToSel_;
       bool doTrigSel_;
+
+      //MET filters
+      std::vector<edm::EDGetTokenT<edm::TriggerResults> >metFilters_;
+      edm::EDGetTokenT<bool> RecoHBHENoiseFilter_;
+      std::vector<std::string> metFiltersToApply_;
 
       //vertices
       edm::EDGetTokenT<reco::VertexCollection> vtxToken_;

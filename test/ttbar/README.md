@@ -18,7 +18,7 @@ Partial submission can be made with -o csv_list
 Don't forget to init the environment for crab3
 (e.g. https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookCRAB3Tutorial)
 ```
-python checkProductionIntegrity.py -i /store/group/phys_btag/performance/TTbar/
+python checkProductionIntegrity.py -i /store/group/phys_btag/performance/TTbar/7b810a5
 ```
 Can run as soon as ntuple production starts to end, to move from crab output directories to a more simple directory structure
 which can be easily parsed by the local analysis. 
@@ -26,7 +26,7 @@ Once production is finished you can call with --cleanup to remove original crab 
 
 ### Running local analysis
 ```
-python runTTbarAnalysis.py -i /store/group/phys_btag/performance/TTbar/ -j ttbar_50ns.json -t taggers_phys14.json -n 8
+python runTTbarAnalysis.py -i /store/group/phys_btag/performance/TTbar/7b810a5 -j ttbar_50ns.json -t taggers_50ns.json -n 8
 ```
 Once grid jobs are run, and ntuples are stored in a given directory, you can run the local analysis to produce the slimmed ntuples for the efficiency measurement.
 MC will be weighted by cross section. The number after -n indicates how many threads should be used.
@@ -50,11 +50,11 @@ sh KIN_runClassifier.sh
 After running the local analysis use the kin tree stored in the ttbar sample to train a kinematics discriminator for b-jets in ttbar events.
 The script compiles and runs KIN_trainClassifier.C which should be modified in case different trainings are required.
 ```
-python runTTbarAnalysis.py -i /store/group/phys_btag/performance/TTbar/ -j ttbar_50ns.json -t taggers_phys14.json --tmvaWgts analysis/KIN_weights/TMVAClassification_BDT.weights.xml -n 8
+python runTTbarAnalysis.py -i /store/group/phys_btag/performance/TTbar/7b810a5 -j ttbar_50ns.json -t taggers_50ns.json --tmvaWgts analysis/KIN_weights/TMVAClassification_BDT.weights.xml -n 8
 ```
 Re-run the analysis to store the KIN discriminator value per jet
 ```
-python Templated_btagEffFitter.py -i analysis/ -o analysis/ -t taggers_phys14.json -n 8
+python Templated_btagEffFitter.py -i analysis/ -o analysis/ -t taggers_50ns.json -n 8
 ```
 Runs the fits to the templates to determine the scale factors. Valid for KIN, Mlj, JP, others one may wish to add.
 The base procedure is similar for all. The first time to run will take a long time as templates need to be created.

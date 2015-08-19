@@ -1,0 +1,13 @@
+{
+"MC13TeV_TTJets_powheg_herwig"      : [831.76,    0, "/TT_TuneEE5C_13TeV-powheg-herwigpp/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM", "t#bar{t} (HW++)",          920],
+"MC13TeV_TTJets_m169v5"             : [831.76,    0, "/TT_TuneCUETP8M1_mtop1695_13TeV-powheg-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM", "t#bar{t} (m=169.5)",          920],
+"MC13TeV_TTJets_m175v5"             : [831.76,    0, "/TT_TuneCUETP8M1_mtop1755_13TeV-powheg-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM", "t#bar{t} (m=175.5)",          920],
+"MC13TeV_TTJets_amcatnlo"           : [831.76,    0, "/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM", "t#bar{t} (aMC@NLO)",          920]
+}
+
+
+
+
+
+
+
