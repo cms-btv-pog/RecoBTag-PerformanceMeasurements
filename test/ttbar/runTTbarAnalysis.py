@@ -33,7 +33,7 @@ def runTTbarAnalysis(inFile, outFile, wgt, taggers, tmvaWgts=None):
 
     #Data specifics
     if 'Data' in inFile:
-        applyMETFilters=True
+        #applyMETFilters=True
         applyPUWgt=0
         applyTriggerEff=False
         applyLepSelEff=False
@@ -133,7 +133,7 @@ def runTTbarAnalysis(inFile, outFile, wgt, taggers, tmvaWgts=None):
     print '....opened %s -> analysing %d events -> %s' % (inFile,nentries,outFile)
     for i in xrange(0,nentries): 
         tree.GetEntry(i)
-        
+
         #progress bar
         if i%100==0 : print '\r[ %3d/100 ] to completion' % int(100.*i/nentries),
 

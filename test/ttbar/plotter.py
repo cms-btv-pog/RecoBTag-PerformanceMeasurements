@@ -73,7 +73,7 @@ class Plot(object):
             except:
                 pass
 
-    def show(self, outDir,lumi):
+    def show(self, outDir,lumi,noScale=False):
 
         if len(self.mc)==0:
             print '%s has no MC!' % self.name
@@ -114,7 +114,7 @@ class Plot(object):
             leg.AddEntry( self.data, self.data.GetTitle(),'p')
             nlegCols += 1
         for h in self.mc:
-            self.mc[h].Scale(lumi)
+            if not noScale : self.mc[h].Scale(lumi)
             leg.AddEntry(self.mc[h], self.mc[h].GetTitle(), 'f')
             nlegCols += 1
         if nlegCols ==0 :
@@ -260,7 +260,7 @@ def main():
     parser.add_option(      '--saveLog',     dest='saveLog' ,    help='save log versions of the plots', default=False,   action='store_true')
     parser.add_option(      '--silent',      dest='silent' ,     help='only dump to ROOT file',         default=False,   action='store_true')
     parser.add_option(      '--rebin',       dest='rebin',       help='rebin factor',                   default=1,       type=int)
-    parser.add_option('-l', '--lumi',        dest='lumi' ,       help='lumi to print out',              default=1,       type=float)
+    parser.add_option('-l', '--lumi',        dest='lumi' ,       help='lumi to print out',              default=41.6,    type=float)
     parser.add_option(      '--only',        dest='only',        help='plot only these (csv)',          default='',      type='string')
     (opt, args) = parser.parse_args()
 
