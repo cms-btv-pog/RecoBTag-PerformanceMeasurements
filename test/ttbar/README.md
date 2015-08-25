@@ -38,6 +38,7 @@ It prints out s.th. like "Produced normalization cache (analysis/.xsecweights.pc
 In case you update the trees, xsec or lumi you have to remove by hand the pickle file.
 ```
 python plotter.py -i analysis/ -j ttbar_50ns.json  -l 41.6
+python plotter.py -i analysis/ -j ttbar_50ns.json  -l 41.6 --only evsel --saveTeX
 ```
 Makes control plots and stores all in a ROOT file. Different options may be passed to filter plots, and show differently the plots. 
 

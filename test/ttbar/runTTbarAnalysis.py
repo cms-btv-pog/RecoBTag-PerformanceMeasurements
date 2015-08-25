@@ -60,8 +60,13 @@ def runTTbarAnalysis(inFile, outFile, wgt, taggers, tmvaWgts=None):
         'leadjpt': ROOT.TH1F('leadjpt',';Leading jet p_{T} [GeV];Events;',        14,30,300),
         'leadlpt': ROOT.TH1F('leadlpt',';Leading lepton p_{T} [GeV];Events;',     9,20,200),
         'trailjpt': ROOT.TH1F('trailjpt',';Trailing jet p_{T} [GeV];Events;',     14,30,300),
-        'traillpt': ROOT.TH1F('traillpt',';Trailing lepton p_{T} [GeV];Events;',  9,20,200)
+        'traillpt': ROOT.TH1F('traillpt',';Trailing lepton p_{T} [GeV];Events;',  9,20,200),
+        'evsel': ROOT.TH1F('evsel',';Event selection;Events;', 4,0,4)
         }
+    baseHistos['evsel'].GetXaxis().SetBinLabel(1,'#geq 2j')
+    baseHistos['evsel'].GetXaxis().SetBinLabel(2,'=2j')
+    baseHistos['evsel'].GetXaxis().SetBinLabel(3,'=3j')
+    baseHistos['evsel'].GetXaxis().SetBinLabel(4,'#geq4j')
 
     #init KIN tree
     kinTree=ROOT.TTree('kin','kin training')
@@ -276,6 +281,11 @@ def runTTbarAnalysis(inFile, outFile, wgt, taggers, tmvaWgts=None):
         if not passJets : continue
 
         #plots in control region
+        histos[ch+'_evsel'].Fill(0,evWgt)
+        if len(selJets)-2==0:   histos[ch+'_evsel'].Fill(1,evWgt)
+        elif len(selJets)-2==1: histos[ch+'_evsel'].Fill(2,evWgt)
+        else:                   histos[ch+'_evsel'].Fill(3,evWgt)
+
         histos[ch+'_rho'].Fill(tree.ttbar_rho,evWgt) 
         histos[ch+'_npv'].Fill(tree.nPV-1,evWgt)       
         histos[ch+'_njets'].Fill(len(selJets),evWgt)

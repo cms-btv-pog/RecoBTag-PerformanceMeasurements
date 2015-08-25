@@ -134,9 +134,11 @@ def runSFFits(var,tagger,taggerDef,outDir,lumi):
 
     nOPs=len(taggerDef)-2
     bobs={}
+    bexp={}
     for iop in xrange(0,nOPs):
 
         bobs[iop]={}
+        bexp[iop]={}
         for islice in xrange(0,len(SLICEBINS)):
 
             totalExp=0
@@ -195,14 +197,15 @@ def runSFFits(var,tagger,taggerDef,outDir,lumi):
                 saveResultIn = ROOT.TString('%s/%s_templates/%s_%s'%(outDir,var,tagger,baseName) if syst=='' else '')
                 res=ttFracFitter.fit(mc,data,0,saveResultIn)
                 bobs[iop][islice][syst]=(res.nObs,res.nObsUnc)
-
+                if len(syst)==0: bexp[iop][islice]=(res.nExp,res.nExpUnc)
 
     #dump to pickle
     cache = '%s/%s_templates/.%s_fits.pck' % (outDir,var,tagger)
     cachefile = open(cache,'w')
     fitInfo={'var':var,'tagger':tagger,'taggerDef':taggerDef}
     pickle.dump(fitInfo, cachefile,pickle.HIGHEST_PROTOCOL)
-    pickle.dump(bobs, cachefile,pickle.HIGHEST_PROTOCOL)
+    pickle.dump(bobs, cachefile, pickle.HIGHEST_PROTOCOL)
+    pickle.dump(bexp, cachefile, pickle.HIGHEST_PROTOCOL)
     cachefile.close()
     print 'Fit results have been stored in %s'%cache
     
@@ -211,10 +214,9 @@ compares results obtained from different methods
 """
 def showEfficiencyResults(fileList,outDir,lumi):
 
-    grIncStatColl={}
-    grIncTotalColl={}
-    grStatColl={}
-    grTotalColl={}
+    grIncExpColl,     grExpColl={},{}            # expected inclusive, differential
+    grIncObsStatColl, grIncObsTotalColl={},{}    # observed inclusive
+    grObsStatColl,    grObsTotalColl={},{}       # observed differential
 
     for ifile in xrange(0,len(fileList)):
 
@@ -222,14 +224,15 @@ def showEfficiencyResults(fileList,outDir,lumi):
         cachefile = open(f,'r')
         fitInfo=pickle.load(cachefile)
         fitResults=pickle.load(cachefile)
+        mcTruth=pickle.load(cachefile)
         cachefile.close()
     
         var       = fitInfo['var']
         tagger    = fitInfo['tagger']
         taggerDef = fitInfo['taggerDef']
         nOPs=len(taggerDef)-2
-        grIncStat, grIncTotal = {}, {}
-        grStat,    grTotal = {}, {}
+        grIncObsStat, grIncObsTotal = {}, {}
+        grObsStat,    grObsTotal    = {}, {}
         for iop in xrange(1,nOPs):
             for islice in fitResults[iop]:
 
@@ -239,6 +242,10 @@ def showEfficiencyResults(fileList,outDir,lumi):
                 eff={
                     ''     : fitResults[iop][islice][''][0]/fitResults[0][islice][''][0],
                     'stat' : fitResults[iop][islice][''][1]/fitResults[0][islice][''][0]
+                    }
+                mceff={
+                    ''     : mcTruth[iop][islice][0]/mcTruth[0][islice][0],
+                    'stat' : mcTruth[iop][islice][1]/mcTruth[0][islice][0]
                     }
 
                 #alternative variations
@@ -265,41 +272,64 @@ def showEfficiencyResults(fileList,outDir,lumi):
                 xmax=SLICEBINS[islice][1]+ifile*4
 
                 if islice==0 : 
-                    grIncStat[iop]=ROOT.TGraphErrors()
-                    grIncStat[iop].SetName('%s_%d_inc_stat'%(var,iop))
-                    grIncStat[iop].SetPoint(0,0+ifile*4,eff[''])
-                    grIncStat[iop].SetPointError(0,5,eff['stat'])
 
-                    grIncTotal[iop] = ROOT.TGraphErrors()
-                    grIncTotal[iop].SetName('%s_%d_inc_total'%(var,iop))
-                    grIncTotal[iop].SetPoint(0,0+ifile*4,eff[''])
-                    grIncTotal[iop].SetPointError(0,5,eff['total'])
+                    if ifile==0:
+                        grIncExpColl[iop]=ROOT.TGraphErrors()
+                        grIncExpColl[iop].SetName('%s_%d_inc_exp'%(var,iop))
+                        grIncExpColl[iop].SetTitle('simulation')
+                        grIncExpColl[iop].SetPoint(0,-4,mceff[''])
+                        grIncExpColl[iop].SetPointError(0,0,mceff['stat'])
+                        grIncExpColl[iop].SetPoint(1,4*len(fileList),mceff[''])
+                        grIncExpColl[iop].SetPointError(1,0,mceff['stat'])
+                        print iop,mceff[''],mceff['stat']
+
+                        grExpColl[iop]=ROOT.TGraphErrors()
+                        grExpColl[iop].SetName('%s_%d_exp'%(var,iop))
+                        grExpColl[iop].SetTitle('simulation')
+
+                    grIncObsStat[iop]=ROOT.TGraphErrors()
+                    grIncObsStat[iop].SetName('%s_%d_inc_stat'%(var,iop))
+                    grIncObsStat[iop].SetPoint(0,0+ifile*4,eff[''])
+                    grIncObsStat[iop].SetPointError(0,5,eff['stat'])
+
+                    grIncObsTotal[iop] = ROOT.TGraphErrors()
+                    grIncObsTotal[iop].SetName('%s_%d_inc_total'%(var,iop))
+                    grIncObsTotal[iop].SetPoint(0,0+ifile*4,eff[''])
+                    grIncObsTotal[iop].SetPointError(0,5,eff['total'])
 
                     #init differential plots also
-                    grStat[iop]=ROOT.TGraphErrors()
-                    grStat[iop].SetName('%s_%d_stat'%(var,iop))
-                    grTotal[iop] = ROOT.TGraphErrors()
-                    grTotal[iop].SetName('%s_%d_total'%(var,iop))
+                    grObsStat[iop]=ROOT.TGraphErrors()
+                    grObsStat[iop].SetName('%s_%d_stat'%(var,iop))
+                    grObsTotal[iop] = ROOT.TGraphErrors()
+                    grObsTotal[iop].SetName('%s_%d_total'%(var,iop))
 
                 else:
-                    np=grStat[iop].GetN()
-                    grStat[iop].SetPoint(np,0.5*(xmax+xmin),eff[''])
-                    grStat[iop].SetPointError(np,0.5*(xmax-xmin),eff['stat'])
-                    grTotal[iop].SetPoint(np,0.5*(xmax+xmin),eff[''])
-                    grTotal[iop].SetPointError(np,0.5*(xmax-xmin),eff['total'])
+
+                    xcen=0.5*(xmax+xmin)
+                    dx=(xmax-xmin)*0.5
+
+                    np=grObsStat[iop].GetN()
+                    grObsStat[iop].SetPoint(np,xcen,eff[''])
+                    grObsStat[iop].SetPointError(np,dx,eff['stat'])
+                    grObsTotal[iop].SetPoint(np,xcen,eff[''])
+                    grObsTotal[iop].SetPointError(np,dx,eff['total'])
+
+                    if ifile==0:
+                        np=grExpColl[iop].GetN()
+                        grExpColl[iop].SetPoint(np,xcen,mceff[''])
+                        grExpColl[iop].SetPointError(np,0,mceff['stat'])
+                        #grExpColl[iop].SetPoint(np+1,xmin+0.6*dx,mceff[''])
+                        #grExpColl[iop].SetPointError(np+1,0,mceff['stat'])
 
         #add collection
-        if not (var in grStatColl):
-            grIncStatColl[var]={}
-            grIncTotalColl[var]={}
-            grStatColl[var]={}
-            grTotalColl[var]={}
-        grIncStatColl[var]  = grIncStat
-        grIncTotalColl[var] = grIncTotal
-        grStatColl[var]  = grStat
-        grTotalColl[var] = grTotal
+        if not (var in grObsStatColl):
+            grIncObsStatColl[var], grIncObsTotalColl[var] = {}, {}
+            grObsStatColl[var], grObsTotalColl[var] = {}, {}
 
-
+        grIncObsStatColl[var]  = grIncObsStat
+        grIncObsTotalColl[var] = grIncObsTotal
+        grObsStatColl[var]     = grObsStat
+        grObsTotalColl[var]    = grObsTotal
 
     #show results in canvas
     c=ROOT.TCanvas('c','c',800,500)
@@ -337,42 +367,47 @@ def showEfficiencyResults(fileList,outDir,lumi):
     cexc.Draw()
     c.cd()
     
-    firstvar=grIncStatColl.keys()[0]
-    for iop in grIncStatColl[firstvar]:
+    firstvar=grIncObsStatColl.keys()[0]
+    for iop in grIncObsStatColl[firstvar]:
 
         cinc.cd()
         cinc.Clear()
         ivar=0
         drawOpt='a2'
-        for var in grIncTotalColl:
-            grIncTotalColl[var][iop].SetTitle(var)
-            grIncTotalColl[var][iop].SetMarkerColor(colors[ivar]+1)
-            grIncTotalColl[var][iop].SetLineColor(colors[ivar]+1)
-            grIncTotalColl[var][iop].SetFillColor(colors[ivar]+1)
-            grIncTotalColl[var][iop].SetMarkerStyle(1)
-            grIncTotalColl[var][iop].SetFillStyle(3001)
-            grIncTotalColl[var][iop].Draw(drawOpt)
-            grIncTotalColl[var][iop].GetYaxis().SetRangeUser(0.0,1.5)
-            grIncTotalColl[var][iop].GetYaxis().SetTitle('Efficiency')
-            grIncTotalColl[var][iop].GetYaxis().SetTitleSize(0.1)
-            grIncTotalColl[var][iop].GetYaxis().SetLabelSize(0.1)
-            grIncTotalColl[var][iop].GetXaxis().SetTitleSize(0.)
-            grIncTotalColl[var][iop].GetXaxis().SetLabelSize(0.)
-            grIncTotalColl[var][iop].GetXaxis().SetNdivisions(0)
-            grIncTotalColl[var][iop].GetXaxis().SetTitle(SLICEVAR)
+        for var in grIncObsTotalColl:
+            grIncObsTotalColl[var][iop].SetTitle(var)
+            grIncObsTotalColl[var][iop].SetMarkerColor(colors[ivar]+1)
+            grIncObsTotalColl[var][iop].SetLineColor(colors[ivar]+1)
+            grIncObsTotalColl[var][iop].SetFillColor(colors[ivar]+1)
+            grIncObsTotalColl[var][iop].SetMarkerStyle(1)
+            grIncObsTotalColl[var][iop].SetFillStyle(3001)
+            grIncObsTotalColl[var][iop].Draw(drawOpt)
+            grIncObsTotalColl[var][iop].GetYaxis().SetRangeUser(0.0,1.5)
+            grIncObsTotalColl[var][iop].GetYaxis().SetTitle('Efficiency')
+            grIncObsTotalColl[var][iop].GetYaxis().SetTitleSize(0.1)
+            grIncObsTotalColl[var][iop].GetYaxis().SetLabelSize(0.1)
+            grIncObsTotalColl[var][iop].GetXaxis().SetTitleSize(0.)
+            grIncObsTotalColl[var][iop].GetXaxis().SetLabelSize(0.)
+            grIncObsTotalColl[var][iop].GetXaxis().SetNdivisions(0)
             drawOpt='2'
             ivar+=1
 
         ivar=0
-        for var in grIncStatColl:
-            grIncStatColl[var][iop].SetMarkerColor(colors[ivar])
-            grIncStatColl[var][iop].SetLineColor(colors[ivar])
-            grIncStatColl[var][iop].SetFillColor(0)
-            grIncStatColl[var][iop].SetMarkerStyle(markers[ivar])
-            grIncStatColl[var][iop].SetFillStyle(0)
-            grIncStatColl[var][iop].Draw('p')
-            grIncStatColl[var][iop].SetTitle(var)
+        for var in grIncObsStatColl:
+            grIncObsStatColl[var][iop].SetMarkerColor(colors[ivar])
+            grIncObsStatColl[var][iop].SetLineColor(colors[ivar])
+            grIncObsStatColl[var][iop].SetFillColor(0)
+            grIncObsStatColl[var][iop].SetMarkerStyle(markers[ivar])
+            grIncObsStatColl[var][iop].SetFillStyle(0)
+            grIncObsStatColl[var][iop].Draw('p')
+            grIncObsStatColl[var][iop].SetTitle(var)
             ivar+=1
+
+        grIncExpColl[iop].SetMarkerColor(1)
+        grIncExpColl[iop].SetMarkerStyle(1)
+        grIncExpColl[iop].SetLineColor(1)
+        grIncExpColl[iop].SetLineWidth(2)
+        grIncExpColl[iop].Draw('c')
 
         cexc.cd()
         cexc.Clear()
@@ -381,33 +416,43 @@ def showEfficiencyResults(fileList,outDir,lumi):
         leg.SetFillStyle(0)
         leg.SetTextFont(43)
         leg.SetTextSize(16)
+        leg.AddEntry(grExpColl[iop],grExpColl[iop].GetTitle(),"l")
+
         ivar=0
         drawOpt='a2'
-        for var in grTotalColl:
-            grTotalColl[var][iop].SetTitle(var)
-            grTotalColl[var][iop].SetMarkerColor(colors[ivar]+1)
-            grTotalColl[var][iop].SetLineColor(colors[ivar]+1)
-            grTotalColl[var][iop].SetFillColor(colors[ivar]+1)
-            grTotalColl[var][iop].SetMarkerStyle(1)
-            grTotalColl[var][iop].SetFillStyle(3001)
-            grTotalColl[var][iop].Draw(drawOpt)
-            grTotalColl[var][iop].GetYaxis().SetTitleSize(0.)
-            grTotalColl[var][iop].GetYaxis().SetLabelSize(0.)
-            grTotalColl[var][iop].GetYaxis().SetRangeUser(0.0,1.5)
+        for var in grObsTotalColl:
+            grObsTotalColl[var][iop].SetTitle(var)
+            grObsTotalColl[var][iop].SetMarkerColor(colors[ivar]+1)
+            grObsTotalColl[var][iop].SetLineColor(colors[ivar]+1)
+            grObsTotalColl[var][iop].SetFillColor(colors[ivar]+1)
+            grObsTotalColl[var][iop].SetMarkerStyle(1)
+            grObsTotalColl[var][iop].SetFillStyle(3001)
+            grObsTotalColl[var][iop].Draw(drawOpt)
+            grObsTotalColl[var][iop].GetYaxis().SetTitleSize(0.)
+            grObsTotalColl[var][iop].GetYaxis().SetLabelSize(0.)
+            grObsTotalColl[var][iop].GetYaxis().SetRangeUser(0.0,1.5)
+            grObsTotalColl[var][iop].GetXaxis().SetTitle(SLICEVAR)
             drawOpt='2'
             ivar+=1
 
         ivar=0
-        for var in grStatColl:
-            grStatColl[var][iop].SetMarkerColor(colors[ivar])
-            grStatColl[var][iop].SetLineColor(colors[ivar])
-            grStatColl[var][iop].SetFillColor(0)
-            grStatColl[var][iop].SetMarkerStyle(markers[ivar])
-            grStatColl[var][iop].SetFillStyle(0)
-            grStatColl[var][iop].Draw('p')
-            grStatColl[var][iop].SetTitle(var)
-            leg.AddEntry(grStatColl[var][iop],grStatColl[var][iop].GetTitle(),'p')
+        for var in grObsStatColl:
+            grObsStatColl[var][iop].SetMarkerColor(colors[ivar])
+            grObsStatColl[var][iop].SetLineColor(colors[ivar])
+            grObsStatColl[var][iop].SetFillColor(0)
+            grObsStatColl[var][iop].SetMarkerStyle(markers[ivar])
+            grObsStatColl[var][iop].SetFillStyle(0)
+            grObsStatColl[var][iop].Draw('p')
+            grObsStatColl[var][iop].SetTitle(var)
+            leg.AddEntry(grObsStatColl[var][iop],grObsStatColl[var][iop].GetTitle(),'p')
             ivar+=1
+
+        grExpColl[iop].SetMarkerColor(1)
+        grExpColl[iop].SetMarkerStyle(1)
+        grExpColl[iop].SetLineColor(1)
+        grExpColl[iop].SetLineWidth(2)
+        grExpColl[iop].Draw('c')
+
         leg.Draw()
 
         clabel.cd()
@@ -421,7 +466,7 @@ def showEfficiencyResults(fileList,outDir,lumi):
             txt.DrawLatex(0.05,0.5,'#bf{CMS} #it{Preliminary} %3.1f pb^{-1} (13 TeV)' % lumi)
         else:
             txt.DrawLatex(0.05,0.5,'#bf{CMS} #it{Preliminary} %3.1f fb^{-1} (13 TeV)' % (lumi/1000.))
-        txt.DrawLatex(0.8,0.5,'%s > %3.3f #scale[0.8]{#it{inclusive}}' % (tagger,taggerDef[iop+2]))
+        txt.DrawLatex(0.85,0.5,'[%s > %3.3f]' % (tagger,taggerDef[iop+2]))
 
         c.cd()
         c.Modified()

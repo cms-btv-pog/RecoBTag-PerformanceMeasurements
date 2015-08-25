@@ -151,7 +151,7 @@ TTbarFracFitterResult_t TTbarFracFitter::fit(TObjArray &expTemplates, TH1F *data
       TLegend *leg=new TLegend(0.65,0.35,0.95,0.52);
       leg->AddEntry("data",       "Pseudo data",      "p");
       leg->AddEntry("totalexp",   "Total",     "l");
-      leg->AddEntry("poifit",     "t#bar{t}",  "f");
+      leg->AddEntry("poifit",     expFracs.find(poiName)->GetTitle(),  "f");
       leg->SetFillStyle(0);
       leg->SetTextFont(43);
       leg->SetTextSize(14);
@@ -197,7 +197,7 @@ TTbarFracFitterResult_t TTbarFracFitter::fit(TObjArray &expTemplates, TH1F *data
       frame2->GetXaxis()->SetRangeUser(165,180);
       frame2->GetYaxis()->SetNdivisions(3);
       frame2->GetXaxis()->SetNdivisions(3);
-      frame2->GetXaxis()->SetTitle(expFracs.find(poiName)->GetTitle());
+      frame2->GetXaxis()->SetTitle(expFracs.find(poiName)->GetTitle() + TString(" fraction"));
       frame2->GetYaxis()->SetTitle("LL");
       frame2->GetYaxis()->SetTitleOffset(1.5);
       frame2->GetXaxis()->SetTitleSize(0.08);

@@ -4,6 +4,9 @@ import json
 import ROOT
 import math
 
+from rounding import *
+
+
 """
 A wrapper to store data and MC histograms for comparison
 """
@@ -73,7 +76,7 @@ class Plot(object):
             except:
                 pass
 
-    def show(self, outDir,lumi,noScale=False):
+    def show(self, outDir,lumi,noScale=False,saveTeX=False):
 
         if len(self.mc)==0:
             print '%s has no MC!' % self.name
@@ -220,6 +223,65 @@ class Plot(object):
             c.Update()
             for ext in self.plotformats : c.SaveAs(os.path.join(outDir, self.name+'_log.'+ext))
 
+        if saveTeX : self.convertToTeX(outDir=outDir)
+
+
+    def convertToTeX(self, outDir):
+        if len(self.mc)==0:
+            print '%s is empty' % self.name
+            return
+
+        f = open(outDir+'/'+self.name+'.dat','w')
+        f.write('------------------------------------------\n')
+        f.write("Process".ljust(20),)
+        f.write("Events after each cut\n")
+        f.write('------------------------------------------\n')
+
+        tot ={}
+        err = {}
+        f.write(' '.ljust(20),)
+        try:
+            for xbin in xrange(1,self.mc.values()[0].GetXaxis().GetNbins()+1):
+                pcut=self.mc.values()[0].GetXaxis().GetBinLabel(xbin)
+                f.write(pcut.ljust(40),)
+                tot[xbin]=0
+                err[xbin]=0
+        except:
+            pass
+        f.write('\n')
+        f.write('------------------------------------------\n')
+
+        for pname in self.mc:
+            h = self.mc[pname]
+            f.write(pname.ljust(20),)
+
+            for xbin in xrange(1,h.GetXaxis().GetNbins()+1):
+                itot=h.GetBinContent(xbin)
+                ierr=h.GetBinError(xbin)
+                pval=' & %s'%toLatexRounded(itot,ierr)
+                f.write(pval.ljust(40),)
+                tot[xbin] = tot[xbin]+itot
+                err[xbin] = err[xbin]+ierr*ierr
+            f.write('\n')
+
+        f.write('------------------------------------------\n')
+        f.write('Total'.ljust(20),)
+        for xbin in tot:
+            pval=' & %s'%toLatexRounded(tot[xbin],math.sqrt(err[xbin]))
+            f.write(pval.ljust(40),)
+        f.write('\n')
+
+        if self.dataH is None: return
+        f.write('------------------------------------------\n')
+        f.write('Data'.ljust(20),)
+        for xbin in xrange(1,self.dataH.GetXaxis().GetNbins()+1):
+            itot=self.dataH.GetBinContent(xbin)
+            pval=' & %d'%itot
+            f.write(pval.ljust(40))
+        f.write('\n')
+        f.write('------------------------------------------\n')
+        f.close()
+
 
 
 """
@@ -259,6 +321,7 @@ def main():
     parser.add_option('-i', '--inDir',       dest='inDir' ,      help='input directory',                default=None,    type='string')
     parser.add_option(      '--saveLog',     dest='saveLog' ,    help='save log versions of the plots', default=False,   action='store_true')
     parser.add_option(      '--silent',      dest='silent' ,     help='only dump to ROOT file',         default=False,   action='store_true')
+    parser.add_option(      '--saveTeX',     dest='saveTeX' ,    help='save as tex file as well',       default=False,   action='store_true')
     parser.add_option(      '--rebin',       dest='rebin',       help='rebin factor',                   default=1,       type=int)
     parser.add_option('-l', '--lumi',        dest='lumi' ,       help='lumi to print out',              default=41.6,    type=float)
     parser.add_option(      '--only',        dest='only',        help='plot only these (csv)',          default='',      type='string')
@@ -295,7 +358,7 @@ def main():
     os.system('mkdir -p %s' % outDir)
     for p in plots : 
         if opt.saveLog    : plots[p].savelog=True
-        if not opt.silent : plots[p].show(outDir=outDir,lumi=opt.lumi)
+        if not opt.silent : plots[p].show(outDir=outDir,lumi=opt.lumi,saveTeX=opt.saveTeX)
         plots[p].appendTo(outDir+'/plotter.root')
         plots[p].reset()
 
