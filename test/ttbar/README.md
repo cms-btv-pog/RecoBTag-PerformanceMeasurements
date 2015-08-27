@@ -11,7 +11,7 @@ cmsRun runBTagAnalyzer_cfg.py
 ```
 Will run locally the analyzer for testing purposes
 ```
-python submitToGrid.py -j ttbar_50ns.json -c ${CMSSW_BASE}/src/RecoBTag/PerformanceMeasurements/test/runBTagAnalyzer_cfg.py -s
+python submitToGrid.py -j ttbar_Run2015.json -c ${CMSSW_BASE}/src/RecoBTag/PerformanceMeasurements/test/runBTagAnalyzer_cfg.py -s
 ```
 Will submit the samples described in the json to the grid.
 Partial submission can be made with -o csv_list
@@ -26,7 +26,7 @@ Once production is finished you can call with --cleanup to remove original crab 
 
 ### Running local analysis
 ```
-python runTTbarAnalysis.py -i /store/group/phys_btag/performance/TTbar/7b810a5 -j ttbar_50ns.json -t taggers_50ns.json -n 8
+python runTTbarAnalysis.py -i /store/group/phys_btag/performance/TTbar/7b810a5 -j ttbar_Run2015.json -t taggers_Run2015.json -n 8
 ```
 Once grid jobs are run, and ntuples are stored in a given directory, you can run the local analysis to produce the slimmed ntuples for the efficiency measurement.
 MC will be weighted by cross section. The number after -n indicates how many threads should be used.
@@ -37,8 +37,8 @@ See https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookCRAB3Tutorial and htt
 It prints out s.th. like "Produced normalization cache (analysis/.xsecweights.pck)"
 In case you update the trees, xsec or lumi you have to remove by hand the pickle file.
 ```
-python plotter.py -i analysis/ -j ttbar_50ns.json  -l 41.6
-python plotter.py -i analysis/ -j ttbar_50ns.json  -l 41.6 --only evsel --saveTeX
+python plotter.py -i analysis/ -j ttbar_Run2015.json  -l 41.6
+python plotter.py -i analysis/ -j ttbar_Run2015.json  -l 41.6 --only evsel --saveTeX
 ```
 Makes control plots and stores all in a ROOT file. Different options may be passed to filter plots, and show differently the plots. 
 
@@ -51,11 +51,11 @@ sh KIN_runClassifier.sh
 After running the local analysis use the kin tree stored in the ttbar sample to train a kinematics discriminator for b-jets in ttbar events.
 The script compiles and runs KIN_trainClassifier.C which should be modified in case different trainings are required.
 ```
-python runTTbarAnalysis.py -i /store/group/phys_btag/performance/TTbar/7b810a5 -j ttbar_50ns.json -t taggers_50ns.json --tmvaWgts analysis/KIN_weights/TMVAClassification_BDT.weights.xml -n 8
+python runTTbarAnalysis.py -i /store/group/phys_btag/performance/TTbar/7b810a5 -j ttbar_Run2015.json -t taggers_Run2015.json --tmvaWgts analysis/KIN_weights/TMVAClassification_BDT.weights.xml -n 8
 ```
 Re-run the analysis to store the KIN discriminator value per jet
 ```
-python Templated_btagEffFitter.py -i analysis/ -o analysis/ -t taggers_50ns.json -n 8
+python Templated_btagEffFitter.py -i analysis/ -o analysis/ -t taggers_Run2015.json -n 8
 ```
 Runs the fits to the templates to determine the scale factors. Valid for KIN, Mlj, JP, others one may wish to add.
 The base procedure is similar for all. The first time to run will take a long time as templates need to be created.

@@ -148,9 +148,9 @@ TTbarFracFitterResult_t TTbarFracFitter::fit(TObjArray &expTemplates, TH1F *data
       label->SetTextSize(0.04);
       label->DrawLatex(0.18,0.94,"#bf{CMS} #it{simulation}");
 
-      TLegend *leg=new TLegend(0.65,0.35,0.95,0.52);
-      leg->AddEntry("data",       "Pseudo data",      "p");
-      leg->AddEntry("totalexp",   "Total",     "l");
+      TLegend *leg=new TLegend(0.8,0.65,0.95,0.5);
+      leg->AddEntry("data",       "data",      "p");
+      leg->AddEntry("totalexp",   "total",     "l");
       leg->AddEntry("poifit",     expFracs.find(poiName)->GetTitle(),  "f");
       leg->SetFillStyle(0);
       leg->SetTextFont(43);

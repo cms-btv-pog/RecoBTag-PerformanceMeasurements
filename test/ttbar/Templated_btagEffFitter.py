@@ -9,7 +9,7 @@ from plotter import Plot
 VARSTOFIT  = [('kindisc',-1,1),('jpTagger',0,2),('close_mlj',0,200)]
 SLICEBINS  = [(20,320),(20,60),(60,120),(120,320)]
 SLICEVAR   = 'jetpt'
-SYSTVARS   = ['','jesup','jesdn','jerup','jerdn','puup','pudn','trigdn','trigup','seldn','selup','qcdscaledn','qcdscaleup','hdampdn','hdampup']
+SYSTVARS   = ['','jesup','jesdn','jerup','jerdn','trigdn','trigup','seldn','selup','qcdscaledn','qcdscaleup','hdampdn','hdampup']
 
 """
 Project trees from files to build the templates
@@ -122,6 +122,15 @@ def runPrepareTemplatesPacked(args):
         return False
 
 """
+Leave no bins with 0 counts
+If negative values (negative weights in MC) set to minimum 
+"""
+def checkTemplate(h,minVal=1e-5):
+    for xbin in xrange(1,h.GetNbinsX()+1):
+        y=h.GetBinContent(xbin)
+        if y<=0: h.SetBinContent(xbin,minVal)
+
+"""
 run the fits
 """
 def runSFFits(var,tagger,taggerDef,outDir,lumi):
@@ -144,10 +153,12 @@ def runSFFits(var,tagger,taggerDef,outDir,lumi):
             totalExp=0
             data,pseudoData=None,None
             bobs[iop][islice]={}
+            baseNameNominal = 'pass%d_slice%d' % (iop,islice)
             for syst in SYSTVARS:
 
                 #build flavour templates
-                baseName='pass%d_slice%d%s' % (iop,islice,syst)
+                baseName = baseNameNominal+syst
+
                 mc=ROOT.TObjArray( len(flavTemplates) )
                 fIn=ROOT.TFile.Open('%s/%s_templates/%s.root' % (outDir, var, tagger) )
                 for flavGroup in flavTemplates :
@@ -159,12 +170,22 @@ def runSFFits(var,tagger,taggerDef,outDir,lumi):
                     h=None
                     for flav in flavGroup:
                         hname='%s_%s'%(flav,baseName)
+                        ihisto=fIn.Get(hname)
+                        checkTemplate(ihisto)
+
+                        hnomname='%s_%s'%(flav,baseNameNominal)
+                        inomhisto=fIn.Get(hnomname)
+                        checkTemplate(inomhisto)
+
+                        #only interested in shape variations
+                        ihisto.Scale(inomhisto.Integral()/ihisto.Integral())
+
                         if h is None:
-                            h=fIn.Get(hname).Clone(name)        
+                            h=ihisto.Clone(name)        
                             h.SetDirectory(0)
                             h.SetTitle(title)
                         else:
-                            h.Add( fIn.Get(hname) )
+                            h.Add( ihisto )
 
                     #check for empty bins...
                     for xbin in xrange(1,h.GetXaxis().GetNbins()+1):
@@ -195,20 +216,63 @@ def runSFFits(var,tagger,taggerDef,outDir,lumi):
 
                 #fit
                 saveResultIn = ROOT.TString('%s/%s_templates/%s_%s'%(outDir,var,tagger,baseName) if syst=='' else '')
-                res=ttFracFitter.fit(mc,data,0,saveResultIn)
-                bobs[iop][islice][syst]=(res.nObs,res.nObsUnc)
-                if len(syst)==0: bexp[iop][islice]=(res.nExp,res.nExpUnc)
+                if len(syst)==0:
+                    res=ttFracFitter.fit(mc,data,0,saveResultIn)
+                    bobs[iop][islice]['']=(res.nObs,res.nObsUnc)
+                    bexp[iop][islice]=(res.nExp,res.nExpUnc)
+                    res=ttFracFitter.fit(mc,pseudoData,0,saveResultIn)
+                    bobs[iop][islice]['closureup']=(res.nObs,res.nObsUnc)
+                    bobs[iop][islice]['closuredn']=(res.nObs,res.nObsUnc)
+                else:
+                    res=ttFracFitter.fit(mc,pseudoData,0,saveResultIn)
+                    bobs[iop][islice][syst]=(res.nObs,res.nObsUnc)
+
+
 
     #dump to pickle
     cache = '%s/%s_templates/.%s_fits.pck' % (outDir,var,tagger)
     cachefile = open(cache,'w')
-    fitInfo={'var':var,'tagger':tagger,'taggerDef':taggerDef}
+    fitInfo={'var':var,'tagger':tagger,'taggerDef':taggerDef,'slicevar':SLICEVAR,'slicebins':SLICEBINS}
     pickle.dump(fitInfo, cachefile,pickle.HIGHEST_PROTOCOL)
     pickle.dump(bobs, cachefile, pickle.HIGHEST_PROTOCOL)
     pickle.dump(bexp, cachefile, pickle.HIGHEST_PROTOCOL)
     cachefile.close()
     print 'Fit results have been stored in %s'%cache
     
+
+"""
+Massive conversion to scale factors given a MC truth reference
+"""
+def convertToScaleFactor(obs,ref):
+
+    sf={}
+    for var in obs:
+        sf[var]={}
+        for iop in obs[var]:
+
+            newName=obs[var][iop].GetName()+'_sf'
+            sf[var][iop]=obs[var][iop].Clone(newName)
+            
+            xobs, yobs = ROOT.Double(0), ROOT.Double(0)                
+            xexp, yexp = ROOT.Double(0), ROOT.Double(0)                
+            for ip in xrange(0,obs[var][iop].GetN()):
+                obs[var][iop].GetPoint(ip,xobs,yobs)
+                xobsUnc=obs[var][iop].GetErrorX(ip)
+                yobsUnc=obs[var][iop].GetErrorY(ip)
+                
+                ref[iop].GetPoint(ip,xexp,yexp)
+                xexpUnc=ref[iop].GetErrorX(ip)
+                yexpUnc=ref[iop].GetErrorY(ip)
+                
+                sfVal, sfValUnc = 0., 0.
+                if yexp>0:
+                    sfVal=yobs/yexp
+                    sfValUnc= ROOT.TMath.Sqrt( ROOT.TMath.Power(yobsUnc*yexp,2)+ROOT.TMath.Power(yobs*yexpUnc,2) )/ROOT.TMath.Power(yexp,2)
+                sf[var][iop].SetPoint(ip,xobs,sfVal)
+                sf[var][iop].SetPointError(ip,xobsUnc,sfValUnc)
+
+    return sf
+
 """
 compares results obtained from different methods
 """
@@ -252,12 +316,14 @@ def showEfficiencyResults(fileList,outDir,lumi):
                 for systVar in fitResults[iop][islice]:
                     
                     if systVar=='' : continue
+                    if systVar=='closure': continue
 
                     #symmetrize differences for up/dn variations
                     newEff = fitResults[iop][islice][systVar][0]/fitResults[0][islice][systVar][0]
                     key    = systVar.replace('up','')
                     key    = key.replace('dn','')
-                    newEff = newEff-eff['']
+                    #newEff = newEff-eff['']
+                    newEff = newEff-mceff['']
                     if key in eff : eff[key]=0.5*(ROOT.TMath.Abs(eff[key])+ROOT.TMath.Abs(newEff))
                     else          : eff[key]=newEff
                 
@@ -281,7 +347,6 @@ def showEfficiencyResults(fileList,outDir,lumi):
                         grIncExpColl[iop].SetPointError(0,0,mceff['stat'])
                         grIncExpColl[iop].SetPoint(1,4*len(fileList),mceff[''])
                         grIncExpColl[iop].SetPointError(1,0,mceff['stat'])
-                        print iop,mceff[''],mceff['stat']
 
                         grExpColl[iop]=ROOT.TGraphErrors()
                         grExpColl[iop].SetName('%s_%d_exp'%(var,iop))
@@ -290,13 +355,14 @@ def showEfficiencyResults(fileList,outDir,lumi):
                     grIncObsStat[iop]=ROOT.TGraphErrors()
                     grIncObsStat[iop].SetName('%s_%d_inc_stat'%(var,iop))
                     grIncObsStat[iop].SetPoint(0,0+ifile*4,eff[''])
-                    grIncObsStat[iop].SetPointError(0,5,eff['stat'])
+                    #grIncObsStat[iop].SetPointError(0,5,eff['stat'])
+                    grIncObsStat[iop].SetPointError(0,0,eff['stat'])
 
                     grIncObsTotal[iop] = ROOT.TGraphErrors()
                     grIncObsTotal[iop].SetName('%s_%d_inc_total'%(var,iop))
                     grIncObsTotal[iop].SetPoint(0,0+ifile*4,eff[''])
                     grIncObsTotal[iop].SetPointError(0,5,eff['total'])
-
+                    
                     #init differential plots also
                     grObsStat[iop]=ROOT.TGraphErrors()
                     grObsStat[iop].SetName('%s_%d_stat'%(var,iop))
@@ -310,7 +376,8 @@ def showEfficiencyResults(fileList,outDir,lumi):
 
                     np=grObsStat[iop].GetN()
                     grObsStat[iop].SetPoint(np,xcen,eff[''])
-                    grObsStat[iop].SetPointError(np,dx,eff['stat'])
+                    #grObsStat[iop].SetPointError(np,dx,eff['stat'])
+                    grObsStat[iop].SetPointError(np,0,eff['stat'])
                     grObsTotal[iop].SetPoint(np,xcen,eff[''])
                     grObsTotal[iop].SetPointError(np,dx,eff['total'])
 
@@ -341,35 +408,52 @@ def showEfficiencyResults(fileList,outDir,lumi):
     colors=[ROOT.kAzure+9,ROOT.kOrange-1,ROOT.kGreen-5]
     markers=[20,21,22]
 
+    c.cd()
     clabel=ROOT.TPad('clabel','clabel',0,0.95,1.0,1.0)
     clabel.SetRightMargin(0.0)
     clabel.SetTopMargin(0.0)
     clabel.SetLeftMargin(0.0)
     clabel.SetBottomMargin(0.0)
-
-    cinc=ROOT.TPad('cinc','cinc',0,0,0.2,0.95)
+    clabel.Draw()
+    
+    c.cd()
+    cinc=ROOT.TPad('cinc','cinc',0,0.45,0.2,0.95)
     cinc.SetRightMargin(0.02)
     cinc.SetTopMargin(0.01)
     cinc.SetLeftMargin(0.3)
-    cinc.SetBottomMargin(0.12)
+    cinc.SetBottomMargin(0.01)
+    cinc.Draw()
 
-    cexc=ROOT.TPad('cexc','cexc',0.2,0,1.0,0.95)
+    c.cd()
+    cincsf=ROOT.TPad('cincsf','cincsf',0,0,0.2,0.45)
+    cincsf.SetRightMargin(0.02)
+    cincsf.SetTopMargin(0.01)
+    cincsf.SetLeftMargin(0.3)
+    cincsf.SetBottomMargin(0.12)
+    cincsf.Draw()
+
+    c.cd()
+    cexc=ROOT.TPad('cexc','cexc',0.2,0.45,1.0,0.95)
     cexc.SetRightMargin(0.02)
     cexc.SetTopMargin(0.01)
     cexc.SetLeftMargin(0.02)
-    cexc.SetBottomMargin(0.12)
+    cexc.SetBottomMargin(0.01)
+    cexc.Draw()
 
     c.cd()
-    clabel.Draw()
-    c.cd()
-    cinc.Draw()
-    c.cd()
-    cexc.Draw()
-    c.cd()
+    cexcsf=ROOT.TPad('cexcsf','cexcsf',0.2,0,1.0,0.45)
+    cexcsf.SetRightMargin(0.02)
+    cexcsf.SetTopMargin(0.01)
+    cexcsf.SetLeftMargin(0.02)
+    cexcsf.SetBottomMargin(0.12)
+    cexcsf.Draw()
     
     firstvar=grIncObsStatColl.keys()[0]
     for iop in grIncObsStatColl[firstvar]:
 
+        #
+        #inclusive efficiency measurements
+        #
         cinc.cd()
         cinc.Clear()
         ivar=0
@@ -382,8 +466,9 @@ def showEfficiencyResults(fileList,outDir,lumi):
             grIncObsTotalColl[var][iop].SetMarkerStyle(1)
             grIncObsTotalColl[var][iop].SetFillStyle(3001)
             grIncObsTotalColl[var][iop].Draw(drawOpt)
-            grIncObsTotalColl[var][iop].GetYaxis().SetRangeUser(0.0,1.5)
+            grIncObsTotalColl[var][iop].GetYaxis().SetRangeUser(0.12,1.5)
             grIncObsTotalColl[var][iop].GetYaxis().SetTitle('Efficiency')
+            grIncObsTotalColl[var][iop].GetYaxis().SetTitleOffset(1.2)
             grIncObsTotalColl[var][iop].GetYaxis().SetTitleSize(0.1)
             grIncObsTotalColl[var][iop].GetYaxis().SetLabelSize(0.1)
             grIncObsTotalColl[var][iop].GetXaxis().SetTitleSize(0.)
@@ -409,6 +494,37 @@ def showEfficiencyResults(fileList,outDir,lumi):
         grIncExpColl[iop].SetLineWidth(2)
         grIncExpColl[iop].Draw('c')
 
+        #
+        #inclusive scale factors
+        #
+        grIncSFObsStatColl=convertToScaleFactor(obs=grIncObsStatColl,ref=grIncExpColl)
+        grIncSFObsTotalColl=convertToScaleFactor(obs=grIncObsTotalColl,ref=grIncExpColl)
+        cincsf.cd()
+        cincsf.Clear()
+        ivar=0
+        drawOpt='a2'
+        for var in grIncSFObsTotalColl:
+            grIncSFObsTotalColl[var][iop].Draw(drawOpt)
+            grIncSFObsTotalColl[var][iop].GetYaxis().SetRangeUser(0.74,1.26)
+            grIncSFObsTotalColl[var][iop].GetYaxis().SetTitle('Data-MC scale factor')
+            grIncSFObsTotalColl[var][iop].GetYaxis().SetTitleOffset(1.2)
+            grIncSFObsTotalColl[var][iop].GetYaxis().SetTitleSize(0.1)
+            grIncSFObsTotalColl[var][iop].GetYaxis().SetLabelSize(0.1)
+            grIncSFObsTotalColl[var][iop].GetXaxis().SetTitleSize(0.)
+            grIncSFObsTotalColl[var][iop].GetXaxis().SetLabelSize(0.)
+            grIncSFObsTotalColl[var][iop].GetXaxis().SetNdivisions(0)
+            drawOpt='2'
+            ivar+=1
+
+        ivar=0
+        for var in grIncSFObsStatColl:
+            grIncSFObsStatColl[var][iop].Draw('p')
+            grIncSFObsStatColl[var][iop].SetTitle(var)
+            ivar+=1
+
+        #
+        # differential efficiency measurements
+        #
         cexc.cd()
         cexc.Clear()
         leg = ROOT.TLegend(0.6, 0.95,0.95,0.8)
@@ -416,6 +532,7 @@ def showEfficiencyResults(fileList,outDir,lumi):
         leg.SetFillStyle(0)
         leg.SetTextFont(43)
         leg.SetTextSize(16)
+        if len(fileList)>2 : leg.SetNColumns(2)
         leg.AddEntry(grExpColl[iop],grExpColl[iop].GetTitle(),"l")
 
         ivar=0
@@ -431,7 +548,6 @@ def showEfficiencyResults(fileList,outDir,lumi):
             grObsTotalColl[var][iop].GetYaxis().SetTitleSize(0.)
             grObsTotalColl[var][iop].GetYaxis().SetLabelSize(0.)
             grObsTotalColl[var][iop].GetYaxis().SetRangeUser(0.0,1.5)
-            grObsTotalColl[var][iop].GetXaxis().SetTitle(SLICEVAR)
             drawOpt='2'
             ivar+=1
 
@@ -455,6 +571,33 @@ def showEfficiencyResults(fileList,outDir,lumi):
 
         leg.Draw()
 
+
+        #
+        # differential scale factor measurements
+        #
+        grSFObsStatColl=convertToScaleFactor(obs=grObsStatColl,ref=grExpColl)
+        grSFObsTotalColl=convertToScaleFactor(obs=grObsTotalColl,ref=grExpColl)
+        cexcsf.cd()
+        cexcsf.Clear()
+        ivar=0
+        drawOpt='a2'
+        for var in grSFObsTotalColl:
+            grSFObsTotalColl[var][iop].Draw(drawOpt)
+            grSFObsTotalColl[var][iop].GetYaxis().SetTitleSize(0.)
+            grSFObsTotalColl[var][iop].GetYaxis().SetLabelSize(0.)
+            grSFObsTotalColl[var][iop].GetYaxis().SetRangeUser(0.74,1.26)
+            grSFObsTotalColl[var][iop].GetXaxis().SetTitle(SLICEVAR)
+            grSFObsTotalColl[var][iop].GetXaxis().SetTitleSize(0.08)
+            grSFObsTotalColl[var][iop].GetXaxis().SetLabelSize(0.08)
+            drawOpt='2'
+            ivar+=1
+
+        ivar=0
+        for var in grSFObsStatColl:
+            grSFObsStatColl[var][iop].Draw('p')
+            grSFObsStatColl[var][iop].SetTitle(var)
+            ivar+=1
+
         clabel.cd()
         clabel.Clear()
         txt=ROOT.TLatex()
@@ -466,7 +609,7 @@ def showEfficiencyResults(fileList,outDir,lumi):
             txt.DrawLatex(0.05,0.5,'#bf{CMS} #it{Preliminary} %3.1f pb^{-1} (13 TeV)' % lumi)
         else:
             txt.DrawLatex(0.05,0.5,'#bf{CMS} #it{Preliminary} %3.1f fb^{-1} (13 TeV)' % (lumi/1000.))
-        txt.DrawLatex(0.85,0.5,'[%s > %3.3f]' % (tagger,taggerDef[iop+2]))
+        txt.DrawLatex(0.85,0.5,'[%s > %3.3f]' % (tagger,taggerDef[iop+1]))
 
         c.cd()
         c.Modified()

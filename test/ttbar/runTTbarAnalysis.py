@@ -55,18 +55,20 @@ def runTTbarAnalysis(inFile, outFile, wgt, taggers, tmvaWgts=None):
         'npv'    : ROOT.TH1F('npv',    ';N_{PV,good}-N_{HS};Events',              50, 0, 50),
         'rho'    : ROOT.TH1F('rho',    ';#rho [GeV];Events',                      50, 0, 30),
         'mll'    : ROOT.TH1F('mll',    ';Dilepton invariant mass [GeV];Events',   20, 0, 300),
+        'mllinc' : ROOT.TH1F('mllinc',    ';Dilepton invariant mass [GeV];Events',   20, 0, 300),
         'met'    : ROOT.TH1F('met',    ';Missing transverse energy [GeV];Events', 15, 0, 300),
         'njets'  : ROOT.TH1F('njets',  ';Jet multiplicity;Events;',               6,  2, 8),
         'leadjpt': ROOT.TH1F('leadjpt',';Leading jet p_{T} [GeV];Events;',        14,30,300),
         'leadlpt': ROOT.TH1F('leadlpt',';Leading lepton p_{T} [GeV];Events;',     9,20,200),
         'trailjpt': ROOT.TH1F('trailjpt',';Trailing jet p_{T} [GeV];Events;',     14,30,300),
         'traillpt': ROOT.TH1F('traillpt',';Trailing lepton p_{T} [GeV];Events;',  9,20,200),
-        'evsel': ROOT.TH1F('evsel',';Event selection;Events;', 4,0,4)
+        'evsel': ROOT.TH1F('evsel',';Event selection;Events;', 5,0,5)
         }
-    baseHistos['evsel'].GetXaxis().SetBinLabel(1,'#geq 2j')
-    baseHistos['evsel'].GetXaxis().SetBinLabel(2,'=2j')
-    baseHistos['evsel'].GetXaxis().SetBinLabel(3,'=3j')
-    baseHistos['evsel'].GetXaxis().SetBinLabel(4,'#geq4j')
+    baseHistos['evsel'].GetXaxis().SetBinLabel(1,'Z,#geq 2j')    
+    baseHistos['evsel'].GetXaxis().SetBinLabel(2,'#geq 2j')
+    baseHistos['evsel'].GetXaxis().SetBinLabel(3,'=2j')
+    baseHistos['evsel'].GetXaxis().SetBinLabel(4,'=3j')
+    baseHistos['evsel'].GetXaxis().SetBinLabel(5,'#geq4j')
 
     #init KIN tree
     kinTree=ROOT.TTree('kin','kin training')
@@ -217,9 +219,7 @@ def runTTbarAnalysis(inFile, outFile, wgt, taggers, tmvaWgts=None):
         #nominal event weight
         evWgt = wgt*puWgtNom*trigWgtNom*lepSelEffNom*genWgt
         histos[ch+'_npvinc'].Fill(tree.nPV-1,evWgt)
-        zCand   = True if 'll' in ch and ROOT.TMath.Abs(mll-91)<15 else False
-        if zCand        : continue
-
+        
         #
         # JET/MET SELECTION
         #
@@ -274,17 +274,25 @@ def runTTbarAnalysis(inFile, outFile, wgt, taggers, tmvaWgts=None):
                 #if never in kinematic range forget this jet
                 if not canBeSelected : del selJets[ij]
 
-        #n-1 plots
+        #base selection
+        zCand   = True if 'll' in ch and ROOT.TMath.Abs(mll-91)<15 else False        
         passMet = True if 'emu' in ch or tree.ttbar_metpt>40 else False
         passJets = True if len(selJets)>=2 else False
-        if not passMet  : continue
-        if not passJets : continue
+        
+        #n-1 plots
+        if passMet and passJets : 
+            histos[ch+'_mllinc'].Fill(mll,evWgt)
+            if zCand  : histos[ch+'_evsel'].Fill(0,evWgt)
+        if not zCand and passJets: 
+            histos[ch+'_met'].Fill(tree.ttbar_metpt,evWgt)
+        #select event
+        if zCand or not passJets or not passMet: continue
 
         #plots in control region
-        histos[ch+'_evsel'].Fill(0,evWgt)
-        if len(selJets)-2==0:   histos[ch+'_evsel'].Fill(1,evWgt)
-        elif len(selJets)-2==1: histos[ch+'_evsel'].Fill(2,evWgt)
-        else:                   histos[ch+'_evsel'].Fill(3,evWgt)
+        histos[ch+'_evsel'].Fill(1,evWgt)
+        if len(selJets)-2==0:   histos[ch+'_evsel'].Fill(2,evWgt)
+        elif len(selJets)-2==1: histos[ch+'_evsel'].Fill(3,evWgt)
+        else:                   histos[ch+'_evsel'].Fill(4,evWgt)
 
         histos[ch+'_rho'].Fill(tree.ttbar_rho,evWgt) 
         histos[ch+'_npv'].Fill(tree.nPV-1,evWgt)       
@@ -294,7 +302,6 @@ def runTTbarAnalysis(inFile, outFile, wgt, taggers, tmvaWgts=None):
         histos[ch+'_trailjpt'].Fill(trailJPt,evWgt)
         histos[ch+'_traillpt'].Fill(lp4[1].Pt(),evWgt)
         histos[ch+'_mll'].Fill(mll,evWgt)
-        histos[ch+'_met'].Fill(tree.ttbar_metpt,evWgt)
 
         #update weights for systematics
         for iSystVar in xrange(0,len(jetCount)):
