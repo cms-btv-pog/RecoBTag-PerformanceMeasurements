@@ -35,12 +35,12 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
-options.register('mcGlobalTag', 'MCRUN2_74_V9A',
+options.register('mcGlobalTag', 'MCRUN2_74_V9',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', '74X_dataRun2_Prompt_v0',
+options.register('dataGlobalTag', '74X_dataRun2_Prompt_v1',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
@@ -391,7 +391,7 @@ process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
 )
 process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
 ### to activate the new JP calibration: using the data base
-trkProbaCalibTag = "TrackProbabilityCalibration_3D_MC74X_50ns_v1"
+trkProbaCalibTag = "JPcalib_MC74X_25ns_v1"
 if options.runOnData:
   trkProbaCalibTag = "JPcalib_Data74X_2015B_v1"
 
