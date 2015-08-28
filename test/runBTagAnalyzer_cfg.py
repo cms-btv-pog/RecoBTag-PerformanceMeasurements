@@ -90,7 +90,7 @@ options.register('useTopProjections', False,
     VarParsing.varType.bool,
     "Use top projections"
 )
-options.register('miniAOD', False,
+options.register('miniAOD', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Running on miniAOD"
@@ -318,7 +318,8 @@ process.source = cms.Source("PoolSource",
 )
 if options.miniAOD:
     process.source.fileNames = [
-        '/store/mc/RunIISpring15DR74/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v4/10000/00D2A247-2910-E511-9F3D-0CC47A4DEDD2.root'
+        'file:/nfs/dust/cms/user/marchesi/test/CMSSW_7_5_1/src/RecoBTag/PerformanceMeasurements/test/5441AAD7-BC3F-E511-A63E-003048FFD752.root'
+        #'/store/mc/RunIISpring15DR74/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v4/10000/00D2A247-2910-E511-9F3D-0CC47A4DEDD2.root'
         #'/store/relval/CMSSW_7_4_0_pre8/RelValZpTT_1500_13TeV/MINIAODSIM/MCRUN2_74_V7-v1/00000/9008F5B0-54BD-E411-96FB-0025905A6110.root'
     ]
 if options.runOnData:
@@ -367,12 +368,12 @@ process.options   = cms.untracked.PSet(
 
 #In 74X:
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
-from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag.globaltag = globalTag
+#from Configuration.AlCa.GlobalTag import GlobalTag
+#process.GlobalTag.globaltag = globalTag
 #In 75X possible to use:
-# process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-# from Configuration.AlCa.GlobalTag import GlobalTag
-# process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_' + ('data' if options.runOnData else 'mc'))
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_' + ('data' if options.runOnData else 'mc'))
 
 #Loading calibrations: as default, but with new cMVA training
 #Only in 74X: to be revomed in 75X
@@ -395,22 +396,20 @@ trkProbaCalibTag = "TrackProbabilityCalibration_3D_MC74X_50ns_v1"
 if options.runOnData:
   trkProbaCalibTag = "JPcalib_Data74X_2015B_v1"
 
+process.GlobalTag.snapshotTime = cms.string("9999-12-31 23:59:59.000")
+
 process.GlobalTag.toGet = cms.VPSet(
     cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
         tag = cms.string(trkProbaCalibTag),
-        connect = cms.untracked.string("frontier://FrontierPrep/CMS_CONDITIONS")
+        connect = cms.string("frontier://FrontierPrep/CMS_CONDITIONS")
     )
 )
 
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
 process.load("Configuration.Geometry.GeometryRecoDB_cff")
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
-process.load("SimTracker.TrackAssociation.TrackAssociatorByChi2_cfi")
-process.load("SimTracker.TrackAssociation.quickTrackAssociatorByHits_cfi")
-process.load("SimTracker.TrackAssociatorProducers.quickTrackAssociatorByHits_cfi")
-process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
-process.load("SimTracker.TrackHistory.TrackHistory_cff")
-process.load("SimTracker.TrackHistory.TrackClassifier_cff")
+#process.load("SimTracker.TrackHistory.TrackHistory_cff")
+#process.load("SimTracker.TrackHistory.TrackClassifier_cff")
 process.load("RecoBTag.Configuration.RecoBTag_cff")
 
 #-------------------------------------
