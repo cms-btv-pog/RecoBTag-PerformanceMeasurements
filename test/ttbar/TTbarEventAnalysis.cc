@@ -1,6 +1,4 @@
 #include "TTbarEventAnalysis.h"
-#include "../../interface/JetInfoBranches.h"
-#include "../../interface/EventInfoBranches.h"
 #include "TLorentzVector.h"
 
 using namespace std;
@@ -16,10 +14,10 @@ void TTbarEventAnalysis::prepareOutput(TString outFile)
   kinTree_->SetDirectory(outF_);
   kinTree_->Branch("EventInfo",    eventInfo_,         "EventInfo[3]/I");
   kinTree_->Branch("ttbar_chan",    &ttbar_chan_,      "ttbar_chan/I");
-  kinTree_->Branch("flavour",       &jetFlavour_[0],   "flavour/I");
+  kinTree_->Branch("flavour",        jetFlavour_,      "flavour/I");
   kinTree_->Branch("jetmult",       &jetmult_,         "jetmult/I");
-  kinTree_->Branch("jetpt",         &jetPt_[0],        "jetpt/F");
-  kinTree_->Branch("jeteta",        &jetEta_[0],       "jeteta/F");
+  kinTree_->Branch("jetpt",          jetPt_,           "jetpt/F");
+  kinTree_->Branch("jeteta",         jetEta_,          "jeteta/F");
   kinTree_->Branch("close_mlj",      close_mlj_,       "close_mlj[5]/F");
   kinTree_->Branch("close_deta",    &close_deta_,      "close_deta/F");
   kinTree_->Branch("close_dphi",    &close_dphi_,      "close_dphi/F");
@@ -29,9 +27,9 @@ void TTbarEventAnalysis::prepareOutput(TString outFile)
   kinTree_->Branch("far_dphi",      &far_dphi_,        "far_dphi/F");
   kinTree_->Branch("far_ptrel",     &far_ptrel_,       "far_ptrel/F");
   kinTree_->Branch("kindisc",        kinDisc_,         "kindisc[5]/F");
-  kinTree_->Branch("jp",            &jp_[0],           "jp/F");
-  kinTree_->Branch("svhe",          &svhe_[0],         "svhe/F");
-  kinTree_->Branch("csv",           &csv_[0],          "csv/F");
+  kinTree_->Branch("jp",             jp_,              "jp/F");
+  kinTree_->Branch("svhe",           svhe_,            "svhe/F");
+  kinTree_->Branch("csv",            csv_,             "csv/F");
   kinTree_->Branch("weight",         weight_,          "weight[15]/F");
 
   ftmTree_=new TTree("ftm","flavour tag matching");
@@ -118,28 +116,54 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
     }
 
   //prepare to read the tree (for jets only interested in a couple of variables)
-  EventInfoBranches ev;  
-  ev.ReadTree(tree);
-  struct JetInfoBranches_t
+  struct MyEventInfoBranches_t
   {
+    Int_t Run,Evt,LumiBlock,nPV;
+    Int_t   ttbar_chan, ttbar_trigWord, ttbar_metfilterWord;
+    Int_t   ttbar_nl, ttbar_lid[10], ttbar_lgid[10], ttbar_lch[10];
+    Float_t ttbar_lpt[10], ttbar_leta[10], ttbar_lphi[10], ttbar_lm[10];
+    Float_t ttbar_metpt,ttbar_metphi;
+    Float_t ttbar_rho;
+    Int_t   ttbar_nw;
+    Float_t ttbar_w[500];
     Int_t nJet;
     Float_t Jet_pt[100],Jet_genpt[100],Jet_area[100],Jet_jes[100],Jet_eta[100],Jet_phi[100],Jet_mass[100];
     Float_t Jet_Svx[100],Jet_CombIVF[100],Jet_Proba[100];
     Int_t Jet_flavour[100];
   };
-  JetInfoBranches_t jev;
-  tree->SetBranchAddress("nJet",            &jev.nJet);
-  tree->SetBranchAddress("Jet_pt",          jev.Jet_pt);
-  tree->SetBranchAddress("Jet_genpt",       jev.Jet_genpt);
-  tree->SetBranchAddress("Jet_area",        jev.Jet_area);
-  tree->SetBranchAddress("Jet_jes",         jev.Jet_jes);
-  tree->SetBranchAddress("Jet_eta",         jev.Jet_eta);
-  tree->SetBranchAddress("Jet_phi",         jev.Jet_phi);
-  tree->SetBranchAddress("Jet_mass",        jev.Jet_mass);
-  tree->SetBranchAddress("Jet_Svx",         jev.Jet_Svx);
-  tree->SetBranchAddress("Jet_CombIVF",     jev.Jet_CombIVF);
-  tree->SetBranchAddress("Jet_Proba",       jev.Jet_Proba);
-  tree->SetBranchAddress("Jet_flavour",     jev.Jet_flavour);
+  MyEventInfoBranches_t ev;
+  tree->SetBranchAddress("Run"        , &ev.Run        );
+  tree->SetBranchAddress("Evt"        , &ev.Evt        );
+  tree->SetBranchAddress("LumiBlock"  , &ev.LumiBlock  );
+  tree->SetBranchAddress("nPV"        , &ev.nPV        );
+  tree->SetBranchAddress("ttbar_chan" , &ev.ttbar_chan);
+  tree->SetBranchAddress("ttbar_metfilterWord", &ev.ttbar_metfilterWord);
+  tree->SetBranchAddress("ttbar_trigWord", &ev.ttbar_trigWord);
+  tree->SetBranchAddress("ttbar_nl"   ,  &ev.ttbar_nl);
+  tree->SetBranchAddress("ttbar_lpt"  ,   ev.ttbar_lpt); 
+  tree->SetBranchAddress("ttbar_leta" ,   ev.ttbar_leta);
+  tree->SetBranchAddress("ttbar_lphi" ,   ev.ttbar_lphi);
+  tree->SetBranchAddress("ttbar_lm"   ,   ev.ttbar_lm);
+  tree->SetBranchAddress("ttbar_lid"  ,   ev.ttbar_lid);
+  tree->SetBranchAddress("ttbar_lgid" ,   ev.ttbar_lgid);
+  tree->SetBranchAddress("ttbar_lch"  ,   ev.ttbar_lch);
+  tree->SetBranchAddress("ttbar_metpt",  &ev.ttbar_metpt);
+  tree->SetBranchAddress("ttbar_metphi", &ev.ttbar_metphi);
+  tree->SetBranchAddress("ttbar_rho",    &ev.ttbar_rho);
+  tree->SetBranchAddress("ttbar_nw",     &ev.ttbar_nw);
+  tree->SetBranchAddress("ttbar_w",      ev.ttbar_w);
+  tree->SetBranchAddress("nJet",            &ev.nJet);
+  tree->SetBranchAddress("Jet_pt",          ev.Jet_pt);
+  tree->SetBranchAddress("Jet_genpt",       ev.Jet_genpt);
+  tree->SetBranchAddress("Jet_area",        ev.Jet_area);
+  tree->SetBranchAddress("Jet_jes",         ev.Jet_jes);
+  tree->SetBranchAddress("Jet_eta",         ev.Jet_eta);
+  tree->SetBranchAddress("Jet_phi",         ev.Jet_phi);
+  tree->SetBranchAddress("Jet_mass",        ev.Jet_mass);
+  tree->SetBranchAddress("Jet_Svx",         ev.Jet_Svx);
+  tree->SetBranchAddress("Jet_CombIVF",     ev.Jet_CombIVF);
+  tree->SetBranchAddress("Jet_Proba",       ev.Jet_Proba);
+  tree->SetBranchAddress("Jet_flavour",     ev.Jet_flavour);
 
   for(Int_t i=0; i<nentries; i++)
     {
@@ -173,9 +197,9 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
       //
       TString ch("");
       if(ev.ttbar_chan==-11*13) ch="emu";
-      if(ev.ttbar_chan==-11*11 || ev.ttbar_chan==-13*13) ch="ll";
+      if(ev.ttbar_chan==-11*11 || ev.ttbar_chan==-13*13) ch="ll";      
       if(ch=="") continue;
-
+      
       //
       //TRIGGER
       //
@@ -185,6 +209,7 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	  if(triggerBits_[ibit].second!=ev.ttbar_chan) continue;
 	  hasTrigger |= ((ev.ttbar_trigWord>>triggerBits_[ibit].first) & 1);
 	}
+
       if(!hasTrigger) continue;
 
 
@@ -217,7 +242,7 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	      lepSelEffHi  *= (lepSF.first+lepSF.second);
 	    }
 	}
-      
+
       //dilepton invariant mass
       std::vector<TLorentzVector> lp4;
       for(Int_t il=0; il<ev.ttbar_nl; il++)
@@ -226,11 +251,11 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
           lp4[il].SetPtEtaPhiM(ev.ttbar_lpt[il],ev.ttbar_leta[il],ev.ttbar_lphi[il],0.);
 	}
       Float_t mll=(lp4[0]+lp4[1]).M();
-                      
+
       //nominal event weight
       Float_t evWgt(puWgtNom*trigWgtNom*lepSelEffNom*genWgt);
       histos_[ch+"_npvinc"]->Fill(ev.nPV-1,evWgt);
-      
+
       //
       //JET/MET SELECTION
       //
@@ -239,11 +264,11 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
       std::vector<std::vector<Float_t> > selJetsKINDisc;
       std::vector< std::vector<TLorentzVector> > selJetsP4;
       std::vector< std::vector< std::vector<LJKinematics_t> > > selJetsLJKinematics;
-      for(Int_t ij=0; ij<jev.nJet; ij++)
-	{
+      for(Int_t ij=0; ij<ev.nJet; ij++)
+	{      
 	  //convert to P4
 	  TLorentzVector jp4(0,0,0,0);
-	  jp4.SetPtEtaPhiM(jev.Jet_pt[ij],jev.Jet_eta[ij],jev.Jet_phi[ij],jev.Jet_mass[ij]);
+	  jp4.SetPtEtaPhiM(ev.Jet_pt[ij],ev.Jet_eta[ij],ev.Jet_phi[ij],ev.Jet_mass[ij]);
 
 	  //cross clean wrt to leptons
 	  Float_t minDRlj(9999.);
@@ -251,10 +276,10 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	  if(minDRlj<0.4) continue;
 	  
 	  //update jet energy scale/resolution
-	  Float_t jrawsf=1./jev.Jet_jes[ij];
-	  Float_t jarea=jev.Jet_area[ij];
-	  Float_t genjpt=jev.Jet_genpt[ij];
-
+	  Float_t jrawsf=1./ev.Jet_jes[ij];
+	  Float_t jarea=ev.Jet_area[ij];
+	  Float_t genjpt=ev.Jet_genpt[ij];
+      
 	  // update JES+JER for this jet
 	  std::vector<float> jesSF= getJetEnergyScales(jp4.Pt(), jp4.Eta(), jrawsf,jarea,ev.ttbar_rho);
 	  std::vector<float> jerSF= getJetResolutionScales(jesSF[0]*jp4.Pt(), jp4.Eta(), genjpt);
@@ -273,11 +298,7 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	      if(iSystVar==2) varjp4[iSystVar] *= jesSF[2]/jesSF[0];
 	      if(iSystVar==3) varjp4[iSystVar] *= jerSF[1]/jerSF[0];
 	      if(iSystVar==4) varjp4[iSystVar] *= jerSF[2]/jerSF[0];
-	    
-	      if(varjp4[iSystVar].Pt()<30 || TMath::Abs(varjp4[iSystVar].Eta())>2.5) continue;
-	      canBeSelected=true;
-	      jetCount[iSystVar]++;
-
+	          
 	      //prepare variables for MVA
 	      std::vector< LJKinematics_t > ljkinematics;
 	      for(Int_t il=0; il<2; il++)
@@ -292,7 +313,7 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 		}
 	      sort(ljkinematics.begin(),ljkinematics.end(),sortLJKinematicsByDR);
 	      varLJKinematics.push_back(ljkinematics);
-
+      
 	      //evaluate the MVA
 	      Float_t kindisc(0.0);
 	      if(tmvaReader_)
@@ -308,6 +329,11 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 		    }
 		  varkindisc.push_back( tmvaReader_->EvaluateMVA("BDT") );
 		}	      
+	      
+	      //check if can be selected for this variation
+	      if(varjp4[iSystVar].Pt()<30 || TMath::Abs(varjp4[iSystVar].Eta())>2.5) continue;
+	      canBeSelected=true;
+	      jetCount[iSystVar]++;
 	    }
 
 	  //add jet if it is selectable
@@ -340,10 +366,10 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
       histos_[ch+"_leadlpt"]->Fill(lp4[0].Pt(),evWgt);
       histos_[ch+"_trailjpt"]->Fill(selJetsP4[1][0].Pt(),evWgt);
       histos_[ch+"_traillpt"]->Fill(lp4[1].Pt(),evWgt);
+      
       for(size_t ij=0; ij<selJets.size(); ij++)
 	{
 	  Int_t jetIdx(selJets[ij]);
-
 	  histos_[ch+"_close_mlj"]->Fill(selJetsLJKinematics[ij][0][0].mlj,evWgt);
 	  histos_[ch+"_close_deta"]->Fill(selJetsLJKinematics[ij][0][0].deta,evWgt);
 	  histos_[ch+"_close_dphi"]->Fill(selJetsLJKinematics[ij][0][0].dphi,evWgt);
@@ -352,12 +378,12 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	  histos_[ch+"_far_deta"]->Fill(selJetsLJKinematics[ij][0][1].deta,evWgt);
 	  histos_[ch+"_far_dphi"]->Fill(selJetsLJKinematics[ij][0][1].dphi,evWgt);
 	  histos_[ch+"_far_ptrel"]->Fill(selJetsLJKinematics[ij][0][1].ptrel,evWgt);
-	  histos_[ch+"_kindisc"]->Fill(selJetsKINDisc[ij][0],evWgt);
-	  histos_[ch+"_jp"]->Fill(jev.Jet_Proba[jetIdx],evWgt);
-	  histos_[ch+"_svhe"]->Fill(jev.Jet_Svx[jetIdx],evWgt);
-	  histos_[ch+"_csv"]->Fill(jev.Jet_CombIVF[jetIdx],evWgt);
+	  if(tmvaReader_) histos_[ch+"_kindisc"]->Fill(selJetsKINDisc[ij][0],evWgt);
+	  histos_[ch+"_jp"]->Fill(ev.Jet_Proba[jetIdx],evWgt);
+	  histos_[ch+"_svhe"]->Fill(ev.Jet_Svx[jetIdx],evWgt);
+	  histos_[ch+"_csv"]->Fill(ev.Jet_CombIVF[jetIdx],evWgt);
 
-	  Int_t flavBin(0),partonFlav(abs(jev.Jet_flavour[jetIdx]));
+	  Int_t flavBin(0),partonFlav(abs(ev.Jet_flavour[jetIdx]));
 	  if(partonFlav==21 || (partonFlav>0 && partonFlav<4)) flavBin=1;
 	  if(partonFlav==4) flavBin=2;
 	  if(partonFlav==5) flavBin=3;
@@ -396,13 +422,14 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
       for(size_t ij=0; ij<selJets.size(); ij++)
 	{
 	  Int_t jetIdx(selJets[ij]);
-	  jetFlavour_[0] = jev.Jet_flavour[jetIdx];
+	  jetFlavour_[0] = ev.Jet_flavour[jetIdx];
 	  jetPt_[0]      = selJetsP4[ij][0].Pt();
 	  jetEta_[0]     = selJetsP4[ij][0].Eta();
 	  for(size_t iSystVar=0; iSystVar<5; iSystVar++)
 	    {
 	      close_mlj_[iSystVar] = selJetsLJKinematics[ij][iSystVar][0].mlj;
 	      if(tmvaReader_) kinDisc_[iSystVar]   = selJetsKINDisc[ij][iSystVar];
+	      else            kinDisc_[iSystVar]=-999;
 	    }
 	  close_deta_=selJetsLJKinematics[ij][0][0].deta;
 	  close_dphi_=selJetsLJKinematics[ij][0][0].dphi;
@@ -411,9 +438,10 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	  far_deta_=selJetsLJKinematics[ij][0][1].deta;
 	  far_dphi_=selJetsLJKinematics[ij][0][1].dphi;
 	  far_ptrel_=selJetsLJKinematics[ij][0][1].ptrel;
-	  jp_[0]=jev.Jet_Proba[jetIdx];
-	  svhe_[0]=jev.Jet_Svx[jetIdx];
-	  csv_[0]=jev.Jet_CombIVF[jetIdx];
+	  jp_[0]=ev.Jet_Proba[jetIdx];
+	  svhe_[0]=ev.Jet_Svx[jetIdx];
+	  csv_[0]=ev.Jet_CombIVF[jetIdx];
+
 	  kinTree_->Fill();
 	}
 
