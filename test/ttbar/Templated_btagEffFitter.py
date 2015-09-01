@@ -18,11 +18,20 @@ def prepareTemplates(tagger,taggerDef,var,varRange,inDir,outDir):
     
     print '...starting %s for %s'%(tagger,var)
 
+    histos={}
+
+    nOPs=len(taggerDef)-2
+
+    #tag counting
+    tagCounts=[0]*(nOPs-1)
+    for key in ['data','mc']:
+        for i in xrange(1,nOPs):
+            name='%s_%s_pass%d'%(key,tagger,i)
+            histos[name]=ROOT.TH1F(name,';b-tag multiplicity;Events',5,0,5)
+
     #prepare templates
     baseHisto=ROOT.TH1F(var,';Discriminator;Jets',50,varRange[0],varRange[1])
-    histos={}
     for flav in ['b','c','other','data']:
-        nOPs=len(taggerDef)-2
         for i in xrange(0,nOPs):
             for islice in xrange(0,len(SLICEBINS)):
                 for systVar in SYSTVARS:
@@ -33,6 +42,7 @@ def prepareTemplates(tagger,taggerDef,var,varRange,inDir,outDir):
                     histos[key].Sumw2(0)
     baseHisto.Delete()
 
+
     #add files to the corresponding chains
     files = [ f for f in os.listdir(inDir) if '.root' in f ]
     chains={'mc':ROOT.TChain('kin'),'data':ROOT.TChain('kin')}
@@ -42,9 +52,23 @@ def prepareTemplates(tagger,taggerDef,var,varRange,inDir,outDir):
 
     #fill histos
     for key in chains:
+        chains[key].GetEntry(0)
+        curEventInfo=[chains[key].EventInfo[0],chains[key].EventInfo[1],chains[key].EventInfo[2]]
+        curEventWgt=1.0
+
         for i in xrange(0,chains[key].GetEntries()):
+
             chains[key].GetEntry(i)
 
+            #do tag counting
+            iEventInfo=[chains[key].EventInfo[0],chains[key].EventInfo[1],chains[key].EventInfo[2]]
+            if iEventInfo!=curEventInfo:
+                for iop in xrange(0,len(tagCounts)):
+                    name='%s_%s_pass%d'%(key,tagger,iop+1)
+                    histos[name].Fill(tagCounts[iop],chains[key].weight[0])
+                    tagCounts[iop]=0
+                curEventInfo=iEventInfo
+            
             for systVar in SYSTVARS:
                 
                 if key=='data' and len(systVar)>0 : continue
@@ -70,11 +94,17 @@ def prepareTemplates(tagger,taggerDef,var,varRange,inDir,outDir):
 
                 #no need to proceed if event is not selected
                 if weight==0: continue
-
+               
                 #variable to slice on, variable to be fit, and tagger to apply
                 sliceVarVal = getattr(chains[key],SLICEVAR)[systIdx] if SLICEVAR=='jetpt' else getattr(chains[key],SLICEVAR) 
                 varVal      = getattr(chains[key],var)               if var=='jpTagger'   else getattr(chains[key],var)[systIdx]
                 taggerVal   = getattr(chains[key],tagger+'Tagger')
+
+                #tag counting (only nominal)
+                if len(systVar)==0:
+                    for iop in xrange(2,len(taggerDef)-1):
+                        if taggerVal> taggerDef[iop] : 
+                            tagCounts[iop-2]=tagCounts[iop-2]+1
 
                 #determine categories
                 passSlice=[]
@@ -92,9 +122,9 @@ def prepareTemplates(tagger,taggerDef,var,varRange,inDir,outDir):
                 for islice in passSlice:
                     hkey='%s_pass0_slice%d%s'%(flav,islice,systVar)
                     histos[hkey].Fill(varVal,weight)
-                    for i in xrange(2,len(taggerDef)-1):
-                        if taggerVal< taggerDef[i] : continue
-                        hkey='%s_pass%d_slice%d%s'%(flav,i-1,islice,systVar)
+                    for iop in xrange(2,len(taggerDef)-1):
+                        if taggerVal< taggerDef[iop] : continue
+                        hkey='%s_pass%d_slice%d%s'%(flav,iop-1,islice,systVar)
                         histos[hkey].Fill(varVal,weight)
 
     #save templates to file
@@ -220,7 +250,7 @@ def runSFFits(var,tagger,taggerDef,outDir,lumi):
                     res=ttFracFitter.fit(mc,data,0,saveResultIn)
                     bobs[iop][islice]['']=(res.nObs,res.nObsUnc)
                     bexp[iop][islice]=(res.nExp,res.nExpUnc)
-                    res=ttFracFitter.fit(mc,pseudoData,0,saveResultIn)
+                    res=ttFracFitter.fit(mc,pseudoData,0,'')
                     bobs[iop][islice]['closureup']=(res.nObs,res.nObsUnc)
                     bobs[iop][islice]['closuredn']=(res.nObs,res.nObsUnc)
                 else:

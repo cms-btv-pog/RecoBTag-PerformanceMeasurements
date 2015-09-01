@@ -11,9 +11,6 @@
 "Data13TeV_Run2015B_MuonEG"           : [0, 1, "/MuonEG/Run2015B-PromptReco-v1/MINIAOD",     "Data",      1],
 "Data13TeV_Run2015B_DoubleEG"         : [0, 1, "/DoubleEG/Run2015B-PromptReco-v1/MINIAOD",   "Data",      1],
 "Data13TeV_Run2015B_DoubleMuon"       : [0, 1, "/DoubleMuon/Run2015B-PromptReco-v1/MINIAOD", "Data",      1]
-"Data13TeV_Run2015C_MuonEG"           : [0, 1, "/MuonEG/Run2015C-PromptReco-v1/MINIAOD",     "Data",      1],
-"Data13TeV_Run2015C_DoubleEG"         : [0, 1, "/DoubleEG/Run2015C-PromptReco-v1/MINIAOD",   "Data",      1],
-"Data13TeV_Run2015C_DoubleMuon"       : [0, 1, "/DoubleMuon/Run2015C-PromptReco-v1/MINIAOD", "Data",      1]
 }
 
 
