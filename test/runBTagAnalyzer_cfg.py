@@ -35,12 +35,12 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
-options.register('mcGlobalTag', 'MCRUN2_74_V9A',
+options.register('mcGlobalTag', '75X_mcRun2_asymptotic_v3',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', '74X_dataRun2_Prompt_v0',
+options.register('dataGlobalTag', '75X_dataRun2_v2',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
@@ -367,12 +367,12 @@ process.options   = cms.untracked.PSet(
 
 #In 74X:
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
-#from Configuration.AlCa.GlobalTag import GlobalTag
-#process.GlobalTag.globaltag = globalTag
-#In 75X possible to use:
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_' + ('data' if options.runOnData else 'mc'))
+process.GlobalTag.globaltag = globalTag
+#In 75X possible to use:
+#process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+#from Configuration.AlCa.GlobalTag import GlobalTag
+#process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_' + ('data' if options.runOnData else 'mc'))
 
 #Loading calibrations: as default, but with new cMVA training
 #Only in 74X: to be revomed in 75X
