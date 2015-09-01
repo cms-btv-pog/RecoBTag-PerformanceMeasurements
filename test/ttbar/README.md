@@ -26,7 +26,7 @@ Once production is finished you can call with --cleanup to remove original crab 
 
 ### Running local analysis
 ```
-python runTTbarAnalysis.py -i /store/group/phys_btag/performance/TTbar/7b810a5 -j ttbar_Run2015.json -t taggers_Run2015.json -n 8
+python runTTbarAnalysis.py -i /store/group/phys_btag/performance/TTbar/7b810a5 -j ttbar_Run2015.json -n 8
 ```
 Once grid jobs are run, and ntuples are stored in a given directory, you can run the local analysis to produce the slimmed ntuples for the efficiency measurement.
 MC will be weighted by cross section. The number after -n indicates how many threads should be used.
@@ -51,7 +51,7 @@ sh KIN_runClassifier.sh
 After running the local analysis use the kin tree stored in the ttbar sample to train a kinematics discriminator for b-jets in ttbar events.
 The script compiles and runs KIN_trainClassifier.C which should be modified in case different trainings are required.
 ```
-python runTTbarAnalysis.py -i /store/group/phys_btag/performance/TTbar/7b810a5 -j ttbar_Run2015.json -t taggers_Run2015.json --tmvaWgts analysis/KIN_weights/TMVAClassification_BDT.weights.xml -n 8
+python runTTbarAnalysis.py -i /store/group/phys_btag/performance/TTbar/7b810a5 -j ttbar_Run2015.json --tmvaWgts analysis/KIN_weights/TMVAClassification_BDT.weights.xml -n 8
 ```
 Re-run the analysis to store the KIN discriminator value per jet
 ```

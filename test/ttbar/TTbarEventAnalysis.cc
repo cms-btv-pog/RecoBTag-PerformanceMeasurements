@@ -40,9 +40,10 @@ void TTbarEventAnalysis::prepareOutput(TString outFile)
   ftmTree_->Branch("flavour",        jetFlavour_, "flavour[2]/I");
   ftmTree_->Branch("jetpt",          jetPt_,      "jetpt[2]/F");
   ftmTree_->Branch("jeteta",         jetEta_,     "jeteta[2]/F");
-  kinTree_->Branch("jp",             jp_,         "jp[2]/F");
-  kinTree_->Branch("svhe",           svhe_,       "svhe[2]/F");
-  kinTree_->Branch("csv",            csv_,        "csv[2]/F");
+  ftmTree_->Branch("jp",             jp_,         "jp[2]/F");
+  ftmTree_->Branch("svhe",           svhe_,       "svhe[2]/F");
+  ftmTree_->Branch("csv",            csv_,        "csv[2]/F");
+  ftmTree_->Branch("kindisc",        kinDisc_,    "kindisc[2]/F");
   ftmTree_->Branch("weight",         weight_,     "weight[15]/F");
  
   //prepare histograms
@@ -58,6 +59,8 @@ void TTbarEventAnalysis::prepareOutput(TString outFile)
   baseHistos["leadlpt"]  = new TH1F("leadlpt",";Leading lepton p_{T} [GeV];Events;",     9,20,200);
   baseHistos["trailjpt"] = new TH1F("trailjpt",";Trailing jet p_{T} [GeV];Events;",      14,30,300);
   baseHistos["traillpt"] = new TH1F("traillpt",";Trailing lepton p_{T} [GeV];Events;",   9,20,200);
+  baseHistos["leadjeta"]    = new TH1F("leadjeta",    ";Pseudo-rapidity; Jets",              25, 0, 2.5);
+  baseHistos["trailjeta"]   = new TH1F("trailjeta",    ";Pseudo-rapidity; Jets",              25, 0, 2.5);
   baseHistos["evsel"]    = new TH1F("evsel",   ";Event selection;Events;",               4,0,4);
   baseHistos["evsel"]->GetXaxis()->SetBinLabel(1,"#geq 2j");
   baseHistos["evsel"]->GetXaxis()->SetBinLabel(2,"=2j");
@@ -71,7 +74,6 @@ void TTbarEventAnalysis::prepareOutput(TString outFile)
   baseHistos["flavour"]->GetXaxis()->SetBinLabel(2,"udsg");
   baseHistos["flavour"]->GetXaxis()->SetBinLabel(3,"c");
   baseHistos["flavour"]->GetXaxis()->SetBinLabel(4,"b");
-  baseHistos["jeteta"]      = new TH1F("jeteta",      ";Pseudo-rapidity; Jets",              25, 0, 2.5);
   baseHistos["close_mlj"]   = new TH1F("close_mlj",   ";M(lepton,jet) [GeV]; Jets",          50, 0, 250);
   baseHistos["close_deta"]  = new TH1F("close_deta",  ";#Delta#eta(lepton,jet); Jets",       50, 0, 4);
   baseHistos["close_dphi"]  = new TH1F("close_dphi",  ";#Delta#phi(lepton,jet) [rad]; Jets", 50, 0, 3.15);
@@ -103,7 +105,7 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
   TFile *inF=TFile::Open(inFile);
   TTree *tree=(TTree *)inF->Get("btagana/ttree");
   Int_t nentries=tree->GetEntriesFast();
-  std::cout << "...opening " << inFile << " -> analysing " << nentries << " events -> " << outF_->GetName() << std::endl;
+  std::cout << "...opening " << inFile << " -> analysing " << nentries << " events -> " << outF_->GetName() << " xsec weight=" << xsecWgt << std::endl;
 
   //prepare reader
   std::vector<Float_t> tmvaVars( tmvaVarNames_.size(), 0. );
@@ -253,7 +255,7 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
       Float_t mll=(lp4[0]+lp4[1]).M();
 
       //nominal event weight
-      Float_t evWgt(puWgtNom*trigWgtNom*lepSelEffNom*genWgt);
+      Float_t evWgt(xsecWgt*puWgtNom*trigWgtNom*lepSelEffNom*genWgt);
       histos_[ch+"_npvinc"]->Fill(ev.nPV-1,evWgt);
 
       //
@@ -363,10 +365,14 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
       histos_[ch+"_npv"]->Fill(ev.nPV-1,evWgt);       
       histos_[ch+"_njets"]->Fill(selJets.size(),evWgt);
       histos_[ch+"_leadjpt"]->Fill(selJetsP4[0][0].Pt(),evWgt);
+      histos_[ch+"_leadjeta"]->Fill((selJetsP4[0][0].Eta()),evWgt);
       histos_[ch+"_leadlpt"]->Fill(lp4[0].Pt(),evWgt);
       histos_[ch+"_trailjpt"]->Fill(selJetsP4[1][0].Pt(),evWgt);
+      histos_[ch+"_trailjeta"]->Fill(fabs(selJetsP4[1][0].Eta()),evWgt);
       histos_[ch+"_traillpt"]->Fill(lp4[1].Pt(),evWgt);
       
+      std::vector<float> leadingkindisc(2,-9999);
+      std::vector<int> leadingkindiscIdx(2,-1);
       for(size_t ij=0; ij<selJets.size(); ij++)
 	{
 	  Int_t jetIdx(selJets[ij]);
@@ -388,6 +394,17 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	  if(partonFlav==4) flavBin=2;
 	  if(partonFlav==5) flavBin=3;
 	  histos_[ch+"_flavour"]->Fill(flavBin,evWgt);
+
+	  //rank jets by kinematics discriminator
+	  if(selJetsKINDisc[ij][0]>leadingkindisc[0])
+	    {
+	      leadingkindisc[1]=leadingkindisc[0];     leadingkindiscIdx[1]=leadingkindiscIdx[0];
+	      leadingkindisc[0]=selJetsKINDisc[ij][0]; leadingkindiscIdx[0]=jetIdx;
+	    }
+	  else if(selJetsKINDisc[ij][0]>leadingkindisc[1])
+	    {
+	      leadingkindisc[1]=selJetsKINDisc[ij][0]; leadingkindiscIdx[1]=jetIdx;
+	    }
 	}
 
       //
@@ -445,7 +462,19 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	  kinTree_->Fill();
 	}
 
-      //      ftmTree_->Fill();
+      //FtM tree is filled with the two leading jets in the KIN discriminator
+      for(size_t ij=0; ij<2; ij++)
+	{
+	  size_t jetIdx=leadingkindiscIdx[ij];
+	  jetFlavour_[ij]=ev.Jet_flavour[jetIdx];
+	  jetPt_[ij]=ev.Jet_pt[jetIdx];
+	  jetEta_[ij]=ev.Jet_eta[jetIdx];
+	  jp_[ij]=ev.Jet_Proba[jetIdx];
+	  svhe_[ij]=ev.Jet_Svx[jetIdx];
+	  csv_[ij]=ev.Jet_CombIVF[jetIdx];
+	  kinDisc_[ij]=leadingkindisc[ij];
+	}
+      ftmTree_->Fill();
    }
 
   //all done with this file

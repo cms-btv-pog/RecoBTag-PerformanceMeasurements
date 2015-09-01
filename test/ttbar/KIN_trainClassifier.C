@@ -209,7 +209,7 @@ void KIN_trainClassifier( TString myMethodList = "", TString inputFile="", Int_t
   factory->SetBackgroundWeightExpression("weight[0]");
 
   //define variables for the training
-  factory->AddVariable( "close_mlj[0]","M(close lepton,jet)"                            "GeV", 'F' );
+  factory->AddVariable( "close_mlj",   "M(close lepton,jet)"                            "GeV", 'F' );
   factory->AddVariable( "close_ptrel", "p_{T}^{rel}(close lepton)/p(closest lepton)"    "",    'F' );
   factory->AddVariable( "close_dphi",  "#Delta#phi(close lepton,jet)"                   "rad", 'F' );
   factory->AddVariable( "close_deta",  "#Delta#eta(close lepton,jet)"                   "",    'F' );
