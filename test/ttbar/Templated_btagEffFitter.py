@@ -169,7 +169,7 @@ def runSFFits(var,tagger,taggerDef,outDir,lumi):
     if var=='jpTagger' : flavTemplates=[ ['b'], ['c'], ['other'] ]
 
     #custom fraction fitter class
-    ttFracFitter=ROOT.TTbarFracFitter();
+    ttFracFitter=ROOT.TTbarFracFitter()
 
     nOPs=len(taggerDef)-2
     bobs={}

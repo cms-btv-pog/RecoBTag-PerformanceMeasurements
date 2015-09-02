@@ -8,6 +8,7 @@ import math
 from array import array
 from storeTools import getEOSlslist
 from systTools import getTriggerEfficiency,getLeptonSelectionEfficiencyScaleFactor,getJetEnergyScales, getJetResolutionScales
+from rounding import *
 
 CHANNELS={-11*11:'ll', -13*13:'ll', -11*13:'emu'}
 
@@ -58,7 +59,6 @@ def runTTbarAnalysisPacked(args):
 """
 steer the script
 """
-from rounding import *
 def main():
 
     #configuration
@@ -68,7 +68,8 @@ def main():
     parser.add_option('-i', '--inDir',       dest='inDir',       help='input directory with files',   default=None,        type='string')
     parser.add_option('-o', '--outDir',      dest='outDir',      help='output directory',             default='analysis',  type='string')
     parser.add_option(      '--only',        dest='only',        help='process only matching (csv)',  default='',          type='string')
-    parser.add_option(      '--tmvaWgts',    dest='tmvaWgts',    help='tmva weights',             default=None,  type='string')
+    parser.add_option(      '--tmvaWgts',    dest='tmvaWgts',    help='tmva weights',                 default=None,        type='string')
+    parser.add_option(      '--dyScale',     dest='dyScale',     help='DY scale factor',              default=None,        type='string')
     parser.add_option('-n', '--njobs',       dest='njobs',       help='# jobs to run in parallel',    default=0,           type='int')
     (opt, args) = parser.parse_args()
 
@@ -77,7 +78,6 @@ def main():
     ROOT.gSystem.Load("libTTbarEventAnalysis.so")
 
     #read list of samples
-    print opt.json
     jsonFile = open(opt.json,'r')
     samplesList=json.load(jsonFile,encoding='utf-8').items()
     jsonFile.close()
@@ -122,6 +122,17 @@ def main():
         pickle.dump(integLumi, cachefile, pickle.HIGHEST_PROTOCOL)
         cachefile.close()
         print 'Produced normalization cache (%s)'%cache
+
+    #DY scale factor
+    if opt.dyScale:
+        cachefile=open(opt.dyScale,'r')
+        dySF=pickle.load(cachefile)
+        cachefile.close()
+        for tag in xsecWgts:
+            if not 'DY' in tag: continue
+            print tag,xsecWgts[tag],' -> ',
+            xsecWgts[tag]=xsecWgts[tag]*dySF[0]
+            print xsecWgts[tag]
 
     #create the analysis jobs
     runTags = []

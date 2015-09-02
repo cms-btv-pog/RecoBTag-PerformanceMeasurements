@@ -32,20 +32,28 @@ void TTbarEventAnalysis::prepareOutput(TString outFile)
   kinTree_->Branch("csv",            csv_,             "csv/F");
   kinTree_->Branch("weight",         weight_,          "weight[15]/F");
 
-  ftmTree_=new TTree("ftm","flavour tag matching");
-  ftmTree_->SetDirectory(outF_);
-  ftmTree_->Branch("EventInfo",      eventInfo_,  "EventInfo[3]/I");
-  ftmTree_->Branch("ttbar_chan",    &ttbar_chan_, "ttbar_chan/I");
-  ftmTree_->Branch("jetmult",       &jetmult_,    "jetmult/I");
-  ftmTree_->Branch("flavour",        jetFlavour_, "flavour[2]/I");
-  ftmTree_->Branch("jetpt",          jetPt_,      "jetpt[2]/F");
-  ftmTree_->Branch("jeteta",         jetEta_,     "jeteta[2]/F");
-  ftmTree_->Branch("jp",             jp_,         "jp[2]/F");
-  ftmTree_->Branch("svhe",           svhe_,       "svhe[2]/F");
-  ftmTree_->Branch("csv",            csv_,        "csv[2]/F");
-  ftmTree_->Branch("kindisc",        kinDisc_,    "kindisc[2]/F");
-  ftmTree_->Branch("weight",         weight_,     "weight[15]/F");
- 
+  if(tmvaReader_)
+    {
+      ftmTree_=new TTree("ftm","flavour tag matching");
+      ftmTree_->SetDirectory(outF_);
+      ftmTree_->Branch("EventInfo",      eventInfo_,  "EventInfo[3]/I");
+      ftmTree_->Branch("ttbar_chan",    &ttbar_chan_, "ttbar_chan/I");
+      ftmTree_->Branch("jetmult",       &jetmult_,    "jetmult/I");
+      ftmTree_->Branch("flavour",        jetFlavour_, "flavour[2]/I");
+      ftmTree_->Branch("jetpt",          jetPt_,      "jetpt[2]/F");
+      ftmTree_->Branch("jeteta",         jetEta_,     "jeteta[2]/F");
+      ftmTree_->Branch("jp",             jp_,         "jp[2]/F");
+      ftmTree_->Branch("svhe",           svhe_,       "svhe[2]/F");
+      ftmTree_->Branch("csv",            csv_,        "csv[2]/F");
+      ftmTree_->Branch("kindisc",        kinDisc_,    "kindisc[2]/F");
+      ftmTree_->Branch("weight",         weight_,     "weight[15]/F");
+    }
+  else
+    {
+      std::cout << "...warning: tmva reader was not initiated, FtM tree won't be stored" << std::endl;
+      ftmTree_=0;
+    }
+
   //prepare histograms
   std::map<TString,TH1F *> baseHistos;
   baseHistos["npvinc" ]  = new TH1F("npvinc", ";N_{PV,good}-N_{HS};Events",              50, 0, 50);
@@ -173,7 +181,7 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
       
       //progress bar
       if(i%100==0) std::cout << "\r[ " << int(100.*i/nentries) << "/100 ] to completion" << std::flush;
-
+      
       //generator level weights
       Float_t genWgt=ev.ttbar_nw==0 ? 1.0 : ev.ttbar_w[0];
       if(useOnlySignOfGenWeight_) genWgt=ev.ttbar_w[0]<0 ? -1.0 : 1.0;
@@ -201,7 +209,7 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
       if(ev.ttbar_chan==-11*13) ch="emu";
       if(ev.ttbar_chan==-11*11 || ev.ttbar_chan==-13*13) ch="ll";      
       if(ch=="") continue;
-      
+
       //
       //TRIGGER
       //
@@ -356,7 +364,12 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
       if(!passJets) continue;
       histos_[ch+"_mllinc"]->Fill(mll,evWgt);
       if(passMet) histos_[ch+"_mll"]->Fill(mll,evWgt);
-      if(zCand) ch="z"+ch;
+      if(zCand) {
+	ch="z"+ch;
+	histos_[ch+"_mllinc"]->Fill(mll,evWgt);
+	if(passMet) histos_[ch+"_mll"]->Fill(mll,evWgt);
+      }
+
       histos_[ch+"_met"]->Fill(ev.ttbar_metpt,evWgt);
       if(!passMet) continue;
       histos_[ch+"_evsel"]->Fill(0.,evWgt);
@@ -370,7 +383,7 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
       histos_[ch+"_trailjpt"]->Fill(selJetsP4[1][0].Pt(),evWgt);
       histos_[ch+"_trailjeta"]->Fill(fabs(selJetsP4[1][0].Eta()),evWgt);
       histos_[ch+"_traillpt"]->Fill(lp4[1].Pt(),evWgt);
-      
+
       std::vector<float> leadingkindisc(2,-9999);
       std::vector<int> leadingkindiscIdx(2,-1);
       for(size_t ij=0; ij<selJets.size(); ij++)
@@ -396,17 +409,20 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	  histos_[ch+"_flavour"]->Fill(flavBin,evWgt);
 
 	  //rank jets by kinematics discriminator
-	  if(selJetsKINDisc[ij][0]>leadingkindisc[0])
+	  if(tmvaReader_)
 	    {
-	      leadingkindisc[1]=leadingkindisc[0];     leadingkindiscIdx[1]=leadingkindiscIdx[0];
-	      leadingkindisc[0]=selJetsKINDisc[ij][0]; leadingkindiscIdx[0]=jetIdx;
-	    }
-	  else if(selJetsKINDisc[ij][0]>leadingkindisc[1])
-	    {
-	      leadingkindisc[1]=selJetsKINDisc[ij][0]; leadingkindiscIdx[1]=jetIdx;
+	      if(selJetsKINDisc[ij][0]>leadingkindisc[0])
+		{
+		  leadingkindisc[1]=leadingkindisc[0];     leadingkindiscIdx[1]=leadingkindiscIdx[0];
+		  leadingkindisc[0]=selJetsKINDisc[ij][0]; leadingkindiscIdx[0]=jetIdx;
+		}
+	      else if(selJetsKINDisc[ij][0]>leadingkindisc[1])
+		{
+		  leadingkindisc[1]=selJetsKINDisc[ij][0]; leadingkindiscIdx[1]=jetIdx;
+		}
 	    }
 	}
-
+      
       //
       //prepare to store trees
       //
@@ -451,7 +467,7 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	  close_deta_=selJetsLJKinematics[ij][0][0].deta;
 	  close_dphi_=selJetsLJKinematics[ij][0][0].dphi;
 	  close_ptrel_=selJetsLJKinematics[ij][0][0].ptrel;
-	  far_mlj_=selJetsLJKinematics[ij][0][0].mlj;
+	  far_mlj_=selJetsLJKinematics[ij][0][1].mlj;
 	  far_deta_=selJetsLJKinematics[ij][0][1].deta;
 	  far_dphi_=selJetsLJKinematics[ij][0][1].dphi;
 	  far_ptrel_=selJetsLJKinematics[ij][0][1].ptrel;
@@ -463,19 +479,22 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	}
 
       //FtM tree is filled with the two leading jets in the KIN discriminator
-      for(size_t ij=0; ij<2; ij++)
+      if(tmvaReader_)
 	{
-	  size_t jetIdx=leadingkindiscIdx[ij];
-	  jetFlavour_[ij]=ev.Jet_flavour[jetIdx];
-	  jetPt_[ij]=ev.Jet_pt[jetIdx];
-	  jetEta_[ij]=ev.Jet_eta[jetIdx];
-	  jp_[ij]=ev.Jet_Proba[jetIdx];
-	  svhe_[ij]=ev.Jet_Svx[jetIdx];
-	  csv_[ij]=ev.Jet_CombIVF[jetIdx];
-	  kinDisc_[ij]=leadingkindisc[ij];
+	  for(size_t ij=0; ij<2; ij++)
+	    {
+	      size_t jetIdx=leadingkindiscIdx[ij];
+	      jetFlavour_[ij]=ev.Jet_flavour[jetIdx];
+	      jetPt_[ij]=ev.Jet_pt[jetIdx];
+	      jetEta_[ij]=ev.Jet_eta[jetIdx];
+	      jp_[ij]=ev.Jet_Proba[jetIdx];
+	      svhe_[ij]=ev.Jet_Svx[jetIdx];
+	      csv_[ij]=ev.Jet_CombIVF[jetIdx];
+	      kinDisc_[ij]=leadingkindisc[ij];
+	    }
+	  ftmTree_->Fill();
 	}
-      ftmTree_->Fill();
-   }
+    }
 
   //all done with this file
   inF->Close();
@@ -616,6 +635,6 @@ void TTbarEventAnalysis::finalizeOutput()
   outF_->cd();
   for(std::map<TString,TH1F *>::iterator it = histos_.begin(); it != histos_.end(); it++) it->second->Write();
   kinTree_->Write();
-  ftmTree_->Write();
+  if(ftmTree_) ftmTree_->Write();
   outF_->Close();
 }

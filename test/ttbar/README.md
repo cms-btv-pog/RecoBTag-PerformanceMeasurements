@@ -41,6 +41,12 @@ python plotter.py -i analysis/ -j ttbar_Run2015.json  -l 41.6
 python plotter.py -i analysis/ -j ttbar_Run2015.json  -l 41.6 --only evsel --saveTeX
 ```
 Makes control plots and stores all in a ROOT file. Different options may be passed to filter plots, and show differently the plots. 
+```
+python fitDYFromData.py -i analysis/plots/plotter.root
+```
+This script uses the output plots for MET to fit a common scale factor for DY. MET is modelled from under the Z peak
+and used to fit the MET observed after the requirement of at least two jets.
+The scale factor can be applied to all channels as it reflects possible mismodelling in the jet multiplicity of the DY MC.
 
 ### Performance analyses
 
@@ -51,7 +57,7 @@ sh KIN_runClassifier.sh
 After running the local analysis use the kin tree stored in the ttbar sample to train a kinematics discriminator for b-jets in ttbar events.
 The script compiles and runs KIN_trainClassifier.C which should be modified in case different trainings are required.
 ```
-python runTTbarAnalysis.py -i /store/group/phys_btag/performance/TTbar/7b810a5 -j ttbar_Run2015.json --tmvaWgts analysis/KIN_weights/TMVAClassification_BDT.weights.xml -n 8
+python runTTbarAnalysis.py -i /store/group/phys_btag/performance/TTbar/7b810a5 -j ttbar_Run2015.json --tmvaWgts analysis/KIN_weights/TMVAClassification_BDT.weights.xml --dyScale analysis/plots/.dyScaleFactor.pck  -n 8
 ```
 Re-run the analysis to store the KIN discriminator value per jet
 ```
