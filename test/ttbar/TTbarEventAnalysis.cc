@@ -32,27 +32,19 @@ void TTbarEventAnalysis::prepareOutput(TString outFile)
   kinTree_->Branch("csv",            csv_,             "csv/F");
   kinTree_->Branch("weight",         weight_,          "weight[15]/F");
 
-  if(tmvaReader_)
-    {
-      ftmTree_=new TTree("ftm","flavour tag matching");
-      ftmTree_->SetDirectory(outF_);
-      ftmTree_->Branch("EventInfo",      eventInfo_,  "EventInfo[3]/I");
-      ftmTree_->Branch("ttbar_chan",    &ttbar_chan_, "ttbar_chan/I");
-      ftmTree_->Branch("jetmult",       &jetmult_,    "jetmult/I");
-      ftmTree_->Branch("flavour",        jetFlavour_, "flavour[2]/I");
-      ftmTree_->Branch("jetpt",          jetPt_,      "jetpt[2]/F");
-      ftmTree_->Branch("jeteta",         jetEta_,     "jeteta[2]/F");
-      ftmTree_->Branch("jp",             jp_,         "jp[2]/F");
-      ftmTree_->Branch("svhe",           svhe_,       "svhe[2]/F");
-      ftmTree_->Branch("csv",            csv_,        "csv[2]/F");
-      ftmTree_->Branch("kindisc",        kinDisc_,    "kindisc[2]/F");
-      ftmTree_->Branch("weight",         weight_,     "weight[15]/F");
-    }
-  else
-    {
-      std::cout << "...warning: tmva reader was not initiated, FtM tree won't be stored" << std::endl;
-      ftmTree_=0;
-    }
+  ftmTree_=new TTree("ftm","flavour tag matching");
+  ftmTree_->SetDirectory(outF_);
+  ftmTree_->Branch("EventInfo",      eventInfo_,  "EventInfo[3]/I");
+  ftmTree_->Branch("ttbar_chan",    &ttbar_chan_, "ttbar_chan/I");
+  ftmTree_->Branch("jetmult",       &jetmult_,    "jetmult/I");
+  ftmTree_->Branch("flavour",        jetFlavour_, "flavour[2]/I");
+  ftmTree_->Branch("jetpt",          jetPt_,      "jetpt[2]/F");
+  ftmTree_->Branch("jeteta",         jetEta_,     "jeteta[2]/F");
+  ftmTree_->Branch("jp",             jp_,         "jp[2]/F");
+  ftmTree_->Branch("svhe",           svhe_,       "svhe[2]/F");
+  ftmTree_->Branch("csv",            csv_,        "csv[2]/F");
+  ftmTree_->Branch("kindisc",        kinDisc_,    "kindisc[2]/F");
+  ftmTree_->Branch("weight",         weight_,     "weight[15]/F");
 
   //prepare histograms
   std::map<TString,TH1F *> baseHistos;
@@ -77,7 +69,14 @@ void TTbarEventAnalysis::prepareOutput(TString outFile)
   baseHistos["jp"]=new TH1F("jp",";Jet probability;Jets",50,0,3);
   baseHistos["svhe"]=new TH1F("svhe",";Simple secondary vertex (HE);Jets",50,0,6);
   baseHistos["csv"]=new TH1F("csv",";Combined secondary vertex (IVF);Jets",50,0,1.1);
-  baseHistos["flavour"]     = new TH1F("flavour",     ";Jet flavour;Jets",                   4,  0, 4 );
+  baseHistos["tche"]=new TH1F("tche",";Track Counting High Efficiency;Jets",50,-20,50);
+  baseHistos["jetseltrk"]=new TH1F("jetseltrk",";Selected track multiplicity;Jets",15,0,15);
+  baseHistos["jp_leadkin"]=new TH1F("jp_leadkin",";Jet probability;Jets",50,0,3);
+  baseHistos["svhe_leadkin"]=new TH1F("svhe_leadkin",";Simple secondary vertex (HE);Jets",50,0,6);
+  baseHistos["csv_leadkin"]=new TH1F("csv_leadkin",";Combined secondary vertex (IVF);Jets",50,0,1.1);
+  baseHistos["tche_leadkin"]=new TH1F("tche_leadkin",";Track Counting High Efficiency;Jets",50,-20,50);
+  baseHistos["jetseltrk_leadkin"]=new TH1F("jetseltrk_leadkin",";Selected track multiplicity;Jets",15,0,15);
+  baseHistos["flavour"] = new TH1F("flavour",     ";Jet flavour;Jets",                   4,  0, 4 );
   baseHistos["flavour"]->GetXaxis()->SetBinLabel(1,"unmatched");
   baseHistos["flavour"]->GetXaxis()->SetBinLabel(2,"udsg");
   baseHistos["flavour"]->GetXaxis()->SetBinLabel(3,"c");
@@ -138,7 +137,8 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
     Float_t ttbar_w[500];
     Int_t nJet;
     Float_t Jet_pt[100],Jet_genpt[100],Jet_area[100],Jet_jes[100],Jet_eta[100],Jet_phi[100],Jet_mass[100];
-    Float_t Jet_Svx[100],Jet_CombIVF[100],Jet_Proba[100];
+    Float_t Jet_Svx[100],Jet_CombIVF[100],Jet_Proba[100],Jet_Ip2P[100];
+    Int_t Jet_nseltracks[100];
     Int_t Jet_flavour[100];
   };
   MyEventInfoBranches_t ev;
@@ -173,6 +173,8 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
   tree->SetBranchAddress("Jet_Svx",         ev.Jet_Svx);
   tree->SetBranchAddress("Jet_CombIVF",     ev.Jet_CombIVF);
   tree->SetBranchAddress("Jet_Proba",       ev.Jet_Proba);
+  tree->SetBranchAddress("Jet_Ip2P",        ev.Jet_Ip2P);
+  tree->SetBranchAddress("Jet_nseltracks",  ev.Jet_nseltracks);
   tree->SetBranchAddress("Jet_flavour",     ev.Jet_flavour);
 
   for(Int_t i=0; i<nentries; i++)
@@ -371,7 +373,7 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
       }
 
       histos_[ch+"_met"]->Fill(ev.ttbar_metpt,evWgt);
-      if(!passMet) continue;
+      if(!passMet && !zCand) continue;
       histos_[ch+"_evsel"]->Fill(0.,evWgt);
       if(selJets.size()<5)   histos_[ch+"_evsel"]->Fill(selJets.size()-1,evWgt);
       histos_[ch+"_rho"]->Fill(ev.ttbar_rho,evWgt);
@@ -401,6 +403,9 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	  histos_[ch+"_jp"]->Fill(ev.Jet_Proba[jetIdx],evWgt);
 	  histos_[ch+"_svhe"]->Fill(ev.Jet_Svx[jetIdx],evWgt);
 	  histos_[ch+"_csv"]->Fill(ev.Jet_CombIVF[jetIdx],evWgt);
+	  histos_[ch+"_tche"]->Fill(ev.Jet_Ip2P[jetIdx],evWgt);
+	  histos_[ch+"_jetseltrk"]->Fill(ev.Jet_nseltracks[jetIdx],evWgt);
+	  
 
 	  Int_t flavBin(0),partonFlav(abs(ev.Jet_flavour[jetIdx]));
 	  if(partonFlav==21 || (partonFlav>0 && partonFlav<4)) flavBin=1;
@@ -423,6 +428,20 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	    }
 	}
       
+      //control b-tagging quantities for the most promising jets in the KIN discriminator
+      if(tmvaReader_)
+	{
+	  for(size_t ij=0; ij<2; ij++)
+            {
+              size_t jetIdx=leadingkindiscIdx[ij];
+	      histos_[ch+"_jp_leadkin"]->Fill(ev.Jet_Proba[jetIdx],evWgt);
+	      histos_[ch+"_svhe_leadkin"]->Fill(ev.Jet_Svx[jetIdx],evWgt);
+	      histos_[ch+"_csv_leadkin"]->Fill(ev.Jet_CombIVF[jetIdx],evWgt);
+	      histos_[ch+"_tche_leadkin"]->Fill(ev.Jet_Ip2P[jetIdx],evWgt);
+	      histos_[ch+"_jetseltrk_leadkin"]->Fill(ev.Jet_nseltracks[jetIdx],evWgt);
+	    }
+	}
+
       //
       //prepare to store trees
       //

@@ -60,7 +60,7 @@ def main():
 
     #fit
     ttFracFitter=ROOT.TTbarFracFitter()
-    saveResultIn = ROOT.TString(os.path.dirname(opt.input))
+    saveResultIn = ROOT.TString('%s/dyFit'%os.path.dirname(opt.input))
     templates=ROOT.TObjArray()
     templates.Add(dyTemplate)
     templates.Add(otherProc)

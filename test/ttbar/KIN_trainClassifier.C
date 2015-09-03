@@ -201,8 +201,10 @@ void KIN_trainClassifier( TString myMethodList = "", TString inputFile="", Int_t
   
   outputFile->cd();
 
-  //b-jets are saved as 3, require that the event passes nominal preselection (weight[0]>0)
-  factory->SetInputTrees(t,"flavour==3 && weight[0]>0","flavour!=3 && weight[0]>0");
+  //b-jets are saved as 5, require that the event passes nominal preselection (weight[0]>0)
+  factory->SetInputTrees(t,
+			 "abs(flavour)==5 && weight[0]>0 && abs(ttbar_chan)<230000",
+			 "abs(flavour)!=5 && weight[0]>0 && abs(ttbar_chan)<230000");
 
   //use common weight in the events
   factory->SetSignalWeightExpression("weight[0]");
@@ -388,8 +390,11 @@ void KIN_trainClassifier( TString myMethodList = "", TString inputFile="", Int_t
 	Settings = "!H:!V:NTrees=400:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.1:SeparationType=MisClassificationError:nCuts=25:PruneMethod=NoPruning";
       if(BDTTrainMode==BDT_CONFIG2)
 	Settings = "!H:!V:NTrees=300:MinNodeSize=3%:MaxDepth=2:BoostType=AdaBoost:AdaBoostBeta=0.12:SeparationType=MisClassificationError:nCuts=25:PruneMethod=NoPruning";
+      
       factory->BookMethod( TMVA::Types::kBDT, "BDT", Settings);
     }
+
+    
 
   if (Use["BDTB"]) // Bagging
     factory->BookMethod( TMVA::Types::kBDT, "BDTB",
