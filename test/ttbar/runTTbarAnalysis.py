@@ -7,7 +7,6 @@ import pickle
 import math
 from array import array
 from storeTools import getEOSlslist
-from systTools import getTriggerEfficiency,getLeptonSelectionEfficiencyScaleFactor,getJetEnergyScales, getJetResolutionScales
 from rounding import *
 
 CHANNELS={-11*11:'ll', -13*13:'ll', -11*13:'emu'}
@@ -35,9 +34,18 @@ def runTTbarAnalysis(inFile, outFile, wgt, tmvaWgts=None):
             evAnalysis.addTriggerBit(2,-11*11)
         if 'DoubleMu' in inFile :
             evAnalysis.addTriggerBit(3,-13*13)
+    else:
+            evAnalysis.addTriggerBit(0,-11*13)
+            evAnalysis.addTriggerBit(1,-11*13)
+            evAnalysis.addTriggerBit(2,-11*11)
+            evAnalysis.addTriggerBit(3,-13*13)
 
-    for v in ['close_mlj','close_ptrel','close_dphi','close_deta','far_mlj','far_ptrel','far_dphi','far_deta']: evAnalysis.addVarForTMVA(ROOT.TString(v))    
-    if not (tmvaWgts is None) : evAnalysis.setTMVAWeightsFile(tmvaWgts)
+
+    for v in ['close_mlj[0]', 'close_dphi', 'close_deta', 'close_lj2ll_dphi', 'close_lj2ll_deta',
+              'far_mlj',      'far_dphi',   'far_deta',   'far_lj2ll_dphi',   'far_lj2ll_deta',
+              'j2ll_dphi',    'j2ll_deta']: 
+        evAnalysis.addVarForTMVA(ROOT.TString(v))    
+    if not (tmvaWgts is None) : evAnalysis.setTMVAWeightsBaseDir(tmvaWgts)
     evAnalysis.prepareOutput(ROOT.TString(outFile))
     evAnalysis.processFile(ROOT.TString(inFile),wgt)
     evAnalysis.finalizeOutput()
@@ -97,6 +105,11 @@ def main():
         integLumi = pickle.load(cachefile)
         cachefile.close()        
         print 'Normalization read from cache (%s)' % cache
+
+        for tag,sample in samplesList:
+            if not tag in xsecWgts:
+                raise KeyError
+
     except:
         print 'Computing original number of events and storing in cache, this may take a while if it\'s the first time'
         for tag,sample in samplesList: 

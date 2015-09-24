@@ -18,18 +18,25 @@ void TTbarEventAnalysis::prepareOutput(TString outFile)
   kinTree_->Branch("jetmult",       &jetmult_,         "jetmult/I");
   kinTree_->Branch("jetpt",          jetPt_,           "jetpt/F");
   kinTree_->Branch("jeteta",         jetEta_,          "jeteta/F");
+  kinTree_->Branch("jetrank",       &jetrank_,          "jetrank/I");       
   kinTree_->Branch("close_mlj",      close_mlj_,       "close_mlj[5]/F");
   kinTree_->Branch("close_deta",    &close_deta_,      "close_deta/F");
   kinTree_->Branch("close_dphi",    &close_dphi_,      "close_dphi/F");
   kinTree_->Branch("close_ptrel",   &close_ptrel_,     "close_ptrel/F");
+  kinTree_->Branch("close_lj2ll_deta",    &close_lj2ll_deta_,      "close_lj2ll_deta/F");
+  kinTree_->Branch("close_lj2ll_dphi",    &close_lj2ll_dphi_,      "close_lj2ll_dphi/F");
   kinTree_->Branch("far_mlj",       &far_mlj_,         "far_mlj/F");
   kinTree_->Branch("far_deta",      &far_deta_,        "far_deta/F");
   kinTree_->Branch("far_dphi",      &far_dphi_,        "far_dphi/F");
   kinTree_->Branch("far_ptrel",     &far_ptrel_,       "far_ptrel/F");
+  kinTree_->Branch("far_lj2ll_deta",    &far_lj2ll_deta_,      "far_lj2ll_deta/F");
+  kinTree_->Branch("far_lj2ll_dphi",    &far_lj2ll_dphi_,      "far_lj2ll_dphi/F");
+  kinTree_->Branch("j2ll_deta",     &j2ll_deta_,       "j2ll_deta/F");
+  kinTree_->Branch("j2ll_dphi",     &j2ll_dphi_,       "j2ll_dphi/F");
   kinTree_->Branch("kindisc",        kinDisc_,         "kindisc[5]/F");
-  kinTree_->Branch("jp",             jp_,              "jp/F");
-  kinTree_->Branch("svhe",           svhe_,            "svhe/F");
-  kinTree_->Branch("csv",            csv_,             "csv/F");
+  kinTree_->Branch("jp",             &(jp_[0]),              "jp/F");
+  kinTree_->Branch("svhe",           &(svhe_[0]),            "svhe/F");
+  kinTree_->Branch("csv",            &(csv_[0]),             "csv/F");
   kinTree_->Branch("weight",         weight_,          "weight[15]/F");
 
   ftmTree_=new TTree("ftm","flavour tag matching");
@@ -85,11 +92,17 @@ void TTbarEventAnalysis::prepareOutput(TString outFile)
   baseHistos["close_deta"]  = new TH1F("close_deta",  ";#Delta#eta(lepton,jet); Jets",       50, 0, 4);
   baseHistos["close_dphi"]  = new TH1F("close_dphi",  ";#Delta#phi(lepton,jet) [rad]; Jets", 50, 0, 3.15);
   baseHistos["close_ptrel"] = new TH1F("close_ptrel", ";p_{T}^{rel}(lepton,jet) [GeV];Jets", 50, 0, 1);
+  baseHistos["close_lj2ll_deta"] = new TH1F("close_lj2ll_deta",  ";#Delta#eta(lj,ll); Jets",       50, 0, 4);
+  baseHistos["close_lj2ll_dphi"]  = new TH1F("close_l2jll_dphi",  ";#Delta#phi(lj,ll) [rad]; Jets", 50, 0, 3.15);
   baseHistos["far_mlj"]     = new TH1F("far_mlj",     ";M(lepton,jet) [GeV]; Jets",          50, 0, 250);
   baseHistos["far_deta"]    = new TH1F("far_deta",    ";#Delta#eta(lepton,jet); Jets",       50, 0, 4);
   baseHistos["far_dphi"]    = new TH1F("far_dphi",    ";#Delta#phi(lepton,jet) [rad]; Jets", 50, 0, 3.15);
   baseHistos["far_ptrel"]   = new TH1F("far_ptrel",   ";p_{T}^{rel}(lepton,jet) [GeV];Jets", 50, 0, 1);
-  baseHistos["kindisc"]     = new TH1F("kindisc",     ";Kinematics discriminator;Jets",      50, -1, 1);
+  baseHistos["far_lj2ll_deta"] = new TH1F("far_lj2ll_deta",  ";#Delta#eta(lepton+jet,ll); Jets",       50, 0, 4);
+  baseHistos["far_lj2ll_dphi"]  = new TH1F("far_l2jll_dphi",  ";#Delta#phi(lj,ll) [rad]; Jets", 50, 0, 3.15);
+  baseHistos["j2ll_deta"]    = new TH1F("j2ll_deta",    ";#Delta#eta(ll,jet); Jets",       50, 0, 4);
+  baseHistos["j2ll_dphi"]    = new TH1F("j2ll_dphi",    ";#Delta#phi(lll,jet) [rad]; Jets", 50, 0, 3.15);
+  baseHistos["kindisc"]     = new TH1F("kindisc",     ";Kinematics discriminator;Jets",      100, -1, 1);
 
   //replicate histos per channel
   TString ch[]={"emu","ll","zll"};
@@ -116,12 +129,15 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 
   //prepare reader
   std::vector<Float_t> tmvaVars( tmvaVarNames_.size(), 0. );
-  if(weightsFile_!="")
+  if(weightsDir_!="")
     {
       tmvaReader_=new TMVA::Reader( "!Color:!Silent" );
       for(size_t ivar=0; ivar<tmvaVarNames_.size(); ivar++)   
 	tmvaReader_->AddVariable( tmvaVarNames_[ivar], &tmvaVars[ivar] );
-      tmvaReader_->BookMVA("BDT", weightsFile_);
+      
+      TString jranks[]={"leading",  "others",  "subleading" };
+      for(size_t i=0; i<sizeof(jranks)/sizeof(TString); i++)
+	tmvaReader_->BookMVA("BDT_"+jranks[i], weightsDir_+"/"+jranks[i]+"/TMVAClassification_BDT.weights.xml");
     }
 
   //prepare to read the tree (for jets only interested in a couple of variables)
@@ -222,8 +238,15 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	  hasTrigger |= ((ev.ttbar_trigWord>>triggerBits_[ibit].first) & 1);
 	}
 
-      if(!hasTrigger) continue;
-
+      if(applyTriggerEff_)
+	{
+	  if(abs(ev.ttbar_chan)==11*13) { if(!hasTrigger) continue; }
+	  else hasTrigger=true;
+	}
+      else
+	{
+	  if(!hasTrigger) continue;
+	}
 
       //
       //LEPTONS
@@ -262,7 +285,9 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	  lp4.push_back( TLorentzVector(0,0,0,0) );
           lp4[il].SetPtEtaPhiM(ev.ttbar_lpt[il],ev.ttbar_leta[il],ev.ttbar_lphi[il],0.);
 	}
-      Float_t mll=(lp4[0]+lp4[1]).M();
+
+      TLorentzVector dilepton(lp4[0]+lp4[1]);
+      Float_t mll=dilepton.M();
 
       //nominal event weight
       Float_t evWgt(xsecWgt*puWgtNom*trigWgtNom*lepSelEffNom*genWgt);
@@ -316,11 +341,14 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	      for(Int_t il=0; il<2; il++)
 		{
 		  LJKinematics_t iljkin;
-		  iljkin.dr=lp4[il].DeltaR(varjp4[iSystVar]);
-		  iljkin.dphi=TMath::Abs(lp4[il].DeltaPhi(varjp4[iSystVar]));
-		  iljkin.deta=TMath::Abs(lp4[il].Eta()-varjp4[iSystVar].Eta());
-		  iljkin.ptrel=ROOT::Math::VectorUtil::Perp(lp4[il].Vect(),varjp4[iSystVar].Vect().Unit())/lp4[il].P();
-		  iljkin.mlj=(varjp4[iSystVar]+lp4[il]).M();
+		  iljkin.dr         = lp4[il].DeltaR(varjp4[iSystVar]);
+		  iljkin.dphi       = fabs(lp4[il].DeltaPhi(varjp4[iSystVar]));
+		  iljkin.deta       = fabs(lp4[il].Eta()-varjp4[iSystVar].Eta());
+		  iljkin.ptrel      = ROOT::Math::VectorUtil::Perp(lp4[il].Vect(),varjp4[iSystVar].Vect().Unit())/lp4[il].P();
+		  TLorentzVector ljP4(lp4[il]+varjp4[iSystVar]);
+		  iljkin.mlj        = ljP4.M();
+		  iljkin.lj2ll_deta = fabs(ljP4.Eta()-dilepton.Eta());
+		  iljkin.lj2ll_dphi = fabs(ljP4.DeltaPhi(dilepton));		  
 		  ljkinematics.push_back(iljkin);
 		}
 	      sort(ljkinematics.begin(),ljkinematics.end(),sortLJKinematicsByDR);
@@ -332,14 +360,34 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 		{
 		  for(size_t ivar=0; ivar<tmvaVarNames_.size(); ivar++)
 		    {
-		      int ljidx( tmvaVarNames_[ivar].Contains("close") ? 0 : 1);
-		      if(tmvaVarNames_[ivar].Contains("_dr"))    tmvaVars[ivar]=ljkinematics[ljidx].dr;
-		      if(tmvaVarNames_[ivar].Contains("_dphi"))  tmvaVars[ivar]=ljkinematics[ljidx].dphi;
-		      if(tmvaVarNames_[ivar].Contains("_deta"))  tmvaVars[ivar]=ljkinematics[ljidx].deta;
-		      if(tmvaVarNames_[ivar].Contains("_ptrel")) tmvaVars[ivar]=ljkinematics[ljidx].ptrel;
-		      if(tmvaVarNames_[ivar].Contains("_mlj"))   tmvaVars[ivar]=ljkinematics[ljidx].mlj;
+		      if( tmvaVarNames_[ivar].Contains("j2ll_") )
+			{
+			  if(tmvaVarNames_[ivar]=="j2ll_deta") tmvaVars[ivar]=fabs(varjp4[iSystVar].Eta()-dilepton.Eta());
+			  if(tmvaVarNames_[ivar]=="j2ll_phi")  tmvaVars[ivar]=fabs(varjp4[iSystVar].DeltaPhi(dilepton));
+			}
+		      else
+			{
+			  int ljidx( tmvaVarNames_[ivar].Contains("close") ? 0 : 1);
+			  if(tmvaVarNames_[ivar].Contains("_dr"))    tmvaVars[ivar]=ljkinematics[ljidx].dr;			  
+			  if(tmvaVarNames_[ivar].Contains("_dphi"))  
+			    {
+			      if(tmvaVarNames_[ivar].Contains("lj2ll_")) tmvaVars[ivar]=ljkinematics[ljidx].lj2ll_dphi;
+			      else                                       tmvaVars[ivar]=ljkinematics[ljidx].dphi;
+			    }
+			  if(tmvaVarNames_[ivar].Contains("_deta"))  
+			    {
+			      if(tmvaVarNames_[ivar].Contains("lj2ll_")) tmvaVars[ivar]=ljkinematics[ljidx].lj2ll_deta;
+			      else                                       tmvaVars[ivar]=ljkinematics[ljidx].deta;
+			    }			      
+			  if(tmvaVarNames_[ivar].Contains("_ptrel")) tmvaVars[ivar]=ljkinematics[ljidx].ptrel;
+			  if(tmvaVarNames_[ivar].Contains("_mlj"))   tmvaVars[ivar]=ljkinematics[ljidx].mlj;
+			}
 		    }
-		  varkindisc.push_back( tmvaReader_->EvaluateMVA("BDT") );
+
+		  TString methodPFix("_others");
+		  if(selJets.size()==0) methodPFix="_leading";
+		  else if(selJets.size()==1) methodPFix="_subleading";
+		  varkindisc.push_back( tmvaReader_->EvaluateMVA("BDT"+methodPFix) );
 		}	      
 	      
 	      //check if can be selected for this variation
@@ -364,20 +412,16 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
       bool passJets(selJets.size()>=2 ? true : false);
       
       if(!passJets) continue;
+      if(zCand)  ch="z"+ch;
       histos_[ch+"_mllinc"]->Fill(mll,evWgt);
-      if(passMet) histos_[ch+"_mll"]->Fill(mll,evWgt);
-      if(zCand) {
-	ch="z"+ch;
-	histos_[ch+"_mllinc"]->Fill(mll,evWgt);
-	if(passMet) histos_[ch+"_mll"]->Fill(mll,evWgt);
-      }
-
       histos_[ch+"_met"]->Fill(ev.ttbar_metpt,evWgt);
-      if(!passMet && !zCand) continue;
+
+      if(!passMet) continue;
       histos_[ch+"_evsel"]->Fill(0.,evWgt);
       if(selJets.size()<5)   histos_[ch+"_evsel"]->Fill(selJets.size()-1,evWgt);
       histos_[ch+"_rho"]->Fill(ev.ttbar_rho,evWgt);
       histos_[ch+"_npv"]->Fill(ev.nPV-1,evWgt);       
+      histos_[ch+"_mll"]->Fill(mll,evWgt);
       histos_[ch+"_njets"]->Fill(selJets.size(),evWgt);
       histos_[ch+"_leadjpt"]->Fill(selJetsP4[0][0].Pt(),evWgt);
       histos_[ch+"_leadjeta"]->Fill((selJetsP4[0][0].Eta()),evWgt);
@@ -395,10 +439,16 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	  histos_[ch+"_close_deta"]->Fill(selJetsLJKinematics[ij][0][0].deta,evWgt);
 	  histos_[ch+"_close_dphi"]->Fill(selJetsLJKinematics[ij][0][0].dphi,evWgt);
 	  histos_[ch+"_close_ptrel"]->Fill(selJetsLJKinematics[ij][0][0].ptrel,evWgt);
+	  histos_[ch+"_close_lj2ll_deta"]->Fill(selJetsLJKinematics[ij][0][0].lj2ll_deta,evWgt);
+	  histos_[ch+"_close_lj2ll_dphi"]->Fill(selJetsLJKinematics[ij][0][0].lj2ll_dphi,evWgt);
 	  histos_[ch+"_far_mlj"]->Fill(selJetsLJKinematics[ij][0][1].mlj,evWgt);
 	  histos_[ch+"_far_deta"]->Fill(selJetsLJKinematics[ij][0][1].deta,evWgt);
 	  histos_[ch+"_far_dphi"]->Fill(selJetsLJKinematics[ij][0][1].dphi,evWgt);
 	  histos_[ch+"_far_ptrel"]->Fill(selJetsLJKinematics[ij][0][1].ptrel,evWgt);
+	  histos_[ch+"_far_lj2ll_deta"]->Fill(selJetsLJKinematics[ij][0][1].lj2ll_deta,evWgt);
+	  histos_[ch+"_far_lj2ll_dphi"]->Fill(selJetsLJKinematics[ij][0][1].lj2ll_dphi,evWgt);
+	  histos_[ch+"_j2ll_deta"]->Fill(fabs(selJetsP4[ij][0].Eta()-dilepton.Eta()),evWgt);
+	  histos_[ch+"_j2ll_dphi"]->Fill(fabs(selJetsP4[ij][0].DeltaPhi(dilepton)),evWgt);
 	  if(tmvaReader_) histos_[ch+"_kindisc"]->Fill(selJetsKINDisc[ij][0],evWgt);
 	  histos_[ch+"_jp"]->Fill(ev.Jet_Proba[jetIdx],evWgt);
 	  histos_[ch+"_svhe"]->Fill(ev.Jet_Svx[jetIdx],evWgt);
@@ -474,22 +524,33 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
       for(size_t ij=0; ij<selJets.size(); ij++)
 	{
 	  Int_t jetIdx(selJets[ij]);
+
+	  jetrank_ = ij;
 	  jetFlavour_[0] = ev.Jet_flavour[jetIdx];
 	  jetPt_[0]      = selJetsP4[ij][0].Pt();
 	  jetEta_[0]     = selJetsP4[ij][0].Eta();
 	  for(size_t iSystVar=0; iSystVar<5; iSystVar++)
 	    {
 	      close_mlj_[iSystVar] = selJetsLJKinematics[ij][iSystVar][0].mlj;
-	      if(tmvaReader_) kinDisc_[iSystVar]   = selJetsKINDisc[ij][iSystVar];
-	      else            kinDisc_[iSystVar]=-999;
+	      if(tmvaReader_) kinDisc_[iSystVar] = selJetsKINDisc[ij][iSystVar];
+	      else            kinDisc_[iSystVar] = -999;
 	    }
-	  close_deta_=selJetsLJKinematics[ij][0][0].deta;
-	  close_dphi_=selJetsLJKinematics[ij][0][0].dphi;
+	  close_deta_ =selJetsLJKinematics[ij][0][0].deta;
+	  close_dphi_ =selJetsLJKinematics[ij][0][0].dphi;
 	  close_ptrel_=selJetsLJKinematics[ij][0][0].ptrel;
-	  far_mlj_=selJetsLJKinematics[ij][0][1].mlj;
-	  far_deta_=selJetsLJKinematics[ij][0][1].deta;
-	  far_dphi_=selJetsLJKinematics[ij][0][1].dphi;
-	  far_ptrel_=selJetsLJKinematics[ij][0][1].ptrel;
+	  close_lj2ll_deta_ = selJetsLJKinematics[ij][0][0].lj2ll_deta;
+	  close_lj2ll_dphi_ = selJetsLJKinematics[ij][0][0].lj2ll_dphi;
+
+	  far_mlj_    =selJetsLJKinematics[ij][0][1].mlj;
+	  far_deta_   =selJetsLJKinematics[ij][0][1].deta;
+	  far_dphi_   =selJetsLJKinematics[ij][0][1].dphi;
+	  far_ptrel_  =selJetsLJKinematics[ij][0][1].ptrel;
+	  far_lj2ll_deta_ = selJetsLJKinematics[ij][0][1].lj2ll_deta;
+	  far_lj2ll_dphi_ = selJetsLJKinematics[ij][0][1].lj2ll_dphi;	  
+
+	  j2ll_deta_  =fabs(selJetsP4[ij][0].Eta()-dilepton.Eta());
+	  j2ll_dphi_  =fabs(selJetsP4[ij][0].DeltaPhi( dilepton ));
+	  
 	  jp_[0]=ev.Jet_Proba[jetIdx];
 	  svhe_[0]=ev.Jet_Svx[jetIdx];
 	  csv_[0]=ev.Jet_CombIVF[jetIdx];
@@ -503,13 +564,16 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	  for(size_t ij=0; ij<2; ij++)
 	    {
 	      size_t jetIdx=leadingkindiscIdx[ij];
-	      jetFlavour_[ij]=ev.Jet_flavour[jetIdx];
-	      jetPt_[ij]=ev.Jet_pt[jetIdx];
-	      jetEta_[ij]=ev.Jet_eta[jetIdx];
-	      jp_[ij]=ev.Jet_Proba[jetIdx];
-	      svhe_[ij]=ev.Jet_Svx[jetIdx];
-	      csv_[ij]=ev.Jet_CombIVF[jetIdx];
-	      kinDisc_[ij]=leadingkindisc[ij];
+	      jetFlavour_[ij] = ev.Jet_flavour[jetIdx];
+	      jetPt_[ij]      = ev.Jet_pt[jetIdx];
+	      jetEta_[ij]     = ev.Jet_eta[jetIdx];
+	      jp_[ij]         = ev.Jet_Proba[jetIdx];
+	      svhe_[ij]       = ev.Jet_Svx[jetIdx];
+	      csv_[ij]        = ev.Jet_CombIVF[jetIdx];
+	      kinDisc_[ij]    = leadingkindisc[ij];
+	      //std::cout << ij << " " <<  jetFlavour_[ij] << " "
+	      //<< jetPt_[ij] << " " << csv_[ij]  << " " << kinDisc_[ij] 
+	      //		<< std::endl;
 	    }
 	  ftmTree_->Fill();
 	}
@@ -525,11 +589,10 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 std::pair<float,float> TTbarEventAnalysis::getTriggerEfficiency(int id1,float pt1,float eta1,int id2,float pt2,float eta2,int ch)
 {
   std::pair<float,float>res(1.0,0.0);
-  
-  if(ch==-11*13) { res.first=0.91; res.second=0.05; }
+  //if(ch==-11*13) { res.first=0.91; res.second=0.05; }
+  if(ch==-11*13) { res.first=1.00; res.second=0.05; }
   if(ch==-11*11) { res.first=0.95; res.second=0.05; }
-  if(ch==-13*13) { res.first=0.92; res.second=0.05; }
-
+  if(ch==-13*13) { res.first=0.99; res.second=0.001; } // this is a single muon trigger
  return res;
 }
 

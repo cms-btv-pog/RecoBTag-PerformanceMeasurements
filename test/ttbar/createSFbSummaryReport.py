@@ -20,11 +20,18 @@ def addToSummaryGr(summaryGrs,val,valUnc,xmin,xmax,taggerName,summaryType,uncTyp
     sliceType='inc' if sliceNb==0 else 'diff'
     key='%s_%s_%s_%d_%s'%(taggerName,summaryType,uncType,iop,sliceType)
     xcen=0.5*(xmin+xmax)
-    dx=xcen-xmin if 'total' in uncType else 0.
+    dx=(xcen-xmin) if 'total' in uncType else 0.
     np=summaryGrs[key].GetN()
-    summaryGrs[key].SetPoint(np,xcen,val)
-    summaryGrs[key].SetPointError(np,dx,valUnc)
-
+    if 'exp' in key and 'inc' in key:
+        summaryGrs[key].SetPoint(np,xmin,val)
+        summaryGrs[key].SetPointError(np,0,valUnc)
+        summaryGrs[key].SetPoint(np+1,xmax,val)
+        summaryGrs[key].SetPointError(np+1,0,valUnc)
+        
+    else:
+        summaryGrs[key].SetPoint(np,xcen,val)
+        summaryGrs[key].SetPointError(np,dx,valUnc)
+        
 def ShowSFbSummary(inF,outF):
 
     #read results from the pickle file
@@ -65,8 +72,6 @@ def ShowSFbSummary(inF,outF):
         nPreTagExp    = mcTruth[0][islice][0]
         nPreTagExpUnc = mcTruth[0][islice][1]
         
-        if islice==0 : print 'pretag: ',nPreTagExp,nPreTagObs
-
         for iop in xrange(1,len(taggerDef)-2):
                 
             tableHeader.append('$>$%3.3f'%taggerDef[iop+1])
@@ -86,8 +91,6 @@ def ShowSFbSummary(inF,outF):
             bEffObs=nTagObs/nPreTagObs
             bEffObsUnc=math.sqrt((nTagObs*nPreTagObsUnc)**2+(nTagObsUnc*nPreTagObs)**2)/(nPreTagObs**2)
             tableObs.append('%s'%toLatexRounded(bEffObs,bEffObsUnc))
-
-            if islice==0 : print iop,nTagExp,nTagObs
            
             sfb          = bEffObs/bEffExp
             sfbStatUnc   = (bEffObsUnc*bEffExp)/(bEffExp**2)
@@ -128,7 +131,7 @@ def ShowSFbSummary(inF,outF):
                            fitInfo['slicebins'][islice][0],fitInfo['slicebins'][islice][1],
                            taggerName,'obsEff','stat',islice,iop)
             addToSummaryGr(summaryGrs,
-                           bEffObs,bEffObsUnc*sfbTotalUnc/sfb,
+                           bEffObs,bEffObs*sfbTotalUnc/sfb,
                            fitInfo['slicebins'][islice][0],fitInfo['slicebins'][islice][1],
                            taggerName,'obsEff','total',islice,iop)
 
@@ -158,7 +161,25 @@ def ShowSFbSummary(inF,outF):
         table+='\\end{table}\n'
         out.write(table)
 
-    showSummary(taggerDef,taggerName,fitInfo['slicevar'],summaryGrsMap=[(fitInfo['var'],summaryGrs),])
+
+    outDir=os.path.dirname(outF)
+    if len(outDir)==0 : outDir='./'
+    showSummary(taggerDef,taggerName,fitInfo['slicevar'],summaryGrsMap=[(fitInfo['var'],summaryGrs),],outDir=outDir)
+
+    #include figures in the tex file
+    for iop in xrange(1,len(taggerDef)-2):
+        out.write('\\begin{figure}[htp]')
+        out.write('\\centering\n')
+        out.write('\\includegraphics[width=0.8\\textwidth]{%s/%s_%d.pdf}' % (outDir,taggerDef[1],iop))
+        out.write('\\caption{\n')
+        out.write('Summary of the results for the measurement of the b-tagging efficiency of %s algorithm $>$%3.2f. \n' % (taggerDef[0],taggerDef[1+iop]) )
+        out.write('The top panels show the observed b-tagging efficiency compared to the one expected in simulation. \n')
+        out.write('While the left panel shows the inclusive results, the right panel shows the results as function of the %s. \n' % fitInfo['slicevar'] )
+        out.write('The bottom panels show the SF$_{\\rm b}$ fit to data. \n')
+        out.write('The error bars (hatched areas) represent the statistical (total) uncertainty of the measurement.\n')
+        out.write('}\n')
+        out.write('\\label{fig:%ssummary%d}' % (taggerDef[1],iop))
+        out.write('\\end{figure}\n')
 
     out.write('\\end{document}\n')
     out.close()
@@ -167,7 +188,11 @@ def ShowSFbSummary(inF,outF):
 
 """
 """
-def showSummary(taggerDef,taggerName,sliceVar,summaryGrsMap):
+def showSummary(taggerDef,taggerName,sliceVar,summaryGrsMap,outDir):
+
+    ROOT.gStyle.SetOptStat(0)
+    ROOT.gStyle.SetOptTitle(0)
+    ROOT.gROOT.SetBatch(True)
 
     #show results in canvas
     c=ROOT.TCanvas('c','c',800,500)
@@ -186,188 +211,109 @@ def showSummary(taggerDef,taggerName,sliceVar,summaryGrsMap):
     clabel.SetLeftMargin(0.0)
     clabel.SetBottomMargin(0.0)
     clabel.Draw()
+
+    subpads={}
+    c.cd()
+    key=('Eff','inc')
+    subpads[key]=ROOT.TPad('cinc','cinc',0,0.45,0.2,0.95)
+    subpads[key].SetRightMargin(0.02)
+    subpads[key].SetTopMargin(0.01)
+    subpads[key].SetLeftMargin(0.3)
+    subpads[key].SetBottomMargin(0.01)
+    subpads[key].Draw()
+
+    c.cd()
+    key=('sfb','inc')
+    subpads[key]=ROOT.TPad('cincsf','cincsf',0,0,0.2,0.45)
+    subpads[key].SetRightMargin(0.02)
+    subpads[key].SetTopMargin(0.01)
+    subpads[key].SetLeftMargin(0.3)
+    subpads[key].SetBottomMargin(0.12)
+    subpads[key].Draw()
+
+    c.cd()
+    key=('Eff','diff')
+    subpads[key]=ROOT.TPad('cexc','cexc',0.2,0.45,1.0,0.95)
+    subpads[key].SetRightMargin(0.02)
+    subpads[key].SetTopMargin(0.01)
+    subpads[key].SetLeftMargin(0.02)
+    subpads[key].SetBottomMargin(0.01)
+    subpads[key].Draw()
+
+    c.cd()
+    key=('sfb','diff')
+    subpads[key]=ROOT.TPad('cexcsf','cexcsf',0.2,0,1.0,0.45)
+    subpads[key].SetRightMargin(0.02)
+    subpads[key].SetTopMargin(0.01)
+    subpads[key].SetLeftMargin(0.02)
+    subpads[key].SetBottomMargin(0.12)
+    subpads[key].Draw()
     
-    c.cd()
-    cinc=ROOT.TPad('cinc','cinc',0,0.45,0.2,0.95)
-    cinc.SetRightMargin(0.02)
-    cinc.SetTopMargin(0.01)
-    cinc.SetLeftMargin(0.3)
-    cinc.SetBottomMargin(0.01)
-    cinc.Draw()
+    for iop in xrange(1,len(taggerDef)-2):
 
-    c.cd()
-    cincsf=ROOT.TPad('cincsf','cincsf',0,0,0.2,0.45)
-    cincsf.SetRightMargin(0.02)
-    cincsf.SetTopMargin(0.01)
-    cincsf.SetLeftMargin(0.3)
-    cincsf.SetBottomMargin(0.12)
-    cincsf.Draw()
-
-    c.cd()
-    cexc=ROOT.TPad('cexc','cexc',0.2,0.45,1.0,0.95)
-    cexc.SetRightMargin(0.02)
-    cexc.SetTopMargin(0.01)
-    cexc.SetLeftMargin(0.02)
-    cexc.SetBottomMargin(0.01)
-    cexc.Draw()
-
-    c.cd()
-    cexcsf=ROOT.TPad('cexcsf','cexcsf',0.2,0,1.0,0.45)
-    cexcsf.SetRightMargin(0.02)
-    cexcsf.SetTopMargin(0.01)
-    cexcsf.SetLeftMargin(0.02)
-    cexcsf.SetBottomMargin(0.12)
-    cexcsf.Draw()
-    
-    for iop in xrange(0,len(taggerDef)-2):
-
-        #
-        #inclusive efficiency measurements
-        #
-        cinc.cd()
-        cinc.Clear()
-        ivar=0
-
-        for uncType in ['total','stat']:
+        for key in subpads:
+            summaryType,sliceType=key[0],key[1]
+            subpads[key].cd()
+            subpads[key].Clear()
             ivar=0
-            drawOpt='a2' if uncType=='total' else 'p'
-            for ivar in xrange(0,len(summaryGrsMap)):
-                var,summaryGrs = summaryGrsMap[ivar][0], summaryGrsMap[ivar][1]
-                gr=summaryGrs['%s_obsEff_%s_%d_inc'%(taggerName,uncType,iop)]
+            for uncType in ['total','stat']:
+                ivar=0
+                drawOpt='a2' if uncType=='total' else 'p'
+                for ivar in xrange(0,len(summaryGrsMap)):
+                    var,summaryGrs = summaryGrsMap[ivar][0], summaryGrsMap[ivar][1]
+
+                    grKey='%s_obs%s_%s_%d_%s'%(taggerName,summaryType,uncType,iop,sliceType)
+                    if 'sfb' in summaryType:
+                        grKey='%s_%s_%s_%d_%s'%(taggerName,summaryType,uncType,iop,sliceType)
+                    gr=summaryGrs[grKey]
                 
-                gr.SetTitle(var)
-                gr.SetMarkerColor(colors[ivar]+1)
-                gr.SetLineColor(colors[ivar]+1)
-                if uncType=='total': gr.SetFillColor(colors[ivar]+1)
-                else : gr.SetFillColor(0)
-                gr.SetMarkerStyle(markers[ivar])
+                    gr.SetTitle(var)
+                    gr.SetMarkerColor(colors[ivar]+1)
+                    gr.SetLineColor(colors[ivar]+1)
+                    if uncType=='total': gr.SetFillColor(colors[ivar]+1)
+                    else : gr.SetFillColor(0)
+                    gr.SetMarkerStyle(markers[ivar])
+                    
+                    gr.SetFillStyle(3001)
+                    gr.Draw(drawOpt)
+                    if 'Eff' in summaryType :
+                        gr.GetYaxis().SetTitle('Efficiency')
+                        gr.GetYaxis().SetRangeUser(0.12,1.5)
+                    else :
+                        gr.GetYaxis().SetTitle('Scale factor')
+                        gr.GetYaxis().SetRangeUser(0.64,1.26)
+                    if 'inc' in sliceType:
+                        gr.GetYaxis().SetTitleOffset(1.2)
+                        gr.GetYaxis().SetTitleSize(0.1)
+                        gr.GetYaxis().SetLabelSize(0.1)
+                        gr.GetXaxis().SetTitleSize(0.)
+                        gr.GetXaxis().SetLabelSize(0.)
+                        gr.GetXaxis().SetNdivisions(0)
+                    else:                        
+                        gr.GetYaxis().SetTitleSize(0.)
+                        gr.GetYaxis().SetLabelSize(0.)
+                        if 'Eff' in summaryType:
+                            gr.GetXaxis().SetTitleSize(0.)
+                            gr.GetXaxis().SetLabelSize(0.)
+                        else:
+                            gr.GetXaxis().SetTitleSize(0.07)
+                            gr.GetXaxis().SetLabelSize(0.07)
+                            gr.GetXaxis().SetTitle(sliceVar)
+                            gr.GetXaxis().SetTitleOffset(0.5)
+
+                    if uncType=='total' : drawOpt='2'
+                    ivar+=1
+                    
+            if 'Eff' in summaryType:
+                gr=summaryGrs['%s_expEff_stat_%d_%s'%(taggerName,iop,sliceType)]
+                gr.SetMarkerColor(1)
                 gr.SetMarkerStyle(1)
-                gr.SetFillStyle(3001)
-                gr.Draw(drawOpt)
-                gr.GetYaxis().SetRangeUser(0.12,1.5)
-                gr.GetYaxis().SetTitle('Efficiency')
-                gr.GetYaxis().SetTitleOffset(1.2)
-                gr.GetYaxis().SetTitleSize(0.1)
-                gr.GetYaxis().SetLabelSize(0.1)
-                gr.GetXaxis().SetTitleSize(0.)
-                gr.GetXaxis().SetLabelSize(0.)
-                gr.GetXaxis().SetNdivisions(0)
-                if uncType=='total' : drawOpt='2'
-                ivar+=1
-        gr=summaryGrs['%s_expEff_stat_%d_inc'%(taggerName,iop)]
-        gr.SetMarkerColor(1)
-        gr.SetMarkerStyle(1)
-        gr.SetLineColor(1)
-        gr.SetLineWidth(2)
-        gr.Draw('c')
+                gr.SetLineColor(1)
+                gr.SetLineWidth(2)
+                gr.Draw('cX')
         c.Modified()
         c.Update()
 
-
-        #
-        #inclusive scale factors
-        #
-#        grIncSFObsStatColl=convertToScaleFactor(obs=grIncObsStatColl,ref=grIncExpColl)
-#        grIncSFObsTotalColl=convertToScaleFactor(obs=grIncObsTotalColl,ref=grIncExpColl)
-#        cincsf.cd()
-#        cincsf.Clear()
-#        ivar=0
-#        drawOpt='a2'
-#        for var in grIncSFObsTotalColl:
-#            grIncSFObsTotalColl[var][iop].Draw(drawOpt)
-#            grIncSFObsTotalColl[var][iop].GetYaxis().SetRangeUser(0.74,1.26)
-#            grIncSFObsTotalColl[var][iop].GetYaxis().SetTitle('Data-MC scale factor')
-#            grIncSFObsTotalColl[var][iop].GetYaxis().SetTitleOffset(1.2)
-#            grIncSFObsTotalColl[var][iop].GetYaxis().SetTitleSize(0.1)
-#            grIncSFObsTotalColl[var][iop].GetYaxis().SetLabelSize(0.1)
-#            grIncSFObsTotalColl[var][iop].GetXaxis().SetTitleSize(0.)
-#            grIncSFObsTotalColl[var][iop].GetXaxis().SetLabelSize(0.)
-#            grIncSFObsTotalColl[var][iop].GetXaxis().SetNdivisions(0)
-#            drawOpt='2'
-#            ivar+=1
-#
-#        ivar=0
-#        for var in grIncSFObsStatColl:
-#            grIncSFObsStatColl[var][iop].Draw('p')
-#            grIncSFObsStatColl[var][iop].SetTitle(var)
-#            ivar+=1
-#
-#        #
-#        # differential efficiency measurements
-#        #
-#        cexc.cd()
-#        cexc.Clear()
-#        leg = ROOT.TLegend(0.6, 0.95,0.95,0.8)
-#        leg.SetBorderSize(0)
-#        leg.SetFillStyle(0)
-#        leg.SetTextFont(43)
-#        leg.SetTextSize(16)
-#        if len(fileList)>2 : leg.SetNColumns(2)
-#        leg.AddEntry(grExpColl[iop],grExpColl[iop].GetTitle(),"l")
-#
-#        ivar=0
-#        drawOpt='a2'
-#        for var in grObsTotalColl:
-#            grObsTotalColl[var][iop].SetTitle(var)
-#            grObsTotalColl[var][iop].SetMarkerColor(colors[ivar]+1)
-#            grObsTotalColl[var][iop].SetLineColor(colors[ivar]+1)
-#            grObsTotalColl[var][iop].SetFillColor(colors[ivar]+1)
-#            grObsTotalColl[var][iop].SetMarkerStyle(1)
-#            grObsTotalColl[var][iop].SetFillStyle(3001)
-#            grObsTotalColl[var][iop].Draw(drawOpt)
-#            grObsTotalColl[var][iop].GetYaxis().SetTitleSize(0.)
-#            grObsTotalColl[var][iop].GetYaxis().SetLabelSize(0.)
-#            grObsTotalColl[var][iop].GetYaxis().SetRangeUser(0.0,1.5)
-#            drawOpt='2'
-#            ivar+=1
-#
-#        ivar=0
-#        for var in grObsStatColl:
-#            grObsStatColl[var][iop].SetMarkerColor(colors[ivar])
-#            grObsStatColl[var][iop].SetLineColor(colors[ivar])
-#            grObsStatColl[var][iop].SetFillColor(0)
-#            grObsStatColl[var][iop].SetMarkerStyle(markers[ivar])
-#            grObsStatColl[var][iop].SetFillStyle(0)
-#            grObsStatColl[var][iop].Draw('p')
-#            grObsStatColl[var][iop].SetTitle(var)
-#            leg.AddEntry(grObsStatColl[var][iop],grObsStatColl[var][iop].GetTitle(),'p')
-#            ivar+=1
-#
-#        grExpColl[iop].SetMarkerColor(1)
-#        grExpColl[iop].SetMarkerStyle(1)
-#        grExpColl[iop].SetLineColor(1)
-#        grExpColl[iop].SetLineWidth(2)
-#        grExpColl[iop].Draw('c')
-#
-#        leg.Draw()
-#
-#
-#        #
-#        # differential scale factor measurements
-#        #
-#        grSFObsStatColl=convertToScaleFactor(obs=grObsStatColl,ref=grExpColl)
-#        grSFObsTotalColl=convertToScaleFactor(obs=grObsTotalColl,ref=grExpColl)
-#        cexcsf.cd()
-#        cexcsf.Clear()
-#        ivar=0
-#        drawOpt='a2'
-#        for var in grSFObsTotalColl:
-#            grSFObsTotalColl[var][iop].Draw(drawOpt)
-#            grSFObsTotalColl[var][iop].GetYaxis().SetTitleSize(0.)
-#            grSFObsTotalColl[var][iop].GetYaxis().SetLabelSize(0.)
-#            grSFObsTotalColl[var][iop].GetYaxis().SetRangeUser(0.74,1.26)
-#            grSFObsTotalColl[var][iop].GetXaxis().SetTitle(SLICEVAR)
-#            grSFObsTotalColl[var][iop].GetXaxis().SetTitleSize(0.08)
-#            grSFObsTotalColl[var][iop].GetXaxis().SetLabelSize(0.08)
-#            drawOpt='2'
-#            ivar+=1
-#
-#        ivar=0
-#        for var in grSFObsStatColl:
-#            grSFObsStatColl[var][iop].Draw('p')
-#            grSFObsStatColl[var][iop].SetTitle(var)
-#            ivar+=1
-#
         clabel.cd()
         clabel.Clear()
         txt=ROOT.TLatex()
@@ -380,13 +326,13 @@ def showSummary(taggerDef,taggerName,sliceVar,summaryGrsMap):
             txt.DrawLatex(0.05,0.5,'#bf{CMS} #it{Preliminary} %3.1f pb^{-1} (13 TeV)' % lumi)
         else:
             txt.DrawLatex(0.05,0.5,'#bf{CMS} #it{Preliminary} %3.1f fb^{-1} (13 TeV)' % (lumi/1000.))
-        txt.DrawLatex(0.6,0.5,'[#scale[0.7]{%s} > %3.3f]' % (taggerDef[0],taggerDef[iop+2]))
+        txt.DrawLatex(0.7,0.5,'[#scale[0.7]{%s} > %3.3f]' % (taggerDef[0],taggerDef[iop+1]))
 
         c.cd()
         c.Modified()
         c.Update()
-        #for ext in ['png','pdf']: c.SaveAs('%s/%s_%d.%s'% (outDir,tagger,iop,ext))
-        raw_input()
+        for ext in ['png','pdf']: c.SaveAs('%s/%s_%d.%s'% (outDir,taggerDef[1],iop,ext))
+        
 
 
 """

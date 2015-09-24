@@ -17,6 +17,7 @@
 struct LJKinematics_t
 {
   Float_t dr,dphi,deta,ptrel,mlj,kindisc;
+  Float_t lj2ll_deta,lj2ll_dphi;
 };
 
 bool sortLJKinematicsByDR (LJKinematics_t i,LJKinematics_t j) { return (i.dr<j.dr); }
@@ -39,7 +40,7 @@ class TTbarEventAnalysis
   void setApplyMETFilters(bool applyMETFilters)               { applyMETFilters_=applyMETFilters; }
   void setApplyTriggerEff(bool applyTriggerEff)               { applyTriggerEff_=applyTriggerEff; }
   void setApplyLepSelEff(bool applyLepSelEff)                 { applyLepSelEff_=applyLepSelEff; }
-  void setTMVAWeightsFile(TString url)                        { weightsFile_=url; gSystem->ExpandPathName(weightsFile_); }
+  void setTMVAWeightsBaseDir(TString url)                     { weightsDir_=url; gSystem->ExpandPathName(weightsDir_); }
   void addTriggerBit(Int_t bit,Int_t ch)                      { triggerBits_.push_back(std::pair<Int_t,Int_t>(bit,ch)); }
   void addVarForTMVA(TString varName)                         { tmvaVarNames_.push_back(varName); }
   void prepareOutput(TString outFile);
@@ -53,15 +54,18 @@ class TTbarEventAnalysis
   std::vector<float> getJetResolutionScales(float pt, float eta, float genjpt);
 
   bool useOnlySignOfGenWeight_, readTTJetsGenWeights_, applyMETFilters_, applyTriggerEff_, applyLepSelEff_;
-  TString weightsFile_;
+  TString weightsDir_;
   std::vector<TString> tmvaVarNames_;
   TMVA::Reader *tmvaReader_;
   TFile *outF_;
   Int_t eventInfo_[3],ttbar_chan_;
   Float_t weight_[15];
-  Int_t jetFlavour_[2],jetmult_;
+  Int_t jetFlavour_[2],jetmult_,jetrank_;
   Float_t jetPt_[2],jetEta_[2];
-  Float_t close_mlj_[5],close_deta_,close_dphi_,close_ptrel_,far_mlj_, far_deta_, far_dphi_, far_ptrel_,kinDisc_[5];
+  Float_t close_mlj_[5],close_deta_,close_dphi_,close_ptrel_,close_lj2ll_deta_, close_lj2ll_dphi_;
+  Float_t far_mlj_, far_deta_, far_dphi_, far_ptrel_,far_lj2ll_deta_, far_lj2ll_dphi_;
+  Float_t  j2ll_deta_,j2ll_dphi_;
+  Float_t kinDisc_[5];
   Float_t jp_[2],svhe_[2],csv_[2];
   std::vector<std::pair<Int_t,Int_t> > triggerBits_;
   TTree *kinTree_,*ftmTree_;

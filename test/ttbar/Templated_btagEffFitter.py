@@ -14,7 +14,7 @@ SYSTVARS   = ['','jesup','jesdn','jerup','jerdn','trigdn','trigup','seldn','selu
 """
 Project trees from files to build the templates
 """
-def prepareTemplates(tagger,taggerDef,var,varRange,channeList,inDir,outDir):
+def prepareTemplates(tagger,taggerDef,var,varRange,channelList,inDir,outDir):
     
     print '...starting %s for %s'%(tagger,var)
 
@@ -50,10 +50,11 @@ def prepareTemplates(tagger,taggerDef,var,varRange,channeList,inDir,outDir):
 
             chains[key].GetEntry(i)
             
+            #filter channel, if required
+            if not chains[key].ttbar_chan in channelList : continue
+
             for systVar in SYSTVARS:
                 
-                if not in channelList : continue
-
                 if key=='data' and len(systVar)>0 : continue
 
                 wgtIdx, systIdx = 0, 0
@@ -91,8 +92,8 @@ def prepareTemplates(tagger,taggerDef,var,varRange,channeList,inDir,outDir):
 
                 #assign flavour
                 flav='other'
-                if chains[key].flavour==3: flav='b'
-                if chains[key].flavour==2: flav='c'
+                if abs(chains[key].flavour)==5: flav='b'
+                if abs(chains[key].flavour)==4: flav='c'
                 if key=='data' : flav='data'
 
                 #fill the histos
@@ -120,7 +121,7 @@ def runPrepareTemplatesPacked(args):
                                 taggerDef=taggerDef,
                                 var=var,
                                 varRange=varRange,
-                                channelList,
+                                channelList=channelList,
                                 inDir=inDir,
                                 outDir=outDir)
     except :
@@ -141,10 +142,13 @@ def checkTemplate(h,minVal=1e-5):
 """
 run the fits
 """
-def runSFFits(var,tagger,taggerDef,outDir,lumi):
+def runSFFits(var,tagger,taggerDef,outDir):
 
     flavTemplates=[ ['b'], ['c','other'] ]
     if var=='jpTagger' : flavTemplates=[ ['b'], ['c'], ['other'] ]
+
+    #customized fraction fitter tool
+    ttFracFitter=ROOT.TTbarFracFitter()
 
     nOPs=len(taggerDef)-2
     bobs={}
@@ -303,7 +307,7 @@ def main():
     ROOT.gSystem.Load("libTTbarSFbFitTools.so")
     for var,_,_ in VARSTOFIT:
         for tagger,taggerDef in taggersList:
-            runSFFits(var,tagger,taggerDef,opt.outDir,opt.lumi)
+            runSFFits(var,tagger,taggerDef,opt.outDir)
 
     #all done here
     exit(0)

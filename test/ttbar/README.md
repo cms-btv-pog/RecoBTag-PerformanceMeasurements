@@ -37,8 +37,8 @@ See https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookCRAB3Tutorial and htt
 It prints out s.th. like "Produced normalization cache (analysis/.xsecweights.pck)"
 In case you update the trees, xsec or lumi you have to remove by hand the pickle file.
 ```
-python plotter.py -i analysis/ -j ttbar_Run2015.json  -l 41.6
-python plotter.py -i analysis/ -j ttbar_Run2015.json  -l 41.6 --only evsel --saveTeX
+python plotter.py -i analysis/ -j ttbar_Run2015.json  -l 71.44
+python plotter.py -i analysis/ -j ttbar_Run2015.json  -l 71.44 --only evsel --saveTeX
 ```
 Makes control plots and stores all in a ROOT file. Different options may be passed to filter plots, and show differently the plots. 
 ```
@@ -57,18 +57,20 @@ sh KIN_runClassifier.sh
 After running the local analysis use the kin tree stored in the ttbar sample to train a kinematics discriminator for b-jets in ttbar events.
 The script compiles and runs KIN_trainClassifier.C which should be modified in case different trainings are required.
 ```
-python runTTbarAnalysis.py -i /store/group/phys_btag/performance/TTbar/7b810a5 -j ttbar_Run2015.json --tmvaWgts analysis/KIN_weights/TMVAClassification_BDT.weights.xml --dyScale analysis/plots/.dyScaleFactor.pck  -n 8
+python runTTbarAnalysis.py -i /store/group/phys_btag/performance/TTbar/7b810a5 -j ttbar_Run2015.json --tmvaWgts analysis/KIN_weights/ --dyScale analysis/plots/.dyScaleFactor.pck  -n 8
 ```
 Re-run the analysis to store the KIN discriminator value per jet
 ```
-python Templated_btagEffFitter.py -i analysis/ -o analysis/ -t taggers_Run2015.json -n 8
+python Templated_btagEffFitter.py -i analysis/ -o analysis_inc/ -t taggers_Run2015.json -n 8 
+python Templated_btagEffFitter.py -i analysis/ -o analysis_ll/ -t taggers_Run2015.json -n 8 --channels -121,-169
+python Templated_btagEffFitter.py -i analysis/ -o analysis_emu/ -t taggers_Run2015.json -n 8 --channels -143
 ```
 Runs the fits to the templates to determine the scale factors. Valid for KIN, Mlj, JP, others one may wish to add.
 The base procedure is similar for all. The first time to run will take a long time as templates need to be created.
 If templates are stable and only fits need to be redone when can run with the option "--recycleTemplates"
 ```
-python Templated_btagEffFitter.py --show analysis//close_mlj_templates/.csvivf_fits.pck,analysis//kindisc_templates/.csvivf_fits.pck,analysis//jpTagger_templates/.csvivf_fits.pck
+python createSFbSummaryReport.py -i analysis/kindisc_templates/.csv_fits.pck -o csv_fits.tex
 ```
-Fit results are stored in pickle files which can be used to produce the final summary plots.
+Parses the fit results and creates a TeX file with the tables as well as the plots with the measured efficiencies.
 
 #### FtM method

@@ -59,7 +59,7 @@ TTbarFracFitterResult_t TTbarFracFitter::fit(TObjArray &expTemplates, TH1F *data
     totalExp += ((TH1 *)expTemplates.At(i))->Integral();
 
   //build the pdf components
-  RooArgSet expPDFs,expFracs;
+  RooArgSet expPDFs,expFracs,nonPOIPDFs;
   TString poiName("v"); poiName+=idxOfInterest;
   for(int i=0; i<expTemplates.GetEntriesFast(); i++)
     {
@@ -89,7 +89,9 @@ TTbarFracFitterResult_t TTbarFracFitter::fit(TObjArray &expTemplates, TH1F *data
       RooHistPdf *ipdf    = new RooHistPdf (name+"_pdf", name+"_pdf",  RooArgSet(x), *itempl);
       ipdf->SetTitle(title);
       expPDFs.add(*ipdf);
+      if(i!=idxOfInterest) nonPOIPDFs.add(*ipdf);
     }
+
 
   //create the final pdf
   RooAddPdf *pdf=new RooAddPdf("pdf","pdf", expPDFs, expFracs);
@@ -126,21 +128,27 @@ TTbarFracFitterResult_t TTbarFracFitter::fit(TObjArray &expTemplates, TH1F *data
       pdf->plotOn(frame,
 		  RooFit::Name("totalexp"),
 		  RooFit::ProjWData(*data),
-		  RooFit::LineColor(kBlue),
-		  RooFit::LineWidth(2),
+		  RooFit::LineColor(1),
+		  RooFit::LineWidth(1),
 		  RooFit::MoveToBack());
+      
+
       pdf->plotOn(frame,
-		  RooFit::Name("poifit"),
+		  RooFit::Name("nonpoifit"),
 		  RooFit::ProjWData(*data),
-		  RooFit::Components(poiName+"_*"),
-		  RooFit::FillColor(kOrange+2),
-		  RooFit::LineColor(kOrange+2),
+		  RooFit::Components(nonPOIPDFs),
+		  RooFit::FillColor(kGray),
+		  RooFit::LineColor(kGray),
+		  //RooFit::Components(poiName+"_*"),
+		  //RooFit::FillColor(kOrange+2),
+		  //RooFit::LineColor(kOrange+2),
 		  RooFit::FillStyle(1001),
 		  RooFit::DrawOption("f"),
 		  RooFit::MoveToBack());
       frame->Draw();
       frame->GetYaxis()->SetTitleOffset(1.5);
       frame->GetXaxis()->SetTitle(x.GetTitle());
+      frame->GetYaxis()->SetRangeUser(0,dataH->GetMaximum()*2.0);
 
       TLatex *label= new TLatex();
       label->SetNDC();
@@ -148,14 +156,14 @@ TTbarFracFitterResult_t TTbarFracFitter::fit(TObjArray &expTemplates, TH1F *data
       label->SetTextSize(0.04);
       label->DrawLatex(0.18,0.94,"#bf{CMS} #it{simulation}");
 
-      TLegend *leg=new TLegend(0.8,0.65,0.95,0.5);
-      leg->AddEntry("data",       "data",      "p");
-      leg->AddEntry("totalexp",   "total",     "l");
-      leg->AddEntry("poifit",     expFracs.find(poiName)->GetTitle(),  "f");
+      TLegend *leg=new TLegend(0.18,0.7,0.35,0.9);
+      leg->AddEntry("data",      "data",                             "p");
+      leg->AddEntry("totalexp",  expFracs.find(poiName)->GetTitle(), "l");
+      leg->AddEntry("nonpoifit", "others",                           "f");
       leg->SetFillStyle(0);
-      leg->SetTextFont(43);
-      leg->SetTextSize(14);
+      leg->SetTextFont(42);
       leg->SetBorderSize(0);
+      leg->SetTextSize(0.035);
       leg->Draw();
 
       canvas->cd();
