@@ -404,7 +404,7 @@ void KIN_trainClassifier( TString myMethodList = "", TString inputFile="", Int_t
     {
       //      TString Default ="!H:!V:NTrees=850:MinNodeSize=2.5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:nCuts=20";
       factory->BookMethod( TMVA::Types::kBDT, "BDT", 
-			   "NTrees=1000:BoostType=Grad:MinNodeSize=5%:MaxDepth=3:Shrinkage=1.0:IgnoreNegWeightsInTraining");
+			   "NTrees=1000:BoostType=Grad:MinNodeSize=5%:MaxDepth=3:Shrinkage=1.0:NegWeightTreatment=Pray");
 
       //"!H:!V:NTrees=450:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.15:SeparationType=MisClassificationError:nCuts=25:PruneMethod=NoPruning");  
     }
