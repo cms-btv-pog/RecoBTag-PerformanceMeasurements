@@ -14,6 +14,8 @@
 #include <map>
 #include <vector>
 
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+
 struct LJKinematics_t
 {
   Float_t dr,dphi,deta,ptrel,mlj,kindisc;
@@ -33,6 +35,10 @@ class TTbarEventAnalysis
     applyTriggerEff_(true),
     applyLepSelEff_(true) 
       {
+	//jet uncertainty parameterization
+	TString jecUncUrl("${CMSSW_BASE}/src/RecoBTag/PerformanceMeasurements/test/ttbar/Summer15_50nsV5_DATA_Uncertainty_AK4PFchs.txt");
+	gSystem->ExpandPathName(jecUncUrl);
+	jecUnc_ = new JetCorrectionUncertainty(jecUncUrl.Data());
       }
   ~TTbarEventAnalysis(){}
   void setUseOnlySignOfGenWeight(bool useOnlySignOfGenWeight) { useOnlySignOfGenWeight_=useOnlySignOfGenWeight; }
@@ -48,6 +54,7 @@ class TTbarEventAnalysis
   void finalizeOutput();
 
  private:
+  JetCorrectionUncertainty *jecUnc_;
   std::pair<float,float> getTriggerEfficiency(int id1,float pt1,float eta1,int id2,float pt2,float eta2,int ch);
   std::pair<float,float> getLeptonSelectionEfficiencyScaleFactor(int id,float pt,float eta);
   std::vector<float> getJetEnergyScales(float pt,float eta,float rawsf,float area,float rho);

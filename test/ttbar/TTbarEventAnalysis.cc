@@ -6,6 +6,7 @@ using namespace std;
 //
 void TTbarEventAnalysis::prepareOutput(TString outFile)
 {
+
   //prepare output file
   outF_=TFile::Open(outFile,"RECREATE");
 
@@ -318,8 +319,15 @@ void TTbarEventAnalysis::processFile(TString inFile,float xsecWgt)
 	  Float_t genjpt=ev.Jet_genpt[ij];
       
 	  // update JES+JER for this jet
-	  std::vector<float> jesSF= getJetEnergyScales(jp4.Pt(), jp4.Eta(), jrawsf,jarea,ev.ttbar_rho);
+	  std::vector<float> jesSF(3,1.0);
+	  jecUnc_->setJetEta(fabs(jp4.Eta()));
+	  jecUnc_->setJetPt(jp4.Pt());
+	  float unc = jecUnc_->getUncertainty(true);
+	  jesSF[1]=(1.+fabs(unc));
+	  jesSF[2]=(1.-fabs(unc));
+	  
 	  std::vector<float> jerSF= getJetResolutionScales(jesSF[0]*jp4.Pt(), jp4.Eta(), genjpt);
+
 	  TLorentzVector oldjp4(jp4);
 	  jp4 = jp4*jesSF[0]*jerSF[0];
 	  

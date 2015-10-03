@@ -82,9 +82,10 @@ def main():
     (opt, args) = parser.parse_args()
 
     #compile c++ wrapper to run over trees 
+    ROOT.gSystem.Load("libJetMETCorrectionsObjects.so")
     ROOT.gSystem.CompileMacro("TTbarEventAnalysis.cc","fkgd","libTTbarEventAnalysis");
     ROOT.gSystem.Load("libTTbarEventAnalysis.so")
-
+    
     #read list of samples
     jsonFile = open(opt.json,'r')
     samplesList=json.load(jsonFile,encoding='utf-8').items()
