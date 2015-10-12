@@ -763,7 +763,15 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     // pileup
 
     edm::Handle<std::vector <PileupSummaryInfo> > PupInfo;
-    iEvent.getByLabel("addPileupInfo", PupInfo);
+    edm::Handle<std::vector <PileupSummaryInfo> > PupInfotest;
+    bool checkPUname = iEvent.getByLabel("addPileupInfo", PupInfotest);
+
+    if (checkPUname){
+      iEvent.getByLabel("addPileupInfo", PupInfo);
+    }
+    else{
+      iEvent.getByLabel("slimmedAddPileupInfo", PupInfo);
+    }
 
     std::vector<PileupSummaryInfo>::const_iterator ipu;
     for (ipu = PupInfo->begin(); ipu != PupInfo->end(); ++ipu) {
@@ -1590,13 +1598,13 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
     int flavour  =-1  ;
     if ( !isData_ ) {
-      flavour = abs( pjet->partonFlavour() );
+      flavour = abs( pjet->hadronFlavour() );
       if ( flavour >= 1 && flavour <= 3 ) flavour = 1;
     }
 
     JetInfo[iJetColl].Jet_partonid[JetInfo[iJetColl].nJet]  = pjet->genParton() ? pjet->genParton()->pdgId() : 0;
     JetInfo[iJetColl].Jet_area[JetInfo[iJetColl].nJet]      = pjet->jetArea();
-    JetInfo[iJetColl].Jet_flavour[JetInfo[iJetColl].nJet]   = pjet->partonFlavour();
+    JetInfo[iJetColl].Jet_flavour[JetInfo[iJetColl].nJet]   = pjet->hadronFlavour();
     JetInfo[iJetColl].Jet_nbHadrons[JetInfo[iJetColl].nJet] = pjet->jetFlavourInfo().getbHadrons().size();
     JetInfo[iJetColl].Jet_ncHadrons[JetInfo[iJetColl].nJet] = pjet->jetFlavourInfo().getcHadrons().size();
     JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet]       = pjet->eta();
