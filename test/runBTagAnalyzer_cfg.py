@@ -371,22 +371,21 @@ process.GlobalTag.globaltag = globalTag
 # from Configuration.AlCa.GlobalTag import GlobalTag
 # process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_' + ('data' if options.runOnData else 'mc'))
 
-#Loading calibrations: as default, but with new cMVA training
-#Only in 74X: to be revomed in 75X
-process.load("CondCore.DBCommon.CondDBSetup_cfi")
-process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
-    process.CondDBSetup,
-    timetype = cms.string('runnumber'),
-    toGet = cms.VPSet(
-        cms.PSet(
-            record = cms.string('BTauGenericMVAJetTagComputerRcd'),
-            tag = cms.string('MVAJetTags')
-        )
-    ),
-    connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags.db'),
-    BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
-)
-process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
+#Loading calibrations from db file, example of code for any future use
+#process.load("CondCore.DBCommon.CondDBSetup_cfi")
+#process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
+#    process.CondDBSetup,
+#    timetype = cms.string('runnumber'),
+#    toGet = cms.VPSet(
+#        cms.PSet(
+#            record = cms.string('BTauGenericMVAJetTagComputerRcd'),
+#            tag = cms.string('MVAJetTags')
+#        )
+#    ),
+#    connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags.db'),
+#    BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
+#)
+#process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
 ### to activate the new JP calibration: using the data base
 trkProbaCalibTag = "JPcalib_MC74X_25ns_v1"
 if options.runOnData:
