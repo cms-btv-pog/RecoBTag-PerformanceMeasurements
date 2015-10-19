@@ -14,6 +14,8 @@
   <use name="DataFormats/EgammaCandidates"/>
   <use name="JetMETCorrections/Objects"/>
   <use name="RecoMuon/TrackingTools"/>
+  <use name="TrackingTools/IPTools"/>
+  <use name="TrackingTools/Records"/>
   <use name="TrackingTools/TransientTrack"/>
   <use name="SimTracker/TrackAssociation"/>
   <use name="SimTracker/TrackHistory"/>

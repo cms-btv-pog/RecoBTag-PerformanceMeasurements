@@ -46,6 +46,7 @@ bTagAnalyzerCommon = cms.PSet(
     beta                     = cms.double(1.0),
     R0                       = cms.double(0.8),
     maxSVDeltaRToJet         = cms.double(0.7),
+    trackPairV0Filter = cms.PSet(k0sMassWindow = cms.double(0.03)),
     TriggerPathNames = cms.vstring(
         "HLT_Jet15U*",
         "HLT_Jet30_v*",
