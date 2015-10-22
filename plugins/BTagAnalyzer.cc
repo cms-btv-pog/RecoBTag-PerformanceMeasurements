@@ -1919,7 +1919,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
                     JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]);
 
         if(JetInfo[iJetColl].Track_PV[JetInfo[iJetColl].nTrack]==0 &&
-           JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]>0) { allKinematics.add(ptrack, JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]); }
+           JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]>0.5) { allKinematics.add(ptrack, JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]); }
 
 
         if( pjet->hasTagInfo(svTagInfos_.c_str()) )
@@ -2576,7 +2576,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       float tau1_trackSip3dSig_0, tau1_trackSip3dSig_1;
       std::vector<float> IP3Ds, etaRels, IP3Ds_1, IP3Ds_2;
       int contTrk=0;
-      for (int iTrk = 0; iTrk < JetInfo[iJetColl].Jet_ntracks[JetInfo[iJetColl].nJet]; ++iTrk)
+      for (int iTrk = JetInfo[iJetColl].Jet_nFirstTrack[JetInfo[iJetColl].nJet]; iTrk < JetInfo[iJetColl].Jet_nLastTrack[JetInfo[iJetColl].nJet]; ++iTrk)
       {
         if(JetInfo[iJetColl].Track_isfromV0[iTrk]==0 &&
            JetInfo[iJetColl].Track_lengthTau[iTrk]<5. &&
@@ -2709,20 +2709,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
                       break;
 
-              case 2:
-
-                      tau1_trackSip3dSig_0 = IP3Ds_1.at(0);
-                      tau1_trackSip3dSig_1 = IP3Ds_1.at(1);
-
-                      break;
-
-              case 3:
-
-                      tau1_trackSip3dSig_0 = IP3Ds_1.at(0);
-                      tau1_trackSip3dSig_1 = IP3Ds_1.at(1);
-
-                      break;
-
               default:
 
                       tau1_trackSip3dSig_0 = IP3Ds_1.at(0);
@@ -2742,17 +2728,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
                        tau2_trackSip3dSig_0 = IP3Ds_2.at(0);
                        tau2_trackSip3dSig_1 = dummyTrack;
 
-                       break;
-
-               case 2:
-                       tau2_trackSip3dSig_0 = IP3Ds_2.at(0);
-                       tau2_trackSip3dSig_1 = IP3Ds_2.at(1);
-
-                       break;
-
-               case 3:
-                       tau2_trackSip3dSig_0 = IP3Ds_2.at(0);
-                       tau2_trackSip3dSig_1 = IP3Ds_2.at(1);
                        break;
 
                default:
