@@ -21,57 +21,58 @@ def main():
         dsetname=dset.split('/')[-1]
 
         pub_list=getEOSlslist(directory=dset,prepend='')
-        if len(pub_list)!=1 or  not 'crab' in pub_list[0]:
-            print 'Ambiguity found @ <publication-name> for <primary-dataset>=%s , bailing out'%dsetname
-            continue
-        pub=pub_list[0].split('/crab_')[-1]
+        for pub in pub_list:
+            if not 'crab' in pub_list[0]:
+                print 'Ambiguity found @ <publication-name> for <primary-dataset>=%s , bailing out'%dsetname
+                continue
+            pub=pub.split('/crab_')[-1]
 
-        time_list=getEOSlslist(directory=pub_list[0],prepend='')
-        if len(time_list)!=1:
-            print 'Ambiguity found @ <time-stamp> for <primary-dataset>=%s , bailing out'%dsetname
-            continue
-        time_stamp=time_list[0].split('/')[-1]
+            time_list=getEOSlslist(directory=pub_list[0],prepend='')
+            if len(time_list)!=1:
+                print 'Ambiguity found @ <time-stamp> for <primary-dataset>=%s , bailing out'%dsetname
+                continue
+            time_stamp=time_list[0].split('/')[-1]
 
-        out_list=[]
-        count_list=getEOSlslist(directory=time_list[0],prepend='')
-        for count in count_list: out_list += getEOSlslist(directory=count,prepend='')
-        file_list=[x for x in out_list if '.root' in x]
+            out_list=[]
+            count_list=getEOSlslist(directory=time_list[0],prepend='')
+            for count in count_list: out_list += getEOSlslist(directory=count,prepend='')
+            file_list=[x for x in out_list if '.root' in x]
 
-        newDir='%s/%s' % (opt.inDir,pub)        
-        print '<primary-dataset>=%s <publication-name>=crab_%s <time-stamp>=%s has %d files' % (dsetname,pub,time_stamp,len(file_list) )
-        if not opt.nocheck:
-            choice = raw_input('Will move to %s current output directory. [y/n] ?' % newDir ).lower()
-            if not 'y' in choice : continue
-        os.system('cmsMkdir %s' % newDir)
+            newDir='%s/%s' % (opt.inDir,pub)        
+            print '<primary-dataset>=%s <publication-name>=crab_%s <time-stamp>=%s has %d files' % (dsetname,pub,time_stamp,len(file_list) )
+            if not opt.nocheck:
+                choice = raw_input('Will move to %s current output directory. [y/n] ?' % newDir ).lower()
+                if not 'y' in choice : continue
+            os.system('cmsMkdir %s' % newDir)
 
-        moveIndividualFiles=True
-        if len(file_list)>5:
-            subgroupMerge = int( raw_input('This set has %d files. Merge into groups? (enter 0 if no merging)' % len(file_list)) )
-            if subgroupMerge>0:
-                moveIndividualFiles=False
+            moveIndividualFiles=True
+            if len(file_list)>5:
+                subgroupMerge = int( raw_input('This set has %d files. Merge into groups? (enter 0 if no merging)' % len(file_list)) )
+                if subgroupMerge>0:
+                    moveIndividualFiles=False
 
-                splitFunc = lambda A, n=subgroupMerge: [A[i:i+n] for i in range(0, len(A), n)]
-                split_file_lists = splitFunc( file_list )
+                    splitFunc = lambda A, n=subgroupMerge: [A[i:i+n] for i in range(0, len(A), n)]
+                    split_file_lists = splitFunc( file_list )
                 
-                for ilist in xrange(0,len(split_file_lists)):
-                    mergedFileName='/tmp/MergedJetTree_%d.root '%ilist
-                    toAdd='%s ' % mergedFileName
-                    for f in split_file_lists[ilist]:
-                        os.system('cmsStage -f %s /tmp/' % f)
-                        toAdd += '/tmp/'+os.path.basename(f) + ' '
-                    os.system('hadd -f %s'%toAdd)
-                    os.system('cmsStage -f %s %s/' %(mergedFileName,newDir))
-                    os.system('rm %s' % toAdd)
+                    for ilist in xrange(0,len(split_file_lists)):
+                        mergedFileName='/tmp/MergedJetTree_%d.root '%ilist
+                        toAdd='%s ' % mergedFileName
+                        for f in split_file_lists[ilist]:
+                            os.system('cmsStage -f %s /tmp/' % f)
+                            toAdd += '/tmp/'+os.path.basename(f) + ' '
+                        os.system('hadd -f %s'%toAdd)
+                        os.system('cmsStage -f %s %s/' %(mergedFileName,newDir))
+                        os.system('rm %s' % toAdd)
 
-        #if still needed copy individual files
-        if moveIndividualFiles:
-            for f in file_list : os.system('cmsStage -f %s %s/' % (f, newDir) )
+                #if still needed copy individual files
+                if moveIndividualFiles:
+                    for f in file_list : os.system('cmsStage -f %s %s/' % (f, newDir) )
 
-        if not opt.nocheck and opt.cleanup : 
-            choice = raw_input('Will remove output directory. [y/n] ?').lower()
-            if 'y' in choice: os.system('cmsRm -r %s' % dset)
+            if not opt.nocheck and opt.cleanup : 
+                choice = raw_input('Will remove output directory. [y/n] ?').lower()
+                if 'y' in choice: os.system('cmsRm -r %s' % dset)
 
-        print 'Crab outputs may now be found in %s' % newDir
+            print 'Crab outputs may now be found in %s' % newDir
 
     print '-'*50
     print 'All done. In case errors were found check that the crab output structure is '

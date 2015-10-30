@@ -1,8 +1,10 @@
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
-
 #include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h" 
-
 #include "RecoBTag/PerformanceMeasurements/interface/TTbarSelectionProducer.h"
+#include "FWCore/Common/interface/TriggerNames.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
 using namespace std;
 using namespace edm;
@@ -10,19 +12,27 @@ using namespace edm;
 
 
 TTbarSelectionProducer::TTbarSelectionProducer(const edm::ParameterSet& iConfig) :
-  triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("triggerColl"))),
+  triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("triggerColl"))), 
+  RecoHBHENoiseFilter_(consumes<bool>(iConfig.getParameter<edm::InputTag>("RecoHBHENoiseFilter"))),
+  vtxToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vtxColl"))),
   electronToken_(consumes<edm::View<pat::Electron> >(iConfig.getParameter<edm::InputTag>("electronColl"))),
   conversionsToken_(mayConsume< reco::ConversionCollection >(iConfig.getParameter<edm::InputTag>("conversions"))),
   electronIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("electronIdMap"))),
   muonToken_(consumes<pat::MuonCollection>(iConfig.getParameter<edm::InputTag>("muonColl"))),
   jetToken_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("jetColl"))),
-  metToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("metColl")))  
+  metToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("metColl")))
 {
   verbose_           = iConfig.getParameter<int > ("verbose");
   
   trigNamesToSel_     = iConfig.getParameter<std::vector<std::string> >("trigNamesToSel");
   trigChannels_       = iConfig.getParameter<std::vector<int> >("trigChannels");
   doTrigSel_          = iConfig.getParameter<bool>("doTrigSel");
+
+  //MET filters
+  std::vector<edm::InputTag> metFiltersInputs=iConfig.getParameter<std::vector<edm::InputTag> >("metFilters");
+  for(size_t i=0; i<metFiltersInputs.size(); i++)
+    metFilters_.push_back(consumes<edm::TriggerResults>(metFiltersInputs[i]));
+  metFiltersToApply_ = iConfig.getParameter<std::vector<std::string> >("metFiltersToApply");
 
   //Configuration for electrons
   electron_cut_pt_   = iConfig.getParameter<double>        ("electron_cut_pt");
@@ -44,13 +54,26 @@ TTbarSelectionProducer::TTbarSelectionProducer(const edm::ParameterSet& iConfig)
   //produce
   produces<int>("topChannel");
   produces<int>("topTrigger");
+  produces<int>("topMETFilter");
   produces<std::vector<pat::Electron> >();
   produces<std::vector<pat::Muon> >();
   produces<std::vector<pat::Jet> >();
   produces<std::vector<pat::MET> >();
 
-  // some histograms
+  //save some control histograms
   edm::Service<TFileService> fs;
+  histos_["wgtcounter"] = fs->make<TH1F>("wgtcounter",";Weight;Weight sum",500,0,500);
+  histos_["triggerpaths"] = fs->make<TH1F>("triggerpaths",";Trigger paths;Channel",trigChannels_.size(),0,trigChannels_.size());
+  for(size_t i=0; i<trigChannels_.size(); i++)
+    {
+      histos_["triggerpaths"]->GetXaxis()->SetBinLabel(i+1,trigNamesToSel_[i].c_str());
+      histos_["triggerpaths"]->SetBinContent(i+1,trigChannels_[i]);
+    }
+
+  histos_["metfilters"] = fs->make<TH1F>("metfilters",";MET filter;",metFiltersToApply_.size()+1,0,metFiltersToApply_.size()+1);
+  histos_["metfilters"]->GetXaxis()->SetBinLabel(1,"HBHENoiseRECO");
+  for(size_t i=0; i<metFiltersToApply_.size(); i++) histos_["metfilters"]->GetXaxis()->SetBinLabel(i+2,metFiltersToApply_[i].c_str());
+
   std::string ch[]={"inc","ee","mumu","emu","e","mu"};
   for(size_t i=0; i<sizeof(ch)/sizeof(std::string); i++)
     {
@@ -85,6 +108,28 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 {
    using namespace edm;
 
+   //keep track of generator level weights for normalization
+   if(!iEvent.isRealData())
+     {
+       edm::Handle<GenEventInfoProduct> evt;
+       iEvent.getByLabel("generator","", evt);
+       float w0(1.0);
+       if(evt.isValid()) w0=evt->weight();
+       histos_["wgtcounter"]->Fill(0.,w0);
+       
+       edm::Handle<LHEEventProduct> evet;
+       iEvent.getByLabel("externalLHEProducer","", evet);    
+       if(evet.isValid())
+	 {
+	   float asdd=evet->originalXWGTUP();
+	   for(unsigned int i=0  ; i<evet->weights().size();i++){
+	     float asdde=evet->weights()[i].wgt;
+	     float wi=w0*asdde/asdd;
+	     histos_["wgtcounter"]->Fill(i+1,wi);
+	   }
+	 }
+     }
+
    if(verbose_>5) std::cout << "in TTbarSelectionProducer::produce " << std::endl;
 
    //check trigger
@@ -114,10 +159,51 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
      }
    if(verbose_>5) std::cout << "Trigger word is: " << trigWord << std::endl;
    
-   //disabel trigger selection in MC, only trigger word will be stored
+   //disable trigger selection in MC, only trigger word will be stored
    bool isData=iEvent.isRealData();
    if(!isData) doTrigSel_=false;
    
+   //MET filter decisions
+   int metfilterWord(0);
+   for(size_t im=0; im<metFilters_.size(); im++)
+     {
+       edm::Handle< edm::TriggerResults> metFilterBits;
+       iEvent.getByToken(metFilters_[im],metFilterBits);
+       if(!metFilterBits.isValid()) continue;
+
+       //check accepted filters
+       const edm::TriggerNames &metFilterNames = iEvent.triggerNames(*metFilterBits);
+       for (unsigned int i = 0, n = metFilterBits->size(); i < n; ++i) {
+	 std::string name=metFilterNames.triggerName(i);
+	 bool accept(metFilterBits->accept(i));
+	 for(size_t j=0; j<metFiltersToApply_.size(); j++)
+	   {
+	     if(name.find(metFiltersToApply_[j])==std::string::npos) continue;
+	     //std::cout << name << std::endl;
+	     metfilterWord |= ((!accept) << (j+1));
+	   }
+       }
+     }
+
+   //for early runs
+   if(isData)
+     {
+       edm::Handle<bool> HBHENoiseFilterResultHandle;
+       iEvent.getByToken(RecoHBHENoiseFilter_, HBHENoiseFilterResultHandle);
+       bool result(false);
+       if(HBHENoiseFilterResultHandle.isValid()) result=*HBHENoiseFilterResultHandle;
+       metfilterWord |= result;
+     }
+   
+   //std::cout << metfilterWord << std::endl;
+
+   // ----------------
+   // Primary vertex
+   //------------------ 
+   edm::Handle<reco::VertexCollection> primaryVertices;
+   iEvent.getByToken(vtxToken_, primaryVertices);
+   const reco::Vertex &pVtx = *(primaryVertices->begin());
+
    //------------------------------------------
    //get beam spot
    //------------------------------------------
@@ -130,21 +216,16 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
    //------------------------------------------
    edm::Handle<pat::MuonCollection> muHa;
    iEvent.getByToken(muonToken_, muHa);
-   std::vector<pat::Muon> selMuons;
+   std::vector<pat::Muon> selMuons, selNonIsoMuons;
    for (const pat::Muon &mu : *muHa) 
      { 
        bool passKin( mu.pt() > muon_cut_pt_  && fabs(mu.eta()) < muon_cut_eta_ );
        if(!passKin) continue;
 
-       //cf. https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonId2015
-       bool goodGlobalMuon(mu.isGlobalMuon() && 
-			   mu.globalTrack()->normalizedChi2() < 3 && 
-			   mu.combinedQuality().chi2LocalPosition < 12 && 
-			   mu.combinedQuality().trkKink < 20); 
-       bool isMedium (muon::isLooseMuon(mu) && 
-                      mu.innerTrack()->validFraction() > 0.8 && 
-                      muon::segmentCompatibility(mu) > (goodGlobalMuon ? 0.303 : 0.451)); 
-       bool passID (goodGlobalMuon && isMedium);
+       //cf. https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2
+       //bool isMedium(muon::isMediumMuon(mu));
+       bool isTight(muon::isTightMuon(mu,pVtx));
+       bool passID(isTight);
        if(!passID) continue;
 
        double nhIso   = mu.neutralHadronIso();
@@ -153,8 +234,7 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
        double gIso    = mu.photonIso() ;
        double relIso  = (TMath::Max(Float_t(nhIso+gIso-0.5*puchIso),Float_t(0.))+chIso)/mu.pt();
        bool passIso( relIso < muon_cut_iso_ );
-       if(!passIso) continue;
-	      
+       if(!passIso)  continue;
        selMuons.push_back(mu);
      }
    if(verbose_>5) std::cout << "\t Selected  " << selMuons.size() << " muons" << std::endl;
@@ -257,7 +337,7 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
    //jet selection
    bool passJetSel(false);
    if((abs(chsel)==13 || abs(chsel)==11) && selJets.size()>=4) passJetSel=true;
-   if(abs(chsel)>13 && selJets.size()>=2)                      passJetSel=true;
+   if(abs(chsel)>13 && selJets.size()>=1)                      passJetSel=true;
    if(verbose_>5) std::cout << "\t Pass jet selection-" << passJetSel << std::endl;
 
    //MET selection
@@ -291,6 +371,8 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 
    std::auto_ptr<int> trigWordOut( new int(trigWord) );
    iEvent.put(trigWordOut,"topTrigger");
+   std::auto_ptr<int> metfilterWordOut( new int(metfilterWord) );
+   iEvent.put(metfilterWordOut,"topMETFilter");
    std::auto_ptr<int > chOut( new int (chsel) );
    iEvent.put(chOut,"topChannel");
    auto_ptr<vector<pat::Electron> > eleColl( new vector<pat::Electron>(selElectrons) );
@@ -316,7 +398,13 @@ TTbarSelectionProducer::endJob() {
 
 // ------------ method called when starting to processes a run  ------------
 void
-TTbarSelectionProducer::beginRun(edm::Run &iRun, edm::EventSetup const &es)
+TTbarSelectionProducer::beginRun(const edm::Run & iRun, edm::EventSetup const & iSetup)
+{
+}
+
+// ------------ method called when ending the processing of a run  ------------
+void
+TTbarSelectionProducer::endRun(const edm::Run & iRun, edm::EventSetup const & iSetup)
 {
   try{
     edm::Service<TFileService> fs;
@@ -330,22 +418,27 @@ TTbarSelectionProducer::beginRun(edm::Run &iRun, edm::EventSetup const &es)
 	 iter!=myLHERunInfoProduct.headers_end(); 
 	 iter++)
       {
+	std::string tag("generator");
+	if(iter->tag()!="") tag+="_"+iter->tag();
+		
 	std::vector<std::string> lines = iter->lines();
-	std::string tag(iter->tag());
-	if(histos_.find(tag)==histos_.end())
-	  histos_[tag]=fs->make<TH1F>(tag.c_str(),tag.c_str(),lines.size(),0,lines.size());
+	std::vector<std::string> prunedLines;
 	for (unsigned int iLine = 0; iLine<lines.size(); iLine++) 
-	  histos_[tag]->GetXaxis()->SetBinLabel(iLine+1,lines.at(iLine).c_str());  
+	  {
+	    if(lines.at(iLine)=="") continue;
+	    if(lines.at(iLine).find("weightgroup")!=std::string::npos) continue;
+	    prunedLines.push_back( lines.at(iLine) );
+	  }
+	
+	if(histos_.find(tag)==histos_.end()) 
+	  histos_[tag]=fs->make<TH1F>(tag.c_str(),tag.c_str(),prunedLines.size(),0,prunedLines.size());
+	for (unsigned int iLine = 0; iLine<prunedLines.size(); iLine++) 
+	  histos_[tag]->GetXaxis()->SetBinLabel(iLine+1,prunedLines.at(iLine).c_str());  
       }
   }
   catch(...){
+    std::cout << "Failed to retrieve LHERunInfoProduct" << std::endl;
   }
-}
-
-// ------------ method called when ending the processing of a run  ------------
-void
-TTbarSelectionProducer::endRun(edm::Run&, edm::EventSetup const&)
-{
 }
 
 // ------------ method called when starting to processes a luminosity block  ------------

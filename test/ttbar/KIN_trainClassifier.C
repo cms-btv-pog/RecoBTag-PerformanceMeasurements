@@ -50,14 +50,19 @@
 #endif
 
 using namespace std;
-enum BDTTraining {BDT_DEFAULT,BDT_CONFIG1,BDT_CONFIG2};
 
-void KIN_trainClassifier( TString myMethodList = "", TString inputFile="", Int_t BDTTrainMode=BDT_DEFAULT)
+enum JETRANK{LEAD,SUBLEAD,OTHER, INCLUSIVE=10000};
+
+void KIN_trainClassifier( TString myMethodList = "", TString inputFile="", Int_t jetRank=LEAD)
 {   
   gSystem->ExpandPathName(inputFile);
+ 
   TMVA::gConfig().GetIONames().fWeightFileDir = gSystem->DirName(inputFile) + TString("/KIN_weights/");
-  
-  cout << TMVA::gConfig().GetIONames().fWeightFileDir << endl;
+  if(jetRank==LEAD)         TMVA::gConfig().GetIONames().fWeightFileDir += "leading/";
+  else if(jetRank==SUBLEAD) TMVA::gConfig().GetIONames().fWeightFileDir += "subleading/";
+  else if(jetRank==OTHER)   TMVA::gConfig().GetIONames().fWeightFileDir += "others/";
+  else                      TMVA::gConfig().GetIONames().fWeightFileDir += "inclusive/";
+  cout << "Output dir set to: " << TMVA::gConfig().GetIONames().fWeightFileDir << endl;
 
   // The explicit loading of the shared libTMVA is done in TMVAlogon.C, defined in .rootrc
   // if you use your private .rootrc, or run from a different directory, please copy the
@@ -201,28 +206,41 @@ void KIN_trainClassifier( TString myMethodList = "", TString inputFile="", Int_t
   
   outputFile->cd();
 
-  //b-jets are saved as 3, require that the event passes nominal preselection (weight[0]>0)
-  factory->SetInputTrees(t,"flavour==3 && weight[0]>0","flavour!=3 && weight[0]>0");
+  //b-jets are saved as 5, require that the event passes nominal preselection (weight[0]>0)
+  TString jetRankCut("");
+  if(jetRank!=OTHER)      { jetRankCut += "&& jetrank=="; jetRankCut += jetRank; }
+  else if(jetRank==OTHER) { jetRankCut += "&& jetrank>="; jetRankCut += jetRank; }
+  TCut sigCut("abs(flavour)==5 && weight[0]>0 && abs(ttbar_chan)<230000" + jetRankCut);
+  TCut bkgCut("abs(flavour)!=5 && weight[0]>0 && abs(ttbar_chan)<230000" + jetRankCut);
+  factory->SetInputTrees(t,sigCut,bkgCut);
 
   //use common weight in the events
   factory->SetSignalWeightExpression("weight[0]");
   factory->SetBackgroundWeightExpression("weight[0]");
 
   //define variables for the training
-  factory->AddVariable( "close_mlj[0]","M(close lepton,jet)"                            "GeV", 'F' );
-  factory->AddVariable( "close_ptrel", "p_{T}^{rel}(close lepton)/p(closest lepton)"    "",    'F' );
+  factory->AddVariable( "close_mlj[0]",   "M(close lepton,jet)"                            "GeV", 'F' );
+  //factory->AddVariable( "close_ptrel", "p_{T}^{rel}(close lepton)/p(closest lepton)"    "",    'F' );
   factory->AddVariable( "close_dphi",  "#Delta#phi(close lepton,jet)"                   "rad", 'F' );
   factory->AddVariable( "close_deta",  "#Delta#eta(close lepton,jet)"                   "",    'F' );
+  factory->AddVariable( "close_lj2ll_dphi",    "#Delta#phi(close lepton+jet,dilepton)"                     "rad", 'F' );
+  factory->AddVariable( "close_lj2ll_deta",    "#Delta#eta(close lepton+jet,dilepton)"                     "",    'F' );
+
   factory->AddVariable( "far_mlj",     "M(far lepton,jet)"                              "GeV", 'F' );
-  factory->AddVariable( "far_ptrel",   "p_{T}^{rel}(far lepton)/p(far lepton)"          "",    'F' );
+  //factory->AddVariable( "far_ptrel",   "p_{T}^{rel}(far lepton)/p(far lepton)"          "",    'F' );
   factory->AddVariable( "far_dphi",    "#Delta#phi(far lepton,jet)"                     "rad", 'F' );
   factory->AddVariable( "far_deta",    "#Delta#eta(far lepton,jet)"                     "",    'F' );
-    
+  factory->AddVariable( "far_lj2ll_dphi",    "#Delta#phi(far lepton+jet,dilepton)"                     "rad", 'F' );
+  factory->AddVariable( "far_lj2ll_deta",    "#Delta#eta(far lepton+jet,dilepton)"                     "",    'F' );
+
+  factory->AddVariable( "j2ll_dphi",     "#Delta#phi(dilepton,jet)",                      "rad", 'F' );
+  factory->AddVariable( "j2ll_deta",     "#Delta#eta(dilepton,jet)",                      "",    'F' );
+
   // Apply additional cuts on the signal and background samples (can be different)
   TCut mycuts = ""; 
   TCut mycutb = ""; 
   factory->PrepareTrainingAndTestTree( mycuts, mycutb,
-				       "nTrain_Signal=0:nTrain_Background=0:SplitMode=Random:NormMode=NumEvents:!V" );
+				       "nTrain_Signal=10000:nTrain_Background=10000:nTest_Signal=10000:nTest_Background=10000:SplitMode=Random:NormMode=NumEvents:!V" );
 
   // ---- Book MVA methods
   //
@@ -355,7 +373,9 @@ void KIN_trainClassifier( TString myMethodList = "", TString inputFile="", Int_t
 
   // TMVA ANN: MLP (recommended ANN) -- all ANNs in TMVA are Multilayer Perceptrons
   if (Use["MLP"])
-    factory->BookMethod( TMVA::Types::kMLP, "MLP", "H:!V:NeuronType=tanh:VarTransform=N:NCycles=600:HiddenLayers=N+5:TestRate=5:!UseRegulator" );
+    factory->BookMethod( TMVA::Types::kMLP, "MLP","H:!V:NeuronType=tanh:NCycles=200:HiddenLayers=N+1,N:TestRate=5");
+  //"H:!V:NeuronType=tanh:VarTransform=N:NCycles=600:HiddenLayers=N+5:TestRate=5:!UseRegulator" );
+
 
   if (Use["MLPBFGS"])
     factory->BookMethod( TMVA::Types::kMLP, "MLPBFGS", "H:!V:NeuronType=tanh:VarTransform=N:NCycles=600:HiddenLayers=N+5:TestRate=5:TrainingMethod=BFGS:!UseRegulator" );
@@ -382,15 +402,14 @@ void KIN_trainClassifier( TString myMethodList = "", TString inputFile="", Int_t
 
   if (Use["BDT"])  // Adaptive Boost
     {
-      TString Default ="!H:!V:NTrees=850:MinNodeSize=2.5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:nCuts=20";
-      TString Settings = "!H:!V:NTrees=450:nEventsMin=550:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.15:SeparationType=MisClassificationError:nCuts=25:PruneMethod=NoPruning";
-      if(BDTTrainMode==BDT_CONFIG1)
-	Settings = "!H:!V:NTrees=400:nEventsMin=500:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.1:SeparationType=MisClassificationError:nCuts=25:PruneMethod=NoPruning";
-      if(BDTTrainMode==BDT_CONFIG2)
-	Settings = "!H:!V:NTrees=300:nEventsMin=300:MaxDepth=2:BoostType=AdaBoost:AdaBoostBeta=0.12:SeparationType=MisClassificationError:nCuts=25:PruneMethod=NoPruning";
-      factory->BookMethod( TMVA::Types::kBDT, "BDT", Settings);
+      //      TString Default ="!H:!V:NTrees=850:MinNodeSize=2.5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:nCuts=20";
+      factory->BookMethod( TMVA::Types::kBDT, "BDT", 
+			   "NTrees=1000:BoostType=Grad:MinNodeSize=5%:MaxDepth=3:Shrinkage=1.0:NegWeightTreatment=Pray");
+
+      //"!H:!V:NTrees=450:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.15:SeparationType=MisClassificationError:nCuts=25:PruneMethod=NoPruning");  
     }
 
+   
   if (Use["BDTB"]) // Bagging
     factory->BookMethod( TMVA::Types::kBDT, "BDTB",
 			 "!H:!V:NTrees=400:BoostType=Bagging:SeparationType=GiniIndex:nCuts=20" );
