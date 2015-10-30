@@ -317,11 +317,13 @@ process.source = cms.Source("PoolSource",
 )
 if options.miniAOD:
     process.source.fileNames = [
-        '/store/mc/RunIISpring15MiniAODv2/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1//50000/E8B99B66-7D6F-E511-AD98-68B599B9B998.root'
+        '/store/mc/RunIISpring15MiniAODv2/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/FC156ADC-CA6D-E511-BC16-0022640691CC.root'
+        #'/store/mc/RunIISpring15MiniAODv2/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1//50000/E8B99B66-7D6F-E511-AD98-68B599B9B998.root'
     ]
 if options.runOnData:
     process.source.fileNames = [
-        '/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/168/00000/60FF8405-EA26-E511-A892-02163E01387D.root'
+        #'/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/168/00000/60FF8405-EA26-E511-A892-02163E01387D.root'
+        '/store/data/Run2015D/MuonEG/MINIAOD/PromptReco-v4/000/258/159/00000/64914E6C-F26B-E511-B0C8-02163E0142D1.root'
     ]
 if options.fastSim:
     process.source.fileNames = [
@@ -783,7 +785,7 @@ if options.useTTbarFilter:
         process.ttbarselectionproducer.electronColl = cms.InputTag('slimmedElectrons')
         process.ttbarselectionproducer.muonColl     = cms.InputTag('slimmedMuons')
         process.ttbarselectionproducer.jetColl      = cms.InputTag('selectedPatJets'+postfix)
-        process.ttbarselectionproducer.metColl      = cms.InputTag('slimmedMETs')
+        process.ttbarselectionproducer.metColl      = cms.InputTag('slimmedMETsNoHF')
         switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
     else:
         process.ttbarselectionproducer.electronColl = cms.InputTag('selectedPatElectrons'+postfix)
@@ -792,9 +794,13 @@ if options.useTTbarFilter:
         process.ttbarselectionproducer.metColl      = cms.InputTag('patMETs'+postfix)
         switchOnVIDElectronIdProducer(process, DataFormat.AOD)
 
-    setupAllVIDIdsInModule(process,
-                           'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V2_cff',
-                           setupVIDElectronSelection)
+    # Set up electron ID (VID framework)
+    from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
+    switchOnVIDElectronIdProducer(process, dataFormat=DataFormat.MiniAOD)
+    my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff']
+    for idmod in my_id_modules:
+        setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
+
 
 
     #process.ttbarselectionproducer.isData       = options.runOnData

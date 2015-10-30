@@ -1250,7 +1250,11 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     edm::Handle<int> triggerIn;
     iEvent.getByLabel(edm::InputTag("ttbarselectionproducer:topTrigger"),triggerIn);
     EventInfo.ttbar_trigWord=*triggerIn;
-    EventInfo.ttbar_chan=*pIn;
+
+    edm::Handle<int> metfilterIn;
+    iEvent.getByLabel(edm::InputTag("ttbarselectionproducer:topMETFilter"),metfilterIn);
+    EventInfo.ttbar_metfilterWord=*metfilterIn;
+
     int lctr(0);
     edm::Handle<edm::View<pat::Electron> > selElectrons;
     iEvent.getByLabel(ttbarproducer_,selElectrons);
@@ -1277,7 +1281,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
 	EventInfo.ttbar_lphi[lctr] = l->phi();
 	EventInfo.ttbar_lm[lctr]   = 0;
 	EventInfo.ttbar_lch[lctr]  = l->charge();
-	EventInfo.ttbar_lid[lctr]  = 11;
+	EventInfo.ttbar_lid[lctr]  = 13;
 	EventInfo.ttbar_lgid[lctr] = l->genParticle() ? l->genParticle()->pdgId() : 0;
 	lctr++;
       }
@@ -1296,16 +1300,16 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     EventInfo.ttbar_nw=0;
     if(!isData_)
       {
-	  edm::Handle<GenEventInfoProduct> evt;
-	  iEvent.getByLabel("generator","", evt);
-	  if(evt.isValid())
-	    {
-	      EventInfo.ttbar_allmepartons   = evt->nMEPartons();
-	      EventInfo.ttbar_matchmepartons = evt->nMEPartonsFiltered();
-	      EventInfo.ttbar_w[0]           = evt->weight();
-	      EventInfo.ttbar_nw++;
-	    }
-
+	edm::Handle<GenEventInfoProduct> evt;
+	iEvent.getByLabel("generator","", evt);
+	if(evt.isValid())
+	  {
+	    EventInfo.ttbar_allmepartons   = evt->nMEPartons();
+	    EventInfo.ttbar_matchmepartons = evt->nMEPartonsFiltered();
+	    EventInfo.ttbar_w[0]           = evt->weight();
+	    EventInfo.ttbar_nw++;
+	  }
+	
 	  edm::Handle<LHEEventProduct> evet;
 	  iEvent.getByLabel("externalLHEProducer","", evet);
 	  if(evet.isValid())
@@ -1587,7 +1591,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     if (use_ttbar_filter_) {
       float minDRlj(9999.);
       TLorentzVector thejet;
-      thejet.SetPtEtaPhiM(ptjet, etajet, phijet, 0.);
+      thejet.SetPtEtaPhiM(ptjet, etajet, phijet, 0.);      
       for(int il=0; il<EventInfo.ttbar_nl; il++)
 	{
 	  TLorentzVector theLepton;
