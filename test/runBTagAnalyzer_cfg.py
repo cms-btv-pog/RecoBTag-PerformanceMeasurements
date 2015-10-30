@@ -794,9 +794,13 @@ if options.useTTbarFilter:
         process.ttbarselectionproducer.metColl      = cms.InputTag('patMETs'+postfix)
         switchOnVIDElectronIdProducer(process, DataFormat.AOD)
 
-    setupAllVIDIdsInModule(process,
-                           'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V2_cff',
-                           setupVIDElectronSelection)
+    # Set up electron ID (VID framework)
+    from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
+    switchOnVIDElectronIdProducer(process, dataFormat=DataFormat.MiniAOD)
+    my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff']
+    for idmod in my_id_modules:
+        setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
+
 
 
     #process.ttbarselectionproducer.isData       = options.runOnData
