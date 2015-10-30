@@ -9,10 +9,10 @@ ttbarselectionproducer = cms.EDProducer("TTbarSelectionProducer",
                                         metFiltersToApply= cms.vstring("Flag_HBHENoiseFilter","Flag_CSCTightHaloFilter","Flag_goodVertices","Flag_eeBadScFilter"),
                                         vtxColl          = cms.InputTag("offlineSlimmedPrimaryVertices"),
                                         #cf https://twiki.cern.ch/twiki/bin/view/CMS/TopTrigger
-                                        trigNamesToSel   = cms.vstring('HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',
-                                                                       'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v',
-                                                                       'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v',
-                                                                       'HLT_IsoMu20_eta2p1_v2'
+                                        trigNamesToSel   = cms.vstring('Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL',
+                                                                       'Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL',
+                                                                       'Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ',
+                                                                       'Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ'
                                                                        ),
                                         trigChannels     = cms.vint32(11*13,
                                                                       11*13,

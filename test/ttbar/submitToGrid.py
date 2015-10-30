@@ -32,11 +32,11 @@ def submitProduction(tag,lfnDirBase,dataset,isData,cfg,workDir,lumiMask,submit=F
     config_file.write('config.Data.inputDBS = "global"\n')
     if isData : 
         config_file.write('config.Data.splitting = "LumiBased"\n')
-        config_file.write('config.Data.unitsPerJob = 2\n')
+        config_file.write('config.Data.unitsPerJob = 3\n')
         config_file.write('config.Data.lumiMask = \'%s\'\n' %lumiMask)
     else : 
         config_file.write('config.Data.splitting = "FileBased"\n')
-        config_file.write('config.Data.unitsPerJob = 4\n')
+        config_file.write('config.Data.unitsPerJob = 5\n')
     config_file.write('config.Data.publication = True\n')
     config_file.write('config.Data.ignoreLocality = False\n')
     config_file.write('config.Data.outLFNDirBase = \'%s\'\n' % lfnDirBase)

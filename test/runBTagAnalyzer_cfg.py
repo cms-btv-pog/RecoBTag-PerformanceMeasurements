@@ -785,7 +785,7 @@ if options.useTTbarFilter:
         process.ttbarselectionproducer.electronColl = cms.InputTag('slimmedElectrons')
         process.ttbarselectionproducer.muonColl     = cms.InputTag('slimmedMuons')
         process.ttbarselectionproducer.jetColl      = cms.InputTag('selectedPatJets'+postfix)
-        process.ttbarselectionproducer.metColl      = cms.InputTag('slimmedMETs')
+        process.ttbarselectionproducer.metColl      = cms.InputTag('slimmedMETsNoHF')
         switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
     else:
         process.ttbarselectionproducer.electronColl = cms.InputTag('selectedPatElectrons'+postfix)
