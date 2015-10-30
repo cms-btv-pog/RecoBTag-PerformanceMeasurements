@@ -11,12 +11,13 @@ cmsRun runBTagAnalyzer_cfg.py runOnData=False miniAOD=True useTTbarFilter=True m
 ```
 Will run locally the analyzer for testing purposes
 ```
-python submitToGrid.py -j ttbar_Run2015.json -c ${CMSSW_BASE}/src/RecoBTag/PerformanceMeasurements/test/runBTagAnalyzer_cfg.py -s
+python submitToGrid.py -j data/samples_Run2015_25ns.json -c ${CMSSW_BASE}/src/RecoBTag/PerformanceMeasurements/test/runBTagAnalyzer_cfg.py -s
 ```
 Will submit the samples described in the json to the grid.
 Partial submission can be made with -o csv_list
 Don't forget to init the environment for crab3
 (e.g. https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookCRAB3Tutorial)
+Other json files with samples (e.g. for systematics scans) are also available under data.
 ```
 python checkProductionIntegrity.py -i /store/group/phys_btag/performance/TTbar/7b810a5
 ```
