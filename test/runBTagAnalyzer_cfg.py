@@ -1087,4 +1087,4 @@ process.p = cms.Path(
 # Delete predefined output module (needed for running with CRAB)
 del process.out
 
-open('pydump.py','w').write(process.dumpPython())
+#open('pydump.py','w').write(process.dumpPython())
