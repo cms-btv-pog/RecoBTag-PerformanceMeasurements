@@ -23,6 +23,7 @@ class EventInfoBranches {
     float mcweight;
 
     int   nPV;
+    int   BX;
     float PV_x[nMaxPVs_];
     float PV_y[nMaxPVs_];
     float PV_z[nMaxPVs_];
@@ -184,6 +185,7 @@ class EventInfoBranches {
       tree->Branch("LumiBlock"  , &LumiBlock  ,  "LumiBlock/I");
       tree->Branch("pthat"      , &pthat      ,  "pthat/F");
       tree->Branch("mcweight"   , &mcweight   ,  "mcweight/F");
+      tree->Branch("BX"         , &BX         ,  "BX/I");
       tree->Branch("nPV"        , &nPV        ,  "nPV/I");
       tree->Branch("PVz"        , &PVz        ,  "PVz/F");
       tree->Branch("PVez"       , &PVez       ,  "PVez/F");

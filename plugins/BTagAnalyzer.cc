@@ -694,6 +694,9 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   //------------------------------------------------------
 
   EventInfo.Run = iEvent.id().run();
+
+  EventInfo.BX  = iEvent.bunchCrossing();
+
   isData_ = iEvent.isRealData();
 
   if ( !isData_ && EventInfo.Run > 0 ) EventInfo.Run = -EventInfo.Run;
