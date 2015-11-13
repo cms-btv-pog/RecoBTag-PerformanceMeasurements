@@ -737,6 +737,16 @@ if options.runFatJets:
 
 #-------------------------------------
 
+#Switch to hadron flavour priority for all jet collections
+if not options.runOnData:
+    process.patJetFlavourAssociation.hadronFlavourHasPriority = cms.bool(True)
+    process.patJetFlavourAssociationPFlow.hadronFlavourHasPriority = cms.bool(True)
+    if options.runFatJets:
+        process.patJetFlavourAssociationPFCHSPFlow.hadronFlavourHasPriority = cms.bool(True)
+    if options.runSubJets:
+        process.patJetFlavourAssociationPrunedSubjetsPFCHSPFlow.hadronFlavourHasPriority = cms.bool(True)
+        process.patJetFlavourAssociationSoftDropSubjetsPFCHSPFlow.hadronFlavourHasPriority = cms.bool(True)
+
 #-------------------------------------
 if options.runOnData:
     # Remove MC matching when running over data
@@ -1077,4 +1087,4 @@ process.p = cms.Path(
 # Delete predefined output module (needed for running with CRAB)
 del process.out
 
-#open('pydump.py','w').write(process.dumpPython())
+open('pydump.py','w').write(process.dumpPython())
