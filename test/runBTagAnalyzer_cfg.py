@@ -409,7 +409,7 @@ process.load("SimTracker.TrackAssociatorProducers.quickTrackAssociatorByHits_cfi
 process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
 process.load("SimTracker.TrackHistory.TrackHistory_cff")
 process.load("SimTracker.TrackHistory.TrackClassifier_cff")
-process.load("RecoBTag.Configuration.RecoBTag_cff")
+#process.load("RecoBTag.Configuration.RecoBTag_cff")
 
 #-------------------------------------
 ## Output Module Configuration (expects a path 'p')
