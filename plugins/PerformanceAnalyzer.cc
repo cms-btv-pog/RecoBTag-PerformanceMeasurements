@@ -223,7 +223,7 @@ PerformanceAnalyzer::PerformanceAnalyzer(const ParameterSet& iConfig)
     if (fdebug) std::cout<< " ROOT directories created." << std::endl;
 
     histcounterf = new TH1I("histcounterf","counter",5,0,5);
-    histcounterf->SetBit(TH1::kCanRebin);
+    histcounterf->SetCanExtend(TH1::kAllAxes);
     rootFile_->cd();
 
     // initialize histograms

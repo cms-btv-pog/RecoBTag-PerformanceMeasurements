@@ -365,13 +365,13 @@ process.options   = cms.untracked.PSet(
 )
 
 #In 74X:
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
-from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag.globaltag = globalTag
+#process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
+#from Configuration.AlCa.GlobalTag import GlobalTag
+#process.GlobalTag.globaltag = globalTag
 #In 75X possible to use:
-# process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-# from Configuration.AlCa.GlobalTag import GlobalTag
-# process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_' + ('data' if options.runOnData else 'mc'))
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_' + ('data' if options.runOnData else 'mc'))
 
 #Loading calibrations from db file, example of code for any future use
 #process.load("CondCore.DBCommon.CondDBSetup_cfi")
@@ -389,26 +389,24 @@ process.GlobalTag.globaltag = globalTag
 #)
 #process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
 ### to activate the new JP calibration: using the data base
-trkProbaCalibTag = "JPcalib_MC74X_25ns_v1"
-if options.runOnData:
-  trkProbaCalibTag = "JPcalib_Data74X_2015D_v1"
+#trkProbaCalibTag = "JPcalib_MC74X_25ns_v1"
+#if options.runOnData:
+#  trkProbaCalibTag = "JPcalib_Data74X_2015D_v1"
 
-process.GlobalTag.toGet = cms.VPSet(
-    cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-        tag = cms.string(trkProbaCalibTag),
-        connect = cms.untracked.string("frontier://FrontierPrep/CMS_CONDITIONS")
-    )
-)
+#process.GlobalTag.snapshotTime = cms.string("9999-12-31 23:59:59.000")
+
+#process.GlobalTag.toGet = cms.VPSet(
+#    cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
+#        tag = cms.string(trkProbaCalibTag),
+#        connect = cms.string("frontier://FrontierPrep/CMS_CONDITIONS")
+#    )
+#)
 
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
 process.load("Configuration.Geometry.GeometryRecoDB_cff")
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
-process.load("SimTracker.TrackAssociation.TrackAssociatorByChi2_cfi")
-process.load("SimTracker.TrackAssociation.quickTrackAssociatorByHits_cfi")
-process.load("SimTracker.TrackAssociatorProducers.quickTrackAssociatorByHits_cfi")
-process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
-process.load("SimTracker.TrackHistory.TrackHistory_cff")
-process.load("SimTracker.TrackHistory.TrackClassifier_cff")
+#process.load("SimTracker.TrackHistory.TrackHistory_cff")
+#process.load("SimTracker.TrackHistory.TrackClassifier_cff")
 #process.load("RecoBTag.Configuration.RecoBTag_cff")
 
 #-------------------------------------
@@ -1087,4 +1085,4 @@ process.p = cms.Path(
 # Delete predefined output module (needed for running with CRAB)
 del process.out
 
-#open('pydump.py','w').write(process.dumpPython())
+open('pydump.py','w').write(process.dumpPython())
