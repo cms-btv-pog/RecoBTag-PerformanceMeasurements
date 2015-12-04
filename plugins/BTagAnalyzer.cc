@@ -265,16 +265,21 @@ private:
   bool runSubJets_ ;
   bool allowJetSkipping_ ;
 
-  edm::InputTag src_;  // Generator/handronizer module label
-  edm::InputTag muonCollectionName_;
-  edm::InputTag patMuonCollectionName_;
-  edm::InputTag genParticleCollectionName_;
-  edm::InputTag prunedGenParticleCollectionName_;
-  edm::InputTag triggerTable_;
+  edm::EDGetTokenT<GenEventInfoProduct> src_;  // Generator/handronizer module label
+  edm::EDGetTokenT<edm::View<reco::Muon>> muonCollectionName_;
+  edm::EDGetTokenT<std::vector<pat::Muon>> patMuonCollectionName_;
+  edm::EDGetTokenT<reco::GenParticleCollection> genParticleCollectionName_;
+  edm::EDGetTokenT<reco::GenParticleCollection> prunedGenParticleCollectionName_;
+  edm::EDGetTokenT<edm::TriggerResults> triggerTable_;
+  edm::EDGetTokenT<std::vector<PileupSummaryInfo>> putoken;
+  edm::EDGetTokenT<std::vector<PileupSummaryInfo>> putokenmini;
+  edm::EDGetTokenT<int> ttbartop;
+  edm::EDGetTokenT<int> ttbartoptrig;
+  edm::EDGetTokenT<int> metfilterIntoken;
 
   std::string   branchNamePrefix_;
-  edm::InputTag JetCollectionTag_;
-  std::vector<edm::InputTag> SubJetCollectionTags_;
+  edm::EDGetTokenT<PatJetCollection> JetCollectionTag_;
+  std::vector<edm::EDGetTokenT<PatJetCollection>> SubJetCollectionTags_;
   std::vector<std::string> SubJetLabels_;
 
   std::string jetPBJetTags_;
@@ -322,8 +327,8 @@ private:
   std::string softPFMuonTagInfos_;
   std::string softPFElectronTagInfos_;
 
-  edm::InputTag primaryVertexColl_;
-  edm::InputTag tracksColl_;
+  edm::EDGetTokenT<reco::VertexCollection> primaryVertexColl_;
+  edm::EDGetTokenT<reco::TrackCollection> tracksColl_;
 
   std::string   SVComputer_;
   std::string   SVComputerSubJets_;
@@ -351,13 +356,19 @@ private:
   bool storeCSVTagVariablesSubJets_;
 
   bool use_ttbar_filter_;
-  edm::InputTag ttbarproducer_;
+  edm::EDGetTokenT<edm::View<pat::Electron>> ttbarproducerEle_;
+  edm::EDGetTokenT<edm::View<pat::Muon>> ttbarproducerMuon_;
+  edm::EDGetTokenT<edm::View<pat::MET>> ttbarproducerMET_;
+  edm::EDGetTokenT<GenEventInfoProduct> generator;
+  edm::EDGetTokenT<GenEventInfoProduct> generatorhep;
+  edm::EDGetTokenT<GenEventInfoProduct> generatorevt;
+  edm::EDGetTokenT<LHEEventProduct> generatorlhe;
 
   // trigger list
   std::vector<std::string> triggerPathNames_;
 
   //rho
-  edm::InputTag rhoTag_;
+  edm::EDGetTokenT<double> rhoTag_;
 
   TrackClassifier classifier_;
 
@@ -493,18 +504,27 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   storeCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("storeCSVTagVariablesSubJets");
 
   use_ttbar_filter_     = iConfig.getParameter<bool> ("use_ttbar_filter");
-  ttbarproducer_        = iConfig.getParameter<edm::InputTag> ("ttbarproducer");
-  rhoTag_               = iConfig.getParameter<edm::InputTag> ("rho");
+  ttbarproducerEle_ = consumes<edm::View<pat::Electron>>(iConfig.getParameter<edm::InputTag>("ttbarproducer"));
+  ttbarproducerMuon_ = consumes<edm::View<pat::Muon>>(iConfig.getParameter<edm::InputTag>("ttbarproducer"));
+  ttbarproducerMET_ = consumes<edm::View<pat::MET>>(iConfig.getParameter<edm::InputTag>("ttbarproducer"));
+  rhoTag_               = consumes<double>(iConfig.getParameter<edm::InputTag>("rho"));
 
   // Modules
-  primaryVertexColl_   = iConfig.getParameter<edm::InputTag>("primaryVertexColl");
-  tracksColl_          = iConfig.getParameter<edm::InputTag>("tracksColl");
+  primaryVertexColl_   = consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertexColl"));
+  tracksColl_          = consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("tracksColl"));
 
-  src_                 = iConfig.getParameter<edm::InputTag>("src");
+  src_ = consumes<GenEventInfoProduct>(iConfig.getParameter<edm::InputTag>("src"));
+  generator = consumes<GenEventInfoProduct>(edm::InputTag("generator"));
+  generatorhep = consumes<GenEventInfoProduct>(edm::InputTag("generator"));
+  generatorlhe = consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer",""));
+  generatorevt = consumes<GenEventInfoProduct>(edm::InputTag("generator",""));
 
   branchNamePrefix_ = iConfig.getParameter<std::string>("BranchNamePrefix");
-  JetCollectionTag_ = iConfig.getParameter<edm::InputTag>("Jets");
-  SubJetCollectionTags_ = iConfig.getParameter<std::vector<edm::InputTag> >("SubJets");
+  JetCollectionTag_ = consumes<PatJetCollection>(iConfig.getParameter<edm::InputTag>("Jets"));
+  SubJetLabels_         = iConfig.getParameter<std::vector<std::string> >("SubJetLabels");
+  for(const auto& tag: iConfig.getParameter<std::vector<edm::InputTag> >("SubJets")){
+    SubJetCollectionTags_.push_back(consumes<PatJetCollection>(tag));
+  }
   SubJetLabels_         = iConfig.getParameter<std::vector<std::string> >("SubJetLabels");
 
   if ( runFatJets_ )
@@ -581,18 +601,24 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   softPFMuonTagInfos_      = iConfig.getParameter<std::string>("softPFMuonTagInfos");
   softPFElectronTagInfos_  = iConfig.getParameter<std::string>("softPFElectronTagInfos");
 
-  muonCollectionName_       = iConfig.getParameter<edm::InputTag>("muonCollectionName");
-  patMuonCollectionName_    = iConfig.getParameter<edm::InputTag>("patMuonCollectionName");
-  genParticleCollectionName_ = iConfig.getParameter<edm::InputTag>("genParticles");
-  prunedGenParticleCollectionName_ = iConfig.getParameter<edm::InputTag>("prunedGenParticles");
+  muonCollectionName_       = consumes<edm::View<reco::Muon>>(iConfig.getParameter<edm::InputTag>("muonCollectionName"));
+  patMuonCollectionName_    = consumes<std::vector<pat::Muon>>(iConfig.getParameter<edm::InputTag>("patMuonCollectionName"));
+  genParticleCollectionName_ = consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genParticles"));
+  prunedGenParticleCollectionName_ = consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("prunedGenParticles"));
 
-  triggerTable_             = iConfig.getParameter<edm::InputTag>("triggerTable");
+  triggerTable_             = consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("triggerTable"));
 
   SVComputer_               = iConfig.getParameter<std::string>("svComputer");
   SVComputerSubJets_        = iConfig.getParameter<std::string>("svComputerSubJets");
 
   triggerPathNames_        = iConfig.getParameter<std::vector<std::string> >("TriggerPathNames");
   PFJet80TriggerPathNames_ = iConfig.getParameter<std::vector<std::string> >("PFJet80TriggerPathNames");
+
+  putoken = consumes<std::vector<PileupSummaryInfo>>(edm::InputTag("addPileupInfo"));
+  putokenmini = consumes<std::vector<PileupSummaryInfo>>(edm::InputTag("slimmedAddPileupInfo"));
+  ttbartop = consumes<int>(edm::InputTag("ttbarselectionproducer:topChannel"));
+  ttbartoptrig = consumes<int>(edm::InputTag("ttbarselectionproducer:topTrigger"));
+  metfilterIntoken = consumes<int>(edm::InputTag("ttbarselectionproducer:topMETFilter"));
 
   ///////////////
   // TTree
@@ -636,7 +662,8 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
 
       // set up subjet helper classes
       edm::ParameterSet iConfigCopy(iConfig);
-      iConfigCopy.insert( true, "Jets",        edm::Entry("Jets",        SubJetCollectionTags_[i],                        true) );
+      const auto subjettags = iConfig.getParameter<std::vector<edm::InputTag> >("SubJets");
+      iConfigCopy.insert( true, "Jets",        edm::Entry("Jets",        subjettags[i],                        true) );
       iConfigCopy.insert( true, "maxDeltaR",   edm::Entry("maxDeltaR",   iConfig.getParameter<double>("subJetMaxDeltaR"), true) );
       iConfigCopy.insert( true, "explicitJTA", edm::Entry("explicitJTA", iConfig.getParameter<bool>("subJetExplicitJTA"), true) );
 
@@ -712,14 +739,14 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     fillHelpers(iEvent);
 
   edm::Handle <PatJetCollection> jetsColl;
-  iEvent.getByLabel (JetCollectionTag_, jetsColl);
+  iEvent.getByToken (JetCollectionTag_, jetsColl);
 
   std::vector<edm::Handle<PatJetCollection> > subjetColls;
   if (runSubJets_)
   {
     subjetColls.resize( SubJetLabels_.size() );
     for ( size_t i = 0; i < SubJetLabels_.size(); ++i )
-      iEvent.getByLabel(SubJetCollectionTags_[i], subjetColls[i]);
+      iEvent.getByToken(SubJetCollectionTags_[i], subjetColls[i]);
   }
 
   //------------------------------------------------------
@@ -728,7 +755,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   if( !isData_ && hadronizerType_ == 0 )
   {
     edm::Handle<GenEventInfoProduct> genEvtInfoProduct;
-    iEvent.getByLabel(src_, genEvtInfoProduct);
+    iEvent.getByToken(src_, genEvtInfoProduct);
 
     std::string moduleName = "";
     const edm::Provenance& prov = iEvent.getProvenance(genEvtInfoProduct.id());
@@ -767,20 +794,20 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   if ( !isData_ && storeEventInfo_ ) {
     // EventInfo.pthat
     edm::Handle<GenEventInfoProduct> geninfos;
-    iEvent.getByLabel( "generator",geninfos );
+    iEvent.getByToken( generator,geninfos );
     EventInfo.mcweight=geninfos->weight();
     if (geninfos->binningValues().size()>0) EventInfo.pthat = geninfos->binningValues()[0];
     // pileup
 
     edm::Handle<std::vector <PileupSummaryInfo> > PupInfo;
     edm::Handle<std::vector <PileupSummaryInfo> > PupInfotest;
-    bool checkPUname = iEvent.getByLabel("addPileupInfo", PupInfotest);
+    bool checkPUname = iEvent.getByToken(putoken, PupInfo);
 
     if (checkPUname){
-      iEvent.getByLabel("addPileupInfo", PupInfo);
+      iEvent.getByToken(putoken, PupInfo);
     }
     else{
-      iEvent.getByLabel("slimmedAddPileupInfo", PupInfo);
+      iEvent.getByToken(putokenmini, PupInfo);
     }
 
     std::vector<PileupSummaryInfo>::const_iterator ipu;
@@ -807,10 +834,10 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   // generated particles
   //------------------------------------------------------
     edm::Handle<reco::GenParticleCollection> genParticles;
-    iEvent.getByLabel(genParticleCollectionName_, genParticles);
+    iEvent.getByToken(genParticleCollectionName_, genParticles);
 
     edm::Handle<reco::GenParticleCollection> prunedGenParticles;
-    iEvent.getByLabel(prunedGenParticleCollectionName_, prunedGenParticles);
+    iEvent.getByToken(prunedGenParticleCollectionName_, prunedGenParticles);
 
     if(fillGenPruned_){
       //loop over pruned GenParticles to fill branches for MC hard process particles and muons
@@ -1233,10 +1260,10 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   // simulated PV
   //------------------------------------------------------
   if ( !isData_ && useTrackHistory_ ) {
-     edm::Handle<edm::HepMCProduct> theHepMCProduct;
-     iEvent.getByLabel("generator",theHepMCProduct);
-     std::vector<simPrimaryVertex> simpv;
-     simpv=getSimPVs(theHepMCProduct);
+    edm::Handle<edm::HepMCProduct> theHepMCProduct;
+    iEvent.getByToken(generatorhep,theHepMCProduct);
+    std::vector<simPrimaryVertex> simpv;
+    simpv=getSimPVs(theHepMCProduct);
     //       cout << "simpv.size() " << simpv.size() << endl;
   }
   //---------------------------- End MC info ---------------------------------------//
@@ -1249,18 +1276,18 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   //------------------------------------------------------
   if (use_ttbar_filter_) {
     edm::Handle<int> pIn;
-    iEvent.getByLabel(edm::InputTag("ttbarselectionproducer:topChannel"), pIn);
+    iEvent.getByToken(ttbartop, pIn);
     edm::Handle<int> triggerIn;
-    iEvent.getByLabel(edm::InputTag("ttbarselectionproducer:topTrigger"),triggerIn);
+    iEvent.getByToken(ttbartoptrig,triggerIn);
     EventInfo.ttbar_trigWord=*triggerIn;
 
     edm::Handle<int> metfilterIn;
-    iEvent.getByLabel(edm::InputTag("ttbarselectionproducer:topMETFilter"),metfilterIn);
+    iEvent.getByToken(metfilterIntoken,metfilterIn);
     EventInfo.ttbar_metfilterWord=*metfilterIn;
 
     int lctr(0);
     edm::Handle<edm::View<pat::Electron> > selElectrons;
-    iEvent.getByLabel(ttbarproducer_,selElectrons);
+    iEvent.getByToken(ttbarproducerEle_,selElectrons);
     for (size_t i = 0; i < selElectrons->size(); ++i)
       {
 	const auto l = selElectrons->ptrAt(i);
@@ -1275,7 +1302,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
       }
 
     edm::Handle<edm::View<pat::Muon> > selMuons;
-    iEvent.getByLabel(ttbarproducer_,selMuons);
+    iEvent.getByToken(ttbarproducerMuon_,selMuons);
     for (size_t i = 0; i < selMuons->size(); ++i)
       {
 	const auto l = selMuons->ptrAt(i);
@@ -1291,12 +1318,12 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     EventInfo.ttbar_nl=lctr;
 
     edm::Handle<edm::View<pat::MET> > selMETs;
-    iEvent.getByLabel(ttbarproducer_,selMETs);
+    iEvent.getByToken(ttbarproducerMET_,selMETs);
     EventInfo.ttbar_metpt=selMETs->ptrAt(0)->pt();
     EventInfo.ttbar_metphi=selMETs->ptrAt(0)->phi();
 
     edm::Handle< double > rhoH;
-    iEvent.getByLabel(rhoTag_,rhoH);
+    iEvent.getByToken(rhoTag_,rhoH);
     EventInfo.ttbar_rho = *rhoH;
 
     //generator information
@@ -1304,7 +1331,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     if(!isData_)
       {
 	edm::Handle<GenEventInfoProduct> evt;
-	iEvent.getByLabel("generator","", evt);
+	iEvent.getByToken(generatorevt, evt);
 	if(evt.isValid())
 	  {
 	    EventInfo.ttbar_allmepartons   = evt->nMEPartons();
@@ -1312,18 +1339,17 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
 	    EventInfo.ttbar_w[0]           = evt->weight();
 	    EventInfo.ttbar_nw++;
 	  }
-	
-	  edm::Handle<LHEEventProduct> evet;
-	  iEvent.getByLabel("externalLHEProducer","", evet);
-	  if(evet.isValid())
-	    {
-	      double asdd=evet->originalXWGTUP();
-	      for(unsigned int i=0; i<evet->weights().size();i++){
-		double asdde=evet->weights()[i].wgt;
-		EventInfo.ttbar_w[EventInfo.ttbar_nw]=EventInfo.ttbar_w[0]*asdde/asdd;
-		EventInfo.ttbar_nw++;
-	      }
+	edm::Handle<LHEEventProduct> evet;
+	iEvent.getByToken(generatorlhe, evet);
+	if(evet.isValid())
+	  {
+	    double asdd=evet->originalXWGTUP();
+	    for(unsigned int i=0; i<evet->weights().size();i++){
+	      double asdde=evet->weights()[i].wgt;
+	      EventInfo.ttbar_w[EventInfo.ttbar_nw]=EventInfo.ttbar_w[0]*asdde/asdd;
+ 	      EventInfo.ttbar_nw++;
 	    }
+	  }
       }
   }
 
@@ -1333,7 +1359,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   edm::Handle<std::vector<pat::Muon> >  patMuonsHandle;
   if( storePatMuons_ )
   {
-    iEvent.getByLabel(patMuonCollectionName_,patMuonsHandle);
+    iEvent.getByToken(patMuonCollectionName_,patMuonsHandle);
 
     for( std::vector<pat::Muon>::const_iterator it = patMuonsHandle->begin(); it != patMuonsHandle->end(); ++it )
     {
@@ -1366,7 +1392,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   // Muons
   //------------------------------------------------------
   edm::Handle<edm::View<reco::Muon> >  muonsHandle;
-  iEvent.getByLabel(muonCollectionName_,muonsHandle);
+  iEvent.getByToken(muonCollectionName_,muonsHandle);
   muons = *muonsHandle;
 
   //----------------------------------------
@@ -1377,8 +1403,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   //------------------
   // Primary vertex
   //------------------
-  iEvent.getByLabel(primaryVertexColl_,primaryVertex);
-
+  iEvent.getByToken(primaryVertexColl_,primaryVertex);
   //bool newvertex = false;
 
   bool pvFound = (primaryVertex->size() != 0);
@@ -1419,7 +1444,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   //------------------------------------------------------
 
   edm::Handle<edm::TriggerResults> trigRes;
-  iEvent.getByLabel(triggerTable_, trigRes);
+  iEvent.getByToken(triggerTable_, trigRes);
 
   EventInfo.nBitTrigger = int(triggerPathNames_.size()/32)+1;
   for(int i=0; i<EventInfo.nBitTrigger; ++i) EventInfo.BitTrigger[i] = 0;
@@ -1459,8 +1484,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   edm::Handle<reco::TrackCollection> tracksHandle;
   if( produceAllTrackTree_ && storeEventInfo_ )
   {
-    iEvent.getByLabel(tracksColl_,tracksHandle);
-
+    iEvent.getByToken(tracksColl_,tracksHandle);
     for(reco::TrackCollection::const_iterator trk = tracksHandle->begin(); trk != tracksHandle->end(); ++trk)
     {
       EventInfo.TrkAll_d0[EventInfo.nTrkAll]        = trk->d0();
