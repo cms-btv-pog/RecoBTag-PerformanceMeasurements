@@ -35,12 +35,12 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
-options.register('mcGlobalTag', '74X_mcRun2_asymptotic_v2',
+options.register('mcGlobalTag', '76X_mcRun2_asymptotic_v12',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', '74X_dataRun2_Prompt_v4', #Use 74X_dataRun2_reMiniAOD_v0 for ReReco of data in Run2015D
+options.register('dataGlobalTag', '76X_dataRun2_v11', 
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
@@ -364,14 +364,14 @@ process.options   = cms.untracked.PSet(
     allowUnscheduled = cms.untracked.bool(True)
 )
 
-#In 74X:
-#process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
-#from Configuration.AlCa.GlobalTag import GlobalTag
-#process.GlobalTag.globaltag = globalTag
-#In 75X possible to use:
+#Set GT by hand:
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_' + ('data' if options.runOnData else 'mc'))
+process.GlobalTag.globaltag = globalTag
+#Choose automatically:
+#process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+#from Configuration.AlCa.GlobalTag import GlobalTag
+#process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_' + ('data' if options.runOnData else 'mc'))
 
 #Loading calibrations from db file, example of code for any future use
 #process.load("CondCore.DBCommon.CondDBSetup_cfi")

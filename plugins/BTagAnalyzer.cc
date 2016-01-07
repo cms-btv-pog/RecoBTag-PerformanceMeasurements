@@ -1976,7 +1976,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         {
           if (itt == jtt) continue;
 
-          const TrackRef pairTrackRef = selectedTracks[jtt];
+	  const TrackRef pairTrackRef = ( useSelectedTracks_ ? selectedTracks[jtt] : tracks[jtt]);
           const reco::Track * pairTrackPtr = reco::btag::toTrack(pairTrackRef);
 
           trackPairV0Test[1] = pairTrackPtr;
