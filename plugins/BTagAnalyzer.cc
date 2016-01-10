@@ -3682,7 +3682,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat5.etaMin        = 0;
   cat5.nHitsMax      = 50;
   cat5.nHitsMin      = 8;
-  cat5.nPixelHitsMax = 8;
+  cat5.nPixelHitsMax = 2;
   cat5.nPixelHitsMin = 2;
   cat5.pMax          = 8;
   cat5.pMin          = 0;

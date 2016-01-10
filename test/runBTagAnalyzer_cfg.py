@@ -312,7 +312,8 @@ process.MessageLogger.cerr.default.limit = 10
 ## Input files
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        '/store/relval/CMSSW_7_4_0_pre8/RelValZpTT_1500_13TeV/GEN-SIM-RECO/MCRUN2_74_V7-v1/00000/58F8AA88-4BBD-E411-95D4-0025905A48F0.root'
+        'file:/nfs/dust/cms/user/marchesi/test/merge76x/CMSSW_7_6_1/src/RecoBTag/PerformanceMeasurements/test/10D3A243-930C-E511-8DBC-0025905A6064.root'
+        #'/store/relval/CMSSW_7_4_0_pre8/RelValZpTT_1500_13TeV/GEN-SIM-RECO/MCRUN2_74_V7-v1/00000/58F8AA88-4BBD-E411-95D4-0025905A48F0.root'
     )
 )
 if options.miniAOD:
@@ -389,18 +390,16 @@ process.GlobalTag.globaltag = globalTag
 #)
 #process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
 ### to activate the new JP calibration: using the data base
-#trkProbaCalibTag = "JPcalib_MC74X_25ns_v1"
-#if options.runOnData:
-#  trkProbaCalibTag = "JPcalib_Data74X_2015D_v1"
-
-#process.GlobalTag.snapshotTime = cms.string("9999-12-31 23:59:59.000")
-
-#process.GlobalTag.toGet = cms.VPSet(
-#    cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-#        tag = cms.string(trkProbaCalibTag),
-#        connect = cms.string("frontier://FrontierPrep/CMS_CONDITIONS")
-#    )
-#)
+trkProbaCalibTag = "JPcalib_MC76X_25ns_v1"
+if options.runOnData:
+  trkProbaCalibTag = "JPcalib_Data74X_2015D_v1"
+# process.GlobalTag.snapshotTime = cms.string("9999-12-31 23:59:59.000")
+process.GlobalTag.toGet = cms.VPSet(
+    cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
+      tag = cms.string(trkProbaCalibTag),
+      connect = cms.string("frontier://FrontierPrep/CMS_CONDITIONS")
+    )
+)
 
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
 process.load("Configuration.Geometry.GeometryRecoDB_cff")
