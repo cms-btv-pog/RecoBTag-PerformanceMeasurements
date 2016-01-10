@@ -312,8 +312,7 @@ process.MessageLogger.cerr.default.limit = 10
 ## Input files
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        'file:/nfs/dust/cms/user/marchesi/test/merge76x/CMSSW_7_6_1/src/RecoBTag/PerformanceMeasurements/test/10D3A243-930C-E511-8DBC-0025905A6064.root'
-        #'/store/relval/CMSSW_7_4_0_pre8/RelValZpTT_1500_13TeV/GEN-SIM-RECO/MCRUN2_74_V7-v1/00000/58F8AA88-4BBD-E411-95D4-0025905A48F0.root'
+        '/store/relval/CMSSW_7_4_0_pre8/RelValZpTT_1500_13TeV/GEN-SIM-RECO/MCRUN2_74_V7-v1/00000/58F8AA88-4BBD-E411-95D4-0025905A48F0.root'
     )
 )
 if options.miniAOD:
