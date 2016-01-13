@@ -355,6 +355,7 @@ private:
   bool storeCSVTagVariablesSubJets_;
 
   bool use_ttbar_filter_;
+  edm::EDGetTokenT<edm::View<reco::GenParticle> > ttbarproducerGen_;
   edm::EDGetTokenT<edm::View<pat::Electron>> ttbarproducerEle_;
   edm::EDGetTokenT<edm::View<pat::Muon>> ttbarproducerMuon_;
   edm::EDGetTokenT<edm::View<pat::MET>> ttbarproducerMET_;
@@ -502,7 +503,8 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   storeCSVTagVariables_ = iConfig.getParameter<bool>("storeCSVTagVariables");
   storeCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("storeCSVTagVariablesSubJets");
 
-  use_ttbar_filter_     = iConfig.getParameter<bool> ("use_ttbar_filter");
+  use_ttbar_filter_ = iConfig.getParameter<bool> ("use_ttbar_filter");
+  ttbarproducerGen_ = consumes<edm::View<reco::GenParticle>>(iConfig.getParameter<edm::InputTag>("ttbarproducer")),
   ttbarproducerEle_ = consumes<edm::View<pat::Electron>>(iConfig.getParameter<edm::InputTag>("ttbarproducer"));
   ttbarproducerMuon_ = consumes<edm::View<pat::Muon>>(iConfig.getParameter<edm::InputTag>("ttbarproducer"));
   ttbarproducerMET_ = consumes<edm::View<pat::MET>>(iConfig.getParameter<edm::InputTag>("ttbarproducer"));
@@ -1274,11 +1276,28 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   // ttbar information
   //------------------------------------------------------
   if (use_ttbar_filter_) {
+
     edm::Handle<int> pIn;
     iEvent.getByToken(ttbartop, pIn);
+
     edm::Handle<int> triggerIn;
     iEvent.getByToken(ttbartoptrig,triggerIn);
     EventInfo.ttbar_trigWord=*triggerIn;
+
+    int gctr(0);
+    edm::Handle<edm::View<reco::GenParticle> > selGen;
+    iEvent.getByToken(ttbarproducerGen_,selGen);
+    for (size_t i = 0; i < selGen->size(); ++i)
+      {
+	const auto g = selGen->ptrAt(i);
+	EventInfo.ttbar_gpt[gctr] = g->pt();
+	EventInfo.ttbar_geta[gctr] = g->eta();
+	EventInfo.ttbar_gphi[gctr] = g->phi();	
+	EventInfo.ttbar_gm[gctr] = g->mass();
+	EventInfo.ttbar_gid[gctr] = g->pdgId();
+	gctr++;
+      }
+    EventInfo.ttbar_ng=gctr;
 
     edm::Handle<int> metfilterIn;
     iEvent.getByToken(metfilterIntoken,metfilterIn);

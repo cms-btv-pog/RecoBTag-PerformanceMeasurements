@@ -5,6 +5,8 @@
 #include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 using namespace std;
 using namespace edm;
@@ -55,6 +57,7 @@ TTbarSelectionProducer::TTbarSelectionProducer(const edm::ParameterSet& iConfig)
   produces<int>("topChannel");
   produces<int>("topTrigger");
   produces<int>("topMETFilter");
+  produces<std::vector<reco::GenParticle> >();
   produces<std::vector<pat::Electron> >();
   produces<std::vector<pat::Muon> >();
   produces<std::vector<pat::Jet> >();
@@ -369,12 +372,28 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
      }
    else if(verbose_>5) std::cout << "\t Event is selected " << std::endl;
 
+
+   //select particles from the hard process for MC
+   std::vector<reco::GenParticle> selGen;
+   if(!iEvent.isRealData())
+     {
+       edm::Handle<reco::GenParticleCollection> gpHa;
+       iEvent.getByLabel("prunedGenParticles", gpHa);
+       for (const reco::GenParticle &g : *gpHa)
+	 {
+	   if(!g.isHardProcess()) continue;
+	   selGen.push_back(g);
+	 }
+     }
+   
    std::auto_ptr<int> trigWordOut( new int(trigWord) );
    iEvent.put(trigWordOut,"topTrigger");
    std::auto_ptr<int> metfilterWordOut( new int(metfilterWord) );
    iEvent.put(metfilterWordOut,"topMETFilter");
    std::auto_ptr<int > chOut( new int (chsel) );
    iEvent.put(chOut,"topChannel");
+   std::auto_ptr< vector<reco::GenParticle> > genColl( new vector<reco::GenParticle>(selGen) );
+   iEvent.put(genColl);
    auto_ptr<vector<pat::Electron> > eleColl( new vector<pat::Electron>(selElectrons) );
    iEvent.put( eleColl );
    auto_ptr<vector<pat::Muon> > muColl( new vector<pat::Muon>(selMuons) );
