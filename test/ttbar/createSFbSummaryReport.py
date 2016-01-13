@@ -5,19 +5,16 @@ import math
 from rounding import *
 import getpass,socket
 import ROOT
+from Templated_btagEffFitter import SLICEVARTITLES
 
+LUMI=2444.
+SUMMARYCTR=0
+COLORS=[1,ROOT.kAzure+9,ROOT.kGreen-5,ROOT.kOrange-1] #,ROOT.kMagenta+2]
+MARKERS=[20,24,22,25]
 
-def initSummaryGrs(taggerName,nop):
-    summaryGrs={}
-    for sliceType in ['inc','diff']:
-        for summaryType in ['expEff','obsEff','sfb']:
-            for uncType in ['stat','total']:
-                for iop in xrange(0,nop):
-                    summaryGrs['%s_%s_%s_%d_%s'%(taggerName,summaryType,uncType,iop,sliceType)]=ROOT.TGraphErrors()
-    return summaryGrs
 
 def addToSummaryGr(summaryGrs,val,valUnc,xmin,xmax,taggerName,summaryType,uncType,sliceNb,iop):
-    sliceType='inc' if sliceNb==0 else 'diff'
+    sliceType='diff'
     key='%s_%s_%s_%d_%s'%(taggerName,summaryType,uncType,iop,sliceType)
     xcen=0.5*(xmin+xmax)
     dx=(xcen-xmin) if 'total' in uncType else 0.
@@ -32,307 +29,325 @@ def addToSummaryGr(summaryGrs,val,valUnc,xmin,xmax,taggerName,summaryType,uncTyp
         summaryGrs[key].SetPoint(np,xcen,val)
         summaryGrs[key].SetPointError(np,dx,valUnc)
         
-def ShowSFbSummary(inF,outF):
+"""
+Parse pickle file
+"""
+def buildSFbSummary(inF,title,outDir):
+
+    global SUMMARYCTR
+    SUMMARYCTR+=1
 
     #read results from the pickle file
     cachefile = open(inF,'r')
     fitInfo=pickle.load(cachefile)
-    fitResults=pickle.load(cachefile)
-    mcTruth=pickle.load(cachefile)
+    effExpected=pickle.load(cachefile)
+    effObserved=pickle.load(cachefile)
+    sfbMeasurement=pickle.load(cachefile)
+    systUncs=pickle.load(cachefile)    
     cachefile.close()
 
     taggerDef=fitInfo['taggerDef']
     taggerName=fitInfo['tagger']
+    nOPs=len(taggerDef)-2
 
-    #init output file
-    out = open(outF,'w')
-    out.write('\\documentclass[10pt,a4paper]{report}\n')
-    out.write('\\usepackage{graphicx}\n')
-    out.write('\\usepackage{color}\n')
-    out.write('\\begin{document}\n')
-    out.write('\\title{Efficiency measurements for %s using $t\\bar{t}$ events}\n'%taggerDef[0])
-    out.write('\\author{%s@%s}\n'%(getpass.getuser(),socket.gethostname()))
-    out.write('\\date{\\today}\n')
-    out.write('\\maketitle\n')
+    # see https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagCalibration#Example_code_in_Python
+    sliceVarName=fitInfo['slicevar']
+    btvCalib = ROOT.BTagCalibration(title) if sliceVarName=='jetpt' else None
 
     #prepare graphs
-    summaryGrs=initSummaryGrs(taggerName=taggerName,nop=len(taggerDef)-2)
+    summaryGrs={}
+    for summaryType in ['eff','sfb']:
+        for uncType in ['stat','total']:
+            for iop in xrange(1,nOPs):
+                if not iop in summaryGrs: summaryGrs[iop]={}
+                key=(summaryType,uncType)
+                summaryGrs[iop][key]=ROOT.TGraphErrors()
+                summaryGrs[iop][key].SetName('%s_pass%d_%s_%s_%d'%(taggerName,iop,summaryType,uncType,SUMMARYCTR))
+                summaryGrs[iop][key].SetTitle(title)
+                summaryGrs[iop][key].SetMarkerColor(COLORS[(SUMMARYCTR-1)%4])
+                summaryGrs[iop][key].SetLineColor(COLORS[(SUMMARYCTR-1)%4])
+                if uncType=='total':
+                    summaryGrs[iop][key].SetFillColor(COLORS[(SUMMARYCTR-1)%4])
+                    summaryGrs[iop][key].SetFillStyle(3001+SUMMARYCTR%4)
+                    summaryGrs[iop][key].SetMarkerStyle(1)
+                else:
+                    summaryGrs[iop][key].SetFillColor(0)
+                    summaryGrs[iop][key].SetFillStyle(0)
+                    summaryGrs[iop][key].SetLineWidth(2)
+                    summaryGrs[iop][key].SetMarkerSize(0.6)
+                    summaryGrs[iop][key].SetMarkerStyle(MARKERS[(SUMMARYCTR-1)%4])
+
 
     #iterate over the results
-    for islice in fitResults[0]:
+    table,plotsToInclude=[],[]
+    for islice in effExpected[1]:
 
-        tableHeader=['Op. point']
-        tableTruth=['$\\varepsilon_{\\rm b}^{\\rm MC}$']
-        tableObs=['$\\varepsilon_{\\rm b}^{\\rm obs}$']
-        tableSF=['${\\rm SF}_{\\rm b}$']
-        tableSyst={}
-
-        nPreTagObs    = fitResults[0][islice][''][0]
-        nPreTagObsUnc = fitResults[0][islice][''][1]
-        nPreTagExp    = mcTruth[0][islice][0]
-        nPreTagExpUnc = mcTruth[0][islice][1]
-        
+        tablePerOp={}
+        sliceVarMin, sliceVarMax = fitInfo['slicebins'][islice][0], fitInfo['slicebins'][islice][1]
+        sliceVarMean = 0.5*(sliceVarMax+sliceVarMin)
+        sliceVarDx   = 0.5*(sliceVarMax-sliceVarMin)
+        sliceVarMean = sliceVarMean+((SUMMARYCTR-1)%4-2)*sliceVarDx*0.1
         for iop in xrange(1,len(taggerDef)-2):
-                
-            tableHeader.append('$>$%3.3f'%taggerDef[iop+1])
 
-            nTagExp    = mcTruth[iop][islice][0]
-            nTagExpUnc = mcTruth[iop][islice][1]
-            bEffExp=nTagExp/nPreTagExp
-            bEffExpUnc=math.sqrt((nTagExp*nPreTagExpUnc)**2+(nTagExpUnc*nPreTagExp)**2)/(nPreTagExp**2)
-            tableTruth.append('%s'%toLatexRounded(bEffExp,bEffExpUnc))
-            addToSummaryGr(summaryGrs,
-                           bEffExp,bEffExpUnc,
-                           fitInfo['slicebins'][islice][0],fitInfo['slicebins'][islice][1],
-                           taggerName,'expEff','stat',islice,iop)
-
-            nTagObs    = fitResults[iop][islice][''][0]
-            nTagObsUnc = fitResults[iop][islice][''][1]
-            bEffObs=nTagObs/nPreTagObs
-            bEffObsUnc=math.sqrt((nTagObs*nPreTagObsUnc)**2+(nTagObsUnc*nPreTagObs)**2)/(nPreTagObs**2)
-            tableObs.append('%s'%toLatexRounded(bEffObs,bEffObsUnc))
-           
-            sfb          = bEffObs/bEffExp
-            sfbStatUnc   = (bEffObsUnc*bEffExp)/(bEffExp**2)
-        
-            sfbMCStatUnc = (bEffObs*bEffExpUnc)/(bEffExp**2)
-            sfbSystUnc   =  sfbMCStatUnc**2
-            for var in fitResults[iop][islice]:
-                if len(var)==0 : continue
-                if var.endswith('dn') : continue
-                syst=var[:-2]
-                nTagObsUp    = fitResults[iop][islice][syst+'up'][0]
-                #sfbObsUp     = ((nTagObsUp-nTagObs)/nPreTagObs)/bEffExp
-                sfbObsUp     = ((nTagObsUp-nTagExp)/nPreTagExp)/bEffExp
-
-                nTagObsDn    = fitResults[iop][islice][syst+'dn'][0]
-                #sfbObsDn     = ((nTagObsDn-nTagObs)/nPreTagObs)/bEffExp
-                sfbObsDn     = ((nTagObsDn-nTagExp)/nPreTagExp)/bEffExp
-
-                if not syst in tableSyst: tableSyst[syst]=['~~~{\small \it %s}'%syst]
-                tableSyst[syst].append('${\small %.1g / %.1g }$'%(sfbObsUp,sfbObsDn))
-                
-                sfbSystUnc += (0.5*(math.fabs(sfbObsUp)+math.fabs(sfbObsDn)))**2
-
+            systTable=[]
+            effExp,effExpUnc = effExpected[iop][islice]
+            effObs,effObsUnc = effObserved[iop][islice][0],effObserved[iop][islice][1]
+            sfb,sfbStatUnc   = sfbMeasurement[iop][islice]
+            sfbSystUnc       = sfbStatUnc**2
+            for syst in systUncs[iop][islice]:
+                if len(syst)==0 : continue
+                if syst.endswith('dn') : continue
+                syst=syst[:-2]
+                sfbUncUp = systUncs[iop][islice][syst+'up']
+                sfbUncDn = systUncs[iop][islice][syst+'dn']
+                sfbSystUnc += (0.5*(math.fabs(sfbUncUp)+math.fabs(sfbUncDn)))**2
+                systTable.append( ('~~~{\\small \\it %s}'%syst,'${\small %.1g / %.1g }$'%(sfbUncUp,sfbUncDn)) )
             sfbSystUnc=math.sqrt(sfbSystUnc)
             sfbTotalUnc=math.sqrt(sfbStatUnc**2+sfbSystUnc**2)
             
-            tableSF.append('%s'%(toLatexRounded(sfb,(sfbStatUnc,sfbSystUnc))))
-            addToSummaryGr(summaryGrs,
-                           sfb,sfbStatUnc,
-                           fitInfo['slicebins'][islice][0],fitInfo['slicebins'][islice][1],
-                           taggerName,'sfb','stat',islice,iop)
-            addToSummaryGr(summaryGrs,
-                           sfb,sfbTotalUnc,
-                           fitInfo['slicebins'][islice][0],fitInfo['slicebins'][islice][1],
-                           taggerName,'sfb','total',islice,iop)
-            addToSummaryGr(summaryGrs,
-                           bEffObs,bEffObsUnc,
-                           fitInfo['slicebins'][islice][0],fitInfo['slicebins'][islice][1],
-                           taggerName,'obsEff','stat',islice,iop)
-            addToSummaryGr(summaryGrs,
-                           bEffObs,bEffObs*sfbTotalUnc/sfb,
-                           fitInfo['slicebins'][islice][0],fitInfo['slicebins'][islice][1],
-                           taggerName,'obsEff','total',islice,iop)
+            #report
+            if sliceVarName=='jetpt':
+                btvCalibParams = ROOT.BTagEntry.Parameters(iop-1, title, 'central', 0, -2.4, 2.4, sliceVarMin,sliceVarMax,0,1)
+                entry = ROOT.BTagEntry(str(sfb),btvCalibParams)
+                btvCalib.addEntry(entry)
+                btvCalibParams = ROOT.BTagEntry.Parameters(iop-1, title, 'up_total', 0, -2.4, 2.4, sliceVarMin,sliceVarMax,0,1)
+                entry = ROOT.BTagEntry(str(sfb+sfbTotalUnc),btvCalibParams)
+                btvCalib.addEntry(entry)
+                btvCalibParams = ROOT.BTagEntry.Parameters(iop-1, title, 'down_total', 0, -2.4, 2.4, sliceVarMin,sliceVarMax,0,1)
+                entry = ROOT.BTagEntry(str(sfb-sfbTotalUnc),btvCalibParams)
+                btvCalib.addEntry(entry)
+                btvCalibParams = ROOT.BTagEntry.Parameters(iop-1, title, 'up_statistics', 0, -2.4, 2.4, sliceVarMin,sliceVarMax,0,1)
+                entry = ROOT.BTagEntry(str(sfb+sfbStatUnc),btvCalibParams)
+                btvCalib.addEntry(entry)
+                btvCalibParams = ROOT.BTagEntry.Parameters(iop-1, title, 'down_statistics', 0, -2.4, 2.4, sliceVarMin,sliceVarMax,0,1)
+                entry = ROOT.BTagEntry(str(sfb-sfbStatUnc),btvCalibParams)
+                btvCalib.addEntry(entry)
 
 
-        #dump table
-        table='\\begin{table}[h]\n'
-        table+='\\caption{Efficiency measurement,'
-        table += ' $%3.1f<%s<%3.1f$.}\n'%(fitInfo['slicebins'][islice][0],fitInfo['slicevar'],fitInfo['slicebins'][islice][1])
-        table+='\\begin{center}\n'
-        table+='\\begin{tabular}[h]{l%s}\n'%('c'*(len(tableHeader)-1))
-        for row in [tableHeader,tableTruth,tableObs,tableSF]:
-            table+='\\hline\n'
-            for icol in xrange(0,len(row)):
-                if icol>0 and icol<len(row): table += '&'
-                table += row[icol]
-            table+='\\\\\n'
-        table+='\\hline\n'
-        table+='\\multicolumn{%d}{l}{\\it Systematic uncertainties}\\\\\n'%len(tableHeader)
-        for syst in tableSyst:
-              for icol in xrange(0,len(tableSyst[syst])):
-                if icol>0 and icol<len(tableSyst[syst]): table += '&'
-                table += tableSyst[syst][icol]
-              table+='\\\\\n'
-        table+='\\hline'
-        table+='\\end{tabular}\n'
-        table+='\\end{center}\n'
-        table+='\\end{table}\n'
-        out.write(table)
+            #fill table rows
+            tablePerOp[iop]=[('$\\varepsilon_{\\rm b}^{\\rm MC}$','%s'%toLatexRounded(effExp,effExpUnc)),
+                             ('$\\varepsilon_{\\rm b}^{\\rm obs}$','%s'%toLatexRounded(effObs,effObsUnc)),
+                             ('${\\rm SF}_{\\rm b}$','%s'%toLatexRounded(sfb,[sfbStatUnc,sfbSystUnc]))] + systTable
 
+            #add points to graphs
+            key=('eff','stat')
+            np=summaryGrs[iop][key].GetN()
+            summaryGrs[iop][key].SetPoint(np,sliceVarMean,effObs)
+            summaryGrs[iop][key].SetPointError(np,sliceVarDx*0.1,effObsUnc)
 
-    outDir=os.path.dirname(outF)
-    if len(outDir)==0 : outDir='./'
-    showSummary(taggerDef,taggerName,fitInfo['slicevar'],summaryGrsMap=[(fitInfo['var'],summaryGrs),],outDir=outDir)
+            key=('eff','total')
+            summaryGrs[iop][key].SetPoint(np,sliceVarMean,effObs)
+            summaryGrs[iop][key].SetPointError(np,sliceVarDx*0.1,effObs*sfbTotalUnc/sfb)
 
-    #include figures in the tex file
-    for iop in xrange(1,len(taggerDef)-2):
-        out.write('\\begin{figure}[htp]')
-        out.write('\\centering\n')
-        out.write('\\includegraphics[width=0.8\\textwidth]{%s/%s_%d.pdf}' % (outDir,taggerDef[1],iop))
-        out.write('\\caption{\n')
-        out.write('Summary of the results for the measurement of the b-tagging efficiency of %s algorithm $>$%3.2f. \n' % (taggerDef[0],taggerDef[1+iop]) )
-        out.write('The top panels show the observed b-tagging efficiency compared to the one expected in simulation. \n')
-        out.write('While the left panel shows the inclusive results, the right panel shows the results as function of the %s. \n' % fitInfo['slicevar'] )
-        out.write('The bottom panels show the SF$_{\\rm b}$ fit to data. \n')
-        out.write('The error bars (hatched areas) represent the statistical (total) uncertainty of the measurement.\n')
-        out.write('}\n')
-        out.write('\\label{fig:%ssummary%d}' % (taggerDef[1],iop))
-        out.write('\\end{figure}\n')
+            key=('sfb','stat')
+            summaryGrs[iop][key].SetPoint(np,sliceVarMean,sfb)
+            summaryGrs[iop][key].SetPointError(np,sliceVarDx*0.1,sfbStatUnc)
 
-    out.write('\\end{document}\n')
-    out.close()
-    print 'Output report available @ %s'%outF
-   
+            key=('sfb','total')
+            summaryGrs[iop][key].SetPoint(np,sliceVarMean,sfb)
+            summaryGrs[iop][key].SetPointError(np,sliceVarDx*0.1,sfbTotalUnc)
+
+        sliceVarRangeText='$%3.0f<%s<%3.0f$'%(sliceVarMin,fitInfo['slicevar'],sliceVarMax)
+        table.append( (sliceVarRangeText, tablePerOp) )
+        plotsToInclude.append( (
+                'Result of the fit to the %s disciminator for events with %s. The left (right) panel shows the pass (fail) category defined for events with %s$>$%s.' 
+                % (title,sliceVarRangeText,taggerDef[0],taggerDef[iop+1]),
+                '%s/%s_%d_slice%d.pdf'
+                % (os.path.dirname(inF),taggerName,iop,islice)
+                ) )
+
+    #dump to file
+    if btvCalib:
+        with open('%s/%s_calib.csv'%(outDir,title), 'w') as f : f.write(btvCalib.makeCSV())
+
+    return sliceVarName,summaryGrs,table,plotsToInclude
+
 
 """
 """
-def showSummary(taggerDef,taggerName,sliceVar,summaryGrsMap,outDir):
+def produceSummaryFigures(sliceVar,summaryGr,output):
+
+    plotsToInclude=[]
 
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetOptTitle(0)
     ROOT.gROOT.SetBatch(True)
 
     #show results in canvas
-    c=ROOT.TCanvas('c','c',800,500)
+    c=ROOT.TCanvas('c','c',500,500)
     c.SetRightMargin(0)
     c.SetLeftMargin(0)
     c.SetBottomMargin(0)
     c.SetTopMargin(0)
 
-    colors=[ROOT.kAzure+9,ROOT.kOrange-1,ROOT.kGreen-5]
-    markers=[20,21,22]
-
     c.cd()
-    clabel=ROOT.TPad('clabel','clabel',0,0.95,1.0,1.0)
-    clabel.SetRightMargin(0.0)
-    clabel.SetTopMargin(0.0)
-    clabel.SetLeftMargin(0.0)
-    clabel.SetBottomMargin(0.0)
-    clabel.Draw()
-
-    subpads={}
-    c.cd()
-    key=('Eff','inc')
-    subpads[key]=ROOT.TPad('cinc','cinc',0,0.45,0.2,0.95)
-    subpads[key].SetRightMargin(0.02)
-    subpads[key].SetTopMargin(0.01)
-    subpads[key].SetLeftMargin(0.3)
-    subpads[key].SetBottomMargin(0.01)
-    subpads[key].Draw()
-
-    c.cd()
-    key=('sfb','inc')
-    subpads[key]=ROOT.TPad('cincsf','cincsf',0,0,0.2,0.45)
-    subpads[key].SetRightMargin(0.02)
-    subpads[key].SetTopMargin(0.01)
-    subpads[key].SetLeftMargin(0.3)
-    subpads[key].SetBottomMargin(0.12)
-    subpads[key].Draw()
-
-    c.cd()
-    key=('Eff','diff')
-    subpads[key]=ROOT.TPad('cexc','cexc',0.2,0.45,1.0,0.95)
-    subpads[key].SetRightMargin(0.02)
-    subpads[key].SetTopMargin(0.01)
-    subpads[key].SetLeftMargin(0.02)
-    subpads[key].SetBottomMargin(0.01)
-    subpads[key].Draw()
+    p1=ROOT.TPad('cexc','cexc',0.0,0.45,1.0,1.0)
+    p1.SetRightMargin(0.02)
+    p1.SetTopMargin(0.01)
+    p1.SetLeftMargin(0.12)
+    p1.SetBottomMargin(0.01)
+    p1.Draw()
 
     c.cd()
     key=('sfb','diff')
-    subpads[key]=ROOT.TPad('cexcsf','cexcsf',0.2,0,1.0,0.45)
-    subpads[key].SetRightMargin(0.02)
-    subpads[key].SetTopMargin(0.01)
-    subpads[key].SetLeftMargin(0.02)
-    subpads[key].SetBottomMargin(0.12)
-    subpads[key].Draw()
-    
-    for iop in xrange(1,len(taggerDef)-2):
+    p2=ROOT.TPad('cexcsf','cexcsf',0.0,0,1.0,0.45)
+    p2.SetRightMargin(0.02)
+    p2.SetTopMargin(0.01)
+    p2.SetLeftMargin(0.12)
+    p2.SetBottomMargin(0.2)
+    p2.Draw()
 
-        for key in subpads:
-            summaryType,sliceType=key[0],key[1]
-            subpads[key].cd()
-            subpads[key].Clear()
-            ivar=0
-            for uncType in ['total','stat']:
-                ivar=0
-                drawOpt='a2' if uncType=='total' else 'p'
-                for ivar in xrange(0,len(summaryGrsMap)):
-                    var,summaryGrs = summaryGrsMap[ivar][0], summaryGrsMap[ivar][1]
+    firstKey=summaryGr.keys()[0]
+    for iop in summaryGr[firstKey]:
 
-                    grKey='%s_obs%s_%s_%d_%s'%(taggerName,summaryType,uncType,iop,sliceType)
-                    if 'sfb' in summaryType:
-                        grKey='%s_%s_%s_%d_%s'%(taggerName,summaryType,uncType,iop,sliceType)
-                    gr=summaryGrs[grKey]
-                
-                    gr.SetTitle(var)
-                    gr.SetMarkerColor(colors[ivar]+1)
-                    gr.SetLineColor(colors[ivar]+1)
-                    if uncType=='total': gr.SetFillColor(colors[ivar]+1)
-                    else : gr.SetFillColor(0)
-                    gr.SetMarkerStyle(markers[ivar])
-                    
-                    gr.SetFillStyle(3001)
-                    gr.Draw(drawOpt)
-                    if 'Eff' in summaryType :
-                        gr.GetYaxis().SetTitle('Efficiency')
-                        gr.GetYaxis().SetRangeUser(0.12,1.5)
-                    else :
-                        gr.GetYaxis().SetTitle('Scale factor')
-                        gr.GetYaxis().SetRangeUser(0.64,1.26)
-                    if 'inc' in sliceType:
-                        gr.GetYaxis().SetTitleOffset(1.2)
-                        gr.GetYaxis().SetTitleSize(0.1)
-                        gr.GetYaxis().SetLabelSize(0.1)
-                        gr.GetXaxis().SetTitleSize(0.)
-                        gr.GetXaxis().SetLabelSize(0.)
-                        gr.GetXaxis().SetNdivisions(0)
-                    else:                        
-                        gr.GetYaxis().SetTitleSize(0.)
-                        gr.GetYaxis().SetLabelSize(0.)
-                        if 'Eff' in summaryType:
-                            gr.GetXaxis().SetTitleSize(0.)
-                            gr.GetXaxis().SetLabelSize(0.)
-                        else:
-                            gr.GetXaxis().SetTitleSize(0.07)
-                            gr.GetXaxis().SetLabelSize(0.07)
-                            gr.GetXaxis().SetTitle(sliceVar)
-                            gr.GetXaxis().SetTitleOffset(0.5)
+        #efficiency pad
+        p1.cd()
+        baseDrawOpt='a'
+        leg=ROOT.TLegend(0.65,0.8,0.95,0.95)
+        leg.SetFillStyle(0)
+        leg.SetBorderSize(0)
+        leg.SetTextFont(42)
+        leg.SetTextSize(0.05)
+        leg.SetHeader("#it{Methods}")
 
-                    if uncType=='total' : drawOpt='2'
-                    ivar+=1
-                    
-            if 'Eff' in summaryType:
-                gr=summaryGrs['%s_expEff_stat_%d_%s'%(taggerName,iop,sliceType)]
-                gr.SetMarkerColor(1)
-                gr.SetMarkerStyle(1)
-                gr.SetLineColor(1)
-                gr.SetLineWidth(2)
-                gr.Draw('cX')
-        c.Modified()
-        c.Update()
+        
 
-        clabel.cd()
-        clabel.Clear()
+        for uncType in ['total','stat']:
+            drawOpt='2' if uncType=='total' else 'p'
+            
+            for key in summaryGr:                   
+                summaryGr[key][iop][('eff',uncType)].Draw(baseDrawOpt+drawOpt)
+                summaryGr[key][iop][('eff',uncType)].GetYaxis().SetTitle('Efficiency')
+                summaryGr[key][iop][('eff',uncType)].GetYaxis().SetRangeUser(0.34,1.08)
+                summaryGr[key][iop][('eff',uncType)].GetXaxis().SetTitleSize(0.)
+                summaryGr[key][iop][('eff',uncType)].GetXaxis().SetLabelSize(0.0)
+                summaryGr[key][iop][('eff',uncType)].GetYaxis().SetTitleOffset(0.8)
+                summaryGr[key][iop][('eff',uncType)].GetYaxis().SetTitleSize(0.06)
+                summaryGr[key][iop][('eff',uncType)].GetYaxis().SetLabelSize(0.06)
+                if uncType=='stat': leg.AddEntry(summaryGr[key][iop][('eff',uncType)],key,'p') 
+                baseDrawOpt=''
+
+        leg.SetNColumns(2)
+        leg.Draw()
         txt=ROOT.TLatex()
         txt.SetNDC(True)
         txt.SetTextFont(43)
-        txt.SetTextSize(16)
+        txt.SetTextSize(14)
         txt.SetTextAlign(12)
-        lumi=41.6
-        if lumi<100:
-            txt.DrawLatex(0.05,0.5,'#bf{CMS} #it{Preliminary} %3.1f pb^{-1} (13 TeV)' % lumi)
+        if LUMI<100:
+            txt.DrawLatex(0.18,0.95,'#bf{CMS} #it{Preliminary} %3.1f pb^{-1} (13 TeV)' % LUMI)
         else:
-            txt.DrawLatex(0.05,0.5,'#bf{CMS} #it{Preliminary} %3.1f fb^{-1} (13 TeV)' % (lumi/1000.))
-        txt.DrawLatex(0.7,0.5,'[#scale[0.7]{%s} > %3.3f]' % (taggerDef[0],taggerDef[iop+1]))
+            txt.DrawLatex(0.18,0.95,'#bf{CMS} #it{Preliminary} %3.1f fb^{-1} (13 TeV)' % (LUMI/1000.))
 
+        p2.cd()
+        baseDrawOpt='a'
+        for uncType in ['total','stat']:
+            drawOpt='2' if uncType=='total' else 'p'            
+            for key in summaryGr:
+                summaryGr[key][iop][('sfb',uncType)].Draw(baseDrawOpt+drawOpt)
+                summaryGr[key][iop][('sfb',uncType)].GetYaxis().SetTitle('Scale factor')
+                summaryGr[key][iop][('sfb',uncType)].GetYaxis().SetRangeUser(0.74,1.16)
+                summaryGr[key][iop][('sfb',uncType)].GetYaxis().SetTitleOffset(0.7)
+                summaryGr[key][iop][('sfb',uncType)].GetYaxis().SetTitleSize(0.08)
+                summaryGr[key][iop][('sfb',uncType)].GetYaxis().SetLabelSize(0.08)
+                summaryGr[key][iop][('sfb',uncType)].GetXaxis().SetLabelSize(0.08)
+                summaryGr[key][iop][('sfb',uncType)].GetXaxis().SetTitleSize(0.08)
+                summaryGr[key][iop][('sfb',uncType)].GetXaxis().SetTitle(SLICEVARTITLES[sliceVar])
+                baseDrawOpt=''
         c.cd()
         c.Modified()
         c.Update()
-        for ext in ['png','pdf']: c.SaveAs('%s/%s_%d.%s'% (outDir,taggerDef[1],iop,ext))
-        
+        for ext in ['png','pdf']: c.SaveAs('%s/EfficiencySummary_%s_%d.%s'% (output,sliceVar,iop,ext))
+        plotsToInclude.append( ('Efficiency measurements as function of %s for the %d-th working point' % (SLICEVARTITLES[sliceVar],iop),
+                                '%s/EfficiencySummary_%s_%d.pdf'% (output,sliceVar,iop) ) )
+
+    return plotsToInclude
+                    
+
+"""
+"""
+def createReport(tableCollection,plotsToInclude,output):
+
+    #create output file
+    out = open('sfb_report.tex','w')
+    out.write('\\documentclass[10pt,a4paper]{article}\n')
+    out.write('\\usepackage{graphicx}\n')
+    out.write('\\usepackage{color}\n')
+    out.write('\\setcounter{tocdepth}{3}\n')
+    out.write('\\begin{document}\n')
+    out.write('\\title{b-tagging efficiency measurements using $t\\bar{t}$ dilepton events}\n')
+    out.write('\\author{%s@%s}\n'%(getpass.getuser(),socket.gethostname()))
+    out.write('\\date{\\today}\n')
+    out.write('\\maketitle\n')
+    out.write('\\tableofcontents\n')
+    out.write('\\section{Summary tables}\n')
+    out.write('\\label{sec:tables}\n')
+    out.write('The following tables report the scale factors and efficiencies measured by different methods for different slice variables.\n')
+
+    for sliceVar in tableCollection:
+        out.write('\\subsection{Results as function of %s}\n'%SLICEVARTITLES[sliceVar])
+        firstMethod=tableCollection[sliceVar].keys()[0]
+
+        out.write('\\clearpage\n')
+        out.write('\\subsubsection{Tables}\n')
+        firstMethod=tableCollection[sliceVar].keys()[0]
+        for iop in tableCollection[sliceVar][firstMethod][0][1]:
+
+            for i in xrange(0,len(tableCollection[sliceVar][firstMethod])):
+                sliceDef=tableCollection[sliceVar][firstMethod][i][0]
+                
+                out.write('\\begin{table}[h]\n')
+                out.write('\\caption{Efficiency measurement for events with %s working point number %d.}\n'%(sliceDef,iop))
+                out.write('\\begin{center}\n')
+                out.write('\\begin{tabular}[h]{l%s}\n'%('c'*len(tableCollection[sliceVar])))
+
+                table=['Method &']
+                for method in tableCollection[sliceVar]:
+                    
+                    table[0] += ' %20s &'%method
+                    rowCtr=1
+                    for row,val in tableCollection[sliceVar][method][i][1][iop]:
+                        if len(table)<=rowCtr: table.append( ' %20s &' % row )
+                        table[rowCtr] += ' %20s &' % val
+                        rowCtr+=1
+
+                #dump table to file
+                out.write('\\hline\n')
+                for row in table: out.write( row[:-1]+'\\\\\n' )
+                out.write('\\hline\n')
+
+                out.write('\\end{tabular}\n')
+                out.write('\\end{center}\n')
+                out.write('\\end{table}\n')
+                out.write('\n\n')
+
+        #dump plots as well
+        out.write('\\clearpage\n')
+        out.write('\\subsubsection{Figures}\n')        
+        firstMethod=tableCollection[sliceVar].keys()[0]
+        if sliceVar in plotsToInclude:
+            iplot=1
+            for caption,plot in plotsToInclude[sliceVar]:
+                if iplot%4==0 : out.write('\\clearpage\n')
+                out.write('\n')
+                out.write('\\begin{figure}[!htbp]')
+                out.write('\\centering\n')
+                print caption,plot
+                out.write('\\includegraphics[width=0.99\\textwidth]{%s}\n' % plot)
+                out.write('\\caption{%s}\n'%caption)
+                out.write('\\end{figure}\n')
+                out.write('\n')
+                iplot+=1
+    out.write('\\end{document}\n')
+    
+    #close TeX file
+    out.close()
+    
+    #compile and move to output
+    os.system('pdflatex sfb_report.tex')
+    os.system('mv -v sfb_report.* %s'%output)
+    
+
 
 
 """
@@ -343,13 +358,40 @@ def main():
     #configuration
     usage = 'usage: %prog [options]'
     parser = optparse.OptionParser(usage)
-    parser.add_option('-i', '--input',              dest='input',              help='input pickle file',   default=None,  type='string')
-    parser.add_option('-o', '--output',             dest='output',             help='output TeX file',     default=None,  type='string')
+    parser.add_option('-i', '--input',              dest='input',              help='input pickle files (csv list)',   default=None,  type='string')
+    parser.add_option('-o', '--output',             dest='output',             help='output directory',                default=None,  type='string')
     (opt, args) = parser.parse_args()
-    
-    if opt.output is None: opt.output=opt.input+'.tex'
 
-    ShowSFbSummary(inF=opt.input,outF=opt.output)
+    #prepare output
+    os.system('mkdir -p %s'%opt.output)
+
+    os.system('ln -s $CMSSW_RELEASE_BASE/src/RecoBTag/PerformanceDB/test/BTagCalibrationStandalone.cc')
+    os.system('ln -s $CMSSW_RELEASE_BASE/src/RecoBTag/PerformanceDB/test/BTagCalibrationStandalone.h')
+    ROOT.gROOT.ProcessLine('.L BTagCalibrationStandalone.cc+')
+
+    allInputs=opt.input.split(',')
+    print allInputs
+    summaryTable,summaryGr,plotsToInclude={},{},{}
+    for line in allInputs:
+        title,inF=line.split(':')        
+        sliceVar, effGrs, tables,plots = buildSFbSummary(inF,title,opt.output)
+        if not sliceVar in summaryGr: 
+            summaryGr[sliceVar]={}
+            summaryTable[sliceVar]={}
+            plotsToInclude[sliceVar]=[]
+             
+        summaryGr[sliceVar][title]=effGrs
+        summaryTable[sliceVar][title]=tables
+        plotsToInclude[sliceVar]+=plots
+
+    for sliceVar in summaryGr:
+        plotsToInclude[sliceVar] += produceSummaryFigures(sliceVar,summaryGr[sliceVar],opt.output)
+
+    createReport(summaryTable,plotsToInclude,opt.output)
+
+    #ShowSFbSummary(inF=opt.input,outF=opt.output)
+
+
 
     #all done here
     exit(0)

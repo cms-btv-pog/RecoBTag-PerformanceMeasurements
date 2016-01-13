@@ -6,228 +6,223 @@ import ROOT
 import pickle
 from plotter import Plot
 
-CHANNELS      = [-11*11,-13*13,-11*13]
-#CHANNELS      = [-11*13]
+from Templated_btagEffFitter import SLICEBINS, SLICEVAR
+
+RELTAGEFFVAR  = 0.5
 JETMULTCATEGS = [2,3,4]
-SLICEBINS     = [(20,320),(20,60),(60,120),(120,320)]
-SLICEVAR      = 'jetpt'
-SYSTVARS      = ['','jesup','jesdn','jerup','jerdn','trigdn','trigup','seldn','selup','qcdscaledn','qcdscaleup','hdampdn','hdampup']
+
+
+SYSTVARS      = ['nom',
+                 #'jesup','jesdn',
+                 #'jerup','jerdn',
+                 #'puup','pudn',
+                 #'trigup','trigdn',
+                 #'selup','seldn',
+                 #'qcdscaledn','qcdscaleup',
+                 #'hdampdn','hdampup'                
+                 ]
 
 """
 Project trees from files to build the templates
 """
-def prepareTemplates(tagger,taggerDef,inDir,outDir):
-    
-    print '...starting %s'%tagger
+def prepareTemplates(sampleTag,tagger,iop,taggerDef,sliceCat,channelList,btagSFTool,expEffUrl,inDir,outDir):
 
+    baseName='%s_count_%s_%d%d'%(tagger,SLICEVAR,sliceCat[0]++1,sliceCat[1]+1)
+
+    #prepare task systematics and tag counting
+    tagCounting={'nom':0}
+    TASKSYSTVARS=SYSTVARS[:]
+    #for idx in effCategs:
+    #    for eff in ['beff','ceff','leff']:
+    #        for sign in ['up','dn']:
+    #            TASKSYSTVARS.append( '%s%d%s'%(eff,idx,sign) )
+    #            tagCounting['%s%d%s'%(eff,idx,sign)]=0
+
+    #efficiency categories
+    effCategs=[0]
+    effCategs.append(sliceCat[0]+1)
+    if sliceCat[0]!=sliceCat[1]:
+        effCategs.append(sliceCat[1]+1)        
+
+    #prepare histograms
     histos={}
-
-    nOPs=len(taggerDef)-2
-    nSliceCategs=(len(SLICEBINS)-1)**2+1
-
-    #MC efficiency
-    for key in ['b','c','l']:        
-        for i in xrange(1,nOPs+1):            
-            name='%s_%s_pass%d'%(key,tagger,i-1)
-            histos[name]=ROOT.TH1F(name,';%s slice bin;Events'%SLICEVAR,len(SLICEBINS),0,len(SLICEBINS))
-            for xbin in xrange(0,len(SLICEBINS)):
-                label='%d-%d'%(SLICEBINS[xbin][0],SLICEBINS[xbin][1])
-                histos[name].GetXaxis().SetBinLabel(xbin+1,label)
-
-    #flavour categories
-    flavourCombinationsBinMap=['l_{1}l_{2}','l_{1}c_{2}','l_{1}b_{2}','c_{1}l_{2}','c_{1}c_{2}','c_{1}b_{2}','b_{1}l_{2}','b_{1}c_{2}','b_{1}b_{2}']
-    jetCategsBinMap=[]
-    j1slice,j2slice=1,1
-    for islice in xrange(0,nSliceCategs):
-        j1Cuts,j2Cuts=SLICEBINS[0],SLICEBINS[0]
-        if islice>0:
-            if j2slice==len(SLICEBINS):
-                j2slice=1
-                j1slice+=1
-            j1Cuts,j2Cuts=SLICEBINS[j1slice],SLICEBINS[j2slice]
-            j2slice+=1
-        if j1Cuts[0]<j2Cuts[0]:continue
-        jetCategsBinMap.append( (j1Cuts,j2Cuts) )
-    histos['flavcategs']=ROOT.TH2F('flavcategs',';Slice category;Flavour combination',
-                                   len(jetCategsBinMap),0,len(jetCategsBinMap),9,0,9)
-    for xbin in xrange(0,len(jetCategsBinMap)):
-        j1Cuts,j2Cuts=jetCategsBinMap[xbin][0],jetCategsBinMap[xbin][1]
-        label='(%d-%d),(%d-%d)'%(j1Cuts[0],j1Cuts[1],j2Cuts[0],j2Cuts[1])
-        histos['flavcategs'].GetXaxis().SetBinLabel(xbin+1,label)
-    for ybin in xrange(0,len(flavourCombinationsBinMap)):
-        histos['flavcategs'].GetYaxis().SetBinLabel(ybin+1,flavourCombinationsBinMap[ybin])
-
-
-    #tag counting in categories
-    tagCountingBinMap=[]
     nJetMultCategs=len(JETMULTCATEGS)
-    j1slice,j2slice=1,1
-    for islice in xrange(0,nSliceCategs):
-
-        j1Cuts,j2Cuts=SLICEBINS[0],SLICEBINS[0]
-        if islice>0:
-            if j2slice==len(SLICEBINS):
-                j2slice=1
-                j1slice+=1
-            j1Cuts,j2Cuts=SLICEBINS[j1slice],SLICEBINS[j2slice]
-            j2slice+=1
-
-        if j1Cuts[0]<j2Cuts[0]:continue
-
+    histoVars=TASKSYSTVARS
+    for var in histoVars:
+        name='%s_pass%d_%s'%(baseName,iop,var)
+        histos[name]=ROOT.TH1F(name,';Category;Events',3*nJetMultCategs,0,3*nJetMultCategs)
         for ij in xrange(0,nJetMultCategs):
-            jmult=JETMULTCATEGS[ij]
-            
-            for bmult in xrange(0,3):
-                tagCountingBinMap.append( (bmult,jmult,j1Cuts,j2Cuts) )
+            histos[name].GetXaxis().SetBinLabel(ij*3+1,'%dj0t'%JETMULTCATEGS[ij])
+            histos[name].GetXaxis().SetBinLabel(ij*3+2,'%dj1t'%JETMULTCATEGS[ij])
+            histos[name].GetXaxis().SetBinLabel(ij*3+3,'%dj2t'%JETMULTCATEGS[ij])
+        histos[name].Sumw2()
+        histos[name].SetDirectory(0)
 
-    print len(tagCountingBinMap),' bins for tag counting...have fun with that'
+    #report
+    sliceVarMin=(SLICEBINS[SLICEVAR][sliceCat[0]][0],SLICEBINS[SLICEVAR][sliceCat[1]][0])
+    sliceVarMax=(SLICEBINS[SLICEVAR][sliceCat[0]][1],SLICEBINS[SLICEVAR][sliceCat[1]][1])
 
-    for key in ['data','hh','hl','ll']:
-        
-        for i in xrange(1,nOPs):            
-            name='%s_%s_pass%d'%(key,tagger,i)
-            histos[name]=ROOT.TH1F(name,';%s b-tag multiplicity;Events'%taggerDef[0],len(tagCountingBinMap),0,len(tagCountingBinMap))
+    print '...starting %s for category %3.0f to %3.0f / %3.0f to %3.0f with wp=%d'%(tagger,
+                                                                                    sliceVarMin[0],sliceVarMax[0],
+                                                                                    sliceVarMin[1],sliceVarMax[1],
+                                                                                    iop)
+    print '   base name is %s'%baseName
+    print '   task systematics are',TASKSYSTVARS
+    print '   will fill %d histograms'%len(histos)
+    print '   for events in',channelList
 
-            curJetMult=tagCountingBinMap[0][1]
-            curJ1Cut=tagCountingBinMap[0][2]
-            curJ2Cut=tagCountingBinMap[0][3]
-            for xbin in xrange(1,len(tagCountingBinMap)+1):
-                bmult=tagCountingBinMap[xbin-1][0]
-                jmult=tagCountingBinMap[xbin-1][1]
-                j1cut=tagCountingBinMap[xbin-1][2]
-                j2cut=tagCountingBinMap[xbin-1][3]
-                printJetMult=False
-                if xbin==1 or jmult!=curJetMult:
-                    printJetMult=True
-                    curJetMult=jmult
-                printJetCuts=False
-                if xbin==1 or j1cut!=curJ1Cut or j2cut!=curJ2Cut:
-                    printJetCuts=True
-                    curJ1Cut=j1cut
-                    curJ2Cut=j2cut
-
-                label='%dt'%bmult
-                if printJetMult : label += ',%dj'%jmult
-                if printJetCuts : label='#splitline{%s}{(%d-%d),(%d-%d)}'%(label,j1cut[0],j1cut[1],j2cut[0],j2cut[1])
-                histos[name].GetXaxis().SetBinLabel(xbin,label)
-
-    #add files to the corresponding chains
-    files = [ f for f in os.listdir(inDir) if '.root' in f ]
-    chains={'mc':ROOT.TChain('ftm'),'data':ROOT.TChain('ftm')}
-    for f in files: 
-        key = 'mc' if 'MC' in f else 'data'
-        chains[key].Add(inDir+'/'+f)
+    #read expected efficiencies from cache
+    cachefile=open(expEffUrl,'r')
+    expEffGr=pickle.load(cachefile)
+    cachefile.close()
 
     #fill histos
-    for key in chains:
-        totalEntries=chains[key].GetEntries()
-        for i in xrange(0,totalEntries):
+    chain=ROOT.TChain('ftm')
+    chain.Add('%s/%s.root'%(inDir,sampleTag))
+    totalEntries=chain.GetEntries()
+    for i in xrange(0,totalEntries):
 
-            if i%100==0 : sys.stdout.write('\r [ %d/100 ] done for %s' %(int(float(100.*i)/float(totalEntries)),key) )
-
-            chains[key].GetEntry(i)
-
-            #require matching channel
-            if not chains[key].ttbar_chan in CHANNELS : continue
-
-            #require at least two jets
-            if not chains[key].jetmult in JETMULTCATEGS : continue
+        if i%100==0 : sys.stdout.write('\r [ %d/100 ] done' %(int(float(100.*i)/float(totalEntries))) )
             
-            #event weight
-            weight=chains[key].weight[0]
+        chain.GetEntry(i)
 
-            ntags=[0]*nOPs
-            nheavy=0
-            flavourCombLabel=''
-            for ij in xrange(0,2):
-                    
-                #tagger value
-                taggerVal = getattr(chains[key],tagger)[ij]
+        #require matching channel
+        if not chain.ttbar_chan in channelList : continue
 
-                #count tags
-                passTagWgts=[False]*nOPs
-                for iop in xrange(1,nOPs):
-                    if taggerVal<taggerDef[iop+1]: continue
-                    passTagWgts[iop-1]=True
-                    ntags[iop-1]+=1
+        #require jet multiplicity within the ones selected
+        jetMultCateg=-1
+        for ijm in xrange(0,len(JETMULTCATEGS)):
+            if  chain.jetmult != JETMULTCATEGS[ijm] : continue
+            jetMultCateg=ijm
+            break
+        if jetMultCateg<0: continue
+            
+        #check if jets are in required category
+        sliceVarVal1=getattr(chain,SLICEVAR)[0]
+        sliceVarVal2=getattr(chain,SLICEVAR)[1]
 
-                #MC truth
-                flavName='l'
-                if abs(chains[key].flavour[ij])==5 :
-                    nheavy +=1 
-                    flavName='b'
-                if abs(chains[key].flavour[ij])==4: 
-                    nheavy+=1
-                    flavName='c'
+        #jet categories
+        jetCats=[-1,-1]
+        if sliceVarVal1>sliceVarMin[0] and sliceVarVal1<sliceVarMax[0]:
+            jetCats[0]=sliceCat[0]+1
+            if sliceVarVal2>sliceVarMin[1] and sliceVarVal2<sliceVarMax[1]:
+                jetCats[1]=sliceCat[1]+1
 
-                #MC truth for the efficiency as function of the slicing variable
-                flavourCombLabel += '%s_{%d}'%(flavName,ij+1)
-                jetSliceVarVal=getattr(chains[key],SLICEVAR)[ij]
-                for ijcat in xrange(0,len(SLICEBINS)):
-                    if jetSliceVarVal<SLICEBINS[ijcat][0] : continue
-                    if jetSliceVarVal>SLICEBINS[ijcat][1] : continue 
-                    histos['%s_%s_pass0'%(flavName,tagger)].Fill(ijcat,weight)
-                    for iop in xrange(1,nOPs):
-                        if not passTagWgts[iop-1] : continue
-                        name='%s_%s_pass%d'%(flavName,tagger,iop)
-                        histos[name].Fill(ijcat,weight)
-                        
-            #MC truth for the jet flavour combination vs jet slicing category
-            if key !='data':
-                for iflavComb in xrange(0,len(flavourCombinationsBinMap)):
-                    if flavourCombLabel!= flavourCombinationsBinMap[iflavComb] : continue
+        if sliceVarVal1>sliceVarMin[1] and sliceVarVal1<sliceVarMax[1]:
+            jetCats[0]=sliceCat[1]+1
+            if sliceVarVal2>sliceVarMin[0] and sliceVarVal2<sliceVarMax[0]:
+                jetCats[1]=sliceCat[0]+1
 
-                    for ijetCateg in xrange(0,len(jetCategsBinMap)):
-                        j1Cuts=jetCategsBinMap[ijetCateg][0]
-                        j1SliceVarVal=getattr(chains[key],SLICEVAR)[0]
-                        if j1SliceVarVal<j1Cuts[0] or j1SliceVarVal>j1Cuts[1] : continue
-                    
-                        j2Cuts=jetCategsBinMap[ijetCateg][1]
-                        j2SliceVarVal=getattr(chains[key],SLICEVAR)[1]
-                        if j2SliceVarVal<j2Cuts[0] or j2SliceVarVal>j2Cuts[1] : continue
+        #check if jets can be both fit into the required category
+        if jetCats[0]<0 or jetCats[1]<0: continue
                 
-                        histos['flavcategs'].Fill(ijetCateg,iflavComb,weight)
-
-            #tag counting histograms
-            flavCat=key
-            if key != 'data' :
-                flavCat='hh'
-                if nheavy==1: flavCat='hl'
-                if nheavy==0: flavCat='ll'
-
-            for ibin in xrange(0,len(tagCountingBinMap)):
-                
-                if chains[key].jetmult != tagCountingBinMap[ibin][1] : continue
-
-                j1Cuts=tagCountingBinMap[ibin][2]
-                j1SliceVarVal=getattr(chains[key],SLICEVAR)[0]
-                if j1SliceVarVal<j1Cuts[0] or j1SliceVarVal>j1Cuts[1] : continue
-
-                j2Cuts=tagCountingBinMap[ibin][3]
-                j2SliceVarVal=getattr(chains[key],SLICEVAR)[1]
-                if j2SliceVarVal<j2Cuts[0] or j2SliceVarVal>j2Cuts[1] : continue
-
-                for iop in xrange(1,nOPs):
-                    if ntags[iop-1]!=tagCountingBinMap[ibin][0] : continue
-                    name='%s_%s_pass%d'%(flavCat,tagger,iop)
-                    histos[name].Fill(ibin,weight)
+        #reset tag counters
+        for tagVar in tagCounting: tagCounting[tagVar]=0
+        for ij in xrange(0,2):
                     
+            #efficiency variation categories
+            effCategs=[0]
+            effCategs.append( jetCats[ij])
+
+            #jet pT
+            jpt=chain.jetpt[ij]
+
+            #MC truth
+            flav,flavName=abs(chain.flavour[ij]),'udsg'
+            if flav==5: flavName='b'
+            if flav==4: flavName='c'
+
+            #tagger value
+            taggerVal = getattr(chain,tagger)[ij]
+
+            #count tags
+            expEff = 1.0
+            try:
+                expEff=expEffGr[tagger][flavName][iop].Eval(jpt) 
+            except:
+                pass
+                
+            passTag = False if taggerVal<taggerDef[iop+1] else True
+            tagCounting['nom'] += int(passTag)
+                    
+            #passTagBeffUp,passTagBeffDown = passTag,passTag
+            #if flav==5:
+            #    passTagBeffUp=btagSFTool.modifyBTagsWithSF(passTagBeffUp,1.0*(1+RELTAGEFFVAR),expEff)
+            #    passTagBeffDown=btagSFTool.modifyBTagsWithSF(passTagBeffDown,1.0*(1-RELTAGEFFVAR),expEff)
+            #for idx in effCategs:
+            #    tagCounting['beff%dUp'%idx] += int(passTagBeffUp)
+            #    tagCounting['beff%dDown'%idx] += int(passTagBeffDown)
+            #
+            #passTagCeffUp,passTagCeffDown = passTag,passTag
+            #if flav==4:
+            #    passTagCeffUp=btagSFTool.modifyBTagsWithSF(passTagCeffUp,1.0*(1+RELTAGEFFVAR),expEff)
+            #    passTagCeffDown=btagSFTool.modifyBTagsWithSF(passTagCeffDown,1.0*(1-RELTAGEFFVAR),expEff)
+            #for idx in effCategs:
+            #    tagCounting['ceff%dUp'%idx] += int(passTagCeffUp)
+            #    tagCounting['ceff%dDown'%idx] += int(passTagCeffDown)
+            #
+            #passTagLeffUp,passTagLeffDown = passTag,passTag
+            #if flav!=4 and flav!=5:
+            #    passTagLeffUp=btagSFTool.modifyBTagsWithSF(passTagLeffUp,1.0*(1+RELTAGEFFVAR),expEff)
+            #    passTagLeffDown=btagSFTool.modifyBTagsWithSF(passTagLeffDown,1.0*(1-RELTAGEFFVAR),expEff)
+            #for idx in effCategs:
+            #    tagCounting['leff%dUp'%idx] += int(passTagLeffUp)
+            #    tagCounting['leff%dDown'%idx] += int(passTagLeffDown)
+
+        #print sliceVarVal1,sliceVarVal2,'->',effCategs
+        #print 'Flavours:',chain.flavour[0],chain.flavour[1]
+        #print tagCounting
+
+        #fill the histograms        
+        for var in histoVars:
+            name='%s_pass%d_%s'%(baseName,iop,var)
+                
+            weight=chain.weight[0]
+            if var=='jesup':      weight=chain.weight[1]
+            if var=='jesdn':      weight=chain.weight[2]
+            if var=='jerup':      weight=chain.weight[3]
+            if var=='jerdn':      weight=chain.weight[4]
+            if var=='puup':       weight=chain.weight[5]
+            if var=='pudn':       weight=chain.weight[6]
+            if var=='trigup':     weight=chain.weight[7]
+            if var=='trigdn':     weight=chain.weight[8]
+            if var=='selup':      weight=chain.weight[9]
+            if var=='seldn':      weight=chain.weight[10]
+            if var=='qcdscaleup': weight=chain.weight[11]
+            if var=='qcdscaledn': weight=chain.weight[12]
+            if var=='hdampup':    weight=chain.weight[13]
+            if var=='hdampdn':    weight=chain.weight[14]
+            nbtags=tagCounting['nom']
+            if 'beff' in var or 'ceff' in var or 'leff' in var:
+                nbtags=tagCounting[var]
+            histos[name].Fill(nbtags+jetMultCateg*3,weight)
+            #print name,nbtags,weight
+        #print tagCounting
+        #raw_input()
+                     
     #save templates to file
-    fOut=ROOT.TFile.Open('%s/FtM/%s.root'%(outDir,tagger),'RECREATE')
+    fOut=ROOT.TFile.Open('%s/FtM/%s.root'%(outDir,sampleTag),'UPDATE')
+    print '    output stored in %s'%fOut.GetName()
     for key in histos : histos[key].Write()
     fOut.Close()
+
 
 
 """
 Wrapper to be used when run in parallel
 """
 def runPrepareTemplatesPacked(args):
-    tagger, taggerDef, inDir, outDir = args
     try:
-        return prepareTemplates(tagger=tagger,
-                                taggerDef=taggerDef,                      
-                                inDir=inDir,
-                                outDir=outDir)
+        return prepareTemplates(sampleTag=args[0],
+                                tagger=args[1],
+                                iop=args[2],
+                                taggerDef=args[3],
+                                sliceCat=args[4],
+                                channelList=args[5],
+                                btagSFTool=args[6],
+                                expEffUrl=args[7],
+                                inDir=args[8],
+                                outDir=args[9])
     except :
         print 50*'<'
         print "  Problem found (%s) baling out of this task" % sys.exc_info()[1]
@@ -235,231 +230,85 @@ def runPrepareTemplatesPacked(args):
         return False
 
 """
-Use the templates to prepare the workspace
-"""
-def prepareWorkspace(tagger,taggerDef,inDir):
-    inF=ROOT.TFile.Open('%s/%s.root'%(inDir,tagger))
-
-    colors = [ROOT.kGray,    ROOT.kAzure+7,  ROOT.kGreen, 
-              ROOT.kGreen+1, ROOT.kOrange+8, ROOT.kMagenta+2,
-              ROOT.kYellow-3, ROOT.kYellow-5, 0]
-
-    #
-    #MC EFFICIENCIES
-    #
-    effGrs={}
-    for flav in ['b','c','l']:
-        preTag=inF.Get('%s_%s_pass0' % (flav,tagger) )
-        if not flav in effGrs: effGrs[flav]=[]
-        for iop in xrange(1,len(taggerDef)-2):
-            postTag=inF.Get('%s_%s_pass%d' % (flav,tagger,iop) )
-            effGrs[flav].append( postTag.Clone() )
-            effGrs[flav][-1].Sumw2()
-            effGrs[flav][-1].SetTitle('%s>%3.2f' % (tagger,taggerDef[iop+2] ))
-            effGrs[flav][-1].SetMarkerStyle(20+iop)
-            effGrs[flav][-1].SetMarkerColor(colors[iop])
-            effGrs[flav][-1].SetLineColor(colors[iop])
-            effGrs[flav][-1].SetFillStyle(0)
-            effGrs[flav][-1].Divide(preTag)
-        
-    #
-    #FLAVOUR COMPOSITION
-    #
-    flavcategs=inF.Get('flavcategs')    
-    catFracHistos=[]
-    for xbin in xrange(1,flavcategs.GetNbinsX()+1):
-        xlabel     = flavcategs.GetXaxis().GetBinLabel(xbin)
-        totalInCat = flavcategs.Integral(xbin,xbin,1,flavcategs.GetNbinsY())
-
-        for ybin in xrange(1,flavcategs.GetNbinsY()+1):
-            ylabel=flavcategs.GetYaxis().GetBinLabel(ybin)
-
-            #init histo if not yet available
-            if len(catFracHistos)<ybin:
-                catFracHistos.append( ROOT.TH1F('catfrac%d'%ybin,
-                                                '%s;%s;Fraction' %(ylabel,flavcategs.GetTitle()),
-                                                flavcategs.GetNbinsX(),flavcategs.GetXaxis().GetXmin(),flavcategs.GetXaxis().GetXmax()))
-                catFracHistos[-1].SetTitle(ylabel)
-                catFracHistos[-1].SetDirectory(0)
-                catFracHistos[-1].Sumw2()
-                catFracHistos[-1].SetLineColor(1)
-                catFracHistos[-1].SetFillColor(colors[ybin-1])
-                catFracHistos[-1].SetMarkerColor(colors[ybin-1])
-                catFracHistos[-1].SetFillStyle(1001)
-                for binCtr in xrange(1, catFracHistos[-1].GetNbinsX()+1):
-                    catFracHistos[-1].GetXaxis().SetBinLabel(binCtr,flavcategs.GetXaxis().GetBinLabel(xbin))
-            catFracHistos[ybin-1].SetBinContent(xbin,flavcategs.GetBinContent(xbin,ybin)/totalInCat)
-            catFracHistos[ybin-1].SetBinError(xbin,flavcategs.GetBinError(xbin,ybin)/totalInCat)       
-    
-
-
-    #SHOW PLOTS
-    ceff=ROOT.TCanvas('ceff','ceff',500,500)
-    ceff.SetTopMargin(0)
-    ceff.SetBottomMargin(0)
-    ceff.SetLeftMargin(0)
-    ceff.SetRightMargin(0)
-
-    txt=ROOT.TLatex()
-    txt.SetNDC(True)
-    txt.SetTextFont(43)
-    txt.SetTextSize(16)
-    txt.SetTextAlign(12)
-
-    ceff.cd()
-    p1=ROOT.TPad('p1','p1',0.,0.,1.0,0.33)
-    p1.SetBottomMargin(0.15)
-    p1.SetTopMargin(0.01)
-    p1.SetLeftMargin(0.12)
-    p1.SetRightMargin(0.05)
-    p1.Draw()
-    p1.cd()
-    for i in xrange(0,len(effGrs['b'])):
-        drawOpt='E1X0' if i==0 else 'E1X0same'
-        effGrs['b'][i].Draw(drawOpt)
-        effGrs['b'][i].GetXaxis().SetTitleSize(0.9)
-        effGrs['b'][i].GetXaxis().SetLabelSize(0.08)
-        effGrs['b'][i].GetYaxis().SetRangeUser(0.12,0.96)
-        effGrs['b'][i].GetYaxis().SetTitleSize(0.09)
-        effGrs['b'][i].GetYaxis().SetLabelSize(0.08)
-        effGrs['b'][i].GetYaxis().SetTitle('Efficiency')
-        effGrs['b'][i].GetYaxis().SetTitleOffset(0.6)
-    txt.DrawLatex(0.85,0.93,'#bf{[b]}')
-
-    ceff.cd()
-    p2=ROOT.TPad('p2','p2',0.,0.33,1.0,0.66)
-    p2.SetBottomMargin(0.01)
-    p2.SetTopMargin(0.01)
-    p2.SetLeftMargin(0.12)
-    p2.SetRightMargin(0.05)
-    p2.Draw()
-    p2.cd()
-    for i in xrange(0,len(effGrs['c'])):
-        drawOpt='E1X0' if i==0 else 'E1X0same'
-        effGrs['c'][i].Draw(drawOpt)
-        effGrs['c'][i].GetYaxis().SetRangeUser(0.12,0.96)
-        effGrs['c'][i].GetYaxis().SetTitleSize(0.09)
-        effGrs['c'][i].GetYaxis().SetLabelSize(0.08)
-        effGrs['c'][i].GetYaxis().SetTitle('Efficiency')
-        effGrs['c'][i].GetYaxis().SetTitleOffset(0.6)
-    txt.DrawLatex(0.85,0.93,'#bf{[c]}')
-
-    ceff.cd()
-    p3=ROOT.TPad('p3','p3',0.,0.66,1.0,1.0)
-    p3.SetBottomMargin(0.01)
-    p3.SetTopMargin(0.02)
-    p3.SetLeftMargin(0.12)
-    p3.SetRightMargin(0.05)
-    p3.Draw()
-    p3.cd()
-    leg=ROOT.TLegend(0.2,0.75,0.8,0.9)
-    leg.SetBorderSize(0)
-    leg.SetFillStyle(0)
-    leg.SetTextFont(42)
-    leg.SetNColumns(4)
-    leg.SetTextSize(0.06)
-    for i in xrange(0,len(effGrs['l'])):
-        drawOpt='E1X0' if i==0 else 'E1X0same'
-        effGrs['l'][i].Draw(drawOpt)
-        effGrs['l'][i].GetYaxis().SetRangeUser(0.12,0.96)
-        effGrs['l'][i].GetYaxis().SetTitleSize(0.09)
-        effGrs['l'][i].GetYaxis().SetLabelSize(0.08)
-        effGrs['l'][i].GetYaxis().SetTitle('Efficiency')
-        effGrs['l'][i].GetYaxis().SetTitleOffset(0.6)
-        leg.AddEntry(effGrs['l'][i],effGrs['l'][i].GetTitle(),'p')
-    leg.Draw()
-    txt.DrawLatex(0.9,0.93,'#bf{[l]}')
-   
-    txt.DrawLatex(0.2,0.93,'#bf{CMS} #it{Simulation}')
-
-    ceff.cd()
-    ceff.Modified()
-    ceff.Update()
-    raw_input()
-
-
-    c=ROOT.TCanvas('c','c',500,500)
-    c.SetTopMargin(0.02)
-    c.SetRightMargin(0.1)
-    c.SetLeftMargin(0.12)
-    c.SetBottomMargin(0.15)
-    leg=ROOT.TLegend(0.2,0.75,0.8,0.9)
-    leg.SetBorderSize(0)
-    leg.SetFillStyle(0)
-    leg.SetTextFont(42)
-    leg.SetNColumns(4)
-    leg.SetTextSize(0.04)
-
-    stack=ROOT.THStack()
-    for h in catFracHistos:        
-        stack.Add(h,'h')
-        leg.AddEntry(h,h.GetTitle(),'f')
-    stack.Draw('hist')  
-    stack.GetYaxis().SetTitle('Fraction')
-    stack.GetXaxis().SetTitle('%s category'%SLICEVAR)
-    stack.GetXaxis().SetTitleOffset(2)
-    stack.GetYaxis().SetRangeUser(0,1)
-    leg.Draw()
-    txt=ROOT.TLatex()
-    txt.SetNDC(True)
-    txt.SetTextFont(43)
-    txt.SetTextSize(16)
-    txt.SetTextAlign(12)
-    txt.DrawLatex(0.2,0.93,'#bf{CMS} #it{Simulation}')
-
-    raw_input()
-        
-
-
-
-"""
 steer the script
 """
 def main():
-
-    ROOT.gStyle.SetOptStat(0)
-    ROOT.gStyle.SetOptTitle(0)
-    #ROOT.gROOT.SetBatch(True)
     
     #configuration
     usage = 'usage: %prog [options]'
     parser = optparse.OptionParser(usage)
     parser.add_option('-t', '--taggers',            dest='taggers'  ,          help='json with list of taggers',    default=None,        type='string')
+    parser.add_option('-j', '--json',        dest='json'  ,      help='json with list of files',      default=None,        type='string')
     parser.add_option('-i', '--inDir',              dest='inDir',              help='input directory with files',   default=None,        type='string')
-    parser.add_option('-l', '--lumi',               dest='lumi' ,              help='lumi to print out',            default=41.6,        type=float)
+    parser.add_option('-e',  '--exp',               dest='expEff',             help='pickle file with the expected efficiencies',   default='data/.expEff.pck',      type='string')
     parser.add_option('-n', '--njobs',              dest='njobs',              help='# jobs to run in parallel',    default=0,           type='int')
     parser.add_option('-o', '--outDir',             dest='outDir',             help='output directory',             default='analysis',  type='string')
+    parser.add_option(      '--channels',           dest='channels',           help='channels to use',              default='-121,-143,-169',  type='string')
     parser.add_option(      '--recycleTemplates',   dest='recycleTemplates',   help='do not regenerate templates',  default=False,       action='store_true')
     (opt, args) = parser.parse_args()
-    
+
+    ROOT.gStyle.SetOptStat(0)
+    ROOT.gStyle.SetOptTitle(0)
+    ROOT.gSystem.CompileMacro("BtagUncertaintyComputer.cc","fkgd","libBtagUncertaintyComputer");
+    ROOT.gSystem.Load("libBtagUncertaintyComputer.so")
+    btagSFTool=ROOT.BTagSFUtil()
+
+    #channels to filter
+    channelList=[ int(k) for k in opt.channels.split(',') ]
+
     #read list of samples
+    jsonFile = open(opt.json,'r')
+    samplesList=json.load(jsonFile,encoding='utf-8').items()
+    jsonFile.close()
+    
+    #read list of taggers
     taggersFile = open(opt.taggers,'r')
     taggersList=json.load(taggersFile,encoding='utf-8').items()
     taggersFile.close()
    
+    #prepare output
+    os.system('mkdir -p %s/FtM'%(opt.outDir))
+
+    #all possible slice categs
+    sliceCategs=[]
+    for i in xrange(0,len(SLICEBINS)):
+        for j in xrange (i,len(SLICEBINS)):
+            sliceCategs.append((i,j))
+
     #re-create templates 
     if not opt.recycleTemplates:
    
         task_list=[]
-        os.system('mkdir -p %s/FtM'%(opt.outDir))
-        for tagger,taggerDef in taggersList:
-            task_list.append((tagger,taggerDef,opt.inDir,opt.outDir))
-    
+        for sampleTag,_ in samplesList:
+
+            #preapare output file
+            fOut=ROOT.TFile.Open('%s/FtM/%s.root'%(opt.outDir,sampleTag),'RECREATE')
+            fOut.Close()
+
+            for tagger,taggerDef in taggersList:
+                nOPs=len(taggerDef)-2
+                for sc in sliceCategs:
+                    for iop in xrange(1,nOPs):
+                        task_list.append((sampleTag,tagger,iop,taggerDef,sc,channelList,btagSFTool,opt.expEff,opt.inDir,opt.outDir))
+        print task_list
         print '%s jobs to run in %d parallel threads' % (len(task_list), opt.njobs)
         if opt.njobs == 0:
-            for tagger,taggerDef,inDir,outDir in task_list:
-                prepareTemplates(tagger=tagger,
-                                 taggerDef=taggerDef,
-                                 inDir=inDir,
-                                 outDir=outDir)
+            for task in task_list:
+                prepareTemplates(sampleTag=task[0],
+                                 tagger=task[1],
+                                 iop=task[2],
+                                 taggerDef=task[3],
+                                 sliceCat=task[4],
+                                 channelList=task[5],
+                                 btagSFTool=task[6],
+                                 expEffUrl=task[7],
+                                 inDir=task[8],
+                                 outDir=task[9])
         else:
             from multiprocessing import Pool
             pool = Pool(opt.njobs)
             pool.map(runPrepareTemplatesPacked, task_list)
 
-    #prepare workspace
-    for tagger,taggerDef in taggersList:
-        prepareWorkspace(tagger=tagger,taggerDef=taggerDef,inDir=opt.outDir+'/FtM')
 
     #all done here
     exit(0)

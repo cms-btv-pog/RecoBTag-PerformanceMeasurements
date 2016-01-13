@@ -57,12 +57,15 @@ void KIN_trainClassifier( TString myMethodList = "", TString inputFile="", Int_t
 {   
   gSystem->ExpandPathName(inputFile);
  
-  TMVA::gConfig().GetIONames().fWeightFileDir = gSystem->DirName(inputFile) + TString("/KIN_weights/");
+  TString wgtsDir("${CMSSW_BASE}/src/RecoBTag/PerformanceMeasurements/test/ttbar/data/KIN");
+  gSystem->ExpandPathName(wgtsDir);
+  TMVA::gConfig().GetIONames().fWeightFileDir = wgtsDir;
   if(jetRank==LEAD)         TMVA::gConfig().GetIONames().fWeightFileDir += "leading/";
   else if(jetRank==SUBLEAD) TMVA::gConfig().GetIONames().fWeightFileDir += "subleading/";
   else if(jetRank==OTHER)   TMVA::gConfig().GetIONames().fWeightFileDir += "others/";
   else                      TMVA::gConfig().GetIONames().fWeightFileDir += "inclusive/";
   cout << "Output dir set to: " << TMVA::gConfig().GetIONames().fWeightFileDir << endl;
+  gSystem->Exec("mkdir -p "+TMVA::gConfig().GetIONames().fWeightFileDir);
 
   // The explicit loading of the shared libTMVA is done in TMVAlogon.C, defined in .rootrc
   // if you use your private .rootrc, or run from a different directory, please copy the

@@ -6,7 +6,7 @@ import ROOT
 import pickle
 import math
 from array import array
-from storeTools import getEOSlslist
+from storeTools import *
 from rounding import *
 
 CHANNELS={-11*11:'ll', -13*13:'ll', -11*13:'emu'}
@@ -14,25 +14,21 @@ CHANNELS={-11*11:'ll', -13*13:'ll', -11*13:'emu'}
 """
 Perform the analysis on a single file
 """
-def runTTbarAnalysis(inFile, outFile, wgt, tmvaWgts=None):
+def runTTbarAnalysis(inFile, outFile, wgt, tmvaWgts=None,isData=False):
 
     from ROOT import TTbarEventAnalysis
     evAnalysis=TTbarEventAnalysis()
 
     #MC specifics
-    if 'MC13TeV_DYJetsToLL' in inFile or 'MC13TeV_WJets' in inFile : evAnalysis.setUseOnlySignOfGenWeight(True)
-    if 'MC13TeV_TTJets' in inFile: evAnalysis.setReadTTJetsGenWeights(True)
+    if 'TTJets' in inFile: evAnalysis.setReadTTJetsGenWeights(True)
 
-    #Data specifics
-    if 'Data' in inFile:
-        evAnalysis.setApplyTriggerEff(False)
-        evAnalysis.setApplyLepSelEff(False)
+    if isData:
         if 'MuonEG'   in inFile : 
             evAnalysis.addTriggerBit(0,-11*13)
             evAnalysis.addTriggerBit(1,-11*13)
-        if 'DoubleEG' in inFile : 
+        if 'DoubleElectron' in inFile : 
             evAnalysis.addTriggerBit(2,-11*11)
-        if 'DoubleMu' in inFile :
+        if 'DoubleMuon' in inFile :
             evAnalysis.addTriggerBit(3,-13*13)
     else:
             evAnalysis.addTriggerBit(0,-11*13)
@@ -47,16 +43,16 @@ def runTTbarAnalysis(inFile, outFile, wgt, tmvaWgts=None):
         evAnalysis.addVarForTMVA(ROOT.TString(v))    
     if not (tmvaWgts is None) : evAnalysis.setTMVAWeightsBaseDir(tmvaWgts)
     evAnalysis.prepareOutput(ROOT.TString(outFile))
-    evAnalysis.processFile(ROOT.TString(inFile),wgt)
+    evAnalysis.processFile(ROOT.TString(inFile),wgt,isData)
     evAnalysis.finalizeOutput()
 
 """
 Wrapper to be used when run in parallel
 """
 def runTTbarAnalysisPacked(args):
-    inFile, outFile, wgt, tmvaWgts = args
+    inFile, outFile, wgt, tmvaWgts,isData = args
     try:
-        return runTTbarAnalysis(inFile=inFile, outFile=outFile, wgt=wgt, tmvaWgts=tmvaWgts)
+        return runTTbarAnalysis(inFile=inFile, outFile=outFile, wgt=wgt, tmvaWgts=tmvaWgts,isData=isData)
     except :
         print 50*'<'
         print "  Problem  (%s) with %s continuing without"%(sys.exc_info()[1],inFile)
@@ -99,7 +95,7 @@ def main():
 
     #read normalization
     xsecWgts, integLumi = {}, {}
-    cache='%s/.xsecweights.pck'%opt.outDir
+    cache='%s/src/RecoBTag/PerformanceMeasurements/test/ttbar/data/.xsecweights.pck'%os.environ['CMSSW_BASE']
     try:
         cachefile = open(cache, 'r')
         xsecWgts  = pickle.load(cachefile)
@@ -112,30 +108,10 @@ def main():
                 raise KeyError
 
     except:
-        print 'Computing original number of events and storing in cache, this may take a while if it\'s the first time'
-        for tag,sample in samplesList: 
+        print '(Re-)Computing original number of events and storing in cache, this may take a while if it\'s the first time'
+        print 'Current cache contains already %d processes'%len(xsecWgts)
+        xsecWgts, integLumi = produceNormalizationCache(samplesList=samplesList,inDir=opt.inDir,cache=cache, xsecWgts=xsecWgts, integLumi=integLumi)
 
-            if sample[1]==1 : 
-                xsecWgts[tag]=1.0
-                continue
-
-            input_list=getEOSlslist(directory=opt.inDir+'/'+tag)            
-            xsec=sample[0]            
-            norigEvents=0
-            for f in input_list:
-                fIn=ROOT.TFile.Open(f)
-                norigEvents+=fIn.Get('allEvents/hEventCount').GetBinContent(1)
-                fIn.Close()
-            xsecWgts[tag]  = xsec/norigEvents  if norigEvents>0 else 0
-            integLumi[tag] = norigEvents/xsec  if norigEvents>0 else 0
-            print '... %s cross section=%f pb #orig events=%d lumi=%3.2f/fb' % (tag,xsec,norigEvents,integLumi[tag]/1000.)
-
-        #dump to file
-        cachefile=open(cache,'w')
-        pickle.dump(xsecWgts, cachefile, pickle.HIGHEST_PROTOCOL)
-        pickle.dump(integLumi, cachefile, pickle.HIGHEST_PROTOCOL)
-        cachefile.close()
-        print 'Produced normalization cache (%s)'%cache
 
     #DY scale factor
     if opt.dyScale:
@@ -144,14 +120,14 @@ def main():
         cachefile.close()
         for tag in xsecWgts:
             if not 'DY' in tag: continue
-            print tag,xsecWgts[tag],' -> ',
-            xsecWgts[tag]=xsecWgts[tag]*dySF[0]
-            print xsecWgts[tag]
+            print tag,xsecWgts[tag].GetBinContent(1),' -> ',
+            xsecWgts[tag].Scale(dySF[0])
+            print xsecWgts[tag].GetBinContent(1)
 
     #create the analysis jobs
     runTags = []
     task_list = []
-    for tag,_ in samplesList:
+    for tag,sample in samplesList:
 
         #check if in list
         if len(onlyList)>0:
@@ -165,15 +141,15 @@ def main():
         wgt = xsecWgts[tag]
         for nf in xrange(0,len(input_list)) : 
             outF='%s/%s_%d.root'%(opt.outDir,tag,nf)
-            task_list.append( (input_list[nf],outF,wgt, opt.tmvaWgts) )
+            task_list.append( (input_list[nf], outF, wgt, opt.tmvaWgts, sample[1]) )
 
     task_list=list(set(task_list))
     print '%s jobs to run in %d parallel threads' % (len(task_list), opt.njobs)
 
     #run the analysis jobs
     if opt.njobs == 0:
-        for inFile, outFile,wgt, tmvaWgts in task_list: 
-            runTTbarAnalysis(inFile=inFile, outFile=outFile, wgt=wgt, tmvaWgts=tmvaWgts)
+        for inFile, outFile,wgt, tmvaWgts,isData in task_list: 
+            runTTbarAnalysis(inFile=inFile, outFile=outFile, wgt=wgt, tmvaWgts=tmvaWgts, isData=isData)
     else:
         from multiprocessing import Pool
         pool = Pool(opt.njobs)
