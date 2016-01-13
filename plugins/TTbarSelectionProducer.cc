@@ -2,9 +2,6 @@
 #include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h" 
 #include "RecoBTag/PerformanceMeasurements/interface/TTbarSelectionProducer.h"
 #include "FWCore/Common/interface/TriggerNames.h"
-#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
-#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
-#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
@@ -15,8 +12,12 @@ using namespace edm;
 
 TTbarSelectionProducer::TTbarSelectionProducer(const edm::ParameterSet& iConfig) :
   triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("triggerColl"))), 
+  prunedGenParticleCollectionName_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("prunedGenParticles"))),
+  generatorevt_(consumes<GenEventInfoProduct>(edm::InputTag("generator",""))),
+  generatorlhe_(consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer",""))),
   RecoHBHENoiseFilter_(consumes<bool>(iConfig.getParameter<edm::InputTag>("RecoHBHENoiseFilter"))),
   vtxToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vtxColl"))),
+  bsToken_(consumes<reco::BeamSpot>(edm::InputTag("offlineBeamSpot",""))),
   electronToken_(consumes<edm::View<pat::Electron> >(iConfig.getParameter<edm::InputTag>("electronColl"))),
   conversionsToken_(mayConsume< reco::ConversionCollection >(iConfig.getParameter<edm::InputTag>("conversions"))),
   electronIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("electronIdMap"))),
@@ -115,13 +116,13 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
    if(!iEvent.isRealData())
      {
        edm::Handle<GenEventInfoProduct> evt;
-       iEvent.getByLabel("generator","", evt);
+       iEvent.getByToken(generatorevt_,evt);
        float w0(1.0);
        if(evt.isValid()) w0=evt->weight();
        histos_["wgtcounter"]->Fill(0.,w0);
        
        edm::Handle<LHEEventProduct> evet;
-       iEvent.getByLabel("externalLHEProducer","", evet);    
+       iEvent.getByToken(generatorlhe_,evet);
        if(evet.isValid())
 	 {
 	   float asdd=evet->originalXWGTUP();
@@ -211,9 +212,9 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
    //get beam spot
    //------------------------------------------
    Handle<reco::BeamSpot> bsHandle;
-   iEvent.getByLabel("offlineBeamSpot", bsHandle);
+   iEvent.getByToken(bsToken_, bsHandle);
    const reco::BeamSpot &beamspot = *bsHandle.product();
-   
+
    //------------------------------------------
    //Selection of muons
    //------------------------------------------
@@ -378,7 +379,7 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
    if(!iEvent.isRealData())
      {
        edm::Handle<reco::GenParticleCollection> gpHa;
-       iEvent.getByLabel("prunedGenParticles", gpHa);
+       iEvent.getByToken(prunedGenParticleCollectionName_,gpHa);
        for (const reco::GenParticle &g : *gpHa)
 	 {
 	   if(!g.isHardProcess()) continue;

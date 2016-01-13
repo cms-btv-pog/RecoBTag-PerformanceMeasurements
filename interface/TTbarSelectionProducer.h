@@ -34,6 +34,10 @@
 
 #include "DataFormats/VertexReco/interface/Vertex.h"
 
+#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+
 //--------------------PAT includes
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "DataFormats/PatCandidates/interface/Particle.h"
@@ -95,14 +99,20 @@ class TTbarSelectionProducer : public edm::EDProducer {
       std::vector<int> trigChannels_;
       std::vector<std::string> trigNamesToSel_;
       bool doTrigSel_;
+  
+      //gen particles
+      edm::EDGetTokenT<reco::GenParticleCollection> prunedGenParticleCollectionName_;
+      edm::EDGetTokenT<GenEventInfoProduct> generatorevt_;     
+      edm::EDGetTokenT<LHEEventProduct> generatorlhe_;
 
       //MET filters
       std::vector<edm::EDGetTokenT<edm::TriggerResults> >metFilters_;
       edm::EDGetTokenT<bool> RecoHBHENoiseFilter_;
       std::vector<std::string> metFiltersToApply_;
 
-      //vertices
+      //vertices, beam spot
       edm::EDGetTokenT<reco::VertexCollection> vtxToken_;
+      edm::EDGetTokenT<reco::BeamSpot> bsToken_;
 
       //Configuration for electrons      
       edm::EDGetTokenT<edm::View<pat::Electron> > electronToken_;

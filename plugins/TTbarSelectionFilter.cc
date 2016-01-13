@@ -40,9 +40,7 @@ class TTbarSelectionFilter : public edm::EDFilter {
       ~TTbarSelectionFilter();
 
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
-     edm::InputTag channel_;
-     
-     
+      edm::EDGetTokenT<int> ttbartop_;   
      
    private:
       virtual void beginJob() ;
@@ -70,10 +68,10 @@ class TTbarSelectionFilter : public edm::EDFilter {
 //
 // constructors and destructor
 //
-TTbarSelectionFilter::TTbarSelectionFilter(const edm::ParameterSet& iConfig)
+TTbarSelectionFilter::TTbarSelectionFilter(const edm::ParameterSet& iConfig):
+  ttbartop_(consumes<int>(edm::InputTag("ttbarselectionproducer:topChannel")))
 {
    //now do what ever initialization is needed
-   channel_        = iConfig.getParameter<edm::InputTag> ("channel");
    selectChannels_ = iConfig.getParameter<std::vector<int> > ("selectChannels");
    selectAll_     = iConfig.getParameter<bool > ("selectAll");
 }
@@ -98,7 +96,7 @@ TTbarSelectionFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
    Handle<int> pIn;
-   iEvent.getByLabel(edm::InputTag("ttbarselectionproducer:topChannel"), pIn);
+   iEvent.getByToken(ttbartop_, pIn);   
    std::vector<int>::iterator it = find (selectChannels_.begin(), selectChannels_.end(), *pIn);
    return ( it!=selectChannels_.end() || selectAll_);
 }

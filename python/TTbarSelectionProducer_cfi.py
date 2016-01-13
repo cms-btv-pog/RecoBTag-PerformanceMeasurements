@@ -3,6 +3,7 @@ import FWCore.ParameterSet.Config as cms
 ttbarselectionproducer = cms.EDProducer("TTbarSelectionProducer",
                                         verbose          = cms.int32(0),
                                         triggerColl      = cms.InputTag("TriggerResults","","HLT"),
+                                        prunedGenParticles       = cms.InputTag('prunedGenParticles'),
                                         metFilters       = cms.VInputTag(cms.InputTag('TriggerResults','','RECO'),
                                                                          cms.InputTag('TriggerResults','','PAT')),
                                         RecoHBHENoiseFilter = cms.InputTag('hcalnoise','','RECO'),
@@ -32,6 +33,6 @@ ttbarselectionproducer = cms.EDProducer("TTbarSelectionProducer",
                                         jetColl          = cms.InputTag("slimmedJets"),
                                         jet_cut_pt       = cms.double(20),
                                         jet_cut_eta      = cms.double(2.5),
-                                        metColl          = cms.InputTag("slimmedMETsNoHF"),
+                                        metColl          = cms.InputTag("slimmedMETs"),
                                         met_cut          = cms.double(0)
                                         )
