@@ -39,5 +39,6 @@ bTagAnalyzer = cms.EDAnalyzer("BTagAnalyzer",
     softPFElectronNegBJetTags = cms.string('negativeSoftPFElectronBJetTags'),
     softPFElectronPosBJetTags = cms.string('positiveSoftPFElectronBJetTags'),
     doubleSVBJetTags = cms.string('pfBoostedDoubleSecondaryVertexAK8BJetTags'),
-    cMVABJetTags = cms.string('pfCombinedMVABJetTags')
+    cMVABJetTags = cms.string('pfCombinedMVABJetTags'),
+    cMVAv2BJetTags = cms.string('pfCombinedMVAV2BJetTags')
 )
