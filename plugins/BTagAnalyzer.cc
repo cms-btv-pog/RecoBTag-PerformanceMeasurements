@@ -359,7 +359,7 @@ private:
   edm::EDGetTokenT<edm::View<pat::Muon>> ttbarproducerMuon_;
   edm::EDGetTokenT<edm::View<pat::MET>> ttbarproducerMET_;
   edm::EDGetTokenT<GenEventInfoProduct> generator;
-  edm::EDGetTokenT<GenEventInfoProduct> generatorhep;
+  edm::EDGetTokenT<edm::HepMCProduct> generatorhep;
   edm::EDGetTokenT<GenEventInfoProduct> generatorevt;
   edm::EDGetTokenT<LHEEventProduct> generatorlhe;
 
@@ -514,7 +514,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
 
   src_ = consumes<GenEventInfoProduct>(iConfig.getParameter<edm::InputTag>("src"));
   generator = consumes<GenEventInfoProduct>(edm::InputTag("generator"));
-  generatorhep = consumes<GenEventInfoProduct>(edm::InputTag("generator"));
+  generatorhep = consumes<edm::HepMCProduct>(edm::InputTag("generatorSmeared"));
   generatorlhe = consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer",""));
   generatorevt = consumes<GenEventInfoProduct>(edm::InputTag("generator",""));
 

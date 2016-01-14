@@ -403,8 +403,10 @@ process.GlobalTag.toGet = cms.VPSet(
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
 process.load("Configuration.Geometry.GeometryRecoDB_cff")
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
-#process.load("SimTracker.TrackHistory.TrackHistory_cff")
-#process.load("SimTracker.TrackHistory.TrackClassifier_cff")
+process.load("SimTracker.TrackHistory.TrackHistory_cff")
+process.load("SimTracker.TrackHistory.TrackClassifier_cff")
+process.load("SimTracker.TrackAssociatorProducers.quickTrackAssociatorByHits_cfi")
+process.load("SimTracker.TrackAssociation.trackingParticleRecoTrackAsssociation_cfi")
 #process.load("RecoBTag.Configuration.RecoBTag_cff")
 
 #-------------------------------------
