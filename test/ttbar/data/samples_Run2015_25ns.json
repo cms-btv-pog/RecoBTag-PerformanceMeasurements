@@ -13,7 +13,7 @@
 "MC13TeV_DY10to50" : [18610.0,      0, "/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIIFall15MiniAODv1-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM", "DY",        8, false, false, 1],
 "MC13TeV_DY50toInf" : [6025.0,      0, "/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv1-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM", "DY",        8, false, false, 1],
 "Data13TeV_DoubleMuon_2015C" : [1, 1, "",     "Data", 1, false, false, 0],
-"Data13TeV_DoubleEG"         : [1, 1, "/DoubleEG/Run2015C_25ns-16Dec2015-v1/MINIAOD",     "Data", 1, false, false, 0],
+"Data13TeV_DoubleEG_2015C"         : [1, 1, "/DoubleEG/Run2015C_25ns-16Dec2015-v1/MINIAOD",     "Data", 1, false, false, 0],
 "Data13TeV_MuonEG_2015C"     : [1, 1, "/MuonEG/Run2015C_25ns-16Dec2015-v1/MINIAOD", "Data", 1, false, false, 0],
 "Data13TeV_DoubleMuon_2015D"     : [1, 1, "/DoubleMuon/Run2015D-16Dec2015-v1/MINIAOD",     "Data", 1, false, false, 0],
 "Data13TeV_DoubleElectron_2015D" : [1, 1, "", "Data", 1, false, false, 0],
