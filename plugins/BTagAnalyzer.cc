@@ -1279,6 +1279,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
 
     edm::Handle<int> pIn;
     iEvent.getByToken(ttbartop, pIn);
+    EventInfo.ttbar_chan=*pIn;
 
     edm::Handle<int> triggerIn;
     iEvent.getByToken(ttbartoptrig,triggerIn);

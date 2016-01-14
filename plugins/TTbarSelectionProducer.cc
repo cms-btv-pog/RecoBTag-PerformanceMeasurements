@@ -301,7 +301,7 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	   if(dR < minDR) minDR=dR;
 	 }
        bool hasOverlap(minDR<0.4);
-       if(!hasOverlap) continue;
+       if(hasOverlap) continue;
        
        selJets.push_back(j);
      }
@@ -380,11 +380,14 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
      {
        edm::Handle<reco::GenParticleCollection> gpHa;
        iEvent.getByToken(prunedGenParticleCollectionName_,gpHa);
+       int genChannel(1);
        for (const reco::GenParticle &g : *gpHa)
 	 {
 	   if(!g.isHardProcess()) continue;
+	   if(abs(g.pdgId())==11 || abs(g.pdgId())==13) genChannel*=g.pdgId();
 	   selGen.push_back(g);
 	 }
+       if(verbose_>5) std::cout << "\t gen level channel is " << genChannel << std::endl;
      }
    
    std::auto_ptr<int> trigWordOut( new int(trigWord) );
