@@ -7,7 +7,7 @@
 #include "TTree.h"
 #include "TSystem.h"
 #include "Math/VectorUtil.h"
-
+#include "TGraph.h"
 #include "TMVA/Reader.h"
 
 #include <iostream>
@@ -28,29 +28,36 @@ class TTbarEventAnalysis
 {
  public:
  TTbarEventAnalysis() : 
-  tmvaReader_(0),
-    useOnlySignOfGenWeight_(false),
-    readTTJetsGenWeights_(false),
-    applyMETFilters_(false),
-    applyTriggerEff_(true),
-    applyLepSelEff_(true) 
+    tmvaReader_(0),
+    readTTJetsGenWeights_(false),   
+    puWgtGr_(0),puWgtDownGr_(0),puWgtUpGr_(0)
       {
 	//jet uncertainty parameterization
-	TString jecUncUrl("${CMSSW_BASE}/src/RecoBTag/PerformanceMeasurements/test/ttbar/Summer15_50nsV5_DATA_Uncertainty_AK4PFchs.txt");
+	TString jecUncUrl("${CMSSW_BASE}/src/RecoBTag/PerformanceMeasurements/test/ttbar/data/Summer15_25nsV5_DATA_Uncertainty_AK4PFchs.txt");
 	gSystem->ExpandPathName(jecUncUrl);
 	jecUnc_ = new JetCorrectionUncertainty(jecUncUrl.Data());
+
+	//pileup weights
+	TString puWgtUrl("${CMSSW_BASE}/src/RecoBTag/PerformanceMeasurements/test/ttbar/data/pileupWgts.root");
+	gSystem->ExpandPathName(puWgtUrl);
+	TFile *fIn=TFile::Open(puWgtUrl);
+	if(fIn){
+	  puWgtGr_     = (TGraph *)fIn->Get("puwgts_nom");
+	  puWgtDownGr_ = (TGraph *)fIn->Get("puwgts_down");
+	  puWgtUpGr_   = (TGraph *)fIn->Get("puwgts_up");
+	  fIn->Close();
+	}
+	else{
+	  std::cout << "Unable to find data/pileupWgts.root, no PU reweighting will be applied" << std::endl;
+	}
       }
   ~TTbarEventAnalysis(){}
-  void setUseOnlySignOfGenWeight(bool useOnlySignOfGenWeight) { useOnlySignOfGenWeight_=useOnlySignOfGenWeight; }
   void setReadTTJetsGenWeights(bool readTTJetsGenWeights)     { readTTJetsGenWeights_=readTTJetsGenWeights; }
-  void setApplyMETFilters(bool applyMETFilters)               { applyMETFilters_=applyMETFilters; }
-  void setApplyTriggerEff(bool applyTriggerEff)               { applyTriggerEff_=applyTriggerEff; }
-  void setApplyLepSelEff(bool applyLepSelEff)                 { applyLepSelEff_=applyLepSelEff; }
   void setTMVAWeightsBaseDir(TString url)                     { weightsDir_=url; gSystem->ExpandPathName(weightsDir_); }
   void addTriggerBit(Int_t bit,Int_t ch)                      { triggerBits_.push_back(std::pair<Int_t,Int_t>(bit,ch)); }
   void addVarForTMVA(TString varName)                         { tmvaVarNames_.push_back(varName); }
   void prepareOutput(TString outFile);
-  void processFile(TString inFile,float xsecWgt);
+  void processFile(TString inFile,TH1F *xsecWgt,Bool_t isData);
   void finalizeOutput();
 
  private:
@@ -60,12 +67,13 @@ class TTbarEventAnalysis
   std::vector<float> getJetEnergyScales(float pt,float eta,float rawsf,float area,float rho);
   std::vector<float> getJetResolutionScales(float pt, float eta, float genjpt);
 
-  bool useOnlySignOfGenWeight_, readTTJetsGenWeights_, applyMETFilters_, applyTriggerEff_, applyLepSelEff_;
+  TGraph *puWgtGr_,*puWgtDownGr_,*puWgtUpGr_;
+  bool readTTJetsGenWeights_;
   TString weightsDir_;
   std::vector<TString> tmvaVarNames_;
   TMVA::Reader *tmvaReader_;
   TFile *outF_;
-  Int_t eventInfo_[3],ttbar_chan_;
+  Int_t eventInfo_[3],ttbar_chan_,npv_;
   Float_t weight_[15];
   Int_t jetFlavour_[2],jetmult_,jetrank_;
   Float_t jetPt_[2],jetEta_[2];

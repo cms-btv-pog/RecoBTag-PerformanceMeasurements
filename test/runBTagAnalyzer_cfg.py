@@ -318,13 +318,15 @@ process.source = cms.Source("PoolSource",
 )
 if options.miniAOD:
     process.source.fileNames = [
-        '/store/mc/RunIISpring15MiniAODv2/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/FC156ADC-CA6D-E511-BC16-0022640691CC.root'
+        '/store/mc/RunIIFall15MiniAODv1/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/30000/02D2C327-8FA6-E511-9BD1-0CC47A4D7668.root'
+        #'/store/mc/RunIISpring15MiniAODv2/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/FC156ADC-CA6D-E511-BC16-0022640691CC.root'
         #'/store/mc/RunIISpring15MiniAODv2/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1//50000/E8B99B66-7D6F-E511-AD98-68B599B9B998.root'
     ]
 if options.runOnData:
     process.source.fileNames = [
+        '/store/data/Run2015D/DoubleMuon/MINIAOD/16Dec2015-v1/10000/DA6A1520-F1A7-E511-83BE-3417EBE64BE8.root'
         #'/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/168/00000/60FF8405-EA26-E511-A892-02163E01387D.root'
-        '/store/data/Run2015D/MuonEG/MINIAOD/PromptReco-v4/000/258/159/00000/64914E6C-F26B-E511-B0C8-02163E0142D1.root'
+        #'/store/data/Run2015D/MuonEG/MINIAOD/PromptReco-v4/000/258/159/00000/64914E6C-F26B-E511-B0C8-02163E0142D1.root'        
     ]
 if options.fastSim:
     process.source.fileNames = [
@@ -754,14 +756,14 @@ if options.runOnData:
 
 #-------------------------------------
 ## Add GenParticlePruner for boosted b-tagging studies
-process.prunedGenParticlesBoost = cms.EDProducer('GenParticlePruner',
-    src = cms.InputTag(genParticles),
-    select = cms.vstring(
-        "drop  *  ", #by default
-        "keep ( status = 3 || (status>=21 && status<=29) )", #keep hard process particles
-        "keep abs(pdgId) = 13 || abs(pdgId) = 15" #keep muons and taus
-    )
-)
+if not options.runOnData:
+    process.prunedGenParticlesBoost = cms.EDProducer('GenParticlePruner',
+                                                     src = cms.InputTag(genParticles),
+                                                     select = cms.vstring("drop  *  ", #by default
+                                                                          "keep ( status = 3 || (status>=21 && status<=29) )", #keep hard process particles
+                                                                          "keep abs(pdgId) = 13 || abs(pdgId) = 15" #keep muons and taus
+                                                                          )
+                                                     )
 
 #-------------------------------------
 
@@ -794,7 +796,7 @@ if options.useTTbarFilter:
         process.ttbarselectionproducer.electronColl = cms.InputTag('slimmedElectrons')
         process.ttbarselectionproducer.muonColl     = cms.InputTag('slimmedMuons')
         process.ttbarselectionproducer.jetColl      = cms.InputTag('selectedPatJets'+postfix)
-        process.ttbarselectionproducer.metColl      = cms.InputTag('slimmedMETsNoHF')
+        process.ttbarselectionproducer.metColl      = cms.InputTag('slimmedMETs')
         switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
     else:
         process.ttbarselectionproducer.electronColl = cms.InputTag('selectedPatElectrons'+postfix)

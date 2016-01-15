@@ -2,9 +2,8 @@
 #include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h" 
 #include "RecoBTag/PerformanceMeasurements/interface/TTbarSelectionProducer.h"
 #include "FWCore/Common/interface/TriggerNames.h"
-#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
-#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
-#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 using namespace std;
 using namespace edm;
@@ -13,8 +12,12 @@ using namespace edm;
 
 TTbarSelectionProducer::TTbarSelectionProducer(const edm::ParameterSet& iConfig) :
   triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("triggerColl"))), 
+  prunedGenParticleCollectionName_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("prunedGenParticles"))),
+  generatorevt_(consumes<GenEventInfoProduct>(edm::InputTag("generator",""))),
+  generatorlhe_(consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer",""))),
   RecoHBHENoiseFilter_(consumes<bool>(iConfig.getParameter<edm::InputTag>("RecoHBHENoiseFilter"))),
   vtxToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vtxColl"))),
+  bsToken_(consumes<reco::BeamSpot>(edm::InputTag("offlineBeamSpot",""))),
   electronToken_(consumes<edm::View<pat::Electron> >(iConfig.getParameter<edm::InputTag>("electronColl"))),
   conversionsToken_(mayConsume< reco::ConversionCollection >(iConfig.getParameter<edm::InputTag>("conversions"))),
   electronIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("electronIdMap"))),
@@ -55,6 +58,7 @@ TTbarSelectionProducer::TTbarSelectionProducer(const edm::ParameterSet& iConfig)
   produces<int>("topChannel");
   produces<int>("topTrigger");
   produces<int>("topMETFilter");
+  produces<std::vector<reco::GenParticle> >();
   produces<std::vector<pat::Electron> >();
   produces<std::vector<pat::Muon> >();
   produces<std::vector<pat::Jet> >();
@@ -112,13 +116,13 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
    if(!iEvent.isRealData())
      {
        edm::Handle<GenEventInfoProduct> evt;
-       iEvent.getByLabel("generator","", evt);
+       iEvent.getByToken(generatorevt_,evt);
        float w0(1.0);
        if(evt.isValid()) w0=evt->weight();
        histos_["wgtcounter"]->Fill(0.,w0);
        
        edm::Handle<LHEEventProduct> evet;
-       iEvent.getByLabel("externalLHEProducer","", evet);    
+       iEvent.getByToken(generatorlhe_,evet);
        if(evet.isValid())
 	 {
 	   float asdd=evet->originalXWGTUP();
@@ -208,9 +212,9 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
    //get beam spot
    //------------------------------------------
    Handle<reco::BeamSpot> bsHandle;
-   iEvent.getByLabel("offlineBeamSpot", bsHandle);
+   iEvent.getByToken(bsToken_, bsHandle);
    const reco::BeamSpot &beamspot = *bsHandle.product();
-   
+
    //------------------------------------------
    //Selection of muons
    //------------------------------------------
@@ -297,7 +301,7 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	   if(dR < minDR) minDR=dR;
 	 }
        bool hasOverlap(minDR<0.4);
-       if(!hasOverlap) continue;
+       if(hasOverlap) continue;
        
        selJets.push_back(j);
      }
@@ -369,12 +373,31 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
      }
    else if(verbose_>5) std::cout << "\t Event is selected " << std::endl;
 
+
+   //select particles from the hard process for MC
+   std::vector<reco::GenParticle> selGen;
+   if(!iEvent.isRealData())
+     {
+       edm::Handle<reco::GenParticleCollection> gpHa;
+       iEvent.getByToken(prunedGenParticleCollectionName_,gpHa);
+       int genChannel(1);
+       for (const reco::GenParticle &g : *gpHa)
+	 {
+	   if(!g.isHardProcess()) continue;
+	   if(abs(g.pdgId())==11 || abs(g.pdgId())==13) genChannel*=g.pdgId();
+	   selGen.push_back(g);
+	 }
+       if(verbose_>5) std::cout << "\t gen level channel is " << genChannel << std::endl;
+     }
+   
    std::auto_ptr<int> trigWordOut( new int(trigWord) );
    iEvent.put(trigWordOut,"topTrigger");
    std::auto_ptr<int> metfilterWordOut( new int(metfilterWord) );
    iEvent.put(metfilterWordOut,"topMETFilter");
    std::auto_ptr<int > chOut( new int (chsel) );
    iEvent.put(chOut,"topChannel");
+   std::auto_ptr< vector<reco::GenParticle> > genColl( new vector<reco::GenParticle>(selGen) );
+   iEvent.put(genColl);
    auto_ptr<vector<pat::Electron> > eleColl( new vector<pat::Electron>(selElectrons) );
    iEvent.put( eleColl );
    auto_ptr<vector<pat::Muon> > muColl( new vector<pat::Muon>(selMuons) );

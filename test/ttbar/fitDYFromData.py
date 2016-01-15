@@ -23,7 +23,7 @@ def main():
     dyTemplate=inF.Get('%s/%s'%(crPlot,crPlot))
     for key in inF.Get(crPlot).GetListOfKeys():
         keyName=key.GetName()
-        if keyName==crPlot or 'DY+jets' in keyName or 'Graph' in keyName: continue
+        if keyName==crPlot or 'DY' in keyName or 'Graph' in keyName: continue
         h=inF.Get('%s/%s'%(crPlot,keyName))        
         dyTemplate.Add( h,-1 )
     
@@ -35,7 +35,7 @@ def main():
         keyName=key.GetName()
         if keyName==srPlot or 'Graph' in keyName : continue
         h=inF.Get('%s/%s'%(srPlot,keyName))
-        if'DY+jets' in keyName:
+        if'DY' in keyName:
             dyTemplate.Scale(h.Integral()/dyTemplate.Integral())
         else:
             if otherProc is None:
