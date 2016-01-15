@@ -40,7 +40,7 @@ options.register('mcGlobalTag', '76X_mcRun2_asymptotic_v12',
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', '76X_dataRun2_v11', 
+options.register('dataGlobalTag', '76X_dataRun2_v11',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
@@ -131,13 +131,13 @@ options.register('usePruned', True,
     "Use pruned jets"
 )
 #Generally leave to False unless you know what you are doing
-options.register('runIVF', False, 
+options.register('runIVF', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Run IVF, currently leave to False!"
 )
 ### Master switch for boosted b tag commissioning: overrider several other switches
-options.register('doBoostedCommissioning', False, 
+options.register('doBoostedCommissioning', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Make NTuples with branches for boosted b tag commissioning: overrider several other switches"
@@ -161,7 +161,7 @@ if options.doBoostedCommissioning:
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
     options.processStdAK4Jets=False
     print "Option processStdAK4Jets will be set to '",options.processStdAK4Jets,"'"
-    options.runFatJets=True  
+    options.runFatJets=True
     options.runSubJets = True
     print "Option runFatJets will be set to '",options.runFatJets,"'"
     print "Option runSubJets  will be set to '",options.runSubJets,"'"
@@ -258,6 +258,7 @@ bTagDiscriminators = [
    ,'negativeSoftPFElectronBJetTags'
    ,'pfCombinedMVABJetTags'
    ,'pfCombinedMVAV2BJetTags'
+   ,'pfNegativeCombinedMVAV2BJetTags'
 ]
 
 ## Legacy taggers not supported with MiniAOD
@@ -326,7 +327,7 @@ if options.runOnData:
     process.source.fileNames = [
         '/store/data/Run2015D/DoubleMuon/MINIAOD/16Dec2015-v1/10000/DA6A1520-F1A7-E511-83BE-3417EBE64BE8.root'
         #'/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/168/00000/60FF8405-EA26-E511-A892-02163E01387D.root'
-        #'/store/data/Run2015D/MuonEG/MINIAOD/PromptReco-v4/000/258/159/00000/64914E6C-F26B-E511-B0C8-02163E0142D1.root'        
+        #'/store/data/Run2015D/MuonEG/MINIAOD/PromptReco-v4/000/258/159/00000/64914E6C-F26B-E511-B0C8-02163E0142D1.root'
     ]
 if options.fastSim:
     process.source.fileNames = [
@@ -349,7 +350,7 @@ if options.fastSim :
     options.outFilename += '_FastSim'
 
 if options.doBoostedCommissioning:
-  options.outFilename += '_BoostedCommissioning' 
+  options.outFilename += '_BoostedCommissioning'
 
 options.outFilename += '.root'
 
@@ -451,7 +452,7 @@ else:
        (pfIsolationR04().sumChargedHadronPt+
 	max(0.,pfIsolationR04().sumNeutralHadronEt+
 	pfIsolationR04().sumPhotonEt-
-	0.50*pfIsolationR04().sumPUPt))/pt < 0.20 && 
+	0.50*pfIsolationR04().sumPUPt))/pt < 0.20 &&
 	(isPFMuon && (isGlobalMuon || isTrackerMuon) )'''))
     process.selectedElectrons = cms.EDFilter("CandPtrSelector", src = cms.InputTag("slimmedElectrons"), cut = cms.string('''abs(eta)<2.5 && pt>20. &&
 	gsfTrack.isAvailable() &&
@@ -791,7 +792,7 @@ if options.useTTbarFilter:
 
     #electron id
     from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
-        
+
     if options.miniAOD:
         process.ttbarselectionproducer.electronColl = cms.InputTag('slimmedElectrons')
         process.ttbarselectionproducer.muonColl     = cms.InputTag('slimmedMuons')
@@ -967,7 +968,7 @@ if options.useLegacyTaggers:
 #   process.btagana.produceAllTrackTree  = True
 #   process.btagana.producePtRelTemplate = False
 #------------------
-process.btagana.tracksColl            = cms.InputTag(trackSource) 
+process.btagana.tracksColl            = cms.InputTag(trackSource)
 process.btagana.useSelectedTracks     = True  ## False if you want to run on all tracks : for commissioning studies
 process.btagana.useTrackHistory       = False ## Can only be used with GEN-SIM-RECODEBUG files
 process.btagana.fillsvTagInfo         = False ## True if you want to store information relative to the svTagInfos, set to False if produceJetTrackTree is set to False
@@ -1019,13 +1020,13 @@ if options.runFatJets:
         process.btaganaFatJets.SubJetLabels.append( 'Pruned' )
 
 if options.doBoostedCommissioning:
-    process.btaganaFatJets.produceJetTrackTree  = True 
-    process.btaganaFatJets.fillsvTagInfo = True  
-    process.btaganaFatJets.storeCSVTagVariables = True  
-    process.btaganaFatJets.storeCSVTagVariablesSubJets = True 
+    process.btaganaFatJets.produceJetTrackTree  = True
+    process.btaganaFatJets.fillsvTagInfo = True
+    process.btaganaFatJets.storeCSVTagVariables = True
+    process.btaganaFatJets.storeCSVTagVariablesSubJets = True
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
-    print "produceJetTrackTree set to '",process.btaganaFatJets.produceJetTrackTree,"'" 
-    print "fillsvTagInfo set to '",process.btaganaFatJets.fillsvTagInfo,"'" 
+    print "produceJetTrackTree set to '",process.btaganaFatJets.produceJetTrackTree,"'"
+    print "fillsvTagInfo set to '",process.btaganaFatJets.fillsvTagInfo,"'"
     print "For fat jets: storeCSVTagVariables set to '",process.btaganaFatJets.storeCSVTagVariables,"'"
     print "For subjets:  storeCSVTagVariablesSubJet set to '",process.btaganaFatJets.storeCSVTagVariablesSubJets,"'"
     print "********************"

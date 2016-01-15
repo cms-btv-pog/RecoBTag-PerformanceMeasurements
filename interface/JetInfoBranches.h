@@ -57,6 +57,7 @@ class JetInfoBranches {
     float Jet_DoubleSV[nMaxJets_];
     float Jet_cMVA[nMaxJets_];
     float Jet_cMVAv2[nMaxJets_];
+    float Jet_cMVAv2N[nMaxJets_];
     int   Jet_hist1[nMaxJets_];
     int   Jet_hist2[nMaxJets_];
     int   Jet_hist3[nMaxJets_];
@@ -404,6 +405,7 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_DoubleSV").c_str(),    Jet_DoubleSV    ,(name+"Jet_DoubleSV["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_cMVA").c_str(),    Jet_cMVA    ,(name+"Jet_cMVA["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_cMVAv2").c_str(),    Jet_cMVAv2    ,(name+"Jet_cMVAv2["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_cMVAv2N").c_str(),    Jet_cMVAv2N    ,(name+"Jet_cMVAv2N["+name+"nJet]/F").c_str());
 
       tree->Branch((name+"Jet_hist1").c_str(),       Jet_hist1       ,(name+"Jet_hist1["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_hist2").c_str(),       Jet_hist2       ,(name+"Jet_hist2["+name+"nJet]/I").c_str());
