@@ -189,6 +189,8 @@ bTagInfosLegacy = [
     'impactParameterTagInfos'
    ,'secondaryVertexTagInfos'
    ,'inclusiveSecondaryVertexFinderTagInfos'
+   ,'secondaryVertexNegativeTagInfos'
+   ,'inclusiveSecondaryVertexFinderNegativeTagInfos'
    ,'softPFMuonsTagInfos'
    ,'softPFElectronsTagInfos'
 ]
@@ -196,6 +198,8 @@ bTagInfos = [
     'pfImpactParameterTagInfos'
    ,'pfSecondaryVertexTagInfos'
    ,'pfInclusiveSecondaryVertexFinderTagInfos'
+   ,'pfSecondaryVertexNegativeTagInfos'
+   ,'pfInclusiveSecondaryVertexFinderNegativeTagInfos'
    ,'softPFMuonsTagInfos'
    ,'softPFElectronsTagInfos'
 ]
@@ -228,6 +232,9 @@ bTagDiscriminatorsLegacy = [
    ,'positiveSoftPFElectronBJetTags'
    ,'negativeSoftPFElectronBJetTags'
    ,'combinedMVABJetTags'
+   ,'combinedMVAv2BJetTags'
+   ,'negativeCombinedMVAv2BJetTags'
+   ,'positiveCombinedMVAv2BJetTags'
 ]
 bTagDiscriminators = [
     'pfJetBProbabilityBJetTags'
@@ -259,6 +266,7 @@ bTagDiscriminators = [
    ,'pfCombinedMVABJetTags'
    ,'pfCombinedMVAV2BJetTags'
    ,'pfNegativeCombinedMVAV2BJetTags'
+   ,'pfPositiveCombinedMVAV2BJetTags'
 ]
 
 ## Legacy taggers not supported with MiniAOD

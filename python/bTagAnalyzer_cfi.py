@@ -42,4 +42,5 @@ bTagAnalyzer = cms.EDAnalyzer("BTagAnalyzer",
     cMVABJetTags = cms.string('pfCombinedMVABJetTags'),
     cMVAv2BJetTags = cms.string('pfCombinedMVAV2BJetTags'),
     cMVAv2NegBJetTags = cms.string('pfNegativeCombinedMVAV2BJetTags')
+    cMVAv2PosBJetTags = cms.string('pfPositiveCombinedMVAV2BJetTags')
 )
