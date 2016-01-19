@@ -40,7 +40,7 @@ options.register('mcGlobalTag', '76X_mcRun2_asymptotic_v12',
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', '76X_dataRun2_v11', 
+options.register('dataGlobalTag', '76X_dataRun2_v15', 
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
