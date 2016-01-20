@@ -41,6 +41,6 @@ bTagAnalyzerLegacy = cms.EDAnalyzer("BTagAnalyzerLegacy",
     doubleSVBJetTags = cms.string('dummy'),
     cMVABJetTags = cms.string('combinedMVABJetTags'),
     cMVAv2BJetTags = cms.string('combinedMVAV2BJetTags'),
-    cMVAv2NegBJetTags = cms.string('negativeCombinedMVAV2BJetTags')
+    cMVAv2NegBJetTags = cms.string('negativeCombinedMVAV2BJetTags'),
     cMVAv2PositiveBJetTags = cms.string('positiveCombinedMVAV2BJetTags')
 )
