@@ -335,6 +335,12 @@ class JetInfoBranches {
     float TagVarCSV_flightDistance2dSig[nMaxJets_];                  // transverse distance significance between primary and secondary vertex
     float TagVarCSV_flightDistance3dVal[nMaxJets_];                  // distance between primary and secondary vertex
     float TagVarCSV_flightDistance3dSig[nMaxJets_];                  // distance significance between primary and secondary vertex
+
+    //Added by Keng
+    float TagVarCSV_vertexFitProb[nMaxJets_];                        //
+    float TagVarCSV_massVertexEnergyFraction[nMaxJets_];             //vertex mass times the fraction of the vertex energy with respect to the jet energy
+    float TagVarCSV_vertexBoostOverSqrtJetPt[nMaxJets_];             //variable related to the boost of the vertex system in flight direction
+
     // per jet per track
     int   nTrkTagVarCSV;
     int   nTrkEtaRelTagVarCSV;
@@ -355,7 +361,6 @@ class JetInfoBranches {
     float TagVarCSV_trackJetDistVal[nMaxTrk_];                       // minimum track approach distance to jet axis
     float TagVarCSV_trackJetDistSig[nMaxTrk_];                       // minimum track approach distance to jet axis significance
     float TagVarCSV_trackEtaRel[nMaxTrk_];                           // track pseudorapidity, relative to the jet axis
-
 
     void RegisterTree(TTree *tree, std::string name="") {
       if(name!="") name += ".";
@@ -680,6 +685,11 @@ class JetInfoBranches {
       tree->Branch((name+"TagVarCSV_trackJetDistVal").c_str()   ,TagVarCSV_trackJetDistVal   ,(name+"TagVarCSV_trackJetDistVal["+name+"nTrkTagVarCSV]/F").c_str()   );
       tree->Branch((name+"TagVarCSV_trackJetDistSig").c_str()   ,TagVarCSV_trackJetDistSig   ,(name+"TagVarCSV_trackJetDistSig["+name+"nTrkTagVarCSV]/F").c_str()   );
       tree->Branch((name+"TagVarCSV_trackEtaRel").c_str()       ,TagVarCSV_trackEtaRel       ,(name+"TagVarCSV_trackEtaRel["+name+"nTrkEtaRelTagVarCSV]/F").c_str() );
+
+    //Add by Keng//
+    tree->Branch((name+"TagVarCSV_vertexFitProb").c_str()         ,TagVarCSV_vertexFitProb         ,(name+"TagVarCSV_vertexFitProb["+name+"nJet]/F").c_str());
+    tree->Branch((name+"TagVarCSV_massVertexEnergyFraction").c_str(),     TagVarCSV_massVertexEnergyFraction     ,(name+"TagVarCSV_massVertexEnergyFraction["+name+"nJet]/F").c_str());
+      tree->Branch((name+"TagVarCSV_vertexBoostOverSqrtJetPt").c_str(),     TagVarCSV_vertexBoostOverSqrtJetPt     ,(name+"TagVarCSV_vertexBoostOverSqrtJetPt["+name+"nJet]/F").c_str());
     }
 
     void RegisterSubJetSpecificTree(TTree *tree, std::string name="") {
@@ -1084,7 +1094,11 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"TagVarCSV_trackJetDistVal").c_str()   ,TagVarCSV_trackJetDistVal  );
       tree->SetBranchAddress((name+"TagVarCSV_trackJetDistSig").c_str()   ,TagVarCSV_trackJetDistSig  );
       tree->SetBranchAddress((name+"TagVarCSV_trackEtaRel").c_str()       ,TagVarCSV_trackEtaRel      );
-
+      
+      //Add by Keng///
+      tree->SetBranchAddress((name+"TagVarCSV_vertexFitProb").c_str()         ,TagVarCSV_vertexFitProb         ) ;
+      tree->SetBranchAddress((name+"TagVarCSV_massVertexEnergyFraction").c_str(),     TagVarCSV_massVertexEnergyFraction);
+      tree->SetBranchAddress((name+"TagVarCSV_vertexBoostOverSqrtJetPt").c_str(),     TagVarCSV_vertexBoostOverSqrtJetPt);
     }
 
     void ReadSubJetSpecificTree(TTree *tree, std::string name="") {

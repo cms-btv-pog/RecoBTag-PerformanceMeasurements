@@ -2576,6 +2576,11 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].TagVarCSV_flightDistance3dVal[JetInfo[iJetColl].nJet]         = ( vars.checkTag(reco::btau::flightDistance3dVal) ? vars.get(reco::btau::flightDistance3dVal) : -9999 );
       JetInfo[iJetColl].TagVarCSV_flightDistance3dSig[JetInfo[iJetColl].nJet]         = ( vars.checkTag(reco::btau::flightDistance3dSig) ? vars.get(reco::btau::flightDistance3dSig) : -9999 );
 
+      //Added by Keng//
+      JetInfo[iJetColl].TagVarCSV_vertexFitProb[JetInfo[iJetColl].nJet]               = ( vars.checkTag(reco::btau::vertexFitProb) ? vars.get(reco::btau::vertexFitProb) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_massVertexEnergyFraction[JetInfo[iJetColl].nJet]           = ( vars.checkTag(reco::btau::massVertexEnergyFraction) ? vars.get(reco::btau::massVertexEnergyFraction) : -0.1);
+      JetInfo[iJetColl].TagVarCSV_vertexBoostOverSqrtJetPt[JetInfo[iJetColl].nJet]           = ( vars.checkTag(reco::btau::vertexBoostOverSqrtJetPt) ? vars.get(reco::btau::vertexBoostOverSqrtJetPt) : -0.1);
+
       // per jet per track
       JetInfo[iJetColl].Jet_nFirstTrkTagVarCSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkTagVarCSV;
       std::vector<float> tagValList = vars.getList(reco::btau::trackSip2dSig,false);
