@@ -8,6 +8,8 @@ const UInt_t nMaxTrk_  = 100000;
 const UInt_t nMaxMuons_= 10000;
 const UInt_t nMaxElectrons_= 10000;
 const UInt_t nMaxSVs_= 10000;
+//added by Keng//
+const UInt_t nMaxLeptons_=10000;
 
 class JetInfoBranches {
 
@@ -340,6 +342,16 @@ class JetInfoBranches {
     float TagVarCSV_vertexFitProb[nMaxJets_];                        //
     float TagVarCSV_massVertexEnergyFraction[nMaxJets_];             //vertex mass times the fraction of the vertex energy with respect to the jet energy
     float TagVarCSV_vertexBoostOverSqrtJetPt[nMaxJets_];             //variable related to the boost of the vertex system in flight direction
+    int   Jet_nFirstLepTagVarCSV[nMaxJets_];
+    int   Jet_nLastLepTagVarCSV[nMaxJets_];
+    float TagVarCSV_jetNLeptons[nMaxJets_];
+    int   nLeptons;
+    float TagVarCSV_leptonPtRel[nMaxLeptons_];
+    float TagVarCSV_leptonSip3d[nMaxLeptons_];
+    float TagVarCSV_leptonDeltaR[nMaxLeptons_];
+    float TagVarCSV_leptonRatioRel[nMaxLeptons_];
+    float TagVarCSV_leptonEtaRel[nMaxLeptons_];
+    float TagVarCSV_leptonRatio[nMaxLeptons_];
 
     // per jet per track
     int   nTrkTagVarCSV;
@@ -689,8 +701,20 @@ class JetInfoBranches {
     //Add by Keng//
     tree->Branch((name+"TagVarCSV_vertexFitProb").c_str()         ,TagVarCSV_vertexFitProb         ,(name+"TagVarCSV_vertexFitProb["+name+"nJet]/F").c_str());
     tree->Branch((name+"TagVarCSV_massVertexEnergyFraction").c_str(),     TagVarCSV_massVertexEnergyFraction     ,(name+"TagVarCSV_massVertexEnergyFraction["+name+"nJet]/F").c_str());
-      tree->Branch((name+"TagVarCSV_vertexBoostOverSqrtJetPt").c_str(),     TagVarCSV_vertexBoostOverSqrtJetPt     ,(name+"TagVarCSV_vertexBoostOverSqrtJetPt["+name+"nJet]/F").c_str());
+    tree->Branch((name+"TagVarCSV_vertexBoostOverSqrtJetPt").c_str(),     TagVarCSV_vertexBoostOverSqrtJetPt     ,(name+"TagVarCSV_vertexBoostOverSqrtJetPt["+name+"nJet]/F").c_str());
+    tree->Branch((name+"Jet_nFirstLepTagVarCSV").c_str()        ,Jet_nFirstLepTagVarCSV        ,(name+"Jet_nFirstLepTagVarCSV["+name+"nJet]/I").c_str()       );
+    tree->Branch((name+"Jet_nLastLepTagVarCSV").c_str()         ,Jet_nLastLepTagVarCSV         ,(name+"Jet_nLastLepCSV["+name+"nJet]/I").c_str()            );
+     tree->Branch((name+"TagVarCSV_jetNLeptons").c_str()               ,TagVarCSV_jetNLeptons               ,(name+"TagVarCSV_jetNLeptons["+name+"nJet]/F").c_str()              );
+    tree->Branch((name+"nLeptons").c_str()               ,&nLeptons              ,(name+"nLeptons/I").c_str());
+    tree->Branch((name+"TagVarCSV_leptonPtRel").c_str()         ,TagVarCSV_leptonPtRel         ,(name+"TagVarCSV_leptonPtRel["+name+"nLeptons]/F").c_str());
+    tree->Branch((name+"TagVarCSV_leptonSip3d").c_str()         ,TagVarCSV_leptonSip3d         ,(name+"TagVarCSV_leptonSip3d["+name+"nLeptons]/F").c_str());
+    tree->Branch((name+"TagVarCSV_leptonDeltaR").c_str()         ,TagVarCSV_leptonDeltaR         ,(name+"TagVarCSV_leptonDeltaR["+name+"nLeptons]/F").c_str());
+    tree->Branch((name+"TagVarCSV_leptonRatioRel").c_str()         ,TagVarCSV_leptonRatioRel         ,(name+"TagVarCSV_leptonRatioRel["+name+"nLeptons]/F").c_str());
+    tree->Branch((name+"TagVarCSV_leptonEtaRel").c_str()         ,TagVarCSV_leptonEtaRel         ,(name+"TagVarCSV_leptonEtaRel["+name+"nLeptons]/F").c_str());
+    tree->Branch((name+"TagVarCSV_leptonRatio").c_str()         ,TagVarCSV_leptonRatio         ,(name+"TagVarCSV_leptonRatio["+name+"nLeptons]/F").c_str());
+
     }
+    
 
     void RegisterSubJetSpecificTree(TTree *tree, std::string name="") {
       if(name!="") name += ".";
@@ -1099,6 +1123,12 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"TagVarCSV_vertexFitProb").c_str()         ,TagVarCSV_vertexFitProb         ) ;
       tree->SetBranchAddress((name+"TagVarCSV_massVertexEnergyFraction").c_str(),     TagVarCSV_massVertexEnergyFraction);
       tree->SetBranchAddress((name+"TagVarCSV_vertexBoostOverSqrtJetPt").c_str(),     TagVarCSV_vertexBoostOverSqrtJetPt);
+      tree->SetBranchAddress((name+"TagVarCSV_leptonPtRel").c_str()         ,TagVarCSV_leptonPtRel         ) ;
+      tree->SetBranchAddress((name+"TagVarCSV_leptonSip3d").c_str()         ,TagVarCSV_leptonSip3d         ) ;
+      tree->SetBranchAddress((name+"TagVarCSV_leptonDeltaR").c_str()         ,TagVarCSV_leptonDeltaR         ) ;
+      tree->SetBranchAddress((name+"TagVarCSV_leptonRatioRel").c_str()         ,TagVarCSV_leptonRatioRel         ) ;
+      tree->SetBranchAddress((name+"TagVarCSV_leptonEtaRel").c_str()         ,TagVarCSV_leptonEtaRel         ) ;
+      tree->SetBranchAddress((name+"TagVarCSV_leptonRatio").c_str()         ,TagVarCSV_leptonRatio         ) ;
     }
 
     void ReadSubJetSpecificTree(TTree *tree, std::string name="") {

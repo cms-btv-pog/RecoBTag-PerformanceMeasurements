@@ -125,6 +125,9 @@
 
 #include "fastjet/contrib/Njettiness.hh"
 
+//add by Keng//
+#include "RecoBTag/SecondaryVertex/interface/CombinedSVSoftLeptonComputer.h"
+
 //
 // constants, enums and typedefs
 //
@@ -2557,6 +2560,15 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       // TaggingVariables
       reco::TaggingVariableList vars = computer->taggingVariables(helper);
 
+      //add by Keng//
+      std::vector<const reco::BaseTagInfo*>  slTagInfos;
+      JetTagComputer::TagInfoHelper slhelper(slTagInfos);      
+      slTagInfos.push_back( ipTagInfo );
+      slTagInfos.push_back( svTagInfo );
+      slTagInfos.push_back( softPFMuTagInfo );
+      slTagInfos.push_back( softPFElTagInfo );
+      reco::TaggingVariableList slvars = computer->taggingVariables(slhelper);
+
       // per jet
       JetInfo[iJetColl].TagVarCSV_trackJetPt[JetInfo[iJetColl].nJet]                  = ( vars.checkTag(reco::btau::trackJetPt) ? vars.get(reco::btau::trackJetPt) : -9999 );
       JetInfo[iJetColl].TagVarCSV_vertexCategory[JetInfo[iJetColl].nJet]              = ( vars.checkTag(reco::btau::vertexCategory) ? vars.get(reco::btau::vertexCategory) : -9999 );
@@ -2630,6 +2642,17 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
       JetInfo[iJetColl].nTrkEtaRelTagVarCSV += JetInfo[iJetColl].TagVarCSV_jetNTracksEtaRel[JetInfo[iJetColl].nJet];
       JetInfo[iJetColl].Jet_nLastTrkEtaRelTagVarCSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkEtaRelTagVarCSV;
+
+      //add by Keng//
+      JetInfo[iJetColl].Jet_nFirstLepTagVarCSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nLeptons;
+      std::vector<float> sltagValList = slvars.getList(reco::btau::leptonPtRel,false);
+      JetInfo[iJetColl].TagVarCSV_jetNLeptons[JetInfo[iJetColl].nJet] = sltagValList.size();
+
+      sltagValList = slvars.getList(reco::btau::leptonPtRel,false);
+      if(sltagValList.size()>0) std::copy( sltagValList.begin(), sltagValList.end(), &JetInfo[iJetColl].TagVarCSV_leptonPtRel[JetInfo[iJetColl].nLeptons] );
+
+      JetInfo[iJetColl].nLeptons += JetInfo[iJetColl].TagVarCSV_jetNLeptons[JetInfo[iJetColl].nJet];
+      JetInfo[iJetColl].Jet_nLastLepTagVarCSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nLeptons;
       
     }
 
