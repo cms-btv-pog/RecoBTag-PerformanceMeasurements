@@ -125,6 +125,10 @@
 
 #include "fastjet/contrib/Njettiness.hh"
 
+//add by Keng//
+//#include "RecoBTag/SecondaryVertex/interface/CombinedSVSoftLeptonComputer.h"
+#include "RecoBTag/CTagging/interface/CharmTagger.h"
+
 //
 // constants, enums and typedefs
 //
@@ -356,6 +360,9 @@ private:
   bool storeTagVariablesSubJets_;
   bool storeCSVTagVariables_;
   bool storeCSVTagVariablesSubJets_;
+  
+  //Add by Keng//
+  bool storeCTagVariables_;
 
   bool use_ttbar_filter_;
   edm::EDGetTokenT<edm::View<reco::GenParticle> > ttbarproducerGen_;
@@ -506,6 +513,9 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   storeCSVTagVariables_ = iConfig.getParameter<bool>("storeCSVTagVariables");
   storeCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("storeCSVTagVariablesSubJets");
 
+  //add by Keng//
+  storeCTagVariables_ = iConfig.getParameter<bool>("storeCTagVariables");
+
   use_ttbar_filter_ = iConfig.getParameter<bool> ("use_ttbar_filter");
   ttbarproducerGen_ = consumes<edm::View<reco::GenParticle>>(iConfig.getParameter<edm::InputTag>("ttbarproducer")),
   ttbarproducerEle_ = consumes<edm::View<pat::Electron>>(iConfig.getParameter<edm::InputTag>("ttbarproducer"));
@@ -655,6 +665,10 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   if ( fillsvTagInfo_ )       JetInfo[0].RegisterJetSVTree(smalltree,branchNamePrefix_);
   if ( storeTagVariables_)    JetInfo[0].RegisterTagVarTree(smalltree,branchNamePrefix_);
   if ( storeCSVTagVariables_) JetInfo[0].RegisterCSVTagVarTree(smalltree,branchNamePrefix_);
+
+  //add by Keng//
+  if ( storeCTagVariables_) JetInfo[0].RegisterCTagVarTree(smalltree,branchNamePrefix_);
+
   if ( runSubJets_ ) {
     for ( size_t i = 0; i < SubJetLabels_.size(); ++i )
     {
@@ -1624,6 +1638,10 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
   bool storeTagVariables    = storeTagVariables_;
   bool storeCSVTagVariables = storeCSVTagVariables_;
+
+  //add by Keng//
+  bool storeCTagVariables = storeCTagVariables_;
+
   if ( runSubJets_ && iJetColl > 0 )
   {
     storeTagVariables    = storeTagVariablesSubJets_;
@@ -2576,6 +2594,11 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].TagVarCSV_flightDistance3dVal[JetInfo[iJetColl].nJet]         = ( vars.checkTag(reco::btau::flightDistance3dVal) ? vars.get(reco::btau::flightDistance3dVal) : -9999 );
       JetInfo[iJetColl].TagVarCSV_flightDistance3dSig[JetInfo[iJetColl].nJet]         = ( vars.checkTag(reco::btau::flightDistance3dSig) ? vars.get(reco::btau::flightDistance3dSig) : -9999 );
 
+      //Added by Keng//
+      JetInfo[iJetColl].TagVarCSV_vertexFitProb[JetInfo[iJetColl].nJet]               = ( vars.checkTag(reco::btau::vertexFitProb) ? vars.get(reco::btau::vertexFitProb) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_massVertexEnergyFraction[JetInfo[iJetColl].nJet]           = ( vars.checkTag(reco::btau::massVertexEnergyFraction) ? vars.get(reco::btau::massVertexEnergyFraction) : -0.1);
+      JetInfo[iJetColl].TagVarCSV_vertexBoostOverSqrtJetPt[JetInfo[iJetColl].nJet]           = ( vars.checkTag(reco::btau::vertexBoostOverSqrtJetPt) ? vars.get(reco::btau::vertexBoostOverSqrtJetPt) : -0.1);
+
       // per jet per track
       JetInfo[iJetColl].Jet_nFirstTrkTagVarCSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkTagVarCSV;
       std::vector<float> tagValList = vars.getList(reco::btau::trackSip2dSig,false);
@@ -2625,7 +2648,53 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
       JetInfo[iJetColl].nTrkEtaRelTagVarCSV += JetInfo[iJetColl].TagVarCSV_jetNTracksEtaRel[JetInfo[iJetColl].nJet];
       JetInfo[iJetColl].Jet_nLastTrkEtaRelTagVarCSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkEtaRelTagVarCSV;
+/*
+      //add by Keng//
+      JetInfo[iJetColl].Jet_nFirstLepTagVarCSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nLeptons;
+      std::vector<float> sltagValList = slvars.getList(reco::btau::leptonPtRel,false);
+      JetInfo[iJetColl].TagVarCSV_jetNLeptons[JetInfo[iJetColl].nJet] = sltagValList.size();
+
+      sltagValList = slvars.getList(reco::btau::leptonPtRel,false);
+      if(sltagValList.size()>0) std::copy( sltagValList.begin(), sltagValList.end(), &JetInfo[iJetColl].TagVarCSV_leptonPtRel[JetInfo[iJetColl].nLeptons] );
+
+      JetInfo[iJetColl].nLeptons += JetInfo[iJetColl].TagVarCSV_jetNLeptons[JetInfo[iJetColl].nJet];
+      JetInfo[iJetColl].Jet_nLastLepTagVarCSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nLeptons;
+  */    
+    }
+
+    //add by Keng//
+    if ( storeCTagVariables )
+    {
+          /*  
+	CombinedSVSoftLeptonComputer sl_computer_;
+        //const reco::CandIPTagInfo & ip_info = tagInfo.get<reco::CandIPTagInfo>(0);
+	//const reco::CandSecondaryVertexTagInfo & sv_info = tagInfo.get<reco::CandSecondaryVertexTagInfo>(1);
+	//const reco::CandSoftLeptonTagInfo& softmu_info = tagInfo.get<reco::CandSoftLeptonTagInfo>(2);
+	//const reco::CandSoftLeptonTagInfo& softel_info = tagInfo.get<reco::CandSoftLeptonTagInfo>(3);
+	reco::TaggingVariableList vars = sl_computer_(ipTagInfo, svTagInfo, softPFMuTagInfo, softPFElTagInfo);
+    */
+
+      std::vector<const reco::BaseTagInfo*>  baseTagInfos;
+      JetTagComputer::TagInfoHelper helper(baseTagInfos);
+      baseTagInfos.push_back( ipTagInfo );
+      baseTagInfos.push_back( svTagInfo );
+      // TaggingVariables
+      reco::TaggingVariableList vars = computer->taggingVariables(helper);
       
+      // per jet
+      JetInfo[iJetColl].trackJetPt[JetInfo[iJetColl].nJet]                  = ( vars.checkTag(reco::btau::trackJetPt) ? vars.get(reco::btau::trackJetPt) : -9999 );	
+
+      // per jet per track
+      JetInfo[iJetColl].Jet_nFirstTrkCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkCTagVar;
+      std::vector<float> tagValList = vars.getList(reco::btau::trackSip2dSig,false);
+      JetInfo[iJetColl].jetNTracks[JetInfo[iJetColl].nJet] = tagValList.size(); 
+
+      tagValList = vars.getList(reco::btau::trackSip2dSig,false);
+      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].trackSip2dSig[JetInfo[iJetColl].nTrkCTagVar] );
+     
+      JetInfo[iJetColl].nTrkCTagVar += JetInfo[iJetColl].jetNTracks[JetInfo[iJetColl].nJet];
+      JetInfo[iJetColl].Jet_nLastTrkCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkCTagVar;
+
     }
 
     if ( runFatJets_ && iJetColl == 0 )

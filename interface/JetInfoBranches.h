@@ -8,6 +8,8 @@ const UInt_t nMaxTrk_  = 100000;
 const UInt_t nMaxMuons_= 10000;
 const UInt_t nMaxElectrons_= 10000;
 const UInt_t nMaxSVs_= 10000;
+//added by Keng//
+const UInt_t nMaxLeptons_=10000;
 
 class JetInfoBranches {
 
@@ -335,6 +337,22 @@ class JetInfoBranches {
     float TagVarCSV_flightDistance2dSig[nMaxJets_];                  // transverse distance significance between primary and secondary vertex
     float TagVarCSV_flightDistance3dVal[nMaxJets_];                  // distance between primary and secondary vertex
     float TagVarCSV_flightDistance3dSig[nMaxJets_];                  // distance significance between primary and secondary vertex
+
+    //Added by Keng
+    float TagVarCSV_vertexFitProb[nMaxJets_];                        //
+    float TagVarCSV_massVertexEnergyFraction[nMaxJets_];             //vertex mass times the fraction of the vertex energy with respect to the jet energy
+    float TagVarCSV_vertexBoostOverSqrtJetPt[nMaxJets_];             //variable related to the boost of the vertex system in flight direction
+    int   Jet_nFirstLepTagVarCSV[nMaxJets_];
+    int   Jet_nLastLepTagVarCSV[nMaxJets_];
+    float TagVarCSV_jetNLeptons[nMaxJets_];
+    int   nLeptons;
+    float TagVarCSV_leptonPtRel[nMaxLeptons_];
+    float TagVarCSV_leptonSip3d[nMaxLeptons_];
+    float TagVarCSV_leptonDeltaR[nMaxLeptons_];
+    float TagVarCSV_leptonRatioRel[nMaxLeptons_];
+    float TagVarCSV_leptonEtaRel[nMaxLeptons_];
+    float TagVarCSV_leptonRatio[nMaxLeptons_];
+
     // per jet per track
     int   nTrkTagVarCSV;
     int   nTrkEtaRelTagVarCSV;
@@ -356,6 +374,13 @@ class JetInfoBranches {
     float TagVarCSV_trackJetDistSig[nMaxTrk_];                       // minimum track approach distance to jet axis significance
     float TagVarCSV_trackEtaRel[nMaxTrk_];                           // track pseudorapidity, relative to the jet axis
 
+    //add by Keng//
+    float trackJetPt[nMaxJets_];                           // track-based jet transverse momentum
+    int   Jet_nFirstTrkCTagVar[nMaxJets_];
+    int   Jet_nLastTrkCTagVar[nMaxJets_];
+    float jetNTracks[nMaxJets_];                              // tracks associated to jet
+    int   nTrkCTagVar;
+    float trackSip2dSig[nMaxTrk_];                            // track 2D signed impact parameter significance
 
     void RegisterTree(TTree *tree, std::string name="") {
       if(name!="") name += ".";
@@ -680,6 +705,39 @@ class JetInfoBranches {
       tree->Branch((name+"TagVarCSV_trackJetDistVal").c_str()   ,TagVarCSV_trackJetDistVal   ,(name+"TagVarCSV_trackJetDistVal["+name+"nTrkTagVarCSV]/F").c_str()   );
       tree->Branch((name+"TagVarCSV_trackJetDistSig").c_str()   ,TagVarCSV_trackJetDistSig   ,(name+"TagVarCSV_trackJetDistSig["+name+"nTrkTagVarCSV]/F").c_str()   );
       tree->Branch((name+"TagVarCSV_trackEtaRel").c_str()       ,TagVarCSV_trackEtaRel       ,(name+"TagVarCSV_trackEtaRel["+name+"nTrkEtaRelTagVarCSV]/F").c_str() );
+
+    //Add by Keng//
+    tree->Branch((name+"TagVarCSV_vertexFitProb").c_str()         ,TagVarCSV_vertexFitProb         ,(name+"TagVarCSV_vertexFitProb["+name+"nJet]/F").c_str());
+    tree->Branch((name+"TagVarCSV_massVertexEnergyFraction").c_str(),     TagVarCSV_massVertexEnergyFraction     ,(name+"TagVarCSV_massVertexEnergyFraction["+name+"nJet]/F").c_str());
+    tree->Branch((name+"TagVarCSV_vertexBoostOverSqrtJetPt").c_str(),     TagVarCSV_vertexBoostOverSqrtJetPt     ,(name+"TagVarCSV_vertexBoostOverSqrtJetPt["+name+"nJet]/F").c_str());
+    tree->Branch((name+"Jet_nFirstLepTagVarCSV").c_str()        ,Jet_nFirstLepTagVarCSV        ,(name+"Jet_nFirstLepTagVarCSV["+name+"nJet]/I").c_str()       );
+    tree->Branch((name+"Jet_nLastLepTagVarCSV").c_str()         ,Jet_nLastLepTagVarCSV         ,(name+"Jet_nLastLepCSV["+name+"nJet]/I").c_str()            );
+     tree->Branch((name+"TagVarCSV_jetNLeptons").c_str()               ,TagVarCSV_jetNLeptons               ,(name+"TagVarCSV_jetNLeptons["+name+"nJet]/F").c_str()              );
+    tree->Branch((name+"nLeptons").c_str()               ,&nLeptons              ,(name+"nLeptons/I").c_str());
+    tree->Branch((name+"TagVarCSV_leptonPtRel").c_str()         ,TagVarCSV_leptonPtRel         ,(name+"TagVarCSV_leptonPtRel["+name+"nLeptons]/F").c_str());
+    tree->Branch((name+"TagVarCSV_leptonSip3d").c_str()         ,TagVarCSV_leptonSip3d         ,(name+"TagVarCSV_leptonSip3d["+name+"nLeptons]/F").c_str());
+    tree->Branch((name+"TagVarCSV_leptonDeltaR").c_str()         ,TagVarCSV_leptonDeltaR         ,(name+"TagVarCSV_leptonDeltaR["+name+"nLeptons]/F").c_str());
+    tree->Branch((name+"TagVarCSV_leptonRatioRel").c_str()         ,TagVarCSV_leptonRatioRel         ,(name+"TagVarCSV_leptonRatioRel["+name+"nLeptons]/F").c_str());
+    tree->Branch((name+"TagVarCSV_leptonEtaRel").c_str()         ,TagVarCSV_leptonEtaRel         ,(name+"TagVarCSV_leptonEtaRel["+name+"nLeptons]/F").c_str());
+    tree->Branch((name+"TagVarCSV_leptonRatio").c_str()         ,TagVarCSV_leptonRatio         ,(name+"TagVarCSV_leptonRatio["+name+"nLeptons]/F").c_str());
+
+    }
+   //Add by Keng// 
+    void RegisterCTagVarTree(TTree *tree, std::string name=""){
+      if(name!="") name += ".";
+      //--------------------------------------
+      // CTag TaggingVariables
+      //--------------------------------------
+      tree->Branch((name+"Jet_nFirstTrkCTagVar").c_str()        ,Jet_nFirstTrkCTagVar        ,(name+"Jet_nFirstTrkCTagVar["+name+"nJet]/I").c_str()       );
+      tree->Branch((name+"Jet_nLastTrkCTagVar").c_str()         ,Jet_nLastTrkCTagVar         ,(name+"Jet_nLastTrkCTagVar["+name+"nJet]/I").c_str()            );
+
+      tree->Branch((name+"trackJetPt").c_str()               ,trackJetPt               ,(name+"trackJetPt["+name+"nJet]/F").c_str()              );
+
+      tree->Branch((name+"jetNTracks").c_str()               ,jetNTracks               ,(name+"jetNTracks["+name+"nJet]/F").c_str()              );
+
+      tree->Branch((name+"nTrkCTagVar").c_str()               ,&nTrkCTagVar              ,(name+"nTrkCTagVar/I").c_str()                                      );
+      tree->Branch((name+"trackSip2dSig").c_str()     ,trackSip2dSig     ,(name+"trackSip2dSig["+name+"nTrkCTagVar]/F").c_str()     );
+    
     }
 
     void RegisterSubJetSpecificTree(TTree *tree, std::string name="") {
@@ -1084,6 +1142,33 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"TagVarCSV_trackJetDistVal").c_str()   ,TagVarCSV_trackJetDistVal  );
       tree->SetBranchAddress((name+"TagVarCSV_trackJetDistSig").c_str()   ,TagVarCSV_trackJetDistSig  );
       tree->SetBranchAddress((name+"TagVarCSV_trackEtaRel").c_str()       ,TagVarCSV_trackEtaRel      );
+      
+      //Add by Keng///
+      tree->SetBranchAddress((name+"TagVarCSV_vertexFitProb").c_str()         ,TagVarCSV_vertexFitProb         ) ;
+      tree->SetBranchAddress((name+"TagVarCSV_massVertexEnergyFraction").c_str(),     TagVarCSV_massVertexEnergyFraction);
+      tree->SetBranchAddress((name+"TagVarCSV_vertexBoostOverSqrtJetPt").c_str(),     TagVarCSV_vertexBoostOverSqrtJetPt);
+      tree->SetBranchAddress((name+"TagVarCSV_leptonPtRel").c_str()         ,TagVarCSV_leptonPtRel         ) ;
+      tree->SetBranchAddress((name+"TagVarCSV_leptonSip3d").c_str()         ,TagVarCSV_leptonSip3d         ) ;
+      tree->SetBranchAddress((name+"TagVarCSV_leptonDeltaR").c_str()         ,TagVarCSV_leptonDeltaR         ) ;
+      tree->SetBranchAddress((name+"TagVarCSV_leptonRatioRel").c_str()         ,TagVarCSV_leptonRatioRel         ) ;
+      tree->SetBranchAddress((name+"TagVarCSV_leptonEtaRel").c_str()         ,TagVarCSV_leptonEtaRel         ) ;
+      tree->SetBranchAddress((name+"TagVarCSV_leptonRatio").c_str()         ,TagVarCSV_leptonRatio         ) ;
+    }
+    //add by Keng//
+    void ReadCTagVarTree(TTree *tree, std::string name=""){
+      if (name!="") name += ".";
+      //--------------------------------------
+      // CTag TaggingVariables
+      //--------------------------------------
+      tree->SetBranchAddress((name+"Jet_nFirstTrkCTagVar").c_str()        ,Jet_nFirstTrkCTagVar );
+      tree->SetBranchAddress((name+"Jet_nLastTrkCTagVar").c_str()         ,Jet_nLastTrkCTagVar  );
+ 
+      tree->SetBranchAddress((name+"trackJetPt").c_str()               ,trackJetPt              );
+   
+      tree->SetBranchAddress((name+"jetNTracks").c_str()               ,jetNTracks              );
+
+      tree->SetBranchAddress((name+"nTrkCTagVar").c_str()               ,&nTrkCTagVar             );
+      tree->SetBranchAddress((name+"trackSip2dSig").c_str()     ,trackSip2dSig    );
 
     }
 
