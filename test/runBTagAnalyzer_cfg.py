@@ -35,12 +35,12 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
-options.register('mcGlobalTag', '76X_mcRun2_asymptotic_v12',
+options.register('mcGlobalTag', '80X_mcRun2_asymptotic_v4',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', '76X_dataRun2_v15', 
+options.register('dataGlobalTag', '80X_dataRun2_v4', 
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
@@ -761,7 +761,7 @@ if not options.runOnData:
 if options.runOnData:
     # Remove MC matching when running over data
     from PhysicsTools.PatAlgos.tools.coreTools import removeMCMatching
-    removeMCMatching( process, ['All'] )
+    removeMCMatching( process, ['Photons', 'Electrons','Muons', 'Taus', 'Jets', 'METs', 'PFElectrons','PFMuons', 'PFTaus'] )
 
 #-------------------------------------
 ## Add GenParticlePruner for boosted b-tagging studies
