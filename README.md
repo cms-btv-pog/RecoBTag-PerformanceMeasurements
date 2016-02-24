@@ -14,8 +14,8 @@ git remote add btv-cmssw https://github.com/cms-btv-pog/cmssw.git
 git fetch --tags btv-cmssw
 
 
-git clone -b V00-00-01 git://github.com/cms-btv-pog/cms-EventCounter.git MyAnalysis/EventCounter
-git clone -b 8_0_X https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b V00-00-01 --depth 1 git://github.com/cms-btv-pog/cms-EventCounter.git MyAnalysis/EventCounter
+git clone -b 8_0_X --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
