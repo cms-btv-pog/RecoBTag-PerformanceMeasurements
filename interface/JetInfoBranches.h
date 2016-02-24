@@ -375,12 +375,13 @@ class JetInfoBranches {
     float TagVarCSV_trackEtaRel[nMaxTrk_];                           // track pseudorapidity, relative to the jet axis
 
     //add by Keng//
-    float trackJetPt[nMaxJets_];                           // track-based jet transverse momentum
+    float CTag_trackJetPt[nMaxJets_];                           // track-based jet transverse momentum
     int   Jet_nFirstTrkCTagVar[nMaxJets_];
     int   Jet_nLastTrkCTagVar[nMaxJets_];
-    float jetNTracks[nMaxJets_];                              // tracks associated to jet
+    float CTag_jetNTracks[nMaxJets_];                              // tracks associated to jet
     int   nTrkCTagVar;
-    float trackSip2dSig[nMaxTrk_];                            // track 2D signed impact parameter significance
+    float CTag_trackSip2dSig[nMaxTrk_];                            // track 2D signed impact parameter significance
+    float CTag_trackPtRel[nMaxTrk_];    
 
     void RegisterTree(TTree *tree, std::string name="") {
       if(name!="") name += ".";
@@ -662,7 +663,7 @@ class JetInfoBranches {
       // CSV TaggingVariables
       //--------------------------------------
       tree->Branch((name+"Jet_nFirstTrkTagVarCSV").c_str()        ,Jet_nFirstTrkTagVarCSV        ,(name+"Jet_nFirstTrkTagVarCSV["+name+"nJet]/I").c_str()       );
-      tree->Branch((name+"Jet_nLastTrkTagVarCSV").c_str()         ,Jet_nLastTrkTagVarCSV         ,(name+"Jet_nLastTrackCSV["+name+"nJet]/I").c_str()            );
+      tree->Branch((name+"Jet_nLastTrkTagVarCSV").c_str()         ,Jet_nLastTrkTagVarCSV         ,(name+"Jet_nLastTrkTagVarCSV["+name+"nJet]/I").c_str()            );
       tree->Branch((name+"Jet_nFirstTrkEtaRelTagVarCSV").c_str()  ,Jet_nFirstTrkEtaRelTagVarCSV  ,(name+"Jet_nFirstTrkEtaRelTagVarCSV["+name+"nJet]/I").c_str() );
       tree->Branch((name+"Jet_nLastTrkEtaRelTagVarCSV").c_str()   ,Jet_nLastTrkEtaRelTagVarCSV   ,(name+"Jet_nLastEtaRelTrackCSV["+name+"nJet]/I").c_str()      );
 
@@ -731,13 +732,13 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_nFirstTrkCTagVar").c_str()        ,Jet_nFirstTrkCTagVar        ,(name+"Jet_nFirstTrkCTagVar["+name+"nJet]/I").c_str()       );
       tree->Branch((name+"Jet_nLastTrkCTagVar").c_str()         ,Jet_nLastTrkCTagVar         ,(name+"Jet_nLastTrkCTagVar["+name+"nJet]/I").c_str()            );
 
-      tree->Branch((name+"trackJetPt").c_str()               ,trackJetPt               ,(name+"trackJetPt["+name+"nJet]/F").c_str()              );
+      tree->Branch((name+"CTag_trackJetPt").c_str()               ,CTag_trackJetPt               ,(name+"CTag_trackJetPt["+name+"nJet]/F").c_str()              );
 
-      tree->Branch((name+"jetNTracks").c_str()               ,jetNTracks               ,(name+"jetNTracks["+name+"nJet]/F").c_str()              );
+      tree->Branch((name+"CTag_jetNTracks").c_str()               ,CTag_jetNTracks               ,(name+"CTag_jetNTracks["+name+"nJet]/F").c_str()              );
 
       tree->Branch((name+"nTrkCTagVar").c_str()               ,&nTrkCTagVar              ,(name+"nTrkCTagVar/I").c_str()                                      );
-      tree->Branch((name+"trackSip2dSig").c_str()     ,trackSip2dSig     ,(name+"trackSip2dSig["+name+"nTrkCTagVar]/F").c_str()     );
-    
+      tree->Branch((name+"CTag_trackSip2dSig").c_str()     ,CTag_trackSip2dSig     ,(name+"CTag_trackSip2dSig["+name+"nTrkCTagVar]/F").c_str()     );
+       tree->Branch((name+"CTag_trackPtRel").c_str()        ,CTag_trackPtRel        ,(name+"CTag_trackPtRel["+name+"nTrkCTagVar]/F").c_str()        );  
     }
     
 
@@ -1164,13 +1165,13 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_nFirstTrkCTagVar").c_str()        ,Jet_nFirstTrkCTagVar );
       tree->SetBranchAddress((name+"Jet_nLastTrkCTagVar").c_str()         ,Jet_nLastTrkCTagVar  );
  
-      tree->SetBranchAddress((name+"trackJetPt").c_str()               ,trackJetPt              );
+      tree->SetBranchAddress((name+"CTag_trackJetPt").c_str()               ,CTag_trackJetPt              );
    
-      tree->SetBranchAddress((name+"jetNTracks").c_str()               ,jetNTracks              );
+      tree->SetBranchAddress((name+"CTag_jetNTracks").c_str()               ,CTag_jetNTracks              );
 
       tree->SetBranchAddress((name+"nTrkCTagVar").c_str()               ,&nTrkCTagVar             );
-      tree->SetBranchAddress((name+"trackSip2dSig").c_str()     ,trackSip2dSig    );
-
+      tree->SetBranchAddress((name+"CTag_trackSip2dSig").c_str()     ,CTag_trackSip2dSig    );
+      tree->SetBranchAddress((name+"CTag_trackPtRel").c_str()        ,CTag_trackPtRel       ); 
     }
 
     void ReadSubJetSpecificTree(TTree *tree, std::string name="") {
