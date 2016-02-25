@@ -295,6 +295,7 @@ private:
   std::string trackCNegHPBJetTags_;
 
   std::string combinedSVBJetTags_;
+  std::string combinedSVRun1BJetTags_;
   std::string combinedSVNegBJetTags_;
   std::string combinedSVPosBJetTags_;
 
@@ -579,6 +580,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   simpleSVNegHighPurBJetTags_   = iConfig.getParameter<std::string>("simpleSVNegHighPurBJetTags");
 
   combinedSVBJetTags_     = iConfig.getParameter<std::string>("combinedSVBJetTags");
+  combinedSVRun1BJetTags_     = iConfig.getParameter<std::string>("combinedSVRun1BJetTags");
   combinedSVNegBJetTags_  = iConfig.getParameter<std::string>("combinedSVNegBJetTags");
   combinedSVPosBJetTags_  = iConfig.getParameter<std::string>("combinedSVPosBJetTags");
 
@@ -2397,6 +2399,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float BprobP = pjet->bDiscriminator(jetBPPosBJetTags_.c_str());
 
     float CombinedSvtx  = pjet->bDiscriminator(combinedSVBJetTags_.c_str());
+    float CombinedSvtxRun1  = pjet->bDiscriminator(combinedSVRun1BJetTags_.c_str());
     float CombinedSvtxN = pjet->bDiscriminator(combinedSVNegBJetTags_.c_str());
     float CombinedSvtxP = pjet->bDiscriminator(combinedSVPosBJetTags_.c_str());
 
@@ -2438,6 +2441,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] = CombinedSvtxN;
     JetInfo[iJetColl].Jet_CombSvxP[JetInfo[iJetColl].nJet] = CombinedSvtxP;
     JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet]  = CombinedSvtx;
+    JetInfo[iJetColl].Jet_CombSvxRun1[JetInfo[iJetColl].nJet]  = CombinedSvtxRun1;
     JetInfo[iJetColl].Jet_CombIVF[JetInfo[iJetColl].nJet]     = CombinedIVF;
     JetInfo[iJetColl].Jet_CombIVF_P[JetInfo[iJetColl].nJet]   = CombinedIVF_P;
     JetInfo[iJetColl].Jet_CombIVF_N[JetInfo[iJetColl].nJet]   = CombinedIVF_N;
