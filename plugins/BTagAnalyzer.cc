@@ -325,6 +325,7 @@ private:
 
   std::string ipTagInfos_;
   std::string svTagInfos_;
+  std::string svTagInfosComputer_;
   std::string svNegTagInfos_;
   std::string softPFMuonTagInfos_;
   std::string softPFElectronTagInfos_;
@@ -605,6 +606,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
 
   ipTagInfos_              = iConfig.getParameter<std::string>("ipTagInfos");
   svTagInfos_              = iConfig.getParameter<std::string>("svTagInfos");
+  svTagInfosComputer_              = iConfig.getParameter<std::string>("svTagInfosComputer");
   svNegTagInfos_           = iConfig.getParameter<std::string>("svNegTagInfos");
   softPFMuonTagInfos_      = iConfig.getParameter<std::string>("softPFMuonTagInfos");
   softPFElectronTagInfos_  = iConfig.getParameter<std::string>("softPFElectronTagInfos");
@@ -1801,6 +1803,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     // Get all TagInfo pointers
     const IPTagInfo *ipTagInfo = toIPTagInfo(*pjet,ipTagInfos_);
     const SVTagInfo *svTagInfo = toSVTagInfo(*pjet,svTagInfos_);
+    const SVTagInfo *svTagInfoComputer = toSVTagInfo(*pjet,svTagInfosComputer_);
     const SVTagInfo *svNegTagInfo = toSVTagInfo(*pjet,svNegTagInfos_);
     const reco::CandSoftLeptonTagInfo *softPFMuTagInfo = pjet->tagInfoCandSoftLepton(softPFMuonTagInfos_.c_str());
     const reco::CandSoftLeptonTagInfo *softPFElTagInfo = pjet->tagInfoCandSoftLepton(softPFElectronTagInfos_.c_str());
@@ -2556,7 +2559,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       std::vector<const reco::BaseTagInfo*>  baseTagInfos;
       JetTagComputer::TagInfoHelper helper(baseTagInfos);
       baseTagInfos.push_back( ipTagInfo );
-      baseTagInfos.push_back( svTagInfo );
+      baseTagInfos.push_back( svTagInfoComputer );
       // TaggingVariables
       reco::TaggingVariableList vars = computer->taggingVariables(helper);
 
