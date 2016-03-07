@@ -142,8 +142,14 @@ options.register('doBoostedCommissioning', False,
     VarParsing.varType.bool,
     "Make NTuples with branches for boosted b tag commissioning: overrider several other switches"
 )
+## Do Ctag
+options.register('doCTag', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Make NTuples with branches for CTag"
+)
 ## 'maxEvents' is already registered by the Framework, changing default value
-options.setDefault('maxEvents', 10)
+options.setDefault('maxEvents', -1)
 
 options.parseArguments()
 
@@ -166,6 +172,9 @@ if options.doBoostedCommissioning:
     print "Option runFatJets will be set to '",options.runFatJets,"'"
     print "Option runSubJets  will be set to '",options.runSubJets,"'"
     print "********************"
+## add by Keng
+if options.doCTag:
+    print "**********You are making NTuple for CTag*************" 
 
 ## Global tag
 globalTag = options.mcGlobalTag
@@ -998,8 +1007,22 @@ process.btagana.genParticles          = cms.InputTag(genParticles)
 process.btagana.candidates            = cms.InputTag(pfCandidates)
 
 ##add by Keng##
-process.btagana.storeCTagVariables = True
-process.btagana.storeEventInfo = False
+if options.doCTag:
+    #process.load('RecoBTag.SecondaryVertex.candidateCombinedSecondaryVertexSoftLeptonComputer_cfi')
+    #process.load('RecoBTag.CTagging.RecoCTagging_cff')
+    #process.customTagInfos = cms.Sequence(
+    #    ( 
+    #	process.inclusiveCandidateVertexingCvsL *
+    #   process.pfInclusiveSecondaryVertexFinderCvsLTagInfos
+    #    )
+    #)
+    process.btagana.storeCTagVariables = True
+    process.btagana.storeEventInfo = False
+    process.btagana.doCTag = options.doCTag
+    process.btagana.ipTagInfos = cms.string('pfImpactParameter')
+    #process.btagana.svTagInfos = cms.string('pfInclusiveSecondaryVertexFinderCvsL')
+    process.btagana.softPFMuonTagInfos = cms.string('softPFMuons')
+    process.btagana.softPFElectronTagInfos = cms.string('softPFElectrons')
 
 ## fillsvTagInfo set to False independently from the choices above, if produceJetTrackTree is set to False
 if not process.btagana.produceJetTrackTree:
@@ -1097,6 +1120,7 @@ process.p = cms.Path(
     process.allEvents
     * process.filtSeq
     * process.selectedEvents
+    #* process.customTagInfos
     * process.analyzerSeq
 )
 

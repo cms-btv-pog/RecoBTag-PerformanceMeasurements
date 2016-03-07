@@ -126,8 +126,8 @@
 #include "fastjet/contrib/Njettiness.hh"
 
 //add by Keng//
-//#include "RecoBTag/SecondaryVertex/interface/CombinedSVSoftLeptonComputer.h"
-#include "RecoBTag/CTagging/interface/CharmTagger.h"
+#include "RecoBTag/SecondaryVertex/interface/CombinedSVSoftLeptonComputer.h"
+//#include "RecoBTag/CTagging/interface/CharmTagger.h"
 
 //
 // constants, enums and typedefs
@@ -338,6 +338,8 @@ private:
 
   std::string   SVComputer_;
   std::string   SVComputerSubJets_;
+  //add by Keng//
+  std::string   SLComputer_;
 
   bool useTrackHistory_;
   TFile*  rootFile_;
@@ -363,6 +365,7 @@ private:
   
   //Add by Keng//
   bool storeCTagVariables_;
+  bool doCTag_;  
 
   bool use_ttbar_filter_;
   edm::EDGetTokenT<edm::View<reco::GenParticle> > ttbarproducerGen_;
@@ -414,6 +417,9 @@ private:
   std::vector<std::string> PFJet80TriggerPathNames_;
 
   const GenericMVAJetTagComputer *computer ;
+  //add by Keng//
+  std::string computer_use;
+  //const CombinedSVSoftLeptonComputer *sl_computer_; 
 
   edm::View<reco::Muon> muons ;
 
@@ -515,6 +521,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
 
   //add by Keng//
   storeCTagVariables_ = iConfig.getParameter<bool>("storeCTagVariables");
+  doCTag_             = iConfig.getParameter<bool>("doCTag");
 
   use_ttbar_filter_ = iConfig.getParameter<bool> ("use_ttbar_filter");
   ttbarproducerGen_ = consumes<edm::View<reco::GenParticle>>(iConfig.getParameter<edm::InputTag>("ttbarproducer")),
@@ -627,6 +634,8 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
 
   SVComputer_               = iConfig.getParameter<std::string>("svComputer");
   SVComputerSubJets_        = iConfig.getParameter<std::string>("svComputerSubJets");
+  //add by Keng//
+  SLComputer_               = iConfig.getParameter<std::string>("slComputer");
 
   triggerPathNames_        = iConfig.getParameter<std::vector<std::string> >("TriggerPathNames");
   PFJet80TriggerPathNames_ = iConfig.getParameter<std::vector<std::string> >("PFJet80TriggerPathNames");
@@ -1516,7 +1525,6 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
 
   computer = dynamic_cast<const GenericMVAJetTagComputer*>( computerHandle.product() );
   //------------- end added-----------------------------------------------------------//
-
   //------------------------------------------------------
   // All tracks info
   //------------------------------------------------------
@@ -1580,7 +1588,17 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     }
   }
   //------------------------------------------------------
+  //add by Keng//
+  std::cout<<"doCtag_:"<<doCTag_<<std::endl;
+  computer_use = SVComputer_;
+  if (doCTag_){
+        edm::ESHandle<JetTagComputer> computerHandle;
+        iSetup.get<JetTagComputerRecord>().get( SLComputer_.c_str(), computerHandle );
 
+        computer = dynamic_cast<const GenericMVAJetTagComputer*>( computerHandle.product() );
+  computer_use = SLComputer_;
+  }
+ 
   //// Fill TTree
   if ( EventInfo.BitTrigger > 0 || EventInfo.Run < 0 ) {
     smalltree->Fill();
@@ -1630,6 +1648,10 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
   JetInfo[iJetColl].nSVTagVar = 0;
   JetInfo[iJetColl].nTrkTagVarCSV = 0;
   JetInfo[iJetColl].nTrkEtaRelTagVarCSV = 0;
+  //Add by Keng
+  JetInfo[iJetColl].nTrkCTagVar = 0;
+  JetInfo[iJetColl].nLeptons = 0;  
+
   if ( runFatJets_ && runSubJets_ && iJetColl == 0 )
   {
     for ( size_t i = 0; i < SubJetLabels_.size(); ++i )
@@ -2598,7 +2620,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].TagVarCSV_vertexFitProb[JetInfo[iJetColl].nJet]               = ( vars.checkTag(reco::btau::vertexFitProb) ? vars.get(reco::btau::vertexFitProb) : -9999 );
       JetInfo[iJetColl].TagVarCSV_massVertexEnergyFraction[JetInfo[iJetColl].nJet]           = ( vars.checkTag(reco::btau::massVertexEnergyFraction) ? vars.get(reco::btau::massVertexEnergyFraction) : -0.1);
       JetInfo[iJetColl].TagVarCSV_vertexBoostOverSqrtJetPt[JetInfo[iJetColl].nJet]           = ( vars.checkTag(reco::btau::vertexBoostOverSqrtJetPt) ? vars.get(reco::btau::vertexBoostOverSqrtJetPt) : -0.1);
-
+      std::cout<<"computer:"<<computer_use<<std::endl;
       // per jet per track
       JetInfo[iJetColl].Jet_nFirstTrkTagVarCSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkTagVarCSV;
       std::vector<float> tagValList = vars.getList(reco::btau::trackSip2dSig,false);
@@ -2665,11 +2687,17 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     //add by Keng//
     if ( storeCTagVariables )
     {
-      
+      std::cout<<"computer_C:"<<computer_use<<std::endl; 
+      std::cout<<"ipTagInfo:"<<ipTagInfos_<<std::endl;
+      std::cout<<"svTagInfo:"<<svTagInfos_<<std::endl;
+      std::cout<<"softPFMuTagInfo:"<<softPFMuonTagInfos_<<std::endl;
+      std::cout<<"softPFElTagInfo:"<<softPFElectronTagInfos_<<std::endl;
       std::vector<const reco::BaseTagInfo*>  baseTagInfos;
       JetTagComputer::TagInfoHelper helper(baseTagInfos);
       baseTagInfos.push_back( ipTagInfo );
       baseTagInfos.push_back( svTagInfo );
+      baseTagInfos.push_back( softPFMuTagInfo );
+      baseTagInfos.push_back( softPFElTagInfo ); 
       // TaggingVariables
       reco::TaggingVariableList vars = computer->taggingVariables(helper);
       
@@ -2688,6 +2716,16 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].nTrkCTagVar += JetInfo[iJetColl].CTag_jetNTracks[JetInfo[iJetColl].nJet];
       JetInfo[iJetColl].Jet_nLastTrkCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkCTagVar;
 
+      //per jet per lepton
+      JetInfo[iJetColl].Jet_nFirstLepCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nLeptons;
+      std::vector<float> sltagValList = vars.getList(reco::btau::leptonPtRel,false);
+      JetInfo[iJetColl].CTag_jetNLeptons[JetInfo[iJetColl].nJet] = sltagValList.size();
+
+      sltagValList = vars.getList(reco::btau::leptonPtRel,false);
+      if(sltagValList.size()>0) std::copy( sltagValList.begin(), sltagValList.end(), &JetInfo[iJetColl].CTag_leptonPtRel[JetInfo[iJetColl].nLeptons] );
+      
+      JetInfo[iJetColl].nLeptons += JetInfo[iJetColl].CTag_jetNLeptons[JetInfo[iJetColl].nJet];
+      JetInfo[iJetColl].Jet_nLastLepCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nLeptons;
     }
 
     if ( runFatJets_ && iJetColl == 0 )

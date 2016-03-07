@@ -17,6 +17,7 @@ bTagAnalyzerCommon = cms.PSet(
     storeCSVTagVariables     = cms.bool(False),
     storeCSVTagVariablesSubJets = cms.bool(False),
     storeCTagVariables       = cms.bool(False),
+    doCTag                   = cms.bool(False),
     fillsvTagInfo            = cms.bool(False),
     fillPU                   = cms.bool(False),
     fillGenPruned            = cms.bool(True),

@@ -5,6 +5,7 @@ bTagAnalyzer = cms.EDAnalyzer("BTagAnalyzer",
     # computers
     svComputer = cms.string('candidateCombinedSecondaryVertexV2Computer'),
     svComputerSubJets = cms.string('candidateCombinedSecondaryVertexV2Computer'),
+    slComputer = cms.string('candidateCombinedSecondaryVertexSoftLeptonComputer'),
     # TagInfos (need to omit the 'TagInfos' part from the label)
     ipTagInfos = cms.string('pfImpactParameter'),
     svTagInfos = cms.string('pfInclusiveSecondaryVertexFinder'),
