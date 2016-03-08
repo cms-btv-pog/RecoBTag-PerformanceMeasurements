@@ -368,6 +368,10 @@ class JetInfoBranches {
     float CTag_Jet_CvsB[nMaxJets_];
     float CTag_Jet_CvsL[nMaxJets_];
     float CTag_trackJetPt[nMaxJets_];                           // track-based jet transverse momentum
+    float CTag_jetNSecondaryVertices[nMaxJets_];                // number of reconstructed possible secondary vertices in jet
+    float CTag_vertexMass[nMaxJets_];                           // mass of track sum at secondary vertex
+    float CTag_vertexNTracks[nMaxJets_];                        // number of tracks at secondary vertex
+    float CTag_vertexEnergyRatio[nMaxJets_];                    // ratio of energy at secondary vertex over total energy
     int   Jet_nFirstTrkCTagVar[nMaxJets_];
     int   Jet_nLastTrkCTagVar[nMaxJets_];
     float CTag_jetNTracks[nMaxJets_];                              // tracks associated to jet
@@ -729,7 +733,10 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_nLastLepCTagVar").c_str()         ,Jet_nLastLepCTagVar         ,(name+"Jet_nLastLepCTagVar["+name+"nJet]/I").c_str()            );
 
       tree->Branch((name+"CTag_trackJetPt").c_str()               ,CTag_trackJetPt               ,(name+"CTag_trackJetPt["+name+"nJet]/F").c_str()              );
-
+      tree->Branch((name+"CTag_jetNSecondaryVertices").c_str()    ,CTag_jetNSecondaryVertices    ,(name+"CTag_jetNSecondaryVertices["+name+"nJet]/F").c_str()   );
+      tree->Branch((name+"CTag_vertexMass").c_str()               ,CTag_vertexMass               ,(name+"CTag_vertexMass["+name+"nJet]/F").c_str()              );
+      tree->Branch((name+"CTag_vertexNTracks").c_str()            ,CTag_vertexNTracks            ,(name+"CTag_vertexNTracks["+name+"nJet]/F").c_str()           );
+      tree->Branch((name+"CTag_vertexEnergyRatio").c_str()        ,CTag_vertexEnergyRatio        ,(name+"CTag_vertexEnergyRatio["+name+"nJet]/F").c_str()       );
       tree->Branch((name+"CTag_jetNTracks").c_str()               ,CTag_jetNTracks               ,(name+"CTag_jetNTracks["+name+"nJet]/F").c_str()              );
 
       tree->Branch((name+"nTrkCTagVar").c_str()               ,&nTrkCTagVar              ,(name+"nTrkCTagVar/I").c_str()                                      );
@@ -1166,6 +1173,10 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_nLastLepCTagVar").c_str()         ,Jet_nLastLepCTagVar  ); 
 
       tree->SetBranchAddress((name+"CTag_trackJetPt").c_str()               ,CTag_trackJetPt              );
+      tree->SetBranchAddress((name+"CTag_jetNSecondaryVertices").c_str()    ,CTag_jetNSecondaryVertices   );
+      tree->SetBranchAddress((name+"CTag_vertexMass").c_str()               ,CTag_vertexMass              );
+      tree->SetBranchAddress((name+"CTag_vertexNTracks").c_str()            ,CTag_vertexNTracks           );
+      tree->SetBranchAddress((name+"CTag_vertexEnergyRatio").c_str()        ,CTag_vertexEnergyRatio       );
       tree->SetBranchAddress((name+"CTag_jetNTracks").c_str()               ,CTag_jetNTracks              );
 
       tree->SetBranchAddress((name+"nTrkCTagVar").c_str()               ,&nTrkCTagVar             );

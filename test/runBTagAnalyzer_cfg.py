@@ -211,6 +211,8 @@ bTagInfos = [
    ,'pfInclusiveSecondaryVertexFinderNegativeTagInfos'
    ,'softPFMuonsTagInfos'
    ,'softPFElectronsTagInfos'
+   #add by Keng#
+   ,'pfInclusiveSecondaryVertexFinderCvsLTagInfos'
 ]
 ## b-tag discriminators
 bTagDiscriminatorsLegacy = [
@@ -1024,7 +1026,7 @@ if options.doCTag:
     process.btagana.storeEventInfo = False
     process.btagana.doCTag = options.doCTag
     process.btagana.ipTagInfos = cms.string('pfImpactParameter')
-    #process.btagana.svTagInfos = cms.string('pfInclusiveSecondaryVertexFinderCvsL')
+    process.btagana.svTagInfos = cms.string('pfInclusiveSecondaryVertexFinderCvsL')
     process.btagana.softPFMuonTagInfos = cms.string('softPFMuons')
     process.btagana.softPFElectronTagInfos = cms.string('softPFElectrons')
 

@@ -2715,6 +2715,10 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       
       // per jet
       JetInfo[iJetColl].CTag_trackJetPt[JetInfo[iJetColl].nJet]                  = ( vars.checkTag(reco::btau::trackJetPt) ? vars.get(reco::btau::trackJetPt) : -9999 );	
+      JetInfo[iJetColl].CTag_jetNSecondaryVertices[JetInfo[iJetColl].nJet]       = ( vars.checkTag(reco::btau::jetNSecondaryVertices) ? vars.get(reco::btau::jetNSecondaryVertices) : 0 );
+      JetInfo[iJetColl].CTag_vertexMass[JetInfo[iJetColl].nJet]                  = ( vars.checkTag(reco::btau::vertexMass) ? vars.get(reco::btau::vertexMass) : -9999 );
+      JetInfo[iJetColl].CTag_vertexNTracks[JetInfo[iJetColl].nJet]               = ( vars.checkTag(reco::btau::vertexNTracks) ? vars.get(reco::btau::vertexNTracks) : 0 );
+      JetInfo[iJetColl].CTag_vertexEnergyRatio[JetInfo[iJetColl].nJet]           = ( vars.checkTag(reco::btau::vertexEnergyRatio) ? vars.get(reco::btau::vertexEnergyRatio) : -9999 );
       // per jet per track
       JetInfo[iJetColl].Jet_nFirstTrkCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkCTagVar;
       std::vector<float> tagValList = vars.getList(reco::btau::trackSip2dSig,false);
