@@ -126,7 +126,7 @@
 #include "fastjet/contrib/Njettiness.hh"
 
 //add by Keng//
-#include "RecoBTag/SecondaryVertex/interface/CombinedSVSoftLeptonComputer.h"
+//#include "RecoBTag/SecondaryVertex/interface/CombinedSVSoftLeptonComputer.h"
 //#include "RecoBTag/CTagging/interface/CharmTagger.h"
 
 //
@@ -340,6 +340,8 @@ private:
   std::string   SVComputerSubJets_;
   //add by Keng//
   std::string   SLComputer_;
+  std::string   CvsBCJetTags_;
+  std::string   CvsLCJetTags_;
 
   bool useTrackHistory_;
   TFile*  rootFile_;
@@ -636,6 +638,8 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   SVComputerSubJets_        = iConfig.getParameter<std::string>("svComputerSubJets");
   //add by Keng//
   SLComputer_               = iConfig.getParameter<std::string>("slComputer");
+  CvsBCJetTags_             = iConfig.getParameter<std::string>("CvsBCJetTags");
+  CvsLCJetTags_             = iConfig.getParameter<std::string>("CvsLCJetTags");
 
   triggerPathNames_        = iConfig.getParameter<std::vector<std::string> >("TriggerPathNames");
   PFJet80TriggerPathNames_ = iConfig.getParameter<std::vector<std::string> >("PFJet80TriggerPathNames");
@@ -2464,6 +2468,10 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float cMVAv2 = pjet->bDiscriminator(cMVAv2BJetTags_.c_str());
     float cMVAv2Neg = pjet->bDiscriminator(cMVAv2NegBJetTags_.c_str());
     float cMVAv2Pos = pjet->bDiscriminator(cMVAv2PosBJetTags_.c_str());
+   
+    //add by Keng//
+    float CvsB = pjet->bDiscriminator(CvsBCJetTags_.c_str());
+    float CvsL = pjet->bDiscriminator(CvsLCJetTags_.c_str());  
 
     // Jet information
     JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet]   = ProbaN;
@@ -2687,17 +2695,21 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     //add by Keng//
     if ( storeCTagVariables )
     {
+      JetInfo[iJetColl].CTag_Jet_CvsB[JetInfo[iJetColl].nJet] = CvsB;
+      JetInfo[iJetColl].CTag_Jet_CvsL[JetInfo[iJetColl].nJet] = CvsL;
+   
       std::cout<<"computer_C:"<<computer_use<<std::endl; 
       std::cout<<"ipTagInfo:"<<ipTagInfos_<<std::endl;
       std::cout<<"svTagInfo:"<<svTagInfos_<<std::endl;
       std::cout<<"softPFMuTagInfo:"<<softPFMuonTagInfos_<<std::endl;
       std::cout<<"softPFElTagInfo:"<<softPFElectronTagInfos_<<std::endl;
       std::vector<const reco::BaseTagInfo*>  baseTagInfos;
-      JetTagComputer::TagInfoHelper helper(baseTagInfos);
+      //JetTagComputer::TagInfoHelper helper(baseTagInfos);
       baseTagInfos.push_back( ipTagInfo );
       baseTagInfos.push_back( svTagInfo );
       baseTagInfos.push_back( softPFMuTagInfo );
       baseTagInfos.push_back( softPFElTagInfo ); 
+      JetTagComputer::TagInfoHelper helper(baseTagInfos);
       // TaggingVariables
       reco::TaggingVariableList vars = computer->taggingVariables(helper);
       

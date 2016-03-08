@@ -149,7 +149,7 @@ options.register('doCTag', True,
     "Make NTuples with branches for CTag"
 )
 ## 'maxEvents' is already registered by the Framework, changing default value
-options.setDefault('maxEvents', -1)
+options.setDefault('maxEvents', 10)
 
 options.parseArguments()
 
@@ -276,6 +276,9 @@ bTagDiscriminators = [
    ,'pfCombinedMVAV2BJetTags'
    ,'pfNegativeCombinedMVAV2BJetTags'
    ,'pfPositiveCombinedMVAV2BJetTags'
+   #add by Keng#
+   ,'pfCombinedCvsBJetTags'
+   ,'pfCombinedCvsLJetTags'
 ]
 
 ## Legacy taggers not supported with MiniAOD
@@ -333,7 +336,8 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
         #'/store/relval/CMSSW_7_4_0_pre8/RelValZpTT_1500_13TeV/GEN-SIM-RECO/MCRUN2_74_V7-v1/00000/58F8AA88-4BBD-E411-95D4-0025905A48F0.root'
         #'file:/data/scratchLocal/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8_PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1_AOD/085BB356-FCC2-E511-B2A2-B499BAAC09C8.root'
-        'root://xrootd.unl.edu//store/mc/RunIIFall15DR76/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/00000/085BB356-FCC2-E511-B2A2-B499BAAC09C8.root'
+        #'root://xrootd.unl.edu//store/mc/RunIIFall15DR76/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/00000/085BB356-FCC2-E511-B2A2-B499BAAC09C8.root'
+        'root://xrootd.unl.edu//store/relval/CMSSW_7_6_0/RelValTTbar_13_HS/GEN-SIM-RECO/76X_mcRun2_asymptotic_v11-v1/00000/082C859B-1987-E511-BF54-0CC47A4C8E1E.root'
     )
 )
 if options.miniAOD:
