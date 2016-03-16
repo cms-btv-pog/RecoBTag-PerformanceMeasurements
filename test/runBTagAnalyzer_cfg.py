@@ -149,7 +149,7 @@ options.register('doCTag', True,
     "Make NTuples with branches for CTag"
 )
 ## 'maxEvents' is already registered by the Framework, changing default value
-options.setDefault('maxEvents', 10)
+options.setDefault('maxEvents', -1)
 
 options.parseArguments()
 
@@ -339,7 +339,10 @@ process.source = cms.Source("PoolSource",
         #'/store/relval/CMSSW_7_4_0_pre8/RelValZpTT_1500_13TeV/GEN-SIM-RECO/MCRUN2_74_V7-v1/00000/58F8AA88-4BBD-E411-95D4-0025905A48F0.root'
         #'file:/data/scratchLocal/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8_PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1_AOD/085BB356-FCC2-E511-B2A2-B499BAAC09C8.root'
         #'root://xrootd.unl.edu//store/mc/RunIIFall15DR76/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/00000/085BB356-FCC2-E511-B2A2-B499BAAC09C8.root'
-        'root://xrootd.unl.edu//store/relval/CMSSW_7_6_0/RelValTTbar_13_HS/GEN-SIM-RECO/76X_mcRun2_asymptotic_v11-v1/00000/082C859B-1987-E511-BF54-0CC47A4C8E1E.root'
+        #'root://xrootd.unl.edu//store/relval/CMSSW_7_6_0/RelValTTbar_13_HS/GEN-SIM-RECO/76X_mcRun2_asymptotic_v11-v1/00000/082C859B-1987-E511-BF54-0CC47A4C8E1E.root'
+        #'root://xrootd.unl.edu//store/mc/RunIIFall15DR76/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/30000/0C30EE1F-2A9F-E511-9B43-00259075D6B4.root'
+        '/store/relval/CMSSW_7_6_0/RelValTTbar_13_HS/GEN-SIM-RECO/76X_mcRun2_asymptotic_v11-v1/00000/082C859B-1987-E511-BF54-0CC47A4C8E1E.root'
+        #'/store/mc/RunIIFall15DR76/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/00000/085BB356-FCC2-E511-B2A2-B499BAAC09C8.root'
     )
 )
 if options.miniAOD:
@@ -1025,10 +1028,10 @@ if options.doCTag:
     process.btagana.storeCTagVariables = True
     process.btagana.storeEventInfo = False
     process.btagana.doCTag = options.doCTag
-    process.btagana.ipTagInfos = cms.string('pfImpactParameter')
-    process.btagana.svTagInfos = cms.string('pfInclusiveSecondaryVertexFinderCvsL')
-    process.btagana.softPFMuonTagInfos = cms.string('softPFMuons')
-    process.btagana.softPFElectronTagInfos = cms.string('softPFElectrons')
+    process.btagana.ipTagInfosCTag = cms.string('pfImpactParameter')
+    process.btagana.svTagInfosCTag = cms.string('pfInclusiveSecondaryVertexFinderCvsL')
+    process.btagana.softPFMuonTagInfosCTag = cms.string('softPFMuons')
+    process.btagana.softPFElectronTagInfosCTag = cms.string('softPFElectrons')
 
 ## fillsvTagInfo set to False independently from the choices above, if produceJetTrackTree is set to False
 if not process.btagana.produceJetTrackTree:
