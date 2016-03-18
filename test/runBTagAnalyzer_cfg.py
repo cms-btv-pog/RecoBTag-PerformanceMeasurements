@@ -143,13 +143,13 @@ options.register('doBoostedCommissioning', False,
     "Make NTuples with branches for boosted b tag commissioning: overrider several other switches"
 )
 ## Do Ctag
-options.register('doCTag', True,
+options.register('doCTag', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Make NTuples with branches for CTag"
 )
 ## 'maxEvents' is already registered by the Framework, changing default value
-options.setDefault('maxEvents', 100)
+options.setDefault('maxEvents', -1)
 
 options.parseArguments()
 
@@ -172,7 +172,6 @@ if options.doBoostedCommissioning:
     print "Option runFatJets will be set to '",options.runFatJets,"'"
     print "Option runSubJets  will be set to '",options.runSubJets,"'"
     print "********************"
-## add by Keng
 if options.doCTag:
     print "**********You are making NTuple for CTag*************" 
 
@@ -211,7 +210,6 @@ bTagInfos = [
    ,'pfInclusiveSecondaryVertexFinderNegativeTagInfos'
    ,'softPFMuonsTagInfos'
    ,'softPFElectronsTagInfos'
-   #add by Keng#
    ,'pfInclusiveSecondaryVertexFinderCvsLTagInfos'
 ]
 ## b-tag discriminators
@@ -278,7 +276,6 @@ bTagDiscriminators = [
    ,'pfCombinedMVAV2BJetTags'
    ,'pfNegativeCombinedMVAV2BJetTags'
    ,'pfPositiveCombinedMVAV2BJetTags'
-   #add by Keng#
    ,'pfCombinedCvsBJetTags'
    ,'pfCombinedCvsLJetTags'
 ]
@@ -337,10 +334,6 @@ process.MessageLogger.cerr.default.limit = 10
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
         #'/store/relval/CMSSW_7_4_0_pre8/RelValZpTT_1500_13TeV/GEN-SIM-RECO/MCRUN2_74_V7-v1/00000/58F8AA88-4BBD-E411-95D4-0025905A48F0.root'
-        #'file:/data/scratchLocal/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8_PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1_AOD/085BB356-FCC2-E511-B2A2-B499BAAC09C8.root'
-        #'root://xrootd.unl.edu//store/mc/RunIIFall15DR76/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/00000/085BB356-FCC2-E511-B2A2-B499BAAC09C8.root'
-        #'root://xrootd.unl.edu//store/relval/CMSSW_7_6_0/RelValTTbar_13_HS/GEN-SIM-RECO/76X_mcRun2_asymptotic_v11-v1/00000/082C859B-1987-E511-BF54-0CC47A4C8E1E.root'
-        #'root://xrootd.unl.edu//store/mc/RunIIFall15DR76/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/30000/0C30EE1F-2A9F-E511-9B43-00259075D6B4.root'
         '/store/relval/CMSSW_7_6_0/RelValTTbar_13_HS/GEN-SIM-RECO/76X_mcRun2_asymptotic_v11-v1/00000/082C859B-1987-E511-BF54-0CC47A4C8E1E.root'
         #'/store/mc/RunIIFall15DR76/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/00000/085BB356-FCC2-E511-B2A2-B499BAAC09C8.root'
     )
@@ -1015,7 +1008,6 @@ process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Da
 process.btagana.genParticles          = cms.InputTag(genParticles)
 process.btagana.candidates            = cms.InputTag(pfCandidates)
 
-##add by Keng##
 if options.doCTag:
     process.btagana.storeCTagVariables = True
     process.btagana.storeEventInfo = False

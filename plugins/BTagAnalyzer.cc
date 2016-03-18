@@ -125,7 +125,6 @@
 
 #include "fastjet/contrib/Njettiness.hh"
 
-//add by Keng//
 #include "RecoBTag/SecondaryVertex/interface/CombinedSVSoftLeptonComputer.h"
 
 //
@@ -337,7 +336,7 @@ private:
 
   std::string   SVComputer_;
   std::string   SVComputerSubJets_;
-  //add by Keng//
+
   std::string ipTagInfosCTag_;
   std::string svTagInfosCTag_;
   std::string softPFMuonTagInfosCTag_;
@@ -368,7 +367,6 @@ private:
   bool storeCSVTagVariables_;
   bool storeCSVTagVariablesSubJets_;
   
-  //Add by Keng//
   bool storeCTagVariables_;
   bool doCTag_;  
 
@@ -422,7 +420,7 @@ private:
   std::vector<std::string> PFJet80TriggerPathNames_;
 
   const GenericMVAJetTagComputer *computer ;
-  //add by Keng//
+
   const GenericMVAJetTagComputer *slcomputer ;
 
   edm::View<reco::Muon> muons ;
@@ -524,7 +522,6 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   storeCSVTagVariables_ = iConfig.getParameter<bool>("storeCSVTagVariables");
   storeCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("storeCSVTagVariablesSubJets");
 
-  //add by Keng//
   storeCTagVariables_ = iConfig.getParameter<bool>("storeCTagVariables");
   doCTag_             = iConfig.getParameter<bool>("doCTag");
 
@@ -639,7 +636,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
 
   SVComputer_               = iConfig.getParameter<std::string>("svComputer");
   SVComputerSubJets_        = iConfig.getParameter<std::string>("svComputerSubJets");
-  //add by Keng//
+
   ipTagInfosCTag_              = iConfig.getParameter<std::string>("ipTagInfosCTag");
   svTagInfosCTag_              = iConfig.getParameter<std::string>("svTagInfosCTag");
   softPFMuonTagInfosCTag_      = iConfig.getParameter<std::string>("softPFMuonTagInfosCTag");
@@ -686,7 +683,6 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   if ( storeTagVariables_)    JetInfo[0].RegisterTagVarTree(smalltree,branchNamePrefix_);
   if ( storeCSVTagVariables_) JetInfo[0].RegisterCSVTagVarTree(smalltree,branchNamePrefix_);
 
-  //add by Keng//
   if ( storeCTagVariables_) JetInfo[0].RegisterCTagVarTree(smalltree,branchNamePrefix_);
 
   if ( runSubJets_ ) {
@@ -1537,7 +1533,6 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   computer = dynamic_cast<const GenericMVAJetTagComputer*>( computerHandle.product() );
   //------------- end added-----------------------------------------------------------//
 
-  //add by Keng//
   if (doCTag_){
      edm::ESHandle<JetTagComputer> slcomputerHandle;
      iSetup.get<JetTagComputerRecord>().get( SLComputer_.c_str(), slcomputerHandle );
@@ -1657,7 +1652,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
   JetInfo[iJetColl].nSVTagVar = 0;
   JetInfo[iJetColl].nTrkTagVarCSV = 0;
   JetInfo[iJetColl].nTrkEtaRelTagVarCSV = 0;
-  //Add by Keng
   JetInfo[iJetColl].nTrkCTagVar = 0;
   JetInfo[iJetColl].nTrkEtaRelCTagVar = 0;
   JetInfo[iJetColl].nLeptons = 0;  
@@ -1671,7 +1665,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
   bool storeTagVariables    = storeTagVariables_;
   bool storeCSVTagVariables = storeCSVTagVariables_;
 
-  //add by Keng//
   bool storeCTagVariables = storeCTagVariables_;
 
   if ( runSubJets_ && iJetColl > 0 )
@@ -1854,7 +1847,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     const reco::CandSoftLeptonTagInfo *softPFMuTagInfo = pjet->tagInfoCandSoftLepton(softPFMuonTagInfos_.c_str());
     const reco::CandSoftLeptonTagInfo *softPFElTagInfo = pjet->tagInfoCandSoftLepton(softPFElectronTagInfos_.c_str());
    
-    //add by Keng//
     //Get all CTagInfo pointers
     const IPTagInfo *ipTagInfoCTag = toIPTagInfo(*pjet,ipTagInfosCTag_);
     const SVTagInfo *svTagInfoCTag = toSVTagInfo(*pjet,svTagInfosCTag_);
@@ -2482,7 +2474,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float cMVAv2Neg = pjet->bDiscriminator(cMVAv2NegBJetTags_.c_str());
     float cMVAv2Pos = pjet->bDiscriminator(cMVAv2PosBJetTags_.c_str());
    
-    //add by Keng//
     float CvsB = pjet->bDiscriminator(CvsBCJetTags_.c_str());
     float CvsL = pjet->bDiscriminator(CvsLCJetTags_.c_str());  
 
@@ -2688,7 +2679,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].Jet_nLastTrkEtaRelTagVarCSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkEtaRelTagVarCSV;
    }
 
-    //add by Keng//
     if ( storeCTagVariables )
     {
       JetInfo[iJetColl].CTag_Jet_CvsB[JetInfo[iJetColl].nJet] = CvsB;
