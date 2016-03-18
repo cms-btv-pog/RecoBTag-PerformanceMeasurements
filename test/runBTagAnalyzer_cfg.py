@@ -149,7 +149,7 @@ options.register('doCTag', True,
     "Make NTuples with branches for CTag"
 )
 ## 'maxEvents' is already registered by the Framework, changing default value
-options.setDefault('maxEvents', -1)
+options.setDefault('maxEvents', 100)
 
 options.parseArguments()
 
@@ -1017,21 +1017,9 @@ process.btagana.candidates            = cms.InputTag(pfCandidates)
 
 ##add by Keng##
 if options.doCTag:
-    #process.load('RecoBTag.SecondaryVertex.candidateCombinedSecondaryVertexSoftLeptonComputer_cfi')
-    #process.load('RecoBTag.CTagging.RecoCTagging_cff')
-    #process.customTagInfos = cms.Sequence(
-    #    ( 
-    #	process.inclusiveCandidateVertexingCvsL *
-    #   process.pfInclusiveSecondaryVertexFinderCvsLTagInfos
-    #    )
-    #)
     process.btagana.storeCTagVariables = True
     process.btagana.storeEventInfo = False
     process.btagana.doCTag = options.doCTag
-    process.btagana.ipTagInfosCTag = cms.string('pfImpactParameter')
-    process.btagana.svTagInfosCTag = cms.string('pfInclusiveSecondaryVertexFinderCvsL')
-    process.btagana.softPFMuonTagInfosCTag = cms.string('softPFMuons')
-    process.btagana.softPFElectronTagInfosCTag = cms.string('softPFElectrons')
 
 ## fillsvTagInfo set to False independently from the choices above, if produceJetTrackTree is set to False
 if not process.btagana.produceJetTrackTree:
