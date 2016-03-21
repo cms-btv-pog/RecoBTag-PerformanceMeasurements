@@ -333,9 +333,7 @@ process.MessageLogger.cerr.default.limit = 10
 ## Input files
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        #'/store/relval/CMSSW_7_4_0_pre8/RelValZpTT_1500_13TeV/GEN-SIM-RECO/MCRUN2_74_V7-v1/00000/58F8AA88-4BBD-E411-95D4-0025905A48F0.root'
-        '/store/relval/CMSSW_7_6_0/RelValTTbar_13_HS/GEN-SIM-RECO/76X_mcRun2_asymptotic_v11-v1/00000/082C859B-1987-E511-BF54-0CC47A4C8E1E.root'
-        #'/store/mc/RunIIFall15DR76/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/00000/085BB356-FCC2-E511-B2A2-B499BAAC09C8.root'
+        '/store/mc/RunIIFall15DR76/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/30000/00348C6E-599F-E511-B51D-02163E00F4BF.root'
     )
 )
 if options.miniAOD:
