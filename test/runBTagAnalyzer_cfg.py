@@ -1008,7 +1008,7 @@ process.btagana.candidates            = cms.InputTag(pfCandidates)
 
 if options.doCTag:
     process.btagana.storeCTagVariables = True
-    process.btagana.storeEventInfo = False
+    process.btagana.storeEventInfo = True
     process.btagana.doCTag = options.doCTag
 
 ## fillsvTagInfo set to False independently from the choices above, if produceJetTrackTree is set to False
