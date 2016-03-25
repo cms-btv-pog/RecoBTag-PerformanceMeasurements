@@ -90,7 +90,7 @@ options.register('useTopProjections', False,
     VarParsing.varType.bool,
     "Use top projections"
 )
-options.register('miniAOD', True,
+options.register('miniAOD', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Running on miniAOD"
@@ -142,8 +142,14 @@ options.register('doBoostedCommissioning', False,
     VarParsing.varType.bool,
     "Make NTuples with branches for boosted b tag commissioning: overrider several other switches"
 )
+## Do Ctag
+options.register('doCTag', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Make NTuples with branches for CTag"
+)
 ## 'maxEvents' is already registered by the Framework, changing default value
-options.setDefault('maxEvents', 10)
+options.setDefault('maxEvents', -1)
 
 options.parseArguments()
 
@@ -166,6 +172,8 @@ if options.doBoostedCommissioning:
     print "Option runFatJets will be set to '",options.runFatJets,"'"
     print "Option runSubJets  will be set to '",options.runSubJets,"'"
     print "********************"
+if options.doCTag:
+    print "**********You are making NTuple for CTag*************" 
 
 ## Global tag
 globalTag = options.mcGlobalTag
@@ -202,6 +210,7 @@ bTagInfos = [
    ,'pfInclusiveSecondaryVertexFinderNegativeTagInfos'
    ,'softPFMuonsTagInfos'
    ,'softPFElectronsTagInfos'
+   ,'pfInclusiveSecondaryVertexFinderCvsLTagInfos'
 ]
 ## b-tag discriminators
 bTagDiscriminatorsLegacy = [
@@ -267,6 +276,8 @@ bTagDiscriminators = [
    ,'pfCombinedMVAV2BJetTags'
    ,'pfNegativeCombinedMVAV2BJetTags'
    ,'pfPositiveCombinedMVAV2BJetTags'
+   ,'pfCombinedCvsBJetTags'
+   ,'pfCombinedCvsLJetTags'
 ]
 
 ## Legacy taggers not supported with MiniAOD
@@ -985,7 +996,7 @@ process.btagana.produceAllTrackTree   = False ## True if you want to keep info f
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
 process.btagana.storeTagVariables     = False  ## True if you want to keep TagInfo TaggingVariables
-process.btagana.storeCSVTagVariables  = False  ## True if you want to keep CSV TaggingVariables
+process.btagana.storeCSVTagVariables  = True  ## True if you want to keep CSV TaggingVariables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag('selectedPatJets'+postfix)
 process.btagana.muonCollectionName    = cms.InputTag(muSource)
@@ -994,6 +1005,11 @@ process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
 process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
 process.btagana.genParticles          = cms.InputTag(genParticles)
 process.btagana.candidates            = cms.InputTag(pfCandidates)
+
+if options.doCTag:
+    process.btagana.storeCTagVariables = True
+    process.btagana.storeEventInfo = True
+    process.btagana.doCTag = options.doCTag
 
 ## fillsvTagInfo set to False independently from the choices above, if produceJetTrackTree is set to False
 if not process.btagana.produceJetTrackTree:
@@ -1091,10 +1107,11 @@ process.p = cms.Path(
     process.allEvents
     * process.filtSeq
     * process.selectedEvents
+    #* process.customTagInfos
     * process.analyzerSeq
 )
 
 # Delete predefined output module (needed for running with CRAB)
 del process.out
 
-open('pydump.py','w').write(process.dumpPython())
+#open('pydump.py','w').write(process.dumpPython())
