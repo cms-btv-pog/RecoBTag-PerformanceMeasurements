@@ -965,15 +965,15 @@ if options.useLegacyTaggers:
 #   process.btagana.producePtRelTemplate = False
 #------------------
 process.btagana.tracksColl            = cms.InputTag(trackSource) 
-process.btagana.useSelectedTracks     = True  ## False if you want to run on all tracks : for commissioning studies
+process.btagana.useSelectedTracks     = False ## False if you want to run on all tracks : for commissioning studies
 process.btagana.useTrackHistory       = False ## Can only be used with GEN-SIM-RECODEBUG files
-process.btagana.fillsvTagInfo         = False ## True if you want to store information relative to the svTagInfos, set to False if produceJetTrackTree is set to False
-process.btagana.produceJetTrackTree   = False ## True if you want to keep info for tracks associated to jets : for commissioning studies
-process.btagana.produceAllTrackTree   = False ## True if you want to keep info for all tracks : for commissioning studies
+process.btagana.fillsvTagInfo         = True  ## True if you want to store information relative to the svTagInfos, set to False if produceJetTrackTree is set to False
+process.btagana.produceJetTrackTree   = True  ## True if you want to keep info for tracks associated to jets : for commissioning studies
+process.btagana.produceAllTrackTree   = True  ## True if you want to keep info for all tracks : for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
-process.btagana.storeTagVariables     = False  ## True if you want to keep TagInfo TaggingVariables
-process.btagana.storeCSVTagVariables  = False  ## True if you want to keep CSV TaggingVariables
+process.btagana.storeTagVariables     = True   ## True if you want to keep TagInfo TaggingVariables
+process.btagana.storeCSVTagVariables  = True   ## True if you want to keep CSV TaggingVariables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag('selectedPatJets'+postfix)
 process.btagana.muonCollectionName    = cms.InputTag(muSource)
