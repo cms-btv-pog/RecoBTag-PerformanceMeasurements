@@ -61,3 +61,15 @@ Draw("SoftEl"        ,"SE Discriminator",1);
 Draw("SoftMu"        ,"SM Discriminator",1);
 Draw("TCHP"         ,"TCHP Discriminator",1);
 Draw("discri_ssche0",      "SSVHE Discriminator", 1);
+
+DrawTTbar("nbtag_all_afterJetSel_CSVv2L","number of b-tagged jets (CSVv2L)",0);
+DrawTTbar("nbtag_all_afterJetSel_CSVv2M","number of b-tagged jets (CSVv2M)",0);
+DrawTTbar("nbtag_all_afterJetSel_CSVv2T","number of b-tagged jets (CSVv2T)",0);
+
+DrawTTbar("nbtag_all_afterJetSel_cMVAv2L","number of b-tagged jets (cMVAv2L)",0);
+DrawTTbar("nbtag_all_afterJetSel_cMVAv2M","number of b-tagged jets (cMVAv2M)",0);
+DrawTTbar("nbtag_all_afterJetSel_cMVAv2T","number of b-tagged jets (cMVAv2T)",0);
+
+DrawTTbar("njet","number of jets",0);
+
+

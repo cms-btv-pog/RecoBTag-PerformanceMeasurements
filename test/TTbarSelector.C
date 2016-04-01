@@ -2,7 +2,7 @@
 
 using namespace std;
 
-bool TTbarSelector::passTTbarSelection(bool isData, vector<TLorentzVector> theLeptColl, vector<Int_t> theLeptIds, vector< pair< TLorentzVector, Float_t> > theJetColl, Int_t ttbar_trigWord, Float_t ttbar_w[250], int ttbar_nw, TH1F* wgtcounter, TString syst)
+bool TTbarSelector::passTTbarSelection(bool isData, vector<TLorentzVector> theLeptColl, vector<Int_t> theLeptIds, vector< pair< TLorentzVector, Float_t> > theJetColl, Int_t ttbar_trigWord, Float_t ttbar_w[250], int ttbar_nw, TH1F* wgtcounter, TString syst, bool computeEvtWgtOnly)
 {
 
         bool applyTriggerEff_ = false;
@@ -11,15 +11,64 @@ bool TTbarSelector::passTTbarSelection(bool isData, vector<TLorentzVector> theLe
         if(!isData) applyTriggerEff_ = true;
         if(!isData) applyLepSelEff_ = true;
 
-        // Dilepton cut
-        if ( theLeptColl.size()  != 2) return false;
-
         // Check of µµ/µe/ee channel
         Int_t theChannel = 1;
         for (unsigned short int ih = 0; ih < theLeptColl.size(); ih++)
         {
                 theChannel *= theLeptIds[ih];
         }
+
+        // Apply trigger efficiency
+        Float_t trigWgtLo(1.0), trigWgtNom(1.0), trigWgtHi(1.0);
+        if(applyTriggerEff_)
+	{
+	       pair<float,float> eff = getTriggerEfficiency(theChannel);
+	       trigWgtLo       *= eff.first-eff.second;
+	       trigWgtNom      *= eff.first;
+	       trigWgtHi       *= eff.first+eff.second;
+	}
+
+        // Apply lepton selection efficiency
+        Float_t lepSelEffLo(1.0), lepSelEffNom(1.0), lepSelEffHi(1.0);
+        if(applyLepSelEff_)
+	{
+	        for(size_t il=0; il< theLeptColl.size(); il++)
+	        {
+	                pair<float,float> lepSF = getLeptonSelectionEfficiencyScaleFactor(theLeptIds[il], theLeptColl[il].Pt(), theLeptColl[il].Eta() );
+	                lepSelEffLo  *= (lepSF.first-lepSF.second);
+	                lepSelEffNom *= lepSF.first;
+	                lepSelEffHi  *= (lepSF.first+lepSF.second);
+	        }
+	}
+
+        Float_t qcdScaleLo(1.0),qcdScaleHi(1.0);
+        if(!isData && ttbar_nw>17)
+        {
+                qcdScaleLo = ttbar_w[9]*(wgtcounter->GetBinContent(10)/wgtcounter->GetBinContent(1));
+                qcdScaleHi = ttbar_w[5]*(wgtcounter->GetBinContent(6)/wgtcounter->GetBinContent(1));
+        }
+
+        // nominal event weight
+        evWgt = 1.0;
+        if(!isData)
+        {
+                if(ttbar_nw != 0) evWgt *= trigWgtNom*lepSelEffNom*ttbar_w[0];
+                else              evWgt *= trigWgtNom*lepSelEffNom;
+
+                //weights for systematic uncertainties
+                if     (syst == "trig__minus")                    evWgt *= trigWgtLo/trigWgtNom;
+                else if(syst == "trig__plus")                     evWgt *= trigWgtHi/trigWgtNom;
+                else if(syst == "lept__minus")                    evWgt *= lepSelEffLo/lepSelEffNom;
+                else if(syst == "lept__plus")                     evWgt *= lepSelEffHi/lepSelEffNom;
+                else if(syst == "scale1__plus"  && ttbar_nw > 0)  evWgt *= qcdScaleHi/ttbar_w[0];
+                else if(syst == "scale1__minus" && ttbar_nw > 0)  evWgt *= qcdScaleLo/ttbar_w[0];
+        }
+
+        // if we do not want to compute the selection but only the weight calculation (for PU reweighting)
+        if(computeEvtWgtOnly) return true;
+
+        // Dilepton cut
+        if ( theLeptColl.size()  != 2) return false;
 
         if (theChannel != -13*11) return false; 
 
@@ -67,64 +116,14 @@ bool TTbarSelector::passTTbarSelection(bool isData, vector<TLorentzVector> theLe
 
         }
 
-
         // Dijet cut
         if ( theSelJetColl.size() < 2) return false;
-
-
-        // Apply trigger efficiency
-        Float_t trigWgtLo(1.0), trigWgtNom(1.0), trigWgtHi(1.0);
-        if(applyTriggerEff_)
-	{
-	       pair<float,float> eff = getTriggerEfficiency(theChannel);
-	       trigWgtLo       *= eff.first-eff.second;
-	       trigWgtNom      *= eff.first;
-	       trigWgtHi       *= eff.first+eff.second;
-	}
-
-        // Apply lepton selection efficiency
-        Float_t lepSelEffLo(1.0), lepSelEffNom(1.0), lepSelEffHi(1.0);
-        if(applyLepSelEff_)
-	{
-	        for(size_t il=0; il< theLeptColl.size(); il++)
-	        {
-	                pair<float,float> lepSF = getLeptonSelectionEfficiencyScaleFactor(theLeptIds[il], theLeptColl[il].Pt(), theLeptColl[il].Eta() );
-	                lepSelEffLo  *= (lepSF.first-lepSF.second);
-	                lepSelEffNom *= lepSF.first;
-	                lepSelEffHi  *= (lepSF.first+lepSF.second);
-	        }
-	}
 
         // dilepton invariant mass
         TLorentzVector dilepton = theLeptColl[0] + theLeptColl[1];
         mll_ = dilepton.M();
         if(mll_ < 12) return false;
 
-
-        Float_t qcdScaleLo(1.0),qcdScaleHi(1.0);
-        if(!isData && ttbar_nw>17)
-        {
-                qcdScaleLo = ttbar_w[9]*(wgtcounter->GetBinContent(10)/wgtcounter->GetBinContent(1));
-                qcdScaleHi = ttbar_w[5]*(wgtcounter->GetBinContent(6)/wgtcounter->GetBinContent(1));
-        }
-
-
-
-        // nominal event weight
-        evWgt = 1.0;
-        if(!isData)
-        {
-                if(ttbar_nw != 0) evWgt *= trigWgtNom*lepSelEffNom*ttbar_w[0];
-                else              evWgt *= trigWgtNom*lepSelEffNom;
-
-                //weights for systematic uncertainties
-                if     (syst == "trig__minus")                    evWgt *= trigWgtLo/trigWgtNom;
-                else if(syst == "trig__plus")                     evWgt *= trigWgtHi/trigWgtNom;
-                else if(syst == "lept__minus")                    evWgt *= lepSelEffLo/lepSelEffNom;
-                else if(syst == "lept__plus")                     evWgt *= lepSelEffHi/lepSelEffNom;
-                else if(syst == "scale1__plus"  && ttbar_nw > 0)  evWgt *= qcdScaleHi/ttbar_w[0];
-                else if(syst == "scale1__minus" && ttbar_nw > 0)  evWgt *= qcdScaleLo/ttbar_w[0];
-        }
 
         return true;                              
 }

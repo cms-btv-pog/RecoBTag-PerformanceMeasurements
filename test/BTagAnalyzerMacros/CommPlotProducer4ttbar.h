@@ -16,59 +16,50 @@
 #include <TChain.h>
 #include <string.h>
 #include <TFile.h>
+#include <TGraph.h>
 #include <iostream>
 #include <fstream>
 #include <map>
-#include "../../../../PhysicsTools/Utilities/interface/LumiReweightingStandAlone.h"
+#include "../TTbarSelector.h"
  
 // Header file for the classes stored in the TTree if any.
 
-// Fixed size dimensions of array or collections stored in the TTree if any.
-void     SetPU(vector<float> PUvector, TString PUdataFile);
-void     SetPU2012_S10(TString PUdataFile);
-void     SetPU2012_S7(TString PUdataFile);   
-reweight::LumiReWeighting LumiWeights;
 
-class CommPlotProducer4ttbar {
+class CommPlotProducer4ttbar 
+{
 public :
+
+
    bool isData;
    bool use_selected_tracks;
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
    bool            produceJetProbaTree;
    bool            produceNewAlgoTree;
-   float           n15_30,n30_50,n50_80,n80_120,n120_170,n170_300,n300_470,n470_600,n600_800;
-   bool            use15_30,use30_50,use50_80,use80_120,use120_170,use170_300,use300_470,use470_600,use600_800;
+
 
    std::vector<TH1D*>   HistoBtag;  
    std::vector<TH1D*>   HistoTTbar;  
    std::vector<TH2D*>   HistoBtag2D;  
     
-/*
-   std::map<TString, int>   HistoBtag_map; 
-   std::map<TString, int>   HistoTTbar_map; 
-   std::map<TString, int>   HistoBtag2D_map; 
-*/
-
    std::map<std::string, int>   HistoBtag_map;
    std::map<std::string, int>   HistoTTbar_map; 
    std::map<std::string, int>   HistoBtag2D_map;
 
    
    double x_section[10]; 
-   double nmc_evt_vect[10];
-   float WeightXS;
-   float sum_xs;
-   int choice;
      
    int numb_histo;
    int numb_histo2D;   
    int numb_histo2;
    
    
+   TTbarSelector thettbarselector_;
+   
    // Declaration of leaf types
 
-   Int_t           BitTrigger;
+   Int_t           nBitTrigger;
+   Int_t           BitTrigger[3];   //[nBitTrigger]
    Int_t           nJet;
    Int_t           Run;
    Int_t           Evt;
@@ -76,10 +67,27 @@ public :
    Int_t           nPV;
    Float_t         PVz;
    Float_t         pthat;
-   Float_t         PVzSim;
-   Int_t           nPUtrue;
+   Float_t         mcweight;
+   Float_t         nPUtrue;
    Int_t           nPU;
    Int_t           ttbar_chan;
+   Int_t           ttbar_trigWord;
+   Int_t           ttbar_metfilterWord;
+   Int_t           ttbar_allmepartons;
+   Int_t           ttbar_matchmepartons;
+   Int_t           ttbar_nl;
+   Float_t         ttbar_lpt[2];   //[ttbar_nl]
+   Float_t         ttbar_leta[2];   //[ttbar_nl]
+   Float_t         ttbar_lphi[2];   //[ttbar_nl]
+   Float_t         ttbar_lm[2];   //[ttbar_nl]
+   Int_t           ttbar_lid[2];   //[ttbar_nl]
+   Int_t           ttbar_lgid[2];   //[ttbar_nl]
+   Int_t           ttbar_lch[2];   //[ttbar_nl]
+   Float_t         ttbar_metpt;
+   Float_t         ttbar_metphi;
+   Float_t         ttbar_rho;
+   Int_t           ttbar_nw;
+   Float_t         ttbar_w[250];   //[ttbar_nw]   
    Float_t         lepton1_pT;
    Float_t         lepton1_eta;
    Float_t         lepton1_phi;
@@ -98,6 +106,7 @@ public :
    Float_t         Jet_jes[1000];   //[nJet]
    Float_t         Jet_eta[1000];   //[nJet]
    Float_t         Jet_phi[1000];   //[nJet]
+   Float_t         Jet_mass[1000];   //[nJet]
    Int_t           Jet_ntracks[1000];   //[nJet]
    Int_t           Jet_flavour[1000];   //[nJet]
    Float_t         Jet_Ip1N[1000];   //[nJet]
@@ -115,32 +124,49 @@ public :
    Float_t         Jet_SvxNHP[1000];   //[nJet]
    Float_t         Jet_SvxHP[1000];   //[nJet]
    Float_t         Jet_SvxMass[1000];   //[nJet]
-   Float_t         Jet_CombSvxN[1000];   //[nJet]
-   Float_t         Jet_CombSvxP[1000];   //[nJet]
+   //Float_t         Jet_CombSvxN[1000];   //[nJet]
+   //Float_t         Jet_CombSvxP[1000];   //[nJet]
    Float_t         Jet_CombSvx[1000];   //[nJet]
-   Float_t         Jet_SimpIVF_HP[1000];   //[nJet]
-   Float_t         Jet_SimpIVF_HE[1000];   //[nJet]
-   Float_t         Jet_DoubIVF_HE[1000];   //[nJet]
+   //Float_t         Jet_SimpIVF_HP[1000];   //[nJet]
+   //Float_t         Jet_SimpIVF_HE[1000];   //[nJet]
+   //Float_t         Jet_DoubIVF_HE[1000];   //[nJet]
+   Float_t         Jet_cMVAv2[1000];   //[nJet]
    Float_t         Jet_CombIVF[1000];   //[nJet]
    Float_t         Jet_CombIVF_P[1000];   //[nJet]
-   Float_t         Jet_RetCombSvxN[1000];   //[nJet]
-   Float_t         Jet_RetCombSvxP[1000];   //[nJet]
-   Float_t         Jet_RetCombSvx[1000];   //[nJet]
-   Float_t         Jet_CombCSVJP_N[1000];   //[nJet]
-   Float_t         Jet_CombCSVJP_P[1000];   //[nJet]
-   Float_t         Jet_CombCSVJP[1000];   //[nJet]
-   Float_t         Jet_CombCSVSL_N[1000];   //[nJet]
-   Float_t         Jet_CombCSVSL_P[1000];   //[nJet]
-   Float_t         Jet_CombCSVSL[1000];   //[nJet]
-   Float_t         Jet_CombCSVJPSL_N[1000];   //[nJet]
-   Float_t         Jet_CombCSVJPSL_P[1000];   //[nJet]
-   Float_t         Jet_CombCSVJPSL[1000];   //[nJet]
+   //Float_t         Jet_RetCombSvxN[1000];   //[nJet]
+   //Float_t         Jet_RetCombSvxP[1000];   //[nJet]
+   //Float_t         Jet_RetCombSvx[1000];   //[nJet]
+   //Float_t         Jet_CombCSVJP_N[1000];   //[nJet]
+   //Float_t         Jet_CombCSVJP_P[1000];   //[nJet]
+   //Float_t         Jet_CombCSVJP[1000];   //[nJet]
+   //Float_t         Jet_CombCSVSL_N[1000];   //[nJet]
+   //Float_t         Jet_CombCSVSL_P[1000];   //[nJet]
+   //Float_t         Jet_CombCSVSL[1000];   //[nJet]
+   //Float_t         Jet_CombCSVJPSL_N[1000];   //[nJet]
+   //Float_t         Jet_CombCSVJPSL_P[1000];   //[nJet]
+   //Float_t         Jet_CombCSVJPSL[1000];   //[nJet]
    Float_t         Jet_SoftMuN[1000];   //[nJet]
    Float_t         Jet_SoftMuP[1000];   //[nJet]
    Float_t         Jet_SoftMu[1000];   //[nJet]
    Float_t         Jet_SoftElN[1000];   //[nJet]
    Float_t         Jet_SoftElP[1000];   //[nJet]
    Float_t         Jet_SoftEl[1000];   //[nJet]
+
+   Float_t         Jet_nFirstTrkEtaRelTagVarCSV[1000];   //[nJet]
+   Float_t         Jet_nLastTrkEtaRelTagVarCSV[1000];   //[nJet]
+   Float_t         Jet_nFirstTrkTagVarCSV[1000];   //[nJet]
+   Float_t         Jet_nLastTrkTagVarCSV[1000];   //[nJet]
+   Float_t         TagVarCSV_trackSip2dSigAboveCharm[1000];   //[nJet]
+   Float_t         TagVarCSV_trackSumJetEtRatio[1000];   //[nJet]
+   Float_t         TagVarCSV_trackSumJetDeltaR[1000];   //[nJet]
+   Float_t         TagVarCSV_trackEtaRel[1000];   //[nJet]
+   Float_t         TagVarCSV_trackSip3dSig[1000];   //[nJet]
+   Float_t         TagVarCSV_vertexEnergyRatio[1000];   //[nJet]
+   Float_t         TagVarCSV_vertexCategory[1000];   //[nJet]
+   Float_t         TagVarCSV_vertexMass[1000];   //[nJet]
+   Float_t         TagVarCSV_vertexNTracks[1000];   //[nJet]
+   Float_t         TagVarCSV_flightDistance2dSig[1000];   //[nJet]
+   Float_t         TagVarCSV_vertexJetDeltaR[1000];   //[nJet]
 
    Int_t           Jet_hist1[1000];   //[nJet]
    Int_t           Jet_hist2[1000];   //[nJet]
@@ -155,30 +181,6 @@ public :
    Int_t           Jet_nLastSV[1000];   //[nJet]
    Int_t           Jet_SV_multi[1000];   //[nJet]
    
-   Int_t           nMuon;
-   Int_t           Muon_IdxJet[1000];   //[nMuon]
-   Int_t           Muon_nMuHit[1000];   //[nMuon]
-   Int_t           Muon_nTkHit[1000];   //[nMuon]
-   Int_t           Muon_nPixHit[1000];   //[nMuon]
-   Int_t           Muon_nOutHit[1000];   //[nMuon]
-   Int_t           Muon_isGlobal[1000];   //[nMuon]
-   Int_t           Muon_nMatched[1000];   //[nMuon]
-   Float_t         Muon_chi2[1000];   //[nMuon]
-   Float_t         Muon_chi2Tk[1000];   //[nMuon]
-   Float_t         Muon_pt[1000];   //[nMuon]
-   Float_t         Muon_eta[1000];   //[nMuon]
-   Float_t         Muon_phi[1000];   //[nMuon]
-   Float_t         Muon_ptrel[1000];   //[nMuon]
-   Float_t         Muon_vz[1000];   //[nMuon]
-   Int_t           Muon_hist[1000];   //[nMuon]
-   Float_t         Muon_IPsig[1000];   //[nMuon]
-   Float_t         Muon_IP[1000];   //[nMuon]
-   Float_t         Muon_Proba[1000];   //[nMuon]
-   Float_t         Muon_IP2D[1000];   //[nMuon]
-   Float_t         Muon_IP2Dsig[1000];   //[nMuon]
-   Float_t         Muon_deltaR[1000];   //[nJet]
-   Float_t         Muon_ratio[1000];   //[nJet]
-
    
    Int_t           nTrkInc;
    Float_t         TrkInc_pt[1000];   //[nTrkInc]
@@ -196,7 +198,7 @@ public :
    Float_t         bFromGSplit_pT[1000];   //[nBFromGSplit]
    Float_t         bFromGSplit_eta[1000];   //[nBFromGSplit]
    Float_t         bFromGSplit_phi[1000];   //[nBFromGSplit]
-   Float_t         mcweight;
+
 
    
    Int_t           nBHadrons;
@@ -216,7 +218,6 @@ public :
    Float_t         PFElectron_deltaR[100];   //[nPFElectron]
    Float_t         PFElectron_ratio[100];   //[nPFElectron]
    Float_t         PFElectron_ratioRel[100];   //[nPFElectron]
-   Float_t         PFElectron_IPsig[100];   //[nPFElectron]
    Int_t           nPFMuon;
    Int_t           PFMuon_IdxJet[100];   //[nPFMuon]
    Float_t         PFMuon_pt[100];   //[nPFMuon]
@@ -232,11 +233,6 @@ public :
    
    
    // List of branches for probatree
-   
-   
-   
-   
-   
    Int_t nTrack; 
    Float_t Track_dxy[ntrack_max];            //[nTrack]
    Float_t Track_dz[ntrack_max];             //[nTrack]
@@ -299,15 +295,13 @@ public :
    Float_t SV_deltaR_jet[1000];             //[nSV]
    Float_t SV_deltaR_sum_jet[1000];             //[nSV]
    Float_t SV_deltaR_sum_dir[1000];             //[nSV]
-   Float_t SV_energy_ratio[1000];             //[nSV]
-   Float_t SV_aboveC[1000];             //[nSV]
+   Float_t SV_EnergyRatio[1000];             //[nSV]
    Float_t SV_vtx_pt[1000];             //[nSV]
    Float_t SV_flight2D[1000];             //[nSV]
    Float_t SV_flight2DErr[1000];             //[nSV]
    Float_t SV_totCharge[1000];             //[nSV]
    Float_t SV_vtxDistJetAxis[1000];             //[nSV]
    Int_t SV_nTrk[1000];              //[nSV]
-   Int_t SV_nTrk_firstVxt[1000];             //[nSV]
    Float_t SV_mass[1000];             //[nSV]	 
    Float_t SV_vtx_eta[1000];             //[nSV]
    Float_t SV_vtx_phi[1000];              //[nSV]  
@@ -317,6 +311,7 @@ public :
 
 
    // List of branches
+   TBranch        *b_nBitTrigger;   //!
    TBranch        *b_BitTrigger;   //!
    TBranch        *b_nJet;   //!
    TBranch        *b_Run;   //!
@@ -325,19 +320,36 @@ public :
    TBranch        *b_nPV;   //!
    TBranch        *b_PVz;   //!
    TBranch        *b_pthat;   //!
-   TBranch        *b_PVzSim;   //!
+   TBranch        *b_mcweight;   //!
    TBranch        *b_nPUtrue;   //!
    TBranch        *b_nPU;   //!
    TBranch        *b_ttbar_chan;   //!
-   TBranch        *b_lepton1_pT;   //!
-   TBranch        *b_lepton1_eta;   //!
-   TBranch        *b_lepton1_phi;   //!
-   TBranch        *b_lepton2_pT;   //!
-   TBranch        *b_lepton2_eta;   //!
-   TBranch        *b_lepton2_phi;   //!
-   TBranch        *b_met;   //!
-   TBranch        *b_mll;   //!
-   TBranch        *b_trig_ttbar;   //!
+   TBranch        *b_ttbar_trigWord;   //!
+   TBranch        *b_ttbar_metfilterWord;   //!
+   TBranch        *b_ttbar_allmepartons;   //!
+   TBranch        *b_ttbar_matchmepartons;   //!
+   TBranch        *b_ttbar_nl;   //!
+   TBranch        *b_ttbar_lpt;   //!
+   TBranch        *b_ttbar_leta;   //!
+   TBranch        *b_ttbar_lphi;   //!
+   TBranch        *b_ttbar_lm;   //!
+   TBranch        *b_ttbar_lid;   //!
+   TBranch        *b_ttbar_lgid;   //!
+   TBranch        *b_ttbar_lch;   //!
+   TBranch        *b_ttbar_metpt;   //!
+   TBranch        *b_ttbar_metphi;   //!
+   TBranch        *b_ttbar_rho;   //!
+   TBranch        *b_ttbar_nw;   //!
+   TBranch        *b_ttbar_w;   //!   
+   //TBranch        *b_lepton1_pT;   //!
+   //TBranch        *b_lepton1_eta;   //!
+   //TBranch        *b_lepton1_phi;   //!
+   //TBranch        *b_lepton2_pT;   //!
+   //TBranch        *b_lepton2_eta;   //!
+   //TBranch        *b_lepton2_phi;   //!
+   //TBranch        *b_met;   //!
+   //TBranch        *b_mll;   //!
+   //TBranch        *b_trig_ttbar;   //!
 
    TBranch        *b_Jet_pt;   //!
    TBranch        *b_Jet_genpt;   //!
@@ -345,6 +357,7 @@ public :
    TBranch        *b_Jet_jes;   //!
    TBranch        *b_Jet_eta;   //!
    TBranch        *b_Jet_phi;   //!
+   TBranch        *b_Jet_mass;   //!
    TBranch        *b_Jet_ntracks;   //!
    TBranch        *b_Jet_flavour;   //!
    TBranch        *b_Jet_Ip1N;   //!
@@ -362,32 +375,48 @@ public :
    TBranch        *b_Jet_SvxNHP;   //!
    TBranch        *b_Jet_SvxHP;   //!
    TBranch        *b_Jet_SvxMass;   //!
-   TBranch        *b_Jet_CombSvxN;   //!
-   TBranch        *b_Jet_CombSvxP;   //!
+   //TBranch        *b_Jet_CombSvxP;   //!
    TBranch        *b_Jet_CombSvx;   //!
-   TBranch        *b_Jet_SimpIVF_HP;   //!
-   TBranch        *b_Jet_SimpIVF_HE;   //!
-   TBranch        *b_Jet_DoubIVF_HE;   //!
+   //TBranch        *b_Jet_SimpIVF_HP;   //!
+   //TBranch        *b_Jet_SimpIVF_HE;   //!
+   //TBranch        *b_Jet_DoubIVF_HE;   //!
+   TBranch        *b_Jet_cMVAv2;   //!
    TBranch        *b_Jet_CombIVF;   //!
    TBranch        *b_Jet_CombIVF_P;   //!
-   TBranch        *b_Jet_RetCombSvxN;   //!
-   TBranch        *b_Jet_RetCombSvxP;   //!
-   TBranch        *b_Jet_RetCombSvx;   //!
-   TBranch        *b_Jet_CombCSVJP_N;   //!
-   TBranch        *b_Jet_CombCSVJP_P;   //!
-   TBranch        *b_Jet_CombCSVJP;   //!
-   TBranch        *b_Jet_CombCSVSL_N;   //!
-   TBranch        *b_Jet_CombCSVSL_P;   //!
-   TBranch        *b_Jet_CombCSVSL;   //!
-   TBranch        *b_Jet_CombCSVJPSL_N;   //!
-   TBranch        *b_Jet_CombCSVJPSL_P;   //!
-   TBranch        *b_Jet_CombCSVJPSL;   //!
+   //TBranch        *b_Jet_RetCombSvxN;   //!
+   //TBranch        *b_Jet_RetCombSvxP;   //!
+   //TBranch        *b_Jet_RetCombSvx;   //!
+   //TBranch        *b_Jet_CombCSVJP_N;   //!
+   //TBranch        *b_Jet_CombCSVJP_P;   //!
+   //TBranch        *b_Jet_CombCSVJP;   //!
+   //TBranch        *b_Jet_CombCSVSL_N;   //!
+   //TBranch        *b_Jet_CombCSVSL_P;   //!
+   //TBranch        *b_Jet_CombCSVSL;   //!
+   //TBranch        *b_Jet_CombCSVJPSL_N;   //!
+   //TBranch        *b_Jet_CombCSVJPSL_P;   //!
+   //TBranch        *b_Jet_CombCSVJPSL;   //!
    TBranch        *b_Jet_SoftMuN;   //!
    TBranch        *b_Jet_SoftMuP;   //!
    TBranch        *b_Jet_SoftMu;   //!
    TBranch        *b_Jet_SoftElN;   //!
    TBranch        *b_Jet_SoftElP;   //!
    TBranch        *b_Jet_SoftEl;   //!
+
+   TBranch        *b_Jet_nFirstTrkEtaRelTagVarCSV;
+   TBranch        *b_Jet_nLastTrkEtaRelTagVarCSV;         
+   TBranch        *b_Jet_nFirstTrkTagVarCSV;              
+   TBranch        *b_Jet_nLastTrkTagVarCSV;               
+   TBranch        *b_TagVarCSV_trackSip2dSigAboveCharm;   
+   TBranch        *b_TagVarCSV_trackSumJetEtRatio;        
+   TBranch        *b_TagVarCSV_trackSumJetDeltaR;         
+   TBranch        *b_TagVarCSV_trackEtaRel;               
+   TBranch        *b_TagVarCSV_trackSip3dSig;             
+   TBranch        *b_TagVarCSV_vertexEnergyRatio;         
+   TBranch        *b_TagVarCSV_vertexCategory;            
+   TBranch        *b_TagVarCSV_vertexMass;                
+   TBranch        *b_TagVarCSV_vertexNTracks;             
+   TBranch        *b_TagVarCSV_flightDistance2dSig;       
+   TBranch        *b_TagVarCSV_vertexJetDeltaR;           
 
    TBranch        *b_Jet_hist1;   //!
    TBranch        *b_Jet_hist2;   //!
@@ -401,29 +430,6 @@ public :
    TBranch        *b_Jet_nFirstSV;
    TBranch        *b_Jet_nLastSV;
    TBranch        *b_Jet_SV_multi;
-   TBranch        *b_nMuon;   //!
-   TBranch        *b_Muon_IdxJet;   //!
-   TBranch        *b_Muon_nMuHit;   //!
-   TBranch        *b_Muon_nTkHit;   //!
-   TBranch        *b_Muon_nPixHit;   //!
-   TBranch        *b_Muon_nOutHit;   //!
-   TBranch        *b_Muon_isGlobal;   //!
-   TBranch        *b_Muon_nMatched;   //!
-   TBranch        *b_Muon_chi2;   //!
-   TBranch        *b_Muon_chi2Tk;   //!
-   TBranch        *b_Muon_pt;   //!
-   TBranch        *b_Muon_eta;   //!   
-   TBranch        *b_Muon_phi;   //!
-   TBranch        *b_Muon_ptrel;   //!
-   TBranch        *b_Muon_vz;   //!
-   TBranch        *b_Muon_hist;   //!
-   TBranch        *b_Muon_IPsig;   //!
-   TBranch        *b_Muon_IP;   //!
-   TBranch        *b_Muon_IP2Dsig;   //!
-   TBranch        *b_Muon_IP2D;   //!   
-   TBranch        *b_Muon_Proba;   //!
-   TBranch        *b_Muon_deltaR;   //!
-   TBranch        *b_Muon_ratio;   //!
    TBranch        *b_nTrkInc;   //!
    TBranch        *b_TrkInc_pt;   //!
    TBranch        *b_TrkInc_eta;   //!
@@ -439,7 +445,6 @@ public :
    TBranch        *b_bFromGSplit_pT;   //!
    TBranch        *b_bFromGSplit_eta;   //!
    TBranch        *b_bFromGSplit_phi;   //!
-   TBranch        *b_mcweight;   //!
    TBranch        *b_nBHadrons;   //!
    TBranch        *b_BHadron_pT;   //!
    TBranch        *b_BHadron_eta;   //!
@@ -457,7 +462,6 @@ public :
    TBranch        *b_PFElectron_deltaR;   //!
    TBranch        *b_PFElectron_ratio;   //!
    TBranch        *b_PFElectron_ratioRel;   //!
-   TBranch        *b_PFElectron_IPsig;   //!
    TBranch        *b_nPFMuon;   //!
    TBranch        *b_PFMuon_IdxJet;   //!
    TBranch        *b_PFMuon_pt;   //!
@@ -472,9 +476,9 @@ public :
    
   
 
-//   //--------------------------------------
-//   // track information 
-//   //--------------------------------------
+   //--------------------------------------
+   // track information 
+   //--------------------------------------
   TBranch *b_nTrack;
   TBranch *b_Trackdxy;
   TBranch *b_Track_dz;   //!
@@ -543,15 +547,13 @@ public :
   TBranch *b_SV_deltaR_jet;             
   TBranch *b_SV_deltaR_sum_jet;  
   TBranch *b_SV_deltaR_sum_dir;  
-  TBranch *b_SV_energy_ratio;    
-  TBranch *b_SV_aboveC;          
+  TBranch *b_SV_EnergyRatio;    
   TBranch *b_SV_vtx_pt;          
   TBranch *b_SV_flight2D;        
   TBranch *b_SV_flight2DErr;     
   TBranch *b_SV_totCharge;       
   TBranch *b_SV_vtxDistJetAxis;  
   TBranch *b_SV_nTrk;  
-  TBranch *b_SV_nTrk_firstVxt;
   TBranch *b_SV_mass;  
   TBranch *b_SV_vtx_eta;
   TBranch *b_SV_vtx_phi;
@@ -561,12 +563,12 @@ public :
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TChain *tree);
-   virtual void     Loop(int datatype, int trig_data, float PtMin_Cut, float PtMax_Cut, TString outputname);
+   virtual void     Loop(int datatype, int trig_data, float PtMin_Cut, float PtMax_Cut, TString outputname, TH1F* wgtcounter, TString syst);
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
-   virtual void     AddHisto(TString name, TString title,  int nbins, float min, float max);
-   virtual void     AddHistottbar(TString name, TString title,  int nbins, float min, float max);
-   virtual void     AddHisto2D(TString name,TString title,int nbins,float min,float max,int nbins2,float min2,float max2);   
+   virtual void     AddHisto(TString name, TString title,  int nbins, float min, float max, TString syst);
+   virtual void     AddHistottbar(TString name, TString title,  int nbins, float min, float max, TString syst);
+   virtual void     AddHisto2D(TString name,TString title,int nbins,float min,float max,int nbins2,float min2,float max2, TString syst);   
    virtual void     FillHisto_int(int flavour, bool isGS, int number, int value, double weight);
    virtual void     FillHisto_float(int flavour, bool isGS, int number, float value, double weight);
    virtual void     FillHisto_floatFromMap(TString name, int flavour, bool isGS, float value, double weight);
@@ -575,15 +577,11 @@ public :
    virtual void     FillHisto_intFromMap(TString name, int flavour, bool isGS, int value, double weight);
    virtual void     FillHisto2D_int_floatFromMap(TString name, int flavour, bool isGS, int value, float value2, double weight);
    virtual void     FillHisto2D_float_floatFromMap(TString name, int flavour, bool isGS, float value, float value2, double weight);
-   virtual int      SetXS();
    virtual void     SetNorm(float xnorm);
-   virtual void     Counter();
-   virtual double   GetEvtWeight() ; 
-   virtual int      SetXS(TString generator, bool MuEnriched, int TeV) ;
-   virtual void     Fill_nevent(double n_ttbar,double n_dy1,double n_dy2,double n_st1,double n_st2);
-   virtual void     SetSumXS();
-   
-   virtual bool            passMuonSelection(int muidx, int ijet);
+
+//private :
+   TGraph *puWgtGr_,*puWgtDownGr_,*puWgtUpGr_;
+
 };
 #endif
 
@@ -594,25 +592,7 @@ CommPlotProducer4ttbar::CommPlotProducer4ttbar(TChain *superTree, bool infotree1
    numb_histo = 0;
    numb_histo2 = 0;
    numb_histo2D = 0;
-   use15_30  =false;
-   use30_50  =false;
-   use50_80  =false;
-   use80_120 =false;
-   use120_170=false;
-   use170_300=false;
-   use300_470=false;
-   use470_600=false;
-   use600_800=false;
-   
-   n15_30   =0;
-   n30_50   =0;
-   n50_80   =0;
-   n80_120  =0;
-   n120_170 =0;
-   n170_300 =0;
-   n300_470 =0;
-   n470_600 =0;
-   n600_800 =0;
+
    produceJetProbaTree=infotree1;
    produceNewAlgoTree=infotree2;
 
@@ -620,13 +600,6 @@ CommPlotProducer4ttbar::CommPlotProducer4ttbar(TChain *superTree, bool infotree1
    else use_selected_tracks=true;
 
    
-   if (superTree==0) {
-      TChain *newchain = new TChain("btagana/ttree");
-      newchain->Add("/opt/sbg/data/data1/cms/cbeluffi/BTag_2013_01_10/Commissioning/CMSSW_5_3_2_patch4/src/RecoBTag/PerformanceMeasurements/test/NTuples_80_120/*.root");
-      superTree=newchain;
-   }
-
-
    Init(superTree);
 }
 
@@ -647,11 +620,15 @@ Long64_t CommPlotProducer4ttbar::LoadTree(Long64_t entry)
 // Set the environment to read one entry
    if (!fChain) return -5;
    Long64_t centry = fChain->LoadTree(entry);
+
    if (centry < 0) return centry;
-   if (fChain->GetTreeNumber() != fCurrent) {
+
+   if (fChain->GetTreeNumber() != fCurrent)
+   {
       fCurrent = fChain->GetTreeNumber();
       Notify();
    }
+
    return centry;
 }
 
@@ -679,27 +656,44 @@ void CommPlotProducer4ttbar::Init(TChain *tree)
    fChain->SetBranchAddress("nPV", &nPV, &b_nPV);
    fChain->SetBranchAddress("PVz", &PVz, &b_PVz);
    fChain->SetBranchAddress("pthat", &pthat, &b_pthat);
-   fChain->SetBranchAddress("PVzSim", &PVzSim, &b_PVzSim);
    fChain->SetBranchAddress("nPUtrue", &nPUtrue, &b_nPUtrue);
    fChain->SetBranchAddress("nPU", &nPU, &b_nPU);
    fChain->SetBranchAddress("ttbar_chan", &ttbar_chan, &b_ttbar_chan);
-   fChain->SetBranchAddress("lepton1_pT", &lepton1_pT, &b_lepton1_pT);
-   fChain->SetBranchAddress("lepton1_eta", &lepton1_eta, &b_lepton1_eta);
-   fChain->SetBranchAddress("lepton1_phi", &lepton1_phi, &b_lepton1_phi);
-   fChain->SetBranchAddress("lepton2_pT", &lepton2_pT, &b_lepton2_pT);
-   fChain->SetBranchAddress("lepton2_eta", &lepton2_eta, &b_lepton2_eta);
-   fChain->SetBranchAddress("lepton2_phi", &lepton2_phi, &b_lepton2_phi);
-   fChain->SetBranchAddress("met", &met, &b_met);
-   fChain->SetBranchAddress("mll", &mll, &b_mll);
-   fChain->SetBranchAddress("trig_ttbar", &trig_ttbar, &b_trig_ttbar);
+   fChain->SetBranchAddress("ttbar_trigWord", &ttbar_trigWord, &b_ttbar_trigWord);
+   fChain->SetBranchAddress("ttbar_metfilterWord", &ttbar_metfilterWord, &b_ttbar_metfilterWord);
+   fChain->SetBranchAddress("ttbar_allmepartons", &ttbar_allmepartons, &b_ttbar_allmepartons);
+   fChain->SetBranchAddress("ttbar_matchmepartons", &ttbar_matchmepartons, &b_ttbar_matchmepartons);
+   fChain->SetBranchAddress("ttbar_nl", &ttbar_nl, &b_ttbar_nl);
+   fChain->SetBranchAddress("ttbar_lpt", ttbar_lpt, &b_ttbar_lpt);
+   fChain->SetBranchAddress("ttbar_leta", ttbar_leta, &b_ttbar_leta);
+   fChain->SetBranchAddress("ttbar_lphi", ttbar_lphi, &b_ttbar_lphi);
+   fChain->SetBranchAddress("ttbar_lm", ttbar_lm, &b_ttbar_lm);
+   fChain->SetBranchAddress("ttbar_lid", ttbar_lid, &b_ttbar_lid);
+   fChain->SetBranchAddress("ttbar_lgid", ttbar_lgid, &b_ttbar_lgid);
+   fChain->SetBranchAddress("ttbar_lch", ttbar_lch, &b_ttbar_lch);
+   fChain->SetBranchAddress("ttbar_metpt", &ttbar_metpt, &b_ttbar_metpt);
+   fChain->SetBranchAddress("ttbar_metphi", &ttbar_metphi, &b_ttbar_metphi);
+   fChain->SetBranchAddress("ttbar_rho", &ttbar_rho, &b_ttbar_rho);
+   fChain->SetBranchAddress("ttbar_nw", &ttbar_nw, &b_ttbar_nw);
+   fChain->SetBranchAddress("ttbar_w", ttbar_w, &b_ttbar_w);
+
+   //fChain->SetBranchAddress("lepton1_pT", &lepton1_pT, &b_lepton1_pT);
+   //fChain->SetBranchAddress("lepton1_eta", &lepton1_eta, &b_lepton1_eta);
+   //fChain->SetBranchAddress("lepton1_phi", &lepton1_phi, &b_lepton1_phi);
+   //fChain->SetBranchAddress("lepton2_pT", &lepton2_pT, &b_lepton2_pT);
+   //fChain->SetBranchAddress("lepton2_eta", &lepton2_eta, &b_lepton2_eta);
+   //fChain->SetBranchAddress("lepton2_phi", &lepton2_phi, &b_lepton2_phi);
+   //fChain->SetBranchAddress("met", &met, &b_met);
+   //fChain->SetBranchAddress("mll", &mll, &b_mll);
+   //fChain->SetBranchAddress("trig_ttbar", &trig_ttbar, &b_trig_ttbar);
 
    fChain->SetBranchAddress("Jet_pt", Jet_pt, &b_Jet_pt);
-   fChain->SetBranchAddress("Jet_phi", Jet_phi, &b_Jet_phi);
    fChain->SetBranchAddress("Jet_genpt", Jet_genpt, &b_Jet_genpt);
    fChain->SetBranchAddress("Jet_residual", Jet_residual, &b_Jet_residual);
    fChain->SetBranchAddress("Jet_jes", Jet_jes, &b_Jet_jes);
    fChain->SetBranchAddress("Jet_eta", Jet_eta, &b_Jet_eta);
    fChain->SetBranchAddress("Jet_phi", Jet_phi, &b_Jet_phi);
+   fChain->SetBranchAddress("Jet_mass", Jet_mass, &b_Jet_mass);
    fChain->SetBranchAddress("Jet_ntracks", Jet_ntracks, &b_Jet_ntracks);
    fChain->SetBranchAddress("Jet_flavour", Jet_flavour, &b_Jet_flavour);
    //fChain->SetBranchAddress("Jet_Ip1N", Jet_Ip1N, &b_Jet_Ip1N);
@@ -716,17 +710,18 @@ void CommPlotProducer4ttbar::Init(TChain *tree)
    fChain->SetBranchAddress("Jet_Svx", Jet_Svx, &b_Jet_Svx);
    fChain->SetBranchAddress("Jet_SvxNHP", Jet_SvxNHP, &b_Jet_SvxNHP);
    fChain->SetBranchAddress("Jet_SvxHP", Jet_SvxHP, &b_Jet_SvxHP);
-   fChain->SetBranchAddress("Jet_SvxMass", Jet_SvxMass, &b_Jet_SvxMass);
-   fChain->SetBranchAddress("Jet_CombSvxN", Jet_CombSvxN, &b_Jet_CombSvxN);
-   fChain->SetBranchAddress("Jet_CombSvxP", Jet_CombSvxP, &b_Jet_CombSvxP);
+   //fChain->SetBranchAddress("Jet_SvxMass", Jet_SvxMass, &b_Jet_SvxMass);
+   //fChain->SetBranchAddress("Jet_CombSvxN", Jet_CombSvxN, &b_Jet_CombSvxN);
+   //fChain->SetBranchAddress("Jet_CombSvxP", Jet_CombSvxP, &b_Jet_CombSvxP);
    fChain->SetBranchAddress("Jet_CombSvx", Jet_CombSvx, &b_Jet_CombSvx);
    //fChain->SetBranchAddress("Jet_SimpIVF_HP", Jet_SimpIVF_HP, &b_Jet_SimpIVF_HP);
    //fChain->SetBranchAddress("Jet_SimpIVF_HE", Jet_SimpIVF_HE, &b_Jet_SimpIVF_HE);
    //fChain->SetBranchAddress("Jet_DoubIVF_HE", Jet_DoubIVF_HE, &b_Jet_DoubIVF_HE);
-   //fChain->SetBranchAddress("Jet_CombIVF", Jet_CombIVF, &b_Jet_CombIVF);
-   //fChain->SetBranchAddress("Jet_CombIVF_P", Jet_CombIVF_P, &b_Jet_CombIVF_P);
-   //fChain->SetBranchAddress("Jet_SoftMuN", Jet_SoftMuN, &b_Jet_SoftMuN);
-   //fChain->SetBranchAddress("Jet_SoftMu", Jet_SoftMu, &b_Jet_SoftMu);
+   fChain->SetBranchAddress("Jet_cMVAv2", Jet_cMVAv2, &b_Jet_cMVAv2);
+   fChain->SetBranchAddress("Jet_CombIVF", Jet_CombIVF, &b_Jet_CombIVF);
+   fChain->SetBranchAddress("Jet_CombIVF_P", Jet_CombIVF_P, &b_Jet_CombIVF_P);
+     fChain->SetBranchAddress("Jet_SoftMuN", Jet_SoftMuN, &b_Jet_SoftMuN);
+     fChain->SetBranchAddress("Jet_SoftMu", Jet_SoftMu, &b_Jet_SoftMu);
    fChain->SetBranchAddress("Jet_hist1", Jet_hist1, &b_Jet_hist1);
    fChain->SetBranchAddress("Jet_hist2", Jet_hist2, &b_Jet_hist2);
    fChain->SetBranchAddress("Jet_hist3", Jet_hist3, &b_Jet_hist3);
@@ -734,62 +729,39 @@ void CommPlotProducer4ttbar::Init(TChain *tree)
    fChain->SetBranchAddress("Jet_histSvx", Jet_histSvx, &b_Jet_histSvx);
    fChain->SetBranchAddress("Jet_nFirstTrack", Jet_nFirstTrack, &b_Jet_nFirstTrack);
    fChain->SetBranchAddress("Jet_nLastTrack", Jet_nLastTrack, &b_Jet_nLastTrack);
-   fChain->SetBranchAddress("Jet_nFirstTrkInc", Jet_nFirstTrkInc, &b_Jet_nFirstTrkInc);
-   fChain->SetBranchAddress("Jet_nLastTrkInc", Jet_nLastTrkInc, &b_Jet_nLastTrkInc);
-   fChain->SetBranchAddress("Jet_nFirstSV", Jet_nFirstSV, &b_Jet_nFirstSV);
-   fChain->SetBranchAddress("Jet_nLastSV", Jet_nLastSV, &b_Jet_nLastSV);
+   //fChain->SetBranchAddress("Jet_nFirstTrkInc", Jet_nFirstTrkInc, &b_Jet_nFirstTrkInc);
+   //fChain->SetBranchAddress("Jet_nLastTrkInc", Jet_nLastTrkInc, &b_Jet_nLastTrkInc);
+     fChain->SetBranchAddress("Jet_nFirstSV", Jet_nFirstSV, &b_Jet_nFirstSV);
+     fChain->SetBranchAddress("Jet_nLastSV", Jet_nLastSV, &b_Jet_nLastSV);
    fChain->SetBranchAddress("Jet_SV_multi",Jet_SV_multi , &b_Jet_SV_multi);
-   fChain->SetBranchAddress("nMuon", &nMuon, &b_nMuon);
-   fChain->SetBranchAddress("Muon_IdxJet", Muon_IdxJet, &b_Muon_IdxJet);
-   fChain->SetBranchAddress("Muon_nMuHit", Muon_nMuHit, &b_Muon_nMuHit);
-   fChain->SetBranchAddress("Muon_nTkHit", Muon_nTkHit, &b_Muon_nTkHit);
-   fChain->SetBranchAddress("Muon_nPixHit", Muon_nPixHit, &b_Muon_nPixHit);
-   fChain->SetBranchAddress("Muon_nOutHit", Muon_nOutHit, &b_Muon_nOutHit);
-   fChain->SetBranchAddress("Muon_isGlobal", Muon_isGlobal, &b_Muon_isGlobal);
-   fChain->SetBranchAddress("Muon_nMatched", Muon_nMatched, &b_Muon_nMatched);
-   fChain->SetBranchAddress("Muon_chi2", Muon_chi2, &b_Muon_chi2);
-   fChain->SetBranchAddress("Muon_chi2Tk", Muon_chi2Tk, &b_Muon_chi2Tk);
-   fChain->SetBranchAddress("Muon_pt", Muon_pt, &b_Muon_pt);
-   fChain->SetBranchAddress("Muon_eta", Muon_eta, &b_Muon_eta);
-   fChain->SetBranchAddress("Muon_phi", Muon_phi, &b_Muon_phi);
-   fChain->SetBranchAddress("Muon_ptrel", Muon_ptrel, &b_Muon_ptrel);
-   fChain->SetBranchAddress("Muon_vz", Muon_vz, &b_Muon_vz);
-   fChain->SetBranchAddress("Muon_hist", Muon_hist, &b_Muon_hist);
-   fChain->SetBranchAddress("Muon_IPsig", Muon_IPsig, &b_Muon_IPsig);
-   fChain->SetBranchAddress("Muon_IP", Muon_IP, &b_Muon_IP);
-   fChain->SetBranchAddress("Muon_IP2Dsig", Muon_IP2Dsig, &b_Muon_IP2Dsig);
-   fChain->SetBranchAddress("Muon_IP2D", Muon_IP2D, &b_Muon_IP2D);   
-   fChain->SetBranchAddress("Muon_Proba", Muon_Proba, &b_Muon_Proba);
-   fChain->SetBranchAddress("Muon_deltaR", Muon_deltaR, &b_Muon_deltaR);
-   fChain->SetBranchAddress("Muon_ratio", Muon_ratio, &b_Muon_ratio);
    //fChain->SetBranchAddress("nTrkInc", &nTrkInc, &b_nTrkInc);
    //fChain->SetBranchAddress("TrkInc_pt", TrkInc_pt, &b_TrkInc_pt);
    //fChain->SetBranchAddress("TrkInc_eta", TrkInc_eta, &b_TrkInc_eta);
    //fChain->SetBranchAddress("TrkInc_ptrel", TrkInc_ptrel, &b_TrkInc_ptrel);
    //fChain->SetBranchAddress("TrkInc_IPsig", TrkInc_IPsig, &b_TrkInc_IPsig);
    //fChain->SetBranchAddress("TrkInc_IP", TrkInc_IP, &b_TrkInc_IP);
-   fChain->SetBranchAddress("nCFromGSplit", &nCFromGSplit, &b_nCFromGSplit);
-   fChain->SetBranchAddress("cFromGSplit_pT", cFromGSplit_pT, &b_cFromGSplit_pT);
-   fChain->SetBranchAddress("cFromGSplit_eta", cFromGSplit_eta, &b_cFromGSplit_eta);
-   fChain->SetBranchAddress("cFromGSplit_phi", cFromGSplit_phi, &b_cFromGSplit_phi);
-   fChain->SetBranchAddress("nBFromGSplit", &nBFromGSplit, &b_nBFromGSplit);
-   fChain->SetBranchAddress("bFromGSplit_pT", bFromGSplit_pT, &b_bFromGSplit_pT);
-   fChain->SetBranchAddress("bFromGSplit_eta", bFromGSplit_eta, &b_bFromGSplit_eta);
-   fChain->SetBranchAddress("bFromGSplit_phi", bFromGSplit_phi, &b_bFromGSplit_phi);   
+   //fChain->SetBranchAddress("nCFromGSplit", &nCFromGSplit, &b_nCFromGSplit);
+   //fChain->SetBranchAddress("cFromGSplit_pT", cFromGSplit_pT, &b_cFromGSplit_pT);
+   //fChain->SetBranchAddress("cFromGSplit_eta", cFromGSplit_eta, &b_cFromGSplit_eta);
+   //fChain->SetBranchAddress("cFromGSplit_phi", cFromGSplit_phi, &b_cFromGSplit_phi);
+   //fChain->SetBranchAddress("nBFromGSplit", &nBFromGSplit, &b_nBFromGSplit);
+   //fChain->SetBranchAddress("bFromGSplit_pT", bFromGSplit_pT, &b_bFromGSplit_pT);
+   //fChain->SetBranchAddress("bFromGSplit_eta", bFromGSplit_eta, &b_bFromGSplit_eta);
+   //fChain->SetBranchAddress("bFromGSplit_phi", bFromGSplit_phi, &b_bFromGSplit_phi);   
    fChain->SetBranchAddress("mcweight", &mcweight, &b_mcweight);
 
    
    
    
   if ( produceJetProbaTree ) {
-//      
-//     //--------------------------------------
-//   // track information 
-//   //--------------------------------------
+      
+   //--------------------------------------
+   // track information 
+   //--------------------------------------
   fChain->SetBranchAddress("nTrack",	      &nTrack, 	     &b_nTrack);
   fChain->SetBranchAddress("Track_dxy",       Track_dxy,     &b_Trackdxy);	
   fChain->SetBranchAddress("Track_dz",        Track_dz, &b_Track_dz);
-  fChain->SetBranchAddress("Track_zIP",       Track_zIP, &b_Track_zIP);
+  //fChain->SetBranchAddress("Track_zIP",       Track_zIP, &b_Track_zIP);
   fChain->SetBranchAddress("Track_length",    Track_length,  &b_Tracklength);
   fChain->SetBranchAddress("Track_dist",      Track_dist,    &b_Trackdist);
   fChain->SetBranchAddress("Track_IP2D",      Track_IP2D,    &b_TrackIP2D);
@@ -854,15 +826,13 @@ void CommPlotProducer4ttbar::Init(TChain *tree)
   fChain->SetBranchAddress("SV_deltaR_jet" ,SV_deltaR_jet,&b_SV_deltaR_jet);
   fChain->SetBranchAddress("SV_deltaR_sum_jet" ,SV_deltaR_sum_jet,&b_SV_deltaR_sum_jet);
   fChain->SetBranchAddress("SV_deltaR_sum_dir" ,SV_deltaR_sum_dir,&b_SV_deltaR_sum_dir);
-  fChain->SetBranchAddress("SV_energy_ratio" ,SV_energy_ratio,&b_SV_energy_ratio);
-  fChain->SetBranchAddress("SV_aboveC" ,SV_aboveC,&b_SV_aboveC);
+  fChain->SetBranchAddress("SV_EnergyRatio" ,SV_EnergyRatio,&b_SV_EnergyRatio);
   fChain->SetBranchAddress("SV_vtx_pt" ,SV_vtx_pt,&b_SV_vtx_pt);
   fChain->SetBranchAddress("SV_flight2D" ,SV_flight2D,&b_SV_flight2D);
   fChain->SetBranchAddress("SV_flight2DErr" ,SV_flight2DErr,&b_SV_flight2DErr);
   fChain->SetBranchAddress("SV_totCharge" ,SV_totCharge,&b_SV_totCharge);
   fChain->SetBranchAddress("SV_vtxDistJetAxis" ,SV_vtxDistJetAxis,&b_SV_vtxDistJetAxis);
   fChain->SetBranchAddress("SV_nTrk" ,SV_nTrk,&b_SV_nTrk);
-  fChain->SetBranchAddress("SV_nTrk_firstVxt" ,SV_nTrk_firstVxt,&b_SV_nTrk_firstVxt);
   fChain->SetBranchAddress("SV_mass" ,SV_mass,&b_SV_mass);
   fChain->SetBranchAddress("SV_vtx_eta" ,SV_vtx_eta,&b_SV_vtx_eta);
   fChain->SetBranchAddress("SV_vtx_phi" ,SV_vtx_phi,&b_SV_vtx_phi);
@@ -870,18 +840,19 @@ void CommPlotProducer4ttbar::Init(TChain *tree)
   
   }
   if (produceNewAlgoTree) {
-   fChain->SetBranchAddress("Jet_RetCombSvxN", Jet_RetCombSvxN, &b_Jet_RetCombSvxN);
-   fChain->SetBranchAddress("Jet_RetCombSvxP", Jet_RetCombSvxP, &b_Jet_RetCombSvxP);
-   fChain->SetBranchAddress("Jet_RetCombSvx", Jet_RetCombSvx, &b_Jet_RetCombSvx);
-   fChain->SetBranchAddress("Jet_CombCSVJP_N", Jet_CombCSVJP_N, &b_Jet_CombCSVJP_N);
-   fChain->SetBranchAddress("Jet_CombCSVJP_P", Jet_CombCSVJP_P, &b_Jet_CombCSVJP_P);
-   fChain->SetBranchAddress("Jet_CombCSVJP", Jet_CombCSVJP, &b_Jet_CombCSVJP);
-   fChain->SetBranchAddress("Jet_CombCSVSL_N", Jet_CombCSVSL_N, &b_Jet_CombCSVSL_N);
-   fChain->SetBranchAddress("Jet_CombCSVSL_P", Jet_CombCSVSL_P, &b_Jet_CombCSVSL_P);
-   fChain->SetBranchAddress("Jet_CombCSVSL", Jet_CombCSVSL, &b_Jet_CombCSVSL);
-   fChain->SetBranchAddress("Jet_CombCSVJPSL_N", Jet_CombCSVJPSL_N, &b_Jet_CombCSVJPSL_N);
-   fChain->SetBranchAddress("Jet_CombCSVJPSL_P", Jet_CombCSVJPSL_P, &b_Jet_CombCSVJPSL_P);
-   fChain->SetBranchAddress("Jet_CombCSVJPSL", Jet_CombCSVJPSL, &b_Jet_CombCSVJPSL);
+   //fChain->SetBranchAddress("Jet_RetCombSvxN", Jet_RetCombSvxN, &b_Jet_RetCombSvxN);
+   //fChain->SetBranchAddress("Jet_RetCombSvxP", Jet_RetCombSvxP, &b_Jet_RetCombSvxP);
+   //fChain->SetBranchAddress("Jet_RetCombSvx", Jet_RetCombSvx, &b_Jet_RetCombSvx);
+   //fChain->SetBranchAddress("Jet_CombCSVJP_N", Jet_CombCSVJP_N, &b_Jet_CombCSVJP_N);
+   //fChain->SetBranchAddress("Jet_CombCSVJP_P", Jet_CombCSVJP_P, &b_Jet_CombCSVJP_P);
+   //fChain->SetBranchAddress("Jet_CombCSVJP", Jet_CombCSVJP, &b_Jet_CombCSVJP);
+   //fChain->SetBranchAddress("Jet_CombCSVSL_N", Jet_CombCSVSL_N, &b_Jet_CombCSVSL_N);
+   //fChain->SetBranchAddress("Jet_CombCSVSL_P", Jet_CombCSVSL_P, &b_Jet_CombCSVSL_P);
+   //fChain->SetBranchAddress("Jet_CombCSVSL", Jet_CombCSVSL, &b_Jet_CombCSVSL);
+   //fChain->SetBranchAddress("Jet_CombCSVJPSL_N", Jet_CombCSVJPSL_N, &b_Jet_CombCSVJPSL_N);
+   //fChain->SetBranchAddress("Jet_CombCSVJPSL_P", Jet_CombCSVJPSL_P, &b_Jet_CombCSVJPSL_P);
+   //fChain->SetBranchAddress("Jet_CombCSVJPSL", Jet_CombCSVJPSL, &b_Jet_CombCSVJPSL);
+
    fChain->SetBranchAddress("Jet_SoftMuN", Jet_SoftMuN, &b_Jet_SoftMuN);
    fChain->SetBranchAddress("Jet_SoftMuP", Jet_SoftMuP, &b_Jet_SoftMuP);
    fChain->SetBranchAddress("Jet_SoftMu", Jet_SoftMu, &b_Jet_SoftMu);
@@ -889,6 +860,23 @@ void CommPlotProducer4ttbar::Init(TChain *tree)
    fChain->SetBranchAddress("Jet_SoftElP", Jet_SoftElP, &b_Jet_SoftElP);
    fChain->SetBranchAddress("Jet_SoftEl", Jet_SoftEl, &b_Jet_SoftEl);
    
+   fChain->SetBranchAddress("Jet_nFirstTrkEtaRelTagVarCSV",      Jet_nFirstTrkEtaRelTagVarCSV,        &b_Jet_nFirstTrkEtaRelTagVarCSV);
+   fChain->SetBranchAddress("Jet_nLastTrkEtaRelTagVarCSV",       Jet_nLastTrkEtaRelTagVarCSV,         &b_Jet_nLastTrkEtaRelTagVarCSV);         
+   fChain->SetBranchAddress("Jet_nFirstTrkTagVarCSV",            Jet_nFirstTrkTagVarCSV,              &b_Jet_nFirstTrkTagVarCSV);              
+   fChain->SetBranchAddress("Jet_nLastTrkTagVarCSV",             Jet_nLastTrkTagVarCSV,               &b_Jet_nLastTrkTagVarCSV);               
+   fChain->SetBranchAddress("TagVarCSV_trackSip2dSigAboveCharm", TagVarCSV_trackSip2dSigAboveCharm,   &b_TagVarCSV_trackSip2dSigAboveCharm);   
+   fChain->SetBranchAddress("TagVarCSV_trackSumJetEtRatio",      TagVarCSV_trackSumJetEtRatio,        &b_TagVarCSV_trackSumJetEtRatio);        
+   fChain->SetBranchAddress("TagVarCSV_trackSumJetDeltaR",       TagVarCSV_trackSumJetDeltaR,         &b_TagVarCSV_trackSumJetDeltaR);         
+   fChain->SetBranchAddress("TagVarCSV_trackEtaRel",             TagVarCSV_trackEtaRel,               &b_TagVarCSV_trackEtaRel);               
+   fChain->SetBranchAddress("TagVarCSV_trackSip3dSig",           TagVarCSV_trackSip3dSig,             &b_TagVarCSV_trackSip3dSig);             
+   fChain->SetBranchAddress("TagVarCSV_vertexEnergyRatio",       TagVarCSV_vertexEnergyRatio,         &b_TagVarCSV_vertexEnergyRatio);         
+   fChain->SetBranchAddress("TagVarCSV_vertexCategory",          TagVarCSV_vertexCategory,            &b_TagVarCSV_vertexCategory);            
+   fChain->SetBranchAddress("TagVarCSV_vertexMass",              TagVarCSV_vertexMass,                &b_TagVarCSV_vertexMass);                
+   fChain->SetBranchAddress("TagVarCSV_vertexNTracks",           TagVarCSV_vertexNTracks,             &b_TagVarCSV_vertexNTracks);             
+   fChain->SetBranchAddress("TagVarCSV_flightDistance2dSig",     TagVarCSV_flightDistance2dSig,       &b_TagVarCSV_flightDistance2dSig);       
+   fChain->SetBranchAddress("TagVarCSV_vertexJetDeltaR",         TagVarCSV_vertexJetDeltaR,           &b_TagVarCSV_vertexJetDeltaR);           
+
+
    
    fChain->SetBranchAddress("nPFElectron", &nPFElectron, &b_nPFElectron);
    fChain->SetBranchAddress("PFElectron_IdxJet", PFElectron_IdxJet, &b_PFElectron_IdxJet);
@@ -899,7 +887,6 @@ void CommPlotProducer4ttbar::Init(TChain *tree)
    fChain->SetBranchAddress("PFElectron_deltaR", PFElectron_deltaR, &b_PFElectron_deltaR);
    fChain->SetBranchAddress("PFElectron_ratio", PFElectron_ratio, &b_PFElectron_ratio);
    fChain->SetBranchAddress("PFElectron_ratioRel", PFElectron_ratioRel, &b_PFElectron_ratioRel);
-   fChain->SetBranchAddress("PFElectron_IPsig", PFElectron_IPsig, &b_PFElectron_IPsig);
    fChain->SetBranchAddress("nPFMuon", &nPFMuon, &b_nPFMuon);
    fChain->SetBranchAddress("PFMuon_IdxJet", PFMuon_IdxJet, &b_PFMuon_IdxJet);
    fChain->SetBranchAddress("PFMuon_pt", PFMuon_pt, &b_PFMuon_pt);
@@ -912,6 +899,26 @@ void CommPlotProducer4ttbar::Init(TChain *tree)
    fChain->SetBranchAddress("PFMuon_IPsig", PFMuon_IPsig, &b_PFMuon_IPsig);
    fChain->SetBranchAddress("PFMuon_GoodQuality", PFMuon_GoodQuality, &b_PFMuon_GoodQuality);   
   }
+
+
+   //pileup weights
+   puWgtGr_ = 0, puWgtDownGr_ = 0, puWgtUpGr_ = 0;
+   
+   TString puWgtUrl("${CMSSW_BASE}/src/RecoBTag/PerformanceMeasurements/test_ttbarSelector_Moriond16/BTagAnalyzerMacros/pileupWgts.root");
+   gSystem->ExpandPathName(puWgtUrl);
+   TFile *fIn=TFile::Open(puWgtUrl);
+   if(fIn)
+   {
+           puWgtGr_     = (TGraph *)fIn->Get("puwgts_nom");
+           puWgtDownGr_ = (TGraph *)fIn->Get("puwgts_down");
+           puWgtUpGr_   = (TGraph *)fIn->Get("puwgts_up");
+           fIn->Close();
+   }
+   else
+   {
+           std::cout << "Unable to find pileupWgts.root, no PU reweighting will be applied" << std::endl;
+   }
+   
 
    Notify();
 }
