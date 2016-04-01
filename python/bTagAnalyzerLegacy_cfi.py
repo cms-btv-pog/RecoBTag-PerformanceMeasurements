@@ -39,5 +39,8 @@ bTagAnalyzerLegacy = cms.EDAnalyzer("BTagAnalyzerLegacy",
     softPFElectronNegBJetTags = cms.string('negativeSoftPFElectronBJetTags'),
     softPFElectronPosBJetTags = cms.string('positiveSoftPFElectronBJetTags'),
     doubleSVBJetTags = cms.string('dummy'),
-    cMVABJetTags = cms.string('combinedMVABJetTags')
+    cMVABJetTags = cms.string('combinedMVABJetTags'),
+    cMVAv2BJetTags = cms.string('combinedMVAV2BJetTags'),
+    cMVAv2NegBJetTags = cms.string('negativeCombinedMVAV2BJetTags'),
+    cMVAv2PositiveBJetTags = cms.string('positiveCombinedMVAV2BJetTags')
 )
