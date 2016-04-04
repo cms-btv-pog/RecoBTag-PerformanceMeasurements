@@ -995,13 +995,8 @@ process.btagana.produceJetTrackTree   = False ## True if you want to keep info f
 process.btagana.produceAllTrackTree   = False ## True if you want to keep info for all tracks : for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
-<<<<<<< HEAD
 process.btagana.storeTagVariables     = False ## True if you want to keep TagInfo TaggingVariables
 process.btagana.storeCSVTagVariables  = True  ## True if you want to keep CSV TaggingVariables
-=======
-process.btagana.storeTagVariables     = False  ## True if you want to keep TagInfo TaggingVariables
-process.btagana.storeCSVTagVariables  = True  ## True if you want to keep CSV TaggingVariables
->>>>>>> 3da5ddf708167047a73e8c2c15fda6dfc5776a9d
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag('selectedPatJets'+postfix)
 process.btagana.muonCollectionName    = cms.InputTag(muSource)
