@@ -27,3 +27,4 @@ cd RecoBTag/PerformanceMeasurements/test/
 
 cmsRun runBTagAnalyzer_cfg.py miniAOD=False maxEvents=100 reportEvery=1 wantSummary=True
 ```
+
