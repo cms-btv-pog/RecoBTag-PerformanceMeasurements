@@ -16,7 +16,7 @@ python submitToGrid.py -j data/syst_samples_Run2015_25ns.json -c ${CMSSW_BASE}/s
 ```
 Will submit the samples described in the json to the grid.
 Partial submission can be made with -o csv_list
-Don't forget to init the environment for crab3
+Dont forget to init the environment for crab3
 (e.g. https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookCRAB3Tutorial)
 Other json files with samples (e.g. for systematics scans) are also available under data.
 ```
