@@ -35,12 +35,12 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
-options.register('mcGlobalTag', 'MCRUN2_74_V9A',
+options.register('mcGlobalTag', '76X_mcRun2_asymptotic_v12',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', '74X_dataRun2_Prompt_v0',
+options.register('dataGlobalTag', '76X_dataRun2_v15', 
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
@@ -142,8 +142,14 @@ options.register('doBoostedCommissioning', False,
     VarParsing.varType.bool,
     "Make NTuples with branches for boosted b tag commissioning: overrider several other switches"
 )
+## Do Ctag
+options.register('doCTag', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Make NTuples with branches for CTag"
+)
 ## 'maxEvents' is already registered by the Framework, changing default value
-options.setDefault('maxEvents', 10)
+options.setDefault('maxEvents', -1)
 
 options.parseArguments()
 
@@ -166,6 +172,8 @@ if options.doBoostedCommissioning:
     print "Option runFatJets will be set to '",options.runFatJets,"'"
     print "Option runSubJets  will be set to '",options.runSubJets,"'"
     print "********************"
+if options.doCTag:
+    print "**********You are making NTuple for CTag*************" 
 
 ## Global tag
 globalTag = options.mcGlobalTag
@@ -189,6 +197,8 @@ bTagInfosLegacy = [
     'impactParameterTagInfos'
    ,'secondaryVertexTagInfos'
    ,'inclusiveSecondaryVertexFinderTagInfos'
+   ,'secondaryVertexNegativeTagInfos'
+   ,'inclusiveSecondaryVertexFinderNegativeTagInfos'
    ,'softPFMuonsTagInfos'
    ,'softPFElectronsTagInfos'
 ]
@@ -196,8 +206,11 @@ bTagInfos = [
     'pfImpactParameterTagInfos'
    ,'pfSecondaryVertexTagInfos'
    ,'pfInclusiveSecondaryVertexFinderTagInfos'
+   ,'pfSecondaryVertexNegativeTagInfos'
+   ,'pfInclusiveSecondaryVertexFinderNegativeTagInfos'
    ,'softPFMuonsTagInfos'
    ,'softPFElectronsTagInfos'
+   ,'pfInclusiveSecondaryVertexFinderCvsLTagInfos'
 ]
 ## b-tag discriminators
 bTagDiscriminatorsLegacy = [
@@ -228,6 +241,9 @@ bTagDiscriminatorsLegacy = [
    ,'positiveSoftPFElectronBJetTags'
    ,'negativeSoftPFElectronBJetTags'
    ,'combinedMVABJetTags'
+   ,'combinedMVAv2BJetTags'
+   ,'negativeCombinedMVAv2BJetTags'
+   ,'positiveCombinedMVAv2BJetTags'
 ]
 bTagDiscriminators = [
     'pfJetBProbabilityBJetTags'
@@ -257,6 +273,11 @@ bTagDiscriminators = [
    ,'positiveSoftPFElectronBJetTags'
    ,'negativeSoftPFElectronBJetTags'
    ,'pfCombinedMVABJetTags'
+   ,'pfCombinedMVAV2BJetTags'
+   ,'pfNegativeCombinedMVAV2BJetTags'
+   ,'pfPositiveCombinedMVAV2BJetTags'
+   ,'pfCombinedCvsBJetTags'
+   ,'pfCombinedCvsLJetTags'
 ]
 
 ## Legacy taggers not supported with MiniAOD
@@ -312,19 +333,20 @@ process.MessageLogger.cerr.default.limit = 10
 ## Input files
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        '/store/relval/CMSSW_7_4_0_pre8/RelValZpTT_1500_13TeV/GEN-SIM-RECO/MCRUN2_74_V7-v1/00000/58F8AA88-4BBD-E411-95D4-0025905A48F0.root'
-        #'/store/mc/RunIISpring15DR74/QCD_Pt_1800to2400_TuneCUETP8M1_13TeV_pythia8/GEN-SIM-RECODEBUG/Asympt25nsRecodebug_MCRUN2_74_V9-v1/70000/0409C04E-CD02-E511-80FE-00266CFCC860.root'
+        '/store/mc/RunIIFall15DR76/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/30000/00348C6E-599F-E511-B51D-02163E00F4BF.root'
     )
 )
 if options.miniAOD:
     process.source.fileNames = [
-        '/store/mc/RunIISpring15DR74/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v4/10000/00D2A247-2910-E511-9F3D-0CC47A4DEDD2.root'
-        #'/store/relval/CMSSW_7_4_0_pre8/RelValZpTT_1500_13TeV/MINIAODSIM/MCRUN2_74_V7-v1/00000/9008F5B0-54BD-E411-96FB-0025905A6110.root'
+        '/store/mc/RunIIFall15MiniAODv1/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/30000/02D2C327-8FA6-E511-9BD1-0CC47A4D7668.root'
+        #'/store/mc/RunIISpring15MiniAODv2/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/FC156ADC-CA6D-E511-BC16-0022640691CC.root'
+        #'/store/mc/RunIISpring15MiniAODv2/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1//50000/E8B99B66-7D6F-E511-AD98-68B599B9B998.root'
     ]
 if options.runOnData:
     process.source.fileNames = [
-        '/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/168/00000/60FF8405-EA26-E511-A892-02163E01387D.root'
-        #'/store/relval/CMSSW_7_4_0_pre7/SingleMu/RECO/GR_R_74_V8A_RelVal_mu2012D-v1/00000/004E151D-D8B6-E411-A889-0025905B859E.root'
+        '/store/data/Run2015D/DoubleMuon/MINIAOD/16Dec2015-v1/10000/DA6A1520-F1A7-E511-83BE-3417EBE64BE8.root'
+        #'/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/168/00000/60FF8405-EA26-E511-A892-02163E01387D.root'
+        #'/store/data/Run2015D/MuonEG/MINIAOD/PromptReco-v4/000/258/159/00000/64914E6C-F26B-E511-B0C8-02163E0142D1.root'        
     ]
 if options.fastSim:
     process.source.fileNames = [
@@ -365,53 +387,50 @@ process.options   = cms.untracked.PSet(
     allowUnscheduled = cms.untracked.bool(True)
 )
 
-#In 74X:
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
+#Set GT by hand:
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag.globaltag = globalTag
-#In 75X possible to use:
-# process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-# from Configuration.AlCa.GlobalTag import GlobalTag
-# process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_' + ('data' if options.runOnData else 'mc'))
+#Choose automatically:
+#process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+#from Configuration.AlCa.GlobalTag import GlobalTag
+#process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_' + ('data' if options.runOnData else 'mc'))
 
-#Loading calibrations: as default, but with new cMVA training
-#Only in 74X: to be revomed in 75X
-process.load("CondCore.DBCommon.CondDBSetup_cfi")
-process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
-    process.CondDBSetup,
-    timetype = cms.string('runnumber'),
-    toGet = cms.VPSet(
-        cms.PSet(
-            record = cms.string('BTauGenericMVAJetTagComputerRcd'),
-            tag = cms.string('MVAJetTags')
-        )
-    ),
-    connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags.db'),
-    BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
-)
-process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
+#Loading calibrations from db file, example of code for any future use
+#process.load("CondCore.DBCommon.CondDBSetup_cfi")
+#process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
+#    process.CondDBSetup,
+#    timetype = cms.string('runnumber'),
+#    toGet = cms.VPSet(
+#        cms.PSet(
+#            record = cms.string('BTauGenericMVAJetTagComputerRcd'),
+#            tag = cms.string('MVAJetTags')
+#        )
+#    ),
+#    connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags.db'),
+#    BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
+#)
+#process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
 ### to activate the new JP calibration: using the data base
-trkProbaCalibTag = "TrackProbabilityCalibration_3D_MC74X_50ns_v1"
+trkProbaCalibTag = "JPcalib_MC76X_25ns_v1"
 if options.runOnData:
-  trkProbaCalibTag = "JPcalib_Data74X_2015B_v1"
-
+  trkProbaCalibTag = "JPcalib_Data76X_2015D_v1"
+# process.GlobalTag.snapshotTime = cms.string("9999-12-31 23:59:59.000")
 process.GlobalTag.toGet = cms.VPSet(
     cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-        tag = cms.string(trkProbaCalibTag),
-        connect = cms.untracked.string("frontier://FrontierPrep/CMS_CONDITIONS")
+      tag = cms.string(trkProbaCalibTag),
+      connect = cms.string("frontier://FrontierPrep/CMS_CONDITIONS")
     )
 )
 
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
 process.load("Configuration.Geometry.GeometryRecoDB_cff")
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
-process.load("SimTracker.TrackAssociation.TrackAssociatorByChi2_cfi")
-process.load("SimTracker.TrackAssociation.quickTrackAssociatorByHits_cfi")
-process.load("SimTracker.TrackAssociatorProducers.quickTrackAssociatorByHits_cfi")
-process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
 process.load("SimTracker.TrackHistory.TrackHistory_cff")
 process.load("SimTracker.TrackHistory.TrackClassifier_cff")
-process.load("RecoBTag.Configuration.RecoBTag_cff")
+process.load("SimTracker.TrackAssociatorProducers.quickTrackAssociatorByHits_cfi")
+process.load("SimTracker.TrackAssociation.trackingParticleRecoTrackAsssociation_cfi")
+#process.load("RecoBTag.Configuration.RecoBTag_cff")
 
 #-------------------------------------
 ## Output Module Configuration (expects a path 'p')
@@ -739,6 +758,16 @@ if options.runFatJets:
 
 #-------------------------------------
 
+#Switch to hadron flavour priority for all jet collections
+if not options.runOnData:
+    process.patJetFlavourAssociation.hadronFlavourHasPriority = cms.bool(True)
+    process.patJetFlavourAssociationPFlow.hadronFlavourHasPriority = cms.bool(True)
+    if options.runFatJets:
+        process.patJetFlavourAssociationPFCHSPFlow.hadronFlavourHasPriority = cms.bool(True)
+    if options.runSubJets:
+        process.patJetFlavourAssociationPrunedSubjetsPFCHSPFlow.hadronFlavourHasPriority = cms.bool(True)
+        process.patJetFlavourAssociationSoftDropSubjetsPFCHSPFlow.hadronFlavourHasPriority = cms.bool(True)
+
 #-------------------------------------
 if options.runOnData:
     # Remove MC matching when running over data
@@ -747,14 +776,14 @@ if options.runOnData:
 
 #-------------------------------------
 ## Add GenParticlePruner for boosted b-tagging studies
-process.prunedGenParticlesBoost = cms.EDProducer('GenParticlePruner',
-    src = cms.InputTag(genParticles),
-    select = cms.vstring(
-        "drop  *  ", #by default
-        "keep ( status = 3 || (status>=21 && status<=29) )", #keep hard process particles
-        "keep abs(pdgId) = 13 || abs(pdgId) = 15" #keep muons and taus
-    )
-)
+if not options.runOnData:
+    process.prunedGenParticlesBoost = cms.EDProducer('GenParticlePruner',
+                                                     src = cms.InputTag(genParticles),
+                                                     select = cms.vstring("drop  *  ", #by default
+                                                                          "keep ( status = 3 || (status>=21 && status<=29) )", #keep hard process particles
+                                                                          "keep abs(pdgId) = 13 || abs(pdgId) = 15" #keep muons and taus
+                                                                          )
+                                                     )
 
 #-------------------------------------
 
@@ -796,9 +825,13 @@ if options.useTTbarFilter:
         process.ttbarselectionproducer.metColl      = cms.InputTag('patMETs'+postfix)
         switchOnVIDElectronIdProducer(process, DataFormat.AOD)
 
-    setupAllVIDIdsInModule(process,
-                           'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V2_cff',
-                           setupVIDElectronSelection)
+    # Set up electron ID (VID framework)
+    from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
+    switchOnVIDElectronIdProducer(process, dataFormat=DataFormat.MiniAOD)
+    my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff']
+    for idmod in my_id_modules:
+        setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
+
 
 
     #process.ttbarselectionproducer.isData       = options.runOnData
@@ -962,8 +995,8 @@ process.btagana.produceJetTrackTree   = False ## True if you want to keep info f
 process.btagana.produceAllTrackTree   = False ## True if you want to keep info for all tracks : for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
-process.btagana.storeTagVariables     = False  ## True if you want to keep TagInfo TaggingVariables
-process.btagana.storeCSVTagVariables  = False  ## True if you want to keep CSV TaggingVariables
+process.btagana.storeTagVariables     = False ## True if you want to keep TagInfo TaggingVariables
+process.btagana.storeCSVTagVariables  = True  ## True if you want to keep CSV TaggingVariables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag('selectedPatJets'+postfix)
 process.btagana.muonCollectionName    = cms.InputTag(muSource)
@@ -972,6 +1005,11 @@ process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
 process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
 process.btagana.genParticles          = cms.InputTag(genParticles)
 process.btagana.candidates            = cms.InputTag(pfCandidates)
+
+if options.doCTag:
+    process.btagana.storeCTagVariables = True
+    process.btagana.storeEventInfo = True
+    process.btagana.doCTag = options.doCTag
 
 ## fillsvTagInfo set to False independently from the choices above, if produceJetTrackTree is set to False
 if not process.btagana.produceJetTrackTree:
@@ -1069,6 +1107,7 @@ process.p = cms.Path(
     process.allEvents
     * process.filtSeq
     * process.selectedEvents
+    #* process.customTagInfos
     * process.analyzerSeq
 )
 

@@ -32,11 +32,11 @@ def submitProduction(tag,lfnDirBase,dataset,isData,cfg,workDir,lumiMask,submit=F
     config_file.write('config.Data.inputDBS = "global"\n')
     if isData : 
         config_file.write('config.Data.splitting = "LumiBased"\n')
-        config_file.write('config.Data.unitsPerJob = 2\n')
+        config_file.write('config.Data.unitsPerJob = 10\n')
         config_file.write('config.Data.lumiMask = \'%s\'\n' %lumiMask)
     else : 
         config_file.write('config.Data.splitting = "FileBased"\n')
-        config_file.write('config.Data.unitsPerJob = 4\n')
+        config_file.write('config.Data.unitsPerJob = 10\n')
     config_file.write('config.Data.publication = True\n')
     config_file.write('config.Data.ignoreLocality = False\n')
     config_file.write('config.Data.outLFNDirBase = \'%s\'\n' % lfnDirBase)
@@ -60,9 +60,9 @@ def main():
     parser.add_option('-c', '--cfg',         dest='cfg'   ,      help='cfg to be sent to grid',       default=None,    type='string')
     parser.add_option('-j', '--json',        dest='json'  ,      help='json with list of files',      default=None,    type='string')
     parser.add_option('-o', '--only',        dest='only'  ,      help='submit only these (csv)',      default=None,    type='string')
-    parser.add_option('-l', '--lumi',        dest='lumiMask',    help='json with list of good lumis', default='/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/Cert_246908-251252_13TeV_PromptReco_Collisions15_JSON.txt',    type='string')
+    parser.add_option('-l', '--lumi',        dest='lumiMask',    help='json with list of good lumis', default='/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/Cert_246908-260627_13TeV_PromptReco_Collisions15_25ns_JSON_Silver.txt')
     parser.add_option('-w', '--workDir',     dest='workDir',     help='working directory',            default='grid',  type='string')
-    parser.add_option(      '--lfn',         dest='lfn',         help='base lfn to store outputs',    default='/store/group/phys_btag/performance/TTbar/', type='string')
+    parser.add_option(      '--lfn',         dest='lfn',         help='base lfn to store outputs',    default='/store/group/phys_btag/Commissioning/TTbar/', type='string')
     parser.add_option('-s', '--submit',      dest='submit',      help='submit jobs',                  default=False,   action='store_true')
     (opt, args) = parser.parse_args()
 

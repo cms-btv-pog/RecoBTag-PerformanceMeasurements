@@ -23,6 +23,7 @@ class EventInfoBranches {
     float mcweight;
 
     int   nPV;
+    int   BX;
     float PV_x[nMaxPVs_];
     float PV_y[nMaxPVs_];
     float PV_z[nMaxPVs_];
@@ -167,12 +168,14 @@ class EventInfoBranches {
     float PatMuon_IP2D[1000];
     float PatMuon_IP2Dsig[1000];
 
-    int   ttbar_chan, ttbar_trigWord, ttbar_allmepartons, ttbar_matchmepartons;
+    int   ttbar_chan, ttbar_trigWord, ttbar_metfilterWord, ttbar_allmepartons, ttbar_matchmepartons;
+    int   ttbar_ng,ttbar_gid[25];
     int   ttbar_nl, ttbar_lid[10], ttbar_lgid[10], ttbar_lch[10];
+    int   ttbar_nw;
+    float ttbar_gpt[25],ttbar_geta[25],ttbar_gphi[25],ttbar_gm[25];
     float ttbar_lpt[10], ttbar_leta[10], ttbar_lphi[10], ttbar_lm[10];
     float ttbar_metpt,ttbar_metphi;
     float ttbar_rho;
-    int   ttbar_nw;
     float ttbar_w[500];
 
 
@@ -184,6 +187,7 @@ class EventInfoBranches {
       tree->Branch("LumiBlock"  , &LumiBlock  ,  "LumiBlock/I");
       tree->Branch("pthat"      , &pthat      ,  "pthat/F");
       tree->Branch("mcweight"   , &mcweight   ,  "mcweight/F");
+      tree->Branch("BX"         , &BX         ,  "BX/I");
       tree->Branch("nPV"        , &nPV        ,  "nPV/I");
       tree->Branch("PVz"        , &PVz        ,  "PVz/F");
       tree->Branch("PVez"       , &PVez       ,  "PVez/F");
@@ -321,8 +325,15 @@ class EventInfoBranches {
     void RegisterTTbarTree(TTree *tree) {
       tree->Branch("ttbar_chan" , &ttbar_chan  , "ttbar_chan/I");
       tree->Branch("ttbar_trigWord" , &ttbar_trigWord, "ttbar_trigWord/I");
+      tree->Branch("ttbar_metfilterWord" , &ttbar_metfilterWord, "ttbar_metfilterWord/I");
       tree->Branch("ttbar_allmepartons" , &ttbar_allmepartons, "ttbar_allmepartons/I");
       tree->Branch("ttbar_matchmepartons" , &ttbar_matchmepartons, "ttbar_matchmepartons/I");
+      tree->Branch("ttbar_ng"   , &ttbar_ng    , "ttbar_ng/I");
+      tree->Branch("ttbar_gpt"  ,  ttbar_gpt   , "ttbar_gpt[ttbar_ng]/F");
+      tree->Branch("ttbar_geta" ,  ttbar_geta  , "ttbar_geta[ttbar_ng]/F");
+      tree->Branch("ttbar_gphi" ,  ttbar_gphi  , "ttbar_gphi[ttbar_ng]/F");
+      tree->Branch("ttbar_gm"   ,  ttbar_gm    , "ttbar_gm[ttbar_ng]/F");
+      tree->Branch("ttbar_gid"  ,  ttbar_gid   , "ttbar_gid[ttbar_ng]/I");
       tree->Branch("ttbar_nl"   , &ttbar_nl    , "ttbar_nl/I");
       tree->Branch("ttbar_lpt"  ,  ttbar_lpt   , "ttbar_lpt[ttbar_nl]/F");
       tree->Branch("ttbar_leta" ,  ttbar_leta  , "ttbar_leta[ttbar_nl]/F");
@@ -506,6 +517,12 @@ class EventInfoBranches {
     void ReadTTbarTree(TTree *tree) {
       tree->SetBranchAddress("ttbar_chan" , &ttbar_chan);
       tree->SetBranchAddress("ttbar_trigWord" , &ttbar_trigWord);
+      tree->SetBranchAddress("ttbar_ng"   , &ttbar_ng);
+      tree->SetBranchAddress("ttbar_gpt"  ,  ttbar_gpt);
+      tree->SetBranchAddress("ttbar_geta" ,  ttbar_geta);
+      tree->SetBranchAddress("ttbar_gphi" ,  ttbar_gphi);
+      tree->SetBranchAddress("ttbar_gm"   ,  ttbar_gm);
+      tree->SetBranchAddress("ttbar_gid"  ,  ttbar_gid);
       tree->SetBranchAddress("ttbar_nl"   , &ttbar_nl);
       tree->SetBranchAddress("ttbar_lpt"  ,  ttbar_lpt); 
       tree->SetBranchAddress("ttbar_leta" ,  ttbar_leta);
