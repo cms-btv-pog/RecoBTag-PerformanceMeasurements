@@ -1066,7 +1066,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
           int ID2 = -9999;
           int ID3 = -9999;
           int ID4 = -9999;
-          int isWZ = 0, istau = 0, isB = 0, isD = 0;
+          int isWZ = 0, istau = 0, isB = 0, isD = 0, isK = 0, isPi = 0;
           if (moth1->numberOfMothers()>0) {   // protection for herwig ttbar mc
             const Candidate * moth2 = moth1->mother();
             ID2 = abs( moth2->pdgId() );
@@ -1100,8 +1100,11 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
           if ( ID4 == 511 || ID4 == 521 || ID4 == 531 || ID4 == 541 ||
               ID4 ==5112 || ID4 ==5122 || ID4 ==5132 ||
               ID4 ==5212 || ID4 ==5222 || ID4 ==5232 || ID4 ==5332 ) isB = 1;
+          if ( ID1 == 321 || ID1 == 130 ) isK = 1;
+	  if ( ID1 == 211 ) isPi = 1;
           if ( isB+isD != 0 ) EventInfo.Genlep_mother[EventInfo.nGenlep] = 5*isB + 4*isD;
-          else                EventInfo.Genlep_mother[EventInfo.nGenlep] = 10*istau + 100*isWZ;
+          else if( istau+isWZ != 0 ) EventInfo.Genlep_mother[EventInfo.nGenlep] = 10*istau + 100*isWZ;
+	  else EventInfo.Genlep_mother[EventInfo.nGenlep] = 1000*isK + 2000*isPi;
           //  cout << " lepton " << EventInfo.nGenlep << " pdgID " << EventInfo.Genlep_pdgID[EventInfo.nGenlep]
           //       << " moth1 " << moth1->pdgId() << " moth2 " << moth2->pdgId()
           //       << " moth3 " << moth3->pdgId() << " moth4 " << moth4->pdgId()
