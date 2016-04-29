@@ -211,6 +211,7 @@ bTagInfos = [
    ,'softPFMuonsTagInfos'
    ,'softPFElectronsTagInfos'
    ,'pfInclusiveSecondaryVertexFinderCvsLTagInfos'
+   ,'pfInclusiveSecondaryVertexFinderNegativeCvsLTagInfos'
 ]
 ## b-tag discriminators
 bTagDiscriminatorsLegacy = [
@@ -277,7 +278,11 @@ bTagDiscriminators = [
    ,'pfNegativeCombinedMVAV2BJetTags'
    ,'pfPositiveCombinedMVAV2BJetTags'
    ,'pfCombinedCvsBJetTags'
+   ,'pfNegativeCombinedCvsBJetTags'
+   ,'pfPositiveCombinedCvsBJetTags'
    ,'pfCombinedCvsLJetTags'
+   ,'pfNegativeCombinedCvsLJetTags'
+   ,'pfPositiveCombinedCvsLJetTags'
 ]
 
 ## Legacy taggers not supported with MiniAOD
