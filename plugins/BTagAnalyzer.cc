@@ -2334,6 +2334,11 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].PFMuon_ratioRel[JetInfo[iJetColl].nPFMuon]  = (softPFMuTagInfo->properties(leptIdx).ratioRel);
       JetInfo[iJetColl].PFMuon_deltaR[JetInfo[iJetColl].nPFMuon]    = (softPFMuTagInfo->properties(leptIdx).deltaR);
 
+      JetInfo[iJetColl].PFMuon_IP[JetInfo[iJetColl].nPFMuon]        = (softPFMuTagInfo->properties(leptIdx).sip3d);
+      JetInfo[iJetColl].PFMuon_IP2D[JetInfo[iJetColl].nPFMuon]      = (softPFMuTagInfo->properties(leptIdx).sip2d);
+      JetInfo[iJetColl].PFMuon_IPsig[JetInfo[iJetColl].nPFMuon]        = (softPFMuTagInfo->properties(leptIdx).sip3dsig);
+      JetInfo[iJetColl].PFMuon_IP2Dsig[JetInfo[iJetColl].nPFMuon]      = (softPFMuTagInfo->properties(leptIdx).sip2dsig);
+
       JetInfo[iJetColl].PFMuon_nMuHit[JetInfo[iJetColl].nPFMuon] = 0;
       JetInfo[iJetColl].PFMuon_nTkHit[JetInfo[iJetColl].nPFMuon] = 0;
       JetInfo[iJetColl].PFMuon_nPixHit[JetInfo[iJetColl].nPFMuon] = 0;
@@ -2347,25 +2352,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] = 0;
       JetInfo[iJetColl].PFMuon_dz[JetInfo[iJetColl].nPFMuon] = 99;
       JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 0;
-
+      
       const edm::Ptr<reco::Muon> muonPtr = matchMuon( softPFMuTagInfo->lepton(leptIdx), muons );
       if ( muonPtr.isNonnull() && muonPtr.isAvailable() && muonPtr->isGlobalMuon() ) {
-
-	//NOTE: temporary workaround for an issue in https://github.com/cms-btv-pog/cmssw/blob/CMSSW_7_5_X/DataFormats/BTauReco/interface/TemplatedSoftLeptonTagInfo.h#L166
-	//where the signed IP is actually filled with the IP significance. To be changed when this is fixed in 76X and the IP branches can be filled directly from the taginfos
-
-	reco::TrackRef innerTrackmuon( muonPtr->innerTrack() );  
-	reco::TransientTrack tmuon = trackBuilder->build(innerTrackmuon);  
- 	
-	GlobalVector directionformuon(pjet->px(), pjet->py(), pjet->pz());
-
-	Measurement1D ip2dmuon    = IPTools::signedTransverseImpactParameter(tmuon, directionformuon, *pv).second;
-	Measurement1D ip3dmuon    = IPTools::signedImpactParameter3D(tmuon, directionformuon, *pv).second;
-	
- 	JetInfo[iJetColl].PFMuon_IP[JetInfo[iJetColl].nPFMuon]        = (ip3dmuon.value());
-	JetInfo[iJetColl].PFMuon_IP2D[JetInfo[iJetColl].nPFMuon]      = (ip2dmuon.value());
-	JetInfo[iJetColl].PFMuon_IPsig[JetInfo[iJetColl].nPFMuon]        = (ip3dmuon.significance());
-	JetInfo[iJetColl].PFMuon_IP2Dsig[JetInfo[iJetColl].nPFMuon]      = (ip2dmuon.significance());
 
         JetInfo[iJetColl].PFMuon_nMuHit[JetInfo[iJetColl].nPFMuon] = muonPtr->outerTrack()->hitPattern().numberOfValidMuonHits();
         JetInfo[iJetColl].PFMuon_nTkHit[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().numberOfValidHits();
