@@ -17,6 +17,7 @@ git cms-merge-topic cms-btv-pog:FixTrackQuality-v1_from-CMSSW_7_6_3
 git cms-merge-topic cms-btv-pog:FixSignedMuonTagger-v1_from-CMSSW_7_6_3
 git cms-merge-topic cms-btv-pog:fixTMVAEvaluatorMemoryProblem-v1_from-CMSSW_7_6_3
 git cms-merge-topic cms-btv-pog:cmvav2_negpos-v1_from-CMSSW_7_6_3
+git cms-merge-topic cms-btv-pog:FixHistoryBase_from-CMSSW_7_6_3
 
 git clone -b V00-00-01 git://github.com/cms-btv-pog/cms-EventCounter.git MyAnalysis/EventCounter
 git clone -b 7_6_X_v1.03 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
