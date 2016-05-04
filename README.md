@@ -3,8 +3,8 @@
 ## Software setup
 
 ```
-cmsrel CMSSW_8_0_0_patch1
-cd CMSSW_8_0_0_patch1/src
+cmsrel CMSSW_8_0_4
+cd CMSSW_8_0_4/src
 cmsenv
 
 git cms-merge-topic kovitang:Neg_Pos_CTagger_80X
