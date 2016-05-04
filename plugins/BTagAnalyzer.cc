@@ -338,11 +338,16 @@ private:
 
   std::string   ipTagInfosCTag_;
   std::string   svTagInfosCTag_;
+  std::string   svNegTagInfosCTag_;
   std::string   softPFMuonTagInfosCTag_;
   std::string   softPFElectronTagInfosCTag_;
   std::string   SLComputer_;
   std::string   CvsBCJetTags_;
+  std::string   CvsBNegCJetTags_;
+  std::string   CvsBPosCJetTags_;
   std::string   CvsLCJetTags_;
+  std::string   CvsLNegCJetTags_;
+  std::string   CvsLPosCJetTags_;
 
   bool useTrackHistory_;
   TFile*  rootFile_;
@@ -638,11 +643,16 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
 
   ipTagInfosCTag_              = iConfig.getParameter<std::string>("ipTagInfosCTag");
   svTagInfosCTag_              = iConfig.getParameter<std::string>("svTagInfosCTag");
+  svNegTagInfosCTag_              = iConfig.getParameter<std::string>("svNegTagInfosCTag");
   softPFMuonTagInfosCTag_      = iConfig.getParameter<std::string>("softPFMuonTagInfosCTag");
   softPFElectronTagInfosCTag_  = iConfig.getParameter<std::string>("softPFElectronTagInfosCTag");
   SLComputer_               = iConfig.getParameter<std::string>("slComputer");
   CvsBCJetTags_             = iConfig.getParameter<std::string>("CvsBCJetTags");
+  CvsBNegCJetTags_             = iConfig.getParameter<std::string>("CvsBNegCJetTags");
+  CvsBPosCJetTags_             = iConfig.getParameter<std::string>("CvsBPosCJetTags");
   CvsLCJetTags_             = iConfig.getParameter<std::string>("CvsLCJetTags");
+  CvsLNegCJetTags_             = iConfig.getParameter<std::string>("CvsLNegCJetTags");
+  CvsLPosCJetTags_             = iConfig.getParameter<std::string>("CvsLPosCJetTags");
 
   triggerPathNames_        = iConfig.getParameter<std::vector<std::string> >("TriggerPathNames");
   PFJet80TriggerPathNames_ = iConfig.getParameter<std::vector<std::string> >("PFJet80TriggerPathNames");
@@ -2457,7 +2467,11 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float cMVAv2Pos = pjet->bDiscriminator(cMVAv2PosBJetTags_.c_str());
 
     float CvsB = pjet->bDiscriminator(CvsBCJetTags_.c_str());
+    float CvsBNeg = pjet->bDiscriminator(CvsBNegCJetTags_.c_str());
+    float CvsBPos = pjet->bDiscriminator(CvsBPosCJetTags_.c_str());
     float CvsL = pjet->bDiscriminator(CvsLCJetTags_.c_str());
+    float CvsLNeg = pjet->bDiscriminator(CvsLNegCJetTags_.c_str());
+    float CvsLPos = pjet->bDiscriminator(CvsLPosCJetTags_.c_str());
 
     // Jet information
     JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet]   = ProbaN;
@@ -2665,7 +2679,11 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     if ( storeCTagVariables )
     {
       JetInfo[iJetColl].CTag_Jet_CvsB[JetInfo[iJetColl].nJet] = CvsB;
+      JetInfo[iJetColl].CTag_Jet_CvsBN[JetInfo[iJetColl].nJet] = CvsBNeg;
+      JetInfo[iJetColl].CTag_Jet_CvsBP[JetInfo[iJetColl].nJet] = CvsBPos;
       JetInfo[iJetColl].CTag_Jet_CvsL[JetInfo[iJetColl].nJet] = CvsL;
+      JetInfo[iJetColl].CTag_Jet_CvsLN[JetInfo[iJetColl].nJet] = CvsLNeg;
+      JetInfo[iJetColl].CTag_Jet_CvsLP[JetInfo[iJetColl].nJet] = CvsLPos;
   
       std::vector<const reco::BaseTagInfo*>  slbaseTagInfos;
       slbaseTagInfos.push_back( ipTagInfoCTag );
