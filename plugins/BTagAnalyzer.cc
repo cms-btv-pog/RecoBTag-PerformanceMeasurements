@@ -111,6 +111,7 @@
 #include "RecoBTag/PerformanceMeasurements/interface/JetInfoBranches.h"
 #include "RecoBTag/PerformanceMeasurements/interface/EventInfoBranches.h"
 #include "RecoBTag/PerformanceMeasurements/interface/BookHistograms.h"
+#include "RecoBTag/PerformanceMeasurements/interface/MVAEvaluator.h"
 
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "FWCore/Common/interface/Provenance.h"
@@ -123,8 +124,6 @@
 #include "TrackingTools/IPTools/interface/IPTools.h"
 
 #include "fastjet/contrib/Njettiness.hh"
-
-#include "RecoBTag/SecondaryVertex/interface/CombinedSVSoftLeptonComputer.h"
 
 //
 // constants, enums and typedefs
@@ -336,14 +335,6 @@ private:
   std::string   SVComputer_;
   std::string   SVComputerSubJets_;
 
-  std::string ipTagInfosCTag_;
-  std::string svTagInfosCTag_;
-  std::string softPFMuonTagInfosCTag_;
-  std::string softPFElectronTagInfosCTag_;
-  std::string   SLComputer_;
-  std::string   CvsBCJetTags_;
-  std::string   CvsLCJetTags_;
-
   bool useTrackHistory_;
   TFile*  rootFile_;
   double minJetPt_;
@@ -365,9 +356,6 @@ private:
   bool storeTagVariablesSubJets_;
   bool storeCSVTagVariables_;
   bool storeCSVTagVariablesSubJets_;
-  
-  bool storeCTagVariables_;
-  bool doCTag_;  
 
   bool use_ttbar_filter_;
   edm::EDGetTokenT<edm::View<reco::GenParticle> > ttbarproducerGen_;
@@ -420,8 +408,6 @@ private:
 
   const GenericMVAJetTagComputer *computer ;
 
-  const GenericMVAJetTagComputer *slcomputer ;
-
   edm::View<reco::Muon> muons ;
 
   edm::ESHandle<TransientTrackBuilder> trackBuilder ;
@@ -461,7 +447,6 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   pv(0),
   PFJet80(0),
   computer(0),
-  slcomputer(0),
   cap0(0),
   cap1(0),
   cap2(0),
@@ -520,9 +505,6 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   storeTagVariablesSubJets_ = iConfig.getParameter<bool>("storeTagVariablesSubJets");
   storeCSVTagVariables_ = iConfig.getParameter<bool>("storeCSVTagVariables");
   storeCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("storeCSVTagVariablesSubJets");
-
-  storeCTagVariables_ = iConfig.getParameter<bool>("storeCTagVariables");
-  doCTag_             = iConfig.getParameter<bool>("doCTag");
 
   use_ttbar_filter_ = iConfig.getParameter<bool> ("use_ttbar_filter");
   ttbarproducerGen_ = consumes<edm::View<reco::GenParticle>>(iConfig.getParameter<edm::InputTag>("ttbarproducer")),
@@ -636,14 +618,6 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   SVComputer_               = iConfig.getParameter<std::string>("svComputer");
   SVComputerSubJets_        = iConfig.getParameter<std::string>("svComputerSubJets");
 
-  ipTagInfosCTag_              = iConfig.getParameter<std::string>("ipTagInfosCTag");
-  svTagInfosCTag_              = iConfig.getParameter<std::string>("svTagInfosCTag");
-  softPFMuonTagInfosCTag_      = iConfig.getParameter<std::string>("softPFMuonTagInfosCTag");
-  softPFElectronTagInfosCTag_  = iConfig.getParameter<std::string>("softPFElectronTagInfosCTag");
-  SLComputer_               = iConfig.getParameter<std::string>("slComputer");
-  CvsBCJetTags_             = iConfig.getParameter<std::string>("CvsBCJetTags");
-  CvsLCJetTags_             = iConfig.getParameter<std::string>("CvsLCJetTags");
-
   triggerPathNames_        = iConfig.getParameter<std::vector<std::string> >("TriggerPathNames");
   PFJet80TriggerPathNames_ = iConfig.getParameter<std::vector<std::string> >("PFJet80TriggerPathNames");
 
@@ -681,9 +655,6 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   if ( fillsvTagInfo_ )       JetInfo[0].RegisterJetSVTree(smalltree,branchNamePrefix_);
   if ( storeTagVariables_)    JetInfo[0].RegisterTagVarTree(smalltree,branchNamePrefix_);
   if ( storeCSVTagVariables_) JetInfo[0].RegisterCSVTagVarTree(smalltree,branchNamePrefix_);
-
-  if ( storeCTagVariables_) JetInfo[0].RegisterCTagVarTree(smalltree,branchNamePrefix_);
-
   if ( runSubJets_ ) {
     for ( size_t i = 0; i < SubJetLabels_.size(); ++i )
     {
@@ -1066,7 +1037,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
           int ID2 = -9999;
           int ID3 = -9999;
           int ID4 = -9999;
-          int isWZ = 0, istau = 0, isB = 0, isD = 0, isK = 0, isPi = 0;
+          int isWZ = 0, istau = 0, isB = 0, isD = 0;
           if (moth1->numberOfMothers()>0) {   // protection for herwig ttbar mc
             const Candidate * moth2 = moth1->mother();
             ID2 = abs( moth2->pdgId() );
@@ -1100,11 +1071,8 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
           if ( ID4 == 511 || ID4 == 521 || ID4 == 531 || ID4 == 541 ||
               ID4 ==5112 || ID4 ==5122 || ID4 ==5132 ||
               ID4 ==5212 || ID4 ==5222 || ID4 ==5232 || ID4 ==5332 ) isB = 1;
-          if ( ID1 == 321 || ID1 == 130 ) isK = 1;
-	  if ( ID1 == 211 ) isPi = 1;
           if ( isB+isD != 0 ) EventInfo.Genlep_mother[EventInfo.nGenlep] = 5*isB + 4*isD;
-          else if( istau+isWZ != 0 ) EventInfo.Genlep_mother[EventInfo.nGenlep] = 10*istau + 100*isWZ;
-	  else EventInfo.Genlep_mother[EventInfo.nGenlep] = 1000*isK + 2000*isPi;
+          else                EventInfo.Genlep_mother[EventInfo.nGenlep] = 10*istau + 100*isWZ;
           //  cout << " lepton " << EventInfo.nGenlep << " pdgID " << EventInfo.Genlep_pdgID[EventInfo.nGenlep]
           //       << " moth1 " << moth1->pdgId() << " moth2 " << moth2->pdgId()
           //       << " moth3 " << moth3->pdgId() << " moth4 " << moth4->pdgId()
@@ -1535,13 +1503,6 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   computer = dynamic_cast<const GenericMVAJetTagComputer*>( computerHandle.product() );
   //------------- end added-----------------------------------------------------------//
 
-  if (doCTag_){
-     edm::ESHandle<JetTagComputer> slcomputerHandle;
-     iSetup.get<JetTagComputerRecord>().get( SLComputer_.c_str(), slcomputerHandle );
-
-     slcomputer = dynamic_cast<const GenericMVAJetTagComputer*>( slcomputerHandle.product() );
-  } 
-
   //------------------------------------------------------
   // All tracks info
   //------------------------------------------------------
@@ -1604,7 +1565,8 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
       processJets(subjetColls[i], jetsColl, subjetColls, iEvent, iSetup, iJetColl); // 'subjetColls' is a dummy input here
     }
   }
-  //------------------------------------------------------ 
+  //------------------------------------------------------
+
   //// Fill TTree
   if ( EventInfo.BitTrigger > 0 || EventInfo.Run < 0 ) {
     smalltree->Fill();
@@ -1654,10 +1616,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
   JetInfo[iJetColl].nSVTagVar = 0;
   JetInfo[iJetColl].nTrkTagVarCSV = 0;
   JetInfo[iJetColl].nTrkEtaRelTagVarCSV = 0;
-  JetInfo[iJetColl].nTrkCTagVar = 0;
-  JetInfo[iJetColl].nTrkEtaRelCTagVar = 0;
-  JetInfo[iJetColl].nLeptons = 0;  
-
   if ( runFatJets_ && runSubJets_ && iJetColl == 0 )
   {
     for ( size_t i = 0; i < SubJetLabels_.size(); ++i )
@@ -1666,9 +1624,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
   bool storeTagVariables    = storeTagVariables_;
   bool storeCSVTagVariables = storeCSVTagVariables_;
-
-  bool storeCTagVariables = storeCTagVariables_;
-
   if ( runSubJets_ && iJetColl > 0 )
   {
     storeTagVariables    = storeTagVariablesSubJets_;
@@ -1848,13 +1803,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     const SVTagInfo *svNegTagInfo = toSVTagInfo(*pjet,svNegTagInfos_);
     const reco::CandSoftLeptonTagInfo *softPFMuTagInfo = pjet->tagInfoCandSoftLepton(softPFMuonTagInfos_.c_str());
     const reco::CandSoftLeptonTagInfo *softPFElTagInfo = pjet->tagInfoCandSoftLepton(softPFElectronTagInfos_.c_str());
-   
-    //Get all CTagInfo pointers
-    const IPTagInfo *ipTagInfoCTag = toIPTagInfo(*pjet,ipTagInfosCTag_);
-    const SVTagInfo *svTagInfoCTag = toSVTagInfo(*pjet,svTagInfosCTag_);
-    const reco::CandSoftLeptonTagInfo *softPFMuTagInfoCTag = pjet->tagInfoCandSoftLepton(softPFMuonTagInfosCTag_.c_str());
-    const reco::CandSoftLeptonTagInfo *softPFElTagInfoCTag = pjet->tagInfoCandSoftLepton(softPFElectronTagInfosCTag_.c_str());
- 
+
     // Re-calculate N-subjettiness
     std::vector<fastjet::PseudoJet> currentAxes;
     if ( runFatJets_ && iJetColl == 0 )
@@ -2475,9 +2424,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float cMVAv2 = pjet->bDiscriminator(cMVAv2BJetTags_.c_str());
     float cMVAv2Neg = pjet->bDiscriminator(cMVAv2NegBJetTags_.c_str());
     float cMVAv2Pos = pjet->bDiscriminator(cMVAv2PosBJetTags_.c_str());
-   
-    float CvsB = pjet->bDiscriminator(CvsBCJetTags_.c_str());
-    float CvsL = pjet->bDiscriminator(CvsLCJetTags_.c_str());  
 
     // Jet information
     JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet]   = ProbaN;
@@ -2679,101 +2625,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
       JetInfo[iJetColl].nTrkEtaRelTagVarCSV += JetInfo[iJetColl].TagVarCSV_jetNTracksEtaRel[JetInfo[iJetColl].nJet];
       JetInfo[iJetColl].Jet_nLastTrkEtaRelTagVarCSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkEtaRelTagVarCSV;
-   }
-
-    if ( storeCTagVariables )
-    {
-      JetInfo[iJetColl].CTag_Jet_CvsB[JetInfo[iJetColl].nJet] = CvsB;
-      JetInfo[iJetColl].CTag_Jet_CvsL[JetInfo[iJetColl].nJet] = CvsL;
-  
-      std::vector<const reco::BaseTagInfo*>  slbaseTagInfos;
-      slbaseTagInfos.push_back( ipTagInfoCTag );
-      slbaseTagInfos.push_back( svTagInfoCTag );
-      slbaseTagInfos.push_back( softPFMuTagInfoCTag );
-      slbaseTagInfos.push_back( softPFElTagInfoCTag ); 
-      JetTagComputer::TagInfoHelper slhelper(slbaseTagInfos);
-      // TaggingVariables
-      reco::TaggingVariableList slvars = slcomputer->taggingVariables(slhelper);
-
-      // per jet
-      JetInfo[iJetColl].CTag_vertexCategory[JetInfo[iJetColl].nJet]              = ( slvars.checkTag(reco::btau::vertexCategory) ? slvars.get(reco::btau::vertexCategory) : -9999 );
-      JetInfo[iJetColl].CTag_jetNSecondaryVertices[JetInfo[iJetColl].nJet]       = ( slvars.checkTag(reco::btau::jetNSecondaryVertices) ? slvars.get(reco::btau::jetNSecondaryVertices) : 0 );
-      JetInfo[iJetColl].CTag_trackSumJetEtRatio[JetInfo[iJetColl].nJet]          = ( slvars.checkTag(reco::btau::trackSumJetEtRatio) ? slvars.get(reco::btau::trackSumJetEtRatio) : -9999 );
-      JetInfo[iJetColl].CTag_trackSumJetDeltaR[JetInfo[iJetColl].nJet]           = ( slvars.checkTag(reco::btau::trackSumJetDeltaR) ? slvars.get(reco::btau::trackSumJetDeltaR) : -9999 );
-      JetInfo[iJetColl].CTag_trackSip2dSigAboveCharm[JetInfo[iJetColl].nJet]     = ( slvars.checkTag(reco::btau::trackSip2dSigAboveCharm) ? slvars.get(reco::btau::trackSip2dSigAboveCharm) : -9999 );
-      JetInfo[iJetColl].CTag_trackSip3dSigAboveCharm[JetInfo[iJetColl].nJet]     = ( slvars.checkTag(reco::btau::trackSip3dSigAboveCharm) ? slvars.get(reco::btau::trackSip3dSigAboveCharm) : -9999 );
-      JetInfo[iJetColl].CTag_vertexMass[JetInfo[iJetColl].nJet]                  = ( slvars.checkTag(reco::btau::vertexMass) ? slvars.get(reco::btau::vertexMass) : -9999 );
-      JetInfo[iJetColl].CTag_vertexNTracks[JetInfo[iJetColl].nJet]               = ( slvars.checkTag(reco::btau::vertexNTracks) ? slvars.get(reco::btau::vertexNTracks) : 0 );
-      JetInfo[iJetColl].CTag_vertexEnergyRatio[JetInfo[iJetColl].nJet]           = ( slvars.checkTag(reco::btau::vertexEnergyRatio) ? slvars.get(reco::btau::vertexEnergyRatio) : -9999 );
-      JetInfo[iJetColl].CTag_vertexJetDeltaR[JetInfo[iJetColl].nJet]             = ( slvars.checkTag(reco::btau::vertexJetDeltaR) ? slvars.get(reco::btau::vertexJetDeltaR) : -9999 );
-      JetInfo[iJetColl].CTag_flightDistance2dVal[JetInfo[iJetColl].nJet]         = ( slvars.checkTag(reco::btau::flightDistance2dVal) ? slvars.get(reco::btau::flightDistance2dVal) : -9999 );
-      JetInfo[iJetColl].CTag_flightDistance2dSig[JetInfo[iJetColl].nJet]         = ( slvars.checkTag(reco::btau::flightDistance2dSig) ? slvars.get(reco::btau::flightDistance2dSig) : -9999 );
-      JetInfo[iJetColl].CTag_flightDistance3dVal[JetInfo[iJetColl].nJet]         = ( slvars.checkTag(reco::btau::flightDistance3dVal) ? slvars.get(reco::btau::flightDistance3dVal) : -9999 );
-      JetInfo[iJetColl].CTag_flightDistance3dSig[JetInfo[iJetColl].nJet]         = ( slvars.checkTag(reco::btau::flightDistance3dSig) ? slvars.get(reco::btau::flightDistance3dSig) : -9999 );
-      JetInfo[iJetColl].CTag_vertexFitProb[JetInfo[iJetColl].nJet]               = ( slvars.checkTag(reco::btau::vertexFitProb) ? slvars.get(reco::btau::vertexFitProb) : -9999 );
-      JetInfo[iJetColl].CTag_massVertexEnergyFraction[JetInfo[iJetColl].nJet]           = ( slvars.checkTag(reco::btau::massVertexEnergyFraction) ? slvars.get(reco::btau::massVertexEnergyFraction) : -0.1);
-      JetInfo[iJetColl].CTag_vertexBoostOverSqrtJetPt[JetInfo[iJetColl].nJet]           = ( slvars.checkTag(reco::btau::vertexBoostOverSqrtJetPt) ? slvars.get(reco::btau::vertexBoostOverSqrtJetPt) : -0.1);
- 
-      // per jet per track
-      JetInfo[iJetColl].Jet_nFirstTrkCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkCTagVar;
-      std::vector<float> tagValList = slvars.getList(reco::btau::trackSip2dSig,false);
-      JetInfo[iJetColl].CTag_jetNTracks[JetInfo[iJetColl].nJet] = tagValList.size(); 
-
-      tagValList = slvars.getList(reco::btau::trackPtRel,false);
-      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackPtRel[JetInfo[iJetColl].nTrkCTagVar] );  
-      tagValList = slvars.getList(reco::btau::trackPPar,false);
-      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackPPar[JetInfo[iJetColl].nTrkCTagVar] );
-      tagValList = slvars.getList(reco::btau::trackDeltaR,false);
-      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackDeltaR[JetInfo[iJetColl].nTrkCTagVar] );
-      tagValList = slvars.getList(reco::btau::trackPtRatio,false);
-      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackPtRatio[JetInfo[iJetColl].nTrkCTagVar] );
-      tagValList = slvars.getList(reco::btau::trackPParRatio,false);
-      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackPParRatio[JetInfo[iJetColl].nTrkCTagVar] );
-      tagValList = slvars.getList(reco::btau::trackSip2dVal,false);
-      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackSip2dVal[JetInfo[iJetColl].nTrkCTagVar] );
-      tagValList = slvars.getList(reco::btau::trackSip2dSig,false);
-      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackSip2dSig[JetInfo[iJetColl].nTrkCTagVar] );
-      tagValList = slvars.getList(reco::btau::trackSip3dVal,false);
-      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackSip3dVal[JetInfo[iJetColl].nTrkCTagVar] );
-      tagValList = slvars.getList(reco::btau::trackSip3dSig,false);
-      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackSip3dSig[JetInfo[iJetColl].nTrkCTagVar] );
-      tagValList = slvars.getList(reco::btau::trackDecayLenVal,false);
-      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackDecayLenVal[JetInfo[iJetColl].nTrkCTagVar] );
-      tagValList = slvars.getList(reco::btau::trackJetDistVal,false);
-      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackJetDistVal[JetInfo[iJetColl].nTrkCTagVar] );
-     
-      JetInfo[iJetColl].nTrkCTagVar += JetInfo[iJetColl].CTag_jetNTracks[JetInfo[iJetColl].nJet];
-      JetInfo[iJetColl].Jet_nLastTrkCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkCTagVar;
-      //---------------------------
-      JetInfo[iJetColl].Jet_nFirstTrkEtaRelCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkEtaRelCTagVar;
-      tagValList = slvars.getList(reco::btau::trackEtaRel,false);
-      JetInfo[iJetColl].CTag_jetNTracksEtaRel[JetInfo[iJetColl].nJet] = tagValList.size();
-
-      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackEtaRel[JetInfo[iJetColl].nTrkEtaRelCTagVar] );
-
-      JetInfo[iJetColl].nTrkEtaRelCTagVar += JetInfo[iJetColl].CTag_jetNTracksEtaRel[JetInfo[iJetColl].nJet];
-      JetInfo[iJetColl].Jet_nLastTrkEtaRelCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkEtaRelCTagVar;
       
-      //per jet per lepton
-      JetInfo[iJetColl].Jet_nFirstLepCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nLeptons;
-      std::vector<float> sltagValList = slvars.getList(reco::btau::leptonPtRel,false);
-      JetInfo[iJetColl].CTag_jetNLeptons[JetInfo[iJetColl].nJet] = sltagValList.size();
-
-      sltagValList = slvars.getList(reco::btau::leptonPtRel,false);
-      if(sltagValList.size()>0) std::copy( sltagValList.begin(), sltagValList.end(), &JetInfo[iJetColl].CTag_leptonPtRel[JetInfo[iJetColl].nLeptons] );
-      sltagValList = slvars.getList(reco::btau::leptonSip3d,false);
-      if(sltagValList.size()>0) std::copy( sltagValList.begin(), sltagValList.end(), &JetInfo[iJetColl].CTag_leptonSip3d[JetInfo[iJetColl].nLeptons] );
-      sltagValList = slvars.getList(reco::btau::leptonDeltaR,false);
-      if(sltagValList.size()>0) std::copy( sltagValList.begin(), sltagValList.end(), &JetInfo[iJetColl].CTag_leptonDeltaR[JetInfo[iJetColl].nLeptons] );
-      sltagValList = slvars.getList(reco::btau::leptonRatioRel,false);
-      if(sltagValList.size()>0) std::copy( sltagValList.begin(), sltagValList.end(), &JetInfo[iJetColl].CTag_leptonRatioRel[JetInfo[iJetColl].nLeptons] );
-      sltagValList = slvars.getList(reco::btau::leptonEtaRel,false);
-      if(sltagValList.size()>0) std::copy( sltagValList.begin(), sltagValList.end(), &JetInfo[iJetColl].CTag_leptonEtaRel[JetInfo[iJetColl].nLeptons] );
-      sltagValList = slvars.getList(reco::btau::leptonRatio,false);
-      if(sltagValList.size()>0) std::copy( sltagValList.begin(), sltagValList.end(), &JetInfo[iJetColl].CTag_leptonRatio[JetInfo[iJetColl].nLeptons] );     
- 
-      JetInfo[iJetColl].nLeptons += JetInfo[iJetColl].CTag_jetNLeptons[JetInfo[iJetColl].nJet];
-      JetInfo[iJetColl].Jet_nLastLepCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nLeptons;
     }
 
     if ( runFatJets_ && iJetColl == 0 )
