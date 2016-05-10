@@ -367,7 +367,11 @@ class JetInfoBranches {
     int   Jet_nLastLepCTagVar[nMaxJets_];
     //per jet    
     float CTag_Jet_CvsB[nMaxJets_];
+    float CTag_Jet_CvsBN[nMaxJets_];
+    float CTag_Jet_CvsBP[nMaxJets_];
     float CTag_Jet_CvsL[nMaxJets_];
+    float CTag_Jet_CvsLN[nMaxJets_];
+    float CTag_Jet_CvsLP[nMaxJets_];
     float CTag_jetNTracks[nMaxJets_];                              // tracks associated to jet
     float CTag_jetNTracksEtaRel[nMaxJets_];                     // tracks associated to jet for which trackEtaRel is calculated
     float CTag_jetNLeptons[nMaxJets_]; 
@@ -743,8 +747,12 @@ class JetInfoBranches {
       //--------------------------------------
       // CTag TaggingVariables
       //--------------------------------------
-      tree->Branch((name+"CTag_Jet_CvsB").c_str(),    CTag_Jet_CvsB    ,(name+"CTag_Jet_CvsB["+name+"nJet]/F").c_str());
-      tree->Branch((name+"CTag_Jet_CvsL").c_str(),    CTag_Jet_CvsL    ,(name+"CTag_Jet_CvsL["+name+"nJet]/F").c_str());
+      tree->Branch((name+"CTag_Jet_CvsB").c_str(),     CTag_Jet_CvsB     ,(name+"CTag_Jet_CvsB["+name+"nJet]/F").c_str());
+      tree->Branch((name+"CTag_Jet_CvsBN").c_str(),    CTag_Jet_CvsBN    ,(name+"CTag_Jet_CvsBN["+name+"nJet]/F").c_str());
+      tree->Branch((name+"CTag_Jet_CvsBP").c_str(),    CTag_Jet_CvsBP    ,(name+"CTag_Jet_CvsBP["+name+"nJet]/F").c_str());
+      tree->Branch((name+"CTag_Jet_CvsL").c_str(),     CTag_Jet_CvsL     ,(name+"CTag_Jet_CvsL["+name+"nJet]/F").c_str());
+      tree->Branch((name+"CTag_Jet_CvsLN").c_str(),    CTag_Jet_CvsLN    ,(name+"CTag_Jet_CvsLN["+name+"nJet]/F").c_str());
+      tree->Branch((name+"CTag_Jet_CvsLP").c_str(),    CTag_Jet_CvsLP    ,(name+"CTag_Jet_CvsLP["+name+"nJet]/F").c_str());
 
       tree->Branch((name+"Jet_nFirstTrkCTagVar").c_str()        ,Jet_nFirstTrkCTagVar        ,(name+"Jet_nFirstTrkCTagVar["+name+"nJet]/I").c_str()       );
       tree->Branch((name+"Jet_nLastTrkCTagVar").c_str()         ,Jet_nLastTrkCTagVar         ,(name+"Jet_nLastTrkCTagVar["+name+"nJet]/I").c_str()            );
@@ -1209,8 +1217,12 @@ class JetInfoBranches {
       //--------------------------------------
       // CTag TaggingVariables
       //--------------------------------------
-      tree->SetBranchAddress((name+"CTag_Jet_CvsB").c_str(),    CTag_Jet_CvsB   );
-      tree->SetBranchAddress((name+"CTag_Jet_CvsL").c_str(),    CTag_Jet_CvsL   );   
+      tree->SetBranchAddress((name+"CTag_Jet_CvsB").c_str(),     CTag_Jet_CvsB   );
+      tree->SetBranchAddress((name+"CTag_Jet_CvsBN").c_str(),    CTag_Jet_CvsBN   );
+      tree->SetBranchAddress((name+"CTag_Jet_CvsBP").c_str(),    CTag_Jet_CvsBP   );
+      tree->SetBranchAddress((name+"CTag_Jet_CvsL").c_str(),     CTag_Jet_CvsL   );
+      tree->SetBranchAddress((name+"CTag_Jet_CvsLN").c_str(),    CTag_Jet_CvsLN   );
+      tree->SetBranchAddress((name+"CTag_Jet_CvsLP").c_str(),    CTag_Jet_CvsLP   );   
 
       tree->SetBranchAddress((name+"Jet_nFirstTrkCTagVar").c_str()        ,Jet_nFirstTrkCTagVar );
       tree->SetBranchAddress((name+"Jet_nLastTrkCTagVar").c_str()         ,Jet_nLastTrkCTagVar  );

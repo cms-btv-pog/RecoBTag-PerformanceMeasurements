@@ -14,6 +14,7 @@ bTagAnalyzer = cms.EDAnalyzer("BTagAnalyzer",
     softPFElectronTagInfos = cms.string('softPFElectrons'),
     ipTagInfosCTag = cms.string('pfImpactParameter'),
     svTagInfosCTag = cms.string('pfInclusiveSecondaryVertexFinderCvsL'),
+    svNegTagInfosCTag = cms.string('pfInclusiveSecondaryVertexFinderNegativeCvsLTagInfos'),
     softPFMuonTagInfosCTag = cms.string('softPFMuons'),
     softPFElectronTagInfosCTag = cms.string('softPFElectrons'),
     # taggers
@@ -49,5 +50,9 @@ bTagAnalyzer = cms.EDAnalyzer("BTagAnalyzer",
     cMVAv2NegBJetTags = cms.string('pfNegativeCombinedMVAV2BJetTags'),
     cMVAv2PosBJetTags = cms.string('pfPositiveCombinedMVAV2BJetTags'),
     CvsBCJetTags = cms.string('pfCombinedCvsBJetTags'),
-    CvsLCJetTags = cms.string('pfCombinedCvsLJetTags')
+    CvsBNegCJetTags = cms.string('pfNegativeCombinedCvsBJetTags'),
+    CvsBPosCJetTags = cms.string('pfPositiveCombinedCvsBJetTags'),
+    CvsLCJetTags = cms.string('pfCombinedCvsLJetTags'),
+    CvsLNegCJetTags = cms.string('pfNegativeCombinedCvsLJetTags'),
+    CvsLPosCJetTags = cms.string('pfPositiveCombinedCvsLJetTags')   
 )
