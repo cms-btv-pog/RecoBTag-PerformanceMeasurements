@@ -60,6 +60,10 @@ class JetInfoBranches {
     float Jet_cMVAv2[nMaxJets_];
     float Jet_cMVAv2N[nMaxJets_];
     float Jet_cMVAv2P[nMaxJets_];
+    //New test variables for AK4 jets: to be cleaned up in the future
+    float Jet_trackSip2dSig_AboveBottom_0[nMaxJets_];
+    float Jet_trackSip2dSig_AboveBottom_1[nMaxJets_];
+    //End new test variables
     int   Jet_hist1[nMaxJets_];
     int   Jet_hist2[nMaxJets_];
     int   Jet_hist3[nMaxJets_];
@@ -475,6 +479,10 @@ class JetInfoBranches {
 
       tree->Branch((name+"Jet_looseID").c_str(),      Jet_looseID  ,(name+"Jet_looseID["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_tightID").c_str(),      Jet_tightID  ,(name+"Jet_tightID["+name+"nJet]/I").c_str());
+
+      //test variables for AK4 jets: clean up in the future
+      tree->Branch((name+"Jet_trackSip2dSig_AboveBottom_0").c_str(),     Jet_trackSip2dSig_AboveBottom_0     ,(name+"Jet_trackSip2dSig_AboveBottom_0["+name+"nJet]/F").c_str()            );
+      tree->Branch((name+"Jet_trackSip2dSig_AboveBottom_1").c_str(),     Jet_trackSip2dSig_AboveBottom_1     ,(name+"Jet_trackSip2dSig_AboveBottom_1["+name+"nJet]/F").c_str()            );
 
       //--------------------------------------
       // pf electron information
@@ -939,6 +947,10 @@ class JetInfoBranches {
 
       tree->SetBranchAddress((name+"Jet_looseID").c_str(),     Jet_looseID);
       tree->SetBranchAddress((name+"Jet_tightID").c_str(),     Jet_tightID);
+
+      //new test variables for AK4 jets: clean up in the future
+      tree->SetBranchAddress((name+"Jet_trackSip2dSig_AboveBottom_0").c_str(),     Jet_trackSip2dSig_AboveBottom_0     );
+      tree->SetBranchAddress((name+"Jet_trackSip2dSig_AboveBottom_1").c_str(),     Jet_trackSip2dSig_AboveBottom_1     );
 
       //--------------------------------------
       // pf electron information

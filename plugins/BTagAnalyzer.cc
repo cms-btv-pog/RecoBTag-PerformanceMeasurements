@@ -1661,6 +1661,11 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
   JetInfo[iJetColl].nTrkCTagVar = 0;
   JetInfo[iJetColl].nTrkEtaRelCTagVar = 0;
   JetInfo[iJetColl].nLeptons = 0;  
+
+  //Initialize new test variables for AK4 jets: to be cleaned up in the future
+  JetInfo[iJetColl].Jet_trackSip2dSig_AboveBottom_0[JetInfo[iJetColl].nJet] = -19.;
+  JetInfo[iJetColl].Jet_trackSip2dSig_AboveBottom_1[JetInfo[iJetColl].nJet] = -19.;
+
   if ( runFatJets_ && runSubJets_ && iJetColl == 0 )
   {
     for ( size_t i = 0; i < SubJetLabels_.size(); ++i )
@@ -2093,44 +2098,47 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
           JetInfo[iJetColl].Track_lengthTau[JetInfo[iJetColl].nTrack] = decayLengthTau;
         }
 
-
-      if ( runFatJets_ && iJetColl == 0 )
-      {
         const std::vector<reco::btag::TrackIPData> & ipData = ipTagInfo->impactParameterData();
         std::vector<size_t> indices = ipTagInfo->sortedIndexes(reco::btag::IP2DSig);
         bool charmThreshSet = false;
-
+	
         reco::TrackKinematics kin;
         for (size_t i =0; i<indices.size(); ++i)
-        {
-          size_t idx = indices[i];
-          const reco::btag::TrackIPData & data = ipData[idx];
-          const TrackRef ptrackRef = selectedTracks[idx];
-          const reco::Track * ptrackPtr = reco::btag::toTrack(ptrackRef);
-          const reco::Track & track = (*ptrackPtr);
-
-          kin.add(track);
-
-          if ( kin.vectorSum().M() > 1.5 // charm cut
-               && !charmThreshSet )
-          {
-            JetInfo[iJetColl].Jet_trackSip2dSigAboveCharm_0[JetInfo[iJetColl].nJet] = data.ip2d.significance();
-            if ( (i+1)<indices.size() ) JetInfo[iJetColl].Jet_trackSip2dSigAboveCharm_1[JetInfo[iJetColl].nJet] = (ipData[indices[i+1]]).ip2d.significance();
-
-            charmThreshSet = true;
-          }
-
-          if ( kin.vectorSum().M() > 5.2 ) // bottom cut
-          {
-            JetInfo[iJetColl].Jet_trackSip2dSigAboveBottom_0[JetInfo[iJetColl].nJet] = data.ip2d.significance();
-            if ( (i+1)<indices.size() ) JetInfo[iJetColl].Jet_trackSip2dSigAboveBottom_1[JetInfo[iJetColl].nJet] = (ipData[indices[i+1]]).ip2d.significance();
-
-            break;
-          }
-        }
-      }
-
-
+	  {
+	    size_t idx = indices[i];
+	    const reco::btag::TrackIPData & data = ipData[idx];
+	    const TrackRef ptrackRef = selectedTracks[idx];
+	    const reco::Track * ptrackPtr = reco::btag::toTrack(ptrackRef);
+	    const reco::Track & track = (*ptrackPtr);
+	    
+	    kin.add(track);
+	    
+	    if ( kin.vectorSum().M() > 1.5 // charm cut
+		 && !charmThreshSet )
+	      {
+		if ( runFatJets_ && iJetColl == 0 ) {
+		  JetInfo[iJetColl].Jet_trackSip2dSigAboveCharm_0[JetInfo[iJetColl].nJet] = data.ip2d.significance();
+		  if ( (i+1)<indices.size() ) JetInfo[iJetColl].Jet_trackSip2dSigAboveCharm_1[JetInfo[iJetColl].nJet] = (ipData[indices[i+1]]).ip2d.significance();
+		}
+		charmThreshSet = true;
+	      }
+	    
+	    if ( kin.vectorSum().M() > 5.2 ) // bottom cut
+	      {
+		//For fatjets saving information in specific fatjet tree
+		if ( runFatJets_ && iJetColl == 0 ) {
+		  JetInfo[iJetColl].Jet_trackSip2dSigAboveBottom_0[JetInfo[iJetColl].nJet] = data.ip2d.significance();
+		  if ( (i+1)<indices.size() ) JetInfo[iJetColl].Jet_trackSip2dSigAboveBottom_1[JetInfo[iJetColl].nJet] = (ipData[indices[i+1]]).ip2d.significance();
+		}
+		
+		//For strandard tree
+		JetInfo[iJetColl].Jet_trackSip2dSig_AboveBottom_0[JetInfo[iJetColl].nJet] = data.ip2d.significance();
+		if ( (i+1)<indices.size() ) JetInfo[iJetColl].Jet_trackSip2dSig_AboveBottom_1[JetInfo[iJetColl].nJet] = (ipData[indices[i+1]]).ip2d.significance();
+		
+		break;
+	      }
+	  }
+	
         JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] = 0;
 
         if ( useTrackHistory_ && !isData_ ) {
