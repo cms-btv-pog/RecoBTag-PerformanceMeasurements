@@ -900,14 +900,11 @@ from PhysicsTools.PatAlgos.tools.pfTools import *
 adaptPVs(process, pvCollection=cms.InputTag(pvSource))
 
 #-------------------------------------
-## Add full JetFlavourInfo and TagInfos to PAT jets
+## Add TagInfos to PAT jets
 for m in ['patJets'+postfix, 'patJetsPFCHS'+postfix, 'patJetsSoftDropSubjetsPFCHS'+postfix, 'patJetsPrunedSubjetsPFCHS'+postfix]:
     if hasattr(process,m) and getattr( getattr(process,m), 'addBTagInfo' ):
         print "Switching 'addTagInfos' for " + m + " to 'True'"
         setattr( getattr(process,m), 'addTagInfos', cms.bool(True) )
-    if hasattr(process,m):
-        print "Switching 'addJetFlavourInfo' for " + m + " to 'True'"
-        setattr( getattr(process,m), 'addJetFlavourInfo', cms.bool(True) )
 
 #-------------------------------------
 ## Adapt fat jet b tagging
