@@ -3477,6 +3477,14 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       variables["nSV"] = JetInfo[iJetColl].Jet_nSV_fat[JetInfo[iJetColl].nJet];
 
       BDTG_SV = evaluator_SV_->evaluate(variables);
+
+//       std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+//       std::cout << "Jet pt, eta, phi: " << pjet->pt() << ", " << pjet->eta() << ", " << pjet->phi() << std::endl;
+//       for(std::map<std::string,float>::const_iterator it = variables.begin(); it != variables.end(); ++it)
+//       {
+//         std::cout << it->first << ": " << it->second << std::endl;
+//       }
+//       std::cout << "Discriminator: " << BDTG_SV << std::endl;
     }
 
     JetInfo[iJetColl].Jet_z_ratio[JetInfo[iJetColl].nJet] = z_ratio;
