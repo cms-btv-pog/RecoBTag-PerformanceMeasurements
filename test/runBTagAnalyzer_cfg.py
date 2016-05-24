@@ -1011,6 +1011,7 @@ if not process.btagana.produceJetTrackTree:
 if options.runFatJets:
     process.btaganaFatJets = process.btagana.clone(
         storeEventInfo      = cms.bool(not options.processStdAK4Jets),
+        fillQuarks = cms.bool(True),
         allowJetSkipping    = cms.bool(False),
         storeTagVariables   = cms.bool(False),
         storeCSVTagVariables = cms.bool(False),
