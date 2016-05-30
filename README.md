@@ -17,7 +17,7 @@ git cms-merge-topic cms-btv-pog:Neg_Pos_CTagger_80X
 git cms-merge-topic cms-btv-pog:FixHistoryBase_from-CMSSW_8_0_4
 git cms-merge-topic cms-btv-pog:FixBoostedTauConfig_from-CMSSW_8_0_4
 git clone -b V00-00-01 --depth 1 git://github.com/cms-btv-pog/cms-EventCounter.git MyAnalysis/EventCounter
-git clone -b 8_0_X_v1.00 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b 8_0_X_v1.01 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
