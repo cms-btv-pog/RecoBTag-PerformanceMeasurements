@@ -341,7 +341,8 @@ process.source = cms.Source("PoolSource",
 )
 if options.miniAOD:
     process.source.fileNames = [
-        '/store/mc/RunIIFall15MiniAODv1/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/30000/02D2C327-8FA6-E511-9BD1-0CC47A4D7668.root'
+        '/store/mc/RunIISpring16MiniAODv2/QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/0223FB02-DF1A-E611-985E-0CC47A1DF64A.root',
+        #'/store/mc/RunIIFall15MiniAODv1/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/30000/02D2C327-8FA6-E511-9BD1-0CC47A4D7668.root'
         #'/store/mc/RunIISpring15MiniAODv2/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/FC156ADC-CA6D-E511-BC16-0022640691CC.root'
         #'/store/mc/RunIISpring15MiniAODv2/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1//50000/E8B99B66-7D6F-E511-AD98-68B599B9B998.root'
     ]
