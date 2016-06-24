@@ -1016,7 +1016,7 @@ if options.runFatJets:
         useSelectedTracks   = cms.bool(True),
         maxDeltaR           = cms.double(options.fatJetRadius),
         R0                  = cms.double(options.fatJetRadius),
-        maxSVDeltaRToJet    = cms.double(options.fatJetRadius-(0.1+(options.fatJetRadius-0.8)*(0.1/0.7))), # linear interpolation from 0.7 at R=0.8 to 1.3 at R=1.5
+        maxSVDeltaRToJet    = cms.double(options.fatJetRadius-(0.1+(options.fatJetRadius-0.8)*(0.4/0.7))), # linear interpolation from 0.7 at R=0.8 to 1.0 at R=1.5
         distJetAxis         = cms.double(9999.),
         decayLength         = cms.double(9999.),
         deltaR              = cms.double(0.8),
