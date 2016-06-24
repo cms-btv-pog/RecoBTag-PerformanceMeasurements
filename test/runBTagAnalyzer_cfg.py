@@ -35,6 +35,16 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
+options.register('usePuppi', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Use Puppi"
+)
+options.register('usePuppiForBTagging', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Use Puppi candidates for b tagging"
+)
 options.register('mcGlobalTag', '80X_mcRun2_asymptotic_v4',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
@@ -148,10 +158,17 @@ options.setDefault('maxEvents', -1)
 
 options.parseArguments()
 
+## Use either PFchs or Puppi
+if options.usePFchs and options.usePuppi:
+    print "WARNING: Both usePFchs and usePuppi set to True. Giving priority to Puppi."
+    options.usePFchs = False
+
 print "Running on data: %s"%('True' if options.runOnData else 'False')
 print "Running using FastSim samples: %s"%('True' if options.fastSim else 'False')
 print "Running on MiniAOD: %s"%('True' if options.miniAOD else 'False')
 print "Using PFchs: %s"%('True' if options.usePFchs else 'False')
+print "Using Puppi: %s"%('True' if options.usePuppi else 'False')
+print "Using Puppi for b tagging: %s"%('True' if (options.usePuppi and options.usePuppiForBTagging) else 'False')
 
 ## Subjets only stored when also running over fat jets
 if options.runSubJets and not options.runFatJets:
@@ -463,6 +480,13 @@ if not options.miniAOD:
     getattr(process,"pfNoPileUpJME"+postfix).enable = options.usePFchs
     getattr(process,"pfNoMuonJMEPFBRECO"+postfix).enable = False
     getattr(process,"pfNoElectronJMEPFBRECO"+postfix).enable = False
+
+    if options.usePuppi:
+        process.load('CommonTools.PileupAlgos.Puppi_cff')
+        from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
+        process.ak4PFJets = ak4PFJets.clone(src = 'puppi', doAreaFastjet = True)
+        jetSource = 'ak4PFJets'
+        if options.usePuppiForBTagging: pfCandidates = 'puppi'
 else:
     ## GenJets
     from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
@@ -476,6 +500,14 @@ else:
     from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
     if options.usePFchs:
         process.ak4PFJets = ak4PFJets.clone(src = 'pfCHS', doAreaFastjet = True)
+    elif options.usePuppi:
+        process.load('CommonTools.PileupAlgos.Puppi_cff')
+        process.puppi.candName           = cms.InputTag(pfCandidates)
+        process.puppi.vertexName         = cms.InputTag(pvSource)
+        process.puppi.useExistingWeights = cms.bool(True)
+        process.puppi.clonePackedCands   = cms.bool(True)
+        process.ak4PFJets = ak4PFJets.clone(src = 'puppi', doAreaFastjet = True)
+        if options.usePuppiForBTagging: pfCandidates = 'puppi'
     else:
         process.ak4PFJets = ak4PFJets.clone(src = 'packedPFCandidates', doAreaFastjet = True)
 
@@ -516,8 +548,8 @@ from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
 process.PFJetsCHS = ak4PFJets.clone(
     jetAlgorithm = cms.string(options.jetAlgo),
     rParam = cms.double(options.fatJetRadius),
-    src = (getattr(process,"ak4PFJets").src if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).src),
-    srcPVs = (getattr(process,"ak4PFJets").srcPVs if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).srcPVs),
+    src = getattr(process,jetSource).src,
+    srcPVs = getattr(process,jetSource).srcPVs,
     doAreaFastjet = cms.bool(True),
     jetPtMin = cms.double(options.fatJetRawPtMin)
 )
@@ -536,8 +568,8 @@ from RecoJets.JetProducers.ak4PFJetsPruned_cfi import ak4PFJetsPruned
 process.PFJetsCHSPruned = ak4PFJetsPruned.clone(
     jetAlgorithm = cms.string(options.jetAlgo),
     rParam = cms.double(options.fatJetRadius),
-    src = (getattr(process,"ak4PFJets").src if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).src),
-    srcPVs = (getattr(process,"ak4PFJets").srcPVs if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).srcPVs),
+    src = getattr(process,jetSource).src,
+    srcPVs = getattr(process,jetSource).srcPVs,
     doAreaFastjet = cms.bool(True),
     writeCompound = cms.bool(True),
     jetCollInstanceName=cms.string("SubJets"),
@@ -560,8 +592,8 @@ process.PFJetsCHSSoftDrop = ak4PFJetsSoftDrop.clone(
     jetAlgorithm = cms.string(options.jetAlgo),
     rParam = cms.double(options.fatJetRadius),
     R0 = cms.double(options.fatJetRadius),
-    src = (getattr(process,"ak4PFJets").src if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).src),
-    srcPVs = (getattr(process,"ak4PFJets").srcPVs if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).srcPVs),
+    src = getattr(process,jetSource).src,
+    srcPVs = getattr(process,jetSource).srcPVs,
     doAreaFastjet = cms.bool(True),
     writeCompound = cms.bool(True),
     jetCollInstanceName=cms.string("SubJets"),
