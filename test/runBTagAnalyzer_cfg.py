@@ -85,11 +85,6 @@ options.register('useTTbarFilter', False,
     VarParsing.varType.bool,
     "Use TTbar filter"
 )
-options.register('useTopProjections', False,
-    VarParsing.multiplicity.singleton,
-    VarParsing.varType.bool,
-    "Use top projections"
-)
 options.register('miniAOD', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -303,7 +298,7 @@ postfix = "PFlow"
 ## Various collection names
 genParticles = 'genParticles'
 jetSource = 'pfJetsPFBRECO'+postfix
-genJetCollection = 'ak4GenJetsNoNu'+postfix
+genJetCollection = 'ak4GenJetsNoNu'
 pfCandidates = 'particleFlow'
 pvSource = 'offlinePrimaryVertices'
 svSource = 'inclusiveCandidateSecondaryVertices'
@@ -311,7 +306,7 @@ muSource = 'muons'
 elSource = 'gedGsfElectrons'
 patMuons = 'selectedPatMuons'
 trackSource = 'generalTracks'
-## If running on miniAOD
+## If running on MiniAOD
 if options.miniAOD:
     genParticles = 'prunedGenParticles'
     jetSource = 'ak4PFJets'
@@ -461,63 +456,28 @@ if not options.miniAOD:
 
     from PhysicsTools.PatAlgos.tools.pfTools import *
     usePF2PAT(process,runPF2PAT=True, jetAlgo=jetAlgo, runOnMC=not options.runOnData, postfix=postfix,
-	      jetCorrections=jetCorrectionsAK4, pvCollection=cms.InputTag(pvSource))
+              jetCorrections=jetCorrectionsAK4, pvCollection=cms.InputTag(pvSource))
 
     ## Top projections in PF2PAT
     getattr(process,"pfPileUpJME"+postfix).checkClosestZVertex = False
     getattr(process,"pfNoPileUpJME"+postfix).enable = options.usePFchs
-    if options.useTTbarFilter:
-	getattr(process,"pfNoMuonJMEPFBRECO"+postfix).enable = False
-	getattr(process,"pfNoElectronJMEPFBRECO"+postfix).enable = False
-    else:
-	getattr(process,"pfNoMuonJMEPFBRECO"+postfix).enable = options.useTopProjections
-	getattr(process,"pfNoElectronJMEPFBRECO"+postfix).enable = options.useTopProjections
+    getattr(process,"pfNoMuonJMEPFBRECO"+postfix).enable = False
+    getattr(process,"pfNoElectronJMEPFBRECO"+postfix).enable = False
 else:
-    ## Recreate tracks and PVs for b tagging
-    from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
+    ## GenJets
     from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
-    ## Select isolated collections
-    process.selectedMuons = cms.EDFilter("CandPtrSelector", src = cms.InputTag("slimmedMuons"), cut = cms.string('''abs(eta)<2.5 && pt>10. &&
-       (pfIsolationR04().sumChargedHadronPt+
-	max(0.,pfIsolationR04().sumNeutralHadronEt+
-	pfIsolationR04().sumPhotonEt-
-	0.50*pfIsolationR04().sumPUPt))/pt < 0.20 && 
-	(isPFMuon && (isGlobalMuon || isTrackerMuon) )'''))
-    process.selectedElectrons = cms.EDFilter("CandPtrSelector", src = cms.InputTag("slimmedElectrons"), cut = cms.string('''abs(eta)<2.5 && pt>20. &&
-	gsfTrack.isAvailable() &&
-	gsfTrack.hitPattern().numberOfLostHits(\'MISSING_INNER_HITS\') < 2 &&
-	(pfIsolationVariables().sumChargedHadronPt+
-	max(0.,pfIsolationVariables().sumNeutralHadronEt+
-	pfIsolationVariables().sumPhotonEt-
-	0.5*pfIsolationVariables().sumPUPt))/pt < 0.15'''))
-
-    ## Do projections
-    process.pfCHS = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
-    process.pfNoMuonCHS =  cms.EDProducer("CandPtrProjector", src = cms.InputTag("pfCHS"), veto = cms.InputTag("selectedMuons"))
-    process.pfNoElectronsCHS = cms.EDProducer("CandPtrProjector", src = cms.InputTag("pfNoMuonCHS"), veto = cms.InputTag("selectedElectrons"))
-
-    process.pfNoMuon =  cms.EDProducer("CandPtrProjector", src = cms.InputTag("packedPFCandidates"), veto = cms.InputTag("selectedMuons"))
-    process.pfNoElectrons = cms.EDProducer("CandPtrProjector", src = cms.InputTag("pfNoMuon"), veto = cms.InputTag("selectedElectrons"))
-
     process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedGenParticles"), cut = cms.string("abs(pdgId) != 12 && abs(pdgId) != 14 && abs(pdgId) != 16"))
     process.ak4GenJetsNoNu = ak4GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
 
-    if options.useTTbarFilter:
-        if options.usePFchs:
-            process.ak4PFJets = ak4PFJets.clone(src = 'pfCHS', doAreaFastjet = True)
-        else:
-            process.ak4PFJets = ak4PFJets.clone(src = 'packedPFCandidates', doAreaFastjet = True)
+    ## PFchs selection
+    process.pfCHS = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
+
+    ## Reco jets
+    from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
+    if options.usePFchs:
+        process.ak4PFJets = ak4PFJets.clone(src = 'pfCHS', doAreaFastjet = True)
     else:
-        if options.usePFchs:
-            if options.useTopProjections:
-                process.ak4PFJets = ak4PFJets.clone(src = 'pfNoElectronsCHS', doAreaFastjet = True)
-            else:
-                process.ak4PFJets = ak4PFJets.clone(src = 'pfCHS', doAreaFastjet = True)
-        else:
-            if options.useTopProjections:
-                process.ak4PFJets = ak4PFJets.clone(src = 'pfNoElectrons', doAreaFastjet = True)
-            else:
-                process.ak4PFJets = ak4PFJets.clone(src = 'packedPFCandidates', doAreaFastjet = True)
+        process.ak4PFJets = ak4PFJets.clone(src = 'packedPFCandidates', doAreaFastjet = True)
 
 ## Load standard PAT objects (here we only need PAT muons but the framework will figure out what it needs to run using the unscheduled mode)
 process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
