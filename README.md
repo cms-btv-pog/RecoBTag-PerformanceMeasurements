@@ -15,7 +15,6 @@ git fetch --tags btv-cmssw
 
 git cms-merge-topic cms-btv-pog:FixHistoryBase_from-CMSSW_8_1_0_pre7
 
-git clone -b V00-00-01 --depth 1 git://github.com/cms-btv-pog/cms-EventCounter.git MyAnalysis/EventCounter
 git clone -b 8_1_X --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
