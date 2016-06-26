@@ -35,6 +35,16 @@ options.register('usePFchs', True,
     VarParsing.varType.bool,
     "Use PFchs"
 )
+options.register('usePuppi', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Use Puppi"
+)
+options.register('usePuppiForBTagging', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Use Puppi candidates for b tagging"
+)
 options.register('mcGlobalTag', '80X_mcRun2_asymptotic_v4',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
@@ -84,11 +94,6 @@ options.register('useTTbarFilter', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Use TTbar filter"
-)
-options.register('useTopProjections', False,
-    VarParsing.multiplicity.singleton,
-    VarParsing.varType.bool,
-    "Use top projections"
 )
 options.register('miniAOD', True,
     VarParsing.multiplicity.singleton,
@@ -153,10 +158,17 @@ options.setDefault('maxEvents', -1)
 
 options.parseArguments()
 
+## Use either PFchs or Puppi
+if options.usePFchs and options.usePuppi:
+    print "WARNING: Both usePFchs and usePuppi set to True. Giving priority to Puppi."
+    options.usePFchs = False
+
 print "Running on data: %s"%('True' if options.runOnData else 'False')
 print "Running using FastSim samples: %s"%('True' if options.fastSim else 'False')
 print "Running on MiniAOD: %s"%('True' if options.miniAOD else 'False')
 print "Using PFchs: %s"%('True' if options.usePFchs else 'False')
+print "Using Puppi: %s"%('True' if options.usePuppi else 'False')
+print "Using Puppi for b tagging: %s"%('True' if (options.usePuppi and options.usePuppiForBTagging) else 'False')
 
 ## Subjets only stored when also running over fat jets
 if options.runSubJets and not options.runFatJets:
@@ -303,7 +315,7 @@ postfix = "PFlow"
 ## Various collection names
 genParticles = 'genParticles'
 jetSource = 'pfJetsPFBRECO'+postfix
-genJetCollection = 'ak4GenJetsNoNu'+postfix
+genJetCollection = 'ak4GenJetsNoNu'
 pfCandidates = 'particleFlow'
 pvSource = 'offlinePrimaryVertices'
 svSource = 'inclusiveCandidateSecondaryVertices'
@@ -311,7 +323,7 @@ muSource = 'muons'
 elSource = 'gedGsfElectrons'
 patMuons = 'selectedPatMuons'
 trackSource = 'generalTracks'
-## If running on miniAOD
+## If running on MiniAOD
 if options.miniAOD:
     genParticles = 'prunedGenParticles'
     jetSource = 'ak4PFJets'
@@ -335,27 +347,33 @@ process.MessageLogger.cerr.default.limit = 10
 
 ## Input files
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(
-        '/store/mc/RunIIFall15DR76/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/30000/00348C6E-599F-E511-B51D-02163E00F4BF.root'
-    )
+    fileNames = cms.untracked.vstring()
 )
+
 if options.miniAOD:
     process.source.fileNames = [
-        '/store/mc/RunIISpring16MiniAODv2/QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/0223FB02-DF1A-E611-985E-0CC47A1DF64A.root',
-        #'/store/mc/RunIIFall15MiniAODv1/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/30000/02D2C327-8FA6-E511-9BD1-0CC47A4D7668.root'
-        #'/store/mc/RunIISpring15MiniAODv2/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/FC156ADC-CA6D-E511-BC16-0022640691CC.root'
-        #'/store/mc/RunIISpring15MiniAODv2/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1//50000/E8B99B66-7D6F-E511-AD98-68B599B9B998.root'
+        '/store/relval/CMSSW_8_0_0/RelValTTbar_13/MINIAODSIM/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/A65CD249-BFDA-E511-813A-0025905A6066.root'
     ]
-if options.runOnData:
+    if options.runOnData:
+        process.source.fileNames = [
+            '/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/275/125/00000/86B9123D-7F36-E611-9D13-02163E0139C7.root'
+        ]
+    if options.fastSim:
+        process.source.fileNames = [
+            '/store/relval/CMSSW_8_0_0/RelValTTbar_13/MINIAODSIM/PU25ns_80X_mcRun2_asymptotic_v4_FastSim-v2/10000/8E75D08A-3FDE-E511-8374-0CC47A4C8F26.root'
+        ]
+else:
     process.source.fileNames = [
-        '/store/data/Run2015D/DoubleMuon/MINIAOD/16Dec2015-v1/10000/DA6A1520-F1A7-E511-83BE-3417EBE64BE8.root'
-        #'/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/168/00000/60FF8405-EA26-E511-A892-02163E01387D.root'
-        #'/store/data/Run2015D/MuonEG/MINIAOD/PromptReco-v4/000/258/159/00000/64914E6C-F26B-E511-B0C8-02163E0142D1.root'        
+        '/store/relval/CMSSW_8_0_0/RelValProdTTbar_13/AODSIM/80X_mcRun2_asymptotic_v4-v1/10000/DE81ABBF-1DDA-E511-8AF8-0026189438B5.root'
     ]
-if options.fastSim:
-    process.source.fileNames = [
-        '/store/relval/CMSSW_7_4_0_pre9_ROOT6/RelValTTbar_13/GEN-SIM-DIGI-RECO/MCRUN2_74_V7_FastSim-v1/00000/026EF5C1-89D1-E411-9EBD-002590596490.root',
-    ]
+    if options.runOnData:
+        process.source.fileNames = [
+            '/store/data/Run2016B/SingleMuon/AOD/PromptReco-v2/000/275/125/00000/DA2EC189-7E36-E611-8C63-02163E01343B.root'
+        ]
+    if options.fastSim:
+        process.source.fileNames = [
+            '/store/relval/CMSSW_8_0_0/RelValTTbar_13/GEN-SIM-DIGI-RECO/PU25ns_80X_mcRun2_asymptotic_v4_FastSim-v2/10000/0400D094-63DD-E511-8B51-0CC47A4C8ED8.root'
+        ]
 
 ## Define the output file name
 if options.runOnData :
@@ -455,63 +473,43 @@ if not options.miniAOD:
 
     from PhysicsTools.PatAlgos.tools.pfTools import *
     usePF2PAT(process,runPF2PAT=True, jetAlgo=jetAlgo, runOnMC=not options.runOnData, postfix=postfix,
-	      jetCorrections=jetCorrectionsAK4, pvCollection=cms.InputTag(pvSource))
+              jetCorrections=jetCorrectionsAK4, pvCollection=cms.InputTag(pvSource))
 
     ## Top projections in PF2PAT
     getattr(process,"pfPileUpJME"+postfix).checkClosestZVertex = False
     getattr(process,"pfNoPileUpJME"+postfix).enable = options.usePFchs
-    if options.useTTbarFilter:
-	getattr(process,"pfNoMuonJMEPFBRECO"+postfix).enable = False
-	getattr(process,"pfNoElectronJMEPFBRECO"+postfix).enable = False
-    else:
-	getattr(process,"pfNoMuonJMEPFBRECO"+postfix).enable = options.useTopProjections
-	getattr(process,"pfNoElectronJMEPFBRECO"+postfix).enable = options.useTopProjections
+    getattr(process,"pfNoMuonJMEPFBRECO"+postfix).enable = False
+    getattr(process,"pfNoElectronJMEPFBRECO"+postfix).enable = False
+
+    if options.usePuppi:
+        process.load('CommonTools.PileupAlgos.Puppi_cff')
+        from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
+        process.ak4PFJets = ak4PFJets.clone(src = 'puppi', doAreaFastjet = True)
+        jetSource = 'ak4PFJets'
+        if options.usePuppiForBTagging: pfCandidates = 'puppi'
 else:
-    ## Recreate tracks and PVs for b tagging
-    from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
+    ## GenJets
     from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
-    ## Select isolated collections
-    process.selectedMuons = cms.EDFilter("CandPtrSelector", src = cms.InputTag("slimmedMuons"), cut = cms.string('''abs(eta)<2.5 && pt>10. &&
-       (pfIsolationR04().sumChargedHadronPt+
-	max(0.,pfIsolationR04().sumNeutralHadronEt+
-	pfIsolationR04().sumPhotonEt-
-	0.50*pfIsolationR04().sumPUPt))/pt < 0.20 && 
-	(isPFMuon && (isGlobalMuon || isTrackerMuon) )'''))
-    process.selectedElectrons = cms.EDFilter("CandPtrSelector", src = cms.InputTag("slimmedElectrons"), cut = cms.string('''abs(eta)<2.5 && pt>20. &&
-	gsfTrack.isAvailable() &&
-	gsfTrack.hitPattern().numberOfLostHits(\'MISSING_INNER_HITS\') < 2 &&
-	(pfIsolationVariables().sumChargedHadronPt+
-	max(0.,pfIsolationVariables().sumNeutralHadronEt+
-	pfIsolationVariables().sumPhotonEt-
-	0.5*pfIsolationVariables().sumPUPt))/pt < 0.15'''))
-
-    ## Do projections
-    process.pfCHS = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
-    process.pfNoMuonCHS =  cms.EDProducer("CandPtrProjector", src = cms.InputTag("pfCHS"), veto = cms.InputTag("selectedMuons"))
-    process.pfNoElectronsCHS = cms.EDProducer("CandPtrProjector", src = cms.InputTag("pfNoMuonCHS"), veto = cms.InputTag("selectedElectrons"))
-
-    process.pfNoMuon =  cms.EDProducer("CandPtrProjector", src = cms.InputTag("packedPFCandidates"), veto = cms.InputTag("selectedMuons"))
-    process.pfNoElectrons = cms.EDProducer("CandPtrProjector", src = cms.InputTag("pfNoMuon"), veto = cms.InputTag("selectedElectrons"))
-
     process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedGenParticles"), cut = cms.string("abs(pdgId) != 12 && abs(pdgId) != 14 && abs(pdgId) != 16"))
     process.ak4GenJetsNoNu = ak4GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
 
-    if options.useTTbarFilter:
-        if options.usePFchs:
-            process.ak4PFJets = ak4PFJets.clone(src = 'pfCHS', doAreaFastjet = True)
-        else:
-            process.ak4PFJets = ak4PFJets.clone(src = 'packedPFCandidates', doAreaFastjet = True)
+    ## PFchs selection
+    process.pfCHS = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
+
+    ## Reco jets
+    from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
+    if options.usePFchs:
+        process.ak4PFJets = ak4PFJets.clone(src = 'pfCHS', doAreaFastjet = True)
+    elif options.usePuppi:
+        process.load('CommonTools.PileupAlgos.Puppi_cff')
+        process.puppi.candName           = cms.InputTag(pfCandidates)
+        process.puppi.vertexName         = cms.InputTag(pvSource)
+        process.puppi.useExistingWeights = cms.bool(True)
+        process.puppi.clonePackedCands   = cms.bool(True)
+        process.ak4PFJets = ak4PFJets.clone(src = 'puppi', doAreaFastjet = True)
+        if options.usePuppiForBTagging: pfCandidates = 'puppi'
     else:
-        if options.usePFchs:
-            if options.useTopProjections:
-                process.ak4PFJets = ak4PFJets.clone(src = 'pfNoElectronsCHS', doAreaFastjet = True)
-            else:
-                process.ak4PFJets = ak4PFJets.clone(src = 'pfCHS', doAreaFastjet = True)
-        else:
-            if options.useTopProjections:
-                process.ak4PFJets = ak4PFJets.clone(src = 'pfNoElectrons', doAreaFastjet = True)
-            else:
-                process.ak4PFJets = ak4PFJets.clone(src = 'packedPFCandidates', doAreaFastjet = True)
+        process.ak4PFJets = ak4PFJets.clone(src = 'packedPFCandidates', doAreaFastjet = True)
 
 ## Load standard PAT objects (here we only need PAT muons but the framework will figure out what it needs to run using the unscheduled mode)
 process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
@@ -550,8 +548,8 @@ from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
 process.PFJetsCHS = ak4PFJets.clone(
     jetAlgorithm = cms.string(options.jetAlgo),
     rParam = cms.double(options.fatJetRadius),
-    src = (getattr(process,"ak4PFJets").src if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).src),
-    srcPVs = (getattr(process,"ak4PFJets").srcPVs if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).srcPVs),
+    src = getattr(process,jetSource).src,
+    srcPVs = getattr(process,jetSource).srcPVs,
     doAreaFastjet = cms.bool(True),
     jetPtMin = cms.double(options.fatJetRawPtMin)
 )
@@ -570,8 +568,8 @@ from RecoJets.JetProducers.ak4PFJetsPruned_cfi import ak4PFJetsPruned
 process.PFJetsCHSPruned = ak4PFJetsPruned.clone(
     jetAlgorithm = cms.string(options.jetAlgo),
     rParam = cms.double(options.fatJetRadius),
-    src = (getattr(process,"ak4PFJets").src if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).src),
-    srcPVs = (getattr(process,"ak4PFJets").srcPVs if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).srcPVs),
+    src = getattr(process,jetSource).src,
+    srcPVs = getattr(process,jetSource).srcPVs,
     doAreaFastjet = cms.bool(True),
     writeCompound = cms.bool(True),
     jetCollInstanceName=cms.string("SubJets"),
@@ -594,8 +592,8 @@ process.PFJetsCHSSoftDrop = ak4PFJetsSoftDrop.clone(
     jetAlgorithm = cms.string(options.jetAlgo),
     rParam = cms.double(options.fatJetRadius),
     R0 = cms.double(options.fatJetRadius),
-    src = (getattr(process,"ak4PFJets").src if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).src),
-    srcPVs = (getattr(process,"ak4PFJets").srcPVs if options.miniAOD else getattr(process,"pfJetsPFBRECO"+postfix).srcPVs),
+    src = getattr(process,jetSource).src,
+    srcPVs = getattr(process,jetSource).srcPVs,
     doAreaFastjet = cms.bool(True),
     writeCompound = cms.bool(True),
     jetCollInstanceName=cms.string("SubJets"),
@@ -616,7 +614,7 @@ if options.runFatJets:
         muSource = cms.InputTag(muSource),
         elSource = cms.InputTag(elSource),
         btagInfos = bTagInfos,
-        btagDiscriminators = (bTagDiscriminators + ([] if options.useLegacyTaggers else ['pfBoostedDoubleSecondaryVertexAK8BJetTags'])),
+        btagDiscriminators = (bTagDiscriminators + ([] if options.useLegacyTaggers else ['pfBoostedDoubleSecondaryVertex' + ('CA15' if algoLabel=='CA' else 'AK8') + 'BJetTags'])),
         jetCorrections = jetCorrectionsAK8,
         genJetCollection = cms.InputTag('genJetsNoNu'),
         genParticles = cms.InputTag(genParticles),
@@ -1018,7 +1016,9 @@ if options.runFatJets:
         useSelectedTracks   = cms.bool(True),
         maxDeltaR           = cms.double(options.fatJetRadius),
         R0                  = cms.double(options.fatJetRadius),
-        maxSVDeltaRToJet    = cms.double(options.fatJetRadius-(0.1+(options.fatJetRadius-0.8)*(0.1/0.7))), # linear interpolation from 0.7 at R=0.8 to 1.3 at R=1.5
+        maxSVDeltaRToJet    = cms.double(options.fatJetRadius-(0.1+(options.fatJetRadius-0.8)*(0.4/0.7))), # linear interpolation from 0.7 at R=0.8 to 1.0 at R=1.5
+        weightFile          = cms.FileInPath('RecoBTag/PerformanceMeasurements/data/BoostedDoubleSV_' + ('CA15' if algoLabel=='CA' else 'AK8') + '_BDT_v3.weights.xml.gz'),
+        doubleSVBJetTags    = cms.string('pfBoostedDoubleSecondaryVertex' + ('CA15' if algoLabel=='CA' else 'AK8') + 'BJetTags'),
         distJetAxis         = cms.double(9999.),
         decayLength         = cms.double(9999.),
         deltaR              = cms.double(0.8),

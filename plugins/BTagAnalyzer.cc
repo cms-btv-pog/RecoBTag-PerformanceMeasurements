@@ -451,6 +451,8 @@ private:
 
   const double maxSVDeltaRToJet_;
 
+  const edm::FileInPath weightFile_;
+
   // MVA evaluators
   std::unique_ptr<TMVAEvaluator> evaluator_SV_;
   
@@ -498,6 +500,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   beta_(iConfig.getParameter<double>("beta")),
   R0_(iConfig.getParameter<double>("R0")),
   maxSVDeltaRToJet_(iConfig.getParameter<double>("maxSVDeltaRToJet")),
+  weightFile_(iConfig.getParameter<edm::FileInPath>("weightFile")),
   trackPairV0Filter(iConfig.getParameter<edm::ParameterSet>("trackPairV0Filter")),
   distJetAxis_(iConfig.getParameter<double>("distJetAxis")),
   decayLength_(iConfig.getParameter<double>("decayLength")),
@@ -582,7 +585,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
     std::vector<std::string> spectators({"massPruned", "flavour", "nbHadrons", "ptPruned", "etaPruned"});
     
     bool useGBRForest = true;
-    evaluator_SV_->initialize("Color:Silent:Error", "BDTG", edm::FileInPath("RecoBTag/PerformanceMeasurements/data/BoostedDoubleSV_AK8_BDT_v2.weights.xml.gz").fullPath(), variables, spectators, useGBRForest);
+    evaluator_SV_->initialize("Color:Silent:Error", "BDTG", weightFile_.fullPath(), variables, spectators, useGBRForest);
   }
 
   if( runSubJets_ && ( SubJetCollectionTags_.size()>0 || SubJetLabels_.size()>0 ) )
