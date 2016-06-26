@@ -1074,7 +1074,7 @@ if options.doBoostedCommissioning:
 
 #---------------------------------------
 ## Event counter
-from MyAnalysis.EventCounter.eventcounter_cfi import eventCounter
+from RecoBTag.PerformanceMeasurements.eventcounter_cfi import eventCounter
 process.allEvents = eventCounter.clone()
 process.selectedEvents = eventCounter.clone()
 #---------------------------------------
