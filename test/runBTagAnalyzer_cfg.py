@@ -520,9 +520,9 @@ if options.usePrivateJEC:
     process.es_prefer_jec = cms.ESPrefer("PoolDBESSource",'jec')
 
 ### to activate the new JP calibration: using the data base
-trkProbaCalibTag = "JPcalib_MC800_v1" ###DM"JPcalib_MC76X_25ns_v1"
+trkProbaCalibTag = "JPcalib_MC76X_25ns_v1" ###DM"JPcalib_MC800_v1" 
 if options.runOnData:
-  trkProbaCalibTag = "JPcalib_Data80X_2016B_v1" ###DM"JPcalib_Data76X_2015D_v1"
+  trkProbaCalibTag = "JPcalib_Data76X_2015D_v1" ###DM"JPcalib_Data80X_2016B_v1" 
 # process.GlobalTag.snapshotTime = cms.string("9999-12-31 23:59:59.000")
 process.GlobalTag.toGet = cms.VPSet(
     cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
