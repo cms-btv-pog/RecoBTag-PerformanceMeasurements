@@ -464,7 +464,7 @@ if options.usePrivateJEC:
     else: dbfile=options.jecDBFile+'_MC'
     print "\nUsing private SQLite file", dbfile, "\n"
     process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
-		    connect = cms.string( "sqlite_file:"+dbfile+'.db'),
+		    connect = cms.string( "sqlite_fip:RecoBTag/PerformanceMeasurements/data/"+dbfile+'.db'),
 		    toGet =  cms.VPSet(
 			    cms.PSet(
 				    record = cms.string("JetCorrectionsRecord"),
