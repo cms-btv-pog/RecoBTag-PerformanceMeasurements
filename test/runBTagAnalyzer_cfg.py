@@ -153,6 +153,22 @@ options.register('doCTag', False,
     VarParsing.varType.bool,
     "Make NTuples with branches for CTag"
 )
+options.register('usePrivateJEC',
+    False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'Use JECs from private SQLite files')
+options.register('jecDBFile',
+    'Spring16_25nsV3', 
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    'SQLite filename for JECs')
+options.register('isReHLT',
+    False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    '80X reHLT samples')
+
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', -1)
 
@@ -203,6 +219,10 @@ if not options.usePFchs:
 if options.runOnData:
     jetCorrectionsAK4[1].append('L2L3Residual')
     jetCorrectionsAK8[1].append('L2L3Residual')
+
+trigresults='TriggerResults::HLT'
+if options.runOnData: options.isReHLT=False
+if options.isReHLT: trigresults = trigresults+'2'
 
 ## b-tag infos
 bTagInfosLegacy = [
@@ -352,7 +372,8 @@ process.source = cms.Source("PoolSource",
 
 if options.miniAOD:
     process.source.fileNames = [
-        '/store/relval/CMSSW_8_0_0/RelValTTbar_13/MINIAODSIM/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/A65CD249-BFDA-E511-813A-0025905A6066.root'
+        #'/store/relval/CMSSW_8_0_0/RelValTTbar_13/MINIAODSIM/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/A65CD249-BFDA-E511-813A-0025905A6066.root'
+        '/store/mc/RunIISpring16MiniAODv2/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/90000/02A0E7CE-1B35-E611-8612-0CC47A7FC4C8.root'
     ]
     if options.runOnData:
         process.source.fileNames = [
@@ -433,10 +454,57 @@ process.GlobalTag.globaltag = globalTag
 #    BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
 #)
 #process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
+
+if options.usePrivateJEC:
+    
+    from CondCore.DBCommon.CondDBSetup_cfi import *
+    import os
+    dbfile=''
+    if options.runOnData: dbfile=options.jecDBFile+'_DATA'
+    else: dbfile=options.jecDBFile+'_MC'
+    print "\nUsing private SQLite file", dbfile, "\n"
+    process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
+		    connect = cms.string( "sqlite_file:"+dbfile+'.db'),
+		    toGet =  cms.VPSet(
+			    cms.PSet(
+				    record = cms.string("JetCorrectionsRecord"),
+				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK4PF"),
+				    label= cms.untracked.string("AK4PF")
+				    ),
+			    cms.PSet(
+				    record = cms.string("JetCorrectionsRecord"),
+				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK4PFchs"),
+				    label= cms.untracked.string("AK4PFchs")
+				    ),
+			    cms.PSet(
+				    record = cms.string("JetCorrectionsRecord"),
+				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK4PFPuppi"),
+				    label= cms.untracked.string("AK4PFPuppi")
+				    ),
+			    cms.PSet(
+				    record = cms.string("JetCorrectionsRecord"),
+				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK8PF"),
+				    label= cms.untracked.string("AK8PF")
+				    ),
+			    cms.PSet(
+				    record = cms.string("JetCorrectionsRecord"),
+				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK8PFchs"),
+				    label= cms.untracked.string("AK8PFchs")
+				    ),
+			    cms.PSet(
+				    record = cms.string("JetCorrectionsRecord"),
+				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK8PFPuppi"),
+				    label= cms.untracked.string("AK8PFPuppi")
+				    ),
+			    )
+		    )
+
+    process.es_prefer_jec = cms.ESPrefer("PoolDBESSource",'jec')
+
 ### to activate the new JP calibration: using the data base
-trkProbaCalibTag = "JPcalib_MC76X_25ns_v1"
+trkProbaCalibTag = "JPcalib_MC76X_25ns_v1" ###DM"JPcalib_MC800_v1" 
 if options.runOnData:
-  trkProbaCalibTag = "JPcalib_Data76X_2015D_v1"
+  trkProbaCalibTag = "JPcalib_Data76X_2015D_v1" ###DM"JPcalib_Data80X_2016B_v1" 
 # process.GlobalTag.snapshotTime = cms.string("9999-12-31 23:59:59.000")
 process.GlobalTag.toGet = cms.VPSet(
     cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
@@ -991,7 +1059,8 @@ process.btagana.Jets                  = cms.InputTag('selectedPatJets'+postfix)
 process.btagana.muonCollectionName    = cms.InputTag(muSource)
 process.btagana.patMuonCollectionName = cms.InputTag(patMuons)
 process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
-process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
+#process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
+process.btagana.triggerTable          = cms.InputTag(trigresults) # Data and MC
 process.btagana.genParticles          = cms.InputTag(genParticles)
 process.btagana.candidates            = cms.InputTag(pfCandidates)
 
