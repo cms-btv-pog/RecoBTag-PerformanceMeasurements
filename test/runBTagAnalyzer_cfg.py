@@ -45,12 +45,12 @@ options.register('usePuppiForBTagging', False,
     VarParsing.varType.bool,
     "Use Puppi candidates for b tagging"
 )
-options.register('mcGlobalTag', '80X_mcRun2_asymptotic_v4',
+options.register('mcGlobalTag', '80X_mcRun2_asymptotic_2016_miniAODv2',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', '80X_dataRun2_v4', 
+options.register('dataGlobalTag', '80X_dataRun2_Prompt_v9', 
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
@@ -502,6 +502,7 @@ if options.usePrivateJEC:
     process.es_prefer_jec = cms.ESPrefer("PoolDBESSource",'jec')
 
 ### to activate the new JP calibration: using the data base
+#Do not use the 80X calibrations if the ntuples are meant to measure SFs or to commission cMVAv2
 trkProbaCalibTag = "JPcalib_MC76X_25ns_v1" ###DM"JPcalib_MC800_v1" 
 if options.runOnData:
   trkProbaCalibTag = "JPcalib_Data76X_2015D_v1" ###DM"JPcalib_Data80X_2016B_v1" 
@@ -509,7 +510,7 @@ if options.runOnData:
 process.GlobalTag.toGet = cms.VPSet(
     cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
       tag = cms.string(trkProbaCalibTag),
-      connect = cms.string("frontier://FrontierPrep/CMS_CONDITIONS")
+      connect = cms.string("frontier://FrontierPrep/CMS_CONDITIONS") ###connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS")
     )
 )
 
