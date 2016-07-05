@@ -15,6 +15,7 @@ git fetch --tags btv-cmssw
 
 git cms-merge-topic -u cms-btv-pog:FixHistoryBase-v1_from-CMSSW_8_0_12
 git cms-merge-topic -u cms-btv-pog:BoostedDoubleSVTaggerV3-WithWeightFiles-v1_from-CMSSW_8_0_8_patch1
+git cms-merge-topic -u cms-btv-pog:FixBoostedTauConfig_from-CMSSW_8_0_12
 
 git clone -b 8_0_X_v1.04 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
