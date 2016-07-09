@@ -153,6 +153,17 @@ options.register('doCTag', False,
     VarParsing.varType.bool,
     "Make NTuples with branches for CTag"
 )
+# Change hits requirements
+options.register('changeMinNumberOfHits', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Change minimum number of tracker hits"
+)
+options.register('minNumberOfHits', 8,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.int,
+    "Minimum number of tracker hits"
+)
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', -1)
 
@@ -894,6 +905,13 @@ if options.useTTbarFilter:
 #-------------------------------------
 
 #-------------------------------------
+## Change the minimum number of tracker hits used in the track selection
+if options.changeMinNumberOfHits:
+    for m in process.producerNames().split(' '):
+        if m.startswith('pfImpactParameterTagInfos'):
+            print "Changing 'minimumNumberOfHits' for " + m + " to " + str(options.minNumberOfHits)
+            getattr(process, m).minimumNumberOfHits = cms.int32(options.minNumberOfHits)
+
 from PhysicsTools.PatAlgos.tools.pfTools import *
 ## Adapt primary vertex collection
 adaptPVs(process, pvCollection=cms.InputTag(pvSource))
