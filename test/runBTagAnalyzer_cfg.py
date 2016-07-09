@@ -153,6 +153,7 @@ options.register('doCTag', False,
     VarParsing.varType.bool,
     "Make NTuples with branches for CTag"
 )
+### Options for upgrade studies
 # Change hits requirements
 options.register('changeMinNumberOfHits', False,
     VarParsing.multiplicity.singleton,
@@ -163,6 +164,12 @@ options.register('minNumberOfHits', 8,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.int,
     "Minimum number of tracker hits"
+)
+# Change eta for extended forward pixel coverage
+options.register('maxJetEta', 2.5,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.float,
+    "Maximum |eta| for fat jets (default is 2.5)"
 )
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', -1)
@@ -1012,6 +1019,7 @@ process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
 process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
 process.btagana.genParticles          = cms.InputTag(genParticles)
 process.btagana.candidates            = cms.InputTag(pfCandidates)
+process.btagana.MaxEta                = cms.double(options.maxJetEta) ## for extended forward pixel coverage
 
 if options.doCTag:
     process.btagana.storeCTagVariables = True
