@@ -159,7 +159,7 @@ options.register('usePrivateJEC',
     VarParsing.varType.bool,
     'Use JECs from private SQLite files')
 options.register('jecDBFile',
-    'Spring16_25nsV3', 
+    'Spring16_25nsV6', 
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     'SQLite filename for JECs')
