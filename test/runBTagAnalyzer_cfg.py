@@ -45,12 +45,12 @@ options.register('usePuppiForBTagging', False,
     VarParsing.varType.bool,
     "Use Puppi candidates for b tagging"
 )
-options.register('mcGlobalTag', '80X_mcRun2_asymptotic_2016_miniAODv2',
+options.register('mcGlobalTag', '80X_mcRun2_asymptotic_2016_miniAODv2_v1',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', '80X_dataRun2_Prompt_v9', 
+options.register('dataGlobalTag', '80X_dataRun2_Prompt_ICHEP16JEC_v0', 
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
