@@ -1796,20 +1796,20 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     if ( runFatJets_ && iJetColl == 0 )
     {
       // N-subjettiness
-      JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet] = pjet->userFloat("Njettiness:tau1");
-      JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet] = pjet->userFloat("Njettiness:tau2");
+      JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet] = ( pjet->hasUserFloat("Njettiness:tau1") ? pjet->userFloat("Njettiness:tau1") : pjet->userFloat("NjettinessAK8:tau1") );
+      JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet] = ( pjet->hasUserFloat("Njettiness:tau2") ? pjet->userFloat("Njettiness:tau2") : pjet->userFloat("NjettinessAK8:tau2") );
       // SoftDrop kinematics
-      JetInfo[iJetColl].Jet_ptSoftDrop[JetInfo[iJetColl].nJet]    = pjet->userFloat("SoftDrop:Pt");
-      JetInfo[iJetColl].Jet_etaSoftDrop[JetInfo[iJetColl].nJet]   = pjet->userFloat("SoftDrop:Eta");
-      JetInfo[iJetColl].Jet_phiSoftDrop[JetInfo[iJetColl].nJet]   = pjet->userFloat("SoftDrop:Phi");
-      JetInfo[iJetColl].Jet_massSoftDrop[JetInfo[iJetColl].nJet]  = pjet->userFloat("SoftDrop:Mass");
-      JetInfo[iJetColl].Jet_jecF0SoftDrop[JetInfo[iJetColl].nJet] = pjet->userFloat("SoftDrop:jecFactor0");
+      JetInfo[iJetColl].Jet_ptSoftDrop[JetInfo[iJetColl].nJet]    = ( pjet->hasUserFloat("SoftDrop:Pt")         ? pjet->userFloat("SoftDrop:Pt")         : 0. );
+      JetInfo[iJetColl].Jet_etaSoftDrop[JetInfo[iJetColl].nJet]   = ( pjet->hasUserFloat("SoftDrop:Eta")        ? pjet->userFloat("SoftDrop:Eta")        : 0. );
+      JetInfo[iJetColl].Jet_phiSoftDrop[JetInfo[iJetColl].nJet]   = ( pjet->hasUserFloat("SoftDrop:Phi")        ? pjet->userFloat("SoftDrop:Phi")        : 0. );
+      JetInfo[iJetColl].Jet_massSoftDrop[JetInfo[iJetColl].nJet]  = ( pjet->hasUserFloat("SoftDrop:Mass")       ? pjet->userFloat("SoftDrop:Mass")       : pjet->userFloat("ak8PFJetsCHSSoftDropMass") );
+      JetInfo[iJetColl].Jet_jecF0SoftDrop[JetInfo[iJetColl].nJet] = ( pjet->hasUserFloat("SoftDrop:jecFactor0") ? pjet->userFloat("SoftDrop:jecFactor0") : 0. );
       // Pruned kinematics
-      JetInfo[iJetColl].Jet_ptPruned[JetInfo[iJetColl].nJet]    = pjet->userFloat("Pruned:Pt");
-      JetInfo[iJetColl].Jet_etaPruned[JetInfo[iJetColl].nJet]   = pjet->userFloat("Pruned:Eta");
-      JetInfo[iJetColl].Jet_phiPruned[JetInfo[iJetColl].nJet]   = pjet->userFloat("Pruned:Phi");
-      JetInfo[iJetColl].Jet_massPruned[JetInfo[iJetColl].nJet]  = pjet->userFloat("Pruned:Mass");
-      JetInfo[iJetColl].Jet_jecF0Pruned[JetInfo[iJetColl].nJet] = pjet->userFloat("Pruned:jecFactor0");
+      JetInfo[iJetColl].Jet_ptPruned[JetInfo[iJetColl].nJet]    = ( pjet->hasUserFloat("Pruned:Pt")         ? pjet->userFloat("Pruned:Pt")         : 0. );
+      JetInfo[iJetColl].Jet_etaPruned[JetInfo[iJetColl].nJet]   = ( pjet->hasUserFloat("Pruned:Eta")        ? pjet->userFloat("Pruned:Eta")        : 0. );
+      JetInfo[iJetColl].Jet_phiPruned[JetInfo[iJetColl].nJet]   = ( pjet->hasUserFloat("Pruned:Phi")        ? pjet->userFloat("Pruned:Phi")        : 0. );
+      JetInfo[iJetColl].Jet_massPruned[JetInfo[iJetColl].nJet]  = ( pjet->hasUserFloat("Pruned:Mass")       ? pjet->userFloat("Pruned:Mass")       : pjet->userFloat("ak8PFJetsCHSPrunedMass") );
+      JetInfo[iJetColl].Jet_jecF0Pruned[JetInfo[iJetColl].nJet] = ( pjet->hasUserFloat("Pruned:jecFactor0") ? pjet->userFloat("Pruned:jecFactor0") : 0. );
     }
     if ( runFatJets_ && runSubJets_ && iJetColl == 0 )
     {
