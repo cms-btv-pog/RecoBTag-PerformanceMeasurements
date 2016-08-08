@@ -155,6 +155,11 @@ options.register('runIVF', False,
     VarParsing.varType.bool,
     "Run IVF, currently leave to False!"
 )
+options.register('hipMitigation', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Enable HIP mitigation"
+)
 ## Master switch for boosted b tag commissioning: overrider several other switches
 options.register('doBoostedCommissioning', False, 
     VarParsing.multiplicity.singleton,
@@ -681,6 +686,8 @@ if options.miniAOD and not options.runJetClustering:
         jetCorrections = jetCorrectionsAK4,
         btagInfos = bTagInfos,
         btagDiscriminators = bTagDiscriminators,
+        runIVF = options.runIVF,
+        hipMitigation = options.hipMitigation,
         explicitJTA = options.useExplicitJTA,
         postfix = postfix
     )
@@ -699,6 +706,8 @@ else:
         jetCorrections = jetCorrectionsAK4,
         genJetCollection = cms.InputTag(genJetCollection),
         genParticles = cms.InputTag(genParticles),
+        runIVF = options.runIVF,
+        hipMitigation = options.hipMitigation,
         explicitJTA = options.useExplicitJTA,
         postfix = postfix
     )
@@ -717,6 +726,7 @@ if options.runFatJets:
             btagDiscriminators = (bTagDiscriminatorsFat + (['pfBoostedDoubleSecondaryVertex' + ('CA15' if algoLabel=='CA' else 'AK8') + 'BJetTags'] if options.remakeDoubleB else [])),
             explicitJTA = options.useExplicitJTA,
             runIVF = options.runIVF,
+            hipMitigation = options.hipMitigation,
             postfix = postfix
         )
         getattr(process,'selectedUpdatedPatJetsFatPFCHS'+postfix).cut = cms.string("pt > %f && abs(eta) < %f"%(float(options.fatJetPtMin), float(options.fatJetAbsEtaMax)))
@@ -733,6 +743,7 @@ if options.runFatJets:
             rParam=options.fatJetRadius, # needed for subjet b tagging
             algo=algoLabel,              # has to be defined but is not used since svClustering=False
             runIVF = options.runIVF,
+            hipMitigation = options.hipMitigation,
             postfix = postfix
         )
     else:
@@ -818,6 +829,7 @@ if options.runFatJets:
             genParticles = cms.InputTag(genParticles),
             explicitJTA = options.useExplicitJTA,
             runIVF = options.runIVF,
+            hipMitigation = options.hipMitigation,
             postfix = postfix
         )
         getattr(process,'selectedPatJetsFatPFCHS'+postfix).cut = cms.string("pt > %f && abs(eta) < %f"%(float(options.fatJetPtMin), float(options.fatJetAbsEtaMax)))
@@ -855,6 +867,7 @@ if options.runFatJets:
             fatJets = cms.InputTag(fatJetSource),                # needed for subjet flavor clustering
             groomedFatJets = cms.InputTag(fatJetSourceSoftDrop), # needed for subjet flavor clustering
             runIVF = options.runIVF,
+            hipMitigation = options.hipMitigation,
             postfix = postfix
         )
 
@@ -898,6 +911,7 @@ if options.runFatJets:
             fatJets = cms.InputTag(fatJetSource),              # needed for subjet flavor clustering
             groomedFatJets = cms.InputTag(fatJetSourcePruned), # needed for subjet flavor clustering
             runIVF = options.runIVF,
+            hipMitigation = options.hipMitigation,
             postfix = postfix
         )
 
