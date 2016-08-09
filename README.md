@@ -25,6 +25,6 @@ scram b -j8
 
 cd RecoBTag/PerformanceMeasurements/test/
 
-cmsRun runBTagAnalyzer_cfg.py miniAOD=True maxEvents=100 reportEvery=1 wantSummary=True hipMitigation=True runIVF=True
+cmsRun runBTagAnalyzer_cfg.py miniAOD=True maxEvents=100 reportEvery=1 wantSummary=True hipMitigation=True runIVF=True remakeAllDiscr=True
 ```
 
