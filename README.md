@@ -18,7 +18,7 @@ git cms-merge-topic -u cms-btv-pog:BoostedDoubleSVTaggerV3-WithWeightFiles-v1_fr
 git cms-merge-topic -u cms-btv-pog:FixBoostedTauConfig_from-CMSSW_8_0_12
 git cms-merge-topic -u cms-btv-pog:SubjetTagInfosNoClustering-PR_from-CMSSW_8_0_12
 
-git clone -b 8_0_X --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b 8_0_X_v1.07 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
