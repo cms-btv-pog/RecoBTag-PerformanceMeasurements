@@ -2851,11 +2851,43 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].TagVarCSV_vertexNTracks[JetInfo[iJetColl].nJet]               = ( vars.checkTag(reco::btau::vertexNTracks) ? vars.get(reco::btau::vertexNTracks) : 0 );
       JetInfo[iJetColl].TagVarCSV_vertexEnergyRatio[JetInfo[iJetColl].nJet]           = ( vars.checkTag(reco::btau::vertexEnergyRatio) ? vars.get(reco::btau::vertexEnergyRatio) : -9999 );
       JetInfo[iJetColl].TagVarCSV_vertexJetDeltaR[JetInfo[iJetColl].nJet]             = ( vars.checkTag(reco::btau::vertexJetDeltaR) ? vars.get(reco::btau::vertexJetDeltaR) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_flightDistance1dAbsVal[JetInfo[iJetColl].nJet]      = ( vars.checkTag(reco::btau::flightDistance1dAbsVal) ? vars.get(reco::btau::flightDistance1dAbsVal) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_flightDistance1dAbsSig[JetInfo[iJetColl].nJet]      = ( vars.checkTag(reco::btau::flightDistance1dAbsSig) ? vars.get(reco::btau::flightDistance1dAbsSig) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_flightDistance2dAbsVal[JetInfo[iJetColl].nJet]      = ( vars.checkTag(reco::btau::flightDistance2dAbsVal) ? vars.get(reco::btau::flightDistance2dAbsVal) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_flightDistance2dAbsSig[JetInfo[iJetColl].nJet]      = ( vars.checkTag(reco::btau::flightDistance2dAbsSig) ? vars.get(reco::btau::flightDistance2dAbsSig) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_flightDistance3dAbsVal[JetInfo[iJetColl].nJet]      = ( vars.checkTag(reco::btau::flightDistance3dAbsVal) ? vars.get(reco::btau::flightDistance3dAbsVal) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_flightDistance3dAbsSig[JetInfo[iJetColl].nJet]      = ( vars.checkTag(reco::btau::flightDistance3dAbsSig) ? vars.get(reco::btau::flightDistance3dAbsSig) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_flightDistance1dVal[JetInfo[iJetColl].nJet]         = ( vars.checkTag(reco::btau::flightDistance1dVal) ? vars.get(reco::btau::flightDistance1dVal) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_flightDistance1dSig[JetInfo[iJetColl].nJet]         = ( vars.checkTag(reco::btau::flightDistance1dSig) ? vars.get(reco::btau::flightDistance1dSig) : -9999 );
       JetInfo[iJetColl].TagVarCSV_flightDistance2dVal[JetInfo[iJetColl].nJet]         = ( vars.checkTag(reco::btau::flightDistance2dVal) ? vars.get(reco::btau::flightDistance2dVal) : -9999 );
       JetInfo[iJetColl].TagVarCSV_flightDistance2dSig[JetInfo[iJetColl].nJet]         = ( vars.checkTag(reco::btau::flightDistance2dSig) ? vars.get(reco::btau::flightDistance2dSig) : -9999 );
       JetInfo[iJetColl].TagVarCSV_flightDistance3dVal[JetInfo[iJetColl].nJet]         = ( vars.checkTag(reco::btau::flightDistance3dVal) ? vars.get(reco::btau::flightDistance3dVal) : -9999 );
       JetInfo[iJetColl].TagVarCSV_flightDistance3dSig[JetInfo[iJetColl].nJet]         = ( vars.checkTag(reco::btau::flightDistance3dSig) ? vars.get(reco::btau::flightDistance3dSig) : -9999 );
-
+      JetInfo[iJetColl].TagVarCSV_SVchi2_ndf_ratio[JetInfo[iJetColl].nJet]            = ( vars.checkTag(reco::btau::SVchi2_ndf_ratio) ? vars.get(reco::btau::SVchi2_ndf_ratio) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_trackAveSip3dVal[JetInfo[iJetColl].nJet]            = ( vars.checkTag(reco::btau::trackAveSip3dVal) ? vars.get(reco::btau::trackAveSip3dVal) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_trackAveSip3dSig[JetInfo[iJetColl].nJet]            = ( vars.checkTag(reco::btau::trackAveSip3dSig) ? vars.get(reco::btau::trackAveSip3dSig) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_trackAveSip2dVal[JetInfo[iJetColl].nJet]            = ( vars.checkTag(reco::btau::trackAveSip2dVal) ? vars.get(reco::btau::trackAveSip2dVal) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_trackAveSip2dSig[JetInfo[iJetColl].nJet]            = ( vars.checkTag(reco::btau::trackAveSip2dSig) ? vars.get(reco::btau::trackAveSip2dSig) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_trackAveSip1dVal[JetInfo[iJetColl].nJet]            = ( vars.checkTag(reco::btau::trackAveSip1dVal) ? vars.get(reco::btau::trackAveSip1dVal) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_trackAveSip1dSig[JetInfo[iJetColl].nJet]            = ( vars.checkTag(reco::btau::trackAveSip1dSig) ? vars.get(reco::btau::trackAveSip1dSig) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_jetNchTracks[JetInfo[iJetColl].nJet]                = ( vars.checkTag(reco::btau::jetNchTracks) ? vars.get(reco::btau::jetNchTracks) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_jetNTracks_PV[JetInfo[iJetColl].nJet]               = ( vars.checkTag(reco::btau::jetNTracks_PV) ? vars.get(reco::btau::jetNTracks_PV) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_jetNTracks_nonPV[JetInfo[iJetColl].nJet]            = ( vars.checkTag(reco::btau::jetNTracks_nonPV) ? vars.get(reco::btau::jetNTracks_nonPV) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_jetPt_Tracks[JetInfo[iJetColl].nJet]                = ( vars.checkTag(reco::btau::jetPt_Tracks) ? vars.get(reco::btau::jetPt_Tracks) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_jetPt_PVTracks[JetInfo[iJetColl].nJet]              = ( vars.checkTag(reco::btau::jetPt_PVTracks) ? vars.get(reco::btau::jetPt_PVTracks) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_jetPt_nonPVTracks[JetInfo[iJetColl].nJet]           = ( vars.checkTag(reco::btau::jetPt_nonPVTracks) ? vars.get(reco::btau::jetPt_nonPVTracks) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_jetNTracks_PV_Ntracks[JetInfo[iJetColl].nJet]       =  ( vars.checkTag(reco::btau::jetNTracks_PV) ? vars.get(reco::btau::jetNTracks_PV)/vars.get(reco::btau::jetNchTracks) : -9999 );
+      float check_Ntracks = ( vars.checkTag(reco::btau::jetNchTracks) ? vars.get(reco::btau::jetNchTracks) : -9999 );
+      if(check_tracks!=0 || check_tracks!=-9999){
+          JetInfo[iJetColl].TagVarCSV_jetNTracks_PV_Ntracks[JetInfo[iJetColl].nJet]    =  ( vars.checkTag(reco::btau::jetNTracks_PV) ? vars.get(reco::btau::jetNTracks_PV)/vars.get(reco::btau::jetNchTracks): -9999);
+          JetInfo[iJetColl].TagVarCSV_jetNTracks_nonPV_Ntracks[JetInfo[iJetColl].nJet] =  ( vars.checkTag(reco::btau::jetNTracks_nonPV) ? vars.get(reco::btau::jetNTracks_nonPV)/vars.get(reco::btau::jetNchTracks): -9999);
+          JetInfo[iJetColl].TagVarCSV_jetPt_PV_NTracks[JetInfo[iJetColl].nJet]         = ( vars.checkTag(reco::btau::jetPt_PVTracks) ? vars.get(reco::btau::jetPt_PVTracks)/vars.get(reco::btau::jetPt_Tracks): -9999);
+          JetInfo[iJetColl].TagVarCSV_jetPt_nonPV_NTracks[JetInfo[iJetColl].nJet]      = ( vars.checkTag(reco::btau::jetPt_nonPVTracks) ? vars.get(reco::btau::jetPt_nonPVTracks)/vars.get(reco::btau::jetPt_Tracks): -9999);
+      }
+      if(JetInfo[iJetColl].TagVarCSV_jetNTracks_nonPV[JetInfo[iJetColl].nJet]!=0) 
+          JetInfo[iJetColl].TagVarCSV_jetNTracks_PV_nonPV[JetInfo[iJetColl].nJet]      = ( vars.checkTag(reco::btau::jetNTracks_PV) ? vars.get(reco::btau::jetNTracks_PV)/vars.get(reco::btau::jetNTracks_nonPV): -9999);
+      if(JetInfo[iJetColl].TagVarCSV_jetPt_nonPV_NTracks[JetInfo[iJetColl].nJet]!=0 && JetInfo[iJetColl].TagVarCSV_jetPt_nonPV_NTracks[JetInfo[iJetColl].nJet]!=-9999) 
+          JetInfo[iJetColl].TagVarCSV_jetPt_PV_nonPVTracks[JetInfo[iJetColl].nJet]     = ( vars.checkTag(reco::btau::jetPt_PVTracks) ? vars.get(reco::btau::jetPt_PVTracks)/vars.get(reco::btau::jetPt_nonPVTracks): -9999);
       // per jet per track
       JetInfo[iJetColl].Jet_nFirstTrkTagVarCSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkTagVarCSV;
       std::vector<float> tagValList = vars.getList(reco::btau::trackSip2dSig,false);
