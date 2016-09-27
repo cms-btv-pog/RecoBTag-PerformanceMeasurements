@@ -390,22 +390,22 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
        if(verbose_>5) std::cout << "\t gen level channel is " << genChannel << std::endl;
      }
    
-   std::auto_ptr<int> trigWordOut( new int(trigWord) );
-   iEvent.put(trigWordOut,"topTrigger");
-   std::auto_ptr<int> metfilterWordOut( new int(metfilterWord) );
-   iEvent.put(metfilterWordOut,"topMETFilter");
-   std::auto_ptr<int > chOut( new int (chsel) );
-   iEvent.put(chOut,"topChannel");
-   std::auto_ptr< vector<reco::GenParticle> > genColl( new vector<reco::GenParticle>(selGen) );
-   iEvent.put(genColl);
-   auto_ptr<vector<pat::Electron> > eleColl( new vector<pat::Electron>(selElectrons) );
-   iEvent.put( eleColl );
-   auto_ptr<vector<pat::Muon> > muColl( new vector<pat::Muon>(selMuons) );
-   iEvent.put( muColl );
-   auto_ptr<vector<pat::Jet> > jetColl( new vector<pat::Jet>(selJets) );
-   iEvent.put( jetColl );
-   auto_ptr<vector<pat::MET> > metColl( new vector<pat::MET>(selMETs) );
-   iEvent.put( metColl );
+   auto trigWordOut = std::make_unique<int>(trigWord);
+   iEvent.put(std::move(trigWordOut),"topTrigger");
+   auto metfilterWordOut = std::make_unique<int>(metfilterWord);
+   iEvent.put(std::move(metfilterWordOut),"topMETFilter");
+   auto chOut = std::make_unique<int>(chsel);
+   iEvent.put(std::move(chOut),"topChannel");
+   auto genColl = std::make_unique< vector<reco::GenParticle> >(selGen);
+   iEvent.put(std::move(genColl));
+   auto eleColl = std::make_unique< vector<pat::Electron> >(selElectrons);
+   iEvent.put(std::move(eleColl));
+   auto muColl = std::make_unique< vector<pat::Muon> >(selMuons);
+   iEvent.put(std::move(muColl));
+   auto jetColl = std::make_unique< vector<pat::Jet> >(selJets);
+   iEvent.put(std::move(jetColl));
+	 auto metColl = std::make_unique< vector<pat::MET> >(selMETs);
+   iEvent.put(std::move(metColl));
 }
 
 // ------------ method called once each job just before starting event loop  ------------

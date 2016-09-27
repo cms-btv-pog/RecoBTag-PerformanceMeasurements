@@ -102,7 +102,7 @@ PMConversionFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle<reco::ConversionCollection> conversions;
    iEvent.getByLabel(conversionTag_, conversions);
 
-   std::auto_ptr<std::vector<pat::Electron> > outputCol(new std::vector<pat::Electron>());
+   auto outputCol = std::make_unique< std::vector<pat::Electron> >();
 
    for(std::vector<pat::Electron>::const_iterator electron = electrons->begin(); 
        electron != electrons->end(); ++electron)
@@ -134,7 +134,7 @@ PMConversionFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
        outputCol->push_back(*electron);
    }  
 
-   iEvent.put(outputCol); 
+   iEvent.put(std::move(outputCol)); 
 
    return !filter_ || !outputCol->empty();
 }
