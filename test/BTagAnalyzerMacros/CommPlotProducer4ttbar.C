@@ -102,6 +102,12 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
   AddHistottbar("pt_mu",          "P_{T}^{#mu}",                50,  0.,200., syst);
   AddHistottbar("pt_jet",         "P_{T}^{leading jet}",        50,  0.,400., syst);
 
+  // HIP check (as function of run range for Run2016B)
+  AddHistottbar("nEvt_run",          "number of evt VS run",                  20,  0,  20, syst);
+  AddHistottbar("nEvt_run_CSVv2L",   "number of evt VS run(b-jet csvl)",      20,  0,  20, syst);
+  AddHistottbar("nEvt_run_CSVv2M",   "number of evt VS run(b-jet csvm)",      20,  0,  20, syst);
+  AddHistottbar("nEvt_run_CSVv2T",   "number of evt VS run(b-jet csvt)",      20,  0,  20, syst);
+
   AddHistottbar("nbtag_CSVv2T","number of btag jets (tight WP)",		     6,-0.5,5.5 , syst   );
   AddHistottbar("nbtag_CSVv2M","number of btag jets (medium WP)",		     6,-0.5,5.5 , syst   );
   AddHistottbar("nbtag_CSVv2L","number of btag jets (loose WP)",		     6,-0.5,5.5 , syst   );
@@ -1199,6 +1205,36 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
         FillHistottbar_intFromMap("nbtag_cMVAv2M",      datatype, 0 ,nbjet_ttbar_cMVAv2_MWP                  , ww);
         FillHistottbar_intFromMap("nbtag_cMVAv2L",      datatype, 0 ,nbjet_ttbar_cMVAv2_LWP                  , ww);
         FillHistottbar_floatFromMap("pt_jet",           datatype, 0 ,ptjet_ttbar                             , ww);
+
+        // HIP check (as function of run range for Run2016B)
+        if( isData && thettbarselector_.theSelJetColl.size() == 2 )//ALPHA
+        {
+            int cat=-1;
+            if( Run < 273450 )      cat=0;
+            else if( Run < 273730 ) cat=1;
+            else if( Run < 274240 ) cat=2;
+            else if( Run < 274284 ) cat=3;
+            else if( Run < 274335 ) cat=4;
+            else if( Run < 274382 ) cat=5;
+            else if( Run < 274421 ) cat=6;
+            else if( Run < 274440 ) cat=7;
+            else if( Run < 274968 ) cat=8;
+            else if( Run < 274970 ) cat=9;
+            else if( Run < 275000 ) cat=10;
+            else if( Run < 275068 ) cat=11;
+            else if( Run < 275124 ) cat=12;
+            else if( Run < 275292 ) cat=13;
+            else if( Run < 275311 ) cat=14;
+            else if( Run < 275345 ) cat=15;
+            else if( Run < 275376 ) cat=16;
+            else if( Run < 275657 ) cat=17;
+            else                    cat=18; // fill events for later run ranges
+
+            FillHistottbar_intFromMap("nEvt_run", datatype, 0, cat, 1);
+            if ( nbjet_ttbar_CSVv2_LWP >= 2 ) FillHistottbar_intFromMap("nEvt_run_CSVv2L", datatype, 0, cat, 1); 
+            if ( nbjet_ttbar_CSVv2_MWP >= 2 ) FillHistottbar_intFromMap("nEvt_run_CSVv2M", datatype, 0, cat, 1);
+            if ( nbjet_ttbar_CSVv2_TWP >= 2 ) FillHistottbar_intFromMap("nEvt_run_CSVv2T", datatype, 0, cat, 1);
+        }
     }
 
     TString tmp_ptbin = "";
