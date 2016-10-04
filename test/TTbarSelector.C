@@ -70,7 +70,11 @@ bool TTbarSelector::passTTbarSelection(bool isData, vector<TLorentzVector> theLe
         // Dilepton cut
         if ( theLeptColl.size()  != 2) return false;
 
-        if (theChannel != -13*11) return false; 
+        if (theChannel != -13*11) return false;
+
+        int nPassPt=0; // Additional offline pt cut (tight)
+        for( unsigned short int ilep = 0; ilep < theLeptColl.size(); ilep++ ){ if( theLeptColl[ilep].Pt() > 25 ) nPassPt++; }
+        if( nPassPt != 2 ) return false;
 
         // Pass trigger
         bool passTrigger_ = passTrigger(isData, theChannel, ttbar_trigWord);
@@ -175,7 +179,8 @@ pair<float,float> TTbarSelector::getTriggerEfficiency(int channel)
 {
   pair<float,float>res(1.0,0.0);
   //if(channel == -11*13) { res.first=0.91; res.second=0.05; }
-  if(channel == -11*13) { res.first=1.0; res.second=0.05; }
+  //if(channel == -11*13) { res.first=1.0; res.second=0.05; }
+  if(channel == -11*13) { res.first=0.901; res.second=0.015; } //  ICHEP2016 dataset
   //if(channel == -11*11) { res.first=0.95; res.second=0.05; }
   if(channel == -11*11) { res.first=1.0; res.second=0.05; }
   //if(channel == -13*13) { res.first=0.99; res.second=0.001; } // this is a single muon trigger
