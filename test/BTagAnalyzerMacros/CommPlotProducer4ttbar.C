@@ -97,6 +97,7 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
   AddHistottbar("met",            "MET",                        30,  0.,300., syst);
   AddHistottbar("mll",            "M_{ll}",                     60,  0.,300., syst);
   AddHistottbar("njet",           "number of jets",	        10,-0.5, 9.5, syst);
+  AddHistottbar("njet_pt30",      "number of jets pt30",        10,-0.5, 9.5, syst);
   AddHistottbar("pt_e",           "P_{T}^{e}",                  50,  0.,200., syst);
   AddHistottbar("pt_mu",          "P_{T}^{#mu}",                50,  0.,200., syst);
   AddHistottbar("pt_jet",         "P_{T}^{leading jet}",        50,  0.,400., syst);
@@ -666,6 +667,7 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
     //-----------------------------------
     //Loop on jets 
     //-----------------------------------
+    int nJets_pt30=0;
     for (unsigned int ijet = 0; ijet < thettbarselector_.theSelJetColl.size(); ijet++) 
     {
 
@@ -676,6 +678,8 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
       float phijet  = Jet_phi[newJetIndex];
       float ntrkjet  = Jet_ntracks[newJetIndex];  
       int   flav     = Jet_flavour[newJetIndex];
+
+      if( ptjet >= 30 ) nJets_pt30++;
       
       //fill info for ttbar SF
       if(thettbarselector_.theSelJetColl.size() == 2)
@@ -1183,7 +1187,8 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
 
     } // End Loop on Jets
 
-
+    if( nJets_pt30 >= 2 ) FillHistottbar_intFromMap("njet_pt30", datatype, 0 , nJets_pt30  , ww);
+ 
     if(fillCommissioningHistograms)
     {
         FillHistottbar_intFromMap("njet",               datatype, 0 ,thettbarselector_.theSelJetColl.size()  , ww);
