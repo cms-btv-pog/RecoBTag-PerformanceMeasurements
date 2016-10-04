@@ -845,8 +845,10 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
 	  passtrklen=false;
 	  passTrackIP2D=false;
 	    
-	  if (Track_nHitAll[itrk]>=8)           passNhit=true;
-	  if (Track_nHitPixel[itrk]>=2)         passPix= true;
+	  //if (Track_nHitAll[itrk]>=8)           passNhit=true;
+	  //if (Track_nHitPixel[itrk]>=2)         passPix= true;
+	  if (Track_nHitAll[itrk]>=0)           passNhit=true;     // HIP mitigation
+	  if (Track_nHitPixel[itrk]>=1)         passPix= true;     // HIP mitigation
 	  if (fabs(Track_dz[itrk])<17)          passIPz=true;
 	  if (Track_pt[itrk]>1)                 passPt=true;
 	  if (Track_chi2[itrk]<5)               passnormchi2=true;
