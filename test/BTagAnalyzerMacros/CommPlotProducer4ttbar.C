@@ -357,9 +357,6 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
   AddHistottbar("nbtag_2l_120-320_afterJetSel_CSVv2M","number of btag jets (medium WP)",     6,-0.5,5.5 , syst   );
   AddHistottbar("nbtag_2l_120-320_afterJetSel_CSVv2L","number of btag jets (loose WP)",	     6,-0.5,5.5 , syst   );
 
-
-  AddHisto("nPU"          ,"number of PU event",	     60,        -0.5,   59.5, syst);
- 
   AddHisto("jet_multi"    ,"number of jets",		     20,        0,      20,   syst);
   AddHisto("jet_pt_all"	  ,"pT of all jets",		     PtMax/10,  0,      PtMax,syst);
   AddHisto("genjet_pt_all"	  ,"genpT of all jets",		50     ,  -0.5,    49.5,syst);
