@@ -156,10 +156,15 @@ bool TTbarSelector::passTrigger(bool isData, Int_t ttbar_chan, Int_t ttbar_trigW
     if( trigBits.size()==0) hasTrigger = true;
     else hasTrigger = false;
 
-    for(unsigned int ibit=0; ibit<trigBits.size(); ibit++)
+    if( isData )
     {
-        if(trigBits[ibit].second != ttbar_chan) continue;
-        hasTrigger |= ((ttbar_trigWord>>trigBits[ibit].first) & 1);
+        for(unsigned int ibit=0; ibit<trigBits.size(); ibit++)
+        {
+            if(trigBits[ibit].second != ttbar_chan) continue;
+            hasTrigger |= ((ttbar_trigWord>>trigBits[ibit].first) & 1);
+        }
+    }else{
+        hasTrigger=true;
     }
 
     return hasTrigger;
