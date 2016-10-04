@@ -458,6 +458,8 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
   AddHisto("CSVv2"	  ,"CSVv2",				     50,0.,1.  , syst);
   AddHisto("CSVv2_pu"	  ,"CSVv2_pu",				     50,0.,1.  , syst);
   AddHisto("cMVAv2"	  ,"cMVAv2",				     50,-1.,1. , syst);
+  AddHisto("CvsB"     ,"CvsB",                                       50,-1.,1. , syst);
+  AddHisto("CvsL"     ,"CvsL",                                       50,-1.,1. , syst);
 
   AddHisto("SoftMu"       ,"SoftMu",                                 50,0.,1.  , syst);
   AddHisto("SoftEl"       ,"SoftEl",                                 50,0.,1.  , syst);
@@ -761,6 +763,8 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
       float csv      = Jet_CombSvx[newJetIndex];
       float csv_v2   = Jet_CombIVF[newJetIndex];
       float cmva_v2  = Jet_cMVAv2[newJetIndex];
+      float cvsB     = CTag_Jet_CvsB[newJetIndex]; 
+      float cvsL     = CTag_Jet_CvsL[newJetIndex];
 
       
 
@@ -1072,6 +1076,8 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
         FillHisto_floatFromMap("CSV",   flav, isPU, csv	        , ww);
         FillHisto_floatFromMap("CSVv2", flav, isPU, csv_v2      , ww);
         FillHisto_floatFromMap("cMVAv2",flav, isPU, cmva_v2     , ww);
+        FillHisto_floatFromMap("CvsB",  flav, isPU, cvsB        , ww);
+        FillHisto_floatFromMap("CvsL",  flav, isPU, cvsL        , ww);
       }
 
       if (fillCommissioningHistograms && produceNewAlgoTree) 
