@@ -168,6 +168,9 @@ public :
    Float_t         TagVarCSV_flightDistance2dSig[1000];   //[nJet]
    Float_t         TagVarCSV_vertexJetDeltaR[1000];   //[nJet]
 
+   Float_t         CTag_Jet_CvsB[1000];   //[nJet] 
+   Float_t         CTag_Jet_CvsL[1000];   //[nJet]
+
    Int_t           Jet_hist1[1000];   //[nJet]
    Int_t           Jet_hist2[1000];   //[nJet]
    Int_t           Jet_hist3[1000];   //[nJet]
@@ -417,6 +420,9 @@ public :
    TBranch        *b_TagVarCSV_vertexNTracks;             
    TBranch        *b_TagVarCSV_flightDistance2dSig;       
    TBranch        *b_TagVarCSV_vertexJetDeltaR;           
+
+   TBranch        *b_CTag_Jet_CvsB;           
+   TBranch        *b_CTag_Jet_CvsL;  
 
    TBranch        *b_Jet_hist1;   //!
    TBranch        *b_Jet_hist2;   //!
@@ -876,7 +882,8 @@ void CommPlotProducer4ttbar::Init(TChain *tree)
    fChain->SetBranchAddress("TagVarCSV_flightDistance2dSig",     TagVarCSV_flightDistance2dSig,       &b_TagVarCSV_flightDistance2dSig);       
    fChain->SetBranchAddress("TagVarCSV_vertexJetDeltaR",         TagVarCSV_vertexJetDeltaR,           &b_TagVarCSV_vertexJetDeltaR);           
 
-
+   fChain->SetBranchAddress("CTag_Jet_CvsB",CTag_Jet_CvsB , &b_CTag_Jet_CvsB);
+   fChain->SetBranchAddress("CTag_Jet_CvsL",CTag_Jet_CvsL , &b_CTag_Jet_CvsL);
    
    fChain->SetBranchAddress("nPFElectron", &nPFElectron, &b_nPFElectron);
    fChain->SetBranchAddress("PFElectron_IdxJet", PFElectron_IdxJet, &b_PFElectron_IdxJet);

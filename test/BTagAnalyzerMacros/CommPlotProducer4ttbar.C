@@ -97,9 +97,16 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
   AddHistottbar("met",            "MET",                        30,  0.,300., syst);
   AddHistottbar("mll",            "M_{ll}",                     60,  0.,300., syst);
   AddHistottbar("njet",           "number of jets",	        10,-0.5, 9.5, syst);
+  AddHistottbar("njet_pt30",      "number of jets pt30",        10,-0.5, 9.5, syst);
   AddHistottbar("pt_e",           "P_{T}^{e}",                  50,  0.,200., syst);
   AddHistottbar("pt_mu",          "P_{T}^{#mu}",                50,  0.,200., syst);
   AddHistottbar("pt_jet",         "P_{T}^{leading jet}",        50,  0.,400., syst);
+
+  // HIP check (as function of run range for Run2016B)
+  AddHistottbar("nEvt_run",          "number of evt VS run",                  20,  0,  20, syst);
+  AddHistottbar("nEvt_run_CSVv2L",   "number of evt VS run(b-jet csvl)",      20,  0,  20, syst);
+  AddHistottbar("nEvt_run_CSVv2M",   "number of evt VS run(b-jet csvm)",      20,  0,  20, syst);
+  AddHistottbar("nEvt_run_CSVv2T",   "number of evt VS run(b-jet csvt)",      20,  0,  20, syst);
 
   AddHistottbar("nbtag_CSVv2T","number of btag jets (tight WP)",		     6,-0.5,5.5 , syst   );
   AddHistottbar("nbtag_CSVv2M","number of btag jets (medium WP)",		     6,-0.5,5.5 , syst   );
@@ -350,9 +357,6 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
   AddHistottbar("nbtag_2l_120-320_afterJetSel_CSVv2M","number of btag jets (medium WP)",     6,-0.5,5.5 , syst   );
   AddHistottbar("nbtag_2l_120-320_afterJetSel_CSVv2L","number of btag jets (loose WP)",	     6,-0.5,5.5 , syst   );
 
-
-  AddHisto("nPU"          ,"number of PU event",	     60,        -0.5,   59.5, syst);
- 
   AddHisto("jet_multi"    ,"number of jets",		     20,        0,      20,   syst);
   AddHisto("jet_pt_all"	  ,"pT of all jets",		     PtMax/10,  0,      PtMax,syst);
   AddHisto("genjet_pt_all"	  ,"genpT of all jets",		50     ,  -0.5,    49.5,syst);
@@ -458,6 +462,8 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
   AddHisto("CSVv2"	  ,"CSVv2",				     50,0.,1.  , syst);
   AddHisto("CSVv2_pu"	  ,"CSVv2_pu",				     50,0.,1.  , syst);
   AddHisto("cMVAv2"	  ,"cMVAv2",				     50,-1.,1. , syst);
+  AddHisto("CvsB"     ,"CvsB",                                       50,-1.,1. , syst);
+  AddHisto("CvsL"     ,"CvsL",                                       50,-1.,1. , syst);
 
   AddHisto("SoftMu"       ,"SoftMu",                                 50,0.,1.  , syst);
   AddHisto("SoftEl"       ,"SoftEl",                                 50,0.,1.  , syst);
@@ -669,6 +675,7 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
     //-----------------------------------
     //Loop on jets 
     //-----------------------------------
+    int nJets_pt30=0;
     for (unsigned int ijet = 0; ijet < thettbarselector_.theSelJetColl.size(); ijet++) 
     {
 
@@ -679,6 +686,8 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
       float phijet  = Jet_phi[newJetIndex];
       float ntrkjet  = Jet_ntracks[newJetIndex];  
       int   flav     = Jet_flavour[newJetIndex];
+
+      if( ptjet >= 30 ) nJets_pt30++;
       
       //fill info for ttbar SF
       if(thettbarselector_.theSelJetColl.size() == 2)
@@ -761,6 +770,8 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
       float csv      = Jet_CombSvx[newJetIndex];
       float csv_v2   = Jet_CombIVF[newJetIndex];
       float cmva_v2  = Jet_cMVAv2[newJetIndex];
+      float cvsB     = CTag_Jet_CvsB[newJetIndex]; 
+      float cvsL     = CTag_Jet_CvsL[newJetIndex];
 
       
 
@@ -834,8 +845,10 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
 	  passtrklen=false;
 	  passTrackIP2D=false;
 	    
-	  if (Track_nHitAll[itrk]>=8)           passNhit=true;
-	  if (Track_nHitPixel[itrk]>=2)         passPix= true;
+	  //if (Track_nHitAll[itrk]>=8)           passNhit=true;
+	  //if (Track_nHitPixel[itrk]>=2)         passPix= true;
+	  if (Track_nHitAll[itrk]>=0)           passNhit=true;     // HIP mitigation
+	  if (Track_nHitPixel[itrk]>=1)         passPix= true;     // HIP mitigation
 	  if (fabs(Track_dz[itrk])<17)          passIPz=true;
 	  if (Track_pt[itrk]>1)                 passPt=true;
 	  if (Track_chi2[itrk]<5)               passnormchi2=true;
@@ -1072,6 +1085,8 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
         FillHisto_floatFromMap("CSV",   flav, isPU, csv	        , ww);
         FillHisto_floatFromMap("CSVv2", flav, isPU, csv_v2      , ww);
         FillHisto_floatFromMap("cMVAv2",flav, isPU, cmva_v2     , ww);
+        FillHisto_floatFromMap("CvsB",  flav, isPU, cvsB        , ww);
+        FillHisto_floatFromMap("CvsL",  flav, isPU, cvsL        , ww);
       }
 
       if (fillCommissioningHistograms && produceNewAlgoTree) 
@@ -1184,7 +1199,8 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
 
     } // End Loop on Jets
 
-
+    if( nJets_pt30 >= 2 ) FillHistottbar_intFromMap("njet_pt30", datatype, 0 , nJets_pt30  , ww);
+ 
     if(fillCommissioningHistograms)
     {
         FillHistottbar_intFromMap("njet",               datatype, 0 ,thettbarselector_.theSelJetColl.size()  , ww);
@@ -1195,6 +1211,36 @@ void CommPlotProducer4ttbar::Loop(int datatype, int trig_data, float PtMin_Cut, 
         FillHistottbar_intFromMap("nbtag_cMVAv2M",      datatype, 0 ,nbjet_ttbar_cMVAv2_MWP                  , ww);
         FillHistottbar_intFromMap("nbtag_cMVAv2L",      datatype, 0 ,nbjet_ttbar_cMVAv2_LWP                  , ww);
         FillHistottbar_floatFromMap("pt_jet",           datatype, 0 ,ptjet_ttbar                             , ww);
+
+        // HIP check (as function of run range for Run2016B)
+        if( isData && thettbarselector_.theSelJetColl.size() == 2 )//ALPHA
+        {
+            int cat=-1;
+            if( Run < 273450 )      cat=0;
+            else if( Run < 273730 ) cat=1;
+            else if( Run < 274240 ) cat=2;
+            else if( Run < 274284 ) cat=3;
+            else if( Run < 274335 ) cat=4;
+            else if( Run < 274382 ) cat=5;
+            else if( Run < 274421 ) cat=6;
+            else if( Run < 274440 ) cat=7;
+            else if( Run < 274968 ) cat=8;
+            else if( Run < 274970 ) cat=9;
+            else if( Run < 275000 ) cat=10;
+            else if( Run < 275068 ) cat=11;
+            else if( Run < 275124 ) cat=12;
+            else if( Run < 275292 ) cat=13;
+            else if( Run < 275311 ) cat=14;
+            else if( Run < 275345 ) cat=15;
+            else if( Run < 275376 ) cat=16;
+            else if( Run < 275657 ) cat=17;
+            else                    cat=18; // fill events for later run ranges
+
+            FillHistottbar_intFromMap("nEvt_run", datatype, 0, cat, 1);
+            if ( nbjet_ttbar_CSVv2_LWP >= 2 ) FillHistottbar_intFromMap("nEvt_run_CSVv2L", datatype, 0, cat, 1); 
+            if ( nbjet_ttbar_CSVv2_MWP >= 2 ) FillHistottbar_intFromMap("nEvt_run_CSVv2M", datatype, 0, cat, 1);
+            if ( nbjet_ttbar_CSVv2_TWP >= 2 ) FillHistottbar_intFromMap("nEvt_run_CSVv2T", datatype, 0, cat, 1);
+        }
     }
 
     TString tmp_ptbin = "";
