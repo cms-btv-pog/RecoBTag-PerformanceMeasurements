@@ -33,6 +33,7 @@ public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
    bool            produceJetProbaTree;
+   bool            produceSVinfo;
    bool            produceTagVarTree;
    bool            produceTagVarCSVTree;
    bool            produceRecoMuon;
@@ -170,6 +171,8 @@ public :
    Float_t         Jet_SoftElN[1000];   //[nJet]
    Float_t         Jet_SoftElP[1000];   //[nJet]
    Float_t         Jet_SoftEl[1000];   //[nJet]
+   Float_t         Jet_cMVA[1000];   //[nJet]
+   Float_t         Jet_cMVAv2[1000];   //[nJet]
    Int_t           Jet_SV_multi[1000];   //[nJet]
    Int_t           Jet_looseID[1000];   //[nJet]
    Int_t           Jet_tightID[1000];   //[nJet]
@@ -407,6 +410,14 @@ public :
    Float_t         TagVarCSV_trackJetDistSig[ntrack_max];   //[nTrkTagVarCSV]
    Float_t         TagVarCSV_trackEtaRel[ntrack_max];   //[nTrkEtaRelTagVarCSV]
 
+   // CTag informations
+   Float_t         CTag_Jet_CvsB[1000];
+   Float_t         CTag_Jet_CvsBN[1000];
+   Float_t         CTag_Jet_CvsBP[1000];
+   Float_t         CTag_Jet_CvsL[1000];
+   Float_t         CTag_Jet_CvsLN[1000];
+   Float_t         CTag_Jet_CvsLP[1000];
+
 
    
 
@@ -508,6 +519,8 @@ public :
    TBranch        *b_Jet_SoftElN;   //!
    TBranch        *b_Jet_SoftElP;   //!
    TBranch        *b_Jet_SoftEl;   //!
+   TBranch        *b_Jet_cMVA;   //!
+   TBranch        *b_Jet_cMVAv2;   //!
    TBranch        *b_Jet_nFirstTrack;   //!
    TBranch        *b_Jet_nLastTrack;   //!
    TBranch        *b_Jet_nFirstSV;   //!  
@@ -744,6 +757,15 @@ public :
   TBranch *b_PV_ndf;
   TBranch *b_PV_isgood;
   TBranch *b_PV_isfake;
+
+  // CTag information
+    TBranch*        b_CTag_Jet_CvsB;
+    TBranch*        b_CTag_Jet_CvsBN;
+    TBranch*        b_CTag_Jet_CvsBP;
+    TBranch*        b_CTag_Jet_CvsL;
+    TBranch*        b_CTag_Jet_CvsLN;
+    TBranch*        b_CTag_Jet_CvsLP;
+
   
 //   CommPlotProducer(TChain *supertree=0, bool infotree1=true, bool infotree2=false, int sqrts=13);
    CommPlotProducer(TChain *supertree=0);
@@ -752,8 +774,10 @@ public :
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TChain *tree);
-   virtual void     Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TString outputname);
-   virtual void     Loop(TString trignam, int trigger, float PtMin_Cut, float PtMax_Cut, TString outputname);
+   //virtual void     Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TString outputname);
+   virtual void     Loop(TString trigname, int trigger, float PtMin_Cut, float PtMax_Cut, TString output_name, TString puRewFileName = "", bool officalRecipe = false);
+   //virtual void     Loop(TString trignam, int trigger, float PtMin_Cut, float PtMax_Cut, TString outputname);
+   //virtual void     Loop(TString trignam, int trigger, float PtMin_Cut, float PtMax_Cut, TString outputname, TString PUreweightingFile);
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
    virtual void     AddHisto(TString name, TString title,  int nbins, float min, float max);
@@ -825,8 +849,8 @@ CommPlotProducer::CommPlotProducer(TChain *superTree)
 //   produceNewAlgoTree=infotree2;
  
 
-   produceJetProbaTree =false;
-//   produceNewAlgoTree  =false;
+   produceJetProbaTree = false;
+   produceSVinfo = false;
    produceTagVarTree   =false;
    produceTagVarCSVTree=false;
    produceRecoMuon     =false;
@@ -984,22 +1008,30 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("Jet_SoftElN", Jet_SoftElN, &b_Jet_SoftElN);
    fChain->SetBranchAddress("Jet_SoftElP", Jet_SoftElP, &b_Jet_SoftElP);
    fChain->SetBranchAddress("Jet_SoftEl", Jet_SoftEl, &b_Jet_SoftEl);
-   fChain->SetBranchAddress("Jet_nFirstTrack", Jet_nFirstTrack, &b_Jet_nFirstTrack);
-   fChain->SetBranchAddress("Jet_nLastTrack", Jet_nLastTrack, &b_Jet_nLastTrack);
-   fChain->SetBranchAddress("Jet_nFirstSV", Jet_nFirstSV, &b_Jet_nFirstSV);
-   fChain->SetBranchAddress("Jet_nLastSV", Jet_nLastSV, &b_Jet_nLastSV);
+   fChain->SetBranchAddress("Jet_cMVA", Jet_cMVA, &b_Jet_cMVA);
+   fChain->SetBranchAddress("Jet_cMVAv2", Jet_cMVAv2, &b_Jet_cMVAv2);
    fChain->SetBranchAddress("Jet_SV_multi", Jet_SV_multi, &b_Jet_SV_multi);
-   fChain->SetBranchAddress("Jet_nFirstTrkInc", Jet_nFirstTrkInc, &b_Jet_nFirstTrkInc);
-   fChain->SetBranchAddress("Jet_nLastTrkInc", Jet_nLastTrkInc, &b_Jet_nLastTrkInc);
+   //fChain->SetBranchAddress("Jet_nFirstTrkInc", Jet_nFirstTrkInc, &b_Jet_nFirstTrkInc);
+   //fChain->SetBranchAddress("Jet_nLastTrkInc", Jet_nLastTrkInc, &b_Jet_nLastTrkInc);
    fChain->SetBranchAddress("Jet_looseID", Jet_looseID, &b_Jet_looseID);
    fChain->SetBranchAddress("Jet_tightID", Jet_tightID, &b_Jet_tightID);
-   fChain->SetBranchAddress("nTrkInc", &nTrkInc, &b_nTrkInc);
-   fChain->SetBranchAddress("TrkInc_pt", &TrkInc_pt, &b_TrkInc_pt);
-   fChain->SetBranchAddress("TrkInc_eta", &TrkInc_eta, &b_TrkInc_eta);
-   fChain->SetBranchAddress("TrkInc_phi", &TrkInc_phi, &b_TrkInc_phi);
-   fChain->SetBranchAddress("TrkInc_ptrel", &TrkInc_ptrel, &b_TrkInc_ptrel);
-   fChain->SetBranchAddress("TrkInc_IPsig", &TrkInc_IPsig, &b_TrkInc_IPsig);
-   fChain->SetBranchAddress("TrkInc_IP", &TrkInc_IP, &b_TrkInc_IP);
+   //fChain->SetBranchAddress("nTrkInc", &nTrkInc, &b_nTrkInc);
+   //fChain->SetBranchAddress("TrkInc_pt", &TrkInc_pt, &b_TrkInc_pt);
+   //fChain->SetBranchAddress("TrkInc_eta", &TrkInc_eta, &b_TrkInc_eta);
+   //fChain->SetBranchAddress("TrkInc_phi", &TrkInc_phi, &b_TrkInc_phi);
+   //fChain->SetBranchAddress("TrkInc_ptrel", &TrkInc_ptrel, &b_TrkInc_ptrel);
+   //fChain->SetBranchAddress("TrkInc_IPsig", &TrkInc_IPsig, &b_TrkInc_IPsig);
+   //fChain->SetBranchAddress("TrkInc_IP", &TrkInc_IP, &b_TrkInc_IP);
+   
+   // CTag information 
+   if (fChain->GetBranch("CTag_Jet_CvsB")){
+       fChain->SetBranchAddress("CTag_Jet_CvsB", CTag_Jet_CvsB, &b_CTag_Jet_CvsB);
+       fChain->SetBranchAddress("CTag_Jet_CvsBN", CTag_Jet_CvsBN, &b_CTag_Jet_CvsBN);
+       fChain->SetBranchAddress("CTag_Jet_CvsBP", CTag_Jet_CvsB, &b_CTag_Jet_CvsBP);
+       fChain->SetBranchAddress("CTag_Jet_CvsL", CTag_Jet_CvsL, &b_CTag_Jet_CvsL);
+       fChain->SetBranchAddress("CTag_Jet_CvsLN", CTag_Jet_CvsLN, &b_CTag_Jet_CvsLN);
+       fChain->SetBranchAddress("CTag_Jet_CvsLP", CTag_Jet_CvsLP, &b_CTag_Jet_CvsLP);
+   }
    if (fChain->GetBranch("nMuon")) produceRecoMuon = true;
    if (produceRecoMuon) {
      fChain->SetBranchAddress("nMuon", &nMuon, &b_nMuon);
@@ -1051,6 +1083,11 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("PFMuon_IP", PFMuon_IP, &b_PFMuon_IP);
    fChain->SetBranchAddress("PFMuon_IP2D", PFMuon_IP2D, &b_PFMuon_IP2D);
    fChain->SetBranchAddress("PFMuon_GoodQuality", PFMuon_GoodQuality, &b_PFMuon_GoodQuality);
+
+   if (fChain->GetBranch("nSV")) produceSVinfo = true;
+   if (produceSVinfo) {
+   fChain->SetBranchAddress("Jet_nFirstSV", Jet_nFirstSV, &b_Jet_nFirstSV);
+   fChain->SetBranchAddress("Jet_nLastSV", Jet_nLastSV, &b_Jet_nLastSV);
    fChain->SetBranchAddress("nSV", &nSV, &b_nSV);
    fChain->SetBranchAddress("SV_x", SV_x, &b_SV_x);
    fChain->SetBranchAddress("SV_y", SV_y, &b_SV_y);
@@ -1074,6 +1111,7 @@ void CommPlotProducer::Init(TChain *tree)
    fChain->SetBranchAddress("SV_mass", SV_mass, &b_SV_mass);
    fChain->SetBranchAddress("SV_vtx_eta", SV_vtx_eta, &b_SV_vtx_eta);
    fChain->SetBranchAddress("SV_vtx_phi", SV_vtx_phi, &b_SV_vtx_phi);
+   }
 
    if (fChain->GetBranch("TagVar_jetNTracks")) produceTagVarTree = true;
    if (produceTagVarTree) {
@@ -1174,6 +1212,8 @@ void CommPlotProducer::Init(TChain *tree)
    
    if (fChain->GetBranch("nTrack")) produceJetProbaTree = true;
    if ( produceJetProbaTree ) {
+    fChain->SetBranchAddress("Jet_nFirstTrack", Jet_nFirstTrack, &b_Jet_nFirstTrack);
+    fChain->SetBranchAddress("Jet_nLastTrack", Jet_nLastTrack, &b_Jet_nLastTrack);
     fChain->SetBranchAddress("nTrack",	      &nTrack, 	     &b_nTrack);
     fChain->SetBranchAddress("Track_dxy",       Track_dxy,     &b_Trackdxy);	
     fChain->SetBranchAddress("Track_dz",        Track_dz, &b_Track_dz);
