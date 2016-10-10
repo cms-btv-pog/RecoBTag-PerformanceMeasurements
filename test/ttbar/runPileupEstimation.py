@@ -3,7 +3,7 @@ import os,sys
 import json
 import commands
 import ROOT
-from SimGeneral.MixingModule.mix_2015_25ns_Startup_PoissonOOTPU_cfi import *
+from SimGeneral.MixingModule.mix_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU_cfi import *
 
 """
 steer the script
@@ -16,7 +16,7 @@ def main():
     parser.add_option('--json',      dest='inJson'  ,      help='json file with processed runs',      default=None,    type='string')
     parser.add_option('--mbXsec',    dest='mbXsec'  ,      help='minimum bias cross section to use',  default=69000,   type=float)
     parser.add_option('--puJson',    dest='puJson'  ,      help='pileup json file',      
-                      default='/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/PileUp/pileup_latest.txt',    type='string')
+                      default='/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt',    type='string')
     (opt, args) = parser.parse_args()
     
     #simulated pileup
