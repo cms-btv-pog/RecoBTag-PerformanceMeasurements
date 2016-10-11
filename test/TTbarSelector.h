@@ -33,9 +33,13 @@ class TTbarSelector
                 
                 // Apply trigger bits efficiency
                 bool passTrigger(bool isData, Int_t ttbar_chan, Int_t ttbar_trigWord);
+                // semilepton trigger
+                bool passSingleTrigger(bool isData, Int_t ttbar_chan, Int_t ttbar_trigWord);
                 
                 // Return true if the event pass the selection
                 bool passTTbarSelection(bool isData, vector<TLorentzVector> theLeptColl, vector<Int_t> theLeptIds, vector< pair< TLorentzVector, Float_t> > theJetColl, Int_t ttbar_trigWord, Float_t ttbar_w[250], int ttbar_nw, TH1F* wgtcounter, TString syst, bool computeEvtWgtOnly);
+                //Reture true if the event pass the semilep selection
+		bool passSemiLepTTbarSelection(bool isData, vector<TLorentzVector> theLeptColl, vector<Int_t> theLeptIds, vector< pair< TLorentzVector, Float_t> > theJetColl, Int_t ttbar_trigWord, Float_t ttbar_w[250], int ttbar_nw, TH1F* wgtcounter, TString syst, bool computeEvtWgtOnly); 
 
                 // Apply object selection on event (fill p4, variables... )	
                 pair<float,float> getTriggerEfficiency(int channel);

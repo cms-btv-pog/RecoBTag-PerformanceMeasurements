@@ -1,0 +1,50 @@
+{
+    gROOT->ProcessLine(".L DrawCommPlot4ttbar.C++");
+
+    Draw("CvsB","Discreiminator CvsB",1);
+    Draw("CvsL","Discreiminator CvsL",1);
+    Draw("CTag_jetNTracks","number of jet tracks",1);
+    Draw("CTag_jetNTracksEtaRel","jetNTracksEtaRel",1);
+    Draw("CTag_jetNLeptons","number of jet leptons",1);
+    Draw("CTag_trackSumJetEtRatio","trackSumJetEtRatio",1);
+    Draw("CTag_trackSumJetDeltaR","trackSumJetDeltaR",1);
+    Draw("CTag_trackSip2dSigAboveCharm","trackSip2dSigAboveCharm",1);
+    Draw("CTag_trackSip3dSigAboveCharm","trackSip3dSigAboveCharm",1);
+    Draw("CTag_vertexCategory","Vertex Category",1);
+    Draw("CTag_jetNSecondaryVertices","jetNSecondaryVertices",1);
+    Draw("CTag_vertexMass","vertexMass",1);
+    Draw("CTag_vertexNTracks","vertexNTracks",1);
+    Draw("CTag_vertexEnergyRatio","vertexEnergyRatio",1);
+    Draw("CTag_vertexJetDeltaR","vertexJetDeltaR",1);
+    Draw("CTag_flightDistance2dSig","flightDistance2dSig",1);
+    Draw("CTag_flightDistance3dSig","flightDistance3dSig",1);
+    Draw("CTag_massVertexEnergyFraction","massVertexEnergyFraction",1);
+    Draw("CTag_vertexBoostOverSqrtJetPt","vertexBoostOverSqrtJetPt",1);
+    Draw("CTag_vertexLeptonCategory","vertexLeptonCategory",1);
+    Draw("CTag_trackPtRel","trackPtRel",1);
+    Draw("CTag_trackPPar","trackPPar",1);
+    Draw("CTag_trackDeltaR","trackDeltaR",1);
+    Draw("CTag_trackPtRatio","trackPtRatio",1);
+    Draw("CTag_trackPParRatio","trackPParRatio",1);
+    Draw("CTag_trackSip2dSig","trackSip2dSig",1);
+    Draw("CTag_trackSip3dSig","trackSip3dSig",1);
+    Draw("CTag_trackDecayLenVal","trackDecayLenVal",1);
+    Draw("CTag_trackJetDistVal","trackJetDistVal",1);
+    Draw("CTag_trackEtaRel","trackEtaRel",1);
+    Draw("CTag_leptonPtRel","leptonPtRel",1);
+    Draw("CTag_leptonSip3d","leptonSip3d",1);
+    Draw("CTag_leptonDeltaR","leptonDeltaR",1);
+    Draw("CTag_leptonRatioRel","leptonRatioRel",1);
+    Draw("CTag_leptonEtaRel","leptonEtaRel",1);
+    Draw("CTag_leptonRatio","leptonRatio",1);
+
+    Draw("CTag_jetNSecondaryVertices_Vcat0","jetNSecondaryVertices_Vcat0",1);
+    Draw("CTag_vertexMass_Vcat0","vertexMass_Vcat0",1);
+    Draw("CTag_vertexNTracks_Vcat0","vertexNTracks_Vcat0",1);
+    Draw("CTag_vertexEnergyRatio_Vcat0","vertexEnergyRatio_Vcat0",1);
+    Draw("CTag_vertexJetDeltaR_Vcat0","vertexJetDeltaR_Vcat0",1);
+    Draw("CTag_flightDistance2dSig_Vcat0","flightDistance2dSig_Vcat0",1);
+    Draw("CTag_flightDistance3dSig_Vcat0","flightDistance3dSig_Vcat0",1);
+    Draw("CTag_massVertexEnergyFraction_Vcat0","massVertexEnergyFraction_Vcat0",1);
+    Draw("CTag_vertexBoostOverSqrtJetPt_Vcat0","vertexBoostOverSqrtJetPt_Vcat0",1);
+}
