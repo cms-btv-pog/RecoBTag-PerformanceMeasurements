@@ -283,10 +283,7 @@ void CommPlotProducer::SetPV(){
     vector<float> data_vect;
     puweight=false;
   
-    //TFile *filepuest = new TFile(filePUstring);
-    // Note, in this version SetPV is dummy ;-)
-    TFile *filepuest = new TFile("/home/fynu/bfrancois/bTag/CMSSW_7_4_5/src/RecoBTag/PerformanceMeasurements/test/BTagAnalyzerMacros/inclusiveQCD_ptBin15to300_star1_TrigPFjet40_Jet60_250_notPUReweighted_goldenJSON/inclusiveQCD_ptBin15to300_star1_TrigPFjet40_Jet60_250_notPUReweighted_goldenJSON.root");
-    //TFile *filepuest = new TFile("/home/fynu/bfrancois/bTag/CMSSW_7_4_5/src/RecoBTag/PerformanceMeasurements/test/BTagAnalyzerMacros/muEnQCD_ptBin20to300_star1_TrigDijet20_Jet60_250_notPUReweighted_goldenJSON/muEnQCD_ptBin20to300_star1_TrigDijet20_Jet60_250_notPUReweighted_goldenJSON.root");
+    TFile *filepuest = new TFile("test/abcd/output_all.root","READ");
     TH1D* npu_mc= (TH1D*) filepuest->Get("nPV_mc_unw");
     TH1D* npu_dat= (TH1D*) filepuest->Get("nPV_data");
     
@@ -322,9 +319,9 @@ void CommPlotProducer::SetXS(){
         if (sqrtstev!=-1) {
             cout << " MC Info not recognized! " << endl;
         }
-        cout << " Set Default values to Pythia inclusive 13 TeV " << endl;
-        SetInfo("pythia",0,13);
-        SetXS("pythia",0,13);   
+        cout << " Set Default values to Pythia inclusive 8 TeV " << endl;
+        SetInfo("pythia",0,8);
+        SetXS("pythia",0,8);   
     }
 
 }
@@ -354,13 +351,12 @@ void CommPlotProducer::SetXS(TString generator, bool MuEnriched, int TeV){
     double pythia_xs7MU[12]={  1471168.0,     1224034.0,   578463.0,    144421.74,   29048.7,   4440.2215,  2837.6712,          0,        0.,          0.,     0.,     0.};  
     //remark for pythia_xs7MU, it is for PTHAT 120-150 & 150-inf (and not 120-170 and 170-300)
 
-//    double pythia_xs13[12]   = { 0., 2.237E9, 1.615E8, 2.211E7, 3000114.3, 493200., 120300., 7475., 587.1, 167., 28.25, 0. };
-//    double pythia_xs13MU[12] = { 1.576E9*0.0039, 6.753E8*0.0065, 1.643E8*0.00816, 2.181E7*0.01522, 2.999E6*0.02424, 493200.*0.0473, 120300.*0.0676, 7475.*0.0864, 587.1*0.1024, 167.*0.0996, 28.25*0.1033, 8.975*0.1097 };
-    //RunIISpring15
-    double pythia_xs13[12]   = { 0., 1.83741E9, 1.40932E8, 1.92043E7, 2762530., 471100., 117276., 7823., 648.2, 186.9, 32.293, 9.4183 };
-    double pythia_xs13MU[12] = { 1.27319E9*0.003, 5.58528E8*0.0053, 1.39803E8*0.01182, 1.92225E7*0.02276, 2.758420E6*0.03844, 469797.*0.05362, 117989.*0.07335, 7820.25*0.10196, 645.528*0.12242, 187.109*0.13412, 32.3486*0.14552, 10.4305*0.15544 };
+    double pythia_xs13[12]   = { 0., 2.237E9, 1.615E8, 2.211E7, 3000114.3, 493200., 120300., 7475., 587.1, 167., 28.25, 0. };
+//    double pythia_xs13MU[12] = { 1.576E9*0.0039, 6.753E8*0.0065, 1.644E8*0.0122, 2.193E7*0.0218, 3000000.*0.0395, 493200.*0.0473, 120300.*0.0676, 7475.*0.0864, 587.1*0.1024, 167.*0.0996, 28.25*0.1033, 8.975*0.1097 };
+    // from DAN Phys14
+    double pythia_xs13MU[12] = { 1.576E9*0.0039, 6.753E8*0.0065, 1.643E8*0.00816, 2.181E7*0.01522, 2.999E6*0.02424, 493200.*0.0473, 120300.*0.0676, 7475.*0.0864, 587.1*0.1024, 167.*0.0996, 28.25*0.1033, 8.975*0.1097 };
 
-    cout << generator << " " << MuEnriched << " " << TeV << endl;
+
  
     if      (generator=="pythia" && !MuEnriched && TeV==8){       for (int i=0; i<12; i++){ x_section[i]=pythia_xs8[i]; }        }
     else if (generator=="pythia" &&  MuEnriched && TeV==8){       for (int i=0; i<12; i++){ x_section[i]=pythia_xs8MU[i]; }        }
@@ -480,76 +476,25 @@ double CommPlotProducer::GetEvtWeight(){
    
 }
 
-void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, float PtMax_Cut, TString output_name, TString puRewFileName, bool officalRecipe) { 
+void CommPlotProducer::Loop(int trigger, float PtMin_Cut, float PtMax_Cut, TString output_name)
+{
+    // if not specified : run on single jet trigger
+    Loop("jet",trigger,PtMin_Cut,PtMax_Cut,output_name);
+}
 
-    // Prepare for PU reweighting 
-    // if  PUreweightingFileName == "" --> no PU reweighting
-    int nBinForPuRew = 0;
-    TH1F* pu_weight_th1; 
-    if (!isData && puRewFileName != ""){
-        cout << "Start PU reweighting" << endl;
-        if (officalRecipe){
-
-            TFile *filepuest = new TFile(puRewFileName,"READ");
-            TH1F* npu_dat = (TH1F*) filepuest->Get("pileup");
-            nBinForPuRew = npu_dat->GetNbinsX(); 
-            float n_integral_da = npu_dat->Integral();
-            npu_dat->Scale(1./n_integral_da);
-
-            static const Double_t arr_Spring2016[] = { 
-                0.000829312873542, 0.00124276120498, 0.00339329181587, 0.00408224735376, 0.00383036590008, 0.00659159288946, 0.00816022734493, 0.00943640833116, 0.0137777376066, 0.017059392038, 
-                0.0213193035468, 0.0247343174676, 0.0280848773878, 0.0323308476564, 0.0370394341409, 0.0456917721191, 0.0558762890594, 0.0576956187107, 0.0625325287017, 
-                0.0591603758776, 0.0656650815128, 0.0678329011676, 0.0625142146389, 0.0548068448797, 0.0503893295063, 0.040209818868, 0.0374446988111, 0.0299661572042, 
-                0.0272024759921, 0.0219328403791, 0.0179586571619, 0.0142926728247, 0.00839941654725, 0.00522366397213, 0.00224457976761, 0.000779274977993, 0.000197066585944,
-                7.16031761328e-05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-            vector<Double_t> Spring2016 (arr_Spring2016, arr_Spring2016 + sizeof(arr_Spring2016)/sizeof(arr_Spring2016[0]));
-
-
-            TH1F* npu_mc = new TH1F("npu_mc", "npu_mc", nBinForPuRew, 0, nBinForPuRew);
-            for( int i=0; i<nBinForPuRew; ++i) {
-                npu_mc->SetBinContent(i+1, Spring2016.at(i));
-            }
-            float n_integral_mc = npu_mc->Integral();
-            npu_mc->Scale(1./n_integral_mc);
-            pu_weight_th1 = new TH1F("pu_weight_th1", "pu_weight_th1", nBinForPuRew, 0, nBinForPuRew);
-            pu_weight_th1 = npu_dat;
-            pu_weight_th1->Divide(npu_mc);
-
-        }
-        else {
-            vector<float> mc_vect;
-            vector<float> data_vect;
-            puweight=false;
-          
-            TFile * puFile = new TFile(puRewFileName);
-
-            TH1D* npu_mc= (TH1D*) puFile->Get("nPV_mc_unw");
-            TH1D* npu_dat= (TH1D*) puFile->Get("nPV_data");
-            cout << "Got file PU histo" << endl;
-            
-            float n_integral_mc = npu_mc->Integral();
-            float n_integral_da = npu_dat->Integral();
-            npu_mc->Scale(1./n_integral_mc);
-            npu_dat->Scale(1./n_integral_da);
-
-            for (int i=0; i<60; i++){
-                mc_vect.push_back(npu_mc->GetBinContent(i+1));
-                data_vect.push_back(npu_dat->GetBinContent(i+1));
-            }
-          
-            LumiWeights = reweight::LumiReWeighting(mc_vect,data_vect);
-        }
-    }   
-
+void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, float PtMax_Cut, TString output_name)
+  
+  
+{ 
+  
     //---------------Configuration-----------------------------------------// 
-    //produceJetProbaTree=true;
-    //produceRecoMuon = false;
-    //produceTagVarCSVTree = true;
-    //produceTagVarTree = true;
+    //produceJetProbaTree=false;
     float PtMin  = PtMin_Cut;  
     float PtMax  = PtMax_Cut;  
     float EtaCut = 2.4; 
     double pi=acos(-1);
+
+  
   
     // Cross check variables--------------------------------------------------//
     int   Nevent = 0; 
@@ -558,17 +503,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     float N_event_mc_after_sel    =0;
     float N_event_data_after_sel  =0;
   
-    int nHitAllCut, nHitPixCut;
-    bool oldTrackSel = false;
-    if (oldTrackSel) {
-        nHitAllCut = 8;
-        nHitPixCut = 2;
-    }
-    else {
-        nHitAllCut = 0;
-        nHitPixCut = 1;
-    }
-
+  
 
   
     bool passNhit;
@@ -584,12 +519,12 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     TFile *myfile=new TFile(output_name+".root",      "recreate");
   
     // --------------------------------------Histograms declaration------------------------------------------------//   
-    TH1D* nPU_mc                  = new TH1D("nPU_mc",                "nPU_mc",                50,0,50);
-    TH1D* nPV_data                = new TH1D("nPV_data",              "nPV_data",              50,0,50);
-    TH1D* nPV_mc                  = new TH1D("nPV_mc",                "nPV_mc",                50,0,50);
-    TH1D* nPV_mc_unw              = new TH1D("nPV_mc_unw",            "nPV_mc_unw",                50,0,50);
-    TH1D* pt_hat                  = new TH1D("pt_hat",                "pt_hat",                100,0,1000);
-    TH1D* pt_hat_fin              = new TH1D("pt_hat_fin",            "pt_hat_fin",             100,0,1000);
+    TH1D* nPU_mc                  = new TH1D("nPU_mc",                "nPU_mc",                60,-0.5,59.5);
+    TH1D* nPV_data                = new TH1D("nPV_data",              "nPV_data",              60,-0.5,59.5);
+    TH1D* nPV_mc                  = new TH1D("nPV_mc",                "nPV_mc",                60,-0.5,59.5);
+    TH1D* nPV_mc_unw              = new TH1D("nPV_mc_unw",            "nPV_mc_unw",                60,-0.5,59.5);
+    TH1D* pt_hat                  = new TH1D("pt_hat",                "pt_hat",                70,30,100);
+    TH1D* pt_hat_fin              = new TH1D("pt_hat_fin",            "pt_hat_fin",                70,30,100);
     TH1D* jet_pt_mc               = new TH1D("jet_pt_mc",  	    "jet_pt_mc", 	     PtMax/10,0,PtMax );
     TH1D* nJet_data               = new TH1D("nJet_data",             "nJet_data",             10,0,10    );
     TH1D* nJet_mc                 = new TH1D("nJet_mc",               "nJet_mc",               10,0,10    );
@@ -653,16 +588,13 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
       AddHisto("muon_Ip2d", 	 "Muon 2D IP",  	   nMubins, -0.1, 0.1 );
       AddHisto("muon_Sip3d",	 "Muon 3D IP significance",nMubins, -35, 35   );
       AddHisto("muon_Sip2d",	 "Muon 2D IP significance",nMubins, -35, 35   );
-      AddHisto("muon_DeltaR",	 "Muon deltaR",nMubins,0,0.4); 
+      AddHisto("muon_DeltaR",	 "Muon deltaR",nMubins,0,0.5); 
     }
   
     int nSVbins = 20; 
-    AddHisto("sv_multi_0"	  ,      "number of secondary vertex",                          6,-0.5,5.5   );
-    AddHisto("sv_multi"	  ,      "number of secondary vertex",                          6,-0.5,5.5   );
-    if (produceSVinfo) {
-    AddHisto("sv_deltaR_jet",      "sv_deltaR_jet",                                   nSVbins,0.,0.4    );
-    AddHisto("sv_deltaR_sumJet",   "SVvtxSumJetDeltaR",                                   nSVbins,0.,0.4    );
-    AddHisto("sv_deltaR_sumDir",   "SVvtxSumVtxDirDeltaR",                                nSVbins,0.,0.4    );
+    AddHisto("sv_deltaR_jet",      "sv_deltaR_jet",                                   nSVbins,0.,0.5    );
+    AddHisto("sv_deltaR_sumJet",   "SVvtxSumJetDeltaR",                                   nSVbins,0.,0.5    );
+    AddHisto("sv_deltaR_sumDir",   "SVvtxSumVtxDirDeltaR",                                nSVbins,0.,0.5    );
     AddHisto("sv_pt",              "Vtx p_{T}",                                           nSVbins,0.,100.   );
     AddHisto("sv_eta",             "Vtx #eta",                                            nSVbins, -2.5, 2.5);
     AddHisto("sv_phi",             "Vtx #phi",                                            nSVbins, -1.*pi,pi);
@@ -672,32 +604,25 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     AddHisto("sv_flight2DSig_3trk","Flight distance significance 2D with >=3 tracks",     nSVbins,0.,80.    );
     AddHisto("sv_flight3D",        "Flight distance 3D",                                  nSVbins,0.,15.    );  
     AddHisto("sv_flight3DSig" ,    "flight distance significance 3D",	                nSVbins,0.,80.    );
+    AddHisto("sv_multi_0"	  ,      "number of secondary vertex",                          6,-0.5,5.5   );
+    AddHisto("sv_multi"	  ,      "number of secondary vertex",                          6,-0.5,5.5   );
     AddHisto("sv_mass"	  ,      "invariant mass of the secondary vertex",              nSVbins,0.,8.     );
     AddHisto("sv_chi2norm"  ,      "normalized chi2 of the secondary vertex",             nSVbins,0.,10.    );
     AddHisto("svnTrk",	         "Track multiplicity : SVnVertexTracks (centered)",     13,-0.5,12.5 );
     AddHisto("sv_flight3Derr",     "Flight distance error 3D",                            nSVbins,0.,0.5);
     AddHisto("sv_flight2Derr",     "Flight distance error 2D",                            nSVbins,0.,0.2);
     AddHisto("sv_mass_3trk"	,"invariant mass of the secondary vertex with at least 3 SV tracks",  nSVbins,0.,8.     );
-    }
   
     int nTrackbins = 100; 
     AddHisto("track_multi"  ,      "number of tracks in the jets",                40,-0.5,39.5 );
-    AddHisto("trk_multi_sel"  ,    "number of selected tracks in the jets",       30,-0.5,29.5 );
-    AddHisto("trk_multi_sel03"  ,    "number of selected tracks in the jets",       30,-0.5,29.5 );
+    AddHisto("track_multi04"  ,      "number of tracks in the jets04",                40,-0.5,39.5 );
 
     if (produceJetProbaTree) {
-    AddHisto("track_multi04"  ,      "number of tracks in the jets04",                40,-0.5,39.5 );
-    AddHisto("track_dr"   ,      "Delta R (jet, track)",               40,0.,0.4   );
+    AddHisto("trk_multi_sel"  ,    "number of selected tracks in the jets",       30,-0.5,29.5 );
+    AddHisto("track_dr"   ,      "Delta R (jet, track)",               50,0.,0.5   );
     AddHisto("track_chi2"   ,      "normalized chi2 of the tracks",               nTrackbins,0.,5.   );
-    AddHisto("track_nHit" ,        "number of hits ",               35,0, 35);
-    AddHisto("track_HPix"   ,      "number of hits in the Pixel",                 10,0,10  );
-    AddHisto("track_nHitStrip"   ,      "number of hits in the Strip",                 27, 0, 27  );
-    AddHisto("track_nHitTIB"   ,      "number of hits in the TIB",                 12,0, 12  );
-    AddHisto("track_nHitTID"   ,      "number of hits in the TID",                 10,0, 10  );
-    AddHisto("track_nHitTOB"   ,      "number of hits in the TOB",                 16,0, 16  );
-    AddHisto("track_nHitTEC"   ,      "number of hits in the TEC",                 21,0, 21  );
-    AddHisto("track_nHitPXB"   ,      "number of hits in the PXB",                 7,0, 7  );
-    AddHisto("track_nHitPXF"   ,      "number of hits in the PXF",                 7,0, 7  );
+    AddHisto("track_nHit" ,        "number of hits ",               35,-0.5, 34.5 );
+    AddHisto("track_HPix"   ,      "number of hits in the Pixel",                 10,-0.5, 9.5  );
   
     AddHisto("track_IPs"    ,      "3D IP significance of all tracks",	        nTrackbins,-35.,35.  );
     AddHisto("track_IPs1tr" ,      "3D IP significance of the first track",       nTrackbins,-35.,35.  );
@@ -746,22 +671,16 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
 
     int nDiscbins = 50; 
    
+ 
+   
     AddHisto("TCHE"	  ,"TCHE",				     nDiscbins,0.,30. );
     AddHisto("TCHP"	  ,"TCHP",				     nDiscbins,0.,30. );  
-    AddHisto("JP" 	  ,"JP",				     nDiscbins,0.,1.5 );
-    AddHisto("JBP"	  ,"JBP",				     nDiscbins,0.,4.  );
+    AddHisto("JP" 	  ,"JP",				     nDiscbins,0.,2.5 );
+    AddHisto("JBP"	  ,"JBP",				     nDiscbins,0.,8.  );
     AddHisto("SSV"	  ,"SSVHE",				     70,0.,7.  );
     AddHisto("SSVHP"  ,"SSVHP",				             70,0.,7.  ); 
     AddHisto("CSV"	  ,"CSV",				     nDiscbins,0.,1.  );
     AddHisto("CSVIVF" ,"CSVIVF",                 nDiscbins,0.,1.  );
-    AddHisto("cMVA" ,"cMVA",                 nDiscbins,0.,1.  );
-    AddHisto("cMVAv2" ,"cMVAv2",                 nDiscbins,-1.,1.);
-    AddHisto("cTagCvsB" ,"cTagCvsB",                 nDiscbins,-1.,1.);
-    AddHisto("cTagCvsBN" ,"cTagCvsBN",                 nDiscbins,-1.,1.);
-    AddHisto("cTagCvsBP" ,"cTagCvsBP",                 nDiscbins,-1.,1.);
-    AddHisto("cTagCvsL" ,"cTagCvsL",                 nDiscbins,-1.,1.);
-    AddHisto("cTagCvsLN" ,"cTagCvsLN",                 nDiscbins,-1.,1.);
-    AddHisto("cTagCvsLP" ,"cTagCvsLP",                 nDiscbins,-1.,1.);
 
     AddHisto("TCHE_extended1"	  ,"TCHE_extended1",				     60, -30.,30. );
     AddHisto("TCHP_extended1"	  ,"TCHP_extended1",				     60, -30.,30. );
@@ -782,7 +701,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     AddHisto("pfmuon_ptrel",      "pT rel. of the muon",	   nMubins,0,5        );
     AddHisto("pfmuon_ratio",      "ratio of pfmuon", nMubins,0,1       );  
     AddHisto("pfmuon_ratiorel",   "ratioRel of pfmuon", nMubins,0,0.03       );  
-    AddHisto("pfmuon_deltar",	"#DeltaR(pfmuon,jet)",nMubins,0,0.4);
+    AddHisto("pfmuon_deltar",	"#DeltaR(pfmuon,jet)",nMubins,0,0.5);
   
     AddHisto("pfelectron_multi",      "number of pfelectron",	   7,-0.5,6.5    );
     AddHisto("pfelectron_pt",		"pfelectron p_{T}",  	   50, 0, 100	 );
@@ -794,46 +713,22 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     AddHisto("pfelectron_ratiorel",   "ratioRel of pfelectron", nMubins,0,0.03      );  
     AddHisto("pfelectron_deltar",	"#DeltaR(pfelectron,jet)",nMubins,0,0.5);  
 
-    AddHisto("pfelectron_eta_1",  "pfelectron #eta",                 nMubins, -2.5, 2.5 );
-    AddHisto("pfelectron_jeta_1", "jet #eta",                 nMubins, -2.5, 2.5 );
-    AddHisto("pfelectron_ip_1",	 "3D IP of pfelectron",140, -350., 350.   );
-    AddHisto("pfelectron_ip2d_1", "2D IP of pfelectron",140, -350., 350.   );	
-    AddHisto("pfelectron_ptratio_1", "el pT / jet pT", 55, 0., 1.1); 
-    AddHisto("pfelectron_ratio_1",    "ratio of pfelectron", nMubins,0,1       );
-    AddHisto("pfelectron_ratiorel_1",  "ratioRel of pfelectron", nMubins,0,0.03      );
-    AddHisto("pfelectron_deltar_1", "#DeltaR(pfelectron,jet)",nMubins,0,0.5);
-    AddHisto("pfelectron_eta_2",  "pfelectron #eta",                 nMubins, -2.5, 2.5 );
-    AddHisto("pfelectron_jeta_2", "jet #eta",                 nMubins, -2.5, 2.5 );
-    AddHisto("pfelectron_ip_2",	 "3D IP of pfelectron",140, -350., 350.   );
-    AddHisto("pfelectron_ip2d_2", "2D IP of pfelectron",140, -350., 350.   );	
-    AddHisto("pfelectron_ptratio_2", "el pT / jet pT", 55, 0., 1.1); 
-    AddHisto("pfelectron_ratio_2",    "ratio of pfelectron", nMubins,0,1       );
-    AddHisto("pfelectron_ratiorel_2",  "ratioRel of pfelectron", nMubins,0,0.03      );
-    AddHisto("pfelectron_deltar_2", "#DeltaR(pfelectron,jet)",nMubins,0,0.5);
-
     if (produceTagVarTree) {
       AddHisto("tagvar_vertexNTracks",  "# SV tracks",  13,-0.5,12.5 );
       AddHisto("tagvar_vertexmass",     "SV mass", nSVbins,0.,8.     );
-      AddHisto("tagvar_vertexmass_cat0",     "SV mass", nSVbins,0.,8.     );
       AddHisto("tagvar_vertexmass3trk", "SV mass (at least 3 SV tracks)",nSVbins,0.,8.     );
-      AddHisto("tagvar_vertexJetDeltaR","DeltaR(SV,jet) ",               nSVbins,0.,0.4    );
+      AddHisto("tagvar_vertexJetDeltaR","DeltaR(SV,jet) ",               nSVbins,0.,0.5    );
     }
     if (produceTagVarCSVTree) { 
       AddHisto("tagvarCSV_vertexCategory","vertex category",4,-0.5, 3.5);
       AddHisto("tagvarCSV_Sig2dAboveCharm",   "IP significance 2D charm",                            nSVbins,-35.,35.  );
       AddHisto("tagvarCSV_trackEtaRel",   "Track etaRel",100,0.,8.);
       AddHisto("tagvarCSV_vertexmass",    "SV mass", nSVbins,0.,8.     );
-      AddHisto("tagvarCSV_vertexmass_cat0",    "SV mass", nSVbins,0.,8.     );
       AddHisto("tagvarCSV_vertexmass3trk",    "SV mass (at least 3 SV tracks)", nSVbins,0.,8.     );
-      AddHisto("tagvarCSV_vertexmass3trk_cat0",    "SV mass (at least 3 SV tracks)", nSVbins,0.,8.     );
       AddHisto("tagvarCSV_vertexNTracks",  "# SV tracks",  13,-0.5,12.5 );
-      AddHisto("tagvarCSV_vertexNTracks_cat0",  "# SV tracks",  13,-0.5,12.5 );
       AddHisto("tagvarCSV_energyratio","Fractional energy",                                   nSVbins,0.,1.     ); 
       AddHisto("tagvarCSV_trackSip3dSig","3D IP significance",       nTrackbins,-35.,35.  );
       AddHisto("tagvarCSV_2DsigFlightDist",     "Flight distance significance 2D",                     nSVbins,0.,80.    );
-      AddHisto("tagvarCSV_2DsigFlightDist_cat0",     "Flight distance significance 2D",                     nSVbins,0.,80.    );
-      AddHisto("tagvarCSV_vertexJetDeltaR","DeltaR(SV,jet) ",               nSVbins,0.,0.4    );
-      AddHisto("tagvarCSV_vertexJetDeltaR_cat0","DeltaR(SV,jet) ",               nSVbins,0.,0.4    );
     }
   
  
@@ -841,17 +736,18 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     AddHisto2D("seltrack_vs_jetpt", "sel track multiplicity vs jet pt",         PtMax/20,0,PtMax, 100,-0.5,99.5);
     }
 
-    if (produceSVinfo) {
     AddHisto2D("sv_mass_vs_flightDist3D", " SVMass vs SV 3D flight distance ",  50,0, 10,60,0,6);			
     AddHisto2D("avg_sv_mass_vs_jetpt","Avg SVMass vs jet pt",                   PtMax/20,0,PtMax, 100,0,6);
-    AddHisto2D("sv_deltar_jet_vs_jetpt","SVJetDeltaR vs jet pt",                PtMax/20,0,PtMax, 40,0.,0.4);  
-    AddHisto2D("sv_deltar_sum_jet_vs_jetpt","SVvtxSumJetDeltaR vs jet pt",      PtMax/20,0,PtMax, 40,0.,0.4);
-    AddHisto2D("sv_deltar_sum_dir_vs_jetpt","SVvtxSumVtxDirDeltaR vs jet pt",   PtMax/20,0,PtMax, 40,0.,0.4); 
-    }
+    AddHisto2D("sv_deltar_jet_vs_jetpt","SVJetDeltaR vs jet pt",                PtMax/20,0,PtMax, 50,0.,0.5);  
+    AddHisto2D("sv_deltar_sum_jet_vs_jetpt","SVvtxSumJetDeltaR vs jet pt",      PtMax/20,0,PtMax, 50,0.,0.5);
+    AddHisto2D("sv_deltar_sum_dir_vs_jetpt","SVvtxSumVtxDirDeltaR vs jet pt",   PtMax/20,0,PtMax, 50,0.,0.5); 
     if (produceRecoMuon) {
     AddHisto2D("muon_ptrel_vs_jetpt","Muon_p{T}^{rel} vs jet pt",               PtMax/20,0,PtMax,50,0,5);  
-    AddHisto2D("muon_DeltaR_vs_jetpt","Muon1 DeltaR vs jet pt",                 PtMax/20,0,PtMax,40,0,0.4);
+    AddHisto2D("muon_DeltaR_vs_jetpt","Muon1 DeltaR vs jet pt",                 PtMax/20,0,PtMax,50,0,0.5);
     }
+
+
+
     
     Nevent = 0;
     int Ntrigevent = 0;
@@ -864,10 +760,21 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
   
     Long64_t nbytes = 0, nb = 0;
 
+    // Read pT reweighting histogram
+    /*
+    string ptreweightfile = "reweightPt_Inclusive_8TeVvs4050_PFJet40.root";
+    TFile *reweightpt = new TFile(ptreweightfile.c_str());
+    TH1F *jetptratio;
+    jetptratio = (TH1F*)reweightpt->Get("reweight");
+    */
+  
+    //nentries=100000;
+    cout << " in loop " << nentries <<endl;
     //------------------------------------------------------------------------------------------------------------------//  
     //----------------------------------------EVENT LOOP ---------------------------------------------------------------// 
     //------------------------------------------------------------------------------------------------------------------//  
     
+    //nentries
     bool printinfo = false;
     for (Long64_t jentry=0; jentry<nentries;jentry++) {
         if (printinfo) cout << " loading tree\n";
@@ -876,11 +783,21 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
         if (printinfo) cout << " getting entry\n";
         nb = fChain->GetEntry(jentry);   nbytes += nb;
 
+
+        /*
+        // keep only the ttbar hadronic events
+        int count_lepdecay =0;
+        for (int il=0; il<nGenlep; il++) {
+           if (Genlep_mother[il]>99) count_lepdecay++;
+        }
+        if (count_lepdecay>0) continue;
+        */
+
+
         //-----------------------------------
         //is data or MC ?
         //-----------------------------------
-        if(pthat == -1) isData=true;
-        else            isData=false;
+        isData=false;
     
         if (isData) N_event_data_before_sel++;
         else        N_event_mc_before_sel++;
@@ -896,26 +813,102 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
         if (printinfo) cout << " getting event weight\n";
         ww=GetEvtWeight();
         if (sqrtstev<0) ww=1.;
-        if (jentry<10) cout << " Evt weight for cross section : " << ww << endl;
+        if (jentry<10) cout << " ww " << ww << endl;
         
 
-        double ww_woPU=ww;
 
-
+        // reweighting to have the same pthat distribution at 8 TeV than at 13 TeV
+        if (sqrtstev==8) {
+          if (pthat<30) ww*=1;
+          else if (pthat<40) ww*=0.976294;
+          else if (pthat<50) ww*=1.01541;
+          else if (pthat<60) ww*=1.07855;
+          else if (pthat<70) ww*=1.11816;
+          else if (pthat<80) ww*=1.14682;
+          else if (pthat<90) ww*=1.15081;
+          else if (pthat<100) ww*=1.18087;
+          else if (pthat<110) ww*=1.20429;
+          else if (pthat<120) ww*=1.22826;
+          else if (pthat<130) ww*=1.24829;
+          else if (pthat<140) ww*=1.27395;
+          else if (pthat<150) ww*=1.2954;
+          else if (pthat<160) ww*=1.31888;
+          else if (pthat<170) ww*=1.34134;
+       }
+/*
+        if (sqrtstev==8) {
+          if (pthat<50) ww*=1;
+          else if (pthat<60) ww*=0.975669;
+          else if (pthat<70) ww*=1.00478;
+          else if (pthat<80) ww*=1.02902;
+          else if (pthat<90) ww*=1.04015;
+          else if (pthat<100) ww*=1.06193;
+          else if (pthat<110) ww*=1.08189;
+          else if (pthat<120) ww*=1.10735;
+          else if (pthat<130) ww*=1.12469;
+          else if (pthat<140) ww*=1.14716;
+          else if (pthat<150) ww*=1.16819;
+          else if (pthat<160) ww*=1.18393;
+          else if (pthat<170) ww*=1.18393;
+          else if (pthat<470) ww*=1.;
+          else if (pthat<480) ww*=1.79;
+          else if (pthat<490) ww*=1.80172;
+          else if (pthat<500) ww*=1.83285;
+          else if (pthat<510) ww*=1.84635;
+          else if (pthat<520) ww*=1.8745;
+          else if (pthat<530) ww*=1.90015;
+          else if (pthat<540) ww*=1.91784;
+          else if (pthat<550) ww*=1.93765;
+          else if (pthat<560) ww*=1.96998;
+          else if (pthat<570) ww*=1.98841;
+          else if (pthat<580) ww*=2.00571;
+          else if (pthat<590) ww*=2.04887;
+          else if (pthat<600) ww*=2.06236;
+          else if (pthat<610) ww*=2.08986;
+          else if (pthat<620) ww*=2.11926;
+          else if (pthat<630) ww*=2.1489;
+          else if (pthat<640) ww*=2.18014;
+          else if (pthat<650) ww*=2.18985;
+          else if (pthat<660) ww*=2.21246;
+          else if (pthat<670) ww*=2.24133;
+          else if (pthat<680) ww*=2.28596;
+          else if (pthat<690) ww*=2.30367;
+          else if (pthat<700) ww*=2.33695;
+          else if (pthat<710) ww*=2.34348;
+          else if (pthat<720) ww*=2.38283;
+          else if (pthat<730) ww*=2.41769;
+          else if (pthat<740) ww*=2.44088;
+          else if (pthat<750) ww*=2.47955;
+          else if (pthat<760) ww*=2.51384;
+          else if (pthat<770) ww*=2.54629;
+          else if (pthat<780) ww*=2.57973;
+          else if (pthat<790) ww*=2.5965;
+          else if (pthat<800) ww*=2.61759;
+          else if (pthat<810) ww*=2.66169;
+          else if (pthat<820) ww*=2.69976;
+          else if (pthat<830) ww*=2.73976;
+          else if (pthat<840) ww*=2.76758;
+          else if (pthat<850) ww*=2.79714;
+          else if (pthat<860) ww*=2.81252;
+          else if (pthat<870) ww*=2.88612;
+          else if (pthat<880) ww*=2.90749;
+          else if (pthat<890) ww*=2.94866;
+          else if (pthat<900) ww*=2.96274;
+          else if (pthat<910) ww*=3.01957;
+          else if (pthat<920) ww*=3.07051;
+          else if (pthat<930) ww*=3.10424;
+          else if (pthat<940) ww*=3.14339;
+          else if (pthat<950) ww*=3.20024;
+          else if (pthat<960) ww*=3.21801;
+          else if (pthat<970) ww*=3.28194;
+          else if (pthat<980) ww*=3.29407;
+          else if (pthat<990) ww*=3.38315;
+          else if (pthat<1000) ww*=3.4031;
+        }
+*/
     
-        //--------------------------------------------//  
-        //-------------pile-up reweighting------------//  
-        //--------------------------------------------//  
-        if (!isData && puRewFileName != ""){
-            float WeightPU =1;
-            if (officalRecipe) {
-                if (nPUtrue > nBinForPuRew-1) WeightPU = 0;
-                else WeightPU = pu_weight_th1->GetBinContent(pu_weight_th1->GetBin(nPUtrue));
-            }
-            else WeightPU  = LumiWeights.weight( nPV );
-            ww*=WeightPU;
-        }    
         if (!isData)  pt_hat         ->Fill(pthat,ww);
+
     
         //-----------------------------------
         //counter of events
@@ -930,21 +923,29 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
         //at least 1 jet in the event
         if (nJet<=0) continue;
 
+
         //select good PV:
         //if (abs(PVz-GenPVz)>0.005) continue;
+    
 
         //-----------------------------------
         //Apply trigger selection
         //-----------------------------------
         if (printinfo) cout << " checking trigger " << trigger << endl;
-        bool isTrigOK = passTrigger(trigname, trigger);
-        // FIXME no trigger in MC
-        if (!isTrigOK && isData) continue;
+        //bool isTrigOK = passTrigger(trigname, trigger);
+        //if (!isTrigOK) continue;
         ++Ntrigevent;
+
+
+        //-----------------------------------
+        //Apply PU selection
+        //-----------------------------------
+
 
         //-----------------------------------
         //Fill control plot
         //-----------------------------------
+        //
     
         if(isData){
             N_event_data_after_sel++;
@@ -954,7 +955,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             N_event_mc_after_sel++;
             nPU_mc         ->Fill(nPUtrue,ww);
             nPV_mc         ->Fill(nPV,ww);
-            nPV_mc_unw     ->Fill(nPV,ww_woPU);
+            nPV_mc_unw     ->Fill(nPV,ww);
             nJet_mc_inc->Fill(nJet, ww);
         }
 
@@ -971,7 +972,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             float phijet   = Jet_phi[ijet];      
             float ntrkjet  = Jet_ntracks[ijet];  
             int   flav     = Jet_flavour[ijet];
-            if (Jet_genpt[ijet]<8) flav=22;
+            if (Jet_genpt[ijet]<8) flav=22; // au hasard pour le PU
 
             FillHisto_floatFromMap("incjet_ptgen",   flav, 0 ,Jet_genpt[ijet]    ,ww);
             FillHisto_floatFromMap("incjet_pt",  flav, 0 ,ptjet    ,ww);
@@ -981,7 +982,8 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             FillHisto_floatFromMap("incjet_diffrel",   flav, 0 ,(Jet_genpt[ijet]-ptjet)/ptjet    ,ww);
 
           
-            if (   ptjet  < PtMin  || ptjet  > PtMax   ) continue;
+            //if (   ptjet  < PtMin  || ptjet  > PtMax   ) continue;
+            if (   Jet_genpt[ijet]  < PtMin  || Jet_genpt[ijet]  > PtMax   ) continue;
             if (   fabs(etajet) > EtaCut               ) continue;
 
             int   idxFirstMuon = -1;
@@ -1002,7 +1004,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
                 }
               }
             }
-            else if (produceRecoMuon) {
+            else if (produceRecoMuon) {     // use RECO Muon (not included in BTagAnalyzer since 74X)
              if (nMuon>0){
                 for (int imu=0; imu< nMuon; imu++){
                     if (Muon_IdxJet[imu]==ijet ){
@@ -1049,14 +1051,6 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             float ssvhp    = Jet_SvxHP[ijet];
             float csv      = Jet_CombSvx[ijet];
             float csvivf   = Jet_CombIVF[ijet];
-            float csvmva   = Jet_cMVA[ijet];
-            float csvmvav2   = Jet_cMVAv2[ijet];
-            float ctagCvsB = CTag_Jet_CvsB[ijet];
-            float ctagCvsBN = CTag_Jet_CvsBN[ijet];
-            float ctagCvsBP = CTag_Jet_CvsBP[ijet];
-            float ctagCvsL = CTag_Jet_CvsL[ijet];
-            float ctagCvsLN = CTag_Jet_CvsLN[ijet];
-            float ctagCvsLP = CTag_Jet_CvsLP[ijet];
       
       
             bool isGluonSplit=false;
@@ -1101,6 +1095,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
       
             FillHisto_floatFromMap("jet_eta",     flav, isGluonSplit ,etajet   ,ww);
             FillHisto_floatFromMap("jet_phi",     flav, isGluonSplit ,phijet   ,ww);
+            FillHisto_intFromMap(  "track_multi", flav, isGluonSplit ,ntrkjet  ,ww);
             FillHisto_intFromMap(  "jet_flav", flav, isGluonSplit ,flav  ,ww);
 
             
@@ -1115,16 +1110,11 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             float sig32D_ip=-9999;   
          
             int ntracksel  =0;   
-            int ntracksel03  =0;   
             int ntrkjet04 =0;
-            ntrkjet=0;
          
             if ( produceJetProbaTree ) {
 	
                 for (int itrk=Jet_nFirstTrack[ijet]; itrk<Jet_nLastTrack[ijet] ; itrk++){
-                    // temporary fix for different MiniAOD versions
-                    // if (Track_pt[itrk]<0.95) continue;
-                    ntrkjet++;
 
                     //-------------------------//
                     //-----Track selection-----//
@@ -1138,17 +1128,18 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
                     passtrklen=false;
                     passTrackIP2D=false;
 	    
-                    if (Track_nHitAll[itrk] >= nHitAllCut)   passNhit=true;
-                    if (Track_nHitPixel[itrk] >= nHitPixCut)   passPix= true;
-                    if (fabs(Track_dz[itrk]) < 17)   passIPz=true;
-                    if (Track_pt[itrk] > 1)           passPt=true;
-                    if (Track_chi2[itrk] < 5)         passnormchi2=true;
-                    if (fabs(Track_dist[itrk]) < 0.07)passtrkdist=true;
-                    if (Track_length[itrk] < 5)       passtrklen=true;
-                    if (fabs(Track_IP2D[itrk]) < 0.2)   passTrackIP2D=true;
+                    if (Track_nHitAll[itrk]>=8)   passNhit=true;
+                    if (Track_nHitPixel[itrk]>=2)   passPix= true;
+                    if (fabs(Track_dz[itrk])<17)   passIPz=true;
+                    if (Track_pt[itrk]>1)           passPt=true;
+                    if (Track_chi2[itrk]<5)         passnormchi2=true;
+                    if (fabs(Track_dist[itrk])<0.07)passtrkdist=true;
+                    if (Track_length[itrk]<5)       passtrklen=true;
+                    if (fabs(Track_IP2D[itrk])<0.2)   passTrackIP2D=true;
 	  
                     float dr_track= DeltaR( Jet_eta[ijet], Jet_phi[ijet], Track_eta[itrk], Track_phi[itrk] );
-                    if (dr_track<0.4) ntrkjet04++;
+                    if (dr_track>0.4) continue;
+                    ntrkjet04++;
                     if (!use_selected_tracks){
 	    
                         FillHisto_floatFromMap("track_len_all_zoom",          flav, isGluonSplit ,Track_length[itrk] , ww);
@@ -1183,19 +1174,11 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
                     }
                     if (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D){
                         ntracksel++;
-                        if (dr_track<0.3) ntracksel03++;
 	    
                         FillHisto_floatFromMap("track_dr",    flav, isGluonSplit ,dr_track	   ,ww);
                         FillHisto_floatFromMap("track_chi2",    flav, isGluonSplit ,Track_chi2[itrk]	   ,ww);
                         FillHisto_intFromMap(  "track_nHit",  flav, isGluonSplit ,Track_nHitAll[itrk],ww);
                         FillHisto_intFromMap(  "track_HPix",    flav, isGluonSplit ,Track_nHitPixel[itrk],ww);
-                        FillHisto_intFromMap(  "track_nHitStrip",    flav, isGluonSplit ,Track_nHitStrip[itrk],ww);
-                        FillHisto_intFromMap(  "track_nHitTIB",    flav, isGluonSplit ,Track_nHitTIB[itrk],ww);
-                        FillHisto_intFromMap(  "track_nHitTID",    flav, isGluonSplit ,Track_nHitTID[itrk],ww);
-                        FillHisto_intFromMap(  "track_nHitTOB",    flav, isGluonSplit ,Track_nHitTOB[itrk],ww);
-                        FillHisto_intFromMap(  "track_nHitTEC",    flav, isGluonSplit ,Track_nHitTEC[itrk],ww);
-                        FillHisto_intFromMap(  "track_nHitPXB",    flav, isGluonSplit ,Track_nHitPXB[itrk],ww);
-                        FillHisto_intFromMap(  "track_nHitPXF",    flav, isGluonSplit ,Track_nHitPXF[itrk],ww);
                         FillHisto_floatFromMap("track_IPs",     flav, isGluonSplit ,Track_IPsig[itrk]    ,ww);
                         FillHisto_floatFromMap("track_IP",      flav, isGluonSplit ,Track_IP[itrk]       ,ww);
                         FillHisto_floatFromMap("track_IP2Ds",   flav, isGluonSplit ,Track_IP2Dsig[itrk]  ,ww);
@@ -1271,16 +1254,11 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
 
 	
                 FillHisto_intFromMap(        "trk_multi_sel",     flav, isGluonSplit ,ntracksel	         , ww);  
-                FillHisto_intFromMap(        "trk_multi_sel03",     flav, isGluonSplit ,ntracksel03	         , ww);  
                 FillHisto2D_int_floatFromMap("seltrack_vs_jetpt", flav, isGluonSplit ,ptjet ,  ntracksel , ww);
                 FillHisto_intFromMap(  "track_multi04", flav, isGluonSplit ,ntrkjet04  ,ww);
-                FillHisto_intFromMap(  "track_multi", flav, isGluonSplit ,ntrkjet  ,ww);
 	
 
             }//end produce jetProbaTree
-            else {
-                FillHisto_intFromMap(        "trk_multi_sel03",     flav, isGluonSplit ,Jet_nseltracks[ijet]	         , ww);  
-            }
 
             //---------------------------------
             //fill information related to SV
@@ -1290,8 +1268,6 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             FillHisto_intFromMap(  "sv_multi_0",      flav, isGluonSplit ,n_sv 	 ,         ww);
 
             if (n_sv>0){  
-              FillHisto_intFromMap(  "sv_multi",     flav, isGluonSplit ,n_sv ,  ww);
-              if (produceSVinfo) {
                 chi2norm_sv    = SV_chi2[Jet_nFirstSV[ijet]]/SV_ndf[Jet_nFirstSV[ijet]];
                 flightSig_sv   = SV_flight[Jet_nFirstSV[ijet]]/SV_flightErr[Jet_nFirstSV[ijet]];
                 flight2DSig_sv = SV_flight2D[Jet_nFirstSV[ijet]]/SV_flight2DErr[Jet_nFirstSV[ijet]];
@@ -1315,6 +1291,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
                 //-------------------------//
                 //-----SV histograms-----//
                 //-------------------------//   
+                FillHisto_intFromMap(  "sv_multi",     flav, isGluonSplit ,n_sv ,  ww);
                 FillHisto_floatFromMap("sv_chi2norm",     flav, isGluonSplit ,chi2norm_sv        , ww);
                 FillHisto_floatFromMap("sv_mass",         flav, isGluonSplit ,mass_sv,             ww);
                 FillHisto_floatFromMap("sv_deltaR_jet",   flav, isGluonSplit ,sv_dR_jet,           ww);
@@ -1342,10 +1319,12 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
                 FillHisto2D_float_floatFromMap("sv_deltar_jet_vs_jetpt"      ,flav,isGluonSplit ,ptjet,sv_dR_jet,ww);
                 FillHisto2D_float_floatFromMap("sv_deltar_sum_jet_vs_jetpt"  ,flav,isGluonSplit ,ptjet,sv_dR_dir_sum,ww);
                 FillHisto2D_float_floatFromMap("sv_deltar_sum_dir_vs_jetpt"  ,flav,isGluonSplit ,ptjet,sv_dR_jet_sum,ww);	    
-                }
 	    
             }
+	    
 
+	
+            
             //-------------------------//
             //-----Tagger histograms-----//
             //-------------------------// 
@@ -1358,14 +1337,6 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             FillHisto_floatFromMap("SSVHP", flav, isGluonSplit, ssvhp	  ,   ww);
             FillHisto_floatFromMap("CSV",   flav, isGluonSplit, csv	  ,   ww);
             FillHisto_floatFromMap("CSVIVF",   flav, isGluonSplit, csvivf         ,   ww);
-            FillHisto_floatFromMap("cMVA",   flav, isGluonSplit, csvmva         ,   ww);
-            FillHisto_floatFromMap("cMVAv2",   flav, isGluonSplit, csvmvav2         ,   ww);
-            FillHisto_floatFromMap("cTagCvsB",   flav, isGluonSplit, ctagCvsB         ,   ww);
-            FillHisto_floatFromMap("cTagCvsBN",   flav, isGluonSplit, ctagCvsBN         ,   ww);
-            FillHisto_floatFromMap("cTagCvsBP",   flav, isGluonSplit, ctagCvsBP         ,   ww);
-            FillHisto_floatFromMap("cTagCvsL",   flav, isGluonSplit, ctagCvsL         ,   ww);
-            FillHisto_floatFromMap("cTagCvsLN",   flav, isGluonSplit, ctagCvsLN         ,   ww);
-            FillHisto_floatFromMap("cTagCvsLP",   flav, isGluonSplit, ctagCvsLP         ,   ww);
       
             FillHisto_floatFromMap("TCHE_extended1",  flav, isGluonSplit, tche  , ww);
             FillHisto_floatFromMap("TCHP_extended1",  flav, isGluonSplit, tchp  , ww);
@@ -1387,11 +1358,18 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             float solfel   = Jet_SoftEl[ijet];
             FillHisto_floatFromMap("SoftMu",      flav, isGluonSplit, softmu  ,   ww);
             FillHisto_floatFromMap("SoftEl",      flav, isGluonSplit, solfel  ,   ww);
+/*
+            float combsl   = Jet_CombCSVSL[ijet];
+            FillHisto_floatFromMap("CombCSVSL",   flav, isGluonSplit, combsl  ,   ww);
+*/  
+
+
       
             //---------------------------------
             //fill information related to muons
             //---------------------------------
          
+      
             if (produceRecoMuon) {
              int nrecomu=0;
              int indrecomu=-1;
@@ -1501,43 +1479,18 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
                     FillHisto_floatFromMap("pfelectron_ratio",       flav, isGluonSplit, PFElectron_ratio[indpfel],                ww);
                     FillHisto_floatFromMap("pfelectron_ratiorel",    flav, isGluonSplit, PFElectron_ratioRel[indpfel],             ww);
                     FillHisto_floatFromMap("pfelectron_deltar",	 flav, isGluonSplit, PFElectron_deltaR[indpfel],                ww);
-
-                    if (PFElectron_pt[indpfel]<50) {
-		    FillHisto_floatFromMap("pfelectron_eta_1",   	 flav, isGluonSplit, PFElectron_eta[indpfel],                ww);
-		    FillHisto_floatFromMap("pfelectron_jeta_1",   	 flav, isGluonSplit, etajet,                ww);
-                    FillHisto_floatFromMap("pfelectron_ip_1",	 flav, isGluonSplit, PFElectron_IP[indpfel],                ww);
-                    FillHisto_floatFromMap("pfelectron_ip2d_1",	 flav, isGluonSplit, PFElectron_IP2D[indpfel],                ww);
-		    FillHisto_floatFromMap("pfelectron_ptratio_1",   	 flav, isGluonSplit, PFElectron_pt[indpfel]/ptjet,                ww);
-                    FillHisto_floatFromMap("pfelectron_ratio_1",       flav, isGluonSplit, PFElectron_ratio[indpfel],                ww);
-                    FillHisto_floatFromMap("pfelectron_ratiorel_1",    flav, isGluonSplit, PFElectron_ratioRel[indpfel],             ww);
-                    FillHisto_floatFromMap("pfelectron_deltar_1",	 flav, isGluonSplit, PFElectron_deltaR[indpfel],                ww);
-                    }
-                    else {
-		    FillHisto_floatFromMap("pfelectron_eta_2",   	 flav, isGluonSplit, PFElectron_eta[indpfel],                ww);
-		    FillHisto_floatFromMap("pfelectron_jeta_2",   	 flav, isGluonSplit, etajet,                ww);
-                    FillHisto_floatFromMap("pfelectron_ip_2",	 flav, isGluonSplit, PFElectron_IP[indpfel],                ww);
-                    FillHisto_floatFromMap("pfelectron_ip2d_2",	 flav, isGluonSplit, PFElectron_IP2D[indpfel],                ww);
-		    FillHisto_floatFromMap("pfelectron_ptratio_2",   	 flav, isGluonSplit, PFElectron_pt[indpfel]/ptjet,                ww);
-                    FillHisto_floatFromMap("pfelectron_ratio_2",       flav, isGluonSplit, PFElectron_ratio[indpfel],                ww);
-                    FillHisto_floatFromMap("pfelectron_ratiorel_2",    flav, isGluonSplit, PFElectron_ratioRel[indpfel],             ww);
-                    FillHisto_floatFromMap("pfelectron_deltar_2",	 flav, isGluonSplit, PFElectron_deltaR[indpfel],                ww);
-
-                    }
             }
 
             //------------------------------------
             //fill information related to TagVar 
             //------------------------------------
 
-            if (produceTagVarTree) {
 
-                if (Jet_nFirstSVTagVar[ijet]>-1) {
-                // look at first vertex info only (possible to access all SV info for vertexNTracks & vertexmass
-                FillHisto_floatFromMap("tagvar_vertexNTracks",      flav, isGluonSplit, TagVar_vertexNTracks[Jet_nFirstSVTagVar[ijet]],   ww);
-                FillHisto_floatFromMap("tagvar_vertexmass",         flav, isGluonSplit, TagVar_vertexMass[Jet_nFirstSVTagVar[ijet]],   ww);
-                if (TagVar_vertexNTracks[ijet]>=3) FillHisto_floatFromMap("tagvar_vertexmass3trk",     flav, isGluonSplit, TagVar_vertexMass[Jet_nFirstSVTagVar[ijet]],   ww);
-                FillHisto_floatFromMap("tagvar_vertexJetDeltaR",    flav, isGluonSplit, TagVar_vertexJetDeltaR[Jet_nFirstSVTagVar[ijet]],   ww);
-                }
+            if (produceTagVarTree) {
+                FillHisto_floatFromMap("tagvar_vertexNTracks",      flav, isGluonSplit, TagVar_vertexNTracks[ijet],   ww);
+                FillHisto_floatFromMap("tagvar_vertexmass",         flav, isGluonSplit, TagVar_vertexMass[ijet],   ww);
+                if (TagVar_vertexNTracks[ijet]>=3) FillHisto_floatFromMap("tagvar_vertexmass3trk",     flav, isGluonSplit, TagVar_vertexMass[ijet],   ww);
+                FillHisto_floatFromMap("tagvar_vertexJetDeltaR",    flav, isGluonSplit, TagVar_vertexJetDeltaR[ijet],   ww);
 
             }
 
@@ -1548,25 +1501,17 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             if (produceTagVarCSVTree) { 
                 FillHisto_floatFromMap("tagvarCSV_vertexCategory", flav, isGluonSplit, TagVarCSV_vertexCategory[ijet],   ww);
                 FillHisto_floatFromMap("tagvarCSV_Sig2dAboveCharm", flav, isGluonSplit, TagVarCSV_trackSip2dSigAboveCharm[ijet],   ww);
-                for (int inrel=Jet_nFirstTrkEtaRelTagVarCSV[ijet]; inrel<Jet_nLastTrkEtaRelTagVarCSV[ijet]; inrel++) {
+                for (int inrel=0; inrel<nTrkEtaRelTagVarCSV; inrel++) {
                    FillHisto_floatFromMap("tagvarCSV_trackEtaRel", flav, isGluonSplit, TagVarCSV_trackEtaRel[inrel],ww);
                 }
                 FillHisto_floatFromMap("tagvarCSV_vertexmass", flav, isGluonSplit, TagVarCSV_vertexMass[ijet],ww);
                 if (TagVarCSV_vertexNTracks[ijet]>=3) FillHisto_floatFromMap("tagvarCSV_vertexmass3trk",     flav, isGluonSplit, TagVarCSV_vertexMass[ijet],   ww);
                 FillHisto_floatFromMap("tagvarCSV_vertexNTracks", flav, isGluonSplit, TagVarCSV_vertexNTracks[ijet],ww);
                 FillHisto_floatFromMap("tagvarCSV_energyratio", flav, isGluonSplit, TagVarCSV_vertexEnergyRatio[ijet],   ww);
-                for (int inrel=Jet_nFirstTrkTagVarCSV[ijet]; inrel<Jet_nLastTrkTagVarCSV[ijet]; inrel++) {
+                for (int inrel=0; inrel<nTrkTagVarCSV; inrel++) {
                    FillHisto_floatFromMap("tagvarCSV_trackSip3dSig", flav, isGluonSplit, TagVarCSV_trackSip3dSig[inrel],ww);
                 }
                 FillHisto_floatFromMap("tagvarCSV_2DsigFlightDist", flav, isGluonSplit, TagVarCSV_flightDistance2dSig[ijet],   ww);
-                FillHisto_floatFromMap("tagvarCSV_vertexJetDeltaR",    flav, isGluonSplit, TagVarCSV_vertexJetDeltaR[ijet],   ww);
-                if (TagVarCSV_vertexCategory[ijet]==0) {
-                  FillHisto_floatFromMap("tagvarCSV_vertexmass_cat0", flav, isGluonSplit, TagVarCSV_vertexMass[ijet],ww);
-                  if (TagVarCSV_vertexNTracks[ijet]>=3) FillHisto_floatFromMap("tagvarCSV_vertexmass3trk_cat0",     flav, isGluonSplit, TagVarCSV_vertexMass[ijet],   ww);
-                  FillHisto_floatFromMap("tagvarCSV_vertexNTracks_cat0", flav, isGluonSplit, TagVarCSV_vertexNTracks[ijet],ww);
-                  FillHisto_floatFromMap("tagvarCSV_2DsigFlightDist_cat0", flav, isGluonSplit, TagVarCSV_flightDistance2dSig[ijet],   ww);
-                  FillHisto_floatFromMap("tagvarCSV_vertexJetDeltaR_cat0",    flav, isGluonSplit, TagVarCSV_vertexJetDeltaR[ijet],   ww);
-                }
             }
  
 
@@ -1598,6 +1543,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     cout << "----------------Configuration-------------------" <<endl;
     cout <<" Run over "<< N_event_data_before_sel<<" data events and " << N_event_mc_before_sel<< " mc events."<<endl;
     cout <<" After selection -> "<< N_event_data_after_sel<<" data events and "<< N_event_mc_after_sel<< "mc events left" <<endl;   
+    // //   
     cout << endl;
   
     myfile->cd();
@@ -1852,9 +1798,8 @@ bool CommPlotProducer::passTrigger(TString trigger, int pttrig) {
 
     bool passTrig=false;
     //bool Jet30  = false, Jet60  = false, Jet150 = false, Jet190 = false, Jet240 = false;
-    bool Jet40  = false, Jet60=false,  Jet80  = false, Jet140 = false;
+    bool Jet40  = false, Jet80  = false, Jet140 = false;
     bool Jet200 = false, Jet260 = false, Jet320 = false;
-    bool Jet400 = false, Jet450 = false, Jet500 = false;
     bool Jet20  = false, Jet70  = false, Jet110 = false, Jet300 = false;
 
     int triggerIdx = 0, bitIdx = 0;
@@ -1863,10 +1808,6 @@ bool CommPlotProducer::passTrigger(TString trigger, int pttrig) {
         triggerIdx = 2;
         bitIdx = int(triggerIdx/32);
         if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet40  = true;
-
-        triggerIdx = 87;
-        bitIdx = int(triggerIdx/32);
-        if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet60  = true;
    
         triggerIdx = 7;
         bitIdx = int(triggerIdx/32);
@@ -1888,29 +1829,13 @@ bool CommPlotProducer::passTrigger(TString trigger, int pttrig) {
         bitIdx = int(triggerIdx/32);
         if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet320 = true;
 
-        triggerIdx = 21;
-        bitIdx = int(triggerIdx/32);
-        if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet400 = true;
-
-        triggerIdx = 88;
-        bitIdx = int(triggerIdx/32);
-        if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet450 = true;
-
-        triggerIdx = 89;
-        bitIdx = int(triggerIdx/32);
-        if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet500 = true;
-
 
         if ( pttrig ==  40 && Jet40 )  passTrig=true;
-        if ( pttrig ==  60 && Jet60 )  passTrig=true;
         if ( pttrig ==  80 && Jet80 )  passTrig=true;
         if ( pttrig == 140 && Jet140 ) passTrig=true;
         if ( pttrig == 200 && Jet200 ) passTrig=true;
         if ( pttrig == 260 && Jet260 ) passTrig=true;
         if ( pttrig == 320 && Jet320 ) passTrig=true;
-        if ( pttrig == 400 && Jet400 ) passTrig=true;
-        if ( pttrig == 450 && Jet450 ) passTrig=true;
-        if ( pttrig == 500 && Jet500 ) passTrig=true;
 
         if (!passTrig) { return false; }
 
@@ -1924,17 +1849,12 @@ bool CommPlotProducer::passTrigger(TString trigger, int pttrig) {
         for (int ijet=0; ijet<nJet ; ijet++) {
             float ptjet = Jet_pt[ijet];
             float etajet = fabs(Jet_eta[ijet]);
-//            if (      pttrig ==  40 && ptjet >  60. && etajet < 2.4 ) JetPtCut = true;
-            if (      pttrig ==  40 && ptjet >  50. && etajet < 2.4 ) JetPtCut = true;
-            else if ( pttrig ==  60 && ptjet >  70. && etajet < 2.4 ) JetPtCut = true;
+            if (      pttrig ==  40 && ptjet >  60. && etajet < 2.4 ) JetPtCut = true;
             else if ( pttrig ==  80 && ptjet > 100. && etajet < 2.4 ) JetPtCut = true;
             else if ( pttrig == 140 && ptjet > 160. && etajet < 2.4 ) JetPtCut = true;
             else if ( pttrig == 200 && ptjet > 220. && etajet < 2.4 ) JetPtCut = true;
             else if ( pttrig == 260 && ptjet > 300. && etajet < 2.4 ) JetPtCut = true;
             else if ( pttrig == 320 && ptjet > 360. && etajet < 2.4 ) JetPtCut = true;
-            else if ( pttrig == 400 && ptjet > 425. && etajet < 2.4 ) JetPtCut = true;
-            else if ( pttrig == 450 && ptjet > 475. && etajet < 2.4 ) JetPtCut = true;
-            else if ( pttrig == 500 && ptjet > 525. && etajet < 2.4 ) JetPtCut = true;
         }
         if (passTrig && JetPtCut) {return true;}
         else {return false;}
@@ -1981,10 +1901,9 @@ bool CommPlotProducer::passTrigger(TString trigger, int pttrig) {
         for (int ijet = 0; ijet < nJet; ijet++) {
             float ptjet = Jet_pt[ijet];
             float etajet = fabs(Jet_eta[ijet]);
-//            if ( pttrig ==20  &&  ptjet > 60. && etajet < 2.4 )  njtrig++;
-            if ( pttrig ==20  &&  ptjet > 30. && etajet < 2.4 )  njtrig++;
-            if ( pttrig ==40  &&  ptjet > 50. && etajet < 2.4 )  njtrig++;
-            if ( pttrig ==70  &&  ptjet > 80. && etajet < 2.4 )  njtrig++;
+            if ( pttrig ==20  &&  ptjet > 40. && etajet < 2.4 )  njtrig++;
+            if ( pttrig ==40  &&  ptjet > 60. && etajet < 2.4 )  njtrig++;
+            if ( pttrig ==70  &&  ptjet > 100. && etajet < 2.4 )  njtrig++;
             if ( pttrig ==110  &&  ptjet > 120. && etajet < 2.4 ) njtrig++;
             if ( pttrig ==300  &&  ptjet > 320. && etajet < 2.4 ) njtrig++;
         }
@@ -1993,4 +1912,8 @@ bool CommPlotProducer::passTrigger(TString trigger, int pttrig) {
 
     }
     return false;
+
+
 }
+
+
