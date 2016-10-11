@@ -1022,6 +1022,9 @@ if options.useTTbarFilter:
     process.load("RecoBTag.PerformanceMeasurements.TTbarSelectionFilter_cfi")
     process.load("RecoBTag.PerformanceMeasurements.TTbarSelectionProducer_cfi")
 
+    if options.isReHLT and not options.runOnData:
+        process.ttbarselectionproducer.triggerColl =  cms.InputTag("TriggerResults","","HLT2")
+
     #electron id
     from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
         

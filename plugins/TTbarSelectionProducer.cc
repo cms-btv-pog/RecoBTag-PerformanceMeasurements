@@ -26,6 +26,7 @@ TTbarSelectionProducer::TTbarSelectionProducer(const edm::ParameterSet& iConfig)
   metToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("metColl")))
 {
   verbose_           = iConfig.getParameter<int > ("verbose");
+  triggerBitsProc_    = iConfig.getParameter<edm::InputTag>("triggerColl").process();
   
   trigNamesToSel_     = iConfig.getParameter<std::vector<std::string> >("trigNamesToSel");
   trigChannels_       = iConfig.getParameter<std::vector<int> >("trigChannels");
@@ -141,7 +142,7 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
    edm::Handle<edm::TriggerResults> triggerBits;
    iEvent.getByToken(triggerBits_, triggerBits);
    bool changedConfig = false;
-   if (!hltConfig.init(iEvent.getRun(), iSetup, "HLT", changedConfig)) 
+   if (!hltConfig.init(iEvent.getRun(), iSetup, triggerBitsProc_, changedConfig))
      {
        std::cout << "Initialization of HLTConfigProvider failed!!" << std::endl;
        return;
