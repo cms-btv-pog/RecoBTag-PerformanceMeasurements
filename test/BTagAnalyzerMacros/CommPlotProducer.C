@@ -596,6 +596,12 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     TH1D* nJet_mc_inc             = new TH1D("nJet_mc_inc",           "nJet_mc_inc",               10,0,10    );
     TH1D* PVz_mc                  = new TH1D("PVz_mc",                "PVz_mc",                120,-30.,30.);
     TH1D* dPVz_mc                 = new TH1D("dPVz_mc",                "dPVz_mc",              50,0.,0.005);
+    TH1D* nJet_csvLoose_data               = new TH1D("nJet_csvLoose_data",             "nJet_csvLoose_data",             10,0,10    );
+    TH1D* nJet_csvMedium_data               = new TH1D("nJet_csvMedium_data",             "nJet_csvMedium_data",             10,0,10    );
+    TH1D* nJet_csvTight_data               = new TH1D("nJet_csvTight_data",             "nJet_csvTight_data",             10,0,10    );
+    TH1D* nJet_csvLoose_mc               = new TH1D("nJet_csvLoose_mc",             "nJet_csvLoose_mc",             10,0,10    );
+    TH1D* nJet_csvMedium_mc               = new TH1D("nJet_csvMedium_mc",             "nJet_csvMedium_mc",             10,0,10    );
+    TH1D* nJet_csvTight_mc               = new TH1D("nJet_csvTight_mc",             "nJet_csvTight_mc",             10,0,10    );
 
 
     nPU_mc->Sumw2();
@@ -610,6 +616,12 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     nJet_mc_inc->Sumw2();
      PVz_mc->Sumw2();
     dPVz_mc->Sumw2();
+    nJet_csvLoose_data->Sumw2();
+    nJet_csvMedium_data->Sumw2();
+    nJet_csvTight_data->Sumw2();
+    nJet_csvLoose_mc->Sumw2();
+    nJet_csvMedium_mc->Sumw2();
+    nJet_csvTight_mc->Sumw2();
   
     // --------------------------------------Histograms declaration -----------------------------------------//
     //  jets before cuts
@@ -631,7 +643,18 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     AddHisto("jet_ratiopt"  ,"pTreco/pTgen of jets",		     150,0,3. );
     AddHisto("jet_diffrel"  ,"(pTgen-pTreco)/pTreco of jets",		     80,-2,2 );
     AddHisto("jet_flav"  ,"flavour of jets",		     28,-5.5, 22.5);
+    AddHisto("jet_phi_sv"	  ,"phi of jets containing a SV",     50,-1*pi,pi);
+    AddHisto("jet_eta_sv"	  ,"eta of jets containing a SV",     50,-1*pi,pi);
+    AddHisto("jet_phi_CSVv2Loose"	  ,"phi of CSVv2 Loose jets",     50,-1*pi,pi);
+    AddHisto("jet_eta_CSVv2Loose"	  ,"eta of CSVv2 Loose jets",     50,-1*pi,pi);
+    AddHisto("jet_phi_CSVv2Medium"	  ,"phi of CSVv2 Medium jets",     50,-1*pi,pi);
+    AddHisto("jet_eta_CSVv2Medium"	  ,"eta of CSVv2 Medium jets",     50,-1*pi,pi);
+    AddHisto("jet_phi_CSVv2Tight"	  ,"phi of CSVv2 Tight jets",     50,-1*pi,pi);
+    AddHisto("jet_eta_CSVv2Tight"	  ,"eta of CSVv2 Tight jets",     50,-1*pi,pi);
 
+    AddHisto("jet_pt_csvv2_l"       ,"pT of jets",              PtMax/10,0,PtMax );
+    AddHisto("jet_pt_csvv2_m"       ,"pT of jets",              PtMax/10,0,PtMax );
+    AddHisto("jet_pt_csvv2_t"       ,"pT of jets",              PtMax/10,0,PtMax );
     AddHisto("jet_pt_csvl"       ,"pTgen of jets",                  PtMax/10,0,PtMax );
     AddHisto("jet_pt_csvm"       ,"pTgen of jets",                  PtMax/10,0,PtMax );
     AddHisto("jet_pt_csvivfl"    ,"pTgen of jets",                  PtMax/10,0,PtMax );
@@ -739,6 +762,11 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     AddHisto("track_pt_cut"       ,"pT ",	                                        80,0.,200.);
     AddHisto("track_pt15_cut"     , "pT of all the tracks",                       150,0.,15.    );
     AddHisto("track_IP2D_cut"     ,"IP2D ",	                                nTrackbins,-1.,1.);
+    AddHisto2D("track_nHit_vs_eta"     ,"number of hits  vs eta",               35,-0.5, 34.5 ,50, -2.5, 2.5);
+    AddHisto2D("track_HPix_vs_eta"     ,"number of hits in the Pixel vs eta",                 10,-0.5, 9.5, 50,  -1.*pi,pi);
+    AddHisto2D("track_nHit_vs_phi"     ,"number of hits  vs phi",               35,-0.5, 34.5 ,50, -2.5, 2.5);
+    AddHisto2D("track_HPix_vs_phi"     ,"number of hits in the Pixel vs phi",                 10,-0.5, 9.5, 50,  -1.*pi,pi);
+    AddHisto2D("track_eta_vs_phi"     ,"eta vs phi",              50, -2.5, 2.5, 50,  -1.*pi,pi);
 
     AddHisto("track_len_sel_zoom"     ,     "decay length",		                nTrackbins,0,0.25     );
     AddHisto("track_len_all_zoom"     ,     "decay length",		                nTrackbins,0,0.25     );
@@ -926,6 +954,12 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
         int njet_l     =0;  
         int njet_mc    =0; 
         int njet_data  =0; 
+        int njet_csvLoose_data = 0;    
+        int njet_csvMedium_data = 0;    
+        int njet_csvTight_data = 0;    
+        int njet_csvLoose_mc = 0;    
+        int njet_csvMedium_mc = 0;    
+        int njet_csvTight_mc = 0;
     
         //at least 1 jet in the event
         if (nJet<=0) continue;
@@ -1097,11 +1131,37 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
             FillHisto_floatFromMap("jet_diffpt",   flav, isGluonSplit ,abs(Jet_genpt[ijet]-ptjet)    ,ww);
             if (Jet_genpt[ijet]>0) FillHisto_floatFromMap("jet_ratiopt",   flav, isGluonSplit ,ptjet/Jet_genpt[ijet]    ,ww);
             FillHisto_floatFromMap("jet_diffrel",   flav, isGluonSplit ,(Jet_genpt[ijet]-ptjet)/ptjet   ,ww);
-            if (nSV > 0)FillHisto_floatFromMap("jet_pt_sv",      flav, isGluonSplit ,ptjet    ,ww);
+            if (nSV > 0)
+            {
+                FillHisto_floatFromMap("jet_pt_sv",      flav, isGluonSplit ,ptjet    ,ww);
+                FillHisto_floatFromMap("jet_phi_sv",      flav, isGluonSplit ,phijet    ,ww);
+                FillHisto_floatFromMap("jet_eta_sv",      flav, isGluonSplit ,etajet    ,ww);
+            }
       
             FillHisto_floatFromMap("jet_eta",     flav, isGluonSplit ,etajet   ,ww);
             FillHisto_floatFromMap("jet_phi",     flav, isGluonSplit ,phijet   ,ww);
             FillHisto_intFromMap(  "jet_flav", flav, isGluonSplit ,flav  ,ww);
+            if (csvivf>0.460) {
+                FillHisto_floatFromMap(  "jet_phi_CSVv2Loose", flav, isGluonSplit, phijet         ,   ww);
+                FillHisto_floatFromMap(  "jet_eta_CSVv2Loose", flav, isGluonSplit, etajet         ,   ww);
+                FillHisto_floatFromMap("jet_pt_csvv2_l",                 flav, isGluonSplit ,ptjet    ,ww);
+                if(isData) njet_csvLoose_data++;
+                else njet_csvLoose_mc++;
+            }
+            if (csvivf>0.800) {
+                FillHisto_floatFromMap(  "jet_phi_CSVv2Medium", flav, isGluonSplit, phijet         ,   ww);
+                FillHisto_floatFromMap(  "jet_eta_CSVv2Medium", flav, isGluonSplit, etajet         ,   ww);
+                FillHisto_floatFromMap("jet_pt_csvv2_m",                 flav, isGluonSplit ,ptjet    ,ww);
+                if(isData) njet_csvMedium_data++;
+                else njet_csvMedium_mc++;
+            }
+            if (csvivf>0.935) {
+                FillHisto_floatFromMap(  "jet_phi_CSVv2Tight", flav, isGluonSplit, phijet         ,   ww);
+                FillHisto_floatFromMap(  "jet_eta_CSVv2Tight", flav, isGluonSplit, etajet         ,   ww);
+                FillHisto_floatFromMap("jet_pt_csvv2_t",                 flav, isGluonSplit ,ptjet    ,ww);
+                if(isData) njet_csvTight_data++;
+                else njet_csvTight_mc++;
+            }
 
             
             int n1_ip=-1;
@@ -1164,6 +1224,11 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
                         if (passNhit && passPix && passIPz && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D){
                             FillHisto_floatFromMap("track_pt_cut",           flav, isGluonSplit ,Track_pt[itrk]     , ww);
                             FillHisto_floatFromMap("track_pt15_cut",           flav, isGluonSplit ,Track_pt[itrk]     , ww);
+                            FillHisto2D_float_floatFromMap("track_nHit_vs_eta"     ,flav,isGluonSplit ,Track_nHitAll[itrk], Track_eta[itrk],ww);	
+                            FillHisto2D_float_floatFromMap("track_nHit_vs_phi"     ,flav,isGluonSplit ,Track_nHitAll[itrk], Track_phi[itrk],ww);	
+                            FillHisto2D_float_floatFromMap("track_HPix_vs_eta"     ,flav,isGluonSplit ,Track_nHitPixel[itrk], Track_eta[itrk],ww);	
+                            FillHisto2D_float_floatFromMap("track_HPix_vs_phi"     ,flav,isGluonSplit ,Track_nHitPixel[itrk], Track_phi[itrk],ww);	
+                            FillHisto2D_float_floatFromMap("track_eta_vs_phi"     ,flav,isGluonSplit ,Track_eta[itrk], Track_phi[itrk],ww);	
                         }	    
                         if (passNhit && passPix && passPt && passnormchi2 && passtrkdist && passtrklen){
                             FillHisto_floatFromMap("track_dz_cut",          flav, isGluonSplit ,Track_dz[itrk]      ,ww);
@@ -1578,9 +1643,18 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
         //---------------------------------
         //fill jet multiplicity
         //---------------------------------
-        if(isData) nJet_data->Fill(njet_data);
+        if(isData)
+        {
+            nJet_data->Fill(njet_data);
+            nJet_csvLoose_data->Fill(njet_csvLoose_data);
+            nJet_csvMedium_data->Fill(njet_csvMedium_data);
+            nJet_csvTight_data->Fill(njet_csvTight_data);
+        }
         else {
             nJet_mc->Fill(njet_mc, ww);
+            nJet_csvLoose_mc->Fill(njet_csvLoose_mc);
+            nJet_csvMedium_mc->Fill(njet_csvMedium_mc);
+            nJet_csvTight_mc->Fill(njet_csvTight_mc);
             if (finselect) {
               pt_hat_fin->Fill(pthat,ww);
               PVz_mc->Fill(PVz,ww);
@@ -1613,6 +1687,12 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
     nJet_mc_inc->Write();
     PVz_mc->Write();
     dPVz_mc->Write();
+    nJet_csvLoose_data->Write();
+    nJet_csvMedium_data->Write();
+    nJet_csvTight_data->Write();
+    nJet_csvLoose_mc->Write();
+    nJet_csvMedium_mc->Write();
+    nJet_csvTight_mc->Write();
   
 
     for (unsigned int i=0; i<HistoBtag.size(); i++) {
