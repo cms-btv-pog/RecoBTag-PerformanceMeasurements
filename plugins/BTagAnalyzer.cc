@@ -1742,6 +1742,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_partonid[JetInfo[iJetColl].nJet]  = pjet->genParton() ? pjet->genParton()->pdgId() : 0;
     JetInfo[iJetColl].Jet_area[JetInfo[iJetColl].nJet]      = pjet->jetArea();
     JetInfo[iJetColl].Jet_flavour[JetInfo[iJetColl].nJet]   = pjet->partonFlavour();
+    JetInfo[iJetColl].Jet_flavourCleaned[JetInfo[iJetColl].nJet]   = pjet->partonFlavour();
     JetInfo[iJetColl].Jet_nbHadrons[JetInfo[iJetColl].nJet] = pjet->jetFlavourInfo().getbHadrons().size();
     JetInfo[iJetColl].Jet_ncHadrons[JetInfo[iJetColl].nJet] = pjet->jetFlavourInfo().getcHadrons().size();
     JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet]       = pjet->eta();
@@ -1749,6 +1750,24 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_pt[JetInfo[iJetColl].nJet]        = pjet->pt();
     JetInfo[iJetColl].Jet_mass[JetInfo[iJetColl].nJet]      = pjet->mass();
     JetInfo[iJetColl].Jet_genpt[JetInfo[iJetColl].nJet]     = ( pjet->genJet()!=0 ? pjet->genJet()->pt() : -1. );
+
+    // generator-level jet cleaning
+    // against prompt leptons
+    double dRlj;
+    double dRele = 1000., dRmuo = 1000., dRtau = 1000.;
+    for (int k = 0; k < EventInfo.nGenlep; k++) {
+      if ( EventInfo.Genlep_mother[k]==0 ) continue; //protection for QCD samples
+      if ( EventInfo.Genlep_mother[k]%10 !=0 ) continue;
+      int lepid = TMath::Abs(EventInfo.Genlep_pdgID[k]);
+      dRlj = reco::deltaR( pjet->eta(), pjet->phi(), EventInfo.Genlep_eta[k], EventInfo.Genlep_phi[k] );
+      if ( lepid == 11 && dRlj < dRele ) dRele = dRlj;
+      if ( lepid == 13 && dRlj < dRmuo ) dRmuo = dRlj;
+      if ( lepid == 15 && dRlj < dRtau ) dRtau = dRlj;
+    }
+    if ( dRele < 0.2 || dRmuo < 0.2 || dRtau < 0.3 ) JetInfo[iJetColl].Jet_flavourCleaned[JetInfo[iJetColl].nJet] = -999;
+
+    // against pileup:
+    if ( JetInfo[iJetColl].Jet_genpt[JetInfo[iJetColl].nJet] < 8. )  JetInfo[iJetColl].Jet_flavourCleaned[JetInfo[iJetColl].nJet] = 0;
 
     // available JEC sets
     unsigned int nJECSets = pjet->availableJECSets().size();
