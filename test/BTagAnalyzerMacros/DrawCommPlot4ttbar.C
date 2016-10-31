@@ -76,15 +76,21 @@ void Draw(TString name, TString histotitle, bool log, int move_legend)
 {
 
  if(c_ordering){
-   //filename="output_allMu.root";
-   //filename="output_allElec.root";
-   filename="output_allMu_NoTriggerMC.root";
-   output="Commissioning_plots_singleMu_JetPt25_NoTriggerMC_100516_test/";
-   //output="Commissioning_plots_singleElec_JetPt25_082516/";
+    //Muon channel//
+   filename="output_allMuEFG.root";
+   output="Commissioning_plots_singleMuEFG_JetPt25_103116/";
    Selectiontitle= "single muon channel, #geq 4 jets";
+   //Eletron Channel//
+   //filename="output_allElecEFG.root";
+   //output="Commissioning_plots_singleElecEFG_JetPt25_103116/";
    //Selectiontitle= "single electron channel, #geq 4 jets";
+
+   TString MakeDir = "mkdir ttbar/"+output;
+   TString action = MakeDir;
+   system(action);
+   Selectiontitle= "single muon channel, #geq 4 jets";
    bOverflow=false;
-   b_ordering=false;
+   b_ordering=false; 
  }
 
  TH1D* hist_b;

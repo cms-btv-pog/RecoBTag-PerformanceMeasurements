@@ -320,10 +320,8 @@ public :
    Int_t Jet_nLastTrkEtaRelCTagVar[nMaxJets_];
    Int_t Jet_nFirstLepCTagVar[nMaxJets_];
    Int_t Jet_nLastLepCTagVar[nMaxJets_]; 
-   Float_t CTag_Jet_CvsB[nMaxJets_];
    Float_t CTag_Jet_CvsBN[nMaxJets_];
    Float_t CTag_Jet_CvsBP[nMaxJets_]; 
-   Float_t CTag_Jet_CvsL[nMaxJets_];
    Float_t CTag_Jet_CvsLN[nMaxJets_];
    Float_t CTag_Jet_CvsLP[nMaxJets_];
    Float_t CTag_jetNTracks[nMaxJets_];
