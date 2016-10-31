@@ -103,7 +103,6 @@
     if(!BTag){
     const int j=7;
     const int k=7;
-    //const int i=0;
 
     const int Nsamples=20;
     float luminosity = 12878; // /pb see usage.txt 
@@ -170,7 +169,7 @@
                                 */};
 
     //float sf_dy=1.3; // in Run2015
-    float sf_dy=0.87; //https://indico.cern.ch/event/557018/contributions/2246861/attachments/1310556/1960899/btag_ttbar_sf_17-07-2016.pdf
+    float sf_dy=1; //https://indico.cern.ch/event/557018/contributions/2246861/attachments/1310556/1960899/btag_ttbar_sf_17-07-2016.pdf
     int datatype[Nsamples] = {0, 0, 0, 1, 2, 3, 3, 3, 3, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5 };
     float xsec[Nsamples]   = {0, 0, 0, 831.77, 6024*sf_dy, 3.4, 35.6, 72.3, 35.6, 61524, 1652471.46, 437504.1, 106033.6648, 24720.71814, 8654.49315, 797.35269, 79.02553776, 25.09505908, 4.707368272, 1.62131692 };
 
