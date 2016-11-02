@@ -181,7 +181,7 @@ options.register('isReHLT', False,
     '80X reHLT samples')
 
 ## 'maxEvents' is already registered by the Framework, changing default value
-options.setDefault('maxEvents', 100)
+options.setDefault('maxEvents', -1)
 
 options.parseArguments()
 
