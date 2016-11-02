@@ -44,12 +44,12 @@ options.register('usePuppiForBTagging', False,
     VarParsing.varType.bool,
     "Use Puppi candidates for b tagging"
 )
-options.register('mcGlobalTag', '80X_mcRun2_asymptotic_2016_miniAODv2_v1',
+options.register('mcGlobalTag', '80X_mcRun2_asymptotic_2016_miniAODv2_v1', #note: to be updated for the new Moriond 2017 MC
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', '80X_dataRun2_Prompt_ICHEP16JEC_v0', 
+options.register('dataGlobalTag', '80X_dataRun2_2016SeptRepro_v3', #note: does not yet include the final JECs for this ReReco
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
@@ -181,7 +181,7 @@ options.register('isReHLT', False,
     '80X reHLT samples')
 
 ## 'maxEvents' is already registered by the Framework, changing default value
-options.setDefault('maxEvents', -1)
+options.setDefault('maxEvents', 100)
 
 options.parseArguments()
 
@@ -467,7 +467,7 @@ if options.miniAOD:
     ]
     if options.runOnData:
         process.source.fileNames = [
-            '/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/275/125/00000/86B9123D-7F36-E611-9D13-02163E0139C7.root'
+            '/store/data/Run2016C/SingleMuon/MINIAOD/23Sep2016-v1/70000/001F13A2-7E8D-E611-B910-FA163E782438.root'
         ]
     if options.fastSim:
         process.source.fileNames = [
@@ -593,14 +593,14 @@ if options.usePrivateJEC:
 
 ### to activate the new JP calibration: using the data base
 #Do not use the 80X calibrations if the ntuples are meant to measure SFs or to commission cMVAv2
-trkProbaCalibTag = "JPcalib_MC76X_25ns_v1" ###DM"JPcalib_MC800_v1" 
+trkProbaCalibTag = "JPcalib_MC80X_v2" 
 if options.runOnData:
-  trkProbaCalibTag = "JPcalib_Data76X_2015D_v1" ###DM"JPcalib_Data80X_2016B_v1" 
+  trkProbaCalibTag = "JPcalib_Data80X_2016_v2" 
 # process.GlobalTag.snapshotTime = cms.string("9999-12-31 23:59:59.000")
 process.GlobalTag.toGet = cms.VPSet(
     cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
       tag = cms.string(trkProbaCalibTag),
-      connect = cms.string("frontier://FrontierPrep/CMS_CONDITIONS") ###connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS")
+      connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS")
     )
 )
 
