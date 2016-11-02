@@ -2181,7 +2181,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
             }
           }
 
-          if ( findCat( &ptrack, *&cat1 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 ) {
+          else if ( findCat( &ptrack, *&cat1 ) ) {
             JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack]  = 1;
             if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
               Histos[iJetColl]->IPSign_cat1->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
@@ -2193,7 +2193,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
             }
           }
 
-          if ( findCat( &ptrack, *&cat2 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 ) {
+          else if ( findCat( &ptrack, *&cat2 ) ) {
             JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 2;
             if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
               Histos[iJetColl]->IPSign_cat2->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
@@ -2205,7 +2205,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
             }
           }
 
-          if ( findCat( &ptrack, *&cat3 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 ) {
+          else if ( findCat( &ptrack, *&cat3 ) ) {
             JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 3;
             if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
               Histos[iJetColl]->IPSign_cat3->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
@@ -2217,7 +2217,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
             }
           }
 
-          if ( findCat( &ptrack, *&cat4 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 ) {
+          else if ( findCat( &ptrack, *&cat4 ) ) {
             JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 4;
             if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
               Histos[iJetColl]->IPSign_cat4->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
@@ -2229,7 +2229,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
             }
           }
 
-          if ( findCat( &ptrack, *&cat5 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 4 ) {
+          else if ( findCat( &ptrack, *&cat5 ) ) {
             JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 5;
             if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
               Histos[iJetColl]->IPSign_cat5->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
@@ -2241,7 +2241,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
             }
           }
 
-          if ( findCat( &ptrack, *&cat6 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 4 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 5 ) {
+          else if ( findCat( &ptrack, *&cat6 ) ) {
             JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 6;
             if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
               Histos[iJetColl]->IPSign_cat6->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
@@ -2253,7 +2253,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
             }
           }
 
-          if ( findCat( &ptrack, *&cat7 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 4 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 5 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 6 ) {
+          else if ( findCat( &ptrack, *&cat7 ) ) {
             JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 7;
             if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
               Histos[iJetColl]->IPSign_cat7->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
@@ -2265,7 +2265,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
             }
           }
 
-          if ( findCat( &ptrack, *&cat8 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 4 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 5 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 6 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 7 ) {
+          else if ( findCat( &ptrack, *&cat8 ) ) {
             JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 8;
             if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
               Histos[iJetColl]->IPSign_cat8->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
@@ -2277,7 +2277,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
             }
           }
 
-          if ( findCat( &ptrack, *&cat9 ) && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 0 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 1 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 2 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 3 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack]!= 4 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 5 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 6 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 7 && JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] != 8 ) {
+          else if ( findCat( &ptrack, *&cat9 ) ) {
             JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = 9;
             if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] < 0 ) {
               Histos[iJetColl]->IPSign_cat9->Fill( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] );
@@ -3840,7 +3840,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat0.etaMax = 2.5;
   cat0.etaMin = 0;
   cat0.nHitsMax= 50;
-  cat0.nHitsMin= 8;
+  cat0.nHitsMin= 1;
   cat0.nPixelHitsMax = 1;
   cat0.nPixelHitsMin = 1;
   cat0.pMax= 5000;
@@ -3853,7 +3853,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat1.etaMax        = 2.5;
   cat1.etaMin        = 0;
   cat1.nHitsMax      = 50;
-  cat1.nHitsMin      = 8;
+  cat1.nHitsMin      = 1;
   cat1.nPixelHitsMax = 8;
   cat1.nPixelHitsMin = 2;
   cat1.pMax          = 5000;
@@ -3866,7 +3866,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat2.etaMax        = 0.8;
   cat2.etaMin        = 0;
   cat2.nHitsMax      = 50;
-  cat2.nHitsMin      = 8;
+  cat2.nHitsMin      = 1;
   cat2.nPixelHitsMax = 8;
   cat2.nPixelHitsMin = 3;
   cat2.pMax          = 8;
@@ -3879,7 +3879,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat3.etaMax        = 1.6;
   cat3.etaMin        = 0.8;
   cat3.nHitsMax      = 50;
-  cat3.nHitsMin      = 8;
+  cat3.nHitsMin      = 1;
   cat3.nPixelHitsMax = 8;
   cat3.nPixelHitsMin = 3;
   cat3.pMax          = 8;
@@ -3892,7 +3892,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat4.etaMax        = 2.5;
   cat4.etaMin        = 1.6;
   cat4.nHitsMax      = 50;
-  cat4.nHitsMin      = 8;
+  cat4.nHitsMin      = 1;
   cat4.nPixelHitsMax = 8;
   cat4.nPixelHitsMin = 3;
   cat4.pMax          = 8;
@@ -3905,7 +3905,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat5.etaMax        = 2.5;
   cat5.etaMin        = 0;
   cat5.nHitsMax      = 50;
-  cat5.nHitsMin      = 8;
+  cat5.nHitsMin      = 1;
   cat5.nPixelHitsMax = 2;
   cat5.nPixelHitsMin = 2;
   cat5.pMax          = 8;
@@ -3918,7 +3918,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat6.etaMax        = 0.8;
   cat6.etaMin        = 0;
   cat6.nHitsMax      = 50;
-  cat6.nHitsMin      = 8;
+  cat6.nHitsMin      = 1;
   cat6.nPixelHitsMax = 8;
   cat6.nPixelHitsMin = 3;
   cat6.pMax          = 5000;
@@ -3931,7 +3931,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat7.etaMax        = 1.6;
   cat7.etaMin        = 0.8;
   cat7.nHitsMax      = 50;
-  cat7.nHitsMin      = 8;
+  cat7.nHitsMin      = 1;
   cat7.nPixelHitsMax = 8;
   cat7.nPixelHitsMin = 3;
   cat7.pMax          = 5000;
@@ -3944,7 +3944,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat8.etaMax        = 2.5;
   cat8.etaMin        = 1.6;
   cat8.nHitsMax      = 50;
-  cat8.nHitsMin      = 8;
+  cat8.nHitsMin      = 1;
   cat8.nPixelHitsMax = 8;
   cat8.nPixelHitsMin = 3;
   cat8.pMax          = 5000;
@@ -3957,7 +3957,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat9.etaMax        = 2.5;
   cat9.etaMin        = 0;
   cat9.nHitsMax      = 50;
-  cat9.nHitsMin      = 8;
+  cat9.nHitsMin      = 1;
   cat9.nPixelHitsMax = 2;
   cat9.nPixelHitsMin = 2;
   cat9.pMax          = 5000;
