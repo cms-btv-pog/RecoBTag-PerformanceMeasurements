@@ -30,6 +30,7 @@
 #include "DataFormats/JetReco/interface/JetTracksAssociation.h"
 #include "DataFormats/BTauReco/interface/CandIPTagInfo.h"
 #include "DataFormats/BTauReco/interface/CandSoftLeptonTagInfo.h"
+#include "DataFormats/BTauReco/interface/BoostedDoubleSVTagInfo.h"
 #include "DataFormats/BTauReco/interface/TrackIPTagInfo.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
@@ -329,6 +330,7 @@ private:
   std::string svNegTagInfos_;
   std::string softPFMuonTagInfos_;
   std::string softPFElectronTagInfos_;
+  std::string bdsvTagInfos_;
 
   edm::EDGetTokenT<reco::VertexCollection> primaryVertexColl_;
   edm::EDGetTokenT<reco::TrackCollection> tracksColl_;
@@ -644,6 +646,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   svNegTagInfos_           = iConfig.getParameter<std::string>("svNegTagInfos");
   softPFMuonTagInfos_      = iConfig.getParameter<std::string>("softPFMuonTagInfos");
   softPFElectronTagInfos_  = iConfig.getParameter<std::string>("softPFElectronTagInfos");
+  bdsvTagInfos_            = iConfig.getParameter<std::string>("bdsvTagInfos");
 
   muonCollectionName_       = consumes<edm::View<reco::Muon>>(iConfig.getParameter<edm::InputTag>("muonCollectionName"));
   patMuonCollectionName_    = consumes<std::vector<pat::Muon>>(iConfig.getParameter<edm::InputTag>("patMuonCollectionName"));
@@ -1896,6 +1899,11 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     const SVTagInfo *svNegTagInfo = toSVTagInfo(*pjet,svNegTagInfos_);
     const reco::CandSoftLeptonTagInfo *softPFMuTagInfo = pjet->tagInfoCandSoftLepton(softPFMuonTagInfos_.c_str());
     const reco::CandSoftLeptonTagInfo *softPFElTagInfo = pjet->tagInfoCandSoftLepton(softPFElectronTagInfos_.c_str());
+    const reco::BoostedDoubleSVTagInfo *bdsvTagInfo = nullptr;
+    if ( runFatJets_ && iJetColl == 0 )
+    {
+      bdsvTagInfo = pjet->tagInfoBoostedDoubleSV(bdsvTagInfos_.c_str());
+    }
 
     //Get all CTagInfo pointers
     const IPTagInfo *ipTagInfoCTag = toIPTagInfo(*pjet,ipTagInfosCTag_);
@@ -3397,6 +3405,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
     if ( runFatJets_ && iJetColl == 0 )
     {
+      // get the TaggingVariables
+      const reco::TaggingVariableList vars = bdsvTagInfo->taggingVariables();
+
       int cont=0;
       GlobalVector flightDir_0, flightDir_1;
       reco::Candidate::LorentzVector SV_p4_0, SV_p4_1;
