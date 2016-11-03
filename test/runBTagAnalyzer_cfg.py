@@ -1254,6 +1254,7 @@ if options.runFatJets:
         runFatJets          = cms.bool(True),
         runSubJets          = options.runSubJets,
         svComputer          = cms.string('combinedSecondaryVertexV2ComputerFat' if options.useLegacyTaggers else 'candidateCombinedSecondaryVertexV2ComputerFat'),
+        bdsvTagInfos        = cms.string('pfBoostedDoubleSV' + ('CA15' if algoLabel=='CA' else 'AK8')),
         use_ttbar_filter    = cms.bool(False)
     )
     if options.useSoftDrop:
