@@ -11,6 +11,7 @@ bTagAnalyzerLegacy = cms.EDAnalyzer("BTagAnalyzerLegacy",
     svNegTagInfos = cms.string('inclusiveSecondaryVertexFinderNegative'),
     softPFMuonTagInfos = cms.string('softPFMuons'),
     softPFElectronTagInfos = cms.string('softPFElectrons'),
+    bdsvTagInfos = cms.string('dummy'),
     # taggers
     trackCHEBJetTags = cms.string('trackCountingHighEffBJetTags'),
     trackCNegHEBJetTags = cms.string('negativeTrackCountingHighEffBJetTags'),
