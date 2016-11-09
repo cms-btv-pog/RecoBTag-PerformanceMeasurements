@@ -554,7 +554,8 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
 
   // Modules
   primaryVertexColl_   = consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertexColl"));
-  tracksColl_          = consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("tracksColl"));
+  if( produceAllTrackTree_ && storeEventInfo_ )
+    tracksColl_ = consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("tracksColl"));
 
   src_ = consumes<GenEventInfoProduct>(iConfig.getParameter<edm::InputTag>("src"));
   generator = consumes<GenEventInfoProduct>(edm::InputTag("generator"));
