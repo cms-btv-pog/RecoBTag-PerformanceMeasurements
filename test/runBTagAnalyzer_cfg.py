@@ -363,8 +363,8 @@ if options.jetAlgo == 'AntiKt':
 
 ## Figure out if jet clustering is needed
 runFatJetClustering = options.runJetClustering
-if options.usePuppi and not options.runJetClustering:
-    print "WARNING: You requested Puppi jets which are not stored in any of the data-tiers. Enabling jet clustering."
+if not options.miniAOD and options.usePuppi and not options.runJetClustering:
+    print "WARNING: You requested Puppi jets which are not stored in AOD. Enabling jet clustering."
     options.runJetClustering = True
 
 if options.miniAOD and not (options.usePFchs or options.usePuppi) and not options.runJetClustering:
