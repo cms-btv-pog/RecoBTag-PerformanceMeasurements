@@ -460,7 +460,6 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_SoftElP").c_str(),     Jet_SoftElP     ,(name+"Jet_SoftElP["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_SoftEl").c_str(),      Jet_SoftEl      ,(name+"Jet_SoftEl["+name+"nJet]/F").c_str());
 
-      tree->Branch((name+"Jet_DoubleSV").c_str(),    Jet_DoubleSV    ,(name+"Jet_DoubleSV["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_cMVA").c_str(),    Jet_cMVA    ,(name+"Jet_cMVA["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_cMVAv2").c_str(),    Jet_cMVAv2    ,(name+"Jet_cMVAv2["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_cMVAv2N").c_str(),    Jet_cMVAv2N    ,(name+"Jet_cMVAv2N["+name+"nJet]/F").c_str());
@@ -851,6 +850,7 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_tau2_vertexMass_corrected").c_str(),    Jet_tau2_vertexMass_corrected    ,(name+"Jet_tau2_vertexMass_corrected["+name+"nJet]/F").c_str()    );
       tree->Branch((name+"Jet_tau1_vertexNTracks").c_str(),           Jet_tau1_vertexNTracks           ,(name+"Jet_tau1_vertexNTracks["+name+"nJet]/F").c_str()           );
       tree->Branch((name+"Jet_tau2_vertexNTracks").c_str(),           Jet_tau2_vertexNTracks           ,(name+"Jet_tau2_vertexNTracks["+name+"nJet]/F").c_str()           );
+      tree->Branch((name+"Jet_DoubleSV").c_str(),         Jet_DoubleSV         ,(name+"Jet_DoubleSV["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_BDTG_SV").c_str(),          Jet_BDTG_SV          ,(name+"Jet_BDTG_SV["+name+"nJet]/F").c_str()         );
       
       if (trackVars)
@@ -926,7 +926,6 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_SoftElP").c_str(),     Jet_SoftElP     );
       tree->SetBranchAddress((name+"Jet_SoftEl").c_str(),      Jet_SoftEl      );
 
-      tree->SetBranchAddress((name+"Jet_DoubleSV").c_str(),    Jet_DoubleSV    );
       tree->SetBranchAddress((name+"Jet_cMVA").c_str(),    Jet_cMVA   );
       tree->SetBranchAddress((name+"Jet_cMVAv2").c_str(),    Jet_cMVAv2   );
       tree->SetBranchAddress((name+"Jet_cMVAv2N").c_str(),    Jet_cMVAv2N   );
@@ -1318,7 +1317,8 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_tau2_vertexMass_corrected").c_str(),    Jet_tau2_vertexMass_corrected    );
       tree->SetBranchAddress((name+"Jet_tau1_vertexNTracks").c_str(),           Jet_tau1_vertexNTracks           );
       tree->SetBranchAddress((name+"Jet_tau2_vertexNTracks").c_str(),           Jet_tau2_vertexNTracks           );
-      tree->SetBranchAddress((name+"Jet_BDTG_SV").c_str(),          Jet_BDTG_SV      );
+      tree->SetBranchAddress((name+"Jet_DoubleSV").c_str(),         Jet_DoubleSV    );
+      tree->SetBranchAddress((name+"Jet_BDTG_SV").c_str(),          Jet_BDTG_SV     );
 
       if (trackVars)
       {
