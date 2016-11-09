@@ -320,10 +320,8 @@ public :
    Int_t Jet_nLastTrkEtaRelCTagVar[nMaxJets_];
    Int_t Jet_nFirstLepCTagVar[nMaxJets_];
    Int_t Jet_nLastLepCTagVar[nMaxJets_]; 
-   Float_t CTag_Jet_CvsB[nMaxJets_];
    Float_t CTag_Jet_CvsBN[nMaxJets_];
    Float_t CTag_Jet_CvsBP[nMaxJets_]; 
-   Float_t CTag_Jet_CvsL[nMaxJets_];
    Float_t CTag_Jet_CvsLN[nMaxJets_];
    Float_t CTag_Jet_CvsLP[nMaxJets_];
    Float_t CTag_jetNTracks[nMaxJets_];
@@ -932,6 +930,22 @@ void CommPlotProducer4ttbar::Init(TChain *tree)
    fChain->SetBranchAddress("CTag_leptonRatioRel"         ,CTag_leptonRatioRel         ,&c_CTag_leptonRatioRel);
    fChain->SetBranchAddress("CTag_leptonEtaRel"         ,CTag_leptonEtaRel         ,&c_CTag_leptonEtaRel);
    fChain->SetBranchAddress("CTag_leptonRatio"         ,CTag_leptonRatio         ,&c_CTag_leptonRatio);
+
+   fChain->SetBranchAddress("Jet_nFirstTrkEtaRelTagVarCSV",      Jet_nFirstTrkEtaRelTagVarCSV,        &b_Jet_nFirstTrkEtaRelTagVarCSV);
+   fChain->SetBranchAddress("Jet_nLastTrkEtaRelTagVarCSV",       Jet_nLastTrkEtaRelTagVarCSV,         &b_Jet_nLastTrkEtaRelTagVarCSV);
+   fChain->SetBranchAddress("Jet_nFirstTrkTagVarCSV",            Jet_nFirstTrkTagVarCSV,              &b_Jet_nFirstTrkTagVarCSV);
+   fChain->SetBranchAddress("Jet_nLastTrkTagVarCSV",             Jet_nLastTrkTagVarCSV,               &b_Jet_nLastTrkTagVarCSV);
+   fChain->SetBranchAddress("TagVarCSV_trackSip2dSigAboveCharm", TagVarCSV_trackSip2dSigAboveCharm,   &b_TagVarCSV_trackSip2dSigAboveCharm);
+   fChain->SetBranchAddress("TagVarCSV_trackSumJetEtRatio",      TagVarCSV_trackSumJetEtRatio,        &b_TagVarCSV_trackSumJetEtRatio);
+   fChain->SetBranchAddress("TagVarCSV_trackSumJetDeltaR",       TagVarCSV_trackSumJetDeltaR,         &b_TagVarCSV_trackSumJetDeltaR);
+   fChain->SetBranchAddress("TagVarCSV_trackEtaRel",             TagVarCSV_trackEtaRel,               &b_TagVarCSV_trackEtaRel);
+   fChain->SetBranchAddress("TagVarCSV_trackSip3dSig",           TagVarCSV_trackSip3dSig,             &b_TagVarCSV_trackSip3dSig);
+   fChain->SetBranchAddress("TagVarCSV_vertexEnergyRatio",       TagVarCSV_vertexEnergyRatio,         &b_TagVarCSV_vertexEnergyRatio);
+   fChain->SetBranchAddress("TagVarCSV_vertexCategory",          TagVarCSV_vertexCategory,            &b_TagVarCSV_vertexCategory);
+   fChain->SetBranchAddress("TagVarCSV_vertexMass",              TagVarCSV_vertexMass,                &b_TagVarCSV_vertexMass);
+   fChain->SetBranchAddress("TagVarCSV_vertexNTracks",           TagVarCSV_vertexNTracks,             &b_TagVarCSV_vertexNTracks);
+   fChain->SetBranchAddress("TagVarCSV_flightDistance2dSig",     TagVarCSV_flightDistance2dSig,       &b_TagVarCSV_flightDistance2dSig);
+   fChain->SetBranchAddress("TagVarCSV_vertexJetDeltaR",         TagVarCSV_vertexJetDeltaR,           &b_TagVarCSV_vertexJetDeltaR);
    } 
    
    
