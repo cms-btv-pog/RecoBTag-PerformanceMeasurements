@@ -109,7 +109,7 @@ options.register('remakeAllDiscr', False,
     VarParsing.varType.bool,
     "Remake all b-tag discriminator, including those already stored in MiniAOD"
 )
-options.register('remakeDoubleB', True,
+options.register('remakeDoubleB', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Remake double-b-tag discriminator"
@@ -396,7 +396,15 @@ if not options.miniAOD and options.runSubJets and options.usePruned and not runF
 print "Fat jet clustering: %s"%('True' if runFatJetClustering else 'False')
 
 ## For fat jets we want to re-run all taggers in order to use the setup adapted to the larger fat jet cone size
+bTagInfosFat = copy.deepcopy(bTagInfos)
+bTagInfosFat += ([] if options.useLegacyTaggers else ['pfImpactParameter' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
+bTagInfosFat += ([] if options.useLegacyTaggers else ['pfInclusiveSecondaryVertexFinder' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
+bTagInfosFat += ([] if options.useLegacyTaggers else ['pfBoostedDoubleSV' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
 bTagDiscriminatorsFat = copy.deepcopy(bTagDiscriminators)
+if options.remakeAllDiscr:
+    options.remakeDoubleB = True
+if options.remakeDoubleB:
+    bTagDiscriminatorsFat += ([] if options.useLegacyTaggers else ['pfBoostedDoubleSecondaryVertex' + ('CA15' if algoLabel=='CA' else 'AK8') + 'BJetTags'])
 
 ## Full list of bTagDiscriminators for SoftDrop subjets
 bTagDiscriminatorsSoftDrop = copy.deepcopy(bTagDiscriminators)
@@ -740,8 +748,8 @@ if options.runFatJets:
             svSource = cms.InputTag(svSource),
             muSource = cms.InputTag(muSource),
             elSource = cms.InputTag(elSource),
-            btagInfos = bTagInfos,
-            btagDiscriminators = (bTagDiscriminatorsFat + (['pfBoostedDoubleSecondaryVertex' + ('CA15' if algoLabel=='CA' else 'AK8') + 'BJetTags'] if options.remakeDoubleB else [])),
+            btagInfos = bTagInfosFat,
+            btagDiscriminators = bTagDiscriminatorsFat,
             explicitJTA = options.useExplicitJTA,
             runIVF = options.runIVF,
             postfix = postfix
@@ -843,8 +851,8 @@ if options.runFatJets:
             svSource = cms.InputTag(svSource),
             muSource = cms.InputTag(muSource),
             elSource = cms.InputTag(elSource),
-            btagInfos = bTagInfos,
-            btagDiscriminators = (bTagDiscriminatorsFat + ([] if options.useLegacyTaggers else ['pfBoostedDoubleSecondaryVertex' + ('CA15' if algoLabel=='CA' else 'AK8') + 'BJetTags'])),
+            btagInfos = bTagInfosFat,
+            btagDiscriminators = bTagDiscriminatorsFat,
             jetCorrections = jetCorrectionsAK8,
             genJetCollection = cms.InputTag(fatGenJetCollection),
             genParticles = cms.InputTag(genParticles),
