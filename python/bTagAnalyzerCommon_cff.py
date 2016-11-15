@@ -115,12 +115,12 @@ bTagAnalyzerCommon = cms.PSet(
         #"HLT_PFHT650_v*",
         #"HLT_PFHT900_v*",
         # BTagMu
-        "HLT_BTagMu_DiJet20_Mu5*",
-        "HLT_BTagMu_DiJet70_Mu5*",
-        "HLT_BTagMu_DiJet110_Mu5*",
-        "HLT_BTagMu_DiJet110_L1FastJet_Mu5*",
+        "HLT_BTagMu_DiJet20_Mu5_v*",
+        "HLT_BTagMu_DiJet40_Mu5_v*",
+        "HLT_BTagMu_DiJet70_Mu5_v*",
+        "HLT_BTagMu_DiJet110_Mu5_v*",
         "HLT_BTagMu_DiJet170_Mu5_v*",
-        "HLT_BTagMu_Jet300_L1FastJet_Mu5*",
+        "HLT_BTagMu_Jet300_Mu5_v*",
         "HLT_BTagMu_AK8Jet300_Mu5_v*"
     ),
     TTbarTriggerPathNames = cms.vstring(
