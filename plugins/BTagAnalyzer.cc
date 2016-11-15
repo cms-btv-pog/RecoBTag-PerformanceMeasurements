@@ -1572,8 +1572,8 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     iEvent.getByToken(tracksColl_,tracksHandle);
     for(reco::TrackCollection::const_iterator trk = tracksHandle->begin(); trk != tracksHandle->end(); ++trk)
     {
-      EventInfo.TrkAll_d0[EventInfo.nTrkAll]        = trk->d0();
-      EventInfo.TrkAll_dz[EventInfo.nTrkAll]        = trk->dz();
+      EventInfo.TrkAll_d0[EventInfo.nTrkAll]        = -trk->dxy((*primaryVertex)[0].position());
+      EventInfo.TrkAll_dz[EventInfo.nTrkAll]        = trk->dz((*primaryVertex)[0].position());
       EventInfo.TrkAll_p[EventInfo.nTrkAll]         = trk->p();
       EventInfo.TrkAll_pt[EventInfo.nTrkAll]        = trk->pt();
       EventInfo.TrkAll_eta[EventInfo.nTrkAll]       = trk->eta();
