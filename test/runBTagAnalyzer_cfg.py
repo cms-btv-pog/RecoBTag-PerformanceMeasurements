@@ -1024,12 +1024,13 @@ if options.runOnData:
 ## Add GenParticlePruner for boosted b-tagging studies
 if not options.runOnData:
     process.prunedGenParticlesBoost = cms.EDProducer('GenParticlePruner',
-                                                     src = cms.InputTag(genParticles),
-                                                     select = cms.vstring("drop  *  ", #by default
-                                                                          "keep ( status = 3 || (status>=21 && status<=29) )", #keep hard process particles
-                                                                          "keep abs(pdgId) = 13 || abs(pdgId) = 15" #keep muons and taus
-                                                                          )
-                                                     )
+        src = cms.InputTag(genParticles),
+        select = cms.vstring(
+            "drop  *  ", #by default
+            "keep ( status = 3 || (status>=21 && status<=29) )", #keep hard process particles
+            "keep abs(pdgId) = 13 || abs(pdgId) = 15" #keep muons and taus
+        )
+    )
 
 #-------------------------------------
 
