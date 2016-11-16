@@ -3,12 +3,14 @@
 ## Software setup
 
 ```
-cmsrel CMSSW_8_0_21
-cd CMSSW_8_0_21/src
+cmsrel CMSSW_8_0_23
+cd CMSSW_8_0_23/src
 cmsenv
 
 setenv CMSSW_GIT_REFERENCE /cvmfs/cms.cern.ch/cmssw.git.daily
 git cms-init
+
+git cms-merge-topic 16377
 
 git clone -b 8_0_X_v2.00 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
