@@ -1203,7 +1203,7 @@ if options.doCTag:
 if not process.btagana.produceJetTrackTree:
     process.btagana.fillsvTagInfo = False
 
-if not process.btagana.useTrackHistory:
+if not process.btagana.useTrackHistory and not process.btagana.produceJetTrackTree:
     process.btagana.produceJetTrackTruthTree = False
 
 if options.runFatJets:
