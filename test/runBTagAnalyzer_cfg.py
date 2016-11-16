@@ -1010,7 +1010,7 @@ if not options.runOnData:
         src = cms.InputTag(genParticles),
         select = cms.vstring(
             "drop  *  ", #by default
-            "keep ( status = 3 || (status>=21 && status<=29) )", #keep hard process particles
+            "keep ( status = 3 || (status>=21 && status<=29) ) && pt > 0", #keep hard process particles with non-zero pT
             "keep abs(pdgId) = 13 || abs(pdgId) = 15" #keep muons and taus
         )
     )
