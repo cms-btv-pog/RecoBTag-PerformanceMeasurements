@@ -96,6 +96,9 @@
 // reconstruct IP
 #include "TrackingTools/IPTools/interface/IPTools.h"
 
+// Math clusters to TrackingParticles
+#include "SimTracker/TrackerHitAssociation/interface/ClusterTPAssociation.h"
+
 #include "RecoBTau/JetTagComputer/interface/GenericMVAJetTagComputer.h"
 #include "RecoBTau/JetTagComputer/interface/GenericMVAJetTagComputerWrapper.h"
 #include "RecoBTau/JetTagComputer/interface/JetTagComputer.h"
@@ -364,6 +367,7 @@ private:
   bool fillQuarks_;
   bool fillGenPruned_;
   bool produceJetTrackTree_;
+  bool produceJetTrackTruthTree_;
   bool produceAllTrackTree_;
   bool producePtRelTemplate_;
   bool storeEventInfo_;
@@ -385,6 +389,9 @@ private:
   edm::EDGetTokenT<edm::HepMCProduct> generatorhep;
   edm::EDGetTokenT<GenEventInfoProduct> generatorevt;
   edm::EDGetTokenT<LHEEventProduct> generatorlhe;
+  
+  // Matching clusters to TP token
+  edm::EDGetTokenT<ClusterTPAssociation> clusterTPMapToken_;
 
   // trigger list
   std::vector<std::string> triggerPathNames_;
@@ -533,6 +540,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   fillGenPruned_    = iConfig.getParameter<bool> ("fillGenPruned");
   useTrackHistory_      = iConfig.getParameter<bool> ("useTrackHistory");
   produceJetTrackTree_  = iConfig.getParameter<bool> ("produceJetTrackTree");
+  produceJetTrackTruthTree_  = iConfig.getParameter<bool> ("produceJetTrackTruthTree");
   produceAllTrackTree_  = iConfig.getParameter<bool> ("produceAllTrackTree");
   producePtRelTemplate_ = iConfig.getParameter<bool> ("producePtRelTemplate");
   storeEventInfo_ = iConfig.getParameter<bool>("storeEventInfo");
@@ -552,6 +560,9 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   ttbarproducerMET_ = consumes<edm::View<pat::MET>>(iConfig.getParameter<edm::InputTag>("ttbarproducer"));
   rhoTag_               = consumes<double>(iConfig.getParameter<edm::InputTag>("rho"));
 
+  // Matching Clusters to TrackingParticles consume token
+  clusterTPMapToken_ = consumes<ClusterTPAssociation>(iConfig.getParameter<edm::InputTag>("clusterTPMap"));
+  
   // Modules
   primaryVertexColl_   = consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertexColl"));
   if( produceAllTrackTree_ && storeEventInfo_ )
@@ -705,6 +716,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   JetInfo[0].RegisterTree(smalltree,branchNamePrefix_);
   if ( runFatJets_ )          JetInfo[0].RegisterFatJetSpecificTree(smalltree,branchNamePrefix_,produceJetTrackTree_);
   if ( produceJetTrackTree_ ) JetInfo[0].RegisterJetTrackTree(smalltree,branchNamePrefix_);
+  if ( produceJetTrackTruthTree_ ) JetInfo[0].RegisterJetTrackTruthTree(smalltree,branchNamePrefix_);
   if ( producePtRelTemplate_ ) JetInfo[0].RegisterJetTrackIncTree(smalltree,branchNamePrefix_);
   if ( fillsvTagInfo_ )       JetInfo[0].RegisterJetSVTree(smalltree,branchNamePrefix_);
   if ( storeTagVariables_)    JetInfo[0].RegisterTagVarTree(smalltree,branchNamePrefix_);
@@ -1656,12 +1668,22 @@ void BTagAnalyzerT<IPTI,VTX>::processTrig(const edm::Handle<edm::TriggerResults>
   return;
 }
 
+// This is needed to get a TrackingParticle --> Cluster match (instead of Cluster-->TP) (only needed in processJets)
+using P = std::pair<OmniClusterRef, TrackingParticleRef>;
+bool compare(const P& i, const P& j) {
+  	return i.second.index() > j.second.index();
+}
 
 template<typename IPTI,typename VTX>
 void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& jetsColl, const edm::Handle<PatJetCollection>& jetsColl2,
 					  const std::vector<edm::Handle<PatJetCollection> >& subjetColls,
 					  const edm::Event& iEvent, const edm::EventSetup& iSetup, const int iJetColl)
 {
+
+  // matching hit-clusters to TrackingParticles
+  edm::Handle<ClusterTPAssociation> pCluster2TPListH;
+  iEvent.getByToken(clusterTPMapToken_, pCluster2TPListH);
+  const ClusterTPAssociation& clusterToTPMap = *pCluster2TPListH;
 
   int numjet = 0;
   //JetInfo[iJetColl].nMuon = 0;
@@ -1670,6 +1692,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
   JetInfo[iJetColl].nJet = 0;
   JetInfo[iJetColl].nTrack = 0;
+  JetInfo[iJetColl].nTrackTruth = 0;
   JetInfo[iJetColl].nTrkInc = 0;
   JetInfo[iJetColl].nSV = 0;
   JetInfo[iJetColl].nTrkTagVar = 0;
@@ -1977,6 +2000,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_ntracks[JetInfo[iJetColl].nJet] = ntagtracks;
 
     JetInfo[iJetColl].Jet_nFirstTrack[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nTrack;
+    JetInfo[iJetColl].Jet_nFirstTrackTruth[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nTrackTruth;
     JetInfo[iJetColl].Jet_nFirstTrkInc[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkInc;
 
     unsigned int trackSize = selectedTracks.size();
@@ -2153,18 +2177,86 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         if ( useTrackHistory_ && !isData_ ) {
            TrackCategories::Flags theFlag ;
            if(useSelectedTracks_) theFlag  = classifier_.evaluate( toTrackRef(ipTagInfo->selectedTracks()[itt]) ).flags();
-	   else                   theFlag  = classifier_.evaluate( toTrackRef(tracks[itt]) ).flags();
+	       else                   theFlag  = classifier_.evaluate( toTrackRef(tracks[itt]) ).flags();
 
            if ( theFlag[TrackCategories::BWeakDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 1);
            if ( theFlag[TrackCategories::CWeakDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 2);
-           if ( theFlag[TrackCategories::TauDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 3);
+           if ( theFlag[TrackCategories::SignalEvent] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 3);
            if ( theFlag[TrackCategories::ConversionsProcess] )JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 4);
            if ( theFlag[TrackCategories::KsDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 5);
            if ( theFlag[TrackCategories::LambdaDecay] )       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 6);
            if ( theFlag[TrackCategories::HadronicProcess] )   JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 7);
            if ( theFlag[TrackCategories::Fake] ) 	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 8);
-           if ( theFlag[TrackCategories::SharedInnerHits] )   JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 9);
+		   if ( theFlag[TrackCategories::SharedInnerHits] )   JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 9);
+        
+        
+            //********************************************************************
+		    //
+			//	Match track to TrackingParticle and retrieve TrackTruth info
+			//
+			//********************************************************************
+			if (produceJetTrackTruthTree_){
+			
+				std::pair<TrackingParticleRef, double> res;
+				TrackingParticleRef tpr;
+				double quality_tpr;
+				res = classifier_.history().getMatchedTrackingParticle();
+				tpr = res.first;
+				quality_tpr = res.second;
+	
+				JetInfo[iJetColl].Track_TPAssociationQuality[JetInfo[iJetColl].nTrack] = quality_tpr;
+				JetInfo[iJetColl].Track_idxMatchedTP[JetInfo[iJetColl].nTrack] = -99; // default in case no match was found
+	
+				// Match TP to hit-cluster (re-ordering according to TP rather than clusters and look for equal_range of a given tpr)
+				auto clusterTPmap = clusterToTPMap.map();
+				std::sort(clusterTPmap.begin(), clusterTPmap.end(), compare);
+				auto clusterRange = std::equal_range(clusterTPmap.begin(), clusterTPmap.end(),std::make_pair(OmniClusterRef(), tpr), compare);
+	
+				if (quality_tpr != 0) {
+	
+					// to match Track to TP
+					JetInfo[iJetColl].Track_idxMatchedTP[JetInfo[iJetColl].nTrack] = JetInfo[iJetColl].nTrackTruth;
+					// to match TP to Track
+					JetInfo[iJetColl].TrackTruth_idxMatchedTrack[JetInfo[iJetColl].nTrackTruth] = JetInfo[iJetColl].nTrack;
+		
+					JetInfo[iJetColl].TrackTruth_p[JetInfo[iJetColl].nTrackTruth] = tpr->p();
+					JetInfo[iJetColl].TrackTruth_pt[JetInfo[iJetColl].nTrackTruth] = tpr->pt();
+					JetInfo[iJetColl].TrackTruth_eta[JetInfo[iJetColl].nTrackTruth] = tpr->eta();
+					JetInfo[iJetColl].TrackTruth_phi[JetInfo[iJetColl].nTrackTruth] = tpr->phi();
+					JetInfo[iJetColl].TrackTruth_charge[JetInfo[iJetColl].nTrackTruth] = tpr->charge();
+					JetInfo[iJetColl].TrackTruth_pdgid[JetInfo[iJetColl].nTrackTruth] = tpr->pdgId();
+		
+					// calculate dxy,dz,IP,...
+					TrackingParticle::Point vertex_pv = pv->position();
+					TrackingParticle::Point vertex_tpr = tpr->vertex();
+					TrackingParticle::Vector momentum_tpr = tpr->momentum();
+					float dxy_tpr = (-(vertex_tpr.x()-vertex_pv.x())*momentum_tpr.y()+(vertex_tpr.y()-vertex_pv.y())*momentum_tpr.x())/tpr->pt();
+					float dz_tpr = (vertex_tpr.z()-vertex_pv.z()) - ((vertex_tpr.x()-vertex_pv.x())*momentum_tpr.x()+(vertex_tpr.y()-vertex_pv.y())*momentum_tpr.y())/sqrt(momentum_tpr.perp2()) * momentum_tpr.z()/sqrt(momentum_tpr.perp2());
+					JetInfo[iJetColl].TrackTruth_dxy[JetInfo[iJetColl].nTrackTruth] = dxy_tpr;
+					JetInfo[iJetColl].TrackTruth_dz[JetInfo[iJetColl].nTrackTruth] = dz_tpr;
+		
+					// calculate hits
+					int n_pix_hits = 0;
+					int n_strip_hits = 0;
+					if( clusterRange.first != clusterRange.second ) {
+						for( auto ip=clusterRange.first; ip != clusterRange.second; ++ip ) {
+							const OmniClusterRef& cluster = ip->first;
+							if (cluster.isPixel() && cluster.isValid()){ n_pix_hits+=1;}
+							if (cluster.isStrip() && cluster.isValid()){ n_strip_hits+=1;}
+						}
+					}
+					JetInfo[iJetColl].TrackTruth_nHitAll[JetInfo[iJetColl].nTrackTruth] = n_pix_hits+n_strip_hits;
+					JetInfo[iJetColl].TrackTruth_nHitStrip[JetInfo[iJetColl].nTrackTruth] = n_strip_hits;
+					JetInfo[iJetColl].TrackTruth_nHitPixel[JetInfo[iJetColl].nTrackTruth] = n_pix_hits;
+
+
+					++JetInfo[iJetColl].nTrackTruth;
+	
+				}
+        	}
+        	// ************ end of track truth calculations ****************************
         }
+        // ************ end of track history calculations ****************************
 
         JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = -1;
 
@@ -2342,6 +2434,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     }
 
     JetInfo[iJetColl].Jet_nLastTrack[JetInfo[iJetColl].nJet]   = JetInfo[iJetColl].nTrack;
+    JetInfo[iJetColl].Jet_nLastTrackTruth[JetInfo[iJetColl].nJet]   = JetInfo[iJetColl].nTrackTruth;
     JetInfo[iJetColl].Jet_nLastTrkInc[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nTrkInc;
 
     math::XYZTLorentzVector allSum = allKinematics.weightedVectorSum() ; // allKinematics.vectorSum()
@@ -2407,7 +2500,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
           TrackCategories::Flags theFlagP = classifier_.evaluate( toTrackRef(muonPtr->globalTrack()) ).flags();
           if ( theFlagP[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 1));
           if ( theFlagP[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 2));
-          if ( theFlagP[TrackCategories::TauDecay] )           JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 3));
+          if ( theFlagP[TrackCategories::SignalEvent] )           JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 3));
           if ( theFlagP[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 4));
           if ( theFlagP[TrackCategories::KsDecay] )            JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 5));
           if ( theFlagP[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 6));
@@ -2826,7 +2919,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     if ( useTrackHistory_ && indexes.size()!=0 && !isData_ ) {
       if ( flags1P[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 1));
       if ( flags1P[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 2));
-      if ( flags1P[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 3));
+      if ( flags1P[TrackCategories::SignalEvent] )           JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 3));
       if ( flags1P[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 4));
       if ( flags1P[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 5));
       if ( flags1P[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 6));
@@ -2836,7 +2929,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       if ( idSize > 1 ) {
         if ( flags2P[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 1));
         if ( flags2P[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 2));
-        if ( flags2P[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 3));
+        if ( flags2P[TrackCategories::SignalEvent] )           JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 3));
         if ( flags2P[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 4));
         if ( flags2P[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 5));
         if ( flags2P[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 6));
@@ -2847,7 +2940,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       if ( idSize > 2 ) {
         if ( flags3P[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 1));
         if ( flags3P[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 2));
-        if ( flags3P[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 3));
+        if ( flags3P[TrackCategories::SignalEvent] )           JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 3));
         if ( flags3P[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 4));
         if ( flags3P[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 5));
         if ( flags3P[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 6));
@@ -2857,7 +2950,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       }
       if ( flags1N[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 1));
       if ( flags1N[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 2));
-      if ( flags1N[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 3));
+      if ( flags1N[TrackCategories::SignalEvent] )           JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 3));
       if ( flags1N[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 4));
       if ( flags1N[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 5));
       if ( flags1N[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 6));
@@ -2867,7 +2960,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       if ( idSize > 1 ) {
         if ( flags2N[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 1));
         if ( flags2N[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 2));
-        if ( flags2N[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 3));
+        if ( flags2N[TrackCategories::SignalEvent] )           JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 3));
         if ( flags2N[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 4));
         if ( flags2N[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 5));
         if ( flags2N[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 6));
@@ -2878,7 +2971,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       if ( idSize > 2 ) {
         if ( flags3N[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 1));
         if ( flags3N[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 2));
-        if ( flags3N[TrackCategories::TauDecay] )           JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 3));
+        if ( flags3N[TrackCategories::SignalEvent] )           JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 3));
         if ( flags3N[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 4));
         if ( flags3N[TrackCategories::KsDecay] )            JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 5));
         if ( flags3N[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 6));
@@ -2906,7 +2999,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
           TrackCategories::Flags theFlag = classifier_.evaluate( toTrackRef(jetProbTracks[i]) ).flags();
           if ( theFlag[TrackCategories::BWeakDecay] )	      cap0 = 1;
           if ( theFlag[TrackCategories::CWeakDecay] )	      cap1 = 1;
-          if ( theFlag[TrackCategories::TauDecay] )	      cap2 = 1;
+          if ( theFlag[TrackCategories::SignalEvent] )	      cap2 = 1;
           if ( theFlag[TrackCategories::ConversionsProcess] ) cap3 = 1;
           if ( theFlag[TrackCategories::KsDecay] )	      cap4 = 1;
           if ( theFlag[TrackCategories::LambdaDecay] )        cap5 = 1;
@@ -2918,7 +3011,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
           TrackCategories::Flags theFlag = classifier_.evaluate( toTrackRef(jetProbTracks[i]) ).flags();
           if ( theFlag[TrackCategories::BWeakDecay] )	      can0 = 2;
           if ( theFlag[TrackCategories::CWeakDecay] )	      can1 = 2;
-          if ( theFlag[TrackCategories::TauDecay] )	      can2 = 2;
+          if ( theFlag[TrackCategories::SignalEvent] )	      can2 = 2;
           if ( theFlag[TrackCategories::ConversionsProcess] ) can3 = 2;
           if ( theFlag[TrackCategories::KsDecay] )	      can4 = 2;
           if ( theFlag[TrackCategories::LambdaDecay] )        can5 = 2;
@@ -3221,7 +3314,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         TrackCategories::Flags theFlag = classifier_.evaluate( toTrackRef(svxPostracks[i]) ).flags();
         if ( theFlag[TrackCategories::BWeakDecay] )         cap0 = 1;
         if ( theFlag[TrackCategories::CWeakDecay] )         cap1 = 1;
-        if ( theFlag[TrackCategories::TauDecay] )           cap2 = 1;
+        if ( theFlag[TrackCategories::SignalEvent] )           cap2 = 1;
         if ( theFlag[TrackCategories::ConversionsProcess] ) cap3 = 1;
         if ( theFlag[TrackCategories::KsDecay] )            cap4 = 1;
         if ( theFlag[TrackCategories::LambdaDecay] )        cap5 = 1;
@@ -3238,7 +3331,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         TrackCategories::Flags theFlag = classifier_.evaluate( toTrackRef(svxNegtracks[i]) ).flags();
         if ( theFlag[TrackCategories::BWeakDecay] )         can0 = 2;
         if ( theFlag[TrackCategories::CWeakDecay] )         can1 = 2;
-        if ( theFlag[TrackCategories::TauDecay] )           can2 = 2;
+        if ( theFlag[TrackCategories::SignalEvent] )           can2 = 2;
         if ( theFlag[TrackCategories::ConversionsProcess] ) can3 = 2;
         if ( theFlag[TrackCategories::KsDecay] )            can4 = 2;
         if ( theFlag[TrackCategories::LambdaDecay] )        can5 = 2;
@@ -3357,7 +3450,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       flags1P[TrackCategories::ConversionsProcess] ;
       if ( flags1P[TrackCategories::BWeakDecay] )              cat1P = 1;
       else if ( flags1P[TrackCategories::CWeakDecay] )         cat1P = 2;
-      else if ( flags1P[TrackCategories::TauDecay] )           cat1P = 3;
+      else if ( flags1P[TrackCategories::SignalEvent] )           cat1P = 3;
       else if ( flags1P[TrackCategories::ConversionsProcess] ) cat1P = 4;
       else if ( flags1P[TrackCategories::KsDecay] )            cat1P = 5;
       else if ( flags1P[TrackCategories::LambdaDecay] )        cat1P = 6;
@@ -3367,7 +3460,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       if(idSize > 1){
         if ( flags2P[TrackCategories::BWeakDecay] )              cat2P = 1;
         else if ( flags2P[TrackCategories::CWeakDecay] )         cat2P = 2;
-        else if ( flags2P[TrackCategories::TauDecay] )           cat2P = 3;
+        else if ( flags2P[TrackCategories::SignalEvent] )           cat2P = 3;
         else if ( flags2P[TrackCategories::ConversionsProcess] ) cat2P = 4;
         else if ( flags2P[TrackCategories::KsDecay] )            cat2P = 5;
         else if ( flags2P[TrackCategories::LambdaDecay] )        cat2P = 6;
@@ -3378,7 +3471,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       if(idSize > 2){
         if ( flags3P[TrackCategories::BWeakDecay] )              cat3P = 1;
         else if ( flags3P[TrackCategories::CWeakDecay] )         cat3P = 2;
-        else if ( flags3P[TrackCategories::TauDecay] )           cat3P = 3;
+        else if ( flags3P[TrackCategories::SignalEvent] )           cat3P = 3;
         else if ( flags3P[TrackCategories::ConversionsProcess] ) cat3P = 4;
         else if ( flags3P[TrackCategories::KsDecay] )            cat3P = 5;
         else if ( flags3P[TrackCategories::LambdaDecay] )        cat3P = 6;
@@ -3388,7 +3481,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       }
       if ( flags1N[TrackCategories::BWeakDecay] )              cat1N = 1;
       else if ( flags1N[TrackCategories::CWeakDecay] )         cat1N = 2;
-      else if ( flags1N[TrackCategories::TauDecay] )           cat1N = 3;
+      else if ( flags1N[TrackCategories::SignalEvent] )           cat1N = 3;
       else if ( flags1N[TrackCategories::ConversionsProcess] ) cat1N = 4;
       else if ( flags1N[TrackCategories::KsDecay] )            cat1N = 5;
       else if ( flags1N[TrackCategories::LambdaDecay] )        cat1N = 6;
@@ -3398,7 +3491,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       if(idSize > 1){
         if ( flags2N[TrackCategories::BWeakDecay] )              cat2N = 1;
         else if ( flags2N[TrackCategories::CWeakDecay] )         cat2N = 2;
-        else if ( flags2N[TrackCategories::TauDecay] )           cat2N = 3;
+        else if ( flags2N[TrackCategories::SignalEvent] )           cat2N = 3;
         else if ( flags2N[TrackCategories::ConversionsProcess] ) cat2N = 4;
         else if ( flags2N[TrackCategories::KsDecay] )            cat2N = 5;
         else if ( flags2N[TrackCategories::LambdaDecay] )        cat2N = 6;
@@ -3409,7 +3502,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       if(idSize > 2){
         if ( flags3N[TrackCategories::BWeakDecay] )              cat3N = 1;
         else if ( flags3N[TrackCategories::CWeakDecay] )         cat3N = 2;
-        else if ( flags3N[TrackCategories::TauDecay] )           cat3N = 3;
+        else if ( flags3N[TrackCategories::SignalEvent] )           cat3N = 3;
         else if ( flags3N[TrackCategories::ConversionsProcess] ) cat3N = 4;
         else if ( flags3N[TrackCategories::KsDecay] )            cat3N = 5;
         else if ( flags3N[TrackCategories::LambdaDecay] )        cat3N = 6;
