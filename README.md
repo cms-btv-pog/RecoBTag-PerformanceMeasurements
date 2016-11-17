@@ -12,7 +12,7 @@ git cms-init
 
 git cms-merge-topic 16377
 
-git clone -b 8_0_X_v2.00 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b 8_0_X_v2.01 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
