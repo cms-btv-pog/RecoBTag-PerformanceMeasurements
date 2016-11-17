@@ -636,6 +636,7 @@ process.load("SimTracker.TrackHistory.TrackHistory_cff")
 process.load("SimTracker.TrackHistory.TrackClassifier_cff")
 process.load("SimTracker.TrackAssociatorProducers.quickTrackAssociatorByHits_cfi")
 process.load("SimTracker.TrackAssociation.trackingParticleRecoTrackAsssociation_cfi")
+process.load("SimTracker.TrackerHitAssociation.tpClusterProducer_cfi")
 #process.load("RecoBTag.Configuration.RecoBTag_cff")
 
 #-------------------------------------
@@ -1238,6 +1239,7 @@ process.btagana.useSelectedTracks     = True  ## False if you want to run on all
 process.btagana.useTrackHistory       = False ## Can only be used with GEN-SIM-RECODEBUG files
 process.btagana.fillsvTagInfo         = False ## True if you want to store information relative to the svTagInfos, set to False if produceJetTrackTree is set to False
 process.btagana.produceJetTrackTree   = False ## True if you want to keep info for tracks associated to jets : for commissioning studies
+process.btagana.produceJetTrackTruthTree   	= False ## can only be used with GEN-SIM-RECODEBUG files and when useTrackHistory and produceJetTrackTree is True
 process.btagana.produceAllTrackTree   = False ## True if you want to keep info for all tracks : for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
@@ -1262,6 +1264,9 @@ if options.doCTag:
 ## fillsvTagInfo set to False independently from the choices above, if produceJetTrackTree is set to False
 if not process.btagana.produceJetTrackTree:
     process.btagana.fillsvTagInfo = False
+
+if not process.btagana.useTrackHistory  or not process.btagana.produceJetTrackTree:
+    process.btagana.produceJetTrackTruthTree = False
 
 if options.runFatJets:
     process.btaganaFatJets = process.btagana.clone(
