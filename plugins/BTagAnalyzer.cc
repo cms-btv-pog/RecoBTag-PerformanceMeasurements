@@ -1766,10 +1766,29 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       if ( flavour >= 1 && flavour <= 3 ) flavour = 1;
     }
 
+		int hflav = pjet->hadronFlavour();		
+		int pflav = pjet->partonFlavour();
+		int cflav = 0; //~correct flavour definition
+		if(!isData_) {
+			if(hflav != 0) {
+				cflav = hflav;
+			}
+			else { //not a heavy jet
+				if(std::abs(pflav) == 4 || std::abs(pflav) == 5) {
+					cflav = 0;
+				}
+				else {
+					cflav = pflav;
+				}
+			}
+		}
+
     JetInfo[iJetColl].Jet_partonid[JetInfo[iJetColl].nJet]  = pjet->genParton() ? pjet->genParton()->pdgId() : 0;
     JetInfo[iJetColl].Jet_area[JetInfo[iJetColl].nJet]      = pjet->jetArea();
-    JetInfo[iJetColl].Jet_flavour[JetInfo[iJetColl].nJet]   = pjet->partonFlavour();
-    JetInfo[iJetColl].Jet_flavourCleaned[JetInfo[iJetColl].nJet]   = pjet->partonFlavour();
+    JetInfo[iJetColl].Jet_flavour[JetInfo[iJetColl].nJet]   = cflav;
+		JetInfo[iJetColl].Jet_flavourCleaned[JetInfo[iJetColl].nJet]  = cflav;
+    JetInfo[iJetColl].Jet_partonFlavour[JetInfo[iJetColl].nJet]   = pjet->partonFlavour();
+    JetInfo[iJetColl].Jet_hadronFlavour[JetInfo[iJetColl].nJet]   = pjet->hadronFlavour();
     JetInfo[iJetColl].Jet_nbHadrons[JetInfo[iJetColl].nJet] = pjet->jetFlavourInfo().getbHadrons().size();
     JetInfo[iJetColl].Jet_ncHadrons[JetInfo[iJetColl].nJet] = pjet->jetFlavourInfo().getcHadrons().size();
     JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet]       = pjet->eta();
