@@ -71,8 +71,10 @@ class JetInfoBranches {
     int   Jet_histSvx[nMaxJets_];
     int   Jet_ntracks[nMaxJets_];
     int   Jet_nseltracks[nMaxJets_];
-    int   Jet_flavour[nMaxJets_];
-    int   Jet_flavourCleaned[nMaxJets_];
+    int   Jet_flavour[nMaxJets_];	
+		int   Jet_flavourCleaned[nMaxJets_];
+    int   Jet_partonFlavour[nMaxJets_];
+    int   Jet_hadronFlavour[nMaxJets_];
     int   Jet_partonid[nMaxJets_];
     int   Jet_nbHadrons[nMaxJets_];
     int   Jet_ncHadrons[nMaxJets_];
@@ -445,7 +447,9 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_ntracks").c_str(),     Jet_ntracks     ,(name+"Jet_ntracks["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_nseltracks").c_str(),  Jet_nseltracks  ,(name+"Jet_nseltracks["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_flavour").c_str(),     Jet_flavour     ,(name+"Jet_flavour["+name+"nJet]/I").c_str());
-      tree->Branch((name+"Jet_flavourCleaned").c_str(),     Jet_flavourCleaned     ,(name+"Jet_flavourCleaned["+name+"nJet]/I").c_str());
+      tree->Branch((name+"Jet_flavourCleaned").c_str(), Jet_flavourCleaned, (name+"Jet_flavourCleaned["+name+"nJet]/I").c_str());
+      tree->Branch((name+"Jet_partonFlavour").c_str(), Jet_partonFlavour, (name+"Jet_partonFlavour["+name+"nJet]/I").c_str());
+      tree->Branch((name+"Jet_hadronFlavour").c_str(), Jet_hadronFlavour, (name+"Jet_hadronFlavour["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_nbHadrons").c_str(),   Jet_nbHadrons   ,(name+"Jet_nbHadrons["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_ncHadrons").c_str(),   Jet_ncHadrons   ,(name+"Jet_ncHadrons["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_Ip2N").c_str(),        Jet_Ip2N        ,(name+"Jet_Ip2N["+name+"nJet]/F").c_str());
@@ -939,7 +943,9 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_ntracks").c_str(),     Jet_ntracks     );
       tree->SetBranchAddress((name+"Jet_nseltracks").c_str(),  Jet_nseltracks  );
       tree->SetBranchAddress((name+"Jet_flavour").c_str(),     Jet_flavour     );
-      tree->SetBranchAddress((name+"Jet_flavourCleaned").c_str(),     Jet_flavourCleaned     );
+      tree->SetBranchAddress((name+"Jet_flavourCleaned").c_str(), Jet_flavourCleaned);
+      tree->SetBranchAddress((name+"Jet_partonFlavour").c_str(), Jet_partonFlavour);
+      tree->SetBranchAddress((name+"Jet_hadronFlavour").c_str(), Jet_hadronFlavour);
       tree->SetBranchAddress((name+"Jet_nbHadrons").c_str(),   Jet_nbHadrons   );
       tree->SetBranchAddress((name+"Jet_ncHadrons").c_str(),   Jet_ncHadrons   );
       tree->SetBranchAddress((name+"Jet_Ip2N").c_str(),        Jet_Ip2N        );
