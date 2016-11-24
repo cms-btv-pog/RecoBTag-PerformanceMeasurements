@@ -990,13 +990,6 @@ if options.runFatJets:
         getattr(process,'patJetsFatPFCHS'+postfix).userData.userFloats.src += ['SoftDrop:Mass','SoftDrop:Pt','SoftDrop:Eta','SoftDrop:Phi','SoftDrop:jecFactor0',
                                                                                'Pruned:Mass'  ,'Pruned:Pt'  ,'Pruned:Eta'  ,'Pruned:Phi'  ,'Pruned:jecFactor0']
 
-#-------------------------------------
-## Switch to hadron flavour priority for all jet collections
-if not options.runOnData:
-    for i in ['', 'FatPFCHS', 'PrunedSubjetsPFCHS', 'SoftDropSubjetsPFCHS']:
-        m = 'patJetFlavourAssociation' + i + postfix
-        if hasattr(process,m):
-            setattr( getattr(process,m), 'hadronFlavourHasPriority', cms.bool(True) )
 
 #-------------------------------------
 if options.runOnData:
