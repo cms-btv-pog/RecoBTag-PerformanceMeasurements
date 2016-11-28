@@ -561,8 +561,9 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   rhoTag_               = consumes<double>(iConfig.getParameter<edm::InputTag>("rho"));
 
   // Matching Clusters to TrackingParticles consume token
-  clusterTPMapToken_ = consumes<ClusterTPAssociation>(iConfig.getParameter<edm::InputTag>("clusterTPMap"));
-  
+  if( produceJetTrackTruthTree_ )
+    clusterTPMapToken_ = consumes<ClusterTPAssociation>(iConfig.getParameter<edm::InputTag>("clusterTPMap"));
+
   // Modules
   primaryVertexColl_   = consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertexColl"));
   if( produceAllTrackTree_ && storeEventInfo_ )
@@ -1681,9 +1682,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 {
 
   // matching hit-clusters to TrackingParticles
-  edm::Handle<ClusterTPAssociation> pCluster2TPListH;
-  iEvent.getByToken(clusterTPMapToken_, pCluster2TPListH);
-  const ClusterTPAssociation& clusterToTPMap = *pCluster2TPListH;
+  edm::Handle<ClusterTPAssociation> clusterToTPMap;
+  if( produceJetTrackTruthTree_ )
+    iEvent.getByToken(clusterTPMapToken_, clusterToTPMap);
 
   int numjet = 0;
   //JetInfo[iJetColl].nMuon = 0;
@@ -2227,7 +2228,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 				JetInfo[iJetColl].Track_idxMatchedTP[JetInfo[iJetColl].nTrack] = -99; // default in case no match was found
 	
 				// Match TP to hit-cluster (re-ordering according to TP rather than clusters and look for equal_range of a given tpr)
-				auto clusterTPmap = clusterToTPMap.map();
+				auto clusterTPmap = clusterToTPMap->map();
 				std::sort(clusterTPmap.begin(), clusterTPmap.end(), compare);
 				auto clusterRange = std::equal_range(clusterTPmap.begin(), clusterTPmap.end(),std::make_pair(OmniClusterRef(), tpr), compare);
 	
