@@ -1236,7 +1236,7 @@ process.btagana.useSelectedTracks     = True  ## False if you want to run on all
 process.btagana.useTrackHistory       = False ## Can only be used with GEN-SIM-RECODEBUG files
 process.btagana.fillsvTagInfo         = False ## True if you want to store information relative to the svTagInfos, set to False if produceJetTrackTree is set to False
 process.btagana.produceJetTrackTree   = False ## True if you want to keep info for tracks associated to jets : for commissioning studies
-process.btagana.produceJetTrackTruthTree   	= False ## can only be used with GEN-SIM-RECODEBUG files and when useTrackHistory and produceJetTrackTree is True
+process.btagana.produceJetTrackTruthTree = False ## can only be used with GEN-SIM-RECODEBUG files and when useTrackHistory is True
 process.btagana.produceAllTrackTree   = False ## True if you want to keep info for all tracks : for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
