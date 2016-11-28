@@ -401,12 +401,15 @@ bTagInfosFat += ([] if options.useLegacyTaggers else ['pfImpactParameter' + ('CA
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfInclusiveSecondaryVertexFinder' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfBoostedDoubleSV' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
 bTagDiscriminatorsFat = copy.deepcopy(bTagDiscriminators)
-if options.remakeAllDiscr:
+if options.runJetClustering:
+    options.remakeAllDiscr = True
+if runFatJetClustering:
     options.remakeDoubleB = True
 if options.remakeDoubleB:
     bTagDiscriminatorsFat += ([] if options.useLegacyTaggers else ['pfBoostedDoubleSecondaryVertex' + ('CA15' if algoLabel=='CA' else 'AK8') + 'BJetTags'])
 
 ## Full list of bTagDiscriminators for SoftDrop subjets
+bTagDiscriminatorsSubJets  = copy.deepcopy(bTagDiscriminators)
 bTagDiscriminatorsSoftDrop = copy.deepcopy(bTagDiscriminators)
 
 ## If using MiniAOD and not reclustering jets, only run taggers not already stored (with the exception of JP taggers)
@@ -417,6 +420,7 @@ if options.miniAOD and not options.runJetClustering and not options.remakeAllDis
     for d in storedDiscriminators:
         if 'ProbabilityBJetTags' in d: continue
         if d in bTagDiscriminators: bTagDiscriminators.remove(d)
+if options.miniAOD and not runFatJetClustering and not options.remakeAllDiscr:
     ## SoftDrop subjets in MiniAOD have only CSVv2AVR and CSVv2IVF discriminators stored
     for d in ['pfCombinedSecondaryVertexV2BJetTags', 'pfCombinedInclusiveSecondaryVertexV2BJetTags']:
         if d in bTagDiscriminatorsSoftDrop: bTagDiscriminatorsSoftDrop.remove(d)
@@ -892,7 +896,7 @@ if options.runFatJets:
             muSource = cms.InputTag(muSource),
             elSource = cms.InputTag(elSource),
             btagInfos = bTagInfos,
-            btagDiscriminators = bTagDiscriminators,
+            btagDiscriminators = bTagDiscriminatorsSubJets,
             jetCorrections = jetCorrectionsAK4,
             genJetCollection = cms.InputTag(fatGenJetCollectionSoftDrop,'SubJets'),
             genParticles = cms.InputTag(genParticles),
@@ -940,7 +944,7 @@ if options.runFatJets:
             muSource = cms.InputTag(muSource),
             elSource = cms.InputTag(elSource),
             btagInfos = bTagInfos,
-            btagDiscriminators = bTagDiscriminators,
+            btagDiscriminators = bTagDiscriminatorsSubJets,
             jetCorrections = jetCorrectionsAK4,
             genJetCollection = cms.InputTag(fatGenJetCollectionPruned,'SubJets'),
             genParticles = cms.InputTag(genParticles),
