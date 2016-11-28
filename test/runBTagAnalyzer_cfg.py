@@ -623,8 +623,6 @@ process.load("SimTracker.TrackHistory.TrackHistory_cff")
 process.load("SimTracker.TrackHistory.TrackClassifier_cff")
 process.load("SimTracker.TrackAssociatorProducers.quickTrackAssociatorByHits_cfi")
 process.load("SimTracker.TrackAssociation.trackingParticleRecoTrackAsssociation_cfi")
-process.load("SimTracker.TrackerHitAssociation.tpClusterProducer_cfi")
-#process.load("RecoBTag.Configuration.RecoBTag_cff")
 
 #-------------------------------------
 ## Output Module Configuration (expects a path 'p')
@@ -1286,6 +1284,9 @@ if options.doBoostedCommissioning:
     print "For fat jets: storeCSVTagVariables set to '",process.btaganaFatJets.storeCSVTagVariables,"'"
     print "For subjets:  storeCSVTagVariablesSubJet set to '",process.btaganaFatJets.storeCSVTagVariablesSubJets,"'"
     print "********************"
+
+if process.btagana.produceJetTrackTruthTree:
+    process.load("SimTracker.TrackerHitAssociation.tpClusterProducer_cfi")
 
 #---------------------------------------
 
