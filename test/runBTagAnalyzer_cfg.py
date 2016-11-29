@@ -344,6 +344,21 @@ bTagDiscriminators = [
    ,'pfCombinedCvsLJetTags'
    ,'pfNegativeCombinedCvsLJetTags'
    ,'pfPositiveCombinedCvsLJetTags'
+   ,'deepFlavourJetTags:probudsg'         
+   ,'deepFlavourJetTags:probb'            
+   ,'deepFlavourJetTags:probc'            
+   ,'deepFlavourJetTags:probbb'           
+   ,'deepFlavourJetTags:probcc'           
+   ,'negativeDeepFlavourJetTags:probudsg' 
+   ,'negativeDeepFlavourJetTags:probb'    
+   ,'negativeDeepFlavourJetTags:probc'    
+   ,'negativeDeepFlavourJetTags:probbb'   
+   ,'negativeDeepFlavourJetTags:probcc'   
+   ,'positiveDeepFlavourJetTags:probudsg' 
+   ,'positiveDeepFlavourJetTags:probb'    
+   ,'positiveDeepFlavourJetTags:probc'    
+   ,'positiveDeepFlavourJetTags:probbb'   
+   ,'positiveDeepFlavourJetTags:probcc'   
 ]
 
 ## Legacy taggers not supported with MiniAOD
