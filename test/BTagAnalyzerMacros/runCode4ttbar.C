@@ -1,174 +1,205 @@
 {
-   
-   float luminosity = 2488; // /pb  see mbuttign@lxplus0058:~/BTagCommissioningPlots/CMSSW_7_6_3/src/RecoBTag/PerformanceMeasurements/test/ttbar and do brilcalc lumi -i lumiSummary_MuonEG_CD.json
+    //////////////////////////////////////////////
+    //        Choose between BTag or CTag      //
+    /////////////////////////////////////////////         
+    bool BTag = false; //false for CTag commissioning
 
-  std::vector<TString > systlist;
-  systlist.push_back(""                );
-/*
-  systlist.push_back("lept__plus"      );
-  systlist.push_back("lept__minus"     );
-  systlist.push_back("trig__plus"      );
-  systlist.push_back("trig__minus"     );
-  //systlist.push_back("PDF__plus"       );
-  //systlist.push_back("PDF__minus"      );
-  systlist.push_back("PU__plus"        );
-  systlist.push_back("PU__minus"       );
-  systlist.push_back("jes__plus"       );
-  systlist.push_back("jes__minus"      );
-  systlist.push_back("jer__plus"       );
-  systlist.push_back("jer__minus"      );
-  systlist.push_back("scale1__plus"    );
-  systlist.push_back("scale1__minus"   );
-  systlist.push_back("scale2__plus"    );
-  systlist.push_back("scale2__minus"   );
-*/
+    // Options for CommPlotProducer4ttbar::Loop
+    int trig_data=3;
+    float PtMin_Cut=30;  // useless now 
+    float PtMax_Cut=500;
+    TString syst="";
 
-  //systlist.push_back("metuncls__plus"  );
-  //systlist.push_back("metuncls__minus" );
-  //systlist.push_back("toppt__plus"     );
-  //systlist.push_back("toppt__minus"    );
-  //systlist.push_back("btag__plus"      );
-  //systlist.push_back("btag__minus"     );
-  //systlist.push_back("mistag__plus"    );
-  //systlist.push_back("mistag__minus"   );
+    //////////////////////
+    //BTag Commissioning//
+    /////////////////////
+    if(BTag){
+    //set the range of ntuples to run on (iname[Nsamples])
+    const int j=3;
+    const int k=3;    
 
+    // Samples defination
+    //Data13TeV_MuonEG_2016B
+    //MC13TeV_DY10to50
+    //MC13TeV_DY50toInf
+    //MC13TeV_SingleT_tW
+    //MC13TeV_SingleTbar_tW
+    //MC13TeV_TTJets_powheg_pythia8
+    //MC13TeV_WW
+    //MC13TeV_WZ
+    //MC13TeV_ZZ
+    //
+    const int Nsamples=10;
+    float luminosity = 6260; // /pb see usage.txt 
+    //float luminosity = 2600; // /pb see usage.txt 
+    //float luminosity = 218.042; // /pb see usage.txt 
+    //float luminosity = 589.3; 
+    //float luminosity = 804.2; 
+    TString iname[Nsamples] = { 
+                                //"Data13TeV_MuonEG_2016B",       // 0
+                                //"Data13TeV_MuonEG_2016B_589pb", // 0
+                                //"Data13TeV_MuonEG_2016B_804pb",  // 0
+                                //"Data13TeV_MuonEG_2016B_2fb",  // 0
+                                "Data13TeV_MuonEG_2016B_6fb",  // 0
+                                "Data13TeV_MuonEG_2016C_6fb",  // 1
+                                "MC13TeV_TTJets_powheg_pythia8", // 2
+                                "MC13TeV_DY10to50",              // 3
+                                "MC13TeV_DY50toInf",             // 4
+                                "MC13TeV_SingleT_tW",            // 5
+                                "MC13TeV_SingleTbar_tW",         // 6
+                                "MC13TeV_WW",                    // 7
+                                "MC13TeV_WZ",                    // 8 
+                                "MC13TeV_ZZ"                     // 9
+                                }; 
+    TString oname[Nsamples] = { "output_dataB_mueg",
+                                "output_dataC_mueg",
+                                "output_ttbar",
+                                "output_dy1",
+                                "output_dy2",
+                                "output_st1",
+                                "output_st2",
+                                "output_ww",
+                                "output_wz",
+                                "output_zz" 
+                                };
+ 
+    //float sf_dy=1.3; // in Run2015
+    float sf_dy=1;
+    int datatype[Nsamples] = {0, 0, 1,     2,    2,     3,     3,      4,     5,    6 }; 
+    float xsec[Nsamples]   = {0, 0, 831.77, 18610*sf_dy, 6025*sf_dy, 35.85, 35.85, 118.7, 47.13, 16.5 };
 
+    //TString samplepath="root://eoscms.cern.ch//eos/cms/store/group/phys_btag/Commissioning/TTbar/Run2016/May2016_v0";
+    //TString samplepath="root://eoscms.cern.ch//eos/cms/store/group/phys_btag/Commissioning/TTbar/Run2016/May2016_v1";
+    TString samplepath="root://eoscms.cern.ch//eos/cms/store/group/phys_btag/Commissioning/TTbar/Run2016/July12_v0";
+    TString sampleroot="MergedJetTree.root";
 
+    ///////////////////
+    // Main Loop    //
+    //////////////////
+    for (int i=j; i<k+1; i++) { 
+    // Run... 
+    TFile* f = TFile::Open(samplepath+"/"+iname[i]+"/"+sampleroot);
+    TChain* tree = (TChain*)f->Get("btagana/ttree");
+    CommPlotProducer4ttbar *run = new CommPlotProducer4ttbar(tree,1,1,0);
 
-   // initialisation
-   TFile* file_data = new TFile("/opt/sbg/data/data2/cms/mbuttign/NTuplesBtagCommissioning_Jan16_v2/Data13TeV_MuonEG_2015CD/MergedJetTree.root");
-   TChain* tree_data = (TChain*) file_data->Get("btagana/ttree");
+    if( xsec[i] != 0 )
+    {
+        TH1F* inputWeight = (TH1F*)f->Get("ttbarselectionproducer/wgtcounter");
+        double wgtcounter = inputWeight->GetBinContent(1);
+        run->SetNorm(xsec[i]*luminosity/wgtcounter);  
+        run->Loop( datatype[i], trig_data, PtMin_Cut, PtMax_Cut, oname[i], inputWeight, syst);
+    }
+    else
+    {
+        run->Loop( datatype[i], trig_data, PtMin_Cut, PtMax_Cut, oname[i], 0, syst);
+    }
+    }//end for loop
 
-   double n_ttbar=0, wgtcounter_ttbar=0;
-   double n_dy1=0, wgtcounter_dy1=0;
-   double n_dy2=0, wgtcounter_dy2=0;
-   double n_st1=0, wgtcounter_st1=0;
-   double n_st2=0, wgtcounter_st2=0;
-   double n_ww=0,  wgtcounter_ww=0;
-   double n_wz=0,  wgtcounter_wz=0;
-   double n_zz=0,  wgtcounter_zz=0;
+    } // end BTag commissioning
 
-   //TFile* file_ttbar = new TFile("/opt/sbg/data/data2/cms/mbuttign/NTuplesBtagCommissioning_Jan16_v2/MC13TeV_TTJets_Pedro/MergedJetTree.root");
-   //TFile* file_ttbar = new TFile("/opt/sbg/data/data2/cms/mbuttign/NTuplesBtagCommissioning_Jan16_v2/MC13TeV_TTJets_madgraphMLM_pythia8/MergedJetTree.root");
-   TFile* file_ttbar = new TFile("/opt/sbg/data/data2/cms/mbuttign/NTuplesBtagCommissioning_Jan16_v2/MC13TeV_TTJets_powheg_pythia8/MergedJetTree.root");
-   //TFile* file_ttbar = new TFile("/opt/sbg/data/data2/cms/mbuttign/NTuplesBtagCommissioning_Jan16_v2/MC13TeV_TTJets_amcatnlo/MergedJetTree.root");
-   TH1F* inputWeight = (TH1F*)file_ttbar->Get("ttbarselectionproducer/wgtcounter");
-   wgtcounter_ttbar = inputWeight->GetBinContent(1);
-   TChain* tree_ttbar = (TChain*) file_ttbar->Get("btagana/ttree");
+    //////////////////////
+    //CTag Commissioning//
+    /////////////////////
+    if(!BTag){
+    const int j=7;
+    const int k=7;
 
-   TFile* file_dy1 = new TFile("/opt/sbg/data/data2/cms/mbuttign/NTuplesBtagCommissioning_Jan16_v2/MC13TeV_DY10to50/MergedJetTree.root");
-   TH1F* inputWeight2 = (TH1F*)file_dy1->Get("ttbarselectionproducer/wgtcounter");
-   wgtcounter_dy1 = inputWeight2->GetBinContent(1);
-   TChain* tree_dy1 = (TChain*) file_dy1->Get("btagana/ttree");
+    const int Nsamples=20;
+    float luminosity = 12878; // /pb see usage.txt 
+    TString iname[Nsamples] = {
+                                "Data13TeV_Mu_2016B", //0
+                                "Data13TeV_Mu_2016C", //1
+                                "Data13TeV_Mu_2016D", //2
+                                /*"Data13TeV_Elec_2016B", //0"
+                                "Data13TeV_Elec_2016C", //1
+                                "Data13TeV_Elec_2016D", //2      
+                                */"MC13TeV_TTJets_powheg_pythia8_1", //3
+                                "MC13TeV_DY", //4
+                                "MC13TeV_SingleT_s-channel", //5
+                                "MC13TeV_SingleT_tW", //6
+                                "MC13TeV_SingleTbar_t-channel", //7
+                                "MC13TeV_SingleTbar_tW", //8
+                                "MC13TeV_WJets", //9
+                                "MC13TeV_QCD_Pt-30to50_MuEnrichedPt5", //10
+                                "MC13TeV_QCD_Pt-50to80_MuEnrichedPt5", //11
+                                "MC13TeV_QCD_Pt-80to120_MuEnrichedPt5", //12
+                                "MC13TeV_QCD_Pt-120to170_MuEnrichedPt5", //13
+                                "MC13TeV_QCD_Pt-170to300_MuEnrichedPt5", //14
+                                "MC13TeV_QCD_Pt-300to470_MuEnrichedPt5", //15
+                                "MC13TeV_QCD_Pt-470to600_MuEnrichedPt5", //16
+                                "MC13TeV_QCD_Pt-600to800_MuEnrichedPt5", //17
+                                "MC13TeV_QCD_Pt-800to1000_MuEnrichedPt5", //18
+                                "MC13TeV_QCD_Pt-1000toInf_MuEnrichedPt5" //19
+                                /*"MC13TeV_QCD_Pt-30to50_EMEnriched", //10
+                                "MC13TeV_QCD_Pt-50to80_EMEnriched", //11
+                                "MC13TeV_QCD_Pt-80to120_EMEnriched", //12
+                                "MC13TeV_QCD_Pt-120to170_EMEnriched", //13
+                                "MC13TeV_QCD_Pt-170to300_EMEnriched", //14
+                                "MC13TeV_QCD_Pt-300toInf_EMEnriched" //15
+                                */};
+    TString oname[Nsamples] = { "output_MUdataB_mueg",
+                                "output_MUdataC_mueg",
+                                "output_MUdataD_mueg",
+                                /*"output_ElecdataB_mueg",
+                                "output_ElecdataC_mueg",
+                                "output_ElecdataD_mueg",        
+                                */"output_ttbar",
+                                "output_dy",
+                                "output_st_s",
+                                "output_st_tW",
+                                "output_stbar_t",
+                                "output_stbar_tW",
+                                "output_wjets",
+                                "output_qcd_mu30to50",
+                                "output_qcd_mu50to80",
+                                "output_qcd_mu80to120",
+                                "output_qcd_mu120to170",
+                                "output_qcd_mu170to300",
+                                "output_qcd_mu300to470",
+                                "output_qcd_mu470to600",
+                                "output_qcd_mu600to800",
+                                "output_qcd_mu800to1000",
+                                "output_qcd_mu1000toinf"
+                                /*"output_qcd_em30to50",
+                                "output_qcd_em50to80",
+                                "output_qcd_em80to120",
+                                "output_qcd_em120to170",
+                                "output_qcd_em170to300",
+                                "output_qcd_em300toInf" 
+                                */};
 
-   TFile* file_dy2 = new TFile("/opt/sbg/data/data2/cms/mbuttign/NTuplesBtagCommissioning_Jan16_v2/MC13TeV_DY50toInf/MergedJetTree.root");
-   TH1F* inputWeight3 = (TH1F*)file_dy2->Get("ttbarselectionproducer/wgtcounter");
-   wgtcounter_dy2 = inputWeight3->GetBinContent(1);
-   TChain* tree_dy2 = (TChain*) file_dy2->Get("btagana/ttree");
+    //float sf_dy=1.3; // in Run2015
+    float sf_dy=1; //https://indico.cern.ch/event/557018/contributions/2246861/attachments/1310556/1960899/btag_ttbar_sf_17-07-2016.pdf
+    int datatype[Nsamples] = {0, 0, 0, 1, 2, 3, 3, 3, 3, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5 };
+    float xsec[Nsamples]   = {0, 0, 0, 831.77, 6024*sf_dy, 3.4, 35.6, 72.3, 35.6, 61524, 1652471.46, 437504.1, 106033.6648, 24720.71814, 8654.49315, 797.35269, 79.02553776, 25.09505908, 4.707368272, 1.62131692 };
 
-   TFile* file_st1 = new TFile("/opt/sbg/data/data2/cms/mbuttign/NTuplesBtagCommissioning_Jan16_v2/MC13TeV_SingleT_tW/MergedJetTree.root");
-   TH1F* inputWeight4 = (TH1F*)file_st1->Get("ttbarselectionproducer/wgtcounter");
-   wgtcounter_st1 = inputWeight4->GetBinContent(1);
-   TChain* tree_st1 = (TChain*) file_st1->Get("btagana/ttree");
+    //int datatype[Nsamples] = {0, 0, 0, 1, 2, 3, 3, 3, 3, 4, 5, 5, 5, 5, 5, 5 }; 
+    //float xsec[Nsamples]   = {0, 0, 0, 831.77, 6024*sf_dy, 3.4, 35.6, 72.3, 35.6, 61524, 9928000, 2890800, 350000, 62964, 18810, 135 };
 
-   TFile* file_st2 = new TFile("/opt/sbg/data/data2/cms/mbuttign/NTuplesBtagCommissioning_Jan16_v2/MC13TeV_SingleTbar_tW/MergedJetTree.root");
-   TH1F* inputWeight5 = (TH1F*)file_st2->Get("ttbarselectionproducer/wgtcounter");
-   wgtcounter_st2 = inputWeight5->GetBinContent(1);
-   TChain* tree_st2 = (TChain*) file_st2->Get("btagana/ttree");
+    TString samplepath="/eos/uscms/store/user/kovitang/July30_v0";
+    TString sampleroot="MergedJetTree.root";
 
-   TFile* file_ww = new TFile("/opt/sbg/data/data2/cms/mbuttign/NTuplesBtagCommissioning_Jan16_v2/MC13TeV_WWTo2L2Nu/MergedJetTree.root");
-   TH1F* inputWeight6 = (TH1F*)file_ww->Get("ttbarselectionproducer/wgtcounter");
-   wgtcounter_ww = inputWeight6->GetBinContent(1);
-   TChain* tree_ww = (TChain*) file_ww->Get("btagana/ttree");
+    ///////////////////
+    // Main Loop    //
+    //////////////////
+    for (int i=j; i<k+1; i++) { 
+    // Run... 
+    TFile* f = TFile::Open(samplepath+"/"+iname[i]+"/"+sampleroot);
+    TChain* tree = (TChain*)f->Get("btagana/ttree");
+    CommPlotProducer4ttbar *run = new CommPlotProducer4ttbar(tree,0,0,1);
 
-   TFile* file_wz = new TFile("/opt/sbg/data/data2/cms/mbuttign/NTuplesBtagCommissioning_Jan16_v2/MC13TeV_WZ/MergedJetTree.root");
-   TH1F* inputWeight7 = (TH1F*)file_wz->Get("ttbarselectionproducer/wgtcounter");
-   wgtcounter_wz = inputWeight7->GetBinContent(1);
-   TChain* tree_wz = (TChain*) file_wz->Get("btagana/ttree");
+    if( xsec[i] != 0 )
+    {
+        TH1F* inputWeight = (TH1F*)f->Get("ttbarselectionproducer/wgtcounter");
+        double wgtcounter = inputWeight->GetBinContent(1);
+        run->SetNorm(xsec[i]*luminosity/wgtcounter);  
+        run->Loop( datatype[i], trig_data, PtMin_Cut, PtMax_Cut, oname[i], inputWeight, syst);
+    }
+    else
+    {
+        run->Loop( datatype[i], trig_data, PtMin_Cut, PtMax_Cut, oname[i], 0, syst);
+    }
+    }//end for loop
 
-   TFile* file_zz = new TFile("/opt/sbg/data/data2/cms/mbuttign/NTuplesBtagCommissioning_Jan16_v2/MC13TeV_ZZ/MergedJetTree.root");
-   TH1F* inputWeight8 = (TH1F*)file_zz->Get("ttbarselectionproducer/wgtcounter");
-   wgtcounter_zz = inputWeight8->GetBinContent(1);
-   TChain* tree_zz = (TChain*) file_zz->Get("btagana/ttree");
-
-   TFile* file_ttscaleup = new TFile("/opt/sbg/data/data2/cms/mbuttign/NTuplesBtagCommissioning_Jan16_v2/MC13TeV_TTJets_powheg_scaleup_pythia8/MergedJetTree.root");
-   TH1F* inputWeight9 = (TH1F*)file_ttscaleup->Get("ttbarselectionproducer/wgtcounter");
-   wgtcounter_ttscaleup = inputWeight9->GetBinContent(1);
-   TChain* tree_ttscaleup = (TChain*) file_ttscaleup->Get("btagana/ttree");
-
-   TFile* file_ttscaledown = new TFile("/opt/sbg/data/data2/cms/mbuttign/NTuplesBtagCommissioning_Jan16_v2/MC13TeV_TTJets_powheg_scaledown_pythia8/MergedJetTree.root");
-   TH1F* inputWeight10 = (TH1F*)file_ttscaledown->Get("ttbarselectionproducer/wgtcounter");
-   wgtcounter_ttscaledown = inputWeight10->GetBinContent(1);
-   TChain* tree_ttscaledown = (TChain*) file_ttscaledown->Get("btagana/ttree");
-
-
-   float sf_dy=1.3;
-
-
-   CommPlotProducer4ttbar *m_data = new CommPlotProducer4ttbar(tree_data,1,1);
-   m_data->Loop(0,3, 30, 500, "output_data_mueg", 0, "");
-
-
-   // Loop on syst
-   for (unsigned int syst = 0; syst < systlist.size(); syst++)
-   { 
-
-        if(systlist[syst] != "scale1__minus" && systlist[syst] != "scale1__plus" && systlist[syst] != "scale2__minus" && systlist[syst] != "scale2__plus")
-        {
-
-                CommPlotProducer4ttbar *m_ttbar = new CommPlotProducer4ttbar(tree_ttbar,1,1);
-                m_ttbar->SetNorm(831.77*luminosity/wgtcounter_ttbar);  
-                m_ttbar->Loop(1,3, 30, 500, "output_ttbar", inputWeight, systlist[syst]);
-
-                CommPlotProducer4ttbar *m_dy1 = new CommPlotProducer4ttbar(tree_dy1,1,1);
-                m_dy1->SetNorm(18610*sf_dy*luminosity/wgtcounter_dy1);
-                m_dy1->Loop(2,3, 30, 500, "output_dy1", inputWeight2, systlist[syst]);
-
-                CommPlotProducer4ttbar *m_dy2 = new CommPlotProducer4ttbar(tree_dy2,1,1);
-                m_dy2->SetNorm(6025*sf_dy*luminosity/wgtcounter_dy2);
-                m_dy2->Loop(2,3, 30, 500, "output_dy2", inputWeight3, systlist[syst]);
-
-                CommPlotProducer4ttbar *m_st1 = new CommPlotProducer4ttbar(tree_st1,1,1);
-                m_st1->SetNorm(35.85*luminosity/wgtcounter_st1);
-                m_st1->Loop(3,3, 30, 500, "output_st1", inputWeight4, systlist[syst]);
-
-                CommPlotProducer4ttbar *m_st2 = new CommPlotProducer4ttbar(tree_st2,1,1);
-                m_st2->SetNorm(35.85*luminosity/wgtcounter_st2);
-                m_st2->Loop(3,3, 30, 500, "output_st2", inputWeight5, systlist[syst]);
-
-                CommPlotProducer4ttbar *m_ww = new CommPlotProducer4ttbar(tree_ww,1,1);
-                m_ww->SetNorm(12.178*luminosity/wgtcounter_ww);
-                m_ww->Loop(4,3, 30, 500, "output_ww", inputWeight6, systlist[syst]);
-
-                CommPlotProducer4ttbar *m_wz = new CommPlotProducer4ttbar(tree_wz,1,1);
-                m_wz->SetNorm(47.13*luminosity/wgtcounter_wz);
-                m_wz->Loop(5,3, 30, 500, "output_wz", inputWeight7, systlist[syst]);
-
-                CommPlotProducer4ttbar *m_zz = new CommPlotProducer4ttbar(tree_zz,1,1);
-                m_zz->SetNorm(16.5*luminosity/wgtcounter_zz);
-                m_zz->Loop(6,3, 30, 500, "output_zz", inputWeight8, systlist[syst]);
-
-
-        }
-        else if(systlist[syst] == "scale1__minus" || systlist[syst] == "scale1__plus")
-        {
-                CommPlotProducer4ttbar *m_ttbar = new CommPlotProducer4ttbar(tree_ttbar,1,1);
-                m_ttbar->SetNorm(831.77*luminosity/wgtcounter_ttbar);  
-                m_ttbar->Loop(1,3, 30, 500, "output_ttbar", inputWeight, systlist[syst]);
-        }
-        else if(systlist[syst] == "scale2__plus")
-        {
-                CommPlotProducer4ttbar *m_ttscaleup = new CommPlotProducer4ttbar(tree_ttscaleup,1,1);
-                m_ttscaleup->SetNorm(831.77*luminosity/wgtcounter_ttscaleup);
-                m_ttscaleup->Loop(1,3, 30, 500, "output_ttscaleup", inputWeight9, systlist[syst]);
-        }
-        else if(systlist[syst] == "scale2__minus")
-        {
-                CommPlotProducer4ttbar *m_ttscaledown = new CommPlotProducer4ttbar(tree_ttscaledown,1,1);
-                m_ttscaledown->SetNorm(831.77*luminosity/wgtcounter_ttscaledown);
-                m_ttscaledown->Loop(1,3, 30, 500, "output_ttscaledown", inputWeight10, systlist[syst]);
-        }       
-
-   }       
-
+    }//end CTag commissioning
 }

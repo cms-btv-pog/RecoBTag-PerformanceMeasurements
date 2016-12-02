@@ -27,6 +27,7 @@ using namespace std;
 
 TString Jettypetitle="AK4 jets (p_{T} > 20 GeV)";
 TString filename="ttbar/output_all.root";
+TString output="Commissioning_plots_JetPt20/";
 TString CMStitle= "CMS";
 TString Preliminarytitle= "Preliminary";
 TString Selectiontitle= "e#mu channel, #geq 2 jets";
@@ -38,6 +39,8 @@ bool bOverflow=true;
 bool b_ordering=true;
 bool web = true;
 
+// Configuration for CTag commissioning //
+bool c_ordering=false;
 
 void Draw(TString name, TString histotitle, bool log, int move_legend=0);
 void DrawTTbar(TString name, TString histotitle, bool log, int move_legend=0);
@@ -71,6 +74,24 @@ bool Draw_newdiscriminator_plots, bool Draw_tagRate_plots, bool Draw_2D_plots)
 
 void Draw(TString name, TString histotitle, bool log, int move_legend)
 {
+
+ if(c_ordering){
+    //Muon channel//
+   filename="output_allMuEFG.root";
+   output="Commissioning_plots_singleMuEFG_JetPt25_103116/";
+   Selectiontitle= "single muon channel, #geq 4 jets";
+   //Eletron Channel//
+   //filename="output_allElecEFG.root";
+   //output="Commissioning_plots_singleElecEFG_JetPt25_103116/";
+   //Selectiontitle= "single electron channel, #geq 4 jets";
+
+   TString MakeDir = "mkdir ttbar/"+output;
+   TString action = MakeDir;
+   system(action);
+   Selectiontitle= "single muon channel, #geq 4 jets";
+   bOverflow=false;
+   b_ordering=false; 
+ }
 
  TH1D* hist_b;
  TH1D* hist_c;
@@ -351,11 +372,8 @@ void Draw(TString name, TString histotitle, bool log, int move_legend)
  if(log) name_plot1=name+"_Log"+format1;
  TString name_plot2=name+"_Linear"+format2; 
  if(log) name_plot2=name+"_Log"+format2;
- c1->SaveAs("ttbar/Commissioning_plots_JetPt20/"+name_plot1);
- //c1->SaveAs("ttbar/"+name_plot1);
- c1->SaveAs("ttbar/Commissioning_plots_JetPt20/"+name_plot2);
- //c1->SaveAs("ttbar/"+name_plot2);
-
+ c1->SaveAs("ttbar/"+output+name_plot1);
+ c1->SaveAs("ttbar/"+output+name_plot2);
 }
 
 //--------------------------
