@@ -180,6 +180,10 @@ class JetInfoBranches {
     int   nTrack;
     float Track_dxy[nMaxTrk_];
     float Track_dz[nMaxTrk_];
+    float Track_dxyError[nMaxTrk_];
+    float Track_dzError[nMaxTrk_];
+    float Track_sign2D[nMaxTrk_];
+    float Track_sign3D[nMaxTrk_];
     float Track_LongIP[nMaxTrk_];
     float Track_length[nMaxTrk_];
     float Track_dist[nMaxTrk_];
@@ -641,6 +645,10 @@ class JetInfoBranches {
       if (!br) tree->Branch((name+"nTrack").c_str()           ,&nTrack          ,(name+"nTrack/I").c_str());
       tree->Branch((name+"Track_dxy").c_str()        ,Track_dxy             ,(name+"Track_dxy["+name+"nTrack]/F").c_str());
       tree->Branch((name+"Track_dz").c_str()         ,Track_dz         ,(name+"Track_dz["+name+"nTrack]/F").c_str());
+      tree->Branch((name+"Track_dxyError").c_str()   ,Track_dxyError   ,(name+"Track_dxyError["+name+"nTrack]/F").c_str());
+      tree->Branch((name+"Track_dzError").c_str()    ,Track_dzError    ,(name+"Track_dzError["+name+"nTrack]/F").c_str());
+      tree->Branch((name+"Track_sign2D").c_str()     ,Track_sign2D    ,(name+"Track_sign2D["+name+"nTrack]/I").c_str());
+      tree->Branch((name+"Track_sign3D").c_str()     ,Track_sign3D    ,(name+"Track_sign3D["+name+"nTrack]/I").c_str());
       tree->Branch((name+"Track_length").c_str()     ,Track_length     ,(name+"Track_length["+name+"nTrack]/F").c_str());
       tree->Branch((name+"Track_dist").c_str()       ,Track_dist            ,(name+"Track_dist["+name+"nTrack]/F").c_str());
       tree->Branch((name+"Track_IP2D").c_str()       ,Track_IP2D            ,(name+"Track_IP2D["+name+"nTrack]/F").c_str());
@@ -1137,6 +1145,10 @@ class JetInfoBranches {
       if (!br) tree->SetBranchAddress((name+"nTrack").c_str()          ,&nTrack            ) ;
       tree->SetBranchAddress((name+"Track_dxy").c_str()       ,Track_dxy          ) ;
       tree->SetBranchAddress((name+"Track_dz").c_str()        ,Track_dz           ) ;
+      tree->SetBranchAddress((name+"Track_dxyError").c_str()  ,Track_dxyError          ) ;
+      tree->SetBranchAddress((name+"Track_dzError").c_str()   ,Track_dzError           ) ;
+      tree->SetBranchAddress((name+"Track_sign2D").c_str()    ,Track_sign2D          ) ;
+      tree->SetBranchAddress((name+"Track_sign3D").c_str()    ,Track_sign3D          ) ;
       tree->SetBranchAddress((name+"Track_length").c_str()    ,Track_length   ) ;
       tree->SetBranchAddress((name+"Track_dist").c_str()      ,Track_dist     ) ;
       tree->SetBranchAddress((name+"Track_IP2D").c_str()      ,Track_IP2D     ) ;

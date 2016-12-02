@@ -109,6 +109,8 @@
 #include "RecoBTag/ImpactParameter/plugins/IPProducer.h"
 #include "RecoVertex/VertexPrimitives/interface/ConvertToFromReco.h"
 
+#include "TrackingTools/GeomPropagators/interface/AnalyticalImpactPointExtrapolator.h"
+
 #include "FWCore/Utilities/interface/RegexMatch.h"
 #include <boost/regex.hpp>
 
@@ -2059,6 +2061,29 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
       JetInfo[iJetColl].Track_dxy[JetInfo[iJetColl].nTrack]      = ptrack.dxy(pv->position());
       JetInfo[iJetColl].Track_dz[JetInfo[iJetColl].nTrack]       = ptrack.dz(pv->position());
+      JetInfo[iJetColl].Track_dxyError[JetInfo[iJetColl].nTrack]      = ptrack.dxyError();
+      JetInfo[iJetColl].Track_dzError[JetInfo[iJetColl].nTrack]       = ptrack.dzError();
+       
+	 {
+	    TransverseImpactPointExtrapolator extrapolator(transientTrack.field());
+	    TrajectoryStateOnSurface closestOnTransversePlaneState =
+	      extrapolator.extrapolate(transientTrack.impactPointState(),RecoVertex::convertPos(pv->position()));
+	    GlobalPoint impactPoint    = closestOnTransversePlaneState.globalPosition();
+	    GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),0.);
+	    double prod = IPVec.dot(direction);
+	    double sign = (prod>=0) ? 1. : -1.;
+	    JetInfo[iJetColl].Track_sign2D[JetInfo[iJetColl].nTrack]      = sign;
+	 }       
+	 {
+	    AnalyticalImpactPointExtrapolator extrapolator(transientTrack.field());
+	    TrajectoryStateOnSurface closestIn3DSpaceState =
+	      extrapolator.extrapolate(transientTrack.impactPointState(),RecoVertex::convertPos(pv->position()));
+	    GlobalPoint impactPoint = closestIn3DSpaceState.globalPosition();
+	    GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),impactPoint.z()-pv->z());
+	    double prod = IPVec.dot(direction);
+	    double sign = (prod>=0) ? 1. : -1.;
+	    JetInfo[iJetColl].Track_sign3D[JetInfo[iJetColl].nTrack]      = sign;
+	 }       
 
       float deltaR = reco::deltaR( ptrackRef->eta(), ptrackRef->phi(),
                                    JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet], JetInfo[iJetColl].Jet_phi[JetInfo[iJetColl].nJet] );
