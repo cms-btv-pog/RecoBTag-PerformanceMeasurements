@@ -44,12 +44,12 @@ options.register('usePuppiForBTagging', False,
     VarParsing.varType.bool,
     "Use Puppi candidates for b tagging"
 )
-options.register('mcGlobalTag', '80X_mcRun2_asymptotic_2016_miniAODv2_v1', #note: to be updated for the new Moriond 2017 MC
+options.register('mcGlobalTag', '80X_mcRun2_asymptotic_2016_TrancheIV_v6', 
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', '80X_dataRun2_2016SeptRepro_v3', #note: does not yet include the final JECs for this ReReco
+options.register('dataGlobalTag', '80X_dataRun2_2016SeptRepro_v4',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
@@ -620,9 +620,9 @@ if options.usePrivateJEC:
 
 ### to activate the new JP calibration: using the data base
 #Do not use the 80X calibrations if the ntuples are meant to measure SFs or to commission cMVAv2
-trkProbaCalibTag = "JPcalib_MC80X_v2" 
+trkProbaCalibTag = "JPcalib_MC80X_v3" 
 if options.runOnData:
-  trkProbaCalibTag = "JPcalib_Data80X_2016_v2" 
+  trkProbaCalibTag = "JPcalib_Data80X_2016_v3" 
 # process.GlobalTag.snapshotTime = cms.string("9999-12-31 23:59:59.000")
 process.GlobalTag.toGet = cms.VPSet(
     cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
