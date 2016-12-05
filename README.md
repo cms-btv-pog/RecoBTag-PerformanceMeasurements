@@ -17,7 +17,7 @@ cd RecoBTag/DeepFlavour/data/
 wget http://home.fnal.gov/~verzetti//DeepFlavour/training/DeepFlavourNoSL.json
 cd -
 
-git clone -b 8_0_X_v2.02 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b 8_0_X_v2.03 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
