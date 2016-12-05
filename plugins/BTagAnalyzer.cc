@@ -2654,6 +2654,12 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float CvsLPos = pjet->bDiscriminator(CvsLPosCJetTags_.c_str());
 
     // Jet information
+    JetInfo[iJetColl].Jet_DeepCSVBDisc[JetInfo[iJetColl].nJet]   = DeepCSVb + DeepCSVbb;
+    JetInfo[iJetColl].Jet_DeepCSVCDisc[JetInfo[iJetColl].nJet]   = DeepCSVc + DeepCSVcc;
+    JetInfo[iJetColl].Jet_DeepCSVBDiscN[JetInfo[iJetColl].nJet]  = DeepCSVbN + DeepCSVbbN;
+    JetInfo[iJetColl].Jet_DeepCSVCDiscN[JetInfo[iJetColl].nJet]  = DeepCSVcN + DeepCSVccN;
+    JetInfo[iJetColl].Jet_DeepCSVBDiscP[JetInfo[iJetColl].nJet]  = DeepCSVbP + DeepCSVbbP;
+    JetInfo[iJetColl].Jet_DeepCSVCDiscP[JetInfo[iJetColl].nJet]  = DeepCSVcP + DeepCSVccP;
     JetInfo[iJetColl].Jet_DeepCSVb[JetInfo[iJetColl].nJet]   = DeepCSVb  ;
     JetInfo[iJetColl].Jet_DeepCSVc[JetInfo[iJetColl].nJet]   = DeepCSVc  ;
     JetInfo[iJetColl].Jet_DeepCSVl[JetInfo[iJetColl].nJet]   = DeepCSVl  ;
