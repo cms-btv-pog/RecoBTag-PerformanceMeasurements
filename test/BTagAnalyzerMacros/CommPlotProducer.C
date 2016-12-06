@@ -972,8 +972,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
         //-----------------------------------
         if (printinfo) cout << " checking trigger " << trigger << endl;
         bool isTrigOK = passTrigger(trigname, trigger);
-        // FIXME no trigger in MC
-        if (!isTrigOK && isData) continue;
+        if (!isTrigOK) continue;
         ++Ntrigevent;
 
         //-----------------------------------
