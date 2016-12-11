@@ -191,8 +191,8 @@ class JetInfoBranches {
     float Track_dz[nMaxTrk_];
     float Track_dxyError[nMaxTrk_];
     float Track_dzError[nMaxTrk_];
-    float Track_sign2D[nMaxTrk_];
-    float Track_sign3D[nMaxTrk_];
+    int   Track_sign2D[nMaxTrk_];
+    int   Track_sign3D[nMaxTrk_];
     float Track_LongIP[nMaxTrk_];
     float Track_length[nMaxTrk_];
     float Track_dist[nMaxTrk_];

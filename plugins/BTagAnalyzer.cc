@@ -2071,7 +2071,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 	    GlobalPoint impactPoint    = closestOnTransversePlaneState.globalPosition();
 	    GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),0.);
 	    double prod = IPVec.dot(direction);
-	    double sign = (prod>=0) ? 1. : -1.;
+	    int sign = (prod>=0) ? 1 : -1;
 	    JetInfo[iJetColl].Track_sign2D[JetInfo[iJetColl].nTrack]      = sign;
 	 }       
 	 {
@@ -2081,7 +2081,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 	    GlobalPoint impactPoint = closestIn3DSpaceState.globalPosition();
 	    GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),impactPoint.z()-pv->z());
 	    double prod = IPVec.dot(direction);
-	    double sign = (prod>=0) ? 1. : -1.;
+	    int sign = (prod>=0) ? 1 : -1;
 	    JetInfo[iJetColl].Track_sign3D[JetInfo[iJetColl].nTrack]      = sign;
 	 }       
 
