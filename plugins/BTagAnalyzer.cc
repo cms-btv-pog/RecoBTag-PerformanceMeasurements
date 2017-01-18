@@ -303,6 +303,7 @@ private:
   std::string trackCNegHPBJetTags_;
 
   std::string combinedSVBJetTags_;
+  std::string combinedSVRun1BJetTags_;
   std::string combinedSVNegBJetTags_;
   std::string combinedSVPosBJetTags_;
 
@@ -336,6 +337,7 @@ private:
 
   std::string ipTagInfos_;
   std::string svTagInfos_;
+  std::string svTagInfosComputer_;
   std::string svNegTagInfos_;
   std::string softPFMuonTagInfos_;
   std::string softPFElectronTagInfos_;
@@ -638,6 +640,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   simpleSVNegHighPurBJetTags_   = iConfig.getParameter<std::string>("simpleSVNegHighPurBJetTags");
 
   combinedSVBJetTags_     = iConfig.getParameter<std::string>("combinedSVBJetTags");
+  combinedSVRun1BJetTags_     = iConfig.getParameter<std::string>("combinedSVRun1BJetTags");
   combinedSVNegBJetTags_  = iConfig.getParameter<std::string>("combinedSVNegBJetTags");
   combinedSVPosBJetTags_  = iConfig.getParameter<std::string>("combinedSVPosBJetTags");
 
@@ -666,6 +669,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
 
   ipTagInfos_              = iConfig.getParameter<std::string>("ipTagInfos");
   svTagInfos_              = iConfig.getParameter<std::string>("svTagInfos");
+  svTagInfosComputer_              = iConfig.getParameter<std::string>("svTagInfosComputer");
   svNegTagInfos_           = iConfig.getParameter<std::string>("svNegTagInfos");
   softPFMuonTagInfos_      = iConfig.getParameter<std::string>("softPFMuonTagInfos");
   softPFElectronTagInfos_  = iConfig.getParameter<std::string>("softPFElectronTagInfos");
@@ -1951,6 +1955,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     // Get all TagInfo pointers
     const IPTagInfo *ipTagInfo = toIPTagInfo(*pjet,ipTagInfos_);
     const SVTagInfo *svTagInfo = toSVTagInfo(*pjet,svTagInfos_);
+    const SVTagInfo *svTagInfoComputer = toSVTagInfo(*pjet,svTagInfosComputer_);
     const SVTagInfo *svNegTagInfo = toSVTagInfo(*pjet,svNegTagInfos_);
     const reco::CandSoftLeptonTagInfo *softPFMuTagInfo = pjet->tagInfoCandSoftLepton(softPFMuonTagInfos_.c_str());
     const reco::CandSoftLeptonTagInfo *softPFElTagInfo = pjet->tagInfoCandSoftLepton(softPFElectronTagInfos_.c_str());
@@ -2603,6 +2608,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float BprobP = pjet->bDiscriminator(jetBPPosBJetTags_.c_str());
 
     float CombinedSvtx  = pjet->bDiscriminator(combinedSVBJetTags_.c_str());
+    float CombinedSvtxRun1  = pjet->bDiscriminator(combinedSVRun1BJetTags_.c_str());
     float CombinedSvtxN = pjet->bDiscriminator(combinedSVNegBJetTags_.c_str());
     float CombinedSvtxP = pjet->bDiscriminator(combinedSVPosBJetTags_.c_str());
 
@@ -2692,6 +2698,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] = CombinedSvtxN;
     JetInfo[iJetColl].Jet_CombSvxP[JetInfo[iJetColl].nJet] = CombinedSvtxP;
     JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet]  = CombinedSvtx;
+    JetInfo[iJetColl].Jet_CombSvxRun1[JetInfo[iJetColl].nJet]  = CombinedSvtxRun1;
     JetInfo[iJetColl].Jet_CombIVF[JetInfo[iJetColl].nJet]     = CombinedIVF;
     JetInfo[iJetColl].Jet_CombIVF_P[JetInfo[iJetColl].nJet]   = CombinedIVF_P;
     JetInfo[iJetColl].Jet_CombIVF_N[JetInfo[iJetColl].nJet]   = CombinedIVF_N;
@@ -2806,7 +2813,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       std::vector<const reco::BaseTagInfo*>  baseTagInfos;
       JetTagComputer::TagInfoHelper helper(baseTagInfos);
       baseTagInfos.push_back( ipTagInfo );
-      baseTagInfos.push_back( svTagInfo );
+      baseTagInfos.push_back( svTagInfoComputer );
       // TaggingVariables
       reco::TaggingVariableList vars = computer->taggingVariables(helper);
 

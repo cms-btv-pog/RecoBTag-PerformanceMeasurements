@@ -319,6 +319,7 @@ bTagDiscriminators = [
    ,'pfNegativeSimpleSecondaryVertexHighEffBJetTags'
    ,'pfNegativeSimpleSecondaryVertexHighPurBJetTags'
    ,'pfCombinedSecondaryVertexV2BJetTags'
+   ,'pfCombinedSecondaryVertexBJetTags'
    ,'pfPositiveCombinedSecondaryVertexV2BJetTags'
    ,'pfNegativeCombinedSecondaryVertexV2BJetTags'
    ,'pfCombinedInclusiveSecondaryVertexV2BJetTags'
@@ -569,20 +570,20 @@ process.GlobalTag.globaltag = globalTag
 #process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_' + ('data' if options.runOnData else 'mc'))
 
 #Loading calibrations from db file, example of code for any future use
-#process.load("CondCore.DBCommon.CondDBSetup_cfi")
-#process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
-#    process.CondDBSetup,
-#    timetype = cms.string('runnumber'),
-#    toGet = cms.VPSet(
-#        cms.PSet(
-#            record = cms.string('BTauGenericMVAJetTagComputerRcd'),
-#            tag = cms.string('MVAJetTags')
-#        )
-#    ),
-#    connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/MVAJetTags.db'),
-#    BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
-#)
-#process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
+process.load("CondCore.DBCommon.CondDBSetup_cfi")
+process.BTauMVAJetTagComputerRecord = cms.ESSource("PoolDBESSource",
+    process.CondDBSetup,
+    timetype = cms.string('runnumber'),
+    toGet = cms.VPSet(
+        cms.PSet(
+            record = cms.string('BTauGenericMVAJetTagComputerRcd'),
+            tag = cms.string('MVAJetTags')
+        )
+    ),
+    connect = cms.string('sqlite_fip:RecoBTag/PerformanceMeasurements/data/CSVincluded.db'),
+    BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
+)
+process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
 
 if options.usePrivateJEC:
     
@@ -1235,13 +1236,13 @@ if options.useLegacyTaggers:
 process.btagana.tracksColl            = cms.InputTag(trackSource) 
 process.btagana.useSelectedTracks     = True  ## False if you want to run on all tracks : for commissioning studies
 process.btagana.useTrackHistory       = False ## Can only be used with GEN-SIM-RECODEBUG files
-process.btagana.fillsvTagInfo         = False ## True if you want to store information relative to the svTagInfos, set to False if produceJetTrackTree is set to False
-process.btagana.produceJetTrackTree   = False ## True if you want to keep info for tracks associated to jets : for commissioning studies
+process.btagana.fillsvTagInfo         = True ## True if you want to store information relative to the svTagInfos, set to False if produceJetTrackTree is set to False
+process.btagana.produceJetTrackTree   = True ## True if you want to keep info for tracks associated to jets : for commissioning studies
 process.btagana.produceJetTrackTruthTree = False ## can only be used with GEN-SIM-RECODEBUG files and when useTrackHistory is True
 process.btagana.produceAllTrackTree   = False ## True if you want to keep info for all tracks : for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
-process.btagana.storeTagVariables     = False  ## True if you want to keep TagInfo TaggingVariables
+process.btagana.storeTagVariables     = True  ## True if you want to keep TagInfo TaggingVariables
 process.btagana.storeCSVTagVariables  = True   ## True if you want to keep CSV TaggingVariables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag(patJetSource)
