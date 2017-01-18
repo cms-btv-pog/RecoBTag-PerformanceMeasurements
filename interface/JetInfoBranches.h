@@ -995,6 +995,7 @@ class JetInfoBranches {
       if (name!="") name += ".";
       tree->SetBranchAddress((name+"nJet").c_str(),            &nJet           );
       tree->SetBranchAddress((name+"Jet_pt").c_str(),          Jet_pt          );
+      tree->SetBranchAddress((name+"Jet_uncorrpt").c_str(),          Jet_uncorrpt           );
       tree->SetBranchAddress((name+"Jet_genpt").c_str(),       Jet_genpt       );
       tree->SetBranchAddress((name+"Jet_residual").c_str(),    Jet_residual    );
       tree->SetBranchAddress((name+"Jet_area").c_str(),        Jet_area        );
