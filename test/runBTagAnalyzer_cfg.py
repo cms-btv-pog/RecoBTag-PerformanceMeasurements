@@ -177,14 +177,18 @@ options.register('doCTag', False,
     VarParsing.varType.bool,
     "Make NTuples with branches for CTag"
 )
-options.register('usePrivateJEC', False,
+options.register('usePrivateJEC', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'Use JECs from private SQLite files')
-options.register('jecDBFile', 'Spring16_25nsV6', 
+options.register('jecDBFileMC', 'Summer16_23Sep2016V3', 
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
-    'SQLite filename for JECs')
+    'SQLite filename for MC JECs')
+options.register('jecDBFileData', 'Summer16_23Sep2016AllV3',
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    'SQLite filename for Data JECs')
 options.register('isReHLT', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -589,8 +593,8 @@ if options.usePrivateJEC:
     from CondCore.DBCommon.CondDBSetup_cfi import *
     import os
     dbfile=''
-    if options.runOnData: dbfile=options.jecDBFile+'_DATA'
-    else: dbfile=options.jecDBFile+'_MC'
+    if options.runOnData: dbfile=options.jecDBFileData+'_DATA'
+    else: dbfile=options.jecDBFileMC+'_MC'
     print "\nUsing private SQLite file", dbfile, "\n"
     process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
 		    connect = cms.string( "sqlite_fip:RecoBTag/PerformanceMeasurements/data/"+dbfile+'.db'),
