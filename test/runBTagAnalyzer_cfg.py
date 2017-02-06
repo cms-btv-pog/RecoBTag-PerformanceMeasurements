@@ -64,7 +64,7 @@ options.register('dataGlobalTagPrompt', '80X_dataRun2_Prompt_v15',
     VarParsing.varType.string,
     "Data global tag for RunH"
 )
-options.register('runJetClustering', False,
+options.register('runJetClustering', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Cluster jets from scratch instead of using those already present in the event"
@@ -114,7 +114,7 @@ options.register('miniAOD', True,
     VarParsing.varType.bool,
     "Running on miniAOD"
 )
-options.register('remakeAllDiscr', False,
+options.register('remakeAllDiscr', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Remake all b-tag discriminator, including those already stored in MiniAOD"
@@ -319,7 +319,6 @@ bTagDiscriminators = [
    ,'pfNegativeSimpleSecondaryVertexHighEffBJetTags'
    ,'pfNegativeSimpleSecondaryVertexHighPurBJetTags'
    ,'pfCombinedSecondaryVertexV2BJetTags'
-   ,'pfCombinedSecondaryVertexBJetTags'
    ,'pfPositiveCombinedSecondaryVertexV2BJetTags'
    ,'pfNegativeCombinedSecondaryVertexV2BJetTags'
    ,'pfCombinedInclusiveSecondaryVertexV2BJetTags'
@@ -746,6 +745,25 @@ else:
         explicitJTA = options.useExplicitJTA,
         postfix = postfix
     )
+
+## Add additional b-tag discriminators
+getattr(process,'patJets'+postfix).discriminatorSources += cms.VInputTag(
+    cms.InputTag("pfCombinedSecondaryVertexBJetTags"),
+    )
+
+process.pfCombinedSecondaryVertexBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('candidateCombinedSecondaryVertexComputer'),
+    tagInfos = cms.VInputTag(cms.InputTag("pfImpactParameterTagInfosPFlow"), cms.InputTag("pfSecondaryVertexTagInfosPFlow"))
+)
+
+process.candidateCombinedSecondaryVertexComputer = process.candidateCombinedSecondaryVertexV2Computer.clone(
+    useCategories = cms.bool(True),
+        calibrationRecords = cms.vstring(
+                'CombinedSVRecoVertex',
+                'CombinedSVPseudoVertex',
+                'CombinedSVNoVertex'),
+        categoryVariableName = cms.string('vertexCategory')
+)
 
 #-------------------------------------
 
