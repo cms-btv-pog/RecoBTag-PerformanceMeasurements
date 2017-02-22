@@ -109,6 +109,8 @@
 #include "RecoBTag/ImpactParameter/plugins/IPProducer.h"
 #include "RecoVertex/VertexPrimitives/interface/ConvertToFromReco.h"
 
+#include "TrackingTools/GeomPropagators/interface/AnalyticalImpactPointExtrapolator.h"
+
 #include "FWCore/Utilities/interface/RegexMatch.h"
 #include <boost/regex.hpp>
 
@@ -303,6 +305,10 @@ private:
   std::string combinedSVBJetTags_;
   std::string combinedSVNegBJetTags_;
   std::string combinedSVPosBJetTags_;
+
+	std::string deepCSVBJetTags_;
+	std::string deepCSVNegBJetTags_;
+	std::string deepCSVPosBJetTags_;
 
   std::string combinedIVFSVBJetTags_;
   std::string combinedIVFSVPosBJetTags_;
@@ -634,6 +640,10 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   combinedSVBJetTags_     = iConfig.getParameter<std::string>("combinedSVBJetTags");
   combinedSVNegBJetTags_  = iConfig.getParameter<std::string>("combinedSVNegBJetTags");
   combinedSVPosBJetTags_  = iConfig.getParameter<std::string>("combinedSVPosBJetTags");
+
+	deepCSVBJetTags_    = iConfig.getParameter<std::string>("deepCSVBJetTags");
+	deepCSVNegBJetTags_ = iConfig.getParameter<std::string>("deepCSVNegBJetTags");
+	deepCSVPosBJetTags_ = iConfig.getParameter<std::string>("deepCSVPosBJetTags");
 
   combinedIVFSVBJetTags_      = iConfig.getParameter<std::string>("combinedIVFSVBJetTags");
   combinedIVFSVPosBJetTags_   = iConfig.getParameter<std::string>("combinedIVFSVPosBJetTags");
@@ -1827,6 +1837,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
     JetInfo[iJetColl].Jet_jes[JetInfo[iJetColl].nJet]      = ( nJECSets>0 ? pjet->pt()/pjet->correctedJet("Uncorrected").pt() : 1. );
     JetInfo[iJetColl].Jet_residual[JetInfo[iJetColl].nJet] = ( nJECSets>0 ? pjet->pt()/pjet->correctedJet("L3Absolute").pt() : 1. );
+		JetInfo[iJetColl].Jet_uncorrpt[JetInfo[iJetColl].nJet] = ( nJECSets>0 ? pjet->correctedJet("Uncorrected").pt() : pjet->pt());
 
     if( runSubJets_ && iJetColl > 0 )
     {
@@ -2050,6 +2061,29 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
       JetInfo[iJetColl].Track_dxy[JetInfo[iJetColl].nTrack]      = ptrack.dxy(pv->position());
       JetInfo[iJetColl].Track_dz[JetInfo[iJetColl].nTrack]       = ptrack.dz(pv->position());
+      JetInfo[iJetColl].Track_dxyError[JetInfo[iJetColl].nTrack]      = ptrack.dxyError();
+      JetInfo[iJetColl].Track_dzError[JetInfo[iJetColl].nTrack]       = ptrack.dzError();
+       
+	 {
+	    TransverseImpactPointExtrapolator extrapolator(transientTrack.field());
+	    TrajectoryStateOnSurface closestOnTransversePlaneState =
+	      extrapolator.extrapolate(transientTrack.impactPointState(),RecoVertex::convertPos(pv->position()));
+	    GlobalPoint impactPoint    = closestOnTransversePlaneState.globalPosition();
+	    GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),0.);
+	    double prod = IPVec.dot(direction);
+	    double sign = (prod>=0) ? 1. : -1.;
+	    JetInfo[iJetColl].Track_sign2D[JetInfo[iJetColl].nTrack]      = sign;
+	 }       
+	 {
+	    AnalyticalImpactPointExtrapolator extrapolator(transientTrack.field());
+	    TrajectoryStateOnSurface closestIn3DSpaceState =
+	      extrapolator.extrapolate(transientTrack.impactPointState(),RecoVertex::convertPos(pv->position()));
+	    GlobalPoint impactPoint = closestIn3DSpaceState.globalPosition();
+	    GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),impactPoint.z()-pv->z());
+	    double prod = IPVec.dot(direction);
+	    double sign = (prod>=0) ? 1. : -1.;
+	    JetInfo[iJetColl].Track_sign3D[JetInfo[iJetColl].nTrack]      = sign;
+	 }       
 
       float deltaR = reco::deltaR( ptrackRef->eta(), ptrackRef->phi(),
                                    JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet], JetInfo[iJetColl].Jet_phi[JetInfo[iJetColl].nJet] );
@@ -2572,6 +2606,22 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float CombinedSvtxN = pjet->bDiscriminator(combinedSVNegBJetTags_.c_str());
     float CombinedSvtxP = pjet->bDiscriminator(combinedSVPosBJetTags_.c_str());
 
+    float DeepCSVb   = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probb"   ).c_str()) : -10;
+    float DeepCSVc   = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probc"   ).c_str()) : -10;
+    float DeepCSVl   = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probudsg").c_str()) : -10;
+    float DeepCSVbb  = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probbb"  ).c_str()) : -10;
+    float DeepCSVcc  = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probcc"  ).c_str()) : -10;
+    float DeepCSVbN  = (deepCSVNegBJetTags_.size()) ? pjet->bDiscriminator((deepCSVNegBJetTags_+":probb"   ).c_str()) : -10;
+    float DeepCSVcN  = (deepCSVNegBJetTags_.size()) ? pjet->bDiscriminator((deepCSVNegBJetTags_+":probc"   ).c_str()) : -10;
+    float DeepCSVlN  = (deepCSVNegBJetTags_.size()) ? pjet->bDiscriminator((deepCSVNegBJetTags_+":probudsg").c_str()) : -10;
+    float DeepCSVbbN = (deepCSVNegBJetTags_.size()) ? pjet->bDiscriminator((deepCSVNegBJetTags_+":probbb"  ).c_str()) : -10;
+    float DeepCSVccN = (deepCSVNegBJetTags_.size()) ? pjet->bDiscriminator((deepCSVNegBJetTags_+":probcc"  ).c_str()) : -10;
+    float DeepCSVbP  = (deepCSVPosBJetTags_.size()) ? pjet->bDiscriminator((deepCSVPosBJetTags_+":probb"   ).c_str()) : -10;
+    float DeepCSVcP  = (deepCSVPosBJetTags_.size()) ? pjet->bDiscriminator((deepCSVPosBJetTags_+":probc"   ).c_str()) : -10;
+    float DeepCSVlP  = (deepCSVPosBJetTags_.size()) ? pjet->bDiscriminator((deepCSVPosBJetTags_+":probudsg").c_str()) : -10;
+    float DeepCSVbbP = (deepCSVPosBJetTags_.size()) ? pjet->bDiscriminator((deepCSVPosBJetTags_+":probbb"  ).c_str()) : -10;
+    float DeepCSVccP = (deepCSVPosBJetTags_.size()) ? pjet->bDiscriminator((deepCSVPosBJetTags_+":probcc"  ).c_str()) : -10;
+
     float CombinedIVF     = pjet->bDiscriminator(combinedIVFSVBJetTags_.c_str());
     float CombinedIVF_P   = pjet->bDiscriminator(combinedIVFSVPosBJetTags_.c_str());
     float CombinedIVF_N   = pjet->bDiscriminator(combinedIVFSVNegBJetTags_.c_str());
@@ -2604,6 +2654,31 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float CvsLPos = pjet->bDiscriminator(CvsLPosCJetTags_.c_str());
 
     // Jet information
+    JetInfo[iJetColl].Jet_DeepCSVBDisc[JetInfo[iJetColl].nJet]   = DeepCSVb + DeepCSVbb  ;
+    JetInfo[iJetColl].Jet_DeepCSVBDiscN[JetInfo[iJetColl].nJet]  = DeepCSVbN + DeepCSVbbN;
+    JetInfo[iJetColl].Jet_DeepCSVBDiscP[JetInfo[iJetColl].nJet]  = DeepCSVbP + DeepCSVbbP;
+    JetInfo[iJetColl].Jet_DeepCSVCvsLDisc[JetInfo[iJetColl].nJet]   = (DeepCSVc  != -1) ? (DeepCSVc  + DeepCSVcc )/(1-(DeepCSVl )) : -1;
+    JetInfo[iJetColl].Jet_DeepCSVCvsLDiscN[JetInfo[iJetColl].nJet]  = (DeepCSVcN != -1) ? (DeepCSVcN + DeepCSVccN)/(1-(DeepCSVlN)) : -1;
+    JetInfo[iJetColl].Jet_DeepCSVCvsLDiscP[JetInfo[iJetColl].nJet]  = (DeepCSVcP != -1) ? (DeepCSVcP + DeepCSVccP)/(1-(DeepCSVlP)) : -1;
+    JetInfo[iJetColl].Jet_DeepCSVCvsBDisc[JetInfo[iJetColl].nJet]   = (DeepCSVc  != -1) ? (DeepCSVc  + DeepCSVcc )/(1-(DeepCSVb + DeepCSVbb  )) : -1;
+    JetInfo[iJetColl].Jet_DeepCSVCvsBDiscN[JetInfo[iJetColl].nJet]  = (DeepCSVcN != -1) ? (DeepCSVcN + DeepCSVccN)/(1-(DeepCSVbN + DeepCSVbbN)) : -1;
+    JetInfo[iJetColl].Jet_DeepCSVCvsBDiscP[JetInfo[iJetColl].nJet]  = (DeepCSVcP != -1) ? (DeepCSVcP + DeepCSVccP)/(1-(DeepCSVbP + DeepCSVbbP)) : -1;
+
+    JetInfo[iJetColl].Jet_DeepCSVb[JetInfo[iJetColl].nJet]   = DeepCSVb  ;
+    JetInfo[iJetColl].Jet_DeepCSVc[JetInfo[iJetColl].nJet]   = DeepCSVc  ;
+    JetInfo[iJetColl].Jet_DeepCSVl[JetInfo[iJetColl].nJet]   = DeepCSVl  ;
+    JetInfo[iJetColl].Jet_DeepCSVbb[JetInfo[iJetColl].nJet]  = DeepCSVbb ;
+    JetInfo[iJetColl].Jet_DeepCSVcc[JetInfo[iJetColl].nJet]  = DeepCSVcc ;
+    JetInfo[iJetColl].Jet_DeepCSVbN[JetInfo[iJetColl].nJet]  = DeepCSVbN ;
+    JetInfo[iJetColl].Jet_DeepCSVcN[JetInfo[iJetColl].nJet]  = DeepCSVcN ;
+    JetInfo[iJetColl].Jet_DeepCSVlN[JetInfo[iJetColl].nJet]  = DeepCSVlN ;
+    JetInfo[iJetColl].Jet_DeepCSVbbN[JetInfo[iJetColl].nJet] = DeepCSVbbN;
+    JetInfo[iJetColl].Jet_DeepCSVccN[JetInfo[iJetColl].nJet] = DeepCSVccN;
+    JetInfo[iJetColl].Jet_DeepCSVbP[JetInfo[iJetColl].nJet]  = DeepCSVbP ;
+    JetInfo[iJetColl].Jet_DeepCSVcP[JetInfo[iJetColl].nJet]  = DeepCSVcP ;
+    JetInfo[iJetColl].Jet_DeepCSVlP[JetInfo[iJetColl].nJet]  = DeepCSVlP ;
+    JetInfo[iJetColl].Jet_DeepCSVbbP[JetInfo[iJetColl].nJet] = DeepCSVbbP;
+    JetInfo[iJetColl].Jet_DeepCSVccP[JetInfo[iJetColl].nJet] = DeepCSVccP;
     JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet]   = ProbaN;
     JetInfo[iJetColl].Jet_ProbaP[JetInfo[iJetColl].nJet]   = ProbaP;
     JetInfo[iJetColl].Jet_Proba[JetInfo[iJetColl].nJet]    = Proba;

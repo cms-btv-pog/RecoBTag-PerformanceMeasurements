@@ -972,8 +972,7 @@ void CommPlotProducer::Loop(TString trigname, int trigger, float PtMin_Cut, floa
         //-----------------------------------
         if (printinfo) cout << " checking trigger " << trigger << endl;
         bool isTrigOK = passTrigger(trigname, trigger);
-        // FIXME no trigger in MC
-        if (!isTrigOK && isData) continue;
+        if (!isTrigOK) continue;
         ++Ntrigevent;
 
         //-----------------------------------
@@ -1935,48 +1934,47 @@ bool CommPlotProducer::passTrigger(TString trigger, int pttrig) {
     bool Jet40  = false, Jet60=false,  Jet80  = false, Jet140 = false;
     bool Jet200 = false, Jet260 = false, Jet320 = false;
     bool Jet400 = false, Jet450 = false, Jet500 = false;
-    bool Jet20  = false, Jet70  = false, Jet110 = false, Jet300 = false;
-
+    bool Jet20  = false, Jet70  = false, Jet110 = false, Jet170 = false; 
     int triggerIdx = 0, bitIdx = 0;
 
     if ( trigger=="jet") {
-        triggerIdx = 2;
+        triggerIdx = 0;
         bitIdx = int(triggerIdx/32);
         if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet40  = true;
 
-        triggerIdx = 87;
+        triggerIdx = 1;
         bitIdx = int(triggerIdx/32);
         if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet60  = true;
    
-        triggerIdx = 7;
+        triggerIdx = 2;
         bitIdx = int(triggerIdx/32);
         if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet80  = true;
    
-        triggerIdx = 12;
+        triggerIdx = 3;
         bitIdx = int(triggerIdx/32);
         if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet140 = true;
    
-        triggerIdx = 15;
+        triggerIdx = 4;
         bitIdx = int(triggerIdx/32);
         if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet200 = true;
    
-        triggerIdx = 17;
+        triggerIdx = 5;
         bitIdx = int(triggerIdx/32);
         if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet260 = true;
    
-        triggerIdx = 19;
+        triggerIdx = 6;
         bitIdx = int(triggerIdx/32);
         if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet320 = true;
 
-        triggerIdx = 21;
+        triggerIdx = 7;
         bitIdx = int(triggerIdx/32);
         if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet400 = true;
 
-        triggerIdx = 88;
+        triggerIdx = 8;
         bitIdx = int(triggerIdx/32);
         if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet450 = true;
 
-        triggerIdx = 89;
+        triggerIdx = 9;
         bitIdx = int(triggerIdx/32);
         if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet500 = true;
 
@@ -2021,31 +2019,31 @@ bool CommPlotProducer::passTrigger(TString trigger, int pttrig) {
     }
    
     else if ( trigger=="btag" ) {
-        triggerIdx = 35;
+        triggerIdx = 30;
         bitIdx = int(triggerIdx/32);
         if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet20  = true;
    
-        triggerIdx = 41;
+        triggerIdx = 31;
         bitIdx = int(triggerIdx/32);
         if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet40  = true;
    
-        triggerIdx = 44;
+        triggerIdx = 32;
         bitIdx = int(triggerIdx/32);
         if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet70  = true;
    
-        triggerIdx = 47;
+        triggerIdx = 33;
         bitIdx = int(triggerIdx/32);
         if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet110 = true;
    
-        triggerIdx = 50;
+        triggerIdx = 34;
         bitIdx = int(triggerIdx/32);
-        if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet300 = true;
+        if ( BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) Jet170 = true;
 
         if ( pttrig ==  20 && Jet20 )  passTrig=true;
         if ( pttrig ==  40 && Jet40 )  passTrig=true;
         if ( pttrig ==  70 && Jet70 )  passTrig=true;
         if ( pttrig == 110 && Jet110 ) passTrig=true;
-        if ( pttrig == 300 && Jet300 ) passTrig=true;
+        if ( pttrig == 170 && Jet170 ) passTrig=true;
     
     
         if (!passTrig) { return false; }
@@ -2062,11 +2060,11 @@ bool CommPlotProducer::passTrigger(TString trigger, int pttrig) {
             float ptjet = Jet_pt[ijet];
             float etajet = fabs(Jet_eta[ijet]);
 //            if ( pttrig ==20  &&  ptjet > 60. && etajet < 2.4 )  njtrig++;
-            if ( pttrig ==20  &&  ptjet > 30. && etajet < 2.4 )  njtrig++;
-            if ( pttrig ==40  &&  ptjet > 50. && etajet < 2.4 )  njtrig++;
-            if ( pttrig ==70  &&  ptjet > 80. && etajet < 2.4 )  njtrig++;
-            if ( pttrig ==110  &&  ptjet > 120. && etajet < 2.4 ) njtrig++;
-            if ( pttrig ==300  &&  ptjet > 320. && etajet < 2.4 ) njtrig++;
+            if ( pttrig == 20  &&  ptjet > 30. && etajet < 2.4 )  njtrig++;
+            if ( pttrig == 40  &&  ptjet > 50. && etajet < 2.4 )  njtrig++;
+            if ( pttrig == 70  &&  ptjet > 80. && etajet < 2.4 )  njtrig++;
+            if ( pttrig == 110  &&  ptjet > 120. && etajet < 2.4 ) njtrig++;
+            if ( pttrig == 170  &&  ptjet > 190. && etajet < 2.4 ) njtrig++;
         }
         if (passTrig && njtrig>1) {return true;}
         else {return false;}
