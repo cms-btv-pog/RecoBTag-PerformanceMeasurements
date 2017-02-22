@@ -245,7 +245,7 @@ if options.usePFchs:
     jetCorrectionsAK8 = ('AK8PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 if options.usePuppi:
     jetCorrectionsAK4 = ('AK4PFPuppi', ['L2Relative', 'L3Absolute'], 'None')
-    jetCorrectionsAK8 = ('AK8PFPuppi', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None') # why do we have L1FastJet for ak8 jets?
+    jetCorrectionsAK8 = ('AK8PFPuppi', ['L2Relative', 'L3Absolute'], 'None')
 
 if options.runOnData:
     jetCorrectionsAK4[1].append('L2L3Residual')
