@@ -20,6 +20,20 @@ void ExecEventCounter(TString DataType) {
 
 }
 
+void ExecComputeBTaggingWorkingPoints(TString AlgorithmName) {
+
+  cout << "ExecComputeBTaggingWorkingPoints " << AlgorithmName << endl; 
+
+  bool RemovePileUpJets = (AlgorithmName.Contains("RemovePU")) ? true : false;
+  AlgorithmName.ReplaceAll("RemovePU", "");
+
+  bool ApplyPileUpReweighting = (AlgorithmName.Contains("ReweightPU")) ? true : false;
+  AlgorithmName.ReplaceAll("ReweightPU", "");
+
+  ptRelAna->ComputeBTaggingWorkingPoints(AlgorithmName, RemovePileUpJets, ApplyPileUpReweighting);
+
+}
+
 void ExecComputePileUpWeights(TString Operation, int DataRange) {
 
   cout << "ExecComputePileUpWeights " << Operation << " " << DataRange << endl; 
@@ -106,7 +120,7 @@ void ExecBuildTemplates(TString TrackTemplates) {
 
   cout << "ExecBuildTemplates " << TrackTemplates << endl; 
  
-  if (TemplateVariable=="PtRel") {
+  if (TemplateVariable!="System8") {
 
     bool AddTrackTemplates = (TrackTemplates.Contains("All")) ? true : false;
     ptRelAna->BuildTemplates(AddTrackTemplates);
@@ -126,7 +140,7 @@ void ExecComputeKinematicWeights(TString DataType) {
 
       if (TemplateVariable=="PtRel") {
 
-	TString AddTrackTemplates = (TrackTemplates.Contains("All")) ? "All" : "";
+	TString AddTrackTemplates = (DataType.Contains("All")) ? "All" : "";
 	if (DataType.Contains("QCDMu")) ptRelAna->ComputeKinematicWeights(SystematicName[is], "QCDMu", AddTrackTemplates); 
 	if (DataType.Contains("JetHT")) ptRelAna->ComputeKinematicWeights(SystematicName[is], "JetHT",             "All"); 
 	if (DataType.Contains( "QCDX")) ptRelAna->ComputeKinematicWeights(SystematicName[is],   "QCD",             "All"); 
@@ -134,6 +148,8 @@ void ExecComputeKinematicWeights(TString DataType) {
       } 
  
       if (TemplateVariable=="System8") ptRelAna->ComputeKinematicWeights(SystematicName[is], "QCDMu", ""); 
+ 
+      if (TemplateVariable=="IP3D") ptRelAna->ComputeKinematicWeights(SystematicName[is], "QCDMu", ""); 
 
     }
 
@@ -151,10 +167,10 @@ void ExecCompareDataToMC(TString EtaBin, int Rebinning) {
       TString LightTemplates = "All";
       if (TemplateVariable=="System8") LightTemplates = "";
 
-      ptRelAna->CompareDataToMC("jetPt",  PtRelEtaBin[nb], "All", Rebinning,   LightTemplates);
-      ptRelAna->CompareDataToMC("jetEta", PtRelEtaBin[nb], "All", 2*Rebinning, LightTemplates);
+      //ptRelAna->CompareDataToMC("jetPt",  PtRelEtaBin[nb], "All", Rebinning,   LightTemplates);
+      //ptRelAna->CompareDataToMC("jetEta", PtRelEtaBin[nb], "All", 2*Rebinning, LightTemplates);
       ptRelAna->CompareDataToMC("PV",     PtRelEtaBin[nb], "All", Rebinning,   LightTemplates);
-      ptRelAna->CompareDataToMC("muonPt", PtRelEtaBin[nb], "All", Rebinning,   LightTemplates);
+      //ptRelAna->CompareDataToMC("muonPt", PtRelEtaBin[nb], "All", Rebinning,   LightTemplates);
       
     }
   }
@@ -172,17 +188,17 @@ void ExecComputePtRelScaleFactors(TString Parameters = "CSVv2:_Central:") {
   SystFit.Remove(SystFit.First(":")); 
   TString FitOption = Parameters;
   FitOption.ReplaceAll(TaggerList + ":" + SystFit + ":", "");
-
+  cout << TaggerList << " " << SystFit << " " << FitOption << endl;
   TString PlotOption = "pngpdf";
   TString PtBinList = "All";
-  TString EtaBinFlag = "anyEta";
+  TString EtaBinFlag = "Eta08";
   TString TemplateFlag = (FitOption.Contains("_LightTemplatesRatio")) ? "All" : "";
 
   if (SystFit=="_All") {
 
     for (int is = 0; is<nFitSystematics; is++) {
 
-      if (FitSystematicName[is].Contains("_Central_")) continue;
+      //if (FitSystematicName[is].Contains("_Central_")) continue;
 
       ptRelAna->ComputePtRelScaleFactors(TaggerList, FitSystematicName[is], FitOption, PlotOption, PtBinList, EtaBinFlag, TemplateFlag);
 
@@ -202,18 +218,56 @@ void ExecPlotBTagPerformance(TString Dependence) {
 
   TString DrawedSystematics = "NONE";
 
-  TString EtaList[2] = {"anyEta", "-"};
-
   if (Dependence=="ICHEP2016") {
 
+    TString EtaList[2] = {"anyEta", "-"};
     TString ConfigurationList[2] = {"_PSICHEP2016_KinPtBinsCentral_LowPtAwayTrgConf", "-"};
     TString SystematicList[2] = {"_Central", "-"};
 
-  } // else if ...
+    for (int tg = 0; tg<nTaggers; tg++) 
+      ptRelAna->PlotBTagPerformance(Dependence, TaggerName[tg], EtaList, ConfigurationList, SystematicList, 670, DrawedSystematics);//, "ScaleFactors");
 
-  for (int tg = 0; tg<nTaggers; tg++) 
-    ptRelAna->PlotBTagPerformance(Dependence, TaggerName[tg], EtaList, ConfigurationList, SystematicList, 670, DrawedSystematics);//, "ScaleFactors");
-  
+  } else if (Dependence=="Moriond17") {
+
+    //VerboseSystematics = true;
+    TString EtaList[2] = {"anyEta", "-"};
+    TString ConfigurationList[2] = {"_PSRun2016Moriond17_KinPtBinsCentral_LowPtAwayTrgConf", "-"};
+    /*
+    TString SystematicList[9] = {"_Central", "_Central_LightTemplatesRatio", 
+				 //"_Central_LightTemplatesRatio_bTemplatesRatio", "_Central_LightTemplatesRatio_bTemplatesRatioCorr",
+				 "_Central_LightTemplatesRatio_bTempRatio", "_Central_LightTemplatesRatio_bTempRatioCorr", 
+				 //"_Central_LightTemplatesRatio_bTempTightRatio", "_Central_LightTemplatesRatio_bTempTightRatioCorr", 
+				 "-"};*/
+    TString SystematicList[9] = {"_Central", "-"};
+
+    for (int tg = 1; tg<4/*nTaggers*/; tg++) 
+      ptRelAna->PlotBTagPerformance(Dependence, TaggerName[tg], EtaList, ConfigurationList, SystematicList, 1000, DrawedSystematics);//, "ScaleFactors");
+
+  } else if (Dependence=="Periods") {
+
+    //VerboseSystematics = true;
+    TString EtaList[2] = {"anyEta", "-"};
+    TString ConfigurationList[3] = {"_PSRun2016BF-69mb_LowPtAwayTrgConf", 
+				    "_PSRun2016GH-69mb_LowPtAwayTrgConf", 
+				    "-"};
+    TString SystematicList[9] = {"_Central_LightTemplatesRatio_bTempRatioCorr", "-"};
+
+    for (int tg = 1; tg<4/*nTaggers*/; tg++) 
+      ptRelAna->PlotBTagPerformance(Dependence, TaggerName[tg], EtaList, ConfigurationList, SystematicList, 1000, DrawedSystematics, "ScaleFactors");
+
+  } else if (Dependence=="EtaBins") {
+
+    //VerboseSystematics = true;
+    TString EtaList[5] = {"anyEta", "Eta08", "Eta16", "Eta24", "-"};
+    TString ConfigurationList[2] = {"_PSRun2016Moriond17_KinPtBinsCentral_LowPtAwayTrgConf", "-"};
+
+    TString SystematicList[2] = {"_Central_LightTemplatesRatio_bTempRatioCorr", "-"};
+
+    for (int tg = 4; tg<7/*nTaggers*/; tg++) 
+      ptRelAna->PlotBTagPerformance(Dependence, TaggerName[tg], EtaList, ConfigurationList, SystematicList, 1000, DrawedSystematics, "ScaleFactors");
+
+  } 
+
 }
 
 void ExecAnalyzeSystematics(TString FitFlag = "") {
@@ -230,14 +284,16 @@ void ExecAnalyzeSystematics(TString FitFlag = "") {
     TString DepOn = ScaleFactorSystematicName[sfs]; DepOn.ReplaceAll("_", "");
     
     for (int tg = 1; tg<nTaggers; tg++) 
-      ptRelAna->PlotBTagPerformance(DepOn, TaggerName[tg], EtaList, ConfigurationList, SystematicList, 670, "NONE");
+      ptRelAna->PlotBTagPerformance(DepOn, TaggerName[tg], EtaList, ConfigurationList, SystematicList, 1000, "NONE");
   
   }
 
   TString SystematicList[2] = {"_Central" + FitFlag, "-"};
-  
+  //TString SystematicList[2] = {"_Central_LightTemplatesRatio_bTempRatioCorr", "-"};
+
+  VerboseSystematics = true;
   for (int tg = 1; tg<nTaggers; tg++)
-    ptRelAna->PlotBTagPerformance("Final", TaggerName[tg], EtaList, ConfigurationList, SystematicList, 670, "_Central" + FitFlag);//, "ScaleFactors");
+      ptRelAna->PlotBTagPerformance("Final", TaggerName[tg], EtaList, ConfigurationList, SystematicList, 1000, "_Central" + FitFlag);//, "ScaleFactors");
 
 }
 
@@ -245,7 +301,7 @@ void ExecStoreScaleFactors(TString FitFlag = "") {
 
   cout << "ExecStoreScaleFactors " << FitFlag << endl; 
 
-  string BTagger = "CSVv2"; TString BTaggerName = BTagger;
+  string BTagger = "DeepCSV"; TString BTaggerName = BTagger;
 
   TString OP = "All";
 
@@ -277,7 +333,7 @@ void ExecStoreScaleFactors(TString FitFlag = "") {
 	  
 	int SysFactor = 6 - ThisFlavour;
 
-	for (int fpt = 1; fpt<nFitPtBins; fpt++) {
+	for (int fpt = 0; fpt<nFitPtBins; fpt++) {
 	      
 	  float MinPt = FitPtEdge[fpt];
 	  float MaxPt = FitPtEdge[fpt+1];
@@ -350,7 +406,10 @@ void RunPtRelAnalyzer() {
   int DataRange = DatasetIndex.Atoi() - 1; 
 
   if (Macro.Contains("EventCounter"))
-    ExecEventCounter(Macro.ReplaceAll("EventCounter", "")); 
+    ExecEventCounter(Macro.ReplaceAll("EventCounter", ""));
+
+  if (Macro.Contains("ComputeBTaggingWorkingPoints"))
+    ExecComputeBTaggingWorkingPoints(Macro.ReplaceAll("ComputeBTaggingWorkingPoints", "")); 
 
   if (Macro.Contains("ComputePileUpWeights"))
     ExecComputePileUpWeights(Macro.ReplaceAll("ComputePileUpWeights", ""), DataRange);
