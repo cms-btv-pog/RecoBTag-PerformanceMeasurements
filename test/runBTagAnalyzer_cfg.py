@@ -1016,7 +1016,7 @@ if options.runFatJets:
         )
         if options.useSoftDrop:
             process.packedPatJetsFatPF.algoTags.append( cms.InputTag('selectedPatJetsSoftDropFatPFPacked') )
-            process.packedPatJetsFatPF.algoLabels.append( 'SoftDrop' )
+            process.packedPatJetsFatPF.algoLabels.append( 'SoftDropPuppi' )
         if options.usePruned:
             process.packedPatJetsFatPF.algoTags.append( cms.InputTag('selectedPatJetsPrunedFatPFPacked') )
             process.packedPatJetsFatPF.algoLabels.append( 'Pruned' )
@@ -1339,7 +1339,7 @@ if options.runFatJets:
     )
     if options.useSoftDrop:
         process.btaganaFatJets.SubJets.append( cms.InputTag(patSubJetSourceSoftDrop) )
-        process.btaganaFatJets.SubJetLabels.append( 'SoftDrop' )
+        process.btaganaFatJets.SubJetLabels.append( 'SoftDropPuppi' )
     if options.usePruned:
         process.btaganaFatJets.SubJets.append( cms.InputTag('selectedPatJetsPrunedFatPFPacked:SubJets') )
         process.btaganaFatJets.SubJetLabels.append( 'Pruned' )
