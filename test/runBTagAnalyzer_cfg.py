@@ -519,7 +519,7 @@ if options.miniAOD:
         ]
 else:
     process.source.fileNames = [
-        '/store/relval/CMSSW_8_0_0/RelValProdTTbar_13/AODSIM/80X_mcRun2_asymptotic_v4-v1/10000/DE81ABBF-1DDA-E511-8AF8-0026189438B5.root'
+        '/store/mc/PhaseIFall16DR/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/AODSIM/PhaseIFall16PUFlat20to50_81X_upgrade2017_realistic_v26-v1/50000/0039E945-35E3-E611-AF8D-001E675A6C2A.root'
     ]
     if options.runOnData:
         process.source.fileNames = [
