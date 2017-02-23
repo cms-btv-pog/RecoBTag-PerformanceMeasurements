@@ -188,7 +188,7 @@ void ExecComputePtRelScaleFactors(TString Parameters = "CSVv2:_Central:") {
   SystFit.Remove(SystFit.First(":")); 
   TString FitOption = Parameters;
   FitOption.ReplaceAll(TaggerList + ":" + SystFit + ":", "");
-  cout << TaggerList << " " << SystFit << " " << FitOption << endl;
+  
   TString PlotOption = "pngpdf";
   TString PtBinList = "All";
   TString EtaBinFlag = "Eta08";
