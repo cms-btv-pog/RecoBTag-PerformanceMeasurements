@@ -455,14 +455,14 @@ elSource = 'gedGsfElectrons'
 patMuons = 'selectedPatMuons'
 trackSource = 'generalTracks'
 fatJetSource = 'fatPFJetsCHS'
-fatJetSourceSoftDrop = 'fatPFJetsCHSSoftDrop'
-fatJetSourcePruned = 'fatPFJetsCHSPruned'
+fatJetSourceSoftDrop = 'fatPFJetsSoftDrop'
+fatJetSourcePruned = 'fatPFJetsPruned'
 fatGenJetCollection = 'genFatJetsNoNu'
 fatGenJetCollectionSoftDrop = 'genFatJetsNoNuSoftDrop'
 fatGenJetCollectionPruned = 'genFatJetsNoNuPruned'
-patFatJetSource = 'packedPatJetsFatPFCHS'
-subJetSourceSoftDrop = 'fatPFJetsCHSSoftDrop:SubJets'
-patSubJetSourceSoftDrop = 'selectedPatJetsSoftDropFatPFCHSPacked:SubJets'
+patFatJetSource = 'packedPatJetsFatPF'
+subJetSourceSoftDrop = 'fatPFJetsSoftDrop:SubJets'
+patSubJetSourceSoftDrop = 'selectedPatJetsSoftDropFatPFPacked:SubJets'
 if not options.runJetClustering:
     jetSource = ('ak4PFJetsCHS' if options.usePFchs else 'ak4PFJets')
 if not runFatJetClustering:
@@ -486,9 +486,9 @@ if options.miniAOD:
         patJetSource = 'selectedUpdatedPatJets'+postfix
     if not runFatJetClustering:
         fatJetSource = 'slimmedJetsAK8'
-        patFatJetSource = 'selectedUpdatedPatJetsFatPFCHS'+postfix
-        subJetSourceSoftDrop = 'slimmedJetsAK8PFCHSSoftDropPacked:SubJets'
-        patSubJetSourceSoftDrop = 'selectedUpdatedPatJetsSoftDropSubjetsPFCHS'+postfix
+        patFatJetSource = 'selectedUpdatedPatJetsFatPF'+postfix
+        subJetSourceSoftDrop = 'slimmedJetsAK8PFSoftDropPacked:SubJets'
+        patSubJetSourceSoftDrop = 'selectedUpdatedPatJetsSoftDropSubjetsPF'+postfix
 
 
 process = cms.Process("BTagAna")
@@ -643,7 +643,7 @@ if options.runOnData:
 process.GlobalTag.toGet = cms.VPSet(
     cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
       tag = cms.string(trkProbaCalibTag),
-      connect = cms.string("frontier://FrontierPrep/CMS_CONDITIONS")
+      connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS")
     )
 )
 
@@ -757,7 +757,7 @@ if options.runFatJets:
     if options.miniAOD and not runFatJetClustering:
         updateJetCollection(
             process,
-            labelName='FatPFCHS',
+            labelName='FatPF',
             jetSource=cms.InputTag(fatJetSource),
             jetCorrections = jetCorrectionsAK8,
             pfCandidates = cms.InputTag(pfCandidates),
@@ -771,10 +771,10 @@ if options.runFatJets:
             runIVF = options.runIVF,
             postfix = postfix
         )
-        getattr(process,'selectedUpdatedPatJetsFatPFCHS'+postfix).cut = cms.string("pt > %f && abs(eta) < %f"%(float(options.fatJetPtMin), float(options.fatJetAbsEtaMax)))
+        getattr(process,'selectedUpdatedPatJetsFatPF'+postfix).cut = cms.string("pt > %f && abs(eta) < %f"%(float(options.fatJetPtMin), float(options.fatJetAbsEtaMax)))
         updateJetCollection(
             process,
-            labelName='SoftDropSubjetsPFCHS',
+            labelName='SoftDropSubjetsPF',
             jetSource=cms.InputTag(subJetSourceSoftDrop),
             jetCorrections = jetCorrectionsAK4,
             pfCandidates = cms.InputTag(pfCandidates),
@@ -821,7 +821,7 @@ if options.runFatJets:
             jetCollInstanceName=cms.string("SubJets")
         )
         from RecoJets.JetProducers.ak4PFJetsPruned_cfi import ak4PFJetsPruned
-        process.fatPFJetsCHSPruned = ak4PFJetsPruned.clone(
+        process.fatPFJetsPruned = ak4PFJetsPruned.clone(
             jetAlgorithm = cms.string(options.jetAlgo),
             rParam = cms.double(options.fatJetRadius),
             src = (getattr(process,'ak4Jets').src if options.miniAOD else getattr(process,'pfJetsPFBRECO'+postfix).src),
@@ -844,7 +844,7 @@ if options.runFatJets:
             jetCollInstanceName=cms.string("SubJets")
         )
         from RecoJets.JetProducers.ak4PFJetsSoftDrop_cfi import ak4PFJetsSoftDrop
-        process.fatPFJetsCHSSoftDrop = ak4PFJetsSoftDrop.clone(
+        process.fatPFJetsSoftDrop = ak4PFJetsSoftDrop.clone(
             jetAlgorithm = cms.string(options.jetAlgo),
             rParam = cms.double(options.fatJetRadius),
             R0 = cms.double(options.fatJetRadius),
@@ -859,7 +859,7 @@ if options.runFatJets:
         ## PATify the above jets
         addJetCollection(
             process,
-            labelName='FatPFCHS',
+            labelName='FatPF',
             jetSource=cms.InputTag(fatJetSource),
             algo=algoLabel,              # needed for jet flavor clustering
             rParam=options.fatJetRadius, # needed for jet flavor clustering
@@ -877,10 +877,10 @@ if options.runFatJets:
             runIVF = options.runIVF,
             postfix = postfix
         )
-        getattr(process,'selectedPatJetsFatPFCHS'+postfix).cut = cms.string("pt > %f && abs(eta) < %f"%(float(options.fatJetPtMin), float(options.fatJetAbsEtaMax)))
+        getattr(process,'selectedPatJetsFatPF'+postfix).cut = cms.string("pt > %f && abs(eta) < %f"%(float(options.fatJetPtMin), float(options.fatJetAbsEtaMax)))
         addJetCollection(
             process,
-            labelName='SoftDropFatPFCHS',
+            labelName='SoftDropFatPF',
             jetSource=cms.InputTag(fatJetSourceSoftDrop),
             algo=algoLabel,
             pfCandidates = cms.InputTag(pfCandidates),
@@ -898,7 +898,7 @@ if options.runFatJets:
         )
         addJetCollection(
             process,
-            labelName='SoftDropSubjetsPFCHS',
+            labelName='SoftDropSubjetsPF',
             jetSource=cms.InputTag(fatJetSourceSoftDrop,'SubJets'),
             algo=algoLabel,              # needed for subjet flavor clustering
             rParam=options.fatJetRadius, # needed for subjet flavor clustering
@@ -921,14 +921,14 @@ if options.runFatJets:
         )
 
         ## Establish references between PATified fat jets and subjets using the BoostedJetMerger
-        process.selectedPatJetsSoftDropFatPFCHSPacked = cms.EDProducer("BoostedJetMerger",
-            jetSrc=cms.InputTag("selectedPatJetsSoftDropFatPFCHS"+postfix),
-            subjetSrc=cms.InputTag("selectedPatJetsSoftDropSubjetsPFCHS"+postfix)
+        process.selectedPatJetsSoftDropFatPFPacked = cms.EDProducer("BoostedJetMerger",
+            jetSrc=cms.InputTag("selectedPatJetsSoftDropFatPF"+postfix),
+            subjetSrc=cms.InputTag("selectedPatJetsSoftDropSubjetsPF"+postfix)
         )
 
         addJetCollection(
             process,
-            labelName='PrunedFatPFCHS',
+            labelName='PrunedFatPF',
             jetSource=cms.InputTag(fatJetSourcePruned),
             algo=algoLabel,
             pfCandidates = cms.InputTag(pfCandidates),
@@ -946,7 +946,7 @@ if options.runFatJets:
         )
         addJetCollection(
             process,
-            labelName='PrunedSubjetsPFCHS',
+            labelName='PrunedSubjetsPF',
             jetSource=cms.InputTag(fatJetSourcePruned,'SubJets'),
             algo=algoLabel,              # needed for subjet flavor clustering
             rParam=options.fatJetRadius, # needed for subjet flavor clustering
@@ -969,25 +969,25 @@ if options.runFatJets:
         )
 
         ## Establish references between PATified fat jets and subjets using the BoostedJetMerger
-        process.selectedPatJetsPrunedFatPFCHSPacked = cms.EDProducer("BoostedJetMerger",
-            jetSrc=cms.InputTag("selectedPatJetsPrunedFatPFCHS"+postfix),
-            subjetSrc=cms.InputTag("selectedPatJetsPrunedSubjetsPFCHS"+postfix)
+        process.selectedPatJetsPrunedFatPFPacked = cms.EDProducer("BoostedJetMerger",
+            jetSrc=cms.InputTag("selectedPatJetsPrunedFatPF"+postfix),
+            subjetSrc=cms.InputTag("selectedPatJetsPrunedSubjetsPF"+postfix)
         )
 
         ## Pack fat jets with subjets
-        process.packedPatJetsFatPFCHS = cms.EDProducer("JetSubstructurePacker",
-                jetSrc = cms.InputTag('selectedPatJetsFatPFCHS'+postfix),
+        process.packedPatJetsFatPF = cms.EDProducer("JetSubstructurePacker",
+                jetSrc = cms.InputTag('selectedPatJetsFatPF'+postfix),
                 distMax = cms.double(options.fatJetRadius),
                 algoTags = cms.VInputTag(),
                 algoLabels = cms.vstring(),
                 fixDaughters = cms.bool(False)
         )
         if options.useSoftDrop:
-            process.packedPatJetsFatPFCHS.algoTags.append( cms.InputTag('selectedPatJetsSoftDropFatPFCHSPacked') )
-            process.packedPatJetsFatPFCHS.algoLabels.append( 'SoftDrop' )
+            process.packedPatJetsFatPF.algoTags.append( cms.InputTag('selectedPatJetsSoftDropFatPFPacked') )
+            process.packedPatJetsFatPF.algoLabels.append( 'SoftDrop' )
         if options.usePruned:
-            process.packedPatJetsFatPFCHS.algoTags.append( cms.InputTag('selectedPatJetsPrunedFatPFCHSPacked') )
-            process.packedPatJetsFatPFCHS.algoLabels.append( 'Pruned' )
+            process.packedPatJetsFatPF.algoTags.append( cms.InputTag('selectedPatJetsPrunedFatPFPacked') )
+            process.packedPatJetsFatPF.algoLabels.append( 'Pruned' )
 
         #-------------------------------------
         ## N-subjettiness
@@ -998,14 +998,14 @@ if options.runFatJets:
             R0  = cms.double(options.fatJetRadius)
         )
 
-        getattr(process,'patJetsFatPFCHS'+postfix).userData.userFloats.src += ['Njettiness:tau1','Njettiness:tau2','Njettiness:tau3']
+        getattr(process,'patJetsFatPF'+postfix).userData.userFloats.src += ['Njettiness:tau1','Njettiness:tau2','Njettiness:tau3']
 
 
         #-------------------------------------
         ## Grooming ValueMaps
         process.SoftDrop = cms.EDProducer("RecoJetDeltaRValueMapProducer",
             src = cms.InputTag(fatJetSource),
-            matched = cms.InputTag("selectedPatJetsSoftDropFatPFCHSPacked"),
+            matched = cms.InputTag("selectedPatJetsSoftDropFatPFPacked"),
             distMax = cms.double(options.fatJetRadius),
             values = cms.vstring('mass','pt','eta','phi','jecFactor(0)'),
             valueLabels = cms.vstring('Mass','Pt','Eta','Phi','jecFactor0'),
@@ -1013,14 +1013,14 @@ if options.runFatJets:
         )
         process.Pruned = cms.EDProducer("RecoJetDeltaRValueMapProducer",
             src = cms.InputTag(fatJetSource),
-            matched = cms.InputTag("selectedPatJetsPrunedFatPFCHSPacked"),
+            matched = cms.InputTag("selectedPatJetsPrunedFatPFPacked"),
             distMax = cms.double(options.fatJetRadius),
             values = cms.vstring('mass','pt','eta','phi','jecFactor(0)'),
             valueLabels = cms.vstring('Mass','Pt','Eta','Phi','jecFactor0'),
             lazyParser = cms.bool(True)
         )
 
-        getattr(process,'patJetsFatPFCHS'+postfix).userData.userFloats.src += ['SoftDrop:Mass','SoftDrop:Pt','SoftDrop:Eta','SoftDrop:Phi','SoftDrop:jecFactor0',
+        getattr(process,'patJetsFatPF'+postfix).userData.userFloats.src += ['SoftDrop:Mass','SoftDrop:Pt','SoftDrop:Eta','SoftDrop:Phi','SoftDrop:jecFactor0',
                                                                                'Pruned:Mass'  ,'Pruned:Pt'  ,'Pruned:Eta'  ,'Pruned:Phi'  ,'Pruned:jecFactor0']
 
 
@@ -1167,8 +1167,8 @@ adaptPVs(process, pvCollection=cms.InputTag(pvSource))
 
 #-------------------------------------
 ## Add TagInfos to PAT jets
-for i in ['patJets', 'patJetsFatPFCHS', 'patJetsSoftDropSubjetsPFCHS', 'patJetsPrunedSubjetsPFCHS',
-          'updatedPatJetsTransientCorrected', 'updatedPatJetsTransientCorrectedFatPFCHS', 'updatedPatJetsTransientCorrectedSoftDropSubjetsPFCHS']:
+for i in ['patJets', 'patJetsFatPF', 'patJetsSoftDropSubjetsPF', 'patJetsPrunedSubjetsPF',
+          'updatedPatJetsTransientCorrected', 'updatedPatJetsTransientCorrectedFatPF', 'updatedPatJetsTransientCorrectedSoftDropSubjetsPF']:
     m = i + postfix
     if hasattr(process,m) and getattr( getattr(process,m), 'addBTagInfo' ):
         print "Switching 'addTagInfos' for " + m + " to 'True'"
@@ -1177,46 +1177,46 @@ for i in ['patJets', 'patJetsFatPFCHS', 'patJetsSoftDropSubjetsPFCHS', 'patJetsP
 #-------------------------------------
 ## Adapt fat jet b tagging
 if options.runFatJets:
-    getattr(process,'softPFElectronsTagInfosFatPFCHS'+postfix).DeltaRElectronJet = cms.double(options.fatJetRadius) # default is 0.4
+    getattr(process,'softPFElectronsTagInfosFatPF'+postfix).DeltaRElectronJet = cms.double(options.fatJetRadius) # default is 0.4
     if options.useLegacyTaggers:
         # Set the cone size for the jet-track association to the jet radius
-        getattr(process,'jetTracksAssociatorAtVertexFatPFCHS'+postfix).coneSize = cms.double(options.fatJetRadius) # default is 0.4
-        getattr(process,'secondaryVertexTagInfosFatPFCHS'+postfix).trackSelection.jetDeltaRMax = cms.double(options.fatJetRadius)   # default is 0.3
-        getattr(process,'secondaryVertexTagInfosFatPFCHS'+postfix).vertexCuts.maxDeltaRToJetAxis = cms.double(options.fatJetRadius) # default is 0.4
+        getattr(process,'jetTracksAssociatorAtVertexFatPF'+postfix).coneSize = cms.double(options.fatJetRadius) # default is 0.4
+        getattr(process,'secondaryVertexTagInfosFatPF'+postfix).trackSelection.jetDeltaRMax = cms.double(options.fatJetRadius)   # default is 0.3
+        getattr(process,'secondaryVertexTagInfosFatPF'+postfix).vertexCuts.maxDeltaRToJetAxis = cms.double(options.fatJetRadius) # default is 0.4
         # Set the jet-SV dR to the jet radius
-        getattr(process,'inclusiveSecondaryVertexFinderTagInfosFatPFCHS'+postfix).vertexCuts.maxDeltaRToJetAxis = cms.double(options.fatJetRadius) # default is 0.4
-        getattr(process,'inclusiveSecondaryVertexFinderTagInfosFatPFCHS'+postfix).extSVDeltaRToJet = cms.double(options.fatJetRadius) # default is 0.3
+        getattr(process,'inclusiveSecondaryVertexFinderTagInfosFatPF'+postfix).vertexCuts.maxDeltaRToJetAxis = cms.double(options.fatJetRadius) # default is 0.4
+        getattr(process,'inclusiveSecondaryVertexFinderTagInfosFatPF'+postfix).extSVDeltaRToJet = cms.double(options.fatJetRadius) # default is 0.3
         # Set the JP track dR cut to the jet radius
         process.jetProbabilityComputerFat = process.jetProbabilityComputer.clone( deltaR = cms.double(options.fatJetRadius) ) # default is 0.3
-        getattr(process,'jetProbabilityBJetTagsFatPFCHS'+postfix).jetTagComputer = cms.string('jetProbabilityComputerFat')
+        getattr(process,'jetProbabilityBJetTagsFatPF'+postfix).jetTagComputer = cms.string('jetProbabilityComputerFat')
         # Set the JBP track dR cut to the jet radius
         process.jetBProbabilityComputerFat = process.jetBProbabilityComputer.clone( deltaR = cms.double(options.fatJetRadius) ) # default is 0.4
-        getattr(process,'jetBProbabilityBJetTagsFatPFCHS'+postfix).jetTagComputer = cms.string('jetBProbabilityComputerFat')
+        getattr(process,'jetBProbabilityBJetTagsFatPF'+postfix).jetTagComputer = cms.string('jetBProbabilityComputerFat')
         # Set the CSVv2 track dR cut to the jet radius
         process.combinedSecondaryVertexV2ComputerFat = process.combinedSecondaryVertexV2Computer.clone()
         process.combinedSecondaryVertexV2ComputerFat.trackSelection.jetDeltaRMax = cms.double(options.fatJetRadius) # default is 0.3
         process.combinedSecondaryVertexV2ComputerFat.trackPseudoSelection.jetDeltaRMax = cms.double(options.fatJetRadius) # default is 0.3
-        getattr(process,'combinedInclusiveSecondaryVertexV2BJetTagsFatPFCHS'+postfix).jetTagComputer = cms.string('combinedSecondaryVertexV2ComputerFat')
+        getattr(process,'combinedInclusiveSecondaryVertexV2BJetTagsFatPF'+postfix).jetTagComputer = cms.string('combinedSecondaryVertexV2ComputerFat')
     else:
         # Set the cone size for the jet-track association to the jet radius
-        getattr(process,'pfImpactParameterTagInfosFatPFCHS'+postfix).maxDeltaR = cms.double(options.fatJetRadius) # default is 0.4
-        getattr(process,'pfSecondaryVertexTagInfosFatPFCHS'+postfix).trackSelection.jetDeltaRMax = cms.double(options.fatJetRadius)   # default is 0.3
-        getattr(process,'pfSecondaryVertexTagInfosFatPFCHS'+postfix).vertexCuts.maxDeltaRToJetAxis = cms.double(options.fatJetRadius) # default is 0.4
+        getattr(process,'pfImpactParameterTagInfosFatPF'+postfix).maxDeltaR = cms.double(options.fatJetRadius) # default is 0.4
+        getattr(process,'pfSecondaryVertexTagInfosFatPF'+postfix).trackSelection.jetDeltaRMax = cms.double(options.fatJetRadius)   # default is 0.3
+        getattr(process,'pfSecondaryVertexTagInfosFatPF'+postfix).vertexCuts.maxDeltaRToJetAxis = cms.double(options.fatJetRadius) # default is 0.4
         # Set the jet-SV dR to the jet radius
-        getattr(process,'pfInclusiveSecondaryVertexFinderTagInfosFatPFCHS'+postfix).vertexCuts.maxDeltaRToJetAxis = cms.double(options.fatJetRadius) # default is 0.4
-        getattr(process,'pfInclusiveSecondaryVertexFinderTagInfosFatPFCHS'+postfix).extSVDeltaRToJet = cms.double(options.fatJetRadius) # default is 0.3
+        getattr(process,'pfInclusiveSecondaryVertexFinderTagInfosFatPF'+postfix).vertexCuts.maxDeltaRToJetAxis = cms.double(options.fatJetRadius) # default is 0.4
+        getattr(process,'pfInclusiveSecondaryVertexFinderTagInfosFatPF'+postfix).extSVDeltaRToJet = cms.double(options.fatJetRadius) # default is 0.3
         # Set the JP track dR cut to the jet radius
         process.candidateJetProbabilityComputerFat = process.candidateJetProbabilityComputer.clone( deltaR = cms.double(options.fatJetRadius) ) # default is 0.3
-        getattr(process,'pfJetProbabilityBJetTagsFatPFCHS'+postfix).jetTagComputer = cms.string('candidateJetProbabilityComputerFat')
+        getattr(process,'pfJetProbabilityBJetTagsFatPF'+postfix).jetTagComputer = cms.string('candidateJetProbabilityComputerFat')
         # Set the JBP track dR cut to the jet radius
         process.candidateJetBProbabilityComputerFat = process.candidateJetBProbabilityComputer.clone( deltaR = cms.double(options.fatJetRadius) ) # default is 0.4
-        getattr(process,'pfJetBProbabilityBJetTagsFatPFCHS'+postfix).jetTagComputer = cms.string('candidateJetBProbabilityComputerFat')
+        getattr(process,'pfJetBProbabilityBJetTagsFatPF'+postfix).jetTagComputer = cms.string('candidateJetBProbabilityComputerFat')
         # Set the CSVv2 track dR cut to the jet radius
         process.candidateCombinedSecondaryVertexV2ComputerFat = process.candidateCombinedSecondaryVertexV2Computer.clone()
         process.candidateCombinedSecondaryVertexV2ComputerFat.trackSelection.jetDeltaRMax = cms.double(options.fatJetRadius) # default is 0.3
         process.candidateCombinedSecondaryVertexV2ComputerFat.trackPseudoSelection.jetDeltaRMax = cms.double(options.fatJetRadius) # default is 0.3
-        if hasattr(process,'pfCombinedInclusiveSecondaryVertexV2BJetTagsFatPFCHS'+postfix):
-            getattr(process,'pfCombinedInclusiveSecondaryVertexV2BJetTagsFatPFCHS'+postfix).jetTagComputer = cms.string('candidateCombinedSecondaryVertexV2ComputerFat')
+        if hasattr(process,'pfCombinedInclusiveSecondaryVertexV2BJetTagsFatPF'+postfix):
+            getattr(process,'pfCombinedInclusiveSecondaryVertexV2BJetTagsFatPF'+postfix).jetTagComputer = cms.string('candidateCombinedSecondaryVertexV2ComputerFat')
 
 #-------------------------------------
 from RecoBTag.PerformanceMeasurements.BTagAnalyzer_cff import *
@@ -1309,7 +1309,7 @@ if options.runFatJets:
         process.btaganaFatJets.SubJets.append( cms.InputTag(patSubJetSourceSoftDrop) )
         process.btaganaFatJets.SubJetLabels.append( 'SoftDrop' )
     if options.usePruned:
-        process.btaganaFatJets.SubJets.append( cms.InputTag('selectedPatJetsPrunedFatPFCHSPacked:SubJets') )
+        process.btaganaFatJets.SubJets.append( cms.InputTag('selectedPatJetsPrunedFatPFPacked:SubJets') )
         process.btaganaFatJets.SubJetLabels.append( 'Pruned' )
 
 if options.doBoostedCommissioning:
