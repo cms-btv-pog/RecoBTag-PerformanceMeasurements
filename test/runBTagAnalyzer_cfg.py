@@ -39,6 +39,11 @@ options.register('usePuppi', False,
     VarParsing.varType.bool,
     "Use Puppi"
 )
+options.register('usePuppiForFatJets', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Use Puppi for fat jets"
+)
 options.register('usePuppiForBTagging', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -58,6 +63,11 @@ options.register('runJetClustering', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Cluster jets from scratch instead of using those already present in the event"
+)
+options.register('runFatJetClustering', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Cluster fat jets from scratch instead of using those already present in the event"
 )
 options.register('runFatJets', False,
     VarParsing.multiplicity.singleton,
@@ -208,11 +218,17 @@ if options.usePFchs and options.usePuppi:
     print "WARNING: Both usePFchs and usePuppi set to True. Giving priority to Puppi."
     options.usePFchs = False
 
+## Resolve potential conflicts in Puppi usage
+if options.usePuppi and not options.usePuppiForFatJets:
+    print "WARNING: usePuppi set to True while usePuppiForFatJets set to False. Puppi will be used for all jet types."
+    options.usePuppiForFatJets = True
+
 print "Running on data: %s"%('True' if options.runOnData else 'False')
 print "Running using FastSim samples: %s"%('True' if options.fastSim else 'False')
 print "Running on MiniAOD: %s"%('True' if options.miniAOD else 'False')
 print "Using PFchs: %s"%('True' if options.usePFchs else 'False')
 print "Using Puppi: %s"%('True' if options.usePuppi else 'False')
+print "Using Puppi for fat jets: %s"%('True' if options.usePuppiForFatJets else 'False')
 print "Using Puppi for b tagging: %s"%('True' if (options.usePuppi and options.usePuppiForBTagging) else 'False')
 
 ## Subjets only stored when also running over fat jets
@@ -245,11 +261,16 @@ if options.usePFchs:
     jetCorrectionsAK8 = ('AK8PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 if options.usePuppi:
     jetCorrectionsAK4 = ('AK4PFPuppi', ['L2Relative', 'L3Absolute'], 'None')
+if options.usePuppiForFatJets:
     jetCorrectionsAK8 = ('AK8PFPuppi', ['L2Relative', 'L3Absolute'], 'None')
 
 if options.runOnData:
     jetCorrectionsAK4[1].append('L2L3Residual')
     jetCorrectionsAK8[1].append('L2L3Residual')
+
+jetCorrectionsSubJets = copy.deepcopy(jetCorrectionsAK4)
+if not options.usePuppi and options.usePuppiForFatJets:
+    jetCorrectionsSubJets = ('AK4PFPuppi', ['L2Relative', 'L3Absolute'], 'None')
 
 trigresults='TriggerResults::HLT'
 if options.runOnData: options.isReHLT=False
@@ -377,7 +398,8 @@ if options.jetAlgo == 'AntiKt':
     algoLabel = 'AK'
 
 ## Figure out if jet clustering is needed
-runFatJetClustering = options.runJetClustering
+if not options.runFatJetClustering:
+    options.runFatJetClustering = options.runJetClustering
 if not options.miniAOD and options.usePuppi and not options.runJetClustering:
     print "WARNING: You requested Puppi jets which are not stored in AOD. Enabling jet clustering."
     options.runJetClustering = True
@@ -389,26 +411,30 @@ if options.miniAOD and not (options.usePFchs or options.usePuppi) and not option
 print "Jet clustering: %s"%('True' if options.runJetClustering else 'False')
 
 ## Figure out if fat jet clustering is needed
-if options.runFatJets and (options.jetAlgo != 'AntiKt' or options.fatJetRadius != 0.8) and not runFatJetClustering:
+if options.runFatJets and (options.jetAlgo != 'AntiKt' or options.fatJetRadius != 0.8) and not options.runFatJetClustering:
     print "WARNING: You requested fat jets with an algorithm or size not stored in any of the data-tiers. Enabling fat jet clustering."
-    runFatJetClustering = True
+    options.runFatJetClustering = True
 
-if options.runFatJets and not (options.usePFchs or options.usePuppi) and not runFatJetClustering:
+if options.runFatJets and not (options.usePFchs or options.usePuppi or options.usePuppiForFatJets) and not options.runFatJetClustering:
     print "WARNING: You requested non-PU-subtracted fat jets which are not stored in any of the data-tiers. Enabling fat jet clustering."
-    runFatJetClustering = True
+    options.runFatJetClustering = True
 
-if options.runFatJets and options.usePuppi and not runFatJetClustering:
-    print "WARNING: You requested Puppi fat jets which are not stored in any of the data-tiers. Enabling fat jet clustering."
-    runFatJetClustering = True
+if options.miniAOD and options.runFatJets and options.usePFchs and not options.usePuppiForFatJets and not options.runFatJetClustering:
+    print "WARNING: You requested CHS fat jets which are not stored in MiniAOD. Enabling fat jet clustering."
+    options.runFatJetClustering = True
 
-if options.miniAOD and options.runSubJets and options.usePruned and not runFatJetClustering:
+if not options.miniAOD and options.runFatJets and (options.usePuppi or options.usePuppiForFatJets) and not options.runFatJetClustering:
+    print "WARNING: You requested Puppi fat jets which are not stored in AOD. Enabling fat jet clustering."
+    options.runFatJetClustering = True
+
+if options.miniAOD and options.runSubJets and options.usePruned and not options.runFatJetClustering:
     print "WARNING: You requested pruned subjets which are not stored in MiniAOD. Enabling fat jet clustering."
-    runFatJetClustering = True
+    options.runFatJetClustering = True
 
-if not options.miniAOD and options.runSubJets and options.usePruned and not runFatJetClustering:
+if not options.miniAOD and options.runSubJets and options.usePruned and not options.runFatJetClustering:
     print "WARNING: You requested pruned subjets which are not stored in AOD. Will run pruned fat jet clustering."
 
-print "Fat jet clustering: %s"%('True' if runFatJetClustering else 'False')
+print "Fat jet clustering: %s"%('True' if options.runFatJetClustering else 'False')
 
 ## For fat jets we want to re-run all taggers in order to use the setup adapted to the larger fat jet cone size
 bTagInfosFat = copy.deepcopy(bTagInfos)
@@ -418,7 +444,7 @@ bTagInfosFat += ([] if options.useLegacyTaggers else ['pfBoostedDoubleSV' + ('CA
 bTagDiscriminatorsFat = copy.deepcopy(bTagDiscriminators)
 if options.runJetClustering:
     options.remakeAllDiscr = True
-if runFatJetClustering:
+if options.runFatJetClustering:
     options.remakeDoubleB = True
 if options.remakeDoubleB:
     bTagDiscriminatorsFat += ([] if options.useLegacyTaggers else ['pfBoostedDoubleSecondaryVertex' + ('CA15' if algoLabel=='CA' else 'AK8') + 'BJetTags'])
@@ -435,7 +461,7 @@ if options.miniAOD and not options.runJetClustering and not options.remakeAllDis
     for d in storedDiscriminators:
         if 'ProbabilityBJetTags' in d: continue
         if d in bTagDiscriminators: bTagDiscriminators.remove(d)
-if options.miniAOD and not runFatJetClustering and not options.remakeAllDiscr:
+if options.miniAOD and not options.runFatJetClustering and not options.remakeAllDiscr:
     ## SoftDrop subjets in MiniAOD have only CSVv2AVR and CSVv2IVF discriminators stored
     for d in ['pfCombinedSecondaryVertexV2BJetTags', 'pfCombinedInclusiveSecondaryVertexV2BJetTags']:
         if d in bTagDiscriminatorsSoftDrop: bTagDiscriminatorsSoftDrop.remove(d)
@@ -465,7 +491,7 @@ subJetSourceSoftDrop = 'fatPFJetsSoftDrop:SubJets'
 patSubJetSourceSoftDrop = 'selectedPatJetsSoftDropFatPFPacked:SubJets'
 if not options.runJetClustering:
     jetSource = ('ak4PFJetsCHS' if options.usePFchs else 'ak4PFJets')
-if not runFatJetClustering:
+if not options.runFatJetClustering:
     fatJetSource = 'ak8PFJetsCHS'
     fatJetSourceSoftDrop = 'ak8PFJetsCHSSoftDrop'
     fatGenJetCollection = 'ak8GenJetsNoNu'
@@ -484,10 +510,10 @@ if options.miniAOD:
     if not options.runJetClustering:
         jetSource = ('slimmedJetsPuppi' if options.usePuppi else 'slimmedJets')
         patJetSource = 'selectedUpdatedPatJets'+postfix
-    if not runFatJetClustering:
+    if not options.runFatJetClustering:
         fatJetSource = 'slimmedJetsAK8'
         patFatJetSource = 'selectedUpdatedPatJetsFatPF'+postfix
-        subJetSourceSoftDrop = 'slimmedJetsAK8PFSoftDropPacked:SubJets'
+        subJetSourceSoftDrop = 'slimmedJetsAK8PFPuppiSoftDropPacked:SubJets'
         patSubJetSourceSoftDrop = 'selectedUpdatedPatJetsSoftDropSubjetsPF'+postfix
 
 
@@ -682,11 +708,12 @@ if not options.miniAOD:
     getattr(process,"pfNoMuonJMEPFBRECO"+postfix).enable = False
     getattr(process,"pfNoElectronJMEPFBRECO"+postfix).enable = False
 
-    if options.usePuppi:
+    if options.usePuppi or options.usePuppiForFatJets:
         process.load('CommonTools.PileupAlgos.Puppi_cff')
-        from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
-        _pfJets = ak4PFJets.clone(src = 'puppi', doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
-        setattr(process,'pfJetsPFBRECO'+postfix,_pfJets)
+        if options.usePuppi:
+            from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
+            _pfJets = ak4PFJets.clone(src = cms.InputTag('puppi'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
+            setattr(process,'pfJetsPFBRECO'+postfix,_pfJets)
         if options.usePuppiForBTagging: pfCandidates = 'puppi'
 else:
     ## GenJetsNoNu selection
@@ -698,17 +725,18 @@ else:
     ## Reco jets
     from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
     if options.usePFchs:
-        process.ak4Jets = ak4PFJets.clone(src = 'pfCHS', doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
-    elif options.usePuppi:
+        process.ak4Jets = ak4PFJets.clone(src = cms.InputTag('pfCHS'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
+    elif options.usePuppi or options.usePuppiForFatJets:
         process.load('CommonTools.PileupAlgos.Puppi_cff')
         process.puppi.candName           = cms.InputTag(pfCandidates)
         process.puppi.vertexName         = cms.InputTag(pvSource)
         process.puppi.useExistingWeights = cms.bool(True)
         process.puppi.clonePackedCands   = cms.bool(True)
-        process.ak4Jets = ak4PFJets.clone(src = 'puppi', doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
+        if options.usePuppi:
+            process.ak4Jets = ak4PFJets.clone(src = cms.InputTag('puppi'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
         if options.usePuppiForBTagging: pfCandidates = 'puppi'
     else:
-        process.ak4Jets = ak4PFJets.clone(src = 'packedPFCandidates', doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
+        process.ak4Jets = ak4PFJets.clone(src = cms.InputTag('packedPFCandidates'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
 
 ## Load standard PAT objects (here we only need PAT muons but the framework will figure out what it needs to run using the unscheduled mode)
 process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
@@ -754,7 +782,7 @@ else:
 
 #-------------------------------------
 if options.runFatJets:
-    if options.miniAOD and not runFatJetClustering:
+    if options.miniAOD and not options.runFatJetClustering:
         updateJetCollection(
             process,
             labelName='FatPF',
@@ -776,7 +804,7 @@ if options.runFatJets:
             process,
             labelName='SoftDropSubjetsPF',
             jetSource=cms.InputTag(subJetSourceSoftDrop),
-            jetCorrections = jetCorrectionsAK4,
+            jetCorrections = jetCorrectionsSubJets,
             pfCandidates = cms.InputTag(pfCandidates),
             pvSource = cms.InputTag(pvSource),
             svSource = cms.InputTag(svSource),
@@ -793,6 +821,10 @@ if options.runFatJets:
             postfix = postfix
         )
     else:
+        _src = getattr(process,'ak4Jets').src if options.miniAOD else getattr(process,'pfJetsPFBRECO'+postfix).src
+        if options.usePuppiForFatJets and not options.usePuppi:
+            _src = cms.InputTag('puppi')
+        _srcPVs = getattr(process,'ak4Jets').srcPVs if options.miniAOD else getattr(process,'pfJetsPFBRECO'+postfix).srcPVs
         ## Fat jets (Gen and Reco)
         from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
         process.genFatJetsNoNu = ak4GenJets.clone(
@@ -804,8 +836,8 @@ if options.runFatJets:
         process.fatPFJetsCHS = ak4PFJets.clone(
             jetAlgorithm = cms.string(options.jetAlgo),
             rParam = cms.double(options.fatJetRadius),
-            src = (getattr(process,'ak4Jets').src if options.miniAOD else getattr(process,'pfJetsPFBRECO'+postfix).src),
-            srcPVs = (getattr(process,'ak4Jets').srcPVs if options.miniAOD else getattr(process,'pfJetsPFBRECO'+postfix).srcPVs),
+            src = _src,
+            srcPVs = _srcPVs,
             doAreaFastjet = cms.bool(True),
             jetPtMin = cms.double(options.fatJetRawPtMin)
         )
@@ -824,8 +856,8 @@ if options.runFatJets:
         process.fatPFJetsPruned = ak4PFJetsPruned.clone(
             jetAlgorithm = cms.string(options.jetAlgo),
             rParam = cms.double(options.fatJetRadius),
-            src = (getattr(process,'ak4Jets').src if options.miniAOD else getattr(process,'pfJetsPFBRECO'+postfix).src),
-            srcPVs = (getattr(process,'ak4Jets').srcPVs if options.miniAOD else getattr(process,'pfJetsPFBRECO'+postfix).srcPVs),
+            src = _src,
+            srcPVs = _srcPVs,
             doAreaFastjet = cms.bool(True),
             writeCompound = cms.bool(True),
             jetCollInstanceName=cms.string("SubJets"),
@@ -848,8 +880,8 @@ if options.runFatJets:
             jetAlgorithm = cms.string(options.jetAlgo),
             rParam = cms.double(options.fatJetRadius),
             R0 = cms.double(options.fatJetRadius),
-            src = (getattr(process,'ak4Jets').src if options.miniAOD else getattr(process,'pfJetsPFBRECO'+postfix).src),
-            srcPVs = (getattr(process,'ak4Jets').srcPVs if options.miniAOD else getattr(process,'pfJetsPFBRECO'+postfix).srcPVs),
+            src = _src,
+            srcPVs = _srcPVs,
             doAreaFastjet = cms.bool(True),
             writeCompound = cms.bool(True),
             jetCollInstanceName=cms.string("SubJets"),
@@ -909,7 +941,7 @@ if options.runFatJets:
             elSource = cms.InputTag(elSource),
             btagInfos = bTagInfos,
             btagDiscriminators = bTagDiscriminatorsSubJets,
-            jetCorrections = jetCorrectionsAK4,
+            jetCorrections = jetCorrectionsSubJets,
             genJetCollection = cms.InputTag(fatGenJetCollectionSoftDrop,'SubJets'),
             genParticles = cms.InputTag(genParticles),
             explicitJTA = True,  # needed for subjet b tagging
@@ -957,7 +989,7 @@ if options.runFatJets:
             elSource = cms.InputTag(elSource),
             btagInfos = bTagInfos,
             btagDiscriminators = bTagDiscriminatorsSubJets,
-            jetCorrections = jetCorrectionsAK4,
+            jetCorrections = jetCorrectionsSubJets,
             genJetCollection = cms.InputTag(fatGenJetCollectionPruned,'SubJets'),
             genParticles = cms.InputTag(genParticles),
             explicitJTA = True,  # needed for subjet b tagging
