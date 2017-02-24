@@ -726,17 +726,18 @@ else:
     from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
     if options.usePFchs:
         process.ak4Jets = ak4PFJets.clone(src = cms.InputTag('pfCHS'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
-    elif options.usePuppi or options.usePuppiForFatJets:
+    elif options.usePuppi:
+        process.ak4Jets = ak4PFJets.clone(src = cms.InputTag('puppi'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
+    else:
+        process.ak4Jets = ak4PFJets.clone(src = cms.InputTag('packedPFCandidates'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
+
+    if options.usePuppi or options.usePuppiForFatJets:
         process.load('CommonTools.PileupAlgos.Puppi_cff')
         process.puppi.candName           = cms.InputTag(pfCandidates)
         process.puppi.vertexName         = cms.InputTag(pvSource)
         process.puppi.useExistingWeights = cms.bool(True)
         process.puppi.clonePackedCands   = cms.bool(True)
-        if options.usePuppi:
-            process.ak4Jets = ak4PFJets.clone(src = cms.InputTag('puppi'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
         if options.usePuppiForBTagging: pfCandidates = 'puppi'
-    else:
-        process.ak4Jets = ak4PFJets.clone(src = cms.InputTag('packedPFCandidates'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
 
 ## Load standard PAT objects (here we only need PAT muons but the framework will figure out what it needs to run using the unscheduled mode)
 process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
