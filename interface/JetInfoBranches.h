@@ -495,9 +495,9 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_DeepCSVCvsLDisc"	 ).c_str(), Jet_DeepCSVCvsLDisc	, (name+"Jet_DeepCSVCvsLDisc["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_DeepCSVCvsLDiscN"	 ).c_str(), Jet_DeepCSVCvsLDiscN, (name+"Jet_DeepCSVCvsLDiscN["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_DeepCSVCvsLDiscP"	 ).c_str(), Jet_DeepCSVCvsLDiscP, (name+"Jet_DeepCSVCvsLDiscP["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_DeepCSVCvsBDisc"	 ).c_str(), Jet_DeepCSVCvsLDisc	, (name+"Jet_DeepCSVCvsBDisc["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_DeepCSVCvsBDiscN"	 ).c_str(), Jet_DeepCSVCvsLDiscN, (name+"Jet_DeepCSVCvsBDiscN["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_DeepCSVCvsBDiscP"	 ).c_str(), Jet_DeepCSVCvsLDiscP, (name+"Jet_DeepCSVCvsBDiscP["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_DeepCSVCvsBDisc"	 ).c_str(), Jet_DeepCSVCvsBDisc	, (name+"Jet_DeepCSVCvsBDisc["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_DeepCSVCvsBDiscN"	 ).c_str(), Jet_DeepCSVCvsBDiscN, (name+"Jet_DeepCSVCvsBDiscN["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_DeepCSVCvsBDiscP"	 ).c_str(), Jet_DeepCSVCvsBDiscP, (name+"Jet_DeepCSVCvsBDiscP["+name+"nJet]/F").c_str());
 		  tree->Branch((name+"Jet_DeepCSVb"	 ).c_str(), Jet_DeepCSVb	,(name+"Jet_DeepCSVb["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_DeepCSVc"	 ).c_str(), Jet_DeepCSVc	,(name+"Jet_DeepCSVc["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_DeepCSVl"	 ).c_str(), Jet_DeepCSVl	,(name+"Jet_DeepCSVl["+name+"nJet]/F").c_str());
