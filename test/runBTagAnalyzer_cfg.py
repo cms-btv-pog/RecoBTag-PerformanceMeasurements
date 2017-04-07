@@ -365,21 +365,22 @@ bTagDiscriminators = [
    ,'pfCombinedCvsLJetTags'
    ,'pfNegativeCombinedCvsLJetTags'
    ,'pfPositiveCombinedCvsLJetTags'
-   ,'deepFlavourJetTags:probudsg'         
-   ,'deepFlavourJetTags:probb'            
-   ,'deepFlavourJetTags:probc'            
-   ,'deepFlavourJetTags:probbb'           
-   ,'deepFlavourJetTags:probcc'           
-   ,'negativeDeepFlavourJetTags:probudsg' 
-   ,'negativeDeepFlavourJetTags:probb'    
-   ,'negativeDeepFlavourJetTags:probc'    
-   ,'negativeDeepFlavourJetTags:probbb'   
-   ,'negativeDeepFlavourJetTags:probcc'   
-   ,'positiveDeepFlavourJetTags:probudsg' 
-   ,'positiveDeepFlavourJetTags:probb'    
-   ,'positiveDeepFlavourJetTags:probc'    
-   ,'positiveDeepFlavourJetTags:probbb'   
-   ,'positiveDeepFlavourJetTags:probcc'   
+    # DeepFlavour
+  , 'pfDeepCSVJetTags:probudsg'        
+  , 'pfDeepCSVJetTags:probb'           
+  , 'pfDeepCSVJetTags:probc'           
+  , 'pfDeepCSVJetTags:probbb'          
+  , 'pfDeepCSVJetTags:probcc'          
+  , 'pfNegativeDeepCSVJetTags:probudsg'
+  , 'pfNegativeDeepCSVJetTags:probb'   
+  , 'pfNegativeDeepCSVJetTags:probc'   
+  , 'pfNegativeDeepCSVJetTags:probbb'  
+  , 'pfNegativeDeepCSVJetTags:probcc'  
+  , 'pfPositiveDeepCSVJetTags:probudsg'
+  , 'pfPositiveDeepCSVJetTags:probb'   
+  , 'pfPositiveDeepCSVJetTags:probc'   
+  , 'pfPositiveDeepCSVJetTags:probbb'  
+  , 'pfPositiveDeepCSVJetTags:probcc'  
 ]
 
 ## Legacy taggers not supported with MiniAOD
@@ -555,6 +556,8 @@ else:
         process.source.fileNames = [
             '/store/relval/CMSSW_8_0_0/RelValTTbar_13/GEN-SIM-DIGI-RECO/PU25ns_80X_mcRun2_asymptotic_v4_FastSim-v2/10000/0400D094-63DD-E511-8B51-0CC47A4C8ED8.root'
         ]
+if options.inputFiles:
+	process.source.fileNames = options.inputFiles
 
 ## Define the output file name
 if options.runOnData :
