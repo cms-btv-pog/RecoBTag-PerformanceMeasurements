@@ -190,10 +190,15 @@ options.register('minNumberOfHits', 8,
     "Minimum number of tracker hits"
 )
 # Change eta for extended forward pixel coverage
-options.register('maxJetEta', 2.5,
+options.register('maxJetEta', 4.0,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
-    "Maximum |eta| for fat jets (default is 2.5)"
+    "Maximum jet |eta| (default is 4.0)"
+)
+options.register('minJetPt', 20.0,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.float,
+    "Minimum jet pt (default is 20)"
 )
 options.register('usePrivateJEC', False,
     VarParsing.multiplicity.singleton,
@@ -207,6 +212,10 @@ options.register('isReHLT', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     '80X reHLT samples')
+options.register('JPCalibration', '',
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    'JP Calibration pyload to use')
 
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', -1)
@@ -668,6 +677,8 @@ if options.usePrivateJEC:
 trkProbaCalibTag = "JPcalib_MC80X_v3"
 if options.runOnData:
   trkProbaCalibTag = "JPcalib_Data80X_2016_v3"
+if options.JPCalibration:
+	trkProbaCalibTag = options.JPCalibration
 # process.GlobalTag.snapshotTime = cms.string("9999-12-31 23:59:59.000")
 process.GlobalTag.toGet = cms.VPSet(
     cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
@@ -1275,6 +1286,8 @@ if options.useLegacyTaggers:
 #   process.btagana.produceAllTrackTree  = True
 #   process.btagana.producePtRelTemplate = False
 #------------------
+process.btagana.MaxEta                = options.maxJetEta ## for extended forward pixel coverage
+process.btagana.MinPt                 = options.minJetPt
 process.btagana.tracksColl            = cms.InputTag(trackSource) 
 process.btagana.useSelectedTracks     = True  ## False if you want to run on all tracks : for commissioning studies
 process.btagana.useTrackHistory       = False ## Can only be used with GEN-SIM-RECODEBUG files
@@ -1295,7 +1308,6 @@ process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
 process.btagana.triggerTable          = cms.InputTag(trigresults) # Data and MC
 process.btagana.genParticles          = cms.InputTag(genParticles)
 process.btagana.candidates            = cms.InputTag(pfCandidates)
-process.btagana.MaxEta                = cms.double(options.maxJetEta) ## for extended forward pixel coverage
 
 if options.doCTag:
     process.btagana.storeCTagVariables = True
