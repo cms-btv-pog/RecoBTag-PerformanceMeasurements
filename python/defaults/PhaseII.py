@@ -1,0 +1,15 @@
+values = {
+	'usePuppi' : True,
+	'usePuppiForFatJets' : False,
+	'usePuppiForBTagging' : True,
+	'mcGlobalTag' : '90X_upgrade2023_realistic_v1',
+	'miniAOD' : False,
+	'remakeAllDiscr' : True,
+	'runIVF' : True, 
+	'maxJetEta' : 4.5,
+	'usePrivateJEC' : True,
+	'jecDBFile' : 'PhaseIISummer16_25nsV3', 
+	'inputFiles' : ['/store/mc/PhaseIIFall16DR82/TT_TuneCUETP8M1_14TeV-powheg-pythia8/AODSIM/PU200_90X_upgrade2023_realistic_v1-v1/110000/FCEB8448-98F6-E611-BA63-1866DAEB5D80.root',],
+	'storeCSVTagVariables' : False,
+	'JPCalibration' : 'JPcalib_MC81X_v0',
+}

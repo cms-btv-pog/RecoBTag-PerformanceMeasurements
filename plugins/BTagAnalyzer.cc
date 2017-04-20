@@ -928,6 +928,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
       //loop over pruned GenParticles to fill branches for MC hard process particles and muons
       for(size_t i = 0; i < prunedGenParticles->size(); ++i){
 	const GenParticle & iGenPart = (*prunedGenParticles)[i];
+	if ( iGenPart.pt() == 0 ) continue;
 	int status = iGenPart.status();
 	int pdgid = iGenPart.pdgId();
 	int numMothers = iGenPart.numberOfMothers();
@@ -2021,6 +2022,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     edm::RefToBase<reco::Jet> jetRef(patJetRef);
     reco::JetTagInfo jetTagInfo(jetRef);
 
+    cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
+    can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
+
     const Tracks & selectedTracks( ipTagInfo->selectedTracks() );
     const Tracks & tracks = ( useSelectedTracks_ ? Tracks() : toAllTracks(*pjet,ipTagInfos_,jetTagInfo,iJetColl) );
 
@@ -2243,6 +2247,29 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
            if ( theFlag[TrackCategories::Fake] ) 	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 8);
 		   if ( theFlag[TrackCategories::SharedInnerHits] )   JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 9);
         
+
+           if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] > 0 ) {
+             if ( theFlag[TrackCategories::BWeakDecay] )	 cap0 = 1;
+             if ( theFlag[TrackCategories::CWeakDecay] )	 cap1 = 1;
+             if ( theFlag[TrackCategories::SignalEvent] )	 cap2 = 1;
+             if ( theFlag[TrackCategories::ConversionsProcess] ) cap3 = 1;
+             if ( theFlag[TrackCategories::KsDecay] )	         cap4 = 1;
+             if ( theFlag[TrackCategories::LambdaDecay] )        cap5 = 1;
+             if ( theFlag[TrackCategories::HadronicProcess] )    cap6 = 1;
+             if ( theFlag[TrackCategories::Fake] ) 	         cap7 = 1;
+             if ( theFlag[TrackCategories::SharedInnerHits] )    cap8 = 1;
+           }
+           else {
+             if ( theFlag[TrackCategories::BWeakDecay] )	 can0 = 2;
+             if ( theFlag[TrackCategories::CWeakDecay] )	 can1 = 2;
+             if ( theFlag[TrackCategories::SignalEvent] )	 can2 = 2;
+             if ( theFlag[TrackCategories::ConversionsProcess] ) can3 = 2;
+             if ( theFlag[TrackCategories::KsDecay] )	         can4 = 2;
+             if ( theFlag[TrackCategories::LambdaDecay] )        can5 = 2;
+             if ( theFlag[TrackCategories::HadronicProcess] )    can6 = 2;
+             if ( theFlag[TrackCategories::Fake] ) 	         can7 = 2;
+             if ( theFlag[TrackCategories::SharedInnerHits] )    can8 = 2;
+           }
         
             //********************************************************************
 		    //
@@ -3082,39 +3109,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_histJet[JetInfo[iJetColl].nJet] = 0;
 
     if(useTrackHistory_ && !isData_){
-      const Tracks jetProbTracks( ipTagInfo->selectedTracks() );
-
-      cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
-      can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
-
-      for (unsigned int i=0; i<jetProbTracks.size(); ++i) {
-        reco::btag::TrackIPData ip = (ipTagInfo->impactParameterData())[i];
-
-        if ( ip.ip3d.significance() > 0 ) {
-          TrackCategories::Flags theFlag = classifier_.evaluate( toTrackRef(jetProbTracks[i]) ).flags();
-          if ( theFlag[TrackCategories::BWeakDecay] )	      cap0 = 1;
-          if ( theFlag[TrackCategories::CWeakDecay] )	      cap1 = 1;
-          if ( theFlag[TrackCategories::SignalEvent] )	      cap2 = 1;
-          if ( theFlag[TrackCategories::ConversionsProcess] ) cap3 = 1;
-          if ( theFlag[TrackCategories::KsDecay] )	      cap4 = 1;
-          if ( theFlag[TrackCategories::LambdaDecay] )        cap5 = 1;
-          if ( theFlag[TrackCategories::HadronicProcess] )    cap6 = 1;
-          if ( theFlag[TrackCategories::Fake] ) 	      cap7 = 1;
-          if ( theFlag[TrackCategories::SharedInnerHits] )    cap8 = 1;
-        }
-        else {
-          TrackCategories::Flags theFlag = classifier_.evaluate( toTrackRef(jetProbTracks[i]) ).flags();
-          if ( theFlag[TrackCategories::BWeakDecay] )	      can0 = 2;
-          if ( theFlag[TrackCategories::CWeakDecay] )	      can1 = 2;
-          if ( theFlag[TrackCategories::SignalEvent] )	      can2 = 2;
-          if ( theFlag[TrackCategories::ConversionsProcess] ) can3 = 2;
-          if ( theFlag[TrackCategories::KsDecay] )	      can4 = 2;
-          if ( theFlag[TrackCategories::LambdaDecay] )        can5 = 2;
-          if ( theFlag[TrackCategories::HadronicProcess] )    can6 = 2;
-          if ( theFlag[TrackCategories::Fake] ) 	      can7 = 2;
-          if ( theFlag[TrackCategories::SharedInnerHits] )    can8 = 2;
-        }
-      }
       JetInfo[iJetColl].Jet_histJet[JetInfo[iJetColl].nJet] =  cap0+can0 + (cap1+can1)*10 + (cap2+can2)*100
         + (cap3+can3)*1000     + (cap4+can4)*10000
         + (cap5+can5)*100000   + (cap6+can6)*1000000
@@ -3720,135 +3714,135 @@ void BTagAnalyzerT<IPTI,VTX>::setTracksPVBase( const reco::TrackRef & trackRef, 
 // ------------ method called once each job just before starting event loop  ------------
 template<typename IPTI,typename VTX>
 void BTagAnalyzerT<IPTI,VTX>::beginJob() {
-  //cat 0
-  cat0.etaMax = 2.5;
-  cat0.etaMin = 0;
-  cat0.nHitsMax= 50;
-  cat0.nHitsMin= 1;
-  cat0.nPixelHitsMax = 1;
+  //cat 0  
+  cat0.withFirstPixel = -1;  
   cat0.nPixelHitsMin = 1;
-  cat0.pMax= 5000;
-  cat0.pMin= 0;
-  cat0.chiMin= 0;
-  cat0.chiMax= 5;
-  cat0.withFirstPixel = 0;
+  cat0.nPixelHitsMax = 99;
+  cat0.etaMin        = 0;
+  cat0.etaMax        = 4.5;
+  cat0.pMin          = 1.;
+  cat0.pMax          = 999.;
+  cat0.nHitsMin      = 1;
+  cat0.nHitsMax      = 50;
+  cat0.chiMin        = 0;
+  cat0.chiMax        = 5;
 
   //cat 1
-  cat1.etaMax        = 2.5;
+  cat1.withFirstPixel = 1;  
+  cat1.nPixelHitsMin = 1;
+  cat1.nPixelHitsMax = 3;
   cat1.etaMin        = 0;
-  cat1.nHitsMax      = 50;
+  cat1.etaMax        = 4.5;
+  cat1.pMin          = 1.;
+  cat1.pMax          = 999.;
   cat1.nHitsMin      = 1;
-  cat1.nPixelHitsMax = 8;
-  cat1.nPixelHitsMin = 2;
-  cat1.pMax          = 5000;
-  cat1.pMin          = 0;
-  cat1.chiMin        = 2.5;
+  cat1.nHitsMax      = 50;
+  cat1.chiMin        = 0;
   cat1.chiMax        = 5;
-  cat1.withFirstPixel = 0;
-
+   
   //cat 2
-  cat2.etaMax        = 0.8;
-  cat2.etaMin        = 0;
-  cat2.nHitsMax      = 50;
+  cat2.withFirstPixel = 1;  
+  cat2.nPixelHitsMin = 4;
+  cat2.nPixelHitsMax = 99;
+  cat2.etaMin        = 0.;
+  cat2.etaMax        = 1.;
+  cat2.pMin          = 1.;
+  cat2.pMax          = 3.;
   cat2.nHitsMin      = 1;
-  cat2.nPixelHitsMax = 8;
-  cat2.nPixelHitsMin = 3;
-  cat2.pMax          = 8;
-  cat2.pMin          = 0;
+  cat2.nHitsMax      = 50;
   cat2.chiMin        = 0;
-  cat2.chiMax        = 2.5;
-  cat2.withFirstPixel = 0;
+  cat2.chiMax        = 5;
 
   //cat 3
-  cat3.etaMax        = 1.6;
-  cat3.etaMin        = 0.8;
-  cat3.nHitsMax      = 50;
+  cat3.withFirstPixel = 1;  
+  cat3.nPixelHitsMin = 4;
+  cat3.nPixelHitsMax = 99;
+  cat3.etaMin        = 0.;
+  cat3.etaMax        = 1.;
+  cat3.pMin          = 3.;
+  cat3.pMax          = 6.;
   cat3.nHitsMin      = 1;
-  cat3.nPixelHitsMax = 8;
-  cat3.nPixelHitsMin = 3;
-  cat3.pMax          = 8;
-  cat3.pMin          = 0;
+  cat3.nHitsMax      = 50;
   cat3.chiMin        = 0;
-  cat3.chiMax        = 2.5;
-  cat3.withFirstPixel = 0;
+  cat3.chiMax        = 5;
 
   //cat 4
-  cat4.etaMax        = 2.5;
-  cat4.etaMin        = 1.6;
-  cat4.nHitsMax      = 50;
+  cat4.withFirstPixel = 1;  
+  cat4.nPixelHitsMin = 4;
+  cat4.nPixelHitsMax = 99;
+  cat4.etaMin        = 0.;
+  cat4.etaMax        = 1.;
+  cat4.pMin          = 6.;
+  cat4.pMax          = 999.;
   cat4.nHitsMin      = 1;
-  cat4.nPixelHitsMax = 8;
-  cat4.nPixelHitsMin = 3;
-  cat4.pMax          = 8;
-  cat4.pMin          = 0;
+  cat4.nHitsMax      = 50;
   cat4.chiMin        = 0;
-  cat4.chiMax        = 2.5;
-  cat4.withFirstPixel = 0;
+  cat4.chiMax        = 5;
 
   //cat 5
-  cat5.etaMax        = 2.5;
-  cat5.etaMin        = 0;
-  cat5.nHitsMax      = 50;
+  cat5.withFirstPixel = 1;  
+  cat5.nPixelHitsMin = 4;
+  cat5.nPixelHitsMax = 99;
+  cat5.etaMin        = 1.;
+  cat5.etaMax        = 2.;
+  cat5.pMin          = 1.;
+  cat5.pMax          = 6.;
   cat5.nHitsMin      = 1;
-  cat5.nPixelHitsMax = 2;
-  cat5.nPixelHitsMin = 2;
-  cat5.pMax          = 8;
-  cat5.pMin          = 0;
+  cat5.nHitsMax      = 50;
   cat5.chiMin        = 0;
-  cat5.chiMax        = 2.5;
-  cat5.withFirstPixel = 0;
+  cat5.chiMax        = 5;
 
   //cat 6
-  cat6.etaMax        = 0.8;
-  cat6.etaMin        = 0;
-  cat6.nHitsMax      = 50;
+  cat6.withFirstPixel = 1;  
+  cat6.nPixelHitsMin = 4;
+  cat6.nPixelHitsMax = 99;
+  cat6.etaMin        = 1.;
+  cat6.etaMax        = 2.;
+  cat6.pMin          = 6.;
+  cat6.pMax          = 12.;
   cat6.nHitsMin      = 1;
-  cat6.nPixelHitsMax = 8;
-  cat6.nPixelHitsMin = 3;
-  cat6.pMax          = 5000;
-  cat6.pMin          = 8;
+  cat6.nHitsMax      = 50;
   cat6.chiMin        = 0;
-  cat6.chiMax        = 2.5;
-  cat6.withFirstPixel = 0;
+  cat6.chiMax        = 5;
 
   //cat 7
-  cat7.etaMax        = 1.6;
-  cat7.etaMin        = 0.8;
-  cat7.nHitsMax      = 50;
+  cat7.withFirstPixel = 1;  
+  cat7.nPixelHitsMin = 4;
+  cat7.nPixelHitsMax = 99;
+  cat7.etaMin        = 1.;
+  cat7.etaMax        = 2.;
+  cat7.pMin          = 12.;
+  cat7.pMax          = 999.;
   cat7.nHitsMin      = 1;
-  cat7.nPixelHitsMax = 8;
-  cat7.nPixelHitsMin = 3;
-  cat7.pMax          = 5000;
-  cat7.pMin          = 8;
+  cat7.nHitsMax      = 50;
   cat7.chiMin        = 0;
-  cat7.chiMax        = 2.5;
-  cat7.withFirstPixel = 0;
-
+  cat7.chiMax        = 5;
+ 
   //cat 8
-  cat8.etaMax        = 2.5;
-  cat8.etaMin        = 1.6;
-  cat8.nHitsMax      = 50;
+  cat8.withFirstPixel = 1;  
+  cat8.nPixelHitsMin = 4;
+  cat8.nPixelHitsMax = 99;
+  cat8.etaMin        = 2.;
+  cat8.etaMax        = 4.5;
+  cat8.pMin          = 1.;
+  cat8.pMax          = 18.;
   cat8.nHitsMin      = 1;
-  cat8.nPixelHitsMax = 8;
-  cat8.nPixelHitsMin = 3;
-  cat8.pMax          = 5000;
-  cat8.pMin          = 8;
+  cat8.nHitsMax      = 50;
   cat8.chiMin        = 0;
-  cat8.chiMax        = 2.5;
-  cat8.withFirstPixel = 0;
+  cat8.chiMax        = 5;
 
   //cat 9
-  cat9.etaMax        = 2.5;
-  cat9.etaMin        = 0;
-  cat9.nHitsMax      = 50;
+  cat9.withFirstPixel = 1;  
+  cat9.nPixelHitsMin = 4;
+  cat9.nPixelHitsMax = 99;
+  cat9.etaMin        = 2.;
+  cat9.etaMax        = 4.5;
+  cat9.pMin          = 18.;
+  cat9.pMax          = 999.;
   cat9.nHitsMin      = 1;
-  cat9.nPixelHitsMax = 2;
-  cat9.nPixelHitsMin = 2;
-  cat9.pMax          = 5000;
-  cat9.pMin          = 8;
+  cat9.nHitsMax      = 50;
   cat9.chiMin        = 0;
-  cat9.chiMax        = 2.5;
-  cat9.withFirstPixel = 0;
+  cat9.chiMax        = 5;
 }
 
 
@@ -3919,18 +3913,22 @@ double BTagAnalyzerT<IPTI,VTX>::calculProbability(std::vector< float > v) {
 template<typename IPTI,typename VTX>
 bool BTagAnalyzerT<IPTI,VTX>::findCat(const reco::Track* track, CategoryFinder& d) {
   //int numcat=-1;
-
+  int   isL1 = track->hitPattern().hasValidHitInPixelLayer(PixelSubdetector::SubDetector::PixelBarrel, 1);
+  int   npix = track->hitPattern().numberOfValidPixelHits();
+  int	nhit = track->numberOfValidHits();
+  double chi = track->normalizedChi2();
   double   p = track->p();
   double eta = track->eta();
-  double chi = track->normalizedChi2();
-  int   nhit = track->numberOfValidHits();
-  int   npix = track->hitPattern().numberOfValidPixelHits();
 
-  bool result = ( p > d.pMin  &&  p  < d.pMax		  &&
-      fabs(eta) > d.etaMin    &&  fabs(eta) < d.etaMax    &&
-      nhit >= d.nHitsMin      &&  nhit <= d.nHitsMax	  &&
-      npix >= d.nPixelHitsMin &&  npix <= d.nPixelHitsMax &&
-      chi >= d.chiMin         &&  chi <= d.chiMax );
+  bool result = ( 
+     ( (d.withFirstPixel == 1 && isL1 == 1) || 
+       (d.withFirstPixel == -1 && isL1 == 0) ||
+        d.withFirstPixel == 0 ) && 
+      npix >= d.nPixelHitsMin && npix <= d.nPixelHitsMax &&
+      nhit >= d.nHitsMin      && nhit <= d.nHitsMax	 &&
+      chi >= d.chiMin	      && chi <= d.chiMax         &&
+      p > d.pMin              && p < d.pMax              &&
+      fabs(eta) > d.etaMin    && fabs(eta) < d.etaMax );
 
   return result;
 }

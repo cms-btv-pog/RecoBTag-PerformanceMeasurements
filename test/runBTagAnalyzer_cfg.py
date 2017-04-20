@@ -184,7 +184,7 @@ options.register('changeMinNumberOfHits', False,
     VarParsing.varType.bool,
     "Change minimum number of tracker hits"
 )
-options.register('minNumberOfHits', 8,
+options.register('minNumberOfHits', 1,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.int,
     "Minimum number of tracker hits"
@@ -216,11 +216,36 @@ options.register('JPCalibration', '',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     'JP Calibration pyload to use')
+options.register('storeCSVTagVariables', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to keep CSV TaggingVariables')
+options.register('defaults', '',
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    'baseline default settings to be used')
+options.register('eras', []
+    VarParsing.multiplicity.list,
+    VarParsing.varType.string,
+    'era modifiers to be used to be used')
 
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', -1)
 
 options.parseArguments()
+if options.defaults:
+	from importlib import import_module
+	try:
+		defaults = import_module('RecoBTag.PerformanceMeasurements.defaults.%s' % options.defaults)
+	except ImportError:
+		raise ValueError('The default settings named %s.py are not present in PerformanceMeasurements/python/defaults/' % options.defaults)
+	if not hasattr(defaults, 'values') or not isinstance(defaults.values, dict):
+		raise RuntimeError('the default file %s.py does not contain a dictionary named values' % options.defaults)  
+	for key, value in defaults.values.iteritems():
+		if key not in options._beenSet:
+			raise ValueError('The key set by the defaults: %s does not exist among the cfg options!' % key)
+		elif not options._beenSet[key]:
+			setattr(options, key, value)
 
 ## Use either PFchs or Puppi
 if options.usePFchs and options.usePuppi:
@@ -526,8 +551,17 @@ if options.miniAOD:
         subJetSourceSoftDrop = 'slimmedJetsAK8PFPuppiSoftDropPacked:SubJets'
         patSubJetSourceSoftDrop = 'selectedUpdatedPatJetsSoftDropSubjetsPF'+postfix
 
-
-process = cms.Process("BTagAna")
+if not options.eras:
+	process = cms.Process("BTagAna")
+else:
+	from Configuration.StandardSequences.Eras import eras
+	eras_to_use = []
+	for era in options.eras:
+		if hasattr(eras, era):
+			eras_to_use.append(getattr(eras, era))
+		else:
+			raise ValueError('The requested era (%s) is not available' % era)
+	process = cms.Process("BTagAna", *eras_to_use)
 
 ## MessageLogger
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
@@ -1298,7 +1332,7 @@ process.btagana.produceAllTrackTree   = False ## True if you want to keep info f
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
 process.btagana.storeTagVariables     = False  ## True if you want to keep TagInfo TaggingVariables
-process.btagana.storeCSVTagVariables  = True   ## True if you want to keep CSV TaggingVariables
+process.btagana.storeCSVTagVariables  = options.storeCSVTagVariables   ## True if you want to keep CSV TaggingVariables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag(patJetSource)
 process.btagana.muonCollectionName    = cms.InputTag(muSource)
