@@ -3,8 +3,8 @@
 ## Software setup
 
 ```
-cmsrel CMSSW_8_1_0
-cd CMSSW_8_1_0/src
+cmsrel CMSSW_8_4_0
+cd CMSSW_8_4_0/src
 cmsenv
 
 setenv CMSSW_GIT_REFERENCE /cvmfs/cms.cern.ch/cmssw.git.daily
@@ -16,8 +16,11 @@ git clone -b 8_4_X --depth 1 https://github.com/cms-btv-pog/RecoBTag-Performance
 
 scram b -j8
 
-cd RecoBTag/PerformanceMeasurements/test/
+```
 
-cmsRun runBTagAnalyzer_cfg.py miniAOD=True maxEvents=100 reportEvery=1 wantSummary=True
+the ntuplizer can be run and configured through 
+
+```
+RecoBTag/PerformanceMeasurements/test/runBTagAnalyzer_cfg.py
 ```
 
