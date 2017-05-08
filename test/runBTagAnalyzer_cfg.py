@@ -224,7 +224,7 @@ options.register('defaults', '',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     'baseline default settings to be used')
-options.register('eras', []
+options.register('eras', [],
     VarParsing.multiplicity.list,
     VarParsing.varType.string,
     'era modifiers to be used to be used')
