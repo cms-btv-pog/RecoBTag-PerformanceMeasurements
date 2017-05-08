@@ -1457,11 +1457,19 @@ if options.processStdAK4Jets and options.useTTbarFilter:
     process.analyzerSeq.replace( process.btagana, process.ttbarselectionproducer * process.ttbarselectionfilter * process.btagana )
 #---------------------------------------
 
+#Trick to make it work in 9_1_X
+process.tsk = cms.Task()
+for mod in process.producers_().itervalues():
+    process.tsk.add(mod)
+for mod in process.filters_().itervalues():
+    process.tsk.add(mod)
+
 process.p = cms.Path(
     process.allEvents
     * process.filtSeq
     * process.selectedEvents
-    * process.analyzerSeq
+    * process.analyzerSeq,
+		process.tsk
 )
 
 # Delete predefined output module (needed for running with CRAB)
