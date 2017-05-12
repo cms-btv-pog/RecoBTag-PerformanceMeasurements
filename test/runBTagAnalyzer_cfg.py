@@ -404,17 +404,14 @@ bTagDiscriminators = [
   , 'pfDeepCSVJetTags:probb'           
   , 'pfDeepCSVJetTags:probc'           
   , 'pfDeepCSVJetTags:probbb'          
-  , 'pfDeepCSVJetTags:probcc'          
   , 'pfNegativeDeepCSVJetTags:probudsg'
   , 'pfNegativeDeepCSVJetTags:probb'   
   , 'pfNegativeDeepCSVJetTags:probc'   
   , 'pfNegativeDeepCSVJetTags:probbb'  
-  , 'pfNegativeDeepCSVJetTags:probcc'  
   , 'pfPositiveDeepCSVJetTags:probudsg'
   , 'pfPositiveDeepCSVJetTags:probb'   
   , 'pfPositiveDeepCSVJetTags:probc'   
   , 'pfPositiveDeepCSVJetTags:probbb'  
-  , 'pfPositiveDeepCSVJetTags:probcc'  
 ]
 
 ## Legacy taggers not supported with MiniAOD
