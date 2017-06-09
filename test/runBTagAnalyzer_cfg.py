@@ -576,7 +576,7 @@ process.source = cms.Source("PoolSource",
 
 if options.miniAOD:
     process.source.fileNames = [
-        '/store/mc/PhaseIFall16MiniAOD/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PhaseIFall16PUFlat20to50_PhaseIFall16_81X_upgrade2017_realistic_v26-v1/50000/08358A47-61E3-E611-8B77-001E677928AE.root'
+        '/store/mc/PhaseISpring17MiniAOD/QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/FlatPU28to62_902_90X_upgrade2017_realistic_v20_ext1-v1/120000/0611567D-0B35-E711-B0FD-A4BF0100DD3E.root'
     ]
     if options.runOnData:
         process.source.fileNames = [
@@ -584,11 +584,11 @@ if options.miniAOD:
         ]
     if options.fastSim:
         process.source.fileNames = [
-            '/store/relval/CMSSW_8_0_0/RelValTTbar_13/MINIAODSIM/PU25ns_80X_mcRun2_asymptotic_v4_FastSim-v2/10000/8E75D08A-3FDE-E511-8374-0CC47A4C8F26.root'
+            '/store/relval/CMSSW_9_0_0/RelValTTbar_13/MINIAODSIM/PUpmx25ns_90X_mcRun2_asymptotic_v5_FastSim-v1/00000/047D9C85-5F14-E711-8F90-0CC47A7C3422.root'
         ]
 else:
     process.source.fileNames = [
-        '/store/mc/PhaseIFall16DR/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/AODSIM/PhaseIFall16PUFlat20to50_81X_upgrade2017_realistic_v26-v1/50000/0039E945-35E3-E611-AF8D-001E675A6C2A.root'
+        '/store/relval/CMSSW_9_0_0/RelValTTbar_13/AODSIM/PU25ns_90X_mcRun2_asymptotic_v5_reHLT-v1/00000/6E4E0C6C-9510-E711-A84A-0025905B856E.root'
     ]
     if options.runOnData:
         process.source.fileNames = [
@@ -596,7 +596,7 @@ else:
         ]
     if options.fastSim:
         process.source.fileNames = [
-            '/store/relval/CMSSW_8_0_0/RelValTTbar_13/GEN-SIM-DIGI-RECO/PU25ns_80X_mcRun2_asymptotic_v4_FastSim-v2/10000/0400D094-63DD-E511-8B51-0CC47A4C8ED8.root'
+            '/store/relval/CMSSW_9_0_0/RelValTTbar_13/GEN-SIM-DIGI-RECO/PUpmx25ns_90X_mcRun2_asymptotic_v5_FastSim-v1/00000/1EB6CBA4-4014-E711-A975-0025905A4964.root'
         ]
 if options.inputFiles:
 	process.source.fileNames = options.inputFiles
