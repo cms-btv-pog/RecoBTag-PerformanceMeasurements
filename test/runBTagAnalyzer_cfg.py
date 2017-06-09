@@ -189,11 +189,10 @@ options.register('minNumberOfHits', 1,
     VarParsing.varType.int,
     "Minimum number of tracker hits"
 )
-# Change eta for extended forward pixel coverage
-options.register('maxJetEta', 4.0,
+options.register('maxJetEta', 2.5,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
-    "Maximum jet |eta| (default is 4.0)"
+    "Maximum jet |eta| (default is 2.5)"
 )
 options.register('minJetPt', 20.0,
     VarParsing.multiplicity.singleton,
@@ -1320,7 +1319,7 @@ if options.useLegacyTaggers:
 #   process.btagana.produceAllTrackTree  = True
 #   process.btagana.producePtRelTemplate = False
 #------------------
-process.btagana.MaxEta                = options.maxJetEta ## for extended forward pixel coverage
+process.btagana.MaxEta                = options.maxJetEta
 process.btagana.MinPt                 = options.minJetPt
 process.btagana.tracksColl            = cms.InputTag(trackSource) 
 process.btagana.useSelectedTracks     = True  ## False if you want to run on all tracks : for commissioning studies
