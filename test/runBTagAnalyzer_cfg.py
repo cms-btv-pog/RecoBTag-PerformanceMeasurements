@@ -707,7 +707,7 @@ if options.usePrivateJEC:
     process.es_prefer_jec = cms.ESPrefer("PoolDBESSource",'jec')
 
 ### to activate the new JP calibration: using the data base
-trkProbaCalibTag = "JPcalib_MC80X_v3"
+trkProbaCalibTag = "JPcalib_MC81X_v0"
 if options.runOnData:
   trkProbaCalibTag = "JPcalib_Data80X_2016_v3"
 if options.JPCalibration:
