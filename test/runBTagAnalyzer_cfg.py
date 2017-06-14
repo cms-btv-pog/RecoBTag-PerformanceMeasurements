@@ -49,12 +49,12 @@ options.register('usePuppiForBTagging', False,
     VarParsing.varType.bool,
     "Use Puppi candidates for b tagging"
 )
-options.register('mcGlobalTag', '81X_upgrade2017_realistic_v26',
+options.register('mcGlobalTag', '92X_upgrade2017_realistic_v1',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', '80X_dataRun2_v4', 
+options.register('dataGlobalTag', '92X_dataRun2_Prompt_v4', 
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
@@ -574,11 +574,13 @@ process.source = cms.Source("PoolSource",
 
 if options.miniAOD:
     process.source.fileNames = [
-        '/store/mc/PhaseIFall16MiniAOD/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PhaseIFall16PUFlat20to50_PhaseIFall16_81X_upgrade2017_realistic_v26-v1/50000/08358A47-61E3-E611-8B77-001E677928AE.root'
+        #/RelValQCD_Pt_600_800_13/CMSSW_9_2_1-92X_upgrade2017_realistic_v1-v1/MINIAODSIM
+        '/store/relval/CMSSW_9_2_1/RelValQCD_Pt_600_800_13/MINIAODSIM/92X_upgrade2017_realistic_v1-v1/10000/C4C4AF9D-B247-E711-A875-0025905A60BC.root',
     ]
     if options.runOnData:
         process.source.fileNames = [
-            '/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/275/125/00000/86B9123D-7F36-E611-9D13-02163E0139C7.root'
+            #/JetHT/Run2017A-PromptReco-v2/MINIAOD
+            '/store/data/Run2017A/JetHT/MINIAOD/PromptReco-v2/000/296/168/00000/3E20EA58-0F4D-E711-851C-02163E0139CE.root',
         ]
     if options.fastSim:
         process.source.fileNames = [
