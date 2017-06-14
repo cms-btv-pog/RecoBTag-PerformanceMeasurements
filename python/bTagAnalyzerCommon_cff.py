@@ -124,6 +124,7 @@ bTagAnalyzerCommon = cms.PSet(
         "HLT_BTagMu_DiJet170_Mu5_v*",
         "HLT_BTagMu_Jet300_Mu5_v*",
         "HLT_BTagMu_AK8Jet300_Mu5_v*"
+        "HLT_BTagMu_AK8DiJet170_Mu5_v*"
     ),
     TTbarTriggerPathNames = cms.vstring(
         # trigger for ttbar: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiTopRefEventSel#Triggers
