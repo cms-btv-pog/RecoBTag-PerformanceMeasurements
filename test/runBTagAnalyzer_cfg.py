@@ -190,10 +190,10 @@ options.register('minNumberOfHits', 1,
     "Minimum number of tracker hits"
 )
 # Change eta for extended forward pixel coverage
-options.register('maxJetEta', 4.0,
+options.register('maxJetEta', 2.4,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
-    "Maximum jet |eta| (default is 4.0)"
+    "Maximum jet |eta| (default is 2.4)"
 )
 options.register('minJetPt', 20.0,
     VarParsing.multiplicity.singleton,
