@@ -54,7 +54,7 @@ options.register('mcGlobalTag', '92X_upgrade2017_realistic_v1',
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', '92X_dataRun2_Prompt_v4', 
+options.register('dataGlobalTag', '92X_dataRun2_Prompt_v7', 
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
