@@ -2876,6 +2876,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].TagVarCSV_flightDistance3dVal[JetInfo[iJetColl].nJet]         = ( vars.checkTag(reco::btau::flightDistance3dVal) ? vars.get(reco::btau::flightDistance3dVal) : -9999 );
       JetInfo[iJetColl].TagVarCSV_flightDistance3dSig[JetInfo[iJetColl].nJet]         = ( vars.checkTag(reco::btau::flightDistance3dSig) ? vars.get(reco::btau::flightDistance3dSig) : -9999 );
       JetInfo[iJetColl].TagVarCSV_SVchi2_ndf_ratio[JetInfo[iJetColl].nJet]            = ( vars.checkTag(reco::btau::SVchi2_ndf_ratio) ? vars.get(reco::btau::SVchi2_ndf_ratio) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_DCA_2tracks_2d[JetInfo[iJetColl].nJet]              = ( vars.checkTag(reco::btau::DCA_2tracks_2d) ? vars.get(reco::btau::DCA_2tracks_2d) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_DCA_2tracks_3d[JetInfo[iJetColl].nJet]              = ( vars.checkTag(reco::btau::DCA_2tracks_3d) ? vars.get(reco::btau::DCA_2tracks_3d) : -9999 );
+      JetInfo[iJetColl].TagVarCSV_Num2tv[JetInfo[iJetColl].nJet]                      = ( vars.checkTag(reco::btau::SVnum2tv) ? vars.get(reco::btau::SVnum2tv) : -9999 );
       JetInfo[iJetColl].TagVarCSV_trackAveSip3dVal[JetInfo[iJetColl].nJet]            = ( vars.checkTag(reco::btau::trackAveSip3dVal) ? vars.get(reco::btau::trackAveSip3dVal) : -9999 );
       JetInfo[iJetColl].TagVarCSV_trackAveSip3dSig[JetInfo[iJetColl].nJet]            = ( vars.checkTag(reco::btau::trackAveSip3dSig) ? vars.get(reco::btau::trackAveSip3dSig) : -9999 );
       JetInfo[iJetColl].TagVarCSV_trackAveSip2dVal[JetInfo[iJetColl].nJet]            = ( vars.checkTag(reco::btau::trackAveSip2dVal) ? vars.get(reco::btau::trackAveSip2dVal) : -9999 );
@@ -2888,7 +2891,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].TagVarCSV_jetPt_Tracks[JetInfo[iJetColl].nJet]                = ( vars.checkTag(reco::btau::jetPt_Tracks) ? vars.get(reco::btau::jetPt_Tracks) : -9999 );
       JetInfo[iJetColl].TagVarCSV_jetPt_PVTracks[JetInfo[iJetColl].nJet]              = ( vars.checkTag(reco::btau::jetPt_PVTracks) ? vars.get(reco::btau::jetPt_PVTracks) : -9999 );
       JetInfo[iJetColl].TagVarCSV_jetPt_nonPVTracks[JetInfo[iJetColl].nJet]           = ( vars.checkTag(reco::btau::jetPt_nonPVTracks) ? vars.get(reco::btau::jetPt_nonPVTracks) : -9999 );
-
       float check_Ntracks = ( vars.checkTag(reco::btau::jetNchTracks) ? vars.get(reco::btau::jetNchTracks) : -9999 );
       if(check_Ntracks!=0 || check_Ntracks!=-9999){
           JetInfo[iJetColl].TagVarCSV_jetNTracks_PV_Ntracks[JetInfo[iJetColl].nJet]    =  ( vars.checkTag(reco::btau::jetNTracks_PV) ? vars.get(reco::btau::jetNTracks_PV)/vars.get(reco::btau::jetNchTracks): -9999);
@@ -2923,6 +2925,14 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].TagVarCSV_trackIp1dVal[JetInfo[iJetColl].nTrkTagVarCSV] );
       tagValList = vars.getList(reco::btau::trackIp1dSig,false);
       if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].TagVarCSV_trackIp1dSig[JetInfo[iJetColl].nTrkTagVarCSV] );
+      tagValList = vars.getList(reco::btau::trackIp2dVal,false);
+      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].TagVarCSV_trackIp2dVal[JetInfo[iJetColl].nTrkTagVarCSV] );
+      tagValList = vars.getList(reco::btau::trackIp2dSig,false);
+      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].TagVarCSV_trackIp2dSig[JetInfo[iJetColl].nTrkTagVarCSV] );
+      tagValList = vars.getList(reco::btau::trackIp3dVal,false);
+      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].TagVarCSV_trackIp3dVal[JetInfo[iJetColl].nTrkTagVarCSV] );
+      tagValList = vars.getList(reco::btau::trackIp3dSig,false);
+      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].TagVarCSV_trackIp3dSig[JetInfo[iJetColl].nTrkTagVarCSV] );
       tagValList = vars.getList(reco::btau::trackSip2dVal,false);
       if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].TagVarCSV_trackSip2dVal[JetInfo[iJetColl].nTrkTagVarCSV] );
       tagValList = vars.getList(reco::btau::trackSip2dSig,false);
