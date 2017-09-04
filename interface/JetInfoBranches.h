@@ -59,6 +59,12 @@ class JetInfoBranches {
     float Jet_DeepCSVlP[nMaxJets_] ;
     float Jet_DeepCSVbbP[nMaxJets_];
     float Jet_DeepCSVccP[nMaxJets_];
+    float Jet_DeepFlavourb[nMaxJets_]  ;
+    float Jet_DeepFlavourbb[nMaxJets_] ;
+    float Jet_DeepFlavourLepb[nMaxJets_] ;
+    float Jet_DeepFlavourc[nMaxJets_]  ;
+    float Jet_DeepFlavourl[nMaxJets_]  ;
+    float Jet_DeepFlavourg[nMaxJets_] ;
 
     float Jet_ProbaN[nMaxJets_];
     float Jet_ProbaP[nMaxJets_];
@@ -513,6 +519,13 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_DeepCSVlP" ).c_str(), Jet_DeepCSVlP ,(name+"Jet_DeepCSVlP["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_DeepCSVbbP").c_str(), Jet_DeepCSVbbP,(name+"Jet_DeepCSVbbP["+name+"nJet]/F").c_str());
 			tree->Branch((name+"Jet_DeepCSVccP").c_str(), Jet_DeepCSVccP,(name+"Jet_DeepCSVccP["+name+"nJet]/F").c_str());
+
+		  tree->Branch((name+"Jet_DeepFlavourb"	  ).c_str(), Jet_DeepFlavourb	   ,(name+"Jet_DeepFlavourb["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_DeepFlavourbb"  ).c_str(), Jet_DeepFlavourbb   ,(name+"Jet_DeepFlavourbb["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_DeepFlavourLepb").c_str(), Jet_DeepFlavourLepb ,(name+"Jet_DeepFlavourLepb["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_DeepFlavourc"	  ).c_str(), Jet_DeepFlavourc	   ,(name+"Jet_DeepFlavourc["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_DeepFlavourl"	  ).c_str(), Jet_DeepFlavourl	   ,(name+"Jet_DeepFlavourl["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_DeepFlavourg"   ).c_str(), Jet_DeepFlavourg    ,(name+"Jet_DeepFlavourg["+name+"nJet]/F").c_str());
 
       tree->Branch((name+"Jet_ProbaN").c_str(),      Jet_ProbaN     ,(name+"Jet_ProbaN["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_ProbaP").c_str(),      Jet_ProbaP     ,(name+"Jet_ProbaP["+name+"nJet]/F").c_str());
@@ -1045,6 +1058,20 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_cMVAv2").c_str(),    Jet_cMVAv2   );
       tree->SetBranchAddress((name+"Jet_cMVAv2N").c_str(),    Jet_cMVAv2N   );
       tree->SetBranchAddress((name+"Jet_cMVAv2P").c_str(),    Jet_cMVAv2P   );
+
+		  tree->SetBranchAddress((name+"Jet_DeepCSVBDisc").c_str()  , Jet_DeepCSVBDisc);
+      tree->SetBranchAddress((name+"Jet_DeepCSVb").c_str()      , Jet_DeepCSVb);
+      tree->SetBranchAddress((name+"Jet_DeepCSVbb").c_str()     , Jet_DeepCSVbb);
+      tree->SetBranchAddress((name+"Jet_DeepCSVc").c_str()      , Jet_DeepCSVc);
+      tree->SetBranchAddress((name+"Jet_DeepCSVcc").c_str()     , Jet_DeepCSVcc);
+      tree->SetBranchAddress((name+"Jet_DeepCSVl").c_str()      , Jet_DeepCSVl);
+
+      tree->SetBranchAddress((name+"Jet_DeepFlavourb").c_str(),     Jet_DeepFlavourb);
+      tree->SetBranchAddress((name+"Jet_DeepFlavourbb").c_str(),    Jet_DeepFlavourbb);
+      tree->SetBranchAddress((name+"Jet_DeepFlavourLepb").c_str(),  Jet_DeepFlavourLepb);
+      tree->SetBranchAddress((name+"Jet_DeepFlavourc").c_str(),     Jet_DeepFlavourc);
+      tree->SetBranchAddress((name+"Jet_DeepFlavourl").c_str(),     Jet_DeepFlavourl);
+      tree->SetBranchAddress((name+"Jet_DeepFlavourg").c_str(),     Jet_DeepFlavourg);
 
       tree->SetBranchAddress((name+"Jet_hist1").c_str(),       Jet_hist1       );
       tree->SetBranchAddress((name+"Jet_hist2").c_str(),       Jet_hist2       );

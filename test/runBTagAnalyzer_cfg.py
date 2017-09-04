@@ -274,6 +274,7 @@ bTagInfos = [
    ,'softPFElectronsTagInfos'
    ,'pfInclusiveSecondaryVertexFinderCvsLTagInfos'
    ,'pfInclusiveSecondaryVertexFinderNegativeCvsLTagInfos'
+   ,'pfDeepFlavourTagInfos'
 ]
 ## b-tag discriminators
 bTagDiscriminatorsLegacy = [
@@ -358,6 +359,12 @@ bTagDiscriminators = [
    ,'pfPositiveDeepCSVJetTags:probc'    
    ,'pfPositiveDeepCSVJetTags:probbb'   
    ,'pfPositiveDeepCSVJetTags:probcc'   
+   ,'pfDeepFlavourJetTags:probb'
+   ,'pfDeepFlavourJetTags:probbb'
+   ,'pfDeepFlavourJetTags:problepb'
+   ,'pfDeepFlavourJetTags:probc'
+   ,'pfDeepFlavourJetTags:probuds'
+   ,'pfDeepFlavourJetTags:probg'
 ]
 
 ## Legacy taggers not supported with MiniAOD

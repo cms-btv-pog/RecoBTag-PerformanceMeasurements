@@ -310,6 +310,8 @@ private:
 	std::string deepCSVNegBJetTags_;
 	std::string deepCSVPosBJetTags_;
 
+  std::string deepFlavourTags_;
+
   std::string combinedIVFSVBJetTags_;
   std::string combinedIVFSVPosBJetTags_;
   std::string combinedIVFSVNegBJetTags_;
@@ -644,6 +646,8 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
 	deepCSVBJetTags_    = iConfig.getParameter<std::string>("deepCSVBJetTags");
 	deepCSVNegBJetTags_ = iConfig.getParameter<std::string>("deepCSVNegBJetTags");
 	deepCSVPosBJetTags_ = iConfig.getParameter<std::string>("deepCSVPosBJetTags");
+
+	deepFlavourTags_    = iConfig.getParameter<std::string>("deepFlavourTags");
 
   combinedIVFSVBJetTags_      = iConfig.getParameter<std::string>("combinedIVFSVBJetTags");
   combinedIVFSVPosBJetTags_   = iConfig.getParameter<std::string>("combinedIVFSVPosBJetTags");
@@ -2622,6 +2626,13 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float DeepCSVbbP = (deepCSVPosBJetTags_.size()) ? pjet->bDiscriminator((deepCSVPosBJetTags_+":probbb"  ).c_str()) : -10;
     float DeepCSVccP = (deepCSVPosBJetTags_.size()) ? pjet->bDiscriminator((deepCSVPosBJetTags_+":probcc"  ).c_str()) : -10;
 
+    float DeepFlavourb    = (deepFlavourTags_.size()) ? pjet->bDiscriminator((deepFlavourTags_+":probb"   ).c_str()) : -10;
+    float DeepFlavourbb   = (deepFlavourTags_.size()) ? pjet->bDiscriminator((deepFlavourTags_+":probbb"  ).c_str()) : -10;
+    float DeepFlavourLepb = (deepFlavourTags_.size()) ? pjet->bDiscriminator((deepFlavourTags_+":problepb").c_str()) : -10;
+    float DeepFlavourc    = (deepFlavourTags_.size()) ? pjet->bDiscriminator((deepFlavourTags_+":probc"   ).c_str()) : -10;
+    float DeepFlavourl    = (deepFlavourTags_.size()) ? pjet->bDiscriminator((deepFlavourTags_+":probuds" ).c_str()) : -10;
+    float DeepFlavourg    = (deepFlavourTags_.size()) ? pjet->bDiscriminator((deepFlavourTags_+":probg"   ).c_str()) : -10;
+
     float CombinedIVF     = pjet->bDiscriminator(combinedIVFSVBJetTags_.c_str());
     float CombinedIVF_P   = pjet->bDiscriminator(combinedIVFSVPosBJetTags_.c_str());
     float CombinedIVF_N   = pjet->bDiscriminator(combinedIVFSVNegBJetTags_.c_str());
@@ -2679,6 +2690,14 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_DeepCSVlP[JetInfo[iJetColl].nJet]  = DeepCSVlP ;
     JetInfo[iJetColl].Jet_DeepCSVbbP[JetInfo[iJetColl].nJet] = DeepCSVbbP;
     JetInfo[iJetColl].Jet_DeepCSVccP[JetInfo[iJetColl].nJet] = DeepCSVccP;
+
+    JetInfo[iJetColl].Jet_DeepFlavourb   [JetInfo[iJetColl].nJet] = DeepFlavourb    ;
+    JetInfo[iJetColl].Jet_DeepFlavourbb  [JetInfo[iJetColl].nJet] = DeepFlavourbb   ;
+    JetInfo[iJetColl].Jet_DeepFlavourLepb[JetInfo[iJetColl].nJet] = DeepFlavourLepb ;
+    JetInfo[iJetColl].Jet_DeepFlavourc   [JetInfo[iJetColl].nJet] = DeepFlavourc    ;
+    JetInfo[iJetColl].Jet_DeepFlavourl   [JetInfo[iJetColl].nJet] = DeepFlavourl    ;
+    JetInfo[iJetColl].Jet_DeepFlavourg   [JetInfo[iJetColl].nJet] = DeepFlavourg    ;
+
     JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet]   = ProbaN;
     JetInfo[iJetColl].Jet_ProbaP[JetInfo[iJetColl].nJet]   = ProbaP;
     JetInfo[iJetColl].Jet_Proba[JetInfo[iJetColl].nJet]    = Proba;
