@@ -1743,6 +1743,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     _decayLength = decayLengthSubJets_;
     _deltaR      = deltaRSubJets_;
   }
+   
   //// Loop over the jets
   for ( PatJetCollection::const_iterator pjet = jetsColl->begin(); pjet != jetsColl->end(); ++pjet ) {
 
@@ -2046,7 +2047,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       const TrackRef ptrackRef = ( useSelectedTracks_ ? selectedTracks[itt] : tracks[itt]);
       const reco::Track * ptrackPtr = reco::btag::toTrack(ptrackRef);
       const reco::Track & ptrack = *ptrackPtr;
-
+       
       reco::TransientTrack transientTrack = trackBuilder->build(ptrackRef);
       GlobalVector direction(pjet->px(), pjet->py(), pjet->pz());
 
@@ -2072,21 +2073,36 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 	    TransverseImpactPointExtrapolator extrapolator(transientTrack.field());
 	    TrajectoryStateOnSurface closestOnTransversePlaneState =
 	      extrapolator.extrapolate(transientTrack.impactPointState(),RecoVertex::convertPos(pv->position()));
-	    GlobalPoint impactPoint    = closestOnTransversePlaneState.globalPosition();
-	    GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),0.);
-	    double prod = IPVec.dot(direction);
-	    int sign = (prod>=0) ? 1 : -1;
-	    JetInfo[iJetColl].Track_sign2D[JetInfo[iJetColl].nTrack]      = sign;
+	    if( closestOnTransversePlaneState.isValid() )
+	      {		 
+		 GlobalPoint impactPoint    = closestOnTransversePlaneState.globalPosition();
+		 GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),0.);
+		 double prod = IPVec.dot(direction);
+		 int sign = (prod>=0) ? 1 : -1;
+		 JetInfo[iJetColl].Track_sign2D[JetInfo[iJetColl].nTrack]      = sign;
+	      }
+	    else
+	      {
+		 JetInfo[iJetColl].Track_sign2D[JetInfo[iJetColl].nTrack]      = -666.;
+	      }	    
 	 }       
 	 {
 	    AnalyticalImpactPointExtrapolator extrapolator(transientTrack.field());
 	    TrajectoryStateOnSurface closestIn3DSpaceState =
 	      extrapolator.extrapolate(transientTrack.impactPointState(),RecoVertex::convertPos(pv->position()));
-	    GlobalPoint impactPoint = closestIn3DSpaceState.globalPosition();
-	    GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),impactPoint.z()-pv->z());
-	    double prod = IPVec.dot(direction);
-	    int sign = (prod>=0) ? 1 : -1;
-	    JetInfo[iJetColl].Track_sign3D[JetInfo[iJetColl].nTrack]      = sign;
+	    if( closestIn3DSpaceState.isValid() )
+	      {		 
+		 GlobalPoint impactPoint = closestIn3DSpaceState.globalPosition();
+		 GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),impactPoint.z()-pv->z());
+		 double prod = IPVec.dot(direction);
+		 int sign = (prod>=0) ? 1 : -1;
+		 JetInfo[iJetColl].Track_sign3D[JetInfo[iJetColl].nTrack]      = sign;
+	      }
+	    else
+	      {
+		 std::cout << "FAILURE: TrajectoryStateOnSurface is not available" << std::endl;
+		 JetInfo[iJetColl].Track_sign3D[JetInfo[iJetColl].nTrack]      = -666.;
+	      }	    
 	 }       
 
       float deltaR = reco::deltaR( ptrackRef->eta(), ptrackRef->phi(),
@@ -2163,7 +2179,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
         if(JetInfo[iJetColl].Track_PV[JetInfo[iJetColl].nTrack]==0 &&
            JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]>0.5) { allKinematics.add(ptrackRef); }
-
 
         if( pjet->hasTagInfo(svTagInfos_.c_str()) )
         {
@@ -2270,7 +2285,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
              if ( theFlag[TrackCategories::Fake] ) 	         can7 = 2;
              if ( theFlag[TrackCategories::SharedInnerHits] )    can8 = 2;
            }
-        
+
             //********************************************************************
 		    //
 			//	Match track to TrackingParticle and retrieve TrackTruth info
@@ -2504,8 +2519,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
     } //// end loop on tracks
 
-
-
     JetInfo[iJetColl].Jet_nseltracks[JetInfo[iJetColl].nJet] = nseltracks;
 
     if ( runFatJets_ && runSubJets_ && iJetColl == 0 )
@@ -2618,7 +2631,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     }
     JetInfo[iJetColl].Jet_nLastSE[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFElectron;
     JetInfo[iJetColl].Jet_nSE[JetInfo[iJetColl].nJet] = nSE;
-
 
     // b-tagger discriminants
     float Proba  = pjet->bDiscriminator(jetPBJetTags_.c_str());
@@ -3001,7 +3013,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].Jet_nLastLepCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nLeptons;
     }
 
-
     std::vector<reco::btag::TrackIPData>  ipdata = ipTagInfo->impactParameterData();
     std::vector<std::size_t> indexes( sortedIndexes(ipdata) );
 
@@ -3036,7 +3047,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] = 0;
     JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] = 0;
     JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] = 0;
-
+     
     // Track Histosry
     if ( useTrackHistory_ && indexes.size()!=0 && !isData_ ) {
       if ( flags1P[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 1));
@@ -3102,7 +3113,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         if ( flags3N[TrackCategories::SharedInnerHits] )    JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] += 2*int(pow(10., -1 + 9));
       }
     }
-
     //*****************************************************************
     // get track Histories of tracks in jets (for Jet Proba)
     //*****************************************************************
@@ -3528,8 +3538,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         if ( varpos > 0 ) Histos[iJetColl]->hBFlav_Tagger->Fill( varpos );
       } // b jets
     }
-
-
 
     // Track History
     if ( useTrackHistory_ && indexes.size()!=0 && !isData_ ) {
