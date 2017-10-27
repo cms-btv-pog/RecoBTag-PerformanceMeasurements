@@ -1,0 +1,25 @@
+@(#)CERN job starter $Date: 2010/06/23 14:22:16 $
+Working directory is </pool/lsf/scodella/102275387> on <b6cb2d13c3.cern.ch>
+
+Processing  BTagMu  for periods  2016
+Fill trigger histograms for PD BTagMu for periods Run 2016 E
+  Processing BTagMu_Run2016E Dataset
+      Events in chain =  16597456
+    Filling histogram for  AK4DiJet70_Mu5 cut (BitTrigger[1] & ( 1 << (32 - 1*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for AK4DiJet70_Mu5 = 2018799.0
+    Filling histogram for  AK4DiJet110_Mu5 cut (BitTrigger[1] & ( 1 << (33 - 1*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for AK4DiJet110_Mu5 = 1831696.0
+    Filling histogram for  AK4DiJet20_Mu5 cut (BitTrigger[0] & ( 1 << (30 - 0*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for AK4DiJet20_Mu5 = 1579373.0
+    Filling histogram for  AK4DiJet170_Mu5 cut (BitTrigger[1] & ( 1 << (34 - 1*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for AK4DiJet170_Mu5 = 3537791.0
+    Filling histogram for  AK4DiJet40_Mu5 cut (BitTrigger[0] & ( 1 << (31 - 0*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for AK4DiJet40_Mu5 = 1890229.0
+    Filling histogram for  AK4Jet300_Mu5 cut (BitTrigger[1] & ( 1 << (35 - 1*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for AK4Jet300_Mu5 = 662493.0
+
+Job finished at Fri Oct 27 14:50:50 CEST 2017 on node 
+ under linux version Scientific Linux CERN SLC release 6.9 (Carbon)
+
+CERN statistics: This process used approximately : 0:09:14 KSI2K hours (554 KSI2K seconds)
+                 This process corresponds to     : 0:36:03 HS06  hours (2163 HS06  seconds)

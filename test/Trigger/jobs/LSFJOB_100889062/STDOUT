@@ -1,0 +1,14 @@
+@(#)CERN job starter $Date: 2010/06/23 14:22:16 $
+Working directory is </pool/lsf/scodella/100889062> on <b6df50eb69.cern.ch>
+
+Processing  JEtHT  for periods  2016
+Trigger Analysis of PD JEtHT for periods Run 2016 B,C,D
+JEtHT_Run2016B not found
+JEtHT_Run2016C not found
+JEtHT_Run2016D not found
+
+Job finished at Mon Oct 23 10:33:22 CEST 2017 on node 
+ under linux version Scientific Linux CERN SLC release 6.9 (Carbon)
+
+CERN statistics: This process used approximately : 0:00:03 KSI2K hours (3 KSI2K seconds)
+                 This process corresponds to     : 0:00:12 HS06  hours (12 HS06  seconds)

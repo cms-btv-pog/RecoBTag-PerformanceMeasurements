@@ -1,0 +1,53 @@
+@(#)CERN job starter $Date: 2010/06/23 14:22:16 $
+Working directory is </pool/lsf/scodella/100888861> on <b61c1c89ea.cern.ch>
+
+Processing  BTagMu  for periods  2016
+Trigger Analysis of PD BTagMu for periods Run 2016 B,C,D
+  Processing BTagMu_Run2016B Dataset
+      Events in chain =  33673783
+    Filling histogram for  Jet300_Mu5 cut (BitTrigger[1] & ( 1 << (35 - 1*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for Jet300_Mu5 = 1023386.0
+    Filling histogram for  DiJet40_Mu5 cut (BitTrigger[0] & ( 1 << (31 - 0*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for DiJet40_Mu5 = 7443407.0
+    Filling histogram for  DiJet110_Mu5 cut (BitTrigger[1] & ( 1 << (33 - 1*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for DiJet110_Mu5 = 4144399.0
+    Filling histogram for  DiJet70_Mu5 cut (BitTrigger[1] & ( 1 << (32 - 1*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for DiJet70_Mu5 = 4931581.0
+    Filling histogram for  DiJet20_Mu5 cut (BitTrigger[0] & ( 1 << (30 - 0*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for DiJet20_Mu5 = 8325397.0
+    Filling histogram for  DiJet170_Mu5 cut (BitTrigger[1] & ( 1 << (34 - 1*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for DiJet170_Mu5 = 0.0
+  Processing BTagMu_Run2016C Dataset
+      Events in chain =  8498278
+    Filling histogram for  Jet300_Mu5 cut (BitTrigger[1] & ( 1 << (35 - 1*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for Jet300_Mu5 = 443462.0
+    Filling histogram for  DiJet40_Mu5 cut (BitTrigger[0] & ( 1 << (31 - 0*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for DiJet40_Mu5 = 1360229.0
+    Filling histogram for  DiJet110_Mu5 cut (BitTrigger[1] & ( 1 << (33 - 1*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for DiJet110_Mu5 = 1301910.0
+    Filling histogram for  DiJet70_Mu5 cut (BitTrigger[1] & ( 1 << (32 - 1*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for DiJet70_Mu5 = 1436168.0
+    Filling histogram for  DiJet20_Mu5 cut (BitTrigger[0] & ( 1 << (30 - 0*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for DiJet20_Mu5 = 1162151.0
+    Filling histogram for  DiJet170_Mu5 cut (BitTrigger[1] & ( 1 << (34 - 1*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for DiJet170_Mu5 = 324749.0
+  Processing BTagMu_Run2016D Dataset
+      Events in chain =  19009145
+    Filling histogram for  Jet300_Mu5 cut (BitTrigger[1] & ( 1 << (35 - 1*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for Jet300_Mu5 = 735330.0
+    Filling histogram for  DiJet40_Mu5 cut (BitTrigger[0] & ( 1 << (31 - 0*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for DiJet40_Mu5 = 2334701.0
+    Filling histogram for  DiJet110_Mu5 cut (BitTrigger[1] & ( 1 << (33 - 1*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for DiJet110_Mu5 = 2223029.0
+    Filling histogram for  DiJet70_Mu5 cut (BitTrigger[1] & ( 1 << (32 - 1*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for DiJet70_Mu5 = 2453608.0
+    Filling histogram for  DiJet20_Mu5 cut (BitTrigger[0] & ( 1 << (30 - 0*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for DiJet20_Mu5 = 1962788.0
+    Filling histogram for  DiJet170_Mu5 cut (BitTrigger[1] & ( 1 << (34 - 1*32) ) ) && PFMuon_pt>=5 && fabs(PFMuon_eta)<2.4 && PFMuon_GoodQuality>=2
+      Entries for DiJet170_Mu5 = 3890674.0
+
+Job finished at Mon Oct 23 12:54:33 CEST 2017 on node 
+ under linux version Scientific Linux CERN SLC release 6.9 (Carbon)
+
+CERN statistics: This process used approximately : 0:31:44 KSI2K hours (1904 KSI2K seconds)
+                 This process corresponds to     : 2:03:47 HS06  hours (7427 HS06  seconds)

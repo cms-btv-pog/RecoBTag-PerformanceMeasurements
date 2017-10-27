@@ -1,0 +1,39 @@
+Sender: LSF System <lsfadmin@b6338ddcaf1a.cern.ch>
+Subject: Job 102275397: </afs/cern.ch/user/s/scodella/work/BTagging/CMSSW_9_2_11/src/RecoBTag/PerformanceMeasurements/test/Trigger/runTriggerHistograms.sh /afs/cern.ch/user/s/scodella/work/BTagging/CMSSW_9_2_11/src/RecoBTag/PerformanceMeasurements/test/Trigger BTagMu 2016 H> in cluster <batch> Done
+
+Job </afs/cern.ch/user/s/scodella/work/BTagging/CMSSW_9_2_11/src/RecoBTag/PerformanceMeasurements/test/Trigger/runTriggerHistograms.sh /afs/cern.ch/user/s/scodella/work/BTagging/CMSSW_9_2_11/src/RecoBTag/PerformanceMeasurements/test/Trigger BTagMu 2016 H> was submitted from host <lxplus068.cern.ch> by user <scodella> in cluster <batch>.
+Job was executed on host(s) <b6338ddcaf1a.cern.ch>, in queue <cmscaf1nd>, as user <scodella> in cluster <batch>.
+</afs/cern.ch/user/s/scodella> was used as the home directory.
+</afs/cern.ch/user/s/scodella/work/BTagging/CMSSW_9_2_11/src/RecoBTag/PerformanceMeasurements/test/Trigger/jobs> was used as the working directory.
+Started at Fri Oct 27 14:02:25 2017
+Results reported on Fri Oct 27 16:52:08 2017
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/afs/cern.ch/user/s/scodella/work/BTagging/CMSSW_9_2_11/src/RecoBTag/PerformanceMeasurements/test/Trigger/runTriggerHistograms.sh /afs/cern.ch/user/s/scodella/work/BTagging/CMSSW_9_2_11/src/RecoBTag/PerformanceMeasurements/test/Trigger BTagMu 2016 H
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   522.75 sec.
+    Max Memory :                                 154.62 MB
+    Average Memory :                             108.59 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   987 MB
+    Max Processes :                              8
+    Max Threads :                                15
+    Run time :                                   10180 sec.
+    Turnaround time :                            10184 sec.
+
+The output (if any) follows:
+
+
+---
+It was not possible to return the standard output of your job <*u 2016 H>,
+id <102275397>, as expected. The file was returned to
+</afs/cern.ch/user/s/scodella/work/BTagging/CMSSW_9_2_11/src/RecoBTag/PerformanceMeasurements/test/Trigger/jobs/LSFJOB_102275397/STDOUT>
