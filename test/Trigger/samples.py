@@ -11,6 +11,18 @@ samples['BTagMu_Run2017C'] = {  'name'     : 'BTagMu_Run2017C',
                                 'treename' : 'btagana/ttree',
                                 }
 
+samples['BTagMu_Run2017D'] = {  'name'     : 'BTagMu_Run2017D',  
+                                'location' : '/eos/cms/store/group/phys_btag/performance/CMSSW_9_2_11/Data/BTagMu/Run2017D_PromptReco-v1/',
+                                'filename' : 'JetTree_data_',
+                                'treename' : 'btagana/ttree',
+                                }
+
+samples['BTagMu_Run2017E'] = {  'name'     : 'BTagMu_Run2017E',  
+                                'location' : '/eos/cms/store/group/phys_btag/performance/CMSSW_9_2_11/Data/BTagMu/Run2017E_PromptReco-v1/',
+                                'filename' : 'JetTree_data_',
+                                'treename' : 'btagana/ttree',
+                                }
+
 # Data 2017 JetHT
 samples['JetHT_Run2017B']  = {  'name'     : 'JetHT_Run2017B',  
                                 'location' : '/eos/cms/store/group/phys_btag/performance/CMSSW_9_2_11/Data/JetHT/Run2017B_12Sep2017/',
@@ -20,6 +32,18 @@ samples['JetHT_Run2017B']  = {  'name'     : 'JetHT_Run2017B',
 
 samples['JetHT_Run2017C']  = {  'name'     : 'JetHT_Run2017C',  
                                 'location' : '/eos/cms/store/group/phys_btag/performance/CMSSW_9_2_11/Data/JetHT/Run2017C_12Sep2017/',
+                                'filename' : 'JetTree_data_',
+                                'treename' : 'btagana/ttree',
+                                }
+
+samples['JetHT_Run2017D']  = {  'name'     : 'JetHT_Run2017D',  
+                                'location' : '/eos/cms/store/group/phys_btag/performance/CMSSW_9_2_11/Data/JetHT/Run2017D_PromptReco-v1/',
+                                'filename' : 'JetTree_data_',
+                                'treename' : 'btagana/ttree',
+                                }
+
+samples['JetHT_Run2017E']  = {  'name'     : 'JetHT_Run2017E',  
+                                'location' : '/eos/cms/store/group/phys_btag/performance/CMSSW_9_2_11/Data/JetHT/Run2017E_PromptReco-v1/',
                                 'filename' : 'JetTree_data_',
                                 'treename' : 'btagana/ttree',
                                 }
