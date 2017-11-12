@@ -1473,7 +1473,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
       EventInfo.PatMuon_isPF[EventInfo.nPatMuon]     = it->isPFMuon();
       EventInfo.PatMuon_nTkHit[EventInfo.nPatMuon]   = it->innerTrack()->hitPattern().numberOfValidHits();
       EventInfo.PatMuon_nPixHit[EventInfo.nPatMuon]  = it->innerTrack()->hitPattern().numberOfValidPixelHits();
-      EventInfo.PatMuon_nOutHit[EventInfo.nPatMuon]  = it->innerTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_OUTER_HITS);
+      EventInfo.PatMuon_nOutHit[EventInfo.nPatMuon]  = it->innerTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_OUTER_HITS);
       EventInfo.PatMuon_nMuHit[EventInfo.nPatMuon]   = it->outerTrack()->hitPattern().numberOfValidMuonHits();
       EventInfo.PatMuon_nMatched[EventInfo.nPatMuon] = it->numberOfMatches();
       EventInfo.PatMuon_chi2[EventInfo.nPatMuon]     = it->globalTrack()->normalizedChi2();
@@ -2501,7 +2501,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
             && ptrack.numberOfValidHits() >= 11
             && ptrack.hitPattern().numberOfValidPixelHits() >= 2
             && ptrack.normalizedChi2() < 10
-            && ptrack.hitPattern().numberOfHits(reco::HitPattern::MISSING_OUTER_HITS) <= 2
+            && ptrack.hitPattern().numberOfLostHits(reco::HitPattern::MISSING_OUTER_HITS) <= 2
             && ptrack.dz( pv->position() ) < 1. ) {
 
           if ( useSelectedTracks_ ) {
@@ -2573,7 +2573,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         JetInfo[iJetColl].PFMuon_nMuHit[JetInfo[iJetColl].nPFMuon] = muonPtr->outerTrack()->hitPattern().numberOfValidMuonHits();
         JetInfo[iJetColl].PFMuon_nTkHit[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().numberOfValidHits();
         JetInfo[iJetColl].PFMuon_nPixHit[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().numberOfValidPixelHits();
-        JetInfo[iJetColl].PFMuon_nOutHit[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_OUTER_HITS);
+        JetInfo[iJetColl].PFMuon_nOutHit[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_OUTER_HITS);
         JetInfo[iJetColl].PFMuon_nTkLwM[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().trackerLayersWithMeasurement();
         JetInfo[iJetColl].PFMuon_nPixLwM[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().pixelLayersWithMeasurement();
         JetInfo[iJetColl].PFMuon_nMatched[JetInfo[iJetColl].nPFMuon] = muonPtr->numberOfMatchedStations();
@@ -2586,7 +2586,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         if (muonPtr->outerTrack()->hitPattern().numberOfValidMuonHits()>0 &&
             muonPtr->numberOfMatches()>1 && muonPtr->innerTrack()->hitPattern().numberOfValidHits()>10 &&
 	    muonPtr->innerTrack()->hitPattern().numberOfValidPixelHits()>1 &&
-	    muonPtr->innerTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_OUTER_HITS)<3 &&
+	    muonPtr->innerTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_OUTER_HITS)<3 &&
 	    muonPtr->globalTrack()->normalizedChi2()<10. && muonPtr->innerTrack()->normalizedChi2()<10.)
           JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 2;
 
