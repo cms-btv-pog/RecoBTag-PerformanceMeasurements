@@ -35,6 +35,16 @@ class JetInfoBranches {
     float Jet_Mass4N[nMaxJets_];
     float Jet_Mass4P[nMaxJets_];
 
+		float Jet_DeepFlavourBDisc[nMaxJets_]   ;
+    float Jet_DeepFlavourCvsLDisc[nMaxJets_];
+    float Jet_DeepFlavourCvsBDisc[nMaxJets_];
+    float Jet_DeepFlavourB[nMaxJets_]	      ;
+    float Jet_DeepFlavourBB[nMaxJets_]		  ;
+    float Jet_DeepFlavourLEPB[nMaxJets_]	  ;
+    float Jet_DeepFlavourC[nMaxJets_]			  ;
+    float Jet_DeepFlavourUDS[nMaxJets_]		  ;
+    float Jet_DeepFlavourG[nMaxJets_]       ;
+
     float Jet_DeepCSVBDisc[nMaxJets_]  ;
     float Jet_DeepCSVBDiscN[nMaxJets_]  ;
     float Jet_DeepCSVBDiscP[nMaxJets_]  ;
@@ -368,6 +378,20 @@ class JetInfoBranches {
     float TagVar_flightDistance3dVal[nMaxSVs_];                      // distance between primary and secondary vertex
     float TagVar_flightDistance3dSig[nMaxSVs_];                      // distance significance between primary and secondary vertex
 
+		//DeepFlavour input features selection
+		float DeepFlavourInput_charged_Sip3dVal[nMaxJets_];
+		float DeepFlavourInput_charged_Sip3dSig[nMaxJets_];
+		float DeepFlavourInput_charged_quality[ nMaxJets_];
+		float DeepFlavourInput_charged_chi2[    nMaxJets_];
+
+		float DeepFlavourInput_neutral_drminsv[nMaxJets_];
+		float DeepFlavourInput_neutral_hadFrac[nMaxJets_];
+		float DeepFlavourInput_neutral_ptrel[  nMaxJets_];
+
+		float DeepFlavourInput_sv_d3d[     nMaxJets_];
+		float DeepFlavourInput_sv_d3dsig[  nMaxJets_];
+		float DeepFlavourInput_sv_normchi2[nMaxJets_];
+
     // CSV TaggingVariables
     // per jet
     float TagVarCSV_trackJetPt[nMaxJets_];                           // track-based jet transverse momentum
@@ -488,6 +512,18 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_Ip2P").c_str(),        Jet_Ip2P        ,(name+"Jet_Ip2P["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_Ip3N").c_str(),        Jet_Ip3N        ,(name+"Jet_Ip3N["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_Ip3P").c_str(),        Jet_Ip3P        ,(name+"Jet_Ip3P["+name+"nJet]/F").c_str());
+
+
+		  tree->Branch((name+"Jet_DeepFlavourBDisc"   ).c_str(), Jet_DeepFlavourBDisc   , (name+"Jet_DeepFlavourBDisc["+name+"nJet]/F"   ).c_str());
+		  tree->Branch((name+"Jet_DeepFlavourCvsLDisc").c_str(), Jet_DeepFlavourCvsLDisc, (name+"Jet_DeepFlavourCvsLDisc["+name+"nJet]/F").c_str());
+		  tree->Branch((name+"Jet_DeepFlavourCvsBDisc").c_str(), Jet_DeepFlavourCvsBDisc, (name+"Jet_DeepFlavourCvsBDisc["+name+"nJet]/F").c_str());
+		  tree->Branch((name+"Jet_DeepFlavourB"       ).c_str(), Jet_DeepFlavourB       , (name+"Jet_DeepFlavourB["+name+"nJet]/F"       ).c_str());
+		  tree->Branch((name+"Jet_DeepFlavourBB"      ).c_str(), Jet_DeepFlavourBB	    , (name+"Jet_DeepFlavourBB["+name+"nJet]/F"      ).c_str());
+		  tree->Branch((name+"Jet_DeepFlavourLEPB"    ).c_str(), Jet_DeepFlavourLEPB    , (name+"Jet_DeepFlavourLEPB["+name+"nJet]/F"    ).c_str());
+		  tree->Branch((name+"Jet_DeepFlavourC"       ).c_str(), Jet_DeepFlavourC		    , (name+"Jet_DeepFlavourC["+name+"nJet]/F"       ).c_str());
+		  tree->Branch((name+"Jet_DeepFlavourUDS"     ).c_str(), Jet_DeepFlavourUDS	    , (name+"Jet_DeepFlavourUDS["+name+"nJet]/F"     ).c_str());
+		  tree->Branch((name+"Jet_DeepFlavourG"       ).c_str(), Jet_DeepFlavourG       , (name+"Jet_DeepFlavourG["+name+"nJet]/F"       ).c_str());
+
 
 		  tree->Branch((name+"Jet_DeepCSVBDisc"	 ).c_str(), Jet_DeepCSVBDisc	,(name+"Jet_DeepCSVBDisc["+name+"nJet]/F").c_str());
 		  tree->Branch((name+"Jet_DeepCSVBDiscN"	 ).c_str(), Jet_DeepCSVBDiscN, (name+"Jet_DeepCSVBDiscN["+name+"nJet]/F").c_str());
@@ -803,7 +839,24 @@ class JetInfoBranches {
 
     }
 
-    void RegisterCSVTagVarTree(TTree *tree, std::string name=""){
+		void RegisterDeepFlavourFeatTree(TTree *tree, std::string name=""){
+      if(name!="") name += ".";
+      tree->Branch((name+"DeepFlavourInput_charged_Sip3dVal").c_str(), DeepFlavourInput_charged_Sip3dVal, (name+"DeepFlavourInput_charged_Sip3dVal["+name+"nJet]/F").c_str());
+      tree->Branch((name+"DeepFlavourInput_charged_Sip3dSig").c_str(), DeepFlavourInput_charged_Sip3dSig, (name+"DeepFlavourInput_charged_Sip3dSig["+name+"nJet]/F").c_str());
+      tree->Branch((name+"DeepFlavourInput_charged_quality" ).c_str(), DeepFlavourInput_charged_quality , (name+"DeepFlavourInput_charged_quality[" +name+"nJet]/F").c_str());
+      tree->Branch((name+"DeepFlavourInput_charged_chi2"    ).c_str(), DeepFlavourInput_charged_chi2    , (name+"DeepFlavourInput_charged_chi2["    +name+"nJet]/F").c_str());
+			
+      tree->Branch((name+"DeepFlavourInput_neutral_drminsv").c_str(), DeepFlavourInput_neutral_drminsv, (name+"DeepFlavourInput_neutral_drminsv["+name+"nJet]/F").c_str());
+      tree->Branch((name+"DeepFlavourInput_neutral_hadFrac").c_str(), DeepFlavourInput_neutral_hadFrac, (name+"DeepFlavourInput_neutral_hadFrac["+name+"nJet]/F").c_str());
+      tree->Branch((name+"DeepFlavourInput_neutral_ptrel  ").c_str(), DeepFlavourInput_neutral_ptrel  , (name+"DeepFlavourInput_neutral_ptrel["  +name+"nJet]/F").c_str());
+			
+      tree->Branch((name+"DeepFlavourInput_sv_d3d"     ).c_str(), DeepFlavourInput_sv_d3d     , (name+"DeepFlavourInput_sv_d3d["     +name+"nJet]/F").c_str());
+      tree->Branch((name+"DeepFlavourInput_sv_d3dsig"  ).c_str(), DeepFlavourInput_sv_d3dsig  , (name+"DeepFlavourInput_sv_d3dsig["  +name+"nJet]/F").c_str());
+      tree->Branch((name+"DeepFlavourInput_sv_normchi2").c_str(), DeepFlavourInput_sv_normchi2, (name+"DeepFlavourInput_sv_normchi2["+name+"nJet]/F").c_str());
+		}
+
+
+			void RegisterCSVTagVarTree(TTree *tree, std::string name=""){
       if(name!="") name += ".";
       //--------------------------------------
       // CSV TaggingVariables

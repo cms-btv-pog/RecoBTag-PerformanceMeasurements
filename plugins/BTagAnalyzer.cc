@@ -73,6 +73,7 @@
 #include "SimTracker/TrackHistory/interface/TrackCategories.h"
 #include "SimTracker/TrackHistory/interface/TrackClassifier.h"
 #include "DataFormats/BTauReco/interface/SoftLeptonTagInfo.h"
+#include "DataFormats/BTauReco/interface/DeepFlavourFeatures.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
@@ -306,6 +307,8 @@ private:
   std::string combinedSVNegBJetTags_;
   std::string combinedSVPosBJetTags_;
 
+	std::string deepFlavourJetTags_;
+
 	std::string deepCSVBJetTags_;
 	std::string deepCSVNegBJetTags_;
 	std::string deepCSVPosBJetTags_;
@@ -334,6 +337,7 @@ private:
   std::string cMVAv2NegBJetTags_;
   std::string cMVAv2PosBJetTags_;
 
+  std::string deepFlavourTagInfos_;
   std::string ipTagInfos_;
   std::string svTagInfos_;
   std::string svNegTagInfos_;
@@ -381,6 +385,7 @@ private:
   bool storeTagVariables_;
   bool storeTagVariablesSubJets_;
   bool storeCSVTagVariables_;
+	bool storeDeepFlavourTagVariables_;
   bool storeCSVTagVariablesSubJets_;
 
   bool storeCTagVariables_;
@@ -554,6 +559,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   storeTagVariables_ = iConfig.getParameter<bool>("storeTagVariables");
   storeTagVariablesSubJets_ = iConfig.getParameter<bool>("storeTagVariablesSubJets");
   storeCSVTagVariables_ = iConfig.getParameter<bool>("storeCSVTagVariables");
+	storeDeepFlavourTagVariables_  = iConfig.getParameter<bool>("storeDeepFlavourTagVariables");
   storeCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("storeCSVTagVariablesSubJets");
 
   storeCTagVariables_ = iConfig.getParameter<bool>("storeCTagVariables");
@@ -641,6 +647,8 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   combinedSVNegBJetTags_  = iConfig.getParameter<std::string>("combinedSVNegBJetTags");
   combinedSVPosBJetTags_  = iConfig.getParameter<std::string>("combinedSVPosBJetTags");
 
+	deepFlavourJetTags_ = iConfig.getParameter<std::string>("deepFlavourJetTags");
+
 	deepCSVBJetTags_    = iConfig.getParameter<std::string>("deepCSVBJetTags");
 	deepCSVNegBJetTags_ = iConfig.getParameter<std::string>("deepCSVNegBJetTags");
 	deepCSVPosBJetTags_ = iConfig.getParameter<std::string>("deepCSVPosBJetTags");
@@ -664,6 +672,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   cMVAv2NegBJetTags_ = iConfig.getParameter<std::string>("cMVAv2NegBJetTags");
   cMVAv2PosBJetTags_ = iConfig.getParameter<std::string>("cMVAv2PosBJetTags");
 
+  deepFlavourTagInfos_     = iConfig.getParameter<std::string>("deepFlavourTagInfos");
   ipTagInfos_              = iConfig.getParameter<std::string>("ipTagInfos");
   svTagInfos_              = iConfig.getParameter<std::string>("svTagInfos");
   svNegTagInfos_           = iConfig.getParameter<std::string>("svNegTagInfos");
@@ -732,6 +741,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   if ( fillsvTagInfo_ )       JetInfo[0].RegisterJetSVTree(smalltree,branchNamePrefix_);
   if ( storeTagVariables_)    JetInfo[0].RegisterTagVarTree(smalltree,branchNamePrefix_);
   if ( storeCSVTagVariables_) JetInfo[0].RegisterCSVTagVarTree(smalltree,branchNamePrefix_);
+	if ( storeDeepFlavourTagVariables_) JetInfo[0].RegisterDeepFlavourFeatTree(smalltree,branchNamePrefix_);
   if ( storeCTagVariables_) JetInfo[0].RegisterCTagVarTree(smalltree,branchNamePrefix_);
   if ( runSubJets_ ) {
     for ( size_t i = 0; i < SubJetLabels_.size(); ++i )
@@ -2645,21 +2655,33 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float CombinedSvtxN = pjet->bDiscriminator(combinedSVNegBJetTags_.c_str());
     float CombinedSvtxP = pjet->bDiscriminator(combinedSVPosBJetTags_.c_str());
 
+    float DeepFlavourB    = -10.;
+		float DeepFlavourBB   = -10.;
+		float DeepFlavourLepB = -10.;
+    float DeepFlavourC    = -10.;
+    float DeepFlavourUDS  = -10.;
+    float DeepFlavourG    = -10.;
+		if(deepFlavourJetTags_.size()) {
+			DeepFlavourB    = pjet->bDiscriminator((deepFlavourJetTags_+":probb"   ).c_str());
+			DeepFlavourBB   = pjet->bDiscriminator((deepFlavourJetTags_+":probbb"   ).c_str()); 
+			DeepFlavourLepB = pjet->bDiscriminator((deepFlavourJetTags_+":problepb"   ).c_str());
+			DeepFlavourC    = pjet->bDiscriminator((deepFlavourJetTags_+":probc"   ).c_str());
+			DeepFlavourUDS  = pjet->bDiscriminator((deepFlavourJetTags_+":probuds").c_str());
+			DeepFlavourG    = pjet->bDiscriminator((deepFlavourJetTags_+":probg").c_str());
+			}
+
     float DeepCSVb   = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probb"   ).c_str()) : -10;
     float DeepCSVc   = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probc"   ).c_str()) : -10;
     float DeepCSVl   = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probudsg").c_str()) : -10;
     float DeepCSVbb  = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probbb"  ).c_str()) : -10;
-    float DeepCSVcc  = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probcc"  ).c_str()) : -10;
     float DeepCSVbN  = (deepCSVNegBJetTags_.size()) ? pjet->bDiscriminator((deepCSVNegBJetTags_+":probb"   ).c_str()) : -10;
     float DeepCSVcN  = (deepCSVNegBJetTags_.size()) ? pjet->bDiscriminator((deepCSVNegBJetTags_+":probc"   ).c_str()) : -10;
     float DeepCSVlN  = (deepCSVNegBJetTags_.size()) ? pjet->bDiscriminator((deepCSVNegBJetTags_+":probudsg").c_str()) : -10;
     float DeepCSVbbN = (deepCSVNegBJetTags_.size()) ? pjet->bDiscriminator((deepCSVNegBJetTags_+":probbb"  ).c_str()) : -10;
-    float DeepCSVccN = (deepCSVNegBJetTags_.size()) ? pjet->bDiscriminator((deepCSVNegBJetTags_+":probcc"  ).c_str()) : -10;
     float DeepCSVbP  = (deepCSVPosBJetTags_.size()) ? pjet->bDiscriminator((deepCSVPosBJetTags_+":probb"   ).c_str()) : -10;
     float DeepCSVcP  = (deepCSVPosBJetTags_.size()) ? pjet->bDiscriminator((deepCSVPosBJetTags_+":probc"   ).c_str()) : -10;
     float DeepCSVlP  = (deepCSVPosBJetTags_.size()) ? pjet->bDiscriminator((deepCSVPosBJetTags_+":probudsg").c_str()) : -10;
     float DeepCSVbbP = (deepCSVPosBJetTags_.size()) ? pjet->bDiscriminator((deepCSVPosBJetTags_+":probbb"  ).c_str()) : -10;
-    float DeepCSVccP = (deepCSVPosBJetTags_.size()) ? pjet->bDiscriminator((deepCSVPosBJetTags_+":probcc"  ).c_str()) : -10;
 
     float CombinedIVF     = pjet->bDiscriminator(combinedIVFSVBJetTags_.c_str());
     float CombinedIVF_P   = pjet->bDiscriminator(combinedIVFSVPosBJetTags_.c_str());
@@ -2693,31 +2715,39 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float CvsLPos = pjet->bDiscriminator(CvsLPosCJetTags_.c_str());
 
     // Jet information
+    JetInfo[iJetColl].Jet_DeepFlavourBDisc[JetInfo[iJetColl].nJet]     = DeepFlavourB + DeepFlavourBB + DeepFlavourLepB;
+    JetInfo[iJetColl].Jet_DeepFlavourCvsLDisc[JetInfo[iJetColl].nJet]  = DeepFlavourC/(DeepFlavourC + DeepFlavourUDS + DeepFlavourG);
+    JetInfo[iJetColl].Jet_DeepFlavourCvsBDisc[JetInfo[iJetColl].nJet]  = DeepFlavourC/(DeepFlavourC + DeepFlavourB + DeepFlavourBB + DeepFlavourLepB);
+
+    JetInfo[iJetColl].Jet_DeepFlavourB[JetInfo[iJetColl].nJet]    = DeepFlavourB   ;
+    JetInfo[iJetColl].Jet_DeepFlavourBB[JetInfo[iJetColl].nJet]   = DeepFlavourBB  ;
+    JetInfo[iJetColl].Jet_DeepFlavourLEPB[JetInfo[iJetColl].nJet] = DeepFlavourLepB;
+    JetInfo[iJetColl].Jet_DeepFlavourC[JetInfo[iJetColl].nJet]    = DeepFlavourC   ;
+    JetInfo[iJetColl].Jet_DeepFlavourUDS[JetInfo[iJetColl].nJet]  = DeepFlavourUDS ;
+    JetInfo[iJetColl].Jet_DeepFlavourG[JetInfo[iJetColl].nJet]    = DeepFlavourG   ;
+
     JetInfo[iJetColl].Jet_DeepCSVBDisc[JetInfo[iJetColl].nJet]   = DeepCSVb + DeepCSVbb  ;
     JetInfo[iJetColl].Jet_DeepCSVBDiscN[JetInfo[iJetColl].nJet]  = DeepCSVbN + DeepCSVbbN;
     JetInfo[iJetColl].Jet_DeepCSVBDiscP[JetInfo[iJetColl].nJet]  = DeepCSVbP + DeepCSVbbP;
-    JetInfo[iJetColl].Jet_DeepCSVCvsLDisc[JetInfo[iJetColl].nJet]   = (DeepCSVc  != -1) ? (DeepCSVc  + DeepCSVcc )/(1-(DeepCSVl )) : -1;
-    JetInfo[iJetColl].Jet_DeepCSVCvsLDiscN[JetInfo[iJetColl].nJet]  = (DeepCSVcN != -1) ? (DeepCSVcN + DeepCSVccN)/(1-(DeepCSVlN)) : -1;
-    JetInfo[iJetColl].Jet_DeepCSVCvsLDiscP[JetInfo[iJetColl].nJet]  = (DeepCSVcP != -1) ? (DeepCSVcP + DeepCSVccP)/(1-(DeepCSVlP)) : -1;
-    JetInfo[iJetColl].Jet_DeepCSVCvsBDisc[JetInfo[iJetColl].nJet]   = (DeepCSVc  != -1) ? (DeepCSVc  + DeepCSVcc )/(1-(DeepCSVb + DeepCSVbb  )) : -1;
-    JetInfo[iJetColl].Jet_DeepCSVCvsBDiscN[JetInfo[iJetColl].nJet]  = (DeepCSVcN != -1) ? (DeepCSVcN + DeepCSVccN)/(1-(DeepCSVbN + DeepCSVbbN)) : -1;
-    JetInfo[iJetColl].Jet_DeepCSVCvsBDiscP[JetInfo[iJetColl].nJet]  = (DeepCSVcP != -1) ? (DeepCSVcP + DeepCSVccP)/(1-(DeepCSVbP + DeepCSVbbP)) : -1;
+    JetInfo[iJetColl].Jet_DeepCSVCvsLDisc[JetInfo[iJetColl].nJet]   = (DeepCSVc  != -1) ? (DeepCSVc )/(DeepCSVc  + DeepCSVl ) : -1;
+    JetInfo[iJetColl].Jet_DeepCSVCvsLDiscN[JetInfo[iJetColl].nJet]  = (DeepCSVcN != -1) ? (DeepCSVcN)/(DeepCSVcN + DeepCSVlN) : -1;
+    JetInfo[iJetColl].Jet_DeepCSVCvsLDiscP[JetInfo[iJetColl].nJet]  = (DeepCSVcP != -1) ? (DeepCSVcP)/(DeepCSVcP + DeepCSVlP) : -1;
+    JetInfo[iJetColl].Jet_DeepCSVCvsBDisc[JetInfo[iJetColl].nJet]   = (DeepCSVc  != -1) ? (DeepCSVc )/(DeepCSVc  + DeepCSVb  + DeepCSVbb ) : -1;
+    JetInfo[iJetColl].Jet_DeepCSVCvsBDiscN[JetInfo[iJetColl].nJet]  = (DeepCSVcN != -1) ? (DeepCSVcN)/(DeepCSVcN + DeepCSVbN + DeepCSVbbN) : -1;
+    JetInfo[iJetColl].Jet_DeepCSVCvsBDiscP[JetInfo[iJetColl].nJet]  = (DeepCSVcP != -1) ? (DeepCSVcP)/(DeepCSVcP + DeepCSVbP + DeepCSVbbP) : -1;
 
     JetInfo[iJetColl].Jet_DeepCSVb[JetInfo[iJetColl].nJet]   = DeepCSVb  ;
     JetInfo[iJetColl].Jet_DeepCSVc[JetInfo[iJetColl].nJet]   = DeepCSVc  ;
     JetInfo[iJetColl].Jet_DeepCSVl[JetInfo[iJetColl].nJet]   = DeepCSVl  ;
     JetInfo[iJetColl].Jet_DeepCSVbb[JetInfo[iJetColl].nJet]  = DeepCSVbb ;
-    JetInfo[iJetColl].Jet_DeepCSVcc[JetInfo[iJetColl].nJet]  = DeepCSVcc ;
     JetInfo[iJetColl].Jet_DeepCSVbN[JetInfo[iJetColl].nJet]  = DeepCSVbN ;
     JetInfo[iJetColl].Jet_DeepCSVcN[JetInfo[iJetColl].nJet]  = DeepCSVcN ;
     JetInfo[iJetColl].Jet_DeepCSVlN[JetInfo[iJetColl].nJet]  = DeepCSVlN ;
     JetInfo[iJetColl].Jet_DeepCSVbbN[JetInfo[iJetColl].nJet] = DeepCSVbbN;
-    JetInfo[iJetColl].Jet_DeepCSVccN[JetInfo[iJetColl].nJet] = DeepCSVccN;
     JetInfo[iJetColl].Jet_DeepCSVbP[JetInfo[iJetColl].nJet]  = DeepCSVbP ;
     JetInfo[iJetColl].Jet_DeepCSVcP[JetInfo[iJetColl].nJet]  = DeepCSVcP ;
     JetInfo[iJetColl].Jet_DeepCSVlP[JetInfo[iJetColl].nJet]  = DeepCSVlP ;
     JetInfo[iJetColl].Jet_DeepCSVbbP[JetInfo[iJetColl].nJet] = DeepCSVbbP;
-    JetInfo[iJetColl].Jet_DeepCSVccP[JetInfo[iJetColl].nJet] = DeepCSVccP;
     JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet]   = ProbaN;
     JetInfo[iJetColl].Jet_ProbaP[JetInfo[iJetColl].nJet]   = ProbaP;
     JetInfo[iJetColl].Jet_Proba[JetInfo[iJetColl].nJet]    = Proba;
@@ -2838,6 +2868,29 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].nSVTagVar += nSVs;
       JetInfo[iJetColl].Jet_nLastSVTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSVTagVar;
     }
+		
+		// DeepFlavour InputFeatures
+		if(storeDeepFlavourTagVariables_) { 
+			auto df_taginfo = static_cast<const reco::DeepFlavourTagInfo*>(pjet->tagInfo(deepFlavourTagInfos_));
+			const auto & features = df_taginfo->features();
+
+			size_t csize = features.c_pf_features.size();
+			JetInfo[iJetColl].DeepFlavourInput_charged_Sip3dVal[JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackSip3dVal;
+			JetInfo[iJetColl].DeepFlavourInput_charged_Sip3dSig[JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackSip3dSig;
+			JetInfo[iJetColl].DeepFlavourInput_charged_quality[ JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].quality;
+			JetInfo[iJetColl].DeepFlavourInput_charged_chi2[    JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].chi2;
+			
+			size_t nsize = features.n_pf_features.size();
+			JetInfo[iJetColl].DeepFlavourInput_neutral_drminsv[JetInfo[iJetColl].nJet] = (nsize == 0) ? -999 : features.n_pf_features[0].drminsv;
+			JetInfo[iJetColl].DeepFlavourInput_neutral_hadFrac[JetInfo[iJetColl].nJet] = (nsize == 0) ? -999 : features.n_pf_features[0].hadFrac;
+			JetInfo[iJetColl].DeepFlavourInput_neutral_ptrel[  JetInfo[iJetColl].nJet] = (nsize == 0) ? -999 : features.n_pf_features[0].ptrel;
+			
+			size_t svsize = features.sv_features.size();
+			JetInfo[iJetColl].DeepFlavourInput_sv_d3d[     JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].d3d;
+			JetInfo[iJetColl].DeepFlavourInput_sv_d3dsig[  JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].d3dsig;
+			JetInfo[iJetColl].DeepFlavourInput_sv_normchi2[JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].normchi2;
+		}
+
 
     // CSV TaggingVariables
     if ( storeCSVTagVariables )
