@@ -2,6 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 from FWCore.ParameterSet.VarParsing import VarParsing
 import copy
+from pdb import set_trace
 
 ###############################
 ####### Parameters ############
@@ -220,6 +221,10 @@ options.register('storeCSVTagVariables', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to keep CSV TaggingVariables')
+options.register('storeDeepFlavourTagVariables', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to keep DeepFlavour TaggingVariables')
 options.register('defaults', '',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
@@ -239,9 +244,18 @@ if options.defaults:
 		defaults = import_module('RecoBTag.PerformanceMeasurements.defaults.%s' % options.defaults)
 	except ImportError:
 		raise ValueError('The default settings named %s.py are not present in PerformanceMeasurements/python/defaults/' % options.defaults)
-	if not hasattr(defaults, 'values') or not isinstance(defaults.values, dict):
-		raise RuntimeError('the default file %s.py does not contain a dictionary named values' % options.defaults)  
-	for key, value in defaults.values.iteritems():
+	if not hasattr(defaults, 'common') or not isinstance(defaults.common, dict):
+		raise RuntimeError('the default file %s.py does not contain a dictionary named common' % options.defaults)  
+	items = defaults.common.items()
+	if hasattr(defaults, 'data') and options.runOnData: 
+		if not isinstance(defaults.data, dict):
+			raise RuntimeError('the default file %s.py contains an object called "data" which is not a dictionary' % options.defaults)
+		items.extend(defaults.data.items())
+	if hasattr(defaults, 'mc') and not options.runOnData: 
+		if not isinstance(defaults.mc, dict):
+			raise RuntimeError('the default file %s.py contains an object called "mc" which is not a dictionary' % options.defaults)
+		items.extend(defaults.mc.items())
+	for key, value in items:
 		if key not in options._beenSet:
 			raise ValueError('The key set by the defaults: %s does not exist among the cfg options!' % key)
 		elif not options._beenSet[key]:
@@ -330,9 +344,11 @@ bTagInfos = [
    ,'softPFElectronsTagInfos'
    ,'pfInclusiveSecondaryVertexFinderCvsLTagInfos'
    ,'pfInclusiveSecondaryVertexFinderNegativeCvsLTagInfos'
+	 ,'pfDeepFlavourTagInfos'
 ]
+bTagInfos_noDeepFlavour = bTagInfos[:-1]
 ## b-tag discriminators
-bTagDiscriminatorsLegacy = [
+bTagDiscriminatorsLegacy = set([
     'jetBProbabilityBJetTags'
    ,'jetProbabilityBJetTags'
    ,'positiveOnlyJetBProbabilityBJetTags'
@@ -362,8 +378,8 @@ bTagDiscriminatorsLegacy = [
    ,'combinedMVAv2BJetTags'
    ,'negativeCombinedMVAv2BJetTags'
    ,'positiveCombinedMVAv2BJetTags'
-]
-bTagDiscriminators = [
+])
+bTagDiscriminators = set([
     'pfJetBProbabilityBJetTags'
    ,'pfJetProbabilityBJetTags'
    ,'pfPositiveOnlyJetBProbabilityBJetTags'
@@ -399,7 +415,7 @@ bTagDiscriminators = [
    ,'pfCombinedCvsLJetTags'
    ,'pfNegativeCombinedCvsLJetTags'
    ,'pfPositiveCombinedCvsLJetTags'
-    # DeepFlavour
+    # DeepCSV
   , 'pfDeepCSVJetTags:probudsg'        
   , 'pfDeepCSVJetTags:probb'           
   , 'pfDeepCSVJetTags:probc'           
@@ -412,7 +428,14 @@ bTagDiscriminators = [
   , 'pfPositiveDeepCSVJetTags:probb'   
   , 'pfPositiveDeepCSVJetTags:probc'   
   , 'pfPositiveDeepCSVJetTags:probbb'  
-]
+		#DeepFlavour
+	, 'pfDeepFlavourJetTags:probb'
+  , 'pfDeepFlavourJetTags:probbb'
+  , 'pfDeepFlavourJetTags:problepb'
+  , 'pfDeepFlavourJetTags:probc'
+  , 'pfDeepFlavourJetTags:probuds'
+  , 'pfDeepFlavourJetTags:probg'
+])
 
 ## Legacy taggers not supported with MiniAOD
 if options.miniAOD and options.useLegacyTaggers:
@@ -469,11 +492,13 @@ if not options.miniAOD and options.runSubJets and options.usePruned and not opti
 print "Fat jet clustering: %s"%('True' if options.runFatJetClustering else 'False')
 
 ## For fat jets we want to re-run all taggers in order to use the setup adapted to the larger fat jet cone size
-bTagInfosFat = copy.deepcopy(bTagInfos)
+bTagInfosFat = copy.deepcopy(bTagInfos_noDeepFlavour)
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfImpactParameter' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfInclusiveSecondaryVertexFinder' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfBoostedDoubleSV' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
-bTagDiscriminatorsFat = copy.deepcopy(bTagDiscriminators)
+
+bTagDiscriminators_no_deepFlavour = {i for i in bTagDiscriminators if not i.startswith('pfDeepFlavourJetTags')}
+bTagDiscriminatorsFat = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
 if options.runJetClustering:
     options.remakeAllDiscr = True
 if options.runFatJetClustering:
@@ -482,21 +507,19 @@ if options.remakeDoubleB:
     bTagDiscriminatorsFat += ([] if options.useLegacyTaggers else ['pfBoostedDoubleSecondaryVertex' + ('CA15' if algoLabel=='CA' else 'AK8') + 'BJetTags'])
 
 ## Full list of bTagDiscriminators for SoftDrop subjets
-bTagDiscriminatorsSubJets  = copy.deepcopy(bTagDiscriminators)
-bTagDiscriminatorsSoftDrop = copy.deepcopy(bTagDiscriminators)
+bTagDiscriminatorsSubJets  = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
+bTagDiscriminatorsSoftDrop = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
 
 ## If using MiniAOD and not reclustering jets, only run taggers not already stored (with the exception of JP taggers)
 if options.miniAOD and not options.runJetClustering and not options.remakeAllDiscr:
     from PhysicsTools.PatAlgos.producersLayer1.jetProducer_cfi import _patJets as patJetsDefault
-    storedDiscriminators = [x.getModuleLabel() for x in patJetsDefault.discriminatorSources]
+    storedDiscriminators = set([x.value() for x in patJetsDefault.discriminatorSources])
     print "INFO: Removing b-tag discriminators already stored in MiniAOD (with the exception of JP taggers)"
-    for d in storedDiscriminators:
-        if 'ProbabilityBJetTags' in d: continue
-        if d in bTagDiscriminators: bTagDiscriminators.remove(d)
+    jptaggers = {i for i in bTagDiscriminators if 'ProbabilityBJetTags' in i}
+    bTagDiscriminators = (bTagDiscriminators - storedDiscriminators) | jptaggers
 if options.miniAOD and not options.runFatJetClustering and not options.remakeAllDiscr:
     ## SoftDrop subjets in MiniAOD have only CSVv2AVR and CSVv2IVF discriminators stored
-    for d in ['pfCombinedSecondaryVertexV2BJetTags', 'pfCombinedInclusiveSecondaryVertexV2BJetTags']:
-        if d in bTagDiscriminatorsSoftDrop: bTagDiscriminatorsSoftDrop.remove(d)
+    bTagDiscriminatorsSoftDrop -= {'pfCombinedSecondaryVertexV2BJetTags', 'pfCombinedInclusiveSecondaryVertexV2BJetTags'}
 
 ## Postfix
 postfix = "PFlow"
@@ -799,7 +822,7 @@ if options.miniAOD and not options.runJetClustering:
         muSource = cms.InputTag(muSource),
         elSource = cms.InputTag(elSource),
         btagInfos = bTagInfos,
-        btagDiscriminators = bTagDiscriminators,
+        btagDiscriminators = list(bTagDiscriminators),
         explicitJTA = options.useExplicitJTA,
         postfix = postfix
     )
@@ -813,7 +836,7 @@ else:
         svSource = cms.InputTag(svSource),
         muSource = cms.InputTag(muSource),
         elSource = cms.InputTag(elSource),
-        btagInfos = bTagInfos,
+        btagInfos = list(bTagInfos),
         btagDiscriminators = bTagDiscriminators,
         jetCorrections = jetCorrectionsAK4,
         genJetCollection = cms.InputTag(genJetCollection),
@@ -838,7 +861,7 @@ if options.runFatJets:
             muSource = cms.InputTag(muSource),
             elSource = cms.InputTag(elSource),
             btagInfos = bTagInfosFat,
-            btagDiscriminators = bTagDiscriminatorsFat,
+            btagDiscriminators = list(bTagDiscriminatorsFat),
             explicitJTA = options.useExplicitJTA,
             runIVF = options.runIVF,
             postfix = postfix
@@ -854,8 +877,8 @@ if options.runFatJets:
             svSource = cms.InputTag(svSource),
             muSource = cms.InputTag(muSource),
             elSource = cms.InputTag(elSource),
-            btagInfos = bTagInfos,
-            btagDiscriminators = bTagDiscriminatorsSoftDrop,
+            btagInfos = bTagInfos_noDeepFlavour,
+            btagDiscriminators = list(bTagDiscriminatorsSoftDrop),
             explicitJTA = True,          # needed for subjet b tagging
             svClustering = False,        # needed for subjet b tagging (IMPORTANT: Needs to be set to False to disable ghost-association which does not work with slimmed jets)
             fatJets = cms.InputTag(fatJetSource), # needed for subjet b tagging
@@ -945,7 +968,7 @@ if options.runFatJets:
             muSource = cms.InputTag(muSource),
             elSource = cms.InputTag(elSource),
             btagInfos = bTagInfosFat,
-            btagDiscriminators = bTagDiscriminatorsFat,
+            btagDiscriminators = list(bTagDiscriminatorsFat),
             jetCorrections = jetCorrectionsAK8,
             genJetCollection = cms.InputTag(fatGenJetCollection),
             genParticles = cms.InputTag(genParticles),
@@ -983,8 +1006,8 @@ if options.runFatJets:
             svSource = cms.InputTag(svSource),
             muSource = cms.InputTag(muSource),
             elSource = cms.InputTag(elSource),
-            btagInfos = bTagInfos,
-            btagDiscriminators = bTagDiscriminatorsSubJets,
+            btagInfos = bTagInfos_noDeepFlavour,
+            btagDiscriminators = list(bTagDiscriminatorsSubJets),
             jetCorrections = jetCorrectionsSubJets,
             genJetCollection = cms.InputTag(fatGenJetCollectionSoftDrop,'SubJets'),
             genParticles = cms.InputTag(genParticles),
@@ -1031,8 +1054,8 @@ if options.runFatJets:
             svSource = cms.InputTag(svSource),
             muSource = cms.InputTag(muSource),
             elSource = cms.InputTag(elSource),
-            btagInfos = bTagInfos,
-            btagDiscriminators = bTagDiscriminatorsSubJets,
+            btagInfos = bTagInfos_noDeepFlavour,
+            btagDiscriminators = list(bTagDiscriminatorsSubJets),
             jetCorrections = jetCorrectionsSubJets,
             genJetCollection = cms.InputTag(fatGenJetCollectionPruned,'SubJets'),
             genParticles = cms.InputTag(genParticles),
@@ -1332,6 +1355,7 @@ process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True fo
 #------------------
 process.btagana.storeTagVariables     = False  ## True if you want to keep TagInfo TaggingVariables
 process.btagana.storeCSVTagVariables  = options.storeCSVTagVariables   ## True if you want to keep CSV TaggingVariables
+process.btagana.storeDeepFlavourTagVariables = options.storeDeepFlavourTagVariables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag(patJetSource)
 process.btagana.muonCollectionName    = cms.InputTag(muSource)

@@ -1,4 +1,4 @@
-values = {
+common = {
 	'usePuppi' : True,
 	'usePuppiForFatJets' : False,
 	'usePuppiForBTagging' : True,
