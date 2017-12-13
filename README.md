@@ -19,6 +19,9 @@ git cms-addpkg RecoBTag/Combined
 git cms-addpkg RecoBTag/Configuration
 git cms-merge-topic pablodecm:DeepFlavour_9_4_1_backport
 
+#Add the DeepFlavour model
+git clone https://github.com/cms-data/RecoBTag-Combined.git RecoBTag/Combined/data
+
 git clone -b 9_4_X --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
