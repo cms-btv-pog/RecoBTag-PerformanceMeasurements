@@ -1384,6 +1384,8 @@ if options.runFatJets:
         fillQuarks = cms.bool(True),
         allowJetSkipping    = cms.bool(False),
         storeTagVariables   = cms.bool(False),
+				storeDeepFlavourTagVariables = cms.bool(False),
+				deepFlavourJetTags = cms.string(''),
         storeCSVTagVariables = cms.bool(True),
         storeTagVariablesSubJets = cms.bool(False),
         storeCSVTagVariablesSubJets = cms.bool(False),

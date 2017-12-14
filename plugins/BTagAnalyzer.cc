@@ -2872,6 +2872,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 		// DeepFlavour InputFeatures
 		if(storeDeepFlavourTagVariables_) { 
 			auto df_taginfo = static_cast<const reco::DeepFlavourTagInfo*>(pjet->tagInfo(deepFlavourTagInfos_));
+			if(!df_taginfo) {
+				throw cms::Exception("CorruptData") << "The jet collection does not have the DeepFlavour TagInfos embedded!";
+			}
 			const auto & features = df_taginfo->features();
 
 			size_t csize = features.c_pf_features.size();
