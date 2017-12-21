@@ -20,7 +20,7 @@ bTagAnalyzer = cms.EDAnalyzer("BTagAnalyzer",
     softPFMuonTagInfosCTag = cms.string('softPFMuons'),
     softPFElectronTagInfosCTag = cms.string('softPFElectrons'),
     # taggers
-		deepFlavourJetTags = cms.string('pfDeepFlavourJetTags'),
+		deepFlavourJetTags = cms.string(''),#pfDeepFlavourJetTags'),
 		deepCSVBJetTags    = cms.string('pfDeepCSVJetTags'),
 		deepCSVNegBJetTags = cms.string('pfNegativeDeepCSVJetTags'),
 	  deepCSVPosBJetTags = cms.string('pfPositiveDeepCSVJetTags'),

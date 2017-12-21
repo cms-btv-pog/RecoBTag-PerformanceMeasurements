@@ -233,6 +233,12 @@ options.register('eras', [],
     VarParsing.multiplicity.list,
     VarParsing.varType.string,
     'era modifiers to be used to be used')
+options.register(
+	'skipEvents', 0, 
+	VarParsing.multiplicity.singleton, 
+	VarParsing.varType.int, 
+	"skip N events"
+)
 
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', -1)
@@ -428,13 +434,13 @@ bTagDiscriminators = set([
   , 'pfPositiveDeepCSVJetTags:probb'   
   , 'pfPositiveDeepCSVJetTags:probc'   
   , 'pfPositiveDeepCSVJetTags:probbb'  
-		#DeepFlavour
-	, 'pfDeepFlavourJetTags:probb'
-  , 'pfDeepFlavourJetTags:probbb'
-  , 'pfDeepFlavourJetTags:problepb'
-  , 'pfDeepFlavourJetTags:probc'
-  , 'pfDeepFlavourJetTags:probuds'
-  , 'pfDeepFlavourJetTags:probg'
+		#DeepFlavour, DISABLED FOR NOW
+	## , 'pfDeepFlavourJetTags:probb'
+  ## , 'pfDeepFlavourJetTags:probbb'
+  ## , 'pfDeepFlavourJetTags:problepb'
+  ## , 'pfDeepFlavourJetTags:probc'
+  ## , 'pfDeepFlavourJetTags:probuds'
+  ## , 'pfDeepFlavourJetTags:probg'
 ])
 
 ## Legacy taggers not supported with MiniAOD
@@ -510,12 +516,12 @@ if options.remakeDoubleB:
 bTagDiscriminatorsSubJets  = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
 bTagDiscriminatorsSoftDrop = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
 
-## If using MiniAOD and not reclustering jets, only run taggers not already stored (with the exception of JP taggers)
+## If using MiniAOD and not reclustering jets, only run taggers not already stored (with the exception of JP taggers and DeepCSV)
 if options.miniAOD and not options.runJetClustering and not options.remakeAllDiscr:
     from PhysicsTools.PatAlgos.producersLayer1.jetProducer_cfi import _patJets as patJetsDefault
     storedDiscriminators = set([x.value() for x in patJetsDefault.discriminatorSources])
     print "INFO: Removing b-tag discriminators already stored in MiniAOD (with the exception of JP taggers)"
-    jptaggers = {i for i in bTagDiscriminators if 'ProbabilityBJetTags' in i}
+    jptaggers = {i for i in bTagDiscriminators if 'ProbabilityBJetTags' in i or i.startswith('pfDeepCSV')}
     bTagDiscriminators = (bTagDiscriminators - storedDiscriminators) | jptaggers
 if options.miniAOD and not options.runFatJetClustering and not options.remakeAllDiscr:
     ## SoftDrop subjets in MiniAOD have only CSVv2AVR and CSVv2IVF discriminators stored
@@ -650,6 +656,7 @@ process.TFileService = cms.Service("TFileService",
 )
 
 ## Events to process
+process.source.skipEvents = cms.untracked.uint32(options.skipEvents)
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents) )
 
 ## Options and Output Report
