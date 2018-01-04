@@ -1,0 +1,10 @@
+{
+"MC13TeV_TTJets_SL" : [366.33,   0, "/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM", "t#bar{t} SL",          920, false, false, 1],
+"MC13TeV_TTJets_DL" : [88.3,   0, "/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM", "t#bar{t} DL",          920, false, false, 1],
+"MC13TeV_TTJets_AH" : [375.27,   0, "/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM", "t#bar{t} AH",          920, false, false, 1],
+"MC13TeV_WJets"  : [61526.7,   0, "/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM", "W+jets", 4],
+"MC13TeV_DY"     : [6025.0,    0, "/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v2/MINIAODSIM", "Z+jets",        8, false, false, 1],
+"MC13TeV_WW"     : [11.6,      0, "/WWTo2L2Nu_13TeV-powheg/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM", "VV",        5],
+"MC13TeV_atW"    : [35.6,     0, "/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM", "tW",       7, false, false, 1],
+"MC13TeV_tW"     : [35.6,     0, "/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM", "tW",        7, false, false, 1]
+}

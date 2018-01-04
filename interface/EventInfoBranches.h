@@ -524,7 +524,7 @@ class EventInfoBranches {
       tree->SetBranchAddress("ttbar_gm"   ,  ttbar_gm);
       tree->SetBranchAddress("ttbar_gid"  ,  ttbar_gid);
       tree->SetBranchAddress("ttbar_nl"   , &ttbar_nl);
-      tree->SetBranchAddress("ttbar_lpt"  ,  ttbar_lpt); 
+      tree->SetBranchAddress("ttbar_lpt"  ,  ttbar_lpt);
       tree->SetBranchAddress("ttbar_leta" ,  ttbar_leta);
       tree->SetBranchAddress("ttbar_lphi" ,  ttbar_lphi);
       tree->SetBranchAddress("ttbar_lm"   ,  ttbar_lm);
@@ -561,4 +561,3 @@ class EventInfoBranches {
 };
 
 #endif
-
