@@ -18,6 +18,7 @@ git cms-addpkg PhysicsTools/PatAlgos
 git cms-addpkg RecoBTag/Combined
 git cms-addpkg RecoBTag/Configuration
 git cms-merge-topic pablodecm:DeepFlavour_9_4_1_backport
+git cms-merge-topic capalmer85:btagSFupdatesForTTbar
 
 #Add the DeepFlavour model
 git clone https://github.com/cms-data/RecoBTag-Combined.git RecoBTag/Combined/data
