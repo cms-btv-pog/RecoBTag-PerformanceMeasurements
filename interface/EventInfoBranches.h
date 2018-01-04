@@ -176,7 +176,7 @@ class EventInfoBranches {
     float ttbar_lpt[10], ttbar_leta[10], ttbar_lphi[10], ttbar_lm[10];
     float ttbar_metpt,ttbar_metphi;
     float ttbar_rho;
-    float ttbar_w[500];
+    float ttbar_w[1200];
 
 
     void RegisterTree(TTree *tree) {
