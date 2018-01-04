@@ -5,7 +5,7 @@ common = {
 }
 
 mc = {
-	'inputFiles' : ['/store/mc/RunIIFall17MiniAOD/QCD_Pt_80to120_TuneCP5_13TeV_pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/40000/007E6772-56D6-E711-82B5-0025905A60F8.root'],
+	'inputFiles' : ['/store/mc/RunIIFall17MiniAOD/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/60000/002E7FEA-16E0-E711-922D-0242AC130002.root'],
 	'JPCalibration' : 'JPcalib_MC94X_2017_v1',
 	'mcGlobalTag' : '94X_mc2017_realistic_v10',
 	}
