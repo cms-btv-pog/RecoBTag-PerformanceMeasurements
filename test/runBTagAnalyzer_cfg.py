@@ -160,6 +160,18 @@ options.register('usePruned', False,
     VarParsing.varType.bool,
     "Use pruned jets"
 )
+options.register('useTrackHistory', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "uses track history, for GEN-SIM-RECODEBUG samples only"
+)
+
+options.register('produceJetTrackTree', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "True if you want to keep info for tracks associated to jets : for commissioning studies"
+)
+
 ## Generally leave to False unless you know what you are doing
 options.register('runIVF', False, 
     VarParsing.multiplicity.singleton,
@@ -263,8 +275,10 @@ if options.defaults:
 		items.extend(defaults.mc.items())
 	for key, value in items:
 		if key not in options._beenSet:
-			raise ValueError('The key set by the defaults: %s does not exist among the cfg options!' % key)
+			raise ValueError('The key set by the defaults: %s does not exist among the cfg options!' % key)		
 		elif not options._beenSet[key]:
+			if key == 'inputFiles' and options.inputFiles: continue #skip input files that for some reason are never considered set
+			print 'setting default option for', key
 			setattr(options, key, value)
 
 ## Use either PFchs or Puppi
@@ -510,7 +524,7 @@ if options.runJetClustering:
 if options.runFatJetClustering:
     options.remakeDoubleB = True
 if options.remakeDoubleB:
-    bTagDiscriminatorsFat += ([] if options.useLegacyTaggers else ['pfBoostedDoubleSecondaryVertex' + ('CA15' if algoLabel=='CA' else 'AK8') + 'BJetTags'])
+    bTagDiscriminatorsFat.update(set([]) if options.useLegacyTaggers else set(['pfBoostedDoubleSecondaryVertex' + ('CA15' if algoLabel=='CA' else 'AK8') + 'BJetTags']))
 
 ## Full list of bTagDiscriminators for SoftDrop subjets
 bTagDiscriminatorsSubJets  = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
@@ -926,8 +940,9 @@ if options.runFatJets:
             writeCompound = cms.bool(True),
             jetCollInstanceName=cms.string("SubJets")
         )
-        from RecoJets.JetProducers.ak4PFJetsPruned_cfi import ak4PFJetsPruned
-        process.fatPFJetsPruned = ak4PFJetsPruned.clone(
+
+        from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJetsCHSPruned
+        process.fatPFJetsPruned = ak8PFJetsCHSPruned.clone(
             jetAlgorithm = cms.string(options.jetAlgo),
             rParam = cms.double(options.fatJetRadius),
             src = _src,
@@ -949,8 +964,8 @@ if options.runFatJets:
             writeCompound = cms.bool(True),
             jetCollInstanceName=cms.string("SubJets")
         )
-        from RecoJets.JetProducers.ak4PFJetsSoftDrop_cfi import ak4PFJetsSoftDrop
-        process.fatPFJetsSoftDrop = ak4PFJetsSoftDrop.clone(
+        from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJetsCHSSoftDrop
+        process.fatPFJetsSoftDrop = ak8PFJetsCHSSoftDrop.clone(
             jetAlgorithm = cms.string(options.jetAlgo),
             rParam = cms.double(options.fatJetRadius),
             R0 = cms.double(options.fatJetRadius),
@@ -1353,10 +1368,10 @@ process.btagana.MaxEta                = options.maxJetEta ## for extended forwar
 process.btagana.MinPt                 = options.minJetPt
 process.btagana.tracksColl            = cms.InputTag(trackSource) 
 process.btagana.useSelectedTracks     = True  ## False if you want to run on all tracks : for commissioning studies
-process.btagana.useTrackHistory       = False ## Can only be used with GEN-SIM-RECODEBUG files
+process.btagana.useTrackHistory       = options.useTrackHistory ## Can only be used with GEN-SIM-RECODEBUG files
 process.btagana.fillsvTagInfo         = False ## True if you want to store information relative to the svTagInfos, set to False if produceJetTrackTree is set to False
-process.btagana.produceJetTrackTree   = False ## True if you want to keep info for tracks associated to jets : for commissioning studies
-process.btagana.produceJetTrackTruthTree = False ## can only be used with GEN-SIM-RECODEBUG files and when useTrackHistory is True
+process.btagana.produceJetTrackTree   = options.produceJetTrackTree ## True if you want to keep info for tracks associated to jets : for commissioning studies
+process.btagana.produceJetTrackTruthTree = options.useTrackHistory ## can only be used with GEN-SIM-RECODEBUG files and when useTrackHistory is True
 process.btagana.produceAllTrackTree   = False ## True if you want to keep info for all tracks : for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
@@ -1384,6 +1399,8 @@ if not process.btagana.produceJetTrackTree:
 
 if not process.btagana.useTrackHistory  or not process.btagana.produceJetTrackTree:
     process.btagana.produceJetTrackTruthTree = False
+    process.load('SimTracker.TrackAssociatorProducers.quickTrackAssociatorByHits_cfi')
+    process.load('SimTracker.TrackerHitAssociation.tpClusterProducer_cfi')
 
 if options.runFatJets:
     process.btaganaFatJets = process.btagana.clone(
