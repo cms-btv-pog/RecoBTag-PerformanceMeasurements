@@ -130,6 +130,16 @@ options.register('fastSim', False,
     VarParsing.varType.bool,
     "Running using FastSim"
 )
+options.register('useSelectedTracks', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "If you want to run on all tracks: False for commissioning studies"
+)
+options.register('fillsvTagInfo', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "True if you want to store information relative to the svTagInfos, set to False if produceJetTrackTree is set to False"
+)
 options.register('useExplicitJTA', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -1367,9 +1377,9 @@ if options.useLegacyTaggers:
 process.btagana.MaxEta                = options.maxJetEta ## for extended forward pixel coverage
 process.btagana.MinPt                 = options.minJetPt
 process.btagana.tracksColl            = cms.InputTag(trackSource) 
-process.btagana.useSelectedTracks     = True  ## False if you want to run on all tracks : for commissioning studies
+process.btagana.useSelectedTracks     = options.useSelectedTracks ## False if you want to run on all tracks : for commissioning studies
 process.btagana.useTrackHistory       = options.useTrackHistory ## Can only be used with GEN-SIM-RECODEBUG files
-process.btagana.fillsvTagInfo         = False ## True if you want to store information relative to the svTagInfos, set to False if produceJetTrackTree is set to False
+process.btagana.fillsvTagInfo         = options.fillsvTagInfo ## True if you want to store information relative to the svTagInfos, set to False if produceJetTrackTree is set to False
 process.btagana.produceJetTrackTree   = options.produceJetTrackTree ## True if you want to keep info for tracks associated to jets : for commissioning studies
 process.btagana.produceJetTrackTruthTree = options.useTrackHistory ## can only be used with GEN-SIM-RECODEBUG files and when useTrackHistory is True
 process.btagana.produceAllTrackTree   = False ## True if you want to keep info for all tracks : for commissioning studies
@@ -1399,6 +1409,8 @@ if not process.btagana.produceJetTrackTree:
 
 if not process.btagana.useTrackHistory  or not process.btagana.produceJetTrackTree:
     process.btagana.produceJetTrackTruthTree = False
+
+if process.btagana.useTrackHistory:
     process.load('SimTracker.TrackAssociatorProducers.quickTrackAssociatorByHits_cfi')
     process.load('SimTracker.TrackerHitAssociation.tpClusterProducer_cfi')
 
