@@ -1464,18 +1464,17 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
  	      EventInfo.ttbar_nw++;
 	    }
 	  }
+    //Code to include PS weights in output ttree branch 'ttbar_w'.
+    //Code added here to keep order of preceeding weights the same
+    //considering code later in chain dependant on order.
+    if(evet.isValid()){
+      std::vector<double> weights_vector;
+      weights_vector = evt->weights();
+      for(unsigned int j=1; j < weights_vector.size(); j++){
+        EventInfo.ttbar_w[EventInfo.ttbar_nw] = weights_vector.at(0)*weights_vector.at(j)/evet->originalXWGTUP();
+        EventInfo.ttbar_nw++;
       }
-
-      //Code to include PS weights in output ttree branch 'ttbar_w'.
-      //Code added here to keep order of preceeding weights the same
-      //considering code later in chain dependant on order.
-      if(evet.isValid()){
-        std::vector<double> weights_vector;
-        weights_vector = evt->weights();
-        for(unsigned int j=1; j < weights_vector.size(); j++){
-          EventInfo.ttbar_w[EventInfo.ttbar_nw] = weights_vector.at(0)*weights_vector.at(j)/evet->originalXWGTUP();
-          EventInfo.ttbar_nw++;
-        }
+    }
       }
   }
 
