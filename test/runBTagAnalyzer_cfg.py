@@ -223,11 +223,11 @@ options.register('minJetPt', 20.0,
     VarParsing.varType.float,
     "Minimum jet pt (default is 20)"
 )
-options.register('usePrivateJEC', False,
+options.register('usePrivateJEC', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'Use JECs from private SQLite files')
-options.register('jecDBFile', 'Spring16_25nsV6', 
+options.register('jecDBFile', 'Fall17_17Nov2017_V4', 
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     'SQLite filename for JECs')
