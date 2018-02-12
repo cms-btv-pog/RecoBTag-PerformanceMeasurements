@@ -223,7 +223,7 @@ options.register('minJetPt', 20.0,
     VarParsing.varType.float,
     "Minimum jet pt (default is 20)"
 )
-options.register('usePrivateJEC', False,
+options.register('usePrivateJEC', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'Use JECs from private SQLite files')
