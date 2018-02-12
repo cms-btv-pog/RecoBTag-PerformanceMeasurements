@@ -1099,6 +1099,10 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_cMVAv2N").c_str(),    Jet_cMVAv2N   );
       tree->SetBranchAddress((name+"Jet_cMVAv2P").c_str(),    Jet_cMVAv2P   );
 
+      tree->SetBranchAddress((name+"Jet_DeepCSVBDisc").c_str(),    Jet_DeepCSVBDisc    );
+      tree->SetBranchAddress((name+"Jet_DeepCSVBDiscP").c_str(),   Jet_DeepCSVBDiscP   );
+      tree->SetBranchAddress((name+"Jet_DeepCSVBDiscN").c_str(),   Jet_DeepCSVBDiscN   );
+
       tree->SetBranchAddress((name+"Jet_hist1").c_str(),       Jet_hist1       );
       tree->SetBranchAddress((name+"Jet_hist2").c_str(),       Jet_hist2       );
       tree->SetBranchAddress((name+"Jet_hist3").c_str(),       Jet_hist3       );
