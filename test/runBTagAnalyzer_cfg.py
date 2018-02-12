@@ -223,11 +223,15 @@ options.register('minJetPt', 20.0,
     VarParsing.varType.float,
     "Minimum jet pt (default is 20)"
 )
-options.register('usePrivateJEC', True,
+options.register('usePrivateJEC', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'Use JECs from private SQLite files')
-options.register('jecDBFile', 'Fall17_17Nov2017_V4', 
+options.register('jecDBFileMC', 'Fall17_17Nov2017_V4_MC', 
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    'SQLite filename for JECs')
+options.register('jecDBFileData', 'Fall17_17Nov2017B_V4_DATA',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     'SQLite filename for JECs')
@@ -719,8 +723,8 @@ if options.usePrivateJEC:
     from CondCore.DBCommon.CondDBSetup_cfi import *
     import os
     dbfile=''
-    if options.runOnData: dbfile=options.jecDBFile+'_DATA'
-    else: dbfile=options.jecDBFile+'_MC'
+    if options.runOnData: dbfile=options.jecDBFileData
+    else: dbfile=options.jecDBFileMC
     print "\nUsing private SQLite file", dbfile, "\n"
     process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
 		    connect = cms.string( "sqlite_fip:RecoBTag/PerformanceMeasurements/data/"+dbfile+'.db'),
