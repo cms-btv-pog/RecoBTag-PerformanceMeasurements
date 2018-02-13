@@ -1367,6 +1367,11 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   //   std::cout << "EventInfo.pthat:" <<EventInfo.pthat << std::endl;
 
 
+  //// Event rho info: Needed for applying JECs
+  edm::Handle< double > rhoH;
+  iEvent.getByToken(rhoTag_,rhoH);
+  EventInfo.rho = *rhoH;
+
   //------------------------------------------------------
   // ttbar information
   //------------------------------------------------------
@@ -1435,10 +1440,6 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     iEvent.getByToken(ttbarproducerMET_,selMETs);
     EventInfo.ttbar_metpt=selMETs->ptrAt(0)->pt();
     EventInfo.ttbar_metphi=selMETs->ptrAt(0)->phi();
-
-    edm::Handle< double > rhoH;
-    iEvent.getByToken(rhoTag_,rhoH);
-    EventInfo.ttbar_rho = *rhoH;
 
     //generator information
     EventInfo.ttbar_nw=0;
