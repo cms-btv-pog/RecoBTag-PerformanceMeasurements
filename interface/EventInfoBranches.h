@@ -21,6 +21,7 @@ class EventInfoBranches {
     float GenPVz;
     float pthat;
     float mcweight;
+    float rho;
 
     int   nPV;
     int   BX;
@@ -175,7 +176,6 @@ class EventInfoBranches {
     float ttbar_gpt[25],ttbar_geta[25],ttbar_gphi[25],ttbar_gm[25];
     float ttbar_lpt[10], ttbar_leta[10], ttbar_lphi[10], ttbar_lm[10];
     float ttbar_metpt,ttbar_metphi;
-    float ttbar_rho;
     float ttbar_w[1200];
 
 
@@ -192,6 +192,7 @@ class EventInfoBranches {
       tree->Branch("PVz"        , &PVz        ,  "PVz/F");
       tree->Branch("PVez"       , &PVez       ,  "PVez/F");
       tree->Branch("GenPVz"     , &GenPVz     ,  "GenPVz/F");
+      tree->Branch("rho"        , &rho        ,  "rho/F");
 
       tree->Branch("nPUtrue"      , &nPUtrue     , "nPUtrue/F");
       tree->Branch("nPU"          , &nPU         , "nPU/I"    );
@@ -344,7 +345,6 @@ class EventInfoBranches {
       tree->Branch("ttbar_lch"  ,  ttbar_lch   , "ttbar_lch[ttbar_nl]/I");
       tree->Branch("ttbar_metpt",  &ttbar_metpt,  "ttbar_metpt/F");
       tree->Branch("ttbar_metphi", &ttbar_metphi, "ttbar_metphi/F");
-      tree->Branch("ttbar_rho"  , &ttbar_rho   , "ttbar_rho/F");
       tree->Branch("ttbar_nw"  ,  &ttbar_nw    , "ttbar_nw/I");
       tree->Branch("ttbar_w"    ,  ttbar_w     , "ttbar_w[ttbar_nw]/F");
     }
@@ -384,6 +384,7 @@ class EventInfoBranches {
       tree->SetBranchAddress("PVz"        , &PVz        );
       tree->SetBranchAddress("PVez"       , &PVez       );
       tree->SetBranchAddress("GenPVz"     , &GenPVz     );
+      tree->SetBranchAddress("rho"        , &rho        );
 
       tree->SetBranchAddress("nPUtrue"      , &nPUtrue     );
       tree->SetBranchAddress("nPU"          , &nPU         );
@@ -533,7 +534,6 @@ class EventInfoBranches {
       tree->SetBranchAddress("ttbar_lch"  ,  ttbar_lch);
       tree->SetBranchAddress("ttbar_metpt"  , &ttbar_metpt);
       tree->SetBranchAddress("ttbar_metphi"  , &ttbar_metphi);
-      tree->SetBranchAddress("ttbar_rho"  , &ttbar_rho);
       tree->SetBranchAddress("ttbar_nw"  ,  &ttbar_nw);
       tree->SetBranchAddress("ttbar_w"    ,  ttbar_w);
     }
