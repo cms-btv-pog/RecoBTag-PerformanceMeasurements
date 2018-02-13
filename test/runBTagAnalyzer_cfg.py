@@ -631,8 +631,8 @@ process.source = cms.Source("PoolSource",
 
 if options.miniAOD:
     process.source.fileNames = [
-        #/RelValQCD_Pt_600_800_13/CMSSW_9_2_1-92X_upgrade2017_realistic_v1-v1/MINIAODSIM
-        '/store/relval/CMSSW_9_2_1/RelValQCD_Pt_600_800_13/MINIAODSIM/92X_upgrade2017_realistic_v1-v1/10000/C4C4AF9D-B247-E711-A875-0025905A60BC.root',
+        #/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM
+        '/store/mc/RunIIFall17MiniAOD/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/00000/C8E934F8-1C06-E811-888D-0242AC130002.root'
     ]
     if options.runOnData:
         process.source.fileNames = [
