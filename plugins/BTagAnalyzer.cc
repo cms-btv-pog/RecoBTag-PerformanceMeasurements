@@ -1438,8 +1438,8 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
 
     edm::Handle<edm::View<pat::MET> > selMETs;
     iEvent.getByToken(ttbarproducerMET_,selMETs);
-    EventInfo.ttbar_metpt=selMETs->ptrAt(0)->pt();
-    EventInfo.ttbar_metphi=selMETs->ptrAt(0)->phi();
+    EventInfo.ttbar_metpt  = (selMETs->size()) ? selMETs->ptrAt(0)->pt()  : -10;
+    EventInfo.ttbar_metphi = (selMETs->size()) ? selMETs->ptrAt(0)->phi() : -10;
 
     //generator information
     EventInfo.ttbar_nw=0;
