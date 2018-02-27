@@ -1494,11 +1494,11 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
 
       EventInfo.PatMuon_isGlobal[EventInfo.nPatMuon] = 1;
       EventInfo.PatMuon_isPF[EventInfo.nPatMuon]     = it->isPFMuon();
-      EventInfo.PatMuon_nTkHit[EventInfo.nPatMuon]   = it->innerTrack()->hitPattern().numberOfValidHits();
+      EventInfo.PatMuon_nTkHit[EventInfo.nPatMuon]   = it->innerTrack()->hitPattern().trackerLayersWithMeasurement();
       EventInfo.PatMuon_nPixHit[EventInfo.nPatMuon]  = it->innerTrack()->hitPattern().numberOfValidPixelHits();
       EventInfo.PatMuon_nOutHit[EventInfo.nPatMuon]  = it->innerTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_OUTER_HITS);
-      EventInfo.PatMuon_nMuHit[EventInfo.nPatMuon]   = it->outerTrack()->hitPattern().numberOfValidMuonHits();
-      EventInfo.PatMuon_nMatched[EventInfo.nPatMuon] = it->numberOfMatches();
+      EventInfo.PatMuon_nMuHit[EventInfo.nPatMuon]   = it->globalTrack()->hitPattern().numberOfValidMuonHits();
+      EventInfo.PatMuon_nMatched[EventInfo.nPatMuon] = it->numberOfMatchedStations();
       EventInfo.PatMuon_chi2[EventInfo.nPatMuon]     = it->globalTrack()->normalizedChi2();
       EventInfo.PatMuon_chi2Tk[EventInfo.nPatMuon]   = it->innerTrack()->normalizedChi2();
       EventInfo.PatMuon_pt[EventInfo.nPatMuon]       = it->pt();
