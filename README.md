@@ -13,17 +13,13 @@ git cms-init
 git remote add btv-cmssw https://github.com/cms-btv-pog/cmssw.git
 
 #Add DeepFlavour and its dependencies
-git cms-addpkg DataFormats/BTauReco
-git cms-addpkg PhysicsTools/PatAlgos
-git cms-addpkg RecoBTag/Combined
-git cms-addpkg RecoBTag/Configuration
-git cms-merge-topic pablodecm:DeepFlavour_9_4_1_backport
 git cms-merge-topic capalmer85:btagSFupdatesForTTbar
+git cms-merge-topic -u 22042
 
 #Add the DeepFlavour model
 git clone https://github.com/cms-data/RecoBTag-Combined.git RecoBTag/Combined/data
 
-git clone -b 9_4_X_v1.03 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b 9_4_X --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
@@ -35,4 +31,10 @@ The ntuplizer can be run and configured through ```RecoBTag/PerformanceMeasureme
 runBTagAnalyzer_cfg.py defaults=Moriond18 runOnData=(True or False, depending on your needs)
 ```
 
+To run the tests for integrating changes run:
+
+```
+cd RecoBTag/PerformanceMeasurements/test/
+./run_tests.sh
+```
 

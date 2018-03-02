@@ -462,13 +462,12 @@ bTagDiscriminators = set([
   , 'pfPositiveDeepCSVJetTags:probb'   
   , 'pfPositiveDeepCSVJetTags:probc'   
   , 'pfPositiveDeepCSVJetTags:probbb'  
-		#DeepFlavour, DISABLED FOR NOW
-	## , 'pfDeepFlavourJetTags:probb'
-  ## , 'pfDeepFlavourJetTags:probbb'
-  ## , 'pfDeepFlavourJetTags:problepb'
-  ## , 'pfDeepFlavourJetTags:probc'
-  ## , 'pfDeepFlavourJetTags:probuds'
-  ## , 'pfDeepFlavourJetTags:probg'
+	, 'pfDeepFlavourJetTags:probb'
+  , 'pfDeepFlavourJetTags:probbb'
+  , 'pfDeepFlavourJetTags:problepb'
+  , 'pfDeepFlavourJetTags:probc'
+  , 'pfDeepFlavourJetTags:probuds'
+  , 'pfDeepFlavourJetTags:probg'
 ])
 
 ## Legacy taggers not supported with MiniAOD
