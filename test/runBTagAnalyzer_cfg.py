@@ -318,6 +318,10 @@ if options.runSubJets and not options.runFatJets:
     print "WARNING: You are attempting to store subjet information without running over fat jets. Please enable running over fat jets in order to store the subjet information."
     options.runSubJets = False
 
+if not options.miniAOD and options.storeDeepFlavourTagVariables: #FIXME
+	print "WARNING: switching off DeepFlavour, as it is not supported in AOD"
+	options.storeDeepFlavourTagVariables = False
+
 if options.doBoostedCommissioning:
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
     options.processStdAK4Jets=False
@@ -862,6 +866,7 @@ if options.miniAOD and not options.runJetClustering:
     )
 ## Switch the default jet collection (done in order to use the above-specified b-tag infos and discriminators)
 else:
+    #switch off deep flavour on AOD for the moment
     switchJetCollection(
         process,
         jetSource = cms.InputTag(jetSource),
