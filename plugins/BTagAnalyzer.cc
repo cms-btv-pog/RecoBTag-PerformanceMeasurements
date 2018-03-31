@@ -1480,53 +1480,6 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
       }
   }
 
-  //------------------------------------------------------
-  // PAT Muons
-  //------------------------------------------------------
-  edm::Handle<std::vector<pat::Muon> >  patMuonsHandle;
-  if( storePatMuons_ )
-  {
-    iEvent.getByToken(patMuonCollectionName_,patMuonsHandle);
-
-    for( std::vector<pat::Muon>::const_iterator it = patMuonsHandle->begin(); it != patMuonsHandle->end(); ++it )
-    {
-      if( !it->isGlobalMuon() ) continue;
-
-      EventInfo.PatMuon_isGlobal[EventInfo.nPatMuon] = 1;
-      EventInfo.PatMuon_isPF[EventInfo.nPatMuon]     = it->isPFMuon();
-      EventInfo.PatMuon_nTkHit[EventInfo.nPatMuon]   = it->innerTrack()->hitPattern().trackerLayersWithMeasurement();
-      EventInfo.PatMuon_nPixHit[EventInfo.nPatMuon]  = it->innerTrack()->hitPattern().numberOfValidPixelHits();
-      EventInfo.PatMuon_nOutHit[EventInfo.nPatMuon]  = it->innerTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_OUTER_HITS);
-      EventInfo.PatMuon_nMuHit[EventInfo.nPatMuon]   = it->globalTrack()->hitPattern().numberOfValidMuonHits();
-      EventInfo.PatMuon_nMatched[EventInfo.nPatMuon] = it->numberOfMatchedStations();
-      EventInfo.PatMuon_chi2[EventInfo.nPatMuon]     = it->globalTrack()->normalizedChi2();
-      EventInfo.PatMuon_chi2Tk[EventInfo.nPatMuon]   = it->innerTrack()->normalizedChi2();
-      EventInfo.PatMuon_pt[EventInfo.nPatMuon]       = it->pt();
-      EventInfo.PatMuon_eta[EventInfo.nPatMuon]      = it->eta();
-      EventInfo.PatMuon_phi[EventInfo.nPatMuon]      = it->phi();
-      EventInfo.PatMuon_vz[EventInfo.nPatMuon]       = it->vz();
-      EventInfo.PatMuon_IP[EventInfo.nPatMuon]       = it->dB(pat::Muon::PV3D);
-      EventInfo.PatMuon_IPsig[EventInfo.nPatMuon]    = (it->dB(pat::Muon::PV3D))/(it->edB(pat::Muon::PV3D));
-      EventInfo.PatMuon_IP2D[EventInfo.nPatMuon]     = it->dB(pat::Muon::PV2D);
-      EventInfo.PatMuon_IP2Dsig[EventInfo.nPatMuon]  = (it->dB(pat::Muon::PV2D))/(it->edB(pat::Muon::PV2D));
-
-      ++EventInfo.nPatMuon;
-    }
-  }
-
-
-  //------------------------------------------------------
-  // Muons
-  //------------------------------------------------------
-  edm::Handle<edm::View<reco::Muon> >  muonsHandle;
-  iEvent.getByToken(muonCollectionName_,muonsHandle);
-  muons = *muonsHandle;
-
-  //----------------------------------------
-  // Transient track for IP calculation
-  //----------------------------------------
-  iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", trackBuilder);
-
   //------------------
   // Primary vertex
   //------------------
@@ -1565,6 +1518,61 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
 
     ++EventInfo.nPV;
   }
+
+  //------------------------------------------------------
+  // PAT Muons
+  //------------------------------------------------------
+  if (storePatMuons_) {
+     //first get a PV for muon id
+     int vtx_idx = -1;
+     for (unsigned int i = 0; i < primaryVertex->size(); ++i) {
+        if (!primaryVertex->at(i).isFake() && primaryVertex->at(i).isValid()) {
+           vtx_idx = i;
+           break;
+       }
+     }
+     //fill muon tree
+     //run2 id: https://twiki.cern.ch/CMS/SWGuideMuonIdRun2
+     edm::Handle<std::vector<pat::Muon>> patMuonsHandle;
+     iEvent.getByToken(patMuonCollectionName_, patMuonsHandle);
+     for (auto i = patMuonsHandle->begin(); i != patMuonsHandle->end(); ++i) {
+        if (!(muon::isLooseMuon(*i))) continue;
+        EventInfo.PatMuon_pt[EventInfo.nPatMuon] = i->pt();
+        EventInfo.PatMuon_eta[EventInfo.nPatMuon] = i->eta();
+        EventInfo.PatMuon_phi[EventInfo.nPatMuon] = i->phi();
+        EventInfo.PatMuon_isMediumMuon[EventInfo.nPatMuon] = muon::isMediumMuon(*i);
+        if (vtx_idx>-1) {
+           EventInfo.PatMuon_isSoftMuon[EventInfo.nPatMuon] = muon::isSoftMuon(*i, primaryVertex->at(vtx_idx));
+           EventInfo.PatMuon_isTightMuon[EventInfo.nPatMuon] = muon::isTightMuon(*i, primaryVertex->at(vtx_idx));
+        } else {
+           EventInfo.PatMuon_isSoftMuon[EventInfo.nPatMuon] = -1;
+           EventInfo.PatMuon_isTightMuon[EventInfo.nPatMuon] = -1;
+        }
+        if (i->isPFMuon()) {
+           EventInfo.PatMuon_iso[EventInfo.nPatMuon] = (i->pfIsolationR04().sumChargedHadronPt + max(0., i->pfIsolationR04().sumNeutralHadronEt + i->pfIsolationR04().sumPhotonEt - 0.5*i->pfIsolationR04().sumPUPt))/i->pt();
+        } else {
+           EventInfo.PatMuon_iso[EventInfo.nPatMuon] = 999.;
+        }
+        EventInfo.PatMuon_isoTrackerOnly[EventInfo.nPatMuon] = i->isolationR03().sumPt/i->pt();
+        EventInfo.PatMuon_IP[EventInfo.nPatMuon] = i->dB(pat::Muon::PV3D);
+        EventInfo.PatMuon_IPsig[EventInfo.nPatMuon] = (i->dB(pat::Muon::PV3D))/(i->edB(pat::Muon::PV3D));
+        EventInfo.PatMuon_IP2D[EventInfo.nPatMuon] = i->dB(pat::Muon::PV2D);
+        EventInfo.PatMuon_IP2Dsig[EventInfo.nPatMuon] = (i->dB(pat::Muon::PV2D))/(i->edB(pat::Muon::PV2D));
+        ++EventInfo.nPatMuon;
+     }
+  }
+
+  //------------------------------------------------------
+  // Muons
+  //------------------------------------------------------
+  edm::Handle<edm::View<reco::Muon> >  muonsHandle;
+  iEvent.getByToken(muonCollectionName_,muonsHandle);
+  muons = *muonsHandle;
+
+  //----------------------------------------
+  // Transient track for IP calculation
+  //----------------------------------------
+  iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", trackBuilder);
 
   //------------------------------------------------------
   // Trigger info

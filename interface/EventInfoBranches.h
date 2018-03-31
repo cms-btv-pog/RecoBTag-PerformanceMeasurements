@@ -150,20 +150,17 @@ class EventInfoBranches {
     int   TrkAll_PV[nMaxTrk_];
     float TrkAll_PVweight[nMaxTrk_];
 
-    int   nPatMuon;
-    int   PatMuon_isGlobal[1000];
-    int   PatMuon_isPF[1000];
-    int   PatMuon_nTkHit[1000];
-    int   PatMuon_nPixHit[1000];
-    int   PatMuon_nOutHit[1000];
-    int   PatMuon_nMuHit[1000];
-    int   PatMuon_nMatched[1000];
-    float PatMuon_chi2[1000];
-    float PatMuon_chi2Tk[1000];
+    //if storePatMuons
+    //run2 id: https://twiki.cern.ch/CMS/SWGuideMuonIdRun2
+    int nPatMuon;
     float PatMuon_pt[1000];
     float PatMuon_eta[1000];
     float PatMuon_phi[1000];
-    float PatMuon_vz[1000];
+    int PatMuon_isSoftMuon[1000];
+    bool PatMuon_isMediumMuon[1000];
+    int PatMuon_isTightMuon[1000];
+    float PatMuon_iso[1000];
+    float PatMuon_isoTrackerOnly[1000];
     float PatMuon_IP[1000];
     float PatMuon_IPsig[1000];
     float PatMuon_IP2D[1000];
@@ -349,25 +346,22 @@ class EventInfoBranches {
       tree->Branch("ttbar_w"    ,  ttbar_w     , "ttbar_w[ttbar_nw]/F");
     }
 
+    //if storePatMuons
+    //run2 id: https://twiki.cern.ch/CMS/SWGuideMuonIdRun2
     void RegisterPatMuonTree(TTree *tree) {
-      tree->Branch("nPatMuon"        , &nPatMuon       , "nPatMuon/I");
-      tree->Branch("PatMuon_nMuHit"  , PatMuon_nMuHit  , "PatMuon_nMuHit[nPatMuon]/I");
-      tree->Branch("PatMuon_nTkHit"  , PatMuon_nTkHit  , "PatMuon_nTkHit[nPatMuon]/I");
-      tree->Branch("PatMuon_nPixHit" , PatMuon_nPixHit , "PatMuon_nPixHit[nPatMuon]/I");
-      tree->Branch("PatMuon_nOutHit" , PatMuon_nOutHit , "PatMuon_nOutHit[nPatMuon]/I");
-      tree->Branch("PatMuon_isGlobal", PatMuon_isGlobal, "PatMuon_isGlobal[nPatMuon]/I");
-      tree->Branch("PatMuon_isPF"    , PatMuon_isPF    , "PatMuon_isPF[nPatMuon]/I");
-      tree->Branch("PatMuon_nMatched", PatMuon_nMatched, "PatMuon_nMatched[nPatMuon]/I");
-      tree->Branch("PatMuon_chi2"    , PatMuon_chi2    , "PatMuon_chi2[nPatMuon]/F");
-      tree->Branch("PatMuon_chi2Tk"  , PatMuon_chi2Tk  , "PatMuon_chi2Tk[nPatMuon]/F");
-      tree->Branch("PatMuon_pt"      , PatMuon_pt      , "PatMuon_pt[nPatMuon]/F");
-      tree->Branch("PatMuon_eta"     , PatMuon_eta     , "PatMuon_eta[nPatMuon]/F");
-      tree->Branch("PatMuon_phi"     , PatMuon_phi     , "PatMuon_phi[nPatMuon]/F");
-      tree->Branch("PatMuon_vz"      , PatMuon_vz      , "PatMuon_vz[nPatMuon]/F");
-      tree->Branch("PatMuon_IP"      , PatMuon_IP      , "PatMuon_IP[nPatMuon]/F");
-      tree->Branch("PatMuon_IPsig"   , PatMuon_IPsig   , "PatMuon_IPsig[nPatMuon]/F");
-      tree->Branch("PatMuon_IP2D"    , PatMuon_IP2D    , "PatMuon_IP2D[nPatMuon]/F");
-      tree->Branch("PatMuon_IP2Dsig" , PatMuon_IP2Dsig , "PatMuon_IP2Dsig[nPatMuon]/F");
+      tree->Branch("nPatMuon", &nPatMuon, "nPatMuon/I");
+      tree->Branch("PatMuon_pt", PatMuon_pt, "PatMuon_pt[nPatMuon]/F");
+      tree->Branch("PatMuon_eta", PatMuon_eta, "PatMuon_eta[nPatMuon]/F");
+      tree->Branch("PatMuon_phi", PatMuon_phi, "PatMuon_phi[nPatMuon]/F");
+      tree->Branch("PatMuon_isSoftMuon", PatMuon_isSoftMuon, "PatMuon_isSoftMuon[nPatMuon]/I");
+      tree->Branch("PatMuon_isMediumMuon", PatMuon_isMediumMuon, "PatMuon_isMediumMuon[nPatMuon]/O");
+      tree->Branch("PatMuon_isTightMuon", PatMuon_isTightMuon, "PatMuon_isTightMuon[nPatMuon]/I");
+      tree->Branch("PatMuon_iso", PatMuon_iso, "PatMuon_iso[nPatMuon]/F");
+      tree->Branch("PatMuon_isoTrackerOnly", PatMuon_isoTrackerOnly, "PatMuon_isoTrackerOnly[nPatMuon]/F");
+      tree->Branch("PatMuon_IP", PatMuon_IP, "PatMuon_IP[nPatMuon]/F");
+      tree->Branch("PatMuon_IPsig", PatMuon_IPsig, "PatMuon_IPsig[nPatMuon]/F");
+      tree->Branch("PatMuon_IP2D", PatMuon_IP2D, "PatMuon_IP2D[nPatMuon]/F");
+      tree->Branch("PatMuon_IP2Dsig", PatMuon_IP2Dsig, "PatMuon_IP2Dsig[nPatMuon]/F");
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -538,25 +532,22 @@ class EventInfoBranches {
       tree->SetBranchAddress("ttbar_w"    ,  ttbar_w);
     }
 
+    //if storePatMuons
+    //run 2 id: https://twiki.cern.ch/CMS/SWGuideMuonIdRun2
     void ReadPatMuonTree(TTree *tree) {
-      tree->SetBranchAddress("nPatMuon"        , &nPatMuon       );
-      tree->SetBranchAddress("PatMuon_nMuHit"  , PatMuon_nMuHit  );
-      tree->SetBranchAddress("PatMuon_nTkHit"  , PatMuon_nTkHit  );
-      tree->SetBranchAddress("PatMuon_nPixHit" , PatMuon_nPixHit );
-      tree->SetBranchAddress("PatMuon_nOutHit" , PatMuon_nOutHit );
-      tree->SetBranchAddress("PatMuon_isGlobal", PatMuon_isGlobal);
-      tree->SetBranchAddress("PatMuon_isPF"    , PatMuon_isPF    );
-      tree->SetBranchAddress("PatMuon_nMatched", PatMuon_nMatched);
-      tree->SetBranchAddress("PatMuon_chi2"    , PatMuon_chi2    );
-      tree->SetBranchAddress("PatMuon_chi2Tk"  , PatMuon_chi2Tk  );
-      tree->SetBranchAddress("PatMuon_pt"      , PatMuon_pt      );
-      tree->SetBranchAddress("PatMuon_eta"     , PatMuon_eta     );
-      tree->SetBranchAddress("PatMuon_phi"     , PatMuon_phi     );
-      tree->SetBranchAddress("PatMuon_vz"      , PatMuon_vz      );
-      tree->SetBranchAddress("PatMuon_IP"      , PatMuon_IP      );
-      tree->SetBranchAddress("PatMuon_IPsig"   , PatMuon_IPsig   );
-      tree->SetBranchAddress("PatMuon_IP2D"    , PatMuon_IP2D    );
-      tree->SetBranchAddress("PatMuon_IP2Dsig" , PatMuon_IP2Dsig );
+      tree->SetBranchAddress("nPatMuon", &nPatMuon);
+      tree->SetBranchAddress("PatMuon_pt", PatMuon_pt);
+      tree->SetBranchAddress("PatMuon_eta", PatMuon_eta);
+      tree->SetBranchAddress("PatMuon_phi", PatMuon_phi);
+      tree->SetBranchAddress("PatMuon_isSoftMuon", PatMuon_isSoftMuon);
+      tree->SetBranchAddress("PatMuon_isMediumMuon", PatMuon_isMediumMuon);
+      tree->SetBranchAddress("PatMuon_isTightMuon", PatMuon_isTightMuon);
+      tree->SetBranchAddress("PatMuon_iso", PatMuon_iso);
+      tree->SetBranchAddress("PatMuon_isoTrackerOnly", PatMuon_isoTrackerOnly);
+      tree->SetBranchAddress("PatMuon_IP", PatMuon_IP);
+      tree->SetBranchAddress("PatMuon_IPsig", PatMuon_IPsig);
+      tree->SetBranchAddress("PatMuon_IP2D", PatMuon_IP2D);
+      tree->SetBranchAddress("PatMuon_IP2Dsig", PatMuon_IP2Dsig);
     }
 };
 
