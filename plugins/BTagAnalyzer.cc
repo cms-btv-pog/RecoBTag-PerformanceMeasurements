@@ -2808,7 +2808,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       // per jet
       JetInfo[iJetColl].TagVar_jetNTracks[JetInfo[iJetColl].nJet]                  = nTracks;
       JetInfo[iJetColl].TagVar_jetNSecondaryVertices[JetInfo[iJetColl].nJet]       = nSVs;
-      //-------------
+      // run 2 id: https://twiki.cern.ch/CMS/JetID13TeVRun2017
       JetInfo[iJetColl].TagVar_chargedHadronEnergyFraction[JetInfo[iJetColl].nJet] = pjet->chargedHadronEnergyFraction();
       JetInfo[iJetColl].TagVar_neutralHadronEnergyFraction[JetInfo[iJetColl].nJet] = pjet->neutralHadronEnergyFraction();
       JetInfo[iJetColl].TagVar_photonEnergyFraction[JetInfo[iJetColl].nJet]        = pjet->photonEnergyFraction();
@@ -2819,6 +2819,11 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].TagVar_photonMultiplicity[JetInfo[iJetColl].nJet]          = pjet->photonMultiplicity();
       JetInfo[iJetColl].TagVar_electronMultiplicity[JetInfo[iJetColl].nJet]        = pjet->electronMultiplicity();
       JetInfo[iJetColl].TagVar_muonMultiplicity[JetInfo[iJetColl].nJet]            = pjet->muonMultiplicity();
+      JetInfo[iJetColl].TagVar_neutralEmEnergyFraction[JetInfo[iJetColl].nJet] = pjet->neutralEmEnergyFraction();
+      JetInfo[iJetColl].TagVar_numberOfDaughters[JetInfo[iJetColl].nJet] = pjet->numberOfDaughters();
+      JetInfo[iJetColl].TagVar_chargedMultiplicity[JetInfo[iJetColl].nJet] = pjet->chargedMultiplicity();
+      JetInfo[iJetColl].TagVar_chargedEmEnergyFraction[JetInfo[iJetColl].nJet] = pjet->chargedEmEnergyFraction();
+      JetInfo[iJetColl].TagVar_neutralMultiplicity[JetInfo[iJetColl].nJet] = pjet->neutralMultiplicity()
 
       // per jet per track
       JetInfo[iJetColl].Jet_nFirstTrkTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkTagVar;
