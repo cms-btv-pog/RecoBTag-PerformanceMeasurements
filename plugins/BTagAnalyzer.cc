@@ -2823,7 +2823,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].TagVar_numberOfDaughters[JetInfo[iJetColl].nJet] = pjet->numberOfDaughters();
       JetInfo[iJetColl].TagVar_chargedMultiplicity[JetInfo[iJetColl].nJet] = pjet->chargedMultiplicity();
       JetInfo[iJetColl].TagVar_chargedEmEnergyFraction[JetInfo[iJetColl].nJet] = pjet->chargedEmEnergyFraction();
-      JetInfo[iJetColl].TagVar_neutralMultiplicity[JetInfo[iJetColl].nJet] = pjet->neutralMultiplicity()
+      JetInfo[iJetColl].TagVar_neutralMultiplicity[JetInfo[iJetColl].nJet] = pjet->neutralMultiplicity();
 
       // per jet per track
       JetInfo[iJetColl].Jet_nFirstTrkTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkTagVar;
