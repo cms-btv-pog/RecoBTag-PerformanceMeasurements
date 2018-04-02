@@ -334,18 +334,25 @@ class JetInfoBranches {
 
     // TagInfo TaggingVariables
     // per jet
-    float TagVar_jetNTracks[nMaxJets_];                              // tracks associated to jet
-    float TagVar_jetNSecondaryVertices[nMaxJets_];                   // number of reconstructed possible secondary vertices in jet
+    // run 2 id: https://twiki.cern.ch/CMS/JetID13TeVRun2017
+    int TagVar_jetNTracks[nMaxJets_];                              // tracks associated to jet
+    int TagVar_jetNSecondaryVertices[nMaxJets_];                   // number of reconstructed possible secondary vertices in jet
     float TagVar_chargedHadronEnergyFraction[nMaxJets_];             // fraction of the jet energy coming from charged hadrons
     float TagVar_neutralHadronEnergyFraction[nMaxJets_];             // fraction of the jet energy coming from neutral hadrons
     float TagVar_photonEnergyFraction[nMaxJets_];                    // fraction of the jet energy coming from photons
     float TagVar_electronEnergyFraction[nMaxJets_];                  // fraction of the jet energy coming from electrons
     float TagVar_muonEnergyFraction[nMaxJets_];                      // fraction of the jet energy coming from muons
-    float TagVar_chargedHadronMultiplicity[nMaxJets_];               // number of charged hadrons in the jet
-    float TagVar_neutralHadronMultiplicity[nMaxJets_];               // number of neutral hadrons in the jet
-    float TagVar_photonMultiplicity[nMaxJets_];                      // number of photons in the jet
-    float TagVar_electronMultiplicity[nMaxJets_];                    // number of electrons in the jet
-    float TagVar_muonMultiplicity[nMaxJets_];                        // number of muons in the jet
+    int TagVar_chargedHadronMultiplicity[nMaxJets_];               // number of charged hadrons in the jet
+    int TagVar_neutralHadronMultiplicity[nMaxJets_];               // number of neutral hadrons in the jet
+    int TagVar_photonMultiplicity[nMaxJets_];                      // number of photons in the jet
+    int TagVar_electronMultiplicity[nMaxJets_];                    // number of electrons in the jet
+    int TagVar_muonMultiplicity[nMaxJets_];                        // number of muons in the jet
+    float TagVar_neutralEmEnergyFraction[nMaxJets_];
+    int TagVar_numberOfDaughters[nMaxJets_];
+    int TagVar_chargedMultiplicity[nMaxJets_];
+    float TagVar_chargedEmEnergyFraction[nMaxJets_];
+    int TagVar_neutralMultiplicity[nMaxJets_];
+	
     // per jet per track
     int   nTrkTagVar;
     float TagVar_trackMomentum[nMaxTrk_];                            // track momentum
@@ -793,19 +800,25 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_nFirstSVTagVar").c_str()   ,Jet_nFirstSVTagVar   ,(name+"Jet_nFirstSVTagVar["+name+"nJet]/I").c_str()  );
       tree->Branch((name+"Jet_nLastSVTagVar").c_str()    ,Jet_nLastSVTagVar    ,(name+"Jet_nLastSVTagVar["+name+"nJet]/I").c_str()   );
 
-      tree->Branch((name+"TagVar_jetNTracks").c_str()                   ,TagVar_jetNTracks                   ,(name+"TagVar_jetNTracks["+name+"nJet]/F").c_str()                   );
-      tree->Branch((name+"TagVar_jetNSecondaryVertices").c_str()        ,TagVar_jetNSecondaryVertices        ,(name+"TagVar_jetNSecondaryVertices["+name+"nJet]/F").c_str()        );
-      tree->Branch((name+"TagVar_chargedHadronEnergyFraction").c_str()  ,TagVar_chargedHadronEnergyFraction  ,(name+"TagVar_chargedHadronEnergyFraction["+name+"nJet]/F").c_str()  );
+      tree->Branch((name+"TagVar_jetNTracks").c_str()                   ,TagVar_jetNTracks                   ,(name+"TagVar_jetNTracks["+name+"nJet]/I").c_str()                   );
+      tree->Branch((name+"TagVar_jetNSecondaryVertices").c_str()        ,TagVar_jetNSecondaryVertices        ,(name+"TagVar_jetNSecondaryVertices["+name+"nJet]/I").c_str()        );
+      //run 2 id: https://twiki.cern.ch/CMS/JetID13TeVRun2017
+	    tree->Branch((name+"TagVar_chargedHadronEnergyFraction").c_str()  ,TagVar_chargedHadronEnergyFraction  ,(name+"TagVar_chargedHadronEnergyFraction["+name+"nJet]/F").c_str()  );
       tree->Branch((name+"TagVar_neutralHadronEnergyFraction").c_str()  ,TagVar_neutralHadronEnergyFraction  ,(name+"TagVar_neutralHadronEnergyFraction["+name+"nJet]/F").c_str()  );
       tree->Branch((name+"TagVar_photonEnergyFraction").c_str()         ,TagVar_photonEnergyFraction         ,(name+"TagVar_photonEnergyFraction["+name+"nJet]/F").c_str()         );
       tree->Branch((name+"TagVar_electronEnergyFraction").c_str()       ,TagVar_electronEnergyFraction       ,(name+"TagVar_electronEnergyFraction["+name+"nJet]/F").c_str()       );
       tree->Branch((name+"TagVar_muonEnergyFraction").c_str()           ,TagVar_muonEnergyFraction           ,(name+"TagVar_muonEnergyFraction["+name+"nJet]/F").c_str()           );
-      tree->Branch((name+"TagVar_chargedHadronMultiplicity").c_str()    ,TagVar_chargedHadronMultiplicity    ,(name+"TagVar_chargedHadronMultiplicity["+name+"nJet]/F").c_str()    );
-      tree->Branch((name+"TagVar_neutralHadronMultiplicity").c_str()    ,TagVar_neutralHadronMultiplicity    ,(name+"TagVar_neutralHadronMultiplicity["+name+"nJet]/F").c_str()    );
-      tree->Branch((name+"TagVar_photonMultiplicity").c_str()           ,TagVar_photonMultiplicity           ,(name+"TagVar_photonMultiplicity["+name+"nJet]/F").c_str()           );
-      tree->Branch((name+"TagVar_electronMultiplicity").c_str()         ,TagVar_electronMultiplicity         ,(name+"TagVar_electronMultiplicity["+name+"nJet]/F").c_str()         );
-      tree->Branch((name+"TagVar_muonMultiplicity").c_str()             ,TagVar_muonMultiplicity             ,(name+"TagVar_muonMultiplicity["+name+"nJet]/F").c_str()             );
-
+      tree->Branch((name+"TagVar_chargedHadronMultiplicity").c_str()    ,TagVar_chargedHadronMultiplicity    ,(name+"TagVar_chargedHadronMultiplicity["+name+"nJet]/I").c_str()    );
+      tree->Branch((name+"TagVar_neutralHadronMultiplicity").c_str()    ,TagVar_neutralHadronMultiplicity    ,(name+"TagVar_neutralHadronMultiplicity["+name+"nJet]/I").c_str()    );
+      tree->Branch((name+"TagVar_photonMultiplicity").c_str()           ,TagVar_photonMultiplicity           ,(name+"TagVar_photonMultiplicity["+name+"nJet]/I").c_str()           );
+      tree->Branch((name+"TagVar_electronMultiplicity").c_str()         ,TagVar_electronMultiplicity         ,(name+"TagVar_electronMultiplicity["+name+"nJet]/I").c_str()         );
+      tree->Branch((name+"TagVar_muonMultiplicity").c_str()             ,TagVar_muonMultiplicity             ,(name+"TagVar_muonMultiplicity["+name+"nJet]/I").c_str()             );
+      tree->Branch((name+"TagVar_neutralEmEnergyFraction").c_str()      ,TagVar_neutralEmEnergyFraction      ,(name+"TagVar_neutralEmEnergyFraction["+name+"nJet]/F").c_str()      );
+      tree->Branch((name+"TagVar_numberOfDaughters").c_str()            ,TagVar_numberOfDaughters            ,(name+"TagVar_numberOfDaughters["+name+"nJet]/I").c_str()            );
+      tree->Branch((name+"TagVar_chargedMultiplicity").c_str()          ,TagVar_chargedMultiplicity          ,(name+"TagVar_chargedMultiplicity["+name+"nJet]/I").c_str()          );
+      tree->Branch((name+"TagVar_chargedEmEnergyFraction").c_str()      ,TagVar_chargedEmEnergyFraction      ,(name+"TagVar_chargedEmEnergyFraction["+name+"nJet]/F").c_str()      );
+      tree->Branch((name+"TagVar_neutralMultiplicity").c_str()          ,TagVar_neutralMultiplicity          ,(name+"TagVar_neutralMultiplicity["+name+"nJet]/I").c_str()          );
+	    
       tree->Branch((name+"nTrkTagVar").c_str()               ,&nTrkTagVar              ,(name+"nTrkTagVar/I").c_str()                                  );
       tree->Branch((name+"TagVar_trackMomentum").c_str()     ,TagVar_trackMomentum     ,(name+"TagVar_trackMomentum["+name+"nTrkTagVar]/F").c_str()    );
       tree->Branch((name+"TagVar_trackEta").c_str()          ,TagVar_trackEta          ,(name+"TagVar_trackEta["+name+"nTrkTagVar]/F").c_str()         );
@@ -1317,6 +1330,7 @@ class JetInfoBranches {
 
       tree->SetBranchAddress((name+"TagVar_jetNTracks").c_str()                   ,TagVar_jetNTracks                  );
       tree->SetBranchAddress((name+"TagVar_jetNSecondaryVertices").c_str()        ,TagVar_jetNSecondaryVertices       );
+	    //run 2 id: https://twiki.cern.ch/CMS/JetID13TeVRun2017
       tree->SetBranchAddress((name+"TagVar_chargedHadronEnergyFraction").c_str()  ,TagVar_chargedHadronEnergyFraction );
       tree->SetBranchAddress((name+"TagVar_neutralHadronEnergyFraction").c_str()  ,TagVar_neutralHadronEnergyFraction );
       tree->SetBranchAddress((name+"TagVar_photonEnergyFraction").c_str()         ,TagVar_photonEnergyFraction        );
@@ -1327,7 +1341,12 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"TagVar_photonMultiplicity").c_str()           ,TagVar_photonMultiplicity          );
       tree->SetBranchAddress((name+"TagVar_electronMultiplicity").c_str()         ,TagVar_electronMultiplicity        );
       tree->SetBranchAddress((name+"TagVar_muonMultiplicity").c_str()             ,TagVar_muonMultiplicity            );
-
+      tree->SetBranchAddress((name+"TagVar_neutralEmEnergyFraction").c_str()      ,TagVar_neutralEmEnergyFraction);
+      tree->SetBranchAddress((name+"TagVar_numberOfDaughters").c_str()            ,TagVar_numberOfDaughters);
+      tree->SetBranchAddress((name+"TagVar_chargedMultiplicity").c_str()          ,TagVar_chargedMultiplicity);
+      tree->SetBranchAddress((name+"TagVar_chargedEmEnergyFraction").c_str()      ,TagVar_chargedEmEnergyFraction);
+      tree->SetBranchAddress((name+"TagVar_neutralMultiplicity").c_str()          ,TagVar_neutralMultiplicity);
+	    
       tree->SetBranchAddress((name+"nTrkTagVar").c_str()               ,&nTrkTagVar             );
       tree->SetBranchAddress((name+"TagVar_trackMomentum").c_str()     ,TagVar_trackMomentum    );
       tree->SetBranchAddress((name+"TagVar_trackEta").c_str()          ,TagVar_trackEta         );
