@@ -10,7 +10,7 @@ echo 'Running on MC'
 cmsRun runBTagAnalyzer_cfg.py defaults=Moriond18 runOnData=False maxEvents=20 &> last.log || die $?
 
 echo 'Rinning on AODSIM'
-cmsRun runBTagAnalyzer_cfg.py defaults=Moriond18 runOnData=False maxEvents=20 miniAOD=False inputFiles=/store/mc/RunIIFall17DRPremix/QCD_Pt_50to80_TuneCP5_13TeV_pythia8/AODSIM/94X_mc2017_realistic_v10-v1/60000/2AE14B27-6FE7-E711-B564-00266CF94C44.root useSelectedTracks=False fillsvTagInfo=True produceJetTrackTree=True doCTag=False || die $?
+cmsRun runBTagAnalyzer_cfg.py defaults=Moriond18 runOnData=False maxEvents=20 miniAOD=False inputFiles=/store/mc/RunIIFall17DRPremix/QCD_Pt_50to80_TuneCP5_13TeV_pythia8/AODSIM/94X_mc2017_realistic_v10-v1/60000/2AE14B27-6FE7-E711-B564-00266CF94C44.root useSelectedTracks=False fillsvTagInfo=True produceJetTrackTree=True doCTag=False &> last.log || die $?
 
 echo 'Running on data -- FatJets'
 cmsRun runBTagAnalyzer_cfg.py defaults=Moriond18 runOnData=True maxEvents=20 runFatJets=True &> last.log || die $?

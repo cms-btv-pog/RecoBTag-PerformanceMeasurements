@@ -45,6 +45,10 @@ class JetInfoBranches {
     float Jet_DeepFlavourUDS[nMaxJets_]		  ;
     float Jet_DeepFlavourG[nMaxJets_]       ;
 
+		float Jet_DeepFlavourBDiscN[nMaxJets_]   ;
+    float Jet_DeepFlavourCvsLDiscN[nMaxJets_];
+    float Jet_DeepFlavourCvsBDiscN[nMaxJets_];
+
     float Jet_DeepCSVBDisc[nMaxJets_]  ;
     float Jet_DeepCSVBDiscN[nMaxJets_]  ;
     float Jet_DeepCSVBDiscP[nMaxJets_]  ;
@@ -524,6 +528,9 @@ class JetInfoBranches {
 		  tree->Branch((name+"Jet_DeepFlavourUDS"     ).c_str(), Jet_DeepFlavourUDS	    , (name+"Jet_DeepFlavourUDS["+name+"nJet]/F"     ).c_str());
 		  tree->Branch((name+"Jet_DeepFlavourG"       ).c_str(), Jet_DeepFlavourG       , (name+"Jet_DeepFlavourG["+name+"nJet]/F"       ).c_str());
 
+		  tree->Branch((name+"Jet_DeepFlavourBDiscN"   ).c_str(), Jet_DeepFlavourBDiscN   , (name+"Jet_DeepFlavourBDiscN["+name+"nJet]/F"   ).c_str());
+		  tree->Branch((name+"Jet_DeepFlavourCvsLDiscN").c_str(), Jet_DeepFlavourCvsLDiscN, (name+"Jet_DeepFlavourCvsLDiscN["+name+"nJet]/F").c_str());
+		  tree->Branch((name+"Jet_DeepFlavourCvsBDiscN").c_str(), Jet_DeepFlavourCvsBDiscN, (name+"Jet_DeepFlavourCvsBDiscN["+name+"nJet]/F").c_str());
 
 		  tree->Branch((name+"Jet_DeepCSVBDisc"	 ).c_str(), Jet_DeepCSVBDisc	,(name+"Jet_DeepCSVBDisc["+name+"nJet]/F").c_str());
 		  tree->Branch((name+"Jet_DeepCSVBDiscN"	 ).c_str(), Jet_DeepCSVBDiscN, (name+"Jet_DeepCSVBDiscN["+name+"nJet]/F").c_str());
