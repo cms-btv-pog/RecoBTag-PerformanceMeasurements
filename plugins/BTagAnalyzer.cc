@@ -308,6 +308,7 @@ private:
   std::string combinedSVPosBJetTags_;
 
 	std::string deepFlavourJetTags_;
+	std::string deepFlavourNegJetTags_;
 
 	std::string deepCSVBJetTags_;
 	std::string deepCSVNegBJetTags_;
@@ -648,6 +649,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   combinedSVPosBJetTags_  = iConfig.getParameter<std::string>("combinedSVPosBJetTags");
 
 	deepFlavourJetTags_ = iConfig.getParameter<std::string>("deepFlavourJetTags");
+	deepFlavourNegJetTags_ = iConfig.getParameter<std::string>("deepFlavourNegJetTags");
 
 	deepCSVBJetTags_    = iConfig.getParameter<std::string>("deepCSVBJetTags");
 	deepCSVNegBJetTags_ = iConfig.getParameter<std::string>("deepCSVNegBJetTags");
@@ -741,7 +743,11 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   if ( fillsvTagInfo_ )       JetInfo[0].RegisterJetSVTree(smalltree,branchNamePrefix_);
   if ( storeTagVariables_)    JetInfo[0].RegisterTagVarTree(smalltree,branchNamePrefix_);
   if ( storeCSVTagVariables_) JetInfo[0].RegisterCSVTagVarTree(smalltree,branchNamePrefix_);
-	if ( storeDeepFlavourTagVariables_) JetInfo[0].RegisterDeepFlavourFeatTree(smalltree,branchNamePrefix_);
+	std::cout << "storeDeepFlavourTagVariables_: " << storeDeepFlavourTagVariables_ << std::endl;
+	if ( storeDeepFlavourTagVariables_) {
+		std::cout << "storeDeepFlavourTagVariables_" << std::endl;
+		JetInfo[0].RegisterDeepFlavourFeatTree(smalltree,branchNamePrefix_);
+	}
   if ( storeCTagVariables_) JetInfo[0].RegisterCTagVarTree(smalltree,branchNamePrefix_);
   if ( runSubJets_ ) {
     for ( size_t i = 0; i < SubJetLabels_.size(); ++i )
@@ -2691,6 +2697,21 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 			DeepFlavourG    = pjet->bDiscriminator((deepFlavourJetTags_+":probg").c_str());
 			}
 
+    float DeepFlavourBN    = -10.;
+		float DeepFlavourBBN   = -10.;
+		float DeepFlavourLepBN = -10.;
+    float DeepFlavourCN    = -10.;
+    float DeepFlavourUDSN  = -10.;
+    float DeepFlavourGN    = -10.;
+		if(deepFlavourJetTags_.size()) {
+			DeepFlavourBN    = pjet->bDiscriminator((deepFlavourNegJetTags_+":probb"   ).c_str());
+			DeepFlavourBBN   = pjet->bDiscriminator((deepFlavourNegJetTags_+":probbb"   ).c_str()); 
+			DeepFlavourLepBN = pjet->bDiscriminator((deepFlavourNegJetTags_+":problepb"   ).c_str());
+			DeepFlavourCN    = pjet->bDiscriminator((deepFlavourNegJetTags_+":probc"   ).c_str());
+			DeepFlavourUDSN  = pjet->bDiscriminator((deepFlavourNegJetTags_+":probuds").c_str());
+			DeepFlavourGN    = pjet->bDiscriminator((deepFlavourNegJetTags_+":probg").c_str());
+			}
+
     float DeepCSVb   = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probb"   ).c_str()) : -10;
     float DeepCSVc   = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probc"   ).c_str()) : -10;
     float DeepCSVl   = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probudsg").c_str()) : -10;
@@ -2736,16 +2757,23 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float CvsLPos = pjet->bDiscriminator(CvsLPosCJetTags_.c_str());
 
     // Jet information
+		//DeepFlavour discriminators
     JetInfo[iJetColl].Jet_DeepFlavourBDisc[JetInfo[iJetColl].nJet]     = DeepFlavourB + DeepFlavourBB + DeepFlavourLepB;
     JetInfo[iJetColl].Jet_DeepFlavourCvsLDisc[JetInfo[iJetColl].nJet]  = DeepFlavourC/(DeepFlavourC + DeepFlavourUDS + DeepFlavourG);
     JetInfo[iJetColl].Jet_DeepFlavourCvsBDisc[JetInfo[iJetColl].nJet]  = DeepFlavourC/(DeepFlavourC + DeepFlavourB + DeepFlavourBB + DeepFlavourLepB);
 
+		//DeepFlavour probabilities
     JetInfo[iJetColl].Jet_DeepFlavourB[JetInfo[iJetColl].nJet]    = DeepFlavourB   ;
     JetInfo[iJetColl].Jet_DeepFlavourBB[JetInfo[iJetColl].nJet]   = DeepFlavourBB  ;
     JetInfo[iJetColl].Jet_DeepFlavourLEPB[JetInfo[iJetColl].nJet] = DeepFlavourLepB;
     JetInfo[iJetColl].Jet_DeepFlavourC[JetInfo[iJetColl].nJet]    = DeepFlavourC   ;
     JetInfo[iJetColl].Jet_DeepFlavourUDS[JetInfo[iJetColl].nJet]  = DeepFlavourUDS ;
     JetInfo[iJetColl].Jet_DeepFlavourG[JetInfo[iJetColl].nJet]    = DeepFlavourG   ;
+
+		//DeepFlavour negative tags
+    JetInfo[iJetColl].Jet_DeepFlavourBDiscN[JetInfo[iJetColl].nJet]     = DeepFlavourBN + DeepFlavourBBN + DeepFlavourLepBN;
+    JetInfo[iJetColl].Jet_DeepFlavourCvsLDiscN[JetInfo[iJetColl].nJet]  = DeepFlavourCN/(DeepFlavourCN + DeepFlavourUDSN + DeepFlavourGN);
+    JetInfo[iJetColl].Jet_DeepFlavourCvsBDiscN[JetInfo[iJetColl].nJet]  = DeepFlavourCN/(DeepFlavourCN + DeepFlavourBN + DeepFlavourBBN + DeepFlavourLepBN);
 
     JetInfo[iJetColl].Jet_DeepCSVBDisc[JetInfo[iJetColl].nJet]   = DeepCSVb + DeepCSVbb  ;
     JetInfo[iJetColl].Jet_DeepCSVBDiscN[JetInfo[iJetColl].nJet]  = DeepCSVbN + DeepCSVbbN;
