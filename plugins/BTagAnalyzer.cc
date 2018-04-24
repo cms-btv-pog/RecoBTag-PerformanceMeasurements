@@ -2703,7 +2703,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float DeepFlavourCN    = -10.;
     float DeepFlavourUDSN  = -10.;
     float DeepFlavourGN    = -10.;
-		if(deepFlavourJetTags_.size()) {
+		if(deepFlavourNegJetTags_.size()) {
 			DeepFlavourBN    = pjet->bDiscriminator((deepFlavourNegJetTags_+":probb"   ).c_str());
 			DeepFlavourBBN   = pjet->bDiscriminator((deepFlavourNegJetTags_+":probbb"   ).c_str()); 
 			DeepFlavourLepBN = pjet->bDiscriminator((deepFlavourNegJetTags_+":problepb"   ).c_str());
