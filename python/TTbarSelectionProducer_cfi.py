@@ -17,7 +17,8 @@ ttbarselectionproducer = cms.EDProducer("TTbarSelectionProducer",
                                                                        '_IsoMu22_v',
                                                                        '_IsoMu24_v',    
                                                                        'Ele35_WPLoose_Gsf_v',   
-                                                                       'Ele45_WPLoose_Gsf_v'
+                                                                       'Ele45_WPLoose_Gsf_v',
+                                                                       'HLT_Mu50_v'
                                                                        ),
                                         trigChannels     = cms.vint32(13*11,
                                                                       13*11,
@@ -26,7 +27,8 @@ ttbarselectionproducer = cms.EDProducer("TTbarSelectionProducer",
                                                                       13,
                                                                       13,
                                                                       11,
-                                                                      11
+                                                                      11,
+                                                                      13
                                                                       ),
                                         doTrigSel        = cms.bool(True),
                                         electronColl     = cms.InputTag("slimmedElectrons"),
