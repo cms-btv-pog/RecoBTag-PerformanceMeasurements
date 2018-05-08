@@ -182,12 +182,6 @@ options.register('produceJetTrackTree', False,
     "True if you want to keep info for tracks associated to jets : for commissioning studies"
 )
 
-options.register('useNegativeDeepFlavourTags', False,
-    VarParsing.multiplicity.singleton,
-    VarParsing.varType.bool,
-    "Include negative deep flavour jet taggers"
-)
-
 ## Generally leave to False unless you know what you are doing
 options.register('runIVF', False, 
     VarParsing.multiplicity.singleton,
@@ -493,10 +487,6 @@ if options.miniAOD and options.useLegacyTaggers:
 if options.useLegacyTaggers:
     bTagInfos = bTagInfosLegacy
     bTagDiscriminators = bTagDiscriminatorsLegacy
-
-## If not including negative deep flavour jet taggers
-if not options.useNegativeDeepFlavourTags:
-  bTagDiscriminators = {i for i in bTagDiscriminators if 'NegativeDeepFlavourJetTags' not in i}
 
 ## Clustering algorithm label
 algoLabel = 'CA'
