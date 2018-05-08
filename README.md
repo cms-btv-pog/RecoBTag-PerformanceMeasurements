@@ -15,7 +15,7 @@ git remote add btv-cmssw https://github.com/cms-btv-pog/cmssw.git
 #Add DeepFlavour and its dependencies
 git cms-merge-topic cms-btv-pog:DeepFlavourNewTraining-from-CMSSW_10_1_2_patch2
 
-git clone -b https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b 10_1_X --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
