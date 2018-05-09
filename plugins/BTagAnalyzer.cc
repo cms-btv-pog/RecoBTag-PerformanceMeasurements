@@ -2759,9 +2759,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
     // Jet information
     //DeepFlavour discriminators
-    JetInfo[iJetColl].Jet_DeepFlavourBDisc[JetInfo[iJetColl].nJet]     = (DeepFlavourB != -1000 && DeepFlavourBB != -1000 && DeepFlavourLepB != -1000) ? DeepFlavourB + DeepFlavourBB + DeepFlavourLepB : -1000;
-    JetInfo[iJetColl].Jet_DeepFlavourCvsLDisc[JetInfo[iJetColl].nJet]  = (DeepFlavourC != -1000 && DeepFlavourUDS != -1000 && DeepFlavourG != -1000) ? DeepFlavourC/(DeepFlavourC + DeepFlavourUDS + DeepFlavourG) : -1000;
-    JetInfo[iJetColl].Jet_DeepFlavourCvsBDisc[JetInfo[iJetColl].nJet]  = (DeepFlavourC != -1000 && DeepFlavourB != -1000 && DeepFlavourBB != -1000 && DeepFlavourLepB!= -1000) ? DeepFlavourC/(DeepFlavourC + DeepFlavourB + DeepFlavourBB + DeepFlavourLepB) : -1000;
+    JetInfo[iJetColl].Jet_DeepFlavourBDisc[JetInfo[iJetColl].nJet]     = (DeepFlavourB < -5) ? DeepFlavourB + DeepFlavourBB + DeepFlavourLepB : -10;
+    JetInfo[iJetColl].Jet_DeepFlavourCvsLDisc[JetInfo[iJetColl].nJet]  = (DeepFlavourB < -5) ? DeepFlavourC/(DeepFlavourC + DeepFlavourUDS + DeepFlavourG) : -10;
+    JetInfo[iJetColl].Jet_DeepFlavourCvsBDisc[JetInfo[iJetColl].nJet]  = (DeepFlavourB < -5) ? DeepFlavourC/(DeepFlavourC + DeepFlavourB + DeepFlavourBB + DeepFlavourLepB) : -10;
 
     //DeepFlavour probabilities
     JetInfo[iJetColl].Jet_DeepFlavourB[JetInfo[iJetColl].nJet]    = DeepFlavourB   ;
@@ -2772,9 +2772,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_DeepFlavourG[JetInfo[iJetColl].nJet]    = DeepFlavourG   ;
 
     //DeepFlavour negative tags
-    JetInfo[iJetColl].Jet_DeepFlavourBDiscN[JetInfo[iJetColl].nJet]     = (DeepFlavourBN != -1000 && DeepFlavourBBN != -1000 && DeepFlavourLepBN != -1000) ? DeepFlavourBN + DeepFlavourBBN + DeepFlavourLepBN : -1000;
-    JetInfo[iJetColl].Jet_DeepFlavourCvsLDiscN[JetInfo[iJetColl].nJet]  = (DeepFlavourCN != -1000 && DeepFlavourUDSN != -1000 && DeepFlavourGN != -1000) ? DeepFlavourCN/(DeepFlavourCN + DeepFlavourUDSN + DeepFlavourGN) : -1000;
-    JetInfo[iJetColl].Jet_DeepFlavourCvsBDiscN[JetInfo[iJetColl].nJet]  = (DeepFlavourCN != -1000 && DeepFlavourBN != -1000 && DeepFlavourBBN != -1000 && DeepFlavourLepBN != -1000) ? DeepFlavourCN/(DeepFlavourCN + DeepFlavourBN + DeepFlavourBBN + DeepFlavourLepBN) : -1000;
+    JetInfo[iJetColl].Jet_DeepFlavourBDiscN[JetInfo[iJetColl].nJet]     = (DeepFlavourBN < -5) ? DeepFlavourBN + DeepFlavourBBN + DeepFlavourLepBN : -10;
+    JetInfo[iJetColl].Jet_DeepFlavourCvsLDiscN[JetInfo[iJetColl].nJet]  = (DeepFlavourBN < -5) ? DeepFlavourCN/(DeepFlavourCN + DeepFlavourUDSN + DeepFlavourGN) : -10;
+    JetInfo[iJetColl].Jet_DeepFlavourCvsBDiscN[JetInfo[iJetColl].nJet]  = (DeepFlavourBN < -5) ? DeepFlavourCN/(DeepFlavourCN + DeepFlavourBN + DeepFlavourBBN + DeepFlavourLepBN) : -10;
 
     JetInfo[iJetColl].Jet_DeepCSVBDisc[JetInfo[iJetColl].nJet]   = DeepCSVb + DeepCSVbb  ;
     JetInfo[iJetColl].Jet_DeepCSVBDiscN[JetInfo[iJetColl].nJet]  = DeepCSVbN + DeepCSVbbN;
