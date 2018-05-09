@@ -99,38 +99,6 @@ void
 EventCounter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    hEventCount->Fill(0.);
-   if(!iEvent.isRealData()){
-      edm::Handle<GenEventInfoProduct> geninfos;
-      iEvent.getByToken( generator,geninfos );
-      int weightSign=1;
-      if(geninfos->weight()<0){
-         weightSign=-1;
-      }
-      
-      // pileup
-      edm::Handle<std::vector <PileupSummaryInfo> > PupInfo;
-      bool checkPUname = iEvent.getByToken(putoken, PupInfo);
-
-      if (checkPUname){
-          iEvent.getByToken(putoken, PupInfo);
-      } else{
-          iEvent.getByToken(putokenmini, PupInfo);
-      }
-      float nPUtrue=-1;
-      std::vector<PileupSummaryInfo>::const_iterator ipu;
-      for (ipu = PupInfo->begin(); ipu != PupInfo->end(); ++ipu) {
-          if ( ipu->getBunchCrossing() != 0 ) continue; //only for the active BX
-          nPUtrue = ipu->getTrueNumInteractions();      
-          break;
-      }
-
-
-      if(weightSign>0){
-          hPUPlusCount->Fill(nPUtrue);
-      } else {
-          hPUNegCount->Fill(nPUtrue);
-      }  
-   }
 }
 
 
