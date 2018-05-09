@@ -1388,9 +1388,9 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     if (!isData_) {
        float wtop = 0.;
        float wantitop = 0.;
-       edm::Handle<reco::GenParticleCollection> prunedGenParticles;
-       iEvent.getByToken(prunedGenParticleCollectionName_, prunedGenParticles);
-       for (auto i = prunedGenParticles->begin(); i != prunedGenParticles->end(); ++i) {
+       edm::Handle<reco::GenParticleCollection> genParticles;
+       iEvent.getByToken(genParticleCollectionName_, genParticles);
+       for (auto i = genParticles->begin(); i != genParticles->end(); ++i) {
           if (i->pdgId()==6 && i->isLastCopy()) {
              wtop = exp(0.0615-0.0005*i->pt());
           }
