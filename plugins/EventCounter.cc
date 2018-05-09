@@ -128,12 +128,10 @@ EventCounter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       } else{
           iEvent.getByToken(putokenmini, PupInfo);
       }
-      int nPU=-1;
       float nPUtrue=-1;
       std::vector<PileupSummaryInfo>::const_iterator ipu;
       for (ipu = PupInfo->begin(); ipu != PupInfo->end(); ++ipu) {
           if ( ipu->getBunchCrossing() != 0 ) continue; //only for the active BX
-	        nPU     = ipu->getPU_NumInteractions(); 
           nPUtrue = ipu->getTrueNumInteractions();      
           break;
       }
