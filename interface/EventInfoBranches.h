@@ -245,7 +245,9 @@ class EventInfoBranches {
       tree->Branch("DHadron_DaughtersPdgID",     DHadron_DaughtersPdgID    ,"DHadron_DaughtersPdgID[nDaughters]/I");
       tree->Branch("DHadron_nChargedDaughters",  DHadron_nChargedDaughters ,"DHadron_nChargedDaughters[nDHadrons]/I");
       tree->Branch("DHadron_nCharged", DHadron_nCharged ,"DHadron_nCharged[nDHadrons]/I");
+    }
 
+    void RegisterGenVarTree(TTree *tree){
       tree->Branch("nGenlep",     &nGenlep       ,"nGenlep/I");
       tree->Branch("Genlep_pT",     Genlep_pT    , "Genlep_pT[nGenlep]/F");
       tree->Branch("Genlep_eta",    Genlep_eta   , "Genlep_eta[nGenlep]/F");
@@ -434,7 +436,9 @@ class EventInfoBranches {
       tree->SetBranchAddress("DHadron_DaughtersPdgID",     DHadron_DaughtersPdgID    );
       tree->SetBranchAddress("DHadron_nChargedDaughters",  DHadron_nChargedDaughters );
       tree->SetBranchAddress("DHadron_nCharged", DHadron_nCharged );
+    }
 
+    void ReadGenVarTree(TTree *tree){
       tree->SetBranchAddress("nGenlep",       &nGenlep     );
       tree->SetBranchAddress("Genlep_pT",     Genlep_pT    );
       tree->SetBranchAddress("Genlep_eta",    Genlep_eta   );
