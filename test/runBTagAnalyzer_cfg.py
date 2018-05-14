@@ -249,6 +249,10 @@ options.register('JPCalibration', '',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     'JP Calibration pyload to use')
+options.register('storeGenVariables', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to store Gen Variables')
 options.register('storeCSVTagVariables', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -1414,6 +1418,11 @@ process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
 process.btagana.triggerTable          = cms.InputTag(trigresults) # Data and MC
 process.btagana.genParticles          = cms.InputTag(genParticles)
 process.btagana.candidates            = cms.InputTag(pfCandidates)
+process.btagana.storeGenVariables     = options.storeGenVariables
+
+if options.runOnData:
+  process.btagana.storeGenVariables     = False
+
 
 if options.doCTag:
     process.btagana.storeCTagVariables = True

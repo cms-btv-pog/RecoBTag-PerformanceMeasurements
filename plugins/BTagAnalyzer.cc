@@ -382,6 +382,7 @@ private:
   bool produceAllTrackTree_;
   bool producePtRelTemplate_;
   bool storeEventInfo_;
+  bool storeGenVariables_;
   bool storePatMuons_;
   bool storeTagVariables_;
   bool storeTagVariablesSubJets_;
@@ -556,6 +557,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   produceAllTrackTree_  = iConfig.getParameter<bool> ("produceAllTrackTree");
   producePtRelTemplate_ = iConfig.getParameter<bool> ("producePtRelTemplate");
   storeEventInfo_ = iConfig.getParameter<bool>("storeEventInfo");
+  storeGenVariables_ = iConfig.getParameter<bool>("storeGenVariables");
   storePatMuons_ = iConfig.getParameter<bool>("storePatMuons");
   storeTagVariables_ = iConfig.getParameter<bool>("storeTagVariables");
   storeTagVariablesSubJets_ = iConfig.getParameter<bool>("storeTagVariablesSubJets");
@@ -729,6 +731,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
     if ( produceJetTrackTree_ ) EventInfo.RegisterJetTrackTree(smalltree);
     if ( produceAllTrackTree_ ) EventInfo.RegisterAllTrackTree(smalltree);
     if ( storePatMuons_ )       EventInfo.RegisterPatMuonTree(smalltree);
+    if ( storeGenVariables_ )   EventInfo.RegisterGenVarTree(smalltree);
   }
 
   //--------------------------------------
