@@ -307,12 +307,12 @@ private:
   std::string combinedSVNegBJetTags_;
   std::string combinedSVPosBJetTags_;
 
-	std::string deepFlavourJetTags_;
-	std::string deepFlavourNegJetTags_;
+  std::string deepFlavourJetTags_;
+  std::string deepFlavourNegJetTags_;
 
-	std::string deepCSVBJetTags_;
-	std::string deepCSVNegBJetTags_;
-	std::string deepCSVPosBJetTags_;
+  std::string deepCSVBJetTags_;
+  std::string deepCSVNegBJetTags_;
+  std::string deepCSVPosBJetTags_;
 
   std::string combinedIVFSVBJetTags_;
   std::string combinedIVFSVPosBJetTags_;
@@ -387,7 +387,7 @@ private:
   bool storeTagVariables_;
   bool storeTagVariablesSubJets_;
   bool storeCSVTagVariables_;
-	bool storeDeepFlavourTagVariables_;
+  bool storeDeepFlavourTagVariables_;
   bool storeCSVTagVariablesSubJets_;
 
   bool storeCTagVariables_;
@@ -562,7 +562,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   storeTagVariables_ = iConfig.getParameter<bool>("storeTagVariables");
   storeTagVariablesSubJets_ = iConfig.getParameter<bool>("storeTagVariablesSubJets");
   storeCSVTagVariables_ = iConfig.getParameter<bool>("storeCSVTagVariables");
-	storeDeepFlavourTagVariables_  = iConfig.getParameter<bool>("storeDeepFlavourTagVariables");
+  storeDeepFlavourTagVariables_  = iConfig.getParameter<bool>("storeDeepFlavourTagVariables");
   storeCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("storeCSVTagVariablesSubJets");
 
   storeCTagVariables_ = iConfig.getParameter<bool>("storeCTagVariables");
@@ -596,7 +596,6 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   for(const auto& tag: iConfig.getParameter<std::vector<edm::InputTag> >("SubJets")){
     SubJetCollectionTags_.push_back(consumes<PatJetCollection>(tag));
   }
-  SubJetLabels_         = iConfig.getParameter<std::vector<std::string> >("SubJetLabels");
 
   if ( runFatJets_ )
   {
@@ -650,12 +649,12 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   combinedSVNegBJetTags_  = iConfig.getParameter<std::string>("combinedSVNegBJetTags");
   combinedSVPosBJetTags_  = iConfig.getParameter<std::string>("combinedSVPosBJetTags");
 
-	deepFlavourJetTags_ = iConfig.getParameter<std::string>("deepFlavourJetTags");
-	deepFlavourNegJetTags_ = iConfig.getParameter<std::string>("deepFlavourNegJetTags");
+  deepFlavourJetTags_ = iConfig.getParameter<std::string>("deepFlavourJetTags");
+  deepFlavourNegJetTags_ = iConfig.getParameter<std::string>("deepFlavourNegJetTags");
 
-	deepCSVBJetTags_    = iConfig.getParameter<std::string>("deepCSVBJetTags");
-	deepCSVNegBJetTags_ = iConfig.getParameter<std::string>("deepCSVNegBJetTags");
-	deepCSVPosBJetTags_ = iConfig.getParameter<std::string>("deepCSVPosBJetTags");
+  deepCSVBJetTags_    = iConfig.getParameter<std::string>("deepCSVBJetTags");
+  deepCSVNegBJetTags_ = iConfig.getParameter<std::string>("deepCSVNegBJetTags");
+  deepCSVPosBJetTags_ = iConfig.getParameter<std::string>("deepCSVPosBJetTags");
 
   combinedIVFSVBJetTags_      = iConfig.getParameter<std::string>("combinedIVFSVBJetTags");
   combinedIVFSVPosBJetTags_   = iConfig.getParameter<std::string>("combinedIVFSVPosBJetTags");
@@ -746,11 +745,10 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   if ( fillsvTagInfo_ )       JetInfo[0].RegisterJetSVTree(smalltree,branchNamePrefix_);
   if ( storeTagVariables_)    JetInfo[0].RegisterTagVarTree(smalltree,branchNamePrefix_);
   if ( storeCSVTagVariables_) JetInfo[0].RegisterCSVTagVarTree(smalltree,branchNamePrefix_);
-	std::cout << "storeDeepFlavourTagVariables_: " << storeDeepFlavourTagVariables_ << std::endl;
-	if ( storeDeepFlavourTagVariables_) {
-		std::cout << "storeDeepFlavourTagVariables_" << std::endl;
-		JetInfo[0].RegisterDeepFlavourFeatTree(smalltree,branchNamePrefix_);
-	}
+  std::cout << "storeDeepFlavourTagVariables_: " << storeDeepFlavourTagVariables_ << std::endl;
+  if ( storeDeepFlavourTagVariables_) {
+    JetInfo[0].RegisterDeepFlavourFeatTree(smalltree,branchNamePrefix_);
+  }
   if ( storeCTagVariables_) JetInfo[0].RegisterCTagVarTree(smalltree,branchNamePrefix_);
   if ( runSubJets_ ) {
     for ( size_t i = 0; i < SubJetLabels_.size(); ++i )
@@ -1799,16 +1797,16 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       TLorentzVector thejet;
       thejet.SetPtEtaPhiM(ptjet, etajet, phijet, 0.);      
       for(int il=0; il<EventInfo.ttbar_nl; il++)
-	{
-	  TLorentzVector theLepton;
-	  theLepton.SetPtEtaPhiM(EventInfo.ttbar_lpt[il],
-				 EventInfo.ttbar_leta[il],
-				 EventInfo.ttbar_lphi[il],
-				 EventInfo.ttbar_lm[il]);
-	  float dR(thejet.DeltaR(theLepton));
-	  if(dR>minDRlj) continue;
-	  minDRlj=dR;
-	}
+      {
+        TLorentzVector theLepton;
+        theLepton.SetPtEtaPhiM(EventInfo.ttbar_lpt[il],
+        EventInfo.ttbar_leta[il],
+        EventInfo.ttbar_lphi[il],
+        EventInfo.ttbar_lm[il]);
+        float dR(thejet.DeltaR(theLepton));
+        if(dR>minDRlj) continue;
+        minDRlj=dR;
+      }
       if(EventInfo.ttbar_chan>=0 && minDRlj<0.4) continue;
     }
     //// end of removal
@@ -1819,27 +1817,27 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       if ( flavour >= 1 && flavour <= 3 ) flavour = 1;
     }
 
-		int hflav = pjet->hadronFlavour();		
-		int pflav = pjet->partonFlavour();
-		int cflav = 0; //~correct flavour definition
-		if(!isData_) {
-			if(hflav != 0) {
-				cflav = hflav;
-			}
-			else { //not a heavy jet
-				if(std::abs(pflav) == 4 || std::abs(pflav) == 5) {
-					cflav = 0;
-				}
-				else {
-					cflav = pflav;
-				}
-			}
-		}
+    int hflav = pjet->hadronFlavour();
+    int pflav = pjet->partonFlavour();
+    int cflav = 0; //~correct flavour definition
+    if(!isData_) {
+      if(hflav != 0) {
+        cflav = hflav;
+      }
+      else { //not a heavy jet
+        if(std::abs(pflav) == 4 || std::abs(pflav) == 5) {
+          cflav = 0;
+        }
+        else {
+          cflav = pflav;
+        }
+      }
+    }
 
     JetInfo[iJetColl].Jet_partonid[JetInfo[iJetColl].nJet]  = pjet->genParton() ? pjet->genParton()->pdgId() : 0;
     JetInfo[iJetColl].Jet_area[JetInfo[iJetColl].nJet]      = pjet->jetArea();
     JetInfo[iJetColl].Jet_flavour[JetInfo[iJetColl].nJet]   = cflav;
-		JetInfo[iJetColl].Jet_flavourCleaned[JetInfo[iJetColl].nJet]  = cflav;
+    JetInfo[iJetColl].Jet_flavourCleaned[JetInfo[iJetColl].nJet]  = cflav;
     JetInfo[iJetColl].Jet_partonFlavour[JetInfo[iJetColl].nJet]   = pjet->partonFlavour();
     JetInfo[iJetColl].Jet_hadronFlavour[JetInfo[iJetColl].nJet]   = pjet->hadronFlavour();
     JetInfo[iJetColl].Jet_nbHadrons[JetInfo[iJetColl].nJet] = pjet->jetFlavourInfo().getbHadrons().size();
@@ -1879,7 +1877,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
     JetInfo[iJetColl].Jet_jes[JetInfo[iJetColl].nJet]      = ( nJECSets>0 ? pjet->pt()/pjet->correctedJet("Uncorrected").pt() : 1. );
     JetInfo[iJetColl].Jet_residual[JetInfo[iJetColl].nJet] = ( nJECSets>0 ? pjet->pt()/pjet->correctedJet("L3Absolute").pt() : 1. );
-		JetInfo[iJetColl].Jet_uncorrpt[JetInfo[iJetColl].nJet] = ( nJECSets>0 ? pjet->correctedJet("Uncorrected").pt() : pjet->pt());
+    JetInfo[iJetColl].Jet_uncorrpt[JetInfo[iJetColl].nJet] = ( nJECSets>0 ? pjet->correctedJet("Uncorrected").pt() : pjet->pt());
 
     if( runSubJets_ && iJetColl > 0 )
     {
@@ -2109,41 +2107,38 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].Track_dxyError[JetInfo[iJetColl].nTrack]      = ptrack.dxyError();
       JetInfo[iJetColl].Track_dzError[JetInfo[iJetColl].nTrack]       = ptrack.dzError();
        
-	 {
-	    TransverseImpactPointExtrapolator extrapolator(transientTrack.field());
-	    TrajectoryStateOnSurface closestOnTransversePlaneState =
-	      extrapolator.extrapolate(transientTrack.impactPointState(),RecoVertex::convertPos(pv->position()));
-	    if( closestOnTransversePlaneState.isValid() )
-	      {		 
-		 GlobalPoint impactPoint    = closestOnTransversePlaneState.globalPosition();
-		 GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),0.);
-		 double prod = IPVec.dot(direction);
-		 int sign = (prod>=0) ? 1 : -1;
-		 JetInfo[iJetColl].Track_sign2D[JetInfo[iJetColl].nTrack]      = sign;
-	      }
-	    else
-	      {
-		 JetInfo[iJetColl].Track_sign2D[JetInfo[iJetColl].nTrack]      = -666.;
-	      }	    
-	 }       
-	 {
-	    AnalyticalImpactPointExtrapolator extrapolator(transientTrack.field());
-	    TrajectoryStateOnSurface closestIn3DSpaceState =
-	      extrapolator.extrapolate(transientTrack.impactPointState(),RecoVertex::convertPos(pv->position()));
-	    if( closestIn3DSpaceState.isValid() )
-	      {		 
-		 GlobalPoint impactPoint = closestIn3DSpaceState.globalPosition();
-		 GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),impactPoint.z()-pv->z());
-		 double prod = IPVec.dot(direction);
-		 int sign = (prod>=0) ? 1 : -1;
-		 JetInfo[iJetColl].Track_sign3D[JetInfo[iJetColl].nTrack]      = sign;
-	      }
-	    else
-	      {
-		 std::cout << "FAILURE: TrajectoryStateOnSurface is not available" << std::endl;
-		 JetInfo[iJetColl].Track_sign3D[JetInfo[iJetColl].nTrack]      = -666.;
-	      }	    
-	 }       
+
+      TransverseImpactPointExtrapolator extrapolator(transientTrack.field());
+      TrajectoryStateOnSurface closestOnTransversePlaneState = extrapolator.extrapolate(transientTrack.impactPointState(),RecoVertex::convertPos(pv->position()));
+      if( closestOnTransversePlaneState.isValid() )
+      {
+        GlobalPoint impactPoint    = closestOnTransversePlaneState.globalPosition();
+        GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),0.);
+        double prod = IPVec.dot(direction);
+        int sign = (prod>=0) ? 1 : -1;
+        JetInfo[iJetColl].Track_sign2D[JetInfo[iJetColl].nTrack]      = sign;
+      }
+      else
+      {
+        JetInfo[iJetColl].Track_sign2D[JetInfo[iJetColl].nTrack]      = -666.;
+      }
+
+      AnalyticalImpactPointExtrapolator extrapolator(transientTrack.field());
+      TrajectoryStateOnSurface closestIn3DSpaceState = extrapolator.extrapolate(transientTrack.impactPointState(),RecoVertex::convertPos(pv->position()));
+      if( closestIn3DSpaceState.isValid() )
+      {
+        GlobalPoint impactPoint = closestIn3DSpaceState.globalPosition();
+        GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),impactPoint.z()-pv->z());
+        double prod = IPVec.dot(direction);
+        int sign = (prod>=0) ? 1 : -1;
+        JetInfo[iJetColl].Track_sign3D[JetInfo[iJetColl].nTrack]      = sign;
+      }
+      else
+      {
+        std::cout << "FAILURE: TrajectoryStateOnSurface is not available" << std::endl;
+        JetInfo[iJetColl].Track_sign3D[JetInfo[iJetColl].nTrack]      = -666.;
+      }
+
 
       float deltaR = reco::deltaR( ptrackRef->eta(), ptrackRef->phi(),
                                    JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet], JetInfo[iJetColl].Jet_phi[JetInfo[iJetColl].nJet] );
@@ -2290,7 +2285,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         if ( useTrackHistory_ && !isData_ ) {
            TrackCategories::Flags theFlag ;
            if(useSelectedTracks_) theFlag  = classifier_.evaluate( toTrackRef(ipTagInfo->selectedTracks()[itt]) ).flags();
-	       else                   theFlag  = classifier_.evaluate( toTrackRef(tracks[itt]) ).flags();
+           else                   theFlag  = classifier_.evaluate( toTrackRef(tracks[itt]) ).flags();
 
            if ( theFlag[TrackCategories::BWeakDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 1);
            if ( theFlag[TrackCategories::CWeakDecay] )	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 2);
@@ -2300,7 +2295,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
            if ( theFlag[TrackCategories::LambdaDecay] )       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 6);
            if ( theFlag[TrackCategories::HadronicProcess] )   JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 7);
            if ( theFlag[TrackCategories::Fake] ) 	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 8);
-		   if ( theFlag[TrackCategories::SharedInnerHits] )   JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 9);
+           if ( theFlag[TrackCategories::SharedInnerHits] )   JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 9);
         
 
            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] > 0 ) {
@@ -2327,70 +2322,65 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
            }
 
             //********************************************************************
-		    //
-			//	Match track to TrackingParticle and retrieve TrackTruth info
-			//
-			//********************************************************************
-			if (produceJetTrackTruthTree_){
-			
-				std::pair<TrackingParticleRef, double> res;
-				TrackingParticleRef tpr;
-				double quality_tpr;
-				res = classifier_.history().getMatchedTrackingParticle();
-				tpr = res.first;
-				quality_tpr = res.second;
-	
-				JetInfo[iJetColl].Track_TPAssociationQuality[JetInfo[iJetColl].nTrack] = quality_tpr;
-				JetInfo[iJetColl].Track_idxMatchedTP[JetInfo[iJetColl].nTrack] = -99; // default in case no match was found
-	
-				// Match TP to hit-cluster (re-ordering according to TP rather than clusters and look for equal_range of a given tpr)
-				auto clusterTPmap = clusterToTPMap->map();
-				std::sort(clusterTPmap.begin(), clusterTPmap.end(), compare);
-				auto clusterRange = std::equal_range(clusterTPmap.begin(), clusterTPmap.end(),std::make_pair(OmniClusterRef(), tpr), compare);
-	
-				if (quality_tpr != 0) {
-	
-					// to match Track to TP
-					JetInfo[iJetColl].Track_idxMatchedTP[JetInfo[iJetColl].nTrack] = JetInfo[iJetColl].nTrackTruth;
-					// to match TP to Track
-					JetInfo[iJetColl].TrackTruth_idxMatchedTrack[JetInfo[iJetColl].nTrackTruth] = JetInfo[iJetColl].nTrack;
-		
-					JetInfo[iJetColl].TrackTruth_p[JetInfo[iJetColl].nTrackTruth] = tpr->p();
-					JetInfo[iJetColl].TrackTruth_pt[JetInfo[iJetColl].nTrackTruth] = tpr->pt();
-					JetInfo[iJetColl].TrackTruth_eta[JetInfo[iJetColl].nTrackTruth] = tpr->eta();
-					JetInfo[iJetColl].TrackTruth_phi[JetInfo[iJetColl].nTrackTruth] = tpr->phi();
-					JetInfo[iJetColl].TrackTruth_charge[JetInfo[iJetColl].nTrackTruth] = tpr->charge();
-					JetInfo[iJetColl].TrackTruth_pdgid[JetInfo[iJetColl].nTrackTruth] = tpr->pdgId();
-		
-					// calculate dxy,dz,IP,...
-					TrackingParticle::Point vertex_pv = pv->position();
-					TrackingParticle::Point vertex_tpr = tpr->vertex();
-					TrackingParticle::Vector momentum_tpr = tpr->momentum();
-					float dxy_tpr = (-(vertex_tpr.x()-vertex_pv.x())*momentum_tpr.y()+(vertex_tpr.y()-vertex_pv.y())*momentum_tpr.x())/tpr->pt();
-					float dz_tpr = (vertex_tpr.z()-vertex_pv.z()) - ((vertex_tpr.x()-vertex_pv.x())*momentum_tpr.x()+(vertex_tpr.y()-vertex_pv.y())*momentum_tpr.y())/sqrt(momentum_tpr.perp2()) * momentum_tpr.z()/sqrt(momentum_tpr.perp2());
-					JetInfo[iJetColl].TrackTruth_dxy[JetInfo[iJetColl].nTrackTruth] = dxy_tpr;
-					JetInfo[iJetColl].TrackTruth_dz[JetInfo[iJetColl].nTrackTruth] = dz_tpr;
-		
-					// calculate hits
-					int n_pix_hits = 0;
-					int n_strip_hits = 0;
-					if( clusterRange.first != clusterRange.second ) {
-						for( auto ip=clusterRange.first; ip != clusterRange.second; ++ip ) {
-							const OmniClusterRef& cluster = ip->first;
-							if (cluster.isPixel() && cluster.isValid()){ n_pix_hits+=1;}
-							if (cluster.isStrip() && cluster.isValid()){ n_strip_hits+=1;}
-						}
-					}
-					JetInfo[iJetColl].TrackTruth_nHitAll[JetInfo[iJetColl].nTrackTruth] = n_pix_hits+n_strip_hits;
-					JetInfo[iJetColl].TrackTruth_nHitStrip[JetInfo[iJetColl].nTrackTruth] = n_strip_hits;
-					JetInfo[iJetColl].TrackTruth_nHitPixel[JetInfo[iJetColl].nTrackTruth] = n_pix_hits;
+            //
+            // Match track to TrackingParticle and retrieve TrackTruth info
+            //
+            //********************************************************************
+            if (produceJetTrackTruthTree_){
+            std::pair<TrackingParticleRef, double> res;
+            TrackingParticleRef tpr;
+            double quality_tpr;
+            res = classifier_.history().getMatchedTrackingParticle();
+            tpr = res.first;
+            quality_tpr = res.second;
 
+            JetInfo[iJetColl].Track_TPAssociationQuality[JetInfo[iJetColl].nTrack] = quality_tpr;
+            JetInfo[iJetColl].Track_idxMatchedTP[JetInfo[iJetColl].nTrack] = -99; // default in case no match was found
 
-					++JetInfo[iJetColl].nTrackTruth;
-	
-				}
-        	}
-        	// ************ end of track truth calculations ****************************
+            // Match TP to hit-cluster (re-ordering according to TP rather than clusters and look for equal_range of a given tpr)
+            auto clusterTPmap = clusterToTPMap->map();
+            std::sort(clusterTPmap.begin(), clusterTPmap.end(), compare);
+            auto clusterRange = std::equal_range(clusterTPmap.begin(), clusterTPmap.end(),std::make_pair(OmniClusterRef(), tpr), compare);
+
+            if (quality_tpr != 0) {
+              // to match Track to TP
+              JetInfo[iJetColl].Track_idxMatchedTP[JetInfo[iJetColl].nTrack] = JetInfo[iJetColl].nTrackTruth;
+              // to match TP to Track
+              JetInfo[iJetColl].TrackTruth_idxMatchedTrack[JetInfo[iJetColl].nTrackTruth] = JetInfo[iJetColl].nTrack;
+
+              JetInfo[iJetColl].TrackTruth_p[JetInfo[iJetColl].nTrackTruth] = tpr->p();
+              JetInfo[iJetColl].TrackTruth_pt[JetInfo[iJetColl].nTrackTruth] = tpr->pt();
+              JetInfo[iJetColl].TrackTruth_eta[JetInfo[iJetColl].nTrackTruth] = tpr->eta();
+              JetInfo[iJetColl].TrackTruth_phi[JetInfo[iJetColl].nTrackTruth] = tpr->phi();
+              JetInfo[iJetColl].TrackTruth_charge[JetInfo[iJetColl].nTrackTruth] = tpr->charge();
+              JetInfo[iJetColl].TrackTruth_pdgid[JetInfo[iJetColl].nTrackTruth] = tpr->pdgId();
+
+              // calculate dxy,dz,IP,...
+              TrackingParticle::Point vertex_pv = pv->position();
+              TrackingParticle::Point vertex_tpr = tpr->vertex();
+              TrackingParticle::Vector momentum_tpr = tpr->momentum();
+              float dxy_tpr = (-(vertex_tpr.x()-vertex_pv.x())*momentum_tpr.y()+(vertex_tpr.y()-vertex_pv.y())*momentum_tpr.x())/tpr->pt();
+              float dz_tpr = (vertex_tpr.z()-vertex_pv.z()) - ((vertex_tpr.x()-vertex_pv.x())*momentum_tpr.x()+(vertex_tpr.y()-vertex_pv.y())*momentum_tpr.y())/sqrt(momentum_tpr.perp2()) * momentum_tpr.z()/sqrt(momentum_tpr.perp2());
+              JetInfo[iJetColl].TrackTruth_dxy[JetInfo[iJetColl].nTrackTruth] = dxy_tpr;
+              JetInfo[iJetColl].TrackTruth_dz[JetInfo[iJetColl].nTrackTruth] = dz_tpr;
+
+              // calculate hits
+              int n_pix_hits = 0;
+              int n_strip_hits = 0;
+              if( clusterRange.first != clusterRange.second ) {
+                      for( auto ip=clusterRange.first; ip != clusterRange.second; ++ip ) {
+                              const OmniClusterRef& cluster = ip->first;
+                              if (cluster.isPixel() && cluster.isValid()){ n_pix_hits+=1;}
+                              if (cluster.isStrip() && cluster.isValid()){ n_strip_hits+=1;}
+                      }
+              }
+              JetInfo[iJetColl].TrackTruth_nHitAll[JetInfo[iJetColl].nTrackTruth] = n_pix_hits+n_strip_hits;
+              JetInfo[iJetColl].TrackTruth_nHitStrip[JetInfo[iJetColl].nTrackTruth] = n_strip_hits;
+              JetInfo[iJetColl].TrackTruth_nHitPixel[JetInfo[iJetColl].nTrackTruth] = n_pix_hits;
+              ++JetInfo[iJetColl].nTrackTruth;
+            }
+          }
+          // ************ end of track truth calculations ****************************
         }
         // ************ end of track history calculations ****************************
 
@@ -2926,31 +2916,31 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].nSVTagVar += nSVs;
       JetInfo[iJetColl].Jet_nLastSVTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSVTagVar;
     }
-		
-		// DeepFlavour InputFeatures
-		if(storeDeepFlavourTagVariables_) { 
-			auto df_taginfo = static_cast<const reco::DeepFlavourTagInfo*>(pjet->tagInfo(deepFlavourTagInfos_));
-			if(!df_taginfo) {
-				throw cms::Exception("CorruptData") << "The jet collection does not have the DeepFlavour TagInfos embedded!";
-			}
-			const auto & features = df_taginfo->features();
 
-			size_t csize = features.c_pf_features.size();
-			JetInfo[iJetColl].DeepFlavourInput_charged_Sip3dVal[JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackSip3dVal;
-			JetInfo[iJetColl].DeepFlavourInput_charged_Sip3dSig[JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackSip3dSig;
-			JetInfo[iJetColl].DeepFlavourInput_charged_quality[ JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].quality;
-			JetInfo[iJetColl].DeepFlavourInput_charged_chi2[    JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].chi2;
-			
-			size_t nsize = features.n_pf_features.size();
-			JetInfo[iJetColl].DeepFlavourInput_neutral_drminsv[JetInfo[iJetColl].nJet] = (nsize == 0) ? -999 : features.n_pf_features[0].drminsv;
-			JetInfo[iJetColl].DeepFlavourInput_neutral_hadFrac[JetInfo[iJetColl].nJet] = (nsize == 0) ? -999 : features.n_pf_features[0].hadFrac;
-			JetInfo[iJetColl].DeepFlavourInput_neutral_ptrel[  JetInfo[iJetColl].nJet] = (nsize == 0) ? -999 : features.n_pf_features[0].ptrel;
-			
-			size_t svsize = features.sv_features.size();
-			JetInfo[iJetColl].DeepFlavourInput_sv_d3d[     JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].d3d;
-			JetInfo[iJetColl].DeepFlavourInput_sv_d3dsig[  JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].d3dsig;
-			JetInfo[iJetColl].DeepFlavourInput_sv_normchi2[JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].normchi2;
-		}
+    // DeepFlavour InputFeatures
+    if(storeDeepFlavourTagVariables_) {
+      auto df_taginfo = static_cast<const reco::DeepFlavourTagInfo*>(pjet->tagInfo(deepFlavourTagInfos_));
+      if(!df_taginfo) {
+        throw cms::Exception("CorruptData") << "The jet collection does not have the DeepFlavour TagInfos embedded!";
+      }
+      const auto & features = df_taginfo->features();
+
+      size_t csize = features.c_pf_features.size();
+      JetInfo[iJetColl].DeepFlavourInput_charged_Sip3dVal[JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackSip3dVal;
+      JetInfo[iJetColl].DeepFlavourInput_charged_Sip3dSig[JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackSip3dSig;
+      JetInfo[iJetColl].DeepFlavourInput_charged_quality[ JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].quality;
+      JetInfo[iJetColl].DeepFlavourInput_charged_chi2[    JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].chi2;
+
+      size_t nsize = features.n_pf_features.size();
+      JetInfo[iJetColl].DeepFlavourInput_neutral_drminsv[JetInfo[iJetColl].nJet] = (nsize == 0) ? -999 : features.n_pf_features[0].drminsv;
+      JetInfo[iJetColl].DeepFlavourInput_neutral_hadFrac[JetInfo[iJetColl].nJet] = (nsize == 0) ? -999 : features.n_pf_features[0].hadFrac;
+      JetInfo[iJetColl].DeepFlavourInput_neutral_ptrel[  JetInfo[iJetColl].nJet] = (nsize == 0) ? -999 : features.n_pf_features[0].ptrel;
+
+      size_t svsize = features.sv_features.size();
+      JetInfo[iJetColl].DeepFlavourInput_sv_d3d[     JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].d3d;
+      JetInfo[iJetColl].DeepFlavourInput_sv_d3dsig[  JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].d3dsig;
+      JetInfo[iJetColl].DeepFlavourInput_sv_normchi2[JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].normchi2;
+    }
 
 
     // CSV TaggingVariables
@@ -3262,102 +3252,101 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
     for (size_t vtx = 0; vtx < (size_t)svTagInfo->nVertices(); ++vtx)
     {
-	JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).x();
-	JetInfo[iJetColl].SV_y[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).y();
-	JetInfo[iJetColl].SV_z[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).z();
-	JetInfo[iJetColl].SV_ex[JetInfo[iJetColl].nSV]   = xError(svTagInfo->secondaryVertex(vtx));
-	JetInfo[iJetColl].SV_ey[JetInfo[iJetColl].nSV]   = yError(svTagInfo->secondaryVertex(vtx));
-	JetInfo[iJetColl].SV_ez[JetInfo[iJetColl].nSV]   = zError(svTagInfo->secondaryVertex(vtx));
-	JetInfo[iJetColl].SV_chi2[JetInfo[iJetColl].nSV] = chi2(svTagInfo->secondaryVertex(vtx));
-	JetInfo[iJetColl].SV_ndf[JetInfo[iJetColl].nSV]  = ndof(svTagInfo->secondaryVertex(vtx));
+      JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).x();
+      JetInfo[iJetColl].SV_y[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).y();
+      JetInfo[iJetColl].SV_z[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).z();
+      JetInfo[iJetColl].SV_ex[JetInfo[iJetColl].nSV]   = xError(svTagInfo->secondaryVertex(vtx));
+      JetInfo[iJetColl].SV_ey[JetInfo[iJetColl].nSV]   = yError(svTagInfo->secondaryVertex(vtx));
+      JetInfo[iJetColl].SV_ez[JetInfo[iJetColl].nSV]   = zError(svTagInfo->secondaryVertex(vtx));
+      JetInfo[iJetColl].SV_chi2[JetInfo[iJetColl].nSV] = chi2(svTagInfo->secondaryVertex(vtx));
+      JetInfo[iJetColl].SV_ndf[JetInfo[iJetColl].nSV]  = ndof(svTagInfo->secondaryVertex(vtx));
 
-	JetInfo[iJetColl].SV_flight[JetInfo[iJetColl].nSV]      = svTagInfo->flightDistance(vtx).value();
-	JetInfo[iJetColl].SV_flightErr[JetInfo[iJetColl].nSV]   = svTagInfo->flightDistance(vtx).error();
-	JetInfo[iJetColl].SV_flight2D[JetInfo[iJetColl].nSV]    = svTagInfo->flightDistance(vtx, true).value();
-	JetInfo[iJetColl].SV_flight2DErr[JetInfo[iJetColl].nSV] = svTagInfo->flightDistance(vtx, true).error();
-	JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = vtxTracks(svTagInfo->secondaryVertex(vtx));
+      JetInfo[iJetColl].SV_flight[JetInfo[iJetColl].nSV]      = svTagInfo->flightDistance(vtx).value();
+      JetInfo[iJetColl].SV_flightErr[JetInfo[iJetColl].nSV]   = svTagInfo->flightDistance(vtx).error();
+      JetInfo[iJetColl].SV_flight2D[JetInfo[iJetColl].nSV]    = svTagInfo->flightDistance(vtx, true).value();
+      JetInfo[iJetColl].SV_flight2DErr[JetInfo[iJetColl].nSV] = svTagInfo->flightDistance(vtx, true).error();
+      JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = vtxTracks(svTagInfo->secondaryVertex(vtx));
 
-	const Vertex &vertex = svTagInfo->secondaryVertex(vtx);
+      const Vertex &vertex = svTagInfo->secondaryVertex(vtx);
 
-	JetInfo[iJetColl].SV_vtx_pt[JetInfo[iJetColl].nSV]  = vertex.p4().pt();
-	JetInfo[iJetColl].SV_vtx_eta[JetInfo[iJetColl].nSV] = vertex.p4().eta();
-	JetInfo[iJetColl].SV_vtx_phi[JetInfo[iJetColl].nSV] = vertex.p4().phi();
-	JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV]    = vertex.p4().mass();
+      JetInfo[iJetColl].SV_vtx_pt[JetInfo[iJetColl].nSV]  = vertex.p4().pt();
+      JetInfo[iJetColl].SV_vtx_eta[JetInfo[iJetColl].nSV] = vertex.p4().eta();
+      JetInfo[iJetColl].SV_vtx_phi[JetInfo[iJetColl].nSV] = vertex.p4().phi();
+      JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV]    = vertex.p4().mass();
 
-	Int_t totcharge=0;
-	reco::TrackKinematics vertexKinematics;
+      Int_t totcharge=0;
+      reco::TrackKinematics vertexKinematics;
 
-	// get the vertex kinematics and charge
-	vertexKinematicsAndChange(vertex, vertexKinematics, totcharge);
-        if (currentAxes.size() > 1)
+      // get the vertex kinematics and charge
+      vertexKinematicsAndChange(vertex, vertexKinematics, totcharge);
+      if (currentAxes.size() > 1)
+      {
+        if (reco::deltaR2(svTagInfo->flightDirection(vtx),currentAxes[1]) < reco::deltaR2(svTagInfo->flightDirection(vtx),currentAxes[0]))
         {
-                if (reco::deltaR2(svTagInfo->flightDirection(vtx),currentAxes[1]) < reco::deltaR2(svTagInfo->flightDirection(vtx),currentAxes[0]))
-                {
-                        tau2Kinematics  = tau2Kinematics + vertexKinematics;
-                        JetInfo[iJetColl].Jet_tau2_vertexNTracks[JetInfo[iJetColl].nJet] += vtxTracks(svTagInfo->secondaryVertex(vtx));
-                        if( JetInfo[iJetColl].Jet_tau2_flightDistance2dSig[JetInfo[iJetColl].nJet] < 0 ) 
-                        {
-                          JetInfo[iJetColl].Jet_tau2_flightDistance2dSig[JetInfo[iJetColl].nJet] = svTagInfo->flightDistance(vtx,true).significance();
-                          JetInfo[iJetColl].Jet_tau2_vertexDeltaR[JetInfo[iJetColl].nJet] = reco::deltaR(svTagInfo->flightDirection(vtx),currentAxes[1]);
-                          tau2_vtx = vtx;
-                        }
-                        JetInfo[iJetColl].Jet_tau2_nSecondaryVertices[JetInfo[iJetColl].nJet] += 1.;
-                }
-                else
-                {
-                        tau1Kinematics = tau1Kinematics + vertexKinematics;
-                        JetInfo[iJetColl].Jet_tau1_vertexNTracks[JetInfo[iJetColl].nJet] += vtxTracks(svTagInfo->secondaryVertex(vtx));
-                        if( JetInfo[iJetColl].Jet_tau1_flightDistance2dSig[JetInfo[iJetColl].nJet] < 0 )
-                        {
-                          JetInfo[iJetColl].Jet_tau1_flightDistance2dSig[JetInfo[iJetColl].nJet] = svTagInfo->flightDistance(vtx,true).significance();
-                          JetInfo[iJetColl].Jet_tau1_vertexDeltaR[JetInfo[iJetColl].nJet] = reco::deltaR(svTagInfo->flightDirection(vtx),currentAxes[0]);
-                          tau1_vtx = vtx;
-                        }
-                        JetInfo[iJetColl].Jet_tau1_nSecondaryVertices[JetInfo[iJetColl].nJet] += 1.;
-                }
-
+          tau2Kinematics  = tau2Kinematics + vertexKinematics;
+          JetInfo[iJetColl].Jet_tau2_vertexNTracks[JetInfo[iJetColl].nJet] += vtxTracks(svTagInfo->secondaryVertex(vtx));
+          if( JetInfo[iJetColl].Jet_tau2_flightDistance2dSig[JetInfo[iJetColl].nJet] < 0 )
+          {
+            JetInfo[iJetColl].Jet_tau2_flightDistance2dSig[JetInfo[iJetColl].nJet] = svTagInfo->flightDistance(vtx,true).significance();
+            JetInfo[iJetColl].Jet_tau2_vertexDeltaR[JetInfo[iJetColl].nJet] = reco::deltaR(svTagInfo->flightDirection(vtx),currentAxes[1]);
+            tau2_vtx = vtx;
+          }
+          JetInfo[iJetColl].Jet_tau2_nSecondaryVertices[JetInfo[iJetColl].nJet] += 1.;
         }
-        else if (currentAxes.size() > 0)
+        else
         {
-                tau1Kinematics = tau1Kinematics + vertexKinematics;
-                JetInfo[iJetColl].Jet_tau1_vertexNTracks[JetInfo[iJetColl].nJet] += vtxTracks(svTagInfo->secondaryVertex(vtx));
-                if( JetInfo[iJetColl].Jet_tau1_flightDistance2dSig[JetInfo[iJetColl].nJet] < 0 )
-                {
-                  JetInfo[iJetColl].Jet_tau1_flightDistance2dSig[JetInfo[iJetColl].nJet] = svTagInfo->flightDistance(vtx,true).significance();
-                  JetInfo[iJetColl].Jet_tau1_vertexDeltaR[JetInfo[iJetColl].nJet] = reco::deltaR(svTagInfo->flightDirection(vtx),currentAxes[0]);
-                  tau1_vtx = vtx;
-                }
-                JetInfo[iJetColl].Jet_tau1_nSecondaryVertices[JetInfo[iJetColl].nJet] += 1.;
+          tau1Kinematics = tau1Kinematics + vertexKinematics;
+          JetInfo[iJetColl].Jet_tau1_vertexNTracks[JetInfo[iJetColl].nJet] += vtxTracks(svTagInfo->secondaryVertex(vtx));
+          if( JetInfo[iJetColl].Jet_tau1_flightDistance2dSig[JetInfo[iJetColl].nJet] < 0 )
+          {
+            JetInfo[iJetColl].Jet_tau1_flightDistance2dSig[JetInfo[iJetColl].nJet] = svTagInfo->flightDistance(vtx,true).significance();
+            JetInfo[iJetColl].Jet_tau1_vertexDeltaR[JetInfo[iJetColl].nJet] = reco::deltaR(svTagInfo->flightDirection(vtx),currentAxes[0]);
+            tau1_vtx = vtx;
+          }
+          JetInfo[iJetColl].Jet_tau1_nSecondaryVertices[JetInfo[iJetColl].nJet] += 1.;
         }
+      }
+      else if (currentAxes.size() > 0)
+      {
+        tau1Kinematics = tau1Kinematics + vertexKinematics;
+        JetInfo[iJetColl].Jet_tau1_vertexNTracks[JetInfo[iJetColl].nJet] += vtxTracks(svTagInfo->secondaryVertex(vtx));
+        if( JetInfo[iJetColl].Jet_tau1_flightDistance2dSig[JetInfo[iJetColl].nJet] < 0 )
+        {
+          JetInfo[iJetColl].Jet_tau1_flightDistance2dSig[JetInfo[iJetColl].nJet] = svTagInfo->flightDistance(vtx,true).significance();
+          JetInfo[iJetColl].Jet_tau1_vertexDeltaR[JetInfo[iJetColl].nJet] = reco::deltaR(svTagInfo->flightDirection(vtx),currentAxes[0]);
+          tau1_vtx = vtx;
+        }
+        JetInfo[iJetColl].Jet_tau1_nSecondaryVertices[JetInfo[iJetColl].nJet] += 1.;
+      }
 
-	// total charge at the secondary vertex
-	JetInfo[iJetColl].SV_totCharge[JetInfo[iJetColl].nSV]=totcharge;
+      // total charge at the secondary vertex
+      JetInfo[iJetColl].SV_totCharge[JetInfo[iJetColl].nSV]=totcharge;
 
-	math::XYZTLorentzVector vertexSum = vertexKinematics.weightedVectorSum();
-	edm::RefToBase<reco::Jet> jet = ipTagInfo->jet();
-	math::XYZVector jetDir = jet->momentum().Unit();
-	GlobalVector flightDir = svTagInfo->flightDirection(vtx);
+      math::XYZTLorentzVector vertexSum = vertexKinematics.weightedVectorSum();
+      edm::RefToBase<reco::Jet> jet = ipTagInfo->jet();
+      math::XYZVector jetDir = jet->momentum().Unit();
+      GlobalVector flightDir = svTagInfo->flightDirection(vtx);
 
-	JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV]     = ( reco::deltaR(flightDir, jetDir) );
-	JetInfo[iJetColl].SV_deltaR_sum_jet[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, jetDir) );
-	JetInfo[iJetColl].SV_deltaR_sum_dir[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, flightDir) );
+      JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV]     = ( reco::deltaR(flightDir, jetDir) );
+      JetInfo[iJetColl].SV_deltaR_sum_jet[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, jetDir) );
+      JetInfo[iJetColl].SV_deltaR_sum_dir[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, flightDir) );
 
-	Line::PositionType pos(GlobalPoint(position(vertex).x(),position(vertex).y(),position(vertex).z()));
-	Line trackline(pos,flightDir);
-	// get the Jet  line
-	Line::PositionType pos2(GlobalPoint(pv->x(),pv->y(),pv->z()));
-	Line::DirectionType dir2(GlobalVector(jetDir.x(),jetDir.y(),jetDir.z()));
-	Line jetline(pos2,dir2);
-	// now compute the distance between the two lines
-	JetInfo[iJetColl].SV_vtxDistJetAxis[JetInfo[iJetColl].nSV] = (jetline.distance(trackline)).mag();
+      Line::PositionType pos(GlobalPoint(position(vertex).x(),position(vertex).y(),position(vertex).z()));
+      Line trackline(pos,flightDir);
+      // get the Jet  line
+      Line::PositionType pos2(GlobalPoint(pv->x(),pv->y(),pv->z()));
+      Line::DirectionType dir2(GlobalVector(jetDir.x(),jetDir.y(),jetDir.z()));
+      Line jetline(pos2,dir2);
+      // now compute the distance between the two lines
+      JetInfo[iJetColl].SV_vtxDistJetAxis[JetInfo[iJetColl].nSV] = (jetline.distance(trackline)).mag();
 
-	JetInfo[iJetColl].SV_EnergyRatio[JetInfo[iJetColl].nSV]= vertexSum.E() / allSum.E();
-	JetInfo[iJetColl].SV_dir_x[JetInfo[iJetColl].nSV]= flightDir.x();
-	JetInfo[iJetColl].SV_dir_y[JetInfo[iJetColl].nSV]= flightDir.y();
-	JetInfo[iJetColl].SV_dir_z[JetInfo[iJetColl].nSV]= flightDir.z();
+      JetInfo[iJetColl].SV_EnergyRatio[JetInfo[iJetColl].nSV]= vertexSum.E() / allSum.E();
+      JetInfo[iJetColl].SV_dir_x[JetInfo[iJetColl].nSV]= flightDir.x();
+      JetInfo[iJetColl].SV_dir_y[JetInfo[iJetColl].nSV]= flightDir.y();
+      JetInfo[iJetColl].SV_dir_z[JetInfo[iJetColl].nSV]= flightDir.z();
 
 
-	++JetInfo[iJetColl].nSV;
+      ++JetInfo[iJetColl].nSV;
 
     } //// if secondary vertices present
     JetInfo[iJetColl].Jet_nLastSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSV;
