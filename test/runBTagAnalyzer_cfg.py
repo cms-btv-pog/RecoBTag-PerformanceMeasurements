@@ -50,15 +50,15 @@ options.register('usePuppiForBTagging', False,
     VarParsing.varType.bool,
     "Use Puppi candidates for b tagging"
 )
-options.register('mcGlobalTag', '92X_upgrade2017_realistic_v1',
+options.register('mcGlobalTag', 'FIXME',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
-    "MC global tag"
+    "MC global tag, no default value provided"
 )
-options.register('dataGlobalTag', '92X_dataRun2_Prompt_v7', 
+options.register('dataGlobalTag', 'FIXME',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
-    "Data global tag"
+    "Data global tag, no default value provided"
 )
 options.register('runJetClustering', False,
     VarParsing.multiplicity.singleton,
@@ -223,18 +223,18 @@ options.register('minJetPt', 20.0,
     VarParsing.varType.float,
     "Minimum jet pt (default is 20)"
 )
-options.register('usePrivateJEC', True,
+options.register('usePrivateJEC', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'Use JECs from private SQLite files')
-options.register('jecDBFileMC', 'Fall17_17Nov2017_V4_MC', 
+options.register('jecDBFileMC', 'FIXME',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
-    'SQLite filename for JECs')
-options.register('jecDBFileData', 'Fall17_17Nov2017B_V4_DATA',
+    'SQLite filename for JECs, no default value provided')
+options.register('jecDBFileData', 'FIXME',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
-    'SQLite filename for JECs')
+    'SQLite filename for JECs, no default value provided')
 options.register('isReHLT', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -822,12 +822,7 @@ if options.usePrivateJEC:
     process.es_prefer_jec = cms.ESPrefer("PoolDBESSource",'jec')
 
 ### to activate the new JP calibration: using the data base
-trkProbaCalibTag = "JPcalib_MC81X_v0"
-if options.runOnData:
-  trkProbaCalibTag = "JPcalib_Data80X_2016_v3"
-if options.JPCalibration:
-	trkProbaCalibTag = options.JPCalibration
-# process.GlobalTag.snapshotTime = cms.string("9999-12-31 23:59:59.000")
+trkProbaCalibTag = options.JPCalibration
 process.GlobalTag.toGet = cms.VPSet(
     cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
       tag = cms.string(trkProbaCalibTag),
