@@ -375,20 +375,25 @@ private:
   bool useSelectedTracks_;
   bool fillsvTagInfo_;
   bool fillPU_;
-  bool fillQuarks_;
-  bool fillGenPruned_;
   bool produceJetTrackTree_;
   bool produceJetTrackTruthTree_;
   bool produceAllTrackTree_;
   bool producePtRelTemplate_;
   bool storeEventInfo_;
+  bool storeJetVariables_;
+  bool storeQuarkVariables_;
+  bool storeHadronVariables_;
   bool storeGenVariables_;
   bool storePatMuons_;
   bool storeTagVariables_;
   bool storeTagVariablesSubJets_;
   bool storeCSVTagVariables_;
+  bool storeDeepCSVVariables_;
+  bool storeDeepFlavourVariables_;
   bool storeDeepFlavourTagVariables_;
   bool storeCSVTagVariablesSubJets_;
+  bool storePFElectronVariables_;
+  bool storePFMuonVariables_;
 
   bool storeCTagVariables_;
   bool doCTag_; 
@@ -549,21 +554,26 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   useSelectedTracks_    = iConfig.getParameter<bool> ("useSelectedTracks");
   fillsvTagInfo_    = iConfig.getParameter<bool> ("fillsvTagInfo");
   fillPU_    = iConfig.getParameter<bool> ("fillPU");
-  fillQuarks_    = iConfig.getParameter<bool> ("fillQuarks");
-  fillGenPruned_    = iConfig.getParameter<bool> ("fillGenPruned");
   useTrackHistory_      = iConfig.getParameter<bool> ("useTrackHistory");
   produceJetTrackTree_  = iConfig.getParameter<bool> ("produceJetTrackTree");
   produceJetTrackTruthTree_  = iConfig.getParameter<bool> ("produceJetTrackTruthTree");
   produceAllTrackTree_  = iConfig.getParameter<bool> ("produceAllTrackTree");
   producePtRelTemplate_ = iConfig.getParameter<bool> ("producePtRelTemplate");
   storeEventInfo_ = iConfig.getParameter<bool>("storeEventInfo");
+  storeJetVariables_ = iConfig.getParameter<bool>("storeJetVariables");
+  storeQuarkVariables_ = iConfig.getParameter<bool>("storeQuarkVariables");
+  storeHadronVariables_ = iConfig.getParameter<bool>("storeHadronVariables");
   storeGenVariables_ = iConfig.getParameter<bool>("storeGenVariables");
   storePatMuons_ = iConfig.getParameter<bool>("storePatMuons");
   storeTagVariables_ = iConfig.getParameter<bool>("storeTagVariables");
   storeTagVariablesSubJets_ = iConfig.getParameter<bool>("storeTagVariablesSubJets");
   storeCSVTagVariables_ = iConfig.getParameter<bool>("storeCSVTagVariables");
+  storeDeepCSVVariables_ = iConfig.getParameter<bool>("storeDeepCSVVariables");
+  storeDeepFlavourVariables_ = iConfig.getParameter<bool>("storeDeepFlavourVariables");
   storeDeepFlavourTagVariables_  = iConfig.getParameter<bool>("storeDeepFlavourTagVariables");
   storeCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("storeCSVTagVariablesSubJets");
+  storePFElectronVariables_ = iConfig.getParameter<bool>("storePFElectronVariables");
+  storePFMuonVariables_ = iConfig.getParameter<bool>("storePFMuonVariables");
 
   storeCTagVariables_ = iConfig.getParameter<bool>("storeCTagVariables");
   doCTag_             = iConfig.getParameter<bool>("doCTag");
@@ -729,15 +739,17 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
     if ( use_ttbar_filter_ )    EventInfo.RegisterTTbarTree(smalltree);
     if ( produceJetTrackTree_ ) EventInfo.RegisterJetTrackTree(smalltree);
     if ( produceAllTrackTree_ ) EventInfo.RegisterAllTrackTree(smalltree);
-    if ( storePatMuons_ )       EventInfo.RegisterPatMuonTree(smalltree);
+    if ( storeQuarkVariables_ ) EventInfo.RegisterQuarkTree(smalltree);
+    if ( storeHadronVariables_ )EventInfo.RegisterHadronTree(smalltree);
     if ( storeGenVariables_ )   EventInfo.RegisterGenVarTree(smalltree);
+    if ( storePatMuons_ )       EventInfo.RegisterPatMuonTree(smalltree);
   }
 
   //--------------------------------------
   // jet information
   //--------------------------------------
   JetInfo.reserve(1+(runSubJets_ ? SubJetLabels_.size() : 0));
-  JetInfo[0].RegisterTree(smalltree,branchNamePrefix_);
+  if ( storeJetVariables_)      JetInfo[0].RegisterJetTree(smalltree,branchNamePrefix_);
   if ( runFatJets_ )          JetInfo[0].RegisterFatJetSpecificTree(smalltree,branchNamePrefix_,produceJetTrackTree_);
   if ( produceJetTrackTree_ ) JetInfo[0].RegisterJetTrackTree(smalltree,branchNamePrefix_);
   if ( produceJetTrackTruthTree_ ) JetInfo[0].RegisterJetTrackTruthTree(smalltree,branchNamePrefix_);
@@ -745,16 +757,18 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   if ( fillsvTagInfo_ )       JetInfo[0].RegisterJetSVTree(smalltree,branchNamePrefix_);
   if ( storeTagVariables_)    JetInfo[0].RegisterTagVarTree(smalltree,branchNamePrefix_);
   if ( storeCSVTagVariables_) JetInfo[0].RegisterCSVTagVarTree(smalltree,branchNamePrefix_);
+  if ( storeDeepCSVVariables_)JetInfo[0].RegisterJetDeepCSVTree(smalltree,branchNamePrefix_);
+  if ( storeDeepFlavourVariables_) JetInfo[0].RegisterJetDeepFlavourTree(smalltree,branchNamePrefix_);
   std::cout << "storeDeepFlavourTagVariables_: " << storeDeepFlavourTagVariables_ << std::endl;
-  if ( storeDeepFlavourTagVariables_) {
-    JetInfo[0].RegisterDeepFlavourFeatTree(smalltree,branchNamePrefix_);
-  }
+  if ( storeDeepFlavourTagVariables_) JetInfo[0].RegisterDeepFlavourFeatTree(smalltree,branchNamePrefix_);
   if ( storeCTagVariables_) JetInfo[0].RegisterCTagVarTree(smalltree,branchNamePrefix_);
+  if ( storePFElectronVariables_) JetInfo[0].RegisterPFElectronTree(smalltree,branchNamePrefix_);
+  if ( storePFMuonVariables_) JetInfo[0].RegisterPFMuonTree(smalltree,branchNamePrefix_);
   if ( runSubJets_ ) {
     for ( size_t i = 0; i < SubJetLabels_.size(); ++i )
     {
       if ( runFatJets_ ) SubJetInfo[SubJetLabels_[i]].RegisterTree(smalltree,branchNamePrefix_,SubJetLabels_[i]);
-      JetInfo[1+i].RegisterTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
+      JetInfo[1+i].RegisterJetTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       JetInfo[1+i].RegisterSubJetSpecificTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       if ( produceJetTrackTree_ )         JetInfo[1+i].RegisterJetTrackTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       if ( producePtRelTemplate_ )        JetInfo[1+i].RegisterJetTrackIncTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
@@ -941,7 +955,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     edm::Handle<reco::GenParticleCollection> prunedGenParticles;
     iEvent.getByToken(prunedGenParticleCollectionName_, prunedGenParticles);
 
-    if(fillGenPruned_){
+    if(storeGenVariables_){
       //loop over pruned GenParticles to fill branches for MC hard process particles and muons
       for(size_t i = 0; i < prunedGenParticles->size(); ++i){
 	const GenParticle & iGenPart = (*prunedGenParticles)[i];
@@ -974,7 +988,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
 	}
 	++EventInfo.nGenPruned;
       } //end loop over pruned genparticles
-    }//fillGenPruned_
+    }//storeGenVariables_
 
     EventInfo.GenPVz = -1000.;
 
@@ -998,7 +1012,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
       }
 
       // b and c quarks from the end of parton showering and before hadronization
-      if(fillQuarks_){
+      if(storeQuarkVariables_){
 	if ( ID == 4 || ID == 5 ) {
 	  if( nDaughters > 0 ) {
 	    int nparton_daughters = 0;
@@ -1030,188 +1044,193 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
 	    }
 	  }
 	}
-      }//fillQuarks_
+      }//storeQuarkVariables_
 
-      if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) AreBHadrons = true;
-//       // Primary b Hadrons
-//       if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) {
-//         //  cout << " pdgId " << genIt.pdgId()  << " pT " << genIt.p4().pt() << " mother " << mother->pdgId() << endl;
-//         EventInfo.BHadron_pT[EventInfo.nBHadrons]    = genIt.p4().pt();
-//         EventInfo.BHadron_eta[EventInfo.nBHadrons]   = genIt.p4().eta();
-//         EventInfo.BHadron_phi[EventInfo.nBHadrons]   = genIt.p4().phi();
-//         EventInfo.BHadron_mass[EventInfo.nBHadrons]  = genIt.mass();
-//         EventInfo.BHadron_pdgID[EventInfo.nBHadrons] = genIt.pdgId();
-//         EventInfo.BHadron_status[EventInfo.nBHadrons] = genIt.status();
-//         EventInfo.BHadron_mother[EventInfo.nBHadrons] = genIt.mother()->pdgId();
-//         // check if any of the daughters is also B hadron
-//         int hasBHadronDaughter = 0;
-//         for (unsigned int d=0; d<nDaughters; ++d) {
-//           int daughterID = abs(genIt.daughter(d)->pdgId());
-//           if ( (daughterID/100)%10 == 5 || (daughterID/1000)%10 == 5 ) { hasBHadronDaughter = 1; break; }
-//         }
-//         EventInfo.BHadron_hasBdaughter[EventInfo.nBHadrons] = hasBHadronDaughter;
-//         ++EventInfo.nBHadrons;
-//       }
+      if(storeHadronVariables_){
+        if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) AreBHadrons = true;
+  //       // Primary b Hadrons
+  //       if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) {
+  //         //  cout << " pdgId " << genIt.pdgId()  << " pT " << genIt.p4().pt() << " mother " << mother->pdgId() << endl;
+  //         EventInfo.BHadron_pT[EventInfo.nBHadrons]    = genIt.p4().pt();
+  //         EventInfo.BHadron_eta[EventInfo.nBHadrons]   = genIt.p4().eta();
+  //         EventInfo.BHadron_phi[EventInfo.nBHadrons]   = genIt.p4().phi();
+  //         EventInfo.BHadron_mass[EventInfo.nBHadrons]  = genIt.mass();
+  //         EventInfo.BHadron_pdgID[EventInfo.nBHadrons] = genIt.pdgId();
+  //         EventInfo.BHadron_status[EventInfo.nBHadrons] = genIt.status();
+  //         EventInfo.BHadron_mother[EventInfo.nBHadrons] = genIt.mother()->pdgId();
+  //         // check if any of the daughters is also B hadron
+  //         int hasBHadronDaughter = 0;
+  //         for (unsigned int d=0; d<nDaughters; ++d) {
+  //           int daughterID = abs(genIt.daughter(d)->pdgId());
+  //           if ( (daughterID/100)%10 == 5 || (daughterID/1000)%10 == 5 ) { hasBHadronDaughter = 1; break; }
+  //         }
+  //         EventInfo.BHadron_hasBdaughter[EventInfo.nBHadrons] = hasBHadronDaughter;
+  //         ++EventInfo.nBHadrons;
+  //       }
 
-      // Final c Hadrons
-      if ( (ID/100)%10 == 4 || (ID/1000)%10 == 4 ) {
-        // check if daughter is not a DHadron
-	bool hasNoDHadronAsDaughter = true;
-	for (unsigned int d=0; d<nDaughters; d++) {
-	  const Candidate* daughter = genIt.daughter(d);
-	  int IDdaughter = abs(daughter->pdgId());
-	  bool hasDHadron = (IDdaughter/100)%10 == 4 || (IDdaughter/1000)%10 == 4;
-	  if ( hasDHadron ) hasNoDHadronAsDaughter = false;
-	}
-
-	// variables
-	if ( hasNoDHadronAsDaughter ) {
-	  EventInfo.DHadron_pT[EventInfo.nDHadrons]    = genIt.p4().pt();
-	  EventInfo.DHadron_eta[EventInfo.nDHadrons]   = genIt.p4().eta();
-	  EventInfo.DHadron_phi[EventInfo.nDHadrons]   = genIt.p4().phi();
-	  EventInfo.DHadron_mass[EventInfo.nDHadrons]  = genIt.mass();
-	  EventInfo.DHadron_pdgID[EventInfo.nDHadrons] = genIt.pdgId();
-
-	  int nCharged = 0;
-	  // Loop on daughters
-	  int numberChargedDaughters = 0;
-	  for (unsigned int d=0; d<nDaughters; d++) {
-	    const Candidate* daughter = genIt.daughter(d);
-	    int IDdaughter = abs(daughter->pdgId());
-	    EventInfo.DHadron_DaughtersPdgID[EventInfo.nDaughters] = IDdaughter;
-	    // take vertex of first daughter for SV
-	    if ( d == 0 ) {
-	      EventInfo.DHadron_SVx[EventInfo.nDHadrons] = daughter->vx();
-   	      EventInfo.DHadron_SVy[EventInfo.nDHadrons] = daughter->vy();
-    	      EventInfo.DHadron_SVz[EventInfo.nDHadrons] = daughter->vz();
-	    }
-	    EventInfo.nDaughters++;
-	    if ( daughter->charge() != 0 ) numberChargedDaughters++;
-	    // charged track multiplicity
-	    unsigned int nDaughters2 = daughter->numberOfDaughters();
-	    if (nDaughters2 == 0 && daughter->charge() != 0
-				 && daughter->p4().pt()>1.) nCharged++;
-	    for (unsigned int d2=0; d2<nDaughters2; d2++) {
-	      const Candidate* daughter2 = daughter->daughter(d2);
-	      unsigned int nDaughters3 = daughter2->numberOfDaughters();
-	      if (nDaughters3 == 0 && daughter2->charge() != 0
-	        		   && daughter2->p4().pt()>1.) nCharged++;
-	      for (unsigned int d3=0; d3<nDaughters3; d3++) {
-		const Candidate* daughter3 = daughter2->daughter(d3);
-		unsigned int nDaughters4 = daughter3->numberOfDaughters();
-		if (nDaughters4 == 0 && daughter3->charge() != 0
-				     && daughter3->p4().pt()>1.) nCharged++;
-		for (unsigned int d4=0; d4<nDaughters4; d4++) {
-		  const Candidate* daughter4 = daughter3->daughter(d4);
-		  unsigned int nDaughters5 = daughter4->numberOfDaughters();
-		  if (nDaughters5 == 0 && daughter4->charge() != 0
-				       && daughter4->p4().pt()>1.) nCharged++;
-		} // D -> X -> X -> X -> X
-	      } // D -> X -> X -> X
-	    } // D -> X -> X
-	  } // loop on daughters from final c hadron
-
-	  EventInfo.DHadron_nDaughters[EventInfo.nDHadrons] = nDaughters;
-	  EventInfo.DHadron_nChargedDaughters[EventInfo.nDHadrons] = numberChargedDaughters;
-	  EventInfo.DHadron_nCharged[EventInfo.nDHadrons] = nCharged;
-// cout << " D hadron " << EventInfo.nDHadrons << "  id " << EventInfo.DHadron_pdgID[EventInfo.nDHadrons] << "  pT " << EventInfo.DHadron_pT[EventInfo.nDHadrons] << "  eta " << EventInfo.DHadron_eta[EventInfo.nDHadrons] << "  phi " << EventInfo.DHadron_phi[EventInfo.nDHadrons] << endl;
-	  EventInfo.nDHadrons++;
-	} // final c hadron
-      } // c hadron
-
-      // Leptons
-      if ( (ID == 11 || ID == 13 || ID == 15) && genIt.p4().pt() > 3. ) {
-       if (genIt.numberOfMothers()>0) {  // protection for herwig ttbar mc
-        const Candidate * moth1 = genIt.mother();
-        if ( moth1->pdgId() != genIt.pdgId() ) {
-          EventInfo.Genlep_pT[EventInfo.nGenlep]    = genIt.p4().pt();
-          EventInfo.Genlep_eta[EventInfo.nGenlep]   = genIt.p4().eta();
-          EventInfo.Genlep_phi[EventInfo.nGenlep]   = genIt.p4().phi();
-          EventInfo.Genlep_pdgID[EventInfo.nGenlep] = genIt.pdgId();
-          EventInfo.Genlep_status[EventInfo.nGenlep] = genIt.status();
-          int ID1 = abs( moth1->pdgId() );
-          int ID2 = -9999;
-          int ID3 = -9999;
-          int ID4 = -9999;
-          int isWZ = 0, istau = 0, isB = 0, isD = 0;
-          if (moth1->numberOfMothers()>0) {   // protection for herwig ttbar mc
-            const Candidate * moth2 = moth1->mother();
-            ID2 = abs( moth2->pdgId() );
-            if (moth2->numberOfMothers()>0) {
-              const Candidate * moth3 = moth2->mother();
-              ID3 = abs( moth3->pdgId() );
-              if (moth3->numberOfMothers()>0) {
-                const Candidate * moth4 = moth3->mother();
-                ID4 = abs( moth4->pdgId() );
-              }
-            }
+        // Final c Hadrons
+        if ( (ID/100)%10 == 4 || (ID/1000)%10 == 4 ) {
+          // check if daughter is not a DHadron
+          bool hasNoDHadronAsDaughter = true;
+          for (unsigned int d=0; d<nDaughters; d++) {
+            const Candidate* daughter = genIt.daughter(d);
+            int IDdaughter = abs(daughter->pdgId());
+            bool hasDHadron = (IDdaughter/100)%10 == 4 || (IDdaughter/1000)%10 == 4;
+            if ( hasDHadron ) hasNoDHadronAsDaughter = false;
           }
-          if ( ID1 == 15 ) istau = 1;
-          if ( ID1 == 24 || ID2 == 24 || ID3 == 24 || ID4 == 24 ||
-              ID1 == 25 || ID2 == 25 || ID3 == 25 || ID4 == 25 ) isWZ = 1;
-          if ( ID1 == 411 || ID1 == 421 || ID1 == 431 ||
-              ID1 ==4112 || ID1 ==4122 || ID1 ==4132 ||
-              ID1 ==4212 || ID1 ==4222 || ID1 ==4232 || ID1 ==4332 ) isD = 1;
-          if ( ID2 == 411 || ID2 == 421 || ID2 == 431 ||
-              ID2 ==4112 || ID2 ==4122 || ID2 ==4132 ||
-              ID2 ==4212 || ID2 ==4222 || ID2 ==4232 || ID2 ==4332 ) isD = 1;
-          if ( ID1 == 511 || ID1 == 521 || ID1 == 531 || ID1 == 541 ||
-              ID1 ==5112 || ID1 ==5122 || ID1 ==5132 ||
-              ID1 ==5212 || ID1 ==5222 || ID1 ==5232 || ID1 ==5332 ) isB = 1;
-          if ( ID2 == 511 || ID2 == 521 || ID2 == 531 || ID2 == 541 ||
-              ID2 ==5112 || ID2 ==5122 || ID2 ==5132 ||
-              ID2 ==5212 || ID2 ==5222 || ID2 ==5232 || ID2 ==5332 ) isB = 1;
-          if ( ID3 == 511 || ID3 == 521 || ID3 == 531 || ID3 == 541 ||
-              ID3 ==5112 || ID3 ==5122 || ID3 ==5132 ||
-              ID3 ==5212 || ID3 ==5222 || ID3 ==5232 || ID3 ==5332 ) isB = 1;
-          if ( ID4 == 511 || ID4 == 521 || ID4 == 531 || ID4 == 541 ||
-              ID4 ==5112 || ID4 ==5122 || ID4 ==5132 ||
-              ID4 ==5212 || ID4 ==5222 || ID4 ==5232 || ID4 ==5332 ) isB = 1;
-          if ( isB+isD != 0 ) EventInfo.Genlep_mother[EventInfo.nGenlep] = 5*isB + 4*isD;
-          else                EventInfo.Genlep_mother[EventInfo.nGenlep] = 10*istau + 100*isWZ;
-          //  cout << " lepton " << EventInfo.nGenlep << " pdgID " << EventInfo.Genlep_pdgID[EventInfo.nGenlep]
-          //       << " moth1 " << moth1->pdgId() << " moth2 " << moth2->pdgId()
-          //       << " moth3 " << moth3->pdgId() << " moth4 " << moth4->pdgId()
-          //       << " pT " << EventInfo.Genlep_pT[EventInfo.nGenlep]
-          //       << " from " << EventInfo.Genlep_mother[EventInfo.nGenlep] << endl;
-          ++EventInfo.nGenlep;
-        }
-       }
+
+          // variables
+          if ( hasNoDHadronAsDaughter ) {
+            EventInfo.DHadron_pT[EventInfo.nDHadrons]    = genIt.p4().pt();
+            EventInfo.DHadron_eta[EventInfo.nDHadrons]   = genIt.p4().eta();
+            EventInfo.DHadron_phi[EventInfo.nDHadrons]   = genIt.p4().phi();
+            EventInfo.DHadron_mass[EventInfo.nDHadrons]  = genIt.mass();
+            EventInfo.DHadron_pdgID[EventInfo.nDHadrons] = genIt.pdgId();
+
+            int nCharged = 0;
+            // Loop on daughters
+            int numberChargedDaughters = 0;
+            for (unsigned int d=0; d<nDaughters; d++) {
+              const Candidate* daughter = genIt.daughter(d);
+              int IDdaughter = abs(daughter->pdgId());
+              EventInfo.DHadron_DaughtersPdgID[EventInfo.nDaughters] = IDdaughter;
+              // take vertex of first daughter for SV
+              if ( d == 0 ) {
+                EventInfo.DHadron_SVx[EventInfo.nDHadrons] = daughter->vx();
+                EventInfo.DHadron_SVy[EventInfo.nDHadrons] = daughter->vy();
+                EventInfo.DHadron_SVz[EventInfo.nDHadrons] = daughter->vz();
+              }
+              EventInfo.nDaughters++;
+              if ( daughter->charge() != 0 ) numberChargedDaughters++;
+              // charged track multiplicity
+              unsigned int nDaughters2 = daughter->numberOfDaughters();
+              if (nDaughters2 == 0 && daughter->charge() != 0
+                                  && daughter->p4().pt()>1.) nCharged++;
+              for (unsigned int d2=0; d2<nDaughters2; d2++) {
+                const Candidate* daughter2 = daughter->daughter(d2);
+                unsigned int nDaughters3 = daughter2->numberOfDaughters();
+                if (nDaughters3 == 0 && daughter2->charge() != 0
+                                    && daughter2->p4().pt()>1.) nCharged++;
+                for (unsigned int d3=0; d3<nDaughters3; d3++) {
+                  const Candidate* daughter3 = daughter2->daughter(d3);
+                  unsigned int nDaughters4 = daughter3->numberOfDaughters();
+                  if (nDaughters4 == 0 && daughter3->charge() != 0
+                                      && daughter3->p4().pt()>1.) nCharged++;
+                  for (unsigned int d4=0; d4<nDaughters4; d4++) {
+                    const Candidate* daughter4 = daughter3->daughter(d4);
+                    unsigned int nDaughters5 = daughter4->numberOfDaughters();
+                    if (nDaughters5 == 0 && daughter4->charge() != 0
+                                        && daughter4->p4().pt()>1.) nCharged++;
+                  } // D -> X -> X -> X -> X
+                } // D -> X -> X -> X
+              } // D -> X -> X
+            } // loop on daughters from final c hadron
+
+            EventInfo.DHadron_nDaughters[EventInfo.nDHadrons] = nDaughters;
+            EventInfo.DHadron_nChargedDaughters[EventInfo.nDHadrons] = numberChargedDaughters;
+            EventInfo.DHadron_nCharged[EventInfo.nDHadrons] = nCharged;
+  // cout << " D hadron " << EventInfo.nDHadrons << "  id " << EventInfo.DHadron_pdgID[EventInfo.nDHadrons] << "  pT " << EventInfo.DHadron_pT[EventInfo.nDHadrons] << "  eta " << EventInfo.DHadron_eta[EventInfo.nDHadrons] << "  phi " << EventInfo.DHadron_phi[EventInfo.nDHadrons] << endl;
+            EventInfo.nDHadrons++;
+          } // final c hadron
+        } // c hadron
       }
 
-      // V0: K0s and Lambda
-      if ( ID == 310 || ID == 3122 ) {
-	 int nCharged = 0;
-	 float SVx = 0., SVy = 0., SVz = 0.;
-	 for (unsigned int d=0; d<nDaughters; d++) {
-	   const Candidate* daughter = genIt.daughter(d);
-	   if ( daughter->charge() != 0 && daughter->pt() > 1. ) {
-	     nCharged++;
-   	     SVx = daughter->vx();
-   	     SVy = daughter->vy();
-   	     SVz = daughter->vz();
-	   }
-	 }
-	 bool inAcceptance = false;
-	 if ( nCharged > 0 ) {
-	   float Radius = TMath::Sqrt( SVx*SVx + SVy*SVy );
-	   float AbsEta = abs( genIt.p4().eta() );
-	   if ( (AbsEta < 2.0 && Radius < 7.3) ||
-	        (AbsEta < 2.5 && Radius < 4.4) ||
-	        (AbsEta > 1.8 && AbsEta < 2.5 && abs(SVz) < 34.5 ) )
-	     inAcceptance = true;
-	 }
-	 if ( inAcceptance ) {
-	   EventInfo.GenV0_pT[EventInfo.nGenV0]    = genIt.p4().pt();
-	   EventInfo.GenV0_eta[EventInfo.nGenV0]   = genIt.p4().eta();
-	   EventInfo.GenV0_phi[EventInfo.nGenV0]   = genIt.p4().phi();
-	   EventInfo.GenV0_pdgID[EventInfo.nGenV0] = genIt.pdgId();
-	   EventInfo.GenV0_SVx[EventInfo.nGenV0] = SVx;
-	   EventInfo.GenV0_SVy[EventInfo.nGenV0] = SVy;
-   	   EventInfo.GenV0_SVz[EventInfo.nGenV0] = SVz;
-	   EventInfo.GenV0_nCharged[EventInfo.nGenV0] = nCharged;
-	   EventInfo.nGenV0++;
-	 }
+
+      if(storeGenVariables_){
+        // Leptons
+        if ( (ID == 11 || ID == 13 || ID == 15) && genIt.p4().pt() > 3. ) {
+          if (genIt.numberOfMothers()>0) {  // protection for herwig ttbar mc
+            const Candidate * moth1 = genIt.mother();
+            if ( moth1->pdgId() != genIt.pdgId() ) {
+              EventInfo.Genlep_pT[EventInfo.nGenlep]    = genIt.p4().pt();
+              EventInfo.Genlep_eta[EventInfo.nGenlep]   = genIt.p4().eta();
+              EventInfo.Genlep_phi[EventInfo.nGenlep]   = genIt.p4().phi();
+              EventInfo.Genlep_pdgID[EventInfo.nGenlep] = genIt.pdgId();
+              EventInfo.Genlep_status[EventInfo.nGenlep] = genIt.status();
+              int ID1 = abs( moth1->pdgId() );
+              int ID2 = -9999;
+              int ID3 = -9999;
+              int ID4 = -9999;
+              int isWZ = 0, istau = 0, isB = 0, isD = 0;
+              if (moth1->numberOfMothers()>0) {   // protection for herwig ttbar mc
+                const Candidate * moth2 = moth1->mother();
+                ID2 = abs( moth2->pdgId() );
+                if (moth2->numberOfMothers()>0) {
+                  const Candidate * moth3 = moth2->mother();
+                  ID3 = abs( moth3->pdgId() );
+                  if (moth3->numberOfMothers()>0) {
+                    const Candidate * moth4 = moth3->mother();
+                    ID4 = abs( moth4->pdgId() );
+                  }
+                }
+              }
+              if ( ID1 == 15 ) istau = 1;
+              if ( ID1 == 24 || ID2 == 24 || ID3 == 24 || ID4 == 24 ||
+                  ID1 == 25 || ID2 == 25 || ID3 == 25 || ID4 == 25 ) isWZ = 1;
+              if ( ID1 == 411 || ID1 == 421 || ID1 == 431 ||
+                  ID1 ==4112 || ID1 ==4122 || ID1 ==4132 ||
+                  ID1 ==4212 || ID1 ==4222 || ID1 ==4232 || ID1 ==4332 ) isD = 1;
+              if ( ID2 == 411 || ID2 == 421 || ID2 == 431 ||
+                  ID2 ==4112 || ID2 ==4122 || ID2 ==4132 ||
+                  ID2 ==4212 || ID2 ==4222 || ID2 ==4232 || ID2 ==4332 ) isD = 1;
+              if ( ID1 == 511 || ID1 == 521 || ID1 == 531 || ID1 == 541 ||
+                  ID1 ==5112 || ID1 ==5122 || ID1 ==5132 ||
+                  ID1 ==5212 || ID1 ==5222 || ID1 ==5232 || ID1 ==5332 ) isB = 1;
+              if ( ID2 == 511 || ID2 == 521 || ID2 == 531 || ID2 == 541 ||
+                  ID2 ==5112 || ID2 ==5122 || ID2 ==5132 ||
+                  ID2 ==5212 || ID2 ==5222 || ID2 ==5232 || ID2 ==5332 ) isB = 1;
+              if ( ID3 == 511 || ID3 == 521 || ID3 == 531 || ID3 == 541 ||
+                  ID3 ==5112 || ID3 ==5122 || ID3 ==5132 ||
+                  ID3 ==5212 || ID3 ==5222 || ID3 ==5232 || ID3 ==5332 ) isB = 1;
+              if ( ID4 == 511 || ID4 == 521 || ID4 == 531 || ID4 == 541 ||
+                  ID4 ==5112 || ID4 ==5122 || ID4 ==5132 ||
+                  ID4 ==5212 || ID4 ==5222 || ID4 ==5232 || ID4 ==5332 ) isB = 1;
+              if ( isB+isD != 0 ) EventInfo.Genlep_mother[EventInfo.nGenlep] = 5*isB + 4*isD;
+              else                EventInfo.Genlep_mother[EventInfo.nGenlep] = 10*istau + 100*isWZ;
+              //  cout << " lepton " << EventInfo.nGenlep << " pdgID " << EventInfo.Genlep_pdgID[EventInfo.nGenlep]
+              //       << " moth1 " << moth1->pdgId() << " moth2 " << moth2->pdgId()
+              //       << " moth3 " << moth3->pdgId() << " moth4 " << moth4->pdgId()
+              //       << " pT " << EventInfo.Genlep_pT[EventInfo.nGenlep]
+              //       << " from " << EventInfo.Genlep_mother[EventInfo.nGenlep] << endl;
+              ++EventInfo.nGenlep;
+            }
+          }
+        }
+
+        // V0: K0s and Lambda
+        if ( ID == 310 || ID == 3122 ) {
+          int nCharged = 0;
+          float SVx = 0., SVy = 0., SVz = 0.;
+          for (unsigned int d=0; d<nDaughters; d++) {
+            const Candidate* daughter = genIt.daughter(d);
+            if ( daughter->charge() != 0 && daughter->pt() > 1. ) {
+              nCharged++;
+              SVx = daughter->vx();
+              SVy = daughter->vy();
+              SVz = daughter->vz();
+            }
+          }
+          bool inAcceptance = false;
+          if ( nCharged > 0 ) {
+            float Radius = TMath::Sqrt( SVx*SVx + SVy*SVy );
+            float AbsEta = abs( genIt.p4().eta() );
+            if ( (AbsEta < 2.0 && Radius < 7.3) ||
+                  (AbsEta < 2.5 && Radius < 4.4) ||
+                  (AbsEta > 1.8 && AbsEta < 2.5 && abs(SVz) < 34.5 ) )
+              inAcceptance = true;
+          }
+          if ( inAcceptance ) {
+            EventInfo.GenV0_pT[EventInfo.nGenV0]    = genIt.p4().pt();
+            EventInfo.GenV0_eta[EventInfo.nGenV0]   = genIt.p4().eta();
+            EventInfo.GenV0_phi[EventInfo.nGenV0]   = genIt.p4().phi();
+            EventInfo.GenV0_pdgID[EventInfo.nGenV0] = genIt.pdgId();
+            EventInfo.GenV0_SVx[EventInfo.nGenV0] = SVx;
+            EventInfo.GenV0_SVy[EventInfo.nGenV0] = SVy;
+            EventInfo.GenV0_SVz[EventInfo.nGenV0] = SVz;
+            EventInfo.GenV0_nCharged[EventInfo.nGenV0] = nCharged;
+            EventInfo.nGenV0++;
+          }
+        }
       }
 
     } // end loop on generated particles
@@ -1219,144 +1238,144 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     //------------------------------------------------------
     // generated particles: looking for b hadrons only
     //------------------------------------------------------
-    if ( AreBHadrons ) {
-    for (size_t i = 0; i < genParticles->size(); ++i) {
-      const GenParticle & genIt = (*genParticles)[i];
-      int ID = abs(genIt.pdgId());
-      unsigned int nDaughters = genIt.numberOfDaughters();
+    if ( AreBHadrons && storeHadronVariables_) {
+      for (size_t i = 0; i < genParticles->size(); ++i) {
+        const GenParticle & genIt = (*genParticles)[i];
+        int ID = abs(genIt.pdgId());
+        unsigned int nDaughters = genIt.numberOfDaughters();
 
-      // b Hadrons
-      if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) {
-        //  cout << " pdgId " << genIt.pdgId()  << " pT " << genIt.p4().pt() << " mother " << mother->pdgId() << endl;
-        EventInfo.BHadron_pT[EventInfo.nBHadrons]    = genIt.p4().pt();
-        EventInfo.BHadron_eta[EventInfo.nBHadrons]   = genIt.p4().eta();
-        EventInfo.BHadron_phi[EventInfo.nBHadrons]   = genIt.p4().phi();
-        EventInfo.BHadron_mass[EventInfo.nBHadrons]  = genIt.mass();
-        EventInfo.BHadron_pdgID[EventInfo.nBHadrons] = genIt.pdgId();
-        if (genIt.numberOfMothers()>0) EventInfo.BHadron_mother[EventInfo.nBHadrons] = genIt.mother()->pdgId();
-        else EventInfo.BHadron_mother[EventInfo.nBHadrons] = -99999;
-        // check if any of the daughters is also B hadron
-        int hasBHadronDaughter = 0;
-        for (unsigned int d=0; d<nDaughters; ++d) {
-          int daughterID = abs(genIt.daughter(d)->pdgId());
-          if ( (daughterID/100)%10 == 5 || (daughterID/1000)%10 == 5 ) { hasBHadronDaughter = 1; break; }
-        }
-        EventInfo.BHadron_hasBdaughter[EventInfo.nBHadrons] = hasBHadronDaughter;
-	int idD1 = -1, idD2 = -1;
-	int nCharged = 0;
-	// take vertex of first daughter for SV
-	EventInfo.BHadron_SVx[EventInfo.nBHadrons] = (nDaughters>0 ? genIt.daughter(0)->vx() : -9999);
-	EventInfo.BHadron_SVy[EventInfo.nBHadrons] = (nDaughters>0 ? genIt.daughter(0)->vy() : -9999);
-	EventInfo.BHadron_SVz[EventInfo.nBHadrons] = (nDaughters>0 ? genIt.daughter(0)->vz() : -9999);
+        // b Hadrons
+        if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) {
+          //  cout << " pdgId " << genIt.pdgId()  << " pT " << genIt.p4().pt() << " mother " << mother->pdgId() << endl;
+          EventInfo.BHadron_pT[EventInfo.nBHadrons]    = genIt.p4().pt();
+          EventInfo.BHadron_eta[EventInfo.nBHadrons]   = genIt.p4().eta();
+          EventInfo.BHadron_phi[EventInfo.nBHadrons]   = genIt.p4().phi();
+          EventInfo.BHadron_mass[EventInfo.nBHadrons]  = genIt.mass();
+          EventInfo.BHadron_pdgID[EventInfo.nBHadrons] = genIt.pdgId();
+          if (genIt.numberOfMothers()>0) EventInfo.BHadron_mother[EventInfo.nBHadrons] = genIt.mother()->pdgId();
+          else EventInfo.BHadron_mother[EventInfo.nBHadrons] = -99999;
+          // check if any of the daughters is also B hadron
+          int hasBHadronDaughter = 0;
+          for (unsigned int d=0; d<nDaughters; ++d) {
+            int daughterID = abs(genIt.daughter(d)->pdgId());
+            if ( (daughterID/100)%10 == 5 || (daughterID/1000)%10 == 5 ) { hasBHadronDaughter = 1; break; }
+          }
+          EventInfo.BHadron_hasBdaughter[EventInfo.nBHadrons] = hasBHadronDaughter;
+          int idD1 = -1, idD2 = -1;
+          int nCharged = 0;
+          // take vertex of first daughter for SV
+          EventInfo.BHadron_SVx[EventInfo.nBHadrons] = (nDaughters>0 ? genIt.daughter(0)->vx() : -9999);
+          EventInfo.BHadron_SVy[EventInfo.nBHadrons] = (nDaughters>0 ? genIt.daughter(0)->vy() : -9999);
+          EventInfo.BHadron_SVz[EventInfo.nBHadrons] = (nDaughters>0 ? genIt.daughter(0)->vz() : -9999);
 
-	if ( !hasBHadronDaughter ) {
-	  // Loop on daughters: B -> X
-	  for (unsigned int d=0; d<nDaughters; d++) {
-	    const Candidate* daughter = genIt.daughter(d);
-	    int IDdaughter = abs(daughter->pdgId());
-	    bool isDHadron = (IDdaughter/100)%10 == 4 || (IDdaughter/1000)%10 == 4;
-	    bool hasNoDHadronAsDaughter = true;
-	    bool isDHadron2, hasNoDHadronAsDaughter2, isDHadron3;
-	    unsigned int nDaughters2 = daughter->numberOfDaughters();
+          if ( !hasBHadronDaughter ) {
+            // Loop on daughters: B -> X
+            for (unsigned int d=0; d<nDaughters; d++) {
+              const Candidate* daughter = genIt.daughter(d);
+              int IDdaughter = abs(daughter->pdgId());
+              bool isDHadron = (IDdaughter/100)%10 == 4 || (IDdaughter/1000)%10 == 4;
+              bool hasNoDHadronAsDaughter = true;
+              bool isDHadron2, hasNoDHadronAsDaughter2, isDHadron3;
+              unsigned int nDaughters2 = daughter->numberOfDaughters();
 
-            // B -> D
-	    if ( isDHadron ) {
-	      for (unsigned int d2=0; d2<nDaughters2; d2++) {
-	        const Candidate* daughter2 = daughter->daughter(d2);
-	        int IDdaughter2 = abs(daughter2->pdgId());
-	        isDHadron2 = (IDdaughter2/100)%10 == 4 || (IDdaughter2/1000)%10 == 4;
-	        if ( isDHadron2 ) hasNoDHadronAsDaughter = false;
-	      }
-	      if ( hasNoDHadronAsDaughter ) {
-	        for (int c=0; c<EventInfo.nDHadrons; c++) {
-	          if ( abs( daughter->p4().pt()
-		                   - EventInfo.DHadron_pT[c] ) < 0.0001 ) {
-		    if ( idD1 < 0 ) idD1 = c;
-		    else if ( idD2 < 0 ) idD2 = c;
-// cout << " D hadron from B " << c << "  id " << daughter->pdgId() << "  pT " << daughter->p4().pt()  << "  eta " << daughter->p4().eta() << "  phi " << daughter->p4().phi() << endl;
-		  }
-	        }
-	      }
-	    }
+              // B -> D
+              if ( isDHadron ) {
+                for (unsigned int d2=0; d2<nDaughters2; d2++) {
+                  const Candidate* daughter2 = daughter->daughter(d2);
+                  int IDdaughter2 = abs(daughter2->pdgId());
+                  isDHadron2 = (IDdaughter2/100)%10 == 4 || (IDdaughter2/1000)%10 == 4;
+                  if ( isDHadron2 ) hasNoDHadronAsDaughter = false;
+                }
+                if ( hasNoDHadronAsDaughter ) {
+                  for (int c=0; c<EventInfo.nDHadrons; c++) {
+                    if ( abs( daughter->p4().pt()
+                                    - EventInfo.DHadron_pT[c] ) < 0.0001 ) {
+                      if ( idD1 < 0 ) idD1 = c;
+                      else if ( idD2 < 0 ) idD2 = c;
+  // cout << " D hadron from B " << c << "  id " << daughter->pdgId() << "  pT " << daughter->p4().pt()  << "  eta " << daughter->p4().eta() << "  phi " << daughter->p4().phi() << endl;
+                    }
+                  }
+                }
+              }
 
-	    if ( !isDHadron || !hasNoDHadronAsDaughter ) {
-	      if (nDaughters2 == 0 && daughter->charge() != 0
-	  	    		   && daughter->p4().pt() > 1.) nCharged++;
-	      // B -> X -> X
-	      for (unsigned int d2=0; d2<nDaughters2; d2++) {
-	        const Candidate* daughter2 = daughter->daughter(d2);
-	        int IDdaughter2 = abs(daughter2->pdgId());
-	        isDHadron2 = (IDdaughter2/100)%10 == 4 || (IDdaughter2/1000)%10 == 4;
-	        hasNoDHadronAsDaughter2 = true;
-	        unsigned int nDaughters3 = daughter2->numberOfDaughters();
+              if ( !isDHadron || !hasNoDHadronAsDaughter ) {
+                if (nDaughters2 == 0 && daughter->charge() != 0
+                                    && daughter->p4().pt() > 1.) nCharged++;
+                // B -> X -> X
+                for (unsigned int d2=0; d2<nDaughters2; d2++) {
+                  const Candidate* daughter2 = daughter->daughter(d2);
+                  int IDdaughter2 = abs(daughter2->pdgId());
+                  isDHadron2 = (IDdaughter2/100)%10 == 4 || (IDdaughter2/1000)%10 == 4;
+                  hasNoDHadronAsDaughter2 = true;
+                  unsigned int nDaughters3 = daughter2->numberOfDaughters();
 
-	        // B -> D*(*) -> D
-	        if ( isDHadron2 ) {
-	          for (unsigned int d3=0; d3<nDaughters3; d3++) {
-	            const Candidate* daughter3 = daughter2->daughter(d3);
-	            int IDdaughter3 = abs(daughter3->pdgId());
-	            isDHadron3 = (IDdaughter3/100)%10 == 4 || (IDdaughter3/1000)%10 == 4;
-	            if ( isDHadron3 ) hasNoDHadronAsDaughter2 = false;
-	          }
-	          if ( hasNoDHadronAsDaughter2 ) {
-	            for (int c=0; c<EventInfo.nDHadrons; c++) {
-	              if ( abs( daughter2->p4().pt()
-		                       - EventInfo.DHadron_pT[c] ) < 0.0001 ) {
-		        if ( idD1 < 0 ) idD1 = c;
-		        else if ( idD2 < 0 ) idD2 = c;
-// cout << " D hadron from B->D*(*) " << c << "  id " << daughter2->pdgId() << "  pT " << daughter2->p4().pt() << "  eta " << daughter2->p4().eta() << "  phi " << daughter2->p4().phi() << endl;
-		      }
-	            }
-	          }
-	        }
+                  // B -> D*(*) -> D
+                  if ( isDHadron2 ) {
+                    for (unsigned int d3=0; d3<nDaughters3; d3++) {
+                      const Candidate* daughter3 = daughter2->daughter(d3);
+                      int IDdaughter3 = abs(daughter3->pdgId());
+                      isDHadron3 = (IDdaughter3/100)%10 == 4 || (IDdaughter3/1000)%10 == 4;
+                      if ( isDHadron3 ) hasNoDHadronAsDaughter2 = false;
+                    }
+                    if ( hasNoDHadronAsDaughter2 ) {
+                      for (int c=0; c<EventInfo.nDHadrons; c++) {
+                        if ( abs( daughter2->p4().pt()
+                                        - EventInfo.DHadron_pT[c] ) < 0.0001 ) {
+                          if ( idD1 < 0 ) idD1 = c;
+                          else if ( idD2 < 0 ) idD2 = c;
+  // cout << " D hadron from B->D*(*) " << c << "  id " << daughter2->pdgId() << "  pT " << daughter2->p4().pt() << "  eta " << daughter2->p4().eta() << "  phi " << daughter2->p4().phi() << endl;
+                        }
+                      }
+                    }
+                  }
 
-	        if ( !isDHadron2 || !hasNoDHadronAsDaughter2 ) {
-	          if (nDaughters3 == 0 && daughter2->charge() != 0
-	        		       && daughter2->p4().pt() > 1.) nCharged++;
-	          // B -> X -> X -> X
-	          for (unsigned int d3=0; d3<nDaughters3; d3++) {
-	            const Candidate* daughter3 = daughter2->daughter(d3);
-	            int IDdaughter3 = abs(daughter3->pdgId());
-	            isDHadron3 = (IDdaughter3/100)%10 == 4 || (IDdaughter3/1000)%10 == 4;
-	            unsigned int nDaughters4 = daughter3->numberOfDaughters();
+                  if ( !isDHadron2 || !hasNoDHadronAsDaughter2 ) {
+                    if (nDaughters3 == 0 && daughter2->charge() != 0
+                                        && daughter2->p4().pt() > 1.) nCharged++;
+                    // B -> X -> X -> X
+                    for (unsigned int d3=0; d3<nDaughters3; d3++) {
+                      const Candidate* daughter3 = daughter2->daughter(d3);
+                      int IDdaughter3 = abs(daughter3->pdgId());
+                      isDHadron3 = (IDdaughter3/100)%10 == 4 || (IDdaughter3/1000)%10 == 4;
+                      unsigned int nDaughters4 = daughter3->numberOfDaughters();
 
-	            // B -> D** -> D* -> D
-	            if ( isDHadron3 ) {
-	              for (int c=0; c<EventInfo.nDHadrons; c++) {
-	                if ( abs( daughter3->p4().pt()
-		                         - EventInfo.DHadron_pT[c] ) < 0.0001 ) {
-		          if ( idD1 < 0 ) idD1 = c;
-		          else if ( idD2 < 0 ) idD2 = c;
-// cout << " D hadron from B->D**->D* " << c << "  id " << daughter3->pdgId() << "  pT " << daughter3->p4().pt() << "  eta " << daughter3->p4().eta() << "  phi " << daughter3->p4().phi() << endl;
-		        }
-	              }
-	            }
-                    else {
-	              if (nDaughters4 == 0 && daughter3->charge() != 0
-	        	  	           && daughter3->p4().pt() > 1.) nCharged++;
-	              // B -> X -> X -> X -> X
-	              for (unsigned int d4=0; d4<nDaughters4; d4++) {
-	                const Candidate* daughter4 = daughter3->daughter(d4);
-	                unsigned int nDaughters5 = daughter4->numberOfDaughters();
-	                if (nDaughters5 == 0 && daughter4->charge() != 0
-	        	   	             && daughter4->p4().pt()>1.) nCharged++;
-	              }
-	            }
-	          } // B -> X -> X -> X
-	        }
-	      } // B -> X -> X
-	    }
-	  } // loop on daughters from final b hadron
-// cout << " B hadron " << EventInfo.nBHadrons << "  id " << EventInfo.BHadron_pdgID[EventInfo.nBHadrons] << "  pT " << EventInfo.BHadron_pT[EventInfo.nBHadrons] << "  eta " << EventInfo.BHadron_eta[EventInfo.nBHadrons]<< "  phi " << EventInfo.BHadron_phi[EventInfo.nBHadrons] << "  ->D " << idD1 << " " << idD2 << "  nCh " << nCharged << endl;
-	} // final b hadron
+                      // B -> D** -> D* -> D
+                      if ( isDHadron3 ) {
+                        for (int c=0; c<EventInfo.nDHadrons; c++) {
+                          if ( abs( daughter3->p4().pt()
+                                          - EventInfo.DHadron_pT[c] ) < 0.0001 ) {
+                            if ( idD1 < 0 ) idD1 = c;
+                            else if ( idD2 < 0 ) idD2 = c;
+  // cout << " D hadron from B->D**->D* " << c << "  id " << daughter3->pdgId() << "  pT " << daughter3->p4().pt() << "  eta " << daughter3->p4().eta() << "  phi " << daughter3->p4().phi() << endl;
+                          }
+                        }
+                      }
+                      else {
+                        if (nDaughters4 == 0 && daughter3->charge() != 0
+                                            && daughter3->p4().pt() > 1.) nCharged++;
+                        // B -> X -> X -> X -> X
+                        for (unsigned int d4=0; d4<nDaughters4; d4++) {
+                          const Candidate* daughter4 = daughter3->daughter(d4);
+                          unsigned int nDaughters5 = daughter4->numberOfDaughters();
+                          if (nDaughters5 == 0 && daughter4->charge() != 0
+                                              && daughter4->p4().pt()>1.) nCharged++;
+                        }
+                      }
+                    } // B -> X -> X -> X
+                  }
+                } // B -> X -> X
+              }
+            } // loop on daughters from final b hadron
+  // cout << " B hadron " << EventInfo.nBHadrons << "  id " << EventInfo.BHadron_pdgID[EventInfo.nBHadrons] << "  pT " << EventInfo.BHadron_pT[EventInfo.nBHadrons] << "  eta " << EventInfo.BHadron_eta[EventInfo.nBHadrons]<< "  phi " << EventInfo.BHadron_phi[EventInfo.nBHadrons] << "  ->D " << idD1 << " " << idD2 << "  nCh " << nCharged << endl;
+          } // final b hadron
 
-    	EventInfo.BHadron_nCharged[EventInfo.nBHadrons] = nCharged;
-    	EventInfo.BHadron_DHadron1[EventInfo.nBHadrons] = idD1;
-    	EventInfo.BHadron_DHadron2[EventInfo.nBHadrons] = idD2;
- 	EventInfo.nBHadrons++;
-      } // b hadron
-    } // end loop on generated particles
-    } // end if ( AreBHadrons )
+          EventInfo.BHadron_nCharged[EventInfo.nBHadrons] = nCharged;
+          EventInfo.BHadron_DHadron1[EventInfo.nBHadrons] = idD1;
+          EventInfo.BHadron_DHadron2[EventInfo.nBHadrons] = idD2;
+          EventInfo.nBHadrons++;
+        } // b hadron
+      } // end loop on generated particles
+    } // end if ( AreBHadrons && storeHadronVariables_)
   }
 
   //------------------------------------------------------
@@ -1834,50 +1853,52 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       }
     }
 
-    JetInfo[iJetColl].Jet_partonid[JetInfo[iJetColl].nJet]  = pjet->genParton() ? pjet->genParton()->pdgId() : 0;
-    JetInfo[iJetColl].Jet_area[JetInfo[iJetColl].nJet]      = pjet->jetArea();
-    JetInfo[iJetColl].Jet_flavour[JetInfo[iJetColl].nJet]   = cflav;
-    JetInfo[iJetColl].Jet_flavourCleaned[JetInfo[iJetColl].nJet]  = cflav;
-    JetInfo[iJetColl].Jet_partonFlavour[JetInfo[iJetColl].nJet]   = pjet->partonFlavour();
-    JetInfo[iJetColl].Jet_hadronFlavour[JetInfo[iJetColl].nJet]   = pjet->hadronFlavour();
-    JetInfo[iJetColl].Jet_nbHadrons[JetInfo[iJetColl].nJet] = pjet->jetFlavourInfo().getbHadrons().size();
-    JetInfo[iJetColl].Jet_ncHadrons[JetInfo[iJetColl].nJet] = pjet->jetFlavourInfo().getcHadrons().size();
-    JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet]       = pjet->eta();
-    JetInfo[iJetColl].Jet_phi[JetInfo[iJetColl].nJet]       = pjet->phi();
-    JetInfo[iJetColl].Jet_pt[JetInfo[iJetColl].nJet]        = pjet->pt();
-    JetInfo[iJetColl].Jet_mass[JetInfo[iJetColl].nJet]      = pjet->mass();
-    JetInfo[iJetColl].Jet_genpt[JetInfo[iJetColl].nJet]     = ( pjet->genJet()!=0 ? pjet->genJet()->pt() : -1. );
+    if(storeJetVariables_){
+      JetInfo[iJetColl].Jet_partonid[JetInfo[iJetColl].nJet]  = pjet->genParton() ? pjet->genParton()->pdgId() : 0;
+      JetInfo[iJetColl].Jet_area[JetInfo[iJetColl].nJet]      = pjet->jetArea();
+      JetInfo[iJetColl].Jet_flavour[JetInfo[iJetColl].nJet]   = cflav;
+      JetInfo[iJetColl].Jet_flavourCleaned[JetInfo[iJetColl].nJet]  = cflav;
+      JetInfo[iJetColl].Jet_partonFlavour[JetInfo[iJetColl].nJet]   = pjet->partonFlavour();
+      JetInfo[iJetColl].Jet_hadronFlavour[JetInfo[iJetColl].nJet]   = pjet->hadronFlavour();
+      JetInfo[iJetColl].Jet_nbHadrons[JetInfo[iJetColl].nJet] = pjet->jetFlavourInfo().getbHadrons().size();
+      JetInfo[iJetColl].Jet_ncHadrons[JetInfo[iJetColl].nJet] = pjet->jetFlavourInfo().getcHadrons().size();
+      JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet]       = pjet->eta();
+      JetInfo[iJetColl].Jet_phi[JetInfo[iJetColl].nJet]       = pjet->phi();
+      JetInfo[iJetColl].Jet_pt[JetInfo[iJetColl].nJet]        = pjet->pt();
+      JetInfo[iJetColl].Jet_mass[JetInfo[iJetColl].nJet]      = pjet->mass();
+      JetInfo[iJetColl].Jet_genpt[JetInfo[iJetColl].nJet]     = ( pjet->genJet()!=0 ? pjet->genJet()->pt() : -1. );
 
-    // generator-level jet cleaning
-    // against prompt leptons
-    double dRlj;
-    double dRele = 1000., dRmuo = 1000., dRtau = 1000.;
-    for (int k = 0; k < EventInfo.nGenlep; k++) {
-      if ( EventInfo.Genlep_mother[k]==0 ) continue; //protection for QCD samples
-      if ( EventInfo.Genlep_mother[k]%10 !=0 ) continue;
-      int lepid = TMath::Abs(EventInfo.Genlep_pdgID[k]);
-      dRlj = reco::deltaR( pjet->eta(), pjet->phi(), EventInfo.Genlep_eta[k], EventInfo.Genlep_phi[k] );
-      if ( lepid == 11 && dRlj < dRele ) dRele = dRlj;
-      if ( lepid == 13 && dRlj < dRmuo ) dRmuo = dRlj;
-      if ( lepid == 15 && dRlj < dRtau ) dRtau = dRlj;
+      // generator-level jet cleaning
+      // against prompt leptons
+      double dRlj;
+      double dRele = 1000., dRmuo = 1000., dRtau = 1000.;
+      for (int k = 0; k < EventInfo.nGenlep; k++) {
+        if ( EventInfo.Genlep_mother[k]==0 ) continue; //protection for QCD samples
+        if ( EventInfo.Genlep_mother[k]%10 !=0 ) continue;
+        int lepid = TMath::Abs(EventInfo.Genlep_pdgID[k]);
+        dRlj = reco::deltaR( pjet->eta(), pjet->phi(), EventInfo.Genlep_eta[k], EventInfo.Genlep_phi[k] );
+        if ( lepid == 11 && dRlj < dRele ) dRele = dRlj;
+        if ( lepid == 13 && dRlj < dRmuo ) dRmuo = dRlj;
+        if ( lepid == 15 && dRlj < dRtau ) dRtau = dRlj;
+      }
+      if ( dRele < 0.2 || dRmuo < 0.2 || dRtau < 0.3 ) JetInfo[iJetColl].Jet_flavourCleaned[JetInfo[iJetColl].nJet] = -999;
+
+      // against pileup:
+      if ( JetInfo[iJetColl].Jet_genpt[JetInfo[iJetColl].nJet] < 8. )  JetInfo[iJetColl].Jet_flavourCleaned[JetInfo[iJetColl].nJet] = 0;
+
+      // available JEC sets
+      unsigned int nJECSets = pjet->availableJECSets().size();
+      // PF jet ID
+      pat::strbitset retpf = pfjetIDLoose_.getBitTemplate();
+      retpf.set(false);
+      JetInfo[iJetColl].Jet_looseID[JetInfo[iJetColl].nJet] = ( ( nJECSets>0 && pjet->isPFJet() ) ? ( pfjetIDLoose_( *pjet, retpf ) ? 1 : 0 ) : 0 );
+      retpf.set(false);
+      JetInfo[iJetColl].Jet_tightID[JetInfo[iJetColl].nJet] = ( ( nJECSets>0 && pjet->isPFJet() ) ? ( pfjetIDTight_( *pjet, retpf ) ? 1 : 0 ) : 0 );
+
+      JetInfo[iJetColl].Jet_jes[JetInfo[iJetColl].nJet]      = ( nJECSets>0 ? pjet->pt()/pjet->correctedJet("Uncorrected").pt() : 1. );
+      JetInfo[iJetColl].Jet_residual[JetInfo[iJetColl].nJet] = ( nJECSets>0 ? pjet->pt()/pjet->correctedJet("L3Absolute").pt() : 1. );
+      JetInfo[iJetColl].Jet_uncorrpt[JetInfo[iJetColl].nJet] = ( nJECSets>0 ? pjet->correctedJet("Uncorrected").pt() : pjet->pt());
     }
-    if ( dRele < 0.2 || dRmuo < 0.2 || dRtau < 0.3 ) JetInfo[iJetColl].Jet_flavourCleaned[JetInfo[iJetColl].nJet] = -999;
-
-    // against pileup:
-    if ( JetInfo[iJetColl].Jet_genpt[JetInfo[iJetColl].nJet] < 8. )  JetInfo[iJetColl].Jet_flavourCleaned[JetInfo[iJetColl].nJet] = 0;
-
-    // available JEC sets
-    unsigned int nJECSets = pjet->availableJECSets().size();
-    // PF jet ID
-    pat::strbitset retpf = pfjetIDLoose_.getBitTemplate();
-    retpf.set(false);
-    JetInfo[iJetColl].Jet_looseID[JetInfo[iJetColl].nJet] = ( ( nJECSets>0 && pjet->isPFJet() ) ? ( pfjetIDLoose_( *pjet, retpf ) ? 1 : 0 ) : 0 );
-    retpf.set(false);
-    JetInfo[iJetColl].Jet_tightID[JetInfo[iJetColl].nJet] = ( ( nJECSets>0 && pjet->isPFJet() ) ? ( pfjetIDTight_( *pjet, retpf ) ? 1 : 0 ) : 0 );
-
-    JetInfo[iJetColl].Jet_jes[JetInfo[iJetColl].nJet]      = ( nJECSets>0 ? pjet->pt()/pjet->correctedJet("Uncorrected").pt() : 1. );
-    JetInfo[iJetColl].Jet_residual[JetInfo[iJetColl].nJet] = ( nJECSets>0 ? pjet->pt()/pjet->correctedJet("L3Absolute").pt() : 1. );
-    JetInfo[iJetColl].Jet_uncorrpt[JetInfo[iJetColl].nJet] = ( nJECSets>0 ? pjet->correctedJet("Uncorrected").pt() : pjet->pt());
 
     if( runSubJets_ && iJetColl > 0 )
     {
@@ -2107,38 +2128,38 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].Track_dxyError[JetInfo[iJetColl].nTrack]      = ptrack.dxyError();
       JetInfo[iJetColl].Track_dzError[JetInfo[iJetColl].nTrack]       = ptrack.dzError();
        
-
-      TransverseImpactPointExtrapolator extrapolator(transientTrack.field());
-      TrajectoryStateOnSurface closestOnTransversePlaneState = extrapolator.extrapolate(transientTrack.impactPointState(),RecoVertex::convertPos(pv->position()));
-      if( closestOnTransversePlaneState.isValid() )
       {
-        GlobalPoint impactPoint    = closestOnTransversePlaneState.globalPosition();
-        GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),0.);
-        double prod = IPVec.dot(direction);
-        int sign = (prod>=0) ? 1 : -1;
-        JetInfo[iJetColl].Track_sign2D[JetInfo[iJetColl].nTrack]      = sign;
+        TransverseImpactPointExtrapolator extrapolator(transientTrack.field());
+        TrajectoryStateOnSurface closestOnTransversePlaneState = extrapolator.extrapolate(transientTrack.impactPointState(),RecoVertex::convertPos(pv->position()));
+        if( closestOnTransversePlaneState.isValid() )
+        {
+          GlobalPoint impactPoint    = closestOnTransversePlaneState.globalPosition();
+          GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),0.);
+          double prod = IPVec.dot(direction);
+          int sign = (prod>=0) ? 1 : -1;
+          JetInfo[iJetColl].Track_sign2D[JetInfo[iJetColl].nTrack]      = sign;
+        }
+        else
+        {
+          JetInfo[iJetColl].Track_sign2D[JetInfo[iJetColl].nTrack]      = -666.;
+        }
+      }{
+        AnalyticalImpactPointExtrapolator extrapolator(transientTrack.field());
+        TrajectoryStateOnSurface closestIn3DSpaceState = extrapolator.extrapolate(transientTrack.impactPointState(),RecoVertex::convertPos(pv->position()));
+        if( closestIn3DSpaceState.isValid() )
+        {
+          GlobalPoint impactPoint = closestIn3DSpaceState.globalPosition();
+          GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),impactPoint.z()-pv->z());
+          double prod = IPVec.dot(direction);
+          int sign = (prod>=0) ? 1 : -1;
+          JetInfo[iJetColl].Track_sign3D[JetInfo[iJetColl].nTrack]      = sign;
+        }
+        else
+        {
+          std::cout << "FAILURE: TrajectoryStateOnSurface is not available" << std::endl;
+          JetInfo[iJetColl].Track_sign3D[JetInfo[iJetColl].nTrack]      = -666.;
+        }
       }
-      else
-      {
-        JetInfo[iJetColl].Track_sign2D[JetInfo[iJetColl].nTrack]      = -666.;
-      }
-
-      AnalyticalImpactPointExtrapolator extrapolator(transientTrack.field());
-      TrajectoryStateOnSurface closestIn3DSpaceState = extrapolator.extrapolate(transientTrack.impactPointState(),RecoVertex::convertPos(pv->position()));
-      if( closestIn3DSpaceState.isValid() )
-      {
-        GlobalPoint impactPoint = closestIn3DSpaceState.globalPosition();
-        GlobalVector IPVec(impactPoint.x()-pv->x(),impactPoint.y()-pv->y(),impactPoint.z()-pv->z());
-        double prod = IPVec.dot(direction);
-        int sign = (prod>=0) ? 1 : -1;
-        JetInfo[iJetColl].Track_sign3D[JetInfo[iJetColl].nTrack]      = sign;
-      }
-      else
-      {
-        std::cout << "FAILURE: TrajectoryStateOnSurface is not available" << std::endl;
-        JetInfo[iJetColl].Track_sign3D[JetInfo[iJetColl].nTrack]      = -666.;
-      }
-
 
       float deltaR = reco::deltaR( ptrackRef->eta(), ptrackRef->phi(),
                                    JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet], JetInfo[iJetColl].Jet_phi[JetInfo[iJetColl].nJet] );
@@ -2563,104 +2584,108 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
     math::XYZTLorentzVector allSum = allKinematics.weightedVectorSum() ; // allKinematics.vectorSum()
 
-    // PFMuon information
-    int nSM = (pjet->hasTagInfo(softPFMuonTagInfos_.c_str()) ? softPFMuTagInfo->leptons() : 0);
-    JetInfo[iJetColl].Jet_nFirstSM[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFMuon;
+    if(storePFMuonVariables_){
+      // PFMuon information
+      int nSM = (pjet->hasTagInfo(softPFMuonTagInfos_.c_str()) ? softPFMuTagInfo->leptons() : 0);
+      JetInfo[iJetColl].Jet_nFirstSM[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFMuon;
 
-    for (size_t leptIdx = 0; leptIdx < (size_t)nSM; ++leptIdx) {
+      for (size_t leptIdx = 0; leptIdx < (size_t)nSM; ++leptIdx) {
 
-      JetInfo[iJetColl].PFMuon_IdxJet[JetInfo[iJetColl].nPFMuon]    = JetInfo[iJetColl].nJet;
-      JetInfo[iJetColl].PFMuon_pt[JetInfo[iJetColl].nPFMuon]        = softPFMuTagInfo->lepton(leptIdx)->pt();
-      JetInfo[iJetColl].PFMuon_eta[JetInfo[iJetColl].nPFMuon]       = softPFMuTagInfo->lepton(leptIdx)->eta();
-      JetInfo[iJetColl].PFMuon_phi[JetInfo[iJetColl].nPFMuon]       = softPFMuTagInfo->lepton(leptIdx)->phi();
-      JetInfo[iJetColl].PFMuon_ptrel[JetInfo[iJetColl].nPFMuon]     = (softPFMuTagInfo->properties(leptIdx).ptRel);
-      JetInfo[iJetColl].PFMuon_ratio[JetInfo[iJetColl].nPFMuon]     = (softPFMuTagInfo->properties(leptIdx).ratio);
-      JetInfo[iJetColl].PFMuon_ratioRel[JetInfo[iJetColl].nPFMuon]  = (softPFMuTagInfo->properties(leptIdx).ratioRel);
-      JetInfo[iJetColl].PFMuon_deltaR[JetInfo[iJetColl].nPFMuon]    = (softPFMuTagInfo->properties(leptIdx).deltaR);
+        JetInfo[iJetColl].PFMuon_IdxJet[JetInfo[iJetColl].nPFMuon]    = JetInfo[iJetColl].nJet;
+        JetInfo[iJetColl].PFMuon_pt[JetInfo[iJetColl].nPFMuon]        = softPFMuTagInfo->lepton(leptIdx)->pt();
+        JetInfo[iJetColl].PFMuon_eta[JetInfo[iJetColl].nPFMuon]       = softPFMuTagInfo->lepton(leptIdx)->eta();
+        JetInfo[iJetColl].PFMuon_phi[JetInfo[iJetColl].nPFMuon]       = softPFMuTagInfo->lepton(leptIdx)->phi();
+        JetInfo[iJetColl].PFMuon_ptrel[JetInfo[iJetColl].nPFMuon]     = (softPFMuTagInfo->properties(leptIdx).ptRel);
+        JetInfo[iJetColl].PFMuon_ratio[JetInfo[iJetColl].nPFMuon]     = (softPFMuTagInfo->properties(leptIdx).ratio);
+        JetInfo[iJetColl].PFMuon_ratioRel[JetInfo[iJetColl].nPFMuon]  = (softPFMuTagInfo->properties(leptIdx).ratioRel);
+        JetInfo[iJetColl].PFMuon_deltaR[JetInfo[iJetColl].nPFMuon]    = (softPFMuTagInfo->properties(leptIdx).deltaR);
 
-      JetInfo[iJetColl].PFMuon_IP[JetInfo[iJetColl].nPFMuon]        = (softPFMuTagInfo->properties(leptIdx).sip3d);
-      JetInfo[iJetColl].PFMuon_IP2D[JetInfo[iJetColl].nPFMuon]      = (softPFMuTagInfo->properties(leptIdx).sip2d);
-      JetInfo[iJetColl].PFMuon_IPsig[JetInfo[iJetColl].nPFMuon]        = (softPFMuTagInfo->properties(leptIdx).sip3dsig);
-      JetInfo[iJetColl].PFMuon_IP2Dsig[JetInfo[iJetColl].nPFMuon]      = (softPFMuTagInfo->properties(leptIdx).sip2dsig);
+        JetInfo[iJetColl].PFMuon_IP[JetInfo[iJetColl].nPFMuon]        = (softPFMuTagInfo->properties(leptIdx).sip3d);
+        JetInfo[iJetColl].PFMuon_IP2D[JetInfo[iJetColl].nPFMuon]      = (softPFMuTagInfo->properties(leptIdx).sip2d);
+        JetInfo[iJetColl].PFMuon_IPsig[JetInfo[iJetColl].nPFMuon]        = (softPFMuTagInfo->properties(leptIdx).sip3dsig);
+        JetInfo[iJetColl].PFMuon_IP2Dsig[JetInfo[iJetColl].nPFMuon]      = (softPFMuTagInfo->properties(leptIdx).sip2dsig);
 
-      JetInfo[iJetColl].PFMuon_nMuHit[JetInfo[iJetColl].nPFMuon] = 0;
-      JetInfo[iJetColl].PFMuon_nTkHit[JetInfo[iJetColl].nPFMuon] = 0;
-      JetInfo[iJetColl].PFMuon_nPixHit[JetInfo[iJetColl].nPFMuon] = 0;
-      JetInfo[iJetColl].PFMuon_nOutHit[JetInfo[iJetColl].nPFMuon] = 0;
-      JetInfo[iJetColl].PFMuon_nTkLwM[JetInfo[iJetColl].nPFMuon] = 0;
-      JetInfo[iJetColl].PFMuon_nPixLwM[JetInfo[iJetColl].nPFMuon] = 0;
-      JetInfo[iJetColl].PFMuon_nMatched[JetInfo[iJetColl].nPFMuon] = 0;
-      JetInfo[iJetColl].PFMuon_chi2[JetInfo[iJetColl].nPFMuon] = 99;
-      JetInfo[iJetColl].PFMuon_chi2Tk[JetInfo[iJetColl].nPFMuon]= 99;
-      JetInfo[iJetColl].PFMuon_isGlobal[JetInfo[iJetColl].nPFMuon] = 0;
-      JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] = 0;
-      JetInfo[iJetColl].PFMuon_dz[JetInfo[iJetColl].nPFMuon] = 99;
-      JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 0;
-      
-      const edm::Ptr<reco::Muon> muonPtr = matchMuon( softPFMuTagInfo->lepton(leptIdx), muons );
-      if ( muonPtr.isNonnull() && muonPtr.isAvailable() && muonPtr->isGlobalMuon() ) {
+        JetInfo[iJetColl].PFMuon_nMuHit[JetInfo[iJetColl].nPFMuon] = 0;
+        JetInfo[iJetColl].PFMuon_nTkHit[JetInfo[iJetColl].nPFMuon] = 0;
+        JetInfo[iJetColl].PFMuon_nPixHit[JetInfo[iJetColl].nPFMuon] = 0;
+        JetInfo[iJetColl].PFMuon_nOutHit[JetInfo[iJetColl].nPFMuon] = 0;
+        JetInfo[iJetColl].PFMuon_nTkLwM[JetInfo[iJetColl].nPFMuon] = 0;
+        JetInfo[iJetColl].PFMuon_nPixLwM[JetInfo[iJetColl].nPFMuon] = 0;
+        JetInfo[iJetColl].PFMuon_nMatched[JetInfo[iJetColl].nPFMuon] = 0;
+        JetInfo[iJetColl].PFMuon_chi2[JetInfo[iJetColl].nPFMuon] = 99;
+        JetInfo[iJetColl].PFMuon_chi2Tk[JetInfo[iJetColl].nPFMuon]= 99;
+        JetInfo[iJetColl].PFMuon_isGlobal[JetInfo[iJetColl].nPFMuon] = 0;
+        JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] = 0;
+        JetInfo[iJetColl].PFMuon_dz[JetInfo[iJetColl].nPFMuon] = 99;
+        JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 0;
 
-        JetInfo[iJetColl].PFMuon_nMuHit[JetInfo[iJetColl].nPFMuon] = muonPtr->outerTrack()->hitPattern().numberOfValidMuonHits();
-        JetInfo[iJetColl].PFMuon_nTkHit[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().numberOfValidHits();
-        JetInfo[iJetColl].PFMuon_nPixHit[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().numberOfValidPixelHits();
-        JetInfo[iJetColl].PFMuon_nOutHit[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_OUTER_HITS);
-        JetInfo[iJetColl].PFMuon_nTkLwM[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().trackerLayersWithMeasurement();
-        JetInfo[iJetColl].PFMuon_nPixLwM[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().pixelLayersWithMeasurement();
-        JetInfo[iJetColl].PFMuon_nMatched[JetInfo[iJetColl].nPFMuon] = muonPtr->numberOfMatchedStations();
-        JetInfo[iJetColl].PFMuon_chi2[JetInfo[iJetColl].nPFMuon] = muonPtr->globalTrack()->normalizedChi2();
-        JetInfo[iJetColl].PFMuon_chi2Tk[JetInfo[iJetColl].nPFMuon]= muonPtr->innerTrack()->normalizedChi2();
-        JetInfo[iJetColl].PFMuon_isGlobal[JetInfo[iJetColl].nPFMuon] = 1;
-        JetInfo[iJetColl].PFMuon_dz[JetInfo[iJetColl].nPFMuon] = muonPtr->muonBestTrack()->dz(pv->position());
-        JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 1;
+        const edm::Ptr<reco::Muon> muonPtr = matchMuon( softPFMuTagInfo->lepton(leptIdx), muons );
+        if ( muonPtr.isNonnull() && muonPtr.isAvailable() && muonPtr->isGlobalMuon() ) {
 
-        if (muonPtr->outerTrack()->hitPattern().numberOfValidMuonHits()>0 &&
-            muonPtr->numberOfMatches()>1 && muonPtr->innerTrack()->hitPattern().numberOfValidHits()>10 &&
-	    muonPtr->innerTrack()->hitPattern().numberOfValidPixelHits()>1 &&
-	    muonPtr->innerTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_OUTER_HITS)<3 &&
-	    muonPtr->globalTrack()->normalizedChi2()<10. && muonPtr->innerTrack()->normalizedChi2()<10.)
-          JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 2;
+          JetInfo[iJetColl].PFMuon_nMuHit[JetInfo[iJetColl].nPFMuon] = muonPtr->outerTrack()->hitPattern().numberOfValidMuonHits();
+          JetInfo[iJetColl].PFMuon_nTkHit[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().numberOfValidHits();
+          JetInfo[iJetColl].PFMuon_nPixHit[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().numberOfValidPixelHits();
+          JetInfo[iJetColl].PFMuon_nOutHit[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_OUTER_HITS);
+          JetInfo[iJetColl].PFMuon_nTkLwM[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().trackerLayersWithMeasurement();
+          JetInfo[iJetColl].PFMuon_nPixLwM[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().pixelLayersWithMeasurement();
+          JetInfo[iJetColl].PFMuon_nMatched[JetInfo[iJetColl].nPFMuon] = muonPtr->numberOfMatchedStations();
+          JetInfo[iJetColl].PFMuon_chi2[JetInfo[iJetColl].nPFMuon] = muonPtr->globalTrack()->normalizedChi2();
+          JetInfo[iJetColl].PFMuon_chi2Tk[JetInfo[iJetColl].nPFMuon]= muonPtr->innerTrack()->normalizedChi2();
+          JetInfo[iJetColl].PFMuon_isGlobal[JetInfo[iJetColl].nPFMuon] = 1;
+          JetInfo[iJetColl].PFMuon_dz[JetInfo[iJetColl].nPFMuon] = muonPtr->muonBestTrack()->dz(pv->position());
+          JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 1;
 
-        if ( useTrackHistory_ && !isData_ ) {
-          TrackCategories::Flags theFlagP = classifier_.evaluate( toTrackRef(muonPtr->globalTrack()) ).flags();
-          if ( theFlagP[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 1));
-          if ( theFlagP[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 2));
-          if ( theFlagP[TrackCategories::SignalEvent] )           JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 3));
-          if ( theFlagP[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 4));
-          if ( theFlagP[TrackCategories::KsDecay] )            JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 5));
-          if ( theFlagP[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 6));
-          if ( theFlagP[TrackCategories::HadronicProcess] )    JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 7));
-          if ( theFlagP[TrackCategories::Fake] )               JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 8));
-          if ( theFlagP[TrackCategories::SharedInnerHits] )    JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 9));
+          if (muonPtr->outerTrack()->hitPattern().numberOfValidMuonHits()>0 &&
+              muonPtr->numberOfMatches()>1 && muonPtr->innerTrack()->hitPattern().numberOfValidHits()>10 &&
+              muonPtr->innerTrack()->hitPattern().numberOfValidPixelHits()>1 &&
+              muonPtr->innerTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_OUTER_HITS)<3 &&
+              muonPtr->globalTrack()->normalizedChi2()<10. && muonPtr->innerTrack()->normalizedChi2()<10.)
+            JetInfo[iJetColl].PFMuon_GoodQuality[JetInfo[iJetColl].nPFMuon] = 2;
+
+          if ( useTrackHistory_ && !isData_ ) {
+            TrackCategories::Flags theFlagP = classifier_.evaluate( toTrackRef(muonPtr->globalTrack()) ).flags();
+            if ( theFlagP[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 1));
+            if ( theFlagP[TrackCategories::CWeakDecay] )         JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 2));
+            if ( theFlagP[TrackCategories::SignalEvent] )           JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 3));
+            if ( theFlagP[TrackCategories::ConversionsProcess] ) JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 4));
+            if ( theFlagP[TrackCategories::KsDecay] )            JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 5));
+            if ( theFlagP[TrackCategories::LambdaDecay] )        JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 6));
+            if ( theFlagP[TrackCategories::HadronicProcess] )    JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 7));
+            if ( theFlagP[TrackCategories::Fake] )               JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 8));
+            if ( theFlagP[TrackCategories::SharedInnerHits] )    JetInfo[iJetColl].PFMuon_hist[JetInfo[iJetColl].nPFMuon] += int(pow(10., -1 + 9));
+          }
         }
+
+        ++JetInfo[iJetColl].nPFMuon;
       }
-
-      ++JetInfo[iJetColl].nPFMuon;
+      JetInfo[iJetColl].Jet_nLastSM[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFMuon;
+      JetInfo[iJetColl].Jet_nSM[JetInfo[iJetColl].nJet] = nSM;
     }
-    JetInfo[iJetColl].Jet_nLastSM[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFMuon;
-    JetInfo[iJetColl].Jet_nSM[JetInfo[iJetColl].nJet] = nSM;
 
-    // PFElectron information
-    int nSE = (pjet->hasTagInfo(softPFElectronTagInfos_.c_str()) ? softPFElTagInfo->leptons() : 0);
-    JetInfo[iJetColl].Jet_nFirstSE[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFElectron;
+    if(storePFElectronVariables_){
+      // PFElectron information
+      int nSE = (pjet->hasTagInfo(softPFElectronTagInfos_.c_str()) ? softPFElTagInfo->leptons() : 0);
+      JetInfo[iJetColl].Jet_nFirstSE[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFElectron;
 
-    for (size_t leptIdx = 0; leptIdx < (size_t)nSE; ++leptIdx) {
+      for (size_t leptIdx = 0; leptIdx < (size_t)nSE; ++leptIdx) {
 
-      JetInfo[iJetColl].PFElectron_IdxJet[JetInfo[iJetColl].nPFElectron]    = JetInfo[iJetColl].nJet;
-      JetInfo[iJetColl].PFElectron_pt[JetInfo[iJetColl].nPFElectron]        = softPFElTagInfo->lepton(leptIdx)->pt();
-      JetInfo[iJetColl].PFElectron_eta[JetInfo[iJetColl].nPFElectron]       = softPFElTagInfo->lepton(leptIdx)->eta();
-      JetInfo[iJetColl].PFElectron_phi[JetInfo[iJetColl].nPFElectron]       = softPFElTagInfo->lepton(leptIdx)->phi();
-      JetInfo[iJetColl].PFElectron_ptrel[JetInfo[iJetColl].nPFElectron]     = (softPFElTagInfo->properties(leptIdx).ptRel);
-      JetInfo[iJetColl].PFElectron_ratio[JetInfo[iJetColl].nPFElectron]     = (softPFElTagInfo->properties(leptIdx).ratio);
-      JetInfo[iJetColl].PFElectron_ratioRel[JetInfo[iJetColl].nPFElectron]  = (softPFElTagInfo->properties(leptIdx).ratioRel);
-      JetInfo[iJetColl].PFElectron_deltaR[JetInfo[iJetColl].nPFElectron]    = (softPFElTagInfo->properties(leptIdx).deltaR);
-      JetInfo[iJetColl].PFElectron_IP[JetInfo[iJetColl].nPFElectron]        = (softPFElTagInfo->properties(leptIdx).sip3d);
-      JetInfo[iJetColl].PFElectron_IP2D[JetInfo[iJetColl].nPFElectron]      = (softPFElTagInfo->properties(leptIdx).sip2d);
-      JetInfo[iJetColl].PFElectron_mva_e_pi[JetInfo[iJetColl].nPFElectron]  = (softPFElTagInfo->properties(leptIdx).elec_mva);
+        JetInfo[iJetColl].PFElectron_IdxJet[JetInfo[iJetColl].nPFElectron]    = JetInfo[iJetColl].nJet;
+        JetInfo[iJetColl].PFElectron_pt[JetInfo[iJetColl].nPFElectron]        = softPFElTagInfo->lepton(leptIdx)->pt();
+        JetInfo[iJetColl].PFElectron_eta[JetInfo[iJetColl].nPFElectron]       = softPFElTagInfo->lepton(leptIdx)->eta();
+        JetInfo[iJetColl].PFElectron_phi[JetInfo[iJetColl].nPFElectron]       = softPFElTagInfo->lepton(leptIdx)->phi();
+        JetInfo[iJetColl].PFElectron_ptrel[JetInfo[iJetColl].nPFElectron]     = (softPFElTagInfo->properties(leptIdx).ptRel);
+        JetInfo[iJetColl].PFElectron_ratio[JetInfo[iJetColl].nPFElectron]     = (softPFElTagInfo->properties(leptIdx).ratio);
+        JetInfo[iJetColl].PFElectron_ratioRel[JetInfo[iJetColl].nPFElectron]  = (softPFElTagInfo->properties(leptIdx).ratioRel);
+        JetInfo[iJetColl].PFElectron_deltaR[JetInfo[iJetColl].nPFElectron]    = (softPFElTagInfo->properties(leptIdx).deltaR);
+        JetInfo[iJetColl].PFElectron_IP[JetInfo[iJetColl].nPFElectron]        = (softPFElTagInfo->properties(leptIdx).sip3d);
+        JetInfo[iJetColl].PFElectron_IP2D[JetInfo[iJetColl].nPFElectron]      = (softPFElTagInfo->properties(leptIdx).sip2d);
+        JetInfo[iJetColl].PFElectron_mva_e_pi[JetInfo[iJetColl].nPFElectron]  = (softPFElTagInfo->properties(leptIdx).elec_mva);
 
-      ++JetInfo[iJetColl].nPFElectron;
+        ++JetInfo[iJetColl].nPFElectron;
+      }
+      JetInfo[iJetColl].Jet_nLastSE[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFElectron;
+      JetInfo[iJetColl].Jet_nSE[JetInfo[iJetColl].nJet] = nSE;
     }
-    JetInfo[iJetColl].Jet_nLastSE[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFElectron;
-    JetInfo[iJetColl].Jet_nSE[JetInfo[iJetColl].nJet] = nSE;
 
     // b-tagger discriminants
     float Proba  = pjet->bDiscriminator(jetPBJetTags_.c_str());
