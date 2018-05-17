@@ -245,7 +245,7 @@ options.register('isReHLT', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     '80X reHLT samples')
-options.register('JPCalibration', '',
+options.register('JPCalibration', 'FIXME',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     'JP Calibration pyload to use')
