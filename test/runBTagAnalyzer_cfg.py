@@ -1537,7 +1537,14 @@ for mod in process.producers_().itervalues():
 for mod in process.filters_().itervalues():
     process.tsk.add(mod)
 
+process.plotPUTrue = cms.EDAnalyzer("plotPUTrue")
+process.recoFilter = cms.EDFilter("recoFilter")
+process.mypath = cms.Sequence(process.plotPUTrue * process.recoFilter)
+if (options.runOnData):
+   process.mypath = cms.Sequence(process.recoFilter)
+
 process.p = cms.Path(
+    process.mypath *
     process.allEvents
     * process.filtSeq
     * process.selectedEvents
