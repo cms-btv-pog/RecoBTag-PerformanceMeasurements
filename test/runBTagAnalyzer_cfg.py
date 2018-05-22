@@ -269,6 +269,10 @@ options.register('storeCSVTagVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to keep CSV TaggingVariables')
+options.register('storeCSVTagTrackVariables', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to keep CSV Tagging Track Variables')
 options.register('storeDeepFlavourTagVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -1436,6 +1440,7 @@ process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True fo
 #------------------
 process.btagana.storeTagVariables     = False  ## True if you want to keep TagInfo TaggingVariables
 process.btagana.storeCSVTagVariables  = options.storeCSVTagVariables   ## True if you want to keep CSV TaggingVariables
+process.btagana.storeCSVTagTrackVariables  = options.storeCSVTagTrackVariables   ## True if you want to keep CSV Tagging Track Variables
 process.btagana.storeDeepFlavourTagVariables = options.storeDeepFlavourTagVariables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag(patJetSource)
@@ -1487,6 +1492,7 @@ if options.runFatJets:
         deepFlavourJetTags = cms.string(''),
         deepFlavourNegJetTags = cms.string(''),
         storeCSVTagVariables = cms.bool(True),
+        storeCSVTagTrackVariables = cms.bool(True),
         storeTagVariablesSubJets = cms.bool(False),
         storeCSVTagVariablesSubJets = cms.bool(False),
         useSelectedTracks   = cms.bool(True),

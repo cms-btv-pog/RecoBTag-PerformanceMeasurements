@@ -388,6 +388,7 @@ private:
   bool storeTagVariables_;
   bool storeTagVariablesSubJets_;
   bool storeCSVTagVariables_;
+  bool storeCSVTagTrackVariables_;
   bool storeDeepCSVVariables_;
   bool storeDeepFlavourVariables_;
   bool storeDeepFlavourTagVariables_;
@@ -568,6 +569,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   storeTagVariables_ = iConfig.getParameter<bool>("storeTagVariables");
   storeTagVariablesSubJets_ = iConfig.getParameter<bool>("storeTagVariablesSubJets");
   storeCSVTagVariables_ = iConfig.getParameter<bool>("storeCSVTagVariables");
+  storeCSVTagTrackVariables_ = iConfig.getParameter<bool>("storeCSVTagTrackVariables");
   storeDeepCSVVariables_ = iConfig.getParameter<bool>("storeDeepCSVVariables");
   storeDeepFlavourVariables_ = iConfig.getParameter<bool>("storeDeepFlavourVariables");
   storeDeepFlavourTagVariables_  = iConfig.getParameter<bool>("storeDeepFlavourTagVariables");
@@ -757,6 +759,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   if ( fillsvTagInfo_ )       JetInfo[0].RegisterJetSVTree(smalltree,branchNamePrefix_);
   if ( storeTagVariables_)    JetInfo[0].RegisterTagVarTree(smalltree,branchNamePrefix_);
   if ( storeCSVTagVariables_) JetInfo[0].RegisterCSVTagVarTree(smalltree,branchNamePrefix_);
+  if ( storeCSVTagTrackVariables_) JetInfo[0].RegisterCSVTagTrackVarTree(smalltree,branchNamePrefix_);
   if ( storeDeepCSVVariables_)JetInfo[0].RegisterJetDeepCSVTree(smalltree,branchNamePrefix_);
   if ( storeDeepFlavourVariables_) JetInfo[0].RegisterJetDeepFlavourTree(smalltree,branchNamePrefix_);
   std::cout << "storeDeepFlavourTagVariables_: " << storeDeepFlavourTagVariables_ << std::endl;
@@ -2602,9 +2605,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
     math::XYZTLorentzVector allSum = allKinematics.weightedVectorSum() ; // allKinematics.vectorSum()
 
+    int nSM = (pjet->hasTagInfo(softPFMuonTagInfos_.c_str()) ? softPFMuTagInfo->leptons() : 0);
     if(storePFMuonVariables_){
       // PFMuon information
-      int nSM = (pjet->hasTagInfo(softPFMuonTagInfos_.c_str()) ? softPFMuTagInfo->leptons() : 0);
       JetInfo[iJetColl].Jet_nFirstSM[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFMuon;
 
       for (size_t leptIdx = 0; leptIdx < (size_t)nSM; ++leptIdx) {
@@ -2679,10 +2682,12 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].Jet_nLastSM[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFMuon;
 //       JetInfo[iJetColl].Jet_nSM[JetInfo[iJetColl].nJet] = nSM;
     }
+    else // fill nPFMuon anyway
+      JetInfo[iJetColl].nPFMuon = nSM;
 
+    int nSE = (pjet->hasTagInfo(softPFElectronTagInfos_.c_str()) ? softPFElTagInfo->leptons() : 0);
     if(storePFElectronVariables_){
       // PFElectron information
-      int nSE = (pjet->hasTagInfo(softPFElectronTagInfos_.c_str()) ? softPFElTagInfo->leptons() : 0);
       JetInfo[iJetColl].Jet_nFirstSE[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFElectron;
 
       for (size_t leptIdx = 0; leptIdx < (size_t)nSE; ++leptIdx) {
@@ -2704,6 +2709,8 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].Jet_nLastSE[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFElectron;
 //       JetInfo[iJetColl].Jet_nSE[JetInfo[iJetColl].nJet] = nSE;
     }
+    else // fill nPFElectron anyway
+      JetInfo[iJetColl].nPFElectron = nSE;
 
     // b-tagger discriminants
     float Proba  = pjet->bDiscriminator(jetPBJetTags_.c_str());
@@ -3014,7 +3021,14 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].TagVarCSV_flightDistance2dSig[JetInfo[iJetColl].nJet]         = ( vars.checkTag(reco::btau::flightDistance2dSig) ? vars.get(reco::btau::flightDistance2dSig) : -9999 );
       JetInfo[iJetColl].TagVarCSV_flightDistance3dVal[JetInfo[iJetColl].nJet]         = ( vars.checkTag(reco::btau::flightDistance3dVal) ? vars.get(reco::btau::flightDistance3dVal) : -9999 );
       JetInfo[iJetColl].TagVarCSV_flightDistance3dSig[JetInfo[iJetColl].nJet]         = ( vars.checkTag(reco::btau::flightDistance3dSig) ? vars.get(reco::btau::flightDistance3dSig) : -9999 );
+    }
 
+    if ( storeCSVTagTrackVariables_ ){
+      std::vector<const reco::BaseTagInfo*>  baseTagInfos;
+      JetTagComputer::TagInfoHelper helper(baseTagInfos);
+      baseTagInfos.push_back( ipTagInfo );
+      baseTagInfos.push_back( svTagInfo );
+      reco::TaggingVariableList vars = computer->taggingVariables(helper);
       // per jet per track
       JetInfo[iJetColl].Jet_nFirstTrkTagVarCSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkTagVarCSV;
       std::vector<float> tagValList = vars.getList(reco::btau::trackSip2dSig,false);
@@ -3277,7 +3291,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     //*****************************************************************
     JetInfo[iJetColl].Jet_histSvx[JetInfo[iJetColl].nJet] = 0;
     JetInfo[iJetColl].Jet_nFirstSV[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nSV;
-//     JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]  = svTagInfo->nVertices();
+    JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]  = svTagInfo->nVertices();
 
     // if secondary vertices present
     reco::TrackKinematics tau1Kinematics;
