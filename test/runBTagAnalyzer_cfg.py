@@ -20,7 +20,7 @@ options.register('outFilename', 'JetTree',
     VarParsing.varType.string,
     "Output file name"
 )
-options.register('reportEvery', 10,
+options.register('reportEvery', 1000,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.int,
     "Report every N events (default is N=1)"
@@ -50,12 +50,12 @@ options.register('usePuppiForBTagging', False,
     VarParsing.varType.bool,
     "Use Puppi candidates for b tagging"
 )
-options.register('mcGlobalTag', '92X_upgrade2017_realistic_v1',
+options.register('mcGlobalTag', '94X_mc2017_realistic_v10',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag"
 )
-options.register('dataGlobalTag', '92X_dataRun2_Prompt_v7', 
+options.register('dataGlobalTag', '94X_dataRun2_ReReco_EOY17_v2',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag"
@@ -70,12 +70,12 @@ options.register('runFatJetClustering', False,
     VarParsing.varType.bool,
     "Cluster fat jets from scratch instead of using those already present in the event"
 )
-options.register('runFatJets', False,
+options.register('runFatJets', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Run fat jets"
 )
-options.register('runSubJets', False,
+options.register('runSubJets', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Run subjets"
@@ -105,7 +105,7 @@ options.register('fatJetAbsEtaMax', 2.5,
     VarParsing.varType.float,
     "Maximum |eta| for fat jets (default is 2.5)"
 )
-options.register('useTTbarFilter', False,
+options.register('useTTbarFilter', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Use TTbar filter"
@@ -267,7 +267,7 @@ options.register(
 )
 
 ## 'maxEvents' is already registered by the Framework, changing default value
-options.setDefault('maxEvents', -1)
+options.setDefault('maxEvents', 10)
 
 options.parseArguments()
 if options.defaults:
