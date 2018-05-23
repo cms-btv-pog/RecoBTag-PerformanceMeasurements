@@ -1,0 +1,14 @@
+SingleMuonB /SingleMuon/Run2017B-17Nov2017-v1/MINIAOD True
+SingleMuonC /SingleMuon/Run2017C-17Nov2017-v1/MINIAOD True
+SingleMuonD /SingleMuon/Run2017D-17Nov2017-v1/MINIAOD True
+SingleMuonE /SingleMuon/Run2017E-17Nov2017-v1/MINIAOD True
+SingleMuonF /SingleMuon/Run2017F-17Nov2017-v1/MINIAOD True
+METF /MET/Run2017F-17Nov2017-v1/MINIAOD True
+TTToSemiLeptonic /TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM False
+TTToHadronic /TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM False
+TTTo2L2Nu /TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM False
+W3JetsToLNu /W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v3/MINIAODSIM False
+W4JetsToLNu /W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM False
+WWToLNuQQ /WWToLNuQQ_NNPDF31_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM False
+ST_tW_top /ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM False
+ST_tW_antitop /ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM False
