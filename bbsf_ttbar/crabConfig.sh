@@ -25,8 +25,8 @@ foreach line ( "`cat crabConfig.list`" )
    echo "config.General.transferLogs = True" >> ${crabConfig_}
    echo " " >> ${crabConfig_}
    echo "config.JobType.pluginName = 'Analysis'" >> ${crabConfig_}
-   echo "config.JobType.psetName = './test/runBTagAnalyzer_cfg.py'" >> ${crabConfig_}
-   echo "config.JobType.pyCfgParams = 'runOnData=${isData_}'" >> ${crabConfig_}
+   echo "config.JobType.psetName = '../test/runBTagAnalyzer_cfg.py'" >> ${crabConfig_}
+   echo "config.JobType.pyCfgParams = ['runOnData=${isData_}']" >> ${crabConfig_}
    echo " " >> ${crabConfig_}
    if ($isData_ == "True") then
       echo "config.Data.lumiMask = 'Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt'" >> ${crabConfig_}
@@ -39,5 +39,5 @@ foreach line ( "`cat crabConfig.list`" )
    echo "config.Site.storageSite = 'T3_US_FNALLPC'" >> ${crabConfig_}
 
    # submit crabConfig file
-   #crab submit --config ${crabConfig_}
+   crab submit --config ${crabConfig_}
 end
