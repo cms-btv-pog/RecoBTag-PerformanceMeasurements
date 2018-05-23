@@ -59,7 +59,7 @@ void pu_addsf(const TString label)
    const TString filestyle[3] = {"down", "central", "up"};
    TH1D *h_pu[3], *h_num[3];
    for (int i = 0; i < 3; ++i) {
-      TFile * tempfile = TFile::Open("pu_datahists/"+filenames[i]+".root");
+      TFile * tempfile = TFile::Open("./RA2PileupHistograms/"+filenames[i]+".root");
       h_pu[i] = (TH1D*)tempfile->Get("pileup");
       h_num[i] = (TH1D*)h_pu[i]->Clone("h_num_"+filestyle[i]);
       h_num[i]->Scale(1./h_num[i]->Integral());
