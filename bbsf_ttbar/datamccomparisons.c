@@ -39,11 +39,11 @@ void drawcomparisons(const TH1D * h, const TString var, const bool dolog=false)
       if (i==0) {
          sprintf(buffer, "(%s)",  baseline.Data());
       } else if (i==1||i==2||i==3) {
-         //sprintf(buffer, "41860. * xsWeight * puWeight * ttbar_ptweight * (%s)", baseline.Data());
-         sprintf(buffer, "41860. * xsWeight * ttbar_ptweight * (%s)", baseline.Data());
+         sprintf(buffer, "41860. * xsWeight * puWeight * ttbar_ptweight * (%s)", baseline.Data());
+         //sprintf(buffer, "41860. * xsWeight * ttbar_ptweight * (%s)", baseline.Data());
       } else {
-         //sprintf(buffer, "41860. * xsWeight * puWeight * (%s)", baseline.Data());
-         sprintf(buffer, "41860. * xsWeight * (%s)", baseline.Data());
+         sprintf(buffer, "41860. * xsWeight * puWeight * (%s)", baseline.Data());
+         //sprintf(buffer, "41860. * xsWeight * (%s)", baseline.Data());
       }
       chain4.Project(hist[i]->GetName(), var, buffer);
       addOverflow(hist[i]);

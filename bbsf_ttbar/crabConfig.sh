@@ -19,7 +19,7 @@ foreach line ( "`cat crabConfig.list`" )
    echo "from CRABClient.UserUtilities import config, getUsernameFromSiteDB" > ${crabConfig_}
    echo "config = config()" >> ${crabConfig_}
    echo " " >> ${crabConfig_}
-   echo "config.General.requestName = '${requestName_}'" >> ${crabConfig_}
+   echo "config.General.requestName = 'BTagAnalyzer_${requestName_}'" >> ${crabConfig_}
    echo "config.General.workArea = 'crab_projects'" >> ${crabConfig_}
    echo "config.General.transferOutputs = True" >> ${crabConfig_}
    echo "config.General.transferLogs = True" >> ${crabConfig_}

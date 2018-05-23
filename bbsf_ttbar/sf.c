@@ -46,32 +46,35 @@ TH1D* makesf(TH1D *mistag_data, TH1D *mistag_mc, const TString name, const TH1D 
 
 void runPoint(const double wp, const TString wptag, TH1D * h)
 {
+   // pu weights
    TString puweight, puweighttag;
    puweight = "puWeight"; puweighttag = puweight;
    //puweight = "1.";  puweighttag = "noPuWeight";
    //puweight = "puWeight_up"; puweighttag = puweight;
    //puweight = "puWeight_down"; puweighttag = puweight;
 
+   // top pt weights (ttbar only)
    TString topweight, topweighttag;
    //topweight = "ttbar_ptweight"; topweighttag = "topPtWeight";
    topweight = "1."; topweighttag = "noTopPtWeight";
 
+   // dataset
    TString datatag = "";
    TString datatitle = "";
    double lumi = 0.;
-   datatag = "SingleMuon"; lumi = 41860.;  datatitle = "Single-Muon";
+   //datatag = "SingleMuon"; lumi = 41860.;  datatitle = "Single-Muon";
    //datatag = "SingleMuonB"; lumi = 4792.; datatitle = "Single-Muon B";
    //datatag = "SingleMuonC"; lumi = 9755.; datatitle = "Single-Muon C";
    //datatag = "SingleMuonD"; lumi = 4319.; datatitle = "Single-Muon D";
    //datatag = "SingleMuonE"; lumi = 9424.; datatitle = "Single-Muon E";
-   //datatag = "SingleMuonF"; lumi = 13570.; datatitle = "Single-Muon F";
+   datatag = "SingleMuonF"; lumi = 13570.; datatitle = "Single-Muon F";
 
    //////
    // fill data hists
    //////
  
    char filebuffer[10000];
-   sprintf(filebuffer, "./sf_hists/sf.%s.%s.%s.%s.root", wptag.Data(), datatag.Data(), puweighttag.Data(), topweighttag.Data());
+   sprintf(filebuffer, "./sf_rootfiles/sf_%s_%s_%s_%s.root", wptag.Data(), datatag.Data(), puweighttag.Data(), topweighttag.Data());
    TFile * f = new TFile(filebuffer, "RECREATE");
  
    TChain * chain4_data = new TChain("treeAK4");
@@ -99,9 +102,9 @@ void runPoint(const double wp, const TString wptag, TH1D * h)
       chain4_sig[i] = new TChain("treeAK4");
       chain8_sig[i] = new TChain("treeAK8");
    }
-   chain4_sig[0]->Add("skims/TTToSemiLeptonic.root"); chain8_sig[0]->Add("skims/TTToSemiLeptonic.root");
-   chain4_sig[1]->Add("skims/TTToHadronic.root");     chain8_sig[1]->Add("skims/TTToHadronic.root");
-   chain4_sig[2]->Add("skims/TTTo2L2Nu.root");        chain8_sig[2]->Add("skims/TTTo2L2Nu.root");
+   chain4_sig[0]->Add("./skims/TTToSemiLeptonic.root"); chain8_sig[0]->Add("./skims/TTToSemiLeptonic.root");
+   chain4_sig[1]->Add("./skims/TTToHadronic.root");     chain8_sig[1]->Add("./skims/TTToHadronic.root");
+   chain4_sig[2]->Add("./skims/TTTo2L2Nu.root");        chain8_sig[2]->Add("./skims/TTTo2L2Nu.root");
    for (int i = 0; i < 3; ++i) chain4_sig[i]->AddFriend(chain8_sig[i]);
    
    TH1D * h_num_sig = (TH1D*)h->Clone("h_num_sig");
@@ -171,9 +174,26 @@ void runPoint(const double wp, const TString wptag, TH1D * h)
    f->Close();
 }
 
-void plotsf(const TString filename)
+void sf()
 {
-   TFile * f = TFile::Open("./sf_hists/" + filename + ".root");
+   double x_3[4] = {250., 350., 430., 700.};
+   TH1D * h_3 = new TH1D("h_3", ";AK8 jet p_{T} [GeV];events / bin", 3, x_3);
+   runPoint(0.3, "0p3", h_3);
+
+   TH1D * h_6 = new TH1D("h_6", ";AK8 jet p_{T} [GeV];events / bin", 3, x_3);
+   runPoint(0.6, "0p6", h_6);
+
+   TH1D * h_8 = new TH1D("h_8", ";AK8 jet p_{T} [GeV];events / bin", 3, x_3);
+   runPoint(0.8, "0p8", h_8);
+
+   //double x_9[3] = {250., 350., 700.};
+   TH1D * h_9 = new TH1D("h_9", ";AK8 jet p_{T} [GeV];events / bin", 3, x_3);
+   runPoint(0.9, "0p9", h_9);
+}
+
+void sf_plot(const TString filetag)
+{
+   TFile * f = TFile::Open("./sf_rootfiles/" + filetag + ".root");
    TH1D * h_sf = (TH1D*)f->Get("h_sf");
    TH1D * h_mistag_sig = (TH1D*)f->Get("h_mistag_sig");
    TH1D * h_mistag_data_bkgsub = (TH1D*)f->Get("h_mistag_data_bkgsub");
@@ -261,24 +281,7 @@ void plotsf(const TString filename)
    h_sf->SetMaximum(1.4);
    pt_3->Draw();
 
-   canvas->SaveAs("./plots/" + filename + ".pdf");
-   canvas->SaveAs("./plots/" + filename + ".png");
-}
-
-void sf()
-{
-   double x_3[4] = {250., 350., 430., 700.};
-   TH1D * h_3 = new TH1D("h_3", ";AK8 jet p_{T} [GeV];events / bin", 3, x_3);
-   runPoint(0.3, "0p3", h_3);
-   
-   TH1D * h_6 = new TH1D("h_6", ";AK8 jet p_{T} [GeV];events / bin", 3, x_3);
-   runPoint(0.6, "0p6", h_6);
-
-   TH1D * h_8 = new TH1D("h_8", ";AK8 jet p_{T} [GeV];events / bin", 3, x_3);
-   runPoint(0.8, "0p8", h_8);
-
-   //double x_9[3] = {250., 350., 700.};
-   TH1D * h_9 = new TH1D("h_9", ";AK8 jet p_{T} [GeV];events / bin", 4, x_3);
-   runPoint(0.9, "0p9", h_9);
+   canvas->SaveAs("./plots/" + filetag + ".pdf");
+   canvas->SaveAs("./plots/" + filetag + ".png");
 }
 

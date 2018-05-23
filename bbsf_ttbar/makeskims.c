@@ -354,18 +354,19 @@ void makeskims::run(const TString intag, TString infiles, float xsWeight=1., con
 
 //const float wlep = 3.*0.1086; const float whad = 0.6741;
 
-//makeskims d; d.run("TTToSemiLeptonic", "/eos/uscms/store/user/fojensen/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/crab_BTagAnalyzer_TTToSemiLeptonic/180510_210825/", (831.76*2.*.3258*0.6741)/111381888., true);
-//makeskims d; d.run("TTTo2L2Nu", "/eos/uscms/store/user/fojensen/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/crab_BTagAnalyzer_TTTo2L2Nu/180510_210135/", (831.76*.3258*.3258)/69705626., true);
-//makeskims d; d.run("TTToHadronic", "/eos/uscms/store/user/fojensen/TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/crab_BTagAnalyzer_TTToHadronic/180510_210014/", (831.76*0.6741*0.6741)/129985840., true);
+//makeskims d; d.run("TTToSemiLeptonic", "/eos/uscms/store/user/fojensen/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/crab_TTToSemiLeptonic/180523_021044/", (831.76*2.*.3258*0.6741)/111381888., true)
+//makeskims d; d.run("TTTo2L2Nu", "/eos/uscms/store/user/fojensen/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/crab_TTTo2L2Nu/180523_025526/", (831.76*.3258*.3258)/69705626., true)
+//makeskims d; d.run("TTToHadronic", "/eos/uscms/store/user/fojensen/TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/crab_TTToHadronic/180523_025440/", (831.76*0.6741*0.6741)/129985840., true)
 
-//makeskims d; d.run("SingleMuonB", "/eos/uscms/store/user/fojensen/SingleMuon/crab_BTagAnalyzer_SingleMuonB/180510_211932/");
-//makeskims d; d.run("SingleMuonC", "/eos/uscms/store/user/fojensen/SingleMuon/crab_BTagAnalyzer_SingleMuonC/180510_211756/");
-//makeskims d; d.run("SingleMuonD", "/eos/uscms/store/user/fojensen/SingleMuon/crab_BTagAnalyzer_SingleMuonD/180510_211529/");
-//makeskims d; d.run("SingleMuonE", "/eos/uscms/store/user/fojensen/SingleMuon/crab_BTagAnalyzer_SingleMuonE/180510_211415/");
-//makeskims d; d.run("SingleMuonF", "/eos/uscms/store/user/fojensen/SingleMuon/crab_BTagAnalyzer_SingleMuonF/180510_211317/");
+//makeskims d; d.run("SingleMuonB", "/eos/uscms/store/user/fojensen/SingleMuon/crab_SingleMuonB/180523_020324/")
+//makeskims d; d.run("SingleMuonC", "/eos/uscms/store/user/fojensen/SingleMuon/crab_SingleMuonC/180523_025112/")
+//makeskims d; d.run("SingleMuonD", "/eos/uscms/store/user/fojensen/SingleMuon/crab_SingleMuonD/180523_025152/")
+//makeskims d; d.run("SingleMuonE", "/eos/uscms/store/user/fojensen/SingleMuon/crab_SingleMuonE/180523_025237/")
+//makeskims d; d.run("SingleMuonF", "/eos/uscms/store/user/fojensen/SingleMuon/crab_SingleMuonF/180523_025316/")
 
-//makeskims d; d.run("ST_tW_antitop_5f", "/eos/uscms/store/user/fojensen/ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_PSweights_13TeV-powheg-pythia8/crab_BTagAnalyzer_ST_tW_antitop_5f/180510_210949/", (35.85*(.6741*.3258+.3258*.6741+.3258*.3258))/5365983., true);
-//makeskims d; d.run("ST_tW_top_5f", "/eos/uscms/store/user/fojensen/ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_PSweights_13TeV-powheg-pythia8/crab_BTagAnalyzer_ST_tW_top_5f/180510_211052/", (35.85*(.6741*.3258+.3258*.6741+.3258*.3258))/4656358., true);
-//makeskims d; d.run("W3JetsToLNu", "/eos/uscms/store/user/fojensen/W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/crab_BTagAnalyzer_W3JetsToLNu/180510_210600/", 942./19644745., true);
-//makeskims d; d.run("W4JetsToLNu", "/eos/uscms/store/user/fojensen/W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/crab_BTagAnalyzer_W4JetsToLNu/180510_210453/", 524.2/11285729., true);
-//makeskims d; d.run("WWToLNuQQ_NNPDF31", "/eos/uscms/store/user/fojensen/WWToLNuQQ_NNPDF31_TuneCP5_13TeV-powheg-pythia8/crab_BTagAnalyzer_WWToLNuQQ_NNPDF31/180510_210254/", (117.8*0.6741*.3258)/8516920., true);
+//makeskims d; d.run("ST_tW_antitop_5f", "/eos/uscms/store/user/fojensen/ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_PSweights_13TeV-powheg-pythia8/crab_ST_tW_antitop/180523_025901/", (35.85*(.6741*.3258+.3258*.6741+.3258*.3258))/5365983., true)
+//makeskims d; d.run("ST_tW_top_5f", "/eos/uscms/store/user/fojensen/ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_PSweights_13TeV-powheg-pythia8/crab_ST_tW_top/180523_025823/", (35.85*(.6741*.3258+.3258*.6741+.3258*.3258))/4656358., true)
+//makeskims d; d.run("W3JetsToLNu", "/eos/uscms/store/user/fojensen/W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/crab_W3JetsToLNu/180523_025614/", 942./19644745., true)
+//makeskims d; d.run("W4JetsToLNu", "/eos/uscms/store/user/fojensen/W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/crab_W4JetsToLNu/180523_025700/", 524.2/11285729., true)
+//makeskims d; d.run("WWToLNuQQ_NNPDF31", "/eos/uscms/store/user/fojensen/WWToLNuQQ_NNPDF31_TuneCP5_13TeV-powheg-pythia8/crab_WWToLNuQQ/180523_025739/", (117.8*0.6741*.3258)/8516920., true)
+

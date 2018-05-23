@@ -32,7 +32,7 @@ void pu_addmc(const TString label)
 
    TH1D * h_denom = new TH1D("h_"+label, ";getTrueNumInteractions();events / 1", 100, 0., 100.);
 
-   ifstream infile("./filelistdir/list_"+label);
+   ifstream infile("./pu_filelists/"+label+".list");
    std::string instring;
    const TString dir = "/eos/uscms/store/user/fojensen/";
    int n = 0;
@@ -111,19 +111,20 @@ void pu()
    pu_addmc("TTTo2L2Nu");
    pu_addsf("TTTo2L2Nu");
 
-   pu_addmc("W4JetsToLNu");
-   pu_addsf("W4JetsToLNu");
-
-   pu_addmc("W3JetsToLNu");
-   pu_addsf("W3JetsToLNu");
-
-   pu_addmc("WWToLNuQQ_NNPDF31");
-   pu_addsf("WWToLNuQQ_NNPDF31");
-
    pu_addmc("ST_tW_antitop_5f");
    pu_addsf("ST_tW_antitop_5f");
 
    pu_addmc("ST_tW_top_5f");
    pu_addsf("ST_tW_top_5f");
+
+   pu_addmc("W3JetsToLNu");
+   pu_addsf("W3JetsToLNu");
+
+   pu_addmc("W4JetsToLNu");
+   pu_addsf("W4JetsToLNu");
+
+   pu_addmc("WWToLNuQQ_NNPDF31");
+   pu_addsf("WWToLNuQQ_NNPDF31");
+
 }
 
