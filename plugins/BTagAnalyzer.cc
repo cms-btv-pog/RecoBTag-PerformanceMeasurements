@@ -1400,7 +1400,55 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
        }
        EventInfo.ttbar_ptweight = sqrt(wtop*wantitop);
     }
-      
+   
+   if (!isData_) {
+      EventInfo.lepB = TVector3(0., 0., 0.);
+      EventInfo.lepL =  TVector3(0., 0., 0.);
+      EventInfo.lepID = 0;
+      EventInfo.hadB = TVector3(0., 0., 0.);
+      EventInfo.hadW = TVector3(0., 0., 0.);
+      EventInfo.hadID = 0;
+      edm::Handle<reco::GenParticleCollection> genParticles;
+      iEvent.getByToken(genParticleCollectionName_, genParticles);
+      for (auto i = genParticles->begin(); i != genParticles->end(); ++i) {
+         if (std::abs(i->pdgId())==6 && i->numberOfDaughters()==2 && std::abs(i->daughter(0)->pdgId()*i->daughter(1)->pdgId())==24*5) {
+            int windex, bindex;
+            if (std::abs(i->daughter(0)->pdgId())==24 && std::abs(i->daughter(1)->pdgId())==5) {
+               windex = 0;
+               bindex = 1;
+            } else if (std::abs(i->daughter(0)->pdgId())==5 && std::abs(i->daughter(1)->pdgId())==24) {
+               windex = 1;
+               bindex = 0;
+            } else {
+               std::cout << "funny top!" << std::endl;
+               std::cout << i->daughter(0)->pdgId() << " " << i->daughter(1)->pdgId() << std::endl;
+               windex = bindex = -1;
+            }
+            const reco::GenParticle * W = dynamic_cast<const reco::GenParticle*>(i->daughter(windex));
+            while (!W->isLastCopy()) W = dynamic_cast<const reco::GenParticle*>(W->daughter(0));
+            if (W->numberOfDaughters()==2 && windex!=-1 && bindex!=-1) {
+               const int dau0id = std::abs(W->daughter(0)->pdgId());
+               const int dau1id = std::abs(W->daughter(1)->pdgId());
+               if (dau0id==11||dau0id==13||dau0id==15) {
+                  EventInfo.lepL.SetPtEtaPhi(W->daughter(0)->pt(), W->daughter(0)->eta(), W->daughter(0)->phi());
+                  EventInfo.lepID = dau0id;
+                  EventInfo.lepB.SetPtEtaPhi(i->daughter(bindex)->pt(), i->daughter(bindex)->eta(), i->daughter(bindex)->phi());
+               }
+               if (dau1id==11||dau1id==13||dau1id==15) {
+                  EventInfo.lepL.SetPtEtaPhi(W->daughter(1)->pt(), W->daughter(1)->eta(), W->daughter(1)->phi());
+                  EventInfo.lepID = dau1id;
+                  EventInfo.lepB.SetPtEtaPhi(i->daughter(bindex)->pt(), i->daughter(bindex)->eta(), i->daughter(bindex)->phi());
+               }
+               if (TMath::Max(dau0id, dau1id)<=5) {
+                  EventInfo.hadW.SetPtEtaPhi(W->pt(), W->eta(), W->phi());
+                  EventInfo.hadID =  TMath::Max(dau0id, dau1id);
+                  EventInfo.hadB.SetPtEtaPhi(i->daughter(bindex)->pt(), i->daughter(bindex)->eta(), i->daughter(bindex)->phi());
+               }
+            }
+         }
+      }
+   }
+
     edm::Handle<int> pIn;
     iEvent.getByToken(ttbartop, pIn);
     EventInfo.ttbar_chan=*pIn;

@@ -175,6 +175,8 @@ class EventInfoBranches {
     float ttbar_metpt,ttbar_metphi;
     float ttbar_w[1200];
     float ttbar_ptweight;
+    TVector3 lepB, hadB, lepL, hadW;
+    int lepID, hadID;
 
     void RegisterTree(TTree *tree) {
       tree->Branch("nBitTrigger", &nBitTrigger,  "nBitTrigger/I");
@@ -345,6 +347,12 @@ class EventInfoBranches {
       tree->Branch("ttbar_nw"  ,  &ttbar_nw    , "ttbar_nw/I");
       tree->Branch("ttbar_w"    ,  ttbar_w     , "ttbar_w[ttbar_nw]/F");
       tree->Branch("ttbar_ptweight", &ttbar_ptweight, "ttbar_ptweight/F");
+      tree->Branch("lepB", "TVector3", &lepB);
+      tree->Branch("hadB", "TVector3", &hadB);
+      tree->Branch("lepL", "TVector3", &lepL);
+      tree->Branch("hadW", "TVector3", &hadW);
+      tree->Branch("lepID", &lepID, "lepID/I");
+      tree->Branch("hadID", &hadID, "hadID/I");
     }
 
     //if storePatMuons
@@ -532,6 +540,12 @@ class EventInfoBranches {
       tree->SetBranchAddress("ttbar_nw"  ,  &ttbar_nw);
       tree->SetBranchAddress("ttbar_w"    ,  ttbar_w);
       tree->SetBranchAddress("ttbar_ptweight", &ttbar_ptweight);
+      tree->SetBranchAddress("lepB", &lepB);
+      tree->SetBranchAddress("hadB", &hadB);
+      tree->SetBranchAddress("lepL", &lepL);
+      tree->SetBranchAddress("hadW", &hadW);
+      tree->SetBranchAddress("lepID", &lepID);
+      tree->SetBranchAddress("hadID",  &hadID);
     }
 
     //if storePatMuons
