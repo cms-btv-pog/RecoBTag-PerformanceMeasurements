@@ -13,6 +13,6 @@ mc = {
 
 data = {
 	'inputFiles' : ['/store/data/Run2018A/JetHT/MINIAOD/PromptReco-v1/000/315/252/00000/04236AA8-404B-E811-9BD8-FA163EF52DAC.root'],
-        'JPCalibration' : 'TrackProbabilityCalibration_PDF3D_express',
+        'JPCalibration' : 'JPcalib_Data94X_2017_v1',
 	'dataGlobalTag' : '101X_dataRun2_Prompt_v9',
 }
