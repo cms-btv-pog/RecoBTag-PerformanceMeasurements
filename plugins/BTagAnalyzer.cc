@@ -1403,6 +1403,24 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   //------------------------------------------------------
   if (use_ttbar_filter_) {
 
+    //https://twiki.cern.ch/CMS/TopPtReweighting
+    EventInfo.ttbar_ptweight = 0.;
+    if (!isData_) {
+       float wtop = 0.;
+       float wantitop = 0.;
+       edm::Handle<reco::GenParticleCollection> genParticles;
+       iEvent.getByToken(genParticleCollectionName_, genParticles);
+       for (auto i = genParticles->begin(); i != genParticles->end(); ++i) {
+          if (i->pdgId()==6 && i->isLastCopy()) {
+             wtop = exp(0.0615-0.0005*i->pt());
+          }
+          if (i->pdgId()==-6 && i->isLastCopy()) {
+             wantitop = exp(0.0615-0.0005*i->pt());
+          }
+       }
+       EventInfo.ttbar_ptweight = sqrt(wtop*wantitop);
+    }
+    
     edm::Handle<int> pIn;
     iEvent.getByToken(ttbartop, pIn);
     EventInfo.ttbar_chan=*pIn;

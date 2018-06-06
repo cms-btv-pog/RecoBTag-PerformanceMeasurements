@@ -183,6 +183,7 @@ class EventInfoBranches {
     float ttbar_lpt[10], ttbar_leta[10], ttbar_lphi[10], ttbar_lm[10];
     float ttbar_metpt,ttbar_metphi;
     float ttbar_w[1200];
+    float ttbar_ptweight;
 
 
     void RegisterTree(TTree *tree) {
@@ -359,6 +360,7 @@ class EventInfoBranches {
       tree->Branch("ttbar_metphi", &ttbar_metphi, "ttbar_metphi/F");
       tree->Branch("ttbar_nw"  ,  &ttbar_nw    , "ttbar_nw/I");
       tree->Branch("ttbar_w"    ,  ttbar_w     , "ttbar_w[ttbar_nw]/F");
+      tree->Branch("ttbar_ptweight", &ttbar_ptweight, "ttbar_ptweight/F");
     }
 
     //if storePatMuons
@@ -551,6 +553,7 @@ class EventInfoBranches {
       tree->SetBranchAddress("ttbar_metphi"  , &ttbar_metphi);
       tree->SetBranchAddress("ttbar_nw"  ,  &ttbar_nw);
       tree->SetBranchAddress("ttbar_w"    ,  ttbar_w);
+      tree->SetBranchAddress("ttbar_ptweight", &ttbar_ptweight);
     }
 
     //if storePatMuons
