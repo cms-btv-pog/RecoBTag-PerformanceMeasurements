@@ -6,6 +6,13 @@
 const UInt_t nMaxPVs_= 1000;
 const UInt_t nMaxPUs_= 1000;
 const UInt_t nMaxTrkAll_ = 100000;
+const UInt_t nMaxQuarks = 1000;
+const UInt_t nMaxHadrons = 100;
+const UInt_t nMaxGenLeps = 100;
+const UInt_t nMaxGenQuarks = 100;
+const UInt_t nMaxGenV0 = 100;
+const UInt_t nMaxGenPruned = 100;
+const UInt_t nMaxPatMuon = 1000;
 
 class EventInfoBranches {
 
@@ -38,93 +45,95 @@ class EventInfoBranches {
 
     float nPUtrue;                 // the true number of pileup interactions that have been added to the event
     int   nPU;                     // the number of pileup interactions that have been added to the event
-    int   PU_bunch[nMaxPUs_];      // 0 if on time pileup, -1 or +1 if out-of-time
-    float PU_z[nMaxPUs_];          // the true primary vertex position along the z axis for each added interaction
-    float PU_sumpT_low[nMaxPUs_];  // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > low_cut
-    float PU_sumpT_high[nMaxPUs_]; // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > high_cut
-    int   PU_ntrks_low[nMaxPUs_];  // the number of tracks originating from each interaction, where track pT > low_cu
-    int   PU_ntrks_high[nMaxPUs_]; // the number of tracks originating from each interaction, where track pT > high_cut
 
-    int   ncQuarks;
-    float cQuark_pT[1000];
-    float cQuark_eta[1000];
-    float cQuark_phi[1000];
-    int   cQuark_pdgID[1000];
-    int   cQuark_status[1000];
-    int   cQuark_fromGSP[1000];
+//     Commented variables seem to be unused and will be removed in the future. Please inform the BTV team if you still require them
+//     int   PU_bunch[nMaxPUs_];      // 0 if on time pileup, -1 or +1 if out-of-time
+//     float PU_z[nMaxPUs_];          // the true primary vertex position along the z axis for each added interaction
+//     float PU_sumpT_low[nMaxPUs_];  // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > low_cut
+//     float PU_sumpT_high[nMaxPUs_]; // the sum of the transverse momentum of the tracks originating from each interaction, where track pT > high_cut
+//     int   PU_ntrks_low[nMaxPUs_];  // the number of tracks originating from each interaction, where track pT > low_cu
+//     int   PU_ntrks_high[nMaxPUs_]; // the number of tracks originating from each interaction, where track pT > high_cut
 
-    int   nbQuarks;
-    float bQuark_pT[1000];
-    float bQuark_eta[1000];
-    float bQuark_phi[1000];
-    int   bQuark_pdgID[1000];
-    int   bQuark_status[1000];
-    int   bQuark_fromGSP[1000];
+//     int   ncQuarks;
+//     float cQuark_pT[nMaxQuarks];
+//     float cQuark_eta[nMaxQuarks];
+//     float cQuark_phi[nMaxQuarks];
+//     int   cQuark_pdgID[nMaxQuarks];
+//     int   cQuark_status[nMaxQuarks];
+//     int   cQuark_fromGSP[nMaxQuarks];
+//
+//     int   nbQuarks;
+//     float bQuark_pT[nMaxQuarks];
+//     float bQuark_eta[nMaxQuarks];
+//     float bQuark_phi[nMaxQuarks];
+//     int   bQuark_pdgID[nMaxQuarks];
+//     int   bQuark_status[nMaxQuarks];
+//     int   bQuark_fromGSP[nMaxQuarks];
 
     int   nBHadrons;
-    float BHadron_pT[100];
-    float BHadron_eta[100];
-    float BHadron_phi[100];
-    float BHadron_mass[100];
-    int   BHadron_pdgID[100];
-    int   BHadron_mother[100];
-    int   BHadron_hasBdaughter[100];
-    float BHadron_SVx[100];
-    float BHadron_SVy[100];
-    float BHadron_SVz[100];
-    int   BHadron_nCharged[100];
-    int   BHadron_DHadron1[100];
-    int   BHadron_DHadron2[100];
+    float BHadron_pT[nMaxHadrons];
+    float BHadron_eta[nMaxHadrons];
+    float BHadron_phi[nMaxHadrons];
+    float BHadron_mass[nMaxHadrons];
+    int   BHadron_pdgID[nMaxHadrons];
+    int   BHadron_mother[nMaxHadrons];
+    int   BHadron_hasBdaughter[nMaxHadrons];
+    float BHadron_SVx[nMaxHadrons];
+    float BHadron_SVy[nMaxHadrons];
+    float BHadron_SVz[nMaxHadrons];
+    int   BHadron_nCharged[nMaxHadrons];
+    int   BHadron_DHadron1[nMaxHadrons];
+    int   BHadron_DHadron2[nMaxHadrons];
 
     int   nDHadrons;
     int   nDaughters;
-    float DHadron_pT[100];
-    float DHadron_eta[100];
-    float DHadron_phi[100];
-    float DHadron_mass[100];
-    float DHadron_SVx[100];
-    float DHadron_SVy[100];
-    float DHadron_SVz[100];
-    int   DHadron_pdgID[100];
-    int   DHadron_nDaughters[100];
-    int   DHadron_DaughtersPdgID[1500]; // sum(DHadron_nDaughters[i]): needed for daughter pdgIDs
-    int   DHadron_nChargedDaughters[100];
-    int   DHadron_nCharged[100];
+    float DHadron_pT[nMaxHadrons];
+    float DHadron_eta[nMaxHadrons];
+    float DHadron_phi[nMaxHadrons];
+    float DHadron_mass[nMaxHadrons];
+    float DHadron_SVx[nMaxHadrons];
+    float DHadron_SVy[nMaxHadrons];
+    float DHadron_SVz[nMaxHadrons];
+    int   DHadron_pdgID[nMaxHadrons];
+    int   DHadron_nDaughters[nMaxHadrons];
+//     int   DHadron_DaughtersPdgID[1500]; // sum(DHadron_nDaughters[i]): needed for daughter pdgIDs
+    int   DHadron_nChargedDaughters[nMaxHadrons];
+    int   DHadron_nCharged[nMaxHadrons];
 
     int   nGenlep;
-    float Genlep_pT[100];
-    float Genlep_eta[100];
-    float Genlep_phi[100];
-    int   Genlep_pdgID[100];
-    int   Genlep_status[100];
-    int   Genlep_mother[100];
+    float Genlep_pT[nMaxGenLeps];
+    float Genlep_eta[nMaxGenLeps];
+    float Genlep_phi[nMaxGenLeps];
+    int   Genlep_pdgID[nMaxGenLeps];
+    int   Genlep_status[nMaxGenLeps];
+    int   Genlep_mother[nMaxGenLeps];
 
     int   nGenquark;
-    float Genquark_pT[100];
-    float Genquark_eta[100];
-    float Genquark_phi[100];
-    int   Genquark_pdgID[100];
-    int   Genquark_mother[100];
+    float Genquark_pT[nMaxGenQuarks];
+    float Genquark_eta[nMaxGenQuarks];
+    float Genquark_phi[nMaxGenQuarks];
+    int   Genquark_pdgID[nMaxGenQuarks];
+    int   Genquark_mother[nMaxGenQuarks];
 
     int   nGenV0;
-    float GenV0_pT[1000];
-    float GenV0_eta[1000];
-    float GenV0_phi[1000];
-    int   GenV0_pdgID[1000];
-    float GenV0_SVx[1000];
-    float GenV0_SVy[1000];
-    float GenV0_SVz[1000];
-    int   GenV0_nCharged[1000];
+    float GenV0_pT[nMaxGenV0];
+    float GenV0_eta[nMaxGenV0];
+    float GenV0_phi[nMaxGenV0];
+    int   GenV0_pdgID[nMaxGenV0];
+    float GenV0_SVx[nMaxGenV0];
+    float GenV0_SVy[nMaxGenV0];
+    float GenV0_SVz[nMaxGenV0];
+    int   GenV0_nCharged[nMaxGenV0];
 
     // HP means hard process
     int   nGenPruned;
-    float GenPruned_pT[1000];
-    float GenPruned_eta[1000];
-    float GenPruned_phi[1000];
-    float GenPruned_mass[1000];
-    int   GenPruned_status[1000];
-    int   GenPruned_pdgID[1000];
-    int   GenPruned_mother[1000];
+    float GenPruned_pT[nMaxGenPruned];
+    float GenPruned_eta[nMaxGenPruned];
+    float GenPruned_phi[nMaxGenPruned];
+    float GenPruned_mass[nMaxGenPruned];
+    int   GenPruned_status[nMaxGenPruned];
+    int   GenPruned_pdgID[nMaxGenPruned];
+    int   GenPruned_mother[nMaxGenPruned];
 
     int   nTrkAll;
     float TrkAll_d0[nMaxTrk_];
@@ -153,18 +162,18 @@ class EventInfoBranches {
     //if storePatMuons
     //run2 id: https://twiki.cern.ch/CMS/SWGuideMuonIdRun2
     int nPatMuon;
-    float PatMuon_pt[1000];
-    float PatMuon_eta[1000];
-    float PatMuon_phi[1000];
-    int PatMuon_isSoftMuon[1000];
-    bool PatMuon_isMediumMuon[1000];
-    int PatMuon_isTightMuon[1000];
-    float PatMuon_iso[1000];
-    float PatMuon_isoTrackerOnly[1000];
-    float PatMuon_IP[1000];
-    float PatMuon_IPsig[1000];
-    float PatMuon_IP2D[1000];
-    float PatMuon_IP2Dsig[1000];
+    float PatMuon_pt[nMaxPatMuon];
+    float PatMuon_eta[nMaxPatMuon];
+    float PatMuon_phi[nMaxPatMuon];
+    int PatMuon_isSoftMuon[nMaxPatMuon];
+    bool PatMuon_isMediumMuon[nMaxPatMuon];
+    int PatMuon_isTightMuon[nMaxPatMuon];
+    float PatMuon_iso[nMaxPatMuon];
+    float PatMuon_isoTrackerOnly[nMaxPatMuon];
+    float PatMuon_IP[nMaxPatMuon];
+    float PatMuon_IPsig[nMaxPatMuon];
+    float PatMuon_IP2D[nMaxPatMuon];
+    float PatMuon_IP2Dsig[nMaxPatMuon];
 
     int   ttbar_chan, ttbar_trigWord, ttbar_metfilterWord, ttbar_allmepartons, ttbar_matchmepartons;
     int   ttbar_ng,ttbar_gid[25];
@@ -174,6 +183,7 @@ class EventInfoBranches {
     float ttbar_lpt[10], ttbar_leta[10], ttbar_lphi[10], ttbar_lm[10];
     float ttbar_metpt,ttbar_metphi;
     float ttbar_w[1200];
+    float ttbar_ptweight;
 
 
     void RegisterTree(TTree *tree) {
@@ -193,29 +203,33 @@ class EventInfoBranches {
 
       tree->Branch("nPUtrue"      , &nPUtrue     , "nPUtrue/F");
       tree->Branch("nPU"          , &nPU         , "nPU/I"    );
-      tree->Branch("PU_bunch"     , PU_bunch     , "PU_bunch[nPU]/I");
-      tree->Branch("PU_z"         , PU_z         , "PU_z[nPU]/F");
-      tree->Branch("PU_sumpT_low" , PU_sumpT_low , "PU_sumpT_low[nPU]/F");
-      tree->Branch("PU_sumpT_high", PU_sumpT_high, "PU_sumpT_high[nPU]/F");
-      tree->Branch("PU_ntrks_low" , PU_ntrks_low , "PU_ntrks_low[nPU]/I");
-      tree->Branch("PU_ntrks_high", PU_ntrks_high, "PU_ntrks_high[nPU]/I");
+//       tree->Branch("PU_bunch"     , PU_bunch     , "PU_bunch[nPU]/I");
+//       tree->Branch("PU_z"         , PU_z         , "PU_z[nPU]/F");
+//       tree->Branch("PU_sumpT_low" , PU_sumpT_low , "PU_sumpT_low[nPU]/F");
+//       tree->Branch("PU_sumpT_high", PU_sumpT_high, "PU_sumpT_high[nPU]/F");
+//       tree->Branch("PU_ntrks_low" , PU_ntrks_low , "PU_ntrks_low[nPU]/I");
+//       tree->Branch("PU_ntrks_high", PU_ntrks_high, "PU_ntrks_high[nPU]/I");
+    }
 
-      tree->Branch("ncQuarks"    , &ncQuarks       ,"ncQuarks/I");
-      tree->Branch("cQuark_pT"     , cQuark_pT     , "cQuark_pT[ncQuarks]/F");
-      tree->Branch("cQuark_eta"    , cQuark_eta    , "cQuark_eta[ncQuarks]/F");
-      tree->Branch("cQuark_phi"    , cQuark_phi    , "cQuark_phi[ncQuarks]/F");
-      tree->Branch("cQuark_pdgID"  , cQuark_pdgID  , "cQuark_pdgID[ncQuarks]/I");
-      tree->Branch("cQuark_status" , cQuark_status , "cQuark_status[ncQuarks]/I");
-      tree->Branch("cQuark_fromGSP", cQuark_fromGSP, "cQuark_fromGSP[ncQuarks]/I");
+    void RegisterQuarkTree(TTree *tree){
+//       tree->Branch("ncQuarks"    , &ncQuarks       ,"ncQuarks/I");
+//       tree->Branch("cQuark_pT"     , cQuark_pT     , "cQuark_pT[ncQuarks]/F");
+//       tree->Branch("cQuark_eta"    , cQuark_eta    , "cQuark_eta[ncQuarks]/F");
+//       tree->Branch("cQuark_phi"    , cQuark_phi    , "cQuark_phi[ncQuarks]/F");
+//       tree->Branch("cQuark_pdgID"  , cQuark_pdgID  , "cQuark_pdgID[ncQuarks]/I");
+//       tree->Branch("cQuark_status" , cQuark_status , "cQuark_status[ncQuarks]/I");
+//       tree->Branch("cQuark_fromGSP", cQuark_fromGSP, "cQuark_fromGSP[ncQuarks]/I");
 
-      tree->Branch("nbQuarks",        &nbQuarks       ,"nbQuarks/I");
-      tree->Branch("bQuark_pT",         bQuark_pT     , "bQuark_pT[nbQuarks]/F");
-      tree->Branch("bQuark_eta",        bQuark_eta    , "bQuark_eta[nbQuarks]/F");
-      tree->Branch("bQuark_phi",        bQuark_phi    , "bQuark_phi[nbQuarks]/F");
-      tree->Branch("bQuark_pdgID",      bQuark_pdgID  , "bQuark_pdgID[nbQuarks]/I");
-      tree->Branch("bQuark_status",     bQuark_status , "bQuark_status[nbQuarks]/I");
-      tree->Branch("bQuark_fromGSP",    bQuark_fromGSP, "bQuark_fromGSP[nbQuarks]/I");
+//       tree->Branch("nbQuarks",        &nbQuarks       ,"nbQuarks/I");
+//       tree->Branch("bQuark_pT",         bQuark_pT     , "bQuark_pT[nbQuarks]/F");
+//       tree->Branch("bQuark_eta",        bQuark_eta    , "bQuark_eta[nbQuarks]/F");
+//       tree->Branch("bQuark_phi",        bQuark_phi    , "bQuark_phi[nbQuarks]/F");
+//       tree->Branch("bQuark_pdgID",      bQuark_pdgID  , "bQuark_pdgID[nbQuarks]/I");
+//       tree->Branch("bQuark_status",     bQuark_status , "bQuark_status[nbQuarks]/I");
+//       tree->Branch("bQuark_fromGSP",    bQuark_fromGSP, "bQuark_fromGSP[nbQuarks]/I");
+    }
 
+    void RegisterHadronTree(TTree *tree){
       tree->Branch("nBHadrons",          &nBHadrons            ,"nBHadrons/I");
       tree->Branch("BHadron_pT",           BHadron_pT          , "BHadron_pT[nBHadrons]/F");
       tree->Branch("BHadron_eta",          BHadron_eta         , "BHadron_eta[nBHadrons]/F");
@@ -242,10 +256,12 @@ class EventInfoBranches {
       tree->Branch("DHadron_SVy",   DHadron_SVy   ,"DHadron_SVy[nDHadrons]/F");
       tree->Branch("DHadron_SVz",   DHadron_SVz   ,"DHadron_SVz[nDHadrons]/F");
       tree->Branch("DHadron_nDaughters",         DHadron_nDaughters        ,"DHadron_nDaughters[nDHadrons]/I");
-      tree->Branch("DHadron_DaughtersPdgID",     DHadron_DaughtersPdgID    ,"DHadron_DaughtersPdgID[nDaughters]/I");
+//       tree->Branch("DHadron_DaughtersPdgID",     DHadron_DaughtersPdgID    ,"DHadron_DaughtersPdgID[nDaughters]/I");
       tree->Branch("DHadron_nChargedDaughters",  DHadron_nChargedDaughters ,"DHadron_nChargedDaughters[nDHadrons]/I");
       tree->Branch("DHadron_nCharged", DHadron_nCharged ,"DHadron_nCharged[nDHadrons]/I");
+    }
 
+    void RegisterGenVarTree(TTree *tree){
       tree->Branch("nGenlep",     &nGenlep       ,"nGenlep/I");
       tree->Branch("Genlep_pT",     Genlep_pT    , "Genlep_pT[nGenlep]/F");
       tree->Branch("Genlep_eta",    Genlep_eta   , "Genlep_eta[nGenlep]/F");
@@ -344,6 +360,7 @@ class EventInfoBranches {
       tree->Branch("ttbar_metphi", &ttbar_metphi, "ttbar_metphi/F");
       tree->Branch("ttbar_nw"  ,  &ttbar_nw    , "ttbar_nw/I");
       tree->Branch("ttbar_w"    ,  ttbar_w     , "ttbar_w[ttbar_nw]/F");
+      tree->Branch("ttbar_ptweight", &ttbar_ptweight, "ttbar_ptweight/F");
     }
 
     //if storePatMuons
@@ -382,29 +399,33 @@ class EventInfoBranches {
 
       tree->SetBranchAddress("nPUtrue"      , &nPUtrue     );
       tree->SetBranchAddress("nPU"          , &nPU         );
-      tree->SetBranchAddress("PU_bunch"     , PU_bunch     );
-      tree->SetBranchAddress("PU_z"         , PU_z         );
-      tree->SetBranchAddress("PU_sumpT_low" , PU_sumpT_low );
-      tree->SetBranchAddress("PU_sumpT_high", PU_sumpT_high);
-      tree->SetBranchAddress("PU_ntrks_low" , PU_ntrks_low );
-      tree->SetBranchAddress("PU_ntrks_high", PU_ntrks_high);
+//       tree->SetBranchAddress("PU_bunch"     , PU_bunch     );
+//       tree->SetBranchAddress("PU_z"         , PU_z         );
+//       tree->SetBranchAddress("PU_sumpT_low" , PU_sumpT_low );
+//       tree->SetBranchAddress("PU_sumpT_high", PU_sumpT_high);
+//       tree->SetBranchAddress("PU_ntrks_low" , PU_ntrks_low );
+//       tree->SetBranchAddress("PU_ntrks_high", PU_ntrks_high);
+    }
 
-      tree->SetBranchAddress("ncQuarks"      , &ncQuarks     );
-      tree->SetBranchAddress("cQuark_pT"     , cQuark_pT     );
-      tree->SetBranchAddress("cQuark_eta"    , cQuark_eta    );
-      tree->SetBranchAddress("cQuark_phi"    , cQuark_phi    );
-      tree->SetBranchAddress("cQuark_pdgID"  , cQuark_pdgID  );
-      tree->SetBranchAddress("cQuark_status" , cQuark_status );
-      tree->SetBranchAddress("cQuark_fromGSP", cQuark_fromGSP);
+    void ReadQuarkTree(TTree *tree){
+//       tree->SetBranchAddress("ncQuarks"      , &ncQuarks     );
+//       tree->SetBranchAddress("cQuark_pT"     , cQuark_pT     );
+//       tree->SetBranchAddress("cQuark_eta"    , cQuark_eta    );
+//       tree->SetBranchAddress("cQuark_phi"    , cQuark_phi    );
+//       tree->SetBranchAddress("cQuark_pdgID"  , cQuark_pdgID  );
+//       tree->SetBranchAddress("cQuark_status" , cQuark_status );
+//       tree->SetBranchAddress("cQuark_fromGSP", cQuark_fromGSP);
 
-      tree->SetBranchAddress("nbQuarks",          &nbQuarks     );
-      tree->SetBranchAddress("bQuark_pT",         bQuark_pT     );
-      tree->SetBranchAddress("bQuark_eta",        bQuark_eta    );
-      tree->SetBranchAddress("bQuark_phi",        bQuark_phi    );
-      tree->SetBranchAddress("bQuark_pdgID",      bQuark_pdgID  );
-      tree->SetBranchAddress("bQuark_status",     bQuark_status );
-      tree->SetBranchAddress("bQuark_fromGSP",    bQuark_fromGSP);
+//       tree->SetBranchAddress("nbQuarks",          &nbQuarks     );
+//       tree->SetBranchAddress("bQuark_pT",         bQuark_pT     );
+//       tree->SetBranchAddress("bQuark_eta",        bQuark_eta    );
+//       tree->SetBranchAddress("bQuark_phi",        bQuark_phi    );
+//       tree->SetBranchAddress("bQuark_pdgID",      bQuark_pdgID  );
+//       tree->SetBranchAddress("bQuark_status",     bQuark_status );
+//       tree->SetBranchAddress("bQuark_fromGSP",    bQuark_fromGSP);
+    }
 
+    void ReadHadronTree(TTree *tree){
       tree->SetBranchAddress("nBHadrons",            &nBHadrons          );
       tree->SetBranchAddress("BHadron_pT",           BHadron_pT          );
       tree->SetBranchAddress("BHadron_eta",          BHadron_eta         );
@@ -431,10 +452,12 @@ class EventInfoBranches {
       tree->SetBranchAddress("DHadron_SVy",   DHadron_SVy   );
       tree->SetBranchAddress("DHadron_SVz",   DHadron_SVz   );
       tree->SetBranchAddress("DHadron_nDaughters",         DHadron_nDaughters        );
-      tree->SetBranchAddress("DHadron_DaughtersPdgID",     DHadron_DaughtersPdgID    );
+//       tree->SetBranchAddress("DHadron_DaughtersPdgID",     DHadron_DaughtersPdgID    );
       tree->SetBranchAddress("DHadron_nChargedDaughters",  DHadron_nChargedDaughters );
       tree->SetBranchAddress("DHadron_nCharged", DHadron_nCharged );
+    }
 
+    void ReadGenVarTree(TTree *tree){
       tree->SetBranchAddress("nGenlep",       &nGenlep     );
       tree->SetBranchAddress("Genlep_pT",     Genlep_pT    );
       tree->SetBranchAddress("Genlep_eta",    Genlep_eta   );
@@ -530,6 +553,7 @@ class EventInfoBranches {
       tree->SetBranchAddress("ttbar_metphi"  , &ttbar_metphi);
       tree->SetBranchAddress("ttbar_nw"  ,  &ttbar_nw);
       tree->SetBranchAddress("ttbar_w"    ,  ttbar_w);
+      tree->SetBranchAddress("ttbar_ptweight", &ttbar_ptweight);
     }
 
     //if storePatMuons

@@ -245,18 +245,54 @@ options.register('isReHLT', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     '80X reHLT samples')
-options.register('JPCalibration', '',
+options.register('JPCalibration', 'FIXME',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     'JP Calibration pyload to use')
-options.register('storeCSVTagVariables', True,
+options.register('storeJetVariables', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to store Jet Variables')
+options.register('storeQuarkVariables', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to store c/b quark Variables')
+options.register('storeHadronVariables', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to store Hadron Variables')
+options.register('storeGenVariables', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to store Gen Variables')
+options.register('storeCSVTagVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to keep CSV TaggingVariables')
-options.register('storeDeepFlavourTagVariables', True,
+options.register('storeCSVTagTrackVariables', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to keep CSV Tagging Track Variables')
+options.register('storeDeepFlavourTagVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to keep DeepFlavour TaggingVariables')
+options.register('storeDeepFlavourVariables', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to keep DeepFlavour Jet Variables')
+options.register('storeDeepCSVVariables', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to keep DeepCSV Jet Variables')
+options.register('storePFElectronVariables', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to keep PF Electron Variables')
+options.register('storePFMuonVariables', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to keep DeepCSV Jet Variables')
 options.register('defaults', '',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
@@ -1404,6 +1440,7 @@ process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True fo
 #------------------
 process.btagana.storeTagVariables     = False  ## True if you want to keep TagInfo TaggingVariables
 process.btagana.storeCSVTagVariables  = options.storeCSVTagVariables   ## True if you want to keep CSV TaggingVariables
+process.btagana.storeCSVTagTrackVariables  = options.storeCSVTagTrackVariables   ## True if you want to keep CSV Tagging Track Variables
 process.btagana.storeDeepFlavourTagVariables = options.storeDeepFlavourTagVariables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag(patJetSource)
@@ -1414,6 +1451,20 @@ process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
 process.btagana.triggerTable          = cms.InputTag(trigresults) # Data and MC
 process.btagana.genParticles          = cms.InputTag(genParticles)
 process.btagana.candidates            = cms.InputTag(pfCandidates)
+process.btagana.storeJetVariables     = options.storeJetVariables
+process.btagana.storeQuarkVariables   = options.storeQuarkVariables
+process.btagana.storeHadronVariables  = options.storeHadronVariables
+process.btagana.storeGenVariables     = options.storeGenVariables
+process.btagana.storeDeepCSVVariables = options.storeDeepCSVVariables
+process.btagana.storeDeepFlavourVariables = options.storeDeepFlavourVariables
+process.btagana.storePFElectronVariables = options.storePFElectronVariables
+process.btagana.storePFMuonVariables = options.storePFMuonVariables
+
+if options.runOnData:
+  process.btagana.storeHadronVariables  = False
+  process.btagana.storeQuarkVariables   = False
+  process.btagana.storeGenVariables     = False
+
 
 if options.doCTag:
     process.btagana.storeCTagVariables = True
@@ -1434,13 +1485,14 @@ if process.btagana.useTrackHistory:
 if options.runFatJets:
     process.btaganaFatJets = process.btagana.clone(
         storeEventInfo      = cms.bool(not options.processStdAK4Jets),
-        fillQuarks = cms.bool(True),
+        storeQuarkVariables_= cms.bool(True),
         allowJetSkipping    = cms.bool(False),
         storeTagVariables   = cms.bool(False),
-				storeDeepFlavourTagVariables = cms.bool(False),
-				deepFlavourJetTags = cms.string(''),
-				deepFlavourNegJetTags = cms.string(''),
+        storeDeepFlavourTagVariables = cms.bool(False),
+        deepFlavourJetTags = cms.string(''),
+        deepFlavourNegJetTags = cms.string(''),
         storeCSVTagVariables = cms.bool(True),
+        storeCSVTagTrackVariables = cms.bool(True),
         storeTagVariablesSubJets = cms.bool(False),
         storeCSVTagVariablesSubJets = cms.bool(False),
         useSelectedTracks   = cms.bool(True),
