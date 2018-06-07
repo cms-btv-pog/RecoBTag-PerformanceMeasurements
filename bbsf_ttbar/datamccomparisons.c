@@ -126,7 +126,7 @@ void datamccomparisons()
    TH1D * hadJetAK8_pt = new TH1D("hadJetAK8_pt", ";AK8 jet p_{T} [GeV];events / 25 GeV", 20, 250., 750.);
    drawcomparisons(hadJetAK8_pt, "FatJetInfo.Jet_pt[idx_ak8]", true);
 
-   TH1D * hadJetAK8_mass = new TH1D("hadJetAK8_mass", ";AK8 jet mass [GeV];events / 7.5 GeV", 20, 50., 200.);
+   TH1D * hadJetAK8_mass = new TH1D("hadJetAK8_mass", ";AK8 jet mass [GeV];events / 5 GeV", 30, 50., 200.);
    drawcomparisons(hadJetAK8_mass, "FatJetInfo.Jet_massSoftDrop[idx_ak8]");
 
    TH1D * hadJetAK8_t2t1 = new TH1D("hadJetAK8_t2t1", ";AK8 jet #tau_{2}/#tau_{1};events / 0.05", 20, 0., 1.);
