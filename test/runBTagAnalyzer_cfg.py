@@ -360,6 +360,10 @@ if options.runSubJets and not options.runFatJets:
     print "WARNING: You are attempting to store subjet information without running over fat jets. Please enable running over fat jets in order to store the subjet information."
     options.runSubJets = False
 
+if not options.miniAOD and options.storeDeepFlavourTagVariables: #FIXME
+    print "WARNING: switching off DeepFlavour, as it is not supported in AOD"
+    options.storeDeepFlavourTagVariables = False
+
 if options.doBoostedCommissioning:
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
     options.processStdAK4Jets=False
@@ -670,23 +674,6 @@ else:
 			raise ValueError('The requested era (%s) is not available' % era)
 	process = cms.Process("BTagAna", *eras_to_use)
 
-#AODSIM/RECODEBUG setup
-process.tsk = cms.Task()
-if not options.miniAOD:
-	#switch off deep flavour on AOD for the moment
-	from PhysicsTools.PatAlgos.slimming.miniAOD_tools import miniAOD_customizeAllMC, miniAOD_customizeAllData, miniAOD_customizeCommon
-	process.load("PhysicsTools.PatAlgos.slimming.slimming_cff")
-	process.tsk.add(process.slimmingTask)
-	if options.runOnData:
-		process.load('Configuration.StandardSequences.PAT_cff')		
-		miniAOD_customizeAllData(process)
-	else:
-		process.load('Configuration.StandardSequences.PATMC_cff')
-		miniAOD_customizeAllMC(process)
-	options.miniAOD = True #resume normal service, quite hacky, just to try it out
-
-
-
 
 ## MessageLogger
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
@@ -928,6 +915,24 @@ if options.miniAOD and not options.runJetClustering:
         postfix = postfix
     )
 ## Switch the default jet collection (done in order to use the above-specified b-tag infos and discriminators)
+else:
+    #switch off deep flavour on AOD for the moment
+    switchJetCollection(
+        process,
+        jetSource = cms.InputTag(jetSource),
+        pfCandidates = cms.InputTag(pfCandidates),
+        pvSource = cms.InputTag(pvSource),
+        svSource = cms.InputTag(svSource),
+        muSource = cms.InputTag(muSource),
+        elSource = cms.InputTag(elSource),
+        btagInfos = list(bTagInfos_noDeepFlavour), #list(bTagInfos),
+        btagDiscriminators = list(bTagDiscriminators_no_deepFlavour), #bTagDiscriminators),
+        jetCorrections = jetCorrectionsAK4,
+        genJetCollection = cms.InputTag(genJetCollection),
+        genParticles = cms.InputTag(genParticles),
+        explicitJTA = options.useExplicitJTA,
+        postfix = postfix
+    )
 
 #-------------------------------------
 
@@ -1589,6 +1594,7 @@ if options.processStdAK4Jets and options.useTTbarFilter:
 #---------------------------------------
 
 #Trick to make it work in 9_1_X
+process.tsk = cms.Task()
 for mod in process.producers_().itervalues():
     process.tsk.add(mod)
 for mod in process.filters_().itervalues():
