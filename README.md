@@ -16,7 +16,7 @@ git remote add btv-cmssw https://github.com/cms-btv-pog/cmssw.git
 git cms-merge-topic capalmer85:btagSFupdatesForTTbar
 git cms-merge-topic cms-btv-pog:DeepFlavourUpdates-from-CMSSW_9_4_4
 
-git clone -b 9_4_X_v1.06 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b 9_4_X_v1.07 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
