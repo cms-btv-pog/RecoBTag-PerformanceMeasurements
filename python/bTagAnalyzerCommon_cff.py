@@ -58,7 +58,6 @@ bTagAnalyzerCommon = cms.PSet(
     beta                     = cms.double(1.0),
     R0                       = cms.double(0.8),
     maxSVDeltaRToJet         = cms.double(0.7),
-    weightFile               = cms.FileInPath('RecoBTag/PerformanceMeasurements/data/BoostedDoubleSV_AK8_BDT_v3.weights.xml.gz'),
     trackPairV0Filter        = cms.PSet(k0sMassWindow = cms.double(0.03)),
     distJetAxis              = cms.double(0.07),
     decayLength              = cms.double(5.0),
