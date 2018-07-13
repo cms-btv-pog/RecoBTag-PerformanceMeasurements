@@ -165,8 +165,8 @@ class JetInfoBranches {
     float Jet_trackSip3dSig_0[nMaxJets_];
     float Jet_trackSip2dSigAboveCharm_0[nMaxJets_];
     float Jet_trackSip2dSigAboveCharm_1[nMaxJets_];
-//     float Jet_trackSip2dSigAboveBottom_0[nMaxJets_];
-//     float Jet_trackSip2dSigAboveBottom_1[nMaxJets_];
+    float Jet_trackSip2dSigAboveBottom_0[nMaxJets_];
+    float Jet_trackSip2dSigAboveBottom_1[nMaxJets_];
     float Jet_tau1_trackSip3dSig_0[nMaxJets_];
     float Jet_tau1_trackSip3dSig_1[nMaxJets_];
     float Jet_tau2_trackSip3dSig_0[nMaxJets_];

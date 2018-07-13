@@ -3496,8 +3496,8 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].Jet_tau1_trackSip3dSig_1[JetInfo[iJetColl].nJet] = vars.get(reco::btau::tau1_trackSip3dSig_1);
 
       JetInfo[iJetColl].Jet_trackSip2dSigAboveCharm_0[JetInfo[iJetColl].nJet] = vars.get(reco::btau::trackSip2dSigAboveCharm);
-//       JetInfo[iJetColl].Jet_trackSip2dSigAboveBottom_0[JetInfo[iJetColl].nJet] = vars.get(reco::btau::trackSip2dSigAboveBottom_0);
-//       JetInfo[iJetColl].Jet_trackSip2dSigAboveBottom_1[JetInfo[iJetColl].nJet] = vars.get(reco::btau::trackSip2dSigAboveBottom_1);
+      JetInfo[iJetColl].Jet_trackSip2dSigAboveBottom_0[JetInfo[iJetColl].nJet] = vars.get(reco::btau::trackSip2dSigAboveBottom_0);
+      JetInfo[iJetColl].Jet_trackSip2dSigAboveBottom_1[JetInfo[iJetColl].nJet] = vars.get(reco::btau::trackSip2dSigAboveBottom_1);
 
       JetInfo[iJetColl].Jet_tau2_trackEtaRel_0[JetInfo[iJetColl].nJet] = vars.get(reco::btau::tau2_trackEtaRel_0);
       JetInfo[iJetColl].Jet_tau2_trackEtaRel_1[JetInfo[iJetColl].nJet] = vars.get(reco::btau::tau2_trackEtaRel_1);
@@ -3529,8 +3529,8 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       variables["trackSipdSig_1_1"] = JetInfo[iJetColl].Jet_tau2_trackSip3dSig_1[JetInfo[iJetColl].nJet];
       variables["trackSipdSig_0_1"] = JetInfo[iJetColl].Jet_tau1_trackSip3dSig_1[JetInfo[iJetColl].nJet]; 
       variables["trackSip2dSigAboveCharm_0"] = JetInfo[iJetColl].Jet_trackSip2dSigAboveCharm_0[JetInfo[iJetColl].nJet];
-//       variables["trackSip2dSigAboveBottom_0"] = JetInfo[iJetColl].Jet_trackSip2dSigAboveBottom_0[JetInfo[iJetColl].nJet];
-//       variables["trackSip2dSigAboveBottom_1"] = JetInfo[iJetColl].Jet_trackSip2dSigAboveBottom_1[JetInfo[iJetColl].nJet];
+      variables["trackSip2dSigAboveBottom_0"] = JetInfo[iJetColl].Jet_trackSip2dSigAboveBottom_0[JetInfo[iJetColl].nJet];
+      variables["trackSip2dSigAboveBottom_1"] = JetInfo[iJetColl].Jet_trackSip2dSigAboveBottom_1[JetInfo[iJetColl].nJet];
       variables["tau1_trackEtaRel_0"] = JetInfo[iJetColl].Jet_tau2_trackEtaRel_0[JetInfo[iJetColl].nJet];
       variables["tau1_trackEtaRel_1"] = JetInfo[iJetColl].Jet_tau2_trackEtaRel_1[JetInfo[iJetColl].nJet];
       variables["tau1_trackEtaRel_2"] = JetInfo[iJetColl].Jet_tau2_trackEtaRel_2[JetInfo[iJetColl].nJet];
