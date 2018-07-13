@@ -590,6 +590,9 @@ bTagInfosFat += ([] if options.useLegacyTaggers else ['pfBoostedDoubleSV' + ('CA
 
 bTagDiscriminators_no_deepFlavour = {i for i in bTagDiscriminators if 'DeepFlavourJetTags' not in i}
 bTagDiscriminatorsFat = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
+## Add DeepDoubleB tagger to fat jets
+bTagDiscriminatorsFat.update(set(['pfDeepDoubleBJetTags:probH']))
+
 if options.runJetClustering:
     options.remakeAllDiscr = True
 if options.runFatJetClustering:

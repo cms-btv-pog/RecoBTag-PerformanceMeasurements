@@ -191,7 +191,6 @@ class JetInfoBranches {
     float Jet_tau2_vertexMass_corrected[nMaxJets_];
     float Jet_tau1_vertexNTracks[nMaxJets_];
     float Jet_tau2_vertexNTracks[nMaxJets_];    
-    float Jet_BDTG_SV[nMaxJets_];
     int   Jet_nFirstTrkTagVar[nMaxJets_];
     int   Jet_nLastTrkTagVar[nMaxJets_];
     int   Jet_nFirstSVTagVar[nMaxJets_];
@@ -200,6 +199,7 @@ class JetInfoBranches {
     int   Jet_nLastTrkTagVarCSV[nMaxJets_];
     int   Jet_nFirstTrkEtaRelTagVarCSV[nMaxJets_];
     int   Jet_nLastTrkEtaRelTagVarCSV[nMaxJets_];
+    float Jet_DeepDoubleB[nMaxJets_];
 
     int   nTrack;
     float Track_dxy[nMaxTrk_];
@@ -1053,7 +1053,7 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_tau1_vertexNTracks").c_str(),           Jet_tau1_vertexNTracks           ,(name+"Jet_tau1_vertexNTracks["+name+"nJet]/F").c_str()           );
       tree->Branch((name+"Jet_tau2_vertexNTracks").c_str(),           Jet_tau2_vertexNTracks           ,(name+"Jet_tau2_vertexNTracks["+name+"nJet]/F").c_str()           );
       tree->Branch((name+"Jet_DoubleSV").c_str(),         Jet_DoubleSV         ,(name+"Jet_DoubleSV["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_BDTG_SV").c_str(),          Jet_BDTG_SV          ,(name+"Jet_BDTG_SV["+name+"nJet]/F").c_str()         );
+      tree->Branch((name+"Jet_DeepDoubleB").c_str(),      Jet_DeepDoubleB      ,(name+"Jet_DeepDoubleB["+name+"nJet]/F").c_str());
       
       if (trackVars)
       {
@@ -1571,7 +1571,7 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_tau1_vertexNTracks").c_str(),           Jet_tau1_vertexNTracks           );
       tree->SetBranchAddress((name+"Jet_tau2_vertexNTracks").c_str(),           Jet_tau2_vertexNTracks           );
       tree->SetBranchAddress((name+"Jet_DoubleSV").c_str(),         Jet_DoubleSV    );
-      tree->SetBranchAddress((name+"Jet_BDTG_SV").c_str(),          Jet_BDTG_SV     );
+      tree->SetBranchAddress((name+"Jet_DeepDoubleB").c_str(),      Jet_DeepDoubleB );
 
       if (trackVars)
       {
