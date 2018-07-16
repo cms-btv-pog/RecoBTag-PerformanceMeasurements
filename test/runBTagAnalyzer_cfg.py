@@ -580,6 +580,9 @@ bTagInfosFat += ([] if options.useLegacyTaggers else ['pfBoostedDoubleSV' + ('CA
 
 bTagDiscriminators_no_deepFlavour = {i for i in bTagDiscriminators if 'DeepFlavourJetTags' not in i}
 bTagDiscriminatorsFat = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
+## Add DeepDoubleB tagger to fat jets
+bTagDiscriminatorsFat.update(set(['pfDeepDoubleBJetTags:probH']))
+
 if options.runJetClustering:
     options.remakeAllDiscr = True
 if options.runFatJetClustering:
@@ -1494,7 +1497,6 @@ if options.runFatJets:
         maxDeltaR           = cms.double(options.fatJetRadius),
         R0                  = cms.double(options.fatJetRadius),
         maxSVDeltaRToJet    = cms.double(options.fatJetRadius-(0.1+(options.fatJetRadius-0.8)*(0.4/0.7))), # linear interpolation from 0.7 at R=0.8 to 1.0 at R=1.5
-        weightFile          = cms.FileInPath('RecoBTag/PerformanceMeasurements/data/BoostedDoubleSV_' + ('CA15' if algoLabel=='CA' else 'AK8') + '_BDT_v3.weights.xml.gz'),
         doubleSVBJetTags    = cms.string('pfBoostedDoubleSecondaryVertex' + ('CA15' if algoLabel=='CA' else 'AK8') + 'BJetTags'),
         distJetAxis         = cms.double(9999.),
         decayLength         = cms.double(9999.),
