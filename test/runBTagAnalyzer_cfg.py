@@ -1483,17 +1483,13 @@ if process.btagana.useTrackHistory:
 if options.runFatJets:
     process.btaganaFatJets = process.btagana.clone(
         storeEventInfo      = cms.bool(not options.processStdAK4Jets),
-        storeHadronVariables = cms.bool(True),
-        storeQuarkVariables_= cms.bool(True),
         allowJetSkipping    = cms.bool(False),
         storeTagVariables   = cms.bool(False),
+        storeDeepFlavourVariables = cms.bool(False),
         storeDeepFlavourTagVariables = cms.bool(False),
         deepFlavourJetTags = cms.string(''),
         deepFlavourNegJetTags = cms.string(''),
-        storeCSVTagVariables = cms.bool(True),
-        storeCSVTagTrackVariables = cms.bool(True),
         storeTagVariablesSubJets = cms.bool(False),
-        storeCSVTagVariablesSubJets = cms.bool(False),
         useSelectedTracks   = cms.bool(True),
         maxDeltaR           = cms.double(options.fatJetRadius),
         R0                  = cms.double(options.fatJetRadius),
@@ -1520,17 +1516,25 @@ if options.runFatJets:
         process.btaganaFatJets.SubJetLabels.append( 'Pruned' )
 
 if options.doBoostedCommissioning:
+    process.btaganaFatJets.storeHadronVariables = True
+    process.btaganaFatJets.storeQuarkVariables = True
     process.btaganaFatJets.storePFMuonVariables = True
-    process.btaganaFatJets.produceJetTrackTree  = True 
-    process.btaganaFatJets.fillsvTagInfo = True  
-    process.btaganaFatJets.storeCSVTagVariables = True  
-    process.btaganaFatJets.storeCSVTagVariablesSubJets = True 
+    process.btaganaFatJets.produceJetTrackTree  = True
+    process.btaganaFatJets.fillsvTagInfo = True
+    process.btaganaFatJets.storeCSVTagVariables = True
+    process.btaganaFatJets.storeCSVTagTrackVariables = True
+    process.btaganaFatJets.storeCSVTagVariablesSubJets = True
+    process.btaganaFatJets.storeCSVTagTrackVariablesSubJets = True
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
-    print "storePFMuonVariables set to '",process.btaganaFatJets.storePFMuonVariables,"'" 
-    print "produceJetTrackTree set to '",process.btaganaFatJets.produceJetTrackTree,"'" 
-    print "fillsvTagInfo set to '",process.btaganaFatJets.fillsvTagInfo,"'" 
+    print "storeHadronVariables set to '",process.btaganaFatJets.storeHadronVariables,"'"
+    print "storeQuarkVariables set to '",process.btaganaFatJets.storeQuarkVariables,"'"
+    print "storePFMuonVariables set to '",process.btaganaFatJets.storePFMuonVariables,"'"
+    print "produceJetTrackTree set to '",process.btaganaFatJets.produceJetTrackTree,"'"
+    print "fillsvTagInfo set to '",process.btaganaFatJets.fillsvTagInfo,"'"
     print "For fat jets: storeCSVTagVariables set to '",process.btaganaFatJets.storeCSVTagVariables,"'"
-    print "For subjets:  storeCSVTagVariablesSubJet set to '",process.btaganaFatJets.storeCSVTagVariablesSubJets,"'"
+    print "For fat jets: storeCSVTagTrackVariables set to '",process.btaganaFatJets.storeCSVTagTrackVariables,"'"
+    print "For subjets:  storeCSVTagVariablesSubJets set to '",process.btaganaFatJets.storeCSVTagVariablesSubJets,"'"
+    print "For subjets:  storeCSVTagTrackVariablesSubJets set to '",process.btaganaFatJets.storeCSVTagTrackVariablesSubJets,"'"
     print "********************"
 
 if process.btagana.produceJetTrackTruthTree:

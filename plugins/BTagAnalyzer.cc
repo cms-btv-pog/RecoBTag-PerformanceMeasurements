@@ -392,6 +392,7 @@ private:
   bool storeDeepFlavourVariables_;
   bool storeDeepFlavourTagVariables_;
   bool storeCSVTagVariablesSubJets_;
+  bool storeCSVTagTrackVariablesSubJets_;
   bool storePFElectronVariables_;
   bool storePFMuonVariables_;
 
@@ -567,6 +568,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   storeDeepFlavourVariables_ = iConfig.getParameter<bool>("storeDeepFlavourVariables");
   storeDeepFlavourTagVariables_  = iConfig.getParameter<bool>("storeDeepFlavourTagVariables");
   storeCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("storeCSVTagVariablesSubJets");
+  storeCSVTagTrackVariablesSubJets_ = iConfig.getParameter<bool>("storeCSVTagTrackVariablesSubJets");
   storePFElectronVariables_ = iConfig.getParameter<bool>("storePFElectronVariables");
   storePFMuonVariables_ = iConfig.getParameter<bool>("storePFMuonVariables");
 
@@ -749,9 +751,11 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
       JetInfo[1+i].RegisterSubJetSpecificTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       if ( produceJetTrackTree_ )         JetInfo[1+i].RegisterJetTrackTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       if ( producePtRelTemplate_ )        JetInfo[1+i].RegisterJetTrackIncTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
+      if ( storePFMuonVariables_ )        JetInfo[1+i].RegisterPFMuonTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       if ( fillsvTagInfo_ )               JetInfo[1+i].RegisterJetSVTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       if ( storeTagVariablesSubJets_ )    JetInfo[1+i].RegisterTagVarTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       if ( storeCSVTagVariablesSubJets_ ) JetInfo[1+i].RegisterCSVTagVarTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
+      if ( storeCSVTagTrackVariablesSubJets_ ) JetInfo[1+i].RegisterCSVTagTrackVarTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
 
       // set up subjet helper classes
       edm::ParameterSet iConfigCopy(iConfig);
