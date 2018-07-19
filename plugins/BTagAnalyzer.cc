@@ -867,8 +867,8 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   EventInfo.pthat      = -1.;
   EventInfo.nPUtrue    = -1.;
   EventInfo.nPU        = 0;
-//   EventInfo.ncQuarks   = 0;
-//   EventInfo.nbQuarks   = 0;
+  EventInfo.ncQuarks   = 0;
+  EventInfo.nbQuarks   = 0;
   EventInfo.nBHadrons  = 0;
   EventInfo.nDHadrons  = 0;
   EventInfo.nDaughters = 0;
@@ -1001,22 +1001,22 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
 	    }
 	    if( nparton_daughters == 0 ) {
 	      if ( ID == 5 ) {
-// 		EventInfo.bQuark_pT[EventInfo.nbQuarks]  = genIt.p4().pt();
-// 		EventInfo.bQuark_eta[EventInfo.nbQuarks] = genIt.p4().eta();
-// 		EventInfo.bQuark_phi[EventInfo.nbQuarks] = genIt.p4().phi();
-// 		EventInfo.bQuark_pdgID[EventInfo.nbQuarks] = genIt.pdgId();
-// 		EventInfo.bQuark_status[EventInfo.nbQuarks] = genIt.status();
-// 		EventInfo.bQuark_fromGSP[EventInfo.nbQuarks] = isFromGSP(&genIt);
-// 		++EventInfo.nbQuarks;
+		EventInfo.bQuark_pT[EventInfo.nbQuarks]  = genIt.p4().pt();
+		EventInfo.bQuark_eta[EventInfo.nbQuarks] = genIt.p4().eta();
+		EventInfo.bQuark_phi[EventInfo.nbQuarks] = genIt.p4().phi();
+		EventInfo.bQuark_pdgID[EventInfo.nbQuarks] = genIt.pdgId();
+		EventInfo.bQuark_status[EventInfo.nbQuarks] = genIt.status();
+		EventInfo.bQuark_fromGSP[EventInfo.nbQuarks] = isFromGSP(&genIt);
+		++EventInfo.nbQuarks;
 	      }
 	      if ( ID == 4 ) {
-// 		EventInfo.cQuark_pT[EventInfo.ncQuarks]  = genIt.p4().pt();
-// 		EventInfo.cQuark_eta[EventInfo.ncQuarks] = genIt.p4().eta();
-// 		EventInfo.cQuark_phi[EventInfo.ncQuarks] = genIt.p4().phi();
-// 		EventInfo.cQuark_pdgID[EventInfo.ncQuarks] = genIt.pdgId();
-// 		EventInfo.cQuark_status[EventInfo.ncQuarks] = genIt.status();
-// 		EventInfo.cQuark_fromGSP[EventInfo.ncQuarks] = isFromGSP(&genIt);
-// 		++EventInfo.ncQuarks;
+		EventInfo.cQuark_pT[EventInfo.ncQuarks]  = genIt.p4().pt();
+		EventInfo.cQuark_eta[EventInfo.ncQuarks] = genIt.p4().eta();
+		EventInfo.cQuark_phi[EventInfo.ncQuarks] = genIt.p4().phi();
+		EventInfo.cQuark_pdgID[EventInfo.ncQuarks] = genIt.pdgId();
+		EventInfo.cQuark_status[EventInfo.ncQuarks] = genIt.status();
+		EventInfo.cQuark_fromGSP[EventInfo.ncQuarks] = isFromGSP(&genIt);
+		++EventInfo.ncQuarks;
 	      }
 	    }
 	  }
@@ -1069,8 +1069,8 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
             int numberChargedDaughters = 0;
             for (unsigned int d=0; d<nDaughters; d++) {
               const Candidate* daughter = genIt.daughter(d);
-//               int IDdaughter = abs(daughter->pdgId());
-//               EventInfo.DHadron_DaughtersPdgID[EventInfo.nDaughters] = IDdaughter;
+              int IDdaughter = abs(daughter->pdgId());
+              EventInfo.DHadron_DaughtersPdgID[EventInfo.nDaughters] = IDdaughter;
               // take vertex of first daughter for SV
               if ( d == 0 ) {
                 EventInfo.DHadron_SVx[EventInfo.nDHadrons] = daughter->vx();
