@@ -189,13 +189,13 @@ options.register('useNegativeDeepFlavourTags', False,
 )
 
 ## Generally leave to False unless you know what you are doing
-options.register('runIVF', False, 
+options.register('runIVF', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Run IVF, currently leave to False!"
 )
 ## Master switch for boosted b tag commissioning: overrider several other switches
-options.register('doBoostedCommissioning', False, 
+options.register('doBoostedCommissioning', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Make NTuples with branches for boosted b tag commissioning: overrider several other switches"
@@ -302,10 +302,10 @@ options.register('eras', [],
     VarParsing.varType.string,
     'era modifiers to be used to be used')
 options.register(
-	'skipEvents', 0, 
-	VarParsing.multiplicity.singleton, 
-	VarParsing.varType.int, 
-	"skip N events"
+    'skipEvents', 0,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.int,
+    "skip N events"
 )
 
 ## 'maxEvents' is already registered by the Framework, changing default value
@@ -425,7 +425,7 @@ bTagInfos = [
    ,'softPFElectronsTagInfos'
    ,'pfInclusiveSecondaryVertexFinderCvsLTagInfos'
    ,'pfInclusiveSecondaryVertexFinderNegativeCvsLTagInfos'
-	 ,'pfDeepFlavourTagInfos'
+   ,'pfDeepFlavourTagInfos'
 ]
 bTagInfos_noDeepFlavour = bTagInfos[:-1]
 ## b-tag discriminators
@@ -497,20 +497,20 @@ bTagDiscriminators = set([
    ,'pfNegativeCombinedCvsLJetTags'
    ,'pfPositiveCombinedCvsLJetTags'
     # DeepCSV
-  , 'pfDeepCSVJetTags:probudsg'        
-  , 'pfDeepCSVJetTags:probb'           
-  , 'pfDeepCSVJetTags:probc'           
-  , 'pfDeepCSVJetTags:probbb'          
+  , 'pfDeepCSVJetTags:probudsg'
+  , 'pfDeepCSVJetTags:probb'
+  , 'pfDeepCSVJetTags:probc'
+  , 'pfDeepCSVJetTags:probbb'
   , 'pfNegativeDeepCSVJetTags:probudsg'
-  , 'pfNegativeDeepCSVJetTags:probb'   
-  , 'pfNegativeDeepCSVJetTags:probc'   
-  , 'pfNegativeDeepCSVJetTags:probbb'  
+  , 'pfNegativeDeepCSVJetTags:probb'
+  , 'pfNegativeDeepCSVJetTags:probc'
+  , 'pfNegativeDeepCSVJetTags:probbb'
   , 'pfPositiveDeepCSVJetTags:probudsg'
-  , 'pfPositiveDeepCSVJetTags:probb'   
-  , 'pfPositiveDeepCSVJetTags:probc'   
-  , 'pfPositiveDeepCSVJetTags:probbb'  
-		# DeepFlavour
-	, 'pfDeepFlavourJetTags:probb'
+  , 'pfPositiveDeepCSVJetTags:probb'
+  , 'pfPositiveDeepCSVJetTags:probc'
+  , 'pfPositiveDeepCSVJetTags:probbb'
+    # DeepFlavour
+  , 'pfDeepFlavourJetTags:probb'
   , 'pfDeepFlavourJetTags:probbb'
   , 'pfDeepFlavourJetTags:problepb'
   , 'pfDeepFlavourJetTags:probc'
@@ -717,7 +717,7 @@ else:
             '/store/relval/CMSSW_8_0_0/RelValTTbar_13/GEN-SIM-DIGI-RECO/PU25ns_80X_mcRun2_asymptotic_v4_FastSim-v2/10000/0400D094-63DD-E511-8B51-0CC47A4C8ED8.root'
         ]
 if options.inputFiles:
-	process.source.fileNames = options.inputFiles
+    process.source.fileNames = options.inputFiles
 
 ## Define the output file name
 if options.runOnData :
@@ -780,7 +780,7 @@ process.GlobalTag.globaltag = globalTag
 #process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
 
 if options.usePrivateJEC:
-    
+
     from CondCore.DBCommon.CondDBSetup_cfi import *
     import os
     dbfile=''
@@ -1263,7 +1263,7 @@ if options.useTTbarFilter:
 
     #electron id
     from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
-        
+
     if options.miniAOD:
         process.ttbarselectionproducer.electronColl = cms.InputTag('slimmedElectrons')
         process.ttbarselectionproducer.muonColl     = cms.InputTag('slimmedMuons')
@@ -1493,16 +1493,13 @@ if process.btagana.useTrackHistory:
 if options.runFatJets:
     process.btaganaFatJets = process.btagana.clone(
         storeEventInfo      = cms.bool(not options.processStdAK4Jets),
-        storeQuarkVariables_= cms.bool(True),
         allowJetSkipping    = cms.bool(False),
         storeTagVariables   = cms.bool(False),
+        storeDeepFlavourVariables = cms.bool(False),
         storeDeepFlavourTagVariables = cms.bool(False),
         deepFlavourJetTags = cms.string(''),
         deepFlavourNegJetTags = cms.string(''),
-        storeCSVTagVariables = cms.bool(True),
-        storeCSVTagTrackVariables = cms.bool(True),
         storeTagVariablesSubJets = cms.bool(False),
-        storeCSVTagVariablesSubJets = cms.bool(False),
         useSelectedTracks   = cms.bool(True),
         maxDeltaR           = cms.double(options.fatJetRadius),
         R0                  = cms.double(options.fatJetRadius),
@@ -1529,15 +1526,25 @@ if options.runFatJets:
         process.btaganaFatJets.SubJetLabels.append( 'Pruned' )
 
 if options.doBoostedCommissioning:
-    process.btaganaFatJets.produceJetTrackTree  = True 
-    process.btaganaFatJets.fillsvTagInfo = True  
-    process.btaganaFatJets.storeCSVTagVariables = True  
-    process.btaganaFatJets.storeCSVTagVariablesSubJets = True 
+    process.btaganaFatJets.storeHadronVariables = True
+    process.btaganaFatJets.storeQuarkVariables = True
+    process.btaganaFatJets.storePFMuonVariables = True
+    process.btaganaFatJets.produceJetTrackTree  = True
+    process.btaganaFatJets.fillsvTagInfo = True
+    process.btaganaFatJets.storeCSVTagVariables = True
+    process.btaganaFatJets.storeCSVTagTrackVariables = True
+    process.btaganaFatJets.storeCSVTagVariablesSubJets = True
+    process.btaganaFatJets.storeCSVTagTrackVariablesSubJets = True
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
-    print "produceJetTrackTree set to '",process.btaganaFatJets.produceJetTrackTree,"'" 
-    print "fillsvTagInfo set to '",process.btaganaFatJets.fillsvTagInfo,"'" 
+    print "storeHadronVariables set to '",process.btaganaFatJets.storeHadronVariables,"'"
+    print "storeQuarkVariables set to '",process.btaganaFatJets.storeQuarkVariables,"'"
+    print "storePFMuonVariables set to '",process.btaganaFatJets.storePFMuonVariables,"'"
+    print "produceJetTrackTree set to '",process.btaganaFatJets.produceJetTrackTree,"'"
+    print "fillsvTagInfo set to '",process.btaganaFatJets.fillsvTagInfo,"'"
     print "For fat jets: storeCSVTagVariables set to '",process.btaganaFatJets.storeCSVTagVariables,"'"
-    print "For subjets:  storeCSVTagVariablesSubJet set to '",process.btaganaFatJets.storeCSVTagVariablesSubJets,"'"
+    print "For fat jets: storeCSVTagTrackVariables set to '",process.btaganaFatJets.storeCSVTagTrackVariables,"'"
+    print "For subjets:  storeCSVTagVariablesSubJets set to '",process.btaganaFatJets.storeCSVTagVariablesSubJets,"'"
+    print "For subjets:  storeCSVTagTrackVariablesSubJets set to '",process.btaganaFatJets.storeCSVTagTrackVariablesSubJets,"'"
     print "********************"
 
 if process.btagana.produceJetTrackTruthTree:
@@ -1607,7 +1614,7 @@ process.p = cms.Path(
     * process.filtSeq
     * process.selectedEvents
     * process.analyzerSeq,
-		process.tsk
+    process.tsk
 )
 
 # Delete predefined output module (needed for running with CRAB)
