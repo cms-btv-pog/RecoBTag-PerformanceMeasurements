@@ -1530,11 +1530,13 @@ if options.runFatJets:
         process.btaganaFatJets.SubJetLabels.append( 'Pruned' )
 
 if options.doBoostedCommissioning:
+    process.btaganaFatJets.storePFMuonVariables = True
     process.btaganaFatJets.produceJetTrackTree  = True 
     process.btaganaFatJets.fillsvTagInfo = True  
     process.btaganaFatJets.storeCSVTagVariables = True  
     process.btaganaFatJets.storeCSVTagVariablesSubJets = True 
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
+    print "storePFMuonVariables set to '",process.btaganaFatJets.storePFMuonVariables,"'" 
     print "produceJetTrackTree set to '",process.btaganaFatJets.produceJetTrackTree,"'" 
     print "fillsvTagInfo set to '",process.btaganaFatJets.fillsvTagInfo,"'" 
     print "For fat jets: storeCSVTagVariables set to '",process.btaganaFatJets.storeCSVTagVariables,"'"
