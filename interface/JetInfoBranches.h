@@ -129,10 +129,10 @@ class JetInfoBranches {
     int   Jet_SV_multi[nMaxJets_];
     int   Jet_nFirstTrkInc[nMaxJets_];
     int   Jet_nLastTrkInc[nMaxJets_];
-//     int   Jet_nSM[nMaxJets_];
+    int   Jet_nSM[nMaxJets_];
     int   Jet_nFirstSM[nMaxJets_];
     int   Jet_nLastSM[nMaxJets_];
-//     int   Jet_nSE[nMaxJets_];
+    int   Jet_nSE[nMaxJets_];
     int   Jet_nFirstSE[nMaxJets_];
     int   Jet_nLastSE[nMaxJets_];
     int   Jet_looseID[nMaxJets_];
@@ -562,8 +562,8 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_histSvx").c_str(),     Jet_histSvx     ,(name+"Jet_histSvx["+name+"nJet]/I").c_str());
 
       tree->Branch((name+"Jet_SV_multi").c_str(),    Jet_SV_multi      ,(name+"Jet_SV_multi["+name+"nJet]/I").c_str());
-//       tree->Branch((name+"Jet_nSM").c_str(),         Jet_nSM         ,(name+"Jet_nSM["+name+"nJet]/I").c_str()      );
-//       tree->Branch((name+"Jet_nSE").c_str(),         Jet_nSE         ,(name+"Jet_nSE["+name+"nJet]/I").c_str()      );
+      tree->Branch((name+"Jet_nSM").c_str(),         Jet_nSM         ,(name+"Jet_nSM["+name+"nJet]/I").c_str()      );
+      tree->Branch((name+"Jet_nSE").c_str(),         Jet_nSE         ,(name+"Jet_nSE["+name+"nJet]/I").c_str()      );
 
       tree->Branch((name+"Jet_looseID").c_str(),      Jet_looseID  ,(name+"Jet_looseID["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_tightID").c_str(),      Jet_tightID  ,(name+"Jet_tightID["+name+"nJet]/I").c_str());
@@ -571,9 +571,6 @@ class JetInfoBranches {
       //test variables for AK4 jets: clean up in the future
       tree->Branch((name+"Jet_trackSip2dSig_AboveBottom_0").c_str(),     Jet_trackSip2dSig_AboveBottom_0     ,(name+"Jet_trackSip2dSig_AboveBottom_0["+name+"nJet]/F").c_str()            );
       tree->Branch((name+"Jet_trackSip2dSig_AboveBottom_1").c_str(),     Jet_trackSip2dSig_AboveBottom_1     ,(name+"Jet_trackSip2dSig_AboveBottom_1["+name+"nJet]/F").c_str()            );
-
-      tree->Branch((name+"nPFElectron").c_str()         ,&nPFElectron        ,(name+"nPFElectron/I").c_str());
-      tree->Branch((name+"nPFMuon").c_str()             ,&nPFMuon            ,(name+"nPFMuon/I").c_str());
     }
 
     void RegisterJetDeepFlavourTree(TTree *tree, std::string name=""){
@@ -628,6 +625,7 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_nFirstSE").c_str(),    Jet_nFirstSE    ,(name+"Jet_nFirstSE["+name+"nJet]/I").c_str() );
       tree->Branch((name+"Jet_nLastSE").c_str(),     Jet_nLastSE     ,(name+"Jet_nLastSE["+name+"nJet]/I").c_str()  );
 
+      tree->Branch((name+"nPFElectron").c_str()         ,&nPFElectron        ,(name+"nPFElectron/I").c_str());
       tree->Branch((name+"PFElectron_IdxJet").c_str()   ,PFElectron_IdxJet   ,(name+"PFElectron_IdxJet["+name+"nPFElectron]/I").c_str());
       tree->Branch((name+"PFElectron_pt").c_str()       ,PFElectron_pt       ,(name+"PFElectron_pt["+name+"nPFElectron]/F").c_str());
       tree->Branch((name+"PFElectron_eta").c_str()      ,PFElectron_eta      ,(name+"PFElectron_eta["+name+"nPFElectron]/F").c_str());
@@ -648,6 +646,7 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_nFirstSM").c_str()        ,Jet_nFirstSM        ,(name+"Jet_nFirstSM["+name+"nJet]/I").c_str() );
       tree->Branch((name+"Jet_nLastSM").c_str()         ,Jet_nLastSM         ,(name+"Jet_nLastSM["+name+"nJet]/I").c_str()  );
 
+      tree->Branch((name+"nPFMuon").c_str()            ,&nPFMuon            ,(name+"nPFMuon/I").c_str());
       tree->Branch((name+"PFMuon_IdxJet").c_str()      ,PFMuon_IdxJet       ,(name+"PFMuon_IdxJet["+name+"nPFMuon]/I").c_str());
       tree->Branch((name+"PFMuon_nMuHit").c_str()      ,PFMuon_nMuHit       ,(name+"PFMuon_nMuHit["+name+"nPFMuon]/I").c_str());
       tree->Branch((name+"PFMuon_nTkHit").c_str()      ,PFMuon_nTkHit       ,(name+"PFMuon_nTkHit["+name+"nPFMuon]/I").c_str());
@@ -1147,8 +1146,8 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_histSvx").c_str(),     Jet_histSvx     );
 
       tree->SetBranchAddress((name+"Jet_SV_multi").c_str(),    Jet_SV_multi      );
-//       tree->SetBranchAddress((name+"Jet_nSM").c_str(),         Jet_nSM         );
-//       tree->SetBranchAddress((name+"Jet_nSE").c_str(),         Jet_nSE         );
+      tree->SetBranchAddress((name+"Jet_nSM").c_str(),         Jet_nSM         );
+      tree->SetBranchAddress((name+"Jet_nSE").c_str(),         Jet_nSE         );
 
       tree->SetBranchAddress((name+"Jet_looseID").c_str(),     Jet_looseID);
       tree->SetBranchAddress((name+"Jet_tightID").c_str(),     Jet_tightID);
