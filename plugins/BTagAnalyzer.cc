@@ -725,7 +725,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   // jet information
   //--------------------------------------
   JetInfo.reserve(1+(runSubJets_ ? SubJetLabels_.size() : 0));
-  if ( storeJetVariables_)      JetInfo[0].RegisterJetTree(smalltree,branchNamePrefix_);
+  if ( storeJetVariables_)      JetInfo[0].RegisterTree(smalltree,branchNamePrefix_);
   if ( runFatJets_ )          JetInfo[0].RegisterFatJetSpecificTree(smalltree,branchNamePrefix_,produceJetTrackTree_);
   if ( produceJetTrackTree_ ) JetInfo[0].RegisterJetTrackTree(smalltree,branchNamePrefix_);
   if ( produceJetTrackTruthTree_ ) JetInfo[0].RegisterJetTrackTruthTree(smalltree,branchNamePrefix_);
@@ -745,7 +745,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
     for ( size_t i = 0; i < SubJetLabels_.size(); ++i )
     {
       if ( runFatJets_ ) SubJetInfo[SubJetLabels_[i]].RegisterTree(smalltree,branchNamePrefix_,SubJetLabels_[i]);
-      JetInfo[1+i].RegisterJetTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
+      JetInfo[1+i].RegisterTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       JetInfo[1+i].RegisterSubJetSpecificTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       if ( produceJetTrackTree_ )         JetInfo[1+i].RegisterJetTrackTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       if ( producePtRelTemplate_ )        JetInfo[1+i].RegisterJetTrackIncTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
