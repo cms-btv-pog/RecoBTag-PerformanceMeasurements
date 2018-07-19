@@ -392,6 +392,7 @@ private:
   bool storeDeepFlavourVariables_;
   bool storeDeepFlavourTagVariables_;
   bool storeCSVTagVariablesSubJets_;
+  bool storeCSVTagTrackVariablesSubJets_;
   bool storePFElectronVariables_;
   bool storePFMuonVariables_;
 
@@ -567,6 +568,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   storeDeepFlavourVariables_ = iConfig.getParameter<bool>("storeDeepFlavourVariables");
   storeDeepFlavourTagVariables_  = iConfig.getParameter<bool>("storeDeepFlavourTagVariables");
   storeCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("storeCSVTagVariablesSubJets");
+  storeCSVTagTrackVariablesSubJets_ = iConfig.getParameter<bool>("storeCSVTagTrackVariablesSubJets");
   storePFElectronVariables_ = iConfig.getParameter<bool>("storePFElectronVariables");
   storePFMuonVariables_ = iConfig.getParameter<bool>("storePFMuonVariables");
 
@@ -725,7 +727,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   // jet information
   //--------------------------------------
   JetInfo.reserve(1+(runSubJets_ ? SubJetLabels_.size() : 0));
-  if ( storeJetVariables_)      JetInfo[0].RegisterJetTree(smalltree,branchNamePrefix_);
+  if ( storeJetVariables_)      JetInfo[0].RegisterTree(smalltree,branchNamePrefix_);
   if ( runFatJets_ )          JetInfo[0].RegisterFatJetSpecificTree(smalltree,branchNamePrefix_,produceJetTrackTree_);
   if ( produceJetTrackTree_ ) JetInfo[0].RegisterJetTrackTree(smalltree,branchNamePrefix_);
   if ( produceJetTrackTruthTree_ ) JetInfo[0].RegisterJetTrackTruthTree(smalltree,branchNamePrefix_);
@@ -745,13 +747,15 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
     for ( size_t i = 0; i < SubJetLabels_.size(); ++i )
     {
       if ( runFatJets_ ) SubJetInfo[SubJetLabels_[i]].RegisterTree(smalltree,branchNamePrefix_,SubJetLabels_[i]);
-      JetInfo[1+i].RegisterJetTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
+      JetInfo[1+i].RegisterTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       JetInfo[1+i].RegisterSubJetSpecificTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       if ( produceJetTrackTree_ )         JetInfo[1+i].RegisterJetTrackTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       if ( producePtRelTemplate_ )        JetInfo[1+i].RegisterJetTrackIncTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
+      if ( storePFMuonVariables_ )        JetInfo[1+i].RegisterPFMuonTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       if ( fillsvTagInfo_ )               JetInfo[1+i].RegisterJetSVTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       if ( storeTagVariablesSubJets_ )    JetInfo[1+i].RegisterTagVarTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
       if ( storeCSVTagVariablesSubJets_ ) JetInfo[1+i].RegisterCSVTagVarTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
+      if ( storeCSVTagTrackVariablesSubJets_ ) JetInfo[1+i].RegisterCSVTagTrackVarTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
 
       // set up subjet helper classes
       edm::ParameterSet iConfigCopy(iConfig);
@@ -867,8 +871,8 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   EventInfo.pthat      = -1.;
   EventInfo.nPUtrue    = -1.;
   EventInfo.nPU        = 0;
-//   EventInfo.ncQuarks   = 0;
-//   EventInfo.nbQuarks   = 0;
+  EventInfo.ncQuarks   = 0;
+  EventInfo.nbQuarks   = 0;
   EventInfo.nBHadrons  = 0;
   EventInfo.nDHadrons  = 0;
   EventInfo.nDaughters = 0;
@@ -1001,22 +1005,22 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
 	    }
 	    if( nparton_daughters == 0 ) {
 	      if ( ID == 5 ) {
-// 		EventInfo.bQuark_pT[EventInfo.nbQuarks]  = genIt.p4().pt();
-// 		EventInfo.bQuark_eta[EventInfo.nbQuarks] = genIt.p4().eta();
-// 		EventInfo.bQuark_phi[EventInfo.nbQuarks] = genIt.p4().phi();
-// 		EventInfo.bQuark_pdgID[EventInfo.nbQuarks] = genIt.pdgId();
-// 		EventInfo.bQuark_status[EventInfo.nbQuarks] = genIt.status();
-// 		EventInfo.bQuark_fromGSP[EventInfo.nbQuarks] = isFromGSP(&genIt);
-// 		++EventInfo.nbQuarks;
+		EventInfo.bQuark_pT[EventInfo.nbQuarks]  = genIt.p4().pt();
+		EventInfo.bQuark_eta[EventInfo.nbQuarks] = genIt.p4().eta();
+		EventInfo.bQuark_phi[EventInfo.nbQuarks] = genIt.p4().phi();
+		EventInfo.bQuark_pdgID[EventInfo.nbQuarks] = genIt.pdgId();
+		EventInfo.bQuark_status[EventInfo.nbQuarks] = genIt.status();
+		EventInfo.bQuark_fromGSP[EventInfo.nbQuarks] = isFromGSP(&genIt);
+		++EventInfo.nbQuarks;
 	      }
 	      if ( ID == 4 ) {
-// 		EventInfo.cQuark_pT[EventInfo.ncQuarks]  = genIt.p4().pt();
-// 		EventInfo.cQuark_eta[EventInfo.ncQuarks] = genIt.p4().eta();
-// 		EventInfo.cQuark_phi[EventInfo.ncQuarks] = genIt.p4().phi();
-// 		EventInfo.cQuark_pdgID[EventInfo.ncQuarks] = genIt.pdgId();
-// 		EventInfo.cQuark_status[EventInfo.ncQuarks] = genIt.status();
-// 		EventInfo.cQuark_fromGSP[EventInfo.ncQuarks] = isFromGSP(&genIt);
-// 		++EventInfo.ncQuarks;
+		EventInfo.cQuark_pT[EventInfo.ncQuarks]  = genIt.p4().pt();
+		EventInfo.cQuark_eta[EventInfo.ncQuarks] = genIt.p4().eta();
+		EventInfo.cQuark_phi[EventInfo.ncQuarks] = genIt.p4().phi();
+		EventInfo.cQuark_pdgID[EventInfo.ncQuarks] = genIt.pdgId();
+		EventInfo.cQuark_status[EventInfo.ncQuarks] = genIt.status();
+		EventInfo.cQuark_fromGSP[EventInfo.ncQuarks] = isFromGSP(&genIt);
+		++EventInfo.ncQuarks;
 	      }
 	    }
 	  }
@@ -1069,8 +1073,8 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
             int numberChargedDaughters = 0;
             for (unsigned int d=0; d<nDaughters; d++) {
               const Candidate* daughter = genIt.daughter(d);
-//               int IDdaughter = abs(daughter->pdgId());
-//               EventInfo.DHadron_DaughtersPdgID[EventInfo.nDaughters] = IDdaughter;
+              int IDdaughter = abs(daughter->pdgId());
+              EventInfo.DHadron_DaughtersPdgID[EventInfo.nDaughters] = IDdaughter;
               // take vertex of first daughter for SV
               if ( d == 0 ) {
                 EventInfo.DHadron_SVx[EventInfo.nDHadrons] = daughter->vx();
@@ -2580,6 +2584,8 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     math::XYZTLorentzVector allSum = allKinematics.weightedVectorSum() ; // allKinematics.vectorSum()
 
     int nSM = (pjet->hasTagInfo(softPFMuonTagInfos_.c_str()) ? softPFMuTagInfo->leptons() : 0);
+    JetInfo[iJetColl].Jet_nSM[JetInfo[iJetColl].nJet] = nSM;
+
     if(storePFMuonVariables_){
       // PFMuon information
       JetInfo[iJetColl].Jet_nFirstSM[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFMuon;
@@ -2654,12 +2660,12 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         ++JetInfo[iJetColl].nPFMuon;
       }
       JetInfo[iJetColl].Jet_nLastSM[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFMuon;
-//       JetInfo[iJetColl].Jet_nSM[JetInfo[iJetColl].nJet] = nSM;
     }
-    else // fill nPFMuon anyway
-      JetInfo[iJetColl].nPFMuon = nSM;
+
 
     int nSE = (pjet->hasTagInfo(softPFElectronTagInfos_.c_str()) ? softPFElTagInfo->leptons() : 0);
+    JetInfo[iJetColl].Jet_nSE[JetInfo[iJetColl].nJet] = nSE;
+
     if(storePFElectronVariables_){
       // PFElectron information
       JetInfo[iJetColl].Jet_nFirstSE[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFElectron;
@@ -2681,10 +2687,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         ++JetInfo[iJetColl].nPFElectron;
       }
       JetInfo[iJetColl].Jet_nLastSE[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFElectron;
-//       JetInfo[iJetColl].Jet_nSE[JetInfo[iJetColl].nJet] = nSE;
     }
-    else // fill nPFElectron anyway
-      JetInfo[iJetColl].nPFElectron = nSE;
 
     // b-tagger discriminants
     float Proba  = pjet->bDiscriminator(jetPBJetTags_.c_str());
@@ -2746,9 +2749,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 //     float CombinedIVF_P   = pjet->bDiscriminator(combinedIVFSVPosBJetTags_.c_str());
     float CombinedIVF_N   = pjet->bDiscriminator(combinedIVFSVNegBJetTags_.c_str());
 
-//     float Svtx    = pjet->bDiscriminator(simpleSVHighEffBJetTags_.c_str());
+    float Svtx    = pjet->bDiscriminator(simpleSVHighEffBJetTags_.c_str());
 //     float SvtxN   = pjet->bDiscriminator(simpleSVNegHighEffBJetTags_.c_str());
-//     float SvtxHP  = pjet->bDiscriminator(simpleSVHighPurBJetTags_.c_str());
+    float SvtxHP  = pjet->bDiscriminator(simpleSVHighPurBJetTags_.c_str());
 //     float SvtxNHP = pjet->bDiscriminator(simpleSVNegHighPurBJetTags_.c_str());
 
     float SoftM  = pjet->bDiscriminator(softPFMuonBJetTags_.c_str());
@@ -2822,9 +2825,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 //     JetInfo[iJetColl].Jet_BprobP[JetInfo[iJetColl].nJet]   = BprobP;
     JetInfo[iJetColl].Jet_Bprob[JetInfo[iJetColl].nJet]    = Bprob;
 //     JetInfo[iJetColl].Jet_SvxN[JetInfo[iJetColl].nJet]     = SvtxN;
-//     JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet]      = Svtx;
+    JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet]      = Svtx;
 //     JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet]   = SvtxNHP;
-//     JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet]    = SvtxHP;
+    JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet]    = SvtxHP;
 //     JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] = CombinedSvtxN;
 //     JetInfo[iJetColl].Jet_CombSvxP[JetInfo[iJetColl].nJet] = CombinedSvtxP;
 //     JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet]  = CombinedSvtx;
