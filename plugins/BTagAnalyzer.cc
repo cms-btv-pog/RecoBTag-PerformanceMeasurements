@@ -2747,9 +2747,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 //     float CombinedIVF_P   = pjet->bDiscriminator(combinedIVFSVPosBJetTags_.c_str());
     float CombinedIVF_N   = pjet->bDiscriminator(combinedIVFSVNegBJetTags_.c_str());
 
-//     float Svtx    = pjet->bDiscriminator(simpleSVHighEffBJetTags_.c_str());
+    float Svtx    = pjet->bDiscriminator(simpleSVHighEffBJetTags_.c_str());
 //     float SvtxN   = pjet->bDiscriminator(simpleSVNegHighEffBJetTags_.c_str());
-//     float SvtxHP  = pjet->bDiscriminator(simpleSVHighPurBJetTags_.c_str());
+    float SvtxHP  = pjet->bDiscriminator(simpleSVHighPurBJetTags_.c_str());
 //     float SvtxNHP = pjet->bDiscriminator(simpleSVNegHighPurBJetTags_.c_str());
 
     float SoftM  = pjet->bDiscriminator(softPFMuonBJetTags_.c_str());
@@ -2823,9 +2823,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 //     JetInfo[iJetColl].Jet_BprobP[JetInfo[iJetColl].nJet]   = BprobP;
     JetInfo[iJetColl].Jet_Bprob[JetInfo[iJetColl].nJet]    = Bprob;
 //     JetInfo[iJetColl].Jet_SvxN[JetInfo[iJetColl].nJet]     = SvtxN;
-//     JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet]      = Svtx;
+    JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet]      = Svtx;
 //     JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet]   = SvtxNHP;
-//     JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet]    = SvtxHP;
+    JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet]    = SvtxHP;
 //     JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] = CombinedSvtxN;
 //     JetInfo[iJetColl].Jet_CombSvxP[JetInfo[iJetColl].nJet] = CombinedSvtxP;
 //     JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet]  = CombinedSvtx;

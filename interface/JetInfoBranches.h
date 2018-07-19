@@ -82,9 +82,9 @@ class JetInfoBranches {
 //     float Jet_BprobP[nMaxJets_];
     float Jet_Bprob[nMaxJets_];
 //     float Jet_SvxN[nMaxJets_];
-//     float Jet_Svx[nMaxJets_];
+    float Jet_Svx[nMaxJets_];
 //     float Jet_SvxNHP[nMaxJets_];
-//     float Jet_SvxHP[nMaxJets_];
+    float Jet_SvxHP[nMaxJets_];
 //     float Jet_CombSvxN[nMaxJets_];
 //     float Jet_CombSvxP[nMaxJets_];
 //     float Jet_CombSvx[nMaxJets_];
@@ -531,9 +531,9 @@ class JetInfoBranches {
 //       tree->Branch((name+"Jet_BprobP").c_str(),      Jet_BprobP     ,(name+"Jet_BprobP["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_Bprob").c_str(),       Jet_Bprob      ,(name+"Jet_Bprob["+name+"nJet]/F").c_str());
 //       tree->Branch((name+"Jet_SvxN").c_str(),        Jet_SvxN       ,(name+"Jet_SvxN["+name+"nJet]/F").c_str());
-//       tree->Branch((name+"Jet_Svx").c_str(),         Jet_Svx        ,(name+"Jet_Svx["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_Svx").c_str(),         Jet_Svx        ,(name+"Jet_Svx["+name+"nJet]/F").c_str());
 //       tree->Branch((name+"Jet_SvxNHP").c_str(),      Jet_SvxNHP     ,(name+"Jet_SvxNHP["+name+"nJet]/F").c_str());
-//       tree->Branch((name+"Jet_SvxHP").c_str(),       Jet_SvxHP      ,(name+"Jet_SvxHP["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_SvxHP").c_str(),       Jet_SvxHP      ,(name+"Jet_SvxHP["+name+"nJet]/F").c_str());
 //       tree->Branch((name+"Jet_CombSvxN").c_str(),    Jet_CombSvxN   ,(name+"Jet_CombSvxN["+name+"nJet]/F").c_str());
 //       tree->Branch((name+"Jet_CombSvxP").c_str(),    Jet_CombSvxP   ,(name+"Jet_CombSvxP["+name+"nJet]/F").c_str());
 //       tree->Branch((name+"Jet_CombSvx").c_str(),     Jet_CombSvx    ,(name+"Jet_CombSvx["+name+"nJet]/F").c_str());
@@ -1112,9 +1112,9 @@ class JetInfoBranches {
 //       tree->SetBranchAddress((name+"Jet_BprobP").c_str(),      Jet_BprobP      );
       tree->SetBranchAddress((name+"Jet_Bprob").c_str(),       Jet_Bprob       );
 //       tree->SetBranchAddress((name+"Jet_SvxN").c_str(),        Jet_SvxN        );
-//       tree->SetBranchAddress((name+"Jet_Svx").c_str(),         Jet_Svx         );
+      tree->SetBranchAddress((name+"Jet_Svx").c_str(),         Jet_Svx         );
 //       tree->SetBranchAddress((name+"Jet_SvxNHP").c_str(),      Jet_SvxNHP      );
-//       tree->SetBranchAddress((name+"Jet_SvxHP").c_str(),       Jet_SvxHP       );
+      tree->SetBranchAddress((name+"Jet_SvxHP").c_str(),       Jet_SvxHP       );
 //       tree->SetBranchAddress((name+"Jet_CombSvxN").c_str(),    Jet_CombSvxN    );
 //       tree->SetBranchAddress((name+"Jet_CombSvxP").c_str(),    Jet_CombSvxP    );
 //       tree->SetBranchAddress((name+"Jet_CombSvx").c_str(),     Jet_CombSvx     );
