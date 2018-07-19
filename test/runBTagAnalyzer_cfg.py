@@ -1483,6 +1483,7 @@ if process.btagana.useTrackHistory:
 if options.runFatJets:
     process.btaganaFatJets = process.btagana.clone(
         storeEventInfo      = cms.bool(not options.processStdAK4Jets),
+        storeHadronVariables = cms.bool(True),
         storeQuarkVariables_= cms.bool(True),
         allowJetSkipping    = cms.bool(False),
         storeTagVariables   = cms.bool(False),

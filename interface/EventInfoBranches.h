@@ -54,21 +54,21 @@ class EventInfoBranches {
 //     int   PU_ntrks_low[nMaxPUs_];  // the number of tracks originating from each interaction, where track pT > low_cu
 //     int   PU_ntrks_high[nMaxPUs_]; // the number of tracks originating from each interaction, where track pT > high_cut
 
-//     int   ncQuarks;
-//     float cQuark_pT[nMaxQuarks];
-//     float cQuark_eta[nMaxQuarks];
-//     float cQuark_phi[nMaxQuarks];
-//     int   cQuark_pdgID[nMaxQuarks];
-//     int   cQuark_status[nMaxQuarks];
-//     int   cQuark_fromGSP[nMaxQuarks];
-//
-//     int   nbQuarks;
-//     float bQuark_pT[nMaxQuarks];
-//     float bQuark_eta[nMaxQuarks];
-//     float bQuark_phi[nMaxQuarks];
-//     int   bQuark_pdgID[nMaxQuarks];
-//     int   bQuark_status[nMaxQuarks];
-//     int   bQuark_fromGSP[nMaxQuarks];
+    int   ncQuarks;
+    float cQuark_pT[nMaxQuarks];
+    float cQuark_eta[nMaxQuarks];
+    float cQuark_phi[nMaxQuarks];
+    int   cQuark_pdgID[nMaxQuarks];
+    int   cQuark_status[nMaxQuarks];
+    int   cQuark_fromGSP[nMaxQuarks];
+
+    int   nbQuarks;
+    float bQuark_pT[nMaxQuarks];
+    float bQuark_eta[nMaxQuarks];
+    float bQuark_phi[nMaxQuarks];
+    int   bQuark_pdgID[nMaxQuarks];
+    int   bQuark_status[nMaxQuarks];
+    int   bQuark_fromGSP[nMaxQuarks];
 
     int   nBHadrons;
     float BHadron_pT[nMaxHadrons];
@@ -96,7 +96,7 @@ class EventInfoBranches {
     float DHadron_SVz[nMaxHadrons];
     int   DHadron_pdgID[nMaxHadrons];
     int   DHadron_nDaughters[nMaxHadrons];
-//     int   DHadron_DaughtersPdgID[1500]; // sum(DHadron_nDaughters[i]): needed for daughter pdgIDs
+    int   DHadron_DaughtersPdgID[nMaxHadrons*15]; // sum(DHadron_nDaughters[i]): needed for daughter pdgIDs
     int   DHadron_nChargedDaughters[nMaxHadrons];
     int   DHadron_nCharged[nMaxHadrons];
 
@@ -211,21 +211,21 @@ class EventInfoBranches {
     }
 
     void RegisterQuarkTree(TTree *tree){
-//       tree->Branch("ncQuarks"    , &ncQuarks       ,"ncQuarks/I");
-//       tree->Branch("cQuark_pT"     , cQuark_pT     , "cQuark_pT[ncQuarks]/F");
-//       tree->Branch("cQuark_eta"    , cQuark_eta    , "cQuark_eta[ncQuarks]/F");
-//       tree->Branch("cQuark_phi"    , cQuark_phi    , "cQuark_phi[ncQuarks]/F");
-//       tree->Branch("cQuark_pdgID"  , cQuark_pdgID  , "cQuark_pdgID[ncQuarks]/I");
-//       tree->Branch("cQuark_status" , cQuark_status , "cQuark_status[ncQuarks]/I");
-//       tree->Branch("cQuark_fromGSP", cQuark_fromGSP, "cQuark_fromGSP[ncQuarks]/I");
+      tree->Branch("ncQuarks"      , &ncQuarks     , "ncQuarks/I");
+      tree->Branch("cQuark_pT"     , cQuark_pT     , "cQuark_pT[ncQuarks]/F");
+      tree->Branch("cQuark_eta"    , cQuark_eta    , "cQuark_eta[ncQuarks]/F");
+      tree->Branch("cQuark_phi"    , cQuark_phi    , "cQuark_phi[ncQuarks]/F");
+      tree->Branch("cQuark_pdgID"  , cQuark_pdgID  , "cQuark_pdgID[ncQuarks]/I");
+      tree->Branch("cQuark_status" , cQuark_status , "cQuark_status[ncQuarks]/I");
+      tree->Branch("cQuark_fromGSP", cQuark_fromGSP, "cQuark_fromGSP[ncQuarks]/I");
 
-//       tree->Branch("nbQuarks",        &nbQuarks       ,"nbQuarks/I");
-//       tree->Branch("bQuark_pT",         bQuark_pT     , "bQuark_pT[nbQuarks]/F");
-//       tree->Branch("bQuark_eta",        bQuark_eta    , "bQuark_eta[nbQuarks]/F");
-//       tree->Branch("bQuark_phi",        bQuark_phi    , "bQuark_phi[nbQuarks]/F");
-//       tree->Branch("bQuark_pdgID",      bQuark_pdgID  , "bQuark_pdgID[nbQuarks]/I");
-//       tree->Branch("bQuark_status",     bQuark_status , "bQuark_status[nbQuarks]/I");
-//       tree->Branch("bQuark_fromGSP",    bQuark_fromGSP, "bQuark_fromGSP[nbQuarks]/I");
+      tree->Branch("nbQuarks",          &nbQuarks     , "nbQuarks/I");
+      tree->Branch("bQuark_pT",         bQuark_pT     , "bQuark_pT[nbQuarks]/F");
+      tree->Branch("bQuark_eta",        bQuark_eta    , "bQuark_eta[nbQuarks]/F");
+      tree->Branch("bQuark_phi",        bQuark_phi    , "bQuark_phi[nbQuarks]/F");
+      tree->Branch("bQuark_pdgID",      bQuark_pdgID  , "bQuark_pdgID[nbQuarks]/I");
+      tree->Branch("bQuark_status",     bQuark_status , "bQuark_status[nbQuarks]/I");
+      tree->Branch("bQuark_fromGSP",    bQuark_fromGSP, "bQuark_fromGSP[nbQuarks]/I");
     }
 
     void RegisterHadronTree(TTree *tree){
@@ -255,7 +255,7 @@ class EventInfoBranches {
       tree->Branch("DHadron_SVy",   DHadron_SVy   ,"DHadron_SVy[nDHadrons]/F");
       tree->Branch("DHadron_SVz",   DHadron_SVz   ,"DHadron_SVz[nDHadrons]/F");
       tree->Branch("DHadron_nDaughters",         DHadron_nDaughters        ,"DHadron_nDaughters[nDHadrons]/I");
-//       tree->Branch("DHadron_DaughtersPdgID",     DHadron_DaughtersPdgID    ,"DHadron_DaughtersPdgID[nDaughters]/I");
+      tree->Branch("DHadron_DaughtersPdgID",     DHadron_DaughtersPdgID    ,"DHadron_DaughtersPdgID[nDaughters]/I");
       tree->Branch("DHadron_nChargedDaughters",  DHadron_nChargedDaughters ,"DHadron_nChargedDaughters[nDHadrons]/I");
       tree->Branch("DHadron_nCharged", DHadron_nCharged ,"DHadron_nCharged[nDHadrons]/I");
     }
@@ -407,21 +407,21 @@ class EventInfoBranches {
     }
 
     void ReadQuarkTree(TTree *tree){
-//       tree->SetBranchAddress("ncQuarks"      , &ncQuarks     );
-//       tree->SetBranchAddress("cQuark_pT"     , cQuark_pT     );
-//       tree->SetBranchAddress("cQuark_eta"    , cQuark_eta    );
-//       tree->SetBranchAddress("cQuark_phi"    , cQuark_phi    );
-//       tree->SetBranchAddress("cQuark_pdgID"  , cQuark_pdgID  );
-//       tree->SetBranchAddress("cQuark_status" , cQuark_status );
-//       tree->SetBranchAddress("cQuark_fromGSP", cQuark_fromGSP);
+      tree->SetBranchAddress("ncQuarks"      , &ncQuarks     );
+      tree->SetBranchAddress("cQuark_pT"     , cQuark_pT     );
+      tree->SetBranchAddress("cQuark_eta"    , cQuark_eta    );
+      tree->SetBranchAddress("cQuark_phi"    , cQuark_phi    );
+      tree->SetBranchAddress("cQuark_pdgID"  , cQuark_pdgID  );
+      tree->SetBranchAddress("cQuark_status" , cQuark_status );
+      tree->SetBranchAddress("cQuark_fromGSP", cQuark_fromGSP);
 
-//       tree->SetBranchAddress("nbQuarks",          &nbQuarks     );
-//       tree->SetBranchAddress("bQuark_pT",         bQuark_pT     );
-//       tree->SetBranchAddress("bQuark_eta",        bQuark_eta    );
-//       tree->SetBranchAddress("bQuark_phi",        bQuark_phi    );
-//       tree->SetBranchAddress("bQuark_pdgID",      bQuark_pdgID  );
-//       tree->SetBranchAddress("bQuark_status",     bQuark_status );
-//       tree->SetBranchAddress("bQuark_fromGSP",    bQuark_fromGSP);
+      tree->SetBranchAddress("nbQuarks",          &nbQuarks     );
+      tree->SetBranchAddress("bQuark_pT",         bQuark_pT     );
+      tree->SetBranchAddress("bQuark_eta",        bQuark_eta    );
+      tree->SetBranchAddress("bQuark_phi",        bQuark_phi    );
+      tree->SetBranchAddress("bQuark_pdgID",      bQuark_pdgID  );
+      tree->SetBranchAddress("bQuark_status",     bQuark_status );
+      tree->SetBranchAddress("bQuark_fromGSP",    bQuark_fromGSP);
     }
 
     void ReadHadronTree(TTree *tree){
@@ -451,7 +451,7 @@ class EventInfoBranches {
       tree->SetBranchAddress("DHadron_SVy",   DHadron_SVy   );
       tree->SetBranchAddress("DHadron_SVz",   DHadron_SVz   );
       tree->SetBranchAddress("DHadron_nDaughters",         DHadron_nDaughters        );
-//       tree->SetBranchAddress("DHadron_DaughtersPdgID",     DHadron_DaughtersPdgID    );
+      tree->SetBranchAddress("DHadron_DaughtersPdgID",     DHadron_DaughtersPdgID    );
       tree->SetBranchAddress("DHadron_nChargedDaughters",  DHadron_nChargedDaughters );
       tree->SetBranchAddress("DHadron_nCharged", DHadron_nCharged );
     }
