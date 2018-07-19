@@ -500,7 +500,7 @@ class JetInfoBranches {
     float CTag_leptonEtaRel[nMaxLeptons_];
     float CTag_leptonRatio[nMaxLeptons_];
 
-    void RegisterJetTree(TTree *tree, std::string name="") {
+    void RegisterTree(TTree *tree, std::string name="") {
       if(name!="") name += ".";
       tree->Branch((name+"nJet").c_str(),            &nJet           ,(name+"nJet/I").c_str());
       tree->Branch((name+"Jet_pt").c_str(),          Jet_pt          ,(name+"Jet_pt["+name+"nJet]/F").c_str());
@@ -1081,7 +1081,7 @@ class JetInfoBranches {
 
     //------------------------------------------------------------------------------------------------------------------
 
-    void ReadJetTree(TTree *tree, std::string name="") {
+    void ReadTree(TTree *tree, std::string name="") {
       if (name!="") name += ".";
       tree->SetBranchAddress((name+"nJet").c_str(),            &nJet           );
       tree->SetBranchAddress((name+"Jet_pt").c_str(),          Jet_pt          );
