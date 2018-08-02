@@ -20,7 +20,7 @@ wget https://github.com/cms-data/RecoBTag-Combined/raw/V01-00-13/DeepDoubleB/V01
 wget https://github.com/cms-data/RecoBTag-Combined/raw/V01-00-13/DeepDoubleB/V01/constant_graph_PtCut_MassSculptPen.pb -P RecoBTag/Combined/data/DeepDoubleB/V01/
 
 
-git clone -b 10_1_X_v1.02 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b varconf  https://github.com/rauser/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
@@ -39,3 +39,45 @@ cd RecoBTag/PerformanceMeasurements/test/
 ./run_tests.sh
 ```
 
+The new variable configuration can be customized in the file ```RecoBTag/PerformanceMeasurements/python/varGroups_cfi.py```.
+New variables need also to be added (apart from adding them in the code) in ```RecoBTag/PerformanceMeasurements/python/variables_cfi.py```
+
+Temporary info: Please validate your output ntuple by running one of the commands:
+
+```
+cmsRun runBTagAnalyzer_cfg.py defaults=Commissioning18 runOnData=False maxEvents=20 {runOptions} groups='{groups}'
+```
+with ```runOptions``` replacing ```store*Variables```
+```
+runOptions :
+runFatJets=True
+runSubJets=True
+runEventInfo=True
+runJetVariables=True
+runQuarkVariables=True
+runHadronVariables=True
+runGenVariables=True
+runPatMuons=True
+runTagVariables=True
+runTagVariablesSubJets=True
+runCSVTagVariables=True
+runCSVTagTrackVariables=True
+runDeepFlavourTagVariables=True
+runCSVTagVariablesSubJets=True
+runPFElectronVariables=True
+runPFMuonVariables=True
+runCTagVariables=True
+```
+
+and
+```
+groups:
+Caroline
+Josh
+Frank
+Daniel
+Petr
+Keng
+Matej
+Devdatta
+```
