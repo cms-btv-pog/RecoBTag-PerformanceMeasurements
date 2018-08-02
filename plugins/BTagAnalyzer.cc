@@ -713,7 +713,8 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   //--------------------------------------
   // event information
   //--------------------------------------
-  EventInfo.RegisterBranches(smalltree, variableParser);
+  if(!runFatJets_ || (runFatJets_ && runEventInfo_)) // When running on FatJets, runEventInfo_ needs to be explicitely set to true, otherwise don't store it (it's probably already contained in the standard tree)
+    EventInfo.RegisterBranches(smalltree, variableParser);
 
   //--------------------------------------
   // jet information
