@@ -3,14 +3,16 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
+#include <unordered_set>
+
 class VariableParser {
 
   public:
 
     VariableParser(bool isMC = false);
 
-    std::vector<std::string> parseGroupsAndVariables(std::vector<edm::ParameterSet> groupSet, std::vector<edm::ParameterSet> variableSet);
-    std::vector<std::string> getStoredVariables();
+    std::unordered_set<std::string> parseGroupsAndVariables(std::vector<edm::ParameterSet> groupSet, std::vector<edm::ParameterSet> variableSet);
+    std::unordered_set<std::string> getStoredVariables();
     void printStoredVariables();
     void printGroups(std::vector<edm::ParameterSet> groupSet);
     void printVariables(std::vector<edm::ParameterSet> variableSet);
@@ -21,7 +23,7 @@ class VariableParser {
 
   private:
 
-    std::vector<std::string> storedVariables_;
+    std::unordered_set<std::string> storedVariables_;
     bool isMC_;
 
     void resolveVariableName(std::string fullName, std::string* variableName, std::string* prefix);

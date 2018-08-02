@@ -484,7 +484,7 @@ private:
   double decayLengthSubJets_;
   double deltaRSubJets_;
 
-  std::vector<std::string> variables; // This vector is going to contain the name of each single variable to be stored in the output tree
+  std::unordered_set<std::string> variables; // This unordered_set is going to contain the name of each single variable to be stored in the output tree
 
 };
 

@@ -15,14 +15,14 @@ VariableParser::VariableParser(bool isMC){
   isMC_ = isMC;
 }
 
-vector<string> VariableParser::parseGroupsAndVariables(vector<edm::ParameterSet> groupSet, vector<edm::ParameterSet> variableSet)
+unordered_set<string> VariableParser::parseGroupsAndVariables(vector<edm::ParameterSet> groupSet, vector<edm::ParameterSet> variableSet)
 {
   parseGroups(groupSet, variableSet);
   parseVariables(variableSet);
   return storedVariables_;
 }
 
-vector<string> VariableParser::getStoredVariables()
+unordered_set<string> VariableParser::getStoredVariables()
 {
   return storedVariables_;
 }
@@ -30,7 +30,7 @@ vector<string> VariableParser::getStoredVariables()
 void VariableParser::printStoredVariables()
 {
   cout << endl << "The following list of variables will be stored: " << endl;
-  for(vector<string>::iterator variable = storedVariables_.begin(); variable != storedVariables_.end(); ++variable)
+  for(unordered_set<string>::iterator variable = storedVariables_.begin(); variable != storedVariables_.end(); ++variable)
   {
     cout << *variable << endl;
   }
@@ -78,7 +78,7 @@ void VariableParser::saveStoredVariablesToFile(string filename)
 {
   ofstream storedVariablesFile;
   storedVariablesFile.open(filename);
-  for(vector<string>::iterator variable = storedVariables_.begin(); variable != storedVariables_.end(); ++variable)
+  for(unordered_set<string>::iterator variable = storedVariables_.begin(); variable != storedVariables_.end(); ++variable)
   {
     storedVariablesFile << *variable << endl;
   }
@@ -129,7 +129,7 @@ void VariableParser::parseGroups(vector<edm::ParameterSet> groupSet, vector<edm:
           {
             if(variableName == variablePSet->getParameter<string>("variable"))
             {
-              addVariable(*variablePSet, true, prefix); // Add (force) the variable to the storedVariables_ vector
+              addVariable(*variablePSet, true, prefix); // Add (force) the variable to the storedVariables_ unordered_set
               found = true;
               break;
             }
@@ -159,12 +159,12 @@ void VariableParser::addVariable(edm::ParameterSet variablePSet, bool force, str
   {
     if(!isToBeStored(variableName)) // variable is not contained yet
     {
-      storedVariables_.push_back(variableName);
+      storedVariables_.insert(variableName);
       vector<string> requires = variablePSet.getParameter<vector<string>>("requires"); // Add required variables (currently does not support nested requirements... souldn't be too much of a problem)
       for(vector<string>::iterator require = requires.begin(); require != requires.end(); ++require)
       {
         if(!isToBeStored(prefix + *require))
-          storedVariables_.push_back(prefix + *require);
+          storedVariables_.insert(prefix + *require);
       }
     }
   }
