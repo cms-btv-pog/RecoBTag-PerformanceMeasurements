@@ -38,7 +38,7 @@ To run the tests for integrating changes run:
 cd RecoBTag/PerformanceMeasurements/test/
 ./run_tests.sh
 ```
-
+The content of the output ntuple is by default empty and has to be configured according to your needs. The ```store*Variables``` options have been removed.
 The new variable configuration can be customized in the file ```RecoBTag/PerformanceMeasurements/python/varGroups_cfi.py```.
 New variables need also to be added (apart from adding them in the code) in ```RecoBTag/PerformanceMeasurements/python/variables_cfi.py```
 
@@ -80,4 +80,11 @@ Petr
 Keng
 Matej
 Devdatta
+```
+
+e.g.:
+```
+cmsRun runBTagAnalyzer_cfg.py defaults=Commissioning18 runOnData=False maxEvents=20 runHadronVariables=True runGenVariables=True runCTagVariables=True runPFMuonVariables=True runPFElectronVariables=True runCSVTagTrackVariables=True  runCSVTagVariables=True runPatMuons=True runDeepFlavourTagVariables=True groups='Caroline'
+cmsRun runBTagAnalyzer_cfg.py defaults=Commissioning18 runOnData=False maxEvents=20 runHadronVariables=True runGenVariables=True runCTagVariables=True runPFMuonVariables=True runPFElectronVariables=True runCSVTagTrackVariables=True  runCSVTagVariables=True runPatMuons=True runDeepFlavourTagVariables=True runFatJets=True runSubJets=True groups='Daniel'
+
 ```
