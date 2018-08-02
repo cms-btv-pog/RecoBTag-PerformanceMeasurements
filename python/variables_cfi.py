@@ -500,7 +500,7 @@ variableList = [
       store       = cms.bool(False),
       mconly      = cms.bool(True),
       description = cms.string("sum(DHadron_nDaughters[i]): needed for daughter pdgIDs"),
-      requires    = cms.vstring("nDHadrons"),
+      requires    = cms.vstring("nDaughters"),
     ),
     cms.PSet(
       variable    = cms.string("DHadron_nChargedDaughters"),
