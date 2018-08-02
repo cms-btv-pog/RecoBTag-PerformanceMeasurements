@@ -4364,7 +4364,7 @@ variableList = [
       store       = cms.bool(False),
       mconly      = cms.bool(False),
       description = cms.string("SubJetIdx"),
-      requires    = cms.vstring(),
+      requires    = cms.vstring("nSubJet"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_nSubJets_SoftDropPuppi"),
@@ -4420,7 +4420,7 @@ variableList = [
       store       = cms.bool(False),
       mconly      = cms.bool(False),
       description = cms.string("SubJetIdx_SoftDropPuppi"),
-      requires    = cms.vstring(),
+      requires    = cms.vstring("nSubJet_SoftDropPuppi"),
     ),
   ]
 
