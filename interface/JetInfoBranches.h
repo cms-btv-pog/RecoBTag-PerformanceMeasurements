@@ -548,9 +548,10 @@ class JetInfoBranches {
 //       tree->Branch((name+"Jet_CombSvxP").c_str(),    Jet_CombSvxP   ,(name+"Jet_CombSvxP["+name+"nJet]/F").c_str());
 //       tree->Branch((name+"Jet_CombSvx").c_str(),     Jet_CombSvx    ,(name+"Jet_CombSvx["+name+"nJet]/F").c_str());
 
-//       tree->Branch((name+"Jet_CombIVF").c_str(),     Jet_CombIVF     ,(name+"Jet_CombIVF["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_CombIVF").c_str(),     Jet_CombIVF     ,(name+"Jet_CombIVF["+name+"nJet]/F").c_str());
 //       tree->Branch((name+"Jet_CombIVF_P").c_str(),   Jet_CombIVF_P   ,(name+"Jet_CombIVF_P["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_CombIVF_N").c_str(),   Jet_CombIVF_N   ,(name+"Jet_CombIVF_N["+name+"nJet]/F").c_str());
+      if(name!="FatJetInfo." && name!="SoftDropPuppiSubJetInfo.")
+        tree->Branch((name+"Jet_CombIVF_N").c_str(),   Jet_CombIVF_N   ,(name+"Jet_CombIVF_N["+name+"nJet]/F").c_str());
 
 //       tree->Branch((name+"Jet_SoftMuN").c_str(),     Jet_SoftMuN     ,(name+"Jet_SoftMuN["+name+"nJet]/F").c_str());
 //       tree->Branch((name+"Jet_SoftMuP").c_str(),     Jet_SoftMuP     ,(name+"Jet_SoftMuP["+name+"nJet]/F").c_str());
