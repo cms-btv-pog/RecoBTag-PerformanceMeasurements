@@ -197,7 +197,7 @@ class EventInfoBranches {
       tree->Branch("BX"         , &BX         ,  "BX/I");
       tree->Branch("nPV"        , &nPV        ,  "nPV/I");
       tree->Branch("PVz"        , &PVz        ,  "PVz/F");
-      tree->Branch("PVez"       , &PVez       ,  "PVez/F");
+//       tree->Branch("PVez"       , &PVez       ,  "PVez/F");
       tree->Branch("GenPVz"     , &GenPVz     ,  "GenPVz/F");
       tree->Branch("rho"        , &rho        ,  "rho/F");
 
@@ -270,12 +270,12 @@ class EventInfoBranches {
       tree->Branch("Genlep_status", Genlep_status, "Genlep_status[nGenlep]/I");
       tree->Branch("Genlep_mother", Genlep_mother, "Genlep_mother[nGenlep]/I");
 
-      tree->Branch("nGenquark",     &nGenquark       ,"nGenquark/I");
-      tree->Branch("Genquark_pT",     Genquark_pT    , "Genquark_pT[nGenquark]/F");
-      tree->Branch("Genquark_eta",    Genquark_eta   , "Genquark_eta[nGenquark]/F");
-      tree->Branch("Genquark_phi",    Genquark_phi   , "Genquark_phi[nGenquark]/F");
-      tree->Branch("Genquark_pdgID",  Genquark_pdgID , "Genquark_pdgID[nGenquark]/I");
-      tree->Branch("Genquark_mother", Genquark_mother, "Genquark_mother[nGenquark]/I");
+//       tree->Branch("nGenquark",     &nGenquark       ,"nGenquark/I");
+//       tree->Branch("Genquark_pT",     Genquark_pT    , "Genquark_pT[nGenquark]/F");
+//       tree->Branch("Genquark_eta",    Genquark_eta   , "Genquark_eta[nGenquark]/F");
+//       tree->Branch("Genquark_phi",    Genquark_phi   , "Genquark_phi[nGenquark]/F");
+//       tree->Branch("Genquark_pdgID",  Genquark_pdgID , "Genquark_pdgID[nGenquark]/I");
+//       tree->Branch("Genquark_mother", Genquark_mother, "Genquark_mother[nGenquark]/I");
 
       tree->Branch("nGenPruned",     &nGenPruned       ,"nGenPruned/I");
       tree->Branch("GenPruned_pT",     GenPruned_pT    , "GenPruned_pT[nGenPruned]/F");
@@ -301,13 +301,13 @@ class EventInfoBranches {
       tree->Branch("PV_x"     , PV_x     , "PV_x[nPV]/F");
       tree->Branch("PV_y"     , PV_y     , "PV_y[nPV]/F");
       tree->Branch("PV_z"     , PV_z     , "PV_z[nPV]/F");
-      tree->Branch("PV_ex"    , PV_ex    , "PV_ex[nPV]/F");
-      tree->Branch("PV_ey"    , PV_ey    , "PV_ey[nPV]/F");
-      tree->Branch("PV_ez"    , PV_ez    , "PV_ez[nPV]/F");
+//       tree->Branch("PV_ex"    , PV_ex    , "PV_ex[nPV]/F");
+//       tree->Branch("PV_ey"    , PV_ey    , "PV_ey[nPV]/F");
+//       tree->Branch("PV_ez"    , PV_ez    , "PV_ez[nPV]/F");
       tree->Branch("PV_chi2"  , PV_chi2  , "PV_chi2[nPV]/F");
       tree->Branch("PV_ndf"   , PV_ndf   , "PV_ndf[nPV]/F");
-      tree->Branch("PV_isgood", PV_isgood, "PV_isgood[nPV]/I");
-      tree->Branch("PV_isfake", PV_isfake, "PV_isfake[nPV]/I");
+//       tree->Branch("PV_isgood", PV_isgood, "PV_isgood[nPV]/I");
+//       tree->Branch("PV_isfake", PV_isfake, "PV_isfake[nPV]/I");
     }
 
     void RegisterAllTrackTree(TTree *tree) {
