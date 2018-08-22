@@ -48,7 +48,6 @@ void VariableParser::printGroups(vector<edm::ParameterSet> groupSet)
   {
     cout << left << setw(20) << "Group: " << group->getParameter<string>("group") << endl;
     cout << left << setw(20) << "Store: " << group->getParameter<bool>("store") << endl;
-    cout << left << setw(20) << "MC only: " << group->getParameter<bool>("mconly") << endl;
     cout << left << setw(20) << "Description: " << group->getParameter<string>("description") << endl;
     vector<string> variables = group->getParameter<vector<string>>("variables");
     cout << "Variables: " << endl;
@@ -133,9 +132,7 @@ void VariableParser::parseGroups(vector<edm::ParameterSet> groupSet, vector<edm:
 {
   for(vector<edm::ParameterSet>::iterator group = groupSet.begin(); group != groupSet.end(); ++group)
   {
-    bool store = group->getParameter<bool>("store");
-    bool mconly = group->getParameter<bool>("mconly");
-    if(store && !( !isMC() && mconly )) // group is to be stored (checking also MC/data setting)
+    if(group->getParameter<bool>("store")) // group is to be stored
     {
       vector<string> variables = group->getParameter<vector<string>>("variables");
       for(vector<string>::iterator variable = variables.begin(); variable != variables.end(); ++variable)
