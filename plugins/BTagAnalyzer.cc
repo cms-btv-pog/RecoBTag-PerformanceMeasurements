@@ -574,8 +574,9 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   runCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("runCSVTagVariablesSubJets");
   runPFElectronVariables_ = iConfig.getParameter<bool>("runPFElectronVariables");
   runPFMuonVariables_ = iConfig.getParameter<bool>("runPFMuonVariables");
-
   runCTagVariables_ = iConfig.getParameter<bool>("runCTagVariables");
+  
+  variableParser.printRunOptions();
 
   use_ttbar_filter_ = iConfig.getParameter<bool> ("use_ttbar_filter");
   ttbarproducerGen_ = consumes<edm::View<reco::GenParticle>>(iConfig.getParameter<edm::InputTag>("ttbarproducer")),

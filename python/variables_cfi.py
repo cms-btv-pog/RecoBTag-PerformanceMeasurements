@@ -11,6 +11,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("nBitTrigger"),
       requires    = cms.vstring(),
+      runOptions  = cms.vstring("runEventInfo","runQuarkVariables"),
     ),
     cms.PSet(
       variable    = cms.string("BitTrigger"),
