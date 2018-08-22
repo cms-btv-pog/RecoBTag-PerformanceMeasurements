@@ -6,7 +6,6 @@ import FWCore.ParameterSet.Config as cms
     #cms.PSet(
       #group       = cms.string("Name of your analysis"),
       #store       = cms.bool(False), #set to True or do this in the command line with e.g. <cmsRun ...options... groups='EventInfo','Name of your analysis'>
-      #mconly      = cms.bool(False), #set to True if you only want to store this group of variables for MC. No command line option provided
       #description = cms.string("Description of your analysis"),
       #variables   = cms.vstring(
         #"nJet",
@@ -23,7 +22,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("EventInfo"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("Event Info Variables"),
       variables   = cms.vstring(
         "nBitTrigger",
@@ -45,7 +43,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("Quarks"),
       store       = cms.bool(False),
-      mconly      = cms.bool(True),
       description = cms.string("Quark Variables"),
       variables   = cms.vstring(
         "ncQuarks",
@@ -67,7 +64,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("Hadrons"),
       store       = cms.bool(False),
-      mconly      = cms.bool(True),
       description = cms.string("Hadron Variables"),
       variables   = cms.vstring(
         "nBHadrons",
@@ -103,7 +99,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("GenVars"),
       store       = cms.bool(False),
-      mconly      = cms.bool(True),
       description = cms.string("Gen Variables"),
       variables   = cms.vstring(
         "nGenlep",
@@ -141,7 +136,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("PV"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("PV Variables"),
       variables   = cms.vstring(
         "nPV",
@@ -161,7 +155,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("AllTrack"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("Track Variables"),
       variables   = cms.vstring(
         "nTrkAll",
@@ -192,7 +185,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("TTbar"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string(" Variables"),
       variables   = cms.vstring(
         "ttbar_chan",
@@ -222,7 +214,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("PatMuon"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string(" Variables"),
       variables   = cms.vstring(
         "nPatMuon",
@@ -243,7 +234,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("JetInfo"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("Jet Info Variables"),
       variables   = cms.vstring(
         "nJet",
@@ -319,7 +309,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("JetDeepFlavour"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("Jet Deep Flavour Variables"),
       variables   = cms.vstring(
         "Jet_DeepFlavourBDisc",
@@ -339,7 +328,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("JetDeepCSV"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("Jet Deep CSV Variables"),
       variables   = cms.vstring(
         "Jet_DeepCSVBDisc",
@@ -363,7 +351,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("PFElectron"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("PF Electron Variables"),
       variables   = cms.vstring(
         "nPFElectron",
@@ -383,7 +370,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("PFMuon"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("PF Muon Variables"),
       variables   = cms.vstring(
         "nPFMuon",
@@ -417,7 +403,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("JetSV"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("Jet SV Variables"),
       variables   = cms.vstring(
         "nSV",
@@ -452,7 +437,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("JetTrack"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("Jet Track Variables"),
       variables   = cms.vstring(
         "nTrack",
@@ -505,7 +489,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("JetTrackTruth"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("Jet Track Truth Variables"),
       variables   = cms.vstring(
         "nTrackTruth",
@@ -526,7 +509,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("JetTrackInc"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("Jet Track Inc Variables"),
       variables   = cms.vstring(
         "nTrkInc",
@@ -541,7 +523,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("TagVar"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("Tag Variables"),
       variables   = cms.vstring(
         "Jet_nFirstTrkTagVar",
@@ -599,7 +580,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("DeepFlavourFeat"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("Deep Flavour Variables"),
       variables   = cms.vstring(
         "DeepFlavourInput_charged_Sip3dVal",
@@ -617,7 +597,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("CSVTagVar"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("CSV Tag Variables"),
       variables   = cms.vstring(
         "TagVarCSV_trackJetPt",
@@ -644,7 +623,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("CSVTagTrackVar"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("CSV Tag Track Variables"),
       variables   = cms.vstring(
         "Jet_nFirstTrkTagVarCSV",
@@ -675,7 +653,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("CTagVar"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("C-Tag Variables"),
       variables   = cms.vstring(
         "Jet_nFirstTrkCTagVar",
@@ -732,7 +709,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("SubJetSpecific"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("SubJet Specific Variables"),
       variables   = cms.vstring(
         "Jet_FatJetIdx",
@@ -741,7 +717,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("FatJetSpecific"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("FatJet Specific Variables"),
       variables   = cms.vstring(
         "Jet_ptSoftDrop",
@@ -811,7 +786,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("SubJetInfo"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("Sub Jet Info Variables"),
       variables   = cms.vstring(
         "Jet_nSubJets",
@@ -827,7 +801,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("Caroline"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("TODO"),
       variables   = cms.vstring(
         "nBitTrigger",
@@ -1005,7 +978,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("Josh"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("TODO"),
       variables   = cms.vstring(
         "Run",
@@ -1063,7 +1035,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("Frank"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("TODO"),
       variables   = cms.vstring(
         "nPUtrue",
@@ -1092,7 +1063,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("Daniel"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("TODO"),
       variables   = cms.vstring(
         "nBitTrigger",
@@ -1328,7 +1298,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("Petr"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("TODO"),
       variables   = cms.vstring(
         "Run",
@@ -1410,7 +1379,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("Keng"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("TODO"),
       variables   = cms.vstring(
         "Run",
@@ -1492,7 +1460,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("Matej"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("TODO"),
       variables   = cms.vstring(
         "nBitTrigger",
@@ -1648,7 +1615,6 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("Devdatta"),
       store       = cms.bool(False),
-      mconly      = cms.bool(False),
       description = cms.string("TODO"),
       variables   = cms.vstring(
         "Run",
