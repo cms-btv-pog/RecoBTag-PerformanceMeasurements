@@ -27,6 +27,11 @@ unordered_set<string> VariableParser::getStoredVariables()
   return storedVariables_;
 }
 
+unordered_set<string> VariableParser::getRunOptions()
+{
+  return runOptions_;
+}
+
 void VariableParser::printStoredVariables()
 {
   cout << endl << "The following list of variables will be stored: " << endl;
@@ -73,6 +78,16 @@ void VariableParser::printVariables(vector<edm::ParameterSet> variableSet)
 
 }
 
+void VariableParser::printRunOptions()
+{
+  cout << endl << "The following list of options will be run: " << endl;
+  for(unordered_set<string>::iterator option = runOptions_.begin(); option != runOptions_.end(); ++option)
+  {
+    cout << *option << endl;
+  }
+  cout << endl;  
+}
+
 void VariableParser::saveStoredVariablesToFile(string filename)
 {
   ofstream storedVariablesFile;
@@ -88,6 +103,11 @@ void VariableParser::saveStoredVariablesToFile(string filename)
 bool VariableParser::isToBeStored(string variableName)
 {
   return (find(storedVariables_.begin(), storedVariables_.end(), variableName) != storedVariables_.end());
+}
+
+bool VariableParser::runOption(string runOption)
+{
+  return (find(runOptions_.begin(), runOptions_.end(), runOption) != runOptions_.end());
 }
 
 void VariableParser::resolveVariableName(string fullName, string* variableName, string* prefix)
@@ -163,6 +183,20 @@ void VariableParser::addVariable(edm::ParameterSet variablePSet, bool force, str
         if(!isToBeStored(prefix + *require))
           storedVariables_.insert(prefix + *require);
       }
+      vector<string> runOptions = variablePSet.getParameter<vector<string>>("runOptions"); // Add the required run options
+      for(vector<string>::iterator Option = runOptions.begin(); Option != runOptions.end(); ++Option)
+      {
+        if(!runOption(*Option))
+          addRunOption(*Option);
+      }
     }
+  }
+}
+
+void VariableParser::addRunOption(string Option)
+{
+  if(!runOption(Option))
+  {
+    runOptions_.insert(Option);
   }
 }
