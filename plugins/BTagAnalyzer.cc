@@ -543,6 +543,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
 //   variableParser.printGroups(groupSet);
 //   variableParser.printVariables(variableSet);
   variableParser.saveStoredVariablesToFile();
+  variableParser.printRunOptions();
 
   // Parameters
   runFatJets_ = iConfig.getParameter<bool>("runFatJets");
@@ -555,27 +556,27 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   selTagger_ = iConfig.getParameter<int>("selTagger");
 
   useSelectedTracks_    = iConfig.getParameter<bool> ("useSelectedTracks");
-  fillPU_    = iConfig.getParameter<bool> ("fillPU");
+  fillPU_    = iConfig.getParameter<bool> ("fillPU") || variableParser.runOption("fillPU");
   useTrackHistory_      = iConfig.getParameter<bool> ("useTrackHistory");
   produceJetTrackTruthTree_  = iConfig.getParameter<bool> ("produceJetTrackTruthTree");
-  produceAllTrackTree_  = iConfig.getParameter<bool> ("produceAllTrackTree");
-  producePtRelTemplate_ = iConfig.getParameter<bool> ("producePtRelTemplate");
-  runEventInfo_ = iConfig.getParameter<bool>("runEventInfo");
-  runJetVariables_ = iConfig.getParameter<bool>("runJetVariables");
-  runQuarkVariables_ = iConfig.getParameter<bool>("runQuarkVariables");
-  runHadronVariables_ = iConfig.getParameter<bool>("runHadronVariables");
-  runGenVariables_ = iConfig.getParameter<bool>("runGenVariables");
-  runPatMuons_ = iConfig.getParameter<bool>("runPatMuons");
-  runTagVariables_ = iConfig.getParameter<bool>("runTagVariables");
-  runTagVariablesSubJets_ = iConfig.getParameter<bool>("runTagVariablesSubJets");
-  runCSVTagVariables_ = iConfig.getParameter<bool>("runCSVTagVariables");
-  runCSVTagTrackVariables_ = iConfig.getParameter<bool>("runCSVTagTrackVariables");
-  runDeepFlavourTagVariables_  = iConfig.getParameter<bool>("runDeepFlavourTagVariables");
-  runCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("runCSVTagVariablesSubJets");
-  runPFElectronVariables_ = iConfig.getParameter<bool>("runPFElectronVariables");
-  runPFMuonVariables_ = iConfig.getParameter<bool>("runPFMuonVariables");
-
-  runCTagVariables_ = iConfig.getParameter<bool>("runCTagVariables");
+  produceAllTrackTree_  = iConfig.getParameter<bool> ("produceAllTrackTree") || variableParser.runOption("produceAllTrackTree");
+  producePtRelTemplate_ = iConfig.getParameter<bool> ("producePtRelTemplate") || variableParser.runOption("producePtRelTemplate");
+  runEventInfo_ = iConfig.getParameter<bool>("runEventInfo") || variableParser.runOption("runEventInfo");
+  runJetVariables_ = iConfig.getParameter<bool>("runJetVariables") || variableParser.runOption("runJetVariables");
+  runQuarkVariables_ = iConfig.getParameter<bool>("runQuarkVariables") || variableParser.runOption("runQuarkVariables");
+  runHadronVariables_ = iConfig.getParameter<bool>("runHadronVariables") || variableParser.runOption("runHadronVariables");
+  runGenVariables_ = iConfig.getParameter<bool>("runGenVariables") || variableParser.runOption("runGenVariables");
+  runPatMuons_ = iConfig.getParameter<bool>("runPatMuons") || variableParser.runOption("runPatMuons");
+  runTagVariables_ = iConfig.getParameter<bool>("runTagVariables") || variableParser.runOption("runTagVariables");
+  runTagVariablesSubJets_ = iConfig.getParameter<bool>("runTagVariablesSubJets") || variableParser.runOption("runTagVariablesSubJets");
+  runCSVTagVariables_ = iConfig.getParameter<bool>("runCSVTagVariables") || variableParser.runOption("runCSVTagVariables");
+  runCSVTagTrackVariables_ = iConfig.getParameter<bool>("runCSVTagTrackVariables") || variableParser.runOption("runCSVTagTrackVariables");
+  runDeepFlavourTagVariables_  = iConfig.getParameter<bool>("runDeepFlavourTagVariables") || variableParser.runOption("runDeepFlavourTagVariables");
+  runCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("runCSVTagVariablesSubJets") || variableParser.runOption("runCSVTagVariablesSubJets");
+  runPFElectronVariables_ = iConfig.getParameter<bool>("runPFElectronVariables") || variableParser.runOption("runPFElectronVariables");
+  runPFMuonVariables_ = iConfig.getParameter<bool>("runPFMuonVariables") || variableParser.runOption("runPFMuonVariables");
+  runCTagVariables_ = iConfig.getParameter<bool>("runCTagVariables") || variableParser.runOption("runCTagVariables");
+  
 
   use_ttbar_filter_ = iConfig.getParameter<bool> ("use_ttbar_filter");
   ttbarproducerGen_ = consumes<edm::View<reco::GenParticle>>(iConfig.getParameter<edm::InputTag>("ttbarproducer")),
@@ -881,19 +882,19 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     for (ipu = PupInfo->begin(); ipu != PupInfo->end(); ++ipu) {
       if ( ipu->getBunchCrossing() != 0 ) continue; // storing detailed PU info only for BX=0
       if(fillPU_){
-	for (unsigned int i=0; i<ipu->getPU_zpositions().size(); ++i) {
-// 	  EventInfo.PU_bunch[EventInfo.nPU]      =  ipu->getBunchCrossing();
-// 	  EventInfo.PU_z[EventInfo.nPU]          = (ipu->getPU_zpositions())[i];
-// 	  EventInfo.PU_sumpT_low[EventInfo.nPU]  = (ipu->getPU_sumpT_lowpT())[i];
-// 	  EventInfo.PU_sumpT_high[EventInfo.nPU] = (ipu->getPU_sumpT_highpT())[i];
-// 	  EventInfo.PU_ntrks_low[EventInfo.nPU]  = (ipu->getPU_ntrks_lowpT())[i];
-// 	  EventInfo.PU_ntrks_high[EventInfo.nPU] = (ipu->getPU_ntrks_highpT())[i];
-	  ++EventInfo.nPU;
-	}
+        for (unsigned int i=0; i<ipu->getPU_zpositions().size(); ++i) {
+          EventInfo.PU_bunch[EventInfo.nPU]      =  ipu->getBunchCrossing();
+          EventInfo.PU_z[EventInfo.nPU]          = (ipu->getPU_zpositions())[i];
+          EventInfo.PU_sumpT_low[EventInfo.nPU]  = (ipu->getPU_sumpT_lowpT())[i];
+          EventInfo.PU_sumpT_high[EventInfo.nPU] = (ipu->getPU_sumpT_highpT())[i];
+          EventInfo.PU_ntrks_low[EventInfo.nPU]  = (ipu->getPU_ntrks_lowpT())[i];
+          EventInfo.PU_ntrks_high[EventInfo.nPU] = (ipu->getPU_ntrks_highpT())[i];
+          ++EventInfo.nPU;
+        }
       }
       EventInfo.nPUtrue = ipu->getTrueNumInteractions();
       if(fillPU_){
-	if(EventInfo.nPU==0) EventInfo.nPU = ipu->getPU_NumInteractions(); // needed in case getPU_zpositions() is empty
+        if(EventInfo.nPU==0) EventInfo.nPU = ipu->getPU_NumInteractions(); // needed in case getPU_zpositions() is empty
       }
     }
 
@@ -909,35 +910,35 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     if(runGenVariables_){
       //loop over pruned GenParticles to fill branches for MC hard process particles and muons
       for(size_t i = 0; i < prunedGenParticles->size(); ++i){
-	const GenParticle & iGenPart = (*prunedGenParticles)[i];
-	if ( iGenPart.pt() == 0 ) continue;
-	int status = iGenPart.status();
-	int pdgid = iGenPart.pdgId();
-	int numMothers = iGenPart.numberOfMothers();
+        const GenParticle & iGenPart = (*prunedGenParticles)[i];
+        if ( iGenPart.pt() == 0 ) continue;
+        int status = iGenPart.status();
+        int pdgid = iGenPart.pdgId();
+        int numMothers = iGenPart.numberOfMothers();
 
-	//fill all the branches
-	EventInfo.GenPruned_pT[EventInfo.nGenPruned] = iGenPart.pt();
-	EventInfo.GenPruned_eta[EventInfo.nGenPruned] = iGenPart.eta();
-	EventInfo.GenPruned_phi[EventInfo.nGenPruned] = iGenPart.phi();
-	EventInfo.GenPruned_mass[EventInfo.nGenPruned] = iGenPart.mass();
-	EventInfo.GenPruned_status[EventInfo.nGenPruned] = status;
-	EventInfo.GenPruned_pdgID[EventInfo.nGenPruned] = pdgid;
-	// if no mothers, set mother index to -1 (just so it's not >=0)
-	if (numMothers == 0)
-	  EventInfo.GenPruned_mother[EventInfo.nGenPruned] = -1;
-	else{
-	  //something new to distinguish from the no mothers case
-	  int idx = -100;
-	  //loop over the pruned genparticle list to get the mother's index
-	  for( reco::GenParticleCollection::const_iterator mit = prunedGenParticles->begin(); mit != prunedGenParticles->end(); ++mit ) {
-	    if( iGenPart.mother(0)==&(*mit) ) {
-	      idx = std::distance(prunedGenParticles->begin(),mit);
-	      break;
-	    }
-	  }
-	  EventInfo.GenPruned_mother[EventInfo.nGenPruned] = idx;
-	}
-	++EventInfo.nGenPruned;
+        //fill all the branches
+        EventInfo.GenPruned_pT[EventInfo.nGenPruned] = iGenPart.pt();
+        EventInfo.GenPruned_eta[EventInfo.nGenPruned] = iGenPart.eta();
+        EventInfo.GenPruned_phi[EventInfo.nGenPruned] = iGenPart.phi();
+        EventInfo.GenPruned_mass[EventInfo.nGenPruned] = iGenPart.mass();
+        EventInfo.GenPruned_status[EventInfo.nGenPruned] = status;
+        EventInfo.GenPruned_pdgID[EventInfo.nGenPruned] = pdgid;
+        // if no mothers, set mother index to -1 (just so it's not >=0)
+        if (numMothers == 0)
+          EventInfo.GenPruned_mother[EventInfo.nGenPruned] = -1;
+        else{
+          //something new to distinguish from the no mothers case
+          int idx = -100;
+          //loop over the pruned genparticle list to get the mother's index
+          for( reco::GenParticleCollection::const_iterator mit = prunedGenParticles->begin(); mit != prunedGenParticles->end(); ++mit ) {
+            if( iGenPart.mother(0)==&(*mit) ) {
+              idx = std::distance(prunedGenParticles->begin(),mit);
+              break;
+            }
+          }
+          EventInfo.GenPruned_mother[EventInfo.nGenPruned] = idx;
+        }
+        ++EventInfo.nGenPruned;
       } //end loop over pruned genparticles
     }//runGenVariables_
 
@@ -964,60 +965,60 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
 
       // b and c quarks from the end of parton showering and before hadronization
       if(runQuarkVariables_){
-	if ( ID == 4 || ID == 5 ) {
-	  if( nDaughters > 0 ) {
-	    int nparton_daughters = 0;
-	    for (unsigned int d=0; d<nDaughters; ++d) {
-	      int daughterID = abs(genIt.daughter(d)->pdgId());
-	      if( (daughterID == 1 || daughterID == 2 || daughterID == 3 ||
-		   daughterID == 4 || daughterID == 5 || daughterID == 6 || daughterID == 21))
-		nparton_daughters++;
-	    }
-	    if( nparton_daughters == 0 ) {
-	      if ( ID == 5 ) {
-		EventInfo.bQuark_pT[EventInfo.nbQuarks]  = genIt.p4().pt();
-		EventInfo.bQuark_eta[EventInfo.nbQuarks] = genIt.p4().eta();
-		EventInfo.bQuark_phi[EventInfo.nbQuarks] = genIt.p4().phi();
-		EventInfo.bQuark_pdgID[EventInfo.nbQuarks] = genIt.pdgId();
-		EventInfo.bQuark_status[EventInfo.nbQuarks] = genIt.status();
-		EventInfo.bQuark_fromGSP[EventInfo.nbQuarks] = isFromGSP(&genIt);
-		++EventInfo.nbQuarks;
-	      }
-	      if ( ID == 4 ) {
-		EventInfo.cQuark_pT[EventInfo.ncQuarks]  = genIt.p4().pt();
-		EventInfo.cQuark_eta[EventInfo.ncQuarks] = genIt.p4().eta();
-		EventInfo.cQuark_phi[EventInfo.ncQuarks] = genIt.p4().phi();
-		EventInfo.cQuark_pdgID[EventInfo.ncQuarks] = genIt.pdgId();
-		EventInfo.cQuark_status[EventInfo.ncQuarks] = genIt.status();
-		EventInfo.cQuark_fromGSP[EventInfo.ncQuarks] = isFromGSP(&genIt);
-		++EventInfo.ncQuarks;
-	      }
-	    }
-	  }
-	}
+        if ( ID == 4 || ID == 5 ) {
+          if( nDaughters > 0 ) {
+            int nparton_daughters = 0;
+            for (unsigned int d=0; d<nDaughters; ++d) {
+              int daughterID = abs(genIt.daughter(d)->pdgId());
+              if( (daughterID == 1 || daughterID == 2 || daughterID == 3 ||
+              daughterID == 4 || daughterID == 5 || daughterID == 6 || daughterID == 21))
+                nparton_daughters++;
+            }
+            if( nparton_daughters == 0 ) {
+              if ( ID == 5 ) {
+                EventInfo.bQuark_pT[EventInfo.nbQuarks]  = genIt.p4().pt();
+                EventInfo.bQuark_eta[EventInfo.nbQuarks] = genIt.p4().eta();
+                EventInfo.bQuark_phi[EventInfo.nbQuarks] = genIt.p4().phi();
+                EventInfo.bQuark_pdgID[EventInfo.nbQuarks] = genIt.pdgId();
+                EventInfo.bQuark_status[EventInfo.nbQuarks] = genIt.status();
+                EventInfo.bQuark_fromGSP[EventInfo.nbQuarks] = isFromGSP(&genIt);
+                ++EventInfo.nbQuarks;
+              }
+              if ( ID == 4 ) {
+                EventInfo.cQuark_pT[EventInfo.ncQuarks]  = genIt.p4().pt();
+                EventInfo.cQuark_eta[EventInfo.ncQuarks] = genIt.p4().eta();
+                EventInfo.cQuark_phi[EventInfo.ncQuarks] = genIt.p4().phi();
+                EventInfo.cQuark_pdgID[EventInfo.ncQuarks] = genIt.pdgId();
+                EventInfo.cQuark_status[EventInfo.ncQuarks] = genIt.status();
+                EventInfo.cQuark_fromGSP[EventInfo.ncQuarks] = isFromGSP(&genIt);
+                ++EventInfo.ncQuarks;
+              }
+            }
+          }
+        }
       }//runQuarkVariables_
 
       if(runHadronVariables_){
         if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) AreBHadrons = true;
-  //       // Primary b Hadrons
-  //       if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) {
-  //         //  cout << " pdgId " << genIt.pdgId()  << " pT " << genIt.p4().pt() << " mother " << mother->pdgId() << endl;
-  //         EventInfo.BHadron_pT[EventInfo.nBHadrons]    = genIt.p4().pt();
-  //         EventInfo.BHadron_eta[EventInfo.nBHadrons]   = genIt.p4().eta();
-  //         EventInfo.BHadron_phi[EventInfo.nBHadrons]   = genIt.p4().phi();
-  //         EventInfo.BHadron_mass[EventInfo.nBHadrons]  = genIt.mass();
-  //         EventInfo.BHadron_pdgID[EventInfo.nBHadrons] = genIt.pdgId();
-  //         EventInfo.BHadron_status[EventInfo.nBHadrons] = genIt.status();
-  //         EventInfo.BHadron_mother[EventInfo.nBHadrons] = genIt.mother()->pdgId();
-  //         // check if any of the daughters is also B hadron
-  //         int hasBHadronDaughter = 0;
-  //         for (unsigned int d=0; d<nDaughters; ++d) {
-  //           int daughterID = abs(genIt.daughter(d)->pdgId());
-  //           if ( (daughterID/100)%10 == 5 || (daughterID/1000)%10 == 5 ) { hasBHadronDaughter = 1; break; }
-  //         }
-  //         EventInfo.BHadron_hasBdaughter[EventInfo.nBHadrons] = hasBHadronDaughter;
-  //         ++EventInfo.nBHadrons;
-  //       }
+//         // Primary b Hadrons
+//         if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) {
+//           //  cout << " pdgId " << genIt.pdgId()  << " pT " << genIt.p4().pt() << " mother " << mother->pdgId() << endl;
+//           EventInfo.BHadron_pT[EventInfo.nBHadrons]    = genIt.p4().pt();
+//           EventInfo.BHadron_eta[EventInfo.nBHadrons]   = genIt.p4().eta();
+//           EventInfo.BHadron_phi[EventInfo.nBHadrons]   = genIt.p4().phi();
+//           EventInfo.BHadron_mass[EventInfo.nBHadrons]  = genIt.mass();
+//           EventInfo.BHadron_pdgID[EventInfo.nBHadrons] = genIt.pdgId();
+//           EventInfo.BHadron_status[EventInfo.nBHadrons] = genIt.status();
+//           EventInfo.BHadron_mother[EventInfo.nBHadrons] = genIt.mother()->pdgId();
+//           // check if any of the daughters is also B hadron
+//           int hasBHadronDaughter = 0;
+//           for (unsigned int d=0; d<nDaughters; ++d) {
+//             int daughterID = abs(genIt.daughter(d)->pdgId());
+//             if ( (daughterID/100)%10 == 5 || (daughterID/1000)%10 == 5 ) { hasBHadronDaughter = 1; break; }
+//           }
+//           EventInfo.BHadron_hasBdaughter[EventInfo.nBHadrons] = hasBHadronDaughter;
+//           ++EventInfo.nBHadrons;
+//         }
 
         // Final c Hadrons
         if ( (ID/100)%10 == 4 || (ID/1000)%10 == 4 ) {
@@ -1385,13 +1386,13 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     iEvent.getByToken(ttbarproducerGen_,selGen);
     for (size_t i = 0; i < selGen->size(); ++i)
       {
-	const auto g = selGen->ptrAt(i);
-	EventInfo.ttbar_gpt[gctr] = g->pt();
-	EventInfo.ttbar_geta[gctr] = g->eta();
-	EventInfo.ttbar_gphi[gctr] = g->phi();	
-	EventInfo.ttbar_gm[gctr] = g->mass();
-	EventInfo.ttbar_gid[gctr] = g->pdgId();
-	gctr++;
+        const auto g = selGen->ptrAt(i);
+        EventInfo.ttbar_gpt[gctr] = g->pt();
+        EventInfo.ttbar_geta[gctr] = g->eta();
+        EventInfo.ttbar_gphi[gctr] = g->phi();	
+        EventInfo.ttbar_gm[gctr] = g->mass();
+        EventInfo.ttbar_gid[gctr] = g->pdgId();
+        gctr++;
       }
     EventInfo.ttbar_ng=gctr;
 
@@ -1404,30 +1405,30 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     iEvent.getByToken(ttbarproducerEle_,selElectrons);
     for (size_t i = 0; i < selElectrons->size(); ++i)
       {
-	const auto l = selElectrons->ptrAt(i);
-	EventInfo.ttbar_lpt[lctr]  = l->pt();
-	EventInfo.ttbar_leta[lctr] = l->eta();
-	EventInfo.ttbar_lphi[lctr] = l->phi();
-	EventInfo.ttbar_lm[lctr]   = 0;
-	EventInfo.ttbar_lch[lctr]  = l->charge();
-	EventInfo.ttbar_lid[lctr]  = 11;
-	EventInfo.ttbar_lgid[lctr] = l->genParticle() ? l->genParticle()->pdgId() : 0;
-	lctr++;
+        const auto l = selElectrons->ptrAt(i);
+        EventInfo.ttbar_lpt[lctr]  = l->pt();
+        EventInfo.ttbar_leta[lctr] = l->eta();
+        EventInfo.ttbar_lphi[lctr] = l->phi();
+        EventInfo.ttbar_lm[lctr]   = 0;
+        EventInfo.ttbar_lch[lctr]  = l->charge();
+        EventInfo.ttbar_lid[lctr]  = 11;
+        EventInfo.ttbar_lgid[lctr] = l->genParticle() ? l->genParticle()->pdgId() : 0;
+        lctr++;
       }
 
     edm::Handle<edm::View<pat::Muon> > selMuons;
     iEvent.getByToken(ttbarproducerMuon_,selMuons);
     for (size_t i = 0; i < selMuons->size(); ++i)
       {
-	const auto l = selMuons->ptrAt(i);
-	EventInfo.ttbar_lpt[lctr]  = l->pt();
-	EventInfo.ttbar_leta[lctr] = l->eta();
-	EventInfo.ttbar_lphi[lctr] = l->phi();
-	EventInfo.ttbar_lm[lctr]   = 0;
-	EventInfo.ttbar_lch[lctr]  = l->charge();
-	EventInfo.ttbar_lid[lctr]  = 13;
-	EventInfo.ttbar_lgid[lctr] = l->genParticle() ? l->genParticle()->pdgId() : 0;
-	lctr++;
+        const auto l = selMuons->ptrAt(i);
+        EventInfo.ttbar_lpt[lctr]  = l->pt();
+        EventInfo.ttbar_leta[lctr] = l->eta();
+        EventInfo.ttbar_lphi[lctr] = l->phi();
+        EventInfo.ttbar_lm[lctr]   = 0;
+        EventInfo.ttbar_lch[lctr]  = l->charge();
+        EventInfo.ttbar_lid[lctr]  = 13;
+        EventInfo.ttbar_lgid[lctr] = l->genParticle() ? l->genParticle()->pdgId() : 0;
+        lctr++;
       }
     EventInfo.ttbar_nl=lctr;
 
@@ -1440,38 +1441,38 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     EventInfo.ttbar_nw=0;
     if(!isData_)
       {
-	edm::Handle<GenEventInfoProduct> evt;
-	iEvent.getByToken(generatorevt, evt);
-	if(evt.isValid())
-	  {
-	    EventInfo.ttbar_allmepartons   = evt->nMEPartons();
-	    EventInfo.ttbar_matchmepartons = evt->nMEPartonsFiltered();
-	    EventInfo.ttbar_w[0]           = evt->weight();
-	    EventInfo.ttbar_nw++;
-	  }
-	edm::Handle<LHEEventProduct> evet;
-	iEvent.getByToken(generatorlhe, evet);
-	if(evet.isValid())
-	  {
-	    double asdd=evet->originalXWGTUP();
-	    for(unsigned int i=0; i<evet->weights().size();i++){
-	      double asdde=evet->weights()[i].wgt;
-	      EventInfo.ttbar_w[EventInfo.ttbar_nw]=EventInfo.ttbar_w[0]*asdde/asdd;
- 	      EventInfo.ttbar_nw++;
-	    }
-	    //Code to include PS weights in output ttree branch 'ttbar_w'.
-	    //Code added here to keep order of preceeding weights the same
-	    //considering code later in chain dependant on order.
-	    if(evt.isValid())
-	      {
-		std::vector<double> weights_vector;
-		weights_vector = evt->weights();
-		for(unsigned int j=1; j < weights_vector.size(); j++){
-		  EventInfo.ttbar_w[EventInfo.ttbar_nw] = weights_vector.at(0)*weights_vector.at(j)/evet->originalXWGTUP();
-		  EventInfo.ttbar_nw++;
-		}
-	      }
-	  }
+      edm::Handle<GenEventInfoProduct> evt;
+      iEvent.getByToken(generatorevt, evt);
+      if(evt.isValid())
+        {
+          EventInfo.ttbar_allmepartons   = evt->nMEPartons();
+          EventInfo.ttbar_matchmepartons = evt->nMEPartonsFiltered();
+          EventInfo.ttbar_w[0]           = evt->weight();
+          EventInfo.ttbar_nw++;
+        }
+      edm::Handle<LHEEventProduct> evet;
+      iEvent.getByToken(generatorlhe, evet);
+      if(evet.isValid())
+        {
+          double asdd=evet->originalXWGTUP();
+          for(unsigned int i=0; i<evet->weights().size();i++){
+            double asdde=evet->weights()[i].wgt;
+            EventInfo.ttbar_w[EventInfo.ttbar_nw]=EventInfo.ttbar_w[0]*asdde/asdd;
+            EventInfo.ttbar_nw++;
+          }
+          //Code to include PS weights in output ttree branch 'ttbar_w'.
+          //Code added here to keep order of preceeding weights the same
+          //considering code later in chain dependant on order.
+          if(evt.isValid())
+          {
+            std::vector<double> weights_vector;
+            weights_vector = evt->weights();
+            for(unsigned int j=1; j < weights_vector.size(); j++){
+              EventInfo.ttbar_w[EventInfo.ttbar_nw] = weights_vector.at(0)*weights_vector.at(j)/evet->originalXWGTUP();
+              EventInfo.ttbar_nw++;
+            }
+          }
+        }
       }
   }
 
