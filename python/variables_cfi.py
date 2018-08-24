@@ -75,7 +75,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("ptHat for pythia"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("mcweight"),
@@ -83,7 +83,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("mcweight"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("rho"),
@@ -195,7 +195,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("the true number of pileup interactions that have been added to the event"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("fillPU","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("nPU"),
@@ -203,7 +203,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("the number of pileup interactions that have been added to the event"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("fillPU","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("PU_bunch"),
@@ -211,7 +211,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("0 if on time pileup, -1 or +1 if out-of-time"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring("runPU"),
+      runOptions  = cms.vstring("fillPU","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("PU_z"),
@@ -219,7 +219,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("the true primary vertex position along the z axis for each added interaction"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring("runPU"),
+      runOptions  = cms.vstring("fillPU","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("PU_sumpT_low"),
@@ -227,7 +227,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("the sum of the transverse momentum of the tracks originating from each interaction, where track pT > low_cut"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring("runPU"),
+      runOptions  = cms.vstring("fillPU","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("PU_sumpT_high"),
@@ -235,7 +235,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("the sum of the transverse momentum of the tracks originating from each interaction, where track pT > high_cut"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring("runPU"),
+      runOptions  = cms.vstring("fillPU","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("PU_ntrks_low"),
@@ -243,7 +243,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("the number of tracks originating from each interaction, where track pT > low_cu"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring("runPU"),
+      runOptions  = cms.vstring("fillPU","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("PU_ntrks_high"),
@@ -251,7 +251,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("the number of tracks originating from each interaction, where track pT > high_cut"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring("runPU"),
+      runOptions  = cms.vstring("fillPU","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("ncQuarks"),
@@ -259,7 +259,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("ncQuarks"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runQuarkVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("cQuark_pT"),
@@ -267,7 +267,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("cQuark_pT"),
       requires    = cms.vstring("ncQuarks"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runQuarkVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("cQuark_eta"),
@@ -275,7 +275,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("cQuark_eta"),
       requires    = cms.vstring("ncQuarks"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runQuarkVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("cQuark_phi"),
@@ -283,7 +283,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("cQuark_phi"),
       requires    = cms.vstring("ncQuarks"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runQuarkVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("cQuark_pdgID"),
@@ -291,7 +291,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("cQuark_pdgID"),
       requires    = cms.vstring("ncQuarks"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runQuarkVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("cQuark_status"),
@@ -299,7 +299,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("cQuark_status"),
       requires    = cms.vstring("ncQuarks"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runQuarkVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("cQuark_fromGSP"),
@@ -307,7 +307,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("cQuark_fromGSP"),
       requires    = cms.vstring("ncQuarks"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runQuarkVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("nbQuarks"),
@@ -315,7 +315,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("nbQuarks"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runQuarkVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("bQuark_pT"),
@@ -323,7 +323,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("bQuark_pT"),
       requires    = cms.vstring("nbQuarks"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runQuarkVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("bQuark_eta"),
@@ -331,7 +331,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("bQuark_eta"),
       requires    = cms.vstring("nbQuarks"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runQuarkVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("bQuark_phi"),
@@ -339,7 +339,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("bQuark_phi"),
       requires    = cms.vstring("nbQuarks"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runQuarkVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("bQuark_pdgID"),
@@ -347,7 +347,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("bQuark_pdgID"),
       requires    = cms.vstring("nbQuarks"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runQuarkVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("bQuark_status"),
@@ -355,7 +355,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("bQuark_status"),
       requires    = cms.vstring("nbQuarks"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runQuarkVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("bQuark_fromGSP"),
@@ -363,7 +363,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("bQuark_fromGSP"),
       requires    = cms.vstring("nbQuarks"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runQuarkVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("nBHadrons"),
@@ -371,7 +371,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("nBHadrons"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("BHadron_pT"),
@@ -379,7 +379,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("BHadron_pT"),
       requires    = cms.vstring("nBHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("BHadron_eta"),
@@ -387,7 +387,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("BHadron_eta"),
       requires    = cms.vstring("nBHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("BHadron_phi"),
@@ -395,7 +395,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("BHadron_phi"),
       requires    = cms.vstring("nBHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("BHadron_mass"),
@@ -403,7 +403,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("BHadron_mass"),
       requires    = cms.vstring("nBHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("BHadron_pdgID"),
@@ -411,7 +411,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("BHadron_pdgID"),
       requires    = cms.vstring("nBHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("BHadron_mother"),
@@ -419,7 +419,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("BHadron_mother"),
       requires    = cms.vstring("nBHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("BHadron_hasBdaughter"),
@@ -427,7 +427,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("BHadron_hasBdaughter"),
       requires    = cms.vstring("nBHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("BHadron_SVx"),
@@ -435,7 +435,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("BHadron_SVx"),
       requires    = cms.vstring("nBHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("BHadron_SVy"),
@@ -443,7 +443,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("BHadron_SVy"),
       requires    = cms.vstring("nBHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("BHadron_SVz"),
@@ -451,7 +451,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("BHadron_SVz"),
       requires    = cms.vstring("nBHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("BHadron_nCharged"),
@@ -459,7 +459,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("BHadron_nCharged"),
       requires    = cms.vstring("nBHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("BHadron_DHadron1"),
@@ -467,7 +467,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("BHadron_DHadron1"),
       requires    = cms.vstring("nBHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("BHadron_DHadron2"),
@@ -475,7 +475,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("BHadron_DHadron2"),
       requires    = cms.vstring("nBHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("nDHadrons"),
@@ -483,7 +483,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("nDHadrons"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("nDaughters"),
@@ -491,7 +491,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("nDaughters"),
       requires    = cms.vstring("nDHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("DHadron_pT"),
@@ -499,7 +499,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("DHadron_pT"),
       requires    = cms.vstring("nDHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("DHadron_eta"),
@@ -507,7 +507,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("DHadron_eta"),
       requires    = cms.vstring("nDHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("DHadron_phi"),
@@ -515,7 +515,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("DHadron_phi"),
       requires    = cms.vstring("nDHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("DHadron_mass"),
@@ -523,7 +523,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("DHadron_mass"),
       requires    = cms.vstring("nDHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("DHadron_SVx"),
@@ -531,7 +531,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("DHadron_SVx"),
       requires    = cms.vstring("nDHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("DHadron_SVy"),
@@ -539,7 +539,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("DHadron_SVy"),
       requires    = cms.vstring("nDHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("DHadron_SVz"),
@@ -547,7 +547,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("DHadron_SVz"),
       requires    = cms.vstring("nDHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("DHadron_pdgID"),
@@ -555,7 +555,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("DHadron_pdgID"),
       requires    = cms.vstring("nDHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("DHadron_nDaughters"),
@@ -563,7 +563,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("DHadron_nDaughters"),
       requires    = cms.vstring("nDHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("DHadron_DaughtersPdgID"),
@@ -571,7 +571,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("sum(DHadron_nDaughters[i]): needed for daughter pdgIDs"),
       requires    = cms.vstring("nDaughters"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("DHadron_nChargedDaughters"),
@@ -579,7 +579,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("DHadron_nChargedDaughters"),
       requires    = cms.vstring("nDHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("DHadron_nCharged"),
@@ -587,7 +587,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("DHadron_nCharged"),
       requires    = cms.vstring("nDHadrons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runHadronVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("nGenlep"),
@@ -595,7 +595,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("nGenlep"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("Genlep_pT"),
@@ -603,7 +603,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("Genlep_pT"),
       requires    = cms.vstring("nGenlep"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("Genlep_eta"),
@@ -611,7 +611,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("Genlep_eta"),
       requires    = cms.vstring("nGenlep"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("Genlep_phi"),
@@ -619,7 +619,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("Genlep_phi"),
       requires    = cms.vstring("nGenlep"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("Genlep_pdgID"),
@@ -627,7 +627,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("Genlep_pdgID"),
       requires    = cms.vstring("nGenlep"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("Genlep_status"),
@@ -635,7 +635,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("Genlep_status"),
       requires    = cms.vstring("nGenlep"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("Genlep_mother"),
@@ -643,7 +643,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("Genlep_mother"),
       requires    = cms.vstring("nGenlep"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("nGenquark"),
@@ -651,7 +651,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("nGenquark"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("Genquark_pT"),
@@ -659,7 +659,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("Genquark_pT"),
       requires    = cms.vstring("nGenquark"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("Genquark_eta"),
@@ -667,7 +667,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("Genquark_eta"),
       requires    = cms.vstring("nGenquark"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("Genquark_phi"),
@@ -675,7 +675,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("Genquark_phi"),
       requires    = cms.vstring("nGenquark"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("Genquark_pdgID"),
@@ -683,7 +683,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("Genquark_pdgID"),
       requires    = cms.vstring("nGenquark"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("Genquark_mother"),
@@ -691,7 +691,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("Genquark_mother"),
       requires    = cms.vstring("nGenquark"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("nGenV0"),
@@ -699,7 +699,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("nGenV0"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("GenV0_pT"),
@@ -707,7 +707,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("GenV0_pT"),
       requires    = cms.vstring("nGenV0"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("GenV0_eta"),
@@ -715,7 +715,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("GenV0_eta"),
       requires    = cms.vstring("nGenV0"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("GenV0_phi"),
@@ -723,7 +723,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("GenV0_phi"),
       requires    = cms.vstring("nGenV0"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("GenV0_pdgID"),
@@ -731,7 +731,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("GenV0_pdgID"),
       requires    = cms.vstring("nGenV0"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("GenV0_SVx"),
@@ -739,7 +739,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("GenV0_SVx"),
       requires    = cms.vstring("nGenV0"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("GenV0_SVy"),
@@ -747,7 +747,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("GenV0_SVy"),
       requires    = cms.vstring("nGenV0"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("GenV0_SVz"),
@@ -755,7 +755,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("GenV0_SVz"),
       requires    = cms.vstring("nGenV0"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("GenV0_nCharged"),
@@ -763,7 +763,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("GenV0_nCharged"),
       requires    = cms.vstring("nGenV0"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("nGenPruned"),
@@ -771,7 +771,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("nGenPruned"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("GenPruned_pT"),
@@ -779,7 +779,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("GenPruned_pT"),
       requires    = cms.vstring("nGenPruned"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("GenPruned_eta"),
@@ -787,7 +787,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("GenPruned_eta"),
       requires    = cms.vstring("nGenPruned"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("GenPruned_phi"),
@@ -795,7 +795,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("GenPruned_phi"),
       requires    = cms.vstring("nGenPruned"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("GenPruned_mass"),
@@ -803,7 +803,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("GenPruned_mass"),
       requires    = cms.vstring("nGenPruned"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("GenPruned_status"),
@@ -811,7 +811,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("GenPruned_status"),
       requires    = cms.vstring("nGenPruned"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("GenPruned_pdgID"),
@@ -819,7 +819,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("GenPruned_pdgID"),
       requires    = cms.vstring("nGenPruned"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("GenPruned_mother"),
@@ -827,7 +827,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("GenPruned_mother"),
       requires    = cms.vstring("nGenPruned"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runGenVariables","runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("nTrkAll"),
@@ -835,7 +835,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("nTrkAll"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_d0"),
@@ -843,7 +843,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_d0"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_dz"),
@@ -851,7 +851,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_dz"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_p"),
@@ -859,7 +859,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_p"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_pt"),
@@ -867,7 +867,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_pt"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_eta"),
@@ -875,7 +875,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_eta"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_phi"),
@@ -883,7 +883,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_phi"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_chi2"),
@@ -891,7 +891,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_chi2"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_charge"),
@@ -899,7 +899,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_charge"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_nHitAll"),
@@ -907,7 +907,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_nHitAll"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_nHitPixel"),
@@ -915,7 +915,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_nHitPixel"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_nHitStrip"),
@@ -923,7 +923,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_nHitStrip"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_nHitTIB"),
@@ -931,7 +931,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_nHitTIB"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_nHitTID"),
@@ -939,7 +939,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_nHitTID"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_nHitTOB"),
@@ -947,7 +947,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_nHitTOB"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_nHitTEC"),
@@ -955,7 +955,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_nHitTEC"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_nHitPXB"),
@@ -963,7 +963,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_nHitPXB"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_nHitPXF"),
@@ -971,7 +971,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_nHitPXF"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_isHitL1"),
@@ -979,7 +979,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_isHitL1"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_nSiLayers"),
@@ -987,7 +987,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_nSiLayers"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_nPxLayers"),
@@ -995,7 +995,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_nPxLayers"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_PV"),
@@ -1003,7 +1003,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_PV"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("TrkAll_PVweight"),
@@ -1011,7 +1011,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkAll_PVweight"),
       requires    = cms.vstring("nTrkAll"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("produceAllTrackTree", "runEventInfo"),
     ),
     cms.PSet(
       variable    = cms.string("nPatMuon"),
@@ -1019,7 +1019,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("nPatMuon"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPatMuons"),
     ),
     cms.PSet(
       variable    = cms.string("PatMuon_pt"),
@@ -1027,7 +1027,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PatMuon_pt"),
       requires    = cms.vstring("nPatMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPatMuons"),
     ),
     cms.PSet(
       variable    = cms.string("PatMuon_eta"),
@@ -1035,7 +1035,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PatMuon_eta"),
       requires    = cms.vstring("nPatMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPatMuons"),
     ),
     cms.PSet(
       variable    = cms.string("PatMuon_phi"),
@@ -1043,7 +1043,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PatMuon_phi"),
       requires    = cms.vstring("nPatMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPatMuons"),
     ),
     cms.PSet(
       variable    = cms.string("PatMuon_isSoftMuon"),
@@ -1051,7 +1051,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PatMuon_isSoftMuon"),
       requires    = cms.vstring("nPatMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPatMuons"),
     ),
     cms.PSet(
       variable    = cms.string("PatMuon_isMediumMuon"),
@@ -1059,7 +1059,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PatMuon_isMediumMuon"),
       requires    = cms.vstring("nPatMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPatMuons"),
     ),
     cms.PSet(
       variable    = cms.string("PatMuon_isTightMuon"),
@@ -1067,7 +1067,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PatMuon_isTightMuon"),
       requires    = cms.vstring("nPatMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPatMuons"),
     ),
     cms.PSet(
       variable    = cms.string("PatMuon_iso"),
@@ -1075,7 +1075,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PatMuon_iso"),
       requires    = cms.vstring("nPatMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPatMuons"),
     ),
     cms.PSet(
       variable    = cms.string("PatMuon_isoTrackerOnly"),
@@ -1083,7 +1083,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PatMuon_isoTrackerOnly"),
       requires    = cms.vstring("nPatMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPatMuons"),
     ),
     cms.PSet(
       variable    = cms.string("PatMuon_IP"),
@@ -1091,7 +1091,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PatMuon_IP"),
       requires    = cms.vstring("nPatMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPatMuons"),
     ),
     cms.PSet(
       variable    = cms.string("PatMuon_IPsig"),
@@ -1099,7 +1099,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PatMuon_IPsig"),
       requires    = cms.vstring("nPatMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPatMuons"),
     ),
     cms.PSet(
       variable    = cms.string("PatMuon_IP2D"),
@@ -1107,7 +1107,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PatMuon_IP2D"),
       requires    = cms.vstring("nPatMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPatMuons"),
     ),
     cms.PSet(
       variable    = cms.string("PatMuon_IP2Dsig"),
@@ -1115,7 +1115,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PatMuon_IP2Dsig"),
       requires    = cms.vstring("nPatMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPatMuons"),
     ),
     cms.PSet(
       variable    = cms.string("ttbar_chan"),
@@ -1323,7 +1323,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("jet pT"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_uncorrpt"),
@@ -1331,7 +1331,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_uncorrpt"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_genpt"),
@@ -1339,7 +1339,7 @@ variableList = [
       mconly      = cms.bool(True),
       description = cms.string("Jet_genpt"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_residual"),
@@ -1347,7 +1347,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("residulat corr (obsolete)"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_area"),
@@ -1355,7 +1355,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_area"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_jes"),
@@ -1363,7 +1363,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("jet energy scale (obsolete)"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_eta"),
@@ -1371,7 +1371,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_eta"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_phi"),
@@ -1379,7 +1379,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_phi"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_mass"),
@@ -1387,7 +1387,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_mass"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_Ip1N"),
@@ -2051,7 +2051,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_flavour"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_flavourCleaned"),
@@ -2059,7 +2059,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_flavourCleaned"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_partonFlavour"),
@@ -2067,7 +2067,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_partonFlavour"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_hadronFlavour"),
@@ -2075,7 +2075,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_hadronFlavour"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_partonid"),
@@ -2083,7 +2083,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_partonid"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_nbHadrons"),
@@ -2091,7 +2091,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_nbHadrons"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_ncHadrons"),
@@ -2099,7 +2099,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_ncHadrons"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_nFirstTrack"),
@@ -2227,7 +2227,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_looseID"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_tightID"),
@@ -2235,7 +2235,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_tightID"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runJetVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_FatJetIdx"),
@@ -2675,7 +2675,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_nFirstTrkTagVar"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_nLastTrkTagVar"),
@@ -2683,7 +2683,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_nLastTrkTagVar"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_nFirstSVTagVar"),
@@ -2691,7 +2691,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_nFirstSVTagVar"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_nLastSVTagVar"),
@@ -2699,7 +2699,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_nLastSVTagVar"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_nFirstTrkTagVarCSV"),
@@ -2707,7 +2707,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_nFirstTrkTagVarCSV"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_nLastTrkTagVarCSV"),
@@ -2715,7 +2715,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_nLastTrkTagVarCSV"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_nFirstTrkEtaRelTagVarCSV"),
@@ -2723,7 +2723,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_nFirstTrkEtaRelTagVarCSV"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_nLastTrkEtaRelTagVarCSV"),
@@ -2731,7 +2731,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_nLastTrkEtaRelTagVarCSV"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_DeepDoubleB"),
@@ -3219,7 +3219,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkInc_pt"),
       requires    = cms.vstring("nTrkInc"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("producePtRelTemplate"),
     ),
     cms.PSet(
       variable    = cms.string("TrkInc_eta"),
@@ -3227,7 +3227,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkInc_eta"),
       requires    = cms.vstring("nTrkInc"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("producePtRelTemplate"),
     ),
     cms.PSet(
       variable    = cms.string("TrkInc_phi"),
@@ -3235,7 +3235,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkInc_phi"),
       requires    = cms.vstring("nTrkInc"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("producePtRelTemplate"),
     ),
     cms.PSet(
       variable    = cms.string("TrkInc_ptrel"),
@@ -3243,7 +3243,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkInc_ptrel"),
       requires    = cms.vstring("nTrkInc"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("producePtRelTemplate"),
     ),
     cms.PSet(
       variable    = cms.string("TrkInc_IPsig"),
@@ -3251,7 +3251,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkInc_IPsig"),
       requires    = cms.vstring("nTrkInc"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("producePtRelTemplate","useSelectedTracks"),
     ),
     cms.PSet(
       variable    = cms.string("TrkInc_IP"),
@@ -3259,7 +3259,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TrkInc_IP"),
       requires    = cms.vstring("nTrkInc"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("producePtRelTemplate","useSelectedTracks"),
     ),
     cms.PSet(
       variable    = cms.string("nPFElectron"),
@@ -3267,7 +3267,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("nPFElectron"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFElectronVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFElectron_IdxJet"),
@@ -3275,7 +3275,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFElectron_IdxJet"),
       requires    = cms.vstring("nPFElectron"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFElectronVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFElectron_pt"),
@@ -3283,7 +3283,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFElectron_pt"),
       requires    = cms.vstring("nPFElectron"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFElectronVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFElectron_eta"),
@@ -3291,7 +3291,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFElectron_eta"),
       requires    = cms.vstring("nPFElectron"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFElectronVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFElectron_phi"),
@@ -3299,7 +3299,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFElectron_phi"),
       requires    = cms.vstring("nPFElectron"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFElectronVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFElectron_ptrel"),
@@ -3307,7 +3307,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFElectron_ptrel"),
       requires    = cms.vstring("nPFElectron"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFElectronVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFElectron_ratio"),
@@ -3315,7 +3315,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFElectron_ratio"),
       requires    = cms.vstring("nPFElectron"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFElectronVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFElectron_ratioRel"),
@@ -3323,7 +3323,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFElectron_ratioRel"),
       requires    = cms.vstring("nPFElectron"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFElectronVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFElectron_deltaR"),
@@ -3331,7 +3331,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFElectron_deltaR"),
       requires    = cms.vstring("nPFElectron"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFElectronVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFElectron_IP"),
@@ -3339,7 +3339,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFElectron_IP"),
       requires    = cms.vstring("nPFElectron"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFElectronVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFElectron_IP2D"),
@@ -3347,7 +3347,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFElectron_IP2D"),
       requires    = cms.vstring("nPFElectron"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFElectronVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFElectron_mva_e_pi"),
@@ -3355,7 +3355,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFElectron_mva_e_pi"),
       requires    = cms.vstring("nPFElectron"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFElectronVariables"),
     ),
     cms.PSet(
       variable    = cms.string("nPFMuon"),
@@ -3363,7 +3363,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("nPFMuon"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_IdxJet"),
@@ -3371,7 +3371,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_IdxJet"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_nMuHit"),
@@ -3379,7 +3379,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_nMuHit"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_nTkHit"),
@@ -3387,7 +3387,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_nTkHit"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_nPixHit"),
@@ -3395,7 +3395,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_nPixHit"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_nOutHit"),
@@ -3403,7 +3403,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_nOutHit"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_nTkLwM"),
@@ -3411,7 +3411,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_nTkLwM"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_nPixLwM"),
@@ -3419,7 +3419,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_nPixLwM"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_nMatched"),
@@ -3427,7 +3427,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_nMatched"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_chi2"),
@@ -3435,7 +3435,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_chi2"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_chi2Tk"),
@@ -3443,7 +3443,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_chi2Tk"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_isGlobal"),
@@ -3451,7 +3451,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_isGlobal"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_hist"),
@@ -3459,7 +3459,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_hist"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_pt"),
@@ -3467,7 +3467,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_pt"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_eta"),
@@ -3475,7 +3475,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_eta"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_phi"),
@@ -3483,7 +3483,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_phi"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_ptrel"),
@@ -3491,7 +3491,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_ptrel"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_ratio"),
@@ -3499,7 +3499,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_ratio"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_ratioRel"),
@@ -3507,7 +3507,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_ratioRel"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_deltaR"),
@@ -3515,7 +3515,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_deltaR"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_IP"),
@@ -3523,7 +3523,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_IP"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_IP2D"),
@@ -3531,7 +3531,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_IP2D"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_IPsig"),
@@ -3539,7 +3539,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_IPsig"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_IP2Dsig"),
@@ -3547,7 +3547,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_IP2Dsig"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_dz"),
@@ -3555,7 +3555,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_dz"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("PFMuon_GoodQuality"),
@@ -3563,7 +3563,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("PFMuon_GoodQuality"),
       requires    = cms.vstring("nPFMuon"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPFMuonVariables"),
     ),
     cms.PSet(
       variable    = cms.string("nSV"),
@@ -3787,7 +3787,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("tracks associated to jet"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_jetNSecondaryVertices"),
@@ -3795,7 +3795,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("number of reconstructed possible secondary vertices in jet"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_chargedHadronEnergyFraction"),
@@ -3803,7 +3803,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("fraction of the jet energy coming from charged hadrons"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_neutralHadronEnergyFraction"),
@@ -3811,7 +3811,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("fraction of the jet energy coming from neutral hadrons"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_photonEnergyFraction"),
@@ -3819,7 +3819,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("fraction of the jet energy coming from photons"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_electronEnergyFraction"),
@@ -3827,7 +3827,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("fraction of the jet energy coming from electrons"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_muonEnergyFraction"),
@@ -3835,7 +3835,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("fraction of the jet energy coming from muons"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_chargedHadronMultiplicity"),
@@ -3843,7 +3843,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("number of charged hadrons in the jet"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_neutralHadronMultiplicity"),
@@ -3851,7 +3851,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("number of neutral hadrons in the jet"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_photonMultiplicity"),
@@ -3859,7 +3859,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("number of photons in the jet"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_electronMultiplicity"),
@@ -3867,7 +3867,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("number of electrons in the jet"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_muonMultiplicity"),
@@ -3875,7 +3875,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("number of muons in the jet"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_neutralEmEnergyFraction"),
@@ -3883,7 +3883,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TagVar_neutralEmEnergyFraction"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_numberOfDaughters"),
@@ -3891,7 +3891,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TagVar_numberOfDaughters"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_chargedMultiplicity"),
@@ -3899,7 +3899,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TagVar_chargedMultiplicity"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_chargedEmEnergyFraction"),
@@ -3907,7 +3907,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TagVar_chargedEmEnergyFraction"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_neutralMultiplicity"),
@@ -3915,7 +3915,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("TagVar_neutralMultiplicity"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("nTrkTagVar"),
@@ -3923,7 +3923,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("nTrkTagVar"),
       requires    = cms.vstring(""),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackMomentum"),
@@ -3931,7 +3931,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track momentum"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackEta"),
@@ -3939,7 +3939,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track pseudorapidity"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackPhi"),
@@ -3947,7 +3947,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track polar angle"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackPtRel"),
@@ -3955,7 +3955,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track transverse momentum, relative to the jet axis"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackPPar"),
@@ -3963,7 +3963,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track parallel momentum, along the jet axis"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackEtaRel"),
@@ -3971,7 +3971,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track pseudorapidity, relative to the jet axis"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackDeltaR"),
@@ -3979,7 +3979,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track pseudoangular distance from the jet axis"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackPtRatio"),
@@ -3987,7 +3987,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track transverse momentum, relative to the jet axis, normalized to its energy"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackPParRatio"),
@@ -3995,7 +3995,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track parallel momentum, along the jet axis, normalized to its energy"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackSip2dVal"),
@@ -4003,7 +4003,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track 2D signed impact parameter"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackSip2dSig"),
@@ -4011,7 +4011,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track 2D signed impact parameter significance"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackSip3dVal"),
@@ -4019,7 +4019,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track 3D signed impact parameter"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackSip3dSig"),
@@ -4027,7 +4027,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track 3D signed impact parameter significance"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackDecayLenVal"),
@@ -4035,7 +4035,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track decay length"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackDecayLenSig"),
@@ -4043,7 +4043,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track decay length significance"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackJetDistVal"),
@@ -4051,7 +4051,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("minimum track approach distance to jet axis"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackJetDistSig"),
@@ -4059,7 +4059,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("minimum track approach distance to jet axis significance"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackChi2"),
@@ -4067,7 +4067,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track fit chi2"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackNTotalHits"),
@@ -4075,7 +4075,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("number of valid total hits"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_trackNPixelHits"),
@@ -4083,7 +4083,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("number of valid pixel hits"),
       requires    = cms.vstring("nTrkTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("nSVTagVar"),
@@ -4091,7 +4091,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("nSVTagVar"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_vertexMass"),
@@ -4099,7 +4099,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("mass of track sum at secondary vertex"),
       requires    = cms.vstring("nSVTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_vertexNTracks"),
@@ -4107,7 +4107,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("number of tracks at secondary vertex"),
       requires    = cms.vstring("nSVTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_vertexJetDeltaR"),
@@ -4115,7 +4115,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("pseudoangular distance between jet axis and secondary vertex direction"),
       requires    = cms.vstring("nSVTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_flightDistance2dVal"),
@@ -4123,7 +4123,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("transverse distance between primary and secondary vertex"),
       requires    = cms.vstring("nSVTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_flightDistance2dSig"),
@@ -4131,7 +4131,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("transverse distance significance between primary and secondary vertex"),
       requires    = cms.vstring("nSVTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_flightDistance3dVal"),
@@ -4139,7 +4139,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("distance between primary and secondary vertex"),
       requires    = cms.vstring("nSVTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVar_flightDistance3dSig"),
@@ -4147,7 +4147,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("distance significance between primary and secondary vertex"),
       requires    = cms.vstring("nSVTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runTagVariables", "runTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("DeepFlavourInput_charged_Sip3dVal"),
@@ -4155,7 +4155,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepFlavourInput_charged_Sip3dVal"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runDeepFlavourTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepFlavourInput_charged_Sip3dSig"),
@@ -4163,7 +4163,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepFlavourInput_charged_Sip3dSig"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runDeepFlavourTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepFlavourInput_charged_quality"),
@@ -4171,7 +4171,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepFlavourInput_charged_quality"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runDeepFlavourTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepFlavourInput_charged_chi2"),
@@ -4179,7 +4179,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepFlavourInput_charged_chi2"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runDeepFlavourTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepFlavourInput_neutral_drminsv"),
@@ -4187,7 +4187,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepFlavourInput_neutral_drminsv"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runDeepFlavourTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepFlavourInput_neutral_hadFrac"),
@@ -4195,7 +4195,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepFlavourInput_neutral_hadFrac"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runDeepFlavourTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepFlavourInput_neutral_ptrel"),
@@ -4203,7 +4203,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepFlavourInput_neutral_ptrel"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runDeepFlavourTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepFlavourInput_sv_d3d"),
@@ -4211,7 +4211,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepFlavourInput_sv_d3d"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runDeepFlavourTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepFlavourInput_sv_d3dsig"),
@@ -4219,7 +4219,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepFlavourInput_sv_d3dsig"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runDeepFlavourTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepFlavourInput_sv_normchi2"),
@@ -4227,7 +4227,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepFlavourInput_sv_normchi2"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runDeepFlavourTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackJetPt"),
@@ -4235,7 +4235,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track-based jet transverse momentum"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_jetNTracks"),
@@ -4243,7 +4243,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("tracks associated to jet"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_jetNTracksEtaRel"),
@@ -4251,7 +4251,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("tracks associated to jet for which trackEtaRel is calculated"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackSumJetEtRatio"),
@@ -4259,7 +4259,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("ratio of track sum transverse energy over jet energy"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackSumJetDeltaR"),
@@ -4267,7 +4267,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("pseudoangular distance between jet axis and track fourvector sum"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackSip2dValAboveCharm"),
@@ -4275,7 +4275,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track 2D signed impact parameter of first track lifting mass above charm"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackSip2dSigAboveCharm"),
@@ -4283,7 +4283,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track 2D signed impact parameter significance of first track lifting mass above charm"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackSip3dValAboveCharm"),
@@ -4291,7 +4291,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track 3D signed impact parameter of first track lifting mass above charm"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackSip3dSigAboveCharm"),
@@ -4299,7 +4299,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track 3D signed impact parameter significance of first track lifting mass above charm"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_vertexCategory"),
@@ -4307,7 +4307,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("category of secondary vertex (Reco, Pseudo, No)"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_jetNSecondaryVertices"),
@@ -4315,7 +4315,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("number of reconstructed possible secondary vertices in jet"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_vertexMass"),
@@ -4323,7 +4323,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("mass of track sum at secondary vertex"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_vertexNTracks"),
@@ -4331,7 +4331,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("number of tracks at secondary vertex"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_vertexEnergyRatio"),
@@ -4339,7 +4339,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("ratio of energy at secondary vertex over total energy"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_vertexJetDeltaR"),
@@ -4347,7 +4347,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("pseudoangular distance between jet axis and secondary vertex direction"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_flightDistance2dVal"),
@@ -4355,7 +4355,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("transverse distance between primary and secondary vertex"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_flightDistance2dSig"),
@@ -4363,7 +4363,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("transverse distance significance between primary and secondary vertex"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_flightDistance3dVal"),
@@ -4371,7 +4371,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("distance between primary and secondary vertex"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_flightDistance3dSig"),
@@ -4379,7 +4379,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("distance significance between primary and secondary vertex"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagVariables","runCSVTagVariablesSubJets"),
     ),
     cms.PSet(
       variable    = cms.string("nTrkTagVarCSV"),
@@ -4387,7 +4387,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("nTrkTagVarCSV"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("nTrkEtaRelTagVarCSV"),
@@ -4395,7 +4395,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("nTrkEtaRelTagVarCSV"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackMomentum"),
@@ -4403,7 +4403,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track momentum"),
       requires    = cms.vstring("nTrkTagVarCSV"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackEta"),
@@ -4411,7 +4411,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track pseudorapidity"),
       requires    = cms.vstring("nTrkTagVarCSV"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackPhi"),
@@ -4419,7 +4419,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track polar angle"),
       requires    = cms.vstring("nTrkTagVarCSV"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackPtRel"),
@@ -4427,7 +4427,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track transverse momentum, relative to the jet axis"),
       requires    = cms.vstring("nTrkTagVarCSV"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackPPar"),
@@ -4435,7 +4435,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track parallel momentum, along the jet axis"),
       requires    = cms.vstring("nTrkTagVarCSV"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackDeltaR"),
@@ -4443,7 +4443,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track pseudoangular distance from the jet axis"),
       requires    = cms.vstring("nTrkTagVarCSV"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackPtRatio"),
@@ -4451,7 +4451,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track transverse momentum, relative to the jet axis, normalized to its energy"),
       requires    = cms.vstring("nTrkTagVarCSV"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackPParRatio"),
@@ -4459,7 +4459,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track parallel momentum, along the jet axis, normalized to its energy"),
       requires    = cms.vstring("nTrkTagVarCSV"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackSip2dVal"),
@@ -4467,7 +4467,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track 2D signed impact parameter"),
       requires    = cms.vstring("nTrkTagVarCSV"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackSip2dSig"),
@@ -4475,7 +4475,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track 2D signed impact parameter significance"),
       requires    = cms.vstring("nTrkTagVarCSV"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackSip3dVal"),
@@ -4483,7 +4483,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track 3D signed impact parameter"),
       requires    = cms.vstring("nTrkTagVarCSV"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackSip3dSig"),
@@ -4491,7 +4491,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track 3D signed impact parameter significance"),
       requires    = cms.vstring("nTrkTagVarCSV"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackDecayLenVal"),
@@ -4499,7 +4499,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track decay length"),
       requires    = cms.vstring("nTrkTagVarCSV"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackDecayLenSig"),
@@ -4507,7 +4507,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track decay length significance"),
       requires    = cms.vstring("nTrkTagVarCSV"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackJetDistVal"),
@@ -4515,7 +4515,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("minimum track approach distance to jet axis"),
       requires    = cms.vstring("nTrkTagVarCSV"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackJetDistSig"),
@@ -4523,7 +4523,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("minimum track approach distance to jet axis significance"),
       requires    = cms.vstring("nTrkTagVarCSV"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("TagVarCSV_trackEtaRel"),
@@ -4531,7 +4531,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track pseudorapidity, relative to the jet axis"),
       requires    = cms.vstring("nTrkTagVarCSV"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCSVTagTrackVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_nFirstTrkCTagVar"),
@@ -4539,7 +4539,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_nFirstTrkCTagVar"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_nLastTrkCTagVar"),
@@ -4547,7 +4547,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_nLastTrkCTagVar"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_nFirstTrkEtaRelCTagVar"),
@@ -4555,7 +4555,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_nFirstTrkEtaRelCTagVar"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_nLastTrkEtaRelCTagVar"),
@@ -4563,7 +4563,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_nLastTrkEtaRelCTagVar"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_nFirstLepCTagVar"),
@@ -4571,7 +4571,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_nFirstLepCTagVar"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_nLastLepCTagVar"),
@@ -4579,7 +4579,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_nLastLepCTagVar"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_Jet_CvsB"),
@@ -4587,7 +4587,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("CTag_Jet_CvsB"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_Jet_CvsBN"),
@@ -4595,7 +4595,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("CTag_Jet_CvsBN"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_Jet_CvsBP"),
@@ -4603,7 +4603,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("CTag_Jet_CvsBP"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_Jet_CvsL"),
@@ -4611,7 +4611,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("CTag_Jet_CvsL"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_Jet_CvsLN"),
@@ -4619,7 +4619,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("CTag_Jet_CvsLN"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_Jet_CvsLP"),
@@ -4627,7 +4627,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("CTag_Jet_CvsLP"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_jetNTracks"),
@@ -4635,7 +4635,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("tracks associated to jet"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_jetNTracksEtaRel"),
@@ -4643,7 +4643,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("tracks associated to jet for which trackEtaRel is calculated"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_jetNLeptons"),
@@ -4651,7 +4651,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("CTag_jetNLeptons"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_trackSumJetEtRatio"),
@@ -4659,7 +4659,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("ratio of track sum transverse energy over jet energy"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_trackSumJetDeltaR"),
@@ -4667,7 +4667,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("pseudoangular distance between jet axis and track fourvector sum"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_trackSip2dSigAboveCharm"),
@@ -4675,7 +4675,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track 2D signed impact parameter significance of first track lifting mass above charm"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_trackSip3dSigAboveCharm"),
@@ -4683,7 +4683,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track 3D signed impact parameter significance of first track lifting mass above charm"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_vertexCategory"),
@@ -4691,7 +4691,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("category of secondary vertex (Reco, Pseudo, No)"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_jetNSecondaryVertices"),
@@ -4699,7 +4699,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("number of reconstructed possible secondary vertices in jet"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_vertexMass"),
@@ -4707,7 +4707,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("mass of track sum at secondary vertex"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_vertexNTracks"),
@@ -4715,7 +4715,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("number of tracks at secondary vertex"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_vertexEnergyRatio"),
@@ -4723,7 +4723,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("ratio of energy at secondary vertex over total energy"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_vertexJetDeltaR"),
@@ -4731,7 +4731,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("pseudoangular distance between jet axis and secondary vertex direction"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_flightDistance2dSig"),
@@ -4739,7 +4739,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("transverse distance significance between primary and secondary vertex"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_flightDistance3dSig"),
@@ -4747,7 +4747,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("distance significance between primary and secondary vertex"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_massVertexEnergyFraction"),
@@ -4755,7 +4755,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("vertex mass times the fraction of the vertex energy with respect to the jet energy"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_vertexBoostOverSqrtJetPt"),
@@ -4763,7 +4763,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("variable related to the boost of the vertex system in flight direction"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_vertexLeptonCategory"),
@@ -4771,7 +4771,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("CTag_vertexLeptonCategory"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("nTrkCTagVar"),
@@ -4779,7 +4779,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("nTrkCTagVar"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("nTrkEtaRelCTagVar"),
@@ -4787,7 +4787,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("nTrkEtaRelCTagVar"),
       requires    = cms.vstring("nTrkCTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_trackPtRel"),
@@ -4795,7 +4795,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track transverse momentum, relative to the jet axis"),
       requires    = cms.vstring("nTrkCTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_trackPPar"),
@@ -4803,7 +4803,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track parallel momentum, along the jet axis"),
       requires    = cms.vstring("nTrkCTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_trackDeltaR"),
@@ -4811,7 +4811,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track pseudoangular distance from the jet axis"),
       requires    = cms.vstring("nTrkCTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_trackPtRatio"),
@@ -4819,7 +4819,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track transverse momentum, relative to the jet axis, normalized to its energy"),
       requires    = cms.vstring("nTrkCTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_trackPParRatio"),
@@ -4827,7 +4827,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track parallel momentum, along the jet axis, normalized to its energy"),
       requires    = cms.vstring("nTrkCTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_trackSip2dSig"),
@@ -4835,7 +4835,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track 2D signed impact parameter significance"),
       requires    = cms.vstring("nTrkCTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_trackSip3dSig"),
@@ -4843,7 +4843,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track 3D signed impact parameter significance"),
       requires    = cms.vstring("nTrkCTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_trackDecayLenVal"),
@@ -4851,7 +4851,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track decay length"),
       requires    = cms.vstring("nTrkCTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_trackJetDistVal"),
@@ -4859,7 +4859,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("minimum track approach distance to jet axis"),
       requires    = cms.vstring("nTrkCTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_trackEtaRel"),
@@ -4867,7 +4867,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("track pseudorapidity, relative to the jet axis"),
       requires    = cms.vstring("nTrkEtaRelCTagVar"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("nLeptons"),
@@ -4875,7 +4875,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("nLeptons"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_leptonPtRel"),
@@ -4883,7 +4883,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("CTag_leptonPtRel"),
       requires    = cms.vstring("nLeptons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_leptonSip3d"),
@@ -4891,7 +4891,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("CTag_leptonSip3d"),
       requires    = cms.vstring("nLeptons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_leptonDeltaR"),
@@ -4899,7 +4899,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("CTag_leptonDeltaR"),
       requires    = cms.vstring("nLeptons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_leptonRatioRel"),
@@ -4907,7 +4907,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("CTag_leptonRatioRel"),
       requires    = cms.vstring("nLeptons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_leptonEtaRel"),
@@ -4915,7 +4915,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("CTag_leptonEtaRel"),
       requires    = cms.vstring("nLeptons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("CTag_leptonRatio"),
@@ -4923,7 +4923,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("CTag_leptonRatio"),
       requires    = cms.vstring("nLeptons"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runCTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_nSubJets"),
