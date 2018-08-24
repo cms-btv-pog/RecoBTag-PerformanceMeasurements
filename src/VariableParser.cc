@@ -80,7 +80,7 @@ void VariableParser::printVariables(vector<edm::ParameterSet> variableSet)
 
 void VariableParser::printRunOptions()
 {
-  cout << endl << "The following list of options will be run: " << endl;
+  cout << endl << "The following options are forced to be true due to the variable selection: " << endl;
   for(unordered_set<string>::iterator option = runOptions_.begin(); option != runOptions_.end(); ++option)
   {
     cout << *option << endl;
