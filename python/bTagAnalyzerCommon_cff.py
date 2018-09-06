@@ -24,6 +24,7 @@ bTagAnalyzerCommon = cms.PSet(
     storeDeepFlavourVariables= cms.bool(True),
     storeDeepCSVVariables    = cms.bool(True),
     storeDeepFlavourTagVariables = cms.bool(False),
+    storeDeepDoubleBTagVariables = cms.bool(False),
     storeCSVTagVariablesSubJets = cms.bool(False),
     storeCSVTagTrackVariablesSubJets = cms.bool(False),
     storePFElectronVariables = cms.bool(False),
