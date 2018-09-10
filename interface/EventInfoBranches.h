@@ -362,7 +362,6 @@ class EventInfoBranches {
       if(variableParser.isToBeStored("PatMuon_IPsig")) tree->Branch("PatMuon_IPsig", PatMuon_IPsig, "PatMuon_IPsig[nPatMuon]/F");
       if(variableParser.isToBeStored("PatMuon_IP2D")) tree->Branch("PatMuon_IP2D", PatMuon_IP2D, "PatMuon_IP2D[nPatMuon]/F");
       if(variableParser.isToBeStored("PatMuon_IP2Dsig")) tree->Branch("PatMuon_IP2Dsig", PatMuon_IP2Dsig, "PatMuon_IP2Dsig[nPatMuon]/F");
->>>>>>> varconf
     }
 
     void ReadBranches(TTree *tree, VariableParser variableParser){
