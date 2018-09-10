@@ -1,7 +1,7 @@
 common = {
 	'eras' : ['Run2_2018'],
 	'miniAOD' : True,
-	'storeDeepFlavourTagVariables' : True,
+	'runDeepFlavourTagVariables' : True,
 }
 
 mc = {

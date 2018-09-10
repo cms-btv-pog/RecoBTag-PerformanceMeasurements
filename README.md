@@ -20,7 +20,7 @@ wget https://github.com/cms-data/RecoBTag-Combined/raw/V01-00-13/DeepDoubleB/V01
 wget https://github.com/cms-data/RecoBTag-Combined/raw/V01-00-13/DeepDoubleB/V01/constant_graph_PtCut_MassSculptPen.pb -P RecoBTag/Combined/data/DeepDoubleB/V01/
 
 
-git clone -b 10_1_X_v1.02 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b varconf  https://github.com/rauser/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
@@ -38,4 +38,53 @@ To run the tests for integrating changes run:
 cd RecoBTag/PerformanceMeasurements/test/
 ./run_tests.sh
 ```
+The content of the output ntuple is by default empty and has to be configured according to your needs. The ```store*Variables``` options have been removed.
+The new variable configuration can be customized in the file ```RecoBTag/PerformanceMeasurements/python/varGroups_cfi.py```.
+New variables need also to be added (apart from adding them in the code) in ```RecoBTag/PerformanceMeasurements/python/variables_cfi.py```
 
+Temporary info: Please validate your output ntuple by running one of the commands:
+
+```
+cmsRun runBTagAnalyzer_cfg.py defaults=Commissioning18 runOnData=False maxEvents=20 {runOptions} groups='{groups}'
+```
+with ```runOptions``` replacing ```store*Variables```
+```
+runOptions :
+runFatJets=True
+runSubJets=True
+runEventInfo=True
+runJetVariables=True
+runQuarkVariables=True
+runHadronVariables=True
+runGenVariables=True
+runPatMuons=True
+runTagVariables=True
+runTagVariablesSubJets=True
+runCSVTagVariables=True
+runCSVTagTrackVariables=True
+runDeepFlavourTagVariables=True
+runCSVTagVariablesSubJets=True
+runPFElectronVariables=True
+runPFMuonVariables=True
+runCTagVariables=True
+```
+
+and
+```
+groups:
+Caroline
+Josh
+Frank
+Daniel
+Petr
+Keng
+Matej
+Devdatta
+```
+
+e.g.:
+```
+cmsRun runBTagAnalyzer_cfg.py defaults=Commissioning18 runOnData=False maxEvents=20 runHadronVariables=True runGenVariables=True runCTagVariables=True runPFMuonVariables=True runPFElectronVariables=True runCSVTagTrackVariables=True  runCSVTagVariables=True runPatMuons=True runDeepFlavourTagVariables=True groups='Caroline'
+cmsRun runBTagAnalyzer_cfg.py defaults=Commissioning18 runOnData=False maxEvents=20 runHadronVariables=True runGenVariables=True runCTagVariables=True runPFMuonVariables=True runPFElectronVariables=True runCSVTagTrackVariables=True  runCSVTagVariables=True runPatMuons=True runDeepFlavourTagVariables=True runFatJets=True runSubJets=True groups='Daniel'
+
+```
