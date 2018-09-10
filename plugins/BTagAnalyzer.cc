@@ -543,7 +543,6 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
 //   variableParser.printGroups(groupSet);
 //   variableParser.printVariables(variableSet);
   variableParser.saveStoredVariablesToFile();
-  variableParser.printRunOptions();
 
   // Parameters
   runFatJets_ = iConfig.getParameter<bool>("runFatJets");
@@ -556,26 +555,26 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   selTagger_ = iConfig.getParameter<int>("selTagger");
 
   useSelectedTracks_    = iConfig.getParameter<bool> ("useSelectedTracks");
-  fillPU_    = iConfig.getParameter<bool> ("fillPU") || variableParser.runOption("fillPU");
+  fillPU_    = iConfig.getParameter<bool> ("fillPU");
   useTrackHistory_      = iConfig.getParameter<bool> ("useTrackHistory");
   produceJetTrackTruthTree_  = iConfig.getParameter<bool> ("produceJetTrackTruthTree");
-  produceAllTrackTree_  = iConfig.getParameter<bool> ("produceAllTrackTree") || variableParser.runOption("produceAllTrackTree");
-  producePtRelTemplate_ = iConfig.getParameter<bool> ("producePtRelTemplate") || variableParser.runOption("producePtRelTemplate");
-  runEventInfo_ = iConfig.getParameter<bool>("runEventInfo") || variableParser.runOption("runEventInfo");
-  runJetVariables_ = iConfig.getParameter<bool>("runJetVariables") || variableParser.runOption("runJetVariables");
-  runQuarkVariables_ = iConfig.getParameter<bool>("runQuarkVariables") || variableParser.runOption("runQuarkVariables");
-  runHadronVariables_ = iConfig.getParameter<bool>("runHadronVariables") || variableParser.runOption("runHadronVariables");
-  runGenVariables_ = iConfig.getParameter<bool>("runGenVariables") || variableParser.runOption("runGenVariables");
-  runPatMuons_ = iConfig.getParameter<bool>("runPatMuons") || variableParser.runOption("runPatMuons");
-  runTagVariables_ = iConfig.getParameter<bool>("runTagVariables") || variableParser.runOption("runTagVariables");
-  runTagVariablesSubJets_ = iConfig.getParameter<bool>("runTagVariablesSubJets") || variableParser.runOption("runTagVariablesSubJets");
-  runCSVTagVariables_ = iConfig.getParameter<bool>("runCSVTagVariables") || variableParser.runOption("runCSVTagVariables");
-  runCSVTagTrackVariables_ = iConfig.getParameter<bool>("runCSVTagTrackVariables") || variableParser.runOption("runCSVTagTrackVariables");
-  runDeepFlavourTagVariables_  = iConfig.getParameter<bool>("runDeepFlavourTagVariables") || variableParser.runOption("runDeepFlavourTagVariables");
-  runCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("runCSVTagVariablesSubJets") || variableParser.runOption("runCSVTagVariablesSubJets");
-  runPFElectronVariables_ = iConfig.getParameter<bool>("runPFElectronVariables") || variableParser.runOption("runPFElectronVariables");
-  runPFMuonVariables_ = iConfig.getParameter<bool>("runPFMuonVariables") || variableParser.runOption("runPFMuonVariables");
-  runCTagVariables_ = iConfig.getParameter<bool>("runCTagVariables") || variableParser.runOption("runCTagVariables");
+  produceAllTrackTree_  = iConfig.getParameter<bool> ("produceAllTrackTree");
+  producePtRelTemplate_ = iConfig.getParameter<bool> ("producePtRelTemplate");
+  runEventInfo_ = iConfig.getParameter<bool>("runEventInfo");
+  runJetVariables_ = iConfig.getParameter<bool>("runJetVariables");
+  runQuarkVariables_ = iConfig.getParameter<bool>("runQuarkVariables");
+  runHadronVariables_ = iConfig.getParameter<bool>("runHadronVariables");
+  runGenVariables_ = iConfig.getParameter<bool>("runGenVariables");
+  runPatMuons_ = iConfig.getParameter<bool>("runPatMuons");
+  runTagVariables_ = iConfig.getParameter<bool>("runTagVariables");
+  runTagVariablesSubJets_ = iConfig.getParameter<bool>("runTagVariablesSubJets");
+  runCSVTagVariables_ = iConfig.getParameter<bool>("runCSVTagVariables");
+  runCSVTagTrackVariables_ = iConfig.getParameter<bool>("runCSVTagTrackVariables");
+  runDeepFlavourTagVariables_  = iConfig.getParameter<bool>("runDeepFlavourTagVariables");
+  runCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("runCSVTagVariablesSubJets");
+  runPFElectronVariables_ = iConfig.getParameter<bool>("runPFElectronVariables");
+  runPFMuonVariables_ = iConfig.getParameter<bool>("runPFMuonVariables");
+  runCTagVariables_ = iConfig.getParameter<bool>("runCTagVariables");
   
 
   use_ttbar_filter_ = iConfig.getParameter<bool> ("use_ttbar_filter");
