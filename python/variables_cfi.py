@@ -5060,3 +5060,5 @@ variableSet = cms.PSet(
     variableList
   )
 )
+
+variableDict = {i.variable.value() : i for i in variableList}

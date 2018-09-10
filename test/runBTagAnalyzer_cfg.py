@@ -80,6 +80,11 @@ options.register('runSubJets', False,
     VarParsing.varType.bool,
     "Run subjets"
 )
+options.register('runEventInfo', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Run Event Info"
+)
 options.register('processStdAK4Jets', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -170,13 +175,16 @@ options.register('useTrackHistory', False,
     VarParsing.varType.bool,
     "uses track history, for GEN-SIM-RECODEBUG samples only"
 )
-
 options.register('produceJetTrackTree', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "True if you want to run info for tracks associated to jets : for commissioning studies"
 )
-
+options.register('produceAllTrackTree', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Produce all track tree"
+)
 options.register('useNegativeDeepFlavourTags', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -331,6 +339,38 @@ if options.defaults:
 			if key == 'inputFiles' and options.inputFiles: continue #skip input files that for some reason are never considered set
 			print 'setting default option for', key
 			setattr(options, key, value)
+
+from RecoBTag.PerformanceMeasurements.BTagAnalyzer_cff import *
+btagana_tmp = bTagAnalyzer.clone()
+print('Storing the variables from the following groups:')
+options_to_change = set() #store which swtiches we need on
+for requiredGroup in options.groups:
+  print(requiredGroup)
+  found=False
+  for existingGroup in btagana_tmp.groups:
+    if(requiredGroup==existingGroup.group):
+      existingGroup.store=True
+      for var in existingGroup.variables:
+        if "FatJetInfo." in var:
+          options_to_change.update({"runFatJets"})
+          var = var.split(".")[1]
+        if "SubJetInfo." in var:
+          options_to_change.update({"runSubJets"})
+          var = var.split(".")[1]
+        options_to_change.update([i for i in variableDict[var].runOptions])
+      found=True
+      break
+  if(not found):
+    print('WARNING: The group ' + requiredGroup + ' was not found')
+ 
+#change values accordingly
+for switch in options_to_change:
+  if switch not in options._beenSet:
+    raise ValueError('The option set by the variables: %s does not exist among the cfg options!' % switch)
+  elif not options._beenSet[key]:
+    print 'Turning on %s, as some stored variables demands it' % switch
+    setattr(options, switch, True)
+
 
 ## Use either PFchs or Puppi
 if options.usePFchs and options.usePuppi:
@@ -1406,7 +1446,6 @@ if options.runFatJets:
             getattr(process,'pfCombinedInclusiveSecondaryVertexV2BJetTagsFatPF'+postfix).jetTagComputer = cms.string('candidateCombinedSecondaryVertexV2ComputerFat')
 
 #-------------------------------------
-from RecoBTag.PerformanceMeasurements.BTagAnalyzer_cff import *
 process.btagana = bTagAnalyzer.clone()
 if options.useLegacyTaggers:
     process.btagana = bTagAnalyzerLegacy.clone()
@@ -1432,17 +1471,10 @@ if options.useLegacyTaggers:
 #------------------
 
 #Handle groups
-print('Storing the variables from the following groups:')
-for requiredGroup in options.groups:
-  print(requiredGroup)
-  found=False
-  for existingGroup in process.btagana.groups:
-    if(requiredGroup==existingGroup.group):
-      existingGroup.store=True
-      found=True
-      break
-  if(not found):
-    print('WARNING: The group ' + requiredGroup + ' was not found')
+for requiredGroup in process.btagana.groups:
+   for storedGroup in btagana_tmp.groups:
+     if (requiredGroup.group == storedGroup.group):
+       requiredGroup.store = storedGroup.store
 
 process.btagana.MaxEta                = options.maxJetEta ## for extended forward pixel coverage
 process.btagana.MinPt                 = options.minJetPt
@@ -1450,7 +1482,7 @@ process.btagana.tracksColl            = cms.InputTag(trackSource)
 process.btagana.useSelectedTracks     = options.useSelectedTracks ## False if you want to run on all tracks : for commissioning studies
 process.btagana.useTrackHistory       = options.useTrackHistory ## Can only be used with GEN-SIM-RECODEBUG files
 process.btagana.produceJetTrackTruthTree = options.useTrackHistory ## can only be used with GEN-SIM-RECODEBUG files and when useTrackHistory is True
-process.btagana.produceAllTrackTree   = False ## True if you want to run info for all tracks : for commissioning studies
+process.btagana.produceAllTrackTree   = options.produceAllTrackTree ## True if you want to run info for all tracks : for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
 process.btagana.runTagVariables     = False  ## True if you want to run TagInfo TaggingVariables
@@ -1474,6 +1506,7 @@ process.btagana.runPFElectronVariables = options.runPFElectronVariables
 process.btagana.runPFMuonVariables = options.runPFMuonVariables
 process.btagana.runPatMuons = options.runPatMuons
 process.btagana.runCTagVariables = options.runCTagVariables
+process.btagana.runEventInfo = options.runEventInfo
 
 process.btagana.runOnData = options.runOnData
 
