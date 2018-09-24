@@ -9,6 +9,8 @@ const UInt_t nMaxMuons_= 10000;
 const UInt_t nMaxElectrons_= 10000;
 const UInt_t nMaxSVs_= 10000;
 const UInt_t nMaxLeptons_=10000;
+const UInt_t nTrk_DeepDoubleB_=60;
+const UInt_t nSV_DeepDoubleB_=5;
 
 class JetInfoBranches {
 
@@ -405,14 +407,14 @@ class JetInfoBranches {
     float DeepFlavourInput_sv_normchi2[nMaxJets_];
 
     //DeepDoubleB input features selection
-    float DeepDoubleBInput_charged_EtaRel[nMaxJets_];
-    float DeepDoubleBInput_charged_PtRatio[nMaxJets_];
-    float DeepDoubleBInput_charged_PParRatio[nMaxJets_];
-    float DeepDoubleBInput_charged_Sip2dVal[nMaxJets_];
-    float DeepDoubleBInput_charged_Sip2dSig[nMaxJets_];
-    float DeepDoubleBInput_charged_Sip3dVal[nMaxJets_];
-    float DeepDoubleBInput_charged_Sip3dSig[nMaxJets_];
-    float DeepDoubleBInput_charged_JetDistVal[nMaxJets_];
+    float DeepDoubleBInput_charged_EtaRel[nTrk_DeepDoubleB_][nMaxJets_];
+    float DeepDoubleBInput_charged_PtRatio[nTrk_DeepDoubleB_][nMaxJets_];
+    float DeepDoubleBInput_charged_PParRatio[nTrk_DeepDoubleB_][nMaxJets_];
+    float DeepDoubleBInput_charged_Sip2dVal[nTrk_DeepDoubleB_][nMaxJets_];
+    float DeepDoubleBInput_charged_Sip2dSig[nTrk_DeepDoubleB_][nMaxJets_];
+    float DeepDoubleBInput_charged_Sip3dVal[nTrk_DeepDoubleB_][nMaxJets_];
+    float DeepDoubleBInput_charged_Sip3dSig[nTrk_DeepDoubleB_][nMaxJets_];
+    float DeepDoubleBInput_charged_JetDistVal[nTrk_DeepDoubleB_][nMaxJets_];
 
     float DeepDoubleBInput_sv_d3d[     nMaxJets_];
     float DeepDoubleBInput_sv_d3dsig[  nMaxJets_];
@@ -934,14 +936,19 @@ class JetInfoBranches {
 
     void RegisterDeepDoubleBFeatTree(TTree *tree, std::string name=""){
       if(name!="") name += ".";
-      tree->Branch((name+"DeepDoubleBInput_charged_EtaRel").c_str(), DeepDoubleBInput_charged_EtaRel, (name+"DeepDoubleBInput_charged_EtaRel["+name+"nJet]/F").c_str());
-      tree->Branch((name+"DeepDoubleBInput_charged_PtRatio").c_str(), DeepDoubleBInput_charged_PtRatio, (name+"DeepDoubleBInput_charged_PtRatio["+name+"nJet]/F").c_str());
-      tree->Branch((name+"DeepDoubleBInput_charged_PParRatio").c_str(), DeepDoubleBInput_charged_PParRatio, (name+"DeepDoubleBInput_charged_PParRatio["+name+"nJet]/F").c_str());
-      tree->Branch((name+"DeepDoubleBInput_charged_Sip2dVal").c_str(), DeepDoubleBInput_charged_Sip2dVal, (name+"DeepDoubleBInput_charged_Sip2dVal["+name+"nJet]/F").c_str());
-      tree->Branch((name+"DeepDoubleBInput_charged_Sip2dSig").c_str(), DeepDoubleBInput_charged_Sip2dSig, (name+"DeepDoubleBInput_charged_Sip2dSig["+name+"nJet]/F").c_str());
-      tree->Branch((name+"DeepDoubleBInput_charged_Sip3dVal").c_str(), DeepDoubleBInput_charged_Sip3dVal, (name+"DeepDoubleBInput_charged_Sip3dVal["+name+"nJet]/F").c_str());
-      tree->Branch((name+"DeepDoubleBInput_charged_Sip3dSig").c_str(), DeepDoubleBInput_charged_Sip3dSig, (name+"DeepDoubleBInput_charged_Sip3dSig["+name+"nJet]/F").c_str());
-      tree->Branch((name+"DeepDoubleBInput_charged_JetDistVal").c_str(), DeepDoubleBInput_charged_JetDistVal, (name+"DeepDoubleBInput_charged_JetDistVal["+name+"nJet]/F").c_str());
+
+      for(unsigned int t = 0; t < nTrk_DeepDoubleB_; t++){
+      tree->Branch((name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_EtaRel").c_str(), DeepDoubleBInput_charged_EtaRel[t], (name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_EtaRel["+name+"nJet]/F").c_str());
+      tree->Branch((name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_PtRatio").c_str(), DeepDoubleBInput_charged_PtRatio[t], (name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_PtRatio["+name+"nJet]/F").c_str());
+      tree->Branch((name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_PParRatio").c_str(), DeepDoubleBInput_charged_PParRatio, (name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_PParRatio["+name+"nJet]/F").c_str());
+      tree->Branch((name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_Sip2dVal").c_str(), DeepDoubleBInput_charged_Sip2dVal[t], (name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_Sip2dVal["+name+"nJet]/F").c_str());
+      tree->Branch((name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_Sip2dSig").c_str(), DeepDoubleBInput_charged_Sip2dSig[t], (name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_Sip2dSig["+name+"nJet]/F").c_str());
+      tree->Branch((name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_Sip3dVal").c_str(), DeepDoubleBInput_charged_Sip3dVal[t], (name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_Sip3dVal["+name+"nJet]/F").c_str());
+      tree->Branch((name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_Sip3dSig").c_str(), DeepDoubleBInput_charged_Sip3dSig[t], (name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_Sip3dSig["+name+"nJet]/F").c_str());
+      tree->Branch((name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_JetDistVal").c_str(), DeepDoubleBInput_charged_JetDistVal[t], (name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_JetDistVal["+name+"nJet]/F").c_str());
+
+      }
+
       tree->Branch((name+"DeepDoubleBInput_sv_d3d"     ).c_str(), DeepDoubleBInput_sv_d3d     , (name+"DeepDoubleBInput_sv_d3d["     +name+"nJet]/F").c_str());
       tree->Branch((name+"DeepDoubleBInput_sv_d3dsig"  ).c_str(), DeepDoubleBInput_sv_d3dsig  , (name+"DeepDoubleBInput_sv_d3dsig["  +name+"nJet]/F").c_str());
     }
