@@ -416,8 +416,8 @@ class JetInfoBranches {
     float DeepDoubleBInput_charged_Sip3dSig[nTrk_DeepDoubleB_][nMaxJets_];
     float DeepDoubleBInput_charged_JetDistVal[nTrk_DeepDoubleB_][nMaxJets_];
 
-    float DeepDoubleBInput_sv_d3d[     nMaxJets_];
-    float DeepDoubleBInput_sv_d3dsig[  nMaxJets_];
+    float DeepDoubleBInput_sv_d3d[nSV_DeepDoubleB_][nMaxJets_];
+    float DeepDoubleBInput_sv_d3dsig[nSV_DeepDoubleB_][nMaxJets_];
 
     // CSV TaggingVariables
     // per jet
@@ -949,8 +949,11 @@ class JetInfoBranches {
 
       }
 
-      tree->Branch((name+"DeepDoubleBInput_sv_d3d"     ).c_str(), DeepDoubleBInput_sv_d3d     , (name+"DeepDoubleBInput_sv_d3d["     +name+"nJet]/F").c_str());
-      tree->Branch((name+"DeepDoubleBInput_sv_d3dsig"  ).c_str(), DeepDoubleBInput_sv_d3dsig  , (name+"DeepDoubleBInput_sv_d3dsig["  +name+"nJet]/F").c_str());
+      for(unsigned int sv = 0; sv < nSV_DeepDoubleB_; sv++)
+      {
+      tree->Branch((name+"DeepDoubleBInput_sv"+std::to_string(sv)+"_d3d").c_str(), DeepDoubleBInput_sv_d3d[sv], (name+"DeepDoubleBInput_sv"+std::to_string(sv)+"_d3d["+name+"nJet]/F").c_str());
+      tree->Branch((name+"DeepDoubleBInput_sv"+std::to_string(sv)+"_d3dsig").c_str(), DeepDoubleBInput_sv_d3dsig[sv], (name+"DeepDoubleBInput_sv"+std::to_string(sv)+"_d3dsig["+name+"nJet]/F").c_str());
+      }
     }
 
 

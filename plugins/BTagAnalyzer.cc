@@ -3525,8 +3525,10 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         }
 
 	size_t svsize = features.sv_features.size();
-	JetInfo[iJetColl].DeepDoubleBInput_sv_d3d[     JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].d3d;
-	JetInfo[iJetColl].DeepDoubleBInput_sv_d3dsig[  JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].d3dsig;
+	for(unsigned int sv = 0; sv < nSV_DeepDoubleB_; sv++){
+	JetInfo[iJetColl].DeepDoubleBInput_sv_d3d[sv][JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[sv].d3d;
+	JetInfo[iJetColl].DeepDoubleBInput_sv_d3dsig[sv][JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[sv].d3dsig;
+        }
       //--------------------------
     }
 
