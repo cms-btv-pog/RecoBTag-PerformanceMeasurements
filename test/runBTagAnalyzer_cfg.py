@@ -275,6 +275,10 @@ options.register('storeDeepFlavourVariables', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to keep DeepFlavour Jet Variables')
+options.register('storeDeepDoubleBTagVariables', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to keep DeepDoubleB TaggingVariables')
 options.register('storeDeepCSVVariables', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -355,8 +359,9 @@ if options.runSubJets and not options.runFatJets:
     options.runSubJets = False
 
 if not options.miniAOD and options.storeDeepFlavourTagVariables: #FIXME
-    print "WARNING: switching off DeepFlavour, as it is not supported in AOD"
+    print "WARNING: switching off DeepFlavour/DeepDoubleB, as it is not supported in AOD"
     options.storeDeepFlavourTagVariables = False
+    options.storeDeepDoubleBTagVariables = False
 
 if options.doBoostedCommissioning:
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
@@ -420,8 +425,9 @@ bTagInfos = [
    ,'pfInclusiveSecondaryVertexFinderCvsLTagInfos'
    ,'pfInclusiveSecondaryVertexFinderNegativeCvsLTagInfos'
    ,'pfDeepFlavourTagInfos'
+   ,'pfDeepDoubleBTagInfos'
 ]
-bTagInfos_noDeepFlavour = bTagInfos[:-1]
+bTagInfos_noDeepFlavour = bTagInfos[:-2]
 ## b-tag discriminators
 bTagDiscriminatorsLegacy = set([
     'jetBProbabilityBJetTags'
@@ -577,6 +583,8 @@ bTagInfosFat = copy.deepcopy(bTagInfos_noDeepFlavour)
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfImpactParameter' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfInclusiveSecondaryVertexFinder' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfBoostedDoubleSV' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
+## Add DeepDoubleB tag infos
+bTagInfosFat += ([] if options.useLegacyTaggers else ['pfDeepDoubleBTagInfos'])
 
 bTagDiscriminators_no_deepFlavour = {i for i in bTagDiscriminators if 'DeepFlavourJetTags' not in i}
 bTagDiscriminatorsFat = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
@@ -1440,6 +1448,7 @@ process.btagana.storeTagVariables     = False  ## True if you want to keep TagIn
 process.btagana.storeCSVTagVariables  = options.storeCSVTagVariables   ## True if you want to keep CSV TaggingVariables
 process.btagana.storeCSVTagTrackVariables  = options.storeCSVTagTrackVariables   ## True if you want to keep CSV Tagging Track Variables
 process.btagana.storeDeepFlavourTagVariables = options.storeDeepFlavourTagVariables
+process.btagana.storeDeepDoubleBTagVariables = options.storeDeepDoubleBTagVariables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag(patJetSource)
 process.btagana.muonCollectionName    = cms.InputTag(muSource)
@@ -1487,6 +1496,7 @@ if options.runFatJets:
         storeTagVariables   = cms.bool(False),
         storeDeepFlavourVariables = cms.bool(False),
         storeDeepFlavourTagVariables = cms.bool(False),
+        storeDeepDoubleBTagVariables = cms.bool(False),
         deepFlavourJetTags = cms.string(''),
         deepFlavourNegJetTags = cms.string(''),
         storeTagVariablesSubJets = cms.bool(False),
@@ -1525,12 +1535,14 @@ if options.doBoostedCommissioning:
     process.btaganaFatJets.storeCSVTagTrackVariables = True
     process.btaganaFatJets.storeCSVTagVariablesSubJets = True
     process.btaganaFatJets.storeCSVTagTrackVariablesSubJets = True
+    process.btaganaFatJets.storeDeepDoubleBTagVariables = True
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
     print "storeHadronVariables set to '",process.btaganaFatJets.storeHadronVariables,"'"
     print "storeQuarkVariables set to '",process.btaganaFatJets.storeQuarkVariables,"'"
     print "storePFMuonVariables set to '",process.btaganaFatJets.storePFMuonVariables,"'"
     print "produceJetTrackTree set to '",process.btaganaFatJets.produceJetTrackTree,"'"
     print "fillsvTagInfo set to '",process.btaganaFatJets.fillsvTagInfo,"'"
+    print "storeDeepDoubleBTagVariables set to '",process.btaganaFatJets.storeDeepDoubleBTagVariables,"'"
     print "For fat jets: storeCSVTagVariables set to '",process.btaganaFatJets.storeCSVTagVariables,"'"
     print "For fat jets: storeCSVTagTrackVariables set to '",process.btaganaFatJets.storeCSVTagTrackVariables,"'"
     print "For subjets:  storeCSVTagVariablesSubJets set to '",process.btaganaFatJets.storeCSVTagVariablesSubJets,"'"
