@@ -32,3 +32,17 @@ cd RecoBTag/PerformanceMeasurements/test/
 ./run_tests.sh
 ```
 
+To run DeepAK8:
+  * The algorithm is merged in CMSSW_9_4_11_cand1.
+  * For previous releases:
+~~~
+# setup MXNet and DeepAK8 models
+scram setup /cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_11_cand1/config/toolbox/slc6_amd64_gcc630/tools/selected/mxnet-predict.xml
+# get DeepAK8 PR for 94X
+git cms-merge-topic -u hqucms:deep-boosted-jets-rebase-94X
+# setup the data files
+mkdir -p $CMSSW_BASE/external/$SCRAM_ARCH/data/RecoBTag/Combined/data
+cp -r /cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_11_cand1/external/slc6_amd64_gcc630/data/RecoBTag/Combined/data/DeepBoostedJet $CMSSW_BASE/external/$SCRAM_ARCH/data/RecoBTag/Combined/data
+# compile
+scram b -j 24
+~~~
