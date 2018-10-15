@@ -32,7 +32,7 @@ cd RecoBTag/PerformanceMeasurements/test/
 ./run_tests.sh
 ```
 
-To run DeepAK8:
+To run DeepAK8 (add the option `runDeepAK8=True` to `runBTagAnalyzer_cfg.py`):
   * The algorithm is merged in CMSSW_9_4_11_cand1.
   * For previous releases:
 ~~~
