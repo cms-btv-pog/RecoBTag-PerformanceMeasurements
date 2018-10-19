@@ -20,7 +20,7 @@ options.register('outFilename', 'JetTree',
     VarParsing.varType.string,
     "Output file name"
 )
-options.register('reportEvery', 10,
+options.register('reportEvery', 1000,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.int,
     "Report every N events (default is N=1)"
@@ -712,7 +712,9 @@ process.source = cms.Source("PoolSource",
 if options.miniAOD:
     process.source.fileNames = [
         #/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM
-        '/store/mc/RunIIFall17MiniAOD/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/00000/C8E934F8-1C06-E811-888D-0242AC130002.root'
+        #'/store/mc/RunIIFall17MiniAOD/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/00000/C8E934F8-1C06-E811-888D-0242AC130002.root'
+        #'/store/mc/RunIIFall17MiniAOD/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/MINIAODSIM/PU2017_94X_mc2017_realistic_v11-v1/50000/8660A60D-61A1-E811-B9F5-3CFDFE639BA0.root'
+        '/store/mc/RunIIFall17MiniAOD/QCD_Pt-800to1000_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/80000/369FCC15-B404-E811-BA2E-0CC47A78A456.root'
     ]
     if options.runOnData:
         process.source.fileNames = [
