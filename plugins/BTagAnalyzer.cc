@@ -3514,20 +3514,20 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 	//size_t csize = features.c_pf_features.size();
 	int csize = features.c_pf_features.size();
 	for(unsigned int t = 0; t < nTrk_DeepDoubleB_; t++){
-	JetInfo[iJetColl].DeepDoubleBInput_charged_EtaRel[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[t].btagPf_trackEtaRel;
-	JetInfo[iJetColl].DeepDoubleBInput_charged_PtRatio[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[t].btagPf_trackPtRatio;
-	JetInfo[iJetColl].DeepDoubleBInput_charged_PParRatio[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[t].btagPf_trackPParRatio;
-	JetInfo[iJetColl].DeepDoubleBInput_charged_Sip2dVal[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[t].btagPf_trackSip2dVal;
-	JetInfo[iJetColl].DeepDoubleBInput_charged_Sip2dSig[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[t].btagPf_trackSip2dSig;
-	JetInfo[iJetColl].DeepDoubleBInput_charged_Sip3dVal[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[t].btagPf_trackSip3dVal;
-	JetInfo[iJetColl].DeepDoubleBInput_charged_Sip3dSig[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[t].btagPf_trackSip3dSig;
-	JetInfo[iJetColl].DeepDoubleBInput_charged_JetDistVal[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[t].btagPf_trackJetDistVal;
+	JetInfo[iJetColl].DeepDoubleBInput_charged_EtaRel[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : (float) features.c_pf_features[t].btagPf_trackEtaRel;
+	JetInfo[iJetColl].DeepDoubleBInput_charged_PtRatio[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : (float) features.c_pf_features[t].btagPf_trackPtRatio;
+	JetInfo[iJetColl].DeepDoubleBInput_charged_PParRatio[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : (float) features.c_pf_features[t].btagPf_trackPParRatio;
+	JetInfo[iJetColl].DeepDoubleBInput_charged_Sip2dVal[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : (float) features.c_pf_features[t].btagPf_trackSip2dVal;
+	JetInfo[iJetColl].DeepDoubleBInput_charged_Sip2dSig[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : (float) features.c_pf_features[t].btagPf_trackSip2dSig;
+	JetInfo[iJetColl].DeepDoubleBInput_charged_Sip3dVal[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : (float) features.c_pf_features[t].btagPf_trackSip3dVal;
+	JetInfo[iJetColl].DeepDoubleBInput_charged_Sip3dSig[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : (float) features.c_pf_features[t].btagPf_trackSip3dSig;
+	JetInfo[iJetColl].DeepDoubleBInput_charged_JetDistVal[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : (float) features.c_pf_features[t].btagPf_trackJetDistVal;
         }
 
 	size_t svsize = features.sv_features.size();
 	for(unsigned int sv = 0; sv < nSV_DeepDoubleB_; sv++){
-	JetInfo[iJetColl].DeepDoubleBInput_sv_d3d[sv][JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[sv].d3d;
-	JetInfo[iJetColl].DeepDoubleBInput_sv_d3dsig[sv][JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[sv].d3dsig;
+	JetInfo[iJetColl].DeepDoubleBInput_sv_d3d[sv][JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 : (float) features.sv_features[sv].d3d;
+	JetInfo[iJetColl].DeepDoubleBInput_sv_d3dsig[sv][JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 : (float) features.sv_features[sv].d3dsig;
         }
       //--------------------------
     }
