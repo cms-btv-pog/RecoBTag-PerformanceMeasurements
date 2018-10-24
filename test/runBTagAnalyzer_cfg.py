@@ -20,7 +20,7 @@ options.register('outFilename', 'JetTree',
     VarParsing.varType.string,
     "Output file name"
 )
-options.register('reportEvery', 10,
+options.register('reportEvery', 1000,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.int,
     "Report every N events (default is N=1)"
@@ -200,6 +200,12 @@ options.register('doCTag', False,
     VarParsing.varType.bool,
     "Make NTuples with branches for CTag"
 )
+## Run DeepAK8
+options.register('runDeepAK8', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Run DeepAK8 for commissioning."
+)
 ### Options for upgrade studies
 # Change hits requirements
 options.register('changeMinNumberOfHits', False,
@@ -317,19 +323,19 @@ if options.defaults:
 	except ImportError:
 		raise ValueError('The default settings named %s.py are not present in PerformanceMeasurements/python/defaults/' % options.defaults)
 	if not hasattr(defaults, 'common') or not isinstance(defaults.common, dict):
-		raise RuntimeError('the default file %s.py does not contain a dictionary named common' % options.defaults)  
+		raise RuntimeError('the default file %s.py does not contain a dictionary named common' % options.defaults)
 	items = defaults.common.items()
-	if hasattr(defaults, 'data') and options.runOnData: 
+	if hasattr(defaults, 'data') and options.runOnData:
 		if not isinstance(defaults.data, dict):
 			raise RuntimeError('the default file %s.py contains an object called "data" which is not a dictionary' % options.defaults)
 		items.extend(defaults.data.items())
-	if hasattr(defaults, 'mc') and not options.runOnData: 
+	if hasattr(defaults, 'mc') and not options.runOnData:
 		if not isinstance(defaults.mc, dict):
 			raise RuntimeError('the default file %s.py contains an object called "mc" which is not a dictionary' % options.defaults)
 		items.extend(defaults.mc.items())
 	for key, value in items:
 		if key not in options._beenSet:
-			raise ValueError('The key set by the defaults: %s does not exist among the cfg options!' % key)		
+			raise ValueError('The key set by the defaults: %s does not exist among the cfg options!' % key)
 		elif not options._beenSet[key]:
 			if key == 'inputFiles' and options.inputFiles: continue #skip input files that for some reason are never considered set
 			print 'setting default option for', key
@@ -367,13 +373,17 @@ if options.doBoostedCommissioning:
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
     options.processStdAK4Jets=False
     print "Option processStdAK4Jets will be set to '",options.processStdAK4Jets,"'"
-    options.runFatJets=True  
+    options.runFatJets=True
     options.runSubJets = True
     print "Option runFatJets will be set to '",options.runFatJets,"'"
     print "Option runSubJets  will be set to '",options.runSubJets,"'"
     print "********************"
 if options.doCTag:
-    print "**********You are making NTuple for CTag*************" 
+    print "**********You are making NTuple for CTag*************"
+if options.runDeepAK8:
+    print "**********Running DeppAK8**********"
+    options.usePuppiForFatJets=True
+    print "Option usePuppiForFatJets will be set to '",options.runFatJets,"'"
 
 ## Global tag
 globalTag = options.mcGlobalTag
@@ -590,6 +600,17 @@ bTagDiscriminators_no_deepFlavour = {i for i in bTagDiscriminators if 'DeepFlavo
 bTagDiscriminatorsFat = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
 ## Add DeepDoubleB tagger to fat jets
 bTagDiscriminatorsFat.update(set(['pfDeepDoubleBJetTags:probH']))
+## Add DeepAK8 discriminators if runDeepAK8 option is true
+if options.runDeepAK8:
+    from RecoBTag.MXNet.pfDeepBoostedJet_cff import _pfMassDecorrelatedDeepBoostedJetTagsProbs, _pfMassDecorrelatedDeepBoostedJetTagsMetaDiscrs
+    bTagDiscriminatorsFat.update(set([
+        "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:bbvsLight",
+        "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ccvsLight",
+        "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:TvsQCD",
+        "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHccvsQCD",
+        "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:WvsQCD",
+        "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHbbvsQCD"
+    ]))
 
 if options.runJetClustering:
     options.remakeAllDiscr = True
@@ -691,7 +712,9 @@ process.source = cms.Source("PoolSource",
 if options.miniAOD:
     process.source.fileNames = [
         #/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM
-        '/store/mc/RunIIFall17MiniAOD/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/00000/C8E934F8-1C06-E811-888D-0242AC130002.root'
+        #'/store/mc/RunIIFall17MiniAOD/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/00000/C8E934F8-1C06-E811-888D-0242AC130002.root'
+        #'/store/mc/RunIIFall17MiniAOD/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/MINIAODSIM/PU2017_94X_mc2017_realistic_v11-v1/50000/8660A60D-61A1-E811-B9F5-3CFDFE639BA0.root'
+        '/store/mc/RunIIFall17MiniAOD/QCD_Pt-800to1000_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/80000/369FCC15-B404-E811-BA2E-0CC47A78A456.root'
     ]
     if options.runOnData:
         process.source.fileNames = [
@@ -733,7 +756,7 @@ if options.fastSim :
     options.outFilename += '_FastSim'
 
 if options.doBoostedCommissioning:
-  options.outFilename += '_BoostedCommissioning' 
+  options.outFilename += '_BoostedCommissioning'
 
 options.outFilename += '.root'
 
@@ -1278,7 +1301,7 @@ if options.useTTbarFilter:
     # Set up electron ID (VID framework)
     from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
     switchOnVIDElectronIdProducer(process, dataFormat=DataFormat.MiniAOD)
-    my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Fall17_94X_V1_Preliminary_cff']
+    my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Fall17_94X_V1_cff']
     for idmod in my_id_modules:
         setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
@@ -1435,7 +1458,7 @@ if options.useLegacyTaggers:
 #------------------
 process.btagana.MaxEta                = options.maxJetEta ## for extended forward pixel coverage
 process.btagana.MinPt                 = options.minJetPt
-process.btagana.tracksColl            = cms.InputTag(trackSource) 
+process.btagana.tracksColl            = cms.InputTag(trackSource)
 process.btagana.useSelectedTracks     = options.useSelectedTracks ## False if you want to run on all tracks : for commissioning studies
 process.btagana.useTrackHistory       = options.useTrackHistory ## Can only be used with GEN-SIM-RECODEBUG files
 process.btagana.fillsvTagInfo         = options.fillsvTagInfo ## True if you want to store information relative to the svTagInfos, set to False if produceJetTrackTree is set to False

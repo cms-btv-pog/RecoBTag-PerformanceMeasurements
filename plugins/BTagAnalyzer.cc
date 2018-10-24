@@ -240,7 +240,7 @@ private:
 
   void setTracksSV(const TrackRef & trackRef, const SVTagInfo *, int & isFromSV, int & iSV, float & SVweight);
   void vertexKinematicsAndChange(const Vertex & vertex, reco::TrackKinematics & vertexKinematics, Int_t & charge);
-  
+
   void etaRelToTauAxis(const Vertex & vertex, const fastjet::PseudoJet & tauAxis, std::vector<float> & tau_trackEtaRel);
 
   bool NameCompatible(const std::string& pattern, const std::string& name);
@@ -332,6 +332,7 @@ private:
 
   std::string doubleSVBJetTags_;
   std::string deepDoubleBJetTags_;
+  std::string deepAK8Tags_;
 
   std::string cMVABJetTags_;
   std::string cMVAv2BJetTags_;
@@ -400,7 +401,7 @@ private:
   bool storePFMuonVariables_;
 
   bool storeCTagVariables_;
-  bool doCTag_; 
+  bool doCTag_;
 
   bool use_ttbar_filter_;
   edm::EDGetTokenT<edm::View<reco::GenParticle> > ttbarproducerGen_;
@@ -411,7 +412,7 @@ private:
   edm::EDGetTokenT<edm::HepMCProduct> generatorhep;
   edm::EDGetTokenT<GenEventInfoProduct> generatorevt;
   edm::EDGetTokenT<LHEEventProduct> generatorlhe;
-  
+
   // Matching clusters to TP token
   edm::EDGetTokenT<ClusterTPAssociation> clusterTPMapToken_;
 
@@ -661,6 +662,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
 
   doubleSVBJetTags_ = iConfig.getParameter<std::string>("doubleSVBJetTags");
   deepDoubleBJetTags_ = iConfig.getParameter<std::string>("deepDoubleBJetTags");
+  deepAK8Tags_ = iConfig.getParameter<std::string>("deepAK8Tags");
 
   cMVABJetTags_ = iConfig.getParameter<std::string>("cMVABJetTags");
   cMVAv2BJetTags_ = iConfig.getParameter<std::string>("cMVAv2BJetTags");
@@ -1390,7 +1392,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   // ttbar information
   //------------------------------------------------------
   if (use_ttbar_filter_) {
-    
+
     //https://twiki.cern.ch/CMS/TopPtReweighting
     EventInfo.ttbar_ptweight = 0.;
     if (!isData_) {
@@ -1408,7 +1410,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
        }
        EventInfo.ttbar_ptweight = sqrt(wtop*wantitop);
     }
-      
+
     edm::Handle<int> pIn;
     iEvent.getByToken(ttbartop, pIn);
     EventInfo.ttbar_chan=*pIn;
@@ -1425,7 +1427,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
 	const auto g = selGen->ptrAt(i);
 	EventInfo.ttbar_gpt[gctr] = g->pt();
 	EventInfo.ttbar_geta[gctr] = g->eta();
-	EventInfo.ttbar_gphi[gctr] = g->phi();	
+	EventInfo.ttbar_gphi[gctr] = g->phi();
 	EventInfo.ttbar_gm[gctr] = g->mass();
 	EventInfo.ttbar_gid[gctr] = g->pdgId();
 	gctr++;
@@ -1776,7 +1778,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
   JetInfo[iJetColl].nTrkEtaRelTagVarCSV = 0;
   JetInfo[iJetColl].nTrkCTagVar = 0;
   JetInfo[iJetColl].nTrkEtaRelCTagVar = 0;
-  JetInfo[iJetColl].nLeptons = 0;  
+  JetInfo[iJetColl].nLeptons = 0;
 
   //Initialize new test variables for AK4 jets: to be cleaned up in the future
   JetInfo[iJetColl].Jet_trackSip2dSig_AboveBottom_0[JetInfo[iJetColl].nJet] = -19.;
@@ -1806,7 +1808,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     _decayLength = decayLengthSubJets_;
     _deltaR      = deltaRSubJets_;
   }
-   
+
   //// Loop over the jets
   for ( PatJetCollection::const_iterator pjet = jetsColl->begin(); pjet != jetsColl->end(); ++pjet ) {
 
@@ -1820,7 +1822,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     if (use_ttbar_filter_) {
       float minDRlj(9999.);
       TLorentzVector thejet;
-      thejet.SetPtEtaPhiM(ptjet, etajet, phijet, 0.);      
+      thejet.SetPtEtaPhiM(ptjet, etajet, phijet, 0.);
       for(int il=0; il<EventInfo.ttbar_nl; il++)
       {
         TLorentzVector theLepton;
@@ -2031,7 +2033,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     const IPTagInfo *ipTagInfoCTag = toIPTagInfo(*pjet,ipTagInfosCTag_);
     const SVTagInfo *svTagInfoCTag = toSVTagInfo(*pjet,svTagInfosCTag_);
     const reco::CandSoftLeptonTagInfo *softPFMuTagInfoCTag = pjet->tagInfoCandSoftLepton(softPFMuonTagInfosCTag_.c_str());
-    const reco::CandSoftLeptonTagInfo *softPFElTagInfoCTag = pjet->tagInfoCandSoftLepton(softPFElectronTagInfosCTag_.c_str()); 
+    const reco::CandSoftLeptonTagInfo *softPFElTagInfoCTag = pjet->tagInfoCandSoftLepton(softPFElectronTagInfosCTag_.c_str());
 
     // Re-calculate N-subjettiness
     std::vector<fastjet::PseudoJet> currentAxes;
@@ -2078,7 +2080,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     }
 
     reco::TrackKinematics allKinematics;
-    
+
     JetInfo[iJetColl].Jet_trackSip2dSigAboveCharm_0[JetInfo[iJetColl].nJet]  = -19.;
     JetInfo[iJetColl].Jet_trackSip2dSigAboveCharm_1[JetInfo[iJetColl].nJet]  = -19.;
 //     JetInfo[iJetColl].Jet_trackSip2dSigAboveBottom_0[JetInfo[iJetColl].nJet] = -19.;
@@ -2112,7 +2114,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       const TrackRef ptrackRef = ( useSelectedTracks_ ? selectedTracks[itt] : tracks[itt]);
       const reco::Track * ptrackPtr = reco::btag::toTrack(ptrackRef);
       const reco::Track & ptrack = *ptrackPtr;
-       
+
       reco::TransientTrack transientTrack = trackBuilder->build(ptrackRef);
       GlobalVector direction(pjet->px(), pjet->py(), pjet->pz());
 
@@ -2133,7 +2135,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].Track_dz[JetInfo[iJetColl].nTrack]       = ptrack.dz(pv->position());
       JetInfo[iJetColl].Track_dxyError[JetInfo[iJetColl].nTrack]      = ptrack.dxyError();
       JetInfo[iJetColl].Track_dzError[JetInfo[iJetColl].nTrack]       = ptrack.dzError();
-       
+
       {
         TransverseImpactPointExtrapolator extrapolator(transientTrack.field());
         TrajectoryStateOnSurface closestOnTransversePlaneState = extrapolator.extrapolate(transientTrack.impactPointState(),RecoVertex::convertPos(pv->position()));
@@ -2207,7 +2209,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         else {
           Measurement1D ip2d    = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;
           Measurement1D ip3d    = IPTools::signedImpactParameter3D(transientTrack, direction, *pv).second;
- 
+
           JetInfo[iJetColl].Track_IP2D[JetInfo[iJetColl].nTrack]     = (ip2d.value());
           JetInfo[iJetColl].Track_IP2Dsig[JetInfo[iJetColl].nTrack]  = (ip2d.significance());
           JetInfo[iJetColl].Track_IP[JetInfo[iJetColl].nTrack]       = (ip3d.value());
@@ -2323,7 +2325,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
            if ( theFlag[TrackCategories::HadronicProcess] )   JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 7);
            if ( theFlag[TrackCategories::Fake] ) 	       JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 8);
            if ( theFlag[TrackCategories::SharedInnerHits] )   JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] += pow(10, -1 + 9);
-        
+
 
            if ( JetInfo[iJetColl].Track_IPsig[JetInfo[iJetColl].nTrack] > 0 ) {
              if ( theFlag[TrackCategories::BWeakDecay] )	 cap0 = 1;
@@ -2772,6 +2774,13 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float DoubleSV = pjet->bDiscriminator(doubleSVBJetTags_.c_str());
     float DeepDoubleB = pjet->bDiscriminator(deepDoubleBJetTags_.c_str());
 
+    float deepAK8bbvsLight   = (deepAK8Tags_.size()) ? pjet->bDiscriminator((deepAK8Tags_+":bbvsLight"   ).c_str()) : -10;
+    float deepAK8ccvsLight   = (deepAK8Tags_.size()) ? pjet->bDiscriminator((deepAK8Tags_+":ccvsLight"   ).c_str()) : -10;
+    float deepAK8TvsQCD   = (deepAK8Tags_.size()) ? pjet->bDiscriminator((deepAK8Tags_+":TvsQCD"   ).c_str()) : -10;
+    float deepAK8ZHccvsQCD   = (deepAK8Tags_.size()) ? pjet->bDiscriminator((deepAK8Tags_+":ZHccvsQCD"   ).c_str()) : -10;
+    float deepAK8WvsQCD   = (deepAK8Tags_.size()) ? pjet->bDiscriminator((deepAK8Tags_+":WvsQCD"   ).c_str()) : -10;
+    float deepAK8ZHbbvsQCD   = (deepAK8Tags_.size()) ? pjet->bDiscriminator((deepAK8Tags_+":ZHbbvsQCD"   ).c_str()) : -10;
+
 //     float cMVA = pjet->bDiscriminator(cMVABJetTags_.c_str());
     float cMVAv2 = pjet->bDiscriminator(cMVAv2BJetTags_.c_str());
     float cMVAv2Neg = pjet->bDiscriminator(cMVAv2NegBJetTags_.c_str());
@@ -2849,6 +2858,13 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_SoftEl[JetInfo[iJetColl].nJet]   = SoftE;
     JetInfo[iJetColl].Jet_DoubleSV[JetInfo[iJetColl].nJet] = DoubleSV;
     JetInfo[iJetColl].Jet_DeepDoubleB[JetInfo[iJetColl].nJet] = DeepDoubleB;
+    //DeepAK8 probabilities
+    JetInfo[iJetColl].Jet_DeepAK8bbvsLight[JetInfo[iJetColl].nJet]    = deepAK8bbvsLight;
+    JetInfo[iJetColl].Jet_DeepAK8ccvsLight[JetInfo[iJetColl].nJet]   = deepAK8ccvsLight;
+    JetInfo[iJetColl].Jet_DeepAK8TvsQCD[JetInfo[iJetColl].nJet] = deepAK8TvsQCD;
+    JetInfo[iJetColl].Jet_DeepAK8ZHccvsQCD[JetInfo[iJetColl].nJet]    = deepAK8ZHccvsQCD;
+    JetInfo[iJetColl].Jet_DeepAK8WvsQCD[JetInfo[iJetColl].nJet]  = deepAK8WvsQCD;
+    JetInfo[iJetColl].Jet_DeepAK8ZHbbvsQCD[JetInfo[iJetColl].nJet]    = deepAK8ZHbbvsQCD;
 //     JetInfo[iJetColl].Jet_cMVA[JetInfo[iJetColl].nJet] = cMVA;
     JetInfo[iJetColl].Jet_cMVAv2[JetInfo[iJetColl].nJet] = cMVAv2;
     JetInfo[iJetColl].Jet_cMVAv2N[JetInfo[iJetColl].nJet] = cMVAv2Neg;
@@ -3063,7 +3079,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
       JetInfo[iJetColl].nTrkEtaRelTagVarCSV += JetInfo[iJetColl].TagVarCSV_jetNTracksEtaRel[JetInfo[iJetColl].nJet];
       JetInfo[iJetColl].Jet_nLastTrkEtaRelTagVarCSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkEtaRelTagVarCSV;
-      
+
     }
 
     if ( storeCTagVariables )
@@ -3074,12 +3090,12 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].CTag_Jet_CvsL[JetInfo[iJetColl].nJet] = CvsL;
       JetInfo[iJetColl].CTag_Jet_CvsLN[JetInfo[iJetColl].nJet] = CvsLNeg;
       JetInfo[iJetColl].CTag_Jet_CvsLP[JetInfo[iJetColl].nJet] = CvsLPos;
-  
+
       std::vector<const reco::BaseTagInfo*>  slbaseTagInfos;
       slbaseTagInfos.push_back( ipTagInfoCTag );
       slbaseTagInfos.push_back( svTagInfoCTag );
       slbaseTagInfos.push_back( softPFMuTagInfoCTag );
-      slbaseTagInfos.push_back( softPFElTagInfoCTag ); 
+      slbaseTagInfos.push_back( softPFElTagInfoCTag );
       JetTagComputer::TagInfoHelper slhelper(slbaseTagInfos);
       // TaggingVariables
       reco::TaggingVariableList slvars = slcomputer->taggingVariables(slhelper);
@@ -3099,15 +3115,15 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].CTag_flightDistance3dSig[JetInfo[iJetColl].nJet]         = ( slvars.checkTag(reco::btau::flightDistance3dSig) ? slvars.get(reco::btau::flightDistance3dSig) : -9999 );
       JetInfo[iJetColl].CTag_massVertexEnergyFraction[JetInfo[iJetColl].nJet]    = ( slvars.checkTag(reco::btau::massVertexEnergyFraction) ? slvars.get(reco::btau::massVertexEnergyFraction) : -0.1);
       JetInfo[iJetColl].CTag_vertexBoostOverSqrtJetPt[JetInfo[iJetColl].nJet]    = ( slvars.checkTag(reco::btau::vertexBoostOverSqrtJetPt) ? slvars.get(reco::btau::vertexBoostOverSqrtJetPt) : -0.1);
-      JetInfo[iJetColl].CTag_vertexLeptonCategory[JetInfo[iJetColl].nJet]        = ( slvars.checkTag(reco::btau::vertexLeptonCategory) ? slvars.get(reco::btau::vertexLeptonCategory) : -1);      
- 
+      JetInfo[iJetColl].CTag_vertexLeptonCategory[JetInfo[iJetColl].nJet]        = ( slvars.checkTag(reco::btau::vertexLeptonCategory) ? slvars.get(reco::btau::vertexLeptonCategory) : -1);
+
       // per jet per track
       JetInfo[iJetColl].Jet_nFirstTrkCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkCTagVar;
       std::vector<float> tagValList = slvars.getList(reco::btau::trackSip2dSig,false);
-      JetInfo[iJetColl].CTag_jetNTracks[JetInfo[iJetColl].nJet] = tagValList.size(); 
+      JetInfo[iJetColl].CTag_jetNTracks[JetInfo[iJetColl].nJet] = tagValList.size();
 
       tagValList = slvars.getList(reco::btau::trackPtRel,false);
-      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackPtRel[JetInfo[iJetColl].nTrkCTagVar] );  
+      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackPtRel[JetInfo[iJetColl].nTrkCTagVar] );
       tagValList = slvars.getList(reco::btau::trackPPar,false);
       if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackPPar[JetInfo[iJetColl].nTrkCTagVar] );
       tagValList = slvars.getList(reco::btau::trackDeltaR,false);
@@ -3124,7 +3140,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackDecayLenVal[JetInfo[iJetColl].nTrkCTagVar] );
       tagValList = slvars.getList(reco::btau::trackJetDistVal,false);
       if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackJetDistVal[JetInfo[iJetColl].nTrkCTagVar] );
-     
+
       JetInfo[iJetColl].nTrkCTagVar += JetInfo[iJetColl].CTag_jetNTracks[JetInfo[iJetColl].nJet];
       JetInfo[iJetColl].Jet_nLastTrkCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkCTagVar;
       //---------------------------
@@ -3136,7 +3152,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
       JetInfo[iJetColl].nTrkEtaRelCTagVar += JetInfo[iJetColl].CTag_jetNTracksEtaRel[JetInfo[iJetColl].nJet];
       JetInfo[iJetColl].Jet_nLastTrkEtaRelCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkEtaRelCTagVar;
-      
+
       //per jet per lepton
       JetInfo[iJetColl].Jet_nFirstLepCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nLeptons;
       std::vector<float> sltagValList = slvars.getList(reco::btau::leptonPtRel,false);
@@ -3153,7 +3169,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       sltagValList = slvars.getList(reco::btau::leptonEtaRel,false);
       if(sltagValList.size()>0) std::copy( sltagValList.begin(), sltagValList.end(), &JetInfo[iJetColl].CTag_leptonEtaRel[JetInfo[iJetColl].nLeptons] );
       sltagValList = slvars.getList(reco::btau::leptonRatio,false);
-      if(sltagValList.size()>0) std::copy( sltagValList.begin(), sltagValList.end(), &JetInfo[iJetColl].CTag_leptonRatio[JetInfo[iJetColl].nLeptons] );     
+      if(sltagValList.size()>0) std::copy( sltagValList.begin(), sltagValList.end(), &JetInfo[iJetColl].CTag_leptonRatio[JetInfo[iJetColl].nLeptons] );
 
       JetInfo[iJetColl].nLeptons += JetInfo[iJetColl].CTag_jetNLeptons[JetInfo[iJetColl].nJet];
       JetInfo[iJetColl].Jet_nLastLepCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nLeptons;
@@ -3193,7 +3209,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] = 0;
     JetInfo[iJetColl].Jet_hist2[JetInfo[iJetColl].nJet] = 0;
     JetInfo[iJetColl].Jet_hist3[JetInfo[iJetColl].nJet] = 0;
-     
+
     // Track Histosry
     if ( useTrackHistory_ && indexes.size()!=0 && !isData_ ) {
       if ( flags1P[TrackCategories::BWeakDecay] )         JetInfo[iJetColl].Jet_hist1[JetInfo[iJetColl].nJet] += int(pow(10., -1 + 1));
@@ -3511,10 +3527,10 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 	}
 	const auto & features = ddb_taginfo->features();
 
-	//size_t csize = features.c_pf_features.size();
-	int csize = features.c_pf_features.size();
-	for(unsigned int t = 0; t < nTrk_DeepDoubleB_; t++){
-	JetInfo[iJetColl].DeepDoubleBInput_charged_EtaRel[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[t].btagPf_trackEtaRel;
+	size_t csize = features.c_pf_features.size();
+	//int csize = features.c_pf_features.size();
+	for(unsigned int t = 0; t < csize; t++){
+  JetInfo[iJetColl].DeepDoubleBInput_charged_EtaRel[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[t].btagPf_trackEtaRel;
 	JetInfo[iJetColl].DeepDoubleBInput_charged_PtRatio[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[t].btagPf_trackPtRatio;
 	JetInfo[iJetColl].DeepDoubleBInput_charged_PParRatio[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[t].btagPf_trackPParRatio;
 	JetInfo[iJetColl].DeepDoubleBInput_charged_Sip2dVal[t][JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[t].btagPf_trackSip2dVal;
@@ -3525,7 +3541,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
         }
 
 	size_t svsize = features.sv_features.size();
-	for(unsigned int sv = 0; sv < nSV_DeepDoubleB_; sv++){
+	for(unsigned int sv = 0; sv < svsize; sv++){
 	JetInfo[iJetColl].DeepDoubleBInput_sv_d3d[sv][JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[sv].d3d;
 	JetInfo[iJetColl].DeepDoubleBInput_sv_d3dsig[sv][JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[sv].d3dsig;
         }
@@ -3857,8 +3873,8 @@ void BTagAnalyzerT<IPTI,VTX>::setTracksPVBase( const reco::TrackRef & trackRef, 
 // ------------ method called once each job just before starting event loop  ------------
 template<typename IPTI,typename VTX>
 void BTagAnalyzerT<IPTI,VTX>::beginJob() {
-  //cat 0  
-  cat0.withFirstPixel = -1;  
+  //cat 0
+  cat0.withFirstPixel = -1;
   cat0.nPixelHitsMin = 1;
   cat0.nPixelHitsMax = 99;
   cat0.etaMin        = 0;
@@ -3871,7 +3887,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat0.chiMax        = 5;
 
   //cat 1
-  cat1.withFirstPixel = 1;  
+  cat1.withFirstPixel = 1;
   cat1.nPixelHitsMin = 1;
   cat1.nPixelHitsMax = 3;
   cat1.etaMin        = 0;
@@ -3882,9 +3898,9 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat1.nHitsMax      = 50;
   cat1.chiMin        = 0;
   cat1.chiMax        = 5;
-   
+
   //cat 2
-  cat2.withFirstPixel = 1;  
+  cat2.withFirstPixel = 1;
   cat2.nPixelHitsMin = 4;
   cat2.nPixelHitsMax = 99;
   cat2.etaMin        = 0.;
@@ -3897,7 +3913,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat2.chiMax        = 5;
 
   //cat 3
-  cat3.withFirstPixel = 1;  
+  cat3.withFirstPixel = 1;
   cat3.nPixelHitsMin = 4;
   cat3.nPixelHitsMax = 99;
   cat3.etaMin        = 0.;
@@ -3910,7 +3926,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat3.chiMax        = 5;
 
   //cat 4
-  cat4.withFirstPixel = 1;  
+  cat4.withFirstPixel = 1;
   cat4.nPixelHitsMin = 4;
   cat4.nPixelHitsMax = 99;
   cat4.etaMin        = 0.;
@@ -3923,7 +3939,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat4.chiMax        = 5;
 
   //cat 5
-  cat5.withFirstPixel = 1;  
+  cat5.withFirstPixel = 1;
   cat5.nPixelHitsMin = 4;
   cat5.nPixelHitsMax = 99;
   cat5.etaMin        = 1.;
@@ -3936,7 +3952,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat5.chiMax        = 5;
 
   //cat 6
-  cat6.withFirstPixel = 1;  
+  cat6.withFirstPixel = 1;
   cat6.nPixelHitsMin = 4;
   cat6.nPixelHitsMax = 99;
   cat6.etaMin        = 1.;
@@ -3949,7 +3965,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat6.chiMax        = 5;
 
   //cat 7
-  cat7.withFirstPixel = 1;  
+  cat7.withFirstPixel = 1;
   cat7.nPixelHitsMin = 4;
   cat7.nPixelHitsMax = 99;
   cat7.etaMin        = 1.;
@@ -3960,9 +3976,9 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat7.nHitsMax      = 50;
   cat7.chiMin        = 0;
   cat7.chiMax        = 5;
- 
+
   //cat 8
-  cat8.withFirstPixel = 1;  
+  cat8.withFirstPixel = 1;
   cat8.nPixelHitsMin = 4;
   cat8.nPixelHitsMax = 99;
   cat8.etaMin        = 2.;
@@ -3975,7 +3991,7 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat8.chiMax        = 5;
 
   //cat 9
-  cat9.withFirstPixel = 1;  
+  cat9.withFirstPixel = 1;
   cat9.nPixelHitsMin = 4;
   cat9.nPixelHitsMax = 99;
   cat9.etaMin        = 2.;
@@ -4063,10 +4079,10 @@ bool BTagAnalyzerT<IPTI,VTX>::findCat(const reco::Track* track, CategoryFinder& 
   double   p = track->p();
   double eta = track->eta();
 
-  bool result = ( 
-     ( (d.withFirstPixel == 1 && isL1 == 1) || 
+  bool result = (
+     ( (d.withFirstPixel == 1 && isL1 == 1) ||
        (d.withFirstPixel == -1 && isL1 == 0) ||
-        d.withFirstPixel == 0 ) && 
+        d.withFirstPixel == 0 ) &&
       npix >= d.nPixelHitsMin && npix <= d.nPixelHitsMax &&
       nhit >= d.nHitsMin      && nhit <= d.nHitsMax	 &&
       chi >= d.chiMin	      && chi <= d.chiMax         &&
