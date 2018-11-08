@@ -9,8 +9,6 @@ const UInt_t nMaxMuons_= 10000;
 const UInt_t nMaxElectrons_= 10000;
 const UInt_t nMaxSVs_= 10000;
 const UInt_t nMaxLeptons_=10000;
-const UInt_t nTrk_DeepDoubleB_=60;
-const UInt_t nSV_DeepDoubleB_=5;
 
 class JetInfoBranches {
 
@@ -413,17 +411,22 @@ class JetInfoBranches {
     float DeepFlavourInput_sv_normchi2[nMaxJets_];
 
     //DeepDoubleB input features selection
-    float DeepDoubleBInput_charged_EtaRel[nTrk_DeepDoubleB_][nMaxJets_];
-    float DeepDoubleBInput_charged_PtRatio[nTrk_DeepDoubleB_][nMaxJets_];
-    float DeepDoubleBInput_charged_PParRatio[nTrk_DeepDoubleB_][nMaxJets_];
-    float DeepDoubleBInput_charged_Sip2dVal[nTrk_DeepDoubleB_][nMaxJets_];
-    float DeepDoubleBInput_charged_Sip2dSig[nTrk_DeepDoubleB_][nMaxJets_];
-    float DeepDoubleBInput_charged_Sip3dVal[nTrk_DeepDoubleB_][nMaxJets_];
-    float DeepDoubleBInput_charged_Sip3dSig[nTrk_DeepDoubleB_][nMaxJets_];
-    float DeepDoubleBInput_charged_JetDistVal[nTrk_DeepDoubleB_][nMaxJets_];
-
-    float DeepDoubleBInput_sv_d3d[nSV_DeepDoubleB_][nMaxJets_];
-    float DeepDoubleBInput_sv_d3dsig[nSV_DeepDoubleB_][nMaxJets_];
+    int   nTrkDeepDoubleB;
+    int   Jet_DeepDoubleB_nFirstTrkTagVar[nMaxJets_];
+    int   Jet_DeepDoubleB_nLastTrkTagVar[nMaxJets_];
+    float DeepDoubleBInput_charged_EtaRel[nMaxTrk_];
+    float DeepDoubleBInput_charged_PtRatio[nMaxTrk_];
+    float DeepDoubleBInput_charged_PParRatio[nMaxTrk_];
+    float DeepDoubleBInput_charged_Sip2dVal[nMaxTrk_];
+    float DeepDoubleBInput_charged_Sip2dSig[nMaxTrk_];
+    float DeepDoubleBInput_charged_Sip3dVal[nMaxTrk_];
+    float DeepDoubleBInput_charged_Sip3dSig[nMaxTrk_];
+    float DeepDoubleBInput_charged_JetDistVal[nMaxTrk_];
+    int   nSVDeepDoubleB;
+    int   Jet_DeepDoubleB_nFirstSVTagVar[nMaxJets_];
+    int   Jet_DeepDoubleB_nLastSVTagVar[nMaxJets_];
+    float DeepDoubleBInput_sv_d3d[nMaxSVs_];
+    float DeepDoubleBInput_sv_d3dsig[nMaxSVs_];
 
     // CSV TaggingVariables
     // per jet
@@ -941,25 +944,26 @@ class JetInfoBranches {
     }
 
     void RegisterDeepDoubleBFeatTree(TTree *tree, std::string name=""){
-      if(name!="") name += ".";
 
-      for(unsigned int t = 0; t < nTrk_DeepDoubleB_; t++){
-      tree->Branch((name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_EtaRel").c_str(), DeepDoubleBInput_charged_EtaRel[t], (name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_EtaRel["+name+"nJet]/F").c_str());
-      tree->Branch((name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_PtRatio").c_str(), DeepDoubleBInput_charged_PtRatio[t], (name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_PtRatio["+name+"nJet]/F").c_str());
-      tree->Branch((name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_PParRatio").c_str(), DeepDoubleBInput_charged_PParRatio, (name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_PParRatio["+name+"nJet]/F").c_str());
-      tree->Branch((name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_Sip2dVal").c_str(), DeepDoubleBInput_charged_Sip2dVal[t], (name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_Sip2dVal["+name+"nJet]/F").c_str());
-      tree->Branch((name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_Sip2dSig").c_str(), DeepDoubleBInput_charged_Sip2dSig[t], (name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_Sip2dSig["+name+"nJet]/F").c_str());
-      tree->Branch((name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_Sip3dVal").c_str(), DeepDoubleBInput_charged_Sip3dVal[t], (name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_Sip3dVal["+name+"nJet]/F").c_str());
-      tree->Branch((name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_Sip3dSig").c_str(), DeepDoubleBInput_charged_Sip3dSig[t], (name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_Sip3dSig["+name+"nJet]/F").c_str());
-      tree->Branch((name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_JetDistVal").c_str(), DeepDoubleBInput_charged_JetDistVal[t], (name+"DeepDoubleBInput_charged_Trk"+std::to_string(t)+"_JetDistVal["+name+"nJet]/F").c_str());
+	if(name!="") name += ".";
 
-      }
+	tree->Branch((name+"nTrkDeepDoubleB").c_str()           ,&nTrkDeepDoubleB          ,(name+"nTrkDeepDoubleB/I").c_str());
+	tree->Branch((name+"Jet_DeepDoubleB_nFirstTrkTagVar").c_str() ,Jet_DeepDoubleB_nFirstTrkTagVar  ,(name+"Jet_DeepDoubleB_nFirstTrkTagVar["+name+"nJet]/I").c_str() );
+	tree->Branch((name+"Jet_DeepDoubleB_nLastTrkTagVar").c_str()   ,Jet_DeepDoubleB_nLastTrkTagVar   ,(name+"Jet_DeepDoubleB_nLastTrack["+name+"nJet]/I").c_str()      );
+	tree->Branch((name+"DeepDoubleBInput_charged_EtaRel").c_str(), DeepDoubleBInput_charged_EtaRel, (name+"DeepDoubleBInput_charged_EtaRel["+name+"nTrkDeepDoubleB]/F").c_str());
+	tree->Branch((name+"DeepDoubleBInput_charged_PtRatio").c_str(), DeepDoubleBInput_charged_PtRatio, (name+"DeepDoubleBInput_charged_PtRatio["+name+"nTrkDeepDoubleB]/F").c_str());
+	tree->Branch((name+"DeepDoubleBInput_charged_PParRatio").c_str(), DeepDoubleBInput_charged_PParRatio, (name+"DeepDoubleBInput_charged_PParRatio["+name+"nTrkDeepDoubleB]/F").c_str());
+	tree->Branch((name+"DeepDoubleBInput_charged_Sip2dVal").c_str(), DeepDoubleBInput_charged_Sip2dVal, (name+"DeepDoubleBInput_charged_Sip2dVal["+name+"nTrkDeepDoubleB]/F").c_str());
+	tree->Branch((name+"DeepDoubleBInput_charged_Sip2dSig").c_str(), DeepDoubleBInput_charged_Sip2dSig, (name+"DeepDoubleBInput_charged_Sip2dSig["+name+"nTrkDeepDoubleB]/F").c_str());
+	tree->Branch((name+"DeepDoubleBInput_charged_Sip3dVal").c_str(), DeepDoubleBInput_charged_Sip3dVal, (name+"DeepDoubleBInput_charged_Sip3dVal["+name+"nTrkDeepDoubleB]/F").c_str());
+	tree->Branch((name+"DeepDoubleBInput_charged_Sip3dSig").c_str(), DeepDoubleBInput_charged_Sip3dSig, (name+"DeepDoubleBInput_charged_Sip3dSig["+name+"nTrkDeepDoubleB]/F").c_str());
+	tree->Branch((name+"DeepDoubleBInput_charged_JetDistVal").c_str(), DeepDoubleBInput_charged_JetDistVal, (name+"DeepDoubleBInput_charged_JetDistVal["+name+"nTrkDeepDoubleB]/F").c_str());
 
-      for(unsigned int sv = 0; sv < nSV_DeepDoubleB_; sv++)
-      {
-      tree->Branch((name+"DeepDoubleBInput_sv"+std::to_string(sv)+"_d3d").c_str(), DeepDoubleBInput_sv_d3d[sv], (name+"DeepDoubleBInput_sv"+std::to_string(sv)+"_d3d["+name+"nJet]/F").c_str());
-      tree->Branch((name+"DeepDoubleBInput_sv"+std::to_string(sv)+"_d3dsig").c_str(), DeepDoubleBInput_sv_d3dsig[sv], (name+"DeepDoubleBInput_sv"+std::to_string(sv)+"_d3dsig["+name+"nJet]/F").c_str());
-      }
+	tree->Branch((name+"nSVDeepDoubleB").c_str()           ,&nSVDeepDoubleB          ,(name+"nSVDeepDoubleB/I").c_str());
+	tree->Branch((name+"Jet_DeepDoubleB_nFirstSVTagVar").c_str()   ,Jet_DeepDoubleB_nFirstSVTagVar   ,(name+"Jet_DeepDoubleB_nFirstSVTagVar["+name+"nJet]/I").c_str()  );
+	tree->Branch((name+"Jet_DeepDoubleB_nLastSVTagVar").c_str()    ,Jet_DeepDoubleB_nLastSVTagVar    ,(name+"Jet_DeepDoubleB_nLastSVTagVar["+name+"nJet]/I").c_str()   );
+	tree->Branch((name+"DeepDoubleBInput_sv_d3d").c_str()	, DeepDoubleBInput_sv_d3d, (name+"DeepDoubleBInput_sv_d3d["+name+"nSVDeepDoubleB]/F").c_str());
+	tree->Branch((name+"DeepDoubleBInput_sv_d3dsig").c_str(), DeepDoubleBInput_sv_d3dsig, (name+"DeepDoubleBInput_sv_d3dsig["+name+"nSVDeepDoubleB]/F").c_str());
     }
 
 
