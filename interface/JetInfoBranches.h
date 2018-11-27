@@ -9,6 +9,7 @@ const UInt_t nMaxMuons_= 10000;
 const UInt_t nMaxElectrons_= 10000;
 const UInt_t nMaxSVs_= 10000;
 const UInt_t nMaxLeptons_=10000;
+const UInt_t nMaxConst_=10000;
 
 class JetInfoBranches {
 
@@ -327,9 +328,12 @@ class JetInfoBranches {
     float SV_flight[nMaxSVs_];
     float SV_flightErr[nMaxSVs_];
     float SV_deltaR_jet[nMaxSVs_];
+    float SV_deltaPhi_jet[nMaxSVs_];
+    float SV_deltaEta_jet[nMaxSVs_];
     float SV_deltaR_sum_jet[nMaxSVs_];
     float SV_deltaR_sum_dir[nMaxSVs_];
     float SV_vtx_pt[nMaxSVs_];
+    float SV_vtx_E[nMaxSVs_];
     float SV_flight2D[nMaxSVs_];
     float SV_flight2DErr[nMaxSVs_];
     float SV_totCharge[nMaxSVs_];
@@ -339,6 +343,8 @@ class JetInfoBranches {
     float SV_vtx_eta[nMaxSVs_];
     float SV_vtx_phi[nMaxSVs_];
     float SV_EnergyRatio[nMaxSVs_];
+    float SV_ptRatio[nMaxSVs_];
+    float SV_cos_PVSV[nMaxSVs_];
     float SV_dir_x[nMaxSVs_];
     float SV_dir_y[nMaxSVs_];
     float SV_dir_z[nMaxSVs_];
@@ -427,6 +433,54 @@ class JetInfoBranches {
     int   Jet_DeepDoubleB_nLastSVTagVar[nMaxJets_];
     float DeepDoubleBInput_sv_d3d[nMaxSVs_];
     float DeepDoubleBInput_sv_d3dsig[nMaxSVs_];
+
+    //DeepAK8 input features
+    int nConstDeepAK8;
+    float DeepAK8_pt[nMaxConst_];
+    float DeepAK8_ptRatio[nMaxConst_];
+    float DeepAK8_E[nMaxConst_];
+    float DeepAK8_eta[nMaxConst_];
+    float DeepAK8_DeltaPhi_jet[nMaxConst_];
+    float DeepAK8_DeltaEta_jet[nMaxConst_];
+    float DeepAK8_PuppiWeight[nMaxConst_];
+    float DeepAK8_minDeltaR_SV[nMaxConst_];
+    float DeepAK8_DeltaR_jet[nMaxConst_];
+    float DeepAK8_DeltaR_subjet1[nMaxConst_];
+    float DeepAK8_DeltaR_subjet2[nMaxConst_];
+    float DeepAK8_charge[nMaxConst_];
+    int DeepAK8_isMuon[nMaxConst_];
+    int DeepAK8_isElectron[nMaxConst_];
+    int DeepAK8_isPhoton[nMaxConst_];
+    int DeepAK8_isChargedHadron[nMaxConst_];
+    int DeepAK8_isNeutralHadron[nMaxConst_];
+    float DeepAK8_hcalFraction[nMaxConst_];
+    float DeepAK8_pvAssociationQuality[nMaxConst_];
+    int DeepAK8_lostInnerHits[nMaxConst_];
+    float DeepAK8_dxy[nMaxConst_];
+    float DeepAK8_dz[nMaxConst_];
+
+    float DeepAK8_dxy_err[nMaxConst_];
+    float DeepAK8_dz_err[nMaxConst_];
+    float DeepAK8_chi2[nMaxConst_];
+    float DeepAK8_qualityMask[nMaxConst_];
+    float DeepAK8_dptdpt[nMaxConst_];
+    float DeepAK8_detadeta[nMaxConst_];
+    float DeepAK8_dphidphi[nMaxConst_];
+    float DeepAK8_dxydxy[nMaxConst_];
+    float DeepAK8_dzdz[nMaxConst_];
+    float DeepAK8_dxydz[nMaxConst_];
+    float DeepAK8_dphidxy[nMaxConst_];
+    float DeepAK8_dlambdadz[nMaxConst_];
+   
+    float DeepAK8_trackEtaRel[nMaxConst_]; 
+    float DeepAK8_trackPtRatio[nMaxConst_]; 
+    float DeepAK8_trackPParRatio[nMaxConst_]; 
+    float DeepAK8_trackSip2dVal[nMaxConst_]; 
+    float DeepAK8_trackSip2dSig[nMaxConst_]; 
+    float DeepAK8_trackSip3dVal[nMaxConst_]; 
+    float DeepAK8_trackSip3dSig[nMaxConst_]; 
+    float DeepAK8_trackJetDistVal[nMaxConst_]; 
+    
 
     // CSV TaggingVariables
     // per jet
@@ -752,9 +806,12 @@ class JetInfoBranches {
       tree->Branch((name+"SV_flight").c_str()          ,SV_flight          ,(name+"SV_flight["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_flightErr").c_str()       ,SV_flightErr       ,(name+"SV_flightErr["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_deltaR_jet").c_str()      ,SV_deltaR_jet      ,(name+"SV_deltaR_jet["+name+"nSV]/F").c_str());
+      tree->Branch((name+"SV_deltaPhi_jet").c_str()      ,SV_deltaPhi_jet      ,(name+"SV_deltaPhi_jet["+name+"nSV]/F").c_str());
+      tree->Branch((name+"SV_deltaEta_jet").c_str()      ,SV_deltaEta_jet      ,(name+"SV_deltaEta_jet["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_deltaR_sum_jet").c_str()  ,SV_deltaR_sum_jet  ,(name+"SV_deltaR_sum_jet["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_deltaR_sum_dir").c_str()  ,SV_deltaR_sum_dir  ,(name+"SV_deltaR_sum_dir["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_vtx_pt").c_str()          ,SV_vtx_pt          ,(name+"SV_vtx_pt["+name+"nSV]/F").c_str());
+      tree->Branch((name+"SV_vtx_E").c_str()          ,SV_vtx_E          ,(name+"SV_vtx_E["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_flight2D").c_str()        ,SV_flight2D        ,(name+"SV_flight2D["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_flight2DErr").c_str()     ,SV_flight2DErr     ,(name+"SV_flight2DErr["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_totCharge").c_str()       ,SV_totCharge       ,(name+"SV_totCharge ["+name+"nSV]/F").c_str());
@@ -764,6 +821,8 @@ class JetInfoBranches {
       tree->Branch((name+"SV_vtx_eta").c_str()         ,SV_vtx_eta         ,(name+"SV_vtx_eta["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_vtx_phi").c_str()         ,SV_vtx_phi         ,(name+"SV_vtx_phi["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_EnergyRatio").c_str()     ,SV_EnergyRatio     ,(name+"SV_EnergyRatio ["+name+"nSV]/F").c_str());
+      tree->Branch((name+"SV_ptRatio").c_str()     ,SV_ptRatio     ,(name+"SV_ptRatio ["+name+"nSV]/F").c_str());
+      tree->Branch((name+"SV_cos_PVSV").c_str()     ,SV_cos_PVSV     ,(name+"SV_cos_PVSV ["+name+"nSV]/F").c_str());
 //       tree->Branch((name+"SV_dir_x").c_str()           ,SV_dir_x           ,(name+"SV_dir_x ["+name+"nSV]/F").c_str());
 //       tree->Branch((name+"SV_dir_y").c_str()           ,SV_dir_y           ,(name+"SV_dir_y ["+name+"nSV]/F").c_str());
 //       tree->Branch((name+"SV_dir_z").c_str()           ,SV_dir_z           ,(name+"SV_dir_z ["+name+"nSV]/F").c_str());
@@ -966,6 +1025,59 @@ class JetInfoBranches {
 	tree->Branch((name+"DeepDoubleBInput_sv_d3dsig").c_str(), DeepDoubleBInput_sv_d3dsig, (name+"DeepDoubleBInput_sv_d3dsig["+name+"nSVDeepDoubleB]/F").c_str());
     }
 
+    void RegisterDeepAK8FeatTree(TTree *tree, std::string name=""){
+
+	if(name!="") name += ".";
+
+	// per constituent variables
+	tree->Branch((name+"nConstDeepAK8").c_str(), &nConstDeepAK8, (name+"nConstDeepAk8/I").c_str());
+	tree->Branch((name+"DeepAK8Input_const_pt").c_str()   , DeepAK8_pt   ,(name+"DeepAK8Input_const_pt["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_ptRatio").c_str()   , DeepAK8_ptRatio   ,(name+"DeepAK8Input_constituent_ptRatio["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_E").c_str()   , DeepAK8_E   ,(name+"DeepAK8Input_const_E["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_eta").c_str()   , DeepAK8_eta   ,(name+"DeepAK8Input_const_eta["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_DeltaPhi_jet").c_str()   , DeepAK8_DeltaPhi_jet   ,(name+"DeepAK8Input_const_DeltaPhi_jet["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_DeltaEta_jet").c_str()   , DeepAK8_DeltaEta_jet   ,(name+"DeepAK8Input_const_DeltaEta_jet["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_PuppiWeight").c_str()   , DeepAK8_PuppiWeight   ,(name+"DeepAK8Input_const_PuppiWeight["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_minDeltaR_SV").c_str()   , DeepAK8_minDeltaR_SV   ,(name+"DeepAK8Input_const_minDeltaR_SV["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_DeltaR_jet").c_str()   , DeepAK8_DeltaR_jet   ,(name+"DeepAK8Input_const_DeltaR_jet["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_DeltaR_subjet1").c_str()   , DeepAK8_DeltaR_subjet1   ,(name+"DeepAK8Input_const_DeltaR_subjet1["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_DeltaR_subjet2").c_str()   , DeepAK8_DeltaR_subjet2   ,(name+"DeepAK8Input_const_DeltaR_subjet2["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_charge").c_str()   , DeepAK8_charge   ,(name+"DeepAK8Input_const_charge["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_isMuon").c_str()   , DeepAK8_isMuon   ,(name+"DeepAK8Input_const_isMuon["+name+"nConstDeepAK8]/I").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_isElectron").c_str()   , DeepAK8_isElectron   ,(name+"DeepAK8Input_const_isElectron["+name+"nConstDeepAK8]/I").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_isPhoton").c_str()   , DeepAK8_isPhoton   ,(name+"DeepAK8Input_const_isPhoton["+name+"nConstDeepAK8]/I").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_isChargedHadron").c_str()   , DeepAK8_isChargedHadron   ,(name+"DeepAK8Input_const_isChargedHadron["+name+"nConstDeepAK8]/I").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_isNeutralHadron").c_str()   , DeepAK8_isNeutralHadron   ,(name+"DeepAK8Input_const_isNeutralHadron["+name+"nConstDeepAK8]/I").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_hcalFraction").c_str()   , DeepAK8_hcalFraction   ,(name+"DeepAK8Input_const_hcalFraction["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_pvAssociationQuality").c_str()   , DeepAK8_pvAssociationQuality   ,(name+"DeepAK8Input_const_pvAssociationQuality["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_lostInnerHits").c_str()   , DeepAK8_lostInnerHits   ,(name+"DeepAK8Input_const_lostInnerHits["+name+"nConstDeepAK8]/I").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_dxy").c_str()   , DeepAK8_dxy   ,(name+"DeepAK8Input_const_dxy["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_dz").c_str()   , DeepAK8_dz   ,(name+"DeepAK8Input_const_dz["+name+"nConstDeepAK8]/F").c_str()      );
+	
+	// best track of cand variables
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_dxy_err").c_str()   , DeepAK8_dxy_err   ,(name+"DeepAK8Input_const_bestTrk_dxy_err["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_dz_err").c_str()   , DeepAK8_dz_err   ,(name+"DeepAK8Input_const_bestTrk_dz_err["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_chi2").c_str()   , DeepAK8_chi2   ,(name+"DeepAK8Input_const_bestTrk_chi2["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_qualityMask").c_str()   , DeepAK8_qualityMask   ,(name+"DeepAK8Input_const_bestTrk_qualityMask["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_dptdpt").c_str()   , DeepAK8_dptdpt   ,(name+"DeepAK8Input_const_bestTrk_dptdpt["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_detadeta").c_str()   , DeepAK8_detadeta  ,(name+"DeepAK8Input_const_bestTrk_detadeta["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_dphidphi").c_str()   , DeepAK8_dphidphi  ,(name+"DeepAK8Input_const_bestTrk_dphidphi["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_dxydxy").c_str()   , DeepAK8_dxydxy  ,(name+"DeepAK8Input_const_bestTrk_dxydxy["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_dzdz").c_str()   , DeepAK8_dzdz  ,(name+"DeepAK8Input_const_bestTrk_dzdz["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_dxydz").c_str()   , DeepAK8_dxydz  ,(name+"DeepAK8Input_const_bestTrk_dxydz["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_dphidxy").c_str()   , DeepAK8_dphidxy  ,(name+"DeepAK8Input_const_bestTrk_dphidxy["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_dlambdadz").c_str()   , DeepAK8_dlambdadz  ,(name+"DeepAK8Input_const_bestTrk_dlambdadz["+name+"nConstDeepAK8]/F").c_str()      );
+	
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_trackEtaRel").c_str()   , DeepAK8_trackEtaRel  ,(name+"DeepAK8Input_const_bestTrk_trackEtaRel["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_trackPtRatio").c_str()   , DeepAK8_trackPtRatio  ,(name+"DeepAK8Input_const_bestTrk_trackPtRatio["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_trackPParRatio").c_str()   , DeepAK8_trackPParRatio  ,(name+"DeepAK8Input_const_bestTrk_trackPParRatio["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_trackSip2dVal").c_str()   , DeepAK8_trackSip2dVal  ,(name+"DeepAK8Input_const_bestTrk_trackSip2dVal["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_trackSip2dSig").c_str()   , DeepAK8_trackSip2dSig  ,(name+"DeepAK8Input_const_bestTrk_trackSip2dSig["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_trackSip3dVal").c_str()   , DeepAK8_trackSip3dVal  ,(name+"DeepAK8Input_const_bestTrk_trackSip3dVal["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_trackSip3dSig").c_str()   , DeepAK8_trackSip3dSig  ,(name+"DeepAK8Input_const_bestTrk_trackSip3dSig["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"DeepAK8Input_const_bestTrk_trackJetDistVal").c_str()   , DeepAK8_trackJetDistVal  ,(name+"DeepAK8Input_const_bestTrk_trackJetDistVal["+name+"nConstDeepAK8]/F").c_str()      );
+
+    }
 
     void RegisterCSVTagVarTree(TTree *tree, std::string name=""){
       if(name!="") name += ".";
@@ -1424,9 +1536,12 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"SV_flight").c_str()          ,SV_flight          ) ;
       tree->SetBranchAddress((name+"SV_flightErr").c_str()       ,SV_flightErr       ) ;
       tree->SetBranchAddress((name+"SV_deltaR_jet").c_str()      ,SV_deltaR_jet      ) ;
+      tree->SetBranchAddress((name+"SV_deltaEta_jet").c_str()      ,SV_deltaEta_jet      ) ;
+      tree->SetBranchAddress((name+"SV_deltaPhi_jet").c_str()      ,SV_deltaPhi_jet      ) ;
       tree->SetBranchAddress((name+"SV_deltaR_sum_jet").c_str()  ,SV_deltaR_sum_jet  ) ;
       tree->SetBranchAddress((name+"SV_deltaR_sum_dir").c_str()  ,SV_deltaR_sum_dir  ) ;
       tree->SetBranchAddress((name+"SV_vtx_pt").c_str()          ,SV_vtx_pt          ) ;
+      tree->SetBranchAddress((name+"SV_vtx_E").c_str()          ,SV_vtx_E          ) ;
       tree->SetBranchAddress((name+"SV_flight2D").c_str()        ,SV_flight2D        ) ;
       tree->SetBranchAddress((name+"SV_flight2DErr").c_str()     ,SV_flight2DErr     ) ;
       tree->SetBranchAddress((name+"SV_totCharge").c_str()       ,SV_totCharge       ) ;
@@ -1436,6 +1551,8 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"SV_vtx_eta").c_str()         ,SV_vtx_eta         ) ;
       tree->SetBranchAddress((name+"SV_vtx_phi").c_str()         ,SV_vtx_phi         ) ;
       tree->SetBranchAddress((name+"SV_EnergyRatio").c_str()     ,SV_EnergyRatio     ) ;
+      tree->SetBranchAddress((name+"SV_ptRatio").c_str()     ,SV_ptRatio     ) ;
+      tree->SetBranchAddress((name+"SV_cos_PVSV").c_str()     ,SV_cos_PVSV     ) ;
       tree->SetBranchAddress((name+"SV_dir_x").c_str()           ,SV_dir_x           ) ;
       tree->SetBranchAddress((name+"SV_dir_y").c_str()           ,SV_dir_y           ) ;
       tree->SetBranchAddress((name+"SV_dir_z").c_str()           ,SV_dir_z           ) ;

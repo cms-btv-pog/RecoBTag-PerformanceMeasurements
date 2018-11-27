@@ -36,6 +36,7 @@
 
 #include "DataFormats/GeometrySurface/interface/Line.h"
 #include "DataFormats/GeometryCommonDetAlgo/interface/Measurement1D.h"
+#include "DataFormats/GeometryVector/interface/VectorUtil.h"
 
 #include "SimTracker/Records/interface/TrackAssociatorRecord.h"
 #include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
@@ -395,6 +396,7 @@ private:
   bool storeDeepFlavourVariables_;
   bool storeDeepFlavourTagVariables_;
   bool storeDeepDoubleBTagVariables_;
+  bool storeDeepAK8Variables_;
   bool storeCSVTagVariablesSubJets_;
   bool storeCSVTagTrackVariablesSubJets_;
   bool storePFElectronVariables_;
@@ -572,6 +574,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   storeDeepFlavourVariables_ = iConfig.getParameter<bool>("storeDeepFlavourVariables");
   storeDeepFlavourTagVariables_  = iConfig.getParameter<bool>("storeDeepFlavourTagVariables");
   storeDeepDoubleBTagVariables_  = iConfig.getParameter<bool>("storeDeepDoubleBTagVariables");
+  storeDeepAK8Variables_  = iConfig.getParameter<bool>("storeDeepAK8Variables");
   storeCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("storeCSVTagVariablesSubJets");
   storeCSVTagTrackVariablesSubJets_ = iConfig.getParameter<bool>("storeCSVTagTrackVariablesSubJets");
   storePFElectronVariables_ = iConfig.getParameter<bool>("storePFElectronVariables");
@@ -749,6 +752,8 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   if ( storeDeepFlavourTagVariables_) JetInfo[0].RegisterDeepFlavourFeatTree(smalltree,branchNamePrefix_);
   std::cout << "storeDeepDoubleBTagVariables_: " << storeDeepDoubleBTagVariables_ << std::endl;
   if ( storeDeepDoubleBTagVariables_) JetInfo[0].RegisterDeepDoubleBFeatTree(smalltree,branchNamePrefix_);
+  std::cout << "storeDeepAK8Variables_: " << storeDeepAK8Variables_ << std::endl;
+  if ( storeDeepAK8Variables_) JetInfo[0].RegisterDeepAK8FeatTree(smalltree,branchNamePrefix_);
   if ( storeCTagVariables_) JetInfo[0].RegisterCTagVarTree(smalltree,branchNamePrefix_);
   if ( storePFElectronVariables_) JetInfo[0].RegisterPFElectronTree(smalltree,branchNamePrefix_);
   if ( storePFMuonVariables_) JetInfo[0].RegisterPFMuonTree(smalltree,branchNamePrefix_);
@@ -1781,6 +1786,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
   JetInfo[iJetColl].nLeptons = 0;
   JetInfo[iJetColl].nTrkDeepDoubleB = 0;
   JetInfo[iJetColl].nSVDeepDoubleB = 0;
+  JetInfo[iJetColl].nConstDeepAK8 = 0;
 
   //Initialize new test variables for AK4 jets: to be cleaned up in the future
   JetInfo[iJetColl].Jet_trackSip2dSig_AboveBottom_0[JetInfo[iJetColl].nJet] = -19.;
@@ -3331,6 +3337,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
       JetInfo[iJetColl].SV_vtx_pt[JetInfo[iJetColl].nSV]  = vertex.p4().pt();
       JetInfo[iJetColl].SV_vtx_eta[JetInfo[iJetColl].nSV] = vertex.p4().eta();
+      JetInfo[iJetColl].SV_vtx_E[JetInfo[iJetColl].nSV] = vertex.p4().E();
       JetInfo[iJetColl].SV_vtx_phi[JetInfo[iJetColl].nSV] = vertex.p4().phi();
       JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV]    = vertex.p4().mass();
 
@@ -3388,8 +3395,12 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       GlobalVector flightDir = svTagInfo->flightDirection(vtx);
 
       JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV]     = ( reco::deltaR(flightDir, jetDir) );
+      JetInfo[iJetColl].SV_deltaPhi_jet[JetInfo[iJetColl].nSV]    = ( reco::deltaPhi(flightDir, jetDir) );
+      JetInfo[iJetColl].SV_deltaEta_jet[JetInfo[iJetColl].nSV]    = ( abs(flightDir.eta() -  jetDir.eta()) );
       JetInfo[iJetColl].SV_deltaR_sum_jet[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, jetDir) );
       JetInfo[iJetColl].SV_deltaR_sum_dir[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, flightDir) );
+      JetInfo[iJetColl].SV_ptRatio[JetInfo[iJetColl].nSV] = ( vertex.p4().pt() / pjet->pt() );
+  
 
       Line::PositionType pos(GlobalPoint(position(vertex).x(),position(vertex).y(),position(vertex).z()));
       Line trackline(pos,flightDir);
@@ -3555,15 +3566,79 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 		//--------------------------
 	}
 
+    // additional DeepAK8 Input Features
+
+	if (storeDeepAK8Variables_) {
+          
+	   size_t constsize = pjet->numberOfDaughters(); 
+
+	   // loop over jet constituents 
+	   for(size_t iConstit = 0; iConstit < pjet->numberOfDaughters(); iConstit++) {
+
+		const reco::Candidate * c = pjet->daughter(iConstit);
+		const pat::PackedCandidate * pcand = dynamic_cast<const pat::PackedCandidate *>(c);
+		//std::cout << "isChargedHadron" << pcand->isIsolatedChargedHadron() << std::endl;
+		JetInfo[iJetColl].DeepAK8_pt[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = pcand->pt();
+		JetInfo[iJetColl].DeepAK8_ptRatio[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->pt() / pjet->pt() );
+		JetInfo[iJetColl].DeepAK8_E[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->energy() );
+		JetInfo[iJetColl].DeepAK8_eta[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->eta() );
+		JetInfo[iJetColl].DeepAK8_charge[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->charge() );
+		JetInfo[iJetColl].DeepAK8_isMuon[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->isMuon() );
+		JetInfo[iJetColl].DeepAK8_isElectron[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->isElectron() );
+		JetInfo[iJetColl].DeepAK8_isPhoton[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->isPhoton() );
+		JetInfo[iJetColl].DeepAK8_hcalFraction[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->hcalFraction() );
+		JetInfo[iJetColl].DeepAK8_PuppiWeight[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->puppiWeight() );
+		JetInfo[iJetColl].DeepAK8_dxy[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->dxy() );
+		JetInfo[iJetColl].DeepAK8_dz[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->dz() );
+		JetInfo[iJetColl].DeepAK8_DeltaPhi_jet[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (reco::deltaPhi(pjet->phi(), pcand->phi()));
+		JetInfo[iJetColl].DeepAK8_DeltaEta_jet[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (abs(pjet->eta() -  pcand->eta()));
+		JetInfo[iJetColl].DeepAK8_DeltaR_jet[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = reco::deltaR(pjet->eta(), pjet->phi(), pcand->eta(), pcand->phi());
+		JetInfo[iJetColl].DeepAK8_lostInnerHits[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = pcand->lostInnerHits();
+		JetInfo[iJetColl].DeepAK8_pvAssociationQuality[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = pcand->pvAssociationQuality();
+		JetInfo[iJetColl].DeepAK8_isChargedHadron[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = pcand->isIsolatedChargedHadron();
+
+		const reco::Track * t = pcand->bestTrack();
+		const reco::TrackBase * bestTrk = dynamic_cast<const reco::TrackBase *>(t);
+		if (bestTrk) {
+			JetInfo[iJetColl].DeepAK8_chi2[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = ((float)(bestTrk->chi2()));
+			JetInfo[iJetColl].DeepAK8_dxy_err[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = ((float)(bestTrk->dxyError()));
+			JetInfo[iJetColl].DeepAK8_dz_err[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = ((float)(bestTrk->dzError()));
+			JetInfo[iJetColl].DeepAK8_qualityMask[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (bestTrk->qualityMask());
+			auto cov = bestTrk->covariance();
+			JetInfo[iJetColl].DeepAK8_dptdpt[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[0][0]);
+			JetInfo[iJetColl].DeepAK8_detadeta[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[1][1]);
+			JetInfo[iJetColl].DeepAK8_dphidphi[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[2][2]);
+			JetInfo[iJetColl].DeepAK8_dxydxy[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[3][3]);
+			JetInfo[iJetColl].DeepAK8_dzdz[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[4][4]);
+			JetInfo[iJetColl].DeepAK8_dxydz[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[3][4]);
+			JetInfo[iJetColl].DeepAK8_dphidxy[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[2][3]);
+			JetInfo[iJetColl].DeepAK8_dlambdadz[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[1][4]);
+			
+		        math::XYZVector jet(pjet->px(), pjet->py(), pjet->pz());
+			auto jetDir = jet.Unit();
+			math::XYZVector trackMom = bestTrk->momentum();
+			double trackMag = std::sqrt(trackMom.Mag2());
+			
+			JetInfo[iJetColl].DeepAK8_trackEtaRel[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = ((float)(reco::btau::etaRel(jetDir, trackMom)));	
+			JetInfo[iJetColl].DeepAK8_trackPParRatio[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = ((float)(jetDir.Dot(trackMom) / trackMag));	
+		}
+		//else {
+		//	JetInfo[iJetColl].DeepAK8_chi2[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (bestTrk->chi2() );
+		//}
+		
+	   }
+
+	   JetInfo[iJetColl].nConstDeepAK8 += constsize;
+
     }
-
-
-    cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
-    can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
+    }
 
     //*****************************************************************
     // for Mistag studies
     //*****************************************************************
+    cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
+    can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
+
     const Tracks svxPostracks( svTagInfo->vertexTracks(0) );
 
     if ( useTrackHistory_ && !isData_ ) {

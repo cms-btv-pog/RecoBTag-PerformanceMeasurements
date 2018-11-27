@@ -285,6 +285,10 @@ options.register('storeDeepDoubleBTagVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to keep DeepDoubleB TaggingVariables')
+options.register('storeDeepAK8Variables', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to keep DeepAK8 Input Variables')
 options.register('storeDeepCSVVariables', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -368,6 +372,7 @@ if not options.miniAOD and options.storeDeepFlavourTagVariables: #FIXME
     print "WARNING: switching off DeepFlavour/DeepDoubleB, as it is not supported in AOD"
     options.storeDeepFlavourTagVariables = False
     options.storeDeepDoubleBTagVariables = False
+    options.storeDeepAK8Variables = False
 
 if options.doBoostedCommissioning:
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
@@ -1472,6 +1477,7 @@ process.btagana.storeCSVTagVariables  = options.storeCSVTagVariables   ## True i
 process.btagana.storeCSVTagTrackVariables  = options.storeCSVTagTrackVariables   ## True if you want to keep CSV Tagging Track Variables
 process.btagana.storeDeepFlavourTagVariables = options.storeDeepFlavourTagVariables
 process.btagana.storeDeepDoubleBTagVariables = options.storeDeepDoubleBTagVariables
+process.btagana.storeDeepAK8Variables = options.storeDeepAK8Variables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag(patJetSource)
 process.btagana.muonCollectionName    = cms.InputTag(muSource)
@@ -1520,6 +1526,7 @@ if options.runFatJets:
         storeDeepFlavourVariables = cms.bool(False),
         storeDeepFlavourTagVariables = cms.bool(False),
         storeDeepDoubleBTagVariables = cms.bool(False),
+        storeDeepAK8Variables = cms.bool(False),
         deepFlavourJetTags = cms.string(''),
         deepFlavourNegJetTags = cms.string(''),
         storeTagVariablesSubJets = cms.bool(False),
@@ -1559,6 +1566,7 @@ if options.doBoostedCommissioning:
     process.btaganaFatJets.storeCSVTagVariablesSubJets = True
     process.btaganaFatJets.storeCSVTagTrackVariablesSubJets = True
     process.btaganaFatJets.storeDeepDoubleBTagVariables = True
+    process.btaganaFatJets.storeDeepAK8Variables = True
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
     print "storeHadronVariables set to '",process.btaganaFatJets.storeHadronVariables,"'"
     print "storeQuarkVariables set to '",process.btaganaFatJets.storeQuarkVariables,"'"
@@ -1566,6 +1574,7 @@ if options.doBoostedCommissioning:
     print "produceJetTrackTree set to '",process.btaganaFatJets.produceJetTrackTree,"'"
     print "fillsvTagInfo set to '",process.btaganaFatJets.fillsvTagInfo,"'"
     print "storeDeepDoubleBTagVariables set to '",process.btaganaFatJets.storeDeepDoubleBTagVariables,"'"
+    print "storeDeepAK8Variables set to '",process.btaganaFatJets.storeDeepAK8Variables,"'"
     print "For fat jets: storeCSVTagVariables set to '",process.btaganaFatJets.storeCSVTagVariables,"'"
     print "For fat jets: storeCSVTagTrackVariables set to '",process.btaganaFatJets.storeCSVTagTrackVariables,"'"
     print "For subjets:  storeCSVTagVariablesSubJets set to '",process.btaganaFatJets.storeCSVTagVariablesSubJets,"'"
