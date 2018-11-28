@@ -188,6 +188,54 @@ const reco::TrackBaseRef toTrackRef(const edm::Ptr<reco::Candidate> & cnd)
   }
 }
 
+// -------------- initialize constituents from pat::Jet ----------------
+// From https://github.com/hqucms/DNNTuplesAK8/blob/master/NtupleCommons/src/JetHelper.cc
+std::vector<const pat::PackedCandidate*> getAllJetConstituents( auto jet_ ) {
+
+        std::vector<const pat::Jet*> subjets_;
+        std::vector<const pat::PackedCandidate*> daughters_;
+        std::vector<const pat::PackedCandidate*> daughtersGroomed_;
+// try {
+        // ak8: use default subjets collection
+//        auto subjets = jet_->subjets();
+//        for (const auto &sj : subjets){
+//                subjets_.push_back(&(*sj));
+//                for (unsigned idau=0; idau<sj->numberOfDaughters(); ++idau){
+//                        daughtersGroomed_.push_back(dynamic_cast<const pat::PackedCandidate*>(sj->daughter(idau)));
+//                        //edm::LogWarning("test") << sj->daughter(idau)->pt();
+//                }
+//        }
+//        std::sort(daughtersGroomed_.begin(), daughtersGroomed_.end(), 
+//                        [](const pat::PackedCandidate* p1, const pat::PackedCandidate* p2){return p1->pt()>p2->pt();});
+//        std::sort(subjets_.begin(), subjets_.end(),
+//                        [](const pat::Jet* p1, const pat::Jet* p2){return p1->pt()>p2->pt();});
+
+        // Then get all constituents
+        for (unsigned idau=0; idau<jet_->numberOfDaughters(); ++idau){
+                const auto *dau = jet_->daughter(idau);
+                edm::LogWarning("subjets") << idau << " " << jet_->numberOfDaughters();
+                if (dau->numberOfDaughters()>0){
+                        // is a subjet; add all daughters
+                        for (unsigned k=0; k<dau->numberOfDaughters(); ++k){
+                        daughters_.push_back(dynamic_cast<const pat::PackedCandidate*>(dau->daughter(k)));
+                        }
+                } else daughters_.push_back(dynamic_cast<const pat::PackedCandidate*>(dau));
+        }
+
+        std::sort(daughters_.begin(), daughters_.end(),
+                        [](const pat::PackedCandidate* p1, const pat::PackedCandidate* p2){return p1->pt()>p2->pt();});
+
+//  }catch(const cms::Exception &e){
+//    // ak4
+//    for (unsigned idau=0; idau<jet_->numberOfDaughters(); ++idau){
+//      daughters_.push_back(dynamic_cast<const pat::PackedCandidate*>(jet_->daughter(idau)));
+//    }
+//}
+        return daughters_;
+
+}
+// ------------------------------
+
 const math::XYZPoint & position(const reco::Vertex & sv) {return sv.position();}
 const math::XYZPoint & position(const reco::VertexCompositePtrCandidate & sv) {return sv.vertex();}
 const double xError(const reco::Vertex & sv) {return sv.xError();}
@@ -263,6 +311,7 @@ private:
   void matchGroomedJets(const edm::Handle<PatJetCollection>& jets,
 			const edm::Handle<PatJetCollection>& matchedJets,
 			std::vector<int>& matchedIndices);
+
 
   // ----------member data ---------------------------
   std::string outputFile_;
@@ -1701,6 +1750,10 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   //------------------------------------------------------
   // Jet info
   //------------------------------------------------------
+  for ( const auto & pjet : *jetsColl ) {
+          edm::LogWarning("outside") << pjet.pt() << " " << pjet.eta() << " " << pjet.numberOfDaughters();
+  }
+
   int iJetColl = 0 ;
   //// Do jets
   processJets(jetsColl, jetsColl, subjetColls, iEvent, iSetup, iJetColl); // the second 'jetsColl' is a dummy input here
@@ -1824,7 +1877,9 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     double etajet = pjet->eta() ;
     double phijet = pjet->phi() ;
 
+    edm::LogWarning("start") << pjet->pt() << " " << pjet->eta() << " "  << pjet->numberOfDaughters();
     if ( allowJetSkipping_ && ( ptjet < minJetPt_ || std::fabs( etajet ) > maxJetEta_ ) ) continue;
+    edm::LogWarning("00") << pjet->pt() << " " << pjet->eta() << " "  << pjet->numberOfDaughters();
 
     //// overlap removal with lepton from ttbar selection
     if (use_ttbar_filter_) {
@@ -3569,68 +3624,79 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     // additional DeepAK8 Input Features
 
 	if (storeDeepAK8Variables_) {
-          
-	   size_t constsize = pjet->numberOfDaughters(); 
 
-	   // loop over jet constituents 
-	   for(size_t iConstit = 0; iConstit < pjet->numberOfDaughters(); iConstit++) {
+           edm::LogWarning("test") << pjet->pt() << " " << pjet->eta() << " "  << pjet->numberOfDaughters();;
+                /*edm::LogWarning("out") << pjet->pt() << " " << pjet->eta() << " "  << pjet->numberOfDaughters();
+                auto vectorCandidates = getAllJetConstituents( *pjet );
 
-		const reco::Candidate * c = pjet->daughter(iConstit);
-		const pat::PackedCandidate * pcand = dynamic_cast<const pat::PackedCandidate *>(c);
-		//std::cout << "isChargedHadron" << pcand->isIsolatedChargedHadron() << std::endl;
-		JetInfo[iJetColl].DeepAK8_pt[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = pcand->pt();
-		JetInfo[iJetColl].DeepAK8_ptRatio[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->pt() / pjet->pt() );
-		JetInfo[iJetColl].DeepAK8_E[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->energy() );
-		JetInfo[iJetColl].DeepAK8_eta[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->eta() );
-		JetInfo[iJetColl].DeepAK8_charge[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->charge() );
-		JetInfo[iJetColl].DeepAK8_isMuon[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->isMuon() );
-		JetInfo[iJetColl].DeepAK8_isElectron[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->isElectron() );
-		JetInfo[iJetColl].DeepAK8_isPhoton[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->isPhoton() );
-		JetInfo[iJetColl].DeepAK8_hcalFraction[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->hcalFraction() );
-		JetInfo[iJetColl].DeepAK8_PuppiWeight[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->puppiWeight() );
-		JetInfo[iJetColl].DeepAK8_dxy[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->dxy() );
-		JetInfo[iJetColl].DeepAK8_dz[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->dz() );
-		JetInfo[iJetColl].DeepAK8_DeltaPhi_jet[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (reco::deltaPhi(pjet->phi(), pcand->phi()));
-		JetInfo[iJetColl].DeepAK8_DeltaEta_jet[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (abs(pjet->eta() -  pcand->eta()));
-		JetInfo[iJetColl].DeepAK8_DeltaR_jet[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = reco::deltaR(pjet->eta(), pjet->phi(), pcand->eta(), pcand->phi());
-		JetInfo[iJetColl].DeepAK8_lostInnerHits[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = pcand->lostInnerHits();
-		JetInfo[iJetColl].DeepAK8_pvAssociationQuality[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = pcand->pvAssociationQuality();
-		JetInfo[iJetColl].DeepAK8_isChargedHadron[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = pcand->isIsolatedChargedHadron();
+                for (auto pcand : vectorCandidates) {
+                        edm::LogWarning("test") << pcand->pt() << " " << pjet->eta() << " "  << pjet->numberOfDaughters();
+                        
+                }*/
+//          
+	   //int constsize = pjet->numberOfDaughters(); 
+//
+//	   // loop over jet constituents 
+	   //for(size_t iConstit = 0; iConstit < pjet->numberOfDaughters(); iConstit++) {
+           //             edm::LogWarning("test") << pjet->pt() << " " << pjet->eta() << " "  << iConstit;
+           //}
+//
+//		const reco::Candidate * c = pjet->daughter(iConstit);
+//		const pat::PackedCandidate * pcand = dynamic_cast<const pat::PackedCandidate *>(c);
+//		//std::cout << "isChargedHadron" << pcand->isIsolatedChargedHadron() << std::endl;
+//		JetInfo[iJetColl].DeepAK8_pt[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = pcand->pt();
+//		JetInfo[iJetColl].DeepAK8_ptRatio[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->pt() / pjet->pt() );
+//		JetInfo[iJetColl].DeepAK8_E[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->energy() );
+//		JetInfo[iJetColl].DeepAK8_eta[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->eta() );
+//		JetInfo[iJetColl].DeepAK8_charge[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->charge() );
+//		JetInfo[iJetColl].DeepAK8_isMuon[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->isMuon() );
+//		JetInfo[iJetColl].DeepAK8_isElectron[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->isElectron() );
+//		JetInfo[iJetColl].DeepAK8_isPhoton[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->isPhoton() );
+//		JetInfo[iJetColl].DeepAK8_hcalFraction[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->hcalFraction() );
+//		JetInfo[iJetColl].DeepAK8_PuppiWeight[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->puppiWeight() );
+//		JetInfo[iJetColl].DeepAK8_dxy[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->dxy() );
+//		JetInfo[iJetColl].DeepAK8_dz[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (pcand->dz() );
+//		JetInfo[iJetColl].DeepAK8_DeltaPhi_jet[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (reco::deltaPhi(pjet->phi(), pcand->phi()));
+//		JetInfo[iJetColl].DeepAK8_DeltaEta_jet[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (abs(pjet->eta() -  pcand->eta()));
+//		JetInfo[iJetColl].DeepAK8_DeltaR_jet[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = reco::deltaR(pjet->eta(), pjet->phi(), pcand->eta(), pcand->phi());
+//		JetInfo[iJetColl].DeepAK8_lostInnerHits[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = pcand->lostInnerHits();
+//		JetInfo[iJetColl].DeepAK8_pvAssociationQuality[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = pcand->pvAssociationQuality();
+//		JetInfo[iJetColl].DeepAK8_isChargedHadron[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = pcand->isIsolatedChargedHadron();
+//
+//		const reco::Track * t = pcand->bestTrack();
+//		const reco::TrackBase * bestTrk = dynamic_cast<const reco::TrackBase *>(t);
+//		if (bestTrk) {
+//			JetInfo[iJetColl].DeepAK8_chi2[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = ((float)(bestTrk->chi2()));
+//			JetInfo[iJetColl].DeepAK8_dxy_err[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = ((float)(bestTrk->dxyError()));
+//			JetInfo[iJetColl].DeepAK8_dz_err[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = ((float)(bestTrk->dzError()));
+//			JetInfo[iJetColl].DeepAK8_qualityMask[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (bestTrk->qualityMask());
+//			auto cov = bestTrk->covariance();
+//			JetInfo[iJetColl].DeepAK8_dptdpt[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[0][0]);
+//			JetInfo[iJetColl].DeepAK8_detadeta[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[1][1]);
+//			JetInfo[iJetColl].DeepAK8_dphidphi[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[2][2]);
+//			JetInfo[iJetColl].DeepAK8_dxydxy[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[3][3]);
+//			JetInfo[iJetColl].DeepAK8_dzdz[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[4][4]);
+//			JetInfo[iJetColl].DeepAK8_dxydz[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[3][4]);
+//			JetInfo[iJetColl].DeepAK8_dphidxy[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[2][3]);
+//			JetInfo[iJetColl].DeepAK8_dlambdadz[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[1][4]);
+//			
+//		        math::XYZVector jet(pjet->px(), pjet->py(), pjet->pz());
+//			auto jetDir = jet.Unit();
+//			math::XYZVector trackMom = bestTrk->momentum();
+//			double trackMag = std::sqrt(trackMom.Mag2());
+//			
+//			JetInfo[iJetColl].DeepAK8_trackEtaRel[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = ((float)(reco::btau::etaRel(jetDir, trackMom)));	
+//			JetInfo[iJetColl].DeepAK8_trackPParRatio[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = ((float)(jetDir.Dot(trackMom) / trackMag));	
+//		}
+//		//else {
+//		//	JetInfo[iJetColl].DeepAK8_chi2[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (bestTrk->chi2() );
+//		//}
+//		
+//	   }
+//
+//	   JetInfo[iJetColl].nConstDeepAK8 += constsize;
 
-		const reco::Track * t = pcand->bestTrack();
-		const reco::TrackBase * bestTrk = dynamic_cast<const reco::TrackBase *>(t);
-		if (bestTrk) {
-			JetInfo[iJetColl].DeepAK8_chi2[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = ((float)(bestTrk->chi2()));
-			JetInfo[iJetColl].DeepAK8_dxy_err[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = ((float)(bestTrk->dxyError()));
-			JetInfo[iJetColl].DeepAK8_dz_err[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = ((float)(bestTrk->dzError()));
-			JetInfo[iJetColl].DeepAK8_qualityMask[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (bestTrk->qualityMask());
-			auto cov = bestTrk->covariance();
-			JetInfo[iJetColl].DeepAK8_dptdpt[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[0][0]);
-			JetInfo[iJetColl].DeepAK8_detadeta[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[1][1]);
-			JetInfo[iJetColl].DeepAK8_dphidphi[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[2][2]);
-			JetInfo[iJetColl].DeepAK8_dxydxy[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[3][3]);
-			JetInfo[iJetColl].DeepAK8_dzdz[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[4][4]);
-			JetInfo[iJetColl].DeepAK8_dxydz[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[3][4]);
-			JetInfo[iJetColl].DeepAK8_dphidxy[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[2][3]);
-			JetInfo[iJetColl].DeepAK8_dlambdadz[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (cov[1][4]);
-			
-		        math::XYZVector jet(pjet->px(), pjet->py(), pjet->pz());
-			auto jetDir = jet.Unit();
-			math::XYZVector trackMom = bestTrk->momentum();
-			double trackMag = std::sqrt(trackMom.Mag2());
-			
-			JetInfo[iJetColl].DeepAK8_trackEtaRel[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = ((float)(reco::btau::etaRel(jetDir, trackMom)));	
-			JetInfo[iJetColl].DeepAK8_trackPParRatio[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = ((float)(jetDir.Dot(trackMom) / trackMag));	
-		}
-		//else {
-		//	JetInfo[iJetColl].DeepAK8_chi2[ JetInfo[iJetColl].nConstDeepAK8 + iConstit ] = (bestTrk->chi2() );
-		//}
-		
-	   }
-
-	   JetInfo[iJetColl].nConstDeepAK8 += constsize;
-
-    }
+        }
     }
 
     //*****************************************************************
@@ -4618,6 +4684,7 @@ void BTagAnalyzerT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::verte
     charge+=mytrack.charge();
   }
 }
+
 
 // define specific instances of the templated BTagAnalyzer
 typedef BTagAnalyzerT<reco::TrackIPTagInfo,reco::Vertex> BTagAnalyzerLegacy;
