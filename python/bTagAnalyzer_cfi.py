@@ -9,6 +9,7 @@ bTagAnalyzer = cms.EDAnalyzer("BTagAnalyzer",
     # TagInfos (need to omit the 'TagInfos' part from the label)
     deepFlavourTagInfos = cms.string('pfDeepFlavour'),
     deepDoubleBTagInfos = cms.string('pfDeepDoubleB'),
+    deepDoubleBoostedJetTagInfos = cms.string('pfDeepDoubleB'),
     ipTagInfos = cms.string('pfImpactParameter'),
     svTagInfos = cms.string('pfInclusiveSecondaryVertexFinder'),
     svNegTagInfos = cms.string('pfInclusiveSecondaryVertexFinderNegative'),

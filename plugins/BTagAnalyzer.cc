@@ -76,6 +76,7 @@
 #include "DataFormats/BTauReco/interface/SoftLeptonTagInfo.h"
 #include "DataFormats/BTauReco/interface/DeepFlavourFeatures.h"
 #include "DataFormats/BTauReco/interface/DeepDoubleBFeatures.h"
+#include "DataFormats/BTauReco/interface/DeepBoostedJetFeatures.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
@@ -187,54 +188,6 @@ const reco::TrackBaseRef toTrackRef(const edm::Ptr<reco::Candidate> & cnd)
       return reco::TrackBaseRef();
   }
 }
-
-// -------------- initialize constituents from pat::Jet ----------------
-// From https://github.com/hqucms/DNNTuplesAK8/blob/master/NtupleCommons/src/JetHelper.cc
-std::vector<const pat::PackedCandidate*> getAllJetConstituents( auto jet_ ) {
-
-        std::vector<const pat::Jet*> subjets_;
-        std::vector<const pat::PackedCandidate*> daughters_;
-        std::vector<const pat::PackedCandidate*> daughtersGroomed_;
-// try {
-        // ak8: use default subjets collection
-//        auto subjets = jet_->subjets();
-//        for (const auto &sj : subjets){
-//                subjets_.push_back(&(*sj));
-//                for (unsigned idau=0; idau<sj->numberOfDaughters(); ++idau){
-//                        daughtersGroomed_.push_back(dynamic_cast<const pat::PackedCandidate*>(sj->daughter(idau)));
-//                        //edm::LogWarning("test") << sj->daughter(idau)->pt();
-//                }
-//        }
-//        std::sort(daughtersGroomed_.begin(), daughtersGroomed_.end(), 
-//                        [](const pat::PackedCandidate* p1, const pat::PackedCandidate* p2){return p1->pt()>p2->pt();});
-//        std::sort(subjets_.begin(), subjets_.end(),
-//                        [](const pat::Jet* p1, const pat::Jet* p2){return p1->pt()>p2->pt();});
-
-        // Then get all constituents
-        for (unsigned idau=0; idau<jet_->numberOfDaughters(); ++idau){
-                const auto *dau = jet_->daughter(idau);
-                edm::LogWarning("subjets") << idau << " " << jet_->numberOfDaughters();
-                if (dau->numberOfDaughters()>0){
-                        // is a subjet; add all daughters
-                        for (unsigned k=0; k<dau->numberOfDaughters(); ++k){
-                        daughters_.push_back(dynamic_cast<const pat::PackedCandidate*>(dau->daughter(k)));
-                        }
-                } else daughters_.push_back(dynamic_cast<const pat::PackedCandidate*>(dau));
-        }
-
-        std::sort(daughters_.begin(), daughters_.end(),
-                        [](const pat::PackedCandidate* p1, const pat::PackedCandidate* p2){return p1->pt()>p2->pt();});
-
-//  }catch(const cms::Exception &e){
-//    // ak4
-//    for (unsigned idau=0; idau<jet_->numberOfDaughters(); ++idau){
-//      daughters_.push_back(dynamic_cast<const pat::PackedCandidate*>(jet_->daughter(idau)));
-//    }
-//}
-        return daughters_;
-
-}
-// ------------------------------
 
 const math::XYZPoint & position(const reco::Vertex & sv) {return sv.position();}
 const math::XYZPoint & position(const reco::VertexCompositePtrCandidate & sv) {return sv.vertex();}
@@ -397,6 +350,7 @@ private:
   std::string softPFElectronTagInfos_;
   std::string bdsvTagInfos_;
   std::string deepDoubleBTagInfos_;
+  std::string deepDoubleBoostedJetTagInfos_;
 
   edm::EDGetTokenT<reco::VertexCollection> primaryVertexColl_;
   edm::EDGetTokenT<reco::TrackCollection> tracksColl_;
@@ -729,6 +683,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   softPFElectronTagInfos_  = iConfig.getParameter<std::string>("softPFElectronTagInfos");
   bdsvTagInfos_            = iConfig.getParameter<std::string>("bdsvTagInfos");
   deepDoubleBTagInfos_     = iConfig.getParameter<std::string>("deepDoubleBTagInfos");
+  deepDoubleBoostedJetTagInfos_     = iConfig.getParameter<std::string>("deepDoubleBTagInfos");
 
   muonCollectionName_       = consumes<edm::View<reco::Muon>>(iConfig.getParameter<edm::InputTag>("muonCollectionName"));
   patMuonCollectionName_    = consumes<std::vector<pat::Muon>>(iConfig.getParameter<edm::InputTag>("patMuonCollectionName"));
@@ -1750,9 +1705,10 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   //------------------------------------------------------
   // Jet info
   //------------------------------------------------------
-  for ( const auto & pjet : *jetsColl ) {
+  /*for ( const auto & pjet : *jetsColl ) {
           edm::LogWarning("outside") << pjet.pt() << " " << pjet.eta() << " " << pjet.numberOfDaughters();
-  }
+          std::cout << "outside " << iEvent.id().event() << " " << pjet.pt() << " " << pjet.eta() << " " << pjet.numberOfDaughters() << std::endl;
+  }*/
 
   int iJetColl = 0 ;
   //// Do jets
@@ -1838,6 +1794,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
   JetInfo[iJetColl].nTrkEtaRelCTagVar = 0;
   JetInfo[iJetColl].nLeptons = 0;
   JetInfo[iJetColl].nTrkDeepDoubleB = 0;
+  JetInfo[iJetColl].nTrkDeepBoostedJet = 0;
   JetInfo[iJetColl].nSVDeepDoubleB = 0;
   JetInfo[iJetColl].nConstDeepAK8 = 0;
 
@@ -1877,9 +1834,11 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     double etajet = pjet->eta() ;
     double phijet = pjet->phi() ;
 
-    edm::LogWarning("start") << pjet->pt() << " " << pjet->eta() << " "  << pjet->numberOfDaughters();
+    //edm::LogWarning("start") << pjet->pt() << " " << pjet->eta() << " "  << pjet->numberOfDaughters();
+    //      std::cout << "start " << iEvent.id().event() << " " << pjet->pt() << " " << pjet->eta() << " " << pjet->numberOfDaughters() << std::endl;
     if ( allowJetSkipping_ && ( ptjet < minJetPt_ || std::fabs( etajet ) > maxJetEta_ ) ) continue;
-    edm::LogWarning("00") << pjet->pt() << " " << pjet->eta() << " "  << pjet->numberOfDaughters();
+    //edm::LogWarning("00") << pjet->pt() << " " << pjet->eta() << " "  << pjet->numberOfDaughters();
+    //      std::cout << "00 " << iEvent.id().event() << " " << pjet->pt() << " " << pjet->eta() << " " << pjet->numberOfDaughters() << std::endl;
 
     //// overlap removal with lepton from ttbar selection
     if (use_ttbar_filter_) {
@@ -3625,15 +3584,22 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
 	if (storeDeepAK8Variables_) {
 
-           edm::LogWarning("test") << pjet->pt() << " " << pjet->eta() << " "  << pjet->numberOfDaughters();;
-                /*edm::LogWarning("out") << pjet->pt() << " " << pjet->eta() << " "  << pjet->numberOfDaughters();
-                auto vectorCandidates = getAllJetConstituents( *pjet );
+		auto ddbj_taginfo = static_cast<const reco::DeepBoostedJetTagInfo*>(pjet->tagInfo(deepDoubleBTagInfos_));
+		if(!ddbj_taginfo) {
+			throw cms::Exception("CorruptData") << "The jet collection does not have the DeepBoostedJet TagInfos embedded!";
+		}
 
-                for (auto pcand : vectorCandidates) {
-                        edm::LogWarning("test") << pcand->pt() << " " << pjet->eta() << " "  << pjet->numberOfDaughters();
-                        
-                }*/
-//          
+		const auto & ddbj_features = ddbj_taginfo->features();
+                const std::string tmpName = "pfcand_puppiw";
+		const auto ddbj_csize = ddbj_features.get(tmpName);
+		//size_t ddbj_csize = ddbj_features.get("pfcand_puppiw").size();
+      		//JetInfo[iJetColl].Jet_DeepDoubleB_nFirstTrkTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkDeepDoubleB;
+		//for(size_t q = 0; q < ddbj_csize; q++){
+                //        edm::LogWarning("test") << q; //<< " " << ddbj_features.get("pfcand_puppiw")[q];
+                //}
+
+           //edm::LogWarning("test") << pjet->pt() << " " << pjet->eta() << " "  << pjet->numberOfDaughters();;
+          //std::cout << "test " << iEvent.id().event() << " " << pjet->pt() << " " << pjet->eta() << " " << pjet->numberOfDaughters() << std::endl;
 	   //int constsize = pjet->numberOfDaughters(); 
 //
 //	   // loop over jet constituents 

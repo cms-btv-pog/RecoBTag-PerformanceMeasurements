@@ -435,6 +435,7 @@ class JetInfoBranches {
     float DeepDoubleBInput_sv_d3dsig[nMaxSVs_];
 
     //DeepAK8 input features
+    int   nTrkDeepBoostedJet;
     int nConstDeepAK8;
     float DeepAK8_pt[nMaxConst_];
     float DeepAK8_ptRatio[nMaxConst_];

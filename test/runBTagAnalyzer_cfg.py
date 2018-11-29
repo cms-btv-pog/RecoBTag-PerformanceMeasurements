@@ -439,6 +439,7 @@ bTagInfos = [
    ,'softPFElectronsTagInfos'
    ,'pfInclusiveSecondaryVertexFinderCvsLTagInfos'
    ,'pfInclusiveSecondaryVertexFinderNegativeCvsLTagInfos'
+   ##,'pfDeepAK8TagInfos'
    ,'pfDeepFlavourTagInfos'
    ,'pfDeepDoubleBTagInfos'
 ]
@@ -616,6 +617,8 @@ if options.runDeepAK8:
         "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:WvsQCD",
         "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHbbvsQCD"
     ]))
+    ## Add DeepDoubleB tag infos
+    bTagInfosFat += ([] if options.useLegacyTaggers else ['pfDeepBoostedJetTagInfos'])
 
 if options.runJetClustering:
     options.remakeAllDiscr = True
