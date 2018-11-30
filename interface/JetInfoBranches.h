@@ -201,12 +201,12 @@ class JetInfoBranches {
     int   Jet_nFirstTrkEtaRelTagVarCSV[nMaxJets_];
     int   Jet_nLastTrkEtaRelTagVarCSV[nMaxJets_];
     float Jet_DeepDoubleB[nMaxJets_];
-    float Jet_DeepAK8bbvsLight[nMaxJets_];
-    float Jet_DeepAK8ccvsLight[nMaxJets_];
-    float Jet_DeepAK8TvsQCD[nMaxJets_];
-    float Jet_DeepAK8ZHccvsQCD[nMaxJets_];
-    float Jet_DeepAK8WvsQCD[nMaxJets_];
-    float Jet_DeepAK8ZHbbvsQCD[nMaxJets_];
+    float Jet_DeepBoostedJetbbvsLight[nMaxJets_];
+    float Jet_DeepBoostedJetccvsLight[nMaxJets_];
+    float Jet_DeepBoostedJetTvsQCD[nMaxJets_];
+    float Jet_DeepBoostedJetZHccvsQCD[nMaxJets_];
+    float Jet_DeepBoostedJetWvsQCD[nMaxJets_];
+    float Jet_DeepBoostedJetZHbbvsQCD[nMaxJets_];
 
     int   nTrack;
     float Track_dxy[nMaxTrk_];
@@ -434,54 +434,71 @@ class JetInfoBranches {
     float DeepDoubleBInput_sv_d3d[nMaxSVs_];
     float DeepDoubleBInput_sv_d3dsig[nMaxSVs_];
 
-    //DeepAK8 input features
-    int   nTrkDeepBoostedJet;
-    int nConstDeepAK8;
-    float DeepAK8_pt[nMaxConst_];
-    float DeepAK8_ptRatio[nMaxConst_];
-    float DeepAK8_E[nMaxConst_];
-    float DeepAK8_eta[nMaxConst_];
-    float DeepAK8_DeltaPhi_jet[nMaxConst_];
-    float DeepAK8_DeltaEta_jet[nMaxConst_];
-    float DeepAK8_PuppiWeight[nMaxConst_];
-    float DeepAK8_minDeltaR_SV[nMaxConst_];
-    float DeepAK8_DeltaR_jet[nMaxConst_];
-    float DeepAK8_DeltaR_subjet1[nMaxConst_];
-    float DeepAK8_DeltaR_subjet2[nMaxConst_];
-    float DeepAK8_charge[nMaxConst_];
-    int DeepAK8_isMuon[nMaxConst_];
-    int DeepAK8_isElectron[nMaxConst_];
-    int DeepAK8_isPhoton[nMaxConst_];
-    int DeepAK8_isChargedHadron[nMaxConst_];
-    int DeepAK8_isNeutralHadron[nMaxConst_];
-    float DeepAK8_hcalFraction[nMaxConst_];
-    float DeepAK8_pvAssociationQuality[nMaxConst_];
-    int DeepAK8_lostInnerHits[nMaxConst_];
-    float DeepAK8_dxy[nMaxConst_];
-    float DeepAK8_dz[nMaxConst_];
+    //DeepBoostedJet input features
+        int   nTrkDeepBoostedJet;
+        int   Jet_DeepBoostedJet_nFirstTrkTagVar[nMaxJets_];
+        int   Jet_DeepBoostedJet_nLastTrkTagVar[nMaxJets_];
+        float DeepBoostedJetInput_pf_puppiw[nMaxTrk_];
+        float DeepBoostedJetInput_pf_hcalFrac[nMaxTrk_];
+        float DeepBoostedJetInput_pf_VTX_ass[nMaxTrk_];
+        float DeepBoostedJetInput_pf_lostInnerHits[nMaxTrk_];
+        float DeepBoostedJetInput_pf_quality[nMaxTrk_];
+        float DeepBoostedJetInput_pf_charge[nMaxTrk_];
+        float DeepBoostedJetInput_pf_isEl[nMaxTrk_];
+        float DeepBoostedJetInput_pf_isMu[nMaxTrk_];
+        float DeepBoostedJetInput_pf_isChargedHad[nMaxTrk_];
+        float DeepBoostedJetInput_pf_isGamma[nMaxTrk_];
+        float DeepBoostedJetInput_pf_isNeutralHad[nMaxTrk_];
+        float DeepBoostedJetInput_pf_phirel[nMaxTrk_];
+        float DeepBoostedJetInput_pf_etarel[nMaxTrk_];
+        float DeepBoostedJetInput_pf_deltaR[nMaxTrk_];
+        float DeepBoostedJetInput_pf_abseta[nMaxTrk_];
+        float DeepBoostedJetInput_pf_ptrel_log[nMaxTrk_];
+        float DeepBoostedJetInput_pf_erel_log[nMaxTrk_];
+        float DeepBoostedJetInput_pf_pt_log[nMaxTrk_];
+        float DeepBoostedJetInput_pf_drminsv[nMaxTrk_];
+        float DeepBoostedJetInput_pf_drsubjet1[nMaxTrk_];
+        float DeepBoostedJetInput_pf_drsubjet2[nMaxTrk_];
+        float DeepBoostedJetInput_pf_normchi2[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dz[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dzsig[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dxy[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dxysig[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dptdpt[nMaxTrk_];
+        float DeepBoostedJetInput_pf_detadeta[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dphidphi[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dxydxy[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dzdz[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dxydz[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dphidxy[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dlambdadz[nMaxTrk_];
+        float DeepBoostedJetInput_pf_btagEtaRel[nMaxTrk_];
+        float DeepBoostedJetInput_pf_btagPtRatio[nMaxTrk_];
+        float DeepBoostedJetInput_pf_btagPParRatio[nMaxTrk_];
+        float DeepBoostedJetInput_pf_btagSip2dVal[nMaxTrk_];
+        float DeepBoostedJetInput_pf_btagSip2dSig[nMaxTrk_];
+        float DeepBoostedJetInput_pf_btagSip3dVal[nMaxTrk_];
+        float DeepBoostedJetInput_pf_btagSip3dSig[nMaxTrk_];
+        float DeepBoostedJetInput_pf_btagJetDistVal[nMaxTrk_];
+        int   nSVDeepBoostedJet;
+        int   Jet_DeepBoostedJet_nFirstSVTagVar[nMaxJets_];
+        int   Jet_DeepBoostedJet_nLastSVTagVar[nMaxJets_];
+        float DeepBoostedJetInput_sv_phirel[nMaxSVs_];
+        float DeepBoostedJetInput_sv_etarel[nMaxSVs_];
+        float DeepBoostedJetInput_sv_deltaR[nMaxSVs_];
+        float DeepBoostedJetInput_sv_abseta[nMaxSVs_];
+        float DeepBoostedJetInput_sv_mass[nMaxSVs_];
+        float DeepBoostedJetInput_sv_ptrel_log[nMaxSVs_];
+        float DeepBoostedJetInput_sv_erel_log[nMaxSVs_];
+        float DeepBoostedJetInput_sv_pt_log[nMaxSVs_];
+        float DeepBoostedJetInput_sv_ntracks[nMaxSVs_];
+        float DeepBoostedJetInput_sv_normchi2[nMaxSVs_];
+        float DeepBoostedJetInput_sv_dxy[nMaxSVs_];
+        float DeepBoostedJetInput_sv_dxysig[nMaxSVs_];
+        float DeepBoostedJetInput_sv_d3d[nMaxSVs_];
+        float DeepBoostedJetInput_sv_d3dsig[nMaxSVs_];
+        float DeepBoostedJetInput_sv_costhetasvpv[nMaxSVs_];
 
-    float DeepAK8_dxy_err[nMaxConst_];
-    float DeepAK8_dz_err[nMaxConst_];
-    float DeepAK8_chi2[nMaxConst_];
-    float DeepAK8_qualityMask[nMaxConst_];
-    float DeepAK8_dptdpt[nMaxConst_];
-    float DeepAK8_detadeta[nMaxConst_];
-    float DeepAK8_dphidphi[nMaxConst_];
-    float DeepAK8_dxydxy[nMaxConst_];
-    float DeepAK8_dzdz[nMaxConst_];
-    float DeepAK8_dxydz[nMaxConst_];
-    float DeepAK8_dphidxy[nMaxConst_];
-    float DeepAK8_dlambdadz[nMaxConst_];
-   
-    float DeepAK8_trackEtaRel[nMaxConst_]; 
-    float DeepAK8_trackPtRatio[nMaxConst_]; 
-    float DeepAK8_trackPParRatio[nMaxConst_]; 
-    float DeepAK8_trackSip2dVal[nMaxConst_]; 
-    float DeepAK8_trackSip2dSig[nMaxConst_]; 
-    float DeepAK8_trackSip3dVal[nMaxConst_]; 
-    float DeepAK8_trackSip3dSig[nMaxConst_]; 
-    float DeepAK8_trackJetDistVal[nMaxConst_]; 
-    
 
     // CSV TaggingVariables
     // per jet
@@ -1026,57 +1043,70 @@ class JetInfoBranches {
 	tree->Branch((name+"DeepDoubleBInput_sv_d3dsig").c_str(), DeepDoubleBInput_sv_d3dsig, (name+"DeepDoubleBInput_sv_d3dsig["+name+"nSVDeepDoubleB]/F").c_str());
     }
 
-    void RegisterDeepAK8FeatTree(TTree *tree, std::string name=""){
+    void RegisterDeepBoostedJetFeatTree(TTree *tree, std::string name=""){
 
-	if(name!="") name += ".";
+        if(name!="") name += ".";
+        tree->Branch((name+"nTrkDeepBoostedJet").c_str()           ,&nTrkDeepBoostedJet          ,(name+"nTrkDeepBoostedJet/I").c_str());
+        tree->Branch((name+"Jet_DeepBoostedJet_nFirstTrkTagVar").c_str() ,Jet_DeepBoostedJet_nFirstTrkTagVar  ,(name+"Jet_DeepBoostedJet_nFirstTrkTagVar["+name+"nJet]/I").c_str() );
+        tree->Branch((name+"Jet_DeepBoostedJet_nLastTrkTagVar").c_str()   ,Jet_DeepBoostedJet_nLastTrkTagVar   ,(name+"Jet_DeepBoostedJet_nLastTrack["+name+"nJet]/I").c_str()      );
+        tree->Branch((name+"DeepBoostedJetInput_pf_puppiw").c_str(), DeepBoostedJetInput_pf_puppiw, (name+"DeepBoostedJetInput_pf_puppiw["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_hcalFrac").c_str(), DeepBoostedJetInput_pf_hcalFrac, (name+"DeepBoostedJetInput_pf_hcalFrac["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_VTX_ass").c_str(), DeepBoostedJetInput_pf_VTX_ass, (name+"DeepBoostedJetInput_pf_VTX_ass["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_lostInnerHits").c_str(), DeepBoostedJetInput_pf_lostInnerHits, (name+"DeepBoostedJetInput_pf_lostInnerHits["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_quality").c_str(), DeepBoostedJetInput_pf_quality, (name+"DeepBoostedJetInput_pf_quality["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_charge").c_str(), DeepBoostedJetInput_pf_charge, (name+"DeepBoostedJetInput_pf_charge["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_isEl").c_str(), DeepBoostedJetInput_pf_isEl, (name+"DeepBoostedJetInput_pf_isEl["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_isMu").c_str(), DeepBoostedJetInput_pf_isMu, (name+"DeepBoostedJetInput_pf_isMu["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_isChargedHad").c_str(), DeepBoostedJetInput_pf_isChargedHad, (name+"DeepBoostedJetInput_pf_isChargedHad["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_isGamma").c_str(), DeepBoostedJetInput_pf_isGamma, (name+"DeepBoostedJetInput_pf_isGamma["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_isNeutralHad").c_str(), DeepBoostedJetInput_pf_isNeutralHad, (name+"DeepBoostedJetInput_pf_isNeutralHad["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_phirel").c_str(), DeepBoostedJetInput_pf_phirel, (name+"DeepBoostedJetInput_pf_phirel["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_etarel").c_str(), DeepBoostedJetInput_pf_etarel, (name+"DeepBoostedJetInput_pf_etarel["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_deltaR").c_str(), DeepBoostedJetInput_pf_deltaR, (name+"DeepBoostedJetInput_pf_deltaR["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_abseta").c_str(), DeepBoostedJetInput_pf_abseta, (name+"DeepBoostedJetInput_pf_abseta["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_ptrel_log").c_str(), DeepBoostedJetInput_pf_ptrel_log, (name+"DeepBoostedJetInput_pf_ptrel_log["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_erel_log").c_str(), DeepBoostedJetInput_pf_erel_log, (name+"DeepBoostedJetInput_pf_erel_log["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_pt_log").c_str(), DeepBoostedJetInput_pf_pt_log, (name+"DeepBoostedJetInput_pf_pt_log["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_drminsv").c_str(), DeepBoostedJetInput_pf_drminsv, (name+"DeepBoostedJetInput_pf_drminsv["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_drsubjet1").c_str(), DeepBoostedJetInput_pf_drsubjet1, (name+"DeepBoostedJetInput_pf_drsubjet1["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_drsubjet2").c_str(), DeepBoostedJetInput_pf_drsubjet2, (name+"DeepBoostedJetInput_pf_drsubjet2["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_normchi2").c_str(), DeepBoostedJetInput_pf_normchi2, (name+"DeepBoostedJetInput_pf_normchi2["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_dz").c_str(), DeepBoostedJetInput_pf_dz, (name+"DeepBoostedJetInput_pf_dz["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_dzsig").c_str(), DeepBoostedJetInput_pf_dzsig, (name+"DeepBoostedJetInput_pf_dzsig["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_dxy").c_str(), DeepBoostedJetInput_pf_dxy, (name+"DeepBoostedJetInput_pf_dxy["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_dxysig").c_str(), DeepBoostedJetInput_pf_dxysig, (name+"DeepBoostedJetInput_pf_dxysig["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_dptdpt").c_str(), DeepBoostedJetInput_pf_dptdpt, (name+"DeepBoostedJetInput_pf_dptdpt["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_detadeta").c_str(), DeepBoostedJetInput_pf_detadeta, (name+"DeepBoostedJetInput_pf_detadeta["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_dphidphi").c_str(), DeepBoostedJetInput_pf_dphidphi, (name+"DeepBoostedJetInput_pf_dphidphi["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_dxydxy").c_str(), DeepBoostedJetInput_pf_dxydxy, (name+"DeepBoostedJetInput_pf_dxydxy["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_dlambdadz").c_str(), DeepBoostedJetInput_pf_dlambdadz, (name+"DeepBoostedJetInput_pf_dlambdadz["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_btagEtaRel").c_str(), DeepBoostedJetInput_pf_btagEtaRel, (name+"DeepBoostedJetInput_pf_btagEtaRel["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_btagPtRatio").c_str(), DeepBoostedJetInput_pf_btagPtRatio, (name+"DeepBoostedJetInput_pf_btagPtRatio["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_btagPParRatio").c_str(), DeepBoostedJetInput_pf_btagPParRatio, (name+"DeepBoostedJetInput_pf_btagPParRatio["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_btagSip2dVal").c_str(), DeepBoostedJetInput_pf_btagSip2dVal, (name+"DeepBoostedJetInput_pf_btagSip2dVal["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_btagSip2dSig").c_str(), DeepBoostedJetInput_pf_btagSip2dSig, (name+"DeepBoostedJetInput_pf_btagSip2dSig["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_btagSip3dVal").c_str(), DeepBoostedJetInput_pf_btagSip3dVal, (name+"DeepBoostedJetInput_pf_btagSip3dVal["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_btagSip3dSig").c_str(), DeepBoostedJetInput_pf_btagSip3dSig, (name+"DeepBoostedJetInput_pf_btagSip3dSig["+name+"nTrkDeepBoostedJet]/F").c_str());
+        tree->Branch((name+"DeepBoostedJetInput_pf_btagJetDistVal").c_str(), DeepBoostedJetInput_pf_btagJetDistVal, (name+"DeepBoostedJetInput_pf_btagJetDistVal["+name+"nTrkDeepBoostedJet]/F").c_str());
 
-	// per constituent variables
-	tree->Branch((name+"nConstDeepAK8").c_str(), &nConstDeepAK8, (name+"nConstDeepAk8/I").c_str());
-	tree->Branch((name+"DeepAK8Input_const_pt").c_str()   , DeepAK8_pt   ,(name+"DeepAK8Input_const_pt["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_ptRatio").c_str()   , DeepAK8_ptRatio   ,(name+"DeepAK8Input_constituent_ptRatio["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_E").c_str()   , DeepAK8_E   ,(name+"DeepAK8Input_const_E["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_eta").c_str()   , DeepAK8_eta   ,(name+"DeepAK8Input_const_eta["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_DeltaPhi_jet").c_str()   , DeepAK8_DeltaPhi_jet   ,(name+"DeepAK8Input_const_DeltaPhi_jet["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_DeltaEta_jet").c_str()   , DeepAK8_DeltaEta_jet   ,(name+"DeepAK8Input_const_DeltaEta_jet["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_PuppiWeight").c_str()   , DeepAK8_PuppiWeight   ,(name+"DeepAK8Input_const_PuppiWeight["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_minDeltaR_SV").c_str()   , DeepAK8_minDeltaR_SV   ,(name+"DeepAK8Input_const_minDeltaR_SV["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_DeltaR_jet").c_str()   , DeepAK8_DeltaR_jet   ,(name+"DeepAK8Input_const_DeltaR_jet["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_DeltaR_subjet1").c_str()   , DeepAK8_DeltaR_subjet1   ,(name+"DeepAK8Input_const_DeltaR_subjet1["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_DeltaR_subjet2").c_str()   , DeepAK8_DeltaR_subjet2   ,(name+"DeepAK8Input_const_DeltaR_subjet2["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_charge").c_str()   , DeepAK8_charge   ,(name+"DeepAK8Input_const_charge["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_isMuon").c_str()   , DeepAK8_isMuon   ,(name+"DeepAK8Input_const_isMuon["+name+"nConstDeepAK8]/I").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_isElectron").c_str()   , DeepAK8_isElectron   ,(name+"DeepAK8Input_const_isElectron["+name+"nConstDeepAK8]/I").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_isPhoton").c_str()   , DeepAK8_isPhoton   ,(name+"DeepAK8Input_const_isPhoton["+name+"nConstDeepAK8]/I").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_isChargedHadron").c_str()   , DeepAK8_isChargedHadron   ,(name+"DeepAK8Input_const_isChargedHadron["+name+"nConstDeepAK8]/I").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_isNeutralHadron").c_str()   , DeepAK8_isNeutralHadron   ,(name+"DeepAK8Input_const_isNeutralHadron["+name+"nConstDeepAK8]/I").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_hcalFraction").c_str()   , DeepAK8_hcalFraction   ,(name+"DeepAK8Input_const_hcalFraction["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_pvAssociationQuality").c_str()   , DeepAK8_pvAssociationQuality   ,(name+"DeepAK8Input_const_pvAssociationQuality["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_lostInnerHits").c_str()   , DeepAK8_lostInnerHits   ,(name+"DeepAK8Input_const_lostInnerHits["+name+"nConstDeepAK8]/I").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_dxy").c_str()   , DeepAK8_dxy   ,(name+"DeepAK8Input_const_dxy["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_dz").c_str()   , DeepAK8_dz   ,(name+"DeepAK8Input_const_dz["+name+"nConstDeepAK8]/F").c_str()      );
-	
-	// best track of cand variables
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_dxy_err").c_str()   , DeepAK8_dxy_err   ,(name+"DeepAK8Input_const_bestTrk_dxy_err["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_dz_err").c_str()   , DeepAK8_dz_err   ,(name+"DeepAK8Input_const_bestTrk_dz_err["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_chi2").c_str()   , DeepAK8_chi2   ,(name+"DeepAK8Input_const_bestTrk_chi2["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_qualityMask").c_str()   , DeepAK8_qualityMask   ,(name+"DeepAK8Input_const_bestTrk_qualityMask["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_dptdpt").c_str()   , DeepAK8_dptdpt   ,(name+"DeepAK8Input_const_bestTrk_dptdpt["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_detadeta").c_str()   , DeepAK8_detadeta  ,(name+"DeepAK8Input_const_bestTrk_detadeta["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_dphidphi").c_str()   , DeepAK8_dphidphi  ,(name+"DeepAK8Input_const_bestTrk_dphidphi["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_dxydxy").c_str()   , DeepAK8_dxydxy  ,(name+"DeepAK8Input_const_bestTrk_dxydxy["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_dzdz").c_str()   , DeepAK8_dzdz  ,(name+"DeepAK8Input_const_bestTrk_dzdz["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_dxydz").c_str()   , DeepAK8_dxydz  ,(name+"DeepAK8Input_const_bestTrk_dxydz["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_dphidxy").c_str()   , DeepAK8_dphidxy  ,(name+"DeepAK8Input_const_bestTrk_dphidxy["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_dlambdadz").c_str()   , DeepAK8_dlambdadz  ,(name+"DeepAK8Input_const_bestTrk_dlambdadz["+name+"nConstDeepAK8]/F").c_str()      );
-	
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_trackEtaRel").c_str()   , DeepAK8_trackEtaRel  ,(name+"DeepAK8Input_const_bestTrk_trackEtaRel["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_trackPtRatio").c_str()   , DeepAK8_trackPtRatio  ,(name+"DeepAK8Input_const_bestTrk_trackPtRatio["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_trackPParRatio").c_str()   , DeepAK8_trackPParRatio  ,(name+"DeepAK8Input_const_bestTrk_trackPParRatio["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_trackSip2dVal").c_str()   , DeepAK8_trackSip2dVal  ,(name+"DeepAK8Input_const_bestTrk_trackSip2dVal["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_trackSip2dSig").c_str()   , DeepAK8_trackSip2dSig  ,(name+"DeepAK8Input_const_bestTrk_trackSip2dSig["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_trackSip3dVal").c_str()   , DeepAK8_trackSip3dVal  ,(name+"DeepAK8Input_const_bestTrk_trackSip3dVal["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_trackSip3dSig").c_str()   , DeepAK8_trackSip3dSig  ,(name+"DeepAK8Input_const_bestTrk_trackSip3dSig["+name+"nConstDeepAK8]/F").c_str()      );
-	tree->Branch((name+"DeepAK8Input_const_bestTrk_trackJetDistVal").c_str()   , DeepAK8_trackJetDistVal  ,(name+"DeepAK8Input_const_bestTrk_trackJetDistVal["+name+"nConstDeepAK8]/F").c_str()      );
+	tree->Branch((name+"nSVDeepBoostedJet").c_str()           ,&nSVDeepBoostedJet          ,(name+"nSVDeepBoostedJet/I").c_str());
+	tree->Branch((name+"Jet_DeepBoostedJet_nFirstSVTagVar").c_str()   ,Jet_DeepBoostedJet_nFirstSVTagVar   ,(name+"Jet_DeepBoostedJet_nFirstSVTagVar["+name+"nJet]/I").c_str()  );
+	tree->Branch((name+"Jet_DeepBoostedJet_nLastSVTagVar").c_str()    ,Jet_DeepBoostedJet_nLastSVTagVar    ,(name+"Jet_DeepBoostedJet_nLastSVTagVar["+name+"nJet]/I").c_str()   );
+	tree->Branch((name+"DeepBoostedJetInput_sv_phirel").c_str()	, DeepBoostedJetInput_sv_phirel, (name+"DeepBoostedJetInput_sv_phirel["+name+"nSVDeepBoostedJet]/F").c_str());
+	tree->Branch((name+"DeepBoostedJetInput_sv_etarel").c_str()	, DeepBoostedJetInput_sv_etarel, (name+"DeepBoostedJetInput_sv_etarel["+name+"nSVDeepBoostedJet]/F").c_str());
+	tree->Branch((name+"DeepBoostedJetInput_sv_deltaR").c_str()	, DeepBoostedJetInput_sv_deltaR, (name+"DeepBoostedJetInput_sv_deltaR["+name+"nSVDeepBoostedJet]/F").c_str());
+	tree->Branch((name+"DeepBoostedJetInput_sv_abseta").c_str()	, DeepBoostedJetInput_sv_abseta, (name+"DeepBoostedJetInput_sv_abseta["+name+"nSVDeepBoostedJet]/F").c_str());
+	tree->Branch((name+"DeepBoostedJetInput_sv_mass").c_str()	, DeepBoostedJetInput_sv_mass, (name+"DeepBoostedJetInput_sv_mass["+name+"nSVDeepBoostedJet]/F").c_str());
+	tree->Branch((name+"DeepBoostedJetInput_sv_ptrel_log").c_str()	, DeepBoostedJetInput_sv_ptrel_log, (name+"DeepBoostedJetInput_sv_ptrel_log["+name+"nSVDeepBoostedJet]/F").c_str());
+	tree->Branch((name+"DeepBoostedJetInput_sv_erel_log").c_str()	, DeepBoostedJetInput_sv_erel_log, (name+"DeepBoostedJetInput_sv_erel_log["+name+"nSVDeepBoostedJet]/F").c_str());
+	tree->Branch((name+"DeepBoostedJetInput_sv_pt_log").c_str()	, DeepBoostedJetInput_sv_pt_log, (name+"DeepBoostedJetInput_sv_pt_log["+name+"nSVDeepBoostedJet]/F").c_str());
+	tree->Branch((name+"DeepBoostedJetInput_sv_ntracks").c_str()	, DeepBoostedJetInput_sv_ntracks, (name+"DeepBoostedJetInput_sv_ntracks["+name+"nSVDeepBoostedJet]/F").c_str());
+	tree->Branch((name+"DeepBoostedJetInput_sv_normchi2").c_str()	, DeepBoostedJetInput_sv_normchi2, (name+"DeepBoostedJetInput_sv_normchi2["+name+"nSVDeepBoostedJet]/F").c_str());
+	tree->Branch((name+"DeepBoostedJetInput_sv_dxy").c_str()	, DeepBoostedJetInput_sv_dxy, (name+"DeepBoostedJetInput_sv_dxy["+name+"nSVDeepBoostedJet]/F").c_str());
+	tree->Branch((name+"DeepBoostedJetInput_sv_dxysig").c_str()	, DeepBoostedJetInput_sv_dxysig, (name+"DeepBoostedJetInput_sv_dxysig["+name+"nSVDeepBoostedJet]/F").c_str());
+	tree->Branch((name+"DeepBoostedJetInput_sv_d3d").c_str()	, DeepBoostedJetInput_sv_d3d, (name+"DeepBoostedJetInput_sv_d3d["+name+"nSVDeepBoostedJet]/F").c_str());
+	tree->Branch((name+"DeepBoostedJetInput_sv_d3dsig").c_str()	, DeepBoostedJetInput_sv_d3dsig, (name+"DeepBoostedJetInput_sv_d3dsig["+name+"nSVDeepBoostedJet]/F").c_str());
+	tree->Branch((name+"DeepBoostedJetInput_sv_costhetasvpv").c_str()	, DeepBoostedJetInput_sv_costhetasvpv, (name+"DeepBoostedJetInput_sv_costhetasvpv["+name+"nSVDeepBoostedJet]/F").c_str());
 
     }
 
@@ -1310,12 +1340,12 @@ class JetInfoBranches {
 //       tree->Branch((name+"Jet_tau2_vertexNTracks").c_str(),           Jet_tau2_vertexNTracks           ,(name+"Jet_tau2_vertexNTracks["+name+"nJet]/F").c_str()           );
       tree->Branch((name+"Jet_DoubleSV").c_str(),         Jet_DoubleSV         ,(name+"Jet_DoubleSV["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_DeepDoubleB").c_str(),      Jet_DeepDoubleB      ,(name+"Jet_DeepDoubleB["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_DeepAK8bbvsLight").c_str(),      Jet_DeepAK8bbvsLight, (name+"Jet_DeepAK8bbvsLight["+name+"nJet]/F").c_str() );
-      tree->Branch((name+"Jet_DeepAK8ccvsLight").c_str(),      Jet_DeepAK8ccvsLight, (name+"Jet_DeepAK8ccvsLight["+name+"nJet]/F").c_str() );
-      tree->Branch((name+"Jet_DeepAK8TvsQCD").c_str(),      Jet_DeepAK8TvsQCD, (name+"Jet_DeepAK8TvsQCD["+name+"nJet]/F").c_str() );
-      tree->Branch((name+"Jet_DeepAK8ZHccvsQCD").c_str(),      Jet_DeepAK8ZHccvsQCD, (name+"Jet_DeepAK8HccvsQCD["+name+"nJet]/F").c_str() );
-      tree->Branch((name+"Jet_DeepAK8WvsQCD").c_str(),      Jet_DeepAK8WvsQCD, (name+"Jet_DeepAK8WvsQCD["+name+"nJet]/F").c_str() );
-      tree->Branch((name+"Jet_DeepAK8ZHbbvsQCD").c_str(),      Jet_DeepAK8ZHbbvsQCD, (name+"Jet_DeepAK8HbbvsQCD["+name+"nJet]/F").c_str() );
+      tree->Branch((name+"Jet_DeepBoostedJetbbvsLight").c_str(),      Jet_DeepBoostedJetbbvsLight, (name+"Jet_DeepBoostedJetbbvsLight["+name+"nJet]/F").c_str() );
+      tree->Branch((name+"Jet_DeepBoostedJetccvsLight").c_str(),      Jet_DeepBoostedJetccvsLight, (name+"Jet_DeepBoostedJetccvsLight["+name+"nJet]/F").c_str() );
+      tree->Branch((name+"Jet_DeepBoostedJetTvsQCD").c_str(),      Jet_DeepBoostedJetTvsQCD, (name+"Jet_DeepBoostedJetTvsQCD["+name+"nJet]/F").c_str() );
+      tree->Branch((name+"Jet_DeepBoostedJetZHccvsQCD").c_str(),      Jet_DeepBoostedJetZHccvsQCD, (name+"Jet_DeepBoostedJetHccvsQCD["+name+"nJet]/F").c_str() );
+      tree->Branch((name+"Jet_DeepBoostedJetWvsQCD").c_str(),      Jet_DeepBoostedJetWvsQCD, (name+"Jet_DeepBoostedJetWvsQCD["+name+"nJet]/F").c_str() );
+      tree->Branch((name+"Jet_DeepBoostedJetZHbbvsQCD").c_str(),      Jet_DeepBoostedJetZHbbvsQCD, (name+"Jet_DeepBoostedJetHbbvsQCD["+name+"nJet]/F").c_str() );
 
       if (trackVars)
       {
@@ -1884,12 +1914,12 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_tau2_vertexNTracks").c_str(),           Jet_tau2_vertexNTracks           );
       tree->SetBranchAddress((name+"Jet_DoubleSV").c_str(),         Jet_DoubleSV    );
       tree->SetBranchAddress((name+"Jet_DeepDoubleB").c_str(),      Jet_DeepDoubleB );
-      tree->SetBranchAddress((name+"Jet_DeepAK8bbvsLight").c_str(),      Jet_DeepAK8bbvsLight );
-      tree->SetBranchAddress((name+"Jet_DeepAK8ccvsLight").c_str(),      Jet_DeepAK8ccvsLight );
-      tree->SetBranchAddress((name+"Jet_DeepAK8TvsQCD").c_str(),      Jet_DeepAK8TvsQCD );
-      tree->SetBranchAddress((name+"Jet_DeepAK8ZHccvsQCD").c_str(),      Jet_DeepAK8ZHccvsQCD );
-      tree->SetBranchAddress((name+"Jet_DeepAK8WvsQCD").c_str(),      Jet_DeepAK8WvsQCD );
-      tree->SetBranchAddress((name+"Jet_DeepAK8ZHbbvsQCD").c_str(),      Jet_DeepAK8ZHbbvsQCD );
+      tree->SetBranchAddress((name+"Jet_DeepBoostedJetbbvsLight").c_str(),      Jet_DeepBoostedJetbbvsLight );
+      tree->SetBranchAddress((name+"Jet_DeepBoostedJetccvsLight").c_str(),      Jet_DeepBoostedJetccvsLight );
+      tree->SetBranchAddress((name+"Jet_DeepBoostedJetTvsQCD").c_str(),      Jet_DeepBoostedJetTvsQCD );
+      tree->SetBranchAddress((name+"Jet_DeepBoostedJetZHccvsQCD").c_str(),      Jet_DeepBoostedJetZHccvsQCD );
+      tree->SetBranchAddress((name+"Jet_DeepBoostedJetWvsQCD").c_str(),      Jet_DeepBoostedJetWvsQCD );
+      tree->SetBranchAddress((name+"Jet_DeepBoostedJetZHbbvsQCD").c_str(),      Jet_DeepBoostedJetZHbbvsQCD );
 
       if (trackVars)
       {
