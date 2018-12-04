@@ -18,6 +18,10 @@ git cms-merge-topic cms-btv-pog:DeepFlavourNewTraining-from-CMSSW_10_1_2_patch2
 mkdir -p RecoBTag/Combined/data/DeepDoubleB/V01/
 wget https://github.com/cms-data/RecoBTag-Combined/raw/V01-00-13/DeepDoubleB/V01/constant_graph_PtCut.pb -P RecoBTag/Combined/data/DeepDoubleB/V01/
 wget https://github.com/cms-data/RecoBTag-Combined/raw/V01-00-13/DeepDoubleB/V01/constant_graph_PtCut_MassSculptPen.pb -P RecoBTag/Combined/data/DeepDoubleB/V01/
+# Add new DeepFlavour training for HLT studies
+wget https://github.com/daseith/RecoBTag-Combined/raw/master/DeepFlavourPhaseIIV01_94X_training.pb -P RecoBTag/Combined/data/DeepFlavourPhaseIIV01/
+sed 's/DeepFlavourV02_realistic_training\/constant_graph.pb/DeepFlavourPhaseIIV01\/DeepFlavourPhaseIIV01_94X_training.pb/' RecoBTag/TensorFlow/plugins/DeepFlavourTFJetTagsProducer.cc -i
+sed 's/\"cpf_input_batchnorm\/keras_learning_phase\"//g' RecoBTag/TensorFlow/plugins/DeepFlavourTFJetTagsProducer.cc -i
 
 
 git clone -b 10_1_X_v1.03 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
