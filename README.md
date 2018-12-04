@@ -3,24 +3,21 @@
 ## Software setup
 
 ```
-cmsrel CMSSW_10_1_8
-cd CMSSW_10_1_8/src
+cmsrel CMSSW_10_4_0_pre1
+cd CMSSW_10_4_0_pre1/src
 cmsenv
 
 setenv CMSSW_GIT_REFERENCE /cvmfs/cms.cern.ch/cmssw.git.daily
 git cms-init
 
-git remote add btv-cmssw https://github.com/cms-btv-pog/cmssw.git
+git cms-addpkg RecoBTag
 
-# Add DeepDoubleB tagger and updated DeepFlavour and DeepDoubleB training
-git cms-merge-topic cms-btv-pog:DeepDoubleB_from-CMSSW_10_1_8
-git cms-merge-topic cms-btv-pog:DeepFlavourNewTraining-from-CMSSW_10_1_2_patch2
-mkdir -p RecoBTag/Combined/data/DeepDoubleB/V01/
-wget https://github.com/cms-data/RecoBTag-Combined/raw/V01-00-13/DeepDoubleB/V01/constant_graph_PtCut.pb -P RecoBTag/Combined/data/DeepDoubleB/V01/
-wget https://github.com/cms-data/RecoBTag-Combined/raw/V01-00-13/DeepDoubleB/V01/constant_graph_PtCut_MassSculptPen.pb -P RecoBTag/Combined/data/DeepDoubleB/V01/
+wget https://github.com/daseith/RecoBTag-Combined/raw/master/DeepFlavourPhaseIIV01_94X_training.pb -P RecoBTag/Combined/data/DeepFlavourPhaseIIV01/
+sed 's/DeepFlavourV03_10X_training\/constant_graph.pb/DeepFlavourPhaseIIV01\/DeepFlavourPhaseIIV01_94X_training.pb/' RecoBTag/TensorFlow/plugins/DeepFlavourTFJetTagsProducer.cc -i
+sed 's/\"cpf_input_batchnorm\/keras_learning_phase\"//g' RecoBTag/TensorFlow/plugins/DeepFlavourTFJetTagsProducer.cc -i
 
 
-git clone -b 10_1_X_v1.03 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b 10_4_0_PhaseII --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
