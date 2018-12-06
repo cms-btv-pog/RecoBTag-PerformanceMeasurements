@@ -16,11 +16,6 @@ wget https://github.com/daseith/RecoBTag-Combined/raw/master/DeepFlavourPhaseIIV
 sed 's/DeepFlavourV03_10X_training\/constant_graph.pb/DeepFlavourPhaseIIV01\/DeepFlavourPhaseIIV01_94X_training.pb/' RecoBTag/TensorFlow/plugins/DeepFlavourTFJetTagsProducer.cc -i
 sed 's/\"cpf_input_batchnorm\/keras_learning_phase\"//g' RecoBTag/TensorFlow/plugins/DeepFlavourTFJetTagsProducer.cc -i
 
-# OPTIONAL: Add new DeepFlavour training for PhaseII studies
-wget https://github.com/daseith/RecoBTag-Combined/raw/master/DeepFlavourPhaseIIV01_94X_training.pb -P RecoBTag/Combined/data/DeepFlavourPhaseIIV01/
-sed 's/DeepFlavourV02_realistic_training\/constant_graph.pb/DeepFlavourPhaseIIV01\/DeepFlavourPhaseIIV01_94X_training.pb/' RecoBTag/TensorFlow/plugins/DeepFlavourTFJetTagsProducer.cc -i
-sed 's/\"cpf_input_batchnorm\/keras_learning_phase\"//g' RecoBTag/TensorFlow/plugins/DeepFlavourTFJetTagsProducer.cc -i
-
 
 git clone -b 10_4_0_PhaseII --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
