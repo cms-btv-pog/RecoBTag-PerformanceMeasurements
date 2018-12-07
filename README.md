@@ -31,4 +31,6 @@ To run the tests for integrating changes run:
 cd RecoBTag/PerformanceMeasurements/test/
 ./run_tests.sh
 ```
-
+The content of the output ntuple is by default empty and has to be configured according to your needs. The ```store*Variables``` options have been removed.
+The new variable configuration can be customized in the file ```RecoBTag/PerformanceMeasurements/python/varGroups_cfi.py```.
+New variables need also to be added (apart from adding them in the code) in ```RecoBTag/PerformanceMeasurements/python/variables_cfi.py```
