@@ -50,6 +50,21 @@ class JetInfoBranches {
     float Jet_DeepFlavourCvsLDiscN[nMaxJets_];
     float Jet_DeepFlavourCvsBDiscN[nMaxJets_];
 
+    float Jet_DeepFlavourPrunedBDisc[nMaxJets_]   ;
+    float Jet_DeepFlavourPrunedCvsLDisc[nMaxJets_];
+    float Jet_DeepFlavourPrunedCvsBDisc[nMaxJets_];
+    float Jet_DeepFlavourPrunedB[nMaxJets_];
+    float Jet_DeepFlavourPrunedBB[nMaxJets_];
+    float Jet_DeepFlavourPrunedLEPB[nMaxJets_];
+    float Jet_DeepFlavourPrunedC[nMaxJets_];
+    float Jet_DeepFlavourPrunedUDS[nMaxJets_];
+    float Jet_DeepFlavourPrunedG[nMaxJets_];
+
+    float Jet_DeepFlavourPrunedBDiscN[nMaxJets_]   ;
+    float Jet_DeepFlavourPrunedCvsLDiscN[nMaxJets_];
+    float Jet_DeepFlavourPrunedCvsBDiscN[nMaxJets_];
+
+
     float Jet_DeepCSVBDisc[nMaxJets_]  ;
     float Jet_DeepCSVBDiscN[nMaxJets_]  ;
     float Jet_DeepCSVBDiscP[nMaxJets_]  ;
@@ -585,6 +600,20 @@ class JetInfoBranches {
       if(variableParser.isToBeStored(name+"Jet_DeepFlavourCvsLDiscN")) tree->Branch((name+"Jet_DeepFlavourCvsLDiscN").c_str(), Jet_DeepFlavourCvsLDiscN, (name+"Jet_DeepFlavourCvsLDiscN["+name+"nJet]/F").c_str());
       if(variableParser.isToBeStored(name+"Jet_DeepFlavourCvsBDiscN")) tree->Branch((name+"Jet_DeepFlavourCvsBDiscN").c_str(), Jet_DeepFlavourCvsBDiscN, (name+"Jet_DeepFlavourCvsBDiscN["+name+"nJet]/F").c_str());
 
+
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedBDisc")) tree->Branch((name+"Jet_DeepFlavourPrunedBDisc"   ).c_str(),  Jet_DeepFlavourPrunedBDisc    , (name+"Jet_DeepFlavourPrunedBDisc["+name+"nJet]/F"   ).c_str() );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedCvsLDisc")) tree->Branch((name+"Jet_DeepFlavourPrunedCvsLDisc").c_str(),  Jet_DeepFlavourPrunedCvsLDisc , (name+"Jet_DeepFlavourPrunedCvsLDisc["+name+"nJet]/F").c_str() );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedCvsBDisc")) tree->Branch((name+"Jet_DeepFlavourPrunedCvsBDisc").c_str(),  Jet_DeepFlavourPrunedCvsBDisc , (name+"Jet_DeepFlavourPrunedCvsBDisc["+name+"nJet]/F").c_str() );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedB")) tree->Branch((name+"Jet_DeepFlavourPrunedB"       ).c_str(),  Jet_DeepFlavourPrunedB        , (name+"Jet_DeepFlavourPrunedB["+name+"nJet]/F"       ).c_str() );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedBB")) tree->Branch((name+"Jet_DeepFlavourPrunedBB"      ).c_str(),  Jet_DeepFlavourPrunedBB       , (name+"Jet_DeepFlavourPrunedBB["+name+"nJet]/F"      ).c_str() );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedLEPB")) tree->Branch((name+"Jet_DeepFlavourPrunedLEPB"    ).c_str(),  Jet_DeepFlavourPrunedLEPB     , (name+"Jet_DeepFlavourPrunedLEPB["+name+"nJet]/F"    ).c_str() );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedC")) tree->Branch((name+"Jet_DeepFlavourPrunedC"       ).c_str(),  Jet_DeepFlavourPrunedC        , (name+"Jet_DeepFlavourPrunedC["+name+"nJet]/F"       ).c_str() );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedUDS")) tree->Branch((name+"Jet_DeepFlavourPrunedUDS"     ).c_str(),  Jet_DeepFlavourPrunedUDS      , (name+"Jet_DeepFlavourPrunedUDS["+name+"nJet]/F"     ).c_str() );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedG")) tree->Branch((name+"Jet_DeepFlavourPrunedG"       ).c_str(),  Jet_DeepFlavourPrunedG        , (name+"Jet_DeepFlavourPrunedG["+name+"nJet]/F"       ).c_str() );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedBDiscN")) tree->Branch((name+"Jet_DeepFlavourPrunedBDiscN"   ).c_str(), Jet_DeepFlavourPrunedBDiscN   , (name+"Jet_DeepFlavourPrunedBDiscN["+name+"nJet]/F"   ).c_str());
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedCvsLDiscN")) tree->Branch((name+"Jet_DeepFlavourPrunedCvsLDiscN").c_str(), Jet_DeepFlavourPrunedCvsLDiscN, (name+"Jet_DeepFlavourPrunedCvsLDiscN["+name+"nJet]/F").c_str());
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedCvsBDiscN")) tree->Branch((name+"Jet_DeepFlavourPrunedCvsBDiscN").c_str(), Jet_DeepFlavourPrunedCvsBDiscN, (name+"Jet_DeepFlavourPrunedCvsBDiscN["+name+"nJet]/F").c_str());
+
       if(variableParser.isToBeStored(name+"Jet_DeepCSVBDisc")) tree->Branch((name+"Jet_DeepCSVBDisc"      ).c_str(), Jet_DeepCSVBDisc     , (name+"Jet_DeepCSVBDisc["+name+"nJet]/F").c_str()     );
       if(variableParser.isToBeStored(name+"Jet_DeepCSVBDiscN")) tree->Branch((name+"Jet_DeepCSVBDiscN"     ).c_str(), Jet_DeepCSVBDiscN    , (name+"Jet_DeepCSVBDiscN["+name+"nJet]/F").c_str()    );
       if(variableParser.isToBeStored(name+"Jet_DeepCSVBDiscP")) tree->Branch((name+"Jet_DeepCSVBDiscP"     ).c_str(), Jet_DeepCSVBDiscP    , (name+"Jet_DeepCSVBDiscP["+name+"nJet]/F").c_str()    );
@@ -1105,6 +1134,19 @@ class JetInfoBranches {
       if(variableParser.isToBeStored(name+"Jet_DeepFlavourBDiscN")) tree->SetBranchAddress((name+"Jet_DeepFlavourBDiscN"   ).c_str(), Jet_DeepFlavourBDiscN   );
       if(variableParser.isToBeStored(name+"Jet_DeepFlavourCvsLDiscN")) tree->SetBranchAddress((name+"Jet_DeepFlavourCvsLDiscN").c_str(), Jet_DeepFlavourCvsLDiscN);
       if(variableParser.isToBeStored(name+"Jet_DeepFlavourCvsBDiscN")) tree->SetBranchAddress((name+"Jet_DeepFlavourCvsBDiscN").c_str(), Jet_DeepFlavourCvsBDiscN);
+
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedBDisc")) tree->SetBranchAddress((name+"Jet_DeepFlavourPrunedBDisc"   ).c_str(),  Jet_DeepFlavourPrunedBDisc     );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedCvsLDisc")) tree->SetBranchAddress((name+"Jet_DeepFlavourPrunedCvsLDisc").c_str(),  Jet_DeepFlavourPrunedCvsLDisc  );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedCvsBDisc")) tree->SetBranchAddress((name+"Jet_DeepFlavourPrunedCvsBDisc").c_str(),  Jet_DeepFlavourPrunedCvsBDisc  );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedB")) tree->SetBranchAddress((name+"Jet_DeepFlavourPrunedB"       ).c_str(),  Jet_DeepFlavourPrunedB         );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedBB")) tree->SetBranchAddress((name+"Jet_DeepFlavourPrunedBB"      ).c_str(),  Jet_DeepFlavourPrunedBB        );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedLEPB")) tree->SetBranchAddress((name+"Jet_DeepFlavourPrunedLEPB"    ).c_str(),  Jet_DeepFlavourPrunedLEPB      );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedC")) tree->SetBranchAddress((name+"Jet_DeepFlavourPrunedC"       ).c_str(),  Jet_DeepFlavourPrunedC         );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedUDS")) tree->SetBranchAddress((name+"Jet_DeepFlavourPrunedUDS"     ).c_str(),  Jet_DeepFlavourPrunedUDS       );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedG")) tree->SetBranchAddress((name+"Jet_DeepFlavourPrunedG"       ).c_str(),  Jet_DeepFlavourPrunedG         );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedBDiscN")) tree->SetBranchAddress((name+"Jet_DeepFlavourPrunedBDiscN"   ).c_str(), Jet_DeepFlavourPrunedBDiscN   );
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedCvsLDiscN")) tree->SetBranchAddress((name+"Jet_DeepFlavourPrunedCvsLDiscN").c_str(), Jet_DeepFlavourPrunedCvsLDiscN);
+      if(variableParser.isToBeStored(name+"Jet_DeepFlavourPrunedCvsBDiscN")) tree->SetBranchAddress((name+"Jet_DeepFlavourPrunedCvsBDiscN").c_str(), Jet_DeepFlavourPrunedCvsBDiscN);
 
       if(variableParser.isToBeStored(name+"Jet_DeepCSVBDisc")) tree->SetBranchAddress((name+"Jet_DeepCSVBDisc"      ).c_str(), Jet_DeepCSVBDisc          );
       if(variableParser.isToBeStored(name+"Jet_DeepCSVBDiscN")) tree->SetBranchAddress((name+"Jet_DeepCSVBDiscN"     ).c_str(), Jet_DeepCSVBDiscN        );
