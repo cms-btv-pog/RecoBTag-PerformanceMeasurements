@@ -557,6 +557,20 @@ bTagDiscriminators = set([
   , 'pfNegativeDeepFlavourJetTags:probc'
   , 'pfNegativeDeepFlavourJetTags:probuds'
   , 'pfNegativeDeepFlavourJetTags:probg'
+    # DeepFlavour with pruned input
+  , 'pfDeepFlavourPrunedJetTags:probb'
+  , 'pfDeepFlavourPrunedJetTags:probbb'
+  , 'pfDeepFlavourPrunedJetTags:problepb'
+  , 'pfDeepFlavourPrunedJetTags:probc'
+  , 'pfDeepFlavourPrunedJetTags:probuds'
+  , 'pfDeepFlavourPrunedJetTags:probg'
+  , 'pfNegativeDeepFlavourPrunedJetTags:probb'
+  , 'pfNegativeDeepFlavourPrunedJetTags:probbb'
+  , 'pfNegativeDeepFlavourPrunedJetTags:problepb'
+  , 'pfNegativeDeepFlavourPrunedJetTags:probc'
+  , 'pfNegativeDeepFlavourPrunedJetTags:probuds'
+  , 'pfNegativeDeepFlavourPrunedJetTags:probg'
+
 ])
 
 ## Legacy taggers not supported with MiniAOD
@@ -568,6 +582,10 @@ if options.miniAOD and options.useLegacyTaggers:
 if options.useLegacyTaggers:
     bTagInfos = bTagInfosLegacy
     bTagDiscriminators = bTagDiscriminatorsLegacy
+
+## If not including negative deep flavour jet taggers
+if not options.useNegativeDeepFlavourTags:
+  bTagDiscriminators = {i for i in bTagDiscriminators if 'NegativeDeepFlavour' not in i}
 
 ## Clustering algorithm label
 algoLabel = 'CA'
