@@ -19,10 +19,18 @@ scram b -j8
 
 ```
 
-The ntuplizer can be run and configured through ```RecoBTag/PerformanceMeasurements/test/runBTagAnalyzer_cfg.py```, to run it for the 2016 SF campaign
+The ntuplizer can be run and configured through ```RecoBTag/PerformanceMeasurements/test/runBTagAnalyzer_cfg.py```. 
+
+To run it for the 2016 Legacy SF campaign, run:
 
 ```
 cmsRun runBTagAnalyzer_cfg.py defaults=2016_SF runOnData=(True or False, depending on your needs)
+```
+
+To run it for 2017 data, including the new JEC, run:
+
+```
+cmsRun runBTagAnalyzer_cfg.py defaults=2017NewJEC runOnData=(True or False, depending on your needs)
 ```
 
 To run the tests for integrating changes run:
