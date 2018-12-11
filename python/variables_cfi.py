@@ -62,6 +62,22 @@ variableList = [
       runOptions  = cms.vstring(),
     ),
     cms.PSet(
+      variable    = cms.string("GenPVx"),
+      store       = cms.bool(False),
+      mconly      = cms.bool(True),
+      description = cms.string("GenPVx"),
+      requires    = cms.vstring(),
+      runOptions  = cms.vstring(),
+    ),
+    cms.PSet(
+      variable    = cms.string("GenPVy"),
+      store       = cms.bool(False),
+      mconly      = cms.bool(True),
+      description = cms.string("GenPVy"),
+      requires    = cms.vstring(),
+      runOptions  = cms.vstring(),
+    ),
+    cms.PSet(
       variable    = cms.string("GenPVz"),
       store       = cms.bool(False),
       mconly      = cms.bool(True),
