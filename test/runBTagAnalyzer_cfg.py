@@ -209,6 +209,11 @@ options.register('runCTagVariables', False,
     VarParsing.varType.bool,
     "Make NTuples with branches for CTag"
 )
+options.register('fillPU', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Fill PU"
+)
 ### Options for upgrade studies
 # Change hits requirements
 options.register('changeMinNumberOfHits', False,
