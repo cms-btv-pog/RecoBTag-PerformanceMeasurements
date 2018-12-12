@@ -80,6 +80,11 @@ options.register('runSubJets', False,
     VarParsing.varType.bool,
     "Run subjets"
 )
+options.register('runEventInfo', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Run Event Info"
+)
 options.register('processStdAK4Jets', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -135,11 +140,6 @@ options.register('useSelectedTracks', True,
     VarParsing.varType.bool,
     "If you want to run on all tracks: False for commissioning studies"
 )
-options.register('fillsvTagInfo', False,
-    VarParsing.multiplicity.singleton,
-    VarParsing.varType.bool,
-    "True if you want to store information relative to the svTagInfos, set to False if produceJetTrackTree is set to False"
-)
 options.register('useExplicitJTA', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -175,11 +175,15 @@ options.register('useTrackHistory', False,
     VarParsing.varType.bool,
     "uses track history, for GEN-SIM-RECODEBUG samples only"
 )
-
 options.register('produceJetTrackTree', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    "True if you want to keep info for tracks associated to jets : for commissioning studies"
+    "True if you want to run info for tracks associated to jets : for commissioning studies"
+)
+options.register('produceAllTrackTree', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Produce all track tree"
 )
 
 ## Generally leave to False unless you know what you are doing
@@ -195,10 +199,15 @@ options.register('doBoostedCommissioning', False,
     "Make NTuples with branches for boosted b tag commissioning: overrider several other switches"
 )
 ## Do Ctag
-options.register('doCTag', False,
+options.register('runCTagVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Make NTuples with branches for CTag"
+)
+options.register('fillPU', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Fill PU"
 )
 ### Options for upgrade studies
 # Change hits requirements
@@ -243,58 +252,54 @@ options.register('JPCalibration', 'FIXME',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     'JP Calibration pyload to use')
-options.register('storeJetVariables', True,
+options.register('runJetVariables', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    'True if you want to store Jet Variables')
-options.register('storeQuarkVariables', False,
+    'True if you want to run Jet Variables')
+options.register('runQuarkVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    'True if you want to store c/b quark Variables')
-options.register('storeHadronVariables', False,
+    'True if you want to run c/b quark Variables')
+options.register('runHadronVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    'True if you want to store Hadron Variables')
-options.register('storeGenVariables', False,
+    'True if you want to run Hadron Variables')
+options.register('runGenVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    'True if you want to store Gen Variables')
-options.register('storeCSVTagVariables', False,
+    'True if you want to run Gen Variables')
+options.register('runCSVTagVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    'True if you want to keep CSV TaggingVariables')
-options.register('storeCSVTagTrackVariables', False,
+    'True if you want to run CSV TaggingVariables')
+options.register('runCSVTagTrackVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    'True if you want to keep CSV Tagging Track Variables')
-options.register('storeDeepFlavourTagVariables', False,
+    'True if you want to run CSV Tagging Track Variables')
+options.register('runDeepFlavourTagVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    'True if you want to keep DeepFlavour TaggingVariables')
-options.register('storeDeepFlavourVariables', True,
+    'True if you want to run DeepFlavour TaggingVariables')
+options.register('runDeepDoubleBTagVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    'True if you want to keep DeepFlavour Jet Variables')
-options.register('storeDeepDoubleBTagVariables', False,
+    'True if you want to run DeepDoubleB TaggingVariables')
+options.register('runDeepBoostedJetVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    'True if you want to keep DeepDoubleB TaggingVariables')
-options.register('storeDeepBoostedJetVariables', False,
+    'True if you want to run DeepBoostedJet Input Variables')
+options.register('runPFElectronVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    'True if you want to keep DeepBoostedJet Input Variables')
-options.register('storeDeepCSVVariables', True,
+    'True if you want to run PF Electron Variables')
+options.register('runPFMuonVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    'True if you want to keep DeepCSV Jet Variables')
-options.register('storePFElectronVariables', False,
+    'True if you want to run PF Muon Variables')
+options.register('runPatMuons', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    'True if you want to keep PF Electron Variables')
-options.register('storePFMuonVariables', False,
-    VarParsing.multiplicity.singleton,
-    VarParsing.varType.bool,
-    'True if you want to keep DeepCSV Jet Variables')
+    'True if you want to run Pat Muon Variables')
 options.register('defaults', '',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
@@ -303,6 +308,10 @@ options.register('eras', [],
     VarParsing.multiplicity.list,
     VarParsing.varType.string,
     'era modifiers to be used to be used')
+options.register('groups', [],
+    VarParsing.multiplicity.list,
+    VarParsing.varType.string,
+    'variable groups to be stored')
 options.register(
     'skipEvents', 0,
     VarParsing.multiplicity.singleton,
@@ -339,6 +348,38 @@ if options.defaults:
 			print 'setting default option for', key
 			setattr(options, key, value)
 
+from RecoBTag.PerformanceMeasurements.BTagAnalyzer_cff import *
+btagana_tmp = bTagAnalyzer.clone()
+print('Storing the variables from the following groups:')
+options_to_change = set() #store which swtiches we need on
+for requiredGroup in options.groups:
+  print(requiredGroup)
+  found=False
+  for existingGroup in btagana_tmp.groups:
+    if(requiredGroup==existingGroup.group):
+      existingGroup.store=True
+      for var in existingGroup.variables:
+        if "FatJetInfo." in var:
+          options_to_change.update({"runFatJets"})
+          var = var.split(".")[1]
+        if "SubJetInfo." in var:
+          options_to_change.update({"runSubJets"})
+          var = var.split(".")[1]
+        options_to_change.update([i for i in variableDict[var].runOptions])
+      found=True
+      break
+  if(not found):
+    print('WARNING: The group ' + requiredGroup + ' was not found')
+ 
+#change values accordingly
+for switch in options_to_change:
+  if switch not in options._beenSet:
+    raise ValueError('The option set by the variables: %s does not exist among the cfg options!' % switch)
+  elif not options._beenSet[key]:
+    print 'Turning on %s, as some stored variables demands it' % switch
+    setattr(options, switch, True)
+
+
 ## Use either PFchs or Puppi
 if options.usePFchs and options.usePuppi:
     print "WARNING: Both usePFchs and usePuppi set to True. Giving priority to Puppi."
@@ -362,11 +403,15 @@ if options.runSubJets and not options.runFatJets:
     print "WARNING: You are attempting to store subjet information without running over fat jets. Please enable running over fat jets in order to store the subjet information."
     options.runSubJets = False
 
-if not options.miniAOD and options.storeDeepFlavourTagVariables: #FIXME
-    print "WARNING: switching off DeepFlavour/DeepDoubleB, as it is not supported in AOD"
-    options.storeDeepFlavourTagVariables = False
-    options.storeDeepDoubleBTagVariables = False
-    options.storeDeepBoostedJetVariables = False
+if not options.miniAOD and options.runDeepFlavourTagVariables: #FIXME
+    print "WARNING: switching off DeepFlavour, as it is not supported in AOD"
+    options.runDeepFlavourTagVariables = False
+if not options.miniAOD and options.runDeepDoubleBTagVariables: 
+    print "WARNING: switching off DeepDoubleB, as it is not supported in AOD"
+    options.runDeepDoubleBTagVariables = False
+if not options.miniAOD and options.runDeepBoostedJetTagVariables: #FIXME
+    print "WARNING: switching off DeepBoostedJet, as it is not supported in AOD"
+    options.runDeepBoostedJetTagVariables = False
 
 if options.doBoostedCommissioning:
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
@@ -377,8 +422,8 @@ if options.doBoostedCommissioning:
     print "Option runFatJets will be set to '",options.runFatJets,"'"
     print "Option runSubJets  will be set to '",options.runSubJets,"'"
     print "********************"
-if options.doCTag:
-    print "**********You are making NTuple for CTag*************"
+if options.runCTagVariables:
+    print "**********You are making NTuple for CTag*************" 
 
 ## Global tag
 globalTag = options.mcGlobalTag
@@ -1428,7 +1473,6 @@ if options.runFatJets:
             getattr(process,'pfCombinedInclusiveSecondaryVertexV2BJetTagsFatPF'+postfix).jetTagComputer = cms.string('candidateCombinedSecondaryVertexV2ComputerFat')
 
 #-------------------------------------
-from RecoBTag.PerformanceMeasurements.BTagAnalyzer_cff import *
 process.btagana = bTagAnalyzer.clone()
 if options.useLegacyTaggers:
     process.btagana = bTagAnalyzerLegacy.clone()
@@ -1436,39 +1480,43 @@ if options.useLegacyTaggers:
 # For b-tagging performance measurements:
 #   process.btagana.useSelectedTracks    = True
 #   process.btagana.useTrackHistory      = False (or True for Mistag systematics with GEN-SIM-RECODEBUG samples)
-#   process.btagana.produceJetTrackTree  = False
+#   options.produceJetTrackTree  = False
 #   process.btagana.produceAllTrackTree  = False
 #   process.btagana.producePtRelTemplate = False (or True for PtRel fit studies)
 # or data/MC validation of jets, tracks and SVs:
 #   process.btagana.useSelectedTracks    = False (or True for JP calibration)
 #   process.btagana.useTrackHistory      = False
-#   process.btagana.produceJetTrackTree  = True
+#   options.produceJetTrackTree  = True
 #   process.btagana.produceAllTrackTree  = False
 #   process.btagana.producePtRelTemplate = False
 # or general tracks, PV and jet performance studies:
 #   process.btagana.useSelectedTracks    = True
 #   process.btagana.useTrackHistory      = False
-#   process.btagana.produceJetTrackTree  = False
+#   options.produceJetTrackTree  = False
 #   process.btagana.produceAllTrackTree  = True
 #   process.btagana.producePtRelTemplate = False
 #------------------
+#Handle groups
+for requiredGroup in process.btagana.groups:
+   for storedGroup in btagana_tmp.groups:
+     if (requiredGroup.group == storedGroup.group):
+       requiredGroup.store = storedGroup.store
+
 process.btagana.MaxEta                = options.maxJetEta ## for extended forward pixel coverage
 process.btagana.MinPt                 = options.minJetPt
 process.btagana.tracksColl            = cms.InputTag(trackSource)
 process.btagana.useSelectedTracks     = options.useSelectedTracks ## False if you want to run on all tracks : for commissioning studies
 process.btagana.useTrackHistory       = options.useTrackHistory ## Can only be used with GEN-SIM-RECODEBUG files
-process.btagana.fillsvTagInfo         = options.fillsvTagInfo ## True if you want to store information relative to the svTagInfos, set to False if produceJetTrackTree is set to False
-process.btagana.produceJetTrackTree   = options.produceJetTrackTree ## True if you want to keep info for tracks associated to jets : for commissioning studies
 process.btagana.produceJetTrackTruthTree = options.useTrackHistory ## can only be used with GEN-SIM-RECODEBUG files and when useTrackHistory is True
-process.btagana.produceAllTrackTree   = False ## True if you want to keep info for all tracks : for commissioning studies
+process.btagana.produceAllTrackTree   = options.produceAllTrackTree ## True if you want to run info for all tracks : for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
-process.btagana.storeTagVariables     = False  ## True if you want to keep TagInfo TaggingVariables
-process.btagana.storeCSVTagVariables  = options.storeCSVTagVariables   ## True if you want to keep CSV TaggingVariables
-process.btagana.storeCSVTagTrackVariables  = options.storeCSVTagTrackVariables   ## True if you want to keep CSV Tagging Track Variables
-process.btagana.storeDeepFlavourTagVariables = options.storeDeepFlavourTagVariables
-process.btagana.storeDeepDoubleBTagVariables = options.storeDeepDoubleBTagVariables
-process.btagana.storeDeepBoostedJetVariables = options.storeDeepBoostedJetVariables
+process.btagana.runTagVariables     = False  ## True if you want to run TagInfo TaggingVariables
+process.btagana.runCSVTagVariables  = options.runCSVTagVariables   ## True if you want to run CSV TaggingVariables
+process.btagana.runCSVTagTrackVariables  = options.runCSVTagTrackVariables   ## True if you want to run CSV Tagging Track Variables
+process.btagana.runDeepFlavourTagVariables = options.runDeepFlavourTagVariables
+process.btagana.runDeepDoubleBTagVariables = options.runDeepDoubleBTagVariables
+process.btagana.runDeepBoostedJetVariables = options.runDeepBoostedJetVariables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag(patJetSource)
 process.btagana.muonCollectionName    = cms.InputTag(muSource)
@@ -1478,31 +1526,26 @@ process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
 process.btagana.triggerTable          = cms.InputTag(trigresults) # Data and MC
 process.btagana.genParticles          = cms.InputTag(genParticles)
 process.btagana.candidates            = cms.InputTag(pfCandidates)
-process.btagana.storeJetVariables     = options.storeJetVariables
-process.btagana.storeQuarkVariables   = options.storeQuarkVariables
-process.btagana.storeHadronVariables  = options.storeHadronVariables
-process.btagana.storeGenVariables     = options.storeGenVariables
-process.btagana.storeDeepCSVVariables = options.storeDeepCSVVariables
-process.btagana.storeDeepFlavourVariables = options.storeDeepFlavourVariables
-process.btagana.storePFElectronVariables = options.storePFElectronVariables
-process.btagana.storePFMuonVariables = options.storePFMuonVariables
+process.btagana.runJetVariables     = options.runJetVariables
+process.btagana.runQuarkVariables   = options.runQuarkVariables
+process.btagana.runHadronVariables  = options.runHadronVariables
+process.btagana.runGenVariables     = options.runGenVariables
+process.btagana.runPFElectronVariables = options.runPFElectronVariables
+process.btagana.runPFMuonVariables = options.runPFMuonVariables
+process.btagana.runPatMuons = options.runPatMuons
+process.btagana.runCTagVariables = options.runCTagVariables
+process.btagana.runEventInfo = options.runEventInfo
+process.btagana.runOnData = options.runOnData
 
 if options.runOnData:
-  process.btagana.storeHadronVariables  = False
-  process.btagana.storeQuarkVariables   = False
-  process.btagana.storeGenVariables     = False
+  process.btagana.runHadronVariables  = False
+  process.btagana.runQuarkVariables   = False
+  process.btagana.runGenVariables     = False
 
+if options.runCTagVariables:
+    process.btagana.runEventInfo = True
 
-if options.doCTag:
-    process.btagana.storeCTagVariables = True
-    process.btagana.storeEventInfo = True
-    process.btagana.doCTag = options.doCTag
-
-## fillsvTagInfo set to False independently from the choices above, if produceJetTrackTree is set to False
-if not process.btagana.produceJetTrackTree:
-    process.btagana.fillsvTagInfo = False
-
-if not process.btagana.useTrackHistory  or not process.btagana.produceJetTrackTree:
+if not process.btagana.useTrackHistory  or not options.produceJetTrackTree:
     process.btagana.produceJetTrackTruthTree = False
 
 if process.btagana.useTrackHistory:
@@ -1511,16 +1554,15 @@ if process.btagana.useTrackHistory:
 
 if options.runFatJets:
     process.btaganaFatJets = process.btagana.clone(
-        storeEventInfo      = cms.bool(not options.processStdAK4Jets),
+        runEventInfo      = cms.bool(not options.processStdAK4Jets),
         allowJetSkipping    = cms.bool(False),
-        storeTagVariables   = cms.bool(False),
-        storeDeepFlavourVariables = cms.bool(False),
-        storeDeepFlavourTagVariables = cms.bool(False),
-        storeDeepDoubleBTagVariables = cms.bool(False),
-        storeDeepBoostedJetVariables = cms.bool(False),
+        runTagVariables   = cms.bool(False),
+        runDeepFlavourTagVariables = cms.bool(False),
+        runDeepDoubleBTagVariables = cms.bool(False),
+        runDeepBoostedJetVariables = cms.bool(False),
         deepFlavourJetTags = cms.string(''),
         deepFlavourNegJetTags = cms.string(''),
-        storeTagVariablesSubJets = cms.bool(False),
+        runTagVariablesSubJets = cms.bool(False),
         useSelectedTracks   = cms.bool(True),
         maxDeltaR           = cms.double(options.fatJetRadius),
         R0                  = cms.double(options.fatJetRadius),
@@ -1547,29 +1589,23 @@ if options.runFatJets:
         process.btaganaFatJets.SubJetLabels.append( 'Pruned' )
 
 if options.doBoostedCommissioning:
-    process.btaganaFatJets.storeHadronVariables = True
-    process.btaganaFatJets.storeQuarkVariables = True
-    process.btaganaFatJets.storePFMuonVariables = True
-    process.btaganaFatJets.produceJetTrackTree  = True
-    process.btaganaFatJets.fillsvTagInfo = True
-    process.btaganaFatJets.storeCSVTagVariables = True
-    process.btaganaFatJets.storeCSVTagTrackVariables = True
-    process.btaganaFatJets.storeCSVTagVariablesSubJets = True
-    process.btaganaFatJets.storeCSVTagTrackVariablesSubJets = True
-    process.btaganaFatJets.storeDeepDoubleBTagVariables = True
-    process.btaganaFatJets.storeDeepBoostedJetVariables = True
+    process.btaganaFatJets.runHadronVariables = True
+    process.btaganaFatJets.runQuarkVariables = True
+    process.btaganaFatJets.runPFMuonVariables = True
+    process.btaganaFatJets.runCSVTagVariables = True
+    process.btaganaFatJets.runCSVTagTrackVariables = True
+    process.btaganaFatJets.runCSVTagVariablesSubJets = True
+    process.btaganaFatJets.runDeepDoubleBTagVariables = True
+    process.btaganaFatJets.runDeepBoostedJetVariables = True
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
-    print "storeHadronVariables set to '",process.btaganaFatJets.storeHadronVariables,"'"
-    print "storeQuarkVariables set to '",process.btaganaFatJets.storeQuarkVariables,"'"
-    print "storePFMuonVariables set to '",process.btaganaFatJets.storePFMuonVariables,"'"
-    print "produceJetTrackTree set to '",process.btaganaFatJets.produceJetTrackTree,"'"
-    print "fillsvTagInfo set to '",process.btaganaFatJets.fillsvTagInfo,"'"
-    print "storeDeepDoubleBTagVariables set to '",process.btaganaFatJets.storeDeepDoubleBTagVariables,"'"
-    print "storeDeepBoostedJetVariables set to '",process.btaganaFatJets.storeDeepBoostedJetVariables,"'"
-    print "For fat jets: storeCSVTagVariables set to '",process.btaganaFatJets.storeCSVTagVariables,"'"
-    print "For fat jets: storeCSVTagTrackVariables set to '",process.btaganaFatJets.storeCSVTagTrackVariables,"'"
-    print "For subjets:  storeCSVTagVariablesSubJets set to '",process.btaganaFatJets.storeCSVTagVariablesSubJets,"'"
-    print "For subjets:  storeCSVTagTrackVariablesSubJets set to '",process.btaganaFatJets.storeCSVTagTrackVariablesSubJets,"'"
+    print "runHadronVariables set to '",process.btaganaFatJets.runHadronVariables,"'"
+    print "runQuarkVariables set to '",process.btaganaFatJets.runQuarkVariables,"'"
+    print "runPFMuonVariables set to '",process.btaganaFatJets.runPFMuonVariables,"'"
+    print "For fat jets: runCSVTagVariables set to '",process.btaganaFatJets.runCSVTagVariables,"'"
+    print "For fat jets: runCSVTagTrackVariables set to '",process.btaganaFatJets.runCSVTagTrackVariables,"'"
+    print "For fat jets: runDeepDoubleBTagVariables set to '",process.btaganaFatJets.runDeepDoubleBTagVariables,"'"
+    print "For fat jets: runDeepBoostedJetVariables set to '",process.btaganaFatJets.runDeepBoostedJetVariables,"'"
+    print "For subjets:  runCSVTagVariablesSubJets set to '",process.btaganaFatJets.runCSVTagVariablesSubJets,"'"
     print "********************"
 
 if process.btagana.produceJetTrackTruthTree:

@@ -1,7 +1,7 @@
 common = {
 	'eras' : ['Run2_2017'],
 	'miniAOD' : True,
-	'storeDeepFlavourTagVariables' : True,
+	'runDeepFlavourTagVariables' : True,
 }
 
 mc = {
@@ -12,6 +12,6 @@ mc = {
 
 data = {
 	'inputFiles' : ['/store/data/Run2017D/JetHT/MINIAOD/17Nov2017-v1/20000/0249B143-8CCC-E711-BA7C-0025905C2CD0.root'],	
-        'JPCalibration' : 'JPcalib_Data94X_2017_v1',
+  'JPCalibration' : 'JPcalib_Data94X_2017_v1',
 	'dataGlobalTag' : '94X_dataRun2_ReReco_EOY17_v2',
 }

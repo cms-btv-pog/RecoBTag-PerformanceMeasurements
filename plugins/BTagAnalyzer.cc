@@ -119,6 +119,7 @@
 #include "RecoBTag/PerformanceMeasurements/interface/JetInfoBranches.h"
 #include "RecoBTag/PerformanceMeasurements/interface/EventInfoBranches.h"
 #include "RecoBTag/PerformanceMeasurements/interface/BookHistograms.h"
+#include "RecoBTag/PerformanceMeasurements/interface/VariableParser.h"
 
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "FWCore/Common/interface/Provenance.h"
@@ -379,34 +380,27 @@ private:
   int selTagger_;
   bool isData_;
   bool useSelectedTracks_;
-  bool fillsvTagInfo_;
   bool fillPU_;
-  bool produceJetTrackTree_;
   bool produceJetTrackTruthTree_;
   bool produceAllTrackTree_;
   bool producePtRelTemplate_;
-  bool storeEventInfo_;
-  bool storeJetVariables_;
-  bool storeQuarkVariables_;
-  bool storeHadronVariables_;
-  bool storeGenVariables_;
-  bool storePatMuons_;
-  bool storeTagVariables_;
-  bool storeTagVariablesSubJets_;
-  bool storeCSVTagVariables_;
-  bool storeCSVTagTrackVariables_;
-  bool storeDeepCSVVariables_;
-  bool storeDeepFlavourVariables_;
-  bool storeDeepFlavourTagVariables_;
-  bool storeDeepDoubleBTagVariables_;
-  bool storeDeepBoostedJetVariables_;
-  bool storeCSVTagVariablesSubJets_;
-  bool storeCSVTagTrackVariablesSubJets_;
-  bool storePFElectronVariables_;
-  bool storePFMuonVariables_;
-
-  bool storeCTagVariables_;
-  bool doCTag_;
+  bool runEventInfo_;
+  bool runJetVariables_;
+  bool runQuarkVariables_;
+  bool runHadronVariables_;
+  bool runGenVariables_;
+  bool runPatMuons_;
+  bool runTagVariables_;
+  bool runTagVariablesSubJets_;
+  bool runCSVTagVariables_;
+  bool runCSVTagTrackVariables_;
+  bool runDeepFlavourTagVariables_;
+  bool runDeepDoubleBTagVariables_;
+  bool runDeepBoostedJetVariables_;
+  bool runCSVTagVariablesSubJets_;
+  bool runPFElectronVariables_;
+  bool runPFMuonVariables_;
+  bool runCTagVariables_;
 
   bool use_ttbar_filter_;
   edm::EDGetTokenT<edm::View<reco::GenParticle> > ttbarproducerGen_;
@@ -498,6 +492,9 @@ private:
   double distJetAxisSubJets_;
   double decayLengthSubJets_;
   double deltaRSubJets_;
+
+  std::unordered_set<std::string> variables; // This unordered_set is going to contain the name of each single variable to be stored in the output tree
+
 };
 
 template<typename IPTI,typename VTX>
@@ -545,6 +542,16 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   std::string module_label = iConfig.getParameter<std::string>("@module_label");
   std::cout << "Constructing " << module_type << ":" << module_label << std::endl;
 
+  std::vector<edm::ParameterSet> groupSet = iConfig.getParameter<std::vector<edm::ParameterSet>>("groups");
+  std::vector<edm::ParameterSet> variableSet = iConfig.getParameter<std::vector<edm::ParameterSet>>("variables");
+
+  bool runOnData = iConfig.getParameter<bool>("runOnData");
+  VariableParser variableParser(!runOnData);
+  variables = variableParser.parseGroupsAndVariables(groupSet, variableSet);
+//   variableParser.printStoredVariables();
+//   variableParser.printGroups(groupSet);
+//   variableParser.printVariables(variableSet);
+  variableParser.saveStoredVariablesToFile();
   // Parameters
   runFatJets_ = iConfig.getParameter<bool>("runFatJets");
   runSubJets_ = iConfig.getParameter<bool>("runSubJets");
@@ -556,35 +563,28 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   selTagger_ = iConfig.getParameter<int>("selTagger");
 
   useSelectedTracks_    = iConfig.getParameter<bool> ("useSelectedTracks");
-  fillsvTagInfo_    = iConfig.getParameter<bool> ("fillsvTagInfo");
   fillPU_    = iConfig.getParameter<bool> ("fillPU");
   useTrackHistory_      = iConfig.getParameter<bool> ("useTrackHistory");
-  produceJetTrackTree_  = iConfig.getParameter<bool> ("produceJetTrackTree");
   produceJetTrackTruthTree_  = iConfig.getParameter<bool> ("produceJetTrackTruthTree");
   produceAllTrackTree_  = iConfig.getParameter<bool> ("produceAllTrackTree");
   producePtRelTemplate_ = iConfig.getParameter<bool> ("producePtRelTemplate");
-  storeEventInfo_ = iConfig.getParameter<bool>("storeEventInfo");
-  storeJetVariables_ = iConfig.getParameter<bool>("storeJetVariables");
-  storeQuarkVariables_ = iConfig.getParameter<bool>("storeQuarkVariables");
-  storeHadronVariables_ = iConfig.getParameter<bool>("storeHadronVariables");
-  storeGenVariables_ = iConfig.getParameter<bool>("storeGenVariables");
-  storePatMuons_ = iConfig.getParameter<bool>("storePatMuons");
-  storeTagVariables_ = iConfig.getParameter<bool>("storeTagVariables");
-  storeTagVariablesSubJets_ = iConfig.getParameter<bool>("storeTagVariablesSubJets");
-  storeCSVTagVariables_ = iConfig.getParameter<bool>("storeCSVTagVariables");
-  storeCSVTagTrackVariables_ = iConfig.getParameter<bool>("storeCSVTagTrackVariables");
-  storeDeepCSVVariables_ = iConfig.getParameter<bool>("storeDeepCSVVariables");
-  storeDeepFlavourVariables_ = iConfig.getParameter<bool>("storeDeepFlavourVariables");
-  storeDeepFlavourTagVariables_  = iConfig.getParameter<bool>("storeDeepFlavourTagVariables");
-  storeDeepDoubleBTagVariables_  = iConfig.getParameter<bool>("storeDeepDoubleBTagVariables");
-  storeDeepBoostedJetVariables_  = iConfig.getParameter<bool>("storeDeepBoostedJetVariables");
-  storeCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("storeCSVTagVariablesSubJets");
-  storeCSVTagTrackVariablesSubJets_ = iConfig.getParameter<bool>("storeCSVTagTrackVariablesSubJets");
-  storePFElectronVariables_ = iConfig.getParameter<bool>("storePFElectronVariables");
-  storePFMuonVariables_ = iConfig.getParameter<bool>("storePFMuonVariables");
-
-  storeCTagVariables_ = iConfig.getParameter<bool>("storeCTagVariables");
-  doCTag_             = iConfig.getParameter<bool>("doCTag");
+  runEventInfo_ = iConfig.getParameter<bool>("runEventInfo");
+  runJetVariables_ = iConfig.getParameter<bool>("runJetVariables");
+  runQuarkVariables_ = iConfig.getParameter<bool>("runQuarkVariables");
+  runHadronVariables_ = iConfig.getParameter<bool>("runHadronVariables");
+  runGenVariables_ = iConfig.getParameter<bool>("runGenVariables");
+  runPatMuons_ = iConfig.getParameter<bool>("runPatMuons");
+  runTagVariables_ = iConfig.getParameter<bool>("runTagVariables");
+  runTagVariablesSubJets_ = iConfig.getParameter<bool>("runTagVariablesSubJets");
+  runCSVTagVariables_ = iConfig.getParameter<bool>("runCSVTagVariables");
+  runCSVTagTrackVariables_ = iConfig.getParameter<bool>("runCSVTagTrackVariables");
+  runDeepFlavourTagVariables_  = iConfig.getParameter<bool>("runDeepFlavourTagVariables");
+  runDeepDoubleBTagVariables_  = iConfig.getParameter<bool>("runDeepDoubleBTagVariables");
+  runDeepBoostedJetVariables_  = iConfig.getParameter<bool>("runDeepBoostedJetVariables");
+  runCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("runCSVTagVariablesSubJets");
+  runPFElectronVariables_ = iConfig.getParameter<bool>("runPFElectronVariables");
+  runPFMuonVariables_ = iConfig.getParameter<bool>("runPFMuonVariables");
+  runCTagVariables_ = iConfig.getParameter<bool>("runCTagVariables");
 
   use_ttbar_filter_ = iConfig.getParameter<bool> ("use_ttbar_filter");
   ttbarproducerGen_ = consumes<edm::View<reco::GenParticle>>(iConfig.getParameter<edm::InputTag>("ttbarproducer")),
@@ -599,7 +599,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
 
   // Modules
   primaryVertexColl_   = consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertexColl"));
-  if( produceAllTrackTree_ && storeEventInfo_ )
+  if( produceAllTrackTree_ && runEventInfo_ )
     tracksColl_ = consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("tracksColl"));
 
   src_ = consumes<GenEventInfoProduct>(iConfig.getParameter<edm::InputTag>("src"));
@@ -725,55 +725,19 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   //--------------------------------------
   // event information
   //--------------------------------------
-  if( storeEventInfo_ )
-  {
-    EventInfo.RegisterTree(smalltree);
-    if ( use_ttbar_filter_ )    EventInfo.RegisterTTbarTree(smalltree);
-    if ( produceJetTrackTree_ ) EventInfo.RegisterJetTrackTree(smalltree);
-    if ( produceAllTrackTree_ ) EventInfo.RegisterAllTrackTree(smalltree);
-    if ( storeQuarkVariables_ ) EventInfo.RegisterQuarkTree(smalltree);
-    if ( storeHadronVariables_ )EventInfo.RegisterHadronTree(smalltree);
-    if ( storeGenVariables_ )   EventInfo.RegisterGenVarTree(smalltree);
-    if ( storePatMuons_ )       EventInfo.RegisterPatMuonTree(smalltree);
-  }
+  if(!runFatJets_ || (runFatJets_ && runEventInfo_)) // When running on FatJets, runEventInfo_ needs to be explicitely set to true, otherwise don't store it (it's probably already contained in the standard tree)
+    EventInfo.RegisterBranches(smalltree, variableParser);
 
   //--------------------------------------
   // jet information
   //--------------------------------------
   JetInfo.reserve(1+(runSubJets_ ? SubJetLabels_.size() : 0));
-  if ( storeJetVariables_)      JetInfo[0].RegisterTree(smalltree,branchNamePrefix_);
-  if ( runFatJets_ )          JetInfo[0].RegisterFatJetSpecificTree(smalltree,branchNamePrefix_,produceJetTrackTree_);
-  if ( produceJetTrackTree_ ) JetInfo[0].RegisterJetTrackTree(smalltree,branchNamePrefix_);
-  if ( produceJetTrackTruthTree_ ) JetInfo[0].RegisterJetTrackTruthTree(smalltree,branchNamePrefix_);
-  if ( producePtRelTemplate_ ) JetInfo[0].RegisterJetTrackIncTree(smalltree,branchNamePrefix_);
-  if ( fillsvTagInfo_ )       JetInfo[0].RegisterJetSVTree(smalltree,branchNamePrefix_);
-  if ( storeTagVariables_)    JetInfo[0].RegisterTagVarTree(smalltree,branchNamePrefix_);
-  if ( storeCSVTagVariables_) JetInfo[0].RegisterCSVTagVarTree(smalltree,branchNamePrefix_);
-  if ( storeCSVTagTrackVariables_) JetInfo[0].RegisterCSVTagTrackVarTree(smalltree,branchNamePrefix_);
-  if ( storeDeepCSVVariables_)JetInfo[0].RegisterJetDeepCSVTree(smalltree,branchNamePrefix_);
-  if ( storeDeepFlavourVariables_) JetInfo[0].RegisterJetDeepFlavourTree(smalltree,branchNamePrefix_);
-  std::cout << "storeDeepFlavourTagVariables_: " << storeDeepFlavourTagVariables_ << std::endl;
-  if ( storeDeepFlavourTagVariables_) JetInfo[0].RegisterDeepFlavourFeatTree(smalltree,branchNamePrefix_);
-  std::cout << "storeDeepDoubleBTagVariables_: " << storeDeepDoubleBTagVariables_ << std::endl;
-  if ( storeDeepDoubleBTagVariables_) JetInfo[0].RegisterDeepDoubleBFeatTree(smalltree,branchNamePrefix_);
-  std::cout << "storeDeepBoostedJetVariables_: " << storeDeepBoostedJetVariables_ << std::endl;
-  if ( storeDeepBoostedJetVariables_) JetInfo[0].RegisterDeepBoostedJetFeatTree(smalltree,branchNamePrefix_);
-  if ( storeCTagVariables_) JetInfo[0].RegisterCTagVarTree(smalltree,branchNamePrefix_);
-  if ( storePFElectronVariables_) JetInfo[0].RegisterPFElectronTree(smalltree,branchNamePrefix_);
-  if ( storePFMuonVariables_) JetInfo[0].RegisterPFMuonTree(smalltree,branchNamePrefix_);
+  JetInfo[0].RegisterBranches(smalltree, variableParser, branchNamePrefix_);
   if ( runSubJets_ ) {
     for ( size_t i = 0; i < SubJetLabels_.size(); ++i )
     {
-      if ( runFatJets_ ) SubJetInfo[SubJetLabels_[i]].RegisterTree(smalltree,branchNamePrefix_,SubJetLabels_[i]);
-      JetInfo[1+i].RegisterTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
-      JetInfo[1+i].RegisterSubJetSpecificTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
-      if ( produceJetTrackTree_ )         JetInfo[1+i].RegisterJetTrackTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
-      if ( producePtRelTemplate_ )        JetInfo[1+i].RegisterJetTrackIncTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
-      if ( storePFMuonVariables_ )        JetInfo[1+i].RegisterPFMuonTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
-      if ( fillsvTagInfo_ )               JetInfo[1+i].RegisterJetSVTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
-      if ( storeTagVariablesSubJets_ )    JetInfo[1+i].RegisterTagVarTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
-      if ( storeCSVTagVariablesSubJets_ ) JetInfo[1+i].RegisterCSVTagVarTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
-      if ( storeCSVTagTrackVariablesSubJets_ ) JetInfo[1+i].RegisterCSVTagTrackVarTree(smalltree,SubJetLabels_[i]+"SubJetInfo");
+      if ( runFatJets_ ) SubJetInfo[SubJetLabels_[i]].RegisterBranches(smalltree, variableParser, branchNamePrefix_, SubJetLabels_[i]);
+      JetInfo[1+i].RegisterBranches(smalltree, variableParser, SubJetLabels_[i]+"SubJetInfo");
 
       // set up subjet helper classes
       edm::ParameterSet iConfigCopy(iConfig);
@@ -906,7 +870,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
 
 
   //---------------------------- Start MC info ---------------------------------------//
-  if ( !isData_ && storeEventInfo_ ) {
+  if ( !isData_ && runEventInfo_ ) {
     // EventInfo.pthat
     edm::Handle<GenEventInfoProduct> geninfos;
     iEvent.getByToken( generator,geninfos );
@@ -929,19 +893,19 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     for (ipu = PupInfo->begin(); ipu != PupInfo->end(); ++ipu) {
       if ( ipu->getBunchCrossing() != 0 ) continue; // storing detailed PU info only for BX=0
       if(fillPU_){
-	for (unsigned int i=0; i<ipu->getPU_zpositions().size(); ++i) {
-// 	  EventInfo.PU_bunch[EventInfo.nPU]      =  ipu->getBunchCrossing();
-// 	  EventInfo.PU_z[EventInfo.nPU]          = (ipu->getPU_zpositions())[i];
-// 	  EventInfo.PU_sumpT_low[EventInfo.nPU]  = (ipu->getPU_sumpT_lowpT())[i];
-// 	  EventInfo.PU_sumpT_high[EventInfo.nPU] = (ipu->getPU_sumpT_highpT())[i];
-// 	  EventInfo.PU_ntrks_low[EventInfo.nPU]  = (ipu->getPU_ntrks_lowpT())[i];
-// 	  EventInfo.PU_ntrks_high[EventInfo.nPU] = (ipu->getPU_ntrks_highpT())[i];
-	  ++EventInfo.nPU;
-	}
+        for (unsigned int i=0; i<ipu->getPU_zpositions().size(); ++i) {
+          EventInfo.PU_bunch[EventInfo.nPU]      =  ipu->getBunchCrossing();
+          EventInfo.PU_z[EventInfo.nPU]          = (ipu->getPU_zpositions())[i];
+          EventInfo.PU_sumpT_low[EventInfo.nPU]  = (ipu->getPU_sumpT_lowpT())[i];
+          EventInfo.PU_sumpT_high[EventInfo.nPU] = (ipu->getPU_sumpT_highpT())[i];
+          EventInfo.PU_ntrks_low[EventInfo.nPU]  = (ipu->getPU_ntrks_lowpT())[i];
+          EventInfo.PU_ntrks_high[EventInfo.nPU] = (ipu->getPU_ntrks_highpT())[i];
+          ++EventInfo.nPU;
+        }
       }
       EventInfo.nPUtrue = ipu->getTrueNumInteractions();
       if(fillPU_){
-	if(EventInfo.nPU==0) EventInfo.nPU = ipu->getPU_NumInteractions(); // needed in case getPU_zpositions() is empty
+	      if(EventInfo.nPU==0) EventInfo.nPU = ipu->getPU_NumInteractions(); // needed in case getPU_zpositions() is empty
       }
     }
 
@@ -954,40 +918,40 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     edm::Handle<reco::GenParticleCollection> prunedGenParticles;
     iEvent.getByToken(prunedGenParticleCollectionName_, prunedGenParticles);
 
-    if(storeGenVariables_){
+    if(runGenVariables_){
       //loop over pruned GenParticles to fill branches for MC hard process particles and muons
       for(size_t i = 0; i < prunedGenParticles->size(); ++i){
-	const GenParticle & iGenPart = (*prunedGenParticles)[i];
-	if ( iGenPart.pt() == 0 ) continue;
-	int status = iGenPart.status();
-	int pdgid = iGenPart.pdgId();
-	int numMothers = iGenPart.numberOfMothers();
+        const GenParticle & iGenPart = (*prunedGenParticles)[i];
+        if ( iGenPart.pt() == 0 ) continue;
+        int status = iGenPart.status();
+        int pdgid = iGenPart.pdgId();
+        int numMothers = iGenPart.numberOfMothers();
 
-	//fill all the branches
-	EventInfo.GenPruned_pT[EventInfo.nGenPruned] = iGenPart.pt();
-	EventInfo.GenPruned_eta[EventInfo.nGenPruned] = iGenPart.eta();
-	EventInfo.GenPruned_phi[EventInfo.nGenPruned] = iGenPart.phi();
-	EventInfo.GenPruned_mass[EventInfo.nGenPruned] = iGenPart.mass();
-	EventInfo.GenPruned_status[EventInfo.nGenPruned] = status;
-	EventInfo.GenPruned_pdgID[EventInfo.nGenPruned] = pdgid;
-	// if no mothers, set mother index to -1 (just so it's not >=0)
-	if (numMothers == 0)
-	  EventInfo.GenPruned_mother[EventInfo.nGenPruned] = -1;
-	else{
-	  //something new to distinguish from the no mothers case
-	  int idx = -100;
-	  //loop over the pruned genparticle list to get the mother's index
-	  for( reco::GenParticleCollection::const_iterator mit = prunedGenParticles->begin(); mit != prunedGenParticles->end(); ++mit ) {
-	    if( iGenPart.mother(0)==&(*mit) ) {
-	      idx = std::distance(prunedGenParticles->begin(),mit);
-	      break;
-	    }
-	  }
-	  EventInfo.GenPruned_mother[EventInfo.nGenPruned] = idx;
-	}
-	++EventInfo.nGenPruned;
+        //fill all the branches
+        EventInfo.GenPruned_pT[EventInfo.nGenPruned] = iGenPart.pt();
+        EventInfo.GenPruned_eta[EventInfo.nGenPruned] = iGenPart.eta();
+        EventInfo.GenPruned_phi[EventInfo.nGenPruned] = iGenPart.phi();
+        EventInfo.GenPruned_mass[EventInfo.nGenPruned] = iGenPart.mass();
+        EventInfo.GenPruned_status[EventInfo.nGenPruned] = status;
+        EventInfo.GenPruned_pdgID[EventInfo.nGenPruned] = pdgid;
+        // if no mothers, set mother index to -1 (just so it's not >=0)
+        if (numMothers == 0)
+          EventInfo.GenPruned_mother[EventInfo.nGenPruned] = -1;
+        else{
+          //something new to distinguish from the no mothers case
+          int idx = -100;
+          //loop over the pruned genparticle list to get the mother's index
+          for( reco::GenParticleCollection::const_iterator mit = prunedGenParticles->begin(); mit != prunedGenParticles->end(); ++mit ) {
+            if( iGenPart.mother(0)==&(*mit) ) {
+              idx = std::distance(prunedGenParticles->begin(),mit);
+              break;
+            }
+          }
+          EventInfo.GenPruned_mother[EventInfo.nGenPruned] = idx;
+        }
+        ++EventInfo.nGenPruned;
       } //end loop over pruned genparticles
-    }//storeGenVariables_
+    }//runGenVariables_
 
     EventInfo.GenPVz = -1000.;
 
@@ -1011,41 +975,41 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
       }
 
       // b and c quarks from the end of parton showering and before hadronization
-      if(storeQuarkVariables_){
-	if ( ID == 4 || ID == 5 ) {
-	  if( nDaughters > 0 ) {
-	    int nparton_daughters = 0;
-	    for (unsigned int d=0; d<nDaughters; ++d) {
-	      int daughterID = abs(genIt.daughter(d)->pdgId());
-	      if( (daughterID == 1 || daughterID == 2 || daughterID == 3 ||
-		   daughterID == 4 || daughterID == 5 || daughterID == 6 || daughterID == 21))
-		nparton_daughters++;
-	    }
-	    if( nparton_daughters == 0 ) {
-	      if ( ID == 5 ) {
-		EventInfo.bQuark_pT[EventInfo.nbQuarks]  = genIt.p4().pt();
-		EventInfo.bQuark_eta[EventInfo.nbQuarks] = genIt.p4().eta();
-		EventInfo.bQuark_phi[EventInfo.nbQuarks] = genIt.p4().phi();
-		EventInfo.bQuark_pdgID[EventInfo.nbQuarks] = genIt.pdgId();
-		EventInfo.bQuark_status[EventInfo.nbQuarks] = genIt.status();
-		EventInfo.bQuark_fromGSP[EventInfo.nbQuarks] = isFromGSP(&genIt);
-		++EventInfo.nbQuarks;
-	      }
-	      if ( ID == 4 ) {
-		EventInfo.cQuark_pT[EventInfo.ncQuarks]  = genIt.p4().pt();
-		EventInfo.cQuark_eta[EventInfo.ncQuarks] = genIt.p4().eta();
-		EventInfo.cQuark_phi[EventInfo.ncQuarks] = genIt.p4().phi();
-		EventInfo.cQuark_pdgID[EventInfo.ncQuarks] = genIt.pdgId();
-		EventInfo.cQuark_status[EventInfo.ncQuarks] = genIt.status();
-		EventInfo.cQuark_fromGSP[EventInfo.ncQuarks] = isFromGSP(&genIt);
-		++EventInfo.ncQuarks;
-	      }
-	    }
-	  }
-	}
-      }//storeQuarkVariables_
+      if(runQuarkVariables_){
+        if ( ID == 4 || ID == 5 ) {
+          if( nDaughters > 0 ) {
+            int nparton_daughters = 0;
+            for (unsigned int d=0; d<nDaughters; ++d) {
+              int daughterID = abs(genIt.daughter(d)->pdgId());
+              if( (daughterID == 1 || daughterID == 2 || daughterID == 3 ||
+            daughterID == 4 || daughterID == 5 || daughterID == 6 || daughterID == 21))
+          nparton_daughters++;
+            }
+            if( nparton_daughters == 0 ) {
+              if ( ID == 5 ) {
+          EventInfo.bQuark_pT[EventInfo.nbQuarks]  = genIt.p4().pt();
+          EventInfo.bQuark_eta[EventInfo.nbQuarks] = genIt.p4().eta();
+          EventInfo.bQuark_phi[EventInfo.nbQuarks] = genIt.p4().phi();
+          EventInfo.bQuark_pdgID[EventInfo.nbQuarks] = genIt.pdgId();
+          EventInfo.bQuark_status[EventInfo.nbQuarks] = genIt.status();
+          EventInfo.bQuark_fromGSP[EventInfo.nbQuarks] = isFromGSP(&genIt);
+          ++EventInfo.nbQuarks;
+              }
+              if ( ID == 4 ) {
+          EventInfo.cQuark_pT[EventInfo.ncQuarks]  = genIt.p4().pt();
+          EventInfo.cQuark_eta[EventInfo.ncQuarks] = genIt.p4().eta();
+          EventInfo.cQuark_phi[EventInfo.ncQuarks] = genIt.p4().phi();
+          EventInfo.cQuark_pdgID[EventInfo.ncQuarks] = genIt.pdgId();
+          EventInfo.cQuark_status[EventInfo.ncQuarks] = genIt.status();
+          EventInfo.cQuark_fromGSP[EventInfo.ncQuarks] = isFromGSP(&genIt);
+          ++EventInfo.ncQuarks;
+              }
+            }
+          }
+        }
+      }//runQuarkVariables_
 
-      if(storeHadronVariables_){
+      if(runHadronVariables_){
         if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) AreBHadrons = true;
   //       // Primary b Hadrons
   //       if ( (ID/100)%10 == 5 || (ID/1000)%10 == 5 ) {
@@ -1135,7 +1099,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
       }
 
 
-      if(storeGenVariables_){
+      if(runGenVariables_){
         // Leptons
         if ( (ID == 11 || ID == 13 || ID == 15) && genIt.p4().pt() > 3. ) {
           if (genIt.numberOfMothers()>0) {  // protection for herwig ttbar mc
@@ -1237,7 +1201,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     //------------------------------------------------------
     // generated particles: looking for b hadrons only
     //------------------------------------------------------
-    if ( AreBHadrons && storeHadronVariables_) {
+    if ( AreBHadrons && runHadronVariables_) {
       for (size_t i = 0; i < genParticles->size(); ++i) {
         const GenParticle & genIt = (*genParticles)[i];
         int ID = abs(genIt.pdgId());
@@ -1374,7 +1338,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
           EventInfo.nBHadrons++;
         } // b hadron
       } // end loop on generated particles
-    } // end if ( AreBHadrons && storeHadronVariables_)
+    } // end if ( AreBHadrons && runHadronVariables_)
   }
 
   //------------------------------------------------------
@@ -1565,7 +1529,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   //------------------------------------------------------
   // PAT Muons
   //------------------------------------------------------
-  if (storePatMuons_) {
+  if (runPatMuons_) {
      //first get a PV for muon id
      int vtx_idx = -1;
      for (unsigned int i = 0; i < primaryVertex->size(); ++i) {
@@ -1655,7 +1619,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
 
   computer = dynamic_cast<const GenericMVAJetTagComputer*>( computerHandle.product() );
   //------------- end added-----------------------------------------------------------//
-  if (doCTag_){
+  if (runCTagVariables_){
      edm::ESHandle<JetTagComputer> slcomputerHandle;
      iSetup.get<JetTagComputerRecord>().get( SLComputer_.c_str(), slcomputerHandle );
 
@@ -1665,7 +1629,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   // All tracks info
   //------------------------------------------------------
   edm::Handle<reco::TrackCollection> tracksHandle;
-  if( produceAllTrackTree_ && storeEventInfo_ )
+  if( produceAllTrackTree_ && runEventInfo_ )
   {
     iEvent.getByToken(tracksColl_,tracksHandle);
     for(reco::TrackCollection::const_iterator trk = tracksHandle->begin(); trk != tracksHandle->end(); ++trk)
@@ -1808,13 +1772,13 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       SubJetInfo[SubJetLabels_[i]].nSubJet = 0;
   }
 
-  bool storeTagVariables    = storeTagVariables_;
-  bool storeCSVTagVariables = storeCSVTagVariables_;
-  bool storeCTagVariables   = storeCTagVariables_;
+  bool runTagVariables    = runTagVariables_;
+  bool runCSVTagVariables = runCSVTagVariables_;
+  bool runCTagVariables   = runCTagVariables_;
   if ( runSubJets_ && iJetColl > 0 )
   {
-    storeTagVariables    = storeTagVariablesSubJets_;
-    storeCSVTagVariables = storeCSVTagVariablesSubJets_;
+    runTagVariables    = runTagVariablesSubJets_;
+    runCSVTagVariables = runCSVTagVariablesSubJets_;
   }
 
   double _distJetAxis = distJetAxis_;
@@ -1883,7 +1847,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       }
     }
 
-    if(storeJetVariables_){
+    if(runJetVariables_){
       JetInfo[iJetColl].Jet_partonid[JetInfo[iJetColl].nJet]  = pjet->genParton() ? pjet->genParton()->pdgId() : 0;
       JetInfo[iJetColl].Jet_area[JetInfo[iJetColl].nJet]      = pjet->jetArea();
       JetInfo[iJetColl].Jet_flavour[JetInfo[iJetColl].nJet]   = cflav;
@@ -2617,7 +2581,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     int nSM = (pjet->hasTagInfo(softPFMuonTagInfos_.c_str()) ? softPFMuTagInfo->leptons() : 0);
     JetInfo[iJetColl].Jet_nSM[JetInfo[iJetColl].nJet] = nSM;
 
-    if(storePFMuonVariables_){
+    if(runPFMuonVariables_){
       // PFMuon information
       JetInfo[iJetColl].Jet_nFirstSM[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFMuon;
 
@@ -2697,7 +2661,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     int nSE = (pjet->hasTagInfo(softPFElectronTagInfos_.c_str()) ? softPFElTagInfo->leptons() : 0);
     JetInfo[iJetColl].Jet_nSE[JetInfo[iJetColl].nJet] = nSE;
 
-    if(storePFElectronVariables_){
+    if(runPFElectronVariables_){
       // PFElectron information
       JetInfo[iJetColl].Jet_nFirstSE[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFElectron;
 
@@ -2893,7 +2857,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 //     JetInfo[iJetColl].Jet_cMVAv2P[JetInfo[iJetColl].nJet] = cMVAv2Pos;
 
     // TagInfo TaggingVariables
-    if ( storeTagVariables )
+    if ( runTagVariables )
     {
       reco::TaggingVariableList ipVars = ipTagInfo->taggingVariables();
       reco::TaggingVariableList svVars = svTagInfo->taggingVariables();
@@ -2991,7 +2955,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     }
 
     // DeepFlavour InputFeatures
-    if(storeDeepFlavourTagVariables_) {
+    if(runDeepFlavourTagVariables_) {
       auto df_taginfo = static_cast<const reco::DeepFlavourTagInfo*>(pjet->tagInfo(deepFlavourTagInfos_));
       if(!df_taginfo) {
         throw cms::Exception("CorruptData") << "The jet collection does not have the DeepFlavour TagInfos embedded!";
@@ -3017,7 +2981,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
 
     // CSV TaggingVariables
-    if ( storeCSVTagVariables )
+    if ( runCSVTagVariables )
     {
       std::vector<const reco::BaseTagInfo*>  baseTagInfos;
       JetTagComputer::TagInfoHelper helper(baseTagInfos);
@@ -3046,7 +3010,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].TagVarCSV_flightDistance3dSig[JetInfo[iJetColl].nJet]         = ( vars.checkTag(reco::btau::flightDistance3dSig) ? vars.get(reco::btau::flightDistance3dSig) : -9999 );
     }
 
-    if ( storeCSVTagTrackVariables_ ){
+    if ( runCSVTagTrackVariables_ ){
       std::vector<const reco::BaseTagInfo*>  baseTagInfos;
       JetTagComputer::TagInfoHelper helper(baseTagInfos);
       baseTagInfos.push_back( ipTagInfo );
@@ -3104,7 +3068,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
     }
 
-    if ( storeCTagVariables )
+    if ( runCTagVariables )
     {
       JetInfo[iJetColl].CTag_Jet_CvsB[JetInfo[iJetColl].nJet] = CvsB;
       JetInfo[iJetColl].CTag_Jet_CvsBN[JetInfo[iJetColl].nJet] = CvsBNeg;
@@ -3547,7 +3511,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].Jet_nSV_fat[JetInfo[iJetColl].nJet] = vars.get(reco::btau::jetNSecondaryVertices);
       //--------------------------
       // DeepDoubleB InputFeatures
-	if(storeDeepDoubleBTagVariables_) {
+	if(runDeepDoubleBTagVariables_) {
 		auto ddb_taginfo = static_cast<const reco::DeepDoubleBTagInfo*>(pjet->tagInfo(deepDoubleBTagInfos_));
 		if(!ddb_taginfo) {
 			throw cms::Exception("CorruptData") << "The jet collection does not have the DeepDoubleB TagInfos embedded!";
@@ -3582,7 +3546,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
     // additional DeepBoostedJet Input Features
 
-	if (storeDeepBoostedJetVariables_) {
+	if (runDeepBoostedJetVariables_) {
 
 		auto dbj_taginfo = static_cast<const reco::DeepBoostedJetTagInfo*>(pjet->tagInfo(deepBoostedJetTagInfos_));
 		if(!dbj_taginfo) {

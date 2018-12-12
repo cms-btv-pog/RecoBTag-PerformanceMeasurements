@@ -1,7 +1,11 @@
 import FWCore.ParameterSet.Config as cms
 from RecoBTag.PerformanceMeasurements.bTagAnalyzerCommon_cff import *
+from RecoBTag.PerformanceMeasurements.variables_cfi import *
+from RecoBTag.PerformanceMeasurements.varGroups_cfi import *
 bTagAnalyzer = cms.EDAnalyzer("BTagAnalyzer",
     bTagAnalyzerCommon,
+    variableSet,
+    groupSet,
     # computers
     svComputer = cms.string('candidateCombinedSecondaryVertexV2Computer'),
     svComputerSubJets = cms.string('candidateCombinedSecondaryVertexV2Computer'),
