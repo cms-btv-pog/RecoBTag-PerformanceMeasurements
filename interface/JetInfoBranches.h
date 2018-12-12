@@ -1176,6 +1176,12 @@ class JetInfoBranches {
       if(variableParser.isToBeStored(name+"Jet_tau2_vertexNTracks")) tree->Branch((name+"Jet_tau2_vertexNTracks").c_str(),           Jet_tau2_vertexNTracks           ,(name+"Jet_tau2_vertexNTracks["+name+"nJet]/F").c_str()           );
       if(variableParser.isToBeStored(name+"Jet_DoubleSV")) tree->Branch((name+"Jet_DoubleSV").c_str(),         Jet_DoubleSV         ,(name+"Jet_DoubleSV["+name+"nJet]/F").c_str());
       if(variableParser.isToBeStored(name+"Jet_DeepDoubleB")) tree->Branch((name+"Jet_DeepDoubleB").c_str(),      Jet_DeepDoubleB      ,(name+"Jet_DeepDoubleB["+name+"nJet]/F").c_str());
+      if(variableParser.isToBeStored(name+"Jet_DeepBoostedJetbbvsLight")) tree->Branch((name+"Jet_DeepBoostedJetbbvsLight").c_str(),      Jet_DeepBoostedJetbbvsLight      ,(name+"Jet_DeepBoostedJetbbvsLight["+name+"nJet]/F").c_str());
+      if(variableParser.isToBeStored(name+"Jet_DeepBoostedJetccvsLight")) tree->Branch((name+"Jet_DeepBoostedJetccvsLight").c_str(),      Jet_DeepBoostedJetccvsLight      ,(name+"Jet_DeepBoostedJetccvsLight["+name+"nJet]/F").c_str());
+      if(variableParser.isToBeStored(name+"Jet_DeepBoostedJetTvsQCD")) tree->Branch((name+"Jet_DeepBoostedJetTvsQCD").c_str(),      Jet_DeepBoostedJetTvsQCD      ,(name+"Jet_DeepBoostedJetTvsQCD["+name+"nJet]/F").c_str());
+      if(variableParser.isToBeStored(name+"Jet_DeepBoostedJetZHccvsQCD")) tree->Branch((name+"Jet_DeepBoostedJetZHccvsQCD").c_str(),      Jet_DeepBoostedJetZHccvsQCD      ,(name+"Jet_DeepBoostedJetZHccvsQCD["+name+"nJet]/F").c_str());
+      if(variableParser.isToBeStored(name+"Jet_DeepBoostedJetWvsQCD")) tree->Branch((name+"Jet_DeepBoostedJetWvsQCD").c_str(),      Jet_DeepBoostedJetWvsQCD      ,(name+"Jet_DeepBoostedJetWvsQCD["+name+"nJet]/F").c_str());
+      if(variableParser.isToBeStored(name+"Jet_DeepBoostedJetZHbbvsQCD")) tree->Branch((name+"Jet_DeepBoostedJetZHbbvsQCD").c_str(),      Jet_DeepBoostedJetZHbbvsQCD      ,(name+"Jet_DeepBoostedJetZHbbvsQCD["+name+"nJet]/F").c_str());
 
 
       if(variableParser.isToBeStored(name+"Track_lengthTau")) tree->Branch((name+"Track_lengthTau").c_str()     ,Track_lengthTau       ,(name+"Track_lengthTau["+name+"nTrack]/F").c_str());

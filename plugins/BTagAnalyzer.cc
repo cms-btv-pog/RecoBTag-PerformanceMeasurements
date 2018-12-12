@@ -1683,6 +1683,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     {
       iJetColl = 1+i ;
       processJets(subjetColls[i], jetsColl, subjetColls, iEvent, iSetup, iJetColl); // 'subjetColls' is a dummy input here
+    }
   }
   //------------------------------------------------------
 
