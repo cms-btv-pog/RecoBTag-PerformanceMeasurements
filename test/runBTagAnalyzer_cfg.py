@@ -280,6 +280,14 @@ options.register('runDeepFlavourTagVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to run DeepFlavour TaggingVariables')
+options.register('runDeepDoubleBTagVariables', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to run DeepDoubleB TaggingVariables')
+options.register('runDeepBoostedJetVariables', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to run DeepBoostedJet Input Variables')
 options.register('runPFElectronVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -398,6 +406,12 @@ if options.runSubJets and not options.runFatJets:
 if not options.miniAOD and options.runDeepFlavourTagVariables: #FIXME
     print "WARNING: switching off DeepFlavour, as it is not supported in AOD"
     options.runDeepFlavourTagVariables = False
+if not options.miniAOD and options.runDeepDoubleBTagVariables: 
+    print "WARNING: switching off DeepDoubleB, as it is not supported in AOD"
+    options.runDeepDoubleBTagVariables = False
+if not options.miniAOD and options.runDeepBoostedJetTagVariables: #FIXME
+    print "WARNING: switching off DeepBoostedJet, as it is not supported in AOD"
+    options.runDeepBoostedJetTagVariables = False
 
 if options.doBoostedCommissioning:
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
@@ -461,8 +475,9 @@ bTagInfos = [
    ,'pfInclusiveSecondaryVertexFinderCvsLTagInfos'
    ,'pfInclusiveSecondaryVertexFinderNegativeCvsLTagInfos'
    ,'pfDeepFlavourTagInfos'
+   ,'pfDeepDoubleBTagInfos'
 ]
-bTagInfos_noDeepFlavour = bTagInfos[:-1]
+bTagInfos_noDeepFlavour = bTagInfos[:-2]
 ## b-tag discriminators
 bTagDiscriminatorsLegacy = set([
     'jetBProbabilityBJetTags'
@@ -618,11 +633,25 @@ bTagInfosFat = copy.deepcopy(bTagInfos_noDeepFlavour)
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfImpactParameter' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfInclusiveSecondaryVertexFinder' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfBoostedDoubleSV' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
+## Add DeepDoubleB tag infos
+bTagInfosFat += ([] if options.useLegacyTaggers else ['pfDeepDoubleBTagInfos'])
 
 bTagDiscriminators_no_deepFlavour = {i for i in bTagDiscriminators if 'DeepFlavourJetTags' not in i}
 bTagDiscriminatorsFat = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
 ## Add DeepDoubleB tagger to fat jets
 bTagDiscriminatorsFat.update(set(['pfDeepDoubleBJetTags:probH']))
+## Add DeepBoostedJet discriminators 
+from RecoBTag.MXNet.pfDeepBoostedJet_cff import _pfMassDecorrelatedDeepBoostedJetTagsProbs, _pfMassDecorrelatedDeepBoostedJetTagsMetaDiscrs
+bTagDiscriminatorsFat.update(set([
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:bbvsLight",
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ccvsLight",
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:TvsQCD",
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHccvsQCD",
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:WvsQCD",
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHbbvsQCD"
+]))
+## Add DeepBoostedJet tag infos
+bTagInfosFat += ([] if options.useLegacyTaggers else ['pfDeepBoostedJetTagInfos'])
 
 if options.runJetClustering:
     options.remakeAllDiscr = True
@@ -1484,6 +1513,8 @@ process.btagana.runTagVariables     = False  ## True if you want to run TagInfo 
 process.btagana.runCSVTagVariables  = options.runCSVTagVariables   ## True if you want to run CSV TaggingVariables
 process.btagana.runCSVTagTrackVariables  = options.runCSVTagTrackVariables   ## True if you want to run CSV Tagging Track Variables
 process.btagana.runDeepFlavourTagVariables = options.runDeepFlavourTagVariables
+process.btagana.runDeepDoubleBTagVariables = options.runDeepDoubleBTagVariables
+process.btagana.runDeepBoostedJetVariables = options.runDeepBoostedJetVariables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag(patJetSource)
 process.btagana.muonCollectionName    = cms.InputTag(muSource)
@@ -1525,6 +1556,8 @@ if options.runFatJets:
         allowJetSkipping    = cms.bool(False),
         runTagVariables   = cms.bool(False),
         runDeepFlavourTagVariables = cms.bool(False),
+        runDeepDoubleBTagVariables = cms.bool(False),
+        runDeepBoostedJetVariables = cms.bool(False),
         deepFlavourJetTags = cms.string(''),
         deepFlavourNegJetTags = cms.string(''),
         runTagVariablesSubJets = cms.bool(False),
@@ -1560,12 +1593,16 @@ if options.doBoostedCommissioning:
     process.btaganaFatJets.runCSVTagVariables = True
     process.btaganaFatJets.runCSVTagTrackVariables = True
     process.btaganaFatJets.runCSVTagVariablesSubJets = True
+    process.btaganaFatJets.runDeepDoubleBTagVariables = True
+    process.btaganaFatJets.runDeepBoostedJetVariables = True
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
     print "runHadronVariables set to '",process.btaganaFatJets.runHadronVariables,"'"
     print "runQuarkVariables set to '",process.btaganaFatJets.runQuarkVariables,"'"
     print "runPFMuonVariables set to '",process.btaganaFatJets.runPFMuonVariables,"'"
     print "For fat jets: runCSVTagVariables set to '",process.btaganaFatJets.runCSVTagVariables,"'"
     print "For fat jets: runCSVTagTrackVariables set to '",process.btaganaFatJets.runCSVTagTrackVariables,"'"
+    print "For fat jets: runDeepDoubleBTagVariables set to '",process.btaganaFatJets.runDeepDoubleBTagVariables,"'"
+    print "For fat jets: runDeepBoostedJetVariables set to '",process.btaganaFatJets.runDeepBoostedJetVariables,"'"
     print "For subjets:  runCSVTagVariablesSubJets set to '",process.btaganaFatJets.runCSVTagVariablesSubJets,"'"
     print "********************"
 
