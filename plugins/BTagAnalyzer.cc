@@ -36,6 +36,7 @@
 
 #include "DataFormats/GeometrySurface/interface/Line.h"
 #include "DataFormats/GeometryCommonDetAlgo/interface/Measurement1D.h"
+#include "DataFormats/GeometryVector/interface/VectorUtil.h"
 
 #include "SimTracker/Records/interface/TrackAssociatorRecord.h"
 #include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
@@ -74,6 +75,8 @@
 #include "SimTracker/TrackHistory/interface/TrackClassifier.h"
 #include "DataFormats/BTauReco/interface/SoftLeptonTagInfo.h"
 #include "DataFormats/BTauReco/interface/DeepFlavourFeatures.h"
+#include "DataFormats/BTauReco/interface/DeepDoubleBFeatures.h"
+#include "DataFormats/BTauReco/interface/DeepBoostedJetFeatures.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
@@ -240,7 +243,6 @@ private:
 
   void setTracksSV(const TrackRef & trackRef, const SVTagInfo *, int & isFromSV, int & iSV, float & SVweight);
   void vertexKinematicsAndChange(const Vertex & vertex, reco::TrackKinematics & vertexKinematics, Int_t & charge);
-  
   void etaRelToTauAxis(const Vertex & vertex, const fastjet::PseudoJet & tauAxis, std::vector<float> & tau_trackEtaRel);
 
   bool NameCompatible(const std::string& pattern, const std::string& name);
@@ -332,6 +334,7 @@ private:
 
   std::string doubleSVBJetTags_;
   std::string deepDoubleBJetTags_;
+  std::string deepBoostedJetTags_;
 
   std::string cMVABJetTags_;
   std::string cMVAv2BJetTags_;
@@ -345,6 +348,8 @@ private:
   std::string softPFMuonTagInfos_;
   std::string softPFElectronTagInfos_;
   std::string bdsvTagInfos_;
+  std::string deepDoubleBTagInfos_;
+  std::string deepBoostedJetTagInfos_;
 
   edm::EDGetTokenT<reco::VertexCollection> primaryVertexColl_;
   edm::EDGetTokenT<reco::TrackCollection> tracksColl_;
@@ -388,6 +393,8 @@ private:
   bool runCSVTagVariables_;
   bool runCSVTagTrackVariables_;
   bool runDeepFlavourTagVariables_;
+  bool runDeepDoubleBTagVariables_;
+  bool runDeepBoostedJetVariables_;
   bool runCSVTagVariablesSubJets_;
   bool runPFElectronVariables_;
   bool runPFMuonVariables_;
@@ -402,7 +409,7 @@ private:
   edm::EDGetTokenT<edm::HepMCProduct> generatorhep;
   edm::EDGetTokenT<GenEventInfoProduct> generatorevt;
   edm::EDGetTokenT<LHEEventProduct> generatorlhe;
-  
+
   // Matching clusters to TP token
   edm::EDGetTokenT<ClusterTPAssociation> clusterTPMapToken_;
 
@@ -570,6 +577,8 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   runCSVTagVariables_ = iConfig.getParameter<bool>("runCSVTagVariables");
   runCSVTagTrackVariables_ = iConfig.getParameter<bool>("runCSVTagTrackVariables");
   runDeepFlavourTagVariables_  = iConfig.getParameter<bool>("runDeepFlavourTagVariables");
+  runDeepDoubleBTagVariables_  = iConfig.getParameter<bool>("runDeepDoubleBTagVariables");
+  runDeepBoostedJetVariables_  = iConfig.getParameter<bool>("runDeepBoostedJetVariables");
   runCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("runCSVTagVariablesSubJets");
   runPFElectronVariables_ = iConfig.getParameter<bool>("runPFElectronVariables");
   runPFMuonVariables_ = iConfig.getParameter<bool>("runPFMuonVariables");
@@ -657,6 +666,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
 
   doubleSVBJetTags_ = iConfig.getParameter<std::string>("doubleSVBJetTags");
   deepDoubleBJetTags_ = iConfig.getParameter<std::string>("deepDoubleBJetTags");
+  deepBoostedJetTags_ = iConfig.getParameter<std::string>("deepBoostedJetTags");
 
   cMVABJetTags_ = iConfig.getParameter<std::string>("cMVABJetTags");
   cMVAv2BJetTags_ = iConfig.getParameter<std::string>("cMVAv2BJetTags");
@@ -670,6 +680,8 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   softPFMuonTagInfos_      = iConfig.getParameter<std::string>("softPFMuonTagInfos");
   softPFElectronTagInfos_  = iConfig.getParameter<std::string>("softPFElectronTagInfos");
   bdsvTagInfos_            = iConfig.getParameter<std::string>("bdsvTagInfos");
+  deepDoubleBTagInfos_     = iConfig.getParameter<std::string>("deepDoubleBTagInfos");
+  deepBoostedJetTagInfos_     = iConfig.getParameter<std::string>("deepBoostedJetTagInfos");
 
   muonCollectionName_       = consumes<edm::View<reco::Muon>>(iConfig.getParameter<edm::InputTag>("muonCollectionName"));
   patMuonCollectionName_    = consumes<std::vector<pat::Muon>>(iConfig.getParameter<edm::InputTag>("patMuonCollectionName"));
@@ -1351,7 +1363,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   // ttbar information
   //------------------------------------------------------
   if (use_ttbar_filter_) {
-    
+
     //https://twiki.cern.ch/CMS/TopPtReweighting
     EventInfo.ttbar_ptweight = 0.;
     if (!isData_) {
@@ -1369,7 +1381,7 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
        }
        EventInfo.ttbar_ptweight = sqrt(wtop*wantitop);
     }
-      
+
     edm::Handle<int> pIn;
     iEvent.getByToken(ttbartop, pIn);
     EventInfo.ttbar_chan=*pIn;
@@ -1737,7 +1749,11 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
   JetInfo[iJetColl].nTrkEtaRelTagVarCSV = 0;
   JetInfo[iJetColl].nTrkCTagVar = 0;
   JetInfo[iJetColl].nTrkEtaRelCTagVar = 0;
-  JetInfo[iJetColl].nLeptons = 0;  
+  JetInfo[iJetColl].nLeptons = 0;
+  JetInfo[iJetColl].nTrkDeepDoubleB = 0;
+  JetInfo[iJetColl].nTrkDeepBoostedJet = 0;
+  JetInfo[iJetColl].nSVDeepDoubleB = 0;
+  JetInfo[iJetColl].nSVDeepBoostedJet = 0;
 
   //Initialize new test variables for AK4 jets: to be cleaned up in the future
   JetInfo[iJetColl].Jet_trackSip2dSig_AboveBottom_0[JetInfo[iJetColl].nJet] = -19.;
@@ -2733,6 +2749,13 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float DoubleSV = pjet->bDiscriminator(doubleSVBJetTags_.c_str());
     float DeepDoubleB = pjet->bDiscriminator(deepDoubleBJetTags_.c_str());
 
+    float deepBoostedJetbbvsLight   = (deepBoostedJetTags_.size()) ? pjet->bDiscriminator((deepBoostedJetTags_+":bbvsLight"   ).c_str()) : -10;
+    float deepBoostedJetccvsLight   = (deepBoostedJetTags_.size()) ? pjet->bDiscriminator((deepBoostedJetTags_+":ccvsLight"   ).c_str()) : -10;
+    float deepBoostedJetTvsQCD   = (deepBoostedJetTags_.size()) ? pjet->bDiscriminator((deepBoostedJetTags_+":TvsQCD"   ).c_str()) : -10;
+    float deepBoostedJetZHccvsQCD   = (deepBoostedJetTags_.size()) ? pjet->bDiscriminator((deepBoostedJetTags_+":ZHccvsQCD"   ).c_str()) : -10;
+    float deepBoostedJetWvsQCD   = (deepBoostedJetTags_.size()) ? pjet->bDiscriminator((deepBoostedJetTags_+":WvsQCD"   ).c_str()) : -10;
+    float deepBoostedJetZHbbvsQCD   = (deepBoostedJetTags_.size()) ? pjet->bDiscriminator((deepBoostedJetTags_+":ZHbbvsQCD"   ).c_str()) : -10;
+
 //     float cMVA = pjet->bDiscriminator(cMVABJetTags_.c_str());
     float cMVAv2 = pjet->bDiscriminator(cMVAv2BJetTags_.c_str());
     float cMVAv2Neg = pjet->bDiscriminator(cMVAv2NegBJetTags_.c_str());
@@ -2810,6 +2833,13 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_SoftEl[JetInfo[iJetColl].nJet]   = SoftE;
     JetInfo[iJetColl].Jet_DoubleSV[JetInfo[iJetColl].nJet] = DoubleSV;
     JetInfo[iJetColl].Jet_DeepDoubleB[JetInfo[iJetColl].nJet] = DeepDoubleB;
+    //DeepBoostedJet probabilities
+    JetInfo[iJetColl].Jet_DeepBoostedJetbbvsLight[JetInfo[iJetColl].nJet]    = deepBoostedJetbbvsLight;
+    JetInfo[iJetColl].Jet_DeepBoostedJetccvsLight[JetInfo[iJetColl].nJet]   = deepBoostedJetccvsLight;
+    JetInfo[iJetColl].Jet_DeepBoostedJetTvsQCD[JetInfo[iJetColl].nJet] = deepBoostedJetTvsQCD;
+    JetInfo[iJetColl].Jet_DeepBoostedJetZHccvsQCD[JetInfo[iJetColl].nJet]    = deepBoostedJetZHccvsQCD;
+    JetInfo[iJetColl].Jet_DeepBoostedJetWvsQCD[JetInfo[iJetColl].nJet]  = deepBoostedJetWvsQCD;
+    JetInfo[iJetColl].Jet_DeepBoostedJetZHbbvsQCD[JetInfo[iJetColl].nJet]    = deepBoostedJetZHbbvsQCD;
 //     JetInfo[iJetColl].Jet_cMVA[JetInfo[iJetColl].nJet] = cMVA;
     JetInfo[iJetColl].Jet_cMVAv2[JetInfo[iJetColl].nJet] = cMVAv2;
     JetInfo[iJetColl].Jet_cMVAv2N[JetInfo[iJetColl].nJet] = cMVAv2Neg;
@@ -3060,15 +3090,15 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].CTag_flightDistance3dSig[JetInfo[iJetColl].nJet]         = ( slvars.checkTag(reco::btau::flightDistance3dSig) ? slvars.get(reco::btau::flightDistance3dSig) : -9999 );
       JetInfo[iJetColl].CTag_massVertexEnergyFraction[JetInfo[iJetColl].nJet]    = ( slvars.checkTag(reco::btau::massVertexEnergyFraction) ? slvars.get(reco::btau::massVertexEnergyFraction) : -0.1);
       JetInfo[iJetColl].CTag_vertexBoostOverSqrtJetPt[JetInfo[iJetColl].nJet]    = ( slvars.checkTag(reco::btau::vertexBoostOverSqrtJetPt) ? slvars.get(reco::btau::vertexBoostOverSqrtJetPt) : -0.1);
-      JetInfo[iJetColl].CTag_vertexLeptonCategory[JetInfo[iJetColl].nJet]        = ( slvars.checkTag(reco::btau::vertexLeptonCategory) ? slvars.get(reco::btau::vertexLeptonCategory) : -1);      
- 
+      JetInfo[iJetColl].CTag_vertexLeptonCategory[JetInfo[iJetColl].nJet]        = ( slvars.checkTag(reco::btau::vertexLeptonCategory) ? slvars.get(reco::btau::vertexLeptonCategory) : -1);
+
       // per jet per track
       JetInfo[iJetColl].Jet_nFirstTrkCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkCTagVar;
       std::vector<float> tagValList = slvars.getList(reco::btau::trackSip2dSig,false);
-      JetInfo[iJetColl].CTag_jetNTracks[JetInfo[iJetColl].nJet] = tagValList.size(); 
+      JetInfo[iJetColl].CTag_jetNTracks[JetInfo[iJetColl].nJet] = tagValList.size();
 
       tagValList = slvars.getList(reco::btau::trackPtRel,false);
-      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackPtRel[JetInfo[iJetColl].nTrkCTagVar] );  
+      if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackPtRel[JetInfo[iJetColl].nTrkCTagVar] );
       tagValList = slvars.getList(reco::btau::trackPPar,false);
       if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].CTag_trackPPar[JetInfo[iJetColl].nTrkCTagVar] );
       tagValList = slvars.getList(reco::btau::trackDeltaR,false);
@@ -3097,7 +3127,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
       JetInfo[iJetColl].nTrkEtaRelCTagVar += JetInfo[iJetColl].CTag_jetNTracksEtaRel[JetInfo[iJetColl].nJet];
       JetInfo[iJetColl].Jet_nLastTrkEtaRelCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkEtaRelCTagVar;
-      
+
       //per jet per lepton
       JetInfo[iJetColl].Jet_nFirstLepCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nLeptons;
       std::vector<float> sltagValList = slvars.getList(reco::btau::leptonPtRel,false);
@@ -3114,7 +3144,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       sltagValList = slvars.getList(reco::btau::leptonEtaRel,false);
       if(sltagValList.size()>0) std::copy( sltagValList.begin(), sltagValList.end(), &JetInfo[iJetColl].CTag_leptonEtaRel[JetInfo[iJetColl].nLeptons] );
       sltagValList = slvars.getList(reco::btau::leptonRatio,false);
-      if(sltagValList.size()>0) std::copy( sltagValList.begin(), sltagValList.end(), &JetInfo[iJetColl].CTag_leptonRatio[JetInfo[iJetColl].nLeptons] );     
+      if(sltagValList.size()>0) std::copy( sltagValList.begin(), sltagValList.end(), &JetInfo[iJetColl].CTag_leptonRatio[JetInfo[iJetColl].nLeptons] );
 
       JetInfo[iJetColl].nLeptons += JetInfo[iJetColl].CTag_jetNLeptons[JetInfo[iJetColl].nJet];
       JetInfo[iJetColl].Jet_nLastLepCTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nLeptons;
@@ -3464,15 +3494,131 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].Jet_nTracks_fat[JetInfo[iJetColl].nJet] = vars.get(reco::btau::jetNTracks);
       JetInfo[iJetColl].Jet_nSV_fat[JetInfo[iJetColl].nJet] = vars.get(reco::btau::jetNSecondaryVertices);
       //--------------------------
+      // DeepDoubleB InputFeatures
+	if(runDeepDoubleBTagVariables_) {
+		auto ddb_taginfo = static_cast<const reco::DeepDoubleBTagInfo*>(pjet->tagInfo(deepDoubleBTagInfos_));
+		if(!ddb_taginfo) {
+			throw cms::Exception("CorruptData") << "The jet collection does not have the DeepDoubleB TagInfos embedded!";
+		}
+		const auto & features = ddb_taginfo->features();
+
+		size_t csize = features.c_pf_features.size();
+      		JetInfo[iJetColl].Jet_DeepDoubleB_nFirstTrkTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkDeepDoubleB;
+		for(size_t t = 0; t < csize; t++){
+			JetInfo[iJetColl].DeepDoubleBInput_charged_EtaRel[ JetInfo[iJetColl].nTrkDeepDoubleB+t ] = features.c_pf_features[t].btagPf_trackEtaRel;
+			JetInfo[iJetColl].DeepDoubleBInput_charged_PtRatio[ JetInfo[iJetColl].nTrkDeepDoubleB+t ] = features.c_pf_features[t].btagPf_trackPtRatio;
+			JetInfo[iJetColl].DeepDoubleBInput_charged_PParRatio[ JetInfo[iJetColl].nTrkDeepDoubleB+t ] = features.c_pf_features[t].btagPf_trackPParRatio;
+			JetInfo[iJetColl].DeepDoubleBInput_charged_Sip2dVal[ JetInfo[iJetColl].nTrkDeepDoubleB+t ] = features.c_pf_features[t].btagPf_trackSip2dVal;
+			JetInfo[iJetColl].DeepDoubleBInput_charged_Sip2dSig[ JetInfo[iJetColl].nTrkDeepDoubleB+t ] = features.c_pf_features[t].btagPf_trackSip2dSig;
+			JetInfo[iJetColl].DeepDoubleBInput_charged_Sip3dVal[ JetInfo[iJetColl].nTrkDeepDoubleB+t ] = features.c_pf_features[t].btagPf_trackSip3dVal;
+			JetInfo[iJetColl].DeepDoubleBInput_charged_Sip3dSig[ JetInfo[iJetColl].nTrkDeepDoubleB+t ] = features.c_pf_features[t].btagPf_trackSip3dSig;
+			JetInfo[iJetColl].DeepDoubleBInput_charged_JetDistVal[ JetInfo[iJetColl].nTrkDeepDoubleB+t ] = features.c_pf_features[t].btagPf_trackJetDistVal;
+		}
+		JetInfo[iJetColl].nTrkDeepDoubleB += csize;
+      		JetInfo[iJetColl].Jet_DeepDoubleB_nLastTrkTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkDeepDoubleB;
+
+		size_t svsize = features.sv_features.size();
+      		JetInfo[iJetColl].Jet_DeepDoubleB_nFirstSVTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSVDeepDoubleB;
+		for(size_t sv = 0; sv < svsize; sv++){
+			JetInfo[iJetColl].DeepDoubleBInput_sv_d3d[ JetInfo[iJetColl].nSVDeepDoubleB+sv ] = features.sv_features[sv].d3d;
+			JetInfo[iJetColl].DeepDoubleBInput_sv_d3dsig[ JetInfo[iJetColl].nSVDeepDoubleB+sv ] = features.sv_features[sv].d3dsig;
+		}
+		JetInfo[iJetColl].nSVDeepDoubleB += svsize;
+      		JetInfo[iJetColl].Jet_DeepDoubleB_nLastSVTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSVDeepDoubleB;
+		//--------------------------
+	}
+
+    // additional DeepBoostedJet Input Features
+
+	if (runDeepBoostedJetVariables_) {
+
+		auto dbj_taginfo = static_cast<const reco::DeepBoostedJetTagInfo*>(pjet->tagInfo(deepBoostedJetTagInfos_));
+		if(!dbj_taginfo) {
+			throw cms::Exception("CorruptData") << "The jet collection does not have the DeepBoostedJet TagInfos embedded!";
+		}
+                // Name of variables from https://github.com/cms-sw/cmssw/blob/master/RecoBTag/FeatureTools/plugins/DeepBoostedJetTagInfoProducer.cc#L75-L136
+
+		const auto & dbj_features = dbj_taginfo->features();
+		size_t dbj_csize = dbj_features.get("pfcand_puppiw").size(); // can be any variable, not necessarily pfcand_puppiw 
+      		JetInfo[iJetColl].Jet_DeepBoostedJet_nFirstTrkTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkDeepBoostedJet;
+		for(size_t q = 0; q < dbj_csize; q++){
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_puppiw[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_puppiw")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_hcalFrac[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_hcalFrac")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_VTX_ass[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_VTX_ass")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_lostInnerHits[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_lostInnerHits")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_quality[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_quality")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_charge[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_charge")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_isEl[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_isEl")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_isMu[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_isMu")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_isChargedHad[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_isChargedHad")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_isGamma[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_isGamma")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_isNeutralHad[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_isNeutralHad")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_phirel[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_phirel")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_etarel[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_etarel")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_deltaR[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_deltaR")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_abseta[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_abseta")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_ptrel_log[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_ptrel_log")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_erel_log[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_erel_log")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_pt_log[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_pt_log")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_drminsv[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_drminsv")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_drsubjet1[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_drsubjet1")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_drsubjet2[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_drsubjet2")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_normchi2[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_normchi2")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_dz[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dz")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_dzsig[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dzsig")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_dxy[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dxy")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_dxysig[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dxysig")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_dptdpt[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dptdpt")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_detadeta[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_detadeta")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_dphidphi[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dphidphi")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_dxydxy[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dxydxy")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_dzdz[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dzdz")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_dxydz[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dxydz")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_dphidxy[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dphidxy")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_dlambdadz[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dlambdadz")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_btagEtaRel[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagEtaRel")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_btagPtRatio[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagPtRatio")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_btagPParRatio[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagPParRatio")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_btagSip2dVal[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagSip2dVal")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_btagSip2dSig[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagSip2dSig")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_btagSip3dVal[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagSip3dVal")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_btagSip3dSig[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagSip3dSig")[q];
+			JetInfo[iJetColl].DeepBoostedJetInput_pf_btagJetDistVal[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagJetDistVal")[q];
+                }
+		JetInfo[iJetColl].nTrkDeepBoostedJet += dbj_csize;
+      		JetInfo[iJetColl].Jet_DeepBoostedJet_nLastTrkTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkDeepBoostedJet;
+
+		size_t dbj_svsize = dbj_features.get("sv_phirel").size(); 
+      		JetInfo[iJetColl].Jet_DeepBoostedJet_nFirstSVTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSVDeepBoostedJet;
+		for(size_t qsv = 0; qsv < dbj_svsize; qsv++){
+			JetInfo[iJetColl].DeepBoostedJetInput_sv_phirel[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_phirel")[qsv];
+			JetInfo[iJetColl].DeepBoostedJetInput_sv_etarel[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_etarel")[qsv];
+			JetInfo[iJetColl].DeepBoostedJetInput_sv_deltaR[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_deltaR")[qsv];
+			JetInfo[iJetColl].DeepBoostedJetInput_sv_abseta[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_abseta")[qsv];
+			JetInfo[iJetColl].DeepBoostedJetInput_sv_mass[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_mass")[qsv];
+			JetInfo[iJetColl].DeepBoostedJetInput_sv_ptrel_log[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_ptrel_log")[qsv];
+			JetInfo[iJetColl].DeepBoostedJetInput_sv_erel_log[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_erel_log")[qsv];
+			JetInfo[iJetColl].DeepBoostedJetInput_sv_pt_log[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_pt_log")[qsv];
+			JetInfo[iJetColl].DeepBoostedJetInput_sv_ntracks[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_ntracks")[qsv];
+			JetInfo[iJetColl].DeepBoostedJetInput_sv_normchi2[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_normchi2")[qsv];
+			JetInfo[iJetColl].DeepBoostedJetInput_sv_dxy[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_dxy")[qsv];
+			JetInfo[iJetColl].DeepBoostedJetInput_sv_dxysig[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_dxysig")[qsv];
+			JetInfo[iJetColl].DeepBoostedJetInput_sv_d3d[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_d3d")[qsv];
+			JetInfo[iJetColl].DeepBoostedJetInput_sv_d3dsig[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_d3dsig")[qsv];
+			JetInfo[iJetColl].DeepBoostedJetInput_sv_costhetasvpv[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_costhetasvpv")[qsv];
+		}
+		JetInfo[iJetColl].nSVDeepBoostedJet += dbj_svsize;
+      		JetInfo[iJetColl].Jet_DeepBoostedJet_nLastSVTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSVDeepBoostedJet;
+
+        }
     }
-
-
-    cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
-    can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
 
     //*****************************************************************
     // for Mistag studies
     //*****************************************************************
+    cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
+    can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
+
     const Tracks svxPostracks( svTagInfo->vertexTracks(0) );
 
     if ( useTrackHistory_ && !isData_ ) {
@@ -3814,9 +3960,9 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat1.nHitsMax      = 50;
   cat1.chiMin        = 0;
   cat1.chiMax        = 5;
-   
+
   //cat 2
-  cat2.withFirstPixel = 1;  
+  cat2.withFirstPixel = 1;
   cat2.nPixelHitsMin = 4;
   cat2.nPixelHitsMax = 99;
   cat2.etaMin        = 0.;
@@ -3892,9 +4038,9 @@ void BTagAnalyzerT<IPTI,VTX>::beginJob() {
   cat7.nHitsMax      = 50;
   cat7.chiMin        = 0;
   cat7.chiMax        = 5;
- 
+
   //cat 8
-  cat8.withFirstPixel = 1;  
+  cat8.withFirstPixel = 1;
   cat8.nPixelHitsMin = 4;
   cat8.nPixelHitsMax = 99;
   cat8.etaMin        = 2.;

@@ -200,6 +200,12 @@ class JetInfoBranches {
     int   Jet_nFirstTrkEtaRelTagVarCSV[nMaxJets_];
     int   Jet_nLastTrkEtaRelTagVarCSV[nMaxJets_];
     float Jet_DeepDoubleB[nMaxJets_];
+    float Jet_DeepBoostedJetbbvsLight[nMaxJets_];
+    float Jet_DeepBoostedJetccvsLight[nMaxJets_];
+    float Jet_DeepBoostedJetTvsQCD[nMaxJets_];
+    float Jet_DeepBoostedJetZHccvsQCD[nMaxJets_];
+    float Jet_DeepBoostedJetWvsQCD[nMaxJets_];
+    float Jet_DeepBoostedJetZHbbvsQCD[nMaxJets_];
 
     int   nTrack;
     float Track_dxy[nMaxTrk_];
@@ -403,6 +409,90 @@ class JetInfoBranches {
     float DeepFlavourInput_sv_d3d[     nMaxJets_];
     float DeepFlavourInput_sv_d3dsig[  nMaxJets_];
     float DeepFlavourInput_sv_normchi2[nMaxJets_];
+
+    //DeepDoubleB input features selection
+    int   nTrkDeepDoubleB;
+    int   Jet_DeepDoubleB_nFirstTrkTagVar[nMaxJets_];
+    int   Jet_DeepDoubleB_nLastTrkTagVar[nMaxJets_];
+    float DeepDoubleBInput_charged_EtaRel[nMaxTrk_];
+    float DeepDoubleBInput_charged_PtRatio[nMaxTrk_];
+    float DeepDoubleBInput_charged_PParRatio[nMaxTrk_];
+    float DeepDoubleBInput_charged_Sip2dVal[nMaxTrk_];
+    float DeepDoubleBInput_charged_Sip2dSig[nMaxTrk_];
+    float DeepDoubleBInput_charged_Sip3dVal[nMaxTrk_];
+    float DeepDoubleBInput_charged_Sip3dSig[nMaxTrk_];
+    float DeepDoubleBInput_charged_JetDistVal[nMaxTrk_];
+    int   nSVDeepDoubleB;
+    int   Jet_DeepDoubleB_nFirstSVTagVar[nMaxJets_];
+    int   Jet_DeepDoubleB_nLastSVTagVar[nMaxJets_];
+    float DeepDoubleBInput_sv_d3d[nMaxSVs_];
+    float DeepDoubleBInput_sv_d3dsig[nMaxSVs_];
+
+    //DeepBoostedJet input features
+        int   nTrkDeepBoostedJet;
+        int   Jet_DeepBoostedJet_nFirstTrkTagVar[nMaxJets_];
+        int   Jet_DeepBoostedJet_nLastTrkTagVar[nMaxJets_];
+        float DeepBoostedJetInput_pf_puppiw[nMaxTrk_];
+        float DeepBoostedJetInput_pf_hcalFrac[nMaxTrk_];
+        float DeepBoostedJetInput_pf_VTX_ass[nMaxTrk_];
+        float DeepBoostedJetInput_pf_lostInnerHits[nMaxTrk_];
+        float DeepBoostedJetInput_pf_quality[nMaxTrk_];
+        float DeepBoostedJetInput_pf_charge[nMaxTrk_];
+        float DeepBoostedJetInput_pf_isEl[nMaxTrk_];
+        float DeepBoostedJetInput_pf_isMu[nMaxTrk_];
+        float DeepBoostedJetInput_pf_isChargedHad[nMaxTrk_];
+        float DeepBoostedJetInput_pf_isGamma[nMaxTrk_];
+        float DeepBoostedJetInput_pf_isNeutralHad[nMaxTrk_];
+        float DeepBoostedJetInput_pf_phirel[nMaxTrk_];
+        float DeepBoostedJetInput_pf_etarel[nMaxTrk_];
+        float DeepBoostedJetInput_pf_deltaR[nMaxTrk_];
+        float DeepBoostedJetInput_pf_abseta[nMaxTrk_];
+        float DeepBoostedJetInput_pf_ptrel_log[nMaxTrk_];
+        float DeepBoostedJetInput_pf_erel_log[nMaxTrk_];
+        float DeepBoostedJetInput_pf_pt_log[nMaxTrk_];
+        float DeepBoostedJetInput_pf_drminsv[nMaxTrk_];
+        float DeepBoostedJetInput_pf_drsubjet1[nMaxTrk_];
+        float DeepBoostedJetInput_pf_drsubjet2[nMaxTrk_];
+        float DeepBoostedJetInput_pf_normchi2[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dz[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dzsig[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dxy[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dxysig[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dptdpt[nMaxTrk_];
+        float DeepBoostedJetInput_pf_detadeta[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dphidphi[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dxydxy[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dzdz[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dxydz[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dphidxy[nMaxTrk_];
+        float DeepBoostedJetInput_pf_dlambdadz[nMaxTrk_];
+        float DeepBoostedJetInput_pf_btagEtaRel[nMaxTrk_];
+        float DeepBoostedJetInput_pf_btagPtRatio[nMaxTrk_];
+        float DeepBoostedJetInput_pf_btagPParRatio[nMaxTrk_];
+        float DeepBoostedJetInput_pf_btagSip2dVal[nMaxTrk_];
+        float DeepBoostedJetInput_pf_btagSip2dSig[nMaxTrk_];
+        float DeepBoostedJetInput_pf_btagSip3dVal[nMaxTrk_];
+        float DeepBoostedJetInput_pf_btagSip3dSig[nMaxTrk_];
+        float DeepBoostedJetInput_pf_btagJetDistVal[nMaxTrk_];
+        int   nSVDeepBoostedJet;
+        int   Jet_DeepBoostedJet_nFirstSVTagVar[nMaxJets_];
+        int   Jet_DeepBoostedJet_nLastSVTagVar[nMaxJets_];
+        float DeepBoostedJetInput_sv_phirel[nMaxSVs_];
+        float DeepBoostedJetInput_sv_etarel[nMaxSVs_];
+        float DeepBoostedJetInput_sv_deltaR[nMaxSVs_];
+        float DeepBoostedJetInput_sv_abseta[nMaxSVs_];
+        float DeepBoostedJetInput_sv_mass[nMaxSVs_];
+        float DeepBoostedJetInput_sv_ptrel_log[nMaxSVs_];
+        float DeepBoostedJetInput_sv_erel_log[nMaxSVs_];
+        float DeepBoostedJetInput_sv_pt_log[nMaxSVs_];
+        float DeepBoostedJetInput_sv_ntracks[nMaxSVs_];
+        float DeepBoostedJetInput_sv_normchi2[nMaxSVs_];
+        float DeepBoostedJetInput_sv_dxy[nMaxSVs_];
+        float DeepBoostedJetInput_sv_dxysig[nMaxSVs_];
+        float DeepBoostedJetInput_sv_d3d[nMaxSVs_];
+        float DeepBoostedJetInput_sv_d3dsig[nMaxSVs_];
+        float DeepBoostedJetInput_sv_costhetasvpv[nMaxSVs_];
+
 
     // CSV TaggingVariables
     // per jet
@@ -849,6 +939,90 @@ class JetInfoBranches {
       if(variableParser.isToBeStored(name+"DeepFlavourInput_sv_d3dsig")) tree->Branch((name+"DeepFlavourInput_sv_d3dsig"  ).c_str(), DeepFlavourInput_sv_d3dsig  , (name+"DeepFlavourInput_sv_d3dsig["  +name+"nJet]/F").c_str());
       if(variableParser.isToBeStored(name+"DeepFlavourInput_sv_normchi2")) tree->Branch((name+"DeepFlavourInput_sv_normchi2").c_str(), DeepFlavourInput_sv_normchi2, (name+"DeepFlavourInput_sv_normchi2["+name+"nJet]/F").c_str());
 
+	////// DeepDoubleB input variables
+	if(variableParser.isToBeStored(name+"nTrkDeepDoubleB")) tree->Branch((name+"nTrkDeepDoubleB").c_str()           ,&nTrkDeepDoubleB          ,(name+"nTrkDeepDoubleB/I").c_str());
+	if(variableParser.isToBeStored(name+"Jet_DeepDoubleB_nFirstTrkTagVar")) tree->Branch((name+"Jet_DeepDoubleB_nFirstTrkTagVar").c_str() ,Jet_DeepDoubleB_nFirstTrkTagVar  ,(name+"Jet_DeepDoubleB_nFirstTrkTagVar["+name+"nJet]/I").c_str() );
+	if(variableParser.isToBeStored(name+"Jet_DeepDoubleB_nLastTrkTagVar")) tree->Branch((name+"Jet_DeepDoubleB_nLastTrkTagVar").c_str()   ,Jet_DeepDoubleB_nLastTrkTagVar   ,(name+"Jet_DeepDoubleB_nLastTrack["+name+"nJet]/I").c_str()      );
+	if(variableParser.isToBeStored(name+"DeepDoubleBInput_charged_EtaRel")) tree->Branch((name+"DeepDoubleBInput_charged_EtaRel").c_str(), DeepDoubleBInput_charged_EtaRel, (name+"DeepDoubleBInput_charged_EtaRel["+name+"nTrkDeepDoubleB]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepDoubleBInput_charged_PtRatio")) tree->Branch((name+"DeepDoubleBInput_charged_PtRatio").c_str(), DeepDoubleBInput_charged_PtRatio, (name+"DeepDoubleBInput_charged_PtRatio["+name+"nTrkDeepDoubleB]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepDoubleBInput_charged_PParRatio")) tree->Branch((name+"DeepDoubleBInput_charged_PParRatio").c_str(), DeepDoubleBInput_charged_PParRatio, (name+"DeepDoubleBInput_charged_PParRatio["+name+"nTrkDeepDoubleB]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepDoubleBInput_charged_Sip2dVal")) tree->Branch((name+"DeepDoubleBInput_charged_Sip2dVal").c_str(), DeepDoubleBInput_charged_Sip2dVal, (name+"DeepDoubleBInput_charged_Sip2dVal["+name+"nTrkDeepDoubleB]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepDoubleBInput_charged_Sip2dSig")) tree->Branch((name+"DeepDoubleBInput_charged_Sip2dSig").c_str(), DeepDoubleBInput_charged_Sip2dSig, (name+"DeepDoubleBInput_charged_Sip2dSig["+name+"nTrkDeepDoubleB]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepDoubleBInput_charged_Sip3dVal")) tree->Branch((name+"DeepDoubleBInput_charged_Sip3dVal").c_str(), DeepDoubleBInput_charged_Sip3dVal, (name+"DeepDoubleBInput_charged_Sip3dVal["+name+"nTrkDeepDoubleB]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepDoubleBInput_charged_Sip3dSig")) tree->Branch((name+"DeepDoubleBInput_charged_Sip3dSig").c_str(), DeepDoubleBInput_charged_Sip3dSig, (name+"DeepDoubleBInput_charged_Sip3dSig["+name+"nTrkDeepDoubleB]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepDoubleBInput_charged_JetDistVal")) tree->Branch((name+"DeepDoubleBInput_charged_JetDistVal").c_str(), DeepDoubleBInput_charged_JetDistVal, (name+"DeepDoubleBInput_charged_JetDistVal["+name+"nTrkDeepDoubleB]/F").c_str());
+
+	if(variableParser.isToBeStored(name+"nSVDeepDoubleB")) tree->Branch((name+"nSVDeepDoubleB").c_str()           ,&nSVDeepDoubleB          ,(name+"nSVDeepDoubleB/I").c_str());
+	if(variableParser.isToBeStored(name+"Jet_DeepDoubleB_nFirstSVTagVar")) tree->Branch((name+"Jet_DeepDoubleB_nFirstSVTagVar").c_str()   ,Jet_DeepDoubleB_nFirstSVTagVar   ,(name+"Jet_DeepDoubleB_nFirstSVTagVar["+name+"nJet]/I").c_str()  );
+	if(variableParser.isToBeStored(name+"Jet_DeepDoubleB_nLastSVTagVar")) tree->Branch((name+"Jet_DeepDoubleB_nLastSVTagVar").c_str()    ,Jet_DeepDoubleB_nLastSVTagVar    ,(name+"Jet_DeepDoubleB_nLastSVTagVar["+name+"nJet]/I").c_str()   );
+	if(variableParser.isToBeStored(name+"DeepDoubleBInput_sv_d3d")) tree->Branch((name+"DeepDoubleBInput_sv_d3d").c_str()	, DeepDoubleBInput_sv_d3d, (name+"DeepDoubleBInput_sv_d3d["+name+"nSVDeepDoubleB]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepDoubleBInput_sv_d3dsig")) tree->Branch((name+"DeepDoubleBInput_sv_d3dsig").c_str(), DeepDoubleBInput_sv_d3dsig, (name+"DeepDoubleBInput_sv_d3dsig["+name+"nSVDeepDoubleB]/F").c_str());
+
+	////// DeepBoostedJet
+	//
+        if(variableParser.isToBeStored(name+"nTrkDeepBoostedJet")) tree->Branch((name+"nTrkDeepBoostedJet").c_str()           ,&nTrkDeepBoostedJet          ,(name+"nTrkDeepBoostedJet/I").c_str());
+        if(variableParser.isToBeStored(name+"Jet_DeepBoostedJet_nFirstTrkTagVar")) tree->Branch((name+"Jet_DeepBoostedJet_nFirstTrkTagVar").c_str() ,Jet_DeepBoostedJet_nFirstTrkTagVar  ,(name+"Jet_DeepBoostedJet_nFirstTrkTagVar["+name+"nJet]/I").c_str() );
+        if(variableParser.isToBeStored(name+"Jet_DeepBoostedJet_nLastTrkTagVar")) tree->Branch((name+"Jet_DeepBoostedJet_nLastTrkTagVar").c_str()   ,Jet_DeepBoostedJet_nLastTrkTagVar   ,(name+"Jet_DeepBoostedJet_nLastTrack["+name+"nJet]/I").c_str()      );
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_puppiw")) tree->Branch((name+"DeepBoostedJetInput_pf_puppiw").c_str(), DeepBoostedJetInput_pf_puppiw, (name+"DeepBoostedJetInput_pf_puppiw["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_hcalFrac")) tree->Branch((name+"DeepBoostedJetInput_pf_hcalFrac").c_str(), DeepBoostedJetInput_pf_hcalFrac, (name+"DeepBoostedJetInput_pf_hcalFrac["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_VTX_ass")) tree->Branch((name+"DeepBoostedJetInput_pf_VTX_ass").c_str(), DeepBoostedJetInput_pf_VTX_ass, (name+"DeepBoostedJetInput_pf_VTX_ass["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_lostInnerHits")) tree->Branch((name+"DeepBoostedJetInput_pf_lostInnerHits").c_str(), DeepBoostedJetInput_pf_lostInnerHits, (name+"DeepBoostedJetInput_pf_lostInnerHits["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_quality")) tree->Branch((name+"DeepBoostedJetInput_pf_quality").c_str(), DeepBoostedJetInput_pf_quality, (name+"DeepBoostedJetInput_pf_quality["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_charge")) tree->Branch((name+"DeepBoostedJetInput_pf_charge").c_str(), DeepBoostedJetInput_pf_charge, (name+"DeepBoostedJetInput_pf_charge["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_isEl")) tree->Branch((name+"DeepBoostedJetInput_pf_isEl").c_str(), DeepBoostedJetInput_pf_isEl, (name+"DeepBoostedJetInput_pf_isEl["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_isMu")) tree->Branch((name+"DeepBoostedJetInput_pf_isMu").c_str(), DeepBoostedJetInput_pf_isMu, (name+"DeepBoostedJetInput_pf_isMu["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_isChargedHad")) tree->Branch((name+"DeepBoostedJetInput_pf_isChargedHad").c_str(), DeepBoostedJetInput_pf_isChargedHad, (name+"DeepBoostedJetInput_pf_isChargedHad["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_isGamma")) tree->Branch((name+"DeepBoostedJetInput_pf_isGamma").c_str(), DeepBoostedJetInput_pf_isGamma, (name+"DeepBoostedJetInput_pf_isGamma["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_isNeutralHad")) tree->Branch((name+"DeepBoostedJetInput_pf_isNeutralHad").c_str(), DeepBoostedJetInput_pf_isNeutralHad, (name+"DeepBoostedJetInput_pf_isNeutralHad["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_phirel")) tree->Branch((name+"DeepBoostedJetInput_pf_phirel").c_str(), DeepBoostedJetInput_pf_phirel, (name+"DeepBoostedJetInput_pf_phirel["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_etarel")) tree->Branch((name+"DeepBoostedJetInput_pf_etarel").c_str(), DeepBoostedJetInput_pf_etarel, (name+"DeepBoostedJetInput_pf_etarel["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_deltaR")) tree->Branch((name+"DeepBoostedJetInput_pf_deltaR").c_str(), DeepBoostedJetInput_pf_deltaR, (name+"DeepBoostedJetInput_pf_deltaR["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_abseta")) tree->Branch((name+"DeepBoostedJetInput_pf_abseta").c_str(), DeepBoostedJetInput_pf_abseta, (name+"DeepBoostedJetInput_pf_abseta["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_ptrel_log")) tree->Branch((name+"DeepBoostedJetInput_pf_ptrel_log").c_str(), DeepBoostedJetInput_pf_ptrel_log, (name+"DeepBoostedJetInput_pf_ptrel_log["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_erel_log")) tree->Branch((name+"DeepBoostedJetInput_pf_erel_log").c_str(), DeepBoostedJetInput_pf_erel_log, (name+"DeepBoostedJetInput_pf_erel_log["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_pt_log")) tree->Branch((name+"DeepBoostedJetInput_pf_pt_log").c_str(), DeepBoostedJetInput_pf_pt_log, (name+"DeepBoostedJetInput_pf_pt_log["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_drminsv")) tree->Branch((name+"DeepBoostedJetInput_pf_drminsv").c_str(), DeepBoostedJetInput_pf_drminsv, (name+"DeepBoostedJetInput_pf_drminsv["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_drsubjet1")) tree->Branch((name+"DeepBoostedJetInput_pf_drsubjet1").c_str(), DeepBoostedJetInput_pf_drsubjet1, (name+"DeepBoostedJetInput_pf_drsubjet1["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_drsubjet2")) tree->Branch((name+"DeepBoostedJetInput_pf_drsubjet2").c_str(), DeepBoostedJetInput_pf_drsubjet2, (name+"DeepBoostedJetInput_pf_drsubjet2["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_normchi2")) tree->Branch((name+"DeepBoostedJetInput_pf_normchi2").c_str(), DeepBoostedJetInput_pf_normchi2, (name+"DeepBoostedJetInput_pf_normchi2["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_dz")) tree->Branch((name+"DeepBoostedJetInput_pf_dz").c_str(), DeepBoostedJetInput_pf_dz, (name+"DeepBoostedJetInput_pf_dz["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_dzsig")) tree->Branch((name+"DeepBoostedJetInput_pf_dzsig").c_str(), DeepBoostedJetInput_pf_dzsig, (name+"DeepBoostedJetInput_pf_dzsig["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_dxy")) tree->Branch((name+"DeepBoostedJetInput_pf_dxy").c_str(), DeepBoostedJetInput_pf_dxy, (name+"DeepBoostedJetInput_pf_dxy["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_dxysig")) tree->Branch((name+"DeepBoostedJetInput_pf_dxysig").c_str(), DeepBoostedJetInput_pf_dxysig, (name+"DeepBoostedJetInput_pf_dxysig["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_dptdpt")) tree->Branch((name+"DeepBoostedJetInput_pf_dptdpt").c_str(), DeepBoostedJetInput_pf_dptdpt, (name+"DeepBoostedJetInput_pf_dptdpt["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_detadeta")) tree->Branch((name+"DeepBoostedJetInput_pf_detadeta").c_str(), DeepBoostedJetInput_pf_detadeta, (name+"DeepBoostedJetInput_pf_detadeta["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_dphidphi")) tree->Branch((name+"DeepBoostedJetInput_pf_dphidphi").c_str(), DeepBoostedJetInput_pf_dphidphi, (name+"DeepBoostedJetInput_pf_dphidphi["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_dxydxy")) tree->Branch((name+"DeepBoostedJetInput_pf_dxydxy").c_str(), DeepBoostedJetInput_pf_dxydxy, (name+"DeepBoostedJetInput_pf_dxydxy["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_dlambdadz")) tree->Branch((name+"DeepBoostedJetInput_pf_dlambdadz").c_str(), DeepBoostedJetInput_pf_dlambdadz, (name+"DeepBoostedJetInput_pf_dlambdadz["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_btagEtaRel")) tree->Branch((name+"DeepBoostedJetInput_pf_btagEtaRel").c_str(), DeepBoostedJetInput_pf_btagEtaRel, (name+"DeepBoostedJetInput_pf_btagEtaRel["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_btagPtRatio")) tree->Branch((name+"DeepBoostedJetInput_pf_btagPtRatio").c_str(), DeepBoostedJetInput_pf_btagPtRatio, (name+"DeepBoostedJetInput_pf_btagPtRatio["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_btagPParRatio")) tree->Branch((name+"DeepBoostedJetInput_pf_btagPParRatio").c_str(), DeepBoostedJetInput_pf_btagPParRatio, (name+"DeepBoostedJetInput_pf_btagPParRatio["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_btagSip2dVal")) tree->Branch((name+"DeepBoostedJetInput_pf_btagSip2dVal").c_str(), DeepBoostedJetInput_pf_btagSip2dVal, (name+"DeepBoostedJetInput_pf_btagSip2dVal["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_btagSip2dSig")) tree->Branch((name+"DeepBoostedJetInput_pf_btagSip2dSig").c_str(), DeepBoostedJetInput_pf_btagSip2dSig, (name+"DeepBoostedJetInput_pf_btagSip2dSig["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_btagSip3dVal")) tree->Branch((name+"DeepBoostedJetInput_pf_btagSip3dVal").c_str(), DeepBoostedJetInput_pf_btagSip3dVal, (name+"DeepBoostedJetInput_pf_btagSip3dVal["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_btagSip3dSig")) tree->Branch((name+"DeepBoostedJetInput_pf_btagSip3dSig").c_str(), DeepBoostedJetInput_pf_btagSip3dSig, (name+"DeepBoostedJetInput_pf_btagSip3dSig["+name+"nTrkDeepBoostedJet]/F").c_str());
+        if(variableParser.isToBeStored(name+"DeepBoostedJetInput_pf_btagJetDistVal")) tree->Branch((name+"DeepBoostedJetInput_pf_btagJetDistVal").c_str(), DeepBoostedJetInput_pf_btagJetDistVal, (name+"DeepBoostedJetInput_pf_btagJetDistVal["+name+"nTrkDeepBoostedJet]/F").c_str());
+
+	if(variableParser.isToBeStored(name+"nSVDeepBoostedJet")) tree->Branch((name+"nSVDeepBoostedJet").c_str()           ,&nSVDeepBoostedJet          ,(name+"nSVDeepBoostedJet/I").c_str());
+	if(variableParser.isToBeStored(name+"Jet_DeepBoostedJet_nFirstSVTagVar")) tree->Branch((name+"Jet_DeepBoostedJet_nFirstSVTagVar").c_str()   ,Jet_DeepBoostedJet_nFirstSVTagVar   ,(name+"Jet_DeepBoostedJet_nFirstSVTagVar["+name+"nJet]/I").c_str()  );
+	if(variableParser.isToBeStored(name+"Jet_DeepBoostedJet_nLastSVTagVar")) tree->Branch((name+"Jet_DeepBoostedJet_nLastSVTagVar").c_str()    ,Jet_DeepBoostedJet_nLastSVTagVar    ,(name+"Jet_DeepBoostedJet_nLastSVTagVar["+name+"nJet]/I").c_str()   );
+	if(variableParser.isToBeStored(name+"DeepBoostedJetInput_sv_phirel")) tree->Branch((name+"DeepBoostedJetInput_sv_phirel").c_str()	, DeepBoostedJetInput_sv_phirel, (name+"DeepBoostedJetInput_sv_phirel["+name+"nSVDeepBoostedJet]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepBoostedJetInput_sv_etarel")) tree->Branch((name+"DeepBoostedJetInput_sv_etarel").c_str()	, DeepBoostedJetInput_sv_etarel, (name+"DeepBoostedJetInput_sv_etarel["+name+"nSVDeepBoostedJet]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepBoostedJetInput_sv_deltaR")) tree->Branch((name+"DeepBoostedJetInput_sv_deltaR").c_str()	, DeepBoostedJetInput_sv_deltaR, (name+"DeepBoostedJetInput_sv_deltaR["+name+"nSVDeepBoostedJet]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepBoostedJetInput_sv_abseta")) tree->Branch((name+"DeepBoostedJetInput_sv_abseta").c_str()	, DeepBoostedJetInput_sv_abseta, (name+"DeepBoostedJetInput_sv_abseta["+name+"nSVDeepBoostedJet]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepBoostedJetInput_sv_mass")) tree->Branch((name+"DeepBoostedJetInput_sv_mass").c_str()	, DeepBoostedJetInput_sv_mass, (name+"DeepBoostedJetInput_sv_mass["+name+"nSVDeepBoostedJet]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepBoostedJetInput_sv_ptrel_log")) tree->Branch((name+"DeepBoostedJetInput_sv_ptrel_log").c_str()	, DeepBoostedJetInput_sv_ptrel_log, (name+"DeepBoostedJetInput_sv_ptrel_log["+name+"nSVDeepBoostedJet]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepBoostedJetInput_sv_erel_log")) tree->Branch((name+"DeepBoostedJetInput_sv_erel_log").c_str()	, DeepBoostedJetInput_sv_erel_log, (name+"DeepBoostedJetInput_sv_erel_log["+name+"nSVDeepBoostedJet]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepBoostedJetInput_sv_pt_log")) tree->Branch((name+"DeepBoostedJetInput_sv_pt_log").c_str()	, DeepBoostedJetInput_sv_pt_log, (name+"DeepBoostedJetInput_sv_pt_log["+name+"nSVDeepBoostedJet]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepBoostedJetInput_sv_ntracks")) tree->Branch((name+"DeepBoostedJetInput_sv_ntracks").c_str()	, DeepBoostedJetInput_sv_ntracks, (name+"DeepBoostedJetInput_sv_ntracks["+name+"nSVDeepBoostedJet]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepBoostedJetInput_sv_normchi2")) tree->Branch((name+"DeepBoostedJetInput_sv_normchi2").c_str()	, DeepBoostedJetInput_sv_normchi2, (name+"DeepBoostedJetInput_sv_normchi2["+name+"nSVDeepBoostedJet]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepBoostedJetInput_sv_dxy")) tree->Branch((name+"DeepBoostedJetInput_sv_dxy").c_str()	, DeepBoostedJetInput_sv_dxy, (name+"DeepBoostedJetInput_sv_dxy["+name+"nSVDeepBoostedJet]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepBoostedJetInput_sv_dxysig")) tree->Branch((name+"DeepBoostedJetInput_sv_dxysig").c_str()	, DeepBoostedJetInput_sv_dxysig, (name+"DeepBoostedJetInput_sv_dxysig["+name+"nSVDeepBoostedJet]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepBoostedJetInput_sv_d3d")) tree->Branch((name+"DeepBoostedJetInput_sv_d3d").c_str()	, DeepBoostedJetInput_sv_d3d, (name+"DeepBoostedJetInput_sv_d3d["+name+"nSVDeepBoostedJet]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepBoostedJetInput_sv_d3dsig")) tree->Branch((name+"DeepBoostedJetInput_sv_d3dsig").c_str()	, DeepBoostedJetInput_sv_d3dsig, (name+"DeepBoostedJetInput_sv_d3dsig["+name+"nSVDeepBoostedJet]/F").c_str());
+	if(variableParser.isToBeStored(name+"DeepBoostedJetInput_sv_costhetasvpv")) tree->Branch((name+"DeepBoostedJetInput_sv_costhetasvpv").c_str()	, DeepBoostedJetInput_sv_costhetasvpv, (name+"DeepBoostedJetInput_sv_costhetasvpv["+name+"nSVDeepBoostedJet]/F").c_str());
+
+
       //--------------------------------------
       // CSV TaggingVariables
       //--------------------------------------
@@ -1002,6 +1176,12 @@ class JetInfoBranches {
       if(variableParser.isToBeStored(name+"Jet_tau2_vertexNTracks")) tree->Branch((name+"Jet_tau2_vertexNTracks").c_str(),           Jet_tau2_vertexNTracks           ,(name+"Jet_tau2_vertexNTracks["+name+"nJet]/F").c_str()           );
       if(variableParser.isToBeStored(name+"Jet_DoubleSV")) tree->Branch((name+"Jet_DoubleSV").c_str(),         Jet_DoubleSV         ,(name+"Jet_DoubleSV["+name+"nJet]/F").c_str());
       if(variableParser.isToBeStored(name+"Jet_DeepDoubleB")) tree->Branch((name+"Jet_DeepDoubleB").c_str(),      Jet_DeepDoubleB      ,(name+"Jet_DeepDoubleB["+name+"nJet]/F").c_str());
+      if(variableParser.isToBeStored(name+"Jet_DeepBoostedJetbbvsLight")) tree->Branch((name+"Jet_DeepBoostedJetbbvsLight").c_str(),      Jet_DeepBoostedJetbbvsLight      ,(name+"Jet_DeepBoostedJetbbvsLight["+name+"nJet]/F").c_str());
+      if(variableParser.isToBeStored(name+"Jet_DeepBoostedJetccvsLight")) tree->Branch((name+"Jet_DeepBoostedJetccvsLight").c_str(),      Jet_DeepBoostedJetccvsLight      ,(name+"Jet_DeepBoostedJetccvsLight["+name+"nJet]/F").c_str());
+      if(variableParser.isToBeStored(name+"Jet_DeepBoostedJetTvsQCD")) tree->Branch((name+"Jet_DeepBoostedJetTvsQCD").c_str(),      Jet_DeepBoostedJetTvsQCD      ,(name+"Jet_DeepBoostedJetTvsQCD["+name+"nJet]/F").c_str());
+      if(variableParser.isToBeStored(name+"Jet_DeepBoostedJetZHccvsQCD")) tree->Branch((name+"Jet_DeepBoostedJetZHccvsQCD").c_str(),      Jet_DeepBoostedJetZHccvsQCD      ,(name+"Jet_DeepBoostedJetZHccvsQCD["+name+"nJet]/F").c_str());
+      if(variableParser.isToBeStored(name+"Jet_DeepBoostedJetWvsQCD")) tree->Branch((name+"Jet_DeepBoostedJetWvsQCD").c_str(),      Jet_DeepBoostedJetWvsQCD      ,(name+"Jet_DeepBoostedJetWvsQCD["+name+"nJet]/F").c_str());
+      if(variableParser.isToBeStored(name+"Jet_DeepBoostedJetZHbbvsQCD")) tree->Branch((name+"Jet_DeepBoostedJetZHbbvsQCD").c_str(),      Jet_DeepBoostedJetZHbbvsQCD      ,(name+"Jet_DeepBoostedJetZHbbvsQCD["+name+"nJet]/F").c_str());
 
 
       if(variableParser.isToBeStored(name+"Track_lengthTau")) tree->Branch((name+"Track_lengthTau").c_str()     ,Track_lengthTau       ,(name+"Track_lengthTau["+name+"nTrack]/F").c_str());
