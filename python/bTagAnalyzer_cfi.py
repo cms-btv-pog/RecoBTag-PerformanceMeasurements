@@ -1,7 +1,11 @@
 import FWCore.ParameterSet.Config as cms
 from RecoBTag.PerformanceMeasurements.bTagAnalyzerCommon_cff import *
+from RecoBTag.PerformanceMeasurements.variables_cfi import *
+from RecoBTag.PerformanceMeasurements.varGroups_cfi import *
 bTagAnalyzer = cms.EDAnalyzer("BTagAnalyzer",
     bTagAnalyzerCommon,
+    variableSet,
+    groupSet,
     # computers
     svComputer = cms.string('candidateCombinedSecondaryVertexV2Computer'),
     svComputerSubJets = cms.string('candidateCombinedSecondaryVertexV2Computer'),
@@ -20,10 +24,11 @@ bTagAnalyzer = cms.EDAnalyzer("BTagAnalyzer",
     softPFMuonTagInfosCTag = cms.string('softPFMuons'),
     softPFElectronTagInfosCTag = cms.string('softPFElectrons'),
     # taggers
-		deepFlavourJetTags = cms.string(''),#pfDeepFlavourJetTags'),
-		deepCSVBJetTags    = cms.string('pfDeepCSVJetTags'),
-		deepCSVNegBJetTags = cms.string('pfNegativeDeepCSVJetTags'),
-	  deepCSVPosBJetTags = cms.string('pfPositiveDeepCSVJetTags'),
+    deepFlavourJetTags = cms.string('pfDeepFlavourJetTags'),
+    deepFlavourNegJetTags = cms.string('pfNegativeDeepFlavourJetTags'),
+    deepCSVBJetTags    = cms.string('pfDeepCSVJetTags'),
+    deepCSVNegBJetTags = cms.string('pfNegativeDeepCSVJetTags'),
+    deepCSVPosBJetTags = cms.string('pfPositiveDeepCSVJetTags'),
     trackCHEBJetTags = cms.string('pfTrackCountingHighEffBJetTags'),
     trackCNegHEBJetTags = cms.string('pfNegativeTrackCountingHighEffBJetTags'),
     trackCHPBJetTags = cms.string('pfTrackCountingHighPurBJetTags'),
@@ -51,6 +56,7 @@ bTagAnalyzer = cms.EDAnalyzer("BTagAnalyzer",
     softPFElectronNegBJetTags = cms.string('negativeSoftPFElectronBJetTags'),
     softPFElectronPosBJetTags = cms.string('positiveSoftPFElectronBJetTags'),
     doubleSVBJetTags = cms.string('pfBoostedDoubleSecondaryVertexAK8BJetTags'),
+    deepDoubleBJetTags = cms.string('pfDeepDoubleBJetTags:probH'),
     cMVABJetTags = cms.string('pfCombinedMVABJetTags'),
     cMVAv2BJetTags = cms.string('pfCombinedMVAV2BJetTags'),
     cMVAv2NegBJetTags = cms.string('pfNegativeCombinedMVAV2BJetTags'),

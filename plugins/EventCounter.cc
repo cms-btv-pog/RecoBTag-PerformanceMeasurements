@@ -33,6 +33,9 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+
 #include "TH1D.h"
 //
 // class declaration
@@ -58,8 +61,13 @@ class EventCounter : public edm::EDAnalyzer {
 
       // ----------member data ---------------------------
       edm::Service<TFileService> fs;
+      edm::EDGetTokenT<GenEventInfoProduct> generator;
+      edm::EDGetTokenT<std::vector<PileupSummaryInfo>> putoken;
+      edm::EDGetTokenT<std::vector<PileupSummaryInfo>> putokenmini;
 
       TH1D *hEventCount;
+      TH1D *hPUPlusCount;
+      TH1D *hPUNegCount;
 };
 
 //
@@ -74,10 +82,14 @@ class EventCounter : public edm::EDAnalyzer {
 // constructors and destructor
 //
 EventCounter::EventCounter(const edm::ParameterSet& iConfig)
-
 {
+   generator = consumes<GenEventInfoProduct>(edm::InputTag("generator"));
+   putoken = consumes<std::vector<PileupSummaryInfo>>(edm::InputTag("addPileupInfo"));
+   putokenmini = consumes<std::vector<PileupSummaryInfo>>(edm::InputTag("slimmedAddPileupInfo"));
    //now do what ever initialization is needed
-   hEventCount = fs->make<TH1D>("hEventCount","Even Count", 1, -0.5, 0.5);
+   hEventCount = fs->make<TH1D>("hEventCount","Event Count", 1, -0.5, 0.5);
+   hPUPlusCount = fs->make<TH1D>("hPUPlusCount","PU Plus Count", 100, 0, 100);
+   hPUNegCount  = fs->make<TH1D>("hPUNegCount", "PU Neg Count",  100, 0, 100);
 }
 
 
@@ -99,6 +111,38 @@ void
 EventCounter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    hEventCount->Fill(0.);
+   if(!iEvent.isRealData()){
+      edm::Handle<GenEventInfoProduct> geninfos;
+      iEvent.getByToken( generator,geninfos );
+      int weightSign=1;
+      if(geninfos->weight()<0){
+         weightSign=-1;
+      }
+      
+      // pileup
+      edm::Handle<std::vector <PileupSummaryInfo> > PupInfo;
+      bool checkPUname = iEvent.getByToken(putoken, PupInfo);
+
+      if (checkPUname){
+          iEvent.getByToken(putoken, PupInfo);
+      } else{
+          iEvent.getByToken(putokenmini, PupInfo);
+      }
+      float nPUtrue=-1;
+      std::vector<PileupSummaryInfo>::const_iterator ipu;
+      for (ipu = PupInfo->begin(); ipu != PupInfo->end(); ++ipu) {
+          if ( ipu->getBunchCrossing() != 0 ) continue; //only for the active BX
+          nPUtrue = ipu->getTrueNumInteractions();      
+          break;
+      }
+
+
+      if(weightSign>0){
+          hPUPlusCount->Fill(nPUtrue);
+      } else {
+          hPUNegCount->Fill(nPUtrue);
+      }  
+   }
 }
 
 
