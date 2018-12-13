@@ -44,7 +44,7 @@ The new variable configuration can be customized in the file ```RecoBTag/Perform
 New variables need also to be added (apart from adding them in the code) in ```RecoBTag/PerformanceMeasurements/python/variables_cfi.py```
 
 ### To run DeepDoubleX
-  * While the PR is merged in the main code:
+  * While the PR is merged in the main code, man can download deepDoubleX:
 ~~~
 git cms-merge-topic  andrzejnovak:94Xpr
 git cms-addpkg RecoBTag/Combined

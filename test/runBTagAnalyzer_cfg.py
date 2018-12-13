@@ -639,7 +639,20 @@ bTagInfosFat += ([] if options.useLegacyTaggers else ['pfDeepDoubleXTagInfos'])
 bTagDiscriminators_no_deepFlavour = {i for i in bTagDiscriminators if 'DeepFlavourJetTags' not in i}
 bTagDiscriminatorsFat = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
 ## Add DeepDoubleX tagger to fat jets
-bTagDiscriminatorsFat.update(set(['pfDeepDoubleBJetTags:probH']))
+bTagDiscriminatorsFat.update(set([
+	'pfDeepDoubleBvLJetTags:probQCD',
+	'pfDeepDoubleBvLJetTags:probHbb',
+	'pfDeepDoubleCvLJetTags:probQCD',
+	'pfDeepDoubleCvLJetTags:probHcc',
+	'pfDeepDoubleCvBJetTags:probHbb',
+	'pfDeepDoubleCvBJetTags:probHcc',
+	'pfMassIndependentDeepDoubleBvLJetTags:probQCD',
+	'pfMassIndependentDeepDoubleBvLJetTags:probHbb',
+	'pfMassIndependentDeepDoubleCvLJetTags:probQCD',
+	'pfMassIndependentDeepDoubleCvLJetTags:probHcc',
+	'pfMassIndependentDeepDoubleCvBJetTags:probHbb',
+	'pfMassIndependentDeepDoubleCvBJetTags:probHcc',
+]))
 ## Add DeepBoostedJet discriminators 
 from RecoBTag.MXNet.pfDeepBoostedJet_cff import _pfMassDecorrelatedDeepBoostedJetTagsProbs, _pfMassDecorrelatedDeepBoostedJetTagsMetaDiscrs
 bTagDiscriminatorsFat.update(set([

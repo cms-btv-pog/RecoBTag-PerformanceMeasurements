@@ -334,6 +334,7 @@ private:
 
   std::string doubleSVBJetTags_;
   std::string deepDoubleXJetTags_;
+  std::string massIndDeepDoubleXJetTags_;
   std::string deepBoostedJetTags_;
 
   std::string cMVABJetTags_;
@@ -666,6 +667,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
 
   doubleSVBJetTags_ = iConfig.getParameter<std::string>("doubleSVBJetTags");
   deepDoubleXJetTags_ = iConfig.getParameter<std::string>("deepDoubleXJetTags");
+  massIndDeepDoubleXJetTags_ = iConfig.getParameter<std::string>("massIndDeepDoubleXJetTags");
   deepBoostedJetTags_ = iConfig.getParameter<std::string>("deepBoostedJetTags");
 
   cMVABJetTags_ = iConfig.getParameter<std::string>("cMVABJetTags");
@@ -2747,8 +2749,22 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 //     float SoftEP = pjet->bDiscriminator(softPFElectronPosBJetTags_.c_str());
 
     float DoubleSV = pjet->bDiscriminator(doubleSVBJetTags_.c_str());
-    float DeepDoubleX = pjet->bDiscriminator(deepDoubleXJetTags_.c_str());
 
+	// DeepDoubleX discriminators
+    float deepDoubleBvLQCD = (deepDoubleXJetTags_.size()) ? pjet->bDiscriminator((deepDoubleXJetTags_+"BvLJetTags:probQCD"   ).c_str()) : -10;
+    float deepDoubleBvLHbb = (deepDoubleXJetTags_.size()) ? pjet->bDiscriminator((deepDoubleXJetTags_+"BvLJetTags:probHbb"   ).c_str()) : -10;
+    float deepDoubleCvLQCD = (deepDoubleXJetTags_.size()) ? pjet->bDiscriminator((deepDoubleXJetTags_+"CvLJetTags:probQCD"   ).c_str()) : -10;
+    float deepDoubleCvLHcc = (deepDoubleXJetTags_.size()) ? pjet->bDiscriminator((deepDoubleXJetTags_+"CvLJetTags:probHcc"   ).c_str()) : -10;
+    float deepDoubleCvBHcc = (deepDoubleXJetTags_.size()) ? pjet->bDiscriminator((deepDoubleXJetTags_+"CvBJetTags:probHcc"   ).c_str()) : -10;
+    float deepDoubleCvBHbb = (deepDoubleXJetTags_.size()) ? pjet->bDiscriminator((deepDoubleXJetTags_+"CvBJetTags:probHbb"   ).c_str()) : -10;
+    float massIndDeepDoubleBvLQCD = (massIndDeepDoubleXJetTags_.size()) ? pjet->bDiscriminator((massIndDeepDoubleXJetTags_+"BvLJetTags:probQCD"   ).c_str()) : -10;
+    float massIndDeepDoubleBvLHbb = (massIndDeepDoubleXJetTags_.size()) ? pjet->bDiscriminator((massIndDeepDoubleXJetTags_+"BvLJetTags:probHbb"   ).c_str()) : -10;
+    float massIndDeepDoubleCvLQCD = (massIndDeepDoubleXJetTags_.size()) ? pjet->bDiscriminator((massIndDeepDoubleXJetTags_+"CvLJetTags:probQCD"   ).c_str()) : -10;
+    float massIndDeepDoubleCvLHcc = (massIndDeepDoubleXJetTags_.size()) ? pjet->bDiscriminator((massIndDeepDoubleXJetTags_+"CvLJetTags:probHcc"   ).c_str()) : -10;
+    float massIndDeepDoubleCvBHcc = (massIndDeepDoubleXJetTags_.size()) ? pjet->bDiscriminator((massIndDeepDoubleXJetTags_+"CvBJetTags:probHcc"   ).c_str()) : -10;
+    float massIndDeepDoubleCvBHbb = (massIndDeepDoubleXJetTags_.size()) ? pjet->bDiscriminator((massIndDeepDoubleXJetTags_+"CvBJetTags:probHbb"   ).c_str()) : -10;
+
+	// DeepBoostedJet discriminators 
     float deepBoostedJetbbvsLight   = (deepBoostedJetTags_.size()) ? pjet->bDiscriminator((deepBoostedJetTags_+":bbvsLight"   ).c_str()) : -10;
     float deepBoostedJetccvsLight   = (deepBoostedJetTags_.size()) ? pjet->bDiscriminator((deepBoostedJetTags_+":ccvsLight"   ).c_str()) : -10;
     float deepBoostedJetTvsQCD   = (deepBoostedJetTags_.size()) ? pjet->bDiscriminator((deepBoostedJetTags_+":TvsQCD"   ).c_str()) : -10;
@@ -2832,7 +2848,19 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 //     JetInfo[iJetColl].Jet_SoftElP[JetInfo[iJetColl].nJet]  = SoftEP;
     JetInfo[iJetColl].Jet_SoftEl[JetInfo[iJetColl].nJet]   = SoftE;
     JetInfo[iJetColl].Jet_DoubleSV[JetInfo[iJetColl].nJet] = DoubleSV;
-    JetInfo[iJetColl].Jet_DeepDoubleX[JetInfo[iJetColl].nJet] = DeepDoubleX;
+    // DeepDoubleX probabilities
+    JetInfo[iJetColl].Jet_DeepDoubleBvLQCD[JetInfo[iJetColl].nJet] = deepDoubleBvLQCD;
+    JetInfo[iJetColl].Jet_DeepDoubleBvLHbb[JetInfo[iJetColl].nJet] = deepDoubleBvLHbb;
+    JetInfo[iJetColl].Jet_DeepDoubleCvLQCD[JetInfo[iJetColl].nJet] = deepDoubleCvLQCD;
+    JetInfo[iJetColl].Jet_DeepDoubleCvLHcc[JetInfo[iJetColl].nJet] = deepDoubleCvLHcc;
+    JetInfo[iJetColl].Jet_DeepDoubleCvBHcc[JetInfo[iJetColl].nJet] = deepDoubleCvBHcc;
+    JetInfo[iJetColl].Jet_DeepDoubleCvBHbb[JetInfo[iJetColl].nJet] = deepDoubleCvBHbb;
+    JetInfo[iJetColl].Jet_MassIndDeepDoubleBvLQCD[JetInfo[iJetColl].nJet] = massIndDeepDoubleBvLQCD;
+    JetInfo[iJetColl].Jet_MassIndDeepDoubleBvLHbb[JetInfo[iJetColl].nJet] = massIndDeepDoubleBvLHbb;
+    JetInfo[iJetColl].Jet_MassIndDeepDoubleCvLQCD[JetInfo[iJetColl].nJet] = massIndDeepDoubleCvLQCD;
+    JetInfo[iJetColl].Jet_MassIndDeepDoubleCvLHcc[JetInfo[iJetColl].nJet] = massIndDeepDoubleCvLHcc;
+    JetInfo[iJetColl].Jet_MassIndDeepDoubleCvBHcc[JetInfo[iJetColl].nJet] = massIndDeepDoubleCvBHcc;
+    JetInfo[iJetColl].Jet_MassIndDeepDoubleCvBHbb[JetInfo[iJetColl].nJet] = massIndDeepDoubleCvBHbb;
     //DeepBoostedJet probabilities
     JetInfo[iJetColl].Jet_DeepBoostedJetbbvsLight[JetInfo[iJetColl].nJet]    = deepBoostedJetbbvsLight;
     JetInfo[iJetColl].Jet_DeepBoostedJetccvsLight[JetInfo[iJetColl].nJet]   = deepBoostedJetccvsLight;
@@ -3501,6 +3529,35 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 			throw cms::Exception("CorruptData") << "The jet collection does not have the DeepDoubleX TagInfos embedded!";
 		}
 		const auto & features = ddb_taginfo->features();
+		/// Name of variables https://github.com/andrzejnovak/cmssw/blob/94Xpr/DataFormats/BTauReco/interface/BoostedDoubleSVTagInfoFeatures.h
+      		JetInfo[iJetColl].DeepDoubleXInput_jetNTracks[JetInfo[iJetColl].nJet] = features.tag_info_features.jetNTracks;
+      		JetInfo[iJetColl].DeepDoubleXInput_jetNSecondaryVertices[JetInfo[iJetColl].nJet] = features.tag_info_features.jetNSecondaryVertices;
+      		JetInfo[iJetColl].DeepDoubleXInput_trackSip3dSig_0[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip3dSig_0;
+      		JetInfo[iJetColl].DeepDoubleXInput_trackSip3dSig_1[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip3dSig_1;
+      		JetInfo[iJetColl].DeepDoubleXInput_trackSip3dSig_2[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip3dSig_2;
+      		JetInfo[iJetColl].DeepDoubleXInput_trackSip3dSig_3[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip3dSig_3;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau1_trackSip3dSig_0[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_trackSip3dSig_0;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau1_trackSip3dSig_1[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_trackSip3dSig_1;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau2_trackSip3dSig_0[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_trackSip3dSig_0;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau2_trackSip3dSig_1[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_trackSip3dSig_1;
+      		JetInfo[iJetColl].DeepDoubleXInput_trackSip2dSigAboveBottom_0[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip2dSigAboveBottom_0;
+      		JetInfo[iJetColl].DeepDoubleXInput_trackSip2dSigAboveBottom_1[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip2dSigAboveBottom_1;
+      		JetInfo[iJetColl].DeepDoubleXInput_trackSip2dSigAboveCharm[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip2dSigAboveCharm;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau1_trackEtaRel_0[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_trackEtaRel_0;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau1_trackEtaRel_1[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_trackEtaRel_1;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau1_trackEtaRel_2[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_trackEtaRel_2;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau2_trackEtaRel_0[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_trackEtaRel_0;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau2_trackEtaRel_1[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_trackEtaRel_1;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau2_trackEtaRel_2[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_trackEtaRel_2;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau1_vertexMass[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_vertexMass;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau1_vertexEnergyRatio[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_vertexEnergyRatio;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau1_flightDistance2dSig[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_flightDistance2dSig;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau1_vertexDeltaR[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_vertexDeltaR;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau2_vertexMass[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_vertexMass;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau2_vertexEnergyRatio[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_vertexEnergyRatio;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau2_flightDistance2dSig[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_flightDistance2dSig;
+      		JetInfo[iJetColl].DeepDoubleXInput_tau2_vertexDeltaR[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_vertexDeltaR;
+      		JetInfo[iJetColl].DeepDoubleXInput_z_ratio[JetInfo[iJetColl].nJet] = features.tag_info_features.z_ratio;
 
 		size_t csize = features.c_pf_features.size();
       		JetInfo[iJetColl].Jet_DeepDoubleX_nFirstTrkTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkDeepDoubleX;
