@@ -43,6 +43,16 @@ The content of the output ntuple is by default empty and has to be configured ac
 The new variable configuration can be customized in the file ```RecoBTag/PerformanceMeasurements/python/varGroups_cfi.py```.
 New variables need also to be added (apart from adding them in the code) in ```RecoBTag/PerformanceMeasurements/python/variables_cfi.py```
 
+### To run DeepDoubleX
+  * While the PR is merged in the main code:
+~~~
+git cms-merge-topic  andrzejnovak:94Xpr
+git cms-addpkg RecoBTag/Combined
+mkdir -p RecoBTag/Combined/data/DeepDoubleX/94X/V01
+cp /afs/desy.de/user/a/anovak/public/models94x/*pb RecoBTag/Combined/data/DeepDoubleX/94X/V01
+scram b -j 28
+~~~
+
 ### To run DeepAK8:
   * The algorithm is merged in CMSSW_9_4_11_cand1.
   * For previous releases:
