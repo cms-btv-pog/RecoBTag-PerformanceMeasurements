@@ -13,7 +13,8 @@ git cms-init
 git cms-addpkg RecoBTag/TensorFlow
 git cherry-pick 94ceae257f846998c357fcad408986cc8a039152
 
-git clone -b 9_4_X_v1.12 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+######git clone -b 9_4_X_v1.12 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone https://github.com/alefisico/RecoBTag-PerformanceMeasurements.git -b 9_4_X_Commissioning_DeepDoubleX
 
 scram b -j8
 
