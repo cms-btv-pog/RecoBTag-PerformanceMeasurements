@@ -55,11 +55,12 @@ cd data
 git config core.sparseCheckout true
 echo 'DeepDoubleX/94X/V01/' > .git/info/sparse-checkout
 git checkout --
+cd $CMSSW_BASE/src
 scram b -j 10
 ~~~
 
-### To run DeepAK8:
-  * The algorithm is merged in CMSSW_9_4_11_cand1.
+### To run DeepBoostedJet (DeepAK8):
+  * The algorithm is merged from CMSSW_9_4_11_cand1.
   * For previous releases:
 ~~~
 # setup MXNet and DeepAK8 models
