@@ -13,8 +13,8 @@ git cms-init
 git cms-addpkg RecoBTag/TensorFlow
 git cherry-pick 94ceae257f846998c357fcad408986cc8a039152
 
-######git clone -b 9_4_X_v1.12 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
-git clone -b 9_4_X_Commissioning_DeepDoubleX https://github.com/alefisico/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b 9_4_X_v1.13 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+
 
 scram b -j8
 
@@ -47,11 +47,15 @@ New variables need also to be added (apart from adding them in the code) in ```R
 ### To run DeepDoubleX
   * While the PR is merged in the main code, man can download deepDoubleX:
 ~~~
-git cms-merge-topic  andrzejnovak:94Xpr
+git cms-merge-topic 25371
 git cms-addpkg RecoBTag/Combined
-mkdir -p RecoBTag/Combined/data/DeepDoubleX/94X/V01
-cp /afs/desy.de/user/a/anovak/public/models94x/*pb RecoBTag/Combined/data/DeepDoubleX/94X/V01
-scram b -j 28
+cd RecoBTag/Combined/
+git clone -b V01-01-01 --depth 1 --no-checkout https://github.com/cms-data/RecoBTag-Combined.git data
+cd data
+git config core.sparseCheckout true
+echo 'DeepDoubleX/94X/V01/' > .git/info/sparse-checkout
+git checkout --
+scram b -j 10
 ~~~
 
 ### To run DeepAK8:
