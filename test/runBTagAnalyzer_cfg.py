@@ -185,6 +185,12 @@ options.register('produceAllTrackTree', False,
     VarParsing.varType.bool,
     "Produce all track tree"
 )
+options.register('useNegativeDeepFlavourTags', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Include negative deep flavour jet taggers"
+)
+
 
 ## Generally leave to False unless you know what you are doing
 options.register('runIVF', False,
