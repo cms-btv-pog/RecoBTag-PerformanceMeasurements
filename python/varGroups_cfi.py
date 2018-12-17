@@ -38,7 +38,6 @@ groupSet = cms.PSet(
         "TrkAll_nHitPXB",
         "PatMuon_pt",
         "Jet_DeepFlavourB",
-        "Jet_DeepFlavourPrunedB",
         "Jet_DeepCSVc",
         "PFElectron_pt",
         "PFMuon_pt",
