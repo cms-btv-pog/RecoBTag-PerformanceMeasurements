@@ -10,7 +10,10 @@ cmsenv
 setenv CMSSW_GIT_REFERENCE /cvmfs/cms.cern.ch/cmssw.git.daily
 git cms-init
 
-
+git cms-addpkg RecoBTag
+git cms-addpkg PhysicsTools/PatAlgos
+git cms-merge-topic emilbols:PrunedTraining_NoPuppi_10_2_7
+git clone -b PrunedTraining_NoPuppi https://github.com/emilbols/RecoBTag-Combined RecoBTag/Combined/data
 
 git clone -b 10_2_X_v1.01 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
