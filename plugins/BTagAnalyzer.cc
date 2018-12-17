@@ -395,7 +395,7 @@ private:
   bool runCSVTagTrackVariables_;
   bool runDeepFlavourTagVariables_;
   bool runDeepDoubleXTagVariables_;
-  bool runDeepBoostedJetVariables_;
+  bool runDeepBoostedJetTagVariables_;
   bool runCSVTagVariablesSubJets_;
   bool runPFElectronVariables_;
   bool runPFMuonVariables_;
@@ -579,7 +579,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   runCSVTagTrackVariables_ = iConfig.getParameter<bool>("runCSVTagTrackVariables");
   runDeepFlavourTagVariables_  = iConfig.getParameter<bool>("runDeepFlavourTagVariables");
   runDeepDoubleXTagVariables_  = iConfig.getParameter<bool>("runDeepDoubleXTagVariables");
-  runDeepBoostedJetVariables_  = iConfig.getParameter<bool>("runDeepBoostedJetVariables");
+  runDeepBoostedJetTagVariables_  = iConfig.getParameter<bool>("runDeepBoostedJetTagVariables");
   runCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("runCSVTagVariablesSubJets");
   runPFElectronVariables_ = iConfig.getParameter<bool>("runPFElectronVariables");
   runPFMuonVariables_ = iConfig.getParameter<bool>("runPFMuonVariables");
@@ -3587,7 +3587,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
     // additional DeepBoostedJet Input Features
 
-	if (runDeepBoostedJetVariables_) {
+	if (runDeepBoostedJetTagVariables_) {
 
 		auto dbj_taginfo = static_cast<const reco::DeepBoostedJetTagInfo*>(pjet->tagInfo(deepBoostedJetTagInfos_));
 		if(!dbj_taginfo) {

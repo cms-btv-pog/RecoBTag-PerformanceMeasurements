@@ -284,7 +284,7 @@ options.register('runDeepDoubleXTagVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to run DeepDoubleX TaggingVariables')
-options.register('runDeepBoostedJetVariables', False,
+options.register('runDeepBoostedJetTagVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to run DeepBoostedJet Input Variables')
@@ -406,12 +406,6 @@ if options.runSubJets and not options.runFatJets:
 if not options.miniAOD and options.runDeepFlavourTagVariables: #FIXME
     print "WARNING: switching off DeepFlavour, as it is not supported in AOD"
     options.runDeepFlavourTagVariables = False
-if not options.miniAOD and options.runDeepDoubleXTagVariables: 
-    print "WARNING: switching off DeepDoubleX, as it is not supported in AOD"
-    options.runDeepDoubleXTagVariables = False
-if not options.miniAOD and options.runDeepBoostedJetTagVariables: #FIXME
-    print "WARNING: switching off DeepBoostedJet, as it is not supported in AOD"
-    options.runDeepBoostedJetTagVariables = False
 
 if options.doBoostedCommissioning:
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
@@ -475,7 +469,6 @@ bTagInfos = [
    ,'pfInclusiveSecondaryVertexFinderCvsLTagInfos'
    ,'pfInclusiveSecondaryVertexFinderNegativeCvsLTagInfos'
    ,'pfDeepFlavourTagInfos'
-   ,'pfDeepDoubleXTagInfos'
 ]
 bTagInfos_noDeepFlavour = bTagInfos[:-2]
 ## b-tag discriminators
@@ -655,7 +648,7 @@ bTagDiscriminatorsFat.update(set([
 ]))
 ## Add DeepBoostedJet discriminators 
 from RecoBTag.MXNet.pfDeepBoostedJet_cff import _pfMassDecorrelatedDeepBoostedJetTagsProbs, _pfMassDecorrelatedDeepBoostedJetTagsMetaDiscrs
-bTagDiscriminatorsFat.update(set([
+bTagDiscriminatorsFat.update(set([]) if (options.useLegacyTaggers or not options.miniAOD) else set([
     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:bbvsLight",
     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ccvsLight",
     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:TvsQCD",
@@ -664,7 +657,7 @@ bTagDiscriminatorsFat.update(set([
     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHbbvsQCD"
 ]))
 ## Add DeepBoostedJet tag infos
-bTagInfosFat += ([] if options.useLegacyTaggers else ['pfDeepBoostedJetTagInfos'])
+bTagInfosFat += ([] if (options.useLegacyTaggers or not options.miniAOD) else ['pfDeepBoostedJetTagInfos'])
 
 if options.runJetClustering:
     options.remakeAllDiscr = True
@@ -1527,7 +1520,7 @@ process.btagana.runCSVTagVariables  = options.runCSVTagVariables   ## True if yo
 process.btagana.runCSVTagTrackVariables  = options.runCSVTagTrackVariables   ## True if you want to run CSV Tagging Track Variables
 process.btagana.runDeepFlavourTagVariables = options.runDeepFlavourTagVariables
 process.btagana.runDeepDoubleXTagVariables = options.runDeepDoubleXTagVariables
-process.btagana.runDeepBoostedJetVariables = options.runDeepBoostedJetVariables
+process.btagana.runDeepBoostedJetTagVariables = options.runDeepBoostedJetTagVariables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag(patJetSource)
 process.btagana.muonCollectionName    = cms.InputTag(muSource)
@@ -1570,7 +1563,7 @@ if options.runFatJets:
         runTagVariables   = cms.bool(False),
         runDeepFlavourTagVariables = cms.bool(False),
         runDeepDoubleXTagVariables = cms.bool(False),
-        runDeepBoostedJetVariables = cms.bool(False),
+        runDeepBoostedJetTagVariables = cms.bool(False),
         deepFlavourJetTags = cms.string(''),
         deepFlavourNegJetTags = cms.string(''),
         runTagVariablesSubJets = cms.bool(False),
@@ -1607,7 +1600,7 @@ if options.doBoostedCommissioning:
     process.btaganaFatJets.runCSVTagTrackVariables = True
     process.btaganaFatJets.runCSVTagVariablesSubJets = True
     process.btaganaFatJets.runDeepDoubleXTagVariables = True
-    process.btaganaFatJets.runDeepBoostedJetVariables = True
+    process.btaganaFatJets.runDeepBoostedJetTagVariables = True
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
     print "runHadronVariables set to '",process.btaganaFatJets.runHadronVariables,"'"
     print "runQuarkVariables set to '",process.btaganaFatJets.runQuarkVariables,"'"
@@ -1615,7 +1608,7 @@ if options.doBoostedCommissioning:
     print "For fat jets: runCSVTagVariables set to '",process.btaganaFatJets.runCSVTagVariables,"'"
     print "For fat jets: runCSVTagTrackVariables set to '",process.btaganaFatJets.runCSVTagTrackVariables,"'"
     print "For fat jets: runDeepDoubleXTagVariables set to '",process.btaganaFatJets.runDeepDoubleXTagVariables,"'"
-    print "For fat jets: runDeepBoostedJetVariables set to '",process.btaganaFatJets.runDeepBoostedJetVariables,"'"
+    print "For fat jets: runDeepBoostedJetTagVariables set to '",process.btaganaFatJets.runDeepBoostedJetTagVariables,"'"
     print "For subjets:  runCSVTagVariablesSubJets set to '",process.btaganaFatJets.runCSVTagVariablesSubJets,"'"
     print "********************"
 

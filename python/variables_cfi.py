@@ -5563,7 +5563,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("nTrkDeepBoostedJet"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_DeepBoostedJet_nFirstTrkTagVar"),
@@ -5571,7 +5571,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_DeepBoostedJet_nFirstTrkTagVar"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_DeepBoostedJet_nLastTrkTagVar"),
@@ -5579,7 +5579,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_DeepBoostedJet_nLastTrkTagVar"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_puppiw"),
@@ -5587,7 +5587,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_puppiw"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_hcalFrac"),
@@ -5595,7 +5595,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_hcalFrac"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_VTX_ass"),
@@ -5603,7 +5603,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_VTX_ass"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_lostInnerHits"),
@@ -5611,7 +5611,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_lostInnerHits"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_quality"),
@@ -5619,7 +5619,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_quality"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_charge"),
@@ -5627,7 +5627,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_charge"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_isEl"),
@@ -5635,7 +5635,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_isEl"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_isMu"),
@@ -5643,7 +5643,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_isMu"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_isChargedHad"),
@@ -5651,7 +5651,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_isChargedHad"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_isGamma"),
@@ -5659,7 +5659,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_isGamma"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_isNeutralHad"),
@@ -5667,7 +5667,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_isNeutralHad"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_phirel"),
@@ -5675,7 +5675,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_phirel"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_etarel"),
@@ -5683,7 +5683,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_etarel"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_deltaR"),
@@ -5691,7 +5691,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_deltaR"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_abseta"),
@@ -5699,7 +5699,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_abseta"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_ptrel_log"),
@@ -5707,7 +5707,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_ptrel_log"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_erel_log"),
@@ -5715,7 +5715,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_erel_log"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_pt_log"),
@@ -5723,7 +5723,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_pt_log"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_drminsv"),
@@ -5731,7 +5731,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_drminsv"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_drsubjet1"),
@@ -5739,7 +5739,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_drsubjet1"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_drsubjet2"),
@@ -5747,7 +5747,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_drsubjet2"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_normchi2"),
@@ -5755,7 +5755,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_normchi2"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_dz"),
@@ -5763,7 +5763,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_dz"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_dzsig"),
@@ -5771,7 +5771,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_dzsig"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_dxy"),
@@ -5779,7 +5779,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_dxy"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_dxysig"),
@@ -5787,7 +5787,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_dxysig"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_dptdpt"),
@@ -5795,7 +5795,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_dptdpt"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_detadeta"),
@@ -5803,7 +5803,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_detadeta"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_dphidphi"),
@@ -5811,7 +5811,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_dphidphi"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_dxydxy"),
@@ -5819,7 +5819,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_dxydxy"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_dzdz"),
@@ -5827,7 +5827,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_dzdz"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_dxydz"),
@@ -5835,7 +5835,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_dxydz"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_dphidxy"),
@@ -5843,7 +5843,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_dphidxy"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_dlambdadz"),
@@ -5851,7 +5851,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_dlambdadz"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_btagEtaRel"),
@@ -5859,7 +5859,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_btagEtaRel"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_btagPtRatio"),
@@ -5867,7 +5867,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_btagPtRatio"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_btagPParRatio"),
@@ -5875,7 +5875,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_btagPParRatio"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_btagSip2dVal"),
@@ -5883,7 +5883,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_btagSip2dVal"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_btagSip2dSig"),
@@ -5891,7 +5891,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_btagSip2dSig"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_btagSip3dVal"),
@@ -5899,7 +5899,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_btagSip3dVal"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_btagSip3dSig"),
@@ -5907,7 +5907,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_btagSip3dSig"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_pf_btagJetDistVal"),
@@ -5915,7 +5915,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_pf_btagJetDistVal"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("nSVDeepBoostedJet"),
@@ -5923,7 +5923,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("nSVDeepBoostedJet"),
       requires    = cms.vstring(),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_DeepBoostedJet_nFirstSVTagVar"),
@@ -5931,7 +5931,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_DeepBoostedJet_nFirstSVTagVar"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_DeepBoostedJet_nLastSVTagVar"),
@@ -5939,7 +5939,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_DeepBoostedJet_nLastSVTagVar"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_sv_phirel"),
@@ -5947,7 +5947,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_sv_phirel"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_sv_etarel"),
@@ -5955,7 +5955,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_sv_etarel"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_sv_deltaR"),
@@ -5963,7 +5963,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_sv_deltaR"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_sv_abseta"),
@@ -5971,7 +5971,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_sv_abseta"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_sv_mass"),
@@ -5979,7 +5979,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_sv_mass"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_sv_ptrel_log"),
@@ -5987,7 +5987,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_sv_ptrel_log"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_sv_erel_log"),
@@ -5995,7 +5995,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_sv_erel_log"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_sv_pt_log"),
@@ -6003,7 +6003,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_sv_pt_log"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_sv_ntracks"),
@@ -6011,7 +6011,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_sv_ntracks"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_sv_normchi2"),
@@ -6019,7 +6019,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_sv_normchi2"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_sv_dxy"),
@@ -6027,7 +6027,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_sv_dxy"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_sv_dxysig"),
@@ -6035,7 +6035,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_sv_dxysig"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_sv_d3d"),
@@ -6043,7 +6043,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_sv_d3d"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_sv_d3dsig"),
@@ -6051,7 +6051,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_sv_d3dsig"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
     cms.PSet(
       variable    = cms.string("DeepBoostedJetInput_sv_costhetasvpv"),
@@ -6059,7 +6059,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("DeepBoostedJetInput_sv_costhetasvpv"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring("runDeepBoostedJetVariables"),
+      runOptions  = cms.vstring("runDeepBoostedJetTagVariables"),
     ),
   ]
 
