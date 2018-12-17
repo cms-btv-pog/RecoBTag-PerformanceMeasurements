@@ -26,6 +26,8 @@ bTagAnalyzer = cms.EDAnalyzer("BTagAnalyzer",
     # taggers
     deepFlavourJetTags = cms.string('pfDeepFlavourJetTags'),
     deepFlavourNegJetTags = cms.string('pfNegativeDeepFlavourJetTags'),
+    deepFlavourPrunedJetTags = cms.string('pfDeepFlavourPrunedJetTags'),
+    deepFlavourPrunedNegJetTags = cms.string('pfNegativeDeepFlavourPrunedJetTags'),
     deepCSVBJetTags    = cms.string('pfDeepCSVJetTags'),
     deepCSVNegBJetTags = cms.string('pfNegativeDeepCSVJetTags'),
     deepCSVPosBJetTags = cms.string('pfPositiveDeepCSVJetTags'),
