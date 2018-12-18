@@ -1190,10 +1190,10 @@ variableList = [
       runOptions  = cms.vstring(),
     ),
     cms.PSet(
-      variable    = cms.string("ttbar_nl,"),
+      variable    = cms.string("ttbar_nl"),
       store       = cms.bool(False),
       mconly      = cms.bool(False),
-      description = cms.string("ttbar_nl,"),
+      description = cms.string("ttbar_nl"),
       requires    = cms.vstring("ttbar_ng"),
       runOptions  = cms.vstring(),
     ),
