@@ -1560,7 +1560,7 @@ if options.runFatJets:
         runEventInfo      = cms.bool(not options.processStdAK4Jets),
         allowJetSkipping    = cms.bool(False),
         runTagVariables     = options.runTagVariables,
-        runDeepFlavourTagVariables = options.runDeepFlavourTagVariables,
+        runDeepFlavourTagVariables = cms.bool(False),
         deepFlavourJetTags = cms.string(''),
         deepFlavourNegJetTags = cms.string(''),
         runTagVariablesSubJets = options.runTagVariablesSubJets,
