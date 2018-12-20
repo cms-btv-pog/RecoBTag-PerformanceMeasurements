@@ -256,6 +256,10 @@ options.register('runJetVariables', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to run Jet Variables')
+options.register('runTagVariables', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to run Tag Variables')
 options.register('runQuarkVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -272,6 +276,14 @@ options.register('runCSVTagVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to run CSV TaggingVariables')
+options.register('runCSVTagVariablesSubJets', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to run CSV TaggingVariables for SubJets')
+options.register('runTagVariablesSubJets', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to run TagVariables for SubJets')
 options.register('runCSVTagTrackVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -1480,7 +1492,7 @@ process.btagana.produceJetTrackTruthTree = options.useTrackHistory ## can only b
 process.btagana.produceAllTrackTree   = options.produceAllTrackTree ## True if you want to run info for all tracks : for commissioning studies
 process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True for performance studies
 #------------------
-process.btagana.runTagVariables     = False  ## True if you want to run TagInfo TaggingVariables
+process.btagana.runTagVariables     = options.runTagVariables  ## True if you want to run TagInfo TaggingVariables
 process.btagana.runCSVTagVariables  = options.runCSVTagVariables   ## True if you want to run CSV TaggingVariables
 process.btagana.runCSVTagTrackVariables  = options.runCSVTagTrackVariables   ## True if you want to run CSV Tagging Track Variables
 process.btagana.runDeepFlavourTagVariables = options.runDeepFlavourTagVariables
@@ -1523,11 +1535,11 @@ if options.runFatJets:
     process.btaganaFatJets = process.btagana.clone(
         runEventInfo      = cms.bool(not options.processStdAK4Jets),
         allowJetSkipping    = cms.bool(False),
-        runTagVariables   = cms.bool(False),
-        runDeepFlavourTagVariables = cms.bool(False),
+        runTagVariables     = options.runTagVariables,
+        runDeepFlavourTagVariables = options.runDeepFlavourTagVariables,
         deepFlavourJetTags = cms.string(''),
         deepFlavourNegJetTags = cms.string(''),
-        runTagVariablesSubJets = cms.bool(False),
+        runTagVariablesSubJets = options.runTagVariablesSubJets,
         useSelectedTracks   = cms.bool(True),
         maxDeltaR           = cms.double(options.fatJetRadius),
         R0                  = cms.double(options.fatJetRadius),
