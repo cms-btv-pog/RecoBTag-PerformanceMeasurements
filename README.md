@@ -24,10 +24,10 @@ scram b -j8
 
 ```
 
-The ntuplizer can be run and configured through ```RecoBTag/PerformanceMeasurements/test/runBTagAnalyzer_cfg.py```, to run it for the 2016 SF campaign
+The ntuplizer can be run and configured through ```RecoBTag/PerformanceMeasurements/test/runBTagAnalyzer_cfg.py```, to run it for PhaseII studies
 
 ```
-cmsRun runBTagAnalyzer_cfg.py defaults=2016_SF runOnData=(True or False, depending on your needs)
+cmsRun runBTagAnalyzer_cfg.py defaults=PhaseII runOnData=(True or False, depending on your needs)
 ```
 
 To run the tests for integrating changes run:
