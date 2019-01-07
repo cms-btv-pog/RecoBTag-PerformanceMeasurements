@@ -45,7 +45,8 @@ New variables need also to be added (apart from adding them in the code) in ```R
 
 ### To run DeepDoubleX
   * While the PR is merged in the main code, man can download deepDoubleX:
-~~
+
+~~~
 git cms-merge-topic 25371
 git cms-addpkg RecoBTag/Combined
 cd RecoBTag/Combined/
@@ -56,12 +57,13 @@ echo 'DeepDoubleX/94X/V01/' > .git/info/sparse-checkout
 git checkout --
 cd $CMSSW_BASE/src
 scram b -j 10
-~~
+~~~
 
 ### To run DeepBoostedJet (DeepAK8):
   * The algorithm is merged from CMSSW_9_4_11_cand1.
   * For previous releases:
-~~
+
+~~~
 # setup MXNet and DeepAK8 models
 scram setup /cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_11_cand1/config/toolbox/slc6_amd64_gcc630/tools/selected/mxnet-predict.xml
 # get DeepAK8 PR for 94X
@@ -71,4 +73,4 @@ mkdir -p $CMSSW_BASE/external/$SCRAM_ARCH/data/RecoBTag/Combined/data
 cp -r /cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_11_cand1/external/slc6_amd64_gcc630/data/RecoBTag/Combined/data/DeepBoostedJet $CMSSW_BASE/external/$SCRAM_ARCH/data/RecoBTag/Combined/data
 # compile
 scram b -j 24
-~~
+~~~
