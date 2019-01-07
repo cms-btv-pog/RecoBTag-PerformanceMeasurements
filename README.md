@@ -42,3 +42,33 @@ cd RecoBTag/PerformanceMeasurements/test/
 The content of the output ntuple is by default empty and has to be configured according to your needs. The ```store*Variables``` options have been removed.
 The new variable configuration can be customized in the file ```RecoBTag/PerformanceMeasurements/python/varGroups_cfi.py```.
 New variables need also to be added (apart from adding them in the code) in ```RecoBTag/PerformanceMeasurements/python/variables_cfi.py```
+
+### To run DeepDoubleX
+  * While the PR is merged in the main code, man can download deepDoubleX:
+~~
+git cms-merge-topic 25371
+git cms-addpkg RecoBTag/Combined
+cd RecoBTag/Combined/
+git clone -b V01-01-01 --depth 1 --no-checkout https://github.com/cms-data/RecoBTag-Combined.git data
+cd data
+git config core.sparseCheckout true
+echo 'DeepDoubleX/94X/V01/' > .git/info/sparse-checkout
+git checkout --
+cd $CMSSW_BASE/src
+scram b -j 10
+~~
+
+### To run DeepBoostedJet (DeepAK8):
+  * The algorithm is merged from CMSSW_9_4_11_cand1.
+  * For previous releases:
+~~
+# setup MXNet and DeepAK8 models
+scram setup /cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_11_cand1/config/toolbox/slc6_amd64_gcc630/tools/selected/mxnet-predict.xml
+# get DeepAK8 PR for 94X
+git cms-merge-topic -u hqucms:deep-boosted-jets-rebase-94X
+# setup the data files
+mkdir -p $CMSSW_BASE/external/$SCRAM_ARCH/data/RecoBTag/Combined/data
+cp -r /cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_11_cand1/external/slc6_amd64_gcc630/data/RecoBTag/Combined/data/DeepBoostedJet $CMSSW_BASE/external/$SCRAM_ARCH/data/RecoBTag/Combined/data
+# compile
+scram b -j 24
+~~
