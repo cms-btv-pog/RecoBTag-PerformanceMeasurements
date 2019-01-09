@@ -898,8 +898,8 @@ process.GlobalTag.toGet = cms.VPSet(
 
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
 #$$
-process.load('Configuration.Geometry.GeometryExtended2023D17Reco_cff')
-#process.load("Configuration.Geometry.GeometryRecoDB_cff")
+if 'Phase2' in options.eras: process.load('Configuration.Geometry.GeometryExtended2023D17Reco_cff')
+else: process.load("Configuration.Geometry.GeometryRecoDB_cff")
 #$$
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 
