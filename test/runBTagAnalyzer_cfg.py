@@ -185,6 +185,11 @@ options.register('produceAllTrackTree', False,
     VarParsing.varType.bool,
     "Produce all track tree"
 )
+options.register('useNegativeDeepFlavourTags', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Include negative deep flavour jet taggers"
+)
 
 ## Generally leave to False unless you know what you are doing
 options.register('runIVF', False,
@@ -324,7 +329,10 @@ options.register(
 )
 
 ## 'maxEvents' is already registered by the Framework, changing default value
+#$$
 options.setDefault('maxEvents', -1)
+#options.setDefault('maxEvents', 100)
+#$$
 
 options.parseArguments()
 if options.defaults:
@@ -374,7 +382,7 @@ for requiredGroup in options.groups:
       break
   if(not found):
     print('WARNING: The group ' + requiredGroup + ' was not found')
-
+ 
 #change values accordingly
 for switch in options_to_change:
   if switch not in options._beenSet:
@@ -581,6 +589,10 @@ if options.useLegacyTaggers:
     bTagInfos = bTagInfosLegacy
     bTagDiscriminators = bTagDiscriminatorsLegacy
 
+## If not including negative deep flavour jet taggers
+if not options.useNegativeDeepFlavourTags:
+  bTagDiscriminators = {i for i in bTagDiscriminators if 'NegativeDeepFlavourJetTags' not in i}
+
 ## Clustering algorithm label
 algoLabel = 'CA'
 if options.jetAlgo == 'AntiKt':
@@ -736,7 +748,14 @@ process.source = cms.Source("PoolSource",
 if options.miniAOD:
     process.source.fileNames = [
         #/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM
-        '/store/mc/RunIIFall17MiniAOD/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/00000/C8E934F8-1C06-E811-888D-0242AC130002.root'
+#$$
+#        '/store/relval/CMSSW_10_4_0_mtd3/RelValTTbar_Tauola_14TeV/MINIAODSIM/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200_1-v2/20000/31C1C942-EC8D-1245-B773-2293F5CC87DB.root'
+#        '/store/relval/CMSSW_10_4_0_mtd3/RelValTTbar_Tauola_14TeV/MINIAODSIM/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200_2-v2/20000/CEEBB55B-67BC-F54C-9243-8D11EEBCA67F.root'
+#        '/store/relval/CMSSW_10_4_0_mtd3/RelValTTbar_Tauola_14TeV/MINIAODSIM/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200_3-v2/20000/3CE6CC6E-10D0-354B-8AA6-C22FDA11A181.root',
+#        '/store/relval/CMSSW_10_4_0_mtd3/RelValTTbar_Tauola_14TeV/MINIAODSIM/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200_3-v2/20000/D083516F-39B8-3947-9013-112F24795E45.root'
+#        '/store/relval/CMSSW_10_4_0_mtd3/RelValTTbar_Tauola_14TeV/MINIAODSIM/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200_4-v2/20000/39ECB63E-296D-9442-BD46-8F96E4832418.root'
+        '/store/relval/CMSSW_10_4_0_mtd3/RelValTTbar_Tauola_14TeV/MINIAODSIM/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200_5-v2/20000/A8AD8A25-CDC1-2E4B-A404-E9DB14ECF16A.root'
+#$$
     ]
     if options.runOnData:
         process.source.fileNames = [
@@ -878,7 +897,10 @@ process.GlobalTag.toGet = cms.VPSet(
 )
 
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
-process.load("Configuration.Geometry.GeometryRecoDB_cff")
+#$$
+if 'Phase2' in options.eras: process.load('Configuration.Geometry.GeometryExtended2023D17Reco_cff')
+else: process.load("Configuration.Geometry.GeometryRecoDB_cff")
+#$$
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 
 #-------------------------------------
@@ -1477,6 +1499,7 @@ if options.useLegacyTaggers:
 #   process.btagana.produceAllTrackTree  = True
 #   process.btagana.producePtRelTemplate = False
 #------------------
+
 #Handle groups
 for requiredGroup in process.btagana.groups:
    for storedGroup in btagana_tmp.groups:
@@ -1514,6 +1537,7 @@ process.btagana.runPFMuonVariables = options.runPFMuonVariables
 process.btagana.runPatMuons = options.runPatMuons
 process.btagana.runCTagVariables = options.runCTagVariables
 process.btagana.runEventInfo = options.runEventInfo
+
 process.btagana.runOnData = options.runOnData
 
 if options.runOnData:
