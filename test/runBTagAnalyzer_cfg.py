@@ -387,7 +387,7 @@ for requiredGroup in options.groups:
 for switch in options_to_change:
   if switch not in options._beenSet:
     raise ValueError('The option set by the variables: %s does not exist among the cfg options!' % switch)
-  elif not options._beenSet[key]:
+  elif not options._beenSet[switch]:
     print 'Turning on %s, as some stored variables demands it' % switch
     setattr(options, switch, True)
 
