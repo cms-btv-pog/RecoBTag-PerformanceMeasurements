@@ -1107,7 +1107,7 @@ groupSet = cms.PSet(
       ),
     ),
     cms.PSet(
-    group       = cms.string("Frank"),
+      group       = cms.string("Frank"),
       store       = cms.bool(False),
       description = cms.string("calculation of W->bb (mistag) scale factors in ttbar events"),
       variables   = cms.vstring(
@@ -1145,7 +1145,6 @@ groupSet = cms.PSet(
         #misc
         "nPUtrue",
       ),
-
     ),
     cms.PSet(
       group       = cms.string("Daniel"),
