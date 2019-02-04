@@ -1109,15 +1109,24 @@ groupSet = cms.PSet(
     cms.PSet(
       group       = cms.string("Frank"),
       store       = cms.bool(False),
-      description = cms.string("TODO"),
+      description = cms.string("calculation of W->bb (mistag) scale factors in ttbar events"),
       variables   = cms.vstring(
-        "nPUtrue",
+        #muons
+        "nPatMuon",
+        "PatMuon_pt",
+        "PatMuon_eta",
+        "PatMuon_phi",
+        "PatMuon_isTightMuon",
+        "PatMuon_iso",
+        "ttbar_trigWord",
+        #AK4 Jets
         "nJet",
         "Jet_pt",
         "Jet_eta",
         "Jet_phi",
         "Jet_tightID",
         "Jet_DeepCSVb",
+        #AK8 jets
         "FatJetInfo.nJet",
         "FatJetInfo.Jet_pt",
         "FatJetInfo.Jet_eta",
@@ -1127,11 +1136,14 @@ groupSet = cms.PSet(
         "FatJetInfo.Jet_tau1",
         "FatJetInfo.Jet_tau2",
         "FatJetInfo.Jet_DoubleSV",
+        #Subjets
         "SoftDropPuppiSubJetInfo.nJet",
         "SoftDropPuppiSubJetInfo.Jet_pt",
         "SoftDropPuppiSubJetInfo.Jet_eta",
         "SoftDropPuppiSubJetInfo.Jet_phi",
         "SoftDropPuppiSubJetInfo.Jet_FatJetIdx",
+        #misc
+        "nPUtrue",
       ),
     ),
     cms.PSet(
