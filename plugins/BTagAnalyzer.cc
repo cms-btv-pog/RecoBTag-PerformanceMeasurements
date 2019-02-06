@@ -74,7 +74,7 @@
 #include "SimTracker/TrackHistory/interface/TrackClassifier.h"
 #include "DataFormats/BTauReco/interface/SoftLeptonTagInfo.h"
 #include "DataFormats/BTauReco/interface/DeepFlavourFeatures.h"
-#include "DataFormats/BTauReco/interface/DeepDoubleBFeatures.h"
+#include "DataFormats/BTauReco/interface/DeepDoubleXFeatures.h"
 #include "DataFormats/BTauReco/interface/DeepBoostedJetFeatures.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -3582,7 +3582,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       //--------------------------
       // DeepDoubleX InputFeatures
     if(runDeepDoubleXTagVariables_) {
-        auto ddb_taginfo = static_cast<const reco::DeepDoubleBTagInfo*>(pjet->tagInfo(deepDoubleXTagInfos_));
+        auto ddb_taginfo = static_cast<const reco::DeepDoubleXTagInfo*>(pjet->tagInfo(deepDoubleXTagInfos_));
         if(!ddb_taginfo) {
             throw cms::Exception("CorruptData") << "The jet collection does not have the DeepDoubleX TagInfos embedded!";
         }

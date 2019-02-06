@@ -338,7 +338,7 @@ options.register(
 )
 
 ## 'maxEvents' is already registered by the Framework, changing default value
-options.setDefault('maxEvents', -1)
+options.setDefault('maxEvents', 100)
 
 options.parseArguments()
 if options.defaults:
@@ -584,18 +584,18 @@ bTagDiscriminators = set([
   , 'pfNegativeDeepFlavourJetTags:probuds'
   , 'pfNegativeDeepFlavourJetTags:probg'
     # DeepFlavour with pruned input
-  , 'pfDeepFlavourPrunedJetTags:probb'
-  , 'pfDeepFlavourPrunedJetTags:probbb'
-  , 'pfDeepFlavourPrunedJetTags:problepb'
-  , 'pfDeepFlavourPrunedJetTags:probc'
-  , 'pfDeepFlavourPrunedJetTags:probuds'
-  , 'pfDeepFlavourPrunedJetTags:probg'
-  , 'pfNegativeDeepFlavourPrunedJetTags:probb'
-  , 'pfNegativeDeepFlavourPrunedJetTags:probbb'
-  , 'pfNegativeDeepFlavourPrunedJetTags:problepb'
-  , 'pfNegativeDeepFlavourPrunedJetTags:probc'
-  , 'pfNegativeDeepFlavourPrunedJetTags:probuds'
-  , 'pfNegativeDeepFlavourPrunedJetTags:probg'
+#  , 'pfDeepFlavourPrunedJetTags:probb'
+#  , 'pfDeepFlavourPrunedJetTags:probbb'
+#  , 'pfDeepFlavourPrunedJetTags:problepb'
+#  , 'pfDeepFlavourPrunedJetTags:probc'
+#  , 'pfDeepFlavourPrunedJetTags:probuds'
+#  , 'pfDeepFlavourPrunedJetTags:probg'
+#  , 'pfNegativeDeepFlavourPrunedJetTags:probb'
+#  , 'pfNegativeDeepFlavourPrunedJetTags:probbb'
+#  , 'pfNegativeDeepFlavourPrunedJetTags:problepb'
+#  , 'pfNegativeDeepFlavourPrunedJetTags:probc'
+#  , 'pfNegativeDeepFlavourPrunedJetTags:probuds'
+#  , 'pfNegativeDeepFlavourPrunedJetTags:probg'
 
 ])
 
