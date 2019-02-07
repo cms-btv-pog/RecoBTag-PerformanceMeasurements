@@ -3,7 +3,7 @@ common = {
 	'miniAOD' : True,
 	'runDeepFlavourTagVariables' : False,
   'doBoostedCommissioning': True,
-  'groups': ['EventInfo', 'Hadrons', 'PV', 'Devdatta'],
+  'groups': ['EventInfo', 'Devdatta'],
 }
 
 mc = {
