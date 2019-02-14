@@ -1724,6 +1724,7 @@ groupSet = cms.PSet(
         "DHadron_mass",
         "DHadron_pT",
         "DHadron_pdgID",
+        "nDaughters",
         "DHadron_nDaughters",
         "DHadron_DaughtersPdgID",
         "ncQuarks",
