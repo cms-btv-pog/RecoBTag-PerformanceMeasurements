@@ -12,14 +12,16 @@ mc = {
 	'mcGlobalTag' : '102X_upgrade2018_realistic_v12',
 	}
 
-data17Sep2018 = {
+##17Sep2018
+data = {
 	'inputFiles' : ['/store/data/Run2018C/BTagMu/MINIAOD/17Sep2018-v1/60000/FE0C866E-6D00-DE47-89AB-A15CC16813B9.root'],
   'JPCalibration' : 'JPcalib_Data102X_2018_v1',
 	'dataGlobalTag' : '102X_dataRun2_Sep2018Rereco_v1',
 }
 
-dataprompt = {
-	'inputFiles' : ['/store/data/Run2018D/BTagMu/MINIAOD/PromptReco-v2/000/325/022/00000/6F0A55A7-7F5F-A54D-A01E-243B27BBCB9A.root'],
-  'JPCalibration' : 'JPcalib_Data102X_2018_v1',
-	'dataGlobalTag' : '102X_dataRun2_Prompt_v11',
-}
+###Prompt
+#data = {
+#	'inputFiles' : ['/store/data/Run2018D/BTagMu/MINIAOD/PromptReco-v2/000/325/022/00000/6F0A55A7-7F5F-A54D-A01E-243B27BBCB9A.root'],
+#  'JPCalibration' : 'JPcalib_Data102X_2018_v1',
+#	'dataGlobalTag' : '102X_dataRun2_Prompt_v11',
+#}
