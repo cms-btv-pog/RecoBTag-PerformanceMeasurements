@@ -12,3 +12,8 @@ mc = {
 	'mcGlobalTag' : '94X_mcRun2_asymptotic_v3',
 	}
 
+data = {
+	'inputFiles' : ['/store/data/Run2016B/JetHT/MINIAOD/17Jul2018_ver2-v2/100000/00323A27-15B8-E811-88B5-E0071B6C9DB0.root'],	
+        'JPCalibration' : 'JPcalib_Data94X_2016_v1',
+	'dataGlobalTag' : '94X_dataRun2_v10',
+}
