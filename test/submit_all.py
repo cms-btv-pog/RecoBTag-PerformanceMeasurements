@@ -34,7 +34,7 @@ def getOptions() :
         help=("input parameters for config file"),
         metavar="PARAMS")
     parser.add_option("-l", "--lumiMask", dest="lumiMask",
-        default='/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Final/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON.txt',
+        default='/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt',
         help=("The JSON file containing good lumi list"),
         metavar="LUMI")
     parser.add_option("-f", "--datasets", dest="datasets",
@@ -126,7 +126,7 @@ def main():
           config.Data.splitting = 'FileBased'
         elif datatier == 'MINIAOD': 
           config.Data.splitting = 'LumiBased'
-          config.Data.unitsPerJob = 10
+          config.Data.unitsPerJob = 20
           config.Data.lumiMask = options.lumiMask
         if options.outLFNDirBase and not options.outLFNDirBase.isspace(): 
           config.Data.outLFNDirBase = os.path.join(options.outLFNDirBase,options.version)
