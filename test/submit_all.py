@@ -120,6 +120,7 @@ def main():
         cond = job.split('/')[2]
         datatier = job.split('/')[3]
         requestname = '_'.join(pdname.split('_')[:3]) + '_' + cond
+        if len(requestname) > 100: requestname = '_'.join(pdname.split('_')[:2]) + '_' + cond
         config.General.requestName = requestname
         config.Data.inputDataset = job
         if datatier == 'MINIAODSIM': 
