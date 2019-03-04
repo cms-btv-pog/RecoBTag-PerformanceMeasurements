@@ -3,9 +3,6 @@
 # set -o errexit
 function die { echo 'FAILED': status $1 ;  exit $1; }
 
-echo 'Running on MINIAODSIM boosted'
-cmsRun runBTagAnalyzer_cfg.py defaults=Moriond19Boosted runOnData=False maxEvents=1000 &> boosted.log || die $? 
-
 echo 'Running on data'
 cmsRun runBTagAnalyzer_cfg.py defaults=Moriond18 runOnData=True maxEvents=20 groups='test' &> last.log || die $?
 
@@ -32,6 +29,9 @@ cmsRun runBTagAnalyzer_cfg.py defaults=Moriond18 runOnData=True maxEvents=20 run
 
 echo 'Running on MC -- ctag'
 cmsRun runBTagAnalyzer_cfg.py defaults=Moriond18 runOnData=False maxEvents=20 runCTagVariables=True runFatJets=True runSubJets=True groups='testfat' &> last.log || die $?
+
+echo 'Running on MINIAODSIM boosted'
+cmsRun runBTagAnalyzer_cfg.py defaults=Moriond19Boosted runOnData=False maxEvents=20 &> boosted.log || die $? 
 
 echo 'RECODEBUG'
 cmsRun runBTagAnalyzer_cfg.py defaults=Moriond18 runOnData=False maxEvents=20 miniAOD=False runFatJets=True runSubJets=True useTrackHistory=True produceJetTrackTree=True inputFiles=/store/mc/RunIIFall17DRPremix/QCD_Pt_15to30_TuneCP5_13TeV_pythia8/GEN-SIM-RECODEBUG/94X_mc2017_realistic_v10-v1/70000/04F991F0-C2DD-E711-B302-0CC47A78A3F8.root groups='testfat' &> last.log || die $?
