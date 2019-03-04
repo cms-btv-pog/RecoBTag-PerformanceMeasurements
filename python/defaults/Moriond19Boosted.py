@@ -1,12 +1,14 @@
 common = {
-	'eras' : ['Run2_2016','run2_miniAOD_80XLegacy'],
+	'eras' : ['Run2_2016'],
 	'miniAOD' : True,
-	'runDeepFlavourTagVariables' : True,
+	'runDeepFlavourTagVariables' : False,
+    'doBoostedCommissioning': True,
+    'groups': ['EventInfo', 'Devdatta', 'DoubleBCommissioning'],
 	'usePrivateJEC': True,
 }
 
 mc = {
-	'inputFiles' : ['/store/mc/RunIISummer16MiniAODv3/QCD_Pt_80to120_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v1/110000/3A8373E0-30D3-E811-BB36-5CB901C2A510.root'],
+	'inputFiles' : ['/store/mc/RunIISummer16MiniAODv3/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v2/120000/92DEC622-A2E6-E811-9DE8-0025904CDDF8.root',],
 	'JPCalibration' : 'JPcalib_MC94X_2016_v1',
 	'mcGlobalTag' : '94X_mcRun2_asymptotic_v3',
 	'jecDBFileMC': 'Summer16_07Aug2017_V11_MC',  ### with the FormulaEvaluator bug

@@ -292,6 +292,14 @@ options.register('runDeepFlavourTagVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to run DeepFlavour TaggingVariables')
+options.register('runDeepDoubleXTagVariables', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to run DeepDoubleX TaggingVariables')
+options.register('runDeepBoostedJetTagVariables', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to run DeepBoostedJet Input Variables')
 options.register('runPFElectronVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -334,19 +342,19 @@ if options.defaults:
 	except ImportError:
 		raise ValueError('The default settings named %s.py are not present in PerformanceMeasurements/python/defaults/' % options.defaults)
 	if not hasattr(defaults, 'common') or not isinstance(defaults.common, dict):
-		raise RuntimeError('the default file %s.py does not contain a dictionary named common' % options.defaults)  
+		raise RuntimeError('the default file %s.py does not contain a dictionary named common' % options.defaults)
 	items = defaults.common.items()
-	if hasattr(defaults, 'data') and options.runOnData: 
+	if hasattr(defaults, 'data') and options.runOnData:
 		if not isinstance(defaults.data, dict):
 			raise RuntimeError('the default file %s.py contains an object called "data" which is not a dictionary' % options.defaults)
 		items.extend(defaults.data.items())
-	if hasattr(defaults, 'mc') and not options.runOnData: 
+	if hasattr(defaults, 'mc') and not options.runOnData:
 		if not isinstance(defaults.mc, dict):
 			raise RuntimeError('the default file %s.py contains an object called "mc" which is not a dictionary' % options.defaults)
 		items.extend(defaults.mc.items())
 	for key, value in items:
 		if key not in options._beenSet:
-			raise ValueError('The key set by the defaults: %s does not exist among the cfg options!' % key)		
+			raise ValueError('The key set by the defaults: %s does not exist among the cfg options!' % key)
 		elif not options._beenSet[key]:
 			if key == 'inputFiles' and options.inputFiles: continue #skip input files that for some reason are never considered set
 			print 'setting default option for', key
@@ -415,13 +423,13 @@ if options.doBoostedCommissioning:
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
     options.processStdAK4Jets=False
     print "Option processStdAK4Jets will be set to '",options.processStdAK4Jets,"'"
-    options.runFatJets=True  
+    options.runFatJets=True
     options.runSubJets = True
     print "Option runFatJets will be set to '",options.runFatJets,"'"
     print "Option runSubJets  will be set to '",options.runSubJets,"'"
     print "********************"
 if options.runCTagVariables:
-    print "**********You are making NTuple for CTag*************" 
+    print "**********You are making NTuple for CTag*************"
 
 ## Global tag
 globalTag = options.mcGlobalTag
@@ -630,11 +638,38 @@ bTagInfosFat = copy.deepcopy(bTagInfos_noDeepFlavour)
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfImpactParameter' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfInclusiveSecondaryVertexFinder' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfBoostedDoubleSV' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
+## Add DeepDoubleX tag infos
+bTagInfosFat += ([] if options.useLegacyTaggers else ['pfDeepDoubleXTagInfos'])
 
 bTagDiscriminators_no_deepFlavour = {i for i in bTagDiscriminators if 'DeepFlavourJetTags' not in i}
 bTagDiscriminatorsFat = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
-## Add DeepDoubleB tagger to fat jets
-bTagDiscriminatorsFat.update(set(['pfDeepDoubleBJetTags:probH']))
+## Add DeepDoubleX tagger to fat jets
+bTagDiscriminatorsFat.update(set([
+    'pfDeepDoubleBvLJetTags:probQCD',
+    'pfDeepDoubleBvLJetTags:probHbb',
+    'pfDeepDoubleCvLJetTags:probQCD',
+    'pfDeepDoubleCvLJetTags:probHcc',
+    'pfDeepDoubleCvBJetTags:probHbb',
+    'pfDeepDoubleCvBJetTags:probHcc',
+    'pfMassIndependentDeepDoubleBvLJetTags:probQCD',
+    'pfMassIndependentDeepDoubleBvLJetTags:probHbb',
+    'pfMassIndependentDeepDoubleCvLJetTags:probQCD',
+    'pfMassIndependentDeepDoubleCvLJetTags:probHcc',
+    'pfMassIndependentDeepDoubleCvBJetTags:probHbb',
+    'pfMassIndependentDeepDoubleCvBJetTags:probHcc',
+]))
+## Add DeepBoostedJet discriminators
+from RecoBTag.MXNet.pfDeepBoostedJet_cff import _pfMassDecorrelatedDeepBoostedJetTagsProbs, _pfMassDecorrelatedDeepBoostedJetTagsMetaDiscrs
+bTagDiscriminatorsFat.update(set([]) if (options.useLegacyTaggers or not options.miniAOD) else set([
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:bbvsLight",
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ccvsLight",
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:TvsQCD",
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHccvsQCD",
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:WvsQCD",
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHbbvsQCD"
+]))
+## Add DeepBoostedJet tag infos
+bTagInfosFat += ([] if (options.useLegacyTaggers or not options.miniAOD) else ['pfDeepBoostedJetTagInfos'])
 
 if options.runJetClustering:
     options.remakeAllDiscr = True
@@ -778,7 +813,7 @@ if options.fastSim :
     options.outFilename += '_FastSim'
 
 if options.doBoostedCommissioning:
-  options.outFilename += '_BoostedCommissioning' 
+  options.outFilename += '_BoostedCommissioning'
 
 options.outFilename += '.root'
 
@@ -1485,7 +1520,7 @@ for requiredGroup in process.btagana.groups:
 
 process.btagana.MaxEta                = options.maxJetEta ## for extended forward pixel coverage
 process.btagana.MinPt                 = options.minJetPt
-process.btagana.tracksColl            = cms.InputTag(trackSource) 
+process.btagana.tracksColl            = cms.InputTag(trackSource)
 process.btagana.useSelectedTracks     = options.useSelectedTracks ## False if you want to run on all tracks : for commissioning studies
 process.btagana.useTrackHistory       = options.useTrackHistory ## Can only be used with GEN-SIM-RECODEBUG files
 process.btagana.produceJetTrackTruthTree = options.useTrackHistory ## can only be used with GEN-SIM-RECODEBUG files and when useTrackHistory is True
@@ -1496,6 +1531,8 @@ process.btagana.runTagVariables     = options.runTagVariables  ## True if you wa
 process.btagana.runCSVTagVariables  = options.runCSVTagVariables   ## True if you want to run CSV TaggingVariables
 process.btagana.runCSVTagTrackVariables  = options.runCSVTagTrackVariables   ## True if you want to run CSV Tagging Track Variables
 process.btagana.runDeepFlavourTagVariables = options.runDeepFlavourTagVariables
+process.btagana.runDeepDoubleXTagVariables = options.runDeepDoubleXTagVariables
+process.btagana.runDeepBoostedJetTagVariables = options.runDeepBoostedJetTagVariables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag(patJetSource)
 process.btagana.muonCollectionName    = cms.InputTag(muSource)
@@ -1540,6 +1577,8 @@ if options.runFatJets:
         deepFlavourJetTags = cms.string(''),
         deepFlavourNegJetTags = cms.string(''),
         runTagVariablesSubJets = options.runTagVariablesSubJets,
+        runDeepDoubleXTagVariables = options.runDeepDoubleXTagVariables,
+        runDeepBoostedJetTagVariables = options.runDeepBoostedJetTagVariables,
         useSelectedTracks   = cms.bool(True),
         maxDeltaR           = cms.double(options.fatJetRadius),
         R0                  = cms.double(options.fatJetRadius),
@@ -1572,6 +1611,8 @@ if options.doBoostedCommissioning:
     process.btaganaFatJets.runCSVTagVariables = True
     process.btaganaFatJets.runCSVTagTrackVariables = True
     process.btaganaFatJets.runCSVTagVariablesSubJets = True
+    process.btaganaFatJets.runDeepDoubleXTagVariables = True
+    process.btaganaFatJets.runDeepBoostedJetTagVariables = True
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
     print "runHadronVariables set to '",process.btaganaFatJets.runHadronVariables,"'"
     print "runQuarkVariables set to '",process.btaganaFatJets.runQuarkVariables,"'"
@@ -1579,6 +1620,8 @@ if options.doBoostedCommissioning:
     print "For fat jets: runCSVTagVariables set to '",process.btaganaFatJets.runCSVTagVariables,"'"
     print "For fat jets: runCSVTagTrackVariables set to '",process.btaganaFatJets.runCSVTagTrackVariables,"'"
     print "For subjets:  runCSVTagVariablesSubJets set to '",process.btaganaFatJets.runCSVTagVariablesSubJets,"'"
+    print "For fat jets: runDeepDoubleXTagVariables set to '",process.btaganaFatJets.runDeepDoubleXTagVariables,"'"
+    print "For fat jets: runDeepBoostedJetTagVariables set to '",process.btaganaFatJets.runDeepBoostedJetTagVariables,"'"
     print "********************"
 
 if process.btagana.produceJetTrackTruthTree:
