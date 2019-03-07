@@ -576,18 +576,18 @@ bTagDiscriminators = set([
   , 'pfNegativeDeepFlavourJetTags:probuds'
   , 'pfNegativeDeepFlavourJetTags:probg'
     # DeepFlavour with pruned input
-  , 'pfDeepFlavourPrunedJetTags:probb'
-  , 'pfDeepFlavourPrunedJetTags:probbb'
-  , 'pfDeepFlavourPrunedJetTags:problepb'
-  , 'pfDeepFlavourPrunedJetTags:probc'
-  , 'pfDeepFlavourPrunedJetTags:probuds'
-  , 'pfDeepFlavourPrunedJetTags:probg'
-  , 'pfNegativeDeepFlavourPrunedJetTags:probb'
-  , 'pfNegativeDeepFlavourPrunedJetTags:probbb'
-  , 'pfNegativeDeepFlavourPrunedJetTags:problepb'
-  , 'pfNegativeDeepFlavourPrunedJetTags:probc'
-  , 'pfNegativeDeepFlavourPrunedJetTags:probuds'
-  , 'pfNegativeDeepFlavourPrunedJetTags:probg'
+#   , 'pfDeepFlavourPrunedJetTags:probb'
+#   , 'pfDeepFlavourPrunedJetTags:probbb'
+#   , 'pfDeepFlavourPrunedJetTags:problepb'
+#   , 'pfDeepFlavourPrunedJetTags:probc'
+#   , 'pfDeepFlavourPrunedJetTags:probuds'
+#   , 'pfDeepFlavourPrunedJetTags:probg'
+#   , 'pfNegativeDeepFlavourPrunedJetTags:probb'
+#   , 'pfNegativeDeepFlavourPrunedJetTags:probbb'
+#   , 'pfNegativeDeepFlavourPrunedJetTags:problepb'
+#   , 'pfNegativeDeepFlavourPrunedJetTags:probc'
+#   , 'pfNegativeDeepFlavourPrunedJetTags:probuds'
+#   , 'pfNegativeDeepFlavourPrunedJetTags:probg'
 
 ])
 
@@ -658,7 +658,7 @@ bTagInfosFat += ([] if options.useLegacyTaggers else ['pfBoostedDoubleSV' + ('CA
 bTagDiscriminators_no_deepFlavour = {i for i in bTagDiscriminators if 'DeepFlavourJetTags' not in i}
 bTagDiscriminatorsFat = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
 ## Add DeepDoubleB tagger to fat jets
-bTagDiscriminatorsFat.update(set(['pfDeepDoubleBJetTags:probH']))
+# bTagDiscriminatorsFat.update(set(['pfDeepDoubleBJetTags:probH']))
 
 if options.runJetClustering:
     options.remakeAllDiscr = True
