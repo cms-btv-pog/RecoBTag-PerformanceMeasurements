@@ -144,6 +144,9 @@ class TTbarSelectionProducer : public edm::EDProducer {
       //verbose level
       int verbose_;
 
+      //do not clear Collections for events not passing the selection criteria
+      bool selectAll_;
+
       //return the channel selected
       int AssignChannel(std::vector<pat::Electron> &selElectrons,
 			std::vector<pat::Muon> &selMuons,

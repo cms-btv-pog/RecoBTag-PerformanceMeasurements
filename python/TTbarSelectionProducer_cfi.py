@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 ttbarselectionproducer = cms.EDProducer("TTbarSelectionProducer",
+                                        selectAll        = cms.bool(False),
                                         verbose          = cms.int32(0),
                                         triggerColl      = cms.InputTag("TriggerResults","","HLT"),
                                         prunedGenParticles       = cms.InputTag('prunedGenParticles'),
