@@ -26,6 +26,7 @@ TTbarSelectionProducer::TTbarSelectionProducer(const edm::ParameterSet& iConfig)
   metToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("metColl")))
 {
   verbose_           = iConfig.getParameter<int > ("verbose");
+  selectAll_         = iConfig.getParameter<bool> ("selectAll");
   triggerBitsProc_    = iConfig.getParameter<edm::InputTag>("triggerColl").process();
   
   trigNamesToSel_     = iConfig.getParameter<std::vector<std::string> >("trigNamesToSel");
@@ -363,7 +364,7 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
      }
 
    //save summary of selected objects into event
-   if(!passLepSel || !passJetSel || !passMetSel) 
+   if((!passLepSel || !passJetSel || !passMetSel) && !selectAll_ )
      {
        chsel=0;
        selElectrons.clear();
