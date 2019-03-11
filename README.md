@@ -3,8 +3,8 @@
 ## Software setup
 
 ```
-cmsrel CMSSW_10_2_7
-cd CMSSW_10_2_7/src
+cmsrel CMSSW_10_2_11
+cd CMSSW_10_2_11/src
 cmsenv
 
 setenv CMSSW_GIT_REFERENCE /cvmfs/cms.cern.ch/cmssw.git.daily
@@ -12,10 +12,10 @@ git cms-init
 
 git cms-addpkg RecoBTag
 git cms-addpkg PhysicsTools/PatAlgos
-git cms-merge-topic emilbols:PrunedTraining_NoPuppi_10_2_7
+git cms-merge-topic rauser:PrunedTraining_NoPuppi_10_2_11
 git clone -b PrunedTraining_NoPuppi https://github.com/emilbols/RecoBTag-Combined RecoBTag/Combined/data
 
-git clone -b 10_2_X_v1.04 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b 10_2_X_v1.05 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
