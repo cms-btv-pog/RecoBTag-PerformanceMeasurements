@@ -3,6 +3,9 @@
 set -o errexit
 function die { echo 'FAILED': status $1 ;  exit $1;}
 
+echo 'Running on MINIAODSIM boosted'
+cmsRun runBTagAnalyzer_cfg.py defaults=Moriond19Boosted runOnData=False maxEvents=1000 &> boosted.log || die $? 
+
 echo 'Running on data'
 cmsRun runBTagAnalyzer_cfg.py defaults=Prompt18 runOnData=True maxEvents=20 groups='test' &> last.log || die $?
 
