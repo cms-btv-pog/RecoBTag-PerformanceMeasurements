@@ -2809,6 +2809,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     float deepBoostedJetWvsQCD   = (deepBoostedJetTags_.size()) ? pjet->bDiscriminator((deepBoostedJetTags_+":WvsQCD"   ).c_str()) : -10;
     float deepBoostedJetZHbbvsQCD   = (deepBoostedJetTags_.size()) ? pjet->bDiscriminator((deepBoostedJetTags_+":ZHbbvsQCD"   ).c_str()) : -10;
 
+
 //     float cMVA = pjet->bDiscriminator(cMVABJetTags_.c_str());
     float cMVAv2 = pjet->bDiscriminator(cMVAv2BJetTags_.c_str());
     float cMVAv2Neg = pjet->bDiscriminator(cMVAv2NegBJetTags_.c_str());
@@ -3643,12 +3644,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
 
 
     // additional DeepBoostedJet Input Features
-
-
-    cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
     if (runDeepBoostedJetTagVariables_) {
-      can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
-
       auto dbj_taginfo = static_cast<const reco::DeepBoostedJetTagInfo*>(pjet->tagInfo(deepBoostedJetTagInfos_));
       if(!dbj_taginfo) {
         throw cms::Exception("CorruptData") << "The jet collection does not have the DeepBoostedJet TagInfos embedded!";

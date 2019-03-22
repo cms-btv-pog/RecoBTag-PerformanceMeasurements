@@ -1,10 +1,9 @@
 common = {
-<<<<<<< HEAD
 	'eras' : ['Run2_2018'],
 	'miniAOD' : True,
 	'runDeepFlavourTagVariables' : False,
-  'doBoostedCommissioning': True,
-  'groups': ['EventInfo', 'Devdatta'],
+        'doBoostedCommissioning': True,
+        'groups': ['EventInfo', 'Devdatta', 'DoubleBCommissioning'],
 }
 
 mc = {

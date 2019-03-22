@@ -338,7 +338,7 @@ options.register(
 )
 
 ## 'maxEvents' is already registered by the Framework, changing default value
-options.setDefault('maxEvents', -1)
+options.setDefault('maxEvents', 100)
 
 options.parseArguments()
 if options.defaults:
@@ -348,19 +348,19 @@ if options.defaults:
 	except ImportError:
 		raise ValueError('The default settings named %s.py are not present in PerformanceMeasurements/python/defaults/' % options.defaults)
 	if not hasattr(defaults, 'common') or not isinstance(defaults.common, dict):
-		raise RuntimeError('the default file %s.py does not contain a dictionary named common' % options.defaults)  
+		raise RuntimeError('the default file %s.py does not contain a dictionary named common' % options.defaults)
 	items = defaults.common.items()
-	if hasattr(defaults, 'data') and options.runOnData: 
+	if hasattr(defaults, 'data') and options.runOnData:
 		if not isinstance(defaults.data, dict):
 			raise RuntimeError('the default file %s.py contains an object called "data" which is not a dictionary' % options.defaults)
 		items.extend(defaults.data.items())
-	if hasattr(defaults, 'mc') and not options.runOnData: 
+	if hasattr(defaults, 'mc') and not options.runOnData:
 		if not isinstance(defaults.mc, dict):
 			raise RuntimeError('the default file %s.py contains an object called "mc" which is not a dictionary' % options.defaults)
 		items.extend(defaults.mc.items())
 	for key, value in items:
 		if key not in options._beenSet:
-			raise ValueError('The key set by the defaults: %s does not exist among the cfg options!' % key)		
+			raise ValueError('The key set by the defaults: %s does not exist among the cfg options!' % key)
 		elif not options._beenSet[key]:
 			if key == 'inputFiles' and options.inputFiles: continue #skip input files that for some reason are never considered set
 			print 'setting default option for', key
@@ -429,13 +429,13 @@ if options.doBoostedCommissioning:
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
     options.processStdAK4Jets=False
     print "Option processStdAK4Jets will be set to '",options.processStdAK4Jets,"'"
-    options.runFatJets=True  
+    options.runFatJets=True
     options.runSubJets = True
     print "Option runFatJets will be set to '",options.runFatJets,"'"
     print "Option runSubJets  will be set to '",options.runSubJets,"'"
     print "********************"
 if options.runCTagVariables:
-    print "**********You are making NTuple for CTag*************" 
+    print "**********You are making NTuple for CTag*************"
 
 ## Global tag
 globalTag = options.mcGlobalTag
@@ -584,18 +584,18 @@ bTagDiscriminators = set([
   , 'pfNegativeDeepFlavourJetTags:probuds'
   , 'pfNegativeDeepFlavourJetTags:probg'
     # DeepFlavour with pruned input
-  , 'pfDeepFlavourPrunedJetTags:probb'
-  , 'pfDeepFlavourPrunedJetTags:probbb'
-  , 'pfDeepFlavourPrunedJetTags:problepb'
-  , 'pfDeepFlavourPrunedJetTags:probc'
-  , 'pfDeepFlavourPrunedJetTags:probuds'
-  , 'pfDeepFlavourPrunedJetTags:probg'
-  , 'pfNegativeDeepFlavourPrunedJetTags:probb'
-  , 'pfNegativeDeepFlavourPrunedJetTags:probbb'
-  , 'pfNegativeDeepFlavourPrunedJetTags:problepb'
-  , 'pfNegativeDeepFlavourPrunedJetTags:probc'
-  , 'pfNegativeDeepFlavourPrunedJetTags:probuds'
-  , 'pfNegativeDeepFlavourPrunedJetTags:probg'
+#  , 'pfDeepFlavourPrunedJetTags:probb'
+#  , 'pfDeepFlavourPrunedJetTags:probbb'
+#  , 'pfDeepFlavourPrunedJetTags:problepb'
+#  , 'pfDeepFlavourPrunedJetTags:probc'
+#  , 'pfDeepFlavourPrunedJetTags:probuds'
+#  , 'pfDeepFlavourPrunedJetTags:probg'
+#  , 'pfNegativeDeepFlavourPrunedJetTags:probb'
+#  , 'pfNegativeDeepFlavourPrunedJetTags:probbb'
+#  , 'pfNegativeDeepFlavourPrunedJetTags:problepb'
+#  , 'pfNegativeDeepFlavourPrunedJetTags:probc'
+#  , 'pfNegativeDeepFlavourPrunedJetTags:probuds'
+#  , 'pfNegativeDeepFlavourPrunedJetTags:probg'
 
 ])
 
@@ -667,6 +667,9 @@ bTagInfosFat += ([] if options.useLegacyTaggers else ['pfDeepDoubleXTagInfos'])
 
 bTagDiscriminators_no_deepFlavour = {i for i in bTagDiscriminators if 'DeepFlavourJetTags' not in i}
 bTagDiscriminatorsFat = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
+## Add DeepDoubleX tag infos
+bTagInfosFat += ([] if options.useLegacyTaggers else ['pfDeepDoubleXTagInfos'])
+
 ## Add DeepDoubleX tagger to fat jets
 bTagDiscriminatorsFat.update(set([
     'pfDeepDoubleBvLJetTags:probQCD',
@@ -837,7 +840,7 @@ if options.fastSim :
     options.outFilename += '_FastSim'
 
 if options.doBoostedCommissioning:
-  options.outFilename += '_BoostedCommissioning' 
+  options.outFilename += '_BoostedCommissioning'
 
 options.outFilename += '.root'
 
@@ -1544,7 +1547,7 @@ for requiredGroup in process.btagana.groups:
 
 process.btagana.MaxEta                = options.maxJetEta ## for extended forward pixel coverage
 process.btagana.MinPt                 = options.minJetPt
-process.btagana.tracksColl            = cms.InputTag(trackSource) 
+process.btagana.tracksColl            = cms.InputTag(trackSource)
 process.btagana.useSelectedTracks     = options.useSelectedTracks ## False if you want to run on all tracks : for commissioning studies
 process.btagana.useTrackHistory       = options.useTrackHistory ## Can only be used with GEN-SIM-RECODEBUG files
 process.btagana.produceJetTrackTruthTree = options.useTrackHistory ## can only be used with GEN-SIM-RECODEBUG files and when useTrackHistory is True
