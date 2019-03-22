@@ -662,6 +662,8 @@ bTagInfosFat = copy.deepcopy(bTagInfos_noDeepFlavour)
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfImpactParameter' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfInclusiveSecondaryVertexFinder' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfBoostedDoubleSV' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
+## Add DeepDoubleX tag infos
+bTagInfosFat += ([] if options.useLegacyTaggers else ['pfDeepDoubleXTagInfos'])
 
 bTagDiscriminators_no_deepFlavour = {i for i in bTagDiscriminators if 'DeepFlavourJetTags' not in i}
 bTagDiscriminatorsFat = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
@@ -695,7 +697,6 @@ bTagDiscriminatorsFat.update(set([]) if (options.useLegacyTaggers or not options
 ]))
 ## Add DeepBoostedJet tag infos
 bTagInfosFat += ([] if (options.useLegacyTaggers or not options.miniAOD) else ['pfDeepBoostedJetTagInfos'])
-
 
 if options.runJetClustering:
     options.remakeAllDiscr = True

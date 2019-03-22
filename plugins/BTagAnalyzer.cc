@@ -400,6 +400,8 @@ private:
   bool runDeepDoubleXTagVariables_;
   bool runDeepBoostedJetTagVariables_;
   bool runCSVTagVariablesSubJets_;
+  bool runDeepDoubleXTagVariables_;
+  bool runDeepBoostedJetTagVariables_;
   bool runPFElectronVariables_;
   bool runPFMuonVariables_;
   bool runCTagVariables_;
@@ -2930,7 +2932,6 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
     JetInfo[iJetColl].Jet_DeepBoostedJetWvsQCD[JetInfo[iJetColl].nJet]  = deepBoostedJetWvsQCD;
     JetInfo[iJetColl].Jet_DeepBoostedJetZHbbvsQCD[JetInfo[iJetColl].nJet]    = deepBoostedJetZHbbvsQCD;
 
-
     // TagInfo TaggingVariables
     if ( runTagVariables )
     {
@@ -3581,156 +3582,150 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].Jet_nSV_fat[JetInfo[iJetColl].nJet] = vars.get(reco::btau::jetNSecondaryVertices);
       //--------------------------
       // DeepDoubleX InputFeatures
-    if(runDeepDoubleXTagVariables_) {
+      if(runDeepDoubleXTagVariables_) {
         auto ddb_taginfo = static_cast<const reco::DeepDoubleXTagInfo*>(pjet->tagInfo(deepDoubleXTagInfos_));
         if(!ddb_taginfo) {
             throw cms::Exception("CorruptData") << "The jet collection does not have the DeepDoubleX TagInfos embedded!";
         }
         const auto & features = ddb_taginfo->features();
         /// Name of variables https://github.com/andrzejnovak/cmssw/blob/94Xpr/DataFormats/BTauReco/interface/BoostedDoubleSVTagInfoFeatures.h
-            JetInfo[iJetColl].DeepDoubleXInput_jetNTracks[JetInfo[iJetColl].nJet] = features.tag_info_features.jetNTracks;
-            JetInfo[iJetColl].DeepDoubleXInput_jetNSecondaryVertices[JetInfo[iJetColl].nJet] = features.tag_info_features.jetNSecondaryVertices;
-            JetInfo[iJetColl].DeepDoubleXInput_trackSip3dSig_0[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip3dSig_0;
-            JetInfo[iJetColl].DeepDoubleXInput_trackSip3dSig_1[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip3dSig_1;
-            JetInfo[iJetColl].DeepDoubleXInput_trackSip3dSig_2[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip3dSig_2;
-            JetInfo[iJetColl].DeepDoubleXInput_trackSip3dSig_3[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip3dSig_3;
-            JetInfo[iJetColl].DeepDoubleXInput_tau1_trackSip3dSig_0[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_trackSip3dSig_0;
-            JetInfo[iJetColl].DeepDoubleXInput_tau1_trackSip3dSig_1[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_trackSip3dSig_1;
-            JetInfo[iJetColl].DeepDoubleXInput_tau2_trackSip3dSig_0[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_trackSip3dSig_0;
-            JetInfo[iJetColl].DeepDoubleXInput_tau2_trackSip3dSig_1[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_trackSip3dSig_1;
-            JetInfo[iJetColl].DeepDoubleXInput_trackSip2dSigAboveBottom_0[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip2dSigAboveBottom_0;
-            JetInfo[iJetColl].DeepDoubleXInput_trackSip2dSigAboveBottom_1[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip2dSigAboveBottom_1;
-            JetInfo[iJetColl].DeepDoubleXInput_trackSip2dSigAboveCharm[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip2dSigAboveCharm;
-            JetInfo[iJetColl].DeepDoubleXInput_tau1_trackEtaRel_0[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_trackEtaRel_0;
-            JetInfo[iJetColl].DeepDoubleXInput_tau1_trackEtaRel_1[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_trackEtaRel_1;
-            JetInfo[iJetColl].DeepDoubleXInput_tau1_trackEtaRel_2[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_trackEtaRel_2;
-            JetInfo[iJetColl].DeepDoubleXInput_tau2_trackEtaRel_0[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_trackEtaRel_0;
-            JetInfo[iJetColl].DeepDoubleXInput_tau2_trackEtaRel_1[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_trackEtaRel_1;
-            JetInfo[iJetColl].DeepDoubleXInput_tau2_trackEtaRel_2[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_trackEtaRel_2;
-            JetInfo[iJetColl].DeepDoubleXInput_tau1_vertexMass[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_vertexMass;
-            JetInfo[iJetColl].DeepDoubleXInput_tau1_vertexEnergyRatio[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_vertexEnergyRatio;
-            JetInfo[iJetColl].DeepDoubleXInput_tau1_flightDistance2dSig[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_flightDistance2dSig;
-            JetInfo[iJetColl].DeepDoubleXInput_tau1_vertexDeltaR[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_vertexDeltaR;
-            JetInfo[iJetColl].DeepDoubleXInput_tau2_vertexMass[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_vertexMass;
-            JetInfo[iJetColl].DeepDoubleXInput_tau2_vertexEnergyRatio[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_vertexEnergyRatio;
-            JetInfo[iJetColl].DeepDoubleXInput_tau2_flightDistance2dSig[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_flightDistance2dSig;
-            JetInfo[iJetColl].DeepDoubleXInput_tau2_vertexDeltaR[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_vertexDeltaR;
-            JetInfo[iJetColl].DeepDoubleXInput_z_ratio[JetInfo[iJetColl].nJet] = features.tag_info_features.z_ratio;
+        JetInfo[iJetColl].DeepDoubleXInput_jetNTracks[JetInfo[iJetColl].nJet] = features.tag_info_features.jetNTracks;
+        JetInfo[iJetColl].DeepDoubleXInput_jetNSecondaryVertices[JetInfo[iJetColl].nJet] = features.tag_info_features.jetNSecondaryVertices;
+        JetInfo[iJetColl].DeepDoubleXInput_trackSip3dSig_0[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip3dSig_0;
+        JetInfo[iJetColl].DeepDoubleXInput_trackSip3dSig_1[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip3dSig_1;
+        JetInfo[iJetColl].DeepDoubleXInput_trackSip3dSig_2[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip3dSig_2;
+        JetInfo[iJetColl].DeepDoubleXInput_trackSip3dSig_3[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip3dSig_3;
+        JetInfo[iJetColl].DeepDoubleXInput_tau1_trackSip3dSig_0[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_trackSip3dSig_0;
+        JetInfo[iJetColl].DeepDoubleXInput_tau1_trackSip3dSig_1[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_trackSip3dSig_1;
+        JetInfo[iJetColl].DeepDoubleXInput_tau2_trackSip3dSig_0[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_trackSip3dSig_0;
+        JetInfo[iJetColl].DeepDoubleXInput_tau2_trackSip3dSig_1[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_trackSip3dSig_1;
+        JetInfo[iJetColl].DeepDoubleXInput_trackSip2dSigAboveBottom_0[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip2dSigAboveBottom_0;
+        JetInfo[iJetColl].DeepDoubleXInput_trackSip2dSigAboveBottom_1[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip2dSigAboveBottom_1;
+        JetInfo[iJetColl].DeepDoubleXInput_trackSip2dSigAboveCharm[JetInfo[iJetColl].nJet] = features.tag_info_features.trackSip2dSigAboveCharm;
+        JetInfo[iJetColl].DeepDoubleXInput_tau1_trackEtaRel_0[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_trackEtaRel_0;
+        JetInfo[iJetColl].DeepDoubleXInput_tau1_trackEtaRel_1[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_trackEtaRel_1;
+        JetInfo[iJetColl].DeepDoubleXInput_tau1_trackEtaRel_2[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_trackEtaRel_2;
+        JetInfo[iJetColl].DeepDoubleXInput_tau2_trackEtaRel_0[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_trackEtaRel_0;
+        JetInfo[iJetColl].DeepDoubleXInput_tau2_trackEtaRel_1[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_trackEtaRel_1;
+        JetInfo[iJetColl].DeepDoubleXInput_tau2_trackEtaRel_2[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_trackEtaRel_2;
+        JetInfo[iJetColl].DeepDoubleXInput_tau1_vertexMass[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_vertexMass;
+        JetInfo[iJetColl].DeepDoubleXInput_tau1_vertexEnergyRatio[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_vertexEnergyRatio;
+        JetInfo[iJetColl].DeepDoubleXInput_tau1_flightDistance2dSig[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_flightDistance2dSig;
+        JetInfo[iJetColl].DeepDoubleXInput_tau1_vertexDeltaR[JetInfo[iJetColl].nJet] = features.tag_info_features.tau1_vertexDeltaR;
+        JetInfo[iJetColl].DeepDoubleXInput_tau2_vertexMass[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_vertexMass;
+        JetInfo[iJetColl].DeepDoubleXInput_tau2_vertexEnergyRatio[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_vertexEnergyRatio;
+        JetInfo[iJetColl].DeepDoubleXInput_tau2_flightDistance2dSig[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_flightDistance2dSig;
+        JetInfo[iJetColl].DeepDoubleXInput_tau2_vertexDeltaR[JetInfo[iJetColl].nJet] = features.tag_info_features.tau2_vertexDeltaR;
+        JetInfo[iJetColl].DeepDoubleXInput_z_ratio[JetInfo[iJetColl].nJet] = features.tag_info_features.z_ratio;
 
         size_t csize = features.c_pf_features.size();
-            JetInfo[iJetColl].Jet_DeepDoubleX_nFirstTrkTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkDeepDoubleX;
+        JetInfo[iJetColl].Jet_DeepDoubleX_nFirstTrkTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkDeepDoubleX;
         for(size_t t = 0; t < csize; t++){
-            JetInfo[iJetColl].DeepDoubleXInput_charged_EtaRel[ JetInfo[iJetColl].nTrkDeepDoubleX+t ] = features.c_pf_features[t].btagPf_trackEtaRel;
-            JetInfo[iJetColl].DeepDoubleXInput_charged_PtRatio[ JetInfo[iJetColl].nTrkDeepDoubleX+t ] = features.c_pf_features[t].btagPf_trackPtRatio;
-            JetInfo[iJetColl].DeepDoubleXInput_charged_PParRatio[ JetInfo[iJetColl].nTrkDeepDoubleX+t ] = features.c_pf_features[t].btagPf_trackPParRatio;
-            JetInfo[iJetColl].DeepDoubleXInput_charged_Sip2dVal[ JetInfo[iJetColl].nTrkDeepDoubleX+t ] = features.c_pf_features[t].btagPf_trackSip2dVal;
-            JetInfo[iJetColl].DeepDoubleXInput_charged_Sip2dSig[ JetInfo[iJetColl].nTrkDeepDoubleX+t ] = features.c_pf_features[t].btagPf_trackSip2dSig;
-            JetInfo[iJetColl].DeepDoubleXInput_charged_Sip3dVal[ JetInfo[iJetColl].nTrkDeepDoubleX+t ] = features.c_pf_features[t].btagPf_trackSip3dVal;
-            JetInfo[iJetColl].DeepDoubleXInput_charged_Sip3dSig[ JetInfo[iJetColl].nTrkDeepDoubleX+t ] = features.c_pf_features[t].btagPf_trackSip3dSig;
-            JetInfo[iJetColl].DeepDoubleXInput_charged_JetDistVal[ JetInfo[iJetColl].nTrkDeepDoubleX+t ] = features.c_pf_features[t].btagPf_trackJetDistVal;
+          JetInfo[iJetColl].DeepDoubleXInput_charged_EtaRel[ JetInfo[iJetColl].nTrkDeepDoubleX+t ] = features.c_pf_features[t].btagPf_trackEtaRel;
+          JetInfo[iJetColl].DeepDoubleXInput_charged_PtRatio[ JetInfo[iJetColl].nTrkDeepDoubleX+t ] = features.c_pf_features[t].btagPf_trackPtRatio;
+          JetInfo[iJetColl].DeepDoubleXInput_charged_PParRatio[ JetInfo[iJetColl].nTrkDeepDoubleX+t ] = features.c_pf_features[t].btagPf_trackPParRatio;
+          JetInfo[iJetColl].DeepDoubleXInput_charged_Sip2dVal[ JetInfo[iJetColl].nTrkDeepDoubleX+t ] = features.c_pf_features[t].btagPf_trackSip2dVal;
+          JetInfo[iJetColl].DeepDoubleXInput_charged_Sip2dSig[ JetInfo[iJetColl].nTrkDeepDoubleX+t ] = features.c_pf_features[t].btagPf_trackSip2dSig;
+          JetInfo[iJetColl].DeepDoubleXInput_charged_Sip3dVal[ JetInfo[iJetColl].nTrkDeepDoubleX+t ] = features.c_pf_features[t].btagPf_trackSip3dVal;
+          JetInfo[iJetColl].DeepDoubleXInput_charged_Sip3dSig[ JetInfo[iJetColl].nTrkDeepDoubleX+t ] = features.c_pf_features[t].btagPf_trackSip3dSig;
+          JetInfo[iJetColl].DeepDoubleXInput_charged_JetDistVal[ JetInfo[iJetColl].nTrkDeepDoubleX+t ] = features.c_pf_features[t].btagPf_trackJetDistVal;
         }
         JetInfo[iJetColl].nTrkDeepDoubleX += csize;
-            JetInfo[iJetColl].Jet_DeepDoubleX_nLastTrkTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkDeepDoubleX;
+        JetInfo[iJetColl].Jet_DeepDoubleX_nLastTrkTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkDeepDoubleX;
 
         size_t svsize = features.sv_features.size();
-            JetInfo[iJetColl].Jet_DeepDoubleX_nFirstSVTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSVDeepDoubleX;
+        JetInfo[iJetColl].Jet_DeepDoubleX_nFirstSVTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSVDeepDoubleX;
         for(size_t sv = 0; sv < svsize; sv++){
-            JetInfo[iJetColl].DeepDoubleXInput_sv_d3d[ JetInfo[iJetColl].nSVDeepDoubleX+sv ] = features.sv_features[sv].d3d;
-            JetInfo[iJetColl].DeepDoubleXInput_sv_d3dsig[ JetInfo[iJetColl].nSVDeepDoubleX+sv ] = features.sv_features[sv].d3dsig;
+          JetInfo[iJetColl].DeepDoubleXInput_sv_d3d[ JetInfo[iJetColl].nSVDeepDoubleX+sv ] = features.sv_features[sv].d3d;
+          JetInfo[iJetColl].DeepDoubleXInput_sv_d3dsig[ JetInfo[iJetColl].nSVDeepDoubleX+sv ] = features.sv_features[sv].d3dsig;
         }
         JetInfo[iJetColl].nSVDeepDoubleX += svsize;
-            JetInfo[iJetColl].Jet_DeepDoubleX_nLastSVTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSVDeepDoubleX;
+        JetInfo[iJetColl].Jet_DeepDoubleX_nLastSVTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSVDeepDoubleX;
         //--------------------------
     }
 
 
     // additional DeepBoostedJet Input Features
-
-
-    cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
     if (runDeepBoostedJetTagVariables_) {
-    can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
+      auto dbj_taginfo = static_cast<const reco::DeepBoostedJetTagInfo*>(pjet->tagInfo(deepBoostedJetTagInfos_));
+      if(!dbj_taginfo) {
+        throw cms::Exception("CorruptData") << "The jet collection does not have the DeepBoostedJet TagInfos embedded!";
+      }
+      // Name of variables from https://github.com/cms-sw/cmssw/blob/master/RecoBTag/FeatureTools/plugins/DeepBoostedJetTagInfoProducer.cc#L75-L136
 
-        auto dbj_taginfo = static_cast<const reco::DeepBoostedJetTagInfo*>(pjet->tagInfo(deepBoostedJetTagInfos_));
-        if(!dbj_taginfo) {
-            throw cms::Exception("CorruptData") << "The jet collection does not have the DeepBoostedJet TagInfos embedded!";
-        }
-                // Name of variables from https://github.com/cms-sw/cmssw/blob/master/RecoBTag/FeatureTools/plugins/DeepBoostedJetTagInfoProducer.cc#L75-L136
+      const auto & dbj_features = dbj_taginfo->features();
+      size_t dbj_csize = dbj_features.get("pfcand_puppiw").size(); // can be any variable, not necessarily pfcand_puppiw 
+      JetInfo[iJetColl].Jet_DeepBoostedJet_nFirstTrkTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkDeepBoostedJet;
+      for(size_t q = 0; q < dbj_csize; q++){
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_puppiw[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_puppiw")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_hcalFrac[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_hcalFrac")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_VTX_ass[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_VTX_ass")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_lostInnerHits[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_lostInnerHits")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_quality[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_quality")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_charge[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_charge")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_isEl[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_isEl")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_isMu[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_isMu")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_isChargedHad[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_isChargedHad")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_isGamma[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_isGamma")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_isNeutralHad[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_isNeutralHad")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_phirel[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_phirel")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_etarel[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_etarel")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_deltaR[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_deltaR")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_abseta[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_abseta")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_ptrel_log[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_ptrel_log")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_erel_log[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_erel_log")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_pt_log[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_pt_log")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_drminsv[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_drminsv")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_drsubjet1[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_drsubjet1")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_drsubjet2[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_drsubjet2")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_normchi2[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_normchi2")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_dz[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dz")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_dzsig[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dzsig")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_dxy[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dxy")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_dxysig[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dxysig")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_dptdpt[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dptdpt")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_detadeta[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_detadeta")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_dphidphi[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dphidphi")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_dxydxy[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dxydxy")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_dzdz[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dzdz")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_dxydz[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dxydz")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_dphidxy[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dphidxy")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_dlambdadz[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dlambdadz")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_btagEtaRel[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagEtaRel")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_btagPtRatio[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagPtRatio")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_btagPParRatio[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagPParRatio")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_btagSip2dVal[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagSip2dVal")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_btagSip2dSig[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagSip2dSig")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_btagSip3dVal[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagSip3dVal")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_btagSip3dSig[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagSip3dSig")[q];
+        JetInfo[iJetColl].DeepBoostedJetInput_pf_btagJetDistVal[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagJetDistVal")[q];
+      }
+      JetInfo[iJetColl].nTrkDeepBoostedJet += dbj_csize;
+      JetInfo[iJetColl].Jet_DeepBoostedJet_nLastTrkTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkDeepBoostedJet;
 
-        const auto & dbj_features = dbj_taginfo->features();
-        size_t dbj_csize = dbj_features.get("pfcand_puppiw").size(); // can be any variable, not necessarily pfcand_puppiw 
-            JetInfo[iJetColl].Jet_DeepBoostedJet_nFirstTrkTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkDeepBoostedJet;
-        for(size_t q = 0; q < dbj_csize; q++){
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_puppiw[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_puppiw")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_hcalFrac[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_hcalFrac")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_VTX_ass[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_VTX_ass")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_lostInnerHits[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_lostInnerHits")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_quality[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_quality")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_charge[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_charge")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_isEl[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_isEl")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_isMu[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_isMu")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_isChargedHad[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_isChargedHad")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_isGamma[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_isGamma")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_isNeutralHad[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_isNeutralHad")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_phirel[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_phirel")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_etarel[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_etarel")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_deltaR[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_deltaR")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_abseta[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_abseta")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_ptrel_log[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_ptrel_log")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_erel_log[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_erel_log")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_pt_log[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_pt_log")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_drminsv[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_drminsv")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_drsubjet1[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_drsubjet1")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_drsubjet2[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_drsubjet2")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_normchi2[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_normchi2")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_dz[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dz")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_dzsig[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dzsig")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_dxy[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dxy")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_dxysig[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dxysig")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_dptdpt[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dptdpt")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_detadeta[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_detadeta")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_dphidphi[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dphidphi")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_dxydxy[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dxydxy")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_dzdz[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dzdz")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_dxydz[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dxydz")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_dphidxy[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dphidxy")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_dlambdadz[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_dlambdadz")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_btagEtaRel[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagEtaRel")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_btagPtRatio[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagPtRatio")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_btagPParRatio[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagPParRatio")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_btagSip2dVal[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagSip2dVal")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_btagSip2dSig[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagSip2dSig")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_btagSip3dVal[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagSip3dVal")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_btagSip3dSig[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagSip3dSig")[q];
-            JetInfo[iJetColl].DeepBoostedJetInput_pf_btagJetDistVal[ JetInfo[iJetColl].nTrkDeepBoostedJet+q ] = dbj_features.get("pfcand_btagJetDistVal")[q];
-                }
-        JetInfo[iJetColl].nTrkDeepBoostedJet += dbj_csize;
-            JetInfo[iJetColl].Jet_DeepBoostedJet_nLastTrkTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkDeepBoostedJet;
-
-        size_t dbj_svsize = dbj_features.get("sv_phirel").size(); 
-            JetInfo[iJetColl].Jet_DeepBoostedJet_nFirstSVTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSVDeepBoostedJet;
-        for(size_t qsv = 0; qsv < dbj_svsize; qsv++){
-            JetInfo[iJetColl].DeepBoostedJetInput_sv_phirel[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_phirel")[qsv];
-            JetInfo[iJetColl].DeepBoostedJetInput_sv_etarel[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_etarel")[qsv];
-            JetInfo[iJetColl].DeepBoostedJetInput_sv_deltaR[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_deltaR")[qsv];
-            JetInfo[iJetColl].DeepBoostedJetInput_sv_abseta[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_abseta")[qsv];
-            JetInfo[iJetColl].DeepBoostedJetInput_sv_mass[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_mass")[qsv];
-            JetInfo[iJetColl].DeepBoostedJetInput_sv_ptrel_log[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_ptrel_log")[qsv];
-            JetInfo[iJetColl].DeepBoostedJetInput_sv_erel_log[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_erel_log")[qsv];
-            JetInfo[iJetColl].DeepBoostedJetInput_sv_pt_log[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_pt_log")[qsv];
-            JetInfo[iJetColl].DeepBoostedJetInput_sv_ntracks[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_ntracks")[qsv];
-            JetInfo[iJetColl].DeepBoostedJetInput_sv_normchi2[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_normchi2")[qsv];
-            JetInfo[iJetColl].DeepBoostedJetInput_sv_dxy[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_dxy")[qsv];
-            JetInfo[iJetColl].DeepBoostedJetInput_sv_dxysig[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_dxysig")[qsv];
-            JetInfo[iJetColl].DeepBoostedJetInput_sv_d3d[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_d3d")[qsv];
-            JetInfo[iJetColl].DeepBoostedJetInput_sv_d3dsig[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_d3dsig")[qsv];
-            JetInfo[iJetColl].DeepBoostedJetInput_sv_costhetasvpv[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_costhetasvpv")[qsv];
-        }
-        JetInfo[iJetColl].nSVDeepBoostedJet += dbj_svsize;
-            JetInfo[iJetColl].Jet_DeepBoostedJet_nLastSVTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSVDeepBoostedJet;
-
-        }
+      size_t dbj_svsize = dbj_features.get("sv_phirel").size(); 
+      JetInfo[iJetColl].Jet_DeepBoostedJet_nFirstSVTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSVDeepBoostedJet;
+      for(size_t qsv = 0; qsv < dbj_svsize; qsv++){
+        JetInfo[iJetColl].DeepBoostedJetInput_sv_phirel[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_phirel")[qsv];
+        JetInfo[iJetColl].DeepBoostedJetInput_sv_etarel[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_etarel")[qsv];
+        JetInfo[iJetColl].DeepBoostedJetInput_sv_deltaR[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_deltaR")[qsv];
+        JetInfo[iJetColl].DeepBoostedJetInput_sv_abseta[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_abseta")[qsv];
+        JetInfo[iJetColl].DeepBoostedJetInput_sv_mass[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_mass")[qsv];
+        JetInfo[iJetColl].DeepBoostedJetInput_sv_ptrel_log[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_ptrel_log")[qsv];
+        JetInfo[iJetColl].DeepBoostedJetInput_sv_erel_log[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_erel_log")[qsv];
+        JetInfo[iJetColl].DeepBoostedJetInput_sv_pt_log[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_pt_log")[qsv];
+        JetInfo[iJetColl].DeepBoostedJetInput_sv_ntracks[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_ntracks")[qsv];
+        JetInfo[iJetColl].DeepBoostedJetInput_sv_normchi2[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_normchi2")[qsv];
+        JetInfo[iJetColl].DeepBoostedJetInput_sv_dxy[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_dxy")[qsv];
+        JetInfo[iJetColl].DeepBoostedJetInput_sv_dxysig[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_dxysig")[qsv];
+        JetInfo[iJetColl].DeepBoostedJetInput_sv_d3d[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_d3d")[qsv];
+        JetInfo[iJetColl].DeepBoostedJetInput_sv_d3dsig[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_d3dsig")[qsv];
+        JetInfo[iJetColl].DeepBoostedJetInput_sv_costhetasvpv[ JetInfo[iJetColl].nSVDeepBoostedJet+qsv ] = dbj_features.get("sv_costhetasvpv")[qsv];
+      }
+      JetInfo[iJetColl].nSVDeepBoostedJet += dbj_svsize;
+      JetInfo[iJetColl].Jet_DeepBoostedJet_nLastSVTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSVDeepBoostedJet;
     }
+  }
 
 
     cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;

@@ -1,4 +1,5 @@
 common = {
+<<<<<<< HEAD
 	'eras' : ['Run2_2018'],
 	'miniAOD' : True,
 	'runDeepFlavourTagVariables' : False,
