@@ -397,8 +397,6 @@ private:
   bool runCSVTagVariables_;
   bool runCSVTagTrackVariables_;
   bool runDeepFlavourTagVariables_;
-  bool runDeepDoubleXTagVariables_;
-  bool runDeepBoostedJetTagVariables_;
   bool runCSVTagVariablesSubJets_;
   bool runDeepDoubleXTagVariables_;
   bool runDeepBoostedJetTagVariables_;
