@@ -4,6 +4,7 @@ import FWCore.ParameterSet.Config as cms
 #Prefixes do not have to be given here, theses will be handled automatically
 #Suffixes have to be introduced by inserting an additional PSet. See for example Jet_nSubJets and Jet_nSubJets_SoftDropPuppi
 
+#To obtain an overview (alphabetically sorted by name) of the included variables, run the print_vars.py script in the same directory
 variableList = [
     cms.PSet(
       variable    = cms.string("nBitTrigger"),
