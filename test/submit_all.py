@@ -90,15 +90,15 @@ def main():
     config.Data.publishDBS = 'phys03'
     config.Site.storageSite = options.storageSite
 
-    print 'Using config ' + options.cfg
-    print 'Writing to versionectory ' + options.version
+    print('Using config  {}'.format(options.cfg))
+    print('Writing to versionectory {}'.format(options.version))
     
     def submit(config):
         try:
             crabCommand('submit', config = config)
         except HTTPException, hte:
-            print 'Cannot execute commend'
-            print hte.headers
+            print('Cannot execute commend')
+            print(hte.headers)
 
     #############################################################################################
     ## From now on that's what users should modify: this is the a-la-CRAB2 configuration part. ##
@@ -132,9 +132,9 @@ def main():
         if options.outLFNDirBase and not options.outLFNDirBase.isspace(): 
           config.Data.outLFNDirBase = os.path.join(options.outLFNDirBase,options.version)
         config.Data.outputDatasetTag = cond
-        print 'Submitting ' + config.General.requestName + ', dataset = ' + job
-        print 'Configuration :'
-        print config
+        print('Submitting {config.General.requestName} dataset =  {job}'.format(**locals()))
+        print('Configuration :')
+        print(config)
 
         try :
           from multiprocessing import Process
@@ -142,8 +142,9 @@ def main():
           p.start()
           p.join()
           submit(config)
+          print('Submitted')
         except :
-          print 'Not submitted.'
+          print('Not submitted.')
 
 if __name__ == '__main__':
   main()            
