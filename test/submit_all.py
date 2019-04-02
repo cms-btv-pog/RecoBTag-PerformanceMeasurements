@@ -1,66 +1,48 @@
 #!/usr/bin/env python
 """
-This is a small script that submits a config over many datasets
+This is a small script that submits CRAB jobs over many datasets
 """
 import os
 import glob
-from optparse import OptionParser
-
-def make_list(option, opt, value, parser):
-    setattr(parser.values, option.dest, value.split(','))
+import argparse
 
 def getOptions() :
-    """
-    Parse and return the arguments provided by the user.
-    """
-    usage = ('usage: python submit_all.py -c CFG -p PYCFGPARAMS -o OUTPUTLFNDIRBASE -d DIR -v VERSION -f DATASETS -s STORAGESITE')
 
-    parser = OptionParser(usage=usage)    
-    parser.add_option("-c", "--config", dest="cfg", default="runBTagAnalyzer_cfg.py",
-        help=("The crab script you want to submit "),
-        metavar="CONFIG")
-    parser.add_option("-i", "--inputFiles", 
-        type='string',
-        #action='callback',
-        #callback=make_list,
-        dest='inputFiles', 
-        help=("Input files that need to be shipped with the job"),
-        metavar="INPUTS")
-    parser.add_option("-p", "--pyCfgParams",
-        type='string',
-        action='callback',
-        callback=make_list,
-        dest='pyCfgParams', 
-        help=("input parameters for config file"),
-        metavar="PARAMS")
-    parser.add_option("-l", "--lumiMask", dest="lumiMask",
-        default='/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt',
-        help=("The JSON file containing good lumi list"),
-        metavar="LUMI")
-    parser.add_option("-f", "--datasets", dest="datasets",
-        help=("File listing datasets to run over"),
-        metavar="FILE")
-    parser.add_option("-v", "--version", dest="version", #default="RunIISummer16MiniAODv3_9_4_X_boosted",
-        help=("B2GAnaFW version"),
-        metavar="VERSION")
-    parser.add_option("-s", "--storageSite", dest="storageSite", #default="T2_CH_CERN",
-        help=("storage site"),
-        metavar="VERSION")
-    parser.add_option("-o", "--outLFNDirBase", dest="outLFNDirBase", 
-        help=("EOS path for storage"),
-        metavar="LFN")
-    (options, args) = parser.parse_args()
+  parser = argparse.ArgumentParser(description='CLI for CRAB config file settings')
+  parser.add_argument('cmsRun_cfg', type=str, default="runBTagAnalyzer_cfg.py", 
+      help='The crab script you want to submit')
+  parser.add_argument('-i', '--inputFiles', type=str, default='CRAB/input.txt',
+      help='Input files that need to be shipped with the job')
+  parser.add_argument('-p', '--pyCfgParams', nargs='+', type=str, default='',
+      help='Input parameters for config file')
+  parser.add_argument('-t', '--maxJobRuntimeMin', type=int, default=2000,
+      help='The maximum runtime (in minutes) per job')
+  parser.add_argument('-m', '--maxMemoryMB', type=int, default=2500,
+      help='Maximum amount of memory (in MB) a job is allowed to use')
+  parser.add_argument('-l', '--lumiMask', type=str, default='',
+      help='The JSON file containing good lumi list')
+  parser.add_argument('-f', '--files', type=str, default='CRAB/tosubmit.txt',
+      required=True,
+      help='File listing datasets to run over')
+  parser.add_argument('-v', '--version', type=str, default='',
+      help='BTagAnalyer version')
+  parser.add_argument('-s', '--storageSite', type=str, default='T2_CH_CERN',
+      help='Storage site')
+  parser.add_argument('-o', '--outLFNDirBase', type=str, default='',
+      required=True,
+      help='EOS path for storage')
+  args = parser.parse_args()
 
+  if args.files == None:
+    parser.error('-f (sample list) is required')
+  if args.outLFNDirBase == None:
+    parser.error('-o (EOS LFN path) is required')
 
-    if options.cfg == None or options.pyCfgParams == None or options.datasets == None or options.version == None or options.storageSite == None or options.outLFNDirBase == None:
-        parser.error(usage)
-    
-    return options
-    
+  return args
 
 def main():
 
-    options = getOptions()
+    args = getOptions()
 
     from CRABClient.UserUtilities import config
     config = config()
@@ -68,19 +50,19 @@ def main():
     from CRABAPI.RawCommand import crabCommand
     from httplib import HTTPException
 
-    # We want to put all the CRAB project directories from the tasks we submit here into one common directory.
-    # That's why we need to set this parameter (here or above in the configuration file, it does not matter, we will not overwrite it).
-    config.General.workArea = options.version 
+    config.General.workArea = args.version 
     config.General.transferLogs = False
     config.General.transferOutputs = True
 
     config.JobType.pluginName = 'Analysis'
-    config.JobType.psetName = options.cfg
-    if options.inputFiles != None:
-      inFiles = glob.glob( options.inputFiles )
-      config.JobType.inputFiles = inFiles #options.inputFiles
-    config.JobType.pyCfgParams = options.pyCfgParams
+    config.JobType.psetName = args.cmsRun_cfg
+    if args.inputFiles != None:
+      inFiles = glob.glob( args.inputFiles )
+      config.JobType.inputFiles = inFiles 
+    config.JobType.pyCfgParams = args.pyCfgParams
     config.JobType.sendExternalFolder = True
+    config.JobType.maxJobRuntimeMin = args.maxJobRuntimeMin
+    config.JobType.maxMemoryMB = args.maxMemoryMB
     
     config.Data.inputDataset = None
     config.Data.splitting = ''
@@ -88,23 +70,23 @@ def main():
     config.Data.ignoreLocality = False
     config.Data.publication = False
     config.Data.publishDBS = 'phys03'
-    config.Site.storageSite = options.storageSite
+    config.Site.storageSite = args.storageSite
 
-    print('Using config  {}'.format(options.cfg))
-    print('Writing to versionectory {}'.format(options.version))
+    print('Using config  {}'.format(args.cmsRun_cfg))
+    print('Writing to versionectory {}'.format(args.version))
     
     def submit(config):
         try:
             crabCommand('submit', config = config)
         except HTTPException, hte:
-            print('Cannot execute commend')
+            print('Cannot execute command')
             print(hte.headers)
 
     #############################################################################################
     ## From now on that's what users should modify: this is the a-la-CRAB2 configuration part. ##
     #############################################################################################
 
-    datasetsFile = open( options.datasets )
+    datasetsFile = open( args.files )
     jobsLines = datasetsFile.readlines()
     jobs = []
     for ijob in jobsLines :
@@ -128,9 +110,9 @@ def main():
         elif datatier == 'MINIAOD': 
           config.Data.splitting = 'LumiBased'
           config.Data.unitsPerJob = 20
-          config.Data.lumiMask = options.lumiMask
-        if options.outLFNDirBase and not options.outLFNDirBase.isspace(): 
-          config.Data.outLFNDirBase = os.path.join(options.outLFNDirBase,options.version)
+          config.Data.lumiMask = args.lumiMask
+        if args.outLFNDirBase and not args.outLFNDirBase.isspace(): 
+          config.Data.outLFNDirBase = os.path.join(args.outLFNDirBase,args.version)
         config.Data.outputDatasetTag = cond
         print('Submitting {config.General.requestName} dataset =  {job}'.format(**locals()))
         print('Configuration :')
