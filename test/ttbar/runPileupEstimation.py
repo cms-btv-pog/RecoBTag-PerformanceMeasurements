@@ -3,7 +3,7 @@ import os,sys
 import json
 import commands
 import ROOT
-from SimGeneral.MixingModule.mix_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU_cfi import *
+from SimGeneral.MixingModule.mix_2018_25ns_JuneProjectionFull18_PoissonOOTPU_cfi import *
 
 """
 steer the script
@@ -30,11 +30,14 @@ def main():
     #compute pileup in data assuming different xsec
     puDist=[]
     puWgts=[]
-    MINBIASXSEC={'nom':opt.mbXsec,'up':opt.mbXsec*1.1,'down':opt.mbXsec*0.9}
+    XSECERROR=1.046
+    MINBIASXSEC={'nom':opt.mbXsec,'up':opt.mbXsec*XSECERROR,'down':opt.mbXsec/XSECERROR}
     for scenario in MINBIASXSEC:
         print scenario, 'xsec=',MINBIASXSEC[scenario]
         cmd='pileupCalc.py -i %s --inputLumiJSON %s --calcMode true --minBiasXsec %f --maxPileupBin %d --numPileupBins %s Pileup.root'%(opt.inJson,opt.puJson,MINBIASXSEC[scenario],NPUBINS,NPUBINS)
         commands.getstatusoutput(cmd)
+        print cmd
+
 
         fIn=ROOT.TFile.Open('Pileup.root')
         pileupH=fIn.Get('pileup')

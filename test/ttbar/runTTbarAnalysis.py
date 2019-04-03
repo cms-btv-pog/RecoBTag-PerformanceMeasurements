@@ -60,6 +60,53 @@ def runTTbarAnalysisPacked(args):
         return False
 
 
+def RunJobs(task_list,nJobs):
+    if nJobs == 0:
+        for inFile, outFile,wgt, tmvaWgts,isData in task_list: 
+            runTTbarAnalysis(inFile=inFile, outFile=outFile, wgt=wgt, tmvaWgts=tmvaWgts, isData=isData)
+    else:
+        from multiprocessing import Pool
+        pool = Pool(nJobs)
+        pool.map(runTTbarAnalysisPacked, task_list)
+
+def InspectFiles(outputDir,runTags):
+    zero=0
+    tiny=0
+    norm=0
+    
+    okFiles=[]
+    bustedFiles=[]
+    for tag in runTags:
+        os.system('ls -l %s/%s_*.root > %s.txt' % (outputDir,tag,tag) )
+        sizeFile=open('%s.txt' % (tag))
+        linesofls=sizeFile.readlines()
+        sizeFile.close()
+        os.system('rm %s.txt' % (tag))
+
+        for line in linesofls:
+            try:
+                items=line.split()
+                sizeOfFile=int(items[4])
+                fileName=str(items[8])
+                if sizeOfFile==0:
+                    zero=zero+1
+                    bustedFiles.append(fileName)
+                elif sizeOfFile<2000:
+                    tiny=tiny+1
+                    bustedFiles.append(fileName)
+                else:
+                    norm=norm+1
+                    okFiles.append(str(items[8]))
+            except:
+                print "can't read",line
+        
+        print tag,"zero, tiny, norm",zero,tiny,norm
+        
+        print "len bustedFiles",len(bustedFiles)
+
+    return okFiles,bustedFiles
+
+
 """
 steer the script
 """
@@ -75,6 +122,8 @@ def main():
     parser.add_option(      '--tmvaWgts',    dest='tmvaWgts',    help='tmva weights',                 default=None,        type='string')
     parser.add_option(      '--dyScale',     dest='dyScale',     help='DY scale factor',              default=None,        type='string')
     parser.add_option('-n', '--njobs',       dest='njobs',       help='# jobs to run in parallel',    default=0,           type='int')
+    parser.add_option('--keepGoodFilesBySize',     dest='keepGoodFilesBySize',       help='Review output file sizes before running and skip good ones',    default=1,           type='int')
+    parser.add_option('--inspectOutput',     dest='inspectOutput',       help='Review output file sizes and re-run baddies',    default=1,           type='int')
     (opt, args) = parser.parse_args()
 
     #compile c++ wrapper to run over trees 
@@ -113,6 +162,14 @@ def main():
         xsecWgts, integLumi = produceNormalizationCache(samplesList=samplesList,inDir=opt.inDir,cache=cache, xsecWgts=xsecWgts, integLumi=integLumi)
 
 
+    for key in xsecWgts:
+        print key,xsecWgts[key]
+
+    print
+    for key in integLumi:
+        print key,integLumi[key]
+
+
     #DY scale factor
     if opt.dyScale:
         cachefile=open(opt.dyScale,'r')
@@ -124,11 +181,20 @@ def main():
             xsecWgts[tag].Scale(dySF[0])
             print xsecWgts[tag].GetBinContent(1)
 
+    
+    if opt.keepGoodFilesBySize:
+        listOfSampleTags=[]
+        for tag,sample in samplesList:
+            listOfSampleTags.append(tag)
+        goodFiles,badFiles=InspectFiles(opt.outDir,listOfSampleTags)
+    else:
+        goodFiles=[]
+
     #create the analysis jobs
     runTags = []
     task_list = []
     for tag,sample in samplesList:
-
+        print tag
         #check if in list
         if len(onlyList)>0:
             veto=True
@@ -141,23 +207,42 @@ def main():
         wgt = xsecWgts[tag]
         for nf in xrange(0,len(input_list)) : 
             outF='%s/%s_%d.root'%(opt.outDir,tag,nf)
+            if outF in goodFiles:
+                continue
             task_list.append( (input_list[nf], outF, wgt, opt.tmvaWgts, sample[1]) )
 
     task_list=list(set(task_list))
     print '%s jobs to run in %d parallel threads' % (len(task_list), opt.njobs)
 
     #run the analysis jobs
-    if opt.njobs == 0:
-        for inFile, outFile,wgt, tmvaWgts,isData in task_list: 
-            runTTbarAnalysis(inFile=inFile, outFile=outFile, wgt=wgt, tmvaWgts=tmvaWgts, isData=isData)
-    else:
-        from multiprocessing import Pool
-        pool = Pool(opt.njobs)
-        pool.map(runTTbarAnalysisPacked, task_list)
+    RunJobs(task_list,opt.njobs)
+
+
+    if opt.inspectOutput:
+        nLoop=0
+        re_task_list=[]
+        while(nLoop==0 or len(re_task_list)>0):
+            print "nLoop",nLoop
+            if nLoop>0:
+                print "going at it again",len(re_task_list)
+                RunJobs(re_task_list,opt.njobs)
+                re_task_list=[]
+
+                goodFiles,badFiles=InspectFiles(opt.outDir,runTags)
+                
+                for task in task_list:
+                    print "task",task
+                    outFileNameFromTask=str(task[1])
+                    if outFileNameFromTask in bustedFiles:
+                        re_task_list.append(task) 
+            nLoop=nLoop+1
+
 
     #merge the outputs
     for tag in runTags:
         os.system('hadd -f %s/%s.root %s/%s_*.root' % (opt.outDir,tag,opt.outDir,tag) )
+
+    for tag in runTags:
         os.system('rm %s/%s_*.root' % (opt.outDir,tag) )
     print 'Analysis results are available in %s' % opt.outDir
 

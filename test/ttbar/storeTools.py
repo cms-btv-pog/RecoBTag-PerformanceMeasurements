@@ -8,29 +8,59 @@ def getEOSlslist(directory, mask='', prepend='root://eoscms//eos/cms'):
     from subprocess import Popen, PIPE
     print 'looking into: '+directory+'...'
 
-    eos_cmd = '/afs/cern.ch/project/eos/installation/0.2.41/bin/eos.select'
-    data = Popen([eos_cmd, 'ls', '/eos/cms/'+directory],stdout=PIPE)
-    out,err = data.communicate()
+    fullPaths=['/eos/cms/'+directory]
+
+    eos_cmd = '/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select'
+    foundROOTOrEnd=False
+
+    while not foundROOTOrEnd:
+        allNewPaths=[]
+        for fullPath in fullPaths:
+            data = Popen([eos_cmd, 'ls', fullPath],stdout=PIPE)
+            out,err = data.communicate()
+            items=out.split('\n')
+            if items[0].find(".root")!=-1:
+                foundROOTOrEnd=True
+                print "found ROOT files"
+            elif len(items)==0:
+                foundROOTOrEnd=True
+                print "empty ls"
+            else:
+                for item in items:
+                    if len(item)>0:
+                        allNewPaths.append(fullPath+'/'+item)
+        if not foundROOTOrEnd:
+            fullPaths=allNewPaths
+
 
     full_list = []
+    for fullPath in fullPaths:
+        data = Popen([eos_cmd, 'ls', fullPath],stdout=PIPE)
+        out,err = data.communicate()
+        items=out.split('\n')
 
-    ## if input file was single root file:
-    if directory.endswith('.root'):
-        if len(out.split('\n')[0]) > 0:
-            return [prepend + directory]
+        ### if input file was single root file:
+        #if directory.endswith('.root'):
+        #    if len(out.split('\n')[0]) > 0:
+        #        return [prepend + directory]
 
-    ## instead of only the file name append the string to open the file in ROOT
-    for line in out.split('\n'):
-        if len(line.split()) == 0: continue
-        full_list.append(prepend + directory + '/' + line)
+        ## instead of only the file name append the string to open the file in ROOT
+        for item in items:
+            if len(item.split()) == 0: continue
+            full_list.append(prepend + fullPath.split("/eos/cms")[-1] + '/' + item)
+
+    print "found n files",len(full_list)
 
     ## strip the list of files if required
     if mask != '':
         stripped_list = [x for x in full_list if mask in x]
+        print "found n files in stripped list",len(stripped_list)
         return stripped_list
 
-    ## return 
-    return full_list
+    print "found n files",len(full_list)
+    returnList=full_list
+    return returnList
+#    return full_list
 
 """
 Loops over a list of samples and produces a cache file to normalize MC
