@@ -15,7 +15,7 @@ git cms-addpkg PhysicsTools/PatAlgos
 git cms-merge-topic rauser:PrunedTraining_NoPuppi_10_2_11
 git clone -b PrunedTraining_NoPuppi https://github.com/emilbols/RecoBTag-Combined RecoBTag/Combined/data
 
-git clone -b 10_2_X_FIXME --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b 10_2_X_v1.05 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
