@@ -338,7 +338,7 @@ options.register(
 )
 
 ## 'maxEvents' is already registered by the Framework, changing default value
-options.setDefault('maxEvents', 100)
+options.setDefault('maxEvents', -1)
 
 options.parseArguments()
 if options.defaults:
