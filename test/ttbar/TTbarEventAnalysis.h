@@ -42,7 +42,11 @@ class MyEventInfoBranches_t
     Float_t ttbar_w[1095];
     Int_t nJet;
     Float_t Jet_pt[100],Jet_genpt[100],Jet_area[100],Jet_jes[100],Jet_eta[100],Jet_phi[100],Jet_mass[100];
-    Float_t Jet_Svx[100],Jet_CombIVF[100],Jet_Proba[100],Jet_Ip2P[100],Jet_DeepCSVBDisc[100],Jet_DeepFlavourBDisc[100];
+    Float_t Jet_Svx[100],Jet_CombIVF[100],Jet_Proba[100],Jet_Ip2P[100];
+    Float_t Jet_DeepCSVb[100], Jet_DeepCSVc[100], Jet_DeepCSVl[100], Jet_DeepCSVbN[100], Jet_DeepCSVcN[100], Jet_DeepCSVlN[100];
+    Float_t Jet_DeepCSVBDisc[100],Jet_DeepCSVBDiscN[100],Jet_DeepCSVCvsLDisc[100],Jet_DeepCSVCvsLDiscN[100],Jet_DeepCSVCvsBDisc[100],Jet_DeepCSVCvsBDiscN[100];
+    Float_t Jet_DeepFlavourBDisc[100], Jet_DeepFlavourCvsLDisc[100], Jet_DeepFlavourCvsBDisc[100];
+    Float_t Jet_DeepFlavourB[100];
     Int_t Jet_nseltracks[100];
     Int_t Jet_flavour[100];
 };
@@ -52,18 +56,18 @@ class TTbarEventAnalysis
  public:
  TTbarEventAnalysis() : 
     tmvaReader_(0),
-    readTTJetsGenWeights_(false),   
+    readTTJetsGenWeights_(true),   
     puWgtGr_(0),puWgtDownGr_(0),puWgtUpGr_(0)
       {
-	//jet uncertainty parameterization
-	TString jecUncUrl("${CMSSW_BASE}/src/RecoBTag/PerformanceMeasurements/test/ttbar/data/Autumn18_V8_MC_Uncertainty_AK4PF.txt");
-	gSystem->ExpandPathName(jecUncUrl);
-	jecUnc_ = new JetCorrectionUncertainty(jecUncUrl.Data());
+  //jet uncertainty parameterization
+  TString jecUncUrl("${CMSSW_BASE}/src/RecoBTag/PerformanceMeasurements/test/ttbar/data/Autumn18_V8_MC_Uncertainty_AK4PF.txt");
+  gSystem->ExpandPathName(jecUncUrl);
+  jecUnc_ = new JetCorrectionUncertainty(jecUncUrl.Data());
 
-	//pileup weights
-	TString stdTarget("${CMSSW_BASE}/src/RecoBTag/PerformanceMeasurements/test/ttbar/data/pileupWgts.root");
-	gSystem->ExpandPathName(stdTarget);
-	SetPUWeightTarget(stdTarget,"");
+  //pileup weights
+  TString stdTarget("${CMSSW_BASE}/src/RecoBTag/PerformanceMeasurements/test/ttbar/data/pileupWgts.root");
+  gSystem->ExpandPathName(stdTarget);
+  SetPUWeightTarget(stdTarget,"");
       }
   ~TTbarEventAnalysis(){}
   void setReadTTJetsGenWeights(bool readTTJetsGenWeights)     { readTTJetsGenWeights_=readTTJetsGenWeights; }
@@ -73,11 +77,11 @@ class TTbarEventAnalysis
   void prepareOutput(TString outFile);
   void processFile(TString inFile,TH1F *xsecWgt,Bool_t isData);
   void finalizeOutput();
-	void SetPUWeightTarget(TString targetFile,TString sampleName){
+  void SetPUWeightTarget(TString targetFile,TString sampleName){
       TFile *fIn=TFile::Open(targetFile);
-	    if(fIn){
-        std::string nom( "puwgts_nom");  
-        std::string up(  "puwgts_down");
+      if(fIn){
+        std::string nom("puwgts_nom");  
+        std::string up("puwgts_down");
         std::string down("puwgts_up");
         if(!sampleName.IsNull()){
             nom.append("_");
@@ -86,15 +90,18 @@ class TTbarEventAnalysis
             up.append(sampleName);
             down.append("_");
             down.append(sampleName);
+        }else{
+            std::cout << "Warning: PUWeight target histogram " << sampleName << " does not exist. Check naming convention of samples matches that of PU histograms." << std::endl;
         }
-	      puWgtGr_     = (TGraph *)fIn->Get(nom.c_str());
-	      puWgtDownGr_ = (TGraph *)fIn->Get(down.c_str());
-	      puWgtUpGr_   = (TGraph *)fIn->Get(up.c_str());
-	    }else{
-	      std::cout << "Unable to find data/pileupWgts.root, no PU reweighting will be applied" << std::endl;
-	    }
-	    fIn->Close();
-	}
+
+        puWgtGr_     = (TGraph *)fIn->Get(nom.c_str());
+        puWgtDownGr_ = (TGraph *)fIn->Get(down.c_str());
+        puWgtUpGr_   = (TGraph *)fIn->Get(up.c_str());
+      }else{
+        std::cout << "Unable to find data/pileupWgts.root, no PU reweighting will be applied" << std::endl;
+      }
+      fIn->Close();
+  }
 
  private:
   JetCorrectionUncertainty *jecUnc_;
@@ -131,6 +138,10 @@ class TTbarEventAnalysis
   Float_t  j2ll_deta_,j2ll_dphi_;
   Float_t kinDisc_[5];
   Float_t jp_[2],svhe_[2],csv_[2];
+  Float_t DeepCSVb_[2], DeepCSVc_[2], DeepCSVl_[2], DeepCSVbb_[2], DeepCSVcc_[2], DeepCSVbN_[2], DeepCSVcN_[2], DeepCSVlN_[2], DeepCSVbbN_[2], DeepCSVccN_[2], DeepCSVbP_[2], DeepCSVcP_[2], DeepCSVlP_[2], DeepCSVbbP_[2], DeepCSVccP_[2];
+  Float_t DeepCSVBDisc_[2], DeepCSVBDiscN_[2], DeepCSVBDiscP_[2], DeepCSVCvsLDisc_[2], DeepCSVCvsLDiscN_[2], DeepCSVCvsLDiscP_[2], DeepCSVCvsBDisc_[2], DeepCSVCvsBDiscN_[2], DeepCSVCvsBDiscP_[2];
+  Float_t DeepFlavourBDisc_[2], DeepFlavourCvsLDisc_[2], DeepFlavourCvsBDisc_[2];
+  Float_t DeepFlavourB_[2], DeepFlavourBB_[2], DeepFlavourLEPB_[2];
   std::vector<std::pair<Int_t,Int_t> > triggerBits_;
   TTree *kinTree_,*ftmTree_;
   std::map<TString,TH1F *> histos_;

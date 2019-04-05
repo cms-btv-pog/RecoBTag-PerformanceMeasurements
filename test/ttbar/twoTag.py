@@ -36,7 +36,7 @@ for syst in systs:
             print "     ",
         for sample in samples:
             histName="emu_"+tag+syst+"/emu_"+tag+syst+"_"+sample
-            print histName
+            #print histName
             hist=tFile.Get(histName)
             if sample==samples[0]:
                 histBkg=hist.Clone("histBkg")
@@ -73,7 +73,7 @@ for syst in systs:
         
         #print tot
         
-        #print histBkg.Integral(),hist.Integral(),hist.Integral()/histBkg.Integral()
+        print histBkg.Integral(),hist.Integral(),hist.Integral()/histBkg.Integral()
         
         for name in tot:
             if name.find("mc")!=-1:
