@@ -393,6 +393,7 @@ private:
   bool runTagVariablesSubJets_;
   bool runCSVTagVariables_;
   bool runCSVTagTrackVariables_;
+  bool runPrunedDeepFlavourTaggers_;
   bool runDeepFlavourTagVariables_;
   bool runCSVTagVariablesSubJets_;
   bool runDeepDoubleXTagVariables_;
@@ -577,6 +578,7 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   runTagVariablesSubJets_ = iConfig.getParameter<bool>("runTagVariablesSubJets");
   runCSVTagVariables_ = iConfig.getParameter<bool>("runCSVTagVariables");
   runCSVTagTrackVariables_ = iConfig.getParameter<bool>("runCSVTagTrackVariables");
+  runPrunedDeepFlavourTaggers_ = iConfig.getParameter<bool>("runPrunedDeepFlavourTaggers");
   runDeepFlavourTagVariables_  = iConfig.getParameter<bool>("runDeepFlavourTagVariables");
   runCSVTagVariablesSubJets_ = iConfig.getParameter<bool>("runCSVTagVariablesSubJets");
   runDeepDoubleXTagVariables_  = iConfig.getParameter<bool>("runDeepDoubleXTagVariables");
@@ -2716,6 +2718,37 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       DeepFlavourCN    = pjet->bDiscriminator((deepFlavourNegJetTags_+":probc"   ).c_str());
       DeepFlavourUDSN  = pjet->bDiscriminator((deepFlavourNegJetTags_+":probuds").c_str());
       DeepFlavourGN    = pjet->bDiscriminator((deepFlavourNegJetTags_+":probg").c_str());
+    }
+
+    float DeepFlavourPrunedB    = -10.;
+    float DeepFlavourPrunedBB   = -10.;
+    float DeepFlavourPrunedLepB = -10.;
+    float DeepFlavourPrunedC    = -10.;
+    float DeepFlavourPrunedUDS  = -10.;
+    float DeepFlavourPrunedG    = -10.;
+    if(deepFlavourPrunedJetTags_.size() && runPrunedDeepFlavourTaggers_) {
+      DeepFlavourPrunedB    = pjet->bDiscriminator((deepFlavourPrunedJetTags_+":probb"   ).c_str());
+      DeepFlavourPrunedBB   = pjet->bDiscriminator((deepFlavourPrunedJetTags_+":probbb"   ).c_str());
+      DeepFlavourPrunedLepB = pjet->bDiscriminator((deepFlavourPrunedJetTags_+":problepb"   ).c_str());
+      DeepFlavourPrunedC    = pjet->bDiscriminator((deepFlavourPrunedJetTags_+":probc"   ).c_str());
+      DeepFlavourPrunedUDS  = pjet->bDiscriminator((deepFlavourPrunedJetTags_+":probuds").c_str());
+      DeepFlavourPrunedG    = pjet->bDiscriminator((deepFlavourPrunedJetTags_+":probg").c_str());
+    }
+
+    // Maybe set default value to -1000 in future, as this is the default returned by the bDiscriminator function if a tagger is not found there. (see http://cmslxr.fnal.gov/source/DataFormats/PatCandidates/src/Jet.cc#0377)
+    float DeepFlavourPrunedBN    = -10.;
+    float DeepFlavourPrunedBBN   = -10.;
+    float DeepFlavourPrunedLepBN = -10.;
+    float DeepFlavourPrunedCN    = -10.;
+    float DeepFlavourPrunedUDSN  = -10.;
+    float DeepFlavourPrunedGN    = -10.;
+    if(deepFlavourPrunedNegJetTags_.size() && runPrunedDeepFlavourTaggers_) {
+      DeepFlavourPrunedBN    = pjet->bDiscriminator((deepFlavourPrunedNegJetTags_+":probb"   ).c_str());
+      DeepFlavourPrunedBBN   = pjet->bDiscriminator((deepFlavourPrunedNegJetTags_+":probbb"   ).c_str());
+      DeepFlavourPrunedLepBN = pjet->bDiscriminator((deepFlavourPrunedNegJetTags_+":problepb"   ).c_str());
+      DeepFlavourPrunedCN    = pjet->bDiscriminator((deepFlavourPrunedNegJetTags_+":probc"   ).c_str());
+      DeepFlavourPrunedUDSN  = pjet->bDiscriminator((deepFlavourPrunedNegJetTags_+":probuds").c_str());
+      DeepFlavourPrunedGN    = pjet->bDiscriminator((deepFlavourPrunedNegJetTags_+":probg").c_str());
     }
 
     float DeepCSVb   = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probb"   ).c_str()) : -10;
