@@ -15,17 +15,19 @@ git cms-addpkg PhysicsTools/PatAlgos
 git cms-merge-topic rauser:PrunedTraining_NoPuppi_10_2_11
 git clone -b PrunedTraining_NoPuppi https://github.com/emilbols/RecoBTag-Combined RecoBTag/Combined/data
 
-git clone -b 10_2_X_v1.05 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b 10_2_X_v1.06 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
 ```
 
-The ntuplizer can be run and configured through ```RecoBTag/PerformanceMeasurements/test/runBTagAnalyzer_cfg.py```, to run it for 2018 prompt reco
+The ntuplizer can be run and configured through ```RecoBTag/PerformanceMeasurements/test/runBTagAnalyzer_cfg.py```, to run it for the 2018 Ultimate SF campaign:
 
 ```
-cmsRun runBTagAnalyzer_cfg.py defaults=Prompt18 runOnData=(True or False, depending on your needs)
+cmsRun runBTagAnalyzer_cfg.py defaults=2018_Ultimate runOnData=(True or False, depending on your needs)
 ```
+
+When running on data please note the different global tag between runs A-C and run D in ```RecoBTag/PerformanceMeasurements/python/defaults/2018_Ultimate.py```
 
 To run the tests for integrating changes run:
 
