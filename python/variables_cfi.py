@@ -1588,7 +1588,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_DeepFlavourPrunedBDisc"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPrunedDeepFlavourTaggers"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_DeepFlavourPrunedCvsLDisc"),
@@ -1596,7 +1596,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_DeepFlavourPrunedCvsLDisc"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPrunedDeepFlavourTaggers"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_DeepFlavourPrunedCvsBDisc"),
@@ -1604,7 +1604,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_DeepFlavourPrunedCvsBDisc"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPrunedDeepFlavourTaggers"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_DeepFlavourPrunedB"),
@@ -1612,7 +1612,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_DeepFlavourPrunedB"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPrunedDeepFlavourTaggers"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_DeepFlavourPrunedBB"),
@@ -1620,7 +1620,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_DeepFlavourPrunedBB"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPrunedDeepFlavourTaggers"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_DeepFlavourPrunedLEPB"),
@@ -1628,7 +1628,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_DeepFlavourPrunedLEPB"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPrunedDeepFlavourTaggers"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_DeepFlavourPrunedC"),
@@ -1636,7 +1636,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_DeepFlavourPrunedC"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPrunedDeepFlavourTaggers"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_DeepFlavourPrunedUDS"),
@@ -1644,7 +1644,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_DeepFlavourPrunedUDS"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPrunedDeepFlavourTaggers"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_DeepFlavourPrunedG"),
@@ -1652,7 +1652,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_DeepFlavourPrunedG"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPrunedDeepFlavourTaggers"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_DeepFlavourPrunedBDiscN"),
@@ -1660,7 +1660,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_DeepFlavourPrunedBDiscN"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPrunedDeepFlavourTaggers"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_DeepFlavourPrunedCvsLDiscN"),
@@ -1668,7 +1668,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_DeepFlavourPrunedCvsLDiscN"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPrunedDeepFlavourTaggers"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_DeepFlavourPrunedCvsBDiscN"),
@@ -1676,7 +1676,7 @@ variableList = [
       mconly      = cms.bool(False),
       description = cms.string("Jet_DeepFlavourPrunedCvsBDiscN"),
       requires    = cms.vstring("nJet"),
-      runOptions  = cms.vstring(),
+      runOptions  = cms.vstring("runPrunedDeepFlavourTaggers"),
     ),
     cms.PSet(
       variable    = cms.string("Jet_DeepCSVBDisc"),

@@ -294,6 +294,10 @@ options.register('runCSVTagTrackVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to run CSV Tagging Track Variables')
+options.register('runPrunedDeepFlavourTaggers', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to run the prunedDeepFlavourTaggers')
 options.register('runDeepFlavourTagVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -1554,6 +1558,7 @@ process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True fo
 process.btagana.runTagVariables     = options.runTagVariables  ## True if you want to run TagInfo TaggingVariables
 process.btagana.runCSVTagVariables  = options.runCSVTagVariables   ## True if you want to run CSV TaggingVariables
 process.btagana.runCSVTagTrackVariables  = options.runCSVTagTrackVariables   ## True if you want to run CSV Tagging Track Variables
+process.btagana.runPrunedDeepFlavourTaggers = options.runPrunedDeepFlavourTaggers
 process.btagana.runDeepFlavourTagVariables = options.runDeepFlavourTagVariables
 process.btagana.runDeepDoubleXTagVariables = options.runDeepDoubleXTagVariables
 process.btagana.runDeepBoostedJetTagVariables = options.runDeepBoostedJetTagVariables
