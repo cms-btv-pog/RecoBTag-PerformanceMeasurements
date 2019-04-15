@@ -44,6 +44,8 @@ results={}
 tgraphs={}
 
 can=ROOT.TCanvas("can","",800,800)
+outputFile=ROOT.TFile("twoTagSFGraphs.root","RECREATE")
+
 
 for syst in systs:
     #print syst
@@ -144,9 +146,12 @@ for syst in systs:
                 statError[tag+"eff"] = math.sqrt(math.pow(eff*statError[tag+"2bmc"],2)  + (math.pow(statError[tag+"data_2btag"],2)+math.pow(statError[tag+"othermc_2btag"],2)  ) / math.pow(eff,2)    )/(2*tot["2bmc"])
         tgraphs[tag].Draw("APE")
         can.Update()
-        raw_input()
+        can.SaveAs(tag+".png")
+        tgraphs[tag].SetName(tag)
+        outputFile.cd()
+        tgraphs[tag].Write()
 
-raw_input()
+outputFile.Close()
 print "tag,",
 for syst in systs:
     if syst=="":
