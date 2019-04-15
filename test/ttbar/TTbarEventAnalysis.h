@@ -71,6 +71,7 @@ class TTbarEventAnalysis
       }
   ~TTbarEventAnalysis(){}
   void setReadTTJetsGenWeights(bool readTTJetsGenWeights)     { readTTJetsGenWeights_=readTTJetsGenWeights; }
+  void setTwoTagCount(bool runTwoTagCount_)                   { runTwoTagAnalysis=runTwoTagCount_; }
   void setTMVAWeightsBaseDir(TString url)                     { weightsDir_=url; gSystem->ExpandPathName(weightsDir_); }
   void addTriggerBit(Int_t bit,Int_t ch)                      { triggerBits_.push_back(std::pair<Int_t,Int_t>(bit,ch)); }
   void addVarForTMVA(TString varName)                         { tmvaVarNames_.push_back(varName); }
@@ -118,10 +119,14 @@ class TTbarEventAnalysis
   std::vector<std::string> systName;
   std::map<std::string,double> systWeight;
 
-  void TwoTag(std::string tagName, std::string discriminator, std::pair<int, int>);  
+  void TwoTag(std::string tagName, std::string discriminator, std::pair<int, int>, int ptBin);  
   std::map<std::string,std::vector<float>> btaggingWPs;
   void GetBestJetPair(std::pair<int, int>& myIndices, std::string discriminator="deepCSV");
+  std::map<std::string,std::pair<int, int>> bestJetPairs;
   float ReturnVarAtIndex(std::string varName, unsigned int index);
+  std::string ReturnPtLabel(int iPT);
+  std::vector<unsigned int> lowerPtBinEdges;
+  std::vector<std::string> twoTagNames; 
  
   TGraph *puWgtGr_,*puWgtDownGr_,*puWgtUpGr_;
   bool readTTJetsGenWeights_;
@@ -147,6 +152,7 @@ class TTbarEventAnalysis
   std::map<TString,TH1F *> histos_;
   std::map<TString,TH2F *> histos2d_;
   bool noEventsSelected;
+  unsigned int runTwoTagAnalysis;
   
 };
 

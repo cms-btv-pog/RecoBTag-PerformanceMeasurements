@@ -179,31 +179,36 @@ void TTbarEventAnalysis::prepareOutput(TString outFile)
   baseHistos["svhe"]=new TH1F("svhe",";Simple secondary vertex (HE);Jets",50,0,6);
   baseHistos["csv"]=new TH1F("csv",";Combined secondary vertex (IVF);Jets",52,-0.02,1.02);
   baseHistos["deepcsv"]=new TH1F("deepcsv",";DeepCSV for B;Jets",52,-0.02,1.02);
-  
-  std::vector<std::string> twoTagNames; 
+ 
+  std::vector<unsigned int> myBins={20,30,50,70,100,200,300};
+  lowerPtBinEdges.insert(lowerPtBinEdges.begin(),myBins.begin(),myBins.end());
+ 
   twoTagNames.clear(); 
-  twoTagNames.push_back("twoTags_deepCSV"); 
-  twoTagNames.push_back("only2_twoTags_deepCSV"); 
-  twoTagNames.push_back("twoTags_deepFlavour"); 
-  twoTagNames.push_back("only2_twoTags_deepFlavour"); 
-  twoTagNames.push_back("twoTags_CSVv2"); 
-  twoTagNames.push_back("only2_twoTags_CSVv2"); 
-  //twoTagNames.push_back(""); 
+  if(runTwoTagAnalysis>0){
+      twoTagNames.push_back("twoTags_deepCSV"); 
+      twoTagNames.push_back("only2_twoTags_deepCSV"); 
+      twoTagNames.push_back("twoTags_deepFlavour"); 
+      twoTagNames.push_back("only2_twoTags_deepFlavour"); 
+  }
 
   for(unsigned int i2Tag=0; i2Tag<twoTagNames.size(); i2Tag++){ 
       for(unsigned int iWP=0; iWP<wpLabel.size(); iWP++){
-          //std::cout<<"iWP "<<iWP<<std::endl;
-          std::string baseLabels;
-          std::string baseHistName;
-          baseHistName+=twoTagNames[i2Tag]+wpLabel[iWP];
-          baseLabels+=";N "+wpLabel[iWP]+" b-tags (cross mc truth)";
-          baseHistos[baseHistName.c_str()]=new TH1F(baseHistName.c_str(),baseLabels.c_str(),14,-1,13);
-          //std::cout<<" "<<baseHistName<<" "<<baseLabels<<std::endl;
-          for(unsigned int iSyst=0; iSyst<systName.size(); iSyst++){
-              std::string labels(baseLabels+systName[iSyst]);
-              std::string histName(baseHistName+"_"+systName[iSyst]);
-              //std::cout<<"iSyst "<<iSyst<<" "<<histName<<" "<<labels<<std::endl;
-              baseHistos[histName.c_str()]=new TH1F(histName.c_str(),labels.c_str(),14,-1,13);
+          for(int iPT=-1; iPT<(int)lowerPtBinEdges.size(); iPT++){
+              //std::cout<<"iWP "<<iWP<<std::endl;
+              std::string baseLabels;
+              std::string baseHistName;
+              std::string ptBinLabel;
+              baseLabels+=";N "+wpLabel[iWP]+" b-tags (cross mc truth)";
+              ptBinLabel+=ReturnPtLabel(iPT);
+              baseHistName+=twoTagNames[i2Tag]+wpLabel[iWP]+ptBinLabel;
+              baseHistos[baseHistName.c_str()]=new TH1F(baseHistName.c_str(),baseLabels.c_str(),14,-1,13);
+              //std::cout<<" "<<baseHistName<<" "<<baseLabels<<std::endl;
+              for(unsigned int iSyst=0; iSyst<systName.size(); iSyst++){
+                  std::string labels(baseLabels+systName[iSyst]);
+                  std::string histName(baseHistName+"_"+systName[iSyst]);
+                  //std::cout<<"iSyst "<<iSyst<<" "<<histName<<" "<<labels<<std::endl;
+                  baseHistos[histName.c_str()]=new TH1F(histName.c_str(),labels.c_str(),14,-1,13);
+              }
           }
       }
   }
@@ -216,6 +221,10 @@ void TTbarEventAnalysis::prepareOutput(TString outFile)
   baseHistos["only2_deepcsv2"]=new TH1F("only2_deepcsv2",";DeepCSV for B;Jets",52,-0.02,1.02);
   baseHistos2d["only2_deepcsv2d"]=new TH2F("only2_deepcsv2d",";DeepCSV lead;DeepCSV sublead",52,-0.02,1.02,52,-0.02,1.02);
   baseHistos2d["only2_deepcsv2d_2b"]=new TH2F("only2_deepcsv2d_2b",";DeepCSV lead;DeepCSV sublead",52,-0.02,1.02,52,-0.02,1.02);
+  baseHistos["pt2OverPt1_deepCSV"]=new TH1F("pt2OverPt1_deepCSV",";P_{T,2}/P_{T,1}",45,0,1.5);
+  baseHistos["pt2OverPt1_deepFlavour"]=new TH1F("pt2OverPt1_deepFlavour",";P_{T,2}/P_{T,1}",45,0,1.5);
+  
+  baseHistos2d["JETPT1VS2"]=new TH2F("JETPT1VS2",";Jet 1 P_{T};Jet 2 P_{T}",100,20,320,100,20,320);
   
   baseHistos["deepflavour1"]=new TH1F("deepflavour1",";DeepFlavour for B;Jets",52,-0.02,1.02);
   baseHistos["deepflavour2"]=new TH1F("deepflavour2",";DeepFlavour for B;Jets",52,-0.02,1.02);
@@ -224,12 +233,8 @@ void TTbarEventAnalysis::prepareOutput(TString outFile)
   
   baseHistos["csvv21"]=new TH1F("csvv21",";DeepCSV for B;Jets",52,-0.02,1.02);
   baseHistos["csvv22"]=new TH1F("csvv22",";DeepCSV for B;Jets",52,-0.02,1.02);
-  baseHistos2d["csvv22d"]=new TH2F("csvv22d",";CSVv2 lead;CSVv2 sublead",52,-0.02,1.02,52,-0.02,1.02);
-  baseHistos2d["csvv22d_2b"]=new TH2F("csvv22d_2b",";CSVv2 lead;CSVv2 sublead",52,-0.02,1.02,52,-0.02,1.02);
   baseHistos["only2_csvv21"]=new TH1F("only_csvv21",";DeepCSV for B;Jets",52,-0.02,1.02);
   baseHistos["only2_csvv22"]=new TH1F("only_csvv22",";DeepCSV for B;Jets",52,-0.02,1.02);
-  baseHistos2d["only2_csvv22d"]=new TH2F("only2_csvv22d",";CSVv2 lead;CSVv2 sublead",52,-0.02,1.02,52,-0.02,1.02);
-  baseHistos2d["only2_csvv22d_2b"]=new TH2F("only2_csvv22d_2b",";CSVv2 lead;CSVv2 sublead",52,-0.02,1.02,52,-0.02,1.02);
   baseHistos["tche"]=new TH1F("tche",";Track Counting High Efficiency;Jets",50,-20,50);
   baseHistos["jetseltrk"]=new TH1F("jetseltrk",";Selected track multiplicity;Jets",20,0,20);
   baseHistos["jp_leadkin"]=new TH1F("jp_leadkin",";Jet probability;Jets",50,0,3);
@@ -508,7 +513,7 @@ void TTbarEventAnalysis::processFile(TString inFile,TH1F *xsecWgt,Bool_t isData)
     
         TLorentzVector dilepton(lp4[0]+lp4[1]);
         Float_t mll=dilepton.M();
-        if(lp4[0].Pt()<30) continue;
+        if(lp4[0].Pt()<20) continue;
         if(lp4[1].Pt()<20) continue;
         if(mll<90) continue;
    
@@ -664,7 +669,7 @@ void TTbarEventAnalysis::processFile(TString inFile,TH1F *xsecWgt,Bool_t isData)
                
                 // JET KINEMATIC SELECTION 
                 //check if can be selected for this variation
-                if(varjp4[iSystVar].Pt()<30 || TMath::Abs(varjp4[iSystVar].Eta())>2.5) continue;
+                if(varjp4[iSystVar].Pt()<20 || TMath::Abs(varjp4[iSystVar].Eta())>2.5) continue;
                 canBeSelected=true;
                 jetCount[iSystVar]++;
             }
@@ -691,10 +696,11 @@ void TTbarEventAnalysis::processFile(TString inFile,TH1F *xsecWgt,Bool_t isData)
   
         std::pair<int, int> bestDeepFlavourPair(-1,-1);
         std::pair<int, int> bestDeepCSVPair(-1,-1);
-        std::pair<int, int> bestCSVv2Pair(-1,-1);
         GetBestJetPair(bestDeepFlavourPair,"deepFlavour");
         GetBestJetPair(bestDeepCSVPair,"deepCSV");
-        GetBestJetPair(bestCSVv2Pair,"CSVv2");
+        bestJetPairs.clear();
+        bestJetPairs["deepFlavour"]=bestDeepFlavourPair;
+        bestJetPairs["deepCSV"]=bestDeepCSVPair;
 
         n2++;
         //bool twoDeepCSVJets=(ev.Jet_DeepCSVBDisc[selJets[bestDeepCSVPair.first]]>0 && ev.Jet_DeepCSVBDisc[selJets[bestDeepCSVPair.second]]>0);
@@ -719,6 +725,8 @@ void TTbarEventAnalysis::processFile(TString inFile,TH1F *xsecWgt,Bool_t isData)
         histos_[ch+"_trailjeta"]->Fill(fabs(selJetsP4[0][1].Eta()),evWgt);
         histos_[ch+"_trailbjpt"]->Fill(selJetsP4[0][selJets[bestDeepCSVPair.second]].Pt(),evWgt);
         histos_[ch+"_trailbjeta"]->Fill(fabs(selJetsP4[0][selJets[bestDeepCSVPair.second]].Eta()),evWgt);
+        histos2d_[ch+"_JETPT1VS2"]->Fill(selJetsP4[0][selJets[bestDeepCSVPair.first]].Pt(),selJetsP4[0][selJets[bestDeepCSVPair.second]].Pt(),evWgt);
+
         if(selJets.size()==2){
             histos_[ch+"_only2_leadjpt"]->Fill(selJetsP4[0][0].Pt(),evWgt);
             histos_[ch+"_only2_leadjeta"]->Fill((selJetsP4[0][0].Eta()),evWgt);
@@ -737,99 +745,71 @@ void TTbarEventAnalysis::processFile(TString inFile,TH1F *xsecWgt,Bool_t isData)
   
         // 2018 WPs
         // https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation102X#AK4_jets
- 
-        std::vector<float> deepCSVWPs;
-        deepCSVWPs.clear();
-        //deepCSVWPs.push_back(0.1522); //2017
-        //deepCSVWPs.push_back(0.4941);
-        //deepCSVWPs.push_back(0.8001);
-        deepCSVWPs.push_back(0.1241); //2018
-        deepCSVWPs.push_back(0.4184);
-        deepCSVWPs.push_back(0.7527);
-        btaggingWPs["deepCSV"]=deepCSVWPs;
+
+        if(runTwoTagAnalysis>0){ 
+            std::vector<float> deepCSVWPs;
+            deepCSVWPs.clear();
+            //deepCSVWPs.push_back(0.1522); //2017
+            //deepCSVWPs.push_back(0.4941);
+            //deepCSVWPs.push_back(0.8001);
+            deepCSVWPs.push_back(0.1241); //2018
+            deepCSVWPs.push_back(0.4184);
+            deepCSVWPs.push_back(0.7527);
+            btaggingWPs["deepCSV"]=deepCSVWPs;
     
-        std::vector<float> CSVv2WPs;
-        CSVv2WPs.clear();
-        CSVv2WPs.push_back(0.5803); //2017
-        CSVv2WPs.push_back(0.8838);
-        CSVv2WPs.push_back(0.9693);
-        btaggingWPs["CSVv2"]=CSVv2WPs;
+            //std::vector<float> CSVv2WPs;
+            //CSVv2WPs.clear();
+            //CSVv2WPs.push_back(0.5803); //2017
+            //CSVv2WPs.push_back(0.8838);
+            //CSVv2WPs.push_back(0.9693);
+            //btaggingWPs["CSVv2"]=CSVv2WPs;
    
-        std::vector<float> deepFlavourWPs;
-        deepFlavourWPs.clear();
-        deepFlavourWPs.push_back(0.0494); //2018
-        deepFlavourWPs.push_back(0.2770);
-        deepFlavourWPs.push_back(0.7264);
-        btaggingWPs["deepFlavour"]=deepFlavourWPs;
-      
+            std::vector<float> deepFlavourWPs;
+            deepFlavourWPs.clear();
+            deepFlavourWPs.push_back(0.0494); //2018
+            deepFlavourWPs.push_back(0.2770);
+            deepFlavourWPs.push_back(0.7264);
+            btaggingWPs["deepFlavour"]=deepFlavourWPs;
+        } 
  
         //histos_[ch+"_deepcsvlead"]->Fill(ev.Jet_DeepCSVBDisc[selJets[bestDeepCSVPair.first]],evWgt);
         //histos_[ch+"_deepcsvsublead"]->Fill(ev.Jet_DeepCSVBDisc[selJets[bestDeepCSVPair.second]],evWgt);
 
-        std::vector<int> nPassCSVv2WPs(3,0);
-        for(unsigned int iWP=0; iWP<CSVv2WPs.size(); iWP++){
-            nPassCSVv2WPs[iWP]+= (ev.Jet_CombIVF[selJets[bestCSVv2Pair.first]]>CSVv2WPs[iWP]);
-            nPassCSVv2WPs[iWP]+= (ev.Jet_CombIVF[selJets[bestCSVv2Pair.second]]>CSVv2WPs[iWP]);
+       
+        // The key for btaggingWPs is the name of the discriminators whose WPs we want to measure
+        // That label is in all the parts (hist name, key of di-jet pair map and discriminator map).
+        for(std::map<std::string,std::vector<float>>::iterator iMap=btaggingWPs.begin(); iMap!=btaggingWPs.end(); iMap++){ 
+            for(int iPT=-1; iPT<(int)lowerPtBinEdges.size(); iPT++){
+                histos_[ch+"_pt2OverPt1_"+iMap->first]->Fill(ReturnVarAtIndex("PT",bestJetPairs[iMap->first].second)/ReturnVarAtIndex("PT",bestJetPairs[iMap->first].first),evWgt);
+                TwoTag(ch+"_twoTags_"+iMap->first,iMap->first,bestJetPairs[iMap->first],iPT);
+                if(selJets.size()==2){
+                    TwoTag(ch+"_only2_twoTags_"+iMap->first,iMap->first,bestJetPairs[iMap->first],iPT);
+                }
+            }
         }
-        
-        std::vector<int> nPassDeepCSVWPs(3,0);
-        for(unsigned int iWP=0; iWP<deepCSVWPs.size(); iWP++){
-            nPassDeepCSVWPs[iWP]+= (ev.Jet_DeepCSVBDisc[selJets[bestDeepCSVPair.first]]>deepCSVWPs[iWP]);
-            nPassDeepCSVWPs[iWP]+= (ev.Jet_DeepCSVBDisc[selJets[bestDeepCSVPair.second]]>deepCSVWPs[iWP]);
-            //std::cout<<"1 2 WP nPass "<<ev.Jet_DeepCSVBDisc[selJets[bestDeepCSVPair.first]]<<"  "<<ev.Jet_DeepCSVBDisc[selJets[bestDeepCSVPair.second]]<<" "<<deepCSVWPs[iWP]<<" "<<nPassDeepCSVWPs[iWP]<<std::endl;
-        }
-        
+ 
         histos_[ch+"_deepcsv1"]->Fill(ev.Jet_DeepCSVBDisc[selJets[bestDeepCSVPair.first]],evWgt);
         histos_[ch+"_deepcsv2"]->Fill(ev.Jet_DeepCSVBDisc[selJets[bestDeepCSVPair.second]],evWgt);
         histos2d_[ch+"_deepcsv2d"]->Fill(ev.Jet_DeepCSVBDisc[selJets[bestDeepCSVPair.first]],ev.Jet_DeepCSVBDisc[selJets[bestDeepCSVPair.second]],evWgt);
         //std::cout<<"go go 012"<<i<<std::endl;       
         
-        TwoTag(ch+"_twoTags_deepCSV", "deepCSV", bestDeepCSVPair);
 
         //std::cout<<"go go 013"<<i<<std::endl;       
         if(selJets.size()==2){
             histos_[ch+"_only2_deepcsv1"]->Fill(ev.Jet_DeepCSVBDisc[selJets[bestDeepCSVPair.first]],evWgt);
             histos_[ch+"_only2_deepcsv2"]->Fill(ev.Jet_DeepCSVBDisc[selJets[bestDeepCSVPair.second]],evWgt);
             histos2d_[ch+"_only2_deepcsv2d"]->Fill(ev.Jet_DeepCSVBDisc[selJets[bestDeepCSVPair.first]],ev.Jet_DeepCSVBDisc[selJets[bestDeepCSVPair.second]],evWgt);
-            TwoTag(ch+"_only2_twoTags_deepCSV", "deepCSV", bestDeepCSVPair);
         }
         //std::cout<<"go go 014"<<i<<std::endl;       
         
         histos_[ch+"_deepflavour1"]->Fill(ev.Jet_DeepFlavourBDisc[selJets[bestDeepFlavourPair.first]],evWgt);
         //std::cout<<"go go 014.1"<<i<<std::endl;       
         histos_[ch+"_deepflavour2"]->Fill(ev.Jet_DeepFlavourBDisc[selJets[bestDeepFlavourPair.second]],evWgt);
-        //std::cout<<"go go 014.2"<<i<<std::endl;       
-        TwoTag(ch+"_twoTags_deepFlavour", "deepFlavour", bestDeepFlavourPair);
-        //std::cout<<"go go 014.3"<<i<<std::endl;       
         if(selJets.size()==2){
             histos_[ch+"_only2_deepflavour1"]->Fill(ev.Jet_DeepFlavourBDisc[selJets[bestDeepFlavourPair.first]],evWgt);
-        //std::cout<<"go go 014.4"<<i<<std::endl;       
             histos_[ch+"_only2_deepflavour2"]->Fill(ev.Jet_DeepFlavourBDisc[selJets[bestDeepFlavourPair.second]],evWgt);
-        //std::cout<<"go go 014.5"<<i<<std::endl;       
-            TwoTag(ch+"_only2_twoTags_deepFlavour", "deepFlavour", bestDeepFlavourPair);
         }       
-        //std::cout<<"go go 014.6"<<i<<std::endl;       
  
-        histos_[ch+"_csvv21"]->Fill(ev.Jet_CombIVF[selJets[bestCSVv2Pair.first]],evWgt);
-        histos_[ch+"_csvv22"]->Fill(ev.Jet_CombIVF[selJets[bestCSVv2Pair.second]],evWgt);
-        histos2d_[ch+"_csvv22d"]->Fill(ev.Jet_CombIVF[selJets[bestCSVv2Pair.first]],ev.Jet_CombIVF[selJets[bestCSVv2Pair.second]],evWgt);
-
-        //if(binProduct==3){
-        //    histos2d_[ch+"_csvv22d_2b"]->Fill(ev.Jet_CombIVF[selJets[bestCSVv2Pair.first]],ev.Jet_CombIVF[selJets[bestCSVv2Pair.second]],evWgt);
-        //}
-
-        TwoTag(ch+"_twoTags_CSVv2", "CSVv2", bestCSVv2Pair);
-        //std::cout<<"go go 014.7"<<i<<std::endl;       
-        
-        if(selJets.size()==2){
-            histos_[ch+"_only2_csvv21"]->Fill(ev.Jet_CombIVF[selJets[bestCSVv2Pair.first]],evWgt);
-            histos_[ch+"_only2_csvv22"]->Fill(ev.Jet_CombIVF[selJets[bestCSVv2Pair.second]],evWgt);
-            histos2d_[ch+"_only2_csvv22d"]->Fill(ev.Jet_CombIVF[selJets[bestCSVv2Pair.first]],ev.Jet_CombIVF[selJets[bestCSVv2Pair.second]],evWgt);
-            //if(binProduct==3){
-            //    histos2d_[ch+"_only2_csvv22d_2b"]->Fill(ev.Jet_CombIVF[selJets[bestCSVv2Pair.first]],ev.Jet_CombIVF[selJets[bestCSVv2Pair.second]],evWgt);
-            //}
-            TwoTag(ch+"_only2_twoTags_CSVv2", "CSVv2", bestCSVv2Pair);
-        }
  
         std::vector<float> leadingkindisc(2,-9999);
         std::vector<int> leadingkindiscIdx(2,-1);
@@ -1095,10 +1075,50 @@ float TTbarEventAnalysis::ReturnVarAtIndex(std::string varName, unsigned int ind
         return 0;
     }
 }
+
+
+std::string TTbarEventAnalysis::ReturnPtLabel(int iPT){
+    std::string ptBinLabel;
+    ptBinLabel.clear();
+    if(iPT==-1){
+        ptBinLabel+="Inclusive";
+    } else {
+        ptBinLabel+=std::to_string(lowerPtBinEdges[iPT])+"to";
+        if(iPT==(int)(lowerPtBinEdges.size()-1)){
+            ptBinLabel+="Inf";
+        }else{
+            ptBinLabel+=std::to_string(lowerPtBinEdges[iPT+1]);
+        }
+    }
+    return ptBinLabel;
+}
         
 // two tag computations and histo filling
-void TTbarEventAnalysis::TwoTag(std::string tagName, std::string discriminator, std::pair<int, int> jetIndices)
+void TTbarEventAnalysis::TwoTag(std::string tagName, std::string discriminator, std::pair<int, int> jetIndices, int ptBin)
 { 
+    // return before filling if not in this pt bin
+    if(ptBin>-1){ //-1 is inclusive--> always keep -1
+        float pt1 = -2;
+        float pt2 = -2;
+
+        pt1 = ReturnVarAtIndex("PT",jetIndices.first);
+        pt2 = ReturnVarAtIndex("PT",jetIndices.second);
+
+        //std::cout<<"pt1 pt2 "<<pt1<<" "<<pt2<<std::endl;
+        //std::cout<<"max min "<<std::max(pt1,pt2)<<" "<<std::min(pt1,pt2)<<std::endl;
+
+        if(lowerPtBinEdges[ptBin]>std::max(pt1,pt2)){
+            //std::cout<<"reject because both smaller than "<<lowerPtBinEdges[ptBin]<<std::endl;
+            return;
+        }
+        if(ptBin!=(int)lowerPtBinEdges.size()){
+            if(lowerPtBinEdges[ptBin+1]<std::min(pt1,pt2)){
+                //std::cout<<"reject because both larger than "<<lowerPtBinEdges[ptBin+1]<<std::endl;
+                return;
+            }
+        }
+    }
+
     std::vector<int> nPassWPs(btaggingWPs[discriminator].size(),0);
     float btag1 = -2;
     float btag2 = -2;
@@ -1140,9 +1160,9 @@ void TTbarEventAnalysis::TwoTag(std::string tagName, std::string discriminator, 
     for(unsigned int iWP=0; iWP<nPassWPs.size(); iWP++){
         twoTagCrossFlavour[iWP]=binProduct + 4*nPassWPs[iWP];
     
-        histos_[tagName+wpLabel[iWP]]->Fill(twoTagCrossFlavour[iWP],evWgt);
+        histos_[tagName+wpLabel[iWP]+ReturnPtLabel(ptBin)]->Fill(twoTagCrossFlavour[iWP],evWgt);
         for(unsigned int iSyst=0; iSyst<systName.size(); iSyst++){
-            histos_[tagName+wpLabel[iWP]+"_"+systName[iSyst]]->Fill(twoTagCrossFlavour[iWP],systWeight[systName[iSyst]]);
+            histos_[tagName+wpLabel[iWP]+ReturnPtLabel(ptBin)+"_"+systName[iSyst]]->Fill(twoTagCrossFlavour[iWP],systWeight[systName[iSyst]]);
         }
     }
 }

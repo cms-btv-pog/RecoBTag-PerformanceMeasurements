@@ -11,6 +11,22 @@ from rounding import *
 
 CHANNELS={-11*11:'ll', -13*13:'ll', -11*13:'emu'}
 
+#configuration
+usage = 'usage: %prog [options]'
+parser = optparse.OptionParser(usage)
+parser.add_option('-j', '--json',        dest='json'  ,      help='json with list of files',      default=None,        type='string')
+parser.add_option('-i', '--inDir',       dest='inDir',       help='input directory with files',   default=None,        type='string')
+parser.add_option('-o', '--outDir',      dest='outDir',      help='output directory',             default='analysis',  type='string')
+parser.add_option(      '--only',        dest='only',        help='process only matching (csv)',  default='',          type='string')
+parser.add_option(      '--tmvaWgts',    dest='tmvaWgts',    help='tmva weights',                 default=None,        type='string')
+parser.add_option(      '--dyScale',     dest='dyScale',     help='DY scale factor',              default=None,        type='string')
+parser.add_option('-n', '--njobs',       dest='njobs',       help='# jobs to run in parallel',    default=0,           type='int')
+parser.add_option('--doTwoTag',          dest='doTwoTag',    help='Run 2TagCount (default:  False)', default=0,        type='int')
+parser.add_option('--keepGoodFilesBySize',     dest='keepGoodFilesBySize',       help='Review output file sizes before running and skip good ones',    default=1,           type='int')
+parser.add_option('--inspectOutput',     dest='inspectOutput',       help='Review output file sizes and re-run baddies',    default=1,           type='int')
+(opt, args) = parser.parse_args()
+
+
 """
 Perform the analysis on a single file
 """
@@ -18,6 +34,10 @@ def runTTbarAnalysis(inFile, outFile, wgt, tmvaWgts=None,isData=False):
 
     from ROOT import TTbarEventAnalysis
     evAnalysis=TTbarEventAnalysis()
+
+
+    print "opt.doTwoTag",opt.doTwoTag
+    evAnalysis.setTwoTagCount(opt.doTwoTag)
 
     #MC specifics
     if 'TTJets' in inFile: evAnalysis.setReadTTJetsGenWeights(True)
@@ -111,20 +131,6 @@ def InspectFiles(outputDir,runTags):
 steer the script
 """
 def main():
-
-    #configuration
-    usage = 'usage: %prog [options]'
-    parser = optparse.OptionParser(usage)
-    parser.add_option('-j', '--json',        dest='json'  ,      help='json with list of files',      default=None,        type='string')
-    parser.add_option('-i', '--inDir',       dest='inDir',       help='input directory with files',   default=None,        type='string')
-    parser.add_option('-o', '--outDir',      dest='outDir',      help='output directory',             default='analysis',  type='string')
-    parser.add_option(      '--only',        dest='only',        help='process only matching (csv)',  default='',          type='string')
-    parser.add_option(      '--tmvaWgts',    dest='tmvaWgts',    help='tmva weights',                 default=None,        type='string')
-    parser.add_option(      '--dyScale',     dest='dyScale',     help='DY scale factor',              default=None,        type='string')
-    parser.add_option('-n', '--njobs',       dest='njobs',       help='# jobs to run in parallel',    default=0,           type='int')
-    parser.add_option('--keepGoodFilesBySize',     dest='keepGoodFilesBySize',       help='Review output file sizes before running and skip good ones',    default=1,           type='int')
-    parser.add_option('--inspectOutput',     dest='inspectOutput',       help='Review output file sizes and re-run baddies',    default=1,           type='int')
-    (opt, args) = parser.parse_args()
 
     #compile c++ wrapper to run over trees 
     ROOT.gSystem.Load("libJetMETCorrectionsObjects.so")
