@@ -20,20 +20,12 @@ def ReturnPtLabel(iPT):
     return ptBinLabel
 
 
-tags=["twoTags_deepCSVL"]
-tags=["twoTags_deepCSVL","only2_twoTags_deepCSVL","twoTags_deepCSVM","only2_twoTags_deepCSVM","twoTags_deepCSVT","only2_twoTags_deepCSVT","twoTags_deepFlavourL","only2_twoTags_deepFlavourL","twoTags_deepFlavourM","only2_twoTags_deepFlavourM","twoTags_deepFlavourT","only2_twoTags_deepFlavourT","twoTags_CSVv2L","only2_twoTags_CSVv2L","twoTags_CSVv2M","only2_twoTags_CSVv2M","twoTags_CSVv2T","only2_twoTags_CSVv2T"]
-tags=["twoTags_deepCSVL","twoTags_deepCSVM","twoTags_deepCSVT","twoTags_deepFlavourL","only2_twoTags_deepFlavourL","twoTags_deepFlavourM","only2_twoTags_deepFlavourM","twoTags_deepFlavourT","only2_twoTags_deepFlavourT"]
+tags=["twoTags_deepCSVL","only2_twoTags_deepCSVL","twoTags_deepCSVM","only2_twoTags_deepCSVM","twoTags_deepCSVT","only2_twoTags_deepCSVT","twoTags_deepFlavourL","only2_twoTags_deepFlavourL","twoTags_deepFlavourM","only2_twoTags_deepFlavourM","twoTags_deepFlavourT","only2_twoTags_deepFlavourT"]
 tags.sort()
 samples=["t#bar{t} SL","VV","tW","t#bar{t} DL"]
 samples=["t#bar{t} SL","t#bar{t} DL","t#bar{t} AH","ZZ","WZ","WW","tW","t#bar{t} DL","DY"]
 systs=["","_fsrConHi","_fsrConLo","_fsrDefHi","_fsrDefLo","_fsrRedHi","_fsrRedLo","_isrConHi","_isrConLo","_isrDefHi","_isrDefLo","_isrRedHi","_isrRedLo","_qcdScaleHi","_qcdScaleLo"]
 systs=[""]
-
-# KEY: TH1F  emu_only2_twoTags_CSVv2L_t#bar{t} AH;1  t#bar{t} AH
-# KEY: TH1F  emu_only2_twoTags_CSVv2L_other;1  other
-# KEY: TH1F  emu_only2_twoTags_CSVv2L_t#bar{t} SL;1  t#bar{t} SL
-# KEY: TH1F  emu_only2_twoTags_CSVv2L_tW;1 tW
-# KEY: TH1F  emu_only2_twoTags_CSVv2L_t#bar{t} DL;1  t#bar{t} DL
 
 
 statError={}
