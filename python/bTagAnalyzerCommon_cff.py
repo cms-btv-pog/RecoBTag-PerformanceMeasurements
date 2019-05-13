@@ -21,7 +21,6 @@ bTagAnalyzerCommon = cms.PSet(
     runTagVariablesSubJets   = cms.bool(False),
     runCSVTagVariables       = cms.bool(False),
     runCSVTagTrackVariables  = cms.bool(False),
-    runPrunedDeepFlavourTaggers = cms.bool(False),
     runDeepFlavourTagVariables = cms.bool(False),
     runDeepDoubleXTagVariables = cms.bool(False),
     runDeepBoostedJetTagVariables = cms.bool(False),
