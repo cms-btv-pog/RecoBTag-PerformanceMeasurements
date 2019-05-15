@@ -12,6 +12,7 @@ git cms-init
 
 git cms-addpkg RecoBTag/TensorFlow
 git cms-addpkg RecoBTag/Combined
+wget https://raw.githubusercontent.com/cms-data/RecoBTag-Combined/master/DeepCSV_PhaseII.json -P RecoBTag/Combined/data/
 git cms-merge-topic rauser:DeepJetPhaseII_10_4_X
 
 git clone -b 10_4_0_PhaseII --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
