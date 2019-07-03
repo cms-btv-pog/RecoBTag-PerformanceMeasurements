@@ -1140,7 +1140,7 @@ groupSet = cms.PSet(
     ),
     cms.PSet(
       group       = cms.string("Frank"),
-      store       = cms.bool(False),
+      store       = cms.bool(True),
       description = cms.string("calculation of W->bb (mistag) scale factors in ttbar events"),
       variables   = cms.vstring(
         #muons
