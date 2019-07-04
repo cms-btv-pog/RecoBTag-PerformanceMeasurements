@@ -56,6 +56,23 @@ This script uses the output plots for MET to fit a common scale factor for DY. M
 and used to fit the MET observed after the requirement of at least two jets.
 The scale factor can be applied to all channels as it reflects possible mismodelling in the jet multiplicity of the DY MC.
 
+### Running local analysis for 2TagCount
+After b-tag analyzer trees are produced, the first two steps of the 2TagCount analysis are the same.  The first is to run the analysis and make histograms (and trees):
+```
+python runTTbarAnalysis.py -i /store/group/phys_btag/Commissioning/TTbar/Moriond19_2018_StructuredDir/ --json data/samples_Run2018.json -o /tmp/MYUSERNAME/Moriond19_Run2018 -n 70 --doTwoTag 1
+```
+
+Re-organize plots and make data, mc comparison canvases (inclusive 2TagCount plots are in):
+```
+python plotter.py -i /tmp/MYUSERNAME/Moriond19_Run2018 --json data/samples_Run2018.json --lumi 58000
+```
+
+Take the 2TagCount histograms and compute efficiency scale factor comparing the following: 1)  b-tagging effiency for each working point for events with two b-jets at truth level (MC eff) and 2) data minus non-double b-jet MC divided by the number of MC events with two matched particle level b-jets:
+```
+python twoTag.py /tmp/MYUSERNAME/Moriond19_Run2018/plots/plotter.root 
+```
+
+
 ### Performance analyses
 
 #### Templated methods
