@@ -3,7 +3,6 @@
 ## Software setup
 
 ```
-# NOTE: The below recipe also works for CMSSW_10_6_* releases (change only the next to lines to your desired release)
 cmsrel CMSSW_10_6_4
 cd CMSSW_10_6_4/src
 cmsenv
