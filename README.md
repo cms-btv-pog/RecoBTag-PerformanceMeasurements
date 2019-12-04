@@ -4,14 +4,14 @@
 
 ```
 # NOTE: The below recipe also works for CMSSW_10_6_* releases (change only the next to lines to your desired release)
-cmsrel CMSSW_10_5_0_pre1
-cd CMSSW_10_5_0_pre1/src
+cmsrel CMSSW_10_6_4
+cd CMSSW_10_6_4/src
 cmsenv
 
 setenv CMSSW_GIT_REFERENCE /cvmfs/cms.cern.ch/cmssw.git.daily
 git cms-init
 
-git clone -b 10_5_X_v1.03 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b 10_6_X_v1.01 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
@@ -20,7 +20,7 @@ scram b -j8
 The ntuplizer can be run and configured through ```RecoBTag/PerformanceMeasurements/test/runBTagAnalyzer_cfg.py```, to run it with the latest defaults
 
 ```
-cmsRun runBTagAnalyzer_cfg.py defaults=PixelStudies runOnData=(True or False, depending on your needs)
+cmsRun runBTagAnalyzer_cfg.py defaults=2017_UltraLegacy runOnData=(True or False, depending on your needs)
 ```
 
 To run the tests for integrating changes run:
