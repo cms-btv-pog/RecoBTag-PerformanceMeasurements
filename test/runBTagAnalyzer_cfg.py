@@ -342,19 +342,19 @@ if options.defaults:
 	except ImportError:
 		raise ValueError('The default settings named %s.py are not present in PerformanceMeasurements/python/defaults/' % options.defaults)
 	if not hasattr(defaults, 'common') or not isinstance(defaults.common, dict):
-		raise RuntimeError('the default file %s.py does not contain a dictionary named common' % options.defaults)  
+		raise RuntimeError('the default file %s.py does not contain a dictionary named common' % options.defaults)
 	items = defaults.common.items()
-	if hasattr(defaults, 'data') and options.runOnData: 
+	if hasattr(defaults, 'data') and options.runOnData:
 		if not isinstance(defaults.data, dict):
 			raise RuntimeError('the default file %s.py contains an object called "data" which is not a dictionary' % options.defaults)
 		items.extend(defaults.data.items())
-	if hasattr(defaults, 'mc') and not options.runOnData: 
+	if hasattr(defaults, 'mc') and not options.runOnData:
 		if not isinstance(defaults.mc, dict):
 			raise RuntimeError('the default file %s.py contains an object called "mc" which is not a dictionary' % options.defaults)
 		items.extend(defaults.mc.items())
 	for key, value in items:
 		if key not in options._beenSet:
-			raise ValueError('The key set by the defaults: %s does not exist among the cfg options!' % key)		
+			raise ValueError('The key set by the defaults: %s does not exist among the cfg options!' % key)
 		elif not options._beenSet[key]:
 			if key == 'inputFiles' and options.inputFiles: continue #skip input files that for some reason are never considered set
 			print 'setting default option for', key
@@ -382,7 +382,7 @@ for requiredGroup in options.groups:
       break
   if(not found):
     print('WARNING: The group ' + requiredGroup + ' was not found')
- 
+
 #change values accordingly
 for switch in options_to_change:
   if switch not in options._beenSet:
@@ -423,13 +423,13 @@ if options.doBoostedCommissioning:
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
     options.processStdAK4Jets=False
     print "Option processStdAK4Jets will be set to '",options.processStdAK4Jets,"'"
-    options.runFatJets=True  
+    options.runFatJets=True
     options.runSubJets = True
     print "Option runFatJets will be set to '",options.runFatJets,"'"
     print "Option runSubJets  will be set to '",options.runSubJets,"'"
     print "********************"
 if options.runCTagVariables:
-    print "**********You are making NTuple for CTag*************" 
+    print "**********You are making NTuple for CTag*************"
 
 ## Global tag
 globalTag = options.mcGlobalTag
@@ -797,7 +797,7 @@ if options.fastSim :
     options.outFilename += '_FastSim'
 
 if options.doBoostedCommissioning:
-  options.outFilename += '_BoostedCommissioning' 
+  options.outFilename += '_BoostedCommissioning'
 
 options.outFilename += '.root'
 
@@ -819,7 +819,8 @@ process.options   = cms.untracked.PSet(
 #Set GT by hand:
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag.globaltag = globalTag
+#~ process.GlobalTag.globaltag = globalTag
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T14', '')
 #Choose automatically:
 #process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 #from Configuration.AlCa.GlobalTag import GlobalTag
@@ -888,18 +889,20 @@ if options.usePrivateJEC:
     process.es_prefer_jec = cms.ESPrefer("PoolDBESSource",'jec')
 
 ### to activate the new JP calibration: using the data base
-trkProbaCalibTag = options.JPCalibration
-process.GlobalTag.toGet = cms.VPSet(
-    cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-      tag = cms.string(trkProbaCalibTag),
-      connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS")
-    )
-)
+# trkProbaCalibTag = options.JPCalibration
+# process.GlobalTag.toGet = cms.VPSet(
+#     cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
+#       tag = cms.string(trkProbaCalibTag),
+#       connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS")
+#     )
+# )
 
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
 #$$
-if 'Phase2' in options.eras: process.load('Configuration.Geometry.GeometryExtended2023D17Reco_cff')
-else: process.load("Configuration.Geometry.GeometryRecoDB_cff")
+# if 'Phase2' in options.eras: process.load('Configuration.Geometry.GeometryExtended2026D41Reco_cff')
+# else: process.load("Configuration.Geometry.GeometryRecoDB_cff")
+process.load('Configuration.Geometry.GeometryExtended2026D41Reco_cff')
+# else: process.load("Configuration.Geometry.GeometryRecoDB_cff")
 #$$
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 
@@ -1508,7 +1511,7 @@ for requiredGroup in process.btagana.groups:
 
 process.btagana.MaxEta                = options.maxJetEta ## for extended forward pixel coverage
 process.btagana.MinPt                 = options.minJetPt
-process.btagana.tracksColl            = cms.InputTag(trackSource) 
+process.btagana.tracksColl            = cms.InputTag(trackSource)
 process.btagana.useSelectedTracks     = options.useSelectedTracks ## False if you want to run on all tracks : for commissioning studies
 process.btagana.useTrackHistory       = options.useTrackHistory ## Can only be used with GEN-SIM-RECODEBUG files
 process.btagana.produceJetTrackTruthTree = options.useTrackHistory ## can only be used with GEN-SIM-RECODEBUG files and when useTrackHistory is True
