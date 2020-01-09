@@ -327,6 +327,29 @@ options.register(
     VarParsing.varType.int,
     "skip N events"
 )
+options.register('numThreads', 1,
+              VarParsing.multiplicity.singleton,
+              VarParsing.varType.int,
+              'number of threads')
+
+options.register('numStreams', 1,
+              VarParsing.multiplicity.singleton,
+              VarParsing.varType.int,
+              'number of streams')
+
+options.register('logs', False,
+              VarParsing.multiplicity.singleton,
+              VarParsing.varType.bool,
+              'create log files configured via MessageLogger')
+
+options.register('dumpPython', None,
+              VarParsing.multiplicity.singleton,
+              VarParsing.varType.string,
+              'Path to python file with content of cms.Process')
+
+
+
+
 
 ## 'maxEvents' is already registered by the Framework, changing default value
 #$$
@@ -734,11 +757,60 @@ else:
 
 
 ## MessageLogger
-process.load("FWCore.MessageLogger.MessageLogger_cfi")
-# If you run over many samples and you save the log, remember to reduce
-# the size of the output by prescaling the report of the event number
-process.MessageLogger.cerr.FwkReport.reportEvery = options.reportEvery
-process.MessageLogger.cerr.default.limit = 10
+# process.load("FWCore.MessageLogger.MessageLogger_cfi")
+# # If you run over many samples and you save the log, remember to reduce
+# # the size of the output by prescaling the report of the event number
+# process.MessageLogger.cerr.FwkReport.reportEvery = options.reportEvery
+# process.MessageLogger.cerr.default.limit = 10
+
+# MessageLogger
+if options.logs:
+   process.MessageLogger = cms.Service('MessageLogger',
+     destinations = cms.untracked.vstring(
+       'cerr',
+       'logError',
+       'logInfo',
+       'logDebug',
+     ),
+     # scram b USER_CXXFLAGS="-DEDM_ML_DEBUG"
+     debugModules = cms.untracked.vstring(
+       'PixelVerticesSelector',
+       'TracksClosestToFirstVerticesSelector',
+       'JMETriggerNTuple',
+     ),
+     categories = cms.untracked.vstring(
+       'FwkReport',
+     ),
+     cerr = cms.untracked.PSet(
+       threshold = cms.untracked.string('WARNING'),
+       FwkReport = cms.untracked.PSet(
+         reportEvery = cms.untracked.int32(1),
+       ),
+     ),
+     logError = cms.untracked.PSet(
+       threshold = cms.untracked.string('ERROR'),
+       extension = cms.untracked.string('.txt'),
+       FwkReport = cms.untracked.PSet(
+         reportEvery = cms.untracked.int32(1),
+       ),
+     ),
+     logInfo = cms.untracked.PSet(
+       threshold = cms.untracked.string('INFO'),
+       extension = cms.untracked.string('.txt'),
+       FwkReport = cms.untracked.PSet(
+         reportEvery = cms.untracked.int32(1),
+       ),
+     ),
+     logDebug = cms.untracked.PSet(
+       threshold = cms.untracked.string('DEBUG'),
+       extension = cms.untracked.string('.txt'),
+       FwkReport = cms.untracked.PSet(
+         reportEvery = cms.untracked.int32(1),
+       ),
+     ),
+   )
+
+
 
 ## Input files
 process.source = cms.Source("PoolSource",
@@ -805,6 +877,13 @@ options.outFilename += '.root'
 process.TFileService = cms.Service("TFileService",
    fileName = cms.string(options.outFilename)
 )
+
+
+# multi-threading settings
+process.options.numberOfThreads = cms.untracked.uint32(options.numThreads if (options.numThreads > 1) else 1)
+process.options.numberOfStreams = cms.untracked.uint32(options.numStreams if (options.numStreams > 1) else 1)
+if hasattr(process, 'DQMStore'):
+   process.DQMStore.enableMultiThread = (process.options.numberOfThreads > 1)
 
 ## Events to process
 process.source.skipEvents = cms.untracked.uint32(options.skipEvents)
@@ -1680,5 +1759,17 @@ process.p = cms.Path(
 
 # Delete predefined output module (needed for running with CRAB)
 del process.out
-
-open('pydump.py','w').write(process.dumpPython())
+# dump content of cms.Process to python file
+if options.dumpPython is not None:
+    open('pydump.py','w').write(process.dumpPython())
+# print-outs
+print '--- runBTagAnalyzer_cfg.py ---\n'
+print 'process.maxEvents.input =', process.maxEvents.input
+print 'process.source.skipEvents =', process.source.skipEvents
+print 'process.source.fileNames =', process.source.fileNames
+print 'numThreads =', options.numThreads
+print 'numStreams =', options.numStreams
+print 'logs =', options.logs
+print 'wantSummary =', options.wantSummary
+print 'dumpPython =', options.dumpPython
+print '\n-------------------------------'
