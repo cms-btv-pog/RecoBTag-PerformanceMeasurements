@@ -24,7 +24,7 @@ TT_14TeV_PU200
  # VBF_HToInvisible_M125_14TeV_PU200
 )
 
-EXE="htc_driver -c runHLTBTagAnalyzer_PhaseII_cfg.py -n 350 numThreads=1 --cpus 1 --memory 3000 --jobflavour workday"
+EXE="htc_driver -c runBTagAnalyzer_PhaseII_cfg.py -n 100 numThreads=1 --cpus 1 --memory 3000 --jobflavour workday"
 
 for dset in "${DSETS[@]}"; do
 
