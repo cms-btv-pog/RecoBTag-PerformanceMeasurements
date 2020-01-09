@@ -27,7 +27,7 @@ void PtrelByCounting::solve(char const * inputfile, char const * mistagfile, cha
     // Creating sub directory for templates
     if (!output->FindKey("measurements")) output->mkdir("measurements");
 
-    char name[256], nsample[256];
+    char name[269], nsample[256];
 
     for (Int_t i = 1; i<Dependency::Dimension; ++i)
     {
@@ -145,4 +145,3 @@ bool PtrelByCounting::compute(
     }
     return true;
 }
-
