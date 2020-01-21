@@ -347,7 +347,10 @@ options.register('dumpPython', None,
               VarParsing.varType.string,
               'Path to python file with content of cms.Process')
 
-
+options.register('runCMSSW11Sample', False,
+              VarParsing.multiplicity.singleton,
+              VarParsing.varType.bool,
+              'Use setup for CMSSW 11')
 
 
 
@@ -899,7 +902,10 @@ process.options   = cms.untracked.PSet(
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
 #~ process.GlobalTag.globaltag = globalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T14', '')
+if options.runCMSSW11Sample:
+    process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', '')
+else:
+    process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T14', '')
 #Choose automatically:
 #process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 #from Configuration.AlCa.GlobalTag import GlobalTag
@@ -980,7 +986,10 @@ process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cf
 #$$
 # if 'Phase2' in options.eras: process.load('Configuration.Geometry.GeometryExtended2026D41Reco_cff')
 # else: process.load("Configuration.Geometry.GeometryRecoDB_cff")
-process.load('Configuration.Geometry.GeometryExtended2026D41Reco_cff')
+if options.runCMSSW11Sample:
+    process.load('Configuration.Geometry.GeometryExtended2026D49Reco_cff')
+else:
+    process.load('Configuration.Geometry.GeometryExtended2026D41Reco_cff')
 # else: process.load("Configuration.Geometry.GeometryRecoDB_cff")
 #$$
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
@@ -1772,4 +1781,5 @@ print 'numStreams =', options.numStreams
 print 'logs =', options.logs
 print 'wantSummary =', options.wantSummary
 print 'dumpPython =', options.dumpPython
+print 'runCMSSW11Sample =', options.runCMSSW11Sample
 print '\n-------------------------------'
