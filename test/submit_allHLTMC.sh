@@ -8,4 +8,4 @@ python submit_all.py \
   -s T2_DE_DESY \
   -p defaults=PhaseII runOnData=False  \
   -o /store/user/sewuchte/BTagServiceWork/PhaseII/Offline/ \
-  -v NewGT_v1_TT
+  -v crab_CMSSW11_NewGT_v1_TT

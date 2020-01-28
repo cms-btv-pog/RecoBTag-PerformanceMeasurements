@@ -17,7 +17,7 @@ def getOptions() :
       help='Input parameters for config file')
   parser.add_argument('-t', '--maxJobRuntimeMin', type=int, default=2750,
       help='The maximum runtime (in minutes) per job')
-  parser.add_argument('-m', '--maxMemoryMB', type=int, default=4500,
+  parser.add_argument('-m', '--maxMemoryMB', type=int, default=4000,
       help='Maximum amount of memory (in MB) a job is allowed to use')
   parser.add_argument('-l', '--lumiMask', type=str, default='',
       help='The JSON file containing good lumi list')
