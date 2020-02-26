@@ -10,6 +10,7 @@ common = {
 	#~ 'mcGlobalTag' : '103X_upgrade2023_realistic_v2',
 	# 'mcGlobalTag' : 'auto:phase2_realistic_T14',
 	'mcGlobalTag' : 'auto:phase2_realistic_T15',
+	# 'mcGlobalTag' : '110X_mcRun4_realistic_v3',
 	#~ 'remakeAllDiscr' : True,
 	'remakeAllDiscr' : True,
 	'maxJetEta' : 4.5,
