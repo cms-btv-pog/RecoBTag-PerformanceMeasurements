@@ -105,7 +105,8 @@ options.register('fatJetPtMin', 200.0,
     VarParsing.varType.float,
     "Minimum pT for fat jets (default is 200 GeV)"
 )
-options.register('fatJetAbsEtaMax', 2.5,
+# options.register('fatJetAbsEtaMax', 2.5,
+options.register('fatJetAbsEtaMax', 4.5,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "Maximum |eta| for fat jets (default is 2.5)"
@@ -227,7 +228,8 @@ options.register('minNumberOfHits', 1,
     "Minimum number of tracker hits"
 )
 # Change eta for extended forward pixel coverage
-options.register('maxJetEta', 2.5,
+# options.register('maxJetEta', 2.5,
+options.register('maxJetEta', 4.5,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "Maximum jet |eta| (default is 2.5)"
@@ -903,7 +905,10 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
 #~ process.GlobalTag.globaltag = globalTag
 if options.runCMSSW11Sample:
+    # process.GlobalTag = GlobalTag(process.GlobalTag, '110X_mcRun4_realistic_v2', '')
+    # process.GlobalTag = GlobalTag(process.GlobalTag, '110X_mcRun4_realistic_v3', '')
     process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', '')
+    # process.GlobalTag.globaltag = '110X_mcRun4_realistic_v3' # needed for Pu200 RelVal CMSSW_11_0_0
 else:
     process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T14', '')
 #Choose automatically:
