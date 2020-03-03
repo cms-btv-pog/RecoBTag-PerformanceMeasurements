@@ -266,7 +266,7 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
        if(!passKin) continue;
 
        // Conversion rejection
-       bool passConvVeto = !ConversionTools::hasMatchedConversion(*el,convHa,beamspot.position());
+       bool passConvVeto = !ConversionTools::hasMatchedConversion(*el,*convHa,beamspot.position());
 
        //cut-based electron id+iso
        //cf. https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2
