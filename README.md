@@ -13,7 +13,7 @@ git cms-init
 git cms-addpkg RecoBTag
 git cms-merge-topic emilbols:BTV_11_0_X
 
-git clone -b Phase2_11_0_X_v1.01 ---depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b Phase2_11_0_X_v1.02 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
