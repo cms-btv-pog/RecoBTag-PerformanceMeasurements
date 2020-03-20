@@ -1,5 +1,5 @@
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
-#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h" 
+#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
 #include "RecoBTag/PerformanceMeasurements/interface/TTbarSelectionProducer.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
@@ -11,7 +11,7 @@ using namespace edm;
 
 
 TTbarSelectionProducer::TTbarSelectionProducer(const edm::ParameterSet& iConfig) :
-  triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("triggerColl"))), 
+  triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("triggerColl"))),
   prunedGenParticleCollectionName_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("prunedGenParticles"))),
   generatorevt_(consumes<GenEventInfoProduct>(edm::InputTag("generator",""))),
   generatorlhe_(consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer",""))),
@@ -28,7 +28,7 @@ TTbarSelectionProducer::TTbarSelectionProducer(const edm::ParameterSet& iConfig)
   verbose_           = iConfig.getParameter<int > ("verbose");
   selectAll_         = iConfig.getParameter<bool> ("selectAll");
   triggerBitsProc_    = iConfig.getParameter<edm::InputTag>("triggerColl").process();
-  
+
   trigNamesToSel_     = iConfig.getParameter<std::vector<std::string> >("trigNamesToSel");
   trigChannels_       = iConfig.getParameter<std::vector<int> >("trigChannels");
   doTrigSel_          = iConfig.getParameter<bool>("doTrigSel");
@@ -43,19 +43,19 @@ TTbarSelectionProducer::TTbarSelectionProducer(const edm::ParameterSet& iConfig)
   electron_cut_pt_   = iConfig.getParameter<double>        ("electron_cut_pt");
   electron_cut_eta_  = iConfig.getParameter<double>        ("electron_cut_eta");
   electron_cut_iso_  = iConfig.getParameter<double>        ("electron_cut_iso");
-  
+
   //Configuration for muons
   muon_cut_pt_   = iConfig.getParameter<double>        ("muon_cut_pt");
   muon_cut_eta_  = iConfig.getParameter<double>        ("muon_cut_eta");
   muon_cut_iso_  = iConfig.getParameter<double>        ("muon_cut_iso");
-  
+
   //Configuration for jets
   jet_cut_pt_   = iConfig.getParameter<double>        ("jet_cut_pt");
   jet_cut_eta_  = iConfig.getParameter<double>        ("jet_cut_eta");
-  
+
   //Configuration for met
   met_cut_   = iConfig.getParameter<double>        ("met_cut");
-  
+
   //produce
   produces<int>("topChannel");
   produces<int>("topTrigger");
@@ -122,7 +122,7 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
        float w0(1.0);
        if(evt.isValid()) w0=evt->weight();
        histos_["wgtcounter"]->Fill(0.,w0);
-       
+
        edm::Handle<LHEEventProduct> evet;
        iEvent.getByToken(generatorlhe_,evet);
        if(evet.isValid())
@@ -147,9 +147,9 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
      {
        std::cout << "Initialization of HLTConfigProvider failed!!" << std::endl;
        return;
-     }   
+     }
    std::vector<bool> passTriggers(trigNamesToSel_.size(),false);
-   for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) 
+   for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i)
      {
        if(!triggerBits->accept(i)) continue;
        std::string trigName=hltConfig.triggerNames()[i];
@@ -164,11 +164,11 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	 }
      }
    if(verbose_>5) std::cout << "Trigger word is: " << trigWord << std::endl;
-   
+
    //disable trigger selection in MC, only trigger word will be stored
    bool isData=iEvent.isRealData();
    if(!isData) doTrigSel_=false;
-   
+
    //MET filter decisions
    int metfilterWord(0);
    for(size_t im=0; im<metFilters_.size(); im++)
@@ -200,12 +200,12 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
        if(HBHENoiseFilterResultHandle.isValid()) result=*HBHENoiseFilterResultHandle;
        metfilterWord |= result;
      }
-   
+
    //std::cout << metfilterWord << std::endl;
 
    // ----------------
    // Primary vertex
-   //------------------ 
+   //------------------
    edm::Handle<reco::VertexCollection> primaryVertices;
    iEvent.getByToken(vtxToken_, primaryVertices);
    const reco::Vertex &pVtx = *(primaryVertices->begin());
@@ -223,8 +223,8 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
    edm::Handle<pat::MuonCollection> muHa;
    iEvent.getByToken(muonToken_, muHa);
    std::vector<pat::Muon> selMuons, selNonIsoMuons;
-   for (const pat::Muon &mu : *muHa) 
-     { 
+   for (const pat::Muon &mu : *muHa)
+     {
        bool passKin( mu.pt() > muon_cut_pt_  && fabs(mu.eta()) < muon_cut_eta_ );
        if(!passKin) continue;
 
@@ -260,14 +260,14 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
      {
        const auto el = elHa->ptrAt(i);
 
-       bool passKin(el->pt() > electron_cut_pt_ && 
-		    fabs(el->superCluster()->eta()) < electron_cut_eta_ && 
+       bool passKin(el->pt() > electron_cut_pt_ &&
+		    fabs(el->superCluster()->eta()) < electron_cut_eta_ &&
 		    (el->isEB() || el->isEE()));
        if(!passKin) continue;
 
        // Conversion rejection
-       //~ bool passConvVeto = !ConversionTools::hasMatchedConversion(*el,convHa,beamspot.position());
-       bool passConvVeto = true;
+       bool passConvVeto = !ConversionTools::hasMatchedConversion(*el,*convHa,beamspot.position());
+       // bool passConvVeto = true;
 
        //cut-based electron id+iso
        //cf. https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2
@@ -278,19 +278,19 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
        selElectrons.push_back(*el);
      }
    if(verbose_>5) std::cout << "\t Selected " << selElectrons.size() << " electrons" << std::endl;
-   
-   
+
+
    //------------------------------------------
    //Selection of jet
    //------------------------------------------
    edm::Handle<pat::JetCollection> jetHa;
    iEvent.getByToken(jetToken_, jetHa);
    std::vector<pat::Jet> selJets;
-   for (const pat::Jet &j : *jetHa) 
+   for (const pat::Jet &j : *jetHa)
      {
        bool passKin( j.pt() > jet_cut_pt_  && fabs(j.eta()) < jet_cut_eta_ );
        if(!passKin) continue;
-	   
+
        // check overlap with electron and muon
        float minDR(99999.);
        for(size_t ilep=0; ilep<selMuons.size(); ilep++)
@@ -305,11 +305,11 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	 }
        bool hasOverlap(minDR<0.4);
        if(hasOverlap) continue;
-       
+
        selJets.push_back(j);
      }
    if(verbose_>5) std::cout << "\t Selected "<< selJets.size() << " jets" << std::endl;
-   
+
 
    edm::Handle<pat::METCollection> metHa;
    iEvent.getByToken(metToken_, metHa);
@@ -323,12 +323,12 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 
    bool passLepSel(chsel!=0);
    std::vector<std::string> tags(1,"inc");
-   if(abs(chsel)==11*11) 
+   if(abs(chsel)==11*11)
      {
        tags.push_back("ee");
        mll=(selElectrons[0].p4()+selElectrons[1].p4()).mass();
      }
-   if(abs(chsel)==11*13) 
+   if(abs(chsel)==11*13)
      {
        tags.push_back("emu");
        mll=(selElectrons[0].p4()+selMuons[0].p4()).mass();
@@ -351,7 +351,7 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
    bool passMetSel(true);
    if(abs(chsel)==11*11 || abs(chsel)==13*13) passMetSel=(met.pt()>met_cut_);
    if(verbose_>5) std::cout << "\t Pass met selection-" << passMetSel << std::endl;
-   
+
    //fill control histos
    for(size_t i=0; i<tags.size(); i++)
      {
@@ -392,7 +392,7 @@ TTbarSelectionProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	 }
        if(verbose_>5) std::cout << "\t gen level channel is " << genChannel << std::endl;
      }
-   
+
    auto trigWordOut = std::make_unique<int>(trigWord);
    iEvent.put(std::move(trigWordOut),"topTrigger");
    auto metfilterWordOut = std::make_unique<int>(metfilterWord);
@@ -434,32 +434,32 @@ TTbarSelectionProducer::endRun(const edm::Run & iRun, edm::EventSetup const & iS
 {
   try{
     edm::Service<TFileService> fs;
-    
+
     edm::Handle<LHERunInfoProduct> lheruninfo;
     typedef std::vector<LHERunInfoProduct::Header>::const_iterator headers_const_iterator;
     iRun.getByLabel( "externalLHEProducer", lheruninfo );
-    
+
     LHERunInfoProduct myLHERunInfoProduct = *(lheruninfo.product());
-    for (headers_const_iterator iter=myLHERunInfoProduct.headers_begin(); 
-	 iter!=myLHERunInfoProduct.headers_end(); 
+    for (headers_const_iterator iter=myLHERunInfoProduct.headers_begin();
+	 iter!=myLHERunInfoProduct.headers_end();
 	 iter++)
       {
 	std::string tag("generator");
 	if(iter->tag()!="") tag+="_"+iter->tag();
-		
+
 	std::vector<std::string> lines = iter->lines();
 	std::vector<std::string> prunedLines;
-	for (unsigned int iLine = 0; iLine<lines.size(); iLine++) 
+	for (unsigned int iLine = 0; iLine<lines.size(); iLine++)
 	  {
 	    if(lines.at(iLine)=="") continue;
 	    if(lines.at(iLine).find("weightgroup")!=std::string::npos) continue;
 	    prunedLines.push_back( lines.at(iLine) );
 	  }
-	
-	if(histos_.find(tag)==histos_.end()) 
+
+	if(histos_.find(tag)==histos_.end())
 	  histos_[tag]=fs->make<TH1F>(tag.c_str(),tag.c_str(),prunedLines.size(),0,prunedLines.size());
-	for (unsigned int iLine = 0; iLine<prunedLines.size(); iLine++) 
-	  histos_[tag]->GetXaxis()->SetBinLabel(iLine+1,prunedLines.at(iLine).c_str());  
+	for (unsigned int iLine = 0; iLine<prunedLines.size(); iLine++)
+	  histos_[tag]->GetXaxis()->SetBinLabel(iLine+1,prunedLines.at(iLine).c_str());
       }
   }
   catch(...){
@@ -516,8 +516,8 @@ TTbarSelectionProducer::AssignChannel(std::vector<pat::Electron> &selElectrons,
     {
       triggerSingleMu=true;
       triggerSingleEle=true;
-      triggerDoubleMu=true; 
-      triggerMuEG=true; 
+      triggerDoubleMu=true;
+      triggerMuEG=true;
       triggerDoubleEle=true;
     }
 
@@ -578,7 +578,7 @@ TTbarSelectionProducer::AssignChannel(std::vector<pat::Electron> &selElectrons,
 	  chsel=selElectrons[0].charge()*(-11)*selElectrons[1].charge()*(-11);
 	}
     }
-  
+
   return chsel;
 }
 
