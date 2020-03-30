@@ -349,18 +349,14 @@ options.register('dumpPython', None,
               VarParsing.varType.string,
               'Path to python file with content of cms.Process')
 
-options.register('runCMSSW11Sample', False,
-              VarParsing.multiplicity.singleton,
-              VarParsing.varType.bool,
-              'Use setup for CMSSW 11')
 
 
 
 ## 'maxEvents' is already registered by the Framework, changing default value
-#$$
+
 options.setDefault('maxEvents', -1)
 #options.setDefault('maxEvents', 100)
-#$$
+
 
 options.parseArguments()
 if options.defaults:
@@ -825,14 +821,9 @@ process.source = cms.Source("PoolSource",
 if options.miniAOD:
     process.source.fileNames = [
         #/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM
-#$$
 #        '/store/relval/CMSSW_10_4_0_mtd3/RelValTTbar_Tauola_14TeV/MINIAODSIM/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200_1-v2/20000/31C1C942-EC8D-1245-B773-2293F5CC87DB.root'
-#        '/store/relval/CMSSW_10_4_0_mtd3/RelValTTbar_Tauola_14TeV/MINIAODSIM/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200_2-v2/20000/CEEBB55B-67BC-F54C-9243-8D11EEBCA67F.root'
-#        '/store/relval/CMSSW_10_4_0_mtd3/RelValTTbar_Tauola_14TeV/MINIAODSIM/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200_3-v2/20000/3CE6CC6E-10D0-354B-8AA6-C22FDA11A181.root',
-#        '/store/relval/CMSSW_10_4_0_mtd3/RelValTTbar_Tauola_14TeV/MINIAODSIM/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200_3-v2/20000/D083516F-39B8-3947-9013-112F24795E45.root'
-#        '/store/relval/CMSSW_10_4_0_mtd3/RelValTTbar_Tauola_14TeV/MINIAODSIM/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200_4-v2/20000/39ECB63E-296D-9442-BD46-8F96E4832418.root'
         '/store/relval/CMSSW_10_4_0_mtd3/RelValTTbar_Tauola_14TeV/MINIAODSIM/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200_5-v2/20000/A8AD8A25-CDC1-2E4B-A404-E9DB14ECF16A.root'
-#$$
+
     ]
     if options.runOnData:
         process.source.fileNames = [
@@ -904,13 +895,10 @@ process.options   = cms.untracked.PSet(
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
 #~ process.GlobalTag.globaltag = globalTag
-if options.runCMSSW11Sample:
-    # process.GlobalTag = GlobalTag(process.GlobalTag, '110X_mcRun4_realistic_v2', '')
-    # process.GlobalTag = GlobalTag(process.GlobalTag, '110X_mcRun4_realistic_v3', '')
-    process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', '')
-    # process.GlobalTag.globaltag = '110X_mcRun4_realistic_v3' # needed for Pu200 RelVal CMSSW_11_0_0
-else:
-    process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T14', '')
+
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', '')
+# process.GlobalTag.globaltag = '110X_mcRun4_realistic_v3' # needed for Pu200 RelVal CMSSW_11_0_0
+
 #Choose automatically:
 #process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 #from Configuration.AlCa.GlobalTag import GlobalTag
@@ -988,15 +976,12 @@ if options.usePrivateJEC:
 # )
 
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
-#$$
-# if 'Phase2' in options.eras: process.load('Configuration.Geometry.GeometryExtended2026D41Reco_cff')
+
+
+process.load('Configuration.Geometry.GeometryExtended2026D49Reco_cff')
+
 # else: process.load("Configuration.Geometry.GeometryRecoDB_cff")
-if options.runCMSSW11Sample:
-    process.load('Configuration.Geometry.GeometryExtended2026D49Reco_cff')
-else:
-    process.load('Configuration.Geometry.GeometryExtended2026D41Reco_cff')
-# else: process.load("Configuration.Geometry.GeometryRecoDB_cff")
-#$$
+
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 
 #-------------------------------------
@@ -1786,5 +1771,4 @@ print 'numStreams =', options.numStreams
 print 'logs =', options.logs
 print 'wantSummary =', options.wantSummary
 print 'dumpPython =', options.dumpPython
-print 'runCMSSW11Sample =', options.runCMSSW11Sample
 print '\n-------------------------------'
