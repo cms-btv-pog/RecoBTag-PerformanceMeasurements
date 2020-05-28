@@ -152,6 +152,9 @@ class JetInfoBranches {
     int   Jet_nLastSE[nMaxJets_];
     int   Jet_looseID[nMaxJets_];
     int   Jet_tightID[nMaxJets_];
+    int   Jet_pileup_looseID[nMaxJets_];
+    int   Jet_pileup_mediumID[nMaxJets_];
+    int   Jet_pileup_tightID[nMaxJets_];
     int   Jet_FatJetIdx[nMaxJets_];
     float Jet_ptSoftDrop[nMaxJets_];
     float Jet_etaSoftDrop[nMaxJets_];
@@ -711,6 +714,9 @@ class JetInfoBranches {
 
       if(variableParser.isToBeStored(name+"Jet_looseID")) tree->Branch((name+"Jet_looseID").c_str(),      Jet_looseID  ,(name+"Jet_looseID["+name+"nJet]/I").c_str());
       if(variableParser.isToBeStored(name+"Jet_tightID")) tree->Branch((name+"Jet_tightID").c_str(),      Jet_tightID  ,(name+"Jet_tightID["+name+"nJet]/I").c_str());
+      if(variableParser.isToBeStored(name+"Jet_pileup_looseID")) tree->Branch((name+"Jet_pileup_looseID").c_str(),      Jet_pileup_looseID  ,(name+"Jet_pileup_looseID["+name+"nJet]/I").c_str());
+      if(variableParser.isToBeStored(name+"Jet_pileup_mediumID")) tree->Branch((name+"Jet_pileup_mediumID").c_str(),      Jet_pileup_mediumID  ,(name+"Jet_pileup_mediumID["+name+"nJet]/I").c_str()); 
+      if(variableParser.isToBeStored(name+"Jet_pileup_tightID")) tree->Branch((name+"Jet_pileup_tightID").c_str(),      Jet_pileup_tightID  ,(name+"Jet_pileup_tightID["+name+"nJet]/I").c_str()); 
 
       //test variables for AK4 jets: clean up in the future
       if(variableParser.isToBeStored(name+"Jet_trackSip2dSig_AboveBottom_0")) tree->Branch((name+"Jet_trackSip2dSig_AboveBottom_0").c_str(),     Jet_trackSip2dSig_AboveBottom_0     ,(name+"Jet_trackSip2dSig_AboveBottom_0["+name+"nJet]/F").c_str()            );
@@ -1377,6 +1383,9 @@ class JetInfoBranches {
 
       if(variableParser.isToBeStored(name+"Jet_looseID")) tree->SetBranchAddress((name+"Jet_looseID").c_str(),      Jet_looseID  );
       if(variableParser.isToBeStored(name+"Jet_tightID")) tree->SetBranchAddress((name+"Jet_tightID").c_str(),      Jet_tightID  );
+      if(variableParser.isToBeStored(name+"Jet_pileup_looseID")) tree->SetBranchAddress((name+"Jet_pileup_looseID").c_str(),      Jet_pileup_looseID  );
+      if(variableParser.isToBeStored(name+"Jet_pileup_mediumID")) tree->SetBranchAddress((name+"Jet_pileup_mediumID").c_str(),      Jet_pileup_mediumID  );
+      if(variableParser.isToBeStored(name+"Jet_pileup_tightID")) tree->SetBranchAddress((name+"Jet_pileup_tightID").c_str(),      Jet_pileup_tightID  );
 
       //test variables for AK4 jets: clean up in the future
       if(variableParser.isToBeStored(name+"Jet_trackSip2dSig_AboveBottom_0")) tree->SetBranchAddress((name+"Jet_trackSip2dSig_AboveBottom_0").c_str(),     Jet_trackSip2dSig_AboveBottom_0                 );

@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 #Only variables that are present in this list, can be stored in the output ntuple.
-#Prefixes do not have to be given here, theses will be handled automatically
+#Prefixes do not have to be given here, these will be handled automatically
 #Suffixes have to be introduced by inserting an additional PSet. See for example Jet_nSubJets and Jet_nSubJets_SoftDropPuppi
 
 #To obtain an overview (alphabetically sorted by name) of the included variables, run the print_vars.py script in the same directory
@@ -2347,6 +2347,30 @@ variableList = [
       store       = cms.bool(False),
       mconly      = cms.bool(False),
       description = cms.string("Jet_tightID"),
+      requires    = cms.vstring("nJet"),
+      runOptions  = cms.vstring("runJetVariables"),
+    ),
+    cms.PSet(
+      variable    = cms.string("Jet_pileup_looseID"),
+      store       = cms.bool(False),
+      mconly      = cms.bool(False),
+      description = cms.string("Jet_pileup_looseID"),
+      requires    = cms.vstring("nJet"),
+      runOptions  = cms.vstring("runJetVariables"),
+    ),
+    cms.PSet(
+      variable    = cms.string("Jet_pileup_mediumID"),
+      store       = cms.bool(False),
+      mconly      = cms.bool(False),
+      description = cms.string("Jet_pileup_mediumID"),
+      requires    = cms.vstring("nJet"),
+      runOptions  = cms.vstring("runJetVariables"),
+    ),
+    cms.PSet(
+      variable    = cms.string("Jet_pileup_tightID"),
+      store       = cms.bool(False),
+      mconly      = cms.bool(False),
+      description = cms.string("Jet_pileup_tightID"),
       requires    = cms.vstring("nJet"),
       runOptions  = cms.vstring("runJetVariables"),
     ),

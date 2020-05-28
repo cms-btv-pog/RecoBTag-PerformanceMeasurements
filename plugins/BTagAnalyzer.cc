@@ -1889,6 +1889,11 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       retpf.set(false);
       JetInfo[iJetColl].Jet_tightID[JetInfo[iJetColl].nJet] = ( ( nJECSets>0 && pjet->isPFJet() ) ? ( pfjetIDTight_( *pjet, retpf ) ? 1 : 0 ) : 0 );
 
+      // PF pileup Jet ID
+      JetInfo[iJetColl].Jet_pileup_tightID[JetInfo[iJetColl].nJet] = (pjet->userInt("pileupJetId:fullId")& (1 << 0)) or (pjet->pt()>50);
+      JetInfo[iJetColl].Jet_pileup_mediumID[JetInfo[iJetColl].nJet] = (pjet->userInt("pileupJetId:fullId")& (1 << 1)) or (pjet->pt()>50);
+      JetInfo[iJetColl].Jet_pileup_looseID[JetInfo[iJetColl].nJet] = (pjet->userInt("pileupJetId:fullId")& (1 << 2)) or (pjet->pt()>50);
+      
       JetInfo[iJetColl].Jet_jes[JetInfo[iJetColl].nJet]      = ( nJECSets>0 ? pjet->pt()/pjet->correctedJet("Uncorrected").pt() : 1. );
       JetInfo[iJetColl].Jet_residual[JetInfo[iJetColl].nJet] = ( nJECSets>0 ? pjet->pt()/pjet->correctedJet("L3Absolute").pt() : 1. );
       JetInfo[iJetColl].Jet_uncorrpt[JetInfo[iJetColl].nJet] = ( nJECSets>0 ? pjet->correctedJet("Uncorrected").pt() : pjet->pt());
