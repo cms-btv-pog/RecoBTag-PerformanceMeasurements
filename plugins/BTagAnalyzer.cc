@@ -475,6 +475,7 @@ private:
   // PF jet ID
   PFJetIDSelectionFunctor pfjetIDLoose_;
   PFJetIDSelectionFunctor pfjetIDTight_;
+  PFJetIDSelectionFunctor pfjetIDTightlepveto_;
 
   // helper class for associating PF candidates to jets
   IPProducerHelpers::FromJetAndCands m_helper;
@@ -526,8 +527,9 @@ BTagAnalyzerT<IPTI,VTX>::BTagAnalyzerT(const edm::ParameterSet& iConfig):
   can7(0),
   can8(0),
   hadronizerType_(0),
-  pfjetIDLoose_( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE ),
-  pfjetIDTight_( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT ),
+  pfjetIDLoose_( PFJetIDSelectionFunctor::SUMMER18, PFJetIDSelectionFunctor::LOOSE ),
+  pfjetIDTight_( PFJetIDSelectionFunctor::SUMMER18, PFJetIDSelectionFunctor::TIGHT ),
+  pfjetIDTightlepveto_( PFJetIDSelectionFunctor::SUMMER18, PFJetIDSelectionFunctor::TIGHTLEPVETO ),
   m_helper(iConfig, consumesCollector(),"Jets"),
   beta_(iConfig.getParameter<double>("beta")),
   R0_(iConfig.getParameter<double>("R0")),
@@ -1888,7 +1890,14 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].Jet_looseID[JetInfo[iJetColl].nJet] = ( ( nJECSets>0 && pjet->isPFJet() ) ? ( pfjetIDLoose_( *pjet, retpf ) ? 1 : 0 ) : 0 );
       retpf.set(false);
       JetInfo[iJetColl].Jet_tightID[JetInfo[iJetColl].nJet] = ( ( nJECSets>0 && pjet->isPFJet() ) ? ( pfjetIDTight_( *pjet, retpf ) ? 1 : 0 ) : 0 );
+      retpf.set(false);
+      JetInfo[iJetColl].Jet_tightlepvetoID[JetInfo[iJetColl].nJet] = ( ( nJECSets>0 && pjet->isPFJet() ) ? ( pfjetIDTightlepveto_( *pjet, retpf ) ? 1 : 0 ) : 0 );
 
+      // PF pileup Jet ID
+      JetInfo[iJetColl].Jet_pileup_tightID[JetInfo[iJetColl].nJet] = (pjet->userInt("pileupJetId:fullId")& (1 << 0)) or (pjet->pt()>50);
+      JetInfo[iJetColl].Jet_pileup_mediumID[JetInfo[iJetColl].nJet] = (pjet->userInt("pileupJetId:fullId")& (1 << 1)) or (pjet->pt()>50);
+      JetInfo[iJetColl].Jet_pileup_looseID[JetInfo[iJetColl].nJet] = (pjet->userInt("pileupJetId:fullId")& (1 << 2)) or (pjet->pt()>50);
+      
       JetInfo[iJetColl].Jet_jes[JetInfo[iJetColl].nJet]      = ( nJECSets>0 ? pjet->pt()/pjet->correctedJet("Uncorrected").pt() : 1. );
       JetInfo[iJetColl].Jet_residual[JetInfo[iJetColl].nJet] = ( nJECSets>0 ? pjet->pt()/pjet->correctedJet("L3Absolute").pt() : 1. );
       JetInfo[iJetColl].Jet_uncorrpt[JetInfo[iJetColl].nJet] = ( nJECSets>0 ? pjet->correctedJet("Uncorrected").pt() : pjet->pt());

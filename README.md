@@ -3,8 +3,8 @@
 ## Software setup
 
 ```
-cmsrel CMSSW_10_6_2
-cd CMSSW_10_6_2/src
+cmsrel CMSSW_10_6_8_patch1 
+cd CMSSW_10_6_8_patch1/src
 cmsenv
 
 setenv CMSSW_GIT_REFERENCE /cvmfs/cms.cern.ch/cmssw.git.daily
