@@ -885,7 +885,10 @@ process.GlobalTag.globaltag = globalTag
 #)
 #process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
 
-if options.usePrivateJEC:
+if options.usePrivateJEC and options.runFatJets:
+	print "\n No private UL2017 JECs available yet for FatJets! Using whatever is in the GT."
+
+if options.usePrivateJEC and not options.runFatJets:
 
     from CondCore.DBCommon.CondDBSetup_cfi import *
     import os
@@ -896,11 +899,11 @@ if options.usePrivateJEC:
     process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
 		    connect = cms.string( "sqlite_fip:RecoBTag/PerformanceMeasurements/data/"+dbfile+'.db'),
 		    toGet =  cms.VPSet(
-			    cms.PSet(
-				    record = cms.string("JetCorrectionsRecord"),
-				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK4PF"),
-				    label= cms.untracked.string("AK4PF")
-				    ),
+			    # cms.PSet(
+# 				    record = cms.string("JetCorrectionsRecord"),
+# 				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK4PF"),
+# 				    label= cms.untracked.string("AK4PF")
+# 				    ),
 			    cms.PSet(
 				    record = cms.string("JetCorrectionsRecord"),
 				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK4PFchs"),
@@ -911,21 +914,21 @@ if options.usePrivateJEC:
 				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK4PFPuppi"),
 				    label= cms.untracked.string("AK4PFPuppi")
 				    ),
-			    cms.PSet(
-				    record = cms.string("JetCorrectionsRecord"),
-				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK8PF"),
-				    label= cms.untracked.string("AK8PF")
-				    ),
-			    cms.PSet(
-				    record = cms.string("JetCorrectionsRecord"),
-				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK8PFchs"),
-				    label= cms.untracked.string("AK8PFchs")
-				    ),
-			    cms.PSet(
-				    record = cms.string("JetCorrectionsRecord"),
-				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK8PFPuppi"),
-				    label= cms.untracked.string("AK8PFPuppi")
-				    ),
+			    # cms.PSet(
+# 				    record = cms.string("JetCorrectionsRecord"),
+# 				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK8PF"),
+# 				    label= cms.untracked.string("AK8PF")
+# 				    ),
+			    # cms.PSet(
+# 				    record = cms.string("JetCorrectionsRecord"),
+# 				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK8PFchs"),
+# 				    label= cms.untracked.string("AK8PFchs")
+# 				    ),
+# 			    cms.PSet(
+# 				    record = cms.string("JetCorrectionsRecord"),
+# 				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK8PFPuppi"),
+# 				    label= cms.untracked.string("AK8PFPuppi")
+# 				    ),
 			    )
 		    )
 
