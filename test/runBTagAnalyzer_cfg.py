@@ -467,7 +467,8 @@ if options.usePFchs:
     jetCorrectionsAK4 = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
     jetCorrectionsAK8 = ('AK8PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 if options.usePuppi:
-    jetCorrectionsAK4 = ('AK4PFPuppi', ['L2Relative', 'L3Absolute'], 'None')
+    # jetCorrectionsAK4 = ('AK4PFPuppi', ['L2Relative', 'L3Absolute'], 'None')
+    jetCorrectionsAK4 = ('AK4PFPuppi', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 if options.usePuppiForFatJets:
     jetCorrectionsAK8 = ('AK8PFPuppi', ['L2Relative', 'L3Absolute'], 'None')
 
@@ -899,6 +900,13 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', '')
 # process.GlobalTag.globaltag = '110X_mcRun4_realistic_v3' # needed for Pu200 RelVal CMSSW_11_0_0
 
+# fix for AK4PF Phase-2 JECs
+process.GlobalTag.toGet.append(cms.PSet(
+  record = cms.string('JetCorrectionsRecord'),
+  tag = cms.string('JetCorrectorParametersCollection_PhaseIIFall17_V5b_MC_AK4PF'),
+  label = cms.untracked.string('AK4PF'),
+))
+
 #Choose automatically:
 #process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 #from Configuration.AlCa.GlobalTag import GlobalTag
@@ -1031,6 +1039,8 @@ else:
         process.ak4Jets = ak4PFJets.clone(src = cms.InputTag('pfCHS'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
     elif options.usePuppi:
         process.ak4Jets = ak4PFJets.clone(src = cms.InputTag('puppi'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
+        # from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJetsPuppi
+        # process.ak4Jets = ak4PFJetsPuppi.clone(srcWeights = cms.InputTag('puppi'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
     else:
         process.ak4Jets = ak4PFJets.clone(src = cms.InputTag('packedPFCandidates'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
 
@@ -1494,6 +1504,7 @@ if options.miniAOD:
 #-------------------------------------
 ## Change the minimum number of tracker hits used in the track selection
 if options.changeMinNumberOfHits:
+    print "changeMinNumberOfHits=True"
     for m in process.producerNames().split(' '):
         if m.startswith('pfImpactParameterTagInfos'):
             print "Changing 'minimumNumberOfHits' for " + m + " to " + str(options.minNumberOfHits)
