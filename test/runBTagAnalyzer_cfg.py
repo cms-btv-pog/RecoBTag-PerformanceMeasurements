@@ -335,6 +335,7 @@ options.setDefault('maxEvents', -1)
 #$$
 
 options.parseArguments()
+
 if options.defaults:
 	from importlib import import_module
 	try:
