@@ -21,7 +21,7 @@ scram b -j8
 The ntuplizer can be run and configured through ```RecoBTag/PerformanceMeasurements/test/runBTagAnalyzer_cfg.py```
 
 ```
-cmsRun runBTagAnalyzer_cfg.py runOnData=(True or False, depending on your needs)
+cmsRun runBTagAnalyzer_cfg.py defaults=PhaseII runOnData=(True or False, depending on your needs)
 ```
 
 To run the tests for integrating changes run:
