@@ -11,6 +11,7 @@ setenv CMSSW_GIT_REFERENCE /cvmfs/cms.cern.ch/cmssw.git.daily
 git cms-init
 
 git cms-addpkg RecoBTag
+git cms-merge-topic emilbols:BTV_CMSSW_11_1_X
 
 git clone -b Phase2_11_1_X --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
