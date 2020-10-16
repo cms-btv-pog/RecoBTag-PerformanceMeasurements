@@ -7,7 +7,12 @@ cmsrel CMSSW_10_6_8_patch1
 cd CMSSW_10_6_8_patch1/src
 cmsenv
 
+for bash
+export CMSSW_GIT_REFERENCE=/cvmfs/cms.cern.ch/cmssw.git.daily
+
+for tcsh
 setenv CMSSW_GIT_REFERENCE /cvmfs/cms.cern.ch/cmssw.git.daily
+
 git cms-init
 
 git clone -b 10_6_X_UL2018_PreliminaryJECs --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
