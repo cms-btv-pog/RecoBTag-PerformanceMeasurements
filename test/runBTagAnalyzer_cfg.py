@@ -50,12 +50,12 @@ options.register('usePuppiForBTagging', False,
     VarParsing.varType.bool,
     "Use Puppi candidates for b tagging"
 )
-options.register('mcGlobalTag', 'FIXME',
+options.register('mcGlobalTag', '106X_mc2018_realistic_v11_L1v1',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag, no default value provided"
 )
-options.register('dataGlobalTag', 'FIXME',
+options.register('dataGlobalTag', '106X_dataRun2_v24',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag, no default value provided"
@@ -886,7 +886,7 @@ process.GlobalTag.globaltag = globalTag
 #process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
 
 if options.usePrivateJEC and options.runFatJets:
-	print "\n No private UL2017 JECs available yet for FatJets! Using whatever is in the GT."
+	print "\n No private UL2018 JECs available yet for FatJets! Using whatever is in the GT."
 
 if options.usePrivateJEC and not options.runFatJets:
 
