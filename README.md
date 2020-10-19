@@ -3,8 +3,8 @@
 ## Software setup
 
 ```
-cmsrel CMSSW_10_6_8_patch1 
-cd CMSSW_10_6_8_patch1/src
+cmsrel CMSSW_10_6_12 
+cd CMSSW_10_6_12/src
 cmsenv
 
 for bash
@@ -15,7 +15,7 @@ setenv CMSSW_GIT_REFERENCE /cvmfs/cms.cern.ch/cmssw.git.daily
 
 git cms-init
 
-git clone -b 10_6_X_UL2018_PreliminaryJECs --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b 10_6_X_v2.01 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
@@ -27,9 +27,9 @@ NOTE1: due to the structure of the preliminary JECs, there are 5 different "defa
 
 > **_MC_**: ```defaults=2018_UltraLegacy```<br/>
 > **_Run2018A_**: ```defaults=2018_UltraLegacy_DataRunA```<br/>
-> **_Run2018B_**: ```defaults=2017_UltraLegacy_DataRunB```<br/>
-> **_Run2018C_**: ```defaults=2017_UltraLegacy_DataRunC```<br/>
-> **_Run2018D_**: ```defaults=2017_UltraLegacy_DataRunD```
+> **_Run2018B_**: ```defaults=2018_UltraLegacy_DataRunB```<br/>
+> **_Run2018C_**: ```defaults=2018_UltraLegacy_DataRunC```<br/>
+> **_Run2018D_**: ```defaults=2018_UltraLegacy_DataRunD```
 
 This means in your crab configuration file, you will have to check which file you are running on, and pick the correct default set accordingly. As an example, one might do something like:
 
