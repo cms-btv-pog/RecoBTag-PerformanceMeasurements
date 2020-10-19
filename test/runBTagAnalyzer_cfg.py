@@ -55,7 +55,7 @@ options.register('mcGlobalTag', '106X_mc2018_realistic_v11_L1v1',
     VarParsing.varType.string,
     "MC global tag, no default value provided"
 )
-options.register('dataGlobalTag', '106X_dataRun2_v24',
+options.register('dataGlobalTag', '106X_dataRun2_v28',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag, no default value provided"
