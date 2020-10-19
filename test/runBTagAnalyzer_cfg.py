@@ -50,7 +50,7 @@ options.register('usePuppiForBTagging', False,
     VarParsing.varType.bool,
     "Use Puppi candidates for b tagging"
 )
-options.register('mcGlobalTag', '106X_mc2018_realistic_v11_L1v1',
+options.register('mcGlobalTag', '106X_upgrade2018_realistic_v11_L1v1',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag, no default value provided"
