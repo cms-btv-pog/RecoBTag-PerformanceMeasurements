@@ -3,8 +3,8 @@
 ## Software setup
 
 ```
-cmsrel CMSSW_10_6_8_patch1 
-cd CMSSW_10_6_8_patch1/src
+cmsrel CMSSW_10_6_12 
+cd CMSSW_10_6_12/src
 cmsenv
 
 for bash
@@ -15,7 +15,7 @@ setenv CMSSW_GIT_REFERENCE /cvmfs/cms.cern.ch/cmssw.git.daily
 
 git cms-init
 
-git clone -b 10_6_X_UL2018_PreliminaryJECs --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b 10_6_X_v2.01 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
