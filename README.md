@@ -3,14 +3,19 @@
 ## Software setup
 
 ```
-cmsrel CMSSW_10_6_8_patch1 
-cd CMSSW_10_6_8_patch1/src
+cmsrel CMSSW_10_6_12 
+cd CMSSW_10_6_12/src
 cmsenv
 
+for bash
+export CMSSW_GIT_REFERENCE=/cvmfs/cms.cern.ch/cmssw.git.daily
+
+for tcsh
 setenv CMSSW_GIT_REFERENCE /cvmfs/cms.cern.ch/cmssw.git.daily
+
 git cms-init
 
-git clone -b 10_6_X_v1.05 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b 10_6_X_v2.01 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j8
 
@@ -18,32 +23,29 @@ scram b -j8
 
 The ntuplizer can be run and configured through ```RecoBTag/PerformanceMeasurements/test/runBTagAnalyzer_cfg.py```.
 
-NOTE1: due to the structure of the preliminary JECs, there are 6 different "defaults" sets; 
+NOTE1: due to the structure of the preliminary JECs, there are 5 different "defaults" sets; 
 
-> **_MC_**: ```defaults=2017_UltraLegacy```<br/>
-> **_Run2017B_**: ```defaults=2017_UltraLegacy_DataRunB```<br/>
-> **_Run2017C_**: ```defaults=2017_UltraLegacy_DataRunC```<br/>
-> **_Run2017D_**: ```defaults=2017_UltraLegacy_DataRunD```<br/>
-> **_Run2017E_**: ```defaults=2017_UltraLegacy_DataRunE```<br/>
-> **_Run2017F_**: ```defaults=2017_UltraLegacy_DataRunF```
+> **_MC_**: ```defaults=2018_UltraLegacy```<br/>
+> **_Run2018A_**: ```defaults=2018_UltraLegacy_DataRunA```<br/>
+> **_Run2018B_**: ```defaults=2018_UltraLegacy_DataRunB```<br/>
+> **_Run2018C_**: ```defaults=2018_UltraLegacy_DataRunC```<br/>
+> **_Run2018D_**: ```defaults=2018_UltraLegacy_DataRunD```
 
 This means in your crab configuration file, you will have to check which file you are running on, and pick the correct default set accordingly. As an example, one might do something like:
 
 ```
 ...
-config.Data.inputDataset = /BTagMu/Run2017D-09Aug2019_UL2017-v1/MINIAOD
-if "Run2017B" in config.Data.inputDataset: 
-	config.JobType.pyCfgParams = [defaults=2017_UltraLegacy_DataRunB ,...]
-elif "Run2017C" in config.Data.inputDataset: 
-	config.JobType.pyCfgParams = [defaults=2017_UltraLegacy_DataRunC ,...]
-elif "Run2017D" in config.Data.inputDataset: 
-	config.JobType.pyCfgParams = [defaults=2017_UltraLegacy_DataRunD ,...]
-elif "Run2017E" in config.Data.inputDataset: 
-	config.JobType.pyCfgParams = [defaults=2017_UltraLegacy_DataRunE ,...]
-elif "Run2017F" in config.Data.inputDataset: 
-	config.JobType.pyCfgParams = [defaults=2017_UltraLegacy_DataRunF ,...]
+config.Data.inputDataset = /BTagMu/Run2018A-12Nov2019_UL2018-v1/MINIAOD
+if "Run2018A" in config.Data.inputDataset: 
+	config.JobType.pyCfgParams = [defaults=2018_UltraLegacy_DataRunA ,...]
+elif "Run2018B" in config.Data.inputDataset: 
+	config.JobType.pyCfgParams = [defaults=2018_UltraLegacy_DataRunB ,...]
+elif "Run2018C" in config.Data.inputDataset: 
+	config.JobType.pyCfgParams = [defaults=2018_UltraLegacy_DataRunC ,...]
+elif "Run2018D" in config.Data.inputDataset: 
+	config.JobType.pyCfgParams = [defaults=2018_UltraLegacy_DataRunD ,...]
 else: 
-	config.JobType.pyCfgParams = [defaults=2017_UltraLegacy ,...]
+	config.JobType.pyCfgParams = [defaults=2018_UltraLegacy ,...]
 ...
 ```
 
