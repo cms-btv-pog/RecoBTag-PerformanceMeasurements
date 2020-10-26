@@ -824,15 +824,16 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     edm::Handle<GenEventInfoProduct> genEvtInfoProduct;
     iEvent.getByToken(src_, genEvtInfoProduct);
 
-    // std::string moduleName = "";
-    // const edm::Provenance& prov = iEvent.getProvenance(genEvtInfoProduct.id());
-    // if( genEvtInfoProduct.isValid() )
-    //   moduleName = edm::moduleName(prov);
+    std::string moduleName = "";
+    const edm::Provenance& prov = iEvent.getProvenance(genEvtInfoProduct.id());
+    if( genEvtInfoProduct.isValid() )
+      // moduleName = edm::moduleName(prov);
+      moduleName = edm::moduleName(prov,iEvent.processHistory());
     //
-    // if( moduleName.find("Pythia8")!=std::string::npos )
+    if( moduleName.find("Pythia8")!=std::string::npos )
       hadronizerType_ |= ( 1 << 1 ); // set the 2nd bit
-    // else // assuming Pythia6
-    //   hadronizerType_ |= ( 1 << 0 ); // set the 1st bit
+    else // assuming Pythia6
+      hadronizerType_ |= ( 1 << 0 ); // set the 1st bit
   }
 
   //------------------------------------------------------

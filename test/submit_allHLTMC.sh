@@ -15,4 +15,4 @@ python submit_all.py \
   -s T2_DE_DESY \
   -p defaults=PhaseII_puppi runOnData=False \
   -o /store/user/sewuchte/BTagServiceWork/PhaseII/Offline/ \
-  -v crab_projects_HLTTDR_puppi_debug4
+  -v crab_projects_SeptemberL1_v4

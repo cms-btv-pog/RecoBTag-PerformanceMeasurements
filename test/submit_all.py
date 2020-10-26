@@ -111,6 +111,9 @@ def main():
         if datatier == 'MINIAODSIM':
           config.Data.splitting = 'EventAwareLumiBased'
           config.Data.unitsPerJob = 100
+        if datatier == 'FEVT':
+          config.Data.splitting = 'EventAwareLumiBased'
+          config.Data.unitsPerJob = 100
         elif datatier == 'AODSIM':
           config.Data.splitting = 'FileBased'
         elif datatier == 'MINIAOD':
