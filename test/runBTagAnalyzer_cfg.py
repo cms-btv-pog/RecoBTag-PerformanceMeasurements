@@ -816,8 +816,10 @@ if options.logs:
 
 ## Input files
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring()
+	fileNames = cms.untracked.vstring(),
+	secondaryFileNames = cms.untracked.vstring(),
 )
+#  process.source.secondaryFileNames = []
 
 if options.miniAOD:
     process.source.fileNames = [
@@ -1771,7 +1773,7 @@ process.p = cms.Path(
 del process.out
 # dump content of cms.Process to python file
 if options.dumpPython is not None:
-    open('pydump.py','w').write(process.dumpPython())
+    open(options.dumpPython,'w').write(process.dumpPython())
 # print-outs
 print '--- runBTagAnalyzer_cfg.py ---\n'
 print 'process.maxEvents.input =', process.maxEvents.input
