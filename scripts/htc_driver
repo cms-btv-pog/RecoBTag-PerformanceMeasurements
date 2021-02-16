@@ -2,9 +2,9 @@
 """
 script to create area for submission of HTCondor batch jobs
 """
-from __future__ import print_function
 import argparse
 import os
+import stat
 import sys
 import math
 import json
@@ -13,11 +13,13 @@ import datetime
 from RecoBTag.PerformanceMeasurements.utils.common import *
 from RecoBTag.PerformanceMeasurements.utils.das import load_dataset_data, skim_das_jsondump
 
-
 #### main
 if __name__ == '__main__':
     ### args
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(
+     prog='./'+os.path.basename(__file__),
+     formatter_class=argparse.RawDescriptionHelpFormatter,
+     description=__doc__)
 
     parser.add_argument('-c', '--cfg', dest='cmsRun_cfg', action='store', default=None, required=True,
                         help='path to cmsRun cfg file')
@@ -31,41 +33,47 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', dest='output', action='store', default=None, required=True,
                         help='path to output directory')
 
-    parser.add_argument('-j', '--jobdirname', dest='jobdirname', action='store', default='job', required=False,
+    parser.add_argument('--cmsRun-output-dir', dest='cmsRun_output_dir', action='store', default=None,
+                        help='directory to host output of cmsRun job (if not specified, same as --output)')
+
+    parser.add_argument('-j', '--jobdirname', dest='jobdirname', action='store', default='job',
                         help='prefix of batch-job sub-directories (example: [JOBDIRNAME]_[counter]/)')
 
-    parser.add_argument('-f', '--max-files', dest='max_files', action='store', type=int, default=-1, required=False,
+    parser.add_argument('-f', '--max-files', dest='max_files', action='store', type=int, default=-1,
                         help='maximum number of input files to be processed (if integer is negative, all files will be processed)')
 
-    parser.add_argument('-m', '--max-events', dest='max_events', action='store', type=int, default=-1, required=False,
+    parser.add_argument('-m', '--max-events', dest='max_events', action='store', type=int, default=-1,
                         help='maximum number of total input events to be processed (if integer is negative, all events will be processed)')
 
-    parser.add_argument('-n', '--n-events', dest='n_events', action='store', type=int, default=-1, required=False,
+    parser.add_argument('-n', '--n-events', dest='n_events', action='store', type=int, default=-1,
                         help='maximum number of events per job')
 
-    parser.add_argument('-p', '--parentFiles-level', dest='parentFiles_level', action='store', type=int, default=0, required=False,
+    parser.add_argument('-p', '--parentFiles-level', dest='parentFiles_level', action='store', type=int, default=2,
                         help='level of parentFiles to be used as secondary input files (currently, anything other than 1 and 2 disables the usage of secondary input files)')
 
-    parser.add_argument('--cpus', dest='cpus', action='store', type=int, default=1, required=False,
+    parser.add_argument('--cpus', dest='cpus', action='store', type=int, default=1,
                         help='argument of HTCondor parameter "RequestCpus"')
 
-    parser.add_argument('--memory', dest='memory', action='store', type=int, default=2000, required=False,
+    parser.add_argument('--memory', dest='memory', action='store', type=int, default=2000,
                         help='argument of HTCondor parameter "RequestMemory"')
 
-    parser.add_argument('--runtime', dest='runtime', action='store', type=int, default=10800, required=False,
+    parser.add_argument('--runtime', dest='runtime', action='store', type=int, default=10800,
                         help='argument of HTCondor parameter "+RequestRuntime"')
 
-    parser.add_argument('--jobflavour', dest='jobflavour', action='store',  default='workday', required=False,
-                        help='argument of HTCondor parameter "+JobFlavour"')
+    parser.add_argument('--JobFlavour', dest='JobFlavour', action='store', default=None,
+                        help='argument of HTCondor parameter "+JobFlavour" (by default, the parameter is not specified)')
 
-    parser.add_argument('--batch-name', dest='batch_name', action='store', default=None, required=False,
+    parser.add_argument('--AccountingGroup', dest='AccountingGroup', action='store', default=None,
+                        help='argument of HTCondor parameter "+AccountingGroup" (by default, the parameter is not specified)')
+
+    parser.add_argument('--batch-name', dest='batch_name', action='store', default=None,
                         help='argument of HTCondor parameter "batch_name" (if not specified, basename of argument of "--output" is used)')
 
     parser.add_argument('--submit', dest='submit', action='store_true', default=False,
                         help='submit job(s) on the batch system')
 
-    parser.add_argument('--no-export-LD-LIBRARY-PATH', dest='no_export_LD_LIBRARY_PATH', action='store_true', default=False,
-                        help='do not export explicitly the environment variable "LD_LIBRARY_PATH" in the batch-job executable')
+    parser.add_argument('--export-LD-LIBRARY-PATH', dest='export_LD_LIBRARY_PATH', action='store_true', default=False,
+                        help='export explicitly the environment variable "LD_LIBRARY_PATH" in the batch-job executable')
 
     parser.add_argument('--dry-run', dest='dry_run', action='store_true', default=False,
                         help='enable dry-run mode')
@@ -119,11 +127,13 @@ if __name__ == '__main__':
 
     ### unrecognized command-line arguments
     ### -> used as additional command-line arguments to cmsRun
-    if opts.verbose and len(opts_unknown):
-       print('-'*50)
-       print(colored_text('additional cmsRun command-line arguments:', ['1']))
-       for _tmp in opts_unknown: print(' '+str(_tmp))
-       print('-'*50)
+    cmsRun_addopts = opts_unknown[:]
+
+    if opts.verbose and len(cmsRun_addopts):
+       print '-'*50
+       print colored_text('additional cmsRun command-line arguments:', ['1'])
+       for _tmp in cmsRun_addopts: print ' '+str(_tmp)
+       print '-'*50
 
     ### extract input-files information from data set name via dasgoclient
     ### -> list of dictionaries, each containing DAS name, files, number of events per file, and parent files
@@ -133,7 +143,7 @@ if __name__ == '__main__':
        input_dset = skim_das_jsondump(file_path=opts.dataset, max_files=opts.max_files, max_events=opts.max_events, verbose=opts.verbose)
     else:
        which('dasgoclient')
-       input_dset = load_dataset_data(das_name=opts.dataset, max_files=opts.max_files, max_events=opts.max_events, verbose=opts.verbose)
+       input_dset = load_dataset_data(das_name=opts.dataset, max_files=opts.max_files, max_events=opts.max_events, parentFiles_levels=opts.parentFiles_level, verbose=opts.verbose)
 
     ### total number of events and jobs
     ### -> used to determine format of output-file name
@@ -166,8 +176,11 @@ if __name__ == '__main__':
     if not os.path.isfile(voms_proxy_path):
        KILL(log_prx+'invalid path to voms proxy: '+voms_proxy_path)
 
-    EXE('mkdir -p '+OUTPUT_DIR, verbose=opts.verbose, dry_run=opts.dry_run)
+    MKDIRP(OUTPUT_DIR, verbose=opts.verbose, dry_run=opts.dry_run)
     EXE('cp '+voms_proxy_path+' '+OUTPUT_DIR+'/X509_USER_PROXY', verbose=opts.verbose, dry_run=opts.dry_run)
+
+    if opts.cmsRun_output_dir is not None:
+      MKDIRP(opts.cmsRun_output_dir, verbose=opts.verbose, dry_run=opts.dry_run)
 
     ### copy cmsRun-cfg into output directory
     out_cmsRun_cfg = os.path.abspath(OUTPUT_DIR+'/cfg.py')
@@ -181,36 +194,51 @@ if __name__ == '__main__':
 ###
 import FWCore.ParameterSet.VarParsing as vpo
 opts = vpo.VarParsing('analysis')
+
 opts.register('skipEvents', 0,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.int,
               'number of events to be skipped')
-opts.register('dumpPython', None,
+
+opts.register('output', 'out.root',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
-              'Path to python file with content of cms.Process')
+              'path to output file of TFileService')
+
+opts.parseArguments()
+
 # max number of events to be processed
 process.maxEvents.input = opts.maxEvents
+
 # number of events to be skipped
 process.source.skipEvents = cms.untracked.uint32(opts.skipEvents)
+
 # input EDM files [primary]
 process.source.fileNames = opts.inputFiles
+
 # input EDM files [secondary]
 process.source.secondaryFileNames = opts.secondaryInputFiles
-# dump content of cms.Process to python file
-if opts.dumpPython is not None:
-   open(opts.dumpPython, 'w').write(process.dumpPython())
+
+# output [TFileService]
+process.TFileService.fileName = opts.output
 """
             cfg_file.write(custom_str.format(os.path.basename(__file__), str(datetime.datetime.now())))
 
     ### copy driver command
     if not opts.dry_run:
-       with open(os.path.abspath(OUTPUT_DIR+'/cmdLog'), 'w') as file_cmdLog:
-            file_cmdLog.write((' '.join(sys.argv[:]))+'\n')
+      with open(os.path.abspath(OUTPUT_DIR+'/cmdLog'), 'w') as file_cmdLog:
+        file_cmdLog.write((' '.join(sys.argv[:]))+'\n')
 
     ### copy dataset information in .json format
     if not opts.dry_run:
        json.dump(input_dset, open(OUTPUT_DIR+'/dataset.json', 'w'), sort_keys=True, indent=2)
+
+    ### dump of python config
+    retcode = EXE('edmConfigDump '+out_cmsRun_cfg+' 2> '+OUTPUT_DIR+'/configDump.log > '+OUTPUT_DIR+'/configDump.py', suspend=False, verbose=opts.verbose, dry_run=opts.dry_run)
+    if retcode:
+       EXE('cat '+OUTPUT_DIR+'/configDump.log', verbose=opts.verbose, dry_run=opts.dry_run)
+       raise SystemExit(retcode)
+    del retcode
 
     ### condor submission file
     SUBFILE_ABSPATH = OUTPUT_DIR+'/condor.sub'
@@ -237,7 +265,29 @@ if opts.dumpPython is not None:
       'RequestCpus = '+str(opts.cpus),
       'RequestMemory = '+str(opts.memory),
       '+RequestRuntime = '+str(opts.runtime),
-      '+JobFlavour = '+str(opts.jobflavour),
+    ]
+
+    if opts.JobFlavour is not None:
+       JobFlavour = opts.JobFlavour
+       while JobFlavour.startswith("'") or JobFlavour.startswith('"'):
+         JobFlavour = JobFlavour[1:]
+       while JobFlavour.endswith("'") or JobFlavour.endswith('"'):
+         JobFlavour = JobFlavour[:-1]
+       SUBFILE_LINES += [
+         '+JobFlavour = "{:}"'.format(JobFlavour)
+       ]
+
+    if opts.AccountingGroup is not None:
+       AccountingGroup = opts.AccountingGroup
+       while AccountingGroup.startswith("'") or AccountingGroup.startswith('"'):
+         AccountingGroup = AccountingGroup[1:]
+       while AccountingGroup.endswith("'") or AccountingGroup.endswith('"'):
+         AccountingGroup = AccountingGroup[:-1]
+       SUBFILE_LINES += [
+         '+AccountingGroup = "{:}"'.format(AccountingGroup)
+       ]
+
+    SUBFILE_LINES += [
       'x509userproxy = $(BASEDIR)/X509_USER_PROXY',
       'queue QFILE matching files $(BASEDIR)/*/flag.queue',
     ]
@@ -263,6 +313,9 @@ if opts.dumpPython is not None:
         elif opts.parentFiles_level == 1:
            i_secondaryInputFiles = i_inpfdc['parentFiles_1']
 
+        if isinstance(i_secondaryInputFiles, list) and len(i_secondaryInputFiles) == 0:
+           KILL(log_prx+'list of secondary input files is empty (parentFiles_level = '+str(opts.parentFiles_level)+')')
+
         # number of jobs for this set of input files
         i_njobs = int(math.ceil(float(i_inputFile_nevents) / opts.n_events)) if (opts.n_events > 0) else 1
         i_nevt_remainder = i_inputFile_nevents%opts.n_events if (opts.n_events > 0) else 0
@@ -273,10 +326,10 @@ if opts.dumpPython is not None:
             i_OUTPUT_DIR = OUTPUT_DIR+'/'+opts.jobdirname+outputname_postfix_format.format(jobCounter)
 
             # create logs/ directory for HTCondor log-files
-            EXE('mkdir -p '+str(i_OUTPUT_DIR)+'/logs', verbose=opts.verbose, dry_run=opts.dry_run)
+            MKDIRP(i_OUTPUT_DIR+'/logs', verbose=opts.verbose, dry_run=opts.dry_run)
 
             # create (empty) queue-file to trigger job submission
-            EXE('touch '+str(i_OUTPUT_DIR)+'/flag.queue', verbose=opts.verbose, dry_run=opts.dry_run)
+            EXE('touch '+i_OUTPUT_DIR+'/flag.queue', verbose=opts.verbose, dry_run=opts.dry_run)
 
             # number of events for this job
             i_maxEvents = opts.n_events if (opts.n_events > 0) else i_inputFile_nevents
@@ -288,28 +341,6 @@ if opts.dumpPython is not None:
                i_maxEvents -= (totEvents - opts.max_events)
                breakLoop = True
 
-            # cmsRun arguments (cfg-file + options)
-            cmsRun_opts = out_cmsRun_cfg
-            cmsRun_opts += ' \\\n maxEvents='+str(i_maxEvents)
-            cmsRun_opts += ' \\\n skipEvents='+str(opts.n_events*i_job)
-            cmsRun_opts += ' \\\n inputFiles='+str(i_inputFile)
-            if i_secondaryInputFiles is not None:
-               cmsRun_opts += ' \\\n secondaryInputFiles='+str(','.join(i_secondaryInputFiles))
-            for _tmp in opts_unknown:
-                cmsRun_opts += ' \\\n '+str(_tmp)
-
-            ## dump of full python config
-            if jobCounter == 0:
-               EXE('python '+cmsRun_opts+' dumpPython='+OUTPUT_DIR+'/dumpPython.py &> /dev/null', suspend=False, verbose=opts.verbose, dry_run=opts.dry_run)
-
-            i_SHELL_COMMANDS  = [['set -e']]
-            i_SHELL_COMMANDS += [['if [ -f flag.done ]; then exit 0; fi;']]
-            i_SHELL_COMMANDS += [['cd '+os.environ['CMSSW_BASE']+'/src']]
-            i_SHELL_COMMANDS += [['eval `scram runtime -sh`']]
-            i_SHELL_COMMANDS += [['cd -']]
-            i_SHELL_COMMANDS += [['cmsRun '+cmsRun_opts]]
-            i_SHELL_COMMANDS += [['touch flag.done']]
-
             EXEFILE_ABSPATH = i_OUTPUT_DIR+'/exe.sh'
 
             if os.path.exists(EXEFILE_ABSPATH):
@@ -317,19 +348,50 @@ if opts.dumpPython is not None:
 
             if not opts.dry_run:
                with open(EXEFILE_ABSPATH, 'w') as f_exefile:
-
                   f_exefile.write('#!/bin/bash\n')
 
                   # export explicitly the environment variable LD_LIBRARY_PATH
-                  if not opts.no_export_LD_LIBRARY_PATH:
+                  if opts.export_LD_LIBRARY_PATH:
                      if 'LD_LIBRARY_PATH' in os.environ:
                         f_exefile.write('\n'+'export LD_LIBRARY_PATH='+os.environ['LD_LIBRARY_PATH']+'\n')
 
+                  # cmsRun arguments (cfg-file + options)
+                  cmsRun_opts = os.path.relpath(out_cmsRun_cfg, i_OUTPUT_DIR)
+                  cmsRun_opts += ' \\\n maxEvents='+str(i_maxEvents)
+                  cmsRun_opts += ' \\\n skipEvents='+str(opts.n_events*i_job)
+                  cmsRun_opts += ' \\\n inputFiles='+str(i_inputFile)
+                  if i_secondaryInputFiles:
+                    cmsRun_opts += ' \\\n secondaryInputFiles='+str(','.join(i_secondaryInputFiles))
+
+                  CMSRUN_OUTPUT_DIR = opts.cmsRun_output_dir
+                  if CMSRUN_OUTPUT_DIR is None:
+                    CMSRUN_OUTPUT_DIR = '.'
+                  elif os.path.isabs(CMSRUN_OUTPUT_DIR):
+                    while CMSRUN_OUTPUT_DIR.endswith('/') and len(CMSRUN_OUTPUT_DIR) > 1:
+                      CMSRUN_OUTPUT_DIR = CMSRUN_OUTPUT_DIR[:-1]
+                  else:
+                    CMSRUN_OUTPUT_DIR = os.path.relpath(os.path.abspath(CMSRUN_OUTPUT_DIR), i_OUTPUT_DIR)
+                  cmsRun_opts += ' \\\n output='+CMSRUN_OUTPUT_DIR+'/out'+outputname_postfix_format.format(jobCounter)+'.root'
+
+                  for _tmp in cmsRun_addopts:
+                    cmsRun_opts += ' \\\n '+str(_tmp)
+
+                  i_SHELL_COMMANDS = [
+                   ['set -e'],
+                   ['cd '+os.environ['CMSSW_BASE']+'/src'],
+                   ['eval `scram runtime -sh`'],
+                   ['cd '+i_OUTPUT_DIR],
+                   ['[ ! -f flag.done ] || exit 0'],
+                   ['cmsRun '+cmsRun_opts],
+                   ['touch flag.done'],
+                  ]
+
                   f_exefile.write('\n'+('\n\n'.join([' \\\n '.join(_tmp) for _tmp in i_SHELL_COMMANDS]))+'\n')
 
-            print(colored_text('output:', ['1', '94']), os.path.relpath(EXEFILE_ABSPATH, os.environ['PWD']))
+            st = os.stat(EXEFILE_ABSPATH)
+            os.chmod(EXEFILE_ABSPATH, st.st_mode | stat.S_IEXEC)
 
-            EXE('chmod u+x '+EXEFILE_ABSPATH, verbose=opts.verbose, dry_run=opts.dry_run)
+            print colored_text('output:', ['1', '94']), os.path.relpath(EXEFILE_ABSPATH, os.environ['PWD'])
 
             jobCounter += 1
 

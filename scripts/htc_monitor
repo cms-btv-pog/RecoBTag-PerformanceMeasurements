@@ -2,7 +2,6 @@
 """
 script to monitor HTCondor batch jobs
 """
-from __future__ import print_function
 import argparse
 import os
 import math
@@ -11,18 +10,13 @@ import glob
 from RecoBTag.PerformanceMeasurements.utils.common import *
 
 def monitor(options, log=''):
-
     # input directories
     INPUT_DIRS = []
-
     for i_opt in options.inputs:
-
         if not os.path.isdir(i_opt):
-           if options.verbose: WARNING(log+'input argument is not a valid directory: '+i_opt)
+           if options.verbose: WARNING(log+'input argument is not a valid directory (will be ignored): '+i_opt)
            continue
-
         INPUT_DIRS += [i_opt]
-
     INPUT_DIRS = list(set(INPUT_DIRS))
 
     if len(INPUT_DIRS) == 0:
@@ -31,8 +25,13 @@ def monitor(options, log=''):
     # batch system
     BATCH_RESUB_EXE = 'condor_submit'
 
-    if which(BATCH_RESUB_EXE, permissive=True) is None:
+    if opts.resubmit and (which(BATCH_RESUB_EXE, permissive=True) is None):
+       WARNING(log+'executable for batch-job submission not found (monitoring stopped): '+BATCH_RESUB_EXE)
        return False
+
+    if options.release:
+       EXE('condor_release '+os.environ['USER'], suspend=False, verbose=options.verbose, dry_run=options.dry_run)
+       EXE('sleep 3', verbose=options.verbose, dry_run=options.dry_run)
 
     ADD_OPTIONS = []
 
@@ -42,8 +41,11 @@ def monitor(options, log=''):
     if options.memory is not None:
        ADD_OPTIONS += ['-append "RequestMemory = '+str(options.memory)+'"']
 
+    if options.jobflavour is not None:
+       ADD_OPTIONS += ['-append \'+JobFlavour = "'+str(options.jobflavour)+'"\'']
+
     if len(ADD_OPTIONS) > 0:
-       print(' > additional options to "'+BATCH_RESUB_EXE+'":', str(ADD_OPTIONS))
+       print ' > additional options to "'+BATCH_RESUB_EXE+'":', str(ADD_OPTIONS)
 
     counter_input = 0
     counter_resubmitted = 0
@@ -72,7 +74,7 @@ def monitor(options, log=''):
 
     for inp_dir in INPUT_DIRS_2:
 
-        job_dirs = glob.glob(inp_dir+'/'+options.jobdirname+'_*/')
+        job_dirs = sorted(glob.glob(inp_dir+'/'+options.jobdirname+'_*/'))
         counter_input += len(job_dirs)
 
         if (options.proxy is not None) and (len(job_dirs) > 0):
@@ -80,43 +82,56 @@ def monitor(options, log=''):
 
         dirs_undone = []
         for _tmp in job_dirs:
+            if not os.path.isfile(_tmp+'exe.sh'): continue
 
-            if os.path.isfile(_tmp+'/flag.done'):
+            if os.path.isfile(_tmp+'flag.done'):
                counter_completed += 1
-               for _tmp2 in [_tmp+'/flag.queue', _tmp+'/flag.submitted']:
-                   if os.path.isfile(_tmp2):
+               for _tmp2 in glob.glob(_tmp+'flag.*'):
+                   if (_tmp2 != _tmp+'flag.done') and os.path.isfile(_tmp2):
                       EXE('rm -f '+_tmp2, verbose=options.verbose, dry_run=options.dry_run)
-
-            elif os.path.isfile(_tmp+'/flag.queue') or os.path.isfile(_tmp+'/flag.submitted'):
+            else:
                dirs_undone += [os.path.abspath(_tmp)]
 
         for _tmp_dirname in dirs_undone:
 
             if read_running_exes:
-               running_exes = HTCondor_jobExecutables_2(os.environ['USER'])
+               running_exes = HTCondor_jobExecutables(os.environ['USER'])
                read_running_exes = False
 
             if _tmp_dirname+'/exe.sh' in running_exes:
                counter_running += 1
                if os.path.isfile(_tmp_dirname+'/flag.queue'):
-                  EXE('mv '+_tmp_dirname+'/flag.queue '+_tmp_dirname+'/flag.submitted', verbose=options.verbose, dry_run=options.dry_run)
+                  EXE('rm '+_tmp_dirname+'/flag.queue', verbose=options.verbose, dry_run=options.dry_run)
+               if not os.path.isfile(_tmp_dirname+'/flag.skip'):
+                  EXE('touch '+_tmp_dirname+'/flag.skip', verbose=options.verbose, dry_run=options.dry_run)
             elif options.local:
                counter_completed += 1
                local_exefiles = [_tmp_dirname+'/exe.sh']
-               for _tmp2 in [_tmp_dirname+'/flag.queue', _tmp_dirname+'/flag.submitted']:
+               for _tmp2 in [_tmp_dirname+'/flag.queue', _tmp_dirname+'/flag.skip']:
                    if os.path.isfile(_tmp2):
                       EXE('rm -f '+_tmp2, verbose=options.verbose, dry_run=options.dry_run)
             else:
-               resubmit_job = options.resubmit and ((options.max_jobs < 0) or (counter_resubmitted < options.max_jobs))
+               resubmit_job = options.resubmit and ((options.max_jobs < 0) or ((len(running_exes) + counter_resubmitted) < options.max_jobs))
 
-               if os.path.isfile(_tmp_dirname+'/flag.submitted'):
-                  EXE('mv '+_tmp_dirname+'/flag.submitted '+_tmp_dirname+'/flag.queue', verbose=options.verbose, dry_run=options.dry_run)
+               if options.show_resubmitted:
+                  print colored_text('>> job '+('resubmitted' if resubmit_job else 'to be resubmitted')+' :', ['94']), colored_text(os.path.relpath(_tmp_dirname), ['1', '94'])
 
                if resubmit_job:
                   counter_resubmitted += 1
-                  condor_subfiles += [_tmp_dirname+'/../condor.sub']
+                  if os.path.isfile(_tmp_dirname+'/flag.skip'):
+                     EXE('rm '+_tmp_dirname+'/flag.skip', verbose=options.verbose, dry_run=options.dry_run)
+                  if not os.path.isfile(_tmp_dirname+'/flag.queue'):
+                     EXE('touch '+_tmp_dirname+'/flag.queue', verbose=options.verbose, dry_run=options.dry_run)
+
+                  if _tmp_dirname+'/../condor.sub' not in condor_subfiles:
+                     condor_subfiles += [_tmp_dirname+'/../condor.sub']
                else:
                   counter_toResubmit += 1
+                  if options.resubmit:
+                     if os.path.isfile(_tmp_dirname+'/flag.queue'):
+                        EXE('rm '+_tmp_dirname+'/flag.queue', verbose=options.verbose, dry_run=options.dry_run)
+                     if not os.path.isfile(_tmp_dirname+'/flag.skip'):
+                        EXE('touch '+_tmp_dirname+'/flag.skip', verbose=options.verbose, dry_run=options.dry_run)
 
     if options.local:
        local_exefiles = sorted(set([os.path.abspath(_tmp) for _tmp in local_exefiles]))
@@ -126,29 +141,33 @@ def monitor(options, log=''):
        condor_subfiles = sorted(set([os.path.abspath(_tmp) for _tmp in condor_subfiles]))
        condor_submit_optstr = (' '+(' '.join(ADD_OPTIONS)) if (len(ADD_OPTIONS) > 0) else '')
        for _tmp in condor_subfiles:
-           EXE(BATCH_RESUB_EXE+' '+_tmp+condor_submit_optstr, verbose=options.verbose, dry_run=options.dry_run)
+           if EXE(BATCH_RESUB_EXE+' '+_tmp+condor_submit_optstr, suspend=False, verbose=options.verbose, dry_run=options.dry_run):
+              break
 
     counter_format = '{:>'+str(1+int(math.log10(counter_input)))+'}' if counter_input > 0 else '{:>1}'
 
-    print('')
-    print('-'*51)
-    print('')
-    print(' Number of input  files found : '+colored_text(counter_format.format(counter_input), ['1']))
-    print(' Number of output files found : '+colored_text(counter_format.format(counter_completed), ['1', '92']))
-    print(' Number of resubmitted jobs   : '+colored_text(counter_format.format(counter_resubmitted), ['1', '94']))
-    print(' Number of jobs to resubmit   : '+colored_text(counter_format.format(counter_toResubmit), ['1', '94']))
-    print('')
-    print(' Number of jobs still running : '+counter_format.format(counter_running))
-    print('')
-    print('-'*51)
-    print('')
+    print ''
+    print '-'*51
+    print ''
+    print ' Number of input  files found : '+colored_text(counter_format.format(counter_input), ['1'])
+    print ' Number of output files found : '+colored_text(counter_format.format(counter_completed), ['1', '92'])
+    print ' Number of resubmitted jobs   : '+colored_text(counter_format.format(counter_resubmitted), ['1', '94'])
+    print ' Number of jobs to resubmit   : '+colored_text(counter_format.format(counter_toResubmit), ['1', '94'])
+    print ''
+    print ' Number of jobs still running : '+counter_format.format(counter_running)
+    print ''
+    print '-'*51
+    print ''
 
-    return bool(counter_input == counter_completed)
+    return bool(counter_input != counter_completed)
 
 #### main
 if __name__ == '__main__':
     ### args
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+     prog='./'+os.path.basename(__file__),
+     formatter_class=argparse.RawDescriptionHelpFormatter,
+     description=__doc__)
 
     parser.add_argument('-i', '--inputs', dest='inputs', nargs='+', default=[], required=True,
                         help='list of paths to input directories')
@@ -171,6 +190,9 @@ if __name__ == '__main__':
     parser.add_argument('--runtime', dest='runtime', action='store', type=int, default=None, required=False,
                         help='argument of HTCondor parameter "+RequestRuntime"')
 
+    parser.add_argument('--jobflavour', dest='jobflavour', action='store', type=str, default=None, required=False,
+                        help='argument of HTCondor parameter "+JobFlavour"')
+
     parser.add_argument('-m', '--max-jobs', dest='max_jobs', action='store', type=int, default=-1,
                         help='maximum number of jobs that can submitted to the batch system')
 
@@ -179,6 +201,12 @@ if __name__ == '__main__':
 
     parser.add_argument('-f', '--frequency', dest='frequency', action='store', type=int, default=3600,
                         help='interval of time in seconds between executions of the monitor (has no effect if --repeat is not specified)')
+
+    parser.add_argument('--release', dest='release', action='store_true', default=False,
+                        help='run "condor_release ${USER}" before monitoring, to release jobs in the "HOLD" state')
+
+    parser.add_argument('--show-resubmitted', dest='show_resubmitted', action='store_true', default=False,
+                        help='show batch jobs flagged for resubmission')
 
     parser.add_argument('-l', '--local', dest='local', action='store_true', default=False,
                         help='execute jobs locally')
@@ -194,6 +222,9 @@ if __name__ == '__main__':
 
     log_prx = os.path.basename(__file__)+' -- '
 
+    if len(opts_unknown) > 0:
+       KILL(log_prx+'unsupported command-line arguments: '+str(opts_unknown))
+
     if (opts.memory is not None) and (opts.memory <= 0):
        KILL(log_prx+'invalid (non-positive) value for HTCondor parameter "RequestMemory": '+str(opts.memory))
 
@@ -203,9 +234,6 @@ if __name__ == '__main__':
     if (opts.proxy is not None) and (not os.path.isfile(opts.proxy)):
        KILL(log_prx+'invalid path to voms proxy: '+str(opts.proxy))
 
-    if len(opts_unknown) > 0:
-       KILL(log_prx+'unsupported command-line arguments: '+str(opts_unknown))
-
     if opts.repeat != 0:
 
        if opts.repeat is not None:
@@ -214,7 +242,7 @@ if __name__ == '__main__':
 
           SLEEP_CMD = 'sleep '+str(opts.frequency)
 
-       while not monitor(options=opts, log=log_prx):
+       while monitor(options=opts, log=log_prx):
 
           if opts.repeat is None: break
 

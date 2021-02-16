@@ -2,16 +2,14 @@
 """
 utilities related to the CMS Data Aggregation System (DAS)
 """
-from __future__ import print_function
-
 import json
 
 from RecoBTag.PerformanceMeasurements.utils.common import *
 
-def load_dataset_data(das_name, max_files=-1, max_events=-1, verbose=False):
+def load_dataset_data(das_name, max_files=-1, max_events=-1, parentFiles_levels=2, files_prefix='', verbose=False):
 
     if verbose:
-       print(das_name)
+       print colored_text(das_name, ['1'])
 
     dataset_split = das_name.split('/')
     if len(dataset_split) != 4:
@@ -19,7 +17,7 @@ def load_dataset_data(das_name, max_files=-1, max_events=-1, verbose=False):
 
     dset_data = {'DAS': str(das_name), 'files': []}
 
-    dataset_files = command_output_lines('dasgoclient --query "file dataset='+str(das_name)+'"')
+    dataset_files = command_output_lines('dasgoclient --query "file dataset='+str(das_name)+' | grep file.name,file.nevents"')
     dataset_files = [_tmp for _tmp in dataset_files if _tmp != '']
     dataset_files = sorted(list(set(dataset_files)))
 
@@ -29,56 +27,46 @@ def load_dataset_data(das_name, max_files=-1, max_events=-1, verbose=False):
     if max_files > 0:
        dataset_files = dataset_files[:max_files]
 
+    dataset_filesNevents = []
+    for _tmp in dataset_files:
+        _tmp_split = _tmp.split()
+        if len(_tmp_split) != 2:
+           KILL(das_name+' '+str(_tmp))
+        if not is_int(_tmp_split[1]):
+           KILL(das_name+' '+i_file+' '+str(_tmp_split[1]))
+        dataset_filesNevents += [[_tmp_split[0], int(_tmp_split[1])]]
+
     totEvents, breakLoop = 0, False
-
-    for i_file_idx, i_file in enumerate(dataset_files):
-
-        if verbose:
-           print('  file', i_file_idx, '/', len(dataset_files))
-
-        i_file_nevents = command_output_lines('dasgoclient --query "file='+str(i_file)+' | grep file.nevents"')
-        i_file_nevents = [_tmp.replace(' ', '') for _tmp in i_file_nevents]
-        i_file_nevents = [_tmp for _tmp in i_file_nevents if _tmp != '']
-        i_file_nevents = sorted(list(set(i_file_nevents)))
-
-        if len(i_file_nevents) != 1:
-           KILL('AAA')
-
-        i_file_nevents = i_file_nevents[0]
-
-        if not is_int(i_file_nevents):
-           KILL('BBB')
-
-        i_file_nevents = int(i_file_nevents)
-
+    for i_file_idx, [i_file, i_file_nevents] in enumerate(dataset_filesNevents):
         totEvents += i_file_nevents
         if (max_events > 0) and (totEvents >= max_events):
            breakLoop = True
 
         if verbose:
-           print(i_file)
-           print(i_file_nevents)
+           print '  [ file', i_file_idx+1, '/', len(dataset_filesNevents), '] [ # events =', i_file_nevents, ']', i_file
 
+        i_file_parents1 = []
         i_file_parents2 = []
-
-        i_file_parents1 = command_output_lines('dasgoclient --query "parent file='+str(i_file)+'"')
-        i_file_parents1 = [_tmp for _tmp in i_file_parents1 if _tmp != '']
-        i_file_parents1 = sorted(list(set(i_file_parents1)))
-        for i_file_aodf in i_file_parents1:
-            i_file_parents2_tmp = command_output_lines('dasgoclient --query "parent file='+str(i_file_aodf)+'"')
-            i_file_parents2_tmp = [_tmp.replace(' ', '') for _tmp in i_file_parents2_tmp]
-            i_file_parents2_tmp = [_tmp for _tmp in i_file_parents2_tmp if _tmp != '']
-            i_file_parents2_tmp = sorted(list(set(i_file_parents2_tmp)))
-            i_file_parents2 += i_file_parents2_tmp
-
-        i_file_parents2 = sorted(list(set(i_file_parents2)))
+        if parentFiles_levels > 0:
+           i_file_parents1 = command_output_lines('dasgoclient --query "parent file='+str(i_file)+'"')
+           i_file_parents1 = [files_prefix+_tmp for _tmp in i_file_parents1 if _tmp]
+           i_file_parents1 = sorted(list(set(i_file_parents1)))
+           if parentFiles_levels > 1:
+              i_file_parents2 = []
+              for i_file_aodf in i_file_parents1:
+                  i_file_parents2_tmp = command_output_lines('dasgoclient --query "parent file='+str(i_file_aodf)+'"')
+                  i_file_parents2_tmp = [_tmp.replace(' ', '') for _tmp in i_file_parents2_tmp]
+                  i_file_parents2_tmp = [files_prefix+_tmp for _tmp in i_file_parents2_tmp if _tmp]
+                  i_file_parents2_tmp = sorted(list(set(i_file_parents2_tmp)))
+                  i_file_parents2 += i_file_parents2_tmp
+              i_file_parents2 = sorted(list(set(i_file_parents2)))
 
         if verbose:
            for _tmp in i_file_parents2:
-               print(' '*5, _tmp)
+               print ' '*5, _tmp
 
         dset_data['files'] += [{
-          'file': i_file,
+          'file': files_prefix+i_file,
           'nevents': i_file_nevents,
           'parentFiles_1': i_file_parents1,
           'parentFiles_2': i_file_parents2,
