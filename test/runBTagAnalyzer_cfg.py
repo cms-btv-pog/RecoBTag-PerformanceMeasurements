@@ -899,15 +899,16 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
 #~ process.GlobalTag.globaltag = globalTag
 
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', '')
+# process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '111X_mcRun4_realistic_T15_v4', '')
 # process.GlobalTag.globaltag = '110X_mcRun4_realistic_v3' # needed for Pu200 RelVal CMSSW_11_0_0
 
 # fix for AK4PF Phase-2 JECs
-process.GlobalTag.toGet.append(cms.PSet(
-  record = cms.string('JetCorrectionsRecord'),
-  tag = cms.string('JetCorrectorParametersCollection_PhaseIIFall17_V5b_MC_AK4PF'),
-  label = cms.untracked.string('AK4PF'),
-))
+# process.GlobalTag.toGet.append(cms.PSet(
+#   record = cms.string('JetCorrectionsRecord'),
+#   tag = cms.string('JetCorrectorParametersCollection_PhaseIIFall17_V5b_MC_AK4PF'),
+#   label = cms.untracked.string('AK4PF'),
+# ))
 
 #Choose automatically:
 #process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
