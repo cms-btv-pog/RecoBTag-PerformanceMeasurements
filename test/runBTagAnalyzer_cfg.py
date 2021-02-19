@@ -105,8 +105,7 @@ options.register('fatJetPtMin', 200.0,
     VarParsing.varType.float,
     "Minimum pT for fat jets (default is 200 GeV)"
 )
-# options.register('fatJetAbsEtaMax', 2.5,
-options.register('fatJetAbsEtaMax', 4.5,
+options.register('fatJetAbsEtaMax', 2.5,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "Maximum |eta| for fat jets (default is 2.5)"
@@ -192,6 +191,7 @@ options.register('useNegativeDeepFlavourTags', False,
     "Include negative deep flavour jet taggers"
 )
 
+
 ## Generally leave to False unless you know what you are doing
 options.register('runIVF', False,
     VarParsing.multiplicity.singleton,
@@ -228,8 +228,7 @@ options.register('minNumberOfHits', 1,
     "Minimum number of tracker hits"
 )
 # Change eta for extended forward pixel coverage
-# options.register('maxJetEta', 2.5,
-options.register('maxJetEta', 4.5,
+options.register('maxJetEta', 2.5,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "Maximum jet |eta| (default is 2.5)"
@@ -295,10 +294,22 @@ options.register('runCSVTagTrackVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to run CSV Tagging Track Variables')
+options.register('runPrunedDeepFlavourTaggers', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to run the prunedDeepFlavourTaggers')
 options.register('runDeepFlavourTagVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to run DeepFlavour TaggingVariables')
+options.register('runDeepDoubleXTagVariables', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to run DeepDoubleX TaggingVariables')
+options.register('runDeepBoostedJetTagVariables', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to run DeepBoostedJet Input Variables')
 options.register('runPFElectronVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -329,34 +340,9 @@ options.register(
     VarParsing.varType.int,
     "skip N events"
 )
-options.register('numThreads', 1,
-              VarParsing.multiplicity.singleton,
-              VarParsing.varType.int,
-              'number of threads')
-
-options.register('numStreams', 1,
-              VarParsing.multiplicity.singleton,
-              VarParsing.varType.int,
-              'number of streams')
-
-options.register('logs', False,
-              VarParsing.multiplicity.singleton,
-              VarParsing.varType.bool,
-              'create log files configured via MessageLogger')
-
-options.register('dumpPython', None,
-              VarParsing.multiplicity.singleton,
-              VarParsing.varType.string,
-              'Path to python file with content of cms.Process')
-
-
-
 
 ## 'maxEvents' is already registered by the Framework, changing default value
-
 options.setDefault('maxEvents', -1)
-#options.setDefault('maxEvents', 100)
-
 
 options.parseArguments()
 if options.defaults:
@@ -467,8 +453,7 @@ if options.usePFchs:
     jetCorrectionsAK4 = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
     jetCorrectionsAK8 = ('AK8PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 if options.usePuppi:
-    # jetCorrectionsAK4 = ('AK4PFPuppi', ['L2Relative', 'L3Absolute'], 'None')
-    jetCorrectionsAK4 = ('AK4PFPuppi', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
+    jetCorrectionsAK4 = ('AK4PFPuppi', ['L2Relative', 'L3Absolute'], 'None')
 if options.usePuppiForFatJets:
     jetCorrectionsAK8 = ('AK8PFPuppi', ['L2Relative', 'L3Absolute'], 'None')
 
@@ -602,6 +587,20 @@ bTagDiscriminators = set([
   , 'pfNegativeDeepFlavourJetTags:probc'
   , 'pfNegativeDeepFlavourJetTags:probuds'
   , 'pfNegativeDeepFlavourJetTags:probg'
+    # DeepFlavour with pruned input
+#   , 'pfDeepFlavourPrunedJetTags:probb'
+#   , 'pfDeepFlavourPrunedJetTags:probbb'
+#   , 'pfDeepFlavourPrunedJetTags:problepb'
+#   , 'pfDeepFlavourPrunedJetTags:probc'
+#   , 'pfDeepFlavourPrunedJetTags:probuds'
+#   , 'pfDeepFlavourPrunedJetTags:probg'
+#   , 'pfNegativeDeepFlavourPrunedJetTags:probb'
+#   , 'pfNegativeDeepFlavourPrunedJetTags:probbb'
+#   , 'pfNegativeDeepFlavourPrunedJetTags:problepb'
+#   , 'pfNegativeDeepFlavourPrunedJetTags:probc'
+#   , 'pfNegativeDeepFlavourPrunedJetTags:probuds'
+#   , 'pfNegativeDeepFlavourPrunedJetTags:probg'
+
 ])
 
 ## Legacy taggers not supported with MiniAOD
@@ -616,7 +615,7 @@ if options.useLegacyTaggers:
 
 ## If not including negative deep flavour jet taggers
 if not options.useNegativeDeepFlavourTags:
-  bTagDiscriminators = {i for i in bTagDiscriminators if 'NegativeDeepFlavourJetTags' not in i}
+  bTagDiscriminators = {i for i in bTagDiscriminators if 'NegativeDeepFlavour' not in i}
 
 ## Clustering algorithm label
 algoLabel = 'CA'
@@ -667,11 +666,38 @@ bTagInfosFat = copy.deepcopy(bTagInfos_noDeepFlavour)
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfImpactParameter' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfInclusiveSecondaryVertexFinder' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
 bTagInfosFat += ([] if options.useLegacyTaggers else ['pfBoostedDoubleSV' + ('CA15' if algoLabel=='CA' else 'AK8') + 'TagInfos'])
+## Add DeepDoubleX tag infos
+bTagInfosFat += ([] if options.useLegacyTaggers else ['pfDeepDoubleXTagInfos'])
 
 bTagDiscriminators_no_deepFlavour = {i for i in bTagDiscriminators if 'DeepFlavourJetTags' not in i}
 bTagDiscriminatorsFat = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
-## Add DeepDoubleB tagger to fat jets
-bTagDiscriminatorsFat.update(set(['pfDeepDoubleBJetTags:probH']))
+## Add DeepDoubleX tagger to fat jets
+bTagDiscriminatorsFat.update(set([
+    'pfDeepDoubleBvLJetTags:probQCD',
+    'pfDeepDoubleBvLJetTags:probHbb',
+    'pfDeepDoubleCvLJetTags:probQCD',
+    'pfDeepDoubleCvLJetTags:probHcc',
+    'pfDeepDoubleCvBJetTags:probHbb',
+    'pfDeepDoubleCvBJetTags:probHcc',
+    'pfMassIndependentDeepDoubleBvLJetTags:probQCD',
+    'pfMassIndependentDeepDoubleBvLJetTags:probHbb',
+    'pfMassIndependentDeepDoubleCvLJetTags:probQCD',
+    'pfMassIndependentDeepDoubleCvLJetTags:probHcc',
+    'pfMassIndependentDeepDoubleCvBJetTags:probHbb',
+    'pfMassIndependentDeepDoubleCvBJetTags:probHcc',
+]))
+## Add DeepBoostedJet discriminators
+from RecoBTag.MXNet.pfDeepBoostedJet_cff import _pfMassDecorrelatedDeepBoostedJetTagsProbs, _pfMassDecorrelatedDeepBoostedJetTagsMetaDiscrs
+bTagDiscriminatorsFat.update(set([]) if (options.useLegacyTaggers or not options.miniAOD) else set([
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:bbvsLight",
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ccvsLight",
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:TvsQCD",
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHccvsQCD",
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:WvsQCD",
+    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHbbvsQCD"
+]))
+## Add DeepBoostedJet tag infos
+bTagInfosFat += ([] if (options.useLegacyTaggers or not options.miniAOD) else ['pfDeepBoostedJetTagInfos'])
 
 if options.runJetClustering:
     options.remakeAllDiscr = True
@@ -759,74 +785,21 @@ else:
 
 
 ## MessageLogger
-# process.load("FWCore.MessageLogger.MessageLogger_cfi")
-# # If you run over many samples and you save the log, remember to reduce
-# # the size of the output by prescaling the report of the event number
-# process.MessageLogger.cerr.FwkReport.reportEvery = options.reportEvery
-# process.MessageLogger.cerr.default.limit = 10
-
-# MessageLogger
-if options.logs:
-   process.MessageLogger = cms.Service('MessageLogger',
-     destinations = cms.untracked.vstring(
-       'cerr',
-       'logError',
-       'logInfo',
-       'logDebug',
-     ),
-     # scram b USER_CXXFLAGS="-DEDM_ML_DEBUG"
-     debugModules = cms.untracked.vstring(
-       'PixelVerticesSelector',
-       'TracksClosestToFirstVerticesSelector',
-       'JMETriggerNTuple',
-     ),
-     categories = cms.untracked.vstring(
-       'FwkReport',
-     ),
-     cerr = cms.untracked.PSet(
-       threshold = cms.untracked.string('WARNING'),
-       FwkReport = cms.untracked.PSet(
-         reportEvery = cms.untracked.int32(1),
-       ),
-     ),
-     logError = cms.untracked.PSet(
-       threshold = cms.untracked.string('ERROR'),
-       extension = cms.untracked.string('.txt'),
-       FwkReport = cms.untracked.PSet(
-         reportEvery = cms.untracked.int32(1),
-       ),
-     ),
-     logInfo = cms.untracked.PSet(
-       threshold = cms.untracked.string('INFO'),
-       extension = cms.untracked.string('.txt'),
-       FwkReport = cms.untracked.PSet(
-         reportEvery = cms.untracked.int32(1),
-       ),
-     ),
-     logDebug = cms.untracked.PSet(
-       threshold = cms.untracked.string('DEBUG'),
-       extension = cms.untracked.string('.txt'),
-       FwkReport = cms.untracked.PSet(
-         reportEvery = cms.untracked.int32(1),
-       ),
-     ),
-   )
-
-
+process.load("FWCore.MessageLogger.MessageLogger_cfi")
+# If you run over many samples and you save the log, remember to reduce
+# the size of the output by prescaling the report of the event number
+process.MessageLogger.cerr.FwkReport.reportEvery = options.reportEvery
+process.MessageLogger.cerr.default.limit = 10
 
 ## Input files
 process.source = cms.Source("PoolSource",
-	fileNames = cms.untracked.vstring(),
-	secondaryFileNames = cms.untracked.vstring(),
+    fileNames = cms.untracked.vstring()
 )
-#  process.source.secondaryFileNames = []
 
 if options.miniAOD:
     process.source.fileNames = [
         #/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM
-#        '/store/relval/CMSSW_10_4_0_mtd3/RelValTTbar_Tauola_14TeV/MINIAODSIM/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200_1-v2/20000/31C1C942-EC8D-1245-B773-2293F5CC87DB.root'
-        '/store/relval/CMSSW_10_4_0_mtd3/RelValTTbar_Tauola_14TeV/MINIAODSIM/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200_5-v2/20000/A8AD8A25-CDC1-2E4B-A404-E9DB14ECF16A.root'
-
+        '/store/mc/RunIIFall17MiniAOD/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/00000/C8E934F8-1C06-E811-888D-0242AC130002.root'
     ]
     if options.runOnData:
         process.source.fileNames = [
@@ -877,13 +850,6 @@ process.TFileService = cms.Service("TFileService",
    fileName = cms.string(options.outFilename)
 )
 
-
-# multi-threading settings
-process.options.numberOfThreads = cms.untracked.uint32(options.numThreads if (options.numThreads > 1) else 1)
-process.options.numberOfStreams = cms.untracked.uint32(options.numStreams if (options.numStreams > 1) else 1)
-if hasattr(process, 'DQMStore'):
-   process.DQMStore.enableMultiThread = (process.options.numberOfThreads > 1)
-
 ## Events to process
 process.source.skipEvents = cms.untracked.uint32(options.skipEvents)
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents) )
@@ -897,19 +863,7 @@ process.options   = cms.untracked.PSet(
 #Set GT by hand:
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
-#~ process.GlobalTag.globaltag = globalTag
-
-# process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', '')
-process.GlobalTag = GlobalTag(process.GlobalTag, '111X_mcRun4_realistic_T15_v4', '')
-# process.GlobalTag.globaltag = '110X_mcRun4_realistic_v3' # needed for Pu200 RelVal CMSSW_11_0_0
-
-# fix for AK4PF Phase-2 JECs
-# process.GlobalTag.toGet.append(cms.PSet(
-#   record = cms.string('JetCorrectionsRecord'),
-#   tag = cms.string('JetCorrectorParametersCollection_PhaseIIFall17_V5b_MC_AK4PF'),
-#   label = cms.untracked.string('AK4PF'),
-# ))
-
+process.GlobalTag.globaltag = globalTag
 #Choose automatically:
 #process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 #from Configuration.AlCa.GlobalTag import GlobalTag
@@ -978,21 +932,16 @@ if options.usePrivateJEC:
     process.es_prefer_jec = cms.ESPrefer("PoolDBESSource",'jec')
 
 ### to activate the new JP calibration: using the data base
-# trkProbaCalibTag = options.JPCalibration
-# process.GlobalTag.toGet = cms.VPSet(
-#     cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-#       tag = cms.string(trkProbaCalibTag),
-#       connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS")
-#     )
-# )
+trkProbaCalibTag = options.JPCalibration
+process.GlobalTag.toGet = cms.VPSet(
+    cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
+      tag = cms.string(trkProbaCalibTag),
+      connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS")
+    )
+)
 
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
-
-
-process.load('Configuration.Geometry.GeometryExtended2026D49Reco_cff')
-
-# else: process.load("Configuration.Geometry.GeometryRecoDB_cff")
-
+process.load("Configuration.Geometry.GeometryRecoDB_cff")
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 
 #-------------------------------------
@@ -1042,8 +991,6 @@ else:
         process.ak4Jets = ak4PFJets.clone(src = cms.InputTag('pfCHS'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
     elif options.usePuppi:
         process.ak4Jets = ak4PFJets.clone(src = cms.InputTag('puppi'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
-        # from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJetsPuppi
-        # process.ak4Jets = ak4PFJetsPuppi.clone(srcWeights = cms.InputTag('puppi'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
     else:
         process.ak4Jets = ak4PFJets.clone(src = cms.InputTag('packedPFCandidates'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
 
@@ -1439,7 +1386,7 @@ if options.useTTbarFilter:
     # Set up electron ID (VID framework)
     from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
     switchOnVIDElectronIdProducer(process, dataFormat=DataFormat.MiniAOD)
-    my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Fall17_94X_V1_cff']
+    my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Fall17_94X_V2_cff']
     for idmod in my_id_modules:
         setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
@@ -1507,7 +1454,6 @@ if options.miniAOD:
 #-------------------------------------
 ## Change the minimum number of tracker hits used in the track selection
 if options.changeMinNumberOfHits:
-    print "changeMinNumberOfHits=True"
     for m in process.producerNames().split(' '):
         if m.startswith('pfImpactParameterTagInfos'):
             print "Changing 'minimumNumberOfHits' for " + m + " to " + str(options.minNumberOfHits)
@@ -1594,7 +1540,6 @@ if options.useLegacyTaggers:
 #   process.btagana.produceAllTrackTree  = True
 #   process.btagana.producePtRelTemplate = False
 #------------------
-
 #Handle groups
 for requiredGroup in process.btagana.groups:
    for storedGroup in btagana_tmp.groups:
@@ -1613,7 +1558,10 @@ process.btagana.producePtRelTemplate  = options.producePtRelTemplate  ## True fo
 process.btagana.runTagVariables     = options.runTagVariables  ## True if you want to run TagInfo TaggingVariables
 process.btagana.runCSVTagVariables  = options.runCSVTagVariables   ## True if you want to run CSV TaggingVariables
 process.btagana.runCSVTagTrackVariables  = options.runCSVTagTrackVariables   ## True if you want to run CSV Tagging Track Variables
+process.btagana.runPrunedDeepFlavourTaggers = options.runPrunedDeepFlavourTaggers
 process.btagana.runDeepFlavourTagVariables = options.runDeepFlavourTagVariables
+process.btagana.runDeepDoubleXTagVariables = options.runDeepDoubleXTagVariables
+process.btagana.runDeepBoostedJetTagVariables = options.runDeepBoostedJetTagVariables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag(patJetSource)
 process.btagana.muonCollectionName    = cms.InputTag(muSource)
@@ -1632,7 +1580,6 @@ process.btagana.runPFMuonVariables = options.runPFMuonVariables
 process.btagana.runPatMuons = options.runPatMuons
 process.btagana.runCTagVariables = options.runCTagVariables
 process.btagana.runEventInfo = options.runEventInfo
-
 process.btagana.runOnData = options.runOnData
 
 if options.runOnData:
@@ -1659,6 +1606,8 @@ if options.runFatJets:
         deepFlavourJetTags = cms.string(''),
         deepFlavourNegJetTags = cms.string(''),
         runTagVariablesSubJets = options.runTagVariablesSubJets,
+        runDeepDoubleXTagVariables = options.runDeepDoubleXTagVariables,
+        runDeepBoostedJetTagVariables = options.runDeepBoostedJetTagVariables,
         useSelectedTracks   = cms.bool(True),
         maxDeltaR           = cms.double(options.fatJetRadius),
         R0                  = cms.double(options.fatJetRadius),
@@ -1691,6 +1640,8 @@ if options.doBoostedCommissioning:
     process.btaganaFatJets.runCSVTagVariables = True
     process.btaganaFatJets.runCSVTagTrackVariables = True
     process.btaganaFatJets.runCSVTagVariablesSubJets = True
+    process.btaganaFatJets.runDeepDoubleXTagVariables = True
+    process.btaganaFatJets.runDeepBoostedJetTagVariables = True
     print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
     print "runHadronVariables set to '",process.btaganaFatJets.runHadronVariables,"'"
     print "runQuarkVariables set to '",process.btaganaFatJets.runQuarkVariables,"'"
@@ -1698,6 +1649,8 @@ if options.doBoostedCommissioning:
     print "For fat jets: runCSVTagVariables set to '",process.btaganaFatJets.runCSVTagVariables,"'"
     print "For fat jets: runCSVTagTrackVariables set to '",process.btaganaFatJets.runCSVTagTrackVariables,"'"
     print "For subjets:  runCSVTagVariablesSubJets set to '",process.btaganaFatJets.runCSVTagVariablesSubJets,"'"
+    print "For fat jets: runDeepDoubleXTagVariables set to '",process.btaganaFatJets.runDeepDoubleXTagVariables,"'"
+    print "For fat jets: runDeepBoostedJetTagVariables set to '",process.btaganaFatJets.runDeepBoostedJetTagVariables,"'"
     print "********************"
 
 if process.btagana.produceJetTrackTruthTree:
@@ -1772,17 +1725,5 @@ process.p = cms.Path(
 
 # Delete predefined output module (needed for running with CRAB)
 del process.out
-# dump content of cms.Process to python file
-if options.dumpPython is not None:
-    open(options.dumpPython,'w').write(process.dumpPython())
-# print-outs
-print '--- runBTagAnalyzer_cfg.py ---\n'
-print 'process.maxEvents.input =', process.maxEvents.input
-print 'process.source.skipEvents =', process.source.skipEvents
-print 'process.source.fileNames =', process.source.fileNames
-print 'numThreads =', options.numThreads
-print 'numStreams =', options.numStreams
-print 'logs =', options.logs
-print 'wantSummary =', options.wantSummary
-print 'dumpPython =', options.dumpPython
-print '\n-------------------------------'
+
+open('pydump.py','w').write(process.dumpPython())
