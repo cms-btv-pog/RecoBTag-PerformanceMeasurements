@@ -16,194 +16,11 @@
 //
 //
 //
-// system include files
-#include <memory>
 
-// user include files
-#include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/EDAnalyzer.h"
-#include "FWCore/Framework/interface/Event.h"
-#include "FWCore/Framework/interface/MakerMacros.h"
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
-
-#include "DataFormats/Common/interface/RefToPtr.h"
-#include "DataFormats/JetReco/interface/JetTracksAssociation.h"
-#include "DataFormats/BTauReco/interface/CandIPTagInfo.h"
-#include "DataFormats/BTauReco/interface/CandSoftLeptonTagInfo.h"
-#include "DataFormats/BTauReco/interface/BoostedDoubleSVTagInfo.h"
-#include "DataFormats/BTauReco/interface/TrackIPTagInfo.h"
-#include "DataFormats/Math/interface/deltaR.h"
-
-#include "DataFormats/GeometrySurface/interface/Line.h"
-#include "DataFormats/GeometryCommonDetAlgo/interface/Measurement1D.h"
-
-#include "SimTracker/Records/interface/TrackAssociatorRecord.h"
-#include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
-
-#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
-#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-#include "RecoBTag/PerformanceMeasurements/interface/CategoryFinder.h"
-
-// reco track and vertex
-#include "DataFormats/Candidate/interface/VertexCompositePtrCandidate.h"
-#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
-#include "DataFormats/TrackReco/interface/Track.h"
-#include "DataFormats/VertexReco/interface/Vertex.h"
-#include "RecoVertex/VertexPrimitives/interface/TransientVertex.h"
-#include "DataFormats/BTauReco/interface/JetTag.h"
-#include "DataFormats/JetReco/interface/JetCollection.h"
-#include "DataFormats/JetReco/interface/Jet.h"
-
-#include "DataFormats/TrackReco/interface/TrackFwd.h"
-#include "DataFormats/TrackingRecHit/interface/TrackingRecHit.h"
-#include "DataFormats/TrackingRecHit/interface/TrackingRecHitFwd.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TFile.h"
-#include "TTree.h"
-#include "TVector3.h"
-#include "TLorentzVector.h"
-#include "Math/GenVector/VectorUtil.h"
-#include "Math/GenVector/PxPyPzE4D.h"
-#include "TGraphErrors.h"
-
-#include "DataFormats/BTauReco/interface/SecondaryVertexTagInfo.h"
-
-#include "SimDataFormats/Associations/interface/TrackToTrackingParticleAssociator.h"
-#include "SimTracker/TrackHistory/interface/TrackCategories.h"
-#include "SimTracker/TrackHistory/interface/TrackClassifier.h"
-#include "DataFormats/BTauReco/interface/SoftLeptonTagInfo.h"
-#include "DataFormats/BTauReco/interface/DeepFlavourFeatures.h"
-#include "DataFormats/BTauReco/interface/DeepDoubleXFeatures.h"
-#include "DataFormats/BTauReco/interface/DeepBoostedJetFeatures.h"
-#include "DataFormats/MuonReco/interface/Muon.h"
-#include "DataFormats/PatCandidates/interface/Electron.h"
-#include "DataFormats/PatCandidates/interface/MET.h"
-
-// trigger
-#include "DataFormats/Common/interface/TriggerResults.h"
-#include "FWCore/Framework/interface/TriggerNamesService.h"
-#include "FWCore/ServiceRegistry/interface/Service.h"
-#include "CommonTools/UtilAlgos/interface/TFileService.h"
-
-#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
-#include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
-#include "DataFormats/JetReco/interface/JetCollection.h"
-#include "DataFormats/JetReco/interface/GenJetCollection.h"
-#include "DataFormats/PatCandidates/interface/Jet.h"
-#include "DataFormats/PatCandidates/interface/Muon.h"
-
-// reconstruct IP
-#include "TrackingTools/IPTools/interface/IPTools.h"
-
-// Math clusters to TrackingParticles
-#include "SimTracker/TrackerHitAssociation/interface/ClusterTPAssociation.h"
-
-#include "RecoBTau/JetTagComputer/interface/GenericMVAJetTagComputer.h"
-#include "RecoBTau/JetTagComputer/interface/GenericMVAJetTagComputerWrapper.h"
-#include "RecoBTau/JetTagComputer/interface/JetTagComputer.h"
-#include "RecoBTau/JetTagComputer/interface/JetTagComputerRecord.h"
-#include "RecoBTag/SecondaryVertex/interface/CombinedSVComputer.h"
-#include "RecoBTag/SecondaryVertex/interface/TrackKinematics.h"
-#include "RecoBTag/SecondaryVertex/interface/V0Filter.h"
+#include "RecoBTag/PerformanceMeasurements/interface/AnalyzerBase.h"
 #include "RecoBTag/ImpactParameter/plugins/IPProducer.h"
-#include "RecoVertex/VertexPrimitives/interface/ConvertToFromReco.h"
 
-#include "TrackingTools/GeomPropagators/interface/AnalyticalImpactPointExtrapolator.h"
-
-#include "FWCore/Utilities/interface/RegexMatch.h"
-#include <boost/regex.hpp>
-
-#include "RecoBTag/PerformanceMeasurements/interface/JetInfoBranches.h"
-#include "RecoBTag/PerformanceMeasurements/interface/EventInfoBranches.h"
-#include "RecoBTag/PerformanceMeasurements/interface/BookHistograms.h"
-#include "RecoBTag/PerformanceMeasurements/interface/VariableParser.h"
-
-#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-#include "FWCore/Common/interface/Provenance.h"
-#include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
-#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
-#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
-
-#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
-#include "TrackingTools/Records/interface/TransientTrackRecord.h"
-#include "TrackingTools/IPTools/interface/IPTools.h"
-
-#include "fastjet/contrib/Njettiness.hh"
-
-#include "RecoBTag/SecondaryVertex/interface/CombinedSVSoftLeptonComputer.h"
-
-//
-// constants, enums and typedefs
-//
-typedef edm::View<pat::Jet> PatJetCollection;
-typedef std::vector<edm::Ptr<pat::Jet> > PatJetPtrCollection;
-
-//
-// class declaration
-//
-
-struct orderByPt {
-  const std::string mCorrLevel;
-  orderByPt(const std::string& fCorrLevel) : mCorrLevel(fCorrLevel) {}
-  bool operator ()(edm::Ptr<pat::Jet> const& a, edm::Ptr<pat::Jet> const& b) {
-    if( mCorrLevel=="Uncorrected" )
-      return a->correctedJet("Uncorrected").pt() > b->correctedJet("Uncorrected").pt();
-    else
-      return a->pt() > b->pt();
-  }
-};
-
-class simPrimaryVertex {
-  public:
-    simPrimaryVertex(double x1,double y1,double z1):x(x1),y(y1),z(z1),ptsq(0),nGenTrk(0){};
-    double x,y,z;
-    HepMC::FourVector ptot;
-    //HepLorentzVector ptot;
-    double ptsq;
-    int nGenTrk;
-    std::vector<int> finalstateParticles;
-    std::vector<int> simTrackIndex;
-    std::vector<int> genVertex;
-    const reco::Vertex *recVtx;
-};
-
-const reco::TrackBaseRef toTrackRef(const reco::TrackRef & trk) {return reco::TrackBaseRef(trk);}
-const reco::TrackBaseRef toTrackRef(const edm::Ptr<reco::Candidate> & cnd)
-{
-  const pat::PackedCandidate * pcand = dynamic_cast<const pat::PackedCandidate *>(cnd.get());
-
-  if(pcand) // MiniAOD case
-    return reco::TrackBaseRef(); // return null reference since no tracks are stored in MiniAOD
-  else
-  {
-    const reco::PFCandidate * pfcand = dynamic_cast<const reco::PFCandidate *>(cnd.get());
-
-    if ( (std::abs(pfcand->pdgId()) == 11 || pfcand->pdgId() == 22) && pfcand->gsfTrackRef().isNonnull() && pfcand->gsfTrackRef().isAvailable() )
-      return reco::TrackBaseRef(pfcand->gsfTrackRef());
-    else if ( pfcand->trackRef().isNonnull() && pfcand->trackRef().isAvailable() )
-      return reco::TrackBaseRef(pfcand->trackRef());
-    else
-      return reco::TrackBaseRef();
-  }
-}
-
-const math::XYZPoint & position(const reco::Vertex & sv) {return sv.position();}
-const math::XYZPoint & position(const reco::VertexCompositePtrCandidate & sv) {return sv.vertex();}
-const double xError(const reco::Vertex & sv) {return sv.xError();}
-const double xError(const reco::VertexCompositePtrCandidate & sv) {return sqrt(sv.vertexCovariance(0,0));}
-const double yError(const reco::Vertex & sv) {return sv.yError();}
-const double yError(const reco::VertexCompositePtrCandidate & sv) {return sqrt(sv.vertexCovariance(1,1));}
-const double zError(const reco::Vertex & sv) {return sv.zError();}
-const double zError(const reco::VertexCompositePtrCandidate & sv) {return sqrt(sv.vertexCovariance(2,2));}
-const double chi2(const reco::Vertex & sv) {return sv.chi2();}
-const double chi2(const reco::VertexCompositePtrCandidate & sv) {return sv.vertexChi2();}
-const double ndof(const reco::Vertex & sv) {return sv.ndof();}
-const double ndof(const reco::VertexCompositePtrCandidate & sv) {return sv.vertexNdof();}
-const unsigned int vtxTracks(const reco::Vertex & sv) {return sv.nTracks();}
-const unsigned int vtxTracks(const reco::VertexCompositePtrCandidate & sv) {return sv.numberOfSourceCandidatePtrs();}
-
+using namespace analyzerBase;
 
 template<typename IPTI,typename VTX>
 class BTagAnalyzerT : public edm::EDAnalyzer
@@ -498,6 +315,19 @@ private:
   double deltaRSubJets_;
 
   std::unordered_set<std::string> variables; // This unordered_set is going to contain the name of each single variable to be stored in the output tree
+
+  // some information to be stored per event
+  std::vector <reco::GenParticle> neutrinosLepB;
+  std::vector <reco::GenParticle> neutrinosLepB_C;
+
+  std::vector<reco::GenParticle> gToBB;
+  std::vector<reco::GenParticle> gToCC;
+  std::vector<reco::GenParticle> alltaus_;
+
+  std::vector<reco::GenParticle> Bhadron_;
+  std::vector<reco::GenParticle> Bhadron_daughter_;
+
+
 
 };
 
@@ -1677,6 +1507,75 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
     }
   }
   //------------------------------------------------------
+  neutrinosLepB.clear();
+  neutrinosLepB_C.clear();
+  gToBB.clear();
+  gToCC.clear();
+  alltaus_.clear();
+  Bhadron_.clear();
+  Bhadron_daughter_.clear();
+
+  if(!isData_){
+      edm::Handle<reco::GenParticleCollection> genParticles;
+      iEvent.getByToken(genParticleCollectionName_, genParticles);
+
+      for (const reco::Candidate &genC : *genParticles){
+          const reco::GenParticle &gen = static_cast< const reco::GenParticle &>(genC);
+          if((abs(gen.pdgId())>500&&abs(gen.pdgId())<600)||(abs(gen.pdgId())>5000&&abs(gen.pdgId())<6000)){
+              Bhadron_.push_back(gen);
+              if(gen.numberOfDaughters()>0){
+                  if( (abs(gen.daughter(0)->pdgId())>500&&abs(gen.daughter(0)->pdgId())<600)||(abs(gen.daughter(0)->pdgId())>5000&&abs(gen.daughter(0)->pdgId())<6000)){
+                      if(gen.daughter(0)->numberOfDaughters()>0){
+                          const reco::GenParticle &daughter_ = static_cast< const reco::GenParticle &>(*(gen.daughter(0)->daughter(0)));
+                          if(daughter_.vx()!=gen.vx()){
+                              Bhadron_daughter_.push_back(daughter_);
+                          }else Bhadron_daughter_.push_back(gen);
+                      }else  Bhadron_daughter_.push_back(gen);
+                  }else{
+                      const reco::GenParticle &daughter_ = static_cast< const reco::GenParticle &>(*gen.daughter(0));
+                      Bhadron_daughter_.push_back(daughter_);
+                  }
+              }else {
+                  Bhadron_daughter_.push_back(gen);
+              }
+          }
+      }
+
+      for (const reco::Candidate &genC : *genParticles){
+          const reco::GenParticle &gen = static_cast< const reco::GenParticle &>(genC);
+          if(abs(gen.pdgId())==12||abs(gen.pdgId())==14||abs(gen.pdgId())==16){
+              const reco::GenParticle* mother =  static_cast< const reco::GenParticle*> (gen.mother());
+              if(mother!=NULL){
+                  if((abs(mother->pdgId())>500&&abs(mother->pdgId())<600)||(abs(mother->pdgId())>5000&&abs(mother->pdgId())<6000)){
+                      neutrinosLepB.emplace_back(gen);
+                  }
+                  if((abs(mother->pdgId())>400&&abs(mother->pdgId())<500)||(abs(mother->pdgId())>4000&&abs(mother->pdgId())<5000)){
+                      neutrinosLepB_C.emplace_back(gen);
+                  }
+              }else {
+                  std::cout << "No mother" << std::endl;
+              }
+          }
+          int id(std::abs(gen.pdgId()));
+          int status(gen.status());
+          if (id == 21 && status >= 21 && status <= 59){ //// Pythia8 hard scatter, ISR, or FSR
+              if ( gen.numberOfDaughters() == 2 ){
+                  const reco::Candidate* d0 = gen.daughter(0);
+                  const reco::Candidate* d1 = gen.daughter(1);
+                  if ( std::abs(d0->pdgId()) == 5 && std::abs(d1->pdgId()) == 5 && d0->pdgId()*d1->pdgId() < 0 && reco::deltaR(*d0, *d1) < 0.4){
+                      gToBB.push_back(gen);
+                  }
+                  if ( std::abs(d0->pdgId()) == 4 && std::abs(d1->pdgId()) == 4 && d0->pdgId()*d1->pdgId() < 0 && reco::deltaR(*d0, *d1) < 0.4){
+                      gToCC.push_back(gen);
+                  }
+              }
+          }
+          if(id == 15 && false){
+              alltaus_.push_back(gen);
+          }
+      }
+  }
+
 
   //------------------------------------------------------
   // Jet info
@@ -1730,11 +1629,6 @@ void BTagAnalyzerT<IPTI,VTX>::processTrig(const edm::Handle<edm::TriggerResults>
   return;
 }
 
-// This is needed to get a TrackingParticle --> Cluster match (instead of Cluster-->TP) (only needed in processJets)
-using P = std::pair<OmniClusterRef, TrackingParticleRef>;
-bool compare(const P& i, const P& j) {
-  	return i.second.index() > j.second.index();
-}
 
 template<typename IPTI,typename VTX>
 void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& jetsColl, const edm::Handle<PatJetCollection>& jetsColl2,
@@ -1864,6 +1758,70 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].Jet_pt[JetInfo[iJetColl].nJet]        = pjet->pt();
       JetInfo[iJetColl].Jet_mass[JetInfo[iJetColl].nJet]      = pjet->mass();
       JetInfo[iJetColl].Jet_genpt[JetInfo[iJetColl].nJet]     = ( pjet->genJet()!=0 ? pjet->genJet()->pt() : -1. );
+
+      int isB_(0);
+      int isGBB_(0);
+      int isBB_(0);
+      int isC_(0);
+      int isGCC_(0);
+      int isCC_(0);
+      int isUD_(0);
+      int isTau_(0);
+      int isS_(0);
+      int isG_(0);
+      int isLeptonicB_(0);
+      int isLeptonicB_C_(0);
+      int isUndefined_(0);
+
+      //// Note that jets with gluon->bb (cc) and x->bb (cc) are in the same categories
+      if(pjet->genJet()!=NULL){
+          switch(analyzerBase::jet_flavour(*pjet, gToBB, gToCC, neutrinosLepB, neutrinosLepB_C, alltaus_)) {
+          case analyzerBase::JetFlavor::B:  isB_=1; break;
+          case analyzerBase::JetFlavor::LeptonicB: isLeptonicB_=1; break;
+          case analyzerBase::JetFlavor::LeptonicB_C: isLeptonicB_C_=1; break;
+          case analyzerBase::JetFlavor::GBB: isGBB_=1; break;
+          case analyzerBase::JetFlavor::BB: isBB_=1; break;
+          case analyzerBase::JetFlavor::C:  isC_=1; break;
+          case analyzerBase::JetFlavor::GCC: isGCC_=1; break;
+          case analyzerBase::JetFlavor::CC: isCC_=1; break;
+          case analyzerBase::JetFlavor::TAU: isTau_=1;break;
+          case analyzerBase::JetFlavor::G:  isG_=1; break;
+          case analyzerBase::JetFlavor::UD: isUD_=1; break;
+          case analyzerBase::JetFlavor::S:  isS_=1; break;
+          default : isUndefined_=1; break;
+          }
+      }
+
+      JetInfo[iJetColl].Jet_isB[JetInfo[iJetColl].nJet] = isB_;
+      JetInfo[iJetColl].Jet_isLeptonicB[JetInfo[iJetColl].nJet] = isLeptonicB_;
+      JetInfo[iJetColl].Jet_isLeptonicB_C[JetInfo[iJetColl].nJet] = isLeptonicB_C_;
+      JetInfo[iJetColl].Jet_isGBB[JetInfo[iJetColl].nJet] = isGBB_;
+      JetInfo[iJetColl].Jet_isBB[JetInfo[iJetColl].nJet] = isBB_;
+      JetInfo[iJetColl].Jet_isC[JetInfo[iJetColl].nJet] = isC_;
+      JetInfo[iJetColl].Jet_isGCC[JetInfo[iJetColl].nJet] = isGCC_;
+      JetInfo[iJetColl].Jet_isCC[JetInfo[iJetColl].nJet] = isCC_;
+      JetInfo[iJetColl].Jet_isTau[JetInfo[iJetColl].nJet] = isTau_;
+      JetInfo[iJetColl].Jet_isG[JetInfo[iJetColl].nJet] = isG_;
+      JetInfo[iJetColl].Jet_isUD[JetInfo[iJetColl].nJet] = isUD_;
+      JetInfo[iJetColl].Jet_isS[JetInfo[iJetColl].nJet] = isS_;
+      JetInfo[iJetColl].Jet_isUndefined[JetInfo[iJetColl].nJet] = isUndefined_;
+
+      if(!pjet->genJet()){//for data
+          isUndefined_=1;
+      }
+
+      auto genjet = pjet->genJet();
+
+      // if (genjet->isNonnull() && genjet->isAvailable()) {
+      if (pjet->genJet()) {
+          JetInfo[iJetColl].Jet_GenJetHasMatch[JetInfo[iJetColl].nJet]=1;
+          JetInfo[iJetColl].Jet_GenJet_pt[JetInfo[iJetColl].nJet]=(*genjet).pt();
+          JetInfo[iJetColl].Jet_GenJet_eta[JetInfo[iJetColl].nJet]=(*genjet).eta();
+          JetInfo[iJetColl].Jet_GenJet_phi[JetInfo[iJetColl].nJet]=(*genjet).phi();
+          JetInfo[iJetColl].Jet_GenJet_mass[JetInfo[iJetColl].nJet]=(*genjet).mass();
+      }else{
+          JetInfo[iJetColl].Jet_GenJetHasMatch[JetInfo[iJetColl].nJet]=0;
+      }
 
       // generator-level jet cleaning
       // against prompt leptons
@@ -3465,7 +3423,7 @@ void BTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& j
       JetInfo[iJetColl].SV_deltaR_sum_jet[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, jetDir) );
       JetInfo[iJetColl].SV_deltaR_sum_dir[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, flightDir) );
 
-      Line::PositionType pos(GlobalPoint(position(vertex).x(),position(vertex).y(),position(vertex).z()));
+      Line::PositionType pos(GlobalPoint( position(vertex).x(), position(vertex).y(), position(vertex).z()));
       Line trackline(pos,flightDir);
       // get the Jet  line
       Line::PositionType pos2(GlobalPoint(pv->x(),pv->y(),pv->z()));
