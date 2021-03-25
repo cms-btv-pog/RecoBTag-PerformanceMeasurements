@@ -488,7 +488,7 @@ print '-'*108
 print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
 print '-'*108
 for _modname in sorted(process.paths_()):
-    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'DeepCSV' in _modname)
+    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'DeepCSV' in _modname or 'DeepFlavour' in _modname)
 #    _keepPath |= _modname.startswith('MC_ReducedIterativeTracking')
     if _keepPath:
       print '{:<99} | {:<4} |'.format(_modname, '+')
@@ -496,7 +496,7 @@ for _modname in sorted(process.paths_()):
     _mod = getattr(process, _modname)
     if type(_mod) == cms.Path:
       process.__delattr__(_modname)
-      print '{:<99} | {:<4} |'.format(_modname, '')
+    #   print '{:<99} | {:<4} |'.format(_modname, '')
 print '-'*108
 
 # remove FastTimerService
