@@ -686,18 +686,18 @@ bTagDiscriminatorsFat.update(set([
     'pfMassIndependentDeepDoubleCvBJetTags:probHbb',
     'pfMassIndependentDeepDoubleCvBJetTags:probHcc',
 ]))
-## Add DeepBoostedJet discriminators
-from RecoBTag.MXNet.pfDeepBoostedJet_cff import _pfMassDecorrelatedDeepBoostedJetTagsProbs, _pfMassDecorrelatedDeepBoostedJetTagsMetaDiscrs
-bTagDiscriminatorsFat.update(set([]) if (options.useLegacyTaggers or not options.miniAOD) else set([
-    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:bbvsLight",
-    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ccvsLight",
-    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:TvsQCD",
-    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHccvsQCD",
-    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:WvsQCD",
-    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHbbvsQCD"
-]))
+# ## Add DeepBoostedJet discriminators
+# from RecoBTag.MXNet.pfDeepBoostedJet_cff import _pfMassDecorrelatedDeepBoostedJetTagsProbs, _pfMassDecorrelatedDeepBoostedJetTagsMetaDiscrs
+# bTagDiscriminatorsFat.update(set([]) if (options.useLegacyTaggers or not options.miniAOD) else set([
+#     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:bbvsLight",
+#     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ccvsLight",
+#     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:TvsQCD",
+#     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHccvsQCD",
+#     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:WvsQCD",
+#     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHbbvsQCD"
+# ]))
 ## Add DeepBoostedJet tag infos
-bTagInfosFat += ([] if (options.useLegacyTaggers or not options.miniAOD) else ['pfDeepBoostedJetTagInfos'])
+# bTagInfosFat += ([] if (options.useLegacyTaggers or not options.miniAOD) else ['pfDeepBoostedJetTagInfos'])
 
 if options.runJetClustering:
     options.remakeAllDiscr = True
@@ -932,13 +932,13 @@ if options.usePrivateJEC:
     process.es_prefer_jec = cms.ESPrefer("PoolDBESSource",'jec')
 
 ### to activate the new JP calibration: using the data base
-trkProbaCalibTag = options.JPCalibration
-process.GlobalTag.toGet = cms.VPSet(
-    cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-      tag = cms.string(trkProbaCalibTag),
-      connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS")
-    )
-)
+# trkProbaCalibTag = options.JPCalibration
+# process.GlobalTag.toGet = cms.VPSet(
+#     cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
+#       tag = cms.string(trkProbaCalibTag),
+#       connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS")
+#     )
+# )
 
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
 process.load("Configuration.Geometry.GeometryRecoDB_cff")
