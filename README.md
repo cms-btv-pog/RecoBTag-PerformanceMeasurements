@@ -3,18 +3,26 @@
 ## Software setup
 
 ```
-cmsrel CMSSW_10_6_8_patch1
-cd CMSSW_10_6_8_patch1/src
+export SCRAM_ARCH=slc7_amd64_gcc900
+cmsrel CMSSW_11_2_0_Patatrack
+cd CMSSW_11_2_0_Patatrack/src
 cmsenv
 
 export CMSSW_GIT_REFERENCE=/cvmfs/cms.cern.ch/cmssw.git.daily
 git cms-init
 
-git clone -b 10_6_X_v1.05 --depth 1 https://github.com/cms-btv-pog/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git cms-merge-topic missirol:devel_1120pa_kineParticleFilter -u
+git cms-merge-topic missirol:devel_puppiPUProxy_1120patatrack -u
+git cms-merge-topic mmasciov:tracking-allPVs -u
+git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b run3
 
-scram b -j8
+git clone -b cleanup-devel --recursive https://github.com/SWuchterl/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+
+scram b -j12
 
 ```
+
+REMARK: OUTDATED BELOW!!!!
 
 The ntuplizer can be run and configured through ```RecoBTag/PerformanceMeasurements/test/runBTagAnalyzer_cfg.py```, to run it with the latest defaults
 
