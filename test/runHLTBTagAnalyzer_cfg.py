@@ -1,8 +1,4 @@
-# import FWCore.ParameterSet.Config as cms
-
 from FWCore.ParameterSet.VarParsing import VarParsing
-# import copy
-# from pdb import set_trace
 
 ###############################
 ####### Parameters ############
@@ -60,11 +56,6 @@ options.register('dataGlobalTag', 'FIXME',
     VarParsing.varType.string,
     "Data global tag, no default value provided"
 )
-# options.register('runJetClustering', True,
-#     VarParsing.multiplicity.singleton,
-#     VarParsing.varType.bool,
-#     "Cluster jets from scratch instead of using those already present in the event"
-# )
 options.register('runEventInfo', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -75,26 +66,6 @@ options.register('processStdAK4Jets', True,
     VarParsing.varType.bool,
     "Process standard AK4 jets"
 )
-options.register('useTTbarFilter', False,
-    VarParsing.multiplicity.singleton,
-    VarParsing.varType.bool,
-    "Use TTbar filter"
-)
-# options.register('remakeAllDiscr', False,
-#     VarParsing.multiplicity.singleton,
-#     VarParsing.varType.bool,
-#     "Remake all b-tag discriminator"
-# )
-# options.register('useExplicitJTA', False,
-#     VarParsing.multiplicity.singleton,
-#     VarParsing.varType.bool,
-#     "Use explicit jet-track association"
-# )
-# options.register('jetAlgo', 'AntiKt',
-#     VarParsing.multiplicity.singleton,
-#     VarParsing.varType.string,
-#     "Jet clustering algorithms (default is AntiKt)"
-# )
 options.register('useTrackHistory', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -163,6 +134,10 @@ options.register('runJetVariables', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to run Jet Variables')
+options.register('runCaloJetVariables', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to run Jet Variables')
 options.register('runTagVariables', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -187,18 +162,18 @@ options.register('runCSVTagTrackVariables', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to run CSV Tagging Track Variables')
-options.register('runDeepFlavourTagVariables', False,
+options.register('runDeepFlavourTagVariables', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to run DeepFlavour TaggingVariables')
-# options.register('runPFElectronVariables', False,
-#     VarParsing.multiplicity.singleton,
-#     VarParsing.varType.bool,
-#     'True if you want to run PF Electron Variables')
-# options.register('runPFMuonVariables', False,
-#     VarParsing.multiplicity.singleton,
-#     VarParsing.varType.bool,
-#     'True if you want to run PF Muon Variables')
+options.register('runPFElectronVariables', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to run PF Electron Variables')
+options.register('runPFMuonVariables', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to run PF Muon Variables')
 # options.register('runPatMuons', False,
 #     VarParsing.multiplicity.singleton,
 #     VarParsing.varType.bool,
@@ -262,6 +237,8 @@ for requiredGroup in options.groups:
     if(requiredGroup==existingGroup.group):
       existingGroup.store=True
       for var in existingGroup.variables:
+        if "CaloJet." in var:
+            var = var.split(".")[1]
         options_to_change.update([i for i in variableDict[var].runOptions])
       found=True
       break
@@ -295,19 +272,6 @@ globalTag = options.mcGlobalTag
 if options.runOnData:
     globalTag = options.dataGlobalTag
 
-## Jet energy corrections
-# jetCorrectionsAK4 = ('AK4PF', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
-# jetCorrectionsAK8 = ('AK8PF', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
-# if options.usePFchs:
-#     jetCorrectionsAK4 = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
-#     jetCorrectionsAK8 = ('AK8PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
-# if options.usePuppi:
-#     jetCorrectionsAK4 = ('AK4PFPuppi', ['L2Relative', 'L3Absolute'], 'None')
-#
-# if options.runOnData:
-#     jetCorrectionsAK4[1].append('L2L3Residual')
-#     jetCorrectionsAK8[1].append('L2L3Residual')
-
 trigresults='TriggerResults::HLT'
 if options.runOnData: options.isReHLT=False
 if options.isReHLT: trigresults = trigresults+'2'
@@ -330,107 +294,6 @@ tracks = "hltMergedTracks" #original generalTracks
 payload = "AK4PFHLT" #original AK4PFchs
 
 
-
-
-## b-tag infos
-# bTagInfos = [
-#     # 'pfImpactParameterTagInfos'
-#    # ,'pfSecondaryVertexTagInfos'
-#    # ,'pfInclusiveSecondaryVertexFinderTagInfos'
-#    'hltDeepSecondaryVertexTagInfosPF'
-#    # ,'pfSecondaryVertexNegativeTagInfos'
-#    # ,'pfInclusiveSecondaryVertexFinderNegativeTagInfos'
-#    # ,'softPFMuonsTagInfos'
-#    # ,'softPFElectronsTagInfos'
-#    # ,'pfInclusiveSecondaryVertexFinderCvsLTagInfos'
-#    # ,'pfInclusiveSecondaryVertexFinderNegativeCvsLTagInfos'
-#    # ,'pfDeepFlavourTagInfos'
-# ]
-# bTagInfos_noDeepFlavour = bTagInfos[:-1]
-## b-tag discriminators
-# bTagDiscriminators = set([
-#    #  'pfJetBProbabilityBJetTags'
-#    # ,'pfJetProbabilityBJetTags'
-#    # ,'pfPositiveOnlyJetBProbabilityBJetTags'
-#    # ,'pfPositiveOnlyJetProbabilityBJetTags'
-#    # ,'pfNegativeOnlyJetBProbabilityBJetTags'
-#    # ,'pfNegativeOnlyJetProbabilityBJetTags'
-#    # ,'pfTrackCountingHighPurBJetTags'
-#    # ,'pfTrackCountingHighEffBJetTags'
-#    # ,'pfNegativeTrackCountingHighPurBJetTags'
-#    # ,'pfNegativeTrackCountingHighEffBJetTags'
-#    # ,'pfSimpleSecondaryVertexHighEffBJetTags'
-#    # ,'pfSimpleSecondaryVertexHighPurBJetTags'
-#    # ,'pfNegativeSimpleSecondaryVertexHighEffBJetTags'
-#    # ,'pfNegativeSimpleSecondaryVertexHighPurBJetTags'
-#    # ,'pfCombinedSecondaryVertexV2BJetTags'
-#    # ,'pfPositiveCombinedSecondaryVertexV2BJetTags'
-#    # ,'pfNegativeCombinedSecondaryVertexV2BJetTags'
-#    # ,'pfCombinedInclusiveSecondaryVertexV2BJetTags'
-#    # ,'pfPositiveCombinedInclusiveSecondaryVertexV2BJetTags'
-#    # ,'pfNegativeCombinedInclusiveSecondaryVertexV2BJetTags'
-#    # ,'softPFMuonBJetTags'
-#    # ,'positiveSoftPFMuonBJetTags'
-#    # ,'negativeSoftPFMuonBJetTags'
-#    # ,'softPFElectronBJetTags'
-#    # ,'positiveSoftPFElectronBJetTags'
-#    # ,'negativeSoftPFElectronBJetTags'
-#    # ,'pfCombinedMVAV2BJetTags'
-#    # ,'pfNegativeCombinedMVAV2BJetTags'
-#    # ,'pfPositiveCombinedMVAV2BJetTags'
-#    # ,'pfCombinedCvsBJetTags'
-#    # ,'pfNegativeCombinedCvsBJetTags'
-#    # ,'pfPositiveCombinedCvsBJetTags'
-#    # ,'pfCombinedCvsLJetTags'
-#    # ,'pfNegativeCombinedCvsLJetTags'
-#    # ,'pfPositiveCombinedCvsLJetTags'
-#     # DeepCSV
-#   # , 'pfDeepCSVJetTags:probudsg'
-#   # , 'pfDeepCSVJetTags:probb'
-#   # , 'pfDeepCSVJetTags:probc'
-#   # , 'pfDeepCSVJetTags:probbb'
-#    PFDeepCSVTags+':probudsg'
-#   , PFDeepCSVTags+':probb'
-#   , PFDeepCSVTags+':probc'
-#   , PFDeepCSVTags+':probbb'
-#   # , 'pfNegativeDeepCSVJetTags:probudsg'
-#   # , 'pfNegativeDeepCSVJetTags:probb'
-#   # , 'pfNegativeDeepCSVJetTags:probc'
-#   # , 'pfNegativeDeepCSVJetTags:probbb'
-#   # , 'pfPositiveDeepCSVJetTags:probudsg'
-#   # , 'pfPositiveDeepCSVJetTags:probb'
-#   # , 'pfPositiveDeepCSVJetTags:probc'
-#   # , 'pfPositiveDeepCSVJetTags:probbb'
-#     # DeepFlavour
-#   # , 'pfDeepFlavourJetTags:probb'
-#   # , 'pfDeepFlavourJetTags:probbb'
-#   # , 'pfDeepFlavourJetTags:problepb'
-#   # , 'pfDeepFlavourJetTags:probc'
-#   # , 'pfDeepFlavourJetTags:probuds'
-#   # , 'pfDeepFlavourJetTags:probg'
-#   # , 'pfNegativeDeepFlavourJetTags:probb'
-#   # , 'pfNegativeDeepFlavourJetTags:probbb'
-#   # , 'pfNegativeDeepFlavourJetTags:problepb'
-#   # , 'pfNegativeDeepFlavourJetTags:probc'
-#   # , 'pfNegativeDeepFlavourJetTags:probuds'
-#   # , 'pfNegativeDeepFlavourJetTags:probg'
-# ])
-
-
-## Clustering algorithm label
-# algoLabel = 'CA'
-# if options.jetAlgo == 'AntiKt':
-#     algoLabel = 'AK'
-
-# print "Jet clustering: %s"%('True' if options.runJetClustering else 'False')
-
-
-# bTagDiscriminators_no_deepFlavour = {i for i in bTagDiscriminators if 'DeepFlavourJetTags' not in i}
-
-# if options.runJetClustering:
-#     options.remakeAllDiscr = True
-
-
 ## Postfix
 # postfix = "PFlow"
 ## Various collection names
@@ -439,6 +302,7 @@ genParticles = 'genParticles'
 # patJetSource = 'selectedPatJets'+postfix
 # patJetSource = 'hltSlimmedJets'
 patJetSource = 'hltPatJets'
+patCaloJetSource = 'hltPatJetsCalo'
 genJetCollection = 'ak4GenJetsNoNu'
 # pfCandidates = 'particleFlow'
 pfCandidates = 'hltParticleFlow'
@@ -447,12 +311,12 @@ pvSource = hltVertices
 # svSource = 'inclusiveCandidateSecondaryVertices'
 svSource = 'hltDeepInclusiveMergedVerticesPF'
 # muSource = 'muons'
+muSource = 'hltMuons'
 # elSource = 'gedGsfElectrons'
+elSource = 'hltEgammaGsfElectrons'
 # patMuons = 'selectedPatMuons'
 # trackSource = 'generalTracks'
 trackSource = tracks
-# if not options.runJetClustering:
-#     jetSource = ('ak4PFJetsCHS' if options.usePFchs else 'ak4PFJets')
 
 
 
@@ -518,11 +382,18 @@ del process.MessageLogger
 
 
 ## MessageLogger
-# process.load("FWCore.MessageLogger.MessageLogger_cfi")
+process.load("FWCore.MessageLogger.MessageLogger_cfi")
 # If you run over many samples and you save the log, remember to reduce
 # the size of the output by prescaling the report of the event number
 # process.MessageLogger.cerr.FwkReport.reportEvery = options.reportEvery
 # process.MessageLogger.cerr.default.limit = 10
+
+process.MessageLogger.suppressWarning = cms.untracked.vstring(
+        'hltPatJetFlavourAssociationCalo'
+)
+process.MessageLogger.suppressError = cms.untracked.vstring(
+        'hltPatJetFlavourAssociationCalo'
+)
 
 ## Input files
 # process.source = cms.Source("PoolSource",
@@ -659,47 +530,9 @@ process.out = cms.OutputModule("PoolOutputModule",
 )
 
 #-------------------------------------
-## PAT Configuration
-# jetAlgo="AK4"
-
-# from PhysicsTools.PatAlgos.tools.pfTools import *
-# usePF2PAT(process,runPF2PAT=True, jetAlgo=jetAlgo, runOnMC=not options.runOnData, postfix=postfix,
-#           jetCorrections=jetCorrectionsAK4, pvCollection=cms.InputTag(pvSource))
-
-## Top projections in PF2PAT
-# getattr(process,"pfPileUpJME"+postfix).checkClosestZVertex = False
-# getattr(process,"pfNoPileUpJME"+postfix).enable = options.usePFchs
-# getattr(process,"pfNoMuonJMEPFBRECO"+postfix).enable = False
-# getattr(process,"pfNoElectronJMEPFBRECO"+postfix).enable = False
 
 if options.usePuppi:
-    # process.load('CommonTools.PileupAlgos.Puppi_cff')
-    # if options.usePuppi:
-        # from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
-        # _pfJets = ak4PFJets.clone(src = cms.InputTag('puppi'), doAreaFastjet = True, srcPVs = cms.InputTag(pvSource))
-        # setattr(process,'pfJetsPFBRECO'+postfix,_pfJets)
     if options.usePuppiForBTagging: pfCandidates = 'puppi'
-
-## Load standard PAT objects (here we only need PAT muons but the framework will figure out what it needs to run using the unscheduled mode)
-# process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
-# process.load("PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff")
-
-# from PhysicsTools.PatAlgos.tools.jetTools import *
-## Updated the default jet collection
-# updateJetCollection(
-#     process,
-#     jetSource = cms.InputTag(jetSource),
-#     jetCorrections = jetCorrectionsAK4,
-#     pfCandidates = cms.InputTag(pfCandidates),
-#     pvSource = cms.InputTag(pvSource),
-#     svSource = cms.InputTag(svSource),
-#     muSource = cms.InputTag(muSource),
-#     elSource = cms.InputTag(elSource),
-#     btagInfos = bTagInfos,
-#     btagDiscriminators = list(bTagDiscriminators),
-#     explicitJTA = options.useExplicitJTA,
-#     postfix = postfix
-# )
 
 
 
@@ -741,88 +574,6 @@ process.noscraping = cms.EDFilter("FilterOutScraping",
 #-------------------------------------
 
 #-------------------------------------
-if options.useTTbarFilter:
-    process.load("RecoBTag.PerformanceMeasurements.TTbarSelectionFilter_cfi")
-    process.load("RecoBTag.PerformanceMeasurements.TTbarSelectionProducer_cfi")
-
-    if options.isReHLT and not options.runOnData:
-        process.ttbarselectionproducer.triggerColl =  cms.InputTag("TriggerResults","","HLT2")
-
-    #electron id
-    from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
-
-    process.ttbarselectionproducer.electronColl = cms.InputTag('selectedPatElectrons'+postfix)
-    process.ttbarselectionproducer.muonColl     = cms.InputTag('selectedPatMuons'+postfix)
-    process.ttbarselectionproducer.jetColl      = cms.InputTag(patJetSource)
-    process.ttbarselectionproducer.metColl      = cms.InputTag('patMETs'+postfix)
-    switchOnVIDElectronIdProducer(process, DataFormat.AOD)
-
-    # Set up electron ID (VID framework)
-    from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
-    switchOnVIDElectronIdProducer(process, dataFormat=DataFormat.MiniAOD)
-    my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Fall17_94X_V2_cff']
-    for idmod in my_id_modules:
-        setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
-
-
-
-    #process.ttbarselectionproducer.isData       = options.runOnData
-    #process.ttbarselectionproducer.electronColl = cms.InputTag('selectedPatElectrons'+postfix)
-    #process.ttbarselectionproducer.muonColl     = cms.InputTag('selectedPatMuons'+postfix)
-    #process.ttbarselectionproducer.jetColl      = cms.InputTag(patJetSource)
-    #process.ttbarselectionproducer.metColl      = cms.InputTag('patMETs'+postfix)
-    #process.ttbarselectionfilter.select_ee   = True
-    #process.ttbarselectionfilter.select_mumu = True
-    #process.ttbarselectionfilter.select_emu  = True
-    #process.ttbarselectionfilter.Keep_all_events  = False
-
-    ## Change the cone size of muon isolation to 0.3
-    #getattr(process,"pfIsolatedMuons"+postfix).isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'muPFIsoValueCharged03'+postfix ) )
-    #getattr(process,"pfIsolatedMuons"+postfix).isolationValueMapsNeutral = cms.VInputTag( cms.InputTag( 'muPFIsoValueNeutral03'+postfix ), cms.InputTag( 'muPFIsoValueGamma03'+postfix ) )
-    #getattr(process,"pfIsolatedMuons"+postfix).deltaBetaIsolationValueMap = cms.InputTag( 'muPFIsoValuePU03'+postfix )
-    #getattr(process,"pfIsolatedMuons"+postfix).combinedIsolationCut = cms.double(9999.)
-    #getattr(process,"pfIsolatedMuons"+postfix).isolationCut = cms.double(9999.)
-
-    #getattr(process,"patMuons"+postfix).isolationValues = cms.PSet(
-    #    pfNeutralHadrons = cms.InputTag('muPFIsoValueNeutral03'+postfix),
-    #    pfPhotons = cms.InputTag('muPFIsoValueGamma03'+postfix),
-    #    pfChargedHadrons = cms.InputTag('muPFIsoValueCharged03'+postfix),
-    #    pfChargedAll = cms.InputTag('muPFIsoValueChargedAll03'+postfix),
-    #    pfPUChargedHadrons = cms.InputTag('muPFIsoValuePU03'+postfix)
-    #)
-
-    ## Change the cone size of electron isolation to 0.3
-    #getattr(process,'pfElectrons'+postfix).isolationValueMapsCharged  = cms.VInputTag(cms.InputTag('elPFIsoValueCharged03PFId'+postfix))
-    #getattr(process,'pfElectrons'+postfix).deltaBetaIsolationValueMap = cms.InputTag('elPFIsoValuePU03PFId'+postfix)
-    #getattr(process,'pfElectrons'+postfix).isolationValueMapsNeutral  = cms.VInputTag(cms.InputTag('elPFIsoValueNeutral03PFId'+postfix), cms.InputTag('elPFIsoValueGamma03PFId'+postfix))
-
-    #getattr(process,'pfIsolatedElectrons'+postfix).isolationValueMapsCharged = cms.VInputTag(cms.InputTag('elPFIsoValueCharged03PFId'+postfix))
-    #getattr(process,'pfIsolatedElectrons'+postfix).deltaBetaIsolationValueMap = cms.InputTag('elPFIsoValuePU03PFId'+postfix)
-    #getattr(process,'pfIsolatedElectrons'+postfix).isolationValueMapsNeutral = cms.VInputTag(cms.InputTag('elPFIsoValueNeutral03PFId'+postfix), cms.InputTag('elPFIsoValueGamma03PFId'+postfix))
-    #getattr(process,'pfIsolatedElectrons'+postfix).combinedIsolationCut = cms.double(9999.)
-    #getattr(process,'pfIsolatedElectrons'+postfix).isolationCut = cms.double(9999.)
-
-    ## Electron ID
-    #process.load("EGamma.EGammaAnalysisTools.electronIdMVAProducer_cfi")
-    #process.eidMVASequence = cms.Sequence( process.mvaTrigV0 + process.mvaNonTrigV0 )
-
-    #getattr(process,'patElectrons'+postfix).electronIDSources.mvaTrigV0    = cms.InputTag("mvaTrigV0")
-    #getattr(process,'patElectrons'+postfix).electronIDSources.mvaNonTrigV0 = cms.InputTag("mvaNonTrigV0")
-    #getattr(process,'patElectrons'+postfix).isolationValues = cms.PSet(
-    #    pfChargedHadrons = cms.InputTag('elPFIsoValueCharged03PFId'+postfix),
-    #    pfChargedAll = cms.InputTag('elPFIsoValueChargedAll03PFId'+postfix),
-    #    pfPUChargedHadrons = cms.InputTag('elPFIsoValuePU03PFId'+postfix),
-    #    pfNeutralHadrons = cms.InputTag('elPFIsoValueNeutral03PFId'+postfix),
-    #    pfPhotons = cms.InputTag('elPFIsoValueGamma03PFId'+postfix)
-    #)
-
-    ## Conversion rejection
-    ## This should be your last selected electron collection name since currently index is used to match with electron later. We can fix this using reference pointer.
-    #setattr(process,'patConversions'+postfix) = cms.EDProducer("PATConversionProducer",
-        #electronSource = cms.InputTag('selectedPatElectrons'+postfix)
-    #)
-
-#-------------------------------------
 ## Change the minimum number of tracker hits used in the track selection
 if options.changeMinNumberOfHits:
     for m in process.producerNames().split(' '):
@@ -830,33 +581,8 @@ if options.changeMinNumberOfHits:
             print "Changing 'minimumNumberOfHits' for " + m + " to " + str(options.minNumberOfHits)
             getattr(process, m).minimumNumberOfHits = cms.int32(options.minNumberOfHits)
 
-# from PhysicsTools.PatAlgos.tools.pfTools import *
-## Adapt primary vertex collection
-# adaptPVs(process, pvCollection=cms.InputTag(pvSource))
-
-#-------------------------------------
-## Add TagInfos to PAT jets
-# for i in ['patJets','updatedPatJetsTransientCorrected']:
-#     m = i + postfix
-#     if hasattr(process,m) and getattr( getattr(process,m), 'addBTagInfo' ):
-#         print "Switching 'addTagInfos' for " + m + " to 'True'"
-#         setattr( getattr(process,m), 'addTagInfos', cms.bool(True) )
-
 #-------------------------------------
 process.btagana = HLTBTagAnalyzer.clone()
-# The following combinations should be considered:
-# For b-tagging performance measurements:
-#   process.btagana.useTrackHistory      = False (or True for Mistag systematics with GEN-SIM-RECODEBUG samples)
-#   options.produceJetTrackTree  = False
-#   process.btagana.produceAllTrackTree  = False
-# or data/MC validation of jets, tracks and SVs:
-#   process.btagana.useTrackHistory      = False
-#   options.produceJetTrackTree  = True
-#   process.btagana.produceAllTrackTree  = False
-# or general tracks, PV and jet performance studies:
-#   process.btagana.useTrackHistory      = False
-#   options.produceJetTrackTree  = False
-#   process.btagana.produceAllTrackTree  = True
 #------------------
 #Handle groups
 for requiredGroup in process.btagana.groups:
@@ -877,9 +603,10 @@ process.btagana.runCSVTagTrackVariables  = options.runCSVTagTrackVariables   ## 
 process.btagana.runDeepFlavourTagVariables = options.runDeepFlavourTagVariables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag(patJetSource)
-# process.btagana.muonCollectionName    = cms.InputTag(muSource)
+process.btagana.CaloJets                  = cms.InputTag(patCaloJetSource)
+process.btagana.muonCollectionName    = cms.InputTag(muSource)
+process.btagana.electronCollectionName    = cms.InputTag(elSource)
 # process.btagana.patMuonCollectionName = cms.InputTag(patMuons)
-process.btagana.use_ttbar_filter      = cms.bool(options.useTTbarFilter)
 process.btagana.rho                   = cms.InputTag(rho)
 process.btagana.deepFlavourJetTags            = PFDeepFlavourTags
 #process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
@@ -887,11 +614,12 @@ process.btagana.triggerTable          = cms.InputTag(trigresults) # Data and MC
 process.btagana.genParticles          = cms.InputTag(genParticles)
 process.btagana.candidates            = cms.InputTag(pfCandidates)
 process.btagana.runJetVariables     = options.runJetVariables
+process.btagana.runCaloJetVariables     = options.runCaloJetVariables
 process.btagana.runQuarkVariables   = options.runQuarkVariables
 process.btagana.runHadronVariables  = options.runHadronVariables
 process.btagana.runGenVariables     = options.runGenVariables
-# process.btagana.runPFElectronVariables = options.runPFElectronVariables
-# process.btagana.runPFMuonVariables = options.runPFMuonVariables
+process.btagana.runPFElectronVariables = options.runPFElectronVariables
+process.btagana.runPFMuonVariables = options.runPFMuonVariables
 # process.btagana.runPatMuons = options.runPatMuons
 process.btagana.runEventInfo = options.runEventInfo
 process.btagana.runOnData = options.runOnData
@@ -958,29 +686,16 @@ process.selectedEvents = eventCounter.clone()
 process.analyzerSeq = cms.Sequence( )
 # if options.processStdAK4Jets:
 process.analyzerSeq += process.btagana
-# if options.processStdAK4Jets and options.useTTbarFilter:
-#     process.analyzerSeq.replace( process.btagana, process.ttbarselectionproducer * process.ttbarselectionfilter * process.btagana )
 #---------------------------------------
-
-#Trick to make it work in 9_1_X
-# process.tsk = cms.Task()
-# for mod in process.producers_().itervalues():
-#     process.tsk.add(mod)
-# for mod in process.filters_().itervalues():
-#     process.tsk.add(mod)
-
 
 
 process.p = cms.Path(
-    # process.jetMatchingPath
     process.allEvents
     # * process.filtSeq
     * process.selectedEvents
     * process.analyzerSeq
-    # process.tsk
 )
 
 # Delete predefined output module (needed for running with CRAB)
 del process.out
-
 open('pydump.py','w').write(process.dumpPython())
