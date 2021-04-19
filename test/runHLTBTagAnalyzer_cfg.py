@@ -326,7 +326,10 @@ from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_conf
 ###
 from JMETriggerAnalysis.Common.customise_hlt import *
 # process = addPaths_MC_PFClusterJME(process)
-process = addPaths_MC_PFPuppiJME(process)
+process = addPaths_MC_JMEPFPuppi(process)
+process = addPaths_MC_JMECalo(process)
+process = addPaths_MC_JMEPFCluster(process)
+process = addPaths_MC_JMEPF(process)
 from RecoBTag.PerformanceMeasurements.PATLikeConfig import customizePFPatLikeJets
 process = customizePFPatLikeJets(process)
 
@@ -380,6 +383,78 @@ del process.MessageLogger
 # 			raise ValueError('The requested era (%s) is not available' % era)
 # 	process = cms.Process("BTagAna", *eras_to_use)
 
+## ES modules for PF-Hadron Calibrations
+import os
+from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
+process.pfhcESSource = cms.ESSource('PoolDBESSource',
+  _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db'),
+  toGet = cms.VPSet(
+    cms.PSet(
+      record = cms.string('PFCalibrationRcd'),
+      tag = cms.string('PFCalibration_HLT_mcRun3_2021'),
+      label = cms.untracked.string('HLT'),
+    ),
+  ),
+)
+process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
+#process.hltParticleFlow.calibrationsLabel = '' # standard label for Offline-PFHC in GT
+## ES modules for HLT JECs
+process.jescESSource = cms.ESSource('PoolDBESSource',
+  _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V1_MC.db'),
+  toGet = cms.VPSet(
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4CaloHLT'),
+      label = cms.untracked.string('AK4CaloHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFClusterHLT'),
+      label = cms.untracked.string('AK4PFClusterHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),
+      label = cms.untracked.string('AK4PFHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),
+      label = cms.untracked.string('AK4PFchsHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFPuppiHLT'),
+      label = cms.untracked.string('AK4PFPuppiHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4CaloHLT'),#!!
+      label = cms.untracked.string('AK8CaloHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFClusterHLT'),#!!
+      label = cms.untracked.string('AK8PFClusterHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),#!!
+      label = cms.untracked.string('AK8PFHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),#!!
+      label = cms.untracked.string('AK8PFchsHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFPuppiHLT'),#!!
+      label = cms.untracked.string('AK8PFPuppiHLT'),
+    ),
+  ),
+)
+process.jescESPrefer = cms.ESPrefer('PoolDBESSource', 'jescESSource')
 
 ## MessageLogger
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
@@ -457,52 +532,6 @@ process.options   = cms.untracked.PSet(
 #    BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
 #)
 #process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
-
-# if options.usePrivateJEC:
-#
-#     from CondCore.DBCommon.CondDBSetup_cfi import *
-#     import os
-#     dbfile=''
-#     if options.runOnData: dbfile=options.jecDBFileData
-#     else: dbfile=options.jecDBFileMC
-#     print "\nUsing private SQLite file", dbfile, "\n"
-#     process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
-# 		    connect = cms.string( "sqlite_fip:RecoBTag/PerformanceMeasurements/data/"+dbfile+'.db'),
-# 		    toGet =  cms.VPSet(
-# 			    cms.PSet(
-# 				    record = cms.string("JetCorrectionsRecord"),
-# 				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK4PF"),
-# 				    label= cms.untracked.string("AK4PF")
-# 				    ),
-# 			    cms.PSet(
-# 				    record = cms.string("JetCorrectionsRecord"),
-# 				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK4PFchs"),
-# 				    label= cms.untracked.string("AK4PFchs")
-# 				    ),
-# 			    cms.PSet(
-# 				    record = cms.string("JetCorrectionsRecord"),
-# 				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK4PFPuppi"),
-# 				    label= cms.untracked.string("AK4PFPuppi")
-# 				    ),
-# 			    cms.PSet(
-# 				    record = cms.string("JetCorrectionsRecord"),
-# 				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK8PF"),
-# 				    label= cms.untracked.string("AK8PF")
-# 				    ),
-# 			    cms.PSet(
-# 				    record = cms.string("JetCorrectionsRecord"),
-# 				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK8PFchs"),
-# 				    label= cms.untracked.string("AK8PFchs")
-# 				    ),
-# 			    cms.PSet(
-# 				    record = cms.string("JetCorrectionsRecord"),
-# 				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK8PFPuppi"),
-# 				    label= cms.untracked.string("AK8PFPuppi")
-# 				    ),
-# 			    )
-# 		    )
-#
-#     process.es_prefer_jec = cms.ESPrefer("PoolDBESSource",'jec')
 
 ### to activate the new JP calibration: using the data base
 # trkProbaCalibTag = options.JPCalibration
