@@ -11,6 +11,7 @@ cmsenv
 export CMSSW_GIT_REFERENCE=/cvmfs/cms.cern.ch/cmssw.git.daily
 git cms-init
 
+git cms-merge-topic SWuchterl:devel_1120patatrack_fixPATRecoJet -u
 git cms-merge-topic missirol:devel_1120pa_kineParticleFilter -u
 git cms-merge-topic missirol:devel_puppiPUProxy_1120patatrack -u
 git cms-merge-topic mmasciov:tracking-allPVs -u

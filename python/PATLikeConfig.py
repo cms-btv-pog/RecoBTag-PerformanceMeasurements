@@ -53,10 +53,10 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
 
     # do the same for caloJets
     process.hltDeepCombinedSecondaryVertexCaloPatBJetTags = process.hltDeepCombinedSecondaryVertexBJetTagsCalo.clone(
-        src = cms.InputTag("hltDeepCombinedSecondaryVertexBJetCaloPatTagsInfos"),
+        src = cms.InputTag("hltDeepCombinedSecondaryVertexBJetCaloPatTagInfos"),
     )
 
-    process.hltDeepCombinedSecondaryVertexBJetCaloPatTagsInfos = process.hltDeepCombinedSecondaryVertexBJetTagsInfosCalo.clone(
+    process.hltDeepCombinedSecondaryVertexBJetCaloPatTagInfos = process.hltDeepCombinedSecondaryVertexBJetTagsInfosCalo.clone(
         svTagInfos = cms.InputTag("hltInclusiveSecondaryVertexFinderPatTagInfos")
     )
     process.hltInclusiveSecondaryVertexFinderPatTagInfos = process.hltInclusiveSecondaryVertexFinderTagInfos.clone(
@@ -93,7 +93,7 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
         +process.hltTrackVertexArbitrator
         +process.hltInclusiveMergedVertices
         +process.hltInclusiveSecondaryVertexFinderPatTagInfos
-        +process.hltDeepCombinedSecondaryVertexBJetCaloPatTagsInfos
+        +process.hltDeepCombinedSecondaryVertexBJetCaloPatTagInfos
         +process.hltDeepCombinedSecondaryVertexCaloPatBJetTags
     )
 
@@ -153,7 +153,7 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
         # jetIDMap = cms.InputTag("hltAk4JetID"),
         jetSource = cms.InputTag(calojetsCutted),
         tagInfoSources = cms.VInputTag(
-            cms.InputTag("hltDeepCombinedSecondaryVertexBJetCaloPatTagsInfos"),
+            cms.InputTag("hltDeepCombinedSecondaryVertexBJetCaloPatTagInfos"),
             cms.InputTag("hltImpactParameterPatTagInfos"),
             cms.InputTag("hltImpactParameterPatTagInfos"),
         ),

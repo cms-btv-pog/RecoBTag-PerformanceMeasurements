@@ -378,7 +378,9 @@ HLTBTagAnalyzerT<IPTI,VTX>::HLTBTagAnalyzerT(const edm::ParameterSet& iConfig):
   // Histos.resize(1);
   Histos.resize(2);
   Histos[0] = new BookHistograms(fs->mkdir( "HistJets" )) ;
-  Histos[1] = new BookHistograms(fs->mkdir( "HistCaloJets" )) ;
+  if(runCaloJetVariables_){
+      Histos[1] = new BookHistograms(fs->mkdir( "HistCaloJets" )) ;
+  }
 
   std::cout << module_type << ":" << module_label << " constructed" << std::endl;
 }
@@ -435,7 +437,9 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
   edm::Handle <PatJetCollection> jetsColl;
   iEvent.getByToken (JetCollectionTag_, jetsColl);
   edm::Handle <PatJetCollection> jetsCollCalo;
-  iEvent.getByToken (CaloJetCollectionTag_, jetsCollCalo);
+  if(runCaloJetVariables_){
+      iEvent.getByToken (CaloJetCollectionTag_, jetsCollCalo);
+  }
 
   //------------------------------------------------------
   // Determine hadronizer type (done only once per job)
@@ -1208,7 +1212,9 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
   //------------------------------------------------------
 
   iJetColl++;
-  processJets(jetsCollCalo, jetsCollCalo, iEvent, iSetup, iJetColl); // the second 'jetsColl' is a dummy input here
+  if(runCaloJetVariables_){
+      processJets(jetsCollCalo, jetsCollCalo, iEvent, iSetup, iJetColl); // the second 'jetsColl' is a dummy input here
+  }
   //// Fill TTree
   if ( EventInfo.BitTrigger > 0 || EventInfo.Run < 0 ) {
     smalltree->Fill();
@@ -1284,7 +1290,7 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
 
     double ptjet  = pjet->pt()  ;
     double etajet = pjet->eta() ;
-    double phijet = pjet->phi() ;
+    // double phijet = pjet->phi() ;
 
     if ( allowJetSkipping_ && ( ptjet < minJetPt_ || std::fabs( etajet ) > maxJetEta_ ) ) continue;
 

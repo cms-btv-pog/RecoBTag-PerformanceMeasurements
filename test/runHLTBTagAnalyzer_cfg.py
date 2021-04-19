@@ -26,25 +26,10 @@ options.register('wantSummary', False,
     VarParsing.varType.bool,
     "Print out trigger and timing summary"
 )
-options.register('useCalo', False,
+options.register('dumpPython', None,
     VarParsing.multiplicity.singleton,
-    VarParsing.varType.bool,
-    "Use Calo"
-)
-options.register('usePFchs', True,
-    VarParsing.multiplicity.singleton,
-    VarParsing.varType.bool,
-    "Use PFchs"
-)
-options.register('usePuppi', False,
-    VarParsing.multiplicity.singleton,
-    VarParsing.varType.bool,
-    "Use Puppi"
-)
-options.register('usePuppiForBTagging', False,
-    VarParsing.multiplicity.singleton,
-    VarParsing.varType.bool,
-    "Use Puppi candidates for b tagging"
+    VarParsing.varType.string,
+    'Dump python config, pass SaveName.py'
 )
 options.register('mcGlobalTag', 'FIXME',
     VarParsing.multiplicity.singleton,
@@ -255,18 +240,6 @@ for switch in options_to_change:
     print 'Turning on %s, as some stored variables demands it' % switch
     setattr(options, switch, True)
 
-
-## Use either PFchs or Puppi
-if options.usePFchs and options.usePuppi:
-    print "WARNING: Both usePFchs and usePuppi set to True. Giving priority to Puppi."
-    options.usePFchs = False
-
-print "Running on data: %s"%('True' if options.runOnData else 'False')
-print "Using calo: %s"%('True' if options.useCalo else 'False')
-print "Using PFchs: %s"%('True' if options.usePFchs else 'False')
-print "Using Puppi: %s"%('True' if options.usePuppi else 'False')
-print "Using Puppi for b tagging: %s"%('True' if (options.usePuppi and options.usePuppiForBTagging) else 'False')
-
 ## Global tag
 globalTag = options.mcGlobalTag
 if options.runOnData:
@@ -321,25 +294,13 @@ trackSource = tracks
 
 
 from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-###
-### customizations
-###
-from JMETriggerAnalysis.Common.customise_hlt import *
-# process = addPaths_MC_PFClusterJME(process)
-process = addPaths_MC_JMEPFPuppi(process)
-process = addPaths_MC_JMECalo(process)
-process = addPaths_MC_JMEPFCluster(process)
-process = addPaths_MC_JMEPF(process)
-from RecoBTag.PerformanceMeasurements.PATLikeConfig import customizePFPatLikeJets
-process = customizePFPatLikeJets(process)
-
 
 # remove cms.OutputModule objects from HLT config-dump
 for _modname in process.outputModules_():
     _mod = getattr(process, _modname)
     if type(_mod) == cms.OutputModule:
        process.__delattr__(_modname)
-       # if opts.verbosity > 0:
+       # if options.verbosity > 0:
        #    print '> removed cms.OutputModule:', _modname
 
 # remove cms.EndPath objects from HLT config-dump
@@ -347,7 +308,7 @@ for _modname in process.endpaths_():
     _mod = getattr(process, _modname)
     if type(_mod) == cms.EndPath:
        process.__delattr__(_modname)
-       # if opts.verbosity > 0:
+       # if options.verbosity > 0:
        #    print '> removed cms.EndPath:', _modname
 
 # remove selected cms.Path objects from HLT config-dump
@@ -355,7 +316,7 @@ print '-'*108
 print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
 print '-'*108
 for _modname in sorted(process.paths_()):
-    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'DeepCSV' in _modname or 'DeepFlavour' in _modname)
+    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'DeepCSV' in _modname or 'DeepFlavour' in _modname or 'AK8Calo' in _modname)
 #    _keepPath |= _modname.startswith('MC_ReducedIterativeTracking')
     if _keepPath:
       print '{:<99} | {:<4} |'.format(_modname, '+')
@@ -367,10 +328,27 @@ for _modname in sorted(process.paths_()):
 print '-'*108
 
 # remove FastTimerService
-del process.FastTimerService
+if hasattr(process, 'FastTimerService'):
+  del process.FastTimerService
 
 # remove MessageLogger
-del process.MessageLogger
+if hasattr(process, 'MessageLogger'):
+  del process.MessageLogger
+
+###
+### customizations
+###
+from JMETriggerAnalysis.Common.customise_hlt import *
+process = addPaths_MC_JMECalo(process)
+process = addPaths_MC_JMEPF(process)
+process = addPaths_MC_JMEPFCluster(process)
+process = addPaths_MC_JMEPFPuppi(process)
+from RecoBTag.PerformanceMeasurements.PATLikeConfig import customizePFPatLikeJets
+process = customizePFPatLikeJets(process)
+
+
+
+
 # if not options.eras:
 # 	process = cms.Process("BTagAna")
 # else:
@@ -560,12 +538,7 @@ process.out = cms.OutputModule("PoolOutputModule",
 
 #-------------------------------------
 
-if options.usePuppi:
-    if options.usePuppiForBTagging: pfCandidates = 'puppi'
 
-
-
-#-------------------------------------
 # if options.runOnData:
 #     # Remove MC matching when running over data
 #     from PhysicsTools.PatAlgos.tools.coreTools import removeMCMatching
@@ -727,4 +700,18 @@ process.p = cms.Path(
 
 # Delete predefined output module (needed for running with CRAB)
 del process.out
-open('pydump.py','w').write(process.dumpPython())
+# dump content of cms.Process to python file
+if options.dumpPython is not None:
+   open(options.dumpPython, 'w').write(process.dumpPython())
+
+print ''
+print 'option: output =', options.outFilename
+# print 'option: reco =', options.reco
+print 'option: dumpPython =', options.dumpPython
+print ''
+# print 'process.GlobalTag =', process.GlobalTag.dumpPython()
+print 'process.GlobalTag =', process.GlobalTag.globaltag
+print 'process.source =', process.source.dumpPython()
+print 'process.maxEvents =', process.maxEvents.input
+# print 'process.options =', process.options.dumpPython()
+print '-------------------------------'

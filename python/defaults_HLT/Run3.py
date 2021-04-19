@@ -6,9 +6,10 @@ common = {
                 ],
 	'eras' : ['Run3'],
 	# 'miniAOD' : True,
-	'usePuppi' : False,
+	# 'usePuppi' : False,
 	# 'usePuppiForFatJets' : True,
-	'usePuppiForBTagging' : False,
+	# 'usePuppiForBTagging' : False
+    'runCaloJetVariables' : False,
 	'mcGlobalTag' : '112X_mcRun3_2021_realistic_v14',
 	# 'remakeAllDiscr' : True,
 	'maxJetEta' : 4.5,
