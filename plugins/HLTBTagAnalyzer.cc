@@ -68,7 +68,8 @@ private:
   void processTrig(const edm::Handle<edm::TriggerResults>&, const std::vector<std::string>&) ;
 
   void processJets(const edm::Handle<PatJetCollection>&, const edm::Handle<PatJetCollection>&,
-		   const edm::Event&, const edm::EventSetup&, const int) ;
+		   const edm::Event&, const edm::EventSetup&, const int,
+           const std::string& ipTagInfos, const std::string& svTagInfos, const std::string& deepFlavourJetTags, const std::string& deepCSVBJetTags) ;
 
   int isFromGSP(const reco::Candidate* c);
 
@@ -97,17 +98,23 @@ private:
   std::string   branchNamePrefix2_;
   edm::EDGetTokenT<PatJetCollection> JetCollectionTag_;
   edm::EDGetTokenT<PatJetCollection> CaloJetCollectionTag_;
+  edm::EDGetTokenT<PatJetCollection> PuppiJetCollectionTag_;
 
   std::string deepFlavourJetTags_;
+  std::string deepFlavourPuppiJetTags_;
 
   std::string deepCSVBJetTags_;
   std::string deepCSVBCaloJetTags_;
+  std::string deepCSVBPuppiJetTags_;
 
   std::string deepFlavourTagInfos_;
+  std::string deepFlavourPuppiTagInfos_;
   std::string ipTagInfos_;
   std::string ipCaloTagInfos_;
+  std::string ipPuppiTagInfos_;
   std::string svTagInfos_;
   std::string svCaloTagInfos_;
+  std::string svPuppiTagInfos_;
 
   edm::EDGetTokenT<reco::VertexCollection> primaryVertexColl_;
   edm::EDGetTokenT<reco::TrackCollection> tracksColl_;
@@ -127,6 +134,7 @@ private:
   bool runEventInfo_;
   bool runJetVariables_;
   bool runCaloJetVariables_;
+  bool runPuppiJetVariables_;
   bool runQuarkVariables_;
   bool runHadronVariables_;
   bool runGenVariables_;
@@ -299,6 +307,7 @@ HLTBTagAnalyzerT<IPTI,VTX>::HLTBTagAnalyzerT(const edm::ParameterSet& iConfig):
   runEventInfo_ = iConfig.getParameter<bool>("runEventInfo");
   runJetVariables_ = iConfig.getParameter<bool>("runJetVariables");
   runCaloJetVariables_ = iConfig.getParameter<bool>("runCaloJetVariables");
+  runPuppiJetVariables_ = iConfig.getParameter<bool>("runPuppiJetVariables");
   runQuarkVariables_ = iConfig.getParameter<bool>("runQuarkVariables");
   runHadronVariables_ = iConfig.getParameter<bool>("runHadronVariables");
   runGenVariables_ = iConfig.getParameter<bool>("runGenVariables");
@@ -331,17 +340,23 @@ HLTBTagAnalyzerT<IPTI,VTX>::HLTBTagAnalyzerT(const edm::ParameterSet& iConfig):
   branchNamePrefix2_ = iConfig.getParameter<std::string>("BranchNamePrefix2");
   JetCollectionTag_ = consumes<PatJetCollection>(iConfig.getParameter<edm::InputTag>("Jets"));
   CaloJetCollectionTag_ = consumes<PatJetCollection>(iConfig.getParameter<edm::InputTag>("CaloJets"));
+  PuppiJetCollectionTag_ = consumes<PatJetCollection>(iConfig.getParameter<edm::InputTag>("PuppiJets"));
 
   deepFlavourJetTags_ = iConfig.getParameter<std::string>("deepFlavourJetTags");
+  deepFlavourPuppiJetTags_ = iConfig.getParameter<std::string>("deepFlavourPuppiJetTags");
 
   deepCSVBJetTags_    = iConfig.getParameter<std::string>("deepCSVBJetTags");
   deepCSVBCaloJetTags_    = iConfig.getParameter<std::string>("deepCSVBCaloJetTags");
+  deepCSVBPuppiJetTags_    = iConfig.getParameter<std::string>("deepCSVBPuppiJetTags");
 
   deepFlavourTagInfos_     = iConfig.getParameter<std::string>("deepFlavourTagInfos");
+  deepFlavourPuppiTagInfos_     = iConfig.getParameter<std::string>("deepFlavourPuppiTagInfos");
   ipTagInfos_              = iConfig.getParameter<std::string>("ipTagInfos");
   ipCaloTagInfos_              = iConfig.getParameter<std::string>("ipCaloTagInfos");
+  ipPuppiTagInfos_              = iConfig.getParameter<std::string>("ipPuppiTagInfos");
   svTagInfos_              = iConfig.getParameter<std::string>("svTagInfos");
   svCaloTagInfos_              = iConfig.getParameter<std::string>("svCaloTagInfos");
+  svPuppiTagInfos_              = iConfig.getParameter<std::string>("svPuppiTagInfos");
 
   muonCollectionName_       = consumes<edm::View<reco::Muon>>(iConfig.getParameter<edm::InputTag>("muonCollectionName"));
   genParticleCollectionName_ = consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genParticles"));
@@ -376,10 +391,13 @@ HLTBTagAnalyzerT<IPTI,VTX>::HLTBTagAnalyzerT(const edm::ParameterSet& iConfig):
 
   //// Book Histograms
   // Histos.resize(1);
-  Histos.resize(2);
+  Histos.resize(3);
   Histos[0] = new BookHistograms(fs->mkdir( "HistJets" )) ;
   if(runCaloJetVariables_){
       Histos[1] = new BookHistograms(fs->mkdir( "HistCaloJets" )) ;
+  }
+  if(runPuppiJetVariables_){
+      Histos[2] = new BookHistograms(fs->mkdir( "HistPuppiJets" )) ;
   }
 
   std::cout << module_type << ":" << module_label << " constructed" << std::endl;
@@ -437,8 +455,12 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
   edm::Handle <PatJetCollection> jetsColl;
   iEvent.getByToken (JetCollectionTag_, jetsColl);
   edm::Handle <PatJetCollection> jetsCollCalo;
+  edm::Handle <PatJetCollection> jetsCollPuppi;
   if(runCaloJetVariables_){
       iEvent.getByToken (CaloJetCollectionTag_, jetsCollCalo);
+  }
+  if(runPuppiJetVariables_){
+      iEvent.getByToken (PuppiJetCollectionTag_, jetsCollPuppi);
   }
 
   //------------------------------------------------------
@@ -1208,15 +1230,22 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
   //------------------------------------------------------
   int iJetColl = 0 ;
   //// Do jets
-  processJets(jetsColl, jetsColl, iEvent, iSetup, iJetColl); // the second 'jetsColl' is a dummy input here
+  processJets(jetsColl, jetsColl, iEvent, iSetup, iJetColl, ipTagInfos_, svTagInfos_, deepFlavourJetTags_, deepCSVBJetTags_); // the second 'jetsColl' is a dummy input here
   //------------------------------------------------------
 
   iJetColl++;
   if(runCaloJetVariables_){
-      processJets(jetsCollCalo, jetsCollCalo, iEvent, iSetup, iJetColl); // the second 'jetsColl' is a dummy input here
+      processJets(jetsCollCalo, jetsCollCalo, iEvent, iSetup, iJetColl, ipCaloTagInfos_, svCaloTagInfos_, "", deepCSVBCaloJetTags_); // the second 'jetsColl' is a dummy input here
+      iJetColl++;
   }
+
+  if(runPuppiJetVariables_){
+      processJets(jetsCollPuppi, jetsCollPuppi, iEvent, iSetup, iJetColl, ipPuppiTagInfos_, svPuppiTagInfos_, deepFlavourPuppiJetTags_, deepCSVBPuppiJetTags_); // the second 'jetsColl' is a dummy input here
+  }
+  iJetColl++;
   //// Fill TTree
-  if ( EventInfo.BitTrigger > 0 || EventInfo.Run < 0 ) {
+  // if ( EventInfo.BitTrigger > 0 || EventInfo.Run < 0 ) {
+  if ( EventInfo.BitTrigger != 0 || EventInfo.Run < 0 ) {
     smalltree->Fill();
   }
 
@@ -1248,7 +1277,8 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processTrig(const edm::Handle<edm::TriggerResul
 
 template<typename IPTI,typename VTX>
 void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& jetsColl, const edm::Handle<PatJetCollection>& jetsColl2,
-					  const edm::Event& iEvent, const edm::EventSetup& iSetup, const int iJetColl)
+					  const edm::Event& iEvent, const edm::EventSetup& iSetup, const int iJetColl,
+                      const std::string& ipTagInfos, const std::string& svTagInfos, const std::string& deepFlavourJetTags, const std::string& deepCSVBJetTags)
 {
 
 
@@ -1441,14 +1471,18 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
       JetInfo[iJetColl].Jet_uncorrpt[JetInfo[iJetColl].nJet] = ( nJECSets>0 ? pjet->correctedJet("Uncorrected").pt() : pjet->pt());
     }
 
+    std::cout<<pjet->pt()<<std::endl;
+    std::cout<<" 1 "<<std::endl;
+
     // Get all TagInfo pointers
-    const IPTagInfo *ipTagInfo = toIPTagInfo(*pjet,ipTagInfos_);
-    const SVTagInfo *svTagInfo = toSVTagInfo(*pjet,svTagInfos_);
+    std::cout<<ipTagInfos<<std::endl;
+    const IPTagInfo *ipTagInfo = toIPTagInfo(*pjet,ipTagInfos);
+    const SVTagInfo *svTagInfo = toSVTagInfo(*pjet,svTagInfos);
     // const SVTagInfo *svNegTagInfo = toSVTagInfo(*pjet,svNegTagInfos_);
     // const reco::CandSoftLeptonTagInfo *softPFMuTagInfo = pjet->tagInfoCandSoftLepton(softPFMuonTagInfos_.c_str());
     // const reco::CandSoftLeptonTagInfo *softPFElTagInfo = pjet->tagInfoCandSoftLepton(softPFElectronTagInfos_.c_str());
 
-
+    std::cout<<" 2 "<<std::endl;
     //*****************************************************************
     // Taggers
     //*****************************************************************
@@ -1469,28 +1503,29 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
     cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
     can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
 
+    std::cout<<" 3 "<<std::endl;
     const Tracks & selectedTracks( ipTagInfo->selectedTracks() );
     // const Tracks & tracks = Tracks();
     int ntagtracks = 0;
 
-
+    std::cout<<" 4 "<<std::endl;
     ntagtracks = selectedTracks.size();
-
+    std::cout<<" 4_1 "<<std::endl;
     JetInfo[iJetColl].Jet_ntracks[JetInfo[iJetColl].nJet] = ntagtracks;
-
+std::cout<<" 4_2 "<<std::endl;
     JetInfo[iJetColl].Jet_nFirstTrack[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nTrack;
     JetInfo[iJetColl].Jet_nFirstTrackTruth[JetInfo[iJetColl].nJet]  = JetInfo[iJetColl].nTrackTruth;
     JetInfo[iJetColl].Jet_nFirstTrkInc[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkInc;
-
+std::cout<<" 4_3 "<<std::endl;
     unsigned int trackSize = selectedTracks.size();
-
-
+std::cout<<" 4_4 "<<std::endl;
+    std::cout<<" 5 "<<std::endl;
     for (unsigned int itt=0; itt < trackSize; ++itt)
     {
       const TrackRef ptrackRef = selectedTracks[itt];
       const reco::Track * ptrackPtr = reco::btag::toTrack(ptrackRef);
       const reco::Track & ptrack = *ptrackPtr;
-
+      std::cout<<" 5_1 "<<std::endl;
       reco::TransientTrack transientTrack = trackBuilder->build(ptrackRef);
       GlobalVector direction(pjet->px(), pjet->py(), pjet->pz());
 
@@ -1503,7 +1538,7 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
         decayLength = -1;
 
       Double_t distJetAxis =  IPTools::jetTrackDistance(transientTrack, direction, *pv).second.value();
-
+      std::cout<<" 5_2 "<<std::endl;
       JetInfo[iJetColl].Track_dist[JetInfo[iJetColl].nTrack]     = distJetAxis;
       JetInfo[iJetColl].Track_length[JetInfo[iJetColl].nTrack]   = decayLength;
 
@@ -1511,7 +1546,7 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
       JetInfo[iJetColl].Track_dz[JetInfo[iJetColl].nTrack]       = ptrack.dz(pv->position());
       JetInfo[iJetColl].Track_dxyError[JetInfo[iJetColl].nTrack]      = ptrack.dxyError();
       JetInfo[iJetColl].Track_dzError[JetInfo[iJetColl].nTrack]       = ptrack.dzError();
-
+      std::cout<<" 5_3 "<<std::endl;
       {
         TransverseImpactPointExtrapolator extrapolator(transientTrack.field());
         TrajectoryStateOnSurface closestOnTransversePlaneState = extrapolator.extrapolate(transientTrack.impactPointState(),RecoVertex::convertPos(pv->position()));
@@ -1544,7 +1579,7 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
           JetInfo[iJetColl].Track_sign3D[JetInfo[iJetColl].nTrack]      = -666.;
         }
       }
-
+      std::cout<<" 5_4 "<<std::endl;
       float deltaR = reco::deltaR( ptrackRef->eta(), ptrackRef->phi(),
                                    JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet], JetInfo[iJetColl].Jet_phi[JetInfo[iJetColl].nJet] );
 
@@ -1554,7 +1589,7 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
       if (std::fabs(distJetAxis) < _distJetAxis && decayLength < _decayLength
                                         && deltaR < _deltaR) nseltracks++;
 
-
+        std::cout<<" 5_5 "<<std::endl;
       // track selection
       if ( pass_cut_trk) {
 
@@ -1585,7 +1620,7 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
         JetInfo[iJetColl].Track_nHitPXB[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidPixelBarrelHits();
         JetInfo[iJetColl].Track_nHitPXF[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidPixelEndcapHits();
         JetInfo[iJetColl].Track_isHitL1[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().hasValidHitInPixelLayer(PixelSubdetector::SubDetector::PixelBarrel, 1);
-
+        std::cout<<" 5_6 "<<std::endl;
         setTracksPV(ptrackRef, primaryVertex,
                     JetInfo[iJetColl].Track_PV[JetInfo[iJetColl].nTrack],
                     JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]);
@@ -1593,7 +1628,7 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
         if(JetInfo[iJetColl].Track_PV[JetInfo[iJetColl].nTrack]==0 &&
            JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]>0.5) { allKinematics.add(ptrackRef); }
 
-        if( pjet->hasTagInfo(svTagInfos_.c_str()) )
+        if( pjet->hasTagInfo(svTagInfos.c_str()) )
         {
           setTracksSV(ptrackRef, svTagInfo,
                       JetInfo[iJetColl].Track_isfromSV[JetInfo[iJetColl].nTrack],
@@ -1606,13 +1641,13 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
           JetInfo[iJetColl].Track_SV[JetInfo[iJetColl].nTrack] = -1;
           JetInfo[iJetColl].Track_SVweight[JetInfo[iJetColl].nTrack] = 0.;
         }
-
+        std::cout<<" 5_7 "<<std::endl;
         // check if the track is a V0 decay product candidate
         JetInfo[iJetColl].Track_isfromV0[JetInfo[iJetColl].nTrack] = 0;
         // apply the V0 filter
         std::vector<TrackRef> trackPairV0Test(2);
         trackPairV0Test[0] = ptrackRef;
-
+        std::cout<<" 5_8 "<<std::endl;
         for (unsigned int jtt=0; jtt < trackSize; ++jtt)
         {
           if (itt == jtt) continue;
@@ -1627,7 +1662,7 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
             break;
           }
         }
-
+        std::cout<<" 5_9 "<<std::endl;
 
         JetInfo[iJetColl].Track_history[JetInfo[iJetColl].nTrack] = 0;
 
@@ -1731,7 +1766,7 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
           // ************ end of track truth calculations ****************************
         }
         // ************ end of track history calculations ****************************
-
+        std::cout<<" 5_10 "<<std::endl;
         JetInfo[iJetColl].Track_category[JetInfo[iJetColl].nTrack] = -1;
 
         TLorentzVector track4P, jet4P;
@@ -1823,13 +1858,14 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
             }
           }
         }
-
+        std::cout<<" 5_11 "<<std::endl;
         ++JetInfo[iJetColl].nTrack;
       }
       JetInfo[iJetColl].Jet_ntracks[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrack-JetInfo[iJetColl].Jet_nFirstTrack[JetInfo[iJetColl].nJet];
 
     } //// end loop on tracks
 
+    std::cout<<" 6 "<<std::endl;
     JetInfo[iJetColl].Jet_nseltracks[JetInfo[iJetColl].nJet] = nseltracks;
 
 
@@ -1958,21 +1994,22 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
 //     float CombinedSvtxN = pjet->bDiscriminator(combinedSVNegBJetTags_.c_str());
 //     float CombinedSvtxP = pjet->bDiscriminator(combinedSVPosBJetTags_.c_str());
 
+    std::cout<<" 7 "<<std::endl;
     float DeepFlavourB    = -10.;
     float DeepFlavourBB   = -10.;
     float DeepFlavourLepB = -10.;
     float DeepFlavourC    = -10.;
     float DeepFlavourUDS  = -10.;
     float DeepFlavourG    = -10.;
-    if(deepFlavourJetTags_.size()) {
-      DeepFlavourB    = pjet->bDiscriminator((deepFlavourJetTags_+":probb"   ).c_str());
-      DeepFlavourBB   = pjet->bDiscriminator((deepFlavourJetTags_+":probbb"   ).c_str());
-      DeepFlavourLepB = pjet->bDiscriminator((deepFlavourJetTags_+":problepb"   ).c_str());
-      DeepFlavourC    = pjet->bDiscriminator((deepFlavourJetTags_+":probc"   ).c_str());
-      DeepFlavourUDS  = pjet->bDiscriminator((deepFlavourJetTags_+":probuds").c_str());
-      DeepFlavourG    = pjet->bDiscriminator((deepFlavourJetTags_+":probg").c_str());
+    if(deepFlavourJetTags.size()) {
+      DeepFlavourB    = pjet->bDiscriminator((deepFlavourJetTags+":probb"   ).c_str());
+      DeepFlavourBB   = pjet->bDiscriminator((deepFlavourJetTags+":probbb"   ).c_str());
+      DeepFlavourLepB = pjet->bDiscriminator((deepFlavourJetTags+":problepb"   ).c_str());
+      DeepFlavourC    = pjet->bDiscriminator((deepFlavourJetTags+":probc"   ).c_str());
+      DeepFlavourUDS  = pjet->bDiscriminator((deepFlavourJetTags+":probuds").c_str());
+      DeepFlavourG    = pjet->bDiscriminator((deepFlavourJetTags+":probg").c_str());
     }
-
+    std::cout<<" 8 "<<std::endl;
     // Maybe set default value to -1000 in future, as this is the default returned by the bDiscriminator function if a tagger is not found there. (see http://cmslxr.fnal.gov/source/DataFormats/PatCandidates/src/Jet.cc#0377)
     float DeepFlavourBN    = -10.;
     float DeepFlavourBBN   = -10.;
@@ -1982,11 +2019,11 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
     float DeepFlavourGN    = -10.;
 
 
-    float DeepCSVb   = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probb"   ).c_str()) : -10;
-    float DeepCSVc   = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probc"   ).c_str()) : -10;
-    float DeepCSVl   = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probudsg").c_str()) : -10;
-    float DeepCSVbb  = (deepCSVBJetTags_.size()) ? pjet->bDiscriminator((deepCSVBJetTags_+":probbb"  ).c_str()) : -10;
-
+    float DeepCSVb   = (deepCSVBJetTags.size()) ? pjet->bDiscriminator((deepCSVBJetTags+":probb"   ).c_str()) : -10;
+    float DeepCSVc   = (deepCSVBJetTags.size()) ? pjet->bDiscriminator((deepCSVBJetTags+":probc"   ).c_str()) : -10;
+    float DeepCSVl   = (deepCSVBJetTags.size()) ? pjet->bDiscriminator((deepCSVBJetTags+":probudsg").c_str()) : -10;
+    float DeepCSVbb  = (deepCSVBJetTags.size()) ? pjet->bDiscriminator((deepCSVBJetTags+":probbb"  ).c_str()) : -10;
+    std::cout<<" 9 "<<std::endl;
     // float CombinedIVF     = pjet->bDiscriminator(combinedIVFSVBJetTags_.c_str());
 //     float CombinedIVF_P   = pjet->bDiscriminator(combinedIVFSVPosBJetTags_.c_str());
     // float CombinedIVF_N   = pjet->bDiscriminator(combinedIVFSVNegBJetTags_.c_str());

@@ -123,6 +123,10 @@ options.register('runCaloJetVariables', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'True if you want to run Jet Variables')
+options.register('runPuppiJetVariables', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to run Jet Variables')
 options.register('runTagVariables', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -222,7 +226,7 @@ for requiredGroup in options.groups:
     if(requiredGroup==existingGroup.group):
       existingGroup.store=True
       for var in existingGroup.variables:
-        if "CaloJet." in var:
+        if "CaloJet." in var or "PuppiJet." in var:
             var = var.split(".")[1]
         options_to_change.update([i for i in variableDict[var].runOptions])
       found=True
@@ -252,6 +256,7 @@ if options.isReHLT: trigresults = trigresults+'2'
 
 pfjets = "hltAK4PFJets" #original ak4PFJetsCHS
 calojets = "hltAK4CaloJets" #original ak4CaloJets
+puppijets = "hltAK4PFPuppiJets"
 PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatJetTags" # original: pfDeepCSVJetTags
 PFDeepFlavourTags = "hltPFDeepFlavourJetTags" # original: pfDeepFlavourJetTagsSlimmedDeepFlavour
 rho = "hltFixedGridRhoFastjetAll" #original fixedGridRhoFastjetAll
@@ -276,6 +281,7 @@ genParticles = 'genParticles'
 # patJetSource = 'hltSlimmedJets'
 patJetSource = 'hltPatJets'
 patCaloJetSource = 'hltPatJetsCalo'
+patPuppiJetSource = 'hltPatJetsPuppi'
 genJetCollection = 'ak4GenJetsNoNu'
 # pfCandidates = 'particleFlow'
 pfCandidates = 'hltParticleFlow'
@@ -316,7 +322,8 @@ print '-'*108
 print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
 print '-'*108
 for _modname in sorted(process.paths_()):
-    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'DeepCSV' in _modname or 'DeepFlavour' in _modname or 'AK8Calo' in _modname)
+    # _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'DeepCSV' in _modname or 'DeepFlavour' in _modname or 'AK8Calo' in _modname)
+    _keepPath = _modname.startswith('MC_')
 #    _keepPath |= _modname.startswith('MC_ReducedIterativeTracking')
     if _keepPath:
       print '{:<99} | {:<4} |'.format(_modname, '+')
@@ -605,21 +612,23 @@ process.btagana.runCSVTagTrackVariables  = options.runCSVTagTrackVariables   ## 
 process.btagana.runDeepFlavourTagVariables = options.runDeepFlavourTagVariables
 process.btagana.primaryVertexColl     = cms.InputTag(pvSource)
 process.btagana.Jets                  = cms.InputTag(patJetSource)
-process.btagana.CaloJets                  = cms.InputTag(patCaloJetSource)
+process.btagana.CaloJets              = cms.InputTag(patCaloJetSource)
+process.btagana.PuppiJets             = cms.InputTag(patPuppiJetSource)
 process.btagana.muonCollectionName    = cms.InputTag(muSource)
-process.btagana.electronCollectionName    = cms.InputTag(elSource)
+process.btagana.electronCollectionName= cms.InputTag(elSource)
 # process.btagana.patMuonCollectionName = cms.InputTag(patMuons)
 process.btagana.rho                   = cms.InputTag(rho)
-process.btagana.deepFlavourJetTags            = PFDeepFlavourTags
-#process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
+process.btagana.deepFlavourJetTags    = PFDeepFlavourTags
+# process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
 process.btagana.triggerTable          = cms.InputTag(trigresults) # Data and MC
 process.btagana.genParticles          = cms.InputTag(genParticles)
 process.btagana.candidates            = cms.InputTag(pfCandidates)
-process.btagana.runJetVariables     = options.runJetVariables
-process.btagana.runCaloJetVariables     = options.runCaloJetVariables
-process.btagana.runQuarkVariables   = options.runQuarkVariables
-process.btagana.runHadronVariables  = options.runHadronVariables
-process.btagana.runGenVariables     = options.runGenVariables
+process.btagana.runJetVariables       = options.runJetVariables
+process.btagana.runCaloJetVariables   = options.runCaloJetVariables
+process.btagana.runPuppiJetVariables   = options.runPuppiJetVariables
+process.btagana.runQuarkVariables     = options.runQuarkVariables
+process.btagana.runHadronVariables    = options.runHadronVariables
+process.btagana.runGenVariables       = options.runGenVariables
 process.btagana.runPFElectronVariables = options.runPFElectronVariables
 process.btagana.runPFMuonVariables = options.runPFMuonVariables
 # process.btagana.runPatMuons = options.runPatMuons

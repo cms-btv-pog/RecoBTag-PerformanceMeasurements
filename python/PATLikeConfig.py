@@ -3,12 +3,15 @@ import FWCore.ParameterSet.Config as cms
 def customizePFPatLikeJets(process, type = "AK4PFCHS"):
     # set some default collection variables
     pfjets =                "hltAK4PFJets"                                  #original ak4PFJetsCHS
+    puppijets =             "hltAK4PFPuppiJets"                                  #original ak4PFJetsCHS
     pfjetsCorrected =       "hltAK4PFJetsCorrected"                         #original ak4PFJetsCHS
     calojets =              "hltAK4CaloJets"                                #original ak4CaloJets
     calojetsCutted =        "hltSelectorCentralJets30L1FastJeta2p5"
     PFDeepCSVTags =         "hltDeepCombinedSecondaryVertexBPFPatJetTags"   #original pfDeepCSVJetTags
+    PFPuppiDeepCSVTags =    "hltDeepCombinedSecondaryVertexBPFPuppiPatJetTags"   #original pfDeepCSVJetTags
     CaloDeepCSVTags =       "hltDeepCombinedSecondaryVertexCaloPatBJetTags"
     PFDeepFlavourTags =     "hltPFDeepFlavourJetTags"                       #original pfDeepFlavourJetTagsSlimmedDeepFlavour
+    PFPuppiDeepFlavourTags ="hltPFPuppiDeepFlavourJetTags"                       #original pfDeepFlavourJetTagsSlimmedDeepFlavour
     rho =                   "hltFixedGridRhoFastjetAll"                     #original fixedGridRhoFastjetAll
     hltVertices =           "hltVerticesPFFilter"                           #original offlinePrimaryVertices
     siPixelClusters =       "hltSiPixelClusters"                            #original siPixelClusters
@@ -19,16 +22,18 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
     rpcRecHits =            "hltRpcRecHits"                                 #original rpcRecHits
     tracks =                "hltMergedTracks"                               #original generalTracks
     payload =               "AK4PFHLT"                                      #original AK4PFchs
+    payloadPuppi =          "AK4PFPuppiHLT"                                      #original AK4PFchs
     particleFlow =          "hltParticleFlow"                               #original particleFlow
     puppi =                 "hltPFPuppi"                                    #original puppi
     puppiNoLep =            "hltPFPuppiNoLep"                               #original puppiNoLep
     beamSpot =              "hltOnlineBeamSpot"                             #original offlineBeamSpot
+    caloTower =             "hltTowerMakerForAll"
 
     # clone and modify the HLT BTV sequence/producers to remove the jet pt and eta selections from "jetsForBtag" and replace with pfjets
     process.hltDeepCombinedSecondaryVertexBPFPatJetTags = process.hltDeepCombinedSecondaryVertexBJetTagsPF.clone(
-        src = cms.InputTag( "hltDeepCombinedSecondaryVertexBJetPatTagsInfos" )
+        src = cms.InputTag( "hltDeepCombinedSecondaryVertexBJetPatTagInfos" )
     )
-    process.hltDeepCombinedSecondaryVertexBJetPatTagsInfos = process.hltDeepCombinedSecondaryVertexBJetTagsInfos.clone(
+    process.hltDeepCombinedSecondaryVertexBJetPatTagInfos = process.hltDeepCombinedSecondaryVertexBJetTagsInfos.clone(
         svTagInfos = cms.InputTag( "hltDeepSecondaryVertexPFPatTagInfos" )
     )
     process.hltDeepSecondaryVertexPFPatTagInfos = process.hltDeepSecondaryVertexTagInfosPF.clone(
@@ -47,8 +52,37 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
         + process.hltDeepTrackVertexArbitratorPF
         + process.hltDeepInclusiveMergedVerticesPF
         + process.hltDeepSecondaryVertexPFPatTagInfos
-        + process.hltDeepCombinedSecondaryVertexBJetPatTagsInfos
+        + process.hltDeepCombinedSecondaryVertexBJetPatTagInfos
         + process.hltDeepCombinedSecondaryVertexBPFPatJetTags
+    )
+
+    # do the same for PuppiJets
+
+    process.hltDeepCombinedSecondaryVertexBPFPuppiPatJetTags = process.hltDeepCombinedSecondaryVertexBJetTagsPF.clone(
+        src = cms.InputTag( "hltDeepCombinedSecondaryVertexBPuppiJetPatTagInfos" )
+    )
+    process.hltDeepCombinedSecondaryVertexBPuppiJetPatTagInfos = process.hltDeepCombinedSecondaryVertexBJetTagsInfos.clone(
+        svTagInfos = cms.InputTag( "hltDeepSecondaryVertexPFPuppiPatTagInfos" )
+    )
+    process.hltDeepSecondaryVertexPFPuppiPatTagInfos = process.hltDeepSecondaryVertexTagInfosPF.clone(
+        trackIPTagInfos = cms.InputTag( "hltDeepBLifetimePFPuppiPatTagInfos" ),
+        weights = cms.InputTag(puppi)
+    )
+    process.hltDeepBLifetimePFPuppiPatTagInfos = process.hltDeepBLifetimeTagInfosPF.clone(
+        jets = cms.InputTag( puppijets )
+    )
+    process.HLTBtagDeepCSVSequencePFPuppiPat = cms.Sequence(
+        process.hltVerticesPF
+        + process.hltVerticesPFSelector
+        + process.hltVerticesPFFilter
+        + process.hltDeepBLifetimePFPuppiPatTagInfos
+        + process.hltDeepInclusiveVertexFinderPF
+        + process.hltDeepInclusiveSecondaryVerticesPF
+        + process.hltDeepTrackVertexArbitratorPF
+        + process.hltDeepInclusiveMergedVerticesPF
+        + process.hltDeepSecondaryVertexPFPuppiPatTagInfos
+        + process.hltDeepCombinedSecondaryVertexBPuppiJetPatTagInfos
+        + process.hltDeepCombinedSecondaryVertexBPFPuppiPatJetTags
     )
 
     # do the same for caloJets
@@ -120,25 +154,51 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
         jetSource = cms.InputTag(pfjets),
         tagInfoSources = cms.VInputTag(
             cms.InputTag("hltDeepBLifetimePFPatTagInfos"),
-            cms.InputTag("hltDeepCombinedSecondaryVertexBJetPatTagsInfos"),
+            cms.InputTag("hltDeepCombinedSecondaryVertexBJetPatTagInfos"),
             cms.InputTag("hltDeepSecondaryVertexPFPatTagInfos"),
             cms.InputTag("hltPFDeepFlavourTagInfos"),
         ),
         trackAssociationSource = cms.InputTag("hltAk4JetTracksAssociatorAtVertexPF"),
     )
+    process.hltPatJetsPuppi = patJets.clone(
+        JetFlavourInfoSource = cms.InputTag("hltPatJetFlavourAssociationPuppi"),
+        JetPartonMapSource = cms.InputTag("hltPatJetFlavourAssociationLegacyPuppi"),
+        addJetID = cms.bool(False),
+        addTagInfos = cms.bool(True),
+        discriminatorSources = cms.VInputTag(
+            cms.InputTag(PFPuppiDeepCSVTags,"probb"),cms.InputTag(PFPuppiDeepCSVTags,"probc"),cms.InputTag(PFPuppiDeepCSVTags,"probudsg"),
+            # cms.InputTag(PFDeepCSVTags,"probbb"), # hltDeepCSV: probb = probb +probbb
+            cms.InputTag(PFPuppiDeepFlavourTags,"probb"), cms.InputTag(PFPuppiDeepFlavourTags,"probc"), cms.InputTag(PFPuppiDeepFlavourTags,"probg"),
+            cms.InputTag(PFPuppiDeepFlavourTags,"problepb"), cms.InputTag(PFPuppiDeepFlavourTags,"probbb"), cms.InputTag(PFPuppiDeepFlavourTags,"probuds"),
+        ),
+        embedGenPartonMatch = cms.bool(False),
+        genJetMatch = cms.InputTag("hltPatJetGenJetMatchPuppi"),
+        genPartonMatch = cms.InputTag("hltPatJetPartonMatchPuppi"),
+        jetChargeSource = cms.InputTag("patJetPuppiCharge"),
+        jetCorrFactorsSource = cms.VInputTag(cms.InputTag("hltPatJetCorrFactorsPuppi")),
+        jetIDMap = cms.InputTag("hltAk4JetID"),
+        jetSource = cms.InputTag(puppijets),
+        tagInfoSources = cms.VInputTag(
+            cms.InputTag("hltDeepBLifetimePFPuppiPatTagInfos"),
+            cms.InputTag("hltDeepCombinedSecondaryVertexBPuppiJetPatTagInfos"),
+            cms.InputTag("hltDeepSecondaryVertexPFPuppiPatTagInfos"),
+            cms.InputTag("hltPFPuppiDeepFlavourTagInfos"),
+        ),
+        trackAssociationSource = cms.InputTag("hltAk4JetTracksAssociatorAtVertexPFPuppi"),
+    )
     process.hltPatJetsCalo = patJets.clone(
         JetFlavourInfoSource = cms.InputTag("hltPatJetFlavourAssociationCalo"),
         JetPartonMapSource = cms.InputTag("hltPatJetFlavourAssociationLegacy"),
-            addAssociatedTracks = cms.bool(True),
-            addBTagInfo = cms.bool(True),
-            addDiscriminators = cms.bool(True),
-            addEfficiencies = cms.bool(False),
-            addGenJetMatch = cms.bool(True),
-            addGenPartonMatch = cms.bool(True),
-            addJetCharge = cms.bool(False),
-            addJetCorrFactors = cms.bool(False),
-            addJetFlavourInfo = cms.bool(True),
-            addPartonJetMatch = cms.bool(False),
+        addAssociatedTracks = cms.bool(True),
+        addBTagInfo = cms.bool(True),
+        addDiscriminators = cms.bool(True),
+        addEfficiencies = cms.bool(False),
+        # addGenJetMatch = cms.bool(True),
+        # addGenPartonMatch = cms.bool(True),
+        addJetCharge = cms.bool(False),
+        addJetCorrFactors = cms.bool(False),
+        # addJetFlavourInfo = cms.bool(True),
+        addPartonJetMatch = cms.bool(False),
         addJetID = cms.bool(False),
         addTagInfos = cms.bool(True),
         discriminatorSources = cms.VInputTag(
@@ -148,14 +208,18 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
         embedGenPartonMatch = cms.bool(False),
         genJetMatch = cms.InputTag("hltPatJetGenJetMatchCalo"),
         genPartonMatch = cms.InputTag("hltPatJetPartonMatchCalo"),
-        jetChargeSource = cms.InputTag("hltPatJetCharge"),
+        # jetChargeSource = cms.InputTag("hltPatJetCharge"),
         # jetCorrFactorsSource = cms.VInputTag(cms.InputTag("hltPatJetCorrFactors")),
         # jetIDMap = cms.InputTag("hltAk4JetID"),
         jetSource = cms.InputTag(calojetsCutted),
         tagInfoSources = cms.VInputTag(
-            cms.InputTag("hltDeepCombinedSecondaryVertexBJetCaloPatTagInfos"),
-            cms.InputTag("hltImpactParameterPatTagInfos"),
-            cms.InputTag("hltImpactParameterPatTagInfos"),
+            # cms.InputTag("hltDeepCombinedSecondaryVertexBJetCaloPatTagInfos"),
+            # cms.InputTag("hltInclusiveSecondaryVertexFinderPatTagInfos"),
+            # cms.InputTag("hltImpactParameterPatTagInfos"),
+            # cms.InputTag("hltImpactParameterTagInfos"),
+            # cms.InputTag("hltInclusiveSecondaryVertexFinderTagInfos"),
+            # cms.InputTag("hltDeepCombinedSecondaryVertexBJetTagsInfoCalo"),
+            cms.InputTag("hltPFDeepFlavourTagInfos"),
         ),
         trackAssociationSource = cms.InputTag("hltAk4JetTracksAssociatorAtVertexCalo"),
     )
@@ -169,6 +233,14 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
         leptons = cms.InputTag("hltPatJetPartons","leptons"),
         partons = cms.InputTag("hltPatJetPartons","physicsPartons"),
     )
+    process.hltPatJetFlavourAssociationPuppi = patJetFlavourAssociation.clone(
+        bHadrons = cms.InputTag("hltPatJetPartons","bHadrons"),
+        cHadrons = cms.InputTag("hltPatJetPartons","cHadrons"),
+        jets = cms.InputTag(puppijets),
+        leptons = cms.InputTag("hltPatJetPartons","leptons"),
+        partons = cms.InputTag("hltPatJetPartons","physicsPartons"),
+        weights = cms.InputTag(puppi)
+    )
     process.hltPatJetFlavourAssociationCalo = patJetFlavourAssociation.clone(
         bHadrons = cms.InputTag("hltPatJetPartons","bHadrons"),
         cHadrons = cms.InputTag("hltPatJetPartons","cHadrons"),
@@ -181,9 +253,16 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
     process.hltPatJetFlavourAssociationLegacy = patJetFlavourAssociationLegacy.clone(
         srcByReference = cms.InputTag("hltPatJetPartonAssociationLegacy")
     )
+    process.hltPatJetFlavourAssociationLegacyPuppi = patJetFlavourAssociationLegacy.clone(
+        srcByReference = cms.InputTag("hltPatJetPartonAssociationLegacyPuppi")
+    )
 
     process.hltPatJetPartonAssociationLegacy = patJetPartonAssociationLegacy.clone(
         jets = cms.InputTag(pfjets),
+        partons = cms.InputTag("hltPatJetPartonsLegacy")
+    )
+    process.hltPatJetPartonAssociationLegacyPuppi = patJetPartonAssociationLegacy.clone(
+        jets = cms.InputTag(puppijets),
         partons = cms.InputTag("hltPatJetPartonsLegacy")
     )
     process.hltPatJetPartonAssociationLegacyCalo = patJetPartonAssociationLegacy.clone(
@@ -199,6 +278,10 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
     process.hltPatJetGenJetMatch = patJetGenJetMatch.clone(
         matched = cms.InputTag("hltSlimmedGenJets"),
         src = cms.InputTag(pfjets)
+    )
+    process.hltPatJetGenJetMatchPuppi = patJetGenJetMatch.clone(
+        matched = cms.InputTag("hltSlimmedGenJets"),
+        src = cms.InputTag(puppijets)
     )
     process.hltPatJetGenJetMatchCalo = patJetGenJetMatch.clone(
         matched = cms.InputTag("hltSlimmedGenJets"),
@@ -233,6 +316,10 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
         matched = cms.InputTag("hltPrunedGenParticles"),
         src = cms.InputTag(pfjets)
     )
+    process.hltPatJetPartonMatchPuppi = patJetPartonMatch.clone(
+        matched = cms.InputTag("hltPrunedGenParticles"),
+        src = cms.InputTag(puppijets)
+    )
     process.hltPatJetPartonMatchCalo = patJetPartonMatch.clone(
         matched = cms.InputTag("hltPrunedGenParticles"),
         src = cms.InputTag(calojetsCutted)
@@ -242,6 +329,9 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
     process.hltPatJetCharge = patJetCharge.clone(
         src = cms.InputTag("hltAk4JetTracksAssociatorAtVertexPF"),
     )
+    process.patJetPuppiCharge = patJetCharge.clone(
+        src = cms.InputTag("hltAk4JetTracksAssociatorAtVertexPFPuppi"),
+    )
 
     from RecoJets.JetAssociationProducers.ak4JTA_cff import ak4JetTracksAssociatorAtVertexPF
     process.hltAk4JetTracksAssociatorAtVertexPF = ak4JetTracksAssociatorAtVertexPF.clone(
@@ -249,10 +339,17 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
         pvSrc = cms.InputTag(hltVertices),
         tracks = cms.InputTag(tracks),
     )
-    process.hltAk4JetTracksAssociatorAtVertexCalo = ak4JetTracksAssociatorAtVertexPF.clone(
-        jets = cms.InputTag(calojetsCutted),
+    process.hltAk4JetTracksAssociatorAtVertexPFPuppi = ak4JetTracksAssociatorAtVertexPF.clone(
+        jets = cms.InputTag(puppijets),
         pvSrc = cms.InputTag(hltVertices),
         tracks = cms.InputTag(tracks),
+    )
+    process.hltAk4JetTracksAssociatorAtVertexCalo = ak4JetTracksAssociatorAtVertexPF.clone(
+        jets = cms.InputTag(calojetsCutted),
+        # pvSrc = cms.InputTag(hltVertices),
+        pvSrc = cms.InputTag("hltVerticesL3"),
+        # tracks = cms.InputTag(tracks),
+        tracks = cms.InputTag("hltMergedTracksForBTag"),
     )
 
     from PhysicsTools.PatAlgos.recoLayer0.jetCorrFactors_cfi  import patJetCorrFactors
@@ -261,6 +358,12 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
         primaryVertices = cms.InputTag(hltVertices),
         rho = cms.InputTag(rho),
         src = cms.InputTag(pfjets),
+    )
+    process.hltPatJetCorrFactorsPuppi = patJetCorrFactors.clone(
+        payload = cms.string(payloadPuppi),
+        primaryVertices = cms.InputTag(hltVertices),
+        rho = cms.InputTag(rho),
+        src = cms.InputTag(puppijets),
     )
 
     from RecoJets.JetProducers.ak4JetID_cfi import ak4JetID
@@ -282,14 +385,26 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
     process.hltPFDeepFlavourJetTags = pfDeepFlavourJetTags.clone(
         src = cms.InputTag("hltPFDeepFlavourTagInfos")
     )
+    process.hltPFPuppiDeepFlavourJetTags = pfDeepFlavourJetTags.clone(
+        src = cms.InputTag("hltPFPuppiDeepFlavourTagInfos")
+    )
     from RecoBTag.FeatureTools.pfDeepFlavourTagInfos_cfi import pfDeepFlavourTagInfos
     process.hltPFDeepFlavourTagInfos = pfDeepFlavourTagInfos.clone(
         candidates = cms.InputTag(particleFlow),
         jets = cms.InputTag(pfjets),
         puppi_value_map = cms.InputTag(puppi),
         secondary_vertices = cms.InputTag("hltDeepInclusiveSecondaryVerticesPF"),
-        shallow_tag_infos = cms.InputTag("hltDeepCombinedSecondaryVertexBJetPatTagsInfos"),
+        shallow_tag_infos = cms.InputTag("hltDeepCombinedSecondaryVertexBJetPatTagInfos"),
         vertex_associator = cms.InputTag("hltPrimaryVertexAssociation","original"),
+        vertices = cms.InputTag(hltVertices)
+    )
+    process.hltPFPuppiDeepFlavourTagInfos = pfDeepFlavourTagInfos.clone(
+        candidates = cms.InputTag(particleFlow),
+        jets = cms.InputTag(puppijets),
+        puppi_value_map = cms.InputTag(puppi),
+        secondary_vertices = cms.InputTag("hltDeepInclusiveSecondaryVerticesPF"),
+        shallow_tag_infos = cms.InputTag("hltDeepCombinedSecondaryVertexBPuppiJetPatTagInfos"),
+        vertex_associator = cms.InputTag("hltPrimaryVertexAssociationPuppi","original"),
         vertices = cms.InputTag(hltVertices)
     )
 
@@ -302,11 +417,27 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
         particles = cms.InputTag(particleFlow),
         vertices = cms.InputTag(hltVertices),
     )
+    process.hltPrimaryVertexAssociationPuppi = primaryVertexAssociation.clone(
+        jets = cms.InputTag(puppijets),
+        particles = cms.InputTag(particleFlow),
+        vertices = cms.InputTag(hltVertices),
+    )
 
     from RecoParticleFlow.PFProducer.chargedHadronPFTrackIsolation_cfi import chargedHadronPFTrackIsolation
     process.hltChargedHadronPFTrackIsolation = chargedHadronPFTrackIsolation.clone(
         src = cms.InputTag(particleFlow)
     )
+
+
+
+
+
+
+
+
+
+
+
 
     # create the final path
     process.MC_JetsMatchingPath = cms.Path(
@@ -329,11 +460,38 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
         *process.hltPatJetCorrFactors
 
         *process.hltPrimaryVertexAssociation
-        *process.hltChargedHadronPFTrackIsolation
+        # *process.hltChargedHadronPFTrackIsolation
         *process.hltPFDeepFlavourTagInfos
         *process.hltPFDeepFlavourJetTags
 
         *process.hltPatJets
+        )
+
+    process.MC_PuppiJetsMatchingPath = cms.Path(
+        process.HLTAK4PFPuppiJetsSequence
+        *process.HLTBtagDeepCSVSequencePFPuppiPat
+        *process.hltPrunedGenParticlesWithStatusOne
+        *process.hltPrunedGenParticles
+        *process.hltPackedGenParticles
+        *process.hltPatJetPartonMatchPuppi
+        *process.hltSlimmedGenJets
+        *process.hltAk4JetID
+        *process.hltPatJetGenJetMatchPuppi
+        *process.hltPatJetPartonsLegacy
+        *process.hltPatJetPartonAssociationLegacyPuppi
+        *process.hltPatJetFlavourAssociationLegacyPuppi
+        *process.hltPatJetPartons
+        *process.hltPatJetFlavourAssociationPuppi
+        *process.hltAk4JetTracksAssociatorAtVertexPFPuppi
+        *process.patJetPuppiCharge
+        *process.hltPatJetCorrFactorsPuppi
+
+        *process.hltPrimaryVertexAssociationPuppi
+        # *process.hltChargedHadronPFTrackIsolation
+        *process.hltPFPuppiDeepFlavourTagInfos
+        *process.hltPFPuppiDeepFlavourJetTags
+
+        *process.hltPatJetsPuppi
         )
 
     process.MC_CaloJetsMatchingPath = cms.Path(
@@ -357,5 +515,6 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
     if process.schedule_():
         process.schedule.extend([process.MC_JetsMatchingPath])
         process.schedule.extend([process.MC_CaloJetsMatchingPath])
+        process.schedule.extend([process.MC_PuppiJetsMatchingPath])
 
     return process

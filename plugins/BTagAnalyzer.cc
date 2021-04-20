@@ -1601,7 +1601,8 @@ void BTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Event
   //------------------------------------------------------
 
   //// Fill TTree
-  if ( EventInfo.BitTrigger > 0 || EventInfo.Run < 0 ) {
+  // if ( EventInfo.BitTrigger > 0 || EventInfo.Run < 0 ) {
+  if ( EventInfo.BitTrigger != 0 || EventInfo.Run < 0 ) {
     smalltree->Fill();
   }
 
