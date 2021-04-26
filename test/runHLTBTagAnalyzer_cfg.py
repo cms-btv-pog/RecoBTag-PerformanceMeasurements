@@ -322,8 +322,9 @@ print '-'*108
 print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
 print '-'*108
 for _modname in sorted(process.paths_()):
-    # _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'DeepCSV' in _modname or 'DeepFlavour' in _modname or 'AK8Calo' in _modname)
-    _keepPath = _modname.startswith('MC_')
+    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'DeepCSV' in _modname or 'DeepFlavour' in _modname or 'AK8Calo' in _modname)
+    # _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'DeepCSV' in _modname or 'DeepFlavour' in _modname or 'AK8Calo' in _modname)
+    # _keepPath = _modname.startswith('MC_')
 #    _keepPath |= _modname.startswith('MC_ReducedIterativeTracking')
     if _keepPath:
       print '{:<99} | {:<4} |'.format(_modname, '+')
@@ -699,12 +700,43 @@ process.analyzerSeq = cms.Sequence( )
 process.analyzerSeq += process.btagana
 #---------------------------------------
 
+process.testOutput = cms.OutputModule("PoolOutputModule",
+    # SelectEvents = cms.untracked.PSet(
+    #     SelectEvents = cms.vstring(
+    #         'HLT_EcalCalibration_v4',
+    #         'HLT_HcalCalibration_v5'
+    #     )
+    # ),
+    dataset = cms.untracked.PSet(
+        dataTier = cms.untracked.string('RAW'),
+        filterName = cms.untracked.string('')
+    ),
+    fastCloning = cms.untracked.bool(False),
+    fileName = cms.untracked.string('testOutput.root'),
+    outputCommands = cms.untracked.vstring(
+        # 'drop *_hlt*_*_*',
+        # 'keep *_hltEcalCalibrationRaw_*_*',
+        # 'keep *_hltHcalCalibrationRaw_*_*',
+        # 'keep edmTriggerResults_*_*_*',
+        # 'keep triggerTriggerEvent_*_*_*'
+        'drop *_*_*_*',
+        # 'keep hltImpactParameterPatTagInfos_*_*_*',
+        'keep *_hltImpactParameterPatTagInfos_*_*',
+        'keep *_hltDeepCombinedSecondaryVertexBJetCaloPatTagInfos_*_*',
+        'keep *_hltInclusiveSecondaryVertexFinderPatTagInfos_*_*',
+        'keep *_hltDeepBLifetimePFPatTagInfos_*_*',
+        'keep *_hltDeepCombinedSecondaryVertexBJetPatTagInfos_*_*',
+        'keep *_hltDeepSecondaryVertexPFPatTagInfos_*_*',
+    )
+)
+# process.myOutput = cms.EndPath(process.testOutput)
 
 process.p = cms.Path(
     process.allEvents
     # * process.filtSeq
     * process.selectedEvents
     * process.analyzerSeq
+    # * process.testOutput
 )
 
 # Delete predefined output module (needed for running with CRAB)
