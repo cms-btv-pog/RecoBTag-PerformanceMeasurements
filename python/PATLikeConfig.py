@@ -167,7 +167,7 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
         addTagInfos = cms.bool(True),
         discriminatorSources = cms.VInputTag(
             cms.InputTag(PFPuppiDeepCSVTags,"probb"),cms.InputTag(PFPuppiDeepCSVTags,"probc"),cms.InputTag(PFPuppiDeepCSVTags,"probudsg"),
-            # cms.InputTag(PFDeepCSVTags,"probbb"), # hltDeepCSV: probb = probb +probbb
+            # cms.InputTag(PFPuppiDeepCSVTags,"probbb"), # hltDeepCSV: probb = probb +probbb
             cms.InputTag(PFPuppiDeepFlavourTags,"probb"), cms.InputTag(PFPuppiDeepFlavourTags,"probc"), cms.InputTag(PFPuppiDeepFlavourTags,"probg"),
             cms.InputTag(PFPuppiDeepFlavourTags,"problepb"), cms.InputTag(PFPuppiDeepFlavourTags,"probbb"), cms.InputTag(PFPuppiDeepFlavourTags,"probuds"),
         ),
@@ -188,11 +188,12 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
     )
     process.hltPatJetsCalo = patJets.clone(
         JetFlavourInfoSource = cms.InputTag("hltPatJetFlavourAssociationCalo"),
-        JetPartonMapSource = cms.InputTag("hltPatJetFlavourAssociationLegacy"),
+        JetPartonMapSource = cms.InputTag("hltPatJetFlavourAssociationLegacyCalo"),
         addAssociatedTracks = cms.bool(True),
         addBTagInfo = cms.bool(True),
         addDiscriminators = cms.bool(True),
         addEfficiencies = cms.bool(False),
+        embedCaloTowers = cms.bool(True),
         # addGenJetMatch = cms.bool(True),
         # addGenPartonMatch = cms.bool(True),
         addJetCharge = cms.bool(False),
@@ -213,13 +214,13 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
         # jetIDMap = cms.InputTag("hltAk4JetID"),
         jetSource = cms.InputTag(calojetsCutted),
         tagInfoSources = cms.VInputTag(
-            # cms.InputTag("hltDeepCombinedSecondaryVertexBJetCaloPatTagInfos"),
-            # cms.InputTag("hltInclusiveSecondaryVertexFinderPatTagInfos"),
-            # cms.InputTag("hltImpactParameterPatTagInfos"),
+            cms.InputTag("hltImpactParameterPatTagInfos"),
+            cms.InputTag("hltDeepCombinedSecondaryVertexBJetCaloPatTagInfos"),
+            cms.InputTag("hltInclusiveSecondaryVertexFinderPatTagInfos"),
             # cms.InputTag("hltImpactParameterTagInfos"),
             # cms.InputTag("hltInclusiveSecondaryVertexFinderTagInfos"),
             # cms.InputTag("hltDeepCombinedSecondaryVertexBJetTagsInfoCalo"),
-            cms.InputTag("hltPFDeepFlavourTagInfos"),
+            # cms.InputTag("hltDeepSecondaryVertexPFPuppiPatTagInfos"),
         ),
         trackAssociationSource = cms.InputTag("hltAk4JetTracksAssociatorAtVertexCalo"),
     )
@@ -252,6 +253,9 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
 
     process.hltPatJetFlavourAssociationLegacy = patJetFlavourAssociationLegacy.clone(
         srcByReference = cms.InputTag("hltPatJetPartonAssociationLegacy")
+    )
+    process.hltPatJetFlavourAssociationLegacyCalo = patJetFlavourAssociationLegacy.clone(
+        srcByReference = cms.InputTag("hltPatJetPartonAssociationLegacyCalo")
     )
     process.hltPatJetFlavourAssociationLegacyPuppi = patJetFlavourAssociationLegacy.clone(
         srcByReference = cms.InputTag("hltPatJetPartonAssociationLegacyPuppi")
@@ -505,7 +509,7 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
         *process.hltPatJetPartonsLegacy
         *process.hltSlimmedGenJets
         *process.hltPatJetPartonAssociationLegacyCalo
-        *process.hltPatJetFlavourAssociationLegacy
+        *process.hltPatJetFlavourAssociationLegacyCalo
         *process.hltPatJetFlavourAssociationCalo
         *process.hltAk4JetTracksAssociatorAtVertexCalo
 
