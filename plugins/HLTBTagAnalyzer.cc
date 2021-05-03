@@ -2770,7 +2770,14 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processCaloJets(const edm::Handle<PatJetCollect
   JetInfo[iJetColl].nSVTagVar  = 0;
   JetInfo[iJetColl].nSV = 0;
   JetInfo[iJetColl].nTrkEtaRelTagVarCSV = 0;
-  //JetInfo[iJetColl].nTrkTagVarCSV = 0;
+
+  JetInfo[iJetColl].nPFElectron = 0;
+  JetInfo[iJetColl].nPFMuon = 0;
+  JetInfo[iJetColl].nTrackTruth = 0;
+  JetInfo[iJetColl].nTrkInc = 0;
+  JetInfo[iJetColl].nTrkTagVarCSV = 0;
+  JetInfo[iJetColl].nLeptons = 0;
+
   // std::cout << "getting jetTags Coll " << std::endl;
   edm::Handle <ShallowTagCollection> jetTagsColl;
   iEvent.getByToken (jetTagsCollToken, jetTagsColl);
@@ -2969,109 +2976,109 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processCaloJets(const edm::Handle<PatJetCollect
 	  if(tagVars.getList(reco::btau::trackJetPt,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_trackJetPt[JetInfo[iJetColl].nJet]                  = ( tagVars.getList(reco::btau::trackJetPt,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_trackJetPt[JetInfo[iJetColl].nJet]                  = 0;
+	    JetInfo[iJetColl].TagVarCSV_trackJetPt[JetInfo[iJetColl].nJet]                  = -9999;
 	  }
 
 	  if(tagVars.getList(reco::btau::jetNTracks,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_jetNTracks[JetInfo[iJetColl].nJet]                  = ( tagVars.getList(reco::btau::jetNTracks,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_jetNTracks[JetInfo[iJetColl].nJet]                  = 0;
+	    JetInfo[iJetColl].TagVarCSV_jetNTracks[JetInfo[iJetColl].nJet]                  = -9999;
 	  }
 
 	  if(tagVars.getList(reco::btau::trackSumJetEtRatio,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_trackSumJetEtRatio[JetInfo[iJetColl].nJet]          = ( tagVars.getList(reco::btau::trackSumJetEtRatio,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_trackSumJetEtRatio[JetInfo[iJetColl].nJet]          = 0;
+	    JetInfo[iJetColl].TagVarCSV_trackSumJetEtRatio[JetInfo[iJetColl].nJet]          = -9999;
 	  }
 
 	  if(tagVars.getList(reco::btau::trackSumJetDeltaR,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_trackSumJetDeltaR[JetInfo[iJetColl].nJet]           = ( tagVars.getList(reco::btau::trackSumJetDeltaR,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_trackSumJetDeltaR[JetInfo[iJetColl].nJet]           = 0;
+	    JetInfo[iJetColl].TagVarCSV_trackSumJetDeltaR[JetInfo[iJetColl].nJet]           = -9999;
 	  }
 
 	  if(tagVars.getList(reco::btau::trackSip2dValAboveCharm,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_trackSip2dValAboveCharm[JetInfo[iJetColl].nJet]     = ( tagVars.getList(reco::btau::trackSip2dValAboveCharm,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_trackSip2dValAboveCharm[JetInfo[iJetColl].nJet]     = 0;
+	    JetInfo[iJetColl].TagVarCSV_trackSip2dValAboveCharm[JetInfo[iJetColl].nJet]     = -9999;
 	  }
 
 	  if(tagVars.getList(reco::btau::trackSip2dSigAboveCharm,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_trackSip2dSigAboveCharm[JetInfo[iJetColl].nJet]     = ( tagVars.getList(reco::btau::trackSip2dSigAboveCharm,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_trackSip2dSigAboveCharm[JetInfo[iJetColl].nJet]     = 0;
+	    JetInfo[iJetColl].TagVarCSV_trackSip2dSigAboveCharm[JetInfo[iJetColl].nJet]     = -9999;
 	  }
 
 	  if(tagVars.getList(reco::btau::trackSip3dValAboveCharm,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_trackSip3dValAboveCharm[JetInfo[iJetColl].nJet]     = ( tagVars.getList(reco::btau::trackSip3dValAboveCharm,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_trackSip3dValAboveCharm[JetInfo[iJetColl].nJet]     = 0;
+	    JetInfo[iJetColl].TagVarCSV_trackSip3dValAboveCharm[JetInfo[iJetColl].nJet]     = -9999;
 	  }
 
 	  if(tagVars.getList(reco::btau::trackSip3dSigAboveCharm,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_trackSip3dSigAboveCharm[JetInfo[iJetColl].nJet]     = ( tagVars.getList(reco::btau::trackSip3dSigAboveCharm,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_trackSip3dSigAboveCharm[JetInfo[iJetColl].nJet]     = 0;
+	    JetInfo[iJetColl].TagVarCSV_trackSip3dSigAboveCharm[JetInfo[iJetColl].nJet]     = -9999;
 	  }
 
 	  if(tagVars.getList(reco::btau::vertexCategory,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_vertexCategory[JetInfo[iJetColl].nJet]              = ( tagVars.getList(reco::btau::vertexCategory,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_vertexCategory[JetInfo[iJetColl].nJet]              = 0;
+	    JetInfo[iJetColl].TagVarCSV_vertexCategory[JetInfo[iJetColl].nJet]              = -9999;
 	  }
 
 	  if(tagVars.getList(reco::btau::jetNSecondaryVertices,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_jetNSecondaryVertices[JetInfo[iJetColl].nJet]       = ( tagVars.getList(reco::btau::jetNSecondaryVertices,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_jetNSecondaryVertices[JetInfo[iJetColl].nJet]       = 0;
+	    JetInfo[iJetColl].TagVarCSV_jetNSecondaryVertices[JetInfo[iJetColl].nJet]       = -9999;
 	  }
 
 	  if(tagVars.getList(reco::btau::vertexMass,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_vertexMass[JetInfo[iJetColl].nJet]                  = ( tagVars.getList(reco::btau::vertexMass,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_vertexMass[JetInfo[iJetColl].nJet]                  = 0;
+	    JetInfo[iJetColl].TagVarCSV_vertexMass[JetInfo[iJetColl].nJet]                  = -9999;
 	  }
 
 	  if(tagVars.getList(reco::btau::vertexNTracks,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_vertexNTracks[JetInfo[iJetColl].nJet]               = ( tagVars.getList(reco::btau::vertexNTracks,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_vertexNTracks[JetInfo[iJetColl].nJet]               = 0;
+	    JetInfo[iJetColl].TagVarCSV_vertexNTracks[JetInfo[iJetColl].nJet]               = -9999;
 	  }
 
 	  if(tagVars.getList(reco::btau::vertexEnergyRatio,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_vertexEnergyRatio[JetInfo[iJetColl].nJet]           = ( tagVars.getList(reco::btau::vertexEnergyRatio,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_vertexEnergyRatio[JetInfo[iJetColl].nJet]           = 0;
+	    JetInfo[iJetColl].TagVarCSV_vertexEnergyRatio[JetInfo[iJetColl].nJet]           = -9999;
 	  }
 
 	  if(tagVars.getList(reco::btau::vertexJetDeltaR,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_vertexJetDeltaR[JetInfo[iJetColl].nJet]             = ( tagVars.getList(reco::btau::vertexJetDeltaR,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_vertexJetDeltaR[JetInfo[iJetColl].nJet]             = 0;
+	    JetInfo[iJetColl].TagVarCSV_vertexJetDeltaR[JetInfo[iJetColl].nJet]             = -9999;
 	  }
 
 	  if(tagVars.getList(reco::btau::flightDistance2dVal,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_flightDistance2dVal[JetInfo[iJetColl].nJet]         = ( tagVars.getList(reco::btau::flightDistance2dVal,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_flightDistance2dVal[JetInfo[iJetColl].nJet]         = 0;
+	    JetInfo[iJetColl].TagVarCSV_flightDistance2dVal[JetInfo[iJetColl].nJet]         = -9999;
 	  }
 
 	  if(tagVars.getList(reco::btau::flightDistance2dSig,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_flightDistance2dSig[JetInfo[iJetColl].nJet]         = ( tagVars.getList(reco::btau::flightDistance2dSig,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_flightDistance2dSig[JetInfo[iJetColl].nJet]         = 0;
+	    JetInfo[iJetColl].TagVarCSV_flightDistance2dSig[JetInfo[iJetColl].nJet]         = -9999;
 	  }
 
 	  if(tagVars.getList(reco::btau::flightDistance3dVal,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_flightDistance3dVal[JetInfo[iJetColl].nJet]         = ( tagVars.getList(reco::btau::flightDistance3dVal,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_flightDistance3dVal[JetInfo[iJetColl].nJet]         = 0;
+	    JetInfo[iJetColl].TagVarCSV_flightDistance3dVal[JetInfo[iJetColl].nJet]         = -9999;
 	  }
 
 	  if(tagVars.getList(reco::btau::flightDistance3dSig,false).size()){
 	    JetInfo[iJetColl].TagVarCSV_flightDistance3dSig[JetInfo[iJetColl].nJet]         = ( tagVars.getList(reco::btau::flightDistance3dSig,false).at(0));
 	  }else{
-	    JetInfo[iJetColl].TagVarCSV_flightDistance3dSig[JetInfo[iJetColl].nJet]         = 0;
+	    JetInfo[iJetColl].TagVarCSV_flightDistance3dSig[JetInfo[iJetColl].nJet]         = -9999;
 	  }
 
 
