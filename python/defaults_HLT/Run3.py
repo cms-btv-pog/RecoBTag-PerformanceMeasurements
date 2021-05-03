@@ -2,7 +2,7 @@ common = {
 	'groups' : ['EventInfo','PV','PFMuon',"PFElectron",
                 'TagVar','JetInfo','JetSV','JetTrack','CSVTagVar','JetDeepCSV','JetDeepFlavour',
                 'PuppiJetInfo','PuppiJetSV','PuppiJetTrack','PuppiJetCSVTagVar','PuppiJetDeepCSV','PuppiJetDeepFlavour',
-                # 'CaloJetInfo','CaloJetSV','CaloJetTrack','CaloJetCSVTagVar','CaloJetDeepCSV',
+                'CaloJetInfo','CaloJetSV','CaloJetTrack','CaloJetCSVTagVar','CaloJetDeepCSV',
                 ],
 	'eras' : ['Run3'],
 	# 'miniAOD' : True,

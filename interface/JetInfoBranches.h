@@ -301,6 +301,8 @@ class JetInfoBranches {
     float Track_lengthTau[nMaxTrk_];
     float Track_distTau[nMaxTrk_];
     int   Track_category[nMaxTrk_];
+    int   Track_algo[nMaxTrk_];
+    int   Track_originalAlgo[nMaxTrk_];
 
     float Track_TPAssociationQuality[nMaxTrk_];
     int	  Track_idxMatchedTP[nMaxTrk_];
@@ -945,6 +947,8 @@ class JetInfoBranches {
       if(variableParser.isToBeStored(name+"Track_isfromSV")) tree->Branch((name+"Track_isfromSV").c_str()   ,Track_isfromSV   ,(name+"Track_isfromSV["+name+"nTrack]/I").c_str());
       if(variableParser.isToBeStored(name+"Track_isfromV0")) tree->Branch((name+"Track_isfromV0").c_str()   ,Track_isfromV0   ,(name+"Track_isfromV0["+name+"nTrack]/I").c_str());
       if(variableParser.isToBeStored(name+"Track_category")) tree->Branch((name+"Track_category").c_str()   ,Track_category   ,(name+"Track_category["+name+"nTrack]/I").c_str());
+      if(variableParser.isToBeStored(name+"Track_algo")) tree->Branch((name+"Track_algo").c_str()   ,Track_algo   ,(name+"Track_algo["+name+"nTrack]/I").c_str());
+      if(variableParser.isToBeStored(name+"Track_originalAlgo")) tree->Branch((name+"Track_originalAlgo").c_str()   ,Track_originalAlgo   ,(name+"Track_originalAlgo["+name+"nTrack]/I").c_str());
 
       //--------------------------------------
       // track truth information
@@ -1632,6 +1636,8 @@ class JetInfoBranches {
       if(variableParser.isToBeStored(name+"Track_isfromSV")) tree->SetBranchAddress((name+"Track_isfromSV").c_str()   ,Track_isfromSV   );
       if(variableParser.isToBeStored(name+"Track_isfromV0")) tree->SetBranchAddress((name+"Track_isfromV0").c_str()   ,Track_isfromV0   );
       if(variableParser.isToBeStored(name+"Track_category")) tree->SetBranchAddress((name+"Track_category").c_str()   ,Track_category   );
+      if(variableParser.isToBeStored(name+"Track_algo")) tree->SetBranchAddress((name+"Track_algo").c_str()   ,Track_algo   );
+      if(variableParser.isToBeStored(name+"Track_originalAlgo")) tree->SetBranchAddress((name+"Track_originalAlgo").c_str()   ,Track_originalAlgo   );
 
       //--------------------------------------
       // track truth information
