@@ -6,7 +6,7 @@ common = {
                 ],
 	'eras' : ['Run3'],
 	# 'miniAOD' : True,
-    'runCaloJetVariables' : False,
+    'runCaloJetVariables' : True,
     'runPuppiJetVariables' : True,
 	'mcGlobalTag' : '112X_mcRun3_2021_realistic_v14',
 	# 'remakeAllDiscr' : True,
