@@ -1225,6 +1225,23 @@ groupSet = cms.PSet(
       ),
     ),
     cms.PSet(
+      group       = cms.string("PuppiJetDeepFlavourFeat"),
+      store       = cms.bool(False),
+      description = cms.string("Deep Flavour Variables"),
+      variables   = cms.vstring(
+        "PuppiJet.DeepFlavourInput_charged_Sip3dVal",
+        "PuppiJet.DeepFlavourInput_charged_Sip3dSig",
+        "PuppiJet.DeepFlavourInput_charged_quality",
+        "PuppiJet.DeepFlavourInput_charged_chi2",
+        "PuppiJet.DeepFlavourInput_neutral_drminsv",
+        "PuppiJet.DeepFlavourInput_neutral_hadFrac",
+        "PuppiJet.DeepFlavourInput_neutral_ptrel",
+        "PuppiJet.DeepFlavourInput_sv_d3d",
+        "PuppiJet.DeepFlavourInput_sv_d3dsig",
+        "PuppiJet.DeepFlavourInput_sv_normchi2",
+      ),
+    ),
+    cms.PSet(
       group       = cms.string("CSVTagVar"),
       store       = cms.bool(False),
       description = cms.string("CSV Tag Variables"),

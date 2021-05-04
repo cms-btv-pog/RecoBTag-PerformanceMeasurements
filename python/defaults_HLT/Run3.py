@@ -1,15 +1,13 @@
 common = {
 	'groups' : ['EventInfo','PV','PFMuon',"PFElectron",
-                'TagVar','JetInfo','JetSV','JetTrack','CSVTagVar','JetDeepCSV','JetDeepFlavour','CSVTagTrackVar',
-                'PuppiJetInfo','PuppiJetSV','PuppiJetTrack','PuppiJetCSVTagVar','PuppiJetDeepCSV','PuppiJetDeepFlavour','PuppiJetTagVar','PuppiJetCSVTagTrackVar',
+                'TagVar','JetInfo','JetSV','JetTrack','CSVTagVar','JetDeepCSV','JetDeepFlavour','CSVTagTrackVar', 'DeepFlavourFeat'
+                'PuppiJetInfo','PuppiJetSV','PuppiJetTrack','PuppiJetCSVTagVar','PuppiJetDeepCSV','PuppiJetDeepFlavour','PuppiJetTagVar','PuppiJetCSVTagTrackVar','PuppiJetDeepFlavourFeat',
                 'CaloJetInfo','CaloJetSV','CaloJetTrack','CaloJetCSVTagVar','CaloJetDeepCSV','CaloJetTagVar','CaloJetCSVTagTrackVar',
                 ],
 	'eras' : ['Run3'],
-	# 'miniAOD' : True,
     'runCaloJetVariables' : True,
     'runPuppiJetVariables' : True,
 	'mcGlobalTag' : '112X_mcRun3_2021_realistic_v14',
-	# 'remakeAllDiscr' : True,
 	'maxJetEta' : 4.5,
 	'usePrivateJEC' : False,
 	'jecDBFileMC' : 'PhaseIIFall17_V5b_MC',
