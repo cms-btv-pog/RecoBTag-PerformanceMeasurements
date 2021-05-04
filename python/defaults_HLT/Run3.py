@@ -1,6 +1,6 @@
 common = {
 	'groups' : ['EventInfo','PV','PFMuon',"PFElectron",
-                'TagVar','JetInfo','JetSV','JetTrack','CSVTagVar','JetDeepCSV','JetDeepFlavour','CSVTagTrackVar', 'DeepFlavourFeat'
+                'TagVar','JetInfo','JetSV','JetTrack','CSVTagVar','JetDeepCSV','JetDeepFlavour','CSVTagTrackVar', 'DeepFlavourFeat',
                 'PuppiJetInfo','PuppiJetSV','PuppiJetTrack','PuppiJetCSVTagVar','PuppiJetDeepCSV','PuppiJetDeepFlavour','PuppiJetTagVar','PuppiJetCSVTagTrackVar','PuppiJetDeepFlavourFeat',
                 'CaloJetInfo','CaloJetSV','CaloJetTrack','CaloJetCSVTagVar','CaloJetDeepCSV','CaloJetTagVar','CaloJetCSVTagTrackVar',
                 ],

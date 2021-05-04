@@ -432,13 +432,18 @@ HLTBTagAnalyzerT<IPTI,VTX>::HLTBTagAnalyzerT(const edm::ParameterSet& iConfig):
   // JetInfo.reserve(1);
   // JetInfo.reserve(3);
   JetInfo[0].RegisterBranches(smalltree, variableParser, branchNamePrefix_);
-  if (runCaloJetVariables_){
+  if ((runCaloJetVariables_ && runPuppiJetVariables_) || (runCaloJetVariables_ && !runPuppiJetVariables_)){
       JetInfo[1].RegisterBranches(smalltree, variableParser, branchNamePrefix2_);
       Histos[1] = new BookHistograms(fs->mkdir( "HistCaloJets" )) ;
   }
-  if (runPuppiJetVariables_){
+  
+  if (runCaloJetVariables_ && runPuppiJetVariables_){
       JetInfo[2].RegisterBranches(smalltree, variableParser, branchNamePrefix3_);
       Histos[2] = new BookHistograms(fs->mkdir( "HistPuppiJets" )) ;
+  }
+  else if (!runCaloJetVariables_ && runPuppiJetVariables_){
+      JetInfo[1].RegisterBranches(smalltree, variableParser, branchNamePrefix3_);
+      Histos[1] = new BookHistograms(fs->mkdir( "HistPuppiJets" )) ;
   }
 
   //// Book Histograms
@@ -2218,20 +2223,47 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
       const auto & features = df_taginfo->features();
 
       size_t csize = features.c_pf_features.size();
-      JetInfo[iJetColl].DeepFlavourInput_charged_Sip3dVal[JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackSip3dVal;
-      JetInfo[iJetColl].DeepFlavourInput_charged_Sip3dSig[JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackSip3dSig;
-      JetInfo[iJetColl].DeepFlavourInput_charged_quality[ JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].quality;
-      JetInfo[iJetColl].DeepFlavourInput_charged_chi2[    JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].chi2;
+      JetInfo[iJetColl].DeepFlavourInput_charged_Sip3dVal               [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackSip3dVal;
+      JetInfo[iJetColl].DeepFlavourInput_charged_Sip3dSig               [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackSip3dSig;
+      JetInfo[iJetColl].DeepFlavourInput_charged_quality                [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].quality;
+      JetInfo[iJetColl].DeepFlavourInput_charged_chi2                   [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].chi2;
+      JetInfo[iJetColl].DeepFlavourInput_charged_btagpf_trackEtaRel     [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackEtaRel;
+      JetInfo[iJetColl].DeepFlavourInput_charged_btagpf_trackPtRel      [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackPtRel;
+      JetInfo[iJetColl].DeepFlavourInput_charged_btagpf_trackPPar       [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackPPar;
+      JetInfo[iJetColl].DeepFlavourInput_charged_btagpf_trackDeltaR     [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackDeltaR;
+      JetInfo[iJetColl].DeepFlavourInput_charged_btagpf_trackPParRatio  [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackPParRatio;
+      JetInfo[iJetColl].DeepFlavourInput_charged_btagpf_trackSip2dSig   [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackSip2dSig;
+      JetInfo[iJetColl].DeepFlavourInput_charged_btagpf_trackSip2dVal   [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackSip2dVal;
+      JetInfo[iJetColl].DeepFlavourInput_charged_btagpf_trackSip3dSig   [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackSip3dSig;
+      JetInfo[iJetColl].DeepFlavourInput_charged_btagpf_trackSip3dVal   [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackSip3dVal;
+      JetInfo[iJetColl].DeepFlavourInput_charged_btagpf_trackJetDistVal [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].btagPf_trackSip3dSig;
+      JetInfo[iJetColl].DeepFlavourInput_charged_ptrel                  [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].ptrel;
+      JetInfo[iJetColl].DeepFlavourInput_charged_drminsv                [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].drminsv;
+      JetInfo[iJetColl].DeepFlavourInput_charged_VTX_ass                [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].vtx_ass;
+      JetInfo[iJetColl].DeepFlavourInput_charged_puppiw                 [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].puppiw;
+      JetInfo[iJetColl].DeepFlavourInput_charged_quality                [JetInfo[iJetColl].nJet] = (csize == 0) ? -999 : features.c_pf_features[0].quality;
 
       size_t nsize = features.n_pf_features.size();
       JetInfo[iJetColl].DeepFlavourInput_neutral_drminsv[JetInfo[iJetColl].nJet] = (nsize == 0) ? -999 : features.n_pf_features[0].drminsv;
       JetInfo[iJetColl].DeepFlavourInput_neutral_hadFrac[JetInfo[iJetColl].nJet] = (nsize == 0) ? -999 : features.n_pf_features[0].hadFrac;
       JetInfo[iJetColl].DeepFlavourInput_neutral_ptrel[  JetInfo[iJetColl].nJet] = (nsize == 0) ? -999 : features.n_pf_features[0].ptrel;
+      JetInfo[iJetColl].DeepFlavourInput_neutral_deltaR[ JetInfo[iJetColl].nJet] = (nsize == 0) ? -999 : features.n_pf_features[0].deltaR;
+      JetInfo[iJetColl].DeepFlavourInput_neutral_isGamma[JetInfo[iJetColl].nJet] = (nsize == 0) ? -999 : features.n_pf_features[0].isGamma;
+      JetInfo[iJetColl].DeepFlavourInput_neutral_puppiw[JetInfo[iJetColl].nJet] = (nsize == 0) ? -999 : features.n_pf_features[0].puppiw;
 
       size_t svsize = features.sv_features.size();
       JetInfo[iJetColl].DeepFlavourInput_sv_d3d[     JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].d3d;
       JetInfo[iJetColl].DeepFlavourInput_sv_d3dsig[  JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].d3dsig;
       JetInfo[iJetColl].DeepFlavourInput_sv_normchi2[JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].normchi2;
+      JetInfo[iJetColl].DeepFlavourInput_sv_pt      [JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].pt;
+      JetInfo[iJetColl].DeepFlavourInput_sv_deltaR  [JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].deltaR;
+      JetInfo[iJetColl].DeepFlavourInput_sv_mass    [JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].mass;
+      JetInfo[iJetColl].DeepFlavourInput_sv_ntracks [JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].ntracks;
+      JetInfo[iJetColl].DeepFlavourInput_sv_chi2    [JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].chi2;
+      JetInfo[iJetColl].DeepFlavourInput_sv_dxy     [JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].dxy;
+      JetInfo[iJetColl].DeepFlavourInput_sv_dxysig  [JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].dxysig;
+      JetInfo[iJetColl].DeepFlavourInput_sv_costhetasvpv[JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].costhetasvpv;
+      JetInfo[iJetColl].DeepFlavourInput_sv_enratio [JetInfo[iJetColl].nJet] = (svsize == 0) ? -999 :features.sv_features[0].enratio;
     }
 
     // CSV TaggingVariables
@@ -3080,6 +3112,48 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processCaloJets(const edm::Handle<PatJetCollect
 	    JetInfo[iJetColl].TagVarCSV_flightDistance3dSig[JetInfo[iJetColl].nJet]         = ( tagVars.getList(reco::btau::flightDistance3dSig,false).at(0));
 	  }else{
 	    JetInfo[iJetColl].TagVarCSV_flightDistance3dSig[JetInfo[iJetColl].nJet]         = -9999;
+	  }
+
+	  if(tagVars.getList(reco::btau::flightDistance3dSig,false).size()){
+	    JetInfo[iJetColl].TagVarCSV_trackJetDistVal[JetInfo[iJetColl].nJet]         = ( tagVars.getList(reco::btau::trackJetDistVal,false).at(0));
+	  }else{
+	    JetInfo[iJetColl].TagVarCSV_trackJetDistVal[JetInfo[iJetColl].nJet]         = -9999;
+	  }
+
+	  if(tagVars.getList(reco::btau::flightDistance3dSig,false).size()){
+	    JetInfo[iJetColl].TagVarCSV_trackPtRel[JetInfo[iJetColl].nJet]         = ( tagVars.getList(reco::btau::trackPtRel,false).at(0));
+	  }else{
+	    JetInfo[iJetColl].TagVarCSV_trackPtRel[JetInfo[iJetColl].nJet]         = -9999;
+	  }
+
+	  if(tagVars.getList(reco::btau::flightDistance3dSig,false).size()){
+	    JetInfo[iJetColl].TagVarCSV_trackDeltaR[JetInfo[iJetColl].nJet]         = ( tagVars.getList(reco::btau::trackDeltaR,false).at(0));
+	  }else{
+	    JetInfo[iJetColl].TagVarCSV_trackDeltaR[JetInfo[iJetColl].nJet]         = -9999;
+	  }
+
+	  if(tagVars.getList(reco::btau::flightDistance3dSig,false).size()){
+	    JetInfo[iJetColl].TagVarCSV_trackPtRatio[JetInfo[iJetColl].nJet]         = ( tagVars.getList(reco::btau::trackPtRatio,false).at(0));
+	  }else{
+	    JetInfo[iJetColl].TagVarCSV_trackPtRatio[JetInfo[iJetColl].nJet]         = -9999;
+	  }
+
+	  if(tagVars.getList(reco::btau::flightDistance3dSig,false).size()){
+	    JetInfo[iJetColl].TagVarCSV_trackSip2dSig[JetInfo[iJetColl].nJet]         = ( tagVars.getList(reco::btau::trackSip2dSig,false).at(0));
+	  }else{
+	    JetInfo[iJetColl].TagVarCSV_trackSip2dSig[JetInfo[iJetColl].nJet]         = -9999;
+	  }
+
+	  if(tagVars.getList(reco::btau::flightDistance3dSig,false).size()){
+	    JetInfo[iJetColl].TagVarCSV_trackSip3dSig[JetInfo[iJetColl].nJet]         = ( tagVars.getList(reco::btau::trackSip3dSig,false).at(0));
+	  }else{
+	    JetInfo[iJetColl].TagVarCSV_trackSip3dSig[JetInfo[iJetColl].nJet]         = -9999;
+	  }
+
+	  if(tagVars.getList(reco::btau::flightDistance3dSig,false).size()){
+	    JetInfo[iJetColl].TagVarCSV_trackDecayLenVal[JetInfo[iJetColl].nJet]         = ( tagVars.getList(reco::btau::trackDecayLenVal,false).at(0));
+	  }else{
+	    JetInfo[iJetColl].TagVarCSV_trackDecayLenVal[JetInfo[iJetColl].nJet]         = -9999;
 	  }
 
 
