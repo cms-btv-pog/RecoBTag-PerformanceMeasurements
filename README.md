@@ -3,8 +3,8 @@
 ## Software setup
 
 ```
-cmsrel CMSSW_10_6_12 
-cd CMSSW_10_6_12/src
+cmsrel CMSSW_10_6_20 
+cd CMSSW_10_6_20/src
 cmsenv
 
 for bash
