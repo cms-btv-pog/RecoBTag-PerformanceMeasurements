@@ -2938,7 +2938,8 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processCaloJets(const edm::Handle<PatJetCollect
       //
       //  Fill DeepCSV Value
       //
-      JetInfo[iJetColl].Jet_DeepCSVb[JetInfo[iJetColl].nJet]     = -1;
+      // JetInfo[iJetColl].Jet_DeepCSVb[JetInfo[iJetColl].nJet]     = -1;
+      JetInfo[iJetColl].Jet_DeepCSVb[JetInfo[iJetColl].nJet]     = -10;
       if(jetDeepCSVColl.isValid()){
 	unsigned int nDeepCSV = jetDeepCSVColl->size();
 	for(unsigned int iDeepCSV = 0; iDeepCSV < nDeepCSV; ++iDeepCSV){

@@ -185,6 +185,12 @@ options.register(
     VarParsing.varType.int,
     "skip N events"
 )
+options.register(
+    'reco', 'HLT_GRun',
+  VarParsing.multiplicity.singleton,
+  VarParsing.varType.string,
+  'keyword to define HLT reconstruction'
+)
 
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', -1)
@@ -272,34 +278,42 @@ tracks = "hltMergedTracks" #original generalTracks
 payload = "AK4PFHLT" #original AK4PFchs
 
 
-## Postfix
-# postfix = "PFlow"
-## Various collection names
 genParticles = 'genParticles'
-# jetSource = 'pfJetsPFBRECO'+postfix
-# patJetSource = 'selectedPatJets'+postfix
-# patJetSource = 'hltSlimmedJets'
 patJetSource = 'hltPatJets'
 patCaloJetSource = 'hltPatJetsCalo'
 patPuppiJetSource = 'hltPatJetsPuppi'
 genJetCollection = 'ak4GenJetsNoNu'
-# pfCandidates = 'particleFlow'
 pfCandidates = 'hltParticleFlow'
-# pvSource = 'offlinePrimaryVertices'
 pvSource = hltVertices
-# svSource = 'inclusiveCandidateSecondaryVertices'
 svSource = 'hltDeepInclusiveMergedVerticesPF'
-# muSource = 'muons'
 muSource = 'hltMuons'
-# elSource = 'gedGsfElectrons'
 elSource = 'hltEgammaGsfElectrons'
-# patMuons = 'selectedPatMuons'
-# trackSource = 'generalTracks'
 trackSource = tracks
 
 
+###
+### HLT configuration
+###
+if options.reco == 'HLT_GRun':
+  from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
 
-from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+elif options.reco == 'HLT_Run3TRK':
+  # (a) Run-3 tracking: standard
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+  from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+  process = customizeHLTRun3Tracking(process)
+
+elif options.reco == 'HLT_Run3TRKWithPU':
+  # (b) Run-3 tracking: all pixel vertices
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+  from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
+  process = customizeHLTRun3TrackingAllPixelVertices(process)
+
+else:
+  raise RuntimeError('keyword "reco = '+options.reco+'" not recognised')
+
+
+# from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
 
 # remove cms.OutputModule objects from HLT config-dump
 for _modname in process.outputModules_():
@@ -446,8 +460,8 @@ process.jescESPrefer = cms.ESPrefer('PoolDBESSource', 'jescESSource')
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 # If you run over many samples and you save the log, remember to reduce
 # the size of the output by prescaling the report of the event number
-# process.MessageLogger.cerr.FwkReport.reportEvery = options.reportEvery
-# process.MessageLogger.cerr.default.limit = 10
+process.MessageLogger.cerr.FwkReport.reportEvery = options.reportEvery
+process.MessageLogger.cerr.default.limit = 10
 
 process.MessageLogger.suppressWarning = cms.untracked.vstring(
         'hltPatJetFlavourAssociationCalo'
@@ -700,43 +714,12 @@ process.analyzerSeq = cms.Sequence( )
 process.analyzerSeq += process.btagana
 #---------------------------------------
 
-process.testOutput = cms.OutputModule("PoolOutputModule",
-    # SelectEvents = cms.untracked.PSet(
-    #     SelectEvents = cms.vstring(
-    #         'HLT_EcalCalibration_v4',
-    #         'HLT_HcalCalibration_v5'
-    #     )
-    # ),
-    dataset = cms.untracked.PSet(
-        dataTier = cms.untracked.string('RAW'),
-        filterName = cms.untracked.string('')
-    ),
-    fastCloning = cms.untracked.bool(False),
-    fileName = cms.untracked.string('testOutput.root'),
-    outputCommands = cms.untracked.vstring(
-        # 'drop *_hlt*_*_*',
-        # 'keep *_hltEcalCalibrationRaw_*_*',
-        # 'keep *_hltHcalCalibrationRaw_*_*',
-        # 'keep edmTriggerResults_*_*_*',
-        # 'keep triggerTriggerEvent_*_*_*'
-        'drop *_*_*_*',
-        # 'keep hltImpactParameterPatTagInfos_*_*_*',
-        'keep *_hltImpactParameterPatTagInfos_*_*',
-        'keep *_hltDeepCombinedSecondaryVertexBJetCaloPatTagInfos_*_*',
-        'keep *_hltInclusiveSecondaryVertexFinderPatTagInfos_*_*',
-        'keep *_hltDeepBLifetimePFPatTagInfos_*_*',
-        'keep *_hltDeepCombinedSecondaryVertexBJetPatTagInfos_*_*',
-        'keep *_hltDeepSecondaryVertexPFPatTagInfos_*_*',
-    )
-)
-# process.myOutput = cms.EndPath(process.testOutput)
 
 process.p = cms.Path(
     process.allEvents
     # * process.filtSeq
     * process.selectedEvents
     * process.analyzerSeq
-    # * process.testOutput
 )
 
 # Delete predefined output module (needed for running with CRAB)
@@ -747,7 +730,7 @@ if options.dumpPython is not None:
 
 print ''
 print 'option: output =', options.outFilename
-# print 'option: reco =', options.reco
+print 'option: reco =', options.reco
 print 'option: dumpPython =', options.dumpPython
 print ''
 # print 'process.GlobalTag =', process.GlobalTag.dumpPython()
