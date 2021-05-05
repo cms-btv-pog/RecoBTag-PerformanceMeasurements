@@ -50,12 +50,21 @@ options.register('usePuppiForBTagging', False,
     VarParsing.varType.bool,
     "Use Puppi candidates for b tagging"
 )
-options.register('mcGlobalTag', '106X_mc2018_realistic_v11_L1v1',
+### MC Global Tag for nonAPV samples
+#options.register('mcGlobalTag', '106X_mcRun2_asymptotic_v15',
+#    VarParsing.multiplicity.singleton,
+#    VarParsing.varType.string,
+#    "MC global tag nonAPV, no default value provided"
+#)
+
+### MC Global Tag for APV samples
+options.register('mcGlobalTag', '106X_mcRun2_asymptotic_preVFP_v9',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
-    "MC global tag, no default value provided"
+    "MC global tag APV, no default value provided"
+
 )
-options.register('dataGlobalTag', '106X_dataRun2_v28',
+options.register('dataGlobalTag', '106X_dataRun2_v32',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Data global tag, no default value provided"
@@ -600,7 +609,12 @@ bTagDiscriminators = set([
 #   , 'pfNegativeDeepFlavourPrunedJetTags:probc'
 #   , 'pfNegativeDeepFlavourPrunedJetTags:probuds'
 #   , 'pfNegativeDeepFlavourPrunedJetTags:probg'
-
+	#DeepVertex
+#  , 'pfDeepVertexJetTags:probb'
+#  , 'pfDeepCombinedJetTags:probb'
+#  , 'pfDeepCombinedJetTags:probc'
+#  , 'pfDeepCombinedJetTags:probuds'
+#  , 'pfDeepCombinedJetTags:probg' 
 ])
 
 ## Legacy taggers not supported with MiniAOD
