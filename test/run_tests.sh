@@ -15,11 +15,11 @@ cmsRun runBTagAnalyzer_cfg.py defaults=2016_UltraLegacy_APV runOnData=True maxEv
 echo 'Running on MC APV -- ctag'
 cmsRun runBTagAnalyzer_cfg.py defaults=2016_UltraLegacy_APV runOnData=False maxEvents=20 runCTagVariables=True runFatJets=True runSubJets=True groups='testfat' &> last.log || die $?
 
-#echo 'Running on data APV -- FatJets'
-#cmsRun runBTagAnalyzer_cfg.py defaults=2016_UltraLegacy_APV runOnData=True maxEvents=20 runFatJets=True groups='testfat' &> last.log || die $?
+echo 'Running on data APV -- FatJets'
+cmsRun runBTagAnalyzer_cfg.py defaults=2016_UltraLegacy_APV runOnData=True maxEvents=20 runFatJets=True groups='testfat' &> last.log || die $?
 
-#echo 'Running on MC APV -- FatJets'
-#cmsRun runBTagAnalyzer_cfg.py defaults=2016_UltraLegacy_APV runOnData=False maxEvents=20 runFatJets=True groups='testfat' &> last.log || die $?
+echo 'Running on MC APV -- FatJets'
+cmsRun runBTagAnalyzer_cfg.py defaults=2016_UltraLegacy_APV runOnData=False maxEvents=20 runFatJets=True groups='testfat' &> last.log || die $?
 
 echo 'Running on data nonAPV'
 cmsRun runBTagAnalyzer_cfg.py defaults=2016_UltraLegacy_nonAPV runOnData=True maxEvents=20 groups='test' &> last.log || die $?
@@ -33,11 +33,11 @@ cmsRun runBTagAnalyzer_cfg.py defaults=2016_UltraLegacy_nonAPV runOnData=True ma
 echo 'Running on MC nonAPV -- ctag'
 cmsRun runBTagAnalyzer_cfg.py defaults=2016_UltraLegacy_nonAPV runOnData=False maxEvents=20 runCTagVariables=True runFatJets=True runSubJets=True groups='testfat' &> last.log || die $?
 
-#echo 'Running on data nonAPV -- FatJets'
-#cmsRun runBTagAnalyzer_cfg.py defaults=2016_UltraLegacy_nonAPV runOnData=True maxEvents=20 runFatJets=True groups='testfat' &> last.log || die $?
+echo 'Running on data nonAPV -- FatJets'
+cmsRun runBTagAnalyzer_cfg.py defaults=2016_UltraLegacy_nonAPV runOnData=True maxEvents=20 runFatJets=True groups='testfat' &> last.log || die $?
 
-#echo 'Running on MC nonAPV -- FatJets'
-#cmsRun runBTagAnalyzer_cfg.py defaults=2016_UltraLegacy_nonAPV runOnData=False maxEvents=20 runFatJets=True groups='testfat' &> last.log || die $?
+echo 'Running on MC nonAPV -- FatJets'
+cmsRun runBTagAnalyzer_cfg.py defaults=2016_UltraLegacy_nonAPV runOnData=False maxEvents=20 runFatJets=True groups='testfat' &> last.log || die $?
 
 
 # echo 'Running on AODSIM'

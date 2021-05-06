@@ -255,7 +255,7 @@ options.register('jecDBFileMC', 'FIXME',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     'SQLite filename for JECs, no default value provided')
-options.register('jecDBFileData', 'FIXME',
+options.register('jecDBFileData', 'Summer19UL16_RunBCDEFGH_Combined_V7_DATA',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     'SQLite filename for JECs, no default value provided')
@@ -609,12 +609,6 @@ bTagDiscriminators = set([
 #   , 'pfNegativeDeepFlavourPrunedJetTags:probc'
 #   , 'pfNegativeDeepFlavourPrunedJetTags:probuds'
 #   , 'pfNegativeDeepFlavourPrunedJetTags:probg'
-	#DeepVertex
-#  , 'pfDeepVertexJetTags:probb'
-#  , 'pfDeepCombinedJetTags:probb'
-#  , 'pfDeepCombinedJetTags:probc'
-#  , 'pfDeepCombinedJetTags:probuds'
-#  , 'pfDeepCombinedJetTags:probg' 
 ])
 
 ## Legacy taggers not supported with MiniAOD
@@ -701,7 +695,7 @@ bTagDiscriminatorsFat.update(set([
     'pfMassIndependentDeepDoubleCvBJetTags:probHcc',
 ]))
 ## Add DeepBoostedJet discriminators
-from RecoBTag.MXNet.pfDeepBoostedJet_cff import _pfMassDecorrelatedDeepBoostedJetTagsProbs, _pfMassDecorrelatedDeepBoostedJetTagsMetaDiscrs
+from RecoBTag.ONNXRuntime.pfDeepBoostedJet_cff import _pfMassDecorrelatedDeepBoostedJetTagsProbs, _pfMassDecorrelatedDeepBoostedJetTagsMetaDiscrs
 bTagDiscriminatorsFat.update(set([]) if (options.useLegacyTaggers or not options.miniAOD) else set([
     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:bbvsLight",
     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ccvsLight",
@@ -904,43 +898,46 @@ if options.usePrivateJEC and options.runFatJets:
 
 if options.usePrivateJEC and not options.runFatJets:
 
-    from CondCore.DBCommon.CondDBSetup_cfi import *
+    from CondCore.CondDB.CondDB_cfi import CondDB
     import os
     dbfile=''
     if options.runOnData: dbfile=options.jecDBFileData
     else: dbfile=options.jecDBFileMC
     print "\nUsing private SQLite file", dbfile, "\n"
-    process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
-		    connect = cms.string( "sqlite_fip:RecoBTag/PerformanceMeasurements/data/"+dbfile+'.db'),
+    CondDBJECFile = CondDB.clone(connect = cms.string( "sqlite_fip:RecoBTag/PerformanceMeasurements/data/"+dbfile+'.db' ) )
+    if options.runOnData: tagPrefix='JetCorrectorParametersCollection_Summer19UL16APV_RunBCDEF_RunGH_V7_DATA'
+    else: tagPrefix='JetCorrectorParametersCollection_'+dbfile
+    process.jec = cms.ESSource("PoolDBESSource",
+            CondDBJECFile,
 		    toGet =  cms.VPSet(
 			    # cms.PSet(
 # 				    record = cms.string("JetCorrectionsRecord"),
-# 				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK4PF"),
+# 				    tag = cms.string(tagPrefix+"_AK4PF"),
 # 				    label= cms.untracked.string("AK4PF")
 # 				    ),
 			    cms.PSet(
 				    record = cms.string("JetCorrectionsRecord"),
-				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK4PFchs"),
+				    tag = cms.string(tagPrefix+"_AK4PFchs"),
 				    label= cms.untracked.string("AK4PFchs")
 				    ),
 			    cms.PSet(
 				    record = cms.string("JetCorrectionsRecord"),
-				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK4PFPuppi"),
+                    tag = cms.string(tagPrefix+"_AK4PFPuppi"),
 				    label= cms.untracked.string("AK4PFPuppi")
 				    ),
 			    # cms.PSet(
 # 				    record = cms.string("JetCorrectionsRecord"),
-# 				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK8PF"),
+# 				    tag = cms.string(tagPrefix+"_AK8PF"),
 # 				    label= cms.untracked.string("AK8PF")
 # 				    ),
-			    # cms.PSet(
+#			     cms.PSet(
 # 				    record = cms.string("JetCorrectionsRecord"),
-# 				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK8PFchs"),
+# 				    tag = cms.string(tagPrefix+"_AK8PFchs"),
 # 				    label= cms.untracked.string("AK8PFchs")
 # 				    ),
 # 			    cms.PSet(
 # 				    record = cms.string("JetCorrectionsRecord"),
-# 				    tag = cms.string("JetCorrectorParametersCollection_"+dbfile+"_AK8PFPuppi"),
+# 				    tag = cms.string(tagPrefix+"_AK8PFPuppi"),
 # 				    label= cms.untracked.string("AK8PFPuppi")
 # 				    ),
 			    )
@@ -1743,4 +1740,4 @@ process.p = cms.Path(
 # Delete predefined output module (needed for running with CRAB)
 del process.out
 
-open('pydump.py','w').write(process.dumpPython())
+#open('pydump.py','w').write(process.dumpPython())

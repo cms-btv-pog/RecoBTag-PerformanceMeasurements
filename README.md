@@ -23,29 +23,29 @@ scram b -j8
 
 The ntuplizer can be run and configured through ```RecoBTag/PerformanceMeasurements/test/runBTagAnalyzer_cfg.py```.
 
-NOTE1: due to the structure of the preliminary JECs, there are 5 different "defaults" sets; 
+NOTE1: due to the structure of the preliminary JECs, there are 2 different "defaults" sets; 
 
-> **_MC_**: ```defaults=2018_UltraLegacy```<br/>
-> **_Run2018A_**: ```defaults=2018_UltraLegacy_DataRunA```<br/>
-> **_Run2018B_**: ```defaults=2018_UltraLegacy_DataRunB```<br/>
-> **_Run2018C_**: ```defaults=2018_UltraLegacy_DataRunC```<br/>
-> **_Run2018D_**: ```defaults=2018_UltraLegacy_DataRunD```
+> **_preVFP_**: ```defaults=2016_UltraLegacy_APV```<br/>
+> **_postVFP_**: ```defaults=2018_UltraLegacy_nonAPV```<br/>
 
 This means in your crab configuration file, you will have to check which file you are running on, and pick the correct default set accordingly. As an example, one might do something like:
 
 ```
+For MC samples: 
 ...
-config.Data.inputDataset = /BTagMu/Run2018A-12Nov2019_UL2018-v1/MINIAOD
-if "Run2018A" in config.Data.inputDataset: 
-	config.JobType.pyCfgParams = [defaults=2018_UltraLegacy_DataRunA ,...]
-elif "Run2018B" in config.Data.inputDataset: 
-	config.JobType.pyCfgParams = [defaults=2018_UltraLegacy_DataRunB ,...]
-elif "Run2018C" in config.Data.inputDataset: 
-	config.JobType.pyCfgParams = [defaults=2018_UltraLegacy_DataRunC ,...]
-elif "Run2018D" in config.Data.inputDataset: 
-	config.JobType.pyCfgParams = [defaults=2018_UltraLegacy_DataRunD ,...]
+config.Data.inputDataset = /*/*RunIISummer20UL16*/MINIAODSIM
+...
+
+For collision data samples:
+...
+config.Data.inputDataset = /BTagMu*/Run2016*-21Feb2020_UL2016*/MINIAOD
+...
+
+...
+if "HIPM" not in config.Data.inputDataset and "APV" not in config.Data.inputDataset: 
+	config.JobType.pyCfgParams = [defaults=2016_UltraLegacy_nonAPV,...]
 else: 
-	config.JobType.pyCfgParams = [defaults=2018_UltraLegacy ,...]
+	config.JobType.pyCfgParams = [defaults=2016_UltraLegacy_APV, ...]
 ...
 ```
 
