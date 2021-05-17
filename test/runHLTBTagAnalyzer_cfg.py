@@ -295,19 +295,31 @@ trackSource = tracks
 ### HLT configuration
 ###
 if options.reco == 'HLT_GRun':
-  from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
 
 elif options.reco == 'HLT_Run3TRK':
-  # (a) Run-3 tracking: standard
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-  from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
-  process = customizeHLTRun3Tracking(process)
+    # (a) Run-3 tracking: standard
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    process = customizeHLTRun3Tracking(process)
 
 elif options.reco == 'HLT_Run3TRKWithPU':
-  # (b) Run-3 tracking: all pixel vertices
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-  from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
-  process = customizeHLTRun3TrackingAllPixelVertices(process)
+    # (b) Run-3 tracking: all pixel vertices
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
+    process = customizeHLTRun3TrackingAllPixelVertices(process)
+
+elif options.reco == 'HLT_Run3TRKPixelOnly':
+    # (c) Run-3 tracking: pixel only tracks
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    # from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
+    process = customizeHLTRun3TrackingAllPixelVertices(process)
+    # def customisePFForPixelTracks(process):
+    process.hltPFMuonMerging.TrackProducers = cms.VInputTag("hltIterL3MuonTracks", "hltPixelTracksClean")
+    process.hltPFMuonMerging.selectedTrackQuals = cms.VInputTag("hltIterL3MuonTracks", "hltPixelTracksClean")
+        # return process
+    # process = customisePFForPixelTracks(process)
 
 else:
   raise RuntimeError('keyword "reco = '+options.reco+'" not recognised')
@@ -385,9 +397,11 @@ process = customizePFPatLikeJets(process)
 
 ## ES modules for PF-Hadron Calibrations
 import os
+# from CondCore.DBCommon.CondDBSetup_cfi import *
 from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
 process.pfhcESSource = cms.ESSource('PoolDBESSource',
-  _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db'),
+  # _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db'),
+  _CondDB.clone(connect = 'sqlite_fip:JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db'),
   toGet = cms.VPSet(
     cms.PSet(
       record = cms.string('PFCalibrationRcd'),
@@ -400,7 +414,8 @@ process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
 #process.hltParticleFlow.calibrationsLabel = '' # standard label for Offline-PFHC in GT
 ## ES modules for HLT JECs
 process.jescESSource = cms.ESSource('PoolDBESSource',
-  _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V1_MC.db'),
+  # _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V1_MC.db'),
+  _CondDB.clone(connect = 'sqlite_fip:JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V1_MC.db'),
   toGet = cms.VPSet(
     cms.PSet(
       record = cms.string('JetCorrectionsRecord'),
