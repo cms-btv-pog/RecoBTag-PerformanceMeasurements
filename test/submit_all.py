@@ -109,19 +109,28 @@ def main():
         config.General.requestName = requestname
         config.Data.inputDataset = job
         if datatier == 'MINIAODSIM':
+          # config.Data.splitting = 'EventAwareLumiBased'
+          config.Data.splitting = 'FileBased'
+          # config.Data.unitsPerJob = 100
+          config.Data.unitsPerJob = 1
+        elif datatier == 'FEVT':
           config.Data.splitting = 'EventAwareLumiBased'
           config.Data.unitsPerJob = 100
-        if datatier == 'FEVT':
-          config.Data.splitting = 'EventAwareLumiBased'
-          config.Data.unitsPerJob = 100
-        if datatier == 'GEN-SIM-RAW':
-          config.Data.splitting = 'EventAwareLumiBased'
-          config.Data.unitsPerJob = 200
+        # elif datatier == 'GEN-SIM-RAW':
+        elif "RAW" in datatier:
+          # config.Data.splitting = 'EventAwareLumiBased'
+          config.Data.splitting = 'FileBased'
+          config.Data.unitsPerJob = 1
+          # config.Data.unitsPerJob = 20
+          # config.Data.unitsPerJob = 200
+          # config.Data.unitsPerJob = 1500
         elif datatier == 'AODSIM':
           config.Data.splitting = 'FileBased'
         elif datatier == 'MINIAOD':
-          config.Data.splitting = 'LumiBased'
-          config.Data.unitsPerJob = 40
+          # config.Data.splitting = 'LumiBased'
+          config.Data.splitting = 'FileBased'
+          # config.Data.unitsPerJob = 40
+          config.Data.unitsPerJob = 1
           config.Data.lumiMask = args.lumiMask
         elif datatier == 'AOD':
           config.Data.splitting = 'LumiBased'
