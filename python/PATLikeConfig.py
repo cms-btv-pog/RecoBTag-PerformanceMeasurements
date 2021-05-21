@@ -20,7 +20,9 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
     hfreco =                "hltHfreco"                                     #original hfreco
     horeco =                "hltHoreco"                                     #original horeco
     rpcRecHits =            "hltRpcRecHits"                                 #original rpcRecHits
-    tracks =                "hltMergedTracks"                               #original generalTracks
+    # tracks =                "hltMergedTracks"                               #original generalTracks
+    tracks =                "hltPFMuonMerging"                               #original generalTracks
+    # tracks =                "hltPixelTracks"                               #original generalTracks
     payload =               "AK4PFHLT"                                      #original AK4PFchs
     payloadPuppi =          "AK4PFPuppiHLT"                                      #original AK4PFchs
     particleFlow =          "hltParticleFlow"                               #original particleFlow
@@ -507,6 +509,7 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
         *process.hltPatJetPartonMatchCalo
         *process.hltPatJetGenJetMatchCalo
         *process.hltPatJetPartonsLegacy
+        *process.hltPatJetPartons
         *process.hltSlimmedGenJets
         *process.hltPatJetPartonAssociationLegacyCalo
         *process.hltPatJetFlavourAssociationLegacyCalo

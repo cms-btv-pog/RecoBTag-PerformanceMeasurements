@@ -31,15 +31,10 @@ options.register('dumpPython', None,
     VarParsing.varType.string,
     'Dump python config, pass SaveName.py'
 )
-options.register('mcGlobalTag', 'FIXME',
+options.register('globalTag', 'FIXME',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag, no default value provided"
-)
-options.register('dataGlobalTag', 'FIXME',
-    VarParsing.multiplicity.singleton,
-    VarParsing.varType.string,
-    "Data global tag, no default value provided"
 )
 options.register('runEventInfo', True,
     VarParsing.multiplicity.singleton,
@@ -251,9 +246,9 @@ for switch in options_to_change:
     setattr(options, switch, True)
 
 ## Global tag
-globalTag = options.mcGlobalTag
-if options.runOnData:
-    globalTag = options.dataGlobalTag
+globalTag = options.globalTag
+# if options.runOnData:
+#     globalTag = options.dataGlobalTag
 
 trigresults='TriggerResults::HLT'
 if options.runOnData: options.isReHLT=False
@@ -274,7 +269,9 @@ hbhereco = "hltHbhereco" #original hbhereco
 hfreco = "hltHfreco" #original hfreco
 horeco = "hltHoreco" #original horeco
 rpcRecHits = "hltRpcRecHits" #original rpcRecHits
-tracks = "hltMergedTracks" #original generalTracks
+# tracks = "hltMergedTracks" #original generalTracks
+tracks = "hltPFMuonMerging" #original generalTracks
+# tracks = "hltPixelTracks" #original generalTracks
 payload = "AK4PFHLT" #original AK4PFchs
 
 
@@ -290,42 +287,44 @@ muSource = 'hltMuons'
 elSource = 'hltEgammaGsfElectrons'
 trackSource = tracks
 
+def customisePFForPixelTracks(process):
+    process.hltPFMuonMerging.TrackProducers = cms.VInputTag("hltIterL3MuonTracks", "hltPixelTracks")
+    process.hltPFMuonMerging.selectedTrackQuals = cms.VInputTag("hltIterL3MuonTracks", "hltPixelTracks")
+    return process
 
 ###
 ### HLT configuration
 ###
 if options.reco == 'HLT_GRun':
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
 
 elif options.reco == 'HLT_Run3TRK':
     # (a) Run-3 tracking: standard
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     process = customizeHLTRun3Tracking(process)
 
 elif options.reco == 'HLT_Run3TRKWithPU':
     # (b) Run-3 tracking: all pixel vertices
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
     process = customizeHLTRun3TrackingAllPixelVertices(process)
 
 elif options.reco == 'HLT_Run3TRKPixelOnly':
     # (c) Run-3 tracking: pixel only tracks
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-    # from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
-    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
-    process = customizeHLTRun3TrackingAllPixelVertices(process)
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
+    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    process = customizeHLTRun3Tracking(process)
     # def customisePFForPixelTracks(process):
-    process.hltPFMuonMerging.TrackProducers = cms.VInputTag("hltIterL3MuonTracks", "hltPixelTracksClean")
-    process.hltPFMuonMerging.selectedTrackQuals = cms.VInputTag("hltIterL3MuonTracks", "hltPixelTracksClean")
-        # return process
-    # process = customisePFForPixelTracks(process)
+    #     process.hltPFMuonMerging.TrackProducers = cms.VInputTag("hltIterL3MuonTracks", "hltPixelTracks")
+    #     process.hltPFMuonMerging.selectedTrackQuals = cms.VInputTag("hltIterL3MuonTracks", "hltPixelTracks")
+    #     return process
+    process = customisePFForPixelTracks(process)
 
 else:
   raise RuntimeError('keyword "reco = '+options.reco+'" not recognised')
 
 
-# from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
 
 # remove cms.OutputModule objects from HLT config-dump
 for _modname in process.outputModules_():
@@ -343,12 +342,17 @@ for _modname in process.endpaths_():
        # if options.verbosity > 0:
        #    print '> removed cms.EndPath:', _modname
 
+# HLTTrackReconstructionForPF
+
+
 # remove selected cms.Path objects from HLT config-dump
 print '-'*108
 print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
 print '-'*108
 for _modname in sorted(process.paths_()):
-    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'DeepCSV' in _modname or 'DeepFlavour' in _modname or 'AK8Calo' in _modname)
+    # _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'DeepCSV' in _modname or 'DeepFlavour' in _modname or 'AK8Calo' in _modname)
+    # _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'DeepCSV' in _modname or 'DeepFlavour' in _modname or 'Tracking' in _modname)
+    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'DeepCSV' in _modname or 'DeepFlavour' in _modname or 'Tracking' in _modname or 'AK8Calo' in _modname)
     # _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'DeepCSV' in _modname or 'DeepFlavour' in _modname or 'AK8Calo' in _modname)
     # _keepPath = _modname.startswith('MC_')
 #    _keepPath |= _modname.startswith('MC_ReducedIterativeTracking')
@@ -476,7 +480,8 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 # If you run over many samples and you save the log, remember to reduce
 # the size of the output by prescaling the report of the event number
 process.MessageLogger.cerr.FwkReport.reportEvery = options.reportEvery
-process.MessageLogger.cerr.default.limit = 10
+# process.MessageLogger.cerr.default.limit = 10
+process.MessageLogger.cerr.default.limit = 1
 
 process.MessageLogger.suppressWarning = cms.untracked.vstring(
         'hltPatJetFlavourAssociationCalo'
@@ -497,8 +502,8 @@ process.MessageLogger.suppressError = cms.untracked.vstring(
 #     process.source.fileNames = [
 #         '/store/data/Run2016B/SingleMuon/AOD/PromptReco-v2/000/275/125/00000/DA2EC189-7E36-E611-8C63-02163E01343B.root'
 #     ]
-# if options.inputFiles:
-#     process.source.fileNames = options.inputFiles
+if options.inputFiles:
+    process.source.fileNames = options.inputFiles
 
 ## Define the output file name
 if options.runOnData :
@@ -526,7 +531,7 @@ process.options   = cms.untracked.PSet(
 #Set GT by hand:
 # process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 # from Configuration.AlCa.GlobalTag import GlobalTag
-# process.GlobalTag.globaltag = globalTag
+process.GlobalTag.globaltag = globalTag
 #Choose automatically:
 #process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 #from Configuration.AlCa.GlobalTag import GlobalTag
@@ -727,7 +732,29 @@ process.selectedEvents = eventCounter.clone()
 process.analyzerSeq = cms.Sequence( )
 # if options.processStdAK4Jets:
 process.analyzerSeq += process.btagana
-#---------------------------------------
+#--------
+
+
+from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
+process.TrackHistograms_hltPixelTracks = TrackHistogrammer.clone(src = 'hltPixelTracks')
+process.TrackHistograms_hltTracks = TrackHistogrammer.clone(src = 'hltPFMuonMerging')
+process.TrackHistograms_hltMergedTracks = TrackHistogrammer.clone(src = 'hltMergedTracks')
+# process.TrackHistograms_hltGeneralTracks = TrackHistogrammer.clone(src = 'generalTracks')
+
+process.trkMonitoringSeq = cms.Sequence(
+   process.TrackHistograms_hltPixelTracks
+ + process.TrackHistograms_hltTracks
+ + process.TrackHistograms_hltMergedTracks
+ # + process.TrackHistograms_hltGeneralTracks
+)
+
+# if opt_skimTracks:
+  # process.TrackHistograms_hltGeneralTracksOriginal = TrackHistogrammer.clone(src = 'generalTracksOriginal')
+  # process.trkMonitoringSeq += process.TrackHistograms_hltGeneralTracksOriginal
+
+process.trkMonitoringEndPath = cms.EndPath(process.trkMonitoringSeq)
+# process.schedule.extend([process.trkMonitoringEndPath])
+
 
 
 process.p = cms.Path(
@@ -735,6 +762,7 @@ process.p = cms.Path(
     # * process.filtSeq
     * process.selectedEvents
     * process.analyzerSeq
+    * process.trkMonitoringSeq
 )
 
 # Delete predefined output module (needed for running with CRAB)
