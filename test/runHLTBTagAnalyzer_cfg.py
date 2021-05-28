@@ -292,6 +292,112 @@ def customisePFForPixelTracks(process):
     process.hltPFMuonMerging.selectedTrackQuals = cms.VInputTag("hltIterL3MuonTracks", "hltPixelTracks")
     return process
 
+def customizeVertices(process):
+    process.hltPixelVerticesPFSelector = cms.EDFilter("PrimaryVertexObjectFilter",
+        filterParams = cms.PSet(
+            maxRho = cms.double(2.0),
+            maxZ = cms.double(24.0),
+            minNdof = cms.double(4.0),
+            pvSrc = cms.InputTag("hltPixelVertices")
+        ),
+        src = cms.InputTag("hltPixelVertices")
+    )
+
+    process.hltPixelVerticesPFFilter = cms.EDFilter("VertexSelector",
+        cut = cms.string('!isFake'),
+        filter = cms.bool(True),
+        src = cms.InputTag("hltPixelVerticesPFSelector")
+    )
+
+    process.HLTBtagDeepCSVSequencePFPat = cms.Sequence(
+         process.hltPixelVerticesPFSelector
+        + process.hltPixelVerticesPFFilter
+        + process.hltVerticesPF
+        + process.hltVerticesPFSelector
+        + process.hltVerticesPFFilter
+        + process.hltDeepBLifetimePFPatTagInfos
+        + process.hltDeepInclusiveVertexFinderPF
+        + process.hltDeepInclusiveSecondaryVerticesPF
+        + process.hltDeepTrackVertexArbitratorPF
+        + process.hltDeepInclusiveMergedVerticesPF
+        + process.hltDeepSecondaryVertexPFPatTagInfos
+        + process.hltDeepCombinedSecondaryVertexBJetPatTagInfos
+        + process.hltDeepCombinedSecondaryVertexBPFPatJetTags
+    )
+    process.HLTBtagDeepCSVSequencePFPuppiPat = cms.Sequence(
+        process.hltPixelVerticesPFSelector
+        + process.hltPixelVerticesPFFilter
+        + process.hltVerticesPF
+        + process.hltVerticesPFSelector
+        + process.hltVerticesPFFilter
+        + process.hltDeepBLifetimePFPuppiPatTagInfos
+        + process.hltDeepInclusiveVertexFinderPF
+        + process.hltDeepInclusiveSecondaryVerticesPF
+        + process.hltDeepTrackVertexArbitratorPF
+        + process.hltDeepInclusiveMergedVerticesPF
+        + process.hltDeepSecondaryVertexPFPuppiPatTagInfos
+        + process.hltDeepCombinedSecondaryVertexBPuppiJetPatTagInfos
+        + process.hltDeepCombinedSecondaryVertexBPFPuppiPatJetTags
+    )
+
+    process.hltAk4JetTracksAssociatorAtVertexPF.pvSrc = cms.InputTag("hltPixelVerticesPFFilter")
+    process.hltAk4JetTracksAssociatorAtVertexPFPuppi.pvSrc = cms.InputTag("hltPixelVerticesPFFilter")
+
+    process.hltDeepBLifetimePFPatTagInfos.primaryVertex = cms.InputTag("hltPixelVerticesPFFilter")
+    process.hltDeepBLifetimePFPuppiPatTagInfos.primaryVertex = cms.InputTag("hltPixelVerticesPFFilter")
+    process.hltDeepBLifetimeTagInfosPF.primaryVertex = cms.InputTag("hltPixelVerticesPFFilter")
+    process.hltDeepInclusiveVertexFinderPF.primaryVertices = cms.InputTag("hltPixelVerticesPFFilter")
+    process.hltDeepTrackVertexArbitratorPF.primaryVertices = cms.InputTag("hltPixelVerticesPFFilter")
+    process.hltPFDeepFlavourTagInfos.vertices = cms.InputTag("hltPixelVerticesPFFilter")
+    process.hltPFPuppiDeepFlavourTagInfos.vertices = cms.InputTag("hltPixelVerticesPFFilter")
+
+    return process
+
+def customizeVertices2(process):
+    process.hltVerticesPFFilter.src = cms.InputTag("hltPixelVertices")
+    process.hltPFPuppi.vertexName = cms.InputTag("hltPixelVertices")
+    process.hltPFPuppiNoLep.vertexName = cms.InputTag("hltPixelVertices")
+
+    # process.HLTBtagDeepCSVSequencePFPat = cms.Sequence(
+    #     process.hltVerticesPF
+    #     + process.hltVerticesPFSelector
+    #     + process.hltVerticesPFFilter
+    #     + process.hltDeepBLifetimePFPatTagInfos
+    #     + process.hltDeepInclusiveVertexFinderPF
+    #     + process.hltDeepInclusiveSecondaryVerticesPF
+    #     + process.hltDeepTrackVertexArbitratorPF
+    #     + process.hltDeepInclusiveMergedVerticesPF
+    #     + process.hltDeepSecondaryVertexPFPatTagInfos
+    #     + process.hltDeepCombinedSecondaryVertexBJetPatTagInfos
+    #     + process.hltDeepCombinedSecondaryVertexBPFPatJetTags
+    # )
+    # process.HLTBtagDeepCSVSequencePFPuppiPat = cms.Sequence(
+    #     process.hltVerticesPF
+    #     + process.hltVerticesPFSelector
+    #     + process.hltVerticesPFFilter
+    #     + process.hltDeepBLifetimePFPuppiPatTagInfos
+    #     + process.hltDeepInclusiveVertexFinderPF
+    #     + process.hltDeepInclusiveSecondaryVerticesPF
+    #     + process.hltDeepTrackVertexArbitratorPF
+    #     + process.hltDeepInclusiveMergedVerticesPF
+    #     + process.hltDeepSecondaryVertexPFPuppiPatTagInfos
+    #     + process.hltDeepCombinedSecondaryVertexBPuppiJetPatTagInfos
+    #     + process.hltDeepCombinedSecondaryVertexBPFPuppiPatJetTags
+    # )
+    #
+    # process.hltAk4JetTracksAssociatorAtVertexPF.pvSrc = cms.InputTag("hltPixelVerticesPFFilter")
+    # process.hltAk4JetTracksAssociatorAtVertexPFPuppi.pvSrc = cms.InputTag("hltPixelVerticesPFFilter")
+    #
+    # process.hltDeepBLifetimePFPatTagInfos.primaryVertex = cms.InputTag("hltPixelVerticesPFFilter")
+    # process.hltDeepBLifetimePFPuppiPatTagInfos.primaryVertex = cms.InputTag("hltPixelVerticesPFFilter")
+    # process.hltDeepBLifetimeTagInfosPF.primaryVertex = cms.InputTag("hltPixelVerticesPFFilter")
+    # process.hltDeepInclusiveVertexFinderPF.primaryVertices = cms.InputTag("hltPixelVerticesPFFilter")
+    # process.hltDeepTrackVertexArbitratorPF.primaryVertices = cms.InputTag("hltPixelVerticesPFFilter")
+    # process.hltPFDeepFlavourTagInfos.vertices = cms.InputTag("hltPixelVerticesPFFilter")
+    # process.hltPFPuppiDeepFlavourTagInfos.vertices = cms.InputTag("hltPixelVerticesPFFilter")
+
+    return process
+
 ###
 ### HLT configuration
 ###
@@ -299,6 +405,17 @@ if options.reco == 'HLT_GRun':
     from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
 
 elif options.reco == 'HLT_Run3TRK':
+    # (a) Run-3 tracking: standard
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
+    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    process = customizeHLTRun3Tracking(process)
+
+elif options.reco == 'HLT_Run3TRKMod':
+    # (a) Run-3 tracking: standard
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
+    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    process = customizeHLTRun3Tracking(process)
+elif options.reco == 'HLT_Run3TRKMod2':
     # (a) Run-3 tracking: standard
     from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
@@ -384,7 +501,10 @@ process = addPaths_MC_JMEPFPuppi(process)
 from RecoBTag.PerformanceMeasurements.PATLikeConfig import customizePFPatLikeJets
 process = customizePFPatLikeJets(process)
 
-
+if options.reco == 'HLT_Run3TRKMod':
+    process = customizeVertices(process)
+if options.reco == 'HLT_Run3TRKMod2':
+    process = customizeVertices2(process)
 
 
 # if not options.eras:
@@ -748,11 +868,7 @@ process.trkMonitoringSeq = cms.Sequence(
  # + process.TrackHistograms_hltGeneralTracks
 )
 
-# if opt_skimTracks:
-  # process.TrackHistograms_hltGeneralTracksOriginal = TrackHistogrammer.clone(src = 'generalTracksOriginal')
-  # process.trkMonitoringSeq += process.TrackHistograms_hltGeneralTracksOriginal
-
-process.trkMonitoringEndPath = cms.EndPath(process.trkMonitoringSeq)
+# process.trkMonitoringEndPath = cms.EndPath(process.trkMonitoringSeq)
 # process.schedule.extend([process.trkMonitoringEndPath])
 
 
@@ -762,7 +878,7 @@ process.p = cms.Path(
     # * process.filtSeq
     * process.selectedEvents
     * process.analyzerSeq
-    * process.trkMonitoringSeq
+    # * process.trkMonitoringSeq
 )
 
 # Delete predefined output module (needed for running with CRAB)
