@@ -310,8 +310,9 @@ if options.reco == 'HLT_BTagROI':
         pfCandidates = 'hltParticleFlowForBTag'
         pvSource = "hltVerticesPFFilterForBTag"
         trackSource = "hltMergedTracksForBTag"
-        #PFDeepFlavourTags = "hltPFDeepFlavourJetTagsROI"
+        PFDeepFlavourTags = "hltPFDeepFlavourJetTagsROI"
         rho = "hltFixedGridRhoFastjetAllForBTag" #original fixedGridRhoFastjetAll
+        patPuppiJetSource = 'hltPatJetsPuppiROI'
 
 def customisePFForPixelTracks(process):
 
@@ -416,8 +417,12 @@ from RecoBTag.PerformanceMeasurements.PATLikeConfig import customizePFPatLikeJet
 process = customizePFPatLikeJets(process)
 
 if options.reco == 'HLT_BTagROI':
-    from RecoBTag.PerformanceMeasurements.ROIPATLikeConfig import customizePFPatLikeJetsROI
-    process = customizePFPatLikeJetsROI(process)
+
+        from RecoBTag.PerformanceMeasurements.customise_hlt import *
+        process = addPaths_MC_JMEPFPuppiROI(process)
+
+        from RecoBTag.PerformanceMeasurements.ROIPATLikeConfig import customizePFPatLikeJetsROI
+        process = customizePFPatLikeJetsROI(process)
 
 
 
