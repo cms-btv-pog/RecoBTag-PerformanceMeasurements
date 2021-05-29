@@ -186,6 +186,11 @@ options.register(
     "skip N events"
 )
 
+options.register('reco', 'HLT_GRun',
+                 VarParsing.multiplicity.singleton,
+                 VarParsing.varType.string,
+                 'keyword to define HLT reconstruction')
+
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', -1)
 
@@ -254,22 +259,24 @@ if options.runOnData: options.isReHLT=False
 if options.isReHLT: trigresults = trigresults+'2'
 
 
-pfjets = "hltAK4PFJets" #original ak4PFJetsCHS
-calojets = "hltAK4CaloJets" #original ak4CaloJets
-puppijets = "hltAK4PFPuppiJets"
-PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatJetTags" # original: pfDeepCSVJetTags
+#pfjets = "hltAK4PFJets" #original ak4PFJetsCHS
+#calojets = "hltAK4CaloJets" #original ak4CaloJets
+#puppijets = "hltAK4PFPuppiJets"
+#PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatJetTags" # original: pfDeepCSVJetTags
 PFDeepFlavourTags = "hltPFDeepFlavourJetTags" # original: pfDeepFlavourJetTagsSlimmedDeepFlavour
 rho = "hltFixedGridRhoFastjetAll" #original fixedGridRhoFastjetAll
-hltVertices = "hltVerticesPFFilter" #original offlinePrimaryVertices
-hltVerticesSlimmed = "hltVerticesPFFilter" #original offlineSlimmedPrimaryVertices
-siPixelClusters = "hltSiPixelClusters" #original siPixelClusters
-ecalRecHit = "hltEcalRecHit" #original ecalRecHit
-hbhereco = "hltHbhereco" #original hbhereco
-hfreco = "hltHfreco" #original hfreco
-horeco = "hltHoreco" #original horeco
-rpcRecHits = "hltRpcRecHits" #original rpcRecHits
-tracks = "hltMergedTracks" #original generalTracks
-payload = "AK4PFHLT" #original AK4PFchs
+#hltVertices = "hltVerticesPFFilter" #original offlinePrimaryVertices
+#hltVerticesSlimmed = "hltVerticesPFFilter" #original offlineSlimmedPrimaryVertices
+#siPixelClusters = "hltSiPixelClusters" #original siPixelClusters
+#ecalRecHit = "hltEcalRecHit" #original ecalRecHit
+#hbhereco = "hltHbhereco" #original hbhereco
+#hfreco = "hltHfreco" #original hfreco
+#horeco = "hltHoreco" #original horeco
+#rpcRecHits = "hltRpcRecHits" #original rpcRecHits
+#tracks = "hltMergedTracks" #original generalTracks
+#payload = "AK4PFHLT" #original AK4PFchs
+
+
 
 
 ## Postfix
@@ -286,20 +293,74 @@ genJetCollection = 'ak4GenJetsNoNu'
 # pfCandidates = 'particleFlow'
 pfCandidates = 'hltParticleFlow'
 # pvSource = 'offlinePrimaryVertices'
-pvSource = hltVertices
+pvSource = "hltVerticesPFFilter" 
 # svSource = 'inclusiveCandidateSecondaryVertices'
-svSource = 'hltDeepInclusiveMergedVerticesPF'
+#svSource = 'hltDeepInclusiveMergedVerticesPF'
 # muSource = 'muons'
 muSource = 'hltMuons'
 # elSource = 'gedGsfElectrons'
 elSource = 'hltEgammaGsfElectrons'
 # patMuons = 'selectedPatMuons'
 # trackSource = 'generalTracks'
-trackSource = tracks
+trackSource = "hltMergedTracks"
+
+
+if options.reco == 'HLT_BTagROI':
+        patJetSource = 'hltPatJetsROI'
+        pfCandidates = 'hltParticleFlowForBTag'
+        pvSource = "hltVerticesPFFilterForBTag"
+        trackSource = "hltMergedTracksForBTag"
+        #PFDeepFlavourTags = "hltPFDeepFlavourJetTagsROI"
+        rho = "hltFixedGridRhoFastjetAllForBTag" #original fixedGridRhoFastjetAll
+
+def customisePFForPixelTracks(process):
+
+    process.hltPFMuonMerging.TrackProducers = cms.VInputTag("hltIterL3MuonTracks", "hltPixelTracksClean")
+    process.hltPFMuonMerging.selectedTrackQuals = cms.VInputTag("hltIterL3MuonTracks", "hltPixelTracksClean")
+
+    return process
+
+
+###
+### HLT configuration
+###
+if options.reco == 'HLT_GRun':
+        #from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+        from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+
+elif options.reco == 'HLT_BTagROI':
+
+        from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump_johnda import cms, process
+
+elif options.reco == 'HLT_Run3TRK':
+        
+    # (a) Run-3 tracking: standard
+        from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+        #from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+        from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+        process = customizeHLTRun3Tracking(process)
+
+elif options.reco == 'HLT_Run3TRKWithPU':
+        # (b) Run-3 tracking: all pixel vertices
+        from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+        #from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+        from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
+        process = customizeHLTRun3TrackingAllPixelVertices(process)
+
+elif options.reco == 'HLT_PixelTracks':
+        from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+        from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
+        process = customizeHLTRun3TrackingAllPixelVertices(process)
+
+        process = customisePFForPixelTracks(process)
+
+        trackSource = "hltPixelTracksClean" 
+else:
+        raise RuntimeError('keyword "reco = '+opts.reco+'" not recognised')
 
 
 
-from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+
 
 # remove cms.OutputModule objects from HLT config-dump
 for _modname in process.outputModules_():
@@ -354,6 +415,10 @@ process = addPaths_MC_JMEPFPuppi(process)
 from RecoBTag.PerformanceMeasurements.PATLikeConfig import customizePFPatLikeJets
 process = customizePFPatLikeJets(process)
 
+if options.reco == 'HLT_BTagROI':
+    from RecoBTag.PerformanceMeasurements.ROIPATLikeConfig import customizePFPatLikeJetsROI
+    process = customizePFPatLikeJetsROI(process)
+
 
 
 
@@ -372,6 +437,7 @@ process = customizePFPatLikeJets(process)
 ## ES modules for PF-Hadron Calibrations
 import os
 from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
+
 process.pfhcESSource = cms.ESSource('PoolDBESSource',
   _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db'),
   toGet = cms.VPSet(
@@ -382,6 +448,7 @@ process.pfhcESSource = cms.ESSource('PoolDBESSource',
     ),
   ),
 )
+
 process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
 #process.hltParticleFlow.calibrationsLabel = '' # standard label for Offline-PFHC in GT
 ## ES modules for HLT JECs
