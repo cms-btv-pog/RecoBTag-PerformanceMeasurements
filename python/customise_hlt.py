@@ -104,3 +104,240 @@ def addPaths_MC_JMEPFPuppiROI(process):
        process.schedule_().append(process.MC_JMEPFPuppiROI_v1)
 
     return process
+
+
+def addPaths_PFJetsForBtag(process):
+
+    process.hltPreMCROIPFBTagDeepCSV = cms.EDFilter("HLTPrescaler",
+                                                    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+                                                    offset = cms.uint32(0)
+    )
+
+    process.hltLightPFTracksForBTag = process.hltLightPFTracks.clone(
+        TkColList = cms.VInputTag("hltMergedTracksForBTag"),
+    )
+
+
+    process.hltParticleFlowBlockForBTag = process.hltParticleFlowBlock.clone(
+        elementImporters = cms.VPSet(
+            cms.PSet(
+                DPtOverPtCuts_byTrackAlgo = cms.vdouble(
+                    0.5, 0.5, 0.5, 0.5, 0.5,
+                    0.5
+                ),
+                NHitCuts_byTrackAlgo = cms.vuint32(
+                    3, 3, 3, 3, 3,
+                    3
+                ),
+                cleanBadConvertedBrems = cms.bool(False),
+                importerName = cms.string('GeneralTracksImporter'),
+                muonMaxDPtOPt = cms.double(1.0),
+                muonSrc = cms.InputTag("hltMuons"),
+                source = cms.InputTag("hltLightPFTracksForBTag"),
+                trackQuality = cms.string('highPurity'),
+                useIterativeTracking = cms.bool(False)
+            ),
+        )
+    )
+
+    process.hltParticleFlowForBTag = process.hltParticleFlow.clone(
+        blocks = cms.InputTag("hltParticleFlowBlockForBTag"),
+        vertexCollection = cms.InputTag("hltPixelVertices")
+    )
+
+
+    process.HLTParticleFlowSequenceForBTag = cms.Sequence(
+        process.HLTPreshowerSequence
+        + process.hltParticleFlowRecHitECALUnseeded
+        + process.hltParticleFlowRecHitHBHE
+        + process.hltParticleFlowRecHitHF
+        + process.hltParticleFlowRecHitPSUnseeded
+        + process.hltParticleFlowClusterECALUncorrectedUnseeded
+        + process.hltParticleFlowClusterPSUnseeded
+        + process.hltParticleFlowClusterECALUnseeded
+        + process.hltParticleFlowClusterHBHE
+        + process.hltParticleFlowClusterHCAL
+        + process.hltParticleFlowClusterHF
+        + process.hltLightPFTracksForBTag
+        + process.hltParticleFlowBlockForBTag
+        + process.hltParticleFlowForBTag)
+
+    process.hltAK4PFJetsForBTag = process.hltAK4PFJets.clone(
+        src = cms.InputTag("hltParticleFlowForBTag"),
+        srcPVs = cms.InputTag("hltPixelVertices"),
+    )
+
+    process.hltAK4PFJetsLooseIDForBTag = process.hltAK4PFJetsLooseID.clone(
+        jetsInput = cms.InputTag("hltAK4PFJetsForBTag"),
+    )
+
+
+    process.hltAK4PFJetsTightIDForBTag = process.hltAK4PFJetsTightID.clone(
+        jetsInput = cms.InputTag("hltAK4PFJetsForBTag"),
+    )
+
+    process.HLTAK4PFJetsReconstructionSequenceForBTag = cms.Sequence(
+        process.HLTL2muonrecoSequence
+        + process.HLTL3muonrecoSequence
+        + process.HLTTrackReconstructionForBTag
+        + process.HLTParticleFlowSequenceForBTag 
+        + process.hltAK4PFJetsForBTag
+        + process.hltAK4PFJetsLooseIDForBTag
+        + process.hltAK4PFJetsTightIDForBTag
+    )
+
+    process.hltFixedGridRhoFastjetAllForBTag = process.hltFixedGridRhoFastjetAll.clone(
+        pfCandidatesTag = cms.InputTag("hltParticleFlowForBTag")
+    )
+
+
+    process.hltAK4PFFastJetCorrectorForBTag = process.hltAK4PFFastJetCorrector.clone(
+        srcRho = cms.InputTag("hltFixedGridRhoFastjetAllForBTag")
+    )
+
+    process.hltAK4PFCorrectorForBTag = cms.EDProducer("ChainedJetCorrectorProducer",
+                                                      correctors = cms.VInputTag("hltAK4PFFastJetCorrector", "hltAK4PFRelativeCorrector", "hltAK4PFAbsoluteCorrector", "hltAK4PFResidualCorrector")
+    )
+
+
+    process.HLTAK4PFCorrectorProducersSequenceForBTag = cms.Sequence(
+        process.hltAK4PFFastJetCorrectorForBTag
+        + process.hltAK4PFRelativeCorrector
+        + process.hltAK4PFAbsoluteCorrector
+        + process.hltAK4PFResidualCorrector
+        + process.hltAK4PFCorrectorForBTag
+    )
+
+
+    process.hltAK4PFJetsCorrectedForBTag = cms.EDProducer("CorrectedPFJetProducer",
+                                                          correctors = cms.VInputTag("hltAK4PFCorrectorForBTag"),
+                                                          src = cms.InputTag("hltAK4PFJetsForBTag")
+    )
+
+
+    process.hltAK4PFJetsLooseIDCorrectedForBTag = cms.EDProducer("CorrectedPFJetProducer",
+                                                                 correctors = cms.VInputTag("hltAK4PFCorrectorForBTag"),
+                                                                 src = cms.InputTag("hltAK4PFJetsLooseIDForBTag")
+    )
+
+
+    process.hltAK4PFJetsTightIDCorrectedForBTag = cms.EDProducer("CorrectedPFJetProducer",
+                                                                 correctors = cms.VInputTag("hltAK4PFCorrectorForBTag"),
+                                                                 src = cms.InputTag("hltAK4PFJetsTightIDForBTag")
+    )
+
+    process.HLTAK4PFJetsCorrectionSequenceForBTag = cms.Sequence(
+        process.hltFixedGridRhoFastjetAllForBTag
+        + process.HLTAK4PFCorrectorProducersSequenceForBTag
+        + process.hltAK4PFJetsCorrectedForBTag
+        + process.hltAK4PFJetsLooseIDCorrectedForBTag
+        + process.hltAK4PFJetsTightIDCorrectedForBTag
+    )
+
+    process.HLTAK4PFJetsSequenceForBTag = cms.Sequence(
+        process.HLTPreAK4PFJetsRecoSequence
+        + process.HLTAK4PFJetsReconstructionSequenceForBTag
+        + process.HLTAK4PFJetsCorrectionSequenceForBTag
+    )
+
+    process.hltVerticesPFForBTag = process.hltVerticesPF.clone(
+        TrackLabel = cms.InputTag("hltMergedTracksForBTag"),
+    )
+
+    process.hltVerticesPFSelectorForBTag = process.hltVerticesPFSelector.clone(
+        filterParams = cms.PSet(
+            maxRho = cms.double(2.0),
+            maxZ = cms.double(24.0),
+            minNdof = cms.double(4.0),
+            pvSrc = cms.InputTag("hltVerticesPFForBTag")
+        ),
+        src = cms.InputTag("hltVerticesPFForBTag")
+    )
+
+    process.hltVerticesPFFilterForBTag = process.hltVerticesPFFilter.clone(
+        src = cms.InputTag("hltVerticesPFSelectorForBTag")
+    )
+
+    process.hltPFJetForBtagSelectorForBTag = process.hltPFJetForBtagSelector.clone(
+        # inputTag = cms.InputTag("hltAK4PFJetsCorrected"),
+        inputTag = cms.InputTag("hltAK4PFJetsCorrectedForBTag"), 
+    )
+
+    process.hltPFJetForBtagROI = process.hltPFJetForBtag.clone(
+        HLTObject = cms.InputTag("hltPFJetForBtagSelectorForBTag"),
+    )
+
+    process.hltDeepBLifetimeTagInfosPFROI = process.hltDeepBLifetimeTagInfosPF.clone(
+        candidates = cms.InputTag("hltParticleFlowForBTag"),
+        jets = cms.InputTag("hltPFJetForBtagROI"),
+        primaryVertex = cms.InputTag("hltVerticesPFFilterForBTag"),
+    )
+
+
+    process.hltDeepInclusiveVertexFinderPFROI = process.hltDeepInclusiveVertexFinderPF.clone(
+        primaryVertices = cms.InputTag("hltVerticesPFFilterForBTag"),
+        tracks = cms.InputTag("hltParticleFlowForBTag"),
+    )
+
+    process.hltDeepInclusiveSecondaryVerticesPFROI = process.hltDeepInclusiveSecondaryVerticesPF.clone(
+        secondaryVertices = cms.InputTag("hltDeepInclusiveVertexFinderPFROI")
+    )
+
+    process.hltDeepTrackVertexArbitratorPFROI = process.hltDeepTrackVertexArbitratorPF.clone(
+        primaryVertices = cms.InputTag("hltVerticesPFFilterForBTag"),
+        secondaryVertices = cms.InputTag("hltDeepInclusiveSecondaryVerticesPFROI"),
+        tracks = cms.InputTag("hltParticleFlowForBTag")
+    )
+    
+    process.hltDeepInclusiveMergedVerticesPFROI = process.hltDeepInclusiveMergedVerticesPF.clone(
+        secondaryVertices = cms.InputTag("hltDeepTrackVertexArbitratorPFROI")
+    )
+
+    process.hltDeepSecondaryVertexTagInfosPFROI = process.hltDeepSecondaryVertexTagInfosPF.clone(
+        extSVCollection = cms.InputTag("hltDeepInclusiveMergedVerticesPFROI"),
+        trackIPTagInfos = cms.InputTag("hltDeepBLifetimeTagInfosPFROI"),
+    )
+
+    process.hltDeepCombinedSecondaryVertexBJetTagsInfosROI = process.hltDeepCombinedSecondaryVertexBJetTagsInfos.clone(
+        svTagInfos = cms.InputTag("hltDeepSecondaryVertexTagInfosPFROI")
+    )
+
+    process.hltDeepCombinedSecondaryVertexBJetTagsPFROI = process.hltDeepCombinedSecondaryVertexBJetTagsPF.clone(
+        src = cms.InputTag("hltDeepCombinedSecondaryVertexBJetTagsInfosROI"),
+    )
+
+    process.HLTBtagDeepCSVSequencePFROI = cms.Sequence(
+        process.hltVerticesPFForBTag
+        + process.hltVerticesPFSelectorForBTag
+        + process.hltVerticesPFFilterForBTag
+        + process.hltPFJetForBtagSelectorForBTag
+        + process.hltPFJetForBtagROI
+        + process.hltDeepBLifetimeTagInfosPFROI
+        + process.hltDeepInclusiveVertexFinderPFROI
+        + process.hltDeepInclusiveSecondaryVerticesPFROI
+        + process.hltDeepTrackVertexArbitratorPFROI
+        + process.hltDeepInclusiveMergedVerticesPFROI
+        + process.hltDeepSecondaryVertexTagInfosPFROI
+        + process.hltDeepCombinedSecondaryVertexBJetTagsInfosROI
+        + process.hltDeepCombinedSecondaryVertexBJetTagsPFROI
+    )
+
+    process.hltBTagPFDeepCSV4p06SingleROI = process.hltBTagPFDeepCSV4p06Single.clone(
+        JetTags = cms.InputTag("hltDeepCombinedSecondaryVertexBJetTagsPFROI","probb"),
+        Jets = cms.InputTag("hltPFJetForBtag"),
+    )
+
+
+    process.MC_ROIPFBTagDeepCSV_v10 = cms.Path(
+        process.HLTBeginSequence
+        + process.hltPreMCROIPFBTagDeepCSV
+        + process.HLTAK4PFJetsSequenceForBTag
+        + process.HLTBtagDeepCSVSequencePFROI
+        + process.hltBTagPFDeepCSV4p06SingleROI
+        + process.HLTEndSequence)
+        
+
+    if process.schedule_():
+       process.schedule_().append(process.MC_ROIPFBTagDeepCSV_v10)
+
+    return process

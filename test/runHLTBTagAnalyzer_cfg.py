@@ -331,7 +331,12 @@ if options.reco == 'HLT_GRun':
 
 elif options.reco == 'HLT_BTagROI':
 
-        from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump_johnda import cms, process
+        #from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump_johnda import cms, process
+        from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+
+        from RecoBTag.PerformanceMeasurements.customise_hlt import *
+        process = addPaths_PFJetsForBtag(process)
+
 
 elif options.reco == 'HLT_Run3TRK':
         

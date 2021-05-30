@@ -298,6 +298,7 @@ def customizePFPatLikeJetsROI(process, type = "AK4PFCHS"):
     #### TAGGERS
     # run DeepFlavour for HLT
     from RecoBTag.ONNXRuntime.pfDeepFlavourJetTags_cfi import pfDeepFlavourJetTags
+
     process.hltPFDeepFlavourJetTagsROI = pfDeepFlavourJetTags.clone(
         src = cms.InputTag("hltPFDeepFlavourTagInfosROI")
     )
