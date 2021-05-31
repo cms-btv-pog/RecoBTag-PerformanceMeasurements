@@ -118,7 +118,7 @@ def customizePFPatLikeJetsROI(process, type = "AK4PFCHS"):
             cms.InputTag("hltDeepBLifetimePFPatTagInfosROI"),
             cms.InputTag("hltDeepCombinedSecondaryVertexBJetPatTagInfosROI"),
             cms.InputTag("hltDeepSecondaryVertexPFPatTagInfosROI"),
-            cms.InputTag("hltPFDeepFlavourTagInfosROI"),
+            cms.InputTag("hltPFDeepFlavourROITagInfos"),
         ),
         trackAssociationSource = cms.InputTag("hltAk4JetTracksAssociatorAtVertexPFROI"),
     )
@@ -145,7 +145,7 @@ def customizePFPatLikeJetsROI(process, type = "AK4PFCHS"):
             cms.InputTag("hltDeepBLifetimePFPuppiPatTagInfosROI"),
             cms.InputTag("hltDeepCombinedSecondaryVertexBPuppiJetPatTagInfosROI"),
             cms.InputTag("hltDeepSecondaryVertexPFPuppiPatTagInfosROI"),
-            cms.InputTag("hltPFPuppiDeepFlavourTagInfosROI"),
+            cms.InputTag("hltPFPuppiDeepFlavourROITagInfos"),
         ),
         trackAssociationSource = cms.InputTag("hltAk4JetTracksAssociatorAtVertexPFPuppiROI"),
     )
@@ -300,15 +300,15 @@ def customizePFPatLikeJetsROI(process, type = "AK4PFCHS"):
     from RecoBTag.ONNXRuntime.pfDeepFlavourJetTags_cfi import pfDeepFlavourJetTags
 
     process.hltPFDeepFlavourJetTagsROI = pfDeepFlavourJetTags.clone(
-        src = cms.InputTag("hltPFDeepFlavourTagInfosROI")
+        src = cms.InputTag("hltPFDeepFlavourROITagInfos")
     )
 
     process.hltPFPuppiDeepFlavourJetTagsROI = pfDeepFlavourJetTags.clone(
-        src = cms.InputTag("hltPFPuppiDeepFlavourTagInfosROI")
+        src = cms.InputTag("hltPFPuppiDeepFlavourROITagInfos")
     )
 
     from RecoBTag.FeatureTools.pfDeepFlavourTagInfos_cfi import pfDeepFlavourTagInfos
-    process.hltPFDeepFlavourTagInfosROI = pfDeepFlavourTagInfos.clone(
+    process.hltPFDeepFlavourROITagInfos = pfDeepFlavourTagInfos.clone(
         candidates = cms.InputTag(particleFlow),
         jets = cms.InputTag(pfjets),
         puppi_value_map = cms.InputTag(puppi),
@@ -318,7 +318,7 @@ def customizePFPatLikeJetsROI(process, type = "AK4PFCHS"):
         vertices = cms.InputTag(hltVertices)
     )
 
-    process.hltPFPuppiDeepFlavourTagInfosROI = pfDeepFlavourTagInfos.clone(
+    process.hltPFPuppiDeepFlavourROITagInfos = pfDeepFlavourTagInfos.clone(
         candidates = cms.InputTag(particleFlow),
         jets = cms.InputTag(puppijets),
         puppi_value_map = cms.InputTag(puppi),
@@ -374,7 +374,7 @@ def customizePFPatLikeJetsROI(process, type = "AK4PFCHS"):
 
         *process.hltPrimaryVertexAssociationROI
         # *process.hltChargedHadronPFTrackIsolationROI
-        *process.hltPFDeepFlavourTagInfosROI
+        *process.hltPFDeepFlavourROITagInfos
         *process.hltPFDeepFlavourJetTagsROI
 
         *process.hltPatJetsROI
@@ -402,7 +402,7 @@ def customizePFPatLikeJetsROI(process, type = "AK4PFCHS"):
 
         *process.hltPrimaryVertexAssociationPuppiROI
         # *process.hltChargedHadronPFTrackIsolation
-        *process.hltPFPuppiDeepFlavourTagInfosROI
+        *process.hltPFPuppiDeepFlavourROITagInfos
         *process.hltPFPuppiDeepFlavourJetTagsROI
 
         *process.hltPatJetsPuppiROI

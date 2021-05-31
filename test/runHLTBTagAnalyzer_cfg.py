@@ -187,11 +187,6 @@ options.register(
   'keyword to define HLT reconstruction'
 )
 
-options.register('reco', 'HLT_GRun',
-                 VarParsing.multiplicity.singleton,
-                 VarParsing.varType.string,
-                 'keyword to define HLT reconstruction')
-
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', -1)
 
@@ -265,6 +260,14 @@ if options.isReHLT: trigresults = trigresults+'2'
 #puppijets = "hltAK4PFPuppiJets"
 #PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatJetTags" # original: pfDeepCSVJetTags
 PFDeepFlavourTags = "hltPFDeepFlavourJetTags" # original: pfDeepFlavourJetTagsSlimmedDeepFlavour
+PFDeepFlavourTagInfos = 'hltPFDeepFlavour'
+PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatJetTags"
+
+PuppiDeepCSVTags = 'hltDeepCombinedSecondaryVertexBPFPuppiPatJetTags'
+PuppiDeepFlavourTags = 'hltPFPuppiDeepFlavourJetTags'
+PuppiDeepFlavourTagInfos = 'hltPFPuppiDeepFlavour'
+
+
 rho = "hltFixedGridRhoFastjetAll" #original fixedGridRhoFastjetAll
 hltVertices = "hltVerticesPFFilter" #original offlinePrimaryVertices
 hltVerticesSlimmed = "hltVerticesPFFilter" #original offlineSlimmedPrimaryVertices
@@ -455,8 +458,14 @@ elif options.reco == 'HLT_BTagROI':
         patJetSource = 'hltPatJetsROI'
         trackSource = "hltMergedTracksForBTag"
         PFDeepFlavourTags = "hltPFDeepFlavourJetTagsROI"
+        PFDeepFlavourTagInfos = 'hltPFDeepFlavourROI'
+
         rho = "hltFixedGridRhoFastjetAllForBTag" #original fixedGridRhoFastjetAll
         patPuppiJetSource = 'hltPatJetsPuppiROI'
+        PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatJetTagsROI"
+        PuppiDeepCSVTags = 'hltDeepCombinedSecondaryVertexBPFPuppiPatJetTagsROI'
+        PuppiDeepFlavourTags = 'hltPFPuppiDeepFlavourJetTagsROI'
+        PuppiDeepFlavourTagInfos = 'hltPFPuppiDeepFlavourROI'
 
 else:
   raise RuntimeError('keyword "reco = '+options.reco+'" not recognised')
@@ -804,7 +813,7 @@ process.btagana.muonCollectionName    = cms.InputTag(muSource)
 process.btagana.electronCollectionName= cms.InputTag(elSource)
 # process.btagana.patMuonCollectionName = cms.InputTag(patMuons)
 process.btagana.rho                   = cms.InputTag(rho)
-process.btagana.deepFlavourJetTags    = PFDeepFlavourTags
+
 # process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
 process.btagana.triggerTable          = cms.InputTag(trigresults) # Data and MC
 process.btagana.genParticles          = cms.InputTag(genParticles)
@@ -820,6 +829,24 @@ process.btagana.runPFMuonVariables = options.runPFMuonVariables
 # process.btagana.runPatMuons = options.runPatMuons
 process.btagana.runEventInfo = options.runEventInfo
 process.btagana.runOnData = options.runOnData
+
+
+process.btagana.deepCSVBJetTags = PFDeepCSVTags
+process.btagana.deepCSVBPuppiJetTags = PuppiDeepCSVTags
+
+process.btagana.deepFlavourJetTags    = PFDeepFlavourTags
+process.btagana.deepFlavourTagInfos   = PFDeepFlavourTagInfos
+
+process.btagana.deepFlavourPuppiJetTags    = PuppiDeepFlavourTags
+process.btagana.deepFlavourPuppiTagInfos = PuppiDeepFlavourTagInfos
+
+PuppiIPTagInfos = 'hltDeepBLifetimePFPuppiPat'
+process.btagana.ipPuppiTagInfos = PuppiIPTagInfos
+
+#    ipTagInfos = cms.string('hltDeepBLifetimePFPat'),
+# primaryVertexColl = cms.InputTag("hltVerticesPFFilterForBTag"),
+#   svPuppiTagInfos = cms.string('hltDeepSecondaryVertexPFPuppiPat'),
+#    svTagInfos = cms.string('hltDeepSecondaryVertexPFPat'),
 
 if options.runOnData:
   process.btagana.runHadronVariables  = False
