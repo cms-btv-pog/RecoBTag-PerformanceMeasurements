@@ -17,7 +17,7 @@ def getOptions() :
       help='Input parameters for config file')
   parser.add_argument('-t', '--maxJobRuntimeMin', type=int, default=2750,
       help='The maximum runtime (in minutes) per job')
-  parser.add_argument('-m', '--maxMemoryMB', type=int, default=4000,
+  parser.add_argument('-m', '--maxMemoryMB', type=int, default=2500,
       help='Maximum amount of memory (in MB) a job is allowed to use')
   parser.add_argument('-l', '--lumiMask', type=str, default='',
       help='The JSON file containing good lumi list')
@@ -108,16 +108,28 @@ def main():
         config.General.requestName = requestname
         config.Data.inputDataset = job
         if datatier == 'MINIAODSIM':
+          # config.Data.splitting = 'EventAwareLumiBased'
+          config.Data.splitting = 'FileBased'
+          # config.Data.unitsPerJob = 100
+          config.Data.unitsPerJob = 1
+        elif datatier == 'FEVT':
           config.Data.splitting = 'EventAwareLumiBased'
           config.Data.unitsPerJob = 100
-        if datatier == 'FEVT':
-          config.Data.splitting = 'EventAwareLumiBased'
-          config.Data.unitsPerJob = 100
+        # elif datatier == 'GEN-SIM-RAW':
+        elif "RAW" in datatier:
+          # config.Data.splitting = 'EventAwareLumiBased'
+          config.Data.splitting = 'FileBased'
+          config.Data.unitsPerJob = 1
+          # config.Data.unitsPerJob = 20
+          # config.Data.unitsPerJob = 200
+          # config.Data.unitsPerJob = 1500
         elif datatier == 'AODSIM':
           config.Data.splitting = 'FileBased'
         elif datatier == 'MINIAOD':
-          config.Data.splitting = 'LumiBased'
-          config.Data.unitsPerJob = 40
+          # config.Data.splitting = 'LumiBased'
+          config.Data.splitting = 'FileBased'
+          # config.Data.unitsPerJob = 40
+          config.Data.unitsPerJob = 1
           config.Data.lumiMask = args.lumiMask
         elif datatier == 'AOD':
           config.Data.splitting = 'LumiBased'

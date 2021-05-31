@@ -143,4 +143,9 @@ HLTBTagAnalyzer = cms.EDAnalyzer("HLTBTagAnalyzer",
     deepCSVBJetTags    = cms.string('hltDeepCombinedSecondaryVertexBPFPatJetTags'),
     deepCSVBCaloJetTags    = cms.string('hltDeepCombinedSecondaryVertexCaloPatBJetTags'),
     deepCSVBPuppiJetTags    = cms.string('hltDeepCombinedSecondaryVertexBPFPuppiPatJetTags'),
+
+    CaloJetTags = cms.InputTag('hltDeepCombinedSecondaryVertexBJetCaloPatTagInfos'),
+    CaloSVs = cms.InputTag('hltInclusiveSecondaryVertexFinderPatTagInfos'),
+    # CaloJetCSVTags = cms.string('hltCombinedSecondaryVertexBJetTagsCalo'),
+    CaloJetDeepCSVTags = cms.InputTag('hltDeepCombinedSecondaryVertexCaloPatBJetTags:probb'),
 )
