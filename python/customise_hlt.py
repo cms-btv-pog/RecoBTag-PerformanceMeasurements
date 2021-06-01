@@ -26,11 +26,11 @@ def addPaths_MC_JMEPFPuppiROI(process):
 
     process.HLTPFPuppiSequenceROI = cms.Sequence(
         process.HLTDoCaloSequencePF
-      #+ process.HLTL2muonrecoSequence
-      #+ process.HLTL3muonrecoSequence
+      + process.HLTL2muonrecoSequence
+      + process.HLTL3muonrecoSequence
       + process.HLTTrackReconstructionForBTag
       + process.HLTParticleFlowSequenceForBTag
-        + process.hltVerticesPFForBTag
+      + process.hltVerticesPFForBTag
       + process.hltPixelClustersMultiplicity
       + process.hltPFPuppiROI
     )
@@ -96,6 +96,7 @@ def addPaths_MC_JMEPFPuppiROI(process):
         process.HLTBeginSequence
         + process.hltPreMCJMEPFPuppiROI
         ## AK4 Jets
+        + process.HLTAK4PFJetsSequenceForBTag # New
         + process.HLTPFPuppiSequenceROI
         + process.HLTAK4PFPuppiJetsSequenceROI
     )

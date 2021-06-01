@@ -510,6 +510,11 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
 
   edm::Handle <PatJetCollection> jetsColl;
   iEvent.getByToken (JetCollectionTag_, jetsColl);
+  if(!jetsColl.isValid()){
+    cout << "jetsColl is not valid " << endl;
+    return;
+  }
+
   edm::Handle <PatJetCollection> jetsCollCalo;
   edm::Handle <PatJetCollection> jetsCollPuppi;
   if(runCaloJetVariables_){
@@ -518,6 +523,7 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
   if(runPuppiJetVariables_){
       iEvent.getByToken (PuppiJetCollectionTag_, jetsCollPuppi);
   }
+
 
   //------------------------------------------------------
   // Determine hadronizer type (done only once per job)
@@ -1050,6 +1056,9 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
   iEvent.getByToken(rhoTag_,rhoH);
   EventInfo.rho = *rhoH;
 
+  if(!rhoH.isValid())
+    cout << "rhoH is not valid: " << rhoH.isValid() << endl;
+
   //cout << "primaryVertexColl_ " << primaryVertexColl_ << endl;
   //------------------
   // Primary vertex
@@ -1059,7 +1068,6 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
 
 
   bool pvFound = (primaryVertex->size() != 0);
-  cout << "pv Found " << pvFound << endl;
 
   if ( pvFound ) {
     pv = &(*primaryVertex->begin());
@@ -1559,7 +1567,6 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
     edm::RefToBase<pat::Jet> patJetRef = jetsColl->refAt(pjet - jetsColl->begin());
     edm::RefToBase<reco::Jet> jetRef(patJetRef);
     reco::JetTagInfo jetTagInfo(jetRef);
-
     cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
     can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
 

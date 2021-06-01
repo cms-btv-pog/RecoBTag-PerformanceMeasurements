@@ -262,10 +262,15 @@ if options.isReHLT: trigresults = trigresults+'2'
 PFDeepFlavourTags = "hltPFDeepFlavourJetTags" # original: pfDeepFlavourJetTagsSlimmedDeepFlavour
 PFDeepFlavourTagInfos = 'hltPFDeepFlavour'
 PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatJetTags"
-
+IPTagInfos = 'hltDeepBLifetimePFPat'
+SVTagInfos = 'hltDeepSecondaryVertexPFPat'
+s
 PuppiDeepCSVTags = 'hltDeepCombinedSecondaryVertexBPFPuppiPatJetTags'
 PuppiDeepFlavourTags = 'hltPFPuppiDeepFlavourJetTags'
 PuppiDeepFlavourTagInfos = 'hltPFPuppiDeepFlavour'
+PuppiIPTagInfos = 'hltDeepBLifetimePFPuppiPat'
+SVPuppiTagInfos = 'hltDeepSecondaryVertexPFPuppiPat'
+
 
 
 rho = "hltFixedGridRhoFastjetAll" #original fixedGridRhoFastjetAll
@@ -460,12 +465,17 @@ elif options.reco == 'HLT_BTagROI':
         PFDeepFlavourTags = "hltPFDeepFlavourJetTagsROI"
         PFDeepFlavourTagInfos = 'hltPFDeepFlavourROI'
 
-        rho = "hltFixedGridRhoFastjetAllForBTag" #original fixedGridRhoFastjetAll
+        rho = "hltFixedGridRhoFastjetAllForBTag" 
         patPuppiJetSource = 'hltPatJetsPuppiROI'
         PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatJetTagsROI"
         PuppiDeepCSVTags = 'hltDeepCombinedSecondaryVertexBPFPuppiPatJetTagsROI'
         PuppiDeepFlavourTags = 'hltPFPuppiDeepFlavourJetTagsROI'
         PuppiDeepFlavourTagInfos = 'hltPFPuppiDeepFlavourROI'
+        PuppiIPTagInfos = 'hltDeepBLifetimePFPuppiPatROI'
+        IPTagInfos = 'hltDeepBLifetimePFPatROI'
+        SVPuppiTagInfos = 'hltDeepSecondaryVertexPFPuppiPatROI'
+        SVTagInfos = 'hltDeepSecondaryVertexPFPatROI'
+
 
 else:
   raise RuntimeError('keyword "reco = '+options.reco+'" not recognised')
@@ -840,13 +850,11 @@ process.btagana.deepFlavourTagInfos   = PFDeepFlavourTagInfos
 process.btagana.deepFlavourPuppiJetTags    = PuppiDeepFlavourTags
 process.btagana.deepFlavourPuppiTagInfos = PuppiDeepFlavourTagInfos
 
-PuppiIPTagInfos = 'hltDeepBLifetimePFPuppiPat'
 process.btagana.ipPuppiTagInfos = PuppiIPTagInfos
+process.btagana.ipTagInfos = IPTagInfos
 
-#    ipTagInfos = cms.string('hltDeepBLifetimePFPat'),
-# primaryVertexColl = cms.InputTag("hltVerticesPFFilterForBTag"),
-#   svPuppiTagInfos = cms.string('hltDeepSecondaryVertexPFPuppiPat'),
-#    svTagInfos = cms.string('hltDeepSecondaryVertexPFPat'),
+process.btagana.svPuppiTagInfos = SVPuppiTagInfos
+process.btagana.svTagInfos = SVTagInfos
 
 if options.runOnData:
   process.btagana.runHadronVariables  = False
