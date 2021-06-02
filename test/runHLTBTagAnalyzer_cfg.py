@@ -264,7 +264,7 @@ PFDeepFlavourTagInfos = 'hltPFDeepFlavour'
 PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatJetTags"
 IPTagInfos = 'hltDeepBLifetimePFPat'
 SVTagInfos = 'hltDeepSecondaryVertexPFPat'
-s
+
 PuppiDeepCSVTags = 'hltDeepCombinedSecondaryVertexBPFPuppiPatJetTags'
 PuppiDeepFlavourTags = 'hltPFPuppiDeepFlavourJetTags'
 PuppiDeepFlavourTagInfos = 'hltPFPuppiDeepFlavour'
@@ -462,14 +462,14 @@ elif options.reco == 'HLT_BTagROI':
         pfCandidates = 'hltParticleFlowForBTag'
         patJetSource = 'hltPatJetsROI'
         trackSource = "hltMergedTracksForBTag"
-        PFDeepFlavourTags = "hltPFDeepFlavourJetTagsROI"
+        PFDeepFlavourTags = "hltPFDeepFlavourROIJetTags"
         PFDeepFlavourTagInfos = 'hltPFDeepFlavourROI'
-
+        
         rho = "hltFixedGridRhoFastjetAllForBTag" 
         patPuppiJetSource = 'hltPatJetsPuppiROI'
-        PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatJetTagsROI"
-        PuppiDeepCSVTags = 'hltDeepCombinedSecondaryVertexBPFPuppiPatJetTagsROI'
-        PuppiDeepFlavourTags = 'hltPFPuppiDeepFlavourJetTagsROI'
+        PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatROIJetTags"
+        PuppiDeepCSVTags = 'hltDeepCombinedSecondaryVertexBPFPuppiPatROIJetTags'
+        PuppiDeepFlavourTags = 'hltPFPuppiDeepFlavourROIJetTags'
         PuppiDeepFlavourTagInfos = 'hltPFPuppiDeepFlavourROI'
         PuppiIPTagInfos = 'hltDeepBLifetimePFPuppiPatROI'
         IPTagInfos = 'hltDeepBLifetimePFPatROI'
@@ -650,8 +650,8 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 # If you run over many samples and you save the log, remember to reduce
 # the size of the output by prescaling the report of the event number
 process.MessageLogger.cerr.FwkReport.reportEvery = options.reportEvery
-# process.MessageLogger.cerr.default.limit = 10
-process.MessageLogger.cerr.default.limit = 1
+#process.MessageLogger.cerr.default.limit = 10
+#process.MessageLogger.cerr.default.limit = 1
 
 process.MessageLogger.suppressWarning = cms.untracked.vstring(
         'hltPatJetFlavourAssociationCalo'
@@ -659,6 +659,8 @@ process.MessageLogger.suppressWarning = cms.untracked.vstring(
 process.MessageLogger.suppressError = cms.untracked.vstring(
         'hltPatJetFlavourAssociationCalo'
 )
+process.MessageLogger.cerr.threshold = "DEBUG"
+#process.MessageLogger.debugModules = ["hltBTagPFDeepCSV4p06SingleROI","hltDeepCombinedSecondaryVertexBJetTagsPFROI","hltDeepCombinedSecondaryVertexBPFPatROIJetTags","hltPatJetsROI"]
 
 ## Input files
 # process.source = cms.Source("PoolSource",
