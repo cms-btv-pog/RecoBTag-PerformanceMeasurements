@@ -436,7 +436,7 @@ HLTBTagAnalyzerT<IPTI,VTX>::HLTBTagAnalyzerT(const edm::ParameterSet& iConfig):
       JetInfo[1].RegisterBranches(smalltree, variableParser, branchNamePrefix2_);
       Histos[1] = new BookHistograms(fs->mkdir( "HistCaloJets" )) ;
   }
-  
+
   if (runCaloJetVariables_ && runPuppiJetVariables_){
       JetInfo[2].RegisterBranches(smalltree, variableParser, branchNamePrefix3_);
       Histos[2] = new BookHistograms(fs->mkdir( "HistPuppiJets" )) ;
@@ -1082,7 +1082,7 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
     //newvertex = true;
   }
 
-  cout << "primaryVertex " << primaryVertex << endl;
+  // cout << "primaryVertex " << primaryVertex << endl;
   //   GlobalPoint Pv_point = GlobalPoint((*pv).x(), (*pv).y(), (*pv).z());
   EventInfo.PVz = pv->z();
   EventInfo.PVez = pv->zError();
