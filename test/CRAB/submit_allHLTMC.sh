@@ -32,10 +32,17 @@ echo "!!!! WARNING: Submitting for MC!!!"
 #   -p defaults=Run3 runOnData=False runCaloJetVariables=False runPuppiJetVariables=True reco=HLT_Run3TRKMod \
 #   -o /store/user/sewuchte/BTagServiceWork/Run3/Online/ \
 #   -v crab_projects_Run3Study_Run3TRKMod_v0
+# python ../submit_all.py \
+#   ../runHLTBTagAnalyzer_cfg.py \
+#   -f tosubmit.txt \
+#   -s T2_DE_DESY \
+#   -p defaults=Run3 runOnData=False runCaloJetVariables=False runPuppiJetVariables=True reco=HLT_Run3TRKMod2 \
+#   -o /store/user/sewuchte/BTagServiceWork/Run3/Online/ \
+#   -v crab_projects_Run3Study_Run3TRKMod2_v0
 python ../submit_all.py \
   ../runHLTBTagAnalyzer_cfg.py \
   -f tosubmit.txt \
   -s T2_DE_DESY \
-  -p defaults=Run3 runOnData=False runCaloJetVariables=False runPuppiJetVariables=True reco=HLT_Run3TRKMod2 \
+  -p defaults=Run3 runOnData=False runCaloJetVariables=False runPuppiJetVariables=True reco=HLT_Run3TRKPixelOnly \
   -o /store/user/sewuchte/BTagServiceWork/Run3/Online/ \
-  -v crab_projects_Run3Study_Run3TRKMod2_v0
+  -v crab_projects_Run3Study_HLT_Run3TRKPixelOnly_v0

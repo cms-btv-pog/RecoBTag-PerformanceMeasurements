@@ -287,9 +287,76 @@ muSource = 'hltMuons'
 elSource = 'hltEgammaGsfElectrons'
 trackSource = tracks
 
-def customisePFForPixelTracks(process):
-    process.hltPFMuonMerging.TrackProducers = cms.VInputTag("hltIterL3MuonTracks", "hltPixelTracks")
-    process.hltPFMuonMerging.selectedTrackQuals = cms.VInputTag("hltIterL3MuonTracks", "hltPixelTracks")
+def customisePFForPixelTracks(process, tracksToUse = "hltPixelTracks"):
+    # hltPixelTracks or hltPixelTracksClean
+    if "Clean" in tracksToUse:
+        process.hltPixelTracksClean = cms.EDProducer("TrackWithVertexSelector",
+            src = cms.InputTag('hltPixelTracks'),
+            etaMin = cms.double(0.0),
+            etaMax = cms.double(5.0),
+            ptMin = cms.double(0.0),
+            ptMax = cms.double(999999.),
+            d0Max = cms.double(999.),
+            dzMax = cms.double(999.),
+            normalizedChi2 = cms.double(999999.),
+            numberOfValidHits = cms.uint32(0),
+            numberOfValidPixelHits = cms.uint32(0),
+            numberOfValidHitsForGood = cms.uint32(4),
+            numberOfValidPixelHitsForGood = cms.uint32(4),
+            numberOfLostHits = cms.uint32(999),
+            ptErrorCut = cms.double(999999.),
+            quality = cms.string("any"),
+            useVtx = cms.bool(True),
+            vertexTag = cms.InputTag('hltPixelVertices'),
+            timesTag = cms.InputTag(''),
+            timeResosTag = cms.InputTag(''),
+            nVertices = cms.uint32(100),
+            vtxFallback = cms.bool(True),
+            zetaVtx = cms.double(0.3),
+            rhoVtx = cms.double(0.1),
+            zetaVtxScale = cms.double(5.0),
+            rhoVtxScale = cms.double(2.5),
+            zetaVtxSig = cms.double(2.0),
+            rhoVtxSig = cms.double(2.0),
+            nSigmaDtVertex = cms.double(0),
+            copyExtras = cms.untracked.bool(True),
+            copyTrajectories = cms.untracked.bool(False)
+        )
+    process.hltPFMuonMerging.TrackProducers = cms.VInputTag("hltIterL3MuonTracks", tracksToUse)
+    process.hltPFMuonMerging.selectedTrackQuals = cms.VInputTag("hltIterL3MuonTracks", tracksToUse)
+    process.hltParticleFlowBlock.elementImporters = cms.VPSet(
+            cms.PSet(
+                DPtOverPtCuts_byTrackAlgo = cms.vdouble(
+                    0.5, 0.5, 0.5, 0.5, 0.5,
+                    0.5
+                ),
+                NHitCuts_byTrackAlgo = cms.vuint32(
+                    3, 3, 3, 3, 3,
+                    3
+                ),
+                cleanBadConvertedBrems = cms.bool(False),
+                importerName = cms.string('GeneralTracksImporter'),
+                muonMaxDPtOPt = cms.double(1.0),
+                muonSrc = cms.InputTag("hltMuons"),
+                source = cms.InputTag("hltLightPFTracks"),
+                # trackQuality = cms.string('highPurity'),
+                trackQuality = cms.string('any'),
+                useIterativeTracking = cms.bool(False)
+            ),
+            cms.PSet(
+                BCtoPFCMap = cms.InputTag(""),
+                importerName = cms.string('ECALClusterImporter'),
+                source = cms.InputTag("hltParticleFlowClusterECALUnseeded")
+            ),
+            cms.PSet(
+                importerName = cms.string('GenericClusterImporter'),
+                source = cms.InputTag("hltParticleFlowClusterHCAL")
+            ),
+            cms.PSet(
+                importerName = cms.string('GenericClusterImporter'),
+                source = cms.InputTag("hltParticleFlowClusterHF")
+            )
+        )
     return process
 
 def customizeVertices(process):
@@ -432,11 +499,13 @@ elif options.reco == 'HLT_Run3TRKPixelOnly':
     from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     process = customizeHLTRun3Tracking(process)
-    # def customisePFForPixelTracks(process):
-    #     process.hltPFMuonMerging.TrackProducers = cms.VInputTag("hltIterL3MuonTracks", "hltPixelTracks")
-    #     process.hltPFMuonMerging.selectedTrackQuals = cms.VInputTag("hltIterL3MuonTracks", "hltPixelTracks")
-    #     return process
     process = customisePFForPixelTracks(process)
+elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned':
+    # (c) Run-3 tracking: pixel only tracks
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
+    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    process = customizeHLTRun3Tracking(process)
+    process = customisePFForPixelTracks(process, "hltPixelTracksClean")
 
 else:
   raise RuntimeError('keyword "reco = '+options.reco+'" not recognised')
@@ -855,18 +924,18 @@ process.analyzerSeq += process.btagana
 #--------
 
 
-from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
-process.TrackHistograms_hltPixelTracks = TrackHistogrammer.clone(src = 'hltPixelTracks')
-process.TrackHistograms_hltTracks = TrackHistogrammer.clone(src = 'hltPFMuonMerging')
-process.TrackHistograms_hltMergedTracks = TrackHistogrammer.clone(src = 'hltMergedTracks')
-# process.TrackHistograms_hltGeneralTracks = TrackHistogrammer.clone(src = 'generalTracks')
-
-process.trkMonitoringSeq = cms.Sequence(
-   process.TrackHistograms_hltPixelTracks
- + process.TrackHistograms_hltTracks
- + process.TrackHistograms_hltMergedTracks
- # + process.TrackHistograms_hltGeneralTracks
-)
+# from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
+# process.TrackHistograms_hltPixelTracks = TrackHistogrammer.clone(src = 'hltPixelTracks')
+# process.TrackHistograms_hltTracks = TrackHistogrammer.clone(src = 'hltPFMuonMerging')
+# process.TrackHistograms_hltMergedTracks = TrackHistogrammer.clone(src = 'hltMergedTracks')
+# # process.TrackHistograms_hltGeneralTracks = TrackHistogrammer.clone(src = 'generalTracks')
+#
+# process.trkMonitoringSeq = cms.Sequence(
+#    process.TrackHistograms_hltPixelTracks
+#  + process.TrackHistograms_hltTracks
+#  + process.TrackHistograms_hltMergedTracks
+#  # + process.TrackHistograms_hltGeneralTracks
+# )
 
 # process.trkMonitoringEndPath = cms.EndPath(process.trkMonitoringSeq)
 # process.schedule.extend([process.trkMonitoringEndPath])

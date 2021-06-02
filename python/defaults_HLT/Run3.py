@@ -11,7 +11,7 @@ common = {
     'runPuppiJetVariables' : False,
 	# 'mcGlobalTag' : '112X_mcRun3_2021_realistic_v14',
 	'globalTag' : '112X_mcRun3_2021_realistic_v14',
-	# 'mcGlobalTag' : '112X_mcRun3_2021_realistic_v16',
+	# 'globalTag' : '112X_mcRun3_2021_realistic_v16',
 	'maxJetEta' : 2.5,
 	'usePrivateJEC' : False,
 	# 'jecDBFileMC' : 'PhaseIIFall17_V5b_MC',
