@@ -494,7 +494,6 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
   //------------------------------------------------------
   // Event information
   //------------------------------------------------------
-
   EventInfo.Run = iEvent.id().run();
 
   EventInfo.BX  = iEvent.bunchCrossing();
@@ -511,6 +510,11 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
 
   edm::Handle <PatJetCollection> jetsColl;
   iEvent.getByToken (JetCollectionTag_, jetsColl);
+  if(!jetsColl.isValid()){
+    cout << "jetsColl is not valid " << endl;
+    return;
+  }
+
   edm::Handle <PatJetCollection> jetsCollCalo;
   edm::Handle <PatJetCollection> jetsCollPuppi;
   if(runCaloJetVariables_){
@@ -519,6 +523,7 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
   if(runPuppiJetVariables_){
       iEvent.getByToken (PuppiJetCollectionTag_, jetsCollPuppi);
   }
+
 
   //------------------------------------------------------
   // Determine hadronizer type (done only once per job)
@@ -561,7 +566,6 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
 
   bool AreBHadrons = false;
 
-
   //---------------------------- Start MC info ---------------------------------------//
   if ( !isData_ && runEventInfo_ ) {
     // EventInfo.pthat
@@ -601,7 +605,6 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
 	      if(EventInfo.nPU==0) EventInfo.nPU = ipu->getPU_NumInteractions(); // needed in case getPU_zpositions() is empty
       }
     }
-
   //------------------------------------------------------
   // generated particles
   //------------------------------------------------------
@@ -1045,22 +1048,27 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
     //       cout << "simpv.size() " << simpv.size() << endl;
   }
   //---------------------------- End MC info ---------------------------------------//
-  //   std::cout << "EventInfo.Evt:" <<EventInfo.Evt << std::endl;
-  //   std::cout << "EventInfo.pthat:" <<EventInfo.pthat << std::endl;
-
+  //std::cout << "EventInfo.Evt:" <<EventInfo.Evt << std::endl;
+  //std::cout << "EventInfo.pthat:" <<EventInfo.pthat << std::endl;
 
   //// Event rho info: Needed for applying JECs
   edm::Handle< double > rhoH;
   iEvent.getByToken(rhoTag_,rhoH);
   EventInfo.rho = *rhoH;
 
+  if(!rhoH.isValid())
+    cout << "rhoH is not valid: " << rhoH.isValid() << endl;
+
+  //cout << "primaryVertexColl_ " << primaryVertexColl_ << endl;
   //------------------
   // Primary vertex
   //------------------
   iEvent.getByToken(primaryVertexColl_,primaryVertex);
   //bool newvertex = false;
 
+
   bool pvFound = (primaryVertex->size() != 0);
+
   if ( pvFound ) {
     pv = &(*primaryVertex->begin());
   }
@@ -1073,9 +1081,11 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
     pv=  new reco::Vertex(p,e,1,1,1);
     //newvertex = true;
   }
+
+  cout << "primaryVertex " << primaryVertex << endl;
   //   GlobalPoint Pv_point = GlobalPoint((*pv).x(), (*pv).y(), (*pv).z());
-  EventInfo.PVz = (*primaryVertex)[0].z();
-  EventInfo.PVez = (*primaryVertex)[0].zError();
+  EventInfo.PVz = pv->z();
+  EventInfo.PVez = pv->zError();
 
   EventInfo.nPV=0;
   for (unsigned int i = 0; i< primaryVertex->size() ; ++i) {
@@ -1151,7 +1161,6 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
   //------------------------------------------------------
   // Trigger info
   //------------------------------------------------------
-
   edm::Handle<edm::TriggerResults> trigRes;
   iEvent.getByToken(triggerTable_, trigRes);
 
@@ -1170,7 +1179,6 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
   //------------- added by Camille-----------------------------------------------------------//
   edm::ESHandle<JetTagComputer> computerHandle;
   iSetup.get<JetTagComputerRecord>().get( SVComputer_.c_str(), computerHandle );
-
   computer = dynamic_cast<const GenericMVAJetTagComputer*>( computerHandle.product() );
   //------------- end added-----------------------------------------------------------//
   //------------------------------------------------------
@@ -1290,7 +1298,6 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
   processJets(jetsColl, jetsColl, iEvent, iSetup, iJetColl, ipTagInfos_, svTagInfos_, deepFlavourJetTags_, deepCSVBJetTags_, deepFlavourTagInfos_); // the second 'jetsColl' is a dummy input here
   //------------------------------------------------------
 
-
   if(runCaloJetVariables_){
         iJetColl++;
       // processJets(jetsCollCalo, jetsCollCalo, iEvent, iSetup, iJetColl, ipCaloTagInfos_, svCaloTagInfos_, "", deepCSVBCaloJetTags_, ""); // the second 'jetsColl' is a dummy input here
@@ -1313,7 +1320,6 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
   if ( EventInfo.BitTrigger != 0 || EventInfo.Run < 0 ) {
     smalltree->Fill();
   }
-
   return;
 }
 
@@ -1561,7 +1567,6 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
     edm::RefToBase<pat::Jet> patJetRef = jetsColl->refAt(pjet - jetsColl->begin());
     edm::RefToBase<reco::Jet> jetRef(patJetRef);
     reco::JetTagInfo jetTagInfo(jetRef);
-
     cap0=0; cap1=0; cap2=0; cap3=0; cap4=0; cap5=0; cap6=0; cap7=0; cap8=0;
     can0=0; can1=0; can2=0; can3=0; can4=0; can5=0; can6=0; can7=0; can8=0;
 

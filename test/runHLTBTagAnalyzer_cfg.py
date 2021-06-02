@@ -255,11 +255,24 @@ if options.runOnData: options.isReHLT=False
 if options.isReHLT: trigresults = trigresults+'2'
 
 
-pfjets = "hltAK4PFJets" #original ak4PFJetsCHS
-calojets = "hltAK4CaloJets" #original ak4CaloJets
-puppijets = "hltAK4PFPuppiJets"
-PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatJetTags" # original: pfDeepCSVJetTags
+#pfjets = "hltAK4PFJets" #original ak4PFJetsCHS
+#calojets = "hltAK4CaloJets" #original ak4CaloJets
+#puppijets = "hltAK4PFPuppiJets"
+#PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatJetTags" # original: pfDeepCSVJetTags
 PFDeepFlavourTags = "hltPFDeepFlavourJetTags" # original: pfDeepFlavourJetTagsSlimmedDeepFlavour
+PFDeepFlavourTagInfos = 'hltPFDeepFlavour'
+PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatJetTags"
+IPTagInfos = 'hltDeepBLifetimePFPat'
+SVTagInfos = 'hltDeepSecondaryVertexPFPat'
+s
+PuppiDeepCSVTags = 'hltDeepCombinedSecondaryVertexBPFPuppiPatJetTags'
+PuppiDeepFlavourTags = 'hltPFPuppiDeepFlavourJetTags'
+PuppiDeepFlavourTagInfos = 'hltPFPuppiDeepFlavour'
+PuppiIPTagInfos = 'hltDeepBLifetimePFPuppiPat'
+SVPuppiTagInfos = 'hltDeepSecondaryVertexPFPuppiPat'
+
+
+
 rho = "hltFixedGridRhoFastjetAll" #original fixedGridRhoFastjetAll
 hltVertices = "hltVerticesPFFilter" #original offlinePrimaryVertices
 hltVerticesSlimmed = "hltVerticesPFFilter" #original offlineSlimmedPrimaryVertices
@@ -272,7 +285,6 @@ rpcRecHits = "hltRpcRecHits" #original rpcRecHits
 # tracks = "hltMergedTracks" #original generalTracks
 tracks = "hltPFMuonMerging" #original generalTracks
 # tracks = "hltPixelTracks" #original generalTracks
-payload = "AK4PFHLT" #original AK4PFchs
 
 
 genParticles = 'genParticles'
@@ -482,6 +494,7 @@ elif options.reco == 'HLT_Run3TRKMod':
     from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     process = customizeHLTRun3Tracking(process)
+
 elif options.reco == 'HLT_Run3TRKMod2':
     # (a) Run-3 tracking: standard
     from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
@@ -506,6 +519,32 @@ elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned':
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     process = customizeHLTRun3Tracking(process)
     process = customisePFForPixelTracks(process, "hltPixelTracksClean")
+
+elif options.reco == 'HLT_BTagROI':
+
+        from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+
+        from RecoBTag.PerformanceMeasurements.customise_hlt import *
+        process = addPaths_PFJetsForBtag(process)
+
+        pvSource = "hltVerticesPFFilterForBTag"
+        pfCandidates = 'hltParticleFlowForBTag'
+        patJetSource = 'hltPatJetsROI'
+        trackSource = "hltMergedTracksForBTag"
+        PFDeepFlavourTags = "hltPFDeepFlavourJetTagsROI"
+        PFDeepFlavourTagInfos = 'hltPFDeepFlavourROI'
+
+        rho = "hltFixedGridRhoFastjetAllForBTag" 
+        patPuppiJetSource = 'hltPatJetsPuppiROI'
+        PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatJetTagsROI"
+        PuppiDeepCSVTags = 'hltDeepCombinedSecondaryVertexBPFPuppiPatJetTagsROI'
+        PuppiDeepFlavourTags = 'hltPFPuppiDeepFlavourJetTagsROI'
+        PuppiDeepFlavourTagInfos = 'hltPFPuppiDeepFlavourROI'
+        PuppiIPTagInfos = 'hltDeepBLifetimePFPuppiPatROI'
+        IPTagInfos = 'hltDeepBLifetimePFPatROI'
+        SVPuppiTagInfos = 'hltDeepSecondaryVertexPFPuppiPatROI'
+        SVTagInfos = 'hltDeepSecondaryVertexPFPatROI'
+
 
 else:
   raise RuntimeError('keyword "reco = '+options.reco+'" not recognised')
@@ -570,10 +609,19 @@ process = addPaths_MC_JMEPFPuppi(process)
 from RecoBTag.PerformanceMeasurements.PATLikeConfig import customizePFPatLikeJets
 process = customizePFPatLikeJets(process)
 
+
 if options.reco == 'HLT_Run3TRKMod':
     process = customizeVertices(process)
+
 if options.reco == 'HLT_Run3TRKMod2':
     process = customizeVertices2(process)
+
+if options.reco == 'HLT_BTagROI':
+    from RecoBTag.PerformanceMeasurements.customise_hlt import *
+    process = addPaths_MC_JMEPFPuppiROI(process)
+
+    from RecoBTag.PerformanceMeasurements.ROIPATLikeConfig import customizePFPatLikeJetsROI
+    process = customizePFPatLikeJetsROI(process)
 
 
 # if not options.eras:
@@ -592,6 +640,7 @@ if options.reco == 'HLT_Run3TRKMod2':
 import os
 # from CondCore.DBCommon.CondDBSetup_cfi import *
 from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
+
 process.pfhcESSource = cms.ESSource('PoolDBESSource',
   # _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db'),
   _CondDB.clone(connect = 'sqlite_fip:JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db'),
@@ -603,6 +652,7 @@ process.pfhcESSource = cms.ESSource('PoolDBESSource',
     ),
   ),
 )
+
 process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
 #process.hltParticleFlow.calibrationsLabel = '' # standard label for Offline-PFHC in GT
 ## ES modules for HLT JECs
@@ -842,7 +892,7 @@ process.btagana.muonCollectionName    = cms.InputTag(muSource)
 process.btagana.electronCollectionName= cms.InputTag(elSource)
 # process.btagana.patMuonCollectionName = cms.InputTag(patMuons)
 process.btagana.rho                   = cms.InputTag(rho)
-process.btagana.deepFlavourJetTags    = PFDeepFlavourTags
+
 # process.btagana.triggerTable          = cms.InputTag('TriggerResults::HLT') # Data and MC
 process.btagana.triggerTable          = cms.InputTag(trigresults) # Data and MC
 process.btagana.genParticles          = cms.InputTag(genParticles)
@@ -858,6 +908,22 @@ process.btagana.runPFMuonVariables = options.runPFMuonVariables
 # process.btagana.runPatMuons = options.runPatMuons
 process.btagana.runEventInfo = options.runEventInfo
 process.btagana.runOnData = options.runOnData
+
+
+process.btagana.deepCSVBJetTags = PFDeepCSVTags
+process.btagana.deepCSVBPuppiJetTags = PuppiDeepCSVTags
+
+process.btagana.deepFlavourJetTags    = PFDeepFlavourTags
+process.btagana.deepFlavourTagInfos   = PFDeepFlavourTagInfos
+
+process.btagana.deepFlavourPuppiJetTags    = PuppiDeepFlavourTags
+process.btagana.deepFlavourPuppiTagInfos = PuppiDeepFlavourTagInfos
+
+process.btagana.ipPuppiTagInfos = PuppiIPTagInfos
+process.btagana.ipTagInfos = IPTagInfos
+
+process.btagana.svPuppiTagInfos = SVPuppiTagInfos
+process.btagana.svTagInfos = SVTagInfos
 
 if options.runOnData:
   process.btagana.runHadronVariables  = False
