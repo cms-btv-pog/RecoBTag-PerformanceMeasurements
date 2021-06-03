@@ -681,7 +681,7 @@ elif options.reco == 'HLT_BTagROI':
         trackSource = "hltMergedTracksForBTag"
         PFDeepFlavourTags = "hltPFDeepFlavourROIJetTags"
         PFDeepFlavourTagInfos = 'hltPFDeepFlavourROI'
-        rho = "hltFixedGridRhoFastjetAllForBTag" 
+        rho = "hltFixedGridRhoFastjetAllForBTag"
         patPuppiJetSource = 'hltPatJetsPuppiROI'
         PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatROIJetTags"
         PuppiDeepCSVTags = 'hltDeepCombinedSecondaryVertexBPFPuppiPatROIJetTags'
@@ -906,6 +906,7 @@ process.MessageLogger.cerr.threshold = "DEBUG"
 #     ]
 if options.inputFiles:
     process.source.fileNames = options.inputFiles
+process.source.secondaryFileNames = cms.untracked.vstring()
 
 ## Define the output file name
 if options.runOnData :

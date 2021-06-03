@@ -24,12 +24,11 @@ fi
 
 declare -A samplesMap
 
-samplesMap["Phase2HLTTDR_TTbar_14TeV_PU140"]="/TT_TuneCP5_14TeV-powheg-pythia8/Phase2HLTTDRSummer20ReRECOMiniAOD-PU140_111X_mcRun4_realistic_T15_v1-v1/FEVT"
+samplesMap["RelValTTbar_14TeV"]="/RelValTTbar_14TeV/CMSSW_11_2_0_pre9-PU_112X_mcRun3_2021_realistic_v11-v1/GEN-SIM-DIGI-RAW"
 
 recoKeys=(
-    HLT_TRKv00_TICL
+    HLT_Run3TRKPixelOnlyCleaned
 )
-# /eos/home-s/sewuchte/BTV-Phase2/December_TDR/Condor_Prod_v01
 
 # options (JobFlavour and AccountingGroup)
 opts=""
@@ -39,20 +38,15 @@ if [[ ${HOSTNAME} == lxplus* ]]; then
     # opts+=" --AccountingGroup group_u_CMS.CAF.PHYS"
   # fi
 fi
-
-# for recoKey in "${recoKeys[@]}"; do
+    for recoKey in "${recoKeys[@]}"; do
         for sampleKey in ${!samplesMap[@]}; do
             sampleName=${samplesMap[${sampleKey}]}
             numEvents=${NEVT}
-            # python ../runHLTBTagAnalyzer_PhaseII_cfg.py dumpPython=/tmp/${USER}/BTV_PhaseII_Offline_cfg.py numThreads=1 reco=${recoKey} globalTag=111X_mcRun4_realistic_T15_v2
             python ../runHLTBTagAnalyzer_cfg.py dumpPython=/tmp/${USER}/BTV_Run3_Online_cfg.py defaults=Run3 runOnData=False reco=${recoKey} runPuppiJetVariables=True runCaloJetVariables=False
 
-            # htc_driver -c /tmp/${USER}/BTV_PhaseII_Offline_cfg.py --customize-cfg -m ${numEvents} -n 250 --cpus 1 --memory 2000 --runtime 10800 ${opts} \
-            htc_driver -c /tmp/${USER}/BTV_PhaseII_Offline_cfg.py --customize-cfg -m ${numEvents} -n 1000 --cpus 1 --memory 2000 --runtime 10800 ${opts} \
+            htc_driver -c /tmp/${USER}/BTV_Run3_Online_cfg.py --customize-cfg -m ${numEvents} -n 1000 --cpus 1 --memory 2000 --runtime 10800 ${opts} \
             -d ${sampleName} -p 0 -o ${ODIR}/${sampleKey} --cmsRun-output-dir ${ODIR_cmsRun}/${sampleKey}
         done
-    # done
+    done
     unset sampleKey sampleName numEvents
-# done
-# unset recoKey opts recoKeys samplesMap NEVT ODIR ODIR_cmsRun
-unset opts samplesMap NEVT ODIR ODIR_cmsRun
+unset opts samplesMap NEVT ODIR ODIR_cmsRun recoKey
