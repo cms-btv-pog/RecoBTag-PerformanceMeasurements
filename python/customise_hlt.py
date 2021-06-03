@@ -197,7 +197,7 @@ def addPaths_PFJetsForBtag(process):
     )
 
     process.hltAK4PFCorrectorForBTag = cms.EDProducer("ChainedJetCorrectorProducer",
-                                                      correctors = cms.VInputTag("hltAK4PFFastJetCorrector", "hltAK4PFRelativeCorrector", "hltAK4PFAbsoluteCorrector", "hltAK4PFResidualCorrector")
+                                                      correctors = cms.VInputTag("hltAK4PFFastJetCorrectorForBTag", "hltAK4PFRelativeCorrector", "hltAK4PFAbsoluteCorrector", "hltAK4PFResidualCorrector")
     )
 
 

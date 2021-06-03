@@ -11,7 +11,7 @@
    <Notes on implementation>
 */
 //
-// Original Author:  Andrea Jeremy
+// Original Author:  John Alison, Andrea Jeremy
 //         Created:  Thu Dec 20 10:00:00 CEST 2012
 //
 //
@@ -1057,7 +1057,7 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
   EventInfo.rho = *rhoH;
 
   if(!rhoH.isValid())
-    cout << "rhoH is not valid: " << rhoH.isValid() << endl;
+    LogWarning("") << "rhoH is not valid: " << rhoH.isValid();
 
   //cout << "primaryVertexColl_ " << primaryVertexColl_ << endl;
   //------------------
@@ -1082,7 +1082,6 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
     //newvertex = true;
   }
 
-  // cout << "primaryVertex " << primaryVertex << endl;
   //   GlobalPoint Pv_point = GlobalPoint((*pv).x(), (*pv).y(), (*pv).z());
   EventInfo.PVz = pv->z();
   EventInfo.PVez = pv->zError();
@@ -2058,7 +2057,6 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
     float DeepFlavourUDSN  = -10.;
     float DeepFlavourGN    = -10.;
 
-
     float DeepCSVb   = (deepCSVBJetTags.size()) ? pjet->bDiscriminator((deepCSVBJetTags+":probb"   ).c_str()) : -10;
     float DeepCSVc   = (deepCSVBJetTags.size()) ? pjet->bDiscriminator((deepCSVBJetTags+":probc"   ).c_str()) : -10;
     float DeepCSVl   = (deepCSVBJetTags.size()) ? pjet->bDiscriminator((deepCSVBJetTags+":probudsg").c_str()) : -10;
@@ -2219,6 +2217,7 @@ void HLTBTagAnalyzerT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>
       JetInfo[iJetColl].nSVTagVar += nSVs;
       JetInfo[iJetColl].Jet_nLastSVTagVar[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSVTagVar;
     }
+
     // DeepFlavour InputFeatures
     if(runDeepFlavourTagVariables_) {
       auto df_taginfo = static_cast<const reco::DeepFlavourTagInfo*>(pjet->tagInfo(deepFlavourTagInfos));
