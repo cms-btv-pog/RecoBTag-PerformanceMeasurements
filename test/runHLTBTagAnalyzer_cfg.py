@@ -338,9 +338,13 @@ def customisePFForPixelTracks(process, tracksToUse = "hltPixelTracks"):
     process.hltPFMuonMerging.selectedTrackQuals = cms.VInputTag("hltIterL3MuonTracks", tracksToUse)
     process.hltParticleFlowBlock.elementImporters = cms.VPSet(
             cms.PSet(
+                # DPtOverPtCuts_byTrackAlgo = cms.vdouble(
+                #     0.5, 0.5, 0.5, 0.5, 0.5,
+                #     0.5
+                # ),
                 DPtOverPtCuts_byTrackAlgo = cms.vdouble(
-                    0.5, 0.5, 0.5, 0.5, 0.5,
-                    0.5
+                    5.0, 5.0, 5.0, 5.0, 5.0,
+                    5.0
                 ),
                 NHitCuts_byTrackAlgo = cms.vuint32(
                     3, 3, 3, 3, 3,
@@ -369,9 +373,37 @@ def customisePFForPixelTracks(process, tracksToUse = "hltPixelTracks"):
                 source = cms.InputTag("hltParticleFlowClusterHF")
             )
         )
-    process.HLTRecopixelvertexingTask = cms.Task(process.HLTRecoPixelTracksTask, process.hltPixelVertices, process.hltPixelVerticesCUDA, process.hltPixelVerticesSoA, process.hltTrimmedPixelVertices)
-    process.HLTTrackReconstructionForPF = cms.Sequence(process.HLTDoLocalPixelSequence+process.HLTRecopixelvertexingSequence+process.hltPFMuonMerging+process.hltMuonLinks+process.hltMuons)
-    # process.HLTAK4PFJetsReconstructionSequence = cms.Sequence(process.HLTL2muonrecoSequence+process.HLTL3muonrecoSequence+process.HLTParticleFlowSequence+process.hltAK4PFJets+process.hltAK4PFJetsLooseID+process.hltAK4PFJetsTightID)
+    process.hltMuonLinks = process.hltPixelOnlyMuonLinks.clone(
+        InclusiveTrackerTrackCollection = cms.InputTag("hltPFMuonMerging")
+    )
+    process.hltMuons = process.hltPixelOnlyMuons.clone(
+        TrackExtractorPSet = cms.PSet(
+            BeamSpotLabel = cms.InputTag("hltOnlineBeamSpot"),
+            BeamlineOption = cms.string('BeamSpotFromEvent'),
+            Chi2Ndof_Max = cms.double(1e+64),
+            Chi2Prob_Min = cms.double(-1.0),
+            ComponentName = cms.string('TrackExtractor'),
+            DR_Max = cms.double(1.0),
+            DR_Veto = cms.double(0.01),
+            DepositLabel = cms.untracked.string(''),
+            Diff_r = cms.double(0.1),
+            Diff_z = cms.double(0.2),
+            NHits_Min = cms.uint32(0),
+            Pt_Min = cms.double(-1.0),
+            inputTrackCollection = cms.InputTag("hltPFMuonMerging")
+        ),
+        inputCollectionLabels = cms.VInputTag("hltPFMuonMerging", "hltMuonLinks", "hltL2Muons")
+    )
+    process.HLTTrackReconstructionForPF = cms.Sequence(
+        process.HLTDoLocalPixelSequence+
+        process.HLTRecopixelvertexingSequence+
+        # process.hltPixelTracksZetaClean+
+        process.hltPFMuonMerging+
+        process.hltMuonLinks+
+        process.hltMuons)
+    process.hltVerticesPF.TkFilterParameters.minSiliconLayersWithHits=cms.int32(0)
+    # process.HLTRecopixelvertexingTask = cms.Task(process.HLTRecoPixelTracksTask, process.hltPixelVertices, process.hltPixelVerticesCUDA, process.hltPixelVerticesSoA, process.hltTrimmedPixelVertices)
+    # process.HLTTrackReconstructionForPF = cms.Sequence(process.HLTDoLocalPixelSequence+process.HLTRecopixelvertexingSequence+process.hltPixelTracksCleanForBTag+process.hltPFMuonMerging+process.hltMuonLinks+process.hltMuons)
     return process
 
 def customisePFForPixelTracksCleaned(process, tracksToUse = "hltPixelTracksCleanForBTag"):
@@ -383,7 +415,8 @@ def customisePFForPixelTracksCleaned(process, tracksToUse = "hltPixelTracksClean
         etaMax = cms.double(5.0),
         etaMin = cms.double(0.0),
         nSigmaDtVertex = cms.double(0.0),
-        nVertices = cms.uint32(2),
+        # nVertices = cms.uint32(2),
+        nVertices = cms.uint32(4),
         normalizedChi2 = cms.double(999999.0),
         numberOfLostHits = cms.uint32(999),
         numberOfValidHits = cms.uint32(0),
@@ -421,11 +454,13 @@ def customisePFForPixelTracksCleaned(process, tracksToUse = "hltPixelTracksClean
                     5.0
                 ),
                 NHitCuts_byTrackAlgo = cms.vuint32(
-                    # 3, 3, 3, 3, 3,
-                    # 3
-                    0, 0, 0, 0, 0,
-                    0
+                    3, 3, 3, 3, 3,
+                    3
                 ),
+                # NHitCuts_byTrackAlgo = cms.vuint32(
+                #     0, 0, 0, 0, 0,
+                #     0
+                # ),
                 cleanBadConvertedBrems = cms.bool(False),
                 importerName = cms.string('GeneralTracksImporter'),
                 muonMaxDPtOPt = cms.double(1.0),
@@ -448,9 +483,39 @@ def customisePFForPixelTracksCleaned(process, tracksToUse = "hltPixelTracksClean
                 importerName = cms.string('GenericClusterImporter'),
                 source = cms.InputTag("hltParticleFlowClusterHF")
             )
-        )
-    process.HLTRecopixelvertexingTask = cms.Task(process.HLTRecoPixelTracksTask, process.hltPixelVertices, process.hltPixelVerticesCUDA, process.hltPixelVerticesSoA, process.hltTrimmedPixelVertices)
-    process.HLTTrackReconstructionForPF = cms.Sequence(process.HLTDoLocalPixelSequence+process.HLTRecopixelvertexingSequence+process.hltPixelTracksCleanForBTag+process.hltPFMuonMerging+process.hltMuonLinks+process.hltMuons)
+    )
+    process.hltMuonLinks = process.hltPixelOnlyMuonLinks.clone(
+        InclusiveTrackerTrackCollection = cms.InputTag("hltPFMuonMerging")
+    )
+    process.hltMuons = process.hltPixelOnlyMuons.clone(
+        TrackExtractorPSet = cms.PSet(
+            BeamSpotLabel = cms.InputTag("hltOnlineBeamSpot"),
+            BeamlineOption = cms.string('BeamSpotFromEvent'),
+            Chi2Ndof_Max = cms.double(1e+64),
+            Chi2Prob_Min = cms.double(-1.0),
+            ComponentName = cms.string('TrackExtractor'),
+            DR_Max = cms.double(1.0),
+            DR_Veto = cms.double(0.01),
+            DepositLabel = cms.untracked.string(''),
+            Diff_r = cms.double(0.1),
+            Diff_z = cms.double(0.2),
+            NHits_Min = cms.uint32(0),
+            Pt_Min = cms.double(-1.0),
+            inputTrackCollection = cms.InputTag("hltPFMuonMerging")
+        ),
+        inputCollectionLabels = cms.VInputTag("hltPFMuonMerging", "hltMuonLinks", "hltL2Muons")
+    )
+    process.HLTTrackReconstructionForPF = cms.Sequence(
+        process.HLTDoLocalPixelSequence+
+        process.HLTRecopixelvertexingSequence+
+        # process.hltPixelTracksZetaClean+
+        process.hltPixelTracksCleanForBTag+
+        process.hltPFMuonMerging+
+        process.hltMuonLinks+
+        process.hltMuons)
+    process.hltVerticesPF.TkFilterParameters.minSiliconLayersWithHits=cms.int32(0)
+    # process.HLTRecopixelvertexingTask = cms.Task(process.HLTRecoPixelTracksTask, process.hltPixelVertices, process.hltPixelVerticesCUDA, process.hltPixelVerticesSoA, process.hltTrimmedPixelVertices)
+    # process.HLTTrackReconstructionForPF = cms.Sequence(process.HLTDoLocalPixelSequence+process.HLTRecopixelvertexingSequence+process.hltPixelTracksCleanForBTag+process.hltPFMuonMerging+process.hltMuonLinks+process.hltMuons)
     return process
 
 def customizeVertices(process):
@@ -690,7 +755,7 @@ process = addPaths_MC_JMEPF(process)
 process = addPaths_MC_JMEPFCluster(process)
 process = addPaths_MC_JMEPFPuppi(process)
 from RecoBTag.PerformanceMeasurements.PATLikeConfig import customizePFPatLikeJets
-process = customizePFPatLikeJets(process)
+process = customizePFPatLikeJets(process, runPF=True, runCalo=options.runCaloJetVariables, runPuppi=options.runPuppiJetVariables)
 
 
 if options.reco == 'HLT_Run3TRKMod':
@@ -706,9 +771,11 @@ if options.reco == 'HLT_Run3TRKPixelOnly' or options.reco == "HLT_Run3TRKPixelOn
     process.hltImpactParameterPatTagInfos.minimumNumberOfHits = cms.int32(0)
     process.hltImpactParameterTagInfos.minimumNumberOfHits = cms.int32(0)
     process.hltDeepTrackVertexArbitratorPF.trackMinLayers = cms.int32(0)
-    process.hltDeepSecondaryVertexPFPatTagInfos.trackSelection.totalHitsMin = cms.uint32(0)
+    # process.hltDeepSecondaryVertexPFPatTagInfos.trackSelection.totalHitsMin = cms.uint32(0)
+    process.hltDeepSecondaryVertexPFPatTagInfos.trackSelection.totalHitsMin = cms.uint32(2)
     process.hltDeepCombinedSecondaryVertexBJetPatTagInfos.computer.trackPseudoSelection.totalHitsMin = cms.uint32(0)
-    process.hltDeepCombinedSecondaryVertexBJetPatTagInfos.computer.trackSelection.totalHitsMin = cms.uint32(0)
+    # process.hltDeepCombinedSecondaryVertexBJetPatTagInfos.computer.trackSelection.totalHitsMin = cms.uint32(0)
+    process.hltDeepCombinedSecondaryVertexBJetPatTagInfos.computer.trackSelection.totalHitsMin = cms.uint32(2)
 
 if options.reco == 'HLT_BTagROI':
     from RecoBTag.PerformanceMeasurements.customise_hlt import *

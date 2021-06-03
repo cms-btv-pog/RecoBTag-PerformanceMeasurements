@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-def customizePFPatLikeJets(process, type = "AK4PFCHS"):
+def customizePFPatLikeJets(process, runCalo=True, runPuppi=True, runPF=True):
     # set some default collection variables
     pfjets =                "hltAK4PFJets"                                  #original ak4PFJetsCHS
     puppijets =             "hltAK4PFPuppiJets"                                  #original ak4PFJetsCHS
@@ -398,7 +398,9 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
     process.hltPFDeepFlavourTagInfos = pfDeepFlavourTagInfos.clone(
         candidates = cms.InputTag(particleFlow),
         jets = cms.InputTag(pfjets),
-        puppi_value_map = cms.InputTag(puppi),
+        fallback_puppi_weight = cms.bool(True),
+        # puppi_value_map = cms.InputTag(puppi),
+        puppi_value_map = cms.InputTag(""),
         secondary_vertices = cms.InputTag("hltDeepInclusiveSecondaryVerticesPF"),
         shallow_tag_infos = cms.InputTag("hltDeepCombinedSecondaryVertexBJetPatTagInfos"),
         vertex_associator = cms.InputTag("hltPrimaryVertexAssociation","original"),
@@ -473,55 +475,57 @@ def customizePFPatLikeJets(process, type = "AK4PFCHS"):
         *process.hltPatJets
         )
 
-    process.MC_PuppiJetsMatchingPath = cms.Path(
-        process.HLTAK4PFPuppiJetsSequence
-        *process.HLTBtagDeepCSVSequencePFPuppiPat
-        *process.hltPrunedGenParticlesWithStatusOne
-        *process.hltPrunedGenParticles
-        *process.hltPackedGenParticles
-        *process.hltPatJetPartonMatchPuppi
-        *process.hltSlimmedGenJets
-        *process.hltAk4JetID
-        *process.hltPatJetGenJetMatchPuppi
-        *process.hltPatJetPartonsLegacy
-        *process.hltPatJetPartonAssociationLegacyPuppi
-        *process.hltPatJetFlavourAssociationLegacyPuppi
-        *process.hltPatJetPartons
-        *process.hltPatJetFlavourAssociationPuppi
-        *process.hltAk4JetTracksAssociatorAtVertexPFPuppi
-        *process.patJetPuppiCharge
-        *process.hltPatJetCorrFactorsPuppi
+    if runPuppi:
+        process.MC_PuppiJetsMatchingPath = cms.Path(
+            process.HLTAK4PFPuppiJetsSequence
+            *process.HLTBtagDeepCSVSequencePFPuppiPat
+            *process.hltPrunedGenParticlesWithStatusOne
+            *process.hltPrunedGenParticles
+            *process.hltPackedGenParticles
+            *process.hltPatJetPartonMatchPuppi
+            *process.hltSlimmedGenJets
+            *process.hltAk4JetID
+            *process.hltPatJetGenJetMatchPuppi
+            *process.hltPatJetPartonsLegacy
+            *process.hltPatJetPartonAssociationLegacyPuppi
+            *process.hltPatJetFlavourAssociationLegacyPuppi
+            *process.hltPatJetPartons
+            *process.hltPatJetFlavourAssociationPuppi
+            *process.hltAk4JetTracksAssociatorAtVertexPFPuppi
+            *process.patJetPuppiCharge
+            *process.hltPatJetCorrFactorsPuppi
 
-        *process.hltPrimaryVertexAssociationPuppi
-        # *process.hltChargedHadronPFTrackIsolation
-        *process.hltPFPuppiDeepFlavourTagInfos
-        *process.hltPFPuppiDeepFlavourJetTags
+            *process.hltPrimaryVertexAssociationPuppi
+            # *process.hltChargedHadronPFTrackIsolation
+            *process.hltPFPuppiDeepFlavourTagInfos
+            *process.hltPFPuppiDeepFlavourJetTags
 
-        *process.hltPatJetsPuppi
+            *process.hltPatJetsPuppi
         )
 
-    process.MC_CaloJetsMatchingPath = cms.Path(
-        process.HLTAK4CaloJetsCorrectionSequence
-        *process.HLTBtagDeepCSVSequenceCaloPat
-        *process.hltPrunedGenParticlesWithStatusOne
-        *process.hltPrunedGenParticles
-        *process.hltPackedGenParticles
-        *process.hltPatJetPartonMatchCalo
-        *process.hltPatJetGenJetMatchCalo
-        *process.hltPatJetPartonsLegacy
-        *process.hltPatJetPartons
-        *process.hltSlimmedGenJets
-        *process.hltPatJetPartonAssociationLegacyCalo
-        *process.hltPatJetFlavourAssociationLegacyCalo
-        *process.hltPatJetFlavourAssociationCalo
-        *process.hltAk4JetTracksAssociatorAtVertexCalo
+    if runCalo:
+        process.MC_CaloJetsMatchingPath = cms.Path(
+            process.HLTAK4CaloJetsCorrectionSequence
+            *process.HLTBtagDeepCSVSequenceCaloPat
+            *process.hltPrunedGenParticlesWithStatusOne
+            *process.hltPrunedGenParticles
+            *process.hltPackedGenParticles
+            *process.hltPatJetPartonMatchCalo
+            *process.hltPatJetGenJetMatchCalo
+            *process.hltPatJetPartonsLegacy
+            *process.hltPatJetPartons
+            *process.hltSlimmedGenJets
+            *process.hltPatJetPartonAssociationLegacyCalo
+            *process.hltPatJetFlavourAssociationLegacyCalo
+            *process.hltPatJetFlavourAssociationCalo
+            *process.hltAk4JetTracksAssociatorAtVertexCalo
 
-        *process.hltPatJetsCalo
-    )
+            *process.hltPatJetsCalo
+        )
 
     if process.schedule_():
-        process.schedule.extend([process.MC_JetsMatchingPath])
-        process.schedule.extend([process.MC_CaloJetsMatchingPath])
-        process.schedule.extend([process.MC_PuppiJetsMatchingPath])
+        if runPF: process.schedule.extend([process.MC_JetsMatchingPath])
+        if runCalo: process.schedule.extend([process.MC_CaloJetsMatchingPath])
+        if runPuppi: process.schedule.extend([process.MC_PuppiJetsMatchingPath])
 
     return process

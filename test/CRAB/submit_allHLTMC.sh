@@ -46,3 +46,10 @@ python ../submit_all.py \
   -p defaults=Run3 runOnData=False runCaloJetVariables=False runPuppiJetVariables=True reco=HLT_Run3TRKPixelOnly \
   -o /store/user/sewuchte/BTagServiceWork/Run3/Online/ \
   -v crab_projects_Run3Study_HLT_Run3TRKPixelOnly_v0
+python ../submit_all.py \
+  ../runHLTBTagAnalyzer_cfg.py \
+  -f tosubmit.txt \
+  -s T2_DE_DESY \
+  -p defaults=Run3 runOnData=False runCaloJetVariables=False runPuppiJetVariables=True reco=HLT_Run3TRKPixelOnlyCleaned \
+  -o /store/user/sewuchte/BTagServiceWork/Run3/Online/ \
+  -v crab_projects_Run3Study_HLT_Run3TRKPixelOnlyCleaned_v0
