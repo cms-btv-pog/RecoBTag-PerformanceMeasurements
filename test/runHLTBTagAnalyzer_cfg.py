@@ -1,5 +1,5 @@
 from FWCore.ParameterSet.VarParsing import VarParsing
-
+import fnmatch
 ###############################
 ####### Parameters ############
 ###############################
@@ -178,8 +178,22 @@ options.register(
     'skipEvents', 0,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.int,
-    "skip N events"
-)
+    "skip N events")
+
+options.register('runTiming', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'run timing instead of rates')
+options.register('numThreads', 1,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.int,
+    'number of threads')
+options.register('numStreams', 1,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.int,
+    'number of streams')
+
+
 options.register(
     'reco', 'HLT_GRun',
   VarParsing.multiplicity.singleton,
@@ -254,13 +268,14 @@ trigresults='TriggerResults::HLT'
 if options.runOnData: options.isReHLT=False
 if options.isReHLT: trigresults = trigresults+'2'
 
-
 #pfjets = "hltAK4PFJets" #original ak4PFJetsCHS
 #calojets = "hltAK4CaloJets" #original ak4CaloJets
 #puppijets = "hltAK4PFPuppiJets"
 #PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatJetTags" # original: pfDeepCSVJetTags
-PFDeepFlavourTags = "hltPFDeepFlavourJetTags" # original: pfDeepFlavourJetTagsSlimmedDeepFlavour
-PFDeepFlavourTagInfos = 'hltPFDeepFlavour'
+# PFDeepFlavourTags = "hltPFDeepFlavourJetTags" # original: pfDeepFlavourJetTagsSlimmedDeepFlavour
+# PFDeepFlavourTagInfos = 'hltPFDeepFlavour'
+PFDeepFlavourTags = "hltPFDeepFlavourPatJetTags" # original: pfDeepFlavourJetTagsSlimmedDeepFlavour
+PFDeepFlavourTagInfos = 'hltPFDeepFlavourPat'
 PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatJetTags"
 IPTagInfos = 'hltDeepBLifetimePFPat'
 SVTagInfos = 'hltDeepSecondaryVertexPFPat'
@@ -271,8 +286,6 @@ PuppiDeepFlavourTagInfos = 'hltPFPuppiDeepFlavour'
 PuppiIPTagInfos = 'hltDeepBLifetimePFPuppiPat'
 SVPuppiTagInfos = 'hltDeepSecondaryVertexPFPuppiPat'
 
-
-
 rho = "hltFixedGridRhoFastjetAll" #original fixedGridRhoFastjetAll
 hltVertices = "hltVerticesPFFilter" #original offlinePrimaryVertices
 hltVerticesSlimmed = "hltVerticesPFFilter" #original offlineSlimmedPrimaryVertices
@@ -282,10 +295,7 @@ hbhereco = "hltHbhereco" #original hbhereco
 hfreco = "hltHfreco" #original hfreco
 horeco = "hltHoreco" #original horeco
 rpcRecHits = "hltRpcRecHits" #original rpcRecHits
-# tracks = "hltMergedTracks" #original generalTracks
 tracks = "hltPFMuonMerging" #original generalTracks
-# tracks = "hltPixelTracks" #original generalTracks
-
 
 genParticles = 'genParticles'
 patJetSource = 'hltPatJets'
@@ -299,330 +309,6 @@ muSource = 'hltMuons'
 elSource = 'hltEgammaGsfElectrons'
 trackSource = tracks
 
-def customisePFForPixelTracks(process, tracksToUse = "hltPixelTracks"):
-    # hltPixelTracks or hltPixelTracksClean
-    # if "Clean" in tracksToUse:
-    #     process.hltPixelTracksClean = cms.EDProducer("TrackWithVertexSelector",
-    #         src = cms.InputTag('hltPixelTracks'),
-    #         etaMin = cms.double(0.0),
-    #         etaMax = cms.double(5.0),
-    #         ptMin = cms.double(0.0),
-    #         ptMax = cms.double(999999.),
-    #         d0Max = cms.double(999.),
-    #         dzMax = cms.double(999.),
-    #         normalizedChi2 = cms.double(999999.),
-    #         numberOfValidHits = cms.uint32(0),
-    #         numberOfValidPixelHits = cms.uint32(0),
-    #         numberOfValidHitsForGood = cms.uint32(4),
-    #         numberOfValidPixelHitsForGood = cms.uint32(4),
-    #         numberOfLostHits = cms.uint32(999),
-    #         ptErrorCut = cms.double(999999.),
-    #         quality = cms.string("any"),
-    #         useVtx = cms.bool(True),
-    #         vertexTag = cms.InputTag('hltPixelVertices'),
-    #         timesTag = cms.InputTag(''),
-    #         timeResosTag = cms.InputTag(''),
-    #         nVertices = cms.uint32(100),
-    #         vtxFallback = cms.bool(True),
-    #         zetaVtx = cms.double(0.3),
-    #         rhoVtx = cms.double(0.1),
-    #         zetaVtxScale = cms.double(5.0),
-    #         rhoVtxScale = cms.double(2.5),
-    #         zetaVtxSig = cms.double(2.0),
-    #         rhoVtxSig = cms.double(2.0),
-    #         nSigmaDtVertex = cms.double(0),
-    #         copyExtras = cms.untracked.bool(True),
-    #         copyTrajectories = cms.untracked.bool(False)
-    #     )
-    process.hltPFMuonMerging.TrackProducers = cms.VInputTag("hltIterL3MuonTracks", tracksToUse)
-    process.hltPFMuonMerging.selectedTrackQuals = cms.VInputTag("hltIterL3MuonTracks", tracksToUse)
-    process.hltParticleFlowBlock.elementImporters = cms.VPSet(
-            cms.PSet(
-                # DPtOverPtCuts_byTrackAlgo = cms.vdouble(
-                #     0.5, 0.5, 0.5, 0.5, 0.5,
-                #     0.5
-                # ),
-                DPtOverPtCuts_byTrackAlgo = cms.vdouble(
-                    5.0, 5.0, 5.0, 5.0, 5.0,
-                    5.0
-                ),
-                NHitCuts_byTrackAlgo = cms.vuint32(
-                    3, 3, 3, 3, 3,
-                    3
-                ),
-                cleanBadConvertedBrems = cms.bool(False),
-                importerName = cms.string('GeneralTracksImporter'),
-                muonMaxDPtOPt = cms.double(1.0),
-                muonSrc = cms.InputTag("hltMuons"),
-                source = cms.InputTag("hltLightPFTracks"),
-                # trackQuality = cms.string('highPurity'),
-                trackQuality = cms.string('any'),
-                useIterativeTracking = cms.bool(False)
-            ),
-            cms.PSet(
-                BCtoPFCMap = cms.InputTag(""),
-                importerName = cms.string('ECALClusterImporter'),
-                source = cms.InputTag("hltParticleFlowClusterECALUnseeded")
-            ),
-            cms.PSet(
-                importerName = cms.string('GenericClusterImporter'),
-                source = cms.InputTag("hltParticleFlowClusterHCAL")
-            ),
-            cms.PSet(
-                importerName = cms.string('GenericClusterImporter'),
-                source = cms.InputTag("hltParticleFlowClusterHF")
-            )
-        )
-    process.hltMuonLinks = process.hltPixelOnlyMuonLinks.clone(
-        InclusiveTrackerTrackCollection = cms.InputTag("hltPFMuonMerging")
-    )
-    process.hltMuons = process.hltPixelOnlyMuons.clone(
-        TrackExtractorPSet = cms.PSet(
-            BeamSpotLabel = cms.InputTag("hltOnlineBeamSpot"),
-            BeamlineOption = cms.string('BeamSpotFromEvent'),
-            Chi2Ndof_Max = cms.double(1e+64),
-            Chi2Prob_Min = cms.double(-1.0),
-            ComponentName = cms.string('TrackExtractor'),
-            DR_Max = cms.double(1.0),
-            DR_Veto = cms.double(0.01),
-            DepositLabel = cms.untracked.string(''),
-            Diff_r = cms.double(0.1),
-            Diff_z = cms.double(0.2),
-            NHits_Min = cms.uint32(0),
-            Pt_Min = cms.double(-1.0),
-            inputTrackCollection = cms.InputTag("hltPFMuonMerging")
-        ),
-        inputCollectionLabels = cms.VInputTag("hltPFMuonMerging", "hltMuonLinks", "hltL2Muons")
-    )
-    process.HLTTrackReconstructionForPF = cms.Sequence(
-        process.HLTDoLocalPixelSequence+
-        process.HLTRecopixelvertexingSequence+
-        # process.hltPixelTracksZetaClean+
-        process.hltPFMuonMerging+
-        process.hltMuonLinks+
-        process.hltMuons)
-    process.hltVerticesPF.TkFilterParameters.minSiliconLayersWithHits=cms.int32(0)
-    # process.HLTRecopixelvertexingTask = cms.Task(process.HLTRecoPixelTracksTask, process.hltPixelVertices, process.hltPixelVerticesCUDA, process.hltPixelVerticesSoA, process.hltTrimmedPixelVertices)
-    # process.HLTTrackReconstructionForPF = cms.Sequence(process.HLTDoLocalPixelSequence+process.HLTRecopixelvertexingSequence+process.hltPixelTracksCleanForBTag+process.hltPFMuonMerging+process.hltMuonLinks+process.hltMuons)
-    return process
-
-def customisePFForPixelTracksCleaned(process, tracksToUse = "hltPixelTracksCleanForBTag"):
-    process.hltPixelTracksCleanForBTag = cms.EDProducer("TrackWithVertexSelector",
-        copyExtras = cms.untracked.bool(False),
-        copyTrajectories = cms.untracked.bool(False),
-        d0Max = cms.double(999.0),
-        dzMax = cms.double(999.0),
-        etaMax = cms.double(5.0),
-        etaMin = cms.double(0.0),
-        nSigmaDtVertex = cms.double(0.0),
-        # nVertices = cms.uint32(2),
-        nVertices = cms.uint32(4),
-        normalizedChi2 = cms.double(999999.0),
-        numberOfLostHits = cms.uint32(999),
-        numberOfValidHits = cms.uint32(0),
-        numberOfValidHitsForGood = cms.uint32(999),
-        numberOfValidPixelHits = cms.uint32(3),
-        numberOfValidPixelHitsForGood = cms.uint32(999),
-        ptErrorCut = cms.double(5.0),
-        ptMax = cms.double(500.0),
-        ptMin = cms.double(0.3),
-        quality = cms.string('any'),
-        rhoVtx = cms.double(0.2),
-        rhoVtxScale = cms.double(1.0),
-        rhoVtxSig = cms.double(999.0),
-        src = cms.InputTag("hltPixelTracks"),
-        timeResosTag = cms.InputTag(""),
-        timesTag = cms.InputTag(""),
-        useVtx = cms.bool(True),
-        # vertexTag = cms.InputTag("hltPixelVertices"),
-        vertexTag = cms.InputTag("hltTrimmedPixelVertices"),
-        vtxFallback = cms.bool(True),
-        zetaVtx = cms.double(0.3),
-        zetaVtxScale = cms.double(1.0),
-        zetaVtxSig = cms.double(999.0)
-    )
-    process.hltPFMuonMerging.TrackProducers = cms.VInputTag("hltIterL3MuonTracks", tracksToUse)
-    process.hltPFMuonMerging.selectedTrackQuals = cms.VInputTag("hltIterL3MuonTracks", tracksToUse)
-    process.hltParticleFlowBlock.elementImporters = cms.VPSet(
-            cms.PSet(
-                # DPtOverPtCuts_byTrackAlgo = cms.vdouble(
-                #     0.5, 0.5, 0.5, 0.5, 0.5,
-                #     0.5
-                # ),
-                DPtOverPtCuts_byTrackAlgo = cms.vdouble(
-                    5.0, 5.0, 5.0, 5.0, 5.0,
-                    5.0
-                ),
-                NHitCuts_byTrackAlgo = cms.vuint32(
-                    3, 3, 3, 3, 3,
-                    3
-                ),
-                # NHitCuts_byTrackAlgo = cms.vuint32(
-                #     0, 0, 0, 0, 0,
-                #     0
-                # ),
-                cleanBadConvertedBrems = cms.bool(False),
-                importerName = cms.string('GeneralTracksImporter'),
-                muonMaxDPtOPt = cms.double(1.0),
-                muonSrc = cms.InputTag("hltMuons"),
-                source = cms.InputTag("hltLightPFTracks"),
-                # trackQuality = cms.string('highPurity'),
-                trackQuality = cms.string('any'),
-                useIterativeTracking = cms.bool(False)
-            ),
-            cms.PSet(
-                BCtoPFCMap = cms.InputTag(""),
-                importerName = cms.string('ECALClusterImporter'),
-                source = cms.InputTag("hltParticleFlowClusterECALUnseeded")
-            ),
-            cms.PSet(
-                importerName = cms.string('GenericClusterImporter'),
-                source = cms.InputTag("hltParticleFlowClusterHCAL")
-            ),
-            cms.PSet(
-                importerName = cms.string('GenericClusterImporter'),
-                source = cms.InputTag("hltParticleFlowClusterHF")
-            )
-    )
-    process.hltMuonLinks = process.hltPixelOnlyMuonLinks.clone(
-        InclusiveTrackerTrackCollection = cms.InputTag("hltPFMuonMerging")
-    )
-    process.hltMuons = process.hltPixelOnlyMuons.clone(
-        TrackExtractorPSet = cms.PSet(
-            BeamSpotLabel = cms.InputTag("hltOnlineBeamSpot"),
-            BeamlineOption = cms.string('BeamSpotFromEvent'),
-            Chi2Ndof_Max = cms.double(1e+64),
-            Chi2Prob_Min = cms.double(-1.0),
-            ComponentName = cms.string('TrackExtractor'),
-            DR_Max = cms.double(1.0),
-            DR_Veto = cms.double(0.01),
-            DepositLabel = cms.untracked.string(''),
-            Diff_r = cms.double(0.1),
-            Diff_z = cms.double(0.2),
-            NHits_Min = cms.uint32(0),
-            Pt_Min = cms.double(-1.0),
-            inputTrackCollection = cms.InputTag("hltPFMuonMerging")
-        ),
-        inputCollectionLabels = cms.VInputTag("hltPFMuonMerging", "hltMuonLinks", "hltL2Muons")
-    )
-    process.HLTTrackReconstructionForPF = cms.Sequence(
-        process.HLTDoLocalPixelSequence+
-        process.HLTRecopixelvertexingSequence+
-        # process.hltPixelTracksZetaClean+
-        process.hltPixelTracksCleanForBTag+
-        process.hltPFMuonMerging+
-        process.hltMuonLinks+
-        process.hltMuons)
-    process.hltVerticesPF.TkFilterParameters.minSiliconLayersWithHits=cms.int32(0)
-    # process.HLTRecopixelvertexingTask = cms.Task(process.HLTRecoPixelTracksTask, process.hltPixelVertices, process.hltPixelVerticesCUDA, process.hltPixelVerticesSoA, process.hltTrimmedPixelVertices)
-    # process.HLTTrackReconstructionForPF = cms.Sequence(process.HLTDoLocalPixelSequence+process.HLTRecopixelvertexingSequence+process.hltPixelTracksCleanForBTag+process.hltPFMuonMerging+process.hltMuonLinks+process.hltMuons)
-    return process
-
-def customizeVertices(process):
-    process.hltPixelVerticesPFSelector = cms.EDFilter("PrimaryVertexObjectFilter",
-        filterParams = cms.PSet(
-            maxRho = cms.double(2.0),
-            maxZ = cms.double(24.0),
-            minNdof = cms.double(4.0),
-            pvSrc = cms.InputTag("hltPixelVertices")
-        ),
-        src = cms.InputTag("hltPixelVertices")
-    )
-
-    process.hltPixelVerticesPFFilter = cms.EDFilter("VertexSelector",
-        cut = cms.string('!isFake'),
-        filter = cms.bool(True),
-        src = cms.InputTag("hltPixelVerticesPFSelector")
-    )
-
-    process.HLTBtagDeepCSVSequencePFPat = cms.Sequence(
-         process.hltPixelVerticesPFSelector
-        + process.hltPixelVerticesPFFilter
-        + process.hltVerticesPF
-        + process.hltVerticesPFSelector
-        + process.hltVerticesPFFilter
-        + process.hltDeepBLifetimePFPatTagInfos
-        + process.hltDeepInclusiveVertexFinderPF
-        + process.hltDeepInclusiveSecondaryVerticesPF
-        + process.hltDeepTrackVertexArbitratorPF
-        + process.hltDeepInclusiveMergedVerticesPF
-        + process.hltDeepSecondaryVertexPFPatTagInfos
-        + process.hltDeepCombinedSecondaryVertexBJetPatTagInfos
-        + process.hltDeepCombinedSecondaryVertexBPFPatJetTags
-    )
-    process.HLTBtagDeepCSVSequencePFPuppiPat = cms.Sequence(
-        process.hltPixelVerticesPFSelector
-        + process.hltPixelVerticesPFFilter
-        + process.hltVerticesPF
-        + process.hltVerticesPFSelector
-        + process.hltVerticesPFFilter
-        + process.hltDeepBLifetimePFPuppiPatTagInfos
-        + process.hltDeepInclusiveVertexFinderPF
-        + process.hltDeepInclusiveSecondaryVerticesPF
-        + process.hltDeepTrackVertexArbitratorPF
-        + process.hltDeepInclusiveMergedVerticesPF
-        + process.hltDeepSecondaryVertexPFPuppiPatTagInfos
-        + process.hltDeepCombinedSecondaryVertexBPuppiJetPatTagInfos
-        + process.hltDeepCombinedSecondaryVertexBPFPuppiPatJetTags
-    )
-
-    process.hltAk4JetTracksAssociatorAtVertexPF.pvSrc = cms.InputTag("hltPixelVerticesPFFilter")
-    process.hltAk4JetTracksAssociatorAtVertexPFPuppi.pvSrc = cms.InputTag("hltPixelVerticesPFFilter")
-
-    process.hltDeepBLifetimePFPatTagInfos.primaryVertex = cms.InputTag("hltPixelVerticesPFFilter")
-    process.hltDeepBLifetimePFPuppiPatTagInfos.primaryVertex = cms.InputTag("hltPixelVerticesPFFilter")
-    process.hltDeepBLifetimeTagInfosPF.primaryVertex = cms.InputTag("hltPixelVerticesPFFilter")
-    process.hltDeepInclusiveVertexFinderPF.primaryVertices = cms.InputTag("hltPixelVerticesPFFilter")
-    process.hltDeepTrackVertexArbitratorPF.primaryVertices = cms.InputTag("hltPixelVerticesPFFilter")
-    process.hltPFDeepFlavourTagInfos.vertices = cms.InputTag("hltPixelVerticesPFFilter")
-    process.hltPFPuppiDeepFlavourTagInfos.vertices = cms.InputTag("hltPixelVerticesPFFilter")
-
-    return process
-
-def customizeVertices2(process):
-    process.hltVerticesPFFilter.src = cms.InputTag("hltPixelVertices")
-    process.hltPFPuppi.vertexName = cms.InputTag("hltPixelVertices")
-    process.hltPFPuppiNoLep.vertexName = cms.InputTag("hltPixelVertices")
-
-    # process.HLTBtagDeepCSVSequencePFPat = cms.Sequence(
-    #     process.hltVerticesPF
-    #     + process.hltVerticesPFSelector
-    #     + process.hltVerticesPFFilter
-    #     + process.hltDeepBLifetimePFPatTagInfos
-    #     + process.hltDeepInclusiveVertexFinderPF
-    #     + process.hltDeepInclusiveSecondaryVerticesPF
-    #     + process.hltDeepTrackVertexArbitratorPF
-    #     + process.hltDeepInclusiveMergedVerticesPF
-    #     + process.hltDeepSecondaryVertexPFPatTagInfos
-    #     + process.hltDeepCombinedSecondaryVertexBJetPatTagInfos
-    #     + process.hltDeepCombinedSecondaryVertexBPFPatJetTags
-    # )
-    # process.HLTBtagDeepCSVSequencePFPuppiPat = cms.Sequence(
-    #     process.hltVerticesPF
-    #     + process.hltVerticesPFSelector
-    #     + process.hltVerticesPFFilter
-    #     + process.hltDeepBLifetimePFPuppiPatTagInfos
-    #     + process.hltDeepInclusiveVertexFinderPF
-    #     + process.hltDeepInclusiveSecondaryVerticesPF
-    #     + process.hltDeepTrackVertexArbitratorPF
-    #     + process.hltDeepInclusiveMergedVerticesPF
-    #     + process.hltDeepSecondaryVertexPFPuppiPatTagInfos
-    #     + process.hltDeepCombinedSecondaryVertexBPuppiJetPatTagInfos
-    #     + process.hltDeepCombinedSecondaryVertexBPFPuppiPatJetTags
-    # )
-    #
-    # process.hltAk4JetTracksAssociatorAtVertexPF.pvSrc = cms.InputTag("hltPixelVerticesPFFilter")
-    # process.hltAk4JetTracksAssociatorAtVertexPFPuppi.pvSrc = cms.InputTag("hltPixelVerticesPFFilter")
-    #
-    # process.hltDeepBLifetimePFPatTagInfos.primaryVertex = cms.InputTag("hltPixelVerticesPFFilter")
-    # process.hltDeepBLifetimePFPuppiPatTagInfos.primaryVertex = cms.InputTag("hltPixelVerticesPFFilter")
-    # process.hltDeepBLifetimeTagInfosPF.primaryVertex = cms.InputTag("hltPixelVerticesPFFilter")
-    # process.hltDeepInclusiveVertexFinderPF.primaryVertices = cms.InputTag("hltPixelVerticesPFFilter")
-    # process.hltDeepTrackVertexArbitratorPF.primaryVertices = cms.InputTag("hltPixelVerticesPFFilter")
-    # process.hltPFDeepFlavourTagInfos.vertices = cms.InputTag("hltPixelVerticesPFFilter")
-    # process.hltPFPuppiDeepFlavourTagInfos.vertices = cms.InputTag("hltPixelVerticesPFFilter")
-
-    return process
 
 ###
 ### HLT configuration
@@ -635,64 +321,103 @@ elif options.reco == 'HLT_Run3TRK':
     from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     process = customizeHLTRun3Tracking(process)
-
 elif options.reco == 'HLT_Run3TRKMod':
     # (a) Run-3 tracking: standard
     from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     process = customizeHLTRun3Tracking(process)
-
 elif options.reco == 'HLT_Run3TRKMod2':
     # (a) Run-3 tracking: standard
     from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     process = customizeHLTRun3Tracking(process)
-
 elif options.reco == 'HLT_Run3TRKWithPU':
     # (b) Run-3 tracking: all pixel vertices
     from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
     process = customizeHLTRun3TrackingAllPixelVertices(process)
-
 elif options.reco == 'HLT_Run3TRKPixelOnly':
     # (c) Run-3 tracking: pixel only tracks
     from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    from RecoBTag.PerformanceMeasurements.customise_TRK import *
     process = customizeHLTRun3Tracking(process)
     process = customisePFForPixelTracks(process)
 elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned':
-    # (c) Run-3 tracking: pixel only tracks
+    # (d) Run-3 tracking: pixel only tracks and trimmed with PVs
     from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    from RecoBTag.PerformanceMeasurements.customise_TRK import *
     process = customizeHLTRun3Tracking(process)
     process = customisePFForPixelTracksCleaned(process, "hltPixelTracksCleanForBTag")
-
+elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned2':
+    # (d) Run-3 tracking: pixel only tracks and trimmed with PVs
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
+    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    from RecoBTag.PerformanceMeasurements.customise_TRK import *
+    process = customizeHLTRun3Tracking(process)
+    process = customisePFForPixelTracksCleaned(process, "hltPixelTracksCleanForBTag", vertex="hltTrimmedPixelVertices", nVertices = 2)
+elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned3':
+    # (d) Run-3 tracking: pixel only tracks and trimmed with PVs
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
+    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    from RecoBTag.PerformanceMeasurements.customise_TRK import *
+    process = customizeHLTRun3Tracking(process)
+    process = customisePFForPixelTracksCleaned(process, "hltPixelTracksCleanForBTag", vertex="hltPixelVertices", nVertices = 4)
+elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned4':
+    # (d) Run-3 tracking: pixel only tracks and trimmed with PVs
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
+    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    from RecoBTag.PerformanceMeasurements.customise_TRK import *
+    process = customizeHLTRun3Tracking(process)
+    process = customisePFForPixelTracksCleaned(process, "hltPixelTracksCleanForBTag", vertex="hltPixelVertices", nVertices = 2)
 elif options.reco == 'HLT_BTagROI':
-
-        # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-        from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
-
-        from RecoBTag.PerformanceMeasurements.customise_hlt import *
-        process = addPaths_PFJetsForBtag(process)
-
-        pvSource = "hltVerticesPFFilterForBTag"
-        pfCandidates = 'hltParticleFlowForBTag'
-        patJetSource = 'hltPatJetsROI'
-        trackSource = "hltMergedTracksForBTag"
-        PFDeepFlavourTags = "hltPFDeepFlavourROIJetTags"
-        PFDeepFlavourTagInfos = 'hltPFDeepFlavourROI'
-        rho = "hltFixedGridRhoFastjetAllForBTag"
-        patPuppiJetSource = 'hltPatJetsPuppiROI'
-        PFDeepCSVTags = "hltDeepCombinedSecondaryVertexBPFPatROIJetTags"
-        PuppiDeepCSVTags = 'hltDeepCombinedSecondaryVertexBPFPuppiPatROIJetTags'
-        PuppiDeepFlavourTags = 'hltPFPuppiDeepFlavourROIJetTags'
-        PuppiDeepFlavourTagInfos = 'hltPFPuppiDeepFlavourROI'
-        PuppiIPTagInfos = 'hltDeepBLifetimePFPuppiPatROI'
-        IPTagInfos = 'hltDeepBLifetimePFPatROI'
-        SVPuppiTagInfos = 'hltDeepSecondaryVertexPFPuppiPatROI'
-        SVTagInfos = 'hltDeepSecondaryVertexPFPatROI'
-
-
+    # (e) Run-3 tracking: ROI PF approach
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
+    from RecoBTag.PerformanceMeasurements.customise_hlt import *
+    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    process = customizeHLTRun3Tracking(process)
+    process = addPaths_PFJetsForBtag(process)
+    pvSource                 = "hltVerticesPFFilterForBTag"
+    pfCandidates             = 'hltParticleFlowForBTag'
+    patJetSource             = 'hltPatJetsROI'
+    trackSource              = "hltMergedTracksForBTag"
+    PFDeepFlavourTags        = "hltPFDeepFlavourROIJetTags"
+    PFDeepFlavourTagInfos    = 'hltPFDeepFlavourROI'
+    rho                      = "hltFixedGridRhoFastjetAllForBTag"
+    patPuppiJetSource        = 'hltPatJetsPuppiROI'
+    PFDeepCSVTags            = "hltDeepCombinedSecondaryVertexBPFPatROIJetTags"
+    PuppiDeepCSVTags         = 'hltDeepCombinedSecondaryVertexBPFPuppiPatROIJetTags'
+    PuppiDeepFlavourTags     = 'hltPFPuppiDeepFlavourROIJetTags'
+    PuppiDeepFlavourTagInfos = 'hltPFPuppiDeepFlavourROI'
+    PuppiIPTagInfos          = 'hltDeepBLifetimePFPuppiPatROI'
+    IPTagInfos               = 'hltDeepBLifetimePFPatROI'
+    SVPuppiTagInfos          = 'hltDeepSecondaryVertexPFPuppiPatROI'
+    SVTagInfos               = 'hltDeepSecondaryVertexPFPatROI'
+elif options.reco == 'HLT_BTagROIPixelTracks':
+    # (e) Run-3 tracking: ROI PF approach
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V20_configDump import cms, process
+    from RecoBTag.PerformanceMeasurements.customise_hlt import *
+    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    process = customizeHLTRun3Tracking(process)
+    process = addPatatracksForROI(process)
+    process = addPaths_PFJetsForBtag(process)
+    pvSource                 = "hltVerticesPFFilterForBTag"
+    pfCandidates             = 'hltParticleFlowForBTag'
+    patJetSource             = 'hltPatJetsROI'
+    trackSource              = "hltMergedTracksForBTag"
+    PFDeepFlavourTags        = "hltPFDeepFlavourROIJetTags"
+    PFDeepFlavourTagInfos    = 'hltPFDeepFlavourROI'
+    rho                      = "hltFixedGridRhoFastjetAllForBTag"
+    patPuppiJetSource        = 'hltPatJetsPuppiROI'
+    PFDeepCSVTags            = "hltDeepCombinedSecondaryVertexBPFPatROIJetTags"
+    PuppiDeepCSVTags         = 'hltDeepCombinedSecondaryVertexBPFPuppiPatROIJetTags'
+    PuppiDeepFlavourTags     = 'hltPFPuppiDeepFlavourROIJetTags'
+    PuppiDeepFlavourTagInfos = 'hltPFPuppiDeepFlavourROI'
+    PuppiIPTagInfos          = 'hltDeepBLifetimePFPuppiPatROI'
+    IPTagInfos               = 'hltDeepBLifetimePFPatROI'
+    SVPuppiTagInfos          = 'hltDeepSecondaryVertexPFPuppiPatROI'
+    SVTagInfos               = 'hltDeepSecondaryVertexPFPatROI'
 else:
   raise RuntimeError('keyword "reco = '+options.reco+'" not recognised')
 
@@ -714,33 +439,46 @@ for _modname in process.endpaths_():
        # if options.verbosity > 0:
        #    print '> removed cms.EndPath:', _modname
 
-# HLTTrackReconstructionForPF
 
+# list of patterns to determine paths to keep
+keepPaths = [
+  'MC_*Jets*',
+  'MC_*MET*',
+  'MC_*AK8Calo*',
+  'MC_*DeepCSV*',
+  'MC_*DeepJet*',
 
+  # 'HLT_PFJet*_v*',
+  # 'HLT_AK4PFJet*_v*',
+  # 'HLT_AK8PFJet*_v*',
+  # 'HLT_PFHT*_v*',
+  # 'HLT_PFMET*_PFMHT*_v*',
+]
+
+# list of paths that are kept
+listOfPaths = []
+print "Keep paths:"
+print '-'*108
 # remove selected cms.Path objects from HLT config-dump
-print '-'*108
-print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
-print '-'*108
 for _modname in sorted(process.paths_()):
-    # _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'DeepCSV' in _modname or 'DeepFlavour' in _modname or 'AK8Calo' in _modname)
-    # _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'DeepCSV' in _modname or 'DeepFlavour' in _modname or 'Tracking' in _modname)
-    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'DeepCSV' in _modname or 'DeepFlavour' in _modname or 'Tracking' in _modname or 'AK8Calo' in _modname)
-    # _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'DeepCSV' in _modname or 'DeepFlavour' in _modname or 'AK8Calo' in _modname)
-    # _keepPath = _modname.startswith('MC_')
-#    _keepPath |= _modname.startswith('MC_ReducedIterativeTracking')
+    _keepPath = False
+    for _tmpPatt in keepPaths:
+        _keepPath = fnmatch.fnmatch(_modname, _tmpPatt)
+        if _keepPath: break
     if _keepPath:
-      print '{:<99} | {:<4} |'.format(_modname, '+')
-      continue
+        print '{:<99} | {:<4} |'.format(_modname, '+')
+        listOfPaths.append(_modname)
+        continue
     _mod = getattr(process, _modname)
     if type(_mod) == cms.Path:
-      process.__delattr__(_modname)
-    #   print '{:<99} | {:<4} |'.format(_modname, '')
+        process.__delattr__(_modname)
+        # if options.verbosity > 0:
+        #     print '{:<99} | {:<4} |'.format(_modname, '')
 print '-'*108
 
 # remove FastTimerService
 if hasattr(process, 'FastTimerService'):
   del process.FastTimerService
-
 # remove MessageLogger
 if hasattr(process, 'MessageLogger'):
   del process.MessageLogger
@@ -749,10 +487,14 @@ if hasattr(process, 'MessageLogger'):
 ### customizations
 ###
 from JMETriggerAnalysis.Common.customise_hlt import *
-process = addPaths_MC_JMECalo(process)
+if options.runCaloJetVariables:
+    process = addPaths_MC_JMECalo(process)
 process = addPaths_MC_JMEPF(process)
-process = addPaths_MC_JMEPFCluster(process)
-process = addPaths_MC_JMEPFPuppi(process)
+# process = addPaths_MC_JMEPFCluster(process)
+if options.runPuppiJetVariables:
+    process = addPaths_MC_JMEPFPuppi(process)
+from RecoBTag.PerformanceMeasurements.customise_TRK import addDeepJet
+process = addDeepJet(process, doPF = True, doPuppi = options.runPuppiJetVariables)
 from RecoBTag.PerformanceMeasurements.PATLikeConfig import customizePFPatLikeJets
 process = customizePFPatLikeJets(process, runPF=True, runCalo=options.runCaloJetVariables, runPuppi=options.runPuppiJetVariables)
 
@@ -763,39 +505,17 @@ if options.reco == 'HLT_Run3TRKMod':
 if options.reco == 'HLT_Run3TRKMod2':
     process = customizeVertices2(process)
 
-if options.reco == 'HLT_Run3TRKPixelOnly' or options.reco == "HLT_Run3TRKPixelOnlyCleaned":
-    process.hltDeepInclusiveVertexFinderPF.minHits = cms.uint32(0)
-    process.hltDeepBLifetimePFPatTagInfos.minimumNumberOfHits = cms.int32(0)
-    process.hltDeepBLifetimeTagInfosPF.minimumNumberOfHits = cms.int32(0)
-    process.hltImpactParameterPatTagInfos.minimumNumberOfHits = cms.int32(0)
-    process.hltImpactParameterTagInfos.minimumNumberOfHits = cms.int32(0)
-    process.hltDeepTrackVertexArbitratorPF.trackMinLayers = cms.int32(0)
-    # process.hltDeepSecondaryVertexPFPatTagInfos.trackSelection.totalHitsMin = cms.uint32(0)
-    process.hltDeepSecondaryVertexPFPatTagInfos.trackSelection.totalHitsMin = cms.uint32(2)
-    process.hltDeepCombinedSecondaryVertexBJetPatTagInfos.computer.trackPseudoSelection.totalHitsMin = cms.uint32(0)
-    # process.hltDeepCombinedSecondaryVertexBJetPatTagInfos.computer.trackSelection.totalHitsMin = cms.uint32(0)
-    process.hltDeepCombinedSecondaryVertexBJetPatTagInfos.computer.trackSelection.totalHitsMin = cms.uint32(2)
+if "HLT_Run3TRKPixelOnly" in options.reco:
+    process = customizeMinHitsAndPt(process)
 
 if options.reco == 'HLT_BTagROI':
     from RecoBTag.PerformanceMeasurements.customise_hlt import *
-    # from RecoBTag.PerformanceMeasurements.customise_hlt import addPaths_MC_JMEPFPuppiROI
     process = addPaths_MC_JMEPFPuppiROI(process)
 
     from RecoBTag.PerformanceMeasurements.ROIPATLikeConfig import customizePFPatLikeJetsROI
     process = customizePFPatLikeJetsROI(process)
 
 
-# if not options.eras:
-# 	process = cms.Process("BTagAna")
-# else:
-# 	from Configuration.StandardSequences.Eras import eras
-# 	eras_to_use = []
-# 	for era in options.eras:
-# 		if hasattr(eras, era):
-# 			eras_to_use.append(getattr(eras, era))
-# 		else:
-# 			raise ValueError('The requested era (%s) is not available' % era)
-# 	process = cms.Process("BTagAna", *eras_to_use)
 
 ## ES modules for PF-Hadron Calibrations
 import os
@@ -803,7 +523,6 @@ import os
 from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
 
 process.pfhcESSource = cms.ESSource('PoolDBESSource',
-  # _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db'),
   _CondDB.clone(connect = 'sqlite_fip:JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db'),
   toGet = cms.VPSet(
     cms.PSet(
@@ -815,10 +534,8 @@ process.pfhcESSource = cms.ESSource('PoolDBESSource',
 )
 
 process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
-#process.hltParticleFlow.calibrationsLabel = '' # standard label for Offline-PFHC in GT
 ## ES modules for HLT JECs
 process.jescESSource = cms.ESSource('PoolDBESSource',
-  # _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V1_MC.db'),
   _CondDB.clone(connect = 'sqlite_fip:JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V1_MC.db'),
   toGet = cms.VPSet(
     cms.PSet(
@@ -892,18 +609,7 @@ process.MessageLogger.suppressError = cms.untracked.vstring(
 process.MessageLogger.cerr.threshold = "DEBUG"
 #process.MessageLogger.debugModules = ["hltBTagPFDeepCSV4p06SingleROI","hltDeepCombinedSecondaryVertexBJetTagsPFROI","hltDeepCombinedSecondaryVertexBPFPatROIJetTags","hltPatJetsROI"]
 
-## Input files
-# process.source = cms.Source("PoolSource",
-#     fileNames = cms.untracked.vstring()
-# )
-#
-# process.source.fileNames = [
-#     '/store/mc/PhaseIFall16DR/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/AODSIM/PhaseIFall16PUFlat20to50_81X_upgrade2017_realistic_v26-v1/50000/0039E945-35E3-E611-AF8D-001E675A6C2A.root'
-# ]
-# if options.runOnData:
-#     process.source.fileNames = [
-#         '/store/data/Run2016B/SingleMuon/AOD/PromptReco-v2/000/275/125/00000/DA2EC189-7E36-E611-8C63-02163E01343B.root'
-#     ]
+
 if options.inputFiles:
     process.source.fileNames = options.inputFiles
 process.source.secondaryFileNames = cms.untracked.vstring()
@@ -930,6 +636,16 @@ process.options   = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(options.wantSummary),
     # allowUnscheduled = cms.untracked.bool(True)
 )
+
+if options.runTiming:
+    # multi-threading settings
+    process.options.numberOfThreads = cms.untracked.uint32(options.numThreads if (options.numThreads > 1) else 1)
+    process.options.numberOfStreams = cms.untracked.uint32(options.numStreams if (options.numStreams > 1) else 1)
+    process.options.sizeOfStackForThreadsInKB = cms.untracked.uint32(10240)
+else:
+    # multi-threading settings
+    process.options.numberOfThreads = cms.untracked.uint32(options.numThreads if (options.numThreads > 1) else 1)
+    process.options.numberOfStreams = cms.untracked.uint32(options.numStreams if (options.numStreams > 1) else 1)
 
 #Set GT by hand:
 # process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
@@ -1154,34 +870,90 @@ process.analyzerSeq += process.btagana
 #--------
 
 
-from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
-process.TrackHistograms_hltPixelTracks = TrackHistogrammer.clone(src = 'hltPixelTracks')
-process.TrackHistograms_hltTracks = TrackHistogrammer.clone(src = 'hltPFMuonMerging')
-process.TrackHistograms_hltMergedTracks = TrackHistogrammer.clone(src = 'hltMergedTracks')
-# process.TrackHistograms_hltGeneralTracks = TrackHistogrammer.clone(src = 'generalTracks')
+# from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
+# process.TrackHistograms_hltPixelTracks = TrackHistogrammer.clone(src = 'hltPixelTracks')
+# process.TrackHistograms_hltTracks = TrackHistogrammer.clone(src = 'hltPFMuonMerging')
+# process.TrackHistograms_hltMergedTracks = TrackHistogrammer.clone(src = 'hltMergedTracks')
+# # process.TrackHistograms_hltGeneralTracks = TrackHistogrammer.clone(src = 'generalTracks')
 
-process.trkMonitoringSeq = cms.Sequence(
-   process.TrackHistograms_hltPixelTracks
- + process.TrackHistograms_hltTracks
- + process.TrackHistograms_hltMergedTracks
- # + process.TrackHistograms_hltGeneralTracks
-)
+# process.trkMonitoringSeq = cms.Sequence(
+#    process.TrackHistograms_hltPixelTracks
+#  + process.TrackHistograms_hltTracks
+#  + process.TrackHistograms_hltMergedTracks
+#  # + process.TrackHistograms_hltGeneralTracks
+# )
 
 # process.trkMonitoringEndPath = cms.EndPath(process.trkMonitoringSeq)
 # process.schedule.extend([process.trkMonitoringEndPath])
 
-from JMETriggerAnalysis.Common.VertexHistogrammer_cfi import VertexHistogrammer
-process.VertexHistograms_hltDeepInclusiveVertexFinderPF = VertexHistogrammer.clone(src = 'hltDeepInclusiveVertexFinderPF')
-process.VertexHistograms_hltDeepSecondaryVertexPFPatTagInfos = VertexHistogrammer.clone(src = 'hltDeepSecondaryVertexPFPatTagInfos')
-process.VertexHistograms_hltDeepInclusiveMergedVerticesPF = VertexHistogrammer.clone(src = 'hltDeepInclusiveMergedVerticesPF')
-process.VertexHistograms_hltDeepInclusiveSecondaryVerticesPF = VertexHistogrammer.clone(src = 'hltDeepInclusiveSecondaryVerticesPF')
+# from JMETriggerAnalysis.Common.VertexHistogrammer_cfi import VertexHistogrammer
+# process.VertexHistograms_hltDeepInclusiveVertexFinderPF = VertexHistogrammer.clone(src = 'hltDeepInclusiveVertexFinderPF')
+# process.VertexHistograms_hltDeepSecondaryVertexPFPatTagInfos = VertexHistogrammer.clone(src = 'hltDeepSecondaryVertexPFPatTagInfos')
+# process.VertexHistograms_hltDeepInclusiveMergedVerticesPF = VertexHistogrammer.clone(src = 'hltDeepInclusiveMergedVerticesPF')
+# process.VertexHistograms_hltDeepInclusiveSecondaryVerticesPF = VertexHistogrammer.clone(src = 'hltDeepInclusiveSecondaryVerticesPF')
+#
+# process.vtxMonitoringSeq = cms.Sequence(
+#    process.VertexHistograms_hltDeepInclusiveVertexFinderPF
+#  + process.VertexHistograms_hltDeepSecondaryVertexPFPatTagInfos
+#  + process.VertexHistograms_hltDeepInclusiveMergedVerticesPF
+#  + process.VertexHistograms_hltDeepInclusiveSecondaryVerticesPF
+# )
 
-process.vtxMonitoringSeq = cms.Sequence(
-   process.VertexHistograms_hltDeepInclusiveVertexFinderPF
- + process.VertexHistograms_hltDeepSecondaryVertexPFPatTagInfos
- + process.VertexHistograms_hltDeepInclusiveMergedVerticesPF
- + process.VertexHistograms_hltDeepInclusiveSecondaryVerticesPF
-)
+if options.runTiming:
+    #timing test
+    from HLTrigger.Timer.FastTimer import customise_timer_service_print,customise_timer_service,customise_timer_service_singlejob
+    # process = customise_timer_service_print(process)
+    # process = customise_timer_service(process)
+        # remove any instance of the FastTimerService
+    if 'FastTimerService' in process.__dict__:
+        del process.FastTimerService
+
+    # instrument the menu with the FastTimerService
+    process.load("HLTrigger.Timer.FastTimerService_cfi")
+
+    # print a text summary at the end of the job
+    process.FastTimerService.printEventSummary        = False
+    process.FastTimerService.printRunSummary          = False
+    process.FastTimerService.printJobSummary          = True
+    # enable DQM plots
+    process.FastTimerService.enableDQM                = True
+    # enable per-path DQM plots (starting with CMSSW 9.2.3-patch2)
+    process.FastTimerService.enableDQMbyPath          = True
+    # enable per-module DQM plots
+    process.FastTimerService.enableDQMbyModule        = True
+    # enable DQM plots vs lumisection
+    process.FastTimerService.enableDQMbyLumiSection   = True
+    process.FastTimerService.dqmLumiSectionsRange     = 2500    # lumisections (23.31 s)
+    # set the time resolution of the DQM plots
+    process.FastTimerService.dqmTimeRange             = 1000.   # ms
+    process.FastTimerService.dqmTimeResolution        =    5.   # ms
+    process.FastTimerService.dqmPathTimeRange         =  100.   # ms
+    process.FastTimerService.dqmPathTimeResolution    =    0.5  # ms
+    process.FastTimerService.dqmModuleTimeRange       =   40.   # ms
+    process.FastTimerService.dqmModuleTimeResolution  =    0.2  # ms
+    # set the base DQM folder for the plots
+    process.FastTimerService.dqmPath                  = "HLT/TimerService"
+    process.FastTimerService.enableDQMbyProcesses     = False
+    # enable text dump
+    if not hasattr(process,'MessageLogger'):
+        process.load('FWCore.MessageService.MessageLogger_cfi')
+    process.MessageLogger.categories.append('FastReport')
+    process.MessageLogger.cerr.FastReport = cms.untracked.PSet( limit = cms.untracked.int32( 10000000 ) )
+    # save the DQM plots in the DQMIO format
+    process.dqmOutput = cms.OutputModule("DQMRootOutputModule",
+        fileName = cms.untracked.string("DQM.root")
+    )
+    process.FastTimerOutput = cms.EndPath(process.dqmOutput)
+    # process.schedule.append(process.FastTimerOutput)
+
+    # process = customise_timer_service_singlejob(process)
+    process.FastTimerService.dqmTimeRange            = 20000.
+    process.FastTimerService.dqmTimeResolution       =    10.
+    process.FastTimerService.dqmPathTimeRange        = 10000.
+    process.FastTimerService.dqmPathTimeResolution   =     5.
+    process.FastTimerService.dqmModuleTimeRange      =  1000.
+    process.FastTimerService.dqmModuleTimeResolution =     1.
+    # process.dqmOutput.fileName = cms.untracked.string(options.output)
 
 process.p = cms.Path(
     process.allEvents
@@ -1191,6 +963,9 @@ process.p = cms.Path(
     # * process.trkMonitoringSeq
     # * process.vtxMonitoringSeq
 )
+
+# if options.runTiming:
+#     process.p *= process.FastTimerOutput
 
 # Delete predefined output module (needed for running with CRAB)
 del process.out

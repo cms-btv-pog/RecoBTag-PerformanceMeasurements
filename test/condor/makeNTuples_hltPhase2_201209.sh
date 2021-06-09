@@ -44,7 +44,8 @@ fi
             numEvents=${NEVT}
             python ../runHLTBTagAnalyzer_cfg.py dumpPython=/tmp/${USER}/BTV_Run3_Online_cfg.py defaults=Run3 runOnData=False reco=${recoKey} runPuppiJetVariables=True runCaloJetVariables=False
 
-            htc_driver -c /tmp/${USER}/BTV_Run3_Online_cfg.py --customize-cfg -m ${numEvents} -n 1000 --cpus 1 --memory 2000 --runtime 10800 ${opts} \
+            # htc_driver -c /tmp/${USER}/BTV_Run3_Online_cfg.py --customize-cfg -m ${numEvents} -n 1000 --cpus 1 --memory 2000 --runtime 10800 ${opts} \
+            htc_driver -c /tmp/${USER}/BTV_Run3_Online_cfg.py --customize-cfg -m ${numEvents} -n 1000 ${opts} \
             -d ${sampleName} -p 0 -o ${ODIR}/${sampleKey} --cmsRun-output-dir ${ODIR_cmsRun}/${sampleKey}
         done
     done
