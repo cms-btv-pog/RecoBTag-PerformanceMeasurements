@@ -106,6 +106,128 @@ def addPaths_MC_JMEPFPuppiROI(process):
 
     return process
 
+def addPatatracksForROI(process):
+
+    process.hltIter0PFLowPixelSeedsFromPixelTracksForBTag.InputCollection = cms.InputTag("hltFastPVPixelTracks")
+    process.hltFastPVPixelTracksTrackingRegions.RegionPSet.vertexCollection = cms.InputTag("hltPixelVertices")
+
+    process.hltIter0PFLowPixelSeedsFromPixelTracksForBTag.InputVertexCollection = cms.InputTag("hltPixelVertices")
+    process.hltIter0PFlowTrackCutClassifierForBTag.vertices = cms.InputTag("hltPixelVertices")
+    process.hltIter1PFLowPixelSeedsFromPixelTracksForBTag.InputVertexCollection = cms.InputTag("hltPixelVertices")
+    process.hltIter1PFlowPixelTrackingRegionsForBTag.RegionPSet.vertexCollection = cms.InputTag("hltPixelVertices")
+    process.hltIter1PFlowTrackCutClassifierDetachedForBTag.vertices = cms.InputTag("hltPixelVertices")
+    process.hltIter1PFlowTrackCutClassifierPromptForBTag.vertices = cms.InputTag("hltPixelVertices")
+    process.hltIter2PFlowPixelTrackingRegionsForBTag.RegionPSet.vertexCollection = cms.InputTag("hltPixelVertices")
+    process.hltIter2PFlowTrackCutClassifierForBTag.vertices = cms.InputTag("hltPixelVertices")
+    process.hltL3DisplacedDijet100FullTracksTrackIPProducerLowPt.primaryVertex = cms.InputTag("hltPixelVertices")
+    process.hltL3DisplacedDijet100FullTracksTrackIPProducerMidPt.primaryVertex = cms.InputTag("hltPixelVertices")
+    process.hltL4PromptDisplacedDijetFullTracksTrackIPProducerLowPt.primaryVertex = cms.InputTag("hltPixelVertices")
+    process.hltL4PromptDisplacedDijetFullTracksTrackIPProducerMidPt.primaryVertex = cms.InputTag("hltPixelVertices")
+    process.hltPixelTracksTrackingRegionsForNoPU.RegionPSet.vertexSrc = cms.InputTag("hltPixelVertices")
+    process.hltFastPVPixelVerticesFilter.src = cms.InputTag("hltPixelVertices")
+
+    process.hltSiStripClustersRegForBTag = process.hltSiStripClusters.clone()
+
+    process.HLTDoLocalPixelSequenceRegForBTag = cms.Sequence(
+        process.hltSelectorJets20L1FastJet
+        +process.hltSelectorCentralJets20L1FastJeta
+        +process.HLTDoLocalPixelSequence
+        # +process.hltSiPixelDigisRegForBTag
+        +process.hltSiPixelClustersRegForBTag
+        +process.hltSiPixelClustersRegForBTagCache
+        +process.hltSiPixelRecHitsRegForBTag
+        # +process.hltPixelLayerQuadrupletsRegForBTag
+    )
+
+    process.hltSiPixelClustersRegForBTag = process.hltSiPixelClusters.clone()
+    process.hltSiPixelRecHitsRegForBTag = process.hltSiPixelRecHits.clone()
+
+    # process.HLTFastPrimaryVertexSequence = cms.Sequence(
+    #     process.hltSelectorJets20L1FastJet
+    #     +process.hltSelectorCentralJets20L1FastJeta
+    #     +process.hltSelector4CentralJetsL1FastJet
+    #     +process.HLTDoLocalPixelSequenceRegForBTag
+    #     +process.HLTFastRecopixelvertexingSequence
+    # )
+    # process.HLTTrackReconstructionForBTag = cms.Sequence(
+    #     process.HLTDoLocalPixelSequenceRegForBTag
+    #     +process.HLTFastRecopixelvertexingSequence
+    #     +process.HLTDoLocalStripSequenceRegForBTag
+    #     +process.HLTIterativeTrackingIter02ForBTag
+    # )
+
+    process.HLTDoLocalStripSequenceRegForBTag = cms.Sequence(process.hltSiStripExcludedFEDListProducer+process.hltSiStripRawToClustersFacility+process.hltSiStripClustersRegForBTag)
+    # process.HLTDoLocalStripSequence = cms.Sequence(process.hltSiStripExcludedFEDListProducer+process.hltSiStripRawToClustersFacility+process.hltSiStripClusters)
+
+    # process.HLTIterativeTrackingIteration0ForBTag = cms.Sequence(
+    #     process.hltIter0PFLowPixelSeedsFromPixelTracksForBTag
+    #     +process.hltIter0PFlowCkfTrackCandidatesForBTag
+    #     +process.hltIter0PFlowCtfWithMaterialTracksForBTag
+    #     +process.hltIter0PFlowTrackCutClassifierForBTag
+    #     +process.hltIter0PFlowTrackSelectionHighPurityForBTag
+    # )
+
+    # process.HLTIterativeTrackingIteration1ForBTag = cms.Sequence(
+    #     process.hltIter1ClustersRefRemovalForBTag+
+    #     process.hltIter1MaskedMeasurementTrackerEventForBTag+
+    #     process.hltIter1PixelLayerQuadrupletsForBTag+
+    #     process.hltIter1PFlowPixelTrackingRegionsForBTag+
+    #     process.hltIter1PFlowPixelClusterCheckForBTag+
+    #     process.hltIter1PFlowPixelHitDoubletsForBTag+
+    #     process.hltIter1PFlowPixelHitQuadrupletsForBTag+
+    #     process.hltIter1PixelTracksForBTag+
+    #     process.hltIter1PFLowPixelSeedsFromPixelTracksForBTag+
+    #     process.hltIter1PFlowCkfTrackCandidatesForBTag+
+    #     process.hltIter1PFlowCtfWithMaterialTracksForBTag+
+    #     process.hltIter1PFlowTrackCutClassifierPromptForBTag+
+    #     process.hltIter1PFlowTrackCutClassifierDetachedForBTag+
+    #     process.hltIter1PFlowTrackCutClassifierMergedForBTag+
+    #     process.hltIter1PFlowTrackSelectionHighPurityForBTag
+    # )
+    #
+    # process.HLTIterativeTrackingIter02ForBTag = cms.Sequence(
+    #     process.HLTIterativeTrackingIteration0ForBTag
+    #     +process.HLTIterativeTrackingIteration1ForBTag
+    #     +process.hltIter1MergedForBTag
+    #     +process.HLTIterativeTrackingIteration2ForBTag
+    #     +process.hltIter2MergedForBTag
+    #     +process.HLTIterativeTrackingDoubletRecoveryForBTag
+    #     +process.hltMergedTracksForBTag
+    # )
+
+
+    process.HLTFastRecopixelvertexingSequence = cms.Sequence(
+        process.hltSelector4CentralJetsL1FastJet
+        # +process.hltFastPrimaryVertex
+        # +process.hltFastPVPixelVertexFilter
+        # +process.hltFastPVPixelTracksFilter
+        # +process.hltFastPVPixelTracksFitter
+        +process.hltFastPVPixelTracksTrackingRegions
+        # +process.hltFastPVPixelTracksHitDoublets
+        # +process.hltFastPVPixelTracksHitQuadruplets
+        +process.hltFastPVPixelTracks
+        +process.hltFastPVJetTracksAssociator
+        +process.hltFastPVJetVertexChecker
+        +process.hltFastPVPixelTracksRecoverFilter
+        +process.hltFastPVPixelTracksRecoverFitter
+        +process.hltFastPVPixelTracksTrackingRegionsRecover
+        # +process.hltFastPVPixelTracksHitDoubletsRecover
+        # +process.hltFastPVPixelTracksHitQuadrupletsRecover
+        # +process.hltFastPVPixelTracksRecover
+        # +process.hltFastPVPixelTracksMerger
+        # +process.hltFastPVPixelVertices
+        +process.hltFastPVPixelVerticesFilter
+    )
+    process.hltFastPVPixelTracks = cms.EDProducer("TrackSelectorByRegion",
+      produceTrackCollection = cms.bool(True),
+      produceMask = cms.bool(False),
+      tracks = cms.InputTag("hltPixelTracks"),
+      regions = cms.InputTag("hltFastPVPixelTracksTrackingRegions") ## or whichever region you want
+
+    )
+
+    return process
+
 
 def addPaths_PFJetsForBtag(process):
 
@@ -181,7 +303,7 @@ def addPaths_PFJetsForBtag(process):
         process.HLTL2muonrecoSequence
         + process.HLTL3muonrecoSequence
         + process.HLTTrackReconstructionForBTag
-        + process.HLTParticleFlowSequenceForBTag 
+        + process.HLTParticleFlowSequenceForBTag
         + process.hltAK4PFJetsForBTag
         + process.hltAK4PFJetsLooseIDForBTag
         + process.hltAK4PFJetsTightIDForBTag
@@ -261,7 +383,7 @@ def addPaths_PFJetsForBtag(process):
 
     process.hltPFJetForBtagSelectorForBTag = process.hltPFJetForBtagSelector.clone(
         # inputTag = cms.InputTag("hltAK4PFJetsCorrected"),
-        inputTag = cms.InputTag("hltAK4PFJetsCorrectedForBTag"), 
+        inputTag = cms.InputTag("hltAK4PFJetsCorrectedForBTag"),
     )
 
     process.hltPFJetForBtagROI = process.hltPFJetForBtag.clone(
@@ -289,7 +411,7 @@ def addPaths_PFJetsForBtag(process):
         secondaryVertices = cms.InputTag("hltDeepInclusiveSecondaryVerticesPFROI"),
         tracks = cms.InputTag("hltParticleFlowForBTag")
     )
-    
+
     process.hltDeepInclusiveMergedVerticesPFROI = process.hltDeepInclusiveMergedVerticesPF.clone(
         secondaryVertices = cms.InputTag("hltDeepTrackVertexArbitratorPFROI")
     )
@@ -336,7 +458,7 @@ def addPaths_PFJetsForBtag(process):
         + process.HLTBtagDeepCSVSequencePFROI
         + process.hltBTagPFDeepCSV4p06SingleROI
         + process.HLTEndSequence)
-        
+
 
     if process.schedule_():
        process.schedule_().append(process.MC_ROIPFBTagDeepCSV_v10)
