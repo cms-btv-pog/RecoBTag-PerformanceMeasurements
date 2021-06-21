@@ -26,7 +26,7 @@ The ntuplizer can be run and configured through ```RecoBTag/PerformanceMeasureme
 NOTE1: due to the structure of the preliminary JECs, there are 2 different "defaults" sets; 
 
 > **_preVFP_**: ```defaults=2016_UltraLegacy_APV```<br/>
-> **_postVFP_**: ```defaults=2018_UltraLegacy_nonAPV```<br/>
+> **_postVFP_**: ```defaults=2016_UltraLegacy_nonAPV```<br/>
 
 This means in your crab configuration file, you will have to check which file you are running on, and pick the correct default set accordingly. As an example, one might do something like:
 
