@@ -182,7 +182,7 @@ class EventInfoBranches {
     float ttbar_gpt[25],ttbar_geta[25],ttbar_gphi[25],ttbar_gm[25];
     float ttbar_lpt[10], ttbar_leta[10], ttbar_lphi[10], ttbar_lm[10];
     float ttbar_metpt,ttbar_metphi;
-    float ttbar_w[1200];
+    float ttbar_w[2400];
     float ttbar_ptweight;
 
 
