@@ -447,13 +447,17 @@ def addPaths_PFJetsForBtag(process):
 
     process.hltBTagPFDeepCSV4p06SingleROI = process.hltBTagPFDeepCSV4p06Single.clone(
         JetTags = cms.InputTag("hltDeepCombinedSecondaryVertexBJetTagsPFROI","probb"),
-        Jets = cms.InputTag("hltPFJetForBtag"),
+        Jets = cms.InputTag("hltPFJetForBtagROI"),
     )
 
 
     process.MC_ROIPFBTagDeepCSV_v10 = cms.Path(
         process.HLTBeginSequence
         + process.hltPreMCROIPFBTagDeepCSV
+        + process.HLTAK4CaloJetsSequence
+        +process.hltSelectorJets30L1FastJet
+        +process.hltSelectorCentralJets30L1FastJeta
+        +process.hltSelector8CentralJetsL1FastJet
         + process.HLTAK4PFJetsSequenceForBTag
         + process.HLTBtagDeepCSVSequencePFROI
         + process.hltBTagPFDeepCSV4p06SingleROI
