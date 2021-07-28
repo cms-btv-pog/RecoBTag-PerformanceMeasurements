@@ -227,7 +227,7 @@ if options.defaults:
 			raise ValueError('The key set by the defaults: %s does not exist among the cfg options!' % key)
 		elif not options._beenSet[key]:
 			if key == 'inputFiles' and options.inputFiles: continue #skip input files that for some reason are never considered set
-			print 'setting default option for', key
+			print ('setting default option for', key)
 			setattr(options, key, value)
 
 from RecoBTag.PerformanceMeasurements.HLTBTagAnalyzer_cff import *
@@ -256,7 +256,7 @@ for switch in options_to_change:
   elif switch not in options._beenSet:
     raise ValueError('The option set by the variables: %s does not exist among the cfg options!' % switch)
   elif not options._beenSet[switch]:
-    print 'Turning on %s, as some stored variables demands it' % switch
+    print ('Turning on %s, as some stored variables demands it' % switch)
     setattr(options, switch, True)
 
 ## Global tag
@@ -314,7 +314,8 @@ trackSource = tracks
 ### HLT configuration
 ###
 if options.reco == 'HLT_GRun':
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_12_0_0_GRun_V3_configDump_GT import cms, process
 
 elif options.reco == 'HLT_Run3TRK':
     # (a) Run-3 tracking: standard
@@ -457,8 +458,8 @@ keepPaths = [
 
 # list of paths that are kept
 listOfPaths = []
-print "Keep paths:"
-print '-'*108
+print ("Keep paths:")
+print ('-'*108)
 # remove selected cms.Path objects from HLT config-dump
 for _modname in sorted(process.paths_()):
     _keepPath = False
@@ -466,7 +467,7 @@ for _modname in sorted(process.paths_()):
         _keepPath = fnmatch.fnmatch(_modname, _tmpPatt)
         if _keepPath: break
     if _keepPath:
-        print '{:<99} | {:<4} |'.format(_modname, '+')
+        print ('{:<99} | {:<4} |'.format(_modname, '+'))
         listOfPaths.append(_modname)
         continue
     _mod = getattr(process, _modname)
@@ -474,7 +475,7 @@ for _modname in sorted(process.paths_()):
         process.__delattr__(_modname)
         # if options.verbosity > 0:
         #     print '{:<99} | {:<4} |'.format(_modname, '')
-print '-'*108
+print ('-'*108)
 
 # remove FastTimerService
 if hasattr(process, 'FastTimerService'):
@@ -741,7 +742,7 @@ process.noscraping = cms.EDFilter("FilterOutScraping",
 if options.changeMinNumberOfHits:
     for m in process.producerNames().split(' '):
         if m.startswith('pfImpactParameterTagInfos'):
-            print "Changing 'minimumNumberOfHits' for " + m + " to " + str(options.minNumberOfHits)
+            print ("Changing 'minimumNumberOfHits' for " + m + " to " + str(options.minNumberOfHits))
             getattr(process, m).minimumNumberOfHits = cms.int32(options.minNumberOfHits)
 
 #-------------------------------------
@@ -973,14 +974,14 @@ del process.out
 if options.dumpPython is not None:
    open(options.dumpPython, 'w').write(process.dumpPython())
 
-print ''
-print 'option: output =', options.outFilename
-print 'option: reco =', options.reco
-print 'option: dumpPython =', options.dumpPython
-print ''
+print ('')
+print ('option: output =', options.outFilename)
+print ('option: reco =', options.reco)
+print ('option: dumpPython =', options.dumpPython)
+print ('')
 # print 'process.GlobalTag =', process.GlobalTag.dumpPython()
-print 'process.GlobalTag =', process.GlobalTag.globaltag
-print 'process.source =', process.source.dumpPython()
-print 'process.maxEvents =', process.maxEvents.input
+print ('process.GlobalTag =', process.GlobalTag.globaltag)
+print ('process.source =', process.source.dumpPython())
+print ('process.maxEvents =', process.maxEvents.input)
 # print 'process.options =', process.options.dumpPython()
-print '-------------------------------'
+print ('-------------------------------')
