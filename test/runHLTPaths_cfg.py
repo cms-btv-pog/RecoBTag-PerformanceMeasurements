@@ -238,6 +238,22 @@ elif options.reco == 'HLT_BTagROI':
     SVTagInfos               = 'hltDeepSecondaryVertexPFPatROI'
 
     update_jmeCalibs = True
+elif options.reco == 'HLT_Run3TRKForBTag':
+    # (a) Run-3 tracking: standard
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    from RecoBTag.PerformanceMeasurements.customise_TRK import *
+    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    process = customizeHLTRun3Tracking(process)
+    print('hltPixelTracksClean' in process.__dict__)
+    process = customiseRun3BTagRegionalTracks(process, clean=False, vertex="hltTrimmedPixelVertices", nVertices = 2)
+elif options.reco == 'HLT_Run3TRKForBTag_2':
+    # (a) Run-3 tracking: standard
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    from RecoBTag.PerformanceMeasurements.customise_TRK import *
+    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    process = customizeHLTRun3Tracking(process)
+    print('hltPixelTracksClean' in process.__dict__)
+    process = customiseRun3BTagRegionalTracks(process, clean=True, vertex="hltTrimmedPixelVertices", nVertices = 2)
 else:
   raise RuntimeError('keyword "reco = '+options.reco+'" not recognised')
 
