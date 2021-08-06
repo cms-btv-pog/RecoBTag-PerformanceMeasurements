@@ -32,7 +32,7 @@ options.register('dumpPython', None,
     VarParsing.varType.string,
     'Dump python config, pass SaveName.py'
 )
-options.register('globalTag', '112X_mcRun3_2021_realistic_v14',
+options.register('globalTag', 'auto:run3_hlt',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "MC global tag, no default value provided"

@@ -22,7 +22,9 @@
 <use   name="fastjet"/>
 <use   name="fastjet-contrib"/>
 <use   name="SimDataFormats/Track"/>
+<!--
 <use   name="SimDataFormats/JetMatching"/>
+-->
 <use   name="SimTracker/TrackAssociation"/>
 <use   name="SimTracker/Records"/>
 <use   name="TrackingTools/TransientTrack"/>

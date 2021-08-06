@@ -534,10 +534,13 @@ void HLTBTagAnalyzerT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::Ev
     iEvent.getByToken(src_, genEvtInfoProduct);
 
     std::string moduleName = "";
-    const edm::Provenance& prov = iEvent.getProvenance(genEvtInfoProduct.id());
-    if( genEvtInfoProduct.isValid() )
+    // const edm::Provenance& prov = iEvent.getProvenance(genEvtInfoProduct.id());
+    const edm::StableProvenance& prov = iEvent.getStableProvenance(genEvtInfoProduct.id());
+    if( genEvtInfoProduct.isValid() ){
       // moduleName = edm::moduleName(prov);
       moduleName = edm::moduleName(prov,iEvent.processHistory());
+      std::cout<<moduleName<<std::endl;
+    }
     //
     if( moduleName.find("Pythia8")!=std::string::npos )
       hadronizerType_ |= ( 1 << 1 ); // set the 2nd bit
