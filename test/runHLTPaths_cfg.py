@@ -73,17 +73,61 @@ options.parseArguments()
 globalTag = options.globalTag
 
 
+update_jmeCalibs = False
+
+def fixForGRunConfig(process):
+  from HLTrigger.Configuration.common import producers_by_type
+  for producer in producers_by_type(process, 'TrackWithVertexSelector'):
+    if not hasattr(producer, 'numberOfValidHitsForGood'):
+      producer.numberOfValidHitsForGood = cms.uint32(999)
+    if not hasattr(producer, 'numberOfValidPixelHitsForGood'):
+      producer.numberOfValidPixelHitsForGood = cms.uint32(999)
+    if not hasattr(producer, 'zetaVtxScale'):
+      producer.zetaVtxScale = cms.double(1.0)
+    if not hasattr(producer, 'rhoVtxScale'):
+      producer.rhoVtxScale = cms.double(1.0)
+    if not hasattr(producer, 'zetaVtxSig'):
+      producer.zetaVtxSig = cms.double(999.0)
+    if not hasattr(producer, 'rhoVtxSig'):
+      producer.rhoVtxSig = cms.double(999.0)
+  return process
+
 ###
 ### HLT configuration
 ###
-if options.reco == 'HLT_GRun':
+if options.reco == 'HLT_GRun_oldJECs':
     from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    process = fixForGRunConfig(process)
+    update_jmeCalibs = False
+
+elif options.reco == 'HLT_GRun':
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    process = fixForGRunConfig(process)
+    update_jmeCalibs = True
 
 elif options.reco == 'HLT_Run3TRK':
     # (a) Run-3 tracking: standard
     from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     process = customizeHLTRun3Tracking(process)
+    update_jmeCalibs = True
+
+    if hasattr(process, 'hltEG60R9Id90CaloIdLIsoLDisplacedIdFilter'):
+      process.hltEG60R9Id90CaloIdLIsoLDisplacedIdFilter.inputTrack = 'hltMergedTracks'
+
+    if hasattr(process, 'hltIter1ClustersRefRemoval'):
+      process.hltIter1ClustersRefRemoval.trajectories = 'hltMergedTracks'
+
+    for _tmpPathName in [
+      'AlCa_LumiPixelsCounts_ZeroBias_v1',
+      'AlCa_LumiPixelsCounts_Random_v1',
+    ]:
+      if hasattr(process, _tmpPathName):
+        _tmpPath = getattr(process, _tmpPathName)
+        _tmpPath.remove(process.hltSiPixelDigis)
+        _tmpPath.remove(process.hltSiPixelClusters)
+        _tmpPath.associate(process.HLTDoLocalPixelTask)
+
 elif options.reco == 'HLT_Run3TRKMod':
     # (a) Run-3 tracking: standard
     from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
@@ -99,6 +143,23 @@ elif options.reco == 'HLT_Run3TRKWithPU':
     from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
     process = customizeHLTRun3TrackingAllPixelVertices(process)
+    update_jmeCalibs = True
+
+    if hasattr(process, 'hltEG60R9Id90CaloIdLIsoLDisplacedIdFilter'):
+      process.hltEG60R9Id90CaloIdLIsoLDisplacedIdFilter.inputTrack = 'hltMergedTracks'
+
+    if hasattr(process, 'hltIter1ClustersRefRemoval'):
+      process.hltIter1ClustersRefRemoval.trajectories = 'hltMergedTracks'
+
+    for _tmpPathName in [
+      'AlCa_LumiPixelsCounts_ZeroBias_v1',
+      'AlCa_LumiPixelsCounts_Random_v1',
+    ]:
+      if hasattr(process, _tmpPathName):
+        _tmpPath = getattr(process, _tmpPathName)
+        _tmpPath.remove(process.hltSiPixelDigis)
+        _tmpPath.remove(process.hltSiPixelClusters)
+        _tmpPath.associate(process.HLTDoLocalPixelTask)
 elif options.reco == 'HLT_Run3TRKPixelOnly':
     # (c) Run-3 tracking: pixel only tracks
     from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
@@ -120,6 +181,24 @@ elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned2':
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
     process = customizeHLTRun3Tracking(process)
     process = customisePFForPixelTracksCleaned(process, "hltPixelTracksCleanForBTag", vertex="hltTrimmedPixelVertices", nVertices = 2)
+    update_jmeCalibs = True
+
+    if hasattr(process, 'hltEG60R9Id90CaloIdLIsoLDisplacedIdFilter'):
+      process.hltEG60R9Id90CaloIdLIsoLDisplacedIdFilter.inputTrack = 'hltMergedTracks'
+
+    if hasattr(process, 'hltIter1ClustersRefRemoval'):
+      process.hltIter1ClustersRefRemoval.trajectories = 'hltMergedTracks'
+
+    for _tmpPathName in [
+      'AlCa_LumiPixelsCounts_ZeroBias_v1',
+      'AlCa_LumiPixelsCounts_Random_v1',
+    ]:
+      if hasattr(process, _tmpPathName):
+        _tmpPath = getattr(process, _tmpPathName)
+        _tmpPath.remove(process.hltSiPixelDigis)
+        _tmpPath.remove(process.hltSiPixelClusters)
+        _tmpPath.associate(process.HLTDoLocalPixelTask)
+
 elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned3':
     # (d) Run-3 tracking: pixel only tracks and trimmed with PVs
     from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
@@ -157,6 +236,8 @@ elif options.reco == 'HLT_BTagROI':
     IPTagInfos               = 'hltDeepBLifetimePFPatROI'
     SVPuppiTagInfos          = 'hltDeepSecondaryVertexPFPuppiPatROI'
     SVTagInfos               = 'hltDeepSecondaryVertexPFPatROI'
+
+    update_jmeCalibs = True
 else:
   raise RuntimeError('keyword "reco = '+options.reco+'" not recognised')
 
@@ -190,6 +271,7 @@ keepPaths = [
   # 'MC_*DeepCSV*',
   # 'MC_*CaloBTagDeepCSV*',
   'MC_*PFBTagDeepCSV*',
+  'MC_ReducedIterativeTracking*',
   # 'MC_*DeepJet*',
   # 'HLT_PFJet*_v*',
   # 'HLT_AK4PFJet*_v*',
@@ -197,7 +279,7 @@ keepPaths = [
   # 'HLT_PFHT*_v*',
   # 'HLT_PFMET*_PFMHT*_v*',
 
-  'HLT_*DeepCSV*_v*',
+  # 'HLT_*DeepCSV*_v*',
 ]
 # list of paths that are kept
 listOfPaths = []
@@ -260,81 +342,81 @@ if options.reco == 'HLT_BTagROI':
     # process = customizePFPatLikeJetsROI(process)
 
 
+if update_jmeCalibs:
+    ## ES modules for PF-Hadron Calibrations
+    import os
+    # from CondCore.DBCommon.CondDBSetup_cfi import *
+    from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
 
-## ES modules for PF-Hadron Calibrations
-import os
-# from CondCore.DBCommon.CondDBSetup_cfi import *
-from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
+    process.pfhcESSource = cms.ESSource('PoolDBESSource',
+      _CondDB.clone(connect = 'sqlite_fip:JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db'),
+      toGet = cms.VPSet(
+        cms.PSet(
+          record = cms.string('PFCalibrationRcd'),
+          tag = cms.string('PFCalibration_HLT_mcRun3_2021'),
+          label = cms.untracked.string('HLT'),
+        ),
+      ),
+    )
 
-process.pfhcESSource = cms.ESSource('PoolDBESSource',
-  _CondDB.clone(connect = 'sqlite_fip:JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db'),
-  toGet = cms.VPSet(
-    cms.PSet(
-      record = cms.string('PFCalibrationRcd'),
-      tag = cms.string('PFCalibration_HLT_mcRun3_2021'),
-      label = cms.untracked.string('HLT'),
-    ),
-  ),
-)
-
-process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
-## ES modules for HLT JECs
-process.jescESSource = cms.ESSource('PoolDBESSource',
-  _CondDB.clone(connect = 'sqlite_fip:JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V1_MC.db'),
-  toGet = cms.VPSet(
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4CaloHLT'),
-      label = cms.untracked.string('AK4CaloHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFClusterHLT'),
-      label = cms.untracked.string('AK4PFClusterHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),
-      label = cms.untracked.string('AK4PFHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),
-      label = cms.untracked.string('AK4PFchsHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFPuppiHLT'),
-      label = cms.untracked.string('AK4PFPuppiHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4CaloHLT'),#!!
-      label = cms.untracked.string('AK8CaloHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFClusterHLT'),#!!
-      label = cms.untracked.string('AK8PFClusterHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),#!!
-      label = cms.untracked.string('AK8PFHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),#!!
-      label = cms.untracked.string('AK8PFchsHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFPuppiHLT'),#!!
-      label = cms.untracked.string('AK8PFPuppiHLT'),
-    ),
-  ),
-)
-process.jescESPrefer = cms.ESPrefer('PoolDBESSource', 'jescESSource')
+    process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
+    ## ES modules for HLT JECs
+    process.jescESSource = cms.ESSource('PoolDBESSource',
+      _CondDB.clone(connect = 'sqlite_fip:JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V2_MC.db'),
+     toGet = cms.VPSet(
+        cms.PSet(
+          record = cms.string('JetCorrectionsRecord'),
+          tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4CaloHLT'),
+          label = cms.untracked.string('AK4CaloHLT'),
+        ),
+        cms.PSet(
+          record = cms.string('JetCorrectionsRecord'),
+          tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFClusterHLT'),
+          label = cms.untracked.string('AK4PFClusterHLT'),
+        ),
+        cms.PSet(
+          record = cms.string('JetCorrectionsRecord'),
+          tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFHLT'),
+          label = cms.untracked.string('AK4PFHLT'),
+        ),
+        cms.PSet(
+          record = cms.string('JetCorrectionsRecord'),
+          tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFHLT'),#!!
+          label = cms.untracked.string('AK4PFchsHLT'),
+        ),
+        cms.PSet(
+          record = cms.string('JetCorrectionsRecord'),
+          tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFPuppiHLT'),
+          label = cms.untracked.string('AK4PFPuppiHLT'),
+        ),
+        cms.PSet(
+          record = cms.string('JetCorrectionsRecord'),
+          tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8CaloHLT'),
+          label = cms.untracked.string('AK8CaloHLT'),
+        ),
+        cms.PSet(
+          record = cms.string('JetCorrectionsRecord'),
+          tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFClusterHLT'),
+          label = cms.untracked.string('AK8PFClusterHLT'),
+        ),
+        cms.PSet(
+          record = cms.string('JetCorrectionsRecord'),
+          tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFHLT'),
+          label = cms.untracked.string('AK8PFHLT'),
+        ),
+        cms.PSet(
+          record = cms.string('JetCorrectionsRecord'),
+          tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFHLT'),#!!
+          label = cms.untracked.string('AK8PFchsHLT'),
+        ),
+        cms.PSet(
+          record = cms.string('JetCorrectionsRecord'),
+          tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFPuppiHLT'),
+          label = cms.untracked.string('AK8PFPuppiHLT'),
+        ),
+      ),
+    )
+    process.jescESPrefer = cms.ESPrefer('PoolDBESSource', 'jescESSource')
 
 ## MessageLogger
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
