@@ -1,5 +1,122 @@
 import FWCore.ParameterSet.Config as cms
 
+def customiseRun3BTagRegionalTracks(process, clean=False, vertex="hltTrimmedPixelVertices", nVertices = 4):
+
+   # process.hltBTaggingRegion = cms.PSet(
+   #     beamSpot = cms.InputTag("hltOnlineBeamSpot"),
+   #     deltaPhi = cms.vdouble(0.5),
+   #     inputs = cms.VInputTag("hltSelectorCentralJets20L1FastJeta"),
+   #     maxZ = cms.vdouble(24.0)
+   # )
+
+    process.hltBTaggingRegion = cms.EDProducer("CandidateSeededTrackingRegionsEDProducer",
+    RegionPSet = cms.PSet(
+        beamSpot = cms.InputTag("hltOnlineBeamSpot"),
+        # deltaEta = cms.double(0.25),
+        deltaEta = cms.double(0.5),
+        deltaPhi = cms.double(0.5),
+        input = cms.InputTag("hltSelectorCentralJets20L1FastJeta"),
+        maxNRegions = cms.int32(100),
+        # maxNVertices = cms.int32(1),
+        maxNVertices = cms.int32(2),
+        measurementTrackerName = cms.InputTag(""),
+        # mode = cms.string('BeamSpotSigma'),
+        mode = cms.string('VerticesFixed'),
+        nSigmaZBeamSpot = cms.double(3.0),
+        nSigmaZVertex = cms.double(0.0),
+        # originRadius = cms.double(0.05),
+        originRadius = cms.double(0.3),
+        precise = cms.bool(True),
+        ptMin = cms.double(0.3),
+        searchOpt = cms.bool(True),
+        # vertexCollection = cms.InputTag(""),
+        vertexCollection = cms.InputTag("hltTrimmedPixelVertices"),
+        whereToUseMeasurementTracker = cms.string('Never'),
+        zErrorBeamSpot = cms.double(0.5),
+        # zErrorVetex = cms.double(0.1)
+        zErrorVetex = cms.double(0.3)
+    )
+)
+
+    process.hltPixelTracksCleanForBTag = cms.EDProducer("TrackWithVertexSelector",
+        copyExtras = cms.untracked.bool(False),
+        copyTrajectories = cms.untracked.bool(False),
+        d0Max = cms.double(999.0),
+        dzMax = cms.double(999.0),
+        etaMax = cms.double(5.0),
+        etaMin = cms.double(0.0),
+        nSigmaDtVertex = cms.double(0.0),
+        nVertices = cms.uint32(nVertices),
+        normalizedChi2 = cms.double(999999.0),
+        numberOfLostHits = cms.uint32(999),
+        numberOfValidHits = cms.uint32(0),
+        numberOfValidHitsForGood = cms.uint32(999),
+        numberOfValidPixelHits = cms.uint32(3),
+        numberOfValidPixelHitsForGood = cms.uint32(999),
+        ptErrorCut = cms.double(5.0),
+        ptMax = cms.double(500.0),
+        ptMin = cms.double(0.3),
+        # ptMin = cms.double(0.8),
+        quality = cms.string('any'),
+        rhoVtx = cms.double(0.2),
+        rhoVtxScale = cms.double(1.0),
+        rhoVtxSig = cms.double(999.0),
+        src = cms.InputTag("hltPixelTracks"),
+        timeResosTag = cms.InputTag(""),
+        timesTag = cms.InputTag(""),
+        useVtx = cms.bool(True),
+        vertexTag = cms.InputTag(vertex),
+        vtxFallback = cms.bool(True),
+        zetaVtx = cms.double(0.3),
+        zetaVtxScale = cms.double(1.0),
+        zetaVtxSig = cms.double(999.0)
+    )
+
+    process.hltPixelTracksForBTag = cms.EDProducer('TrackSelectorByRegion',
+          tracks = cms.InputTag('hltPixelTracks') if not clean else cms.InputTag("hltPixelTracksCleanForBTag"),
+          regions = cms.InputTag('hltBTaggingRegion'),
+          produceTrackCollection = cms.bool(True),
+          produceMask = cms.bool(True),
+          mightGet = cms.optional.untracked.vstring
+        )
+
+    process.hltIter0PFLowPixelSeedsFromPixelTracks.InputCollection = cms.InputTag("hltPixelTracksForBTag")
+
+    if not clean:
+        process.HLTIterativeTrackingIteration0 = cms.Sequence(
+            # process.hltAK4CaloJetsCorrected +
+            process.HLTAK4CaloJetsCorrectionNoIDSequence +
+            process.hltSelectorJets20L1FastJet +
+            process.hltSelectorCentralJets20L1FastJeta +
+            process.hltBTaggingRegion +
+            process.hltPixelTracksForBTag +
+            process.hltIter0PFLowPixelSeedsFromPixelTracks+
+            process.hltIter0PFlowCkfTrackCandidates+
+            process.hltIter0PFlowCtfWithMaterialTracks+
+            process.hltIter0PFlowTrackCutClassifier+
+            process.hltMergedTracks
+        )
+    else:
+        process.HLTIterativeTrackingIteration0 = cms.Sequence(
+            process.HLTAK4CaloJetsCorrectionNoIDSequence +
+            process.hltSelectorJets20L1FastJet +
+            process.hltSelectorCentralJets20L1FastJeta +
+            process.hltBTaggingRegion +
+            process.hltPixelTracksCleanForBTag +
+            process.hltPixelTracksForBTag +
+            process.hltIter0PFLowPixelSeedsFromPixelTracks+
+            process.hltIter0PFlowCkfTrackCandidates+
+            process.hltIter0PFlowCtfWithMaterialTracks+
+            process.hltIter0PFlowTrackCutClassifier+
+            process.hltMergedTracks
+        )
+
+    process.HLTIterativeTrackingIter02 = cms.Sequence(
+        process.HLTIterativeTrackingIteration0
+    )
+
+    return process
+
 def customisePFForPixelTracks(process, tracksToUse = "hltPixelTracks"):
      process.hltPFMuonMerging.TrackProducers = cms.VInputTag("hltIterL3MuonTracks", tracksToUse)
      process.hltPFMuonMerging.selectedTrackQuals = cms.VInputTag("hltIterL3MuonTracks", tracksToUse)
