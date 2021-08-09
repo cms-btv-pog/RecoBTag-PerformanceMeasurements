@@ -95,19 +95,24 @@ def fixForGRunConfig(process):
 ###
 ### HLT configuration
 ###
+if options.runOnData:
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_12_0_0_GRun_V3_configDump_Data import cms, process
+else:
+    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_12_0_0_GRun_V3_configDump_MC import cms, process
+
 if options.reco == 'HLT_GRun_oldJECs':
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     process = fixForGRunConfig(process)
     update_jmeCalibs = False
 
 elif options.reco == 'HLT_GRun':
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     process = fixForGRunConfig(process)
     update_jmeCalibs = True
 
 elif options.reco == 'HLT_Run3TRK':
     # (a) Run-3 tracking: standard
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     process = customizeHLTRun3Tracking(process)
     update_jmeCalibs = True
@@ -130,17 +135,17 @@ elif options.reco == 'HLT_Run3TRK':
 
 elif options.reco == 'HLT_Run3TRKMod':
     # (a) Run-3 tracking: standard
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     process = customizeHLTRun3Tracking(process)
 elif options.reco == 'HLT_Run3TRKMod2':
     # (a) Run-3 tracking: standard
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     process = customizeHLTRun3Tracking(process)
 elif options.reco == 'HLT_Run3TRKWithPU':
     # (b) Run-3 tracking: all pixel vertices
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
     process = customizeHLTRun3TrackingAllPixelVertices(process)
     update_jmeCalibs = True
@@ -162,21 +167,21 @@ elif options.reco == 'HLT_Run3TRKWithPU':
         _tmpPath.associate(process.HLTDoLocalPixelTask)
 elif options.reco == 'HLT_Run3TRKPixelOnly':
     # (c) Run-3 tracking: pixel only tracks
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
     process = customizeHLTRun3Tracking(process)
     process = customisePFForPixelTracks(process)
 elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned':
     # (d) Run-3 tracking: pixel only tracks and trimmed with PVs
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
     process = customizeHLTRun3Tracking(process)
     process = customisePFForPixelTracksCleaned(process, "hltPixelTracksCleanForBTag")
 elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned2':
     # (d) Run-3 tracking: pixel only tracks and trimmed with PVs
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
     process = customizeHLTRun3Tracking(process)
@@ -201,21 +206,21 @@ elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned2':
 
 elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned3':
     # (d) Run-3 tracking: pixel only tracks and trimmed with PVs
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
     process = customizeHLTRun3Tracking(process)
     process = customisePFForPixelTracksCleaned(process, "hltPixelTracksCleanForBTag", vertex="hltPixelVertices", nVertices = 4)
 elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned4':
     # (d) Run-3 tracking: pixel only tracks and trimmed with PVs
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
     process = customizeHLTRun3Tracking(process)
     process = customisePFForPixelTracksCleaned(process, "hltPixelTracksCleanForBTag", vertex="hltPixelVertices", nVertices = 2)
 elif options.reco == 'HLT_BTagROI':
     # (e) Run-3 tracking: ROI PF approach
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     from RecoBTag.PerformanceMeasurements.customise_hlt import *
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     process = customizeHLTRun3Tracking(process)
@@ -240,7 +245,7 @@ elif options.reco == 'HLT_BTagROI':
     update_jmeCalibs = True
 elif options.reco == 'HLT_Run3TRKForBTag':
     # (a) Run-3 tracking: standard
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     process = customizeHLTRun3Tracking(process)
@@ -248,7 +253,7 @@ elif options.reco == 'HLT_Run3TRKForBTag':
     process = customiseRun3BTagRegionalTracks(process, clean=False, vertex="hltTrimmedPixelVertices", nVertices = 2)
 elif options.reco == 'HLT_Run3TRKForBTag_2':
     # (a) Run-3 tracking: standard
-    from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+    # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
     from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
     process = customizeHLTRun3Tracking(process)
@@ -300,15 +305,15 @@ keepPaths = [
 # list of paths that are kept
 listOfPaths = []
 # remove selected cms.Path objects from HLT config-dump
-print "Keep paths:"
-print '-'*108
+print ("Keep paths:")
+print ('-'*108)
 for _modname in sorted(process.paths_()):
     _keepPath = False
     for _tmpPatt in keepPaths:
         _keepPath = fnmatch.fnmatch(_modname, _tmpPatt)
         if _keepPath: break
     if _keepPath:
-        print '{:<99} | {:<4} |'.format(_modname, '+')
+        print ('{:<99} | {:<4} |'.format(_modname, '+'))
         listOfPaths.append(_modname)
         continue
     _mod = getattr(process, _modname)
@@ -316,7 +321,7 @@ for _modname in sorted(process.paths_()):
         process.__delattr__(_modname)
         # if options.verbosity > 0:
         #     print '{:<99} | {:<4} |'.format(_modname, '')
-print '-'*108
+print ('-'*108)
 
 # remove FastTimerService
 if hasattr(process, 'FastTimerService'):
@@ -514,7 +519,7 @@ if options.runTiming:
     # enable text dump
     if not hasattr(process,'MessageLogger'):
         process.load('FWCore.MessageService.MessageLogger_cfi')
-    process.MessageLogger.categories.append('FastReport')
+    # process.MessageLogger.categories.append('FastReport')
     process.MessageLogger.cerr.FastReport = cms.untracked.PSet( limit = cms.untracked.int32( 10000000 ) )
     # save the DQM plots in the DQMIO format
     process.dqmOutput = cms.OutputModule("DQMRootOutputModule",
@@ -558,14 +563,14 @@ if options.runTiming:
 if options.dumpPython is not None:
    open(options.dumpPython, 'w').write(process.dumpPython())
 
-print ''
-print 'option: output =', options.outFilename
-print 'option: reco =', options.reco
-print 'option: dumpPython =', options.dumpPython
-print ''
+print ('')
+print ('option: output =', options.outFilename)
+print ('option: reco =', options.reco)
+print ('option: dumpPython =', options.dumpPython)
+print ('')
 # print 'process.GlobalTag =', process.GlobalTag.dumpPython()
-print 'process.GlobalTag =', process.GlobalTag.globaltag
-print 'process.source =', process.source.dumpPython()
-print 'process.maxEvents =', process.maxEvents.input
+print ('process.GlobalTag =', process.GlobalTag.globaltag)
+print ('process.source =', process.source.dumpPython())
+print ('process.maxEvents =', process.maxEvents.input)
 # print 'process.options =', process.options.dumpPython()
-print '-------------------------------'
+print ('-------------------------------')

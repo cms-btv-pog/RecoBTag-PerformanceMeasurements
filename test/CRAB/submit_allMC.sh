@@ -7,4 +7,4 @@ python ../submit_all.py \
   -s T2_DE_DESY \
   -p defaults=Run3 runOnData=False \
   -o /store/user/sewuchte/BTagServiceWork/Run3/Offline/ \
-  -v crab_projects_Run3Study_Offline_v0
+  -v crab_projects_Run3Study_120X_Offline_v0
