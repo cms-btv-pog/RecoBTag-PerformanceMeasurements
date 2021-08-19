@@ -1212,6 +1212,11 @@ groupSet = cms.PSet(
       store       = cms.bool(False),
       description = cms.string("Deep Flavour Variables"),
       variables   = cms.vstring(
+        "DeepFlavourInput_nPVS",
+        "DeepFlavourInput_n_charged",
+        "DeepFlavourInput_NFirst_charged",
+        "DeepFlavourInput_NLast_charged",
+        "DeepFlavourInput_multi_charged",
         "DeepFlavourInput_charged_Sip3dVal",
         "DeepFlavourInput_charged_Sip3dSig",
         "DeepFlavourInput_charged_quality",
@@ -1231,6 +1236,10 @@ groupSet = cms.PSet(
         "DeepFlavourInput_charged_VTX_ass",
         "DeepFlavourInput_charged_puppiw",
 
+        "DeepFlavourInput_n_neutral",
+        "DeepFlavourInput_NFirst_neutral",
+        "DeepFlavourInput_NLast_neutral",
+        "DeepFlavourInput_multi_neutral",
         "DeepFlavourInput_neutral_drminsv",
         "DeepFlavourInput_neutral_hadFrac",
         "DeepFlavourInput_neutral_ptrel",
@@ -1238,6 +1247,10 @@ groupSet = cms.PSet(
         "DeepFlavourInput_neutral_isGamma",
         "DeepFlavourInput_neutral_puppiw",
 
+        "DeepFlavourInput_n_sv",
+        "DeepFlavourInput_NFirst_sv",
+        "DeepFlavourInput_NLast_sv",
+        "DeepFlavourInput_multi_sv",
         "DeepFlavourInput_sv_d3d",
         "DeepFlavourInput_sv_d3dsig",
         "DeepFlavourInput_sv_normchi2",
