@@ -35,8 +35,8 @@ def customiseRun3BTagRegionalTracks(process, clean=False, vertex="hltTrimmedPixe
         zErrorBeamSpot = cms.double(0.5),
         # zErrorVetex = cms.double(0.1)
         zErrorVetex = cms.double(0.3)
+        )
     )
-)
 
     process.hltPixelTracksCleanForBTag = cms.EDProducer("TrackWithVertexSelector",
         copyExtras = cms.untracked.bool(False),
@@ -50,14 +50,17 @@ def customiseRun3BTagRegionalTracks(process, clean=False, vertex="hltTrimmedPixe
         normalizedChi2 = cms.double(999999.0),
         numberOfLostHits = cms.uint32(999),
         numberOfValidHits = cms.uint32(0),
+        # numberOfValidHitsForGood = cms.uint32(0),
         numberOfValidHitsForGood = cms.uint32(999),
         numberOfValidPixelHits = cms.uint32(3),
+        # numberOfValidPixelHitsForGood = cms.uint32(3),
         numberOfValidPixelHitsForGood = cms.uint32(999),
         ptErrorCut = cms.double(5.0),
         ptMax = cms.double(500.0),
         ptMin = cms.double(0.3),
         # ptMin = cms.double(0.8),
-        quality = cms.string('any'),
+        # quality = cms.string('any'),
+        quality = cms.string('loose'),
         rhoVtx = cms.double(0.2),
         rhoVtxScale = cms.double(1.0),
         rhoVtxSig = cms.double(999.0),
@@ -84,7 +87,6 @@ def customiseRun3BTagRegionalTracks(process, clean=False, vertex="hltTrimmedPixe
 
     if not clean:
         process.HLTIterativeTrackingIteration0 = cms.Sequence(
-            # process.hltAK4CaloJetsCorrected +
             process.HLTAK4CaloJetsCorrectionNoIDSequence +
             process.hltSelectorJets20L1FastJet +
             process.hltSelectorCentralJets20L1FastJeta +
@@ -140,8 +142,10 @@ def customisePFForPixelTracks(process, tracksToUse = "hltPixelTracks"):
                  muonSrc = cms.InputTag("hltMuons"),
                  source = cms.InputTag("hltLightPFTracks"),
                  # trackQuality = cms.string('highPurity'),
-                 trackQuality = cms.string('any'),
-                 useIterativeTracking = cms.bool(False)
+                 # trackQuality = cms.string('any'),
+                 trackQuality = cms.string('loose'),
+                 useIterativeTracking = cms.bool(False),
+                 vetoEndcap = cms.bool(False)
              ),
              cms.PSet(
                  BCtoPFCMap = cms.InputTag(""),
@@ -185,6 +189,9 @@ def customisePFForPixelTracks(process, tracksToUse = "hltPixelTracks"):
          process.hltMuonLinks+
          process.hltMuons)
 
+     process.hltVerticesPF.TkFilterParameters.minSiliconLayersWithHits = cms.int32(0)
+     process.hltVerticesPF.TkFilterParameters.trackQuality = cms.string('any')
+
      return process
 
 def customisePFForPixelTracksCleaned(process, tracksToUse = "hltPixelTracksCleanForBTag", vertex="hltTrimmedPixelVertices", nVertices = 4):
@@ -201,13 +208,16 @@ def customisePFForPixelTracksCleaned(process, tracksToUse = "hltPixelTracksClean
         numberOfLostHits = cms.uint32(999),
         numberOfValidHits = cms.uint32(0),
         numberOfValidHitsForGood = cms.uint32(999),
+        # numberOfValidHitsForGood = cms.uint32(0),
         numberOfValidPixelHits = cms.uint32(3),
         numberOfValidPixelHitsForGood = cms.uint32(999),
+        # numberOfValidPixelHitsForGood = cms.uint32(3),
         ptErrorCut = cms.double(5.0),
         ptMax = cms.double(500.0),
         # ptMin = cms.double(0.3),
         ptMin = cms.double(0.8),
-        quality = cms.string('any'),
+        # quality = cms.string('any'),
+        quality = cms.string('loose'),
         rhoVtx = cms.double(0.2),
         rhoVtxScale = cms.double(1.0),
         rhoVtxSig = cms.double(999.0),
@@ -247,8 +257,10 @@ def customisePFForPixelTracksCleaned(process, tracksToUse = "hltPixelTracksClean
              muonSrc = cms.InputTag("hltMuons"),
              source = cms.InputTag("hltLightPFTracks"),
              # trackQuality = cms.string('highPurity'),
-             trackQuality = cms.string('any'),
-             useIterativeTracking = cms.bool(False)
+             # trackQuality = cms.string('any'),
+             trackQuality = cms.string('loose'),
+             useIterativeTracking = cms.bool(False),
+             vetoEndcap = cms.bool(False)
         ),
         cms.PSet(
             BCtoPFCMap = cms.InputTag(""),
@@ -366,28 +378,44 @@ def customizeVertices2(process):
 
 def customizeMinHitsAndPt(process, doForPat=False):
     # ptValue = 0.8
-    ptValue = 0.9
+    # ptValue = 0.9
+    ptValue = 0.3
 
-    process.hltPixelTracksCleanForBTag.ptMin = cms.double(ptValue)
+    if hasattr(process, "hltPixelTracksCleanForBTag"):
+        process.hltPixelTracksCleanForBTag.ptMin = cms.double(ptValue)
 
     process.hltDeepInclusiveVertexFinderPF.minHits = cms.uint32(0)
     process.hltDeepBLifetimeTagInfosPF.minimumNumberOfHits = cms.int32(0)
     process.hltImpactParameterTagInfos.minimumNumberOfHits = cms.int32(0)
     process.hltDeepTrackVertexArbitratorPF.trackMinLayers = cms.int32(0)
     process.hltDeepSecondaryVertexTagInfosPF.trackSelection.totalHitsMin = cms.uint32(2)
+    process.hltDeepSecondaryVertexTagInfosPF.trackSelection.qualityClass = cms.string('loose')
     process.hltDeepCombinedSecondaryVertexBJetTagsInfos.computer.trackPseudoSelection.totalHitsMin = cms.uint32(0)
     process.hltDeepCombinedSecondaryVertexBJetTagsInfos.computer.trackSelection.totalHitsMin = cms.uint32(2)
     process.hltVerticesPF.TkFilterParameters.minPt = cms.double(ptValue)
     process.hltDeepInclusiveVertexFinderPF.minPt = cms.double(ptValue)
     process.hltDeepTrackVertexArbitratorPF.trackMinPt = cms.double(ptValue)
     process.hltDeepCombinedSecondaryVertexBJetTagsInfos.computer.trackSelection.ptMin = cms.double(ptValue)
+    process.hltDeepCombinedSecondaryVertexBJetTagsInfos.computer.trackPseudoSelection.qualityClass = cms.string('loose')
+    process.hltDeepCombinedSecondaryVertexBJetTagsInfos.computer.trackSelection.qualityClass = cms.string('loose')
+    process.hltInclusiveSecondaryVertexFinderTagInfos.trackSelection.qualityClass = cms.string('loose')
     if doForPat:
         process.hltDeepBLifetimePFPatTagInfos.minimumNumberOfHits = cms.int32(0)
         process.hltImpactParameterPatTagInfos.minimumNumberOfHits = cms.int32(0)
         process.hltDeepSecondaryVertexPFPatTagInfos.trackSelection.totalHitsMin = cms.uint32(2)
+        process.hltDeepSecondaryVertexPFPatTagInfos.trackSelection.qualityClass = cms.string('loose')
         process.hltDeepCombinedSecondaryVertexBJetPatTagInfos.computer.trackPseudoSelection.totalHitsMin = cms.uint32(0)
         process.hltDeepCombinedSecondaryVertexBJetPatTagInfos.computer.trackSelection.totalHitsMin = cms.uint32(2)
         process.hltDeepCombinedSecondaryVertexBJetPatTagInfos.computer.trackSelection.ptMin = cms.double(ptValue)
+        process.hltDeepCombinedSecondaryVertexBJetPatTagInfos.computer.trackPseudoSelection.qualityClass = cms.string('loose')
+        process.hltDeepCombinedSecondaryVertexBJetPatTagInfos.computer.trackSelection.qualityClass = cms.string('loose')
+        process.hltInclusiveSecondaryVertexFinderPatTagInfos.trackSelection.qualityClass = cms.string('loose')
+        process.candidateCombinedSecondaryVertexV2Computer.trackPseudoSelection.qualityClass = cms.string('loose')
+        process.candidateCombinedSecondaryVertexV2Computer.trackSelection.qualityClass = cms.string('loose')
+        process.hltCombinedSecondaryVertex.trackPseudoSelection.qualityClass = cms.string('loose')
+        process.hltCombinedSecondaryVertex.trackSelection.qualityClass = cms.string('loose')
+        process.hltCombinedSecondaryVertexV2.trackPseudoSelection.qualityClass = cms.string('loose')
+        process.hltCombinedSecondaryVertexV2.trackSelection.qualityClass = cms.string('loose')
 
     return process
 

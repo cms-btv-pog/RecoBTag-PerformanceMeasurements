@@ -15,7 +15,7 @@ options.register('runOnData', False,
     VarParsing.varType.bool,
     "Run this on real data"
 )
-options.register('outFilename', 'JetTree',
+options.register('outFilename', 'JetTree.root',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Output file name"
@@ -828,24 +828,24 @@ if options.inputFiles:
     process.source.fileNames = options.inputFiles
 
 ## Define the output file name
-if options.runOnData :
-    options.outFilename += '_data'
-else :
-    options.outFilename += '_mc'
-
-if options.runFatJets :
-    options.outFilename += '_FatJets'
-
-if options.runSubJets :
-    options.outFilename += '_Subjets'
-
-if options.fastSim :
-    options.outFilename += '_FastSim'
-
-if options.doBoostedCommissioning:
-  options.outFilename += '_BoostedCommissioning'
-
-options.outFilename += '.root'
+# if options.runOnData :
+#     options.outFilename += '_data'
+# else :
+#     options.outFilename += '_mc'
+#
+# if options.runFatJets :
+#     options.outFilename += '_FatJets'
+#
+# if options.runSubJets :
+#     options.outFilename += '_Subjets'
+#
+# if options.fastSim :
+#     options.outFilename += '_FastSim'
+#
+# if options.doBoostedCommissioning:
+#   options.outFilename += '_BoostedCommissioning'
+#
+# options.outFilename += '.root'
 
 ## Output file
 process.TFileService = cms.Service("TFileService",
