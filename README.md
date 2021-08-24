@@ -13,6 +13,7 @@ git cms-init
 
 git cms-addpkg HLTrigger/Configuration
 git cms-addpkg CommonTools/RecoAlgos
+git cms-addpkg RecoBTag/FeatureTools
 
 git cms-merge-topic SWuchterl:devel_1120_pre6_TRKPlusBTV
 git clone https://github.com/SWuchterl/JMETriggerAnalysis.git -o SWuchterl -b run3
