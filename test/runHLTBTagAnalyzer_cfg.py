@@ -539,7 +539,7 @@ keepPaths = [
   'MC_*AK8Calo*',
   'MC_*DeepCSV*',
   'MC_*DeepJet*',
-  'DST_Run3_PFScoutingPixelTracking_v*',
+  # 'DST_Run3_PFScoutingPixelTracking_v*',
 
   # 'HLT_PFJet*_v*',
   # 'HLT_AK4PFJet*_v*',
@@ -958,63 +958,46 @@ process.selectedEvents = eventCounter.clone()
 
 ## Define analyzer sequence
 process.analyzerSeq = cms.Sequence( )
-# if options.processStdAK4Jets:
 process.analyzerSeq += process.btagana
 #--------
 
 
-from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
-process.TrackHistograms_hltPixelTracks = TrackHistogrammer.clone(src = 'hltPixelTracks')
-process.TrackHistograms_hltPixelTracksCleanForBTag = TrackHistogrammer.clone(src = 'hltPixelTracksCleanForBTag')
-# process.TrackHistograms_hltTracks = TrackHistogrammer.clone(src = 'hltTracks')
-process.TrackHistograms_hltMergedTracks = TrackHistogrammer.clone(src = 'hltMergedTracks')
-process.TrackHistograms_hltPixelTracksForBTag = TrackHistogrammer.clone(src = 'hltPixelTracksForBTag')
-process.TrackHistograms_hltPixelTracksZetaClean = TrackHistogrammer.clone(src = 'hltPixelTracksZetaClean')
-process.TrackHistograms_hltPFMuonMerging = TrackHistogrammer.clone(src = 'hltPFMuonMerging')
-process.TrackHistograms_hltLightPFTracks = TrackHistogrammer.clone(src = 'hltLightPFTracks')
-# process.TrackHistograms_hltParticleFlow = TrackHistogrammer.clone(src = 'hltParticleFlow')
-# process.TrackHistograms_hltGeneralTracks = TrackHistogrammer.clone(src = 'generalTracks')
+# from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
+# process.TrackHistograms_hltPixelTracks = TrackHistogrammer.clone(src = 'hltPixelTracks')
+# process.TrackHistograms_hltPixelTracksCleanForBTag = TrackHistogrammer.clone(src = 'hltPixelTracksCleanForBTag')
+# process.TrackHistograms_hltMergedTracks = TrackHistogrammer.clone(src = 'hltMergedTracks')
+# process.TrackHistograms_hltPixelTracksForBTag = TrackHistogrammer.clone(src = 'hltPixelTracksForBTag')
+# process.TrackHistograms_hltPixelTracksZetaClean = TrackHistogrammer.clone(src = 'hltPixelTracksZetaClean')
+# process.TrackHistograms_hltPFMuonMerging = TrackHistogrammer.clone(src = 'hltPFMuonMerging')
+# process.TrackHistograms_hltLightPFTracks = TrackHistogrammer.clone(src = 'hltLightPFTracks')
+#
+# process.trkMonitoringSeq = cms.Sequence(
+#    process.TrackHistograms_hltPixelTracks
+#  + process.TrackHistograms_hltMergedTracks
+#  + process.TrackHistograms_hltPixelTracksZetaClean
+#  + process.TrackHistograms_hltPFMuonMerging
+#  + process.TrackHistograms_hltLightPFTracks
+# )
+# if "HLT_Run3TRKForBTag" in options.reco or "HLT_Run3TRKPixelOnly" in options.reco:
+#     process.trkMonitoringSeq+= process.TrackHistograms_hltPixelTracksForBTag
+#     process.trkMonitoringSeq+= process.TrackHistograms_hltPixelTracksCleanForBTag
 
-process.trkMonitoringSeq = cms.Sequence(
-   process.TrackHistograms_hltPixelTracks
- # + process.TrackHistograms_hltPixelTracksCleanForBTag if "HLT_Run3TRKForBTag" in reco
- # + process.TrackHistograms_hltTracks
- + process.TrackHistograms_hltMergedTracks
- # + process.TrackHistograms_hltPixelTracksForBTag if "HLT_Run3TRKForBTag" in reco
- + process.TrackHistograms_hltPixelTracksZetaClean
- + process.TrackHistograms_hltPFMuonMerging
- + process.TrackHistograms_hltLightPFTracks
- # + process.TrackHistograms_hltParticleFlow
- # + process.TrackHistograms_hltGeneralTracks
-)
-if "HLT_Run3TRKForBTag" in options.reco or "HLT_Run3TRKPixelOnly" in options.reco:
-    process.trkMonitoringSeq+= process.TrackHistograms_hltPixelTracksForBTag
-    process.trkMonitoringSeq+= process.TrackHistograms_hltPixelTracksCleanForBTag
-
-process.trkMonitoringEndPath = cms.EndPath(process.trkMonitoringSeq)
+# process.trkMonitoringEndPath = cms.EndPath(process.trkMonitoringSeq)
 # process.schedule.extend([process.trkMonitoringEndPath])
 
-from JMETriggerAnalysis.Common.VertexHistogrammer_cfi import VertexHistogrammer
-process.VertexHistograms_hltPixelVertices = VertexHistogrammer.clone(src = 'hltPixelVertices')
-process.VertexHistograms_hltTrimmedPixelVertices = VertexHistogrammer.clone(src = 'hltTrimmedPixelVertices')
-process.VertexHistograms_hltVerticesPF = VertexHistogrammer.clone(src = 'hltVerticesPF')
-process.VertexHistograms_hltVerticesPFFilter = VertexHistogrammer.clone(src = 'hltVerticesPFFilter')
-# process.VertexHistograms_hltDeepInclusiveVertexFinderPF = VertexHistogrammer.clone(src = 'hltDeepInclusiveVertexFinderPF')
-# process.VertexHistograms_hltDeepSecondaryVertexPFPatTagInfos = VertexHistogrammer.clone(src = 'hltDeepSecondaryVertexPFPatTagInfos')
-# process.VertexHistograms_hltDeepInclusiveMergedVerticesPF = VertexHistogrammer.clone(src = 'hltDeepInclusiveMergedVerticesPF')
-# process.VertexHistograms_hltDeepInclusiveSecondaryVerticesPF = VertexHistogrammer.clone(src = 'hltDeepInclusiveSecondaryVerticesPF')
-#
-process.vtxMonitoringSeq = cms.Sequence(
-   process.VertexHistograms_hltPixelVertices
-   + process.VertexHistograms_hltTrimmedPixelVertices
-   + process.VertexHistograms_hltVerticesPF
-   + process.VertexHistograms_hltVerticesPFFilter
- #   +process.VertexHistograms_hltDeepInclusiveVertexFinderPF
- # + process.VertexHistograms_hltDeepSecondaryVertexPFPatTagInfos
- # + process.VertexHistograms_hltDeepInclusiveMergedVerticesPF
- # + process.VertexHistograms_hltDeepInclusiveSecondaryVerticesPF
-)
-process.vtxMonitoringEndPath = cms.EndPath(process.vtxMonitoringSeq)
+# from JMETriggerAnalysis.Common.VertexHistogrammer_cfi import VertexHistogrammer
+# process.VertexHistograms_hltPixelVertices = VertexHistogrammer.clone(src = 'hltPixelVertices')
+# process.VertexHistograms_hltTrimmedPixelVertices = VertexHistogrammer.clone(src = 'hltTrimmedPixelVertices')
+# process.VertexHistograms_hltVerticesPF = VertexHistogrammer.clone(src = 'hltVerticesPF')
+# process.VertexHistograms_hltVerticesPFFilter = VertexHistogrammer.clone(src = 'hltVerticesPFFilter')
+# #
+# process.vtxMonitoringSeq = cms.Sequence(
+#    process.VertexHistograms_hltPixelVertices
+#    + process.VertexHistograms_hltTrimmedPixelVertices
+#    + process.VertexHistograms_hltVerticesPF
+#    + process.VertexHistograms_hltVerticesPFFilter
+# )
+# process.vtxMonitoringEndPath = cms.EndPath(process.vtxMonitoringSeq)
 
 if options.runTiming:
     #timing test

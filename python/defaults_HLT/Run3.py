@@ -11,11 +11,8 @@ common = {
 	'eras' : ['Run3'],
     'runCaloJetVariables' : False,
     'runPuppiJetVariables' : False,
-	# 'mcGlobalTag' : '112X_mcRun3_2021_realistic_v14',
-	# 'globalTag' : '112X_mcRun3_2021_realistic_v14',
-	# 'globalTag' : '112X_mcRun3_2021_realistic_v16',
-	# 'globalTag' : 'auto:run3_hlt',
-	'globalTag' : '120X_mcRun3_2021_realistic_v2',
+	'globalTag' : '120X_mcRun3_2021_realistic_v4', # mc
+	# 'globalTag' : '113X_dataRun3_HLT_v3', # data
 	'maxJetEta' : 2.5,
 	'usePrivateJEC' : False,
 	# 'jecDBFileMC' : 'PhaseIIFall17_V5b_MC',
