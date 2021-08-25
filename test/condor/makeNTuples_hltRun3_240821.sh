@@ -58,7 +58,7 @@ for recoKey in "${recoKeys[@]}"; do
         # htc_driver -c /tmp/${USER}/BTV_Run3_Online_cfg.py --customize-cfg -m ${numEvents} -n 1000 --cpus 1 --memory 2000 --runtime 10800 ${opts} \
         # htc_driver -c /tmp/${USER}/BTV_Run3_Online_cfg.py --customize-cfg -m ${numEvents} -n 1000 ${opts} \
         bdriver -c .tmp_${recoKey}_cfg.py --customize-cfg -m ${numEvents} -n 1000 ${opts} --cpus 1 --mem 1999 --time 03:00:00 \
-        -d ${sampleName} -p 0 -o ${ODIR}/${recoKey}/${sampleKey} \
+        -d ${sampleName} -p 0 -o ${ODIR}/${recoKey}/${sampleKey} --export-LD-LIBRARY-PATH -b htc\
         --customise-commands \
        '# output [TFileService]' \
        "if hasattr(process, 'TFileService'):" \
