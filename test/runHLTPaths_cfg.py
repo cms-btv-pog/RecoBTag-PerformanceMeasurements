@@ -113,8 +113,8 @@ elif options.reco == 'HLT_GRun':
 elif options.reco == 'HLT_Run3TRK':
     # (a) Run-3 tracking: standard
     # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
-    process = customizeHLTRun3Tracking(process)
+    from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
+    process = customizeHLTforRun3Tracking(process)
     update_jmeCalibs = True
 
     if hasattr(process, 'hltEG60R9Id90CaloIdLIsoLDisplacedIdFilter'):
@@ -136,18 +136,18 @@ elif options.reco == 'HLT_Run3TRK':
 elif options.reco == 'HLT_Run3TRKMod':
     # (a) Run-3 tracking: standard
     # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
-    process = customizeHLTRun3Tracking(process)
+    from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
+    process = customizeHLTforRun3Tracking(process)
 elif options.reco == 'HLT_Run3TRKMod2':
     # (a) Run-3 tracking: standard
     # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
-    process = customizeHLTRun3Tracking(process)
+    from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
+    process = customizeHLTforRun3Tracking(process)
 elif options.reco == 'HLT_Run3TRKWithPU':
     # (b) Run-3 tracking: all pixel vertices
     # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
-    process = customizeHLTRun3TrackingAllPixelVertices(process)
+    from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3TrackingAllPixelVertices
+    process = customizeHLTforRun3TrackingAllPixelVertices(process)
     update_jmeCalibs = True
 
     if hasattr(process, 'hltEG60R9Id90CaloIdLIsoLDisplacedIdFilter'):
@@ -168,23 +168,23 @@ elif options.reco == 'HLT_Run3TRKWithPU':
 elif options.reco == 'HLT_Run3TRKPixelOnly':
     # (c) Run-3 tracking: pixel only tracks
     # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
-    process = customizeHLTRun3Tracking(process)
+    process = customizeHLTforRun3Tracking(process)
     process = customisePFForPixelTracks(process)
 elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned':
     # (d) Run-3 tracking: pixel only tracks and trimmed with PVs
     # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
-    process = customizeHLTRun3Tracking(process)
+    process = customizeHLTforRun3Tracking(process)
     process = customisePFForPixelTracksCleaned(process, "hltPixelTracksCleanForBTag")
 elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned2':
     # (d) Run-3 tracking: pixel only tracks and trimmed with PVs
     # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
-    process = customizeHLTRun3Tracking(process)
+    process = customizeHLTforRun3Tracking(process)
     process = customisePFForPixelTracksCleaned(process, "hltPixelTracksCleanForBTag", vertex="hltTrimmedPixelVertices", nVertices = 2)
     update_jmeCalibs = True
 
@@ -207,23 +207,23 @@ elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned2':
 elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned3':
     # (d) Run-3 tracking: pixel only tracks and trimmed with PVs
     # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
-    process = customizeHLTRun3Tracking(process)
+    process = customizeHLTforRun3Tracking(process)
     process = customisePFForPixelTracksCleaned(process, "hltPixelTracksCleanForBTag", vertex="hltPixelVertices", nVertices = 4)
 elif options.reco == 'HLT_Run3TRKPixelOnlyCleaned4':
     # (d) Run-3 tracking: pixel only tracks and trimmed with PVs
     # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+    from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
-    process = customizeHLTRun3Tracking(process)
+    process = customizeHLTforRun3Tracking(process)
     process = customisePFForPixelTracksCleaned(process, "hltPixelTracksCleanForBTag", vertex="hltPixelVertices", nVertices = 2)
 elif options.reco == 'HLT_BTagROI':
     # (e) Run-3 tracking: ROI PF approach
     # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     from RecoBTag.PerformanceMeasurements.customise_hlt import *
-    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
-    process = customizeHLTRun3Tracking(process)
+    from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
+    process = customizeHLTforRun3Tracking(process)
     process = addPaths_PFJetsForBtag(process)
     pvSource                 = "hltVerticesPFFilterForBTag"
     pfCandidates             = 'hltParticleFlowForBTag'
@@ -247,18 +247,23 @@ elif options.reco == 'HLT_Run3TRKForBTag':
     # (a) Run-3 tracking: standard
     # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
-    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
-    process = customizeHLTRun3Tracking(process)
-    print('hltPixelTracksClean' in process.__dict__)
+    from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
+    process = customizeHLTforRun3Tracking(process)
     process = customiseRun3BTagRegionalTracks(process, clean=False, vertex="hltTrimmedPixelVertices", nVertices = 2)
 elif options.reco == 'HLT_Run3TRKForBTag_2':
     # (a) Run-3 tracking: standard
     # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
-    from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
-    process = customizeHLTRun3Tracking(process)
-    print('hltPixelTracksClean' in process.__dict__)
+    from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
+    process = customizeHLTforRun3Tracking(process)
     process = customiseRun3BTagRegionalTracks(process, clean=True, vertex="hltTrimmedPixelVertices", nVertices = 2)
+elif options.reco == 'HLT_Run3TRKForBTag_3':
+    # (a) Run-3 tracking: standard
+    # from RecoBTag.PerformanceMeasurements.Configs.HLT_dev_CMSSW_12_0_0_GRun_V3_configDump_MC import cms, process
+    from RecoBTag.PerformanceMeasurements.customise_TRK import *
+    from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
+    process = customizeHLTforRun3Tracking(process)
+    process = customiseRun3BTagRegionalTracks(process, clean=True, vertex="hltPixelVertices", nVertices = 2)
 else:
   raise RuntimeError('keyword "reco = '+options.reco+'" not recognised')
 
@@ -543,19 +548,6 @@ if options.runTiming:
 #       process.MC_PFBTagDeepCSV_v10,
 #       process.MC_PFBTagDeepJet,
 # ])
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # del process.out

@@ -492,7 +492,6 @@ elif options.reco == 'HLT_Run3TRKForBTag':
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
     from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
     process = customizeHLTforRun3Tracking(process)
-    print('hltPixelTracksClean' in process.__dict__)
     process = customiseRun3BTagRegionalTracks(process, clean=False, vertex="hltTrimmedPixelVertices", nVertices = 2)
 elif options.reco == 'HLT_Run3TRKForBTag_2':
     # (a) Run-3 tracking: standard
@@ -500,7 +499,6 @@ elif options.reco == 'HLT_Run3TRKForBTag_2':
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
     from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
     process = customizeHLTforRun3Tracking(process)
-    print('hltPixelTracksClean' in process.__dict__)
     process = customiseRun3BTagRegionalTracks(process, clean=True, vertex="hltTrimmedPixelVertices", nVertices = 2)
 elif options.reco == 'HLT_Run3TRKForBTag_3':
     # (a) Run-3 tracking: standard
@@ -508,7 +506,6 @@ elif options.reco == 'HLT_Run3TRKForBTag_3':
     from RecoBTag.PerformanceMeasurements.customise_TRK import *
     from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
     process = customizeHLTforRun3Tracking(process)
-    print('hltPixelTracksClean' in process.__dict__)
     process = customiseRun3BTagRegionalTracks(process, clean=True, vertex="hltPixelVertices", nVertices = 2)
 else:
   raise RuntimeError('keyword "reco = '+options.reco+'" not recognised')
