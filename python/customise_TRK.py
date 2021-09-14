@@ -87,6 +87,7 @@ def customiseRun3BTagRegionalTracks(process, clean=False, vertex="hltTrimmedPixe
 
     if not clean:
         process.HLTIterativeTrackingIteration0 = cms.Sequence(
+            process.HLTAK4CaloJetsReconstructionNoIDSequence +
             process.HLTAK4CaloJetsCorrectionNoIDSequence +
             process.hltSelectorJets20L1FastJet +
             process.hltSelectorCentralJets20L1FastJeta +
@@ -100,6 +101,7 @@ def customiseRun3BTagRegionalTracks(process, clean=False, vertex="hltTrimmedPixe
         )
     else:
         process.HLTIterativeTrackingIteration0 = cms.Sequence(
+            process.HLTAK4CaloJetsReconstructionNoIDSequence +
             process.HLTAK4CaloJetsCorrectionNoIDSequence +
             process.hltSelectorJets20L1FastJet +
             process.hltSelectorCentralJets20L1FastJeta +
