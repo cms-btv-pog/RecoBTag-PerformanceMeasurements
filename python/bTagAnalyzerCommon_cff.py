@@ -119,7 +119,15 @@ bTagAnalyzerCommon = cms.PSet(
         "HLT_BTagMu_AK4Jet300_Mu5_noalgo_v*", #triggerIdx+45
         "HLT_BTagMu_AK8DiJet170_Mu5_noalgo_v*",
         "HLT_BTagMu_AK8Jet300_Mu5_noalgo_v*",
-        "HLT_BTagMu_AK8Jet170_DoubleMu5_noalgo_v*"
+        "HLT_BTagMu_AK8Jet170_DoubleMu5_noalgo_v*",
+        #2016 version of the corresponding AK4 triggers in 2017 and 2018
+        "HLT_BTagMu_DiJet20_Mu5_v*",
+        "HLT_BTagMu_DiJet40_Mu5_v*",
+        "HLT_BTagMu_DiJet70_Mu5_v*",
+        "HLT_BTagMu_DiJet110_Mu5_v*",
+        "HLT_BTagMu_DiJet170_Mu5_v*",
+        "HLT_BTagMu_Jet300_Mu5_v*",
+
     ),
     TTbarTriggerPathNames = cms.vstring(
         # trigger for ttbar: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiTopRefEventSel#Triggers
