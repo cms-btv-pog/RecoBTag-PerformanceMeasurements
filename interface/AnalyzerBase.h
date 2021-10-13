@@ -22,7 +22,7 @@
 #include "DataFormats/GeometrySurface/interface/Line.h"
 #include "DataFormats/GeometryCommonDetAlgo/interface/Measurement1D.h"
 
-#include "SimTracker/Records/interface/TrackAssociatorRecord.h"
+//#include "SimTracker/Records/interface/TrackAssociatorRecord.h"
 #include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
 
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"

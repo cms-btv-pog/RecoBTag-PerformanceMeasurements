@@ -3,35 +3,22 @@
 ## Software setup
 
 ```
-export SCRAM_ARCH=slc7_amd64_gcc900
-cmsrel CMSSW_12_0_0_pre6
-cd CMSSW_12_0_0_pre6/src
+cmsrel CMSSW_12_1_0_pre2
+cd CMSSW_12_1_0_pre2/src
 cmsenv
 
 export CMSSW_GIT_REFERENCE=/cvmfs/cms.cern.ch/cmssw.git.daily
 git cms-init
 
-git cms-addpkg HLTrigger/Configuration
-git cms-addpkg CommonTools/RecoAlgos
-git cms-addpkg RecoBTag/FeatureTools
-
-git cms-merge-topic SWuchterl:devel_1120_pre6_TRKPlusBTV
-git clone https://github.com/SWuchterl/JMETriggerAnalysis.git -o SWuchterl -b run3
-
-# external data
-mkdir -p ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/data
-
-# PFHC: preliminary HLT-PFHC for Run-3
-cp /afs/cern.ch/work/m/missirol/public/run3/PFHC/PFHC_Run3Winter20_HLT_v01.db ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db
-
-# JESC: preliminary HLT-JESCs for Run-3
-cp /afs/cern.ch/work/m/missirol/public/run3/JESC/Run3Winter20_V2_MC/Run3Winter20_V2_MC.db ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V2_MC.db
-
-git clone -b cleanup-devel --recursive https://github.com/SWuchterl/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
+git clone -b CMSSW_12_1_0 --recursive https://github.com/SWuchterl/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
 
 scram b -j12
 
 ```
+
+
+
+
 
 ## Instructions to run
 ### Offline
