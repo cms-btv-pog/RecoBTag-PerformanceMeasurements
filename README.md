@@ -21,18 +21,22 @@ scram b -j12
 
 
 # Make Target Reference BTagAnalyzer NTuple
+```
 cp RecoBTag/PerformanceMeasurements/python/defaults/Run3.py RecoBTag/PerformanceMeasurements/python/defaults/Run3Reference.py 
 [ edit Run3Refernce to point to the right file ]
 cd RecoBTag/PerformanceMeasurements/test/
 cmsRun runBTagAnalyzer_cfg.py defaults=Run3Reference runOnData=(True or False, depending on your needs) 
 cd -
+```
 
 # Make Target Reference BTagAnalyzer NTuple
+```
 cp RecoBTag/PerformanceMeasurements/python/defaults/Run3.py RecoBTag/PerformanceMeasurements/python/defaults/Run3Target.py 
 [ edit Run3Target to point to the right file ]
 cd RecoBTag/PerformanceMeasurements/test/
 cmsRun runBTagAnalyzer_cfg.py defaults=Run3Target runOnData=(True or False, depending on your needs) 
 cd -
+```
 
 ### Process Ntuples To make ROOT file with histograms
 
