@@ -50,6 +50,7 @@ BTagAnalyzer TriggerStudies/NtupleAna/scripts/BTagAnalyzer_cfg.py \
     --histFile hists_Run3_offlineValidation.root \
     --isMC \
     --doTracks \
+    --jetDetailString matchedJet.allTaggers.innerPixHit.noInnerPixHit.DeepJetBins \
     --pfJetName "" \ 
     --nevents -1
 ```
@@ -60,10 +61,10 @@ BTagAnalyzer TriggerStudies/NtupleAna/scripts/BTagAnalyzer_cfg.py \
 ``` 
 git clone -b 12_1_X  git@github.com:johnalison/ROOTHelp.git
 source ROOTHelp/setup.sh
-source TriggerStudies/plotting/offlineDQMPlots.sh hists_Run3_offlineValidation.root hists_Run3_offlineValidation targetName
+source TriggerStudies/plotting/offlineDQMPlots.sh hists_Run3_offlineValidation.root hists_Run3_offlineValidation targetName [python3] 
 ```
 Outpus a slides in hists_Run3_offlineValidation directory
-
+give the option python3 to actually make the plots 
 
 
 
