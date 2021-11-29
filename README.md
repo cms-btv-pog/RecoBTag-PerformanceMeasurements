@@ -11,9 +11,6 @@ export CMSSW_GIT_REFERENCE=/cvmfs/cms.cern.ch/cmssw.git.daily
 git cms-init
 
 git clone -b 12_1_X --recursive https://github.com/johnalison/RecoBTag-PerformanceMeasurements.git RecoBTag/PerformanceMeasurements
-git cms-merge-topic johnalison:MakePy3Bind11ParameterSetsIncludingCommandLineArguments
-git clone -b BTVDQM git@github.com:patrickbryant/nTupleAnalysis.git
-git clone -b 12_1_X git@github.com:johnalison/TriggerStudies.git
 
 scram b -j12
 
@@ -39,6 +36,14 @@ cd -
 ```
 
 ### Process Ntuples To make ROOT file with histograms
+
+Additional Software setup to process BTagNtuples for offline validation monitoring
+
+```
+git cms-merge-topic johnalison:MakePy3Bind11ParameterSetsIncludingCommandLineArguments
+git clone -b BTVDQM git@github.com:patrickbryant/nTupleAnalysis.git
+git clone -b 12_1_X git@github.com:johnalison/TriggerStudies.git
+```
 
 ```
 BTagAnalyzer TriggerStudies/NtupleAna/scripts/BTagAnalyzer_cfg.py \

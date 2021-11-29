@@ -12,7 +12,7 @@ common = {
 	'usePuppiForBTagging' : False,
 	# 'dataGlobalTag' : '113X_dataRun3_HLT_v3', #for data
 	'mcGlobalTag' : '120X_mcRun3_2021_realistic_v4', #for MC
-	'remakeAllDiscr' : False,
+	'remakeAllDiscr' : True,
 	'maxJetEta' : 2.5,
 	'usePrivateJEC' : False,
 	# 'jecDBFileMC' : 'PhaseIIFall17_V5b_MC',
