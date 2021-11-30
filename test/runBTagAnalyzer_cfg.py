@@ -836,6 +836,9 @@ else:
 if options.inputFiles:
     process.source.fileNames = options.inputFiles
 
+# Remove .root if exisits (addded back later)
+options.outFilename = options.outFilename.replace(".root","")
+
 # Define the output file name
 if options.runOnData :
     options.outFilename += '_data'
