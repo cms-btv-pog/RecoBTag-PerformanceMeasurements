@@ -106,7 +106,7 @@ bTagAnalyzerCommon = cms.PSet(
         "HLT_BTagMu_AK4DiJet40_Mu5_v*",
         "HLT_BTagMu_AK4DiJet70_Mu5_v*",
         "HLT_BTagMu_AK4DiJet110_Mu5_v*",
-        "HLT_BTagMu_AK4DiJet170_Mu5_v*", 
+        "HLT_BTagMu_AK4DiJet170_Mu5_v*",
         "HLT_BTagMu_AK4Jet300_Mu5_v*",
         "HLT_BTagMu_AK8DiJet170_Mu5_v*",
         "HLT_BTagMu_AK8Jet300_Mu5_v*",

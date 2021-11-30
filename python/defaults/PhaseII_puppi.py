@@ -1,0 +1,18 @@
+common = {
+	'groups' : ['EventInfo','PV','TagVar','JetInfo','JetSV','JetTrack','CSVTagVar','PFElectron','PFMuon','JetDeepCSV','PatMuon','PatElec','JetDeepFlavour'],
+	'eras' : ['Phase2'],
+	'miniAOD' : True,
+	'usePFchs' : False,
+	'usePuppi' : True,
+	'usePuppiForFatJets' : True,
+	'usePuppiForBTagging' : False,
+	# 'mcGlobalTag' : '111X_mcRun4_realistic_T15_v2',
+	'mcGlobalTag' : '111X_mcRun4_realistic_T15_v4',
+	'remakeAllDiscr' : True,
+	'maxJetEta' : 4.5,
+	'usePrivateJEC' : False,
+	# 'jecDBFileMC' : 'PhaseIIFall17_V5b_MC',
+	# 'inputFiles' : ['/store/mc/Phase2HLTTDRWinter20RECOMiniAOD/TTToSemiLepton_TuneCP5_14TeV-powheg-pythia8/MINIAODSIM/NoPU_110X_mcRun4_realistic_v3-v2/20000/F3F1773B-D087-F941-B4EE-40F14D00A794.root',],
+	'inputFiles' : ['file:/afs/cern.ch/work/s/sewuchte/private/BTag_Upgrade/August_11_1_2/CMSSW_11_1_2_patch3/src/fevt.root',],
+    # 'JPCalibration' : 'JPcalib_MC81X_v0',
+}

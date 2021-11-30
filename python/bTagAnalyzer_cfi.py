@@ -72,5 +72,5 @@ bTagAnalyzer = cms.EDAnalyzer("BTagAnalyzer",
     CvsBPosCJetTags = cms.string('pfPositiveCombinedCvsBJetTags'),
     CvsLCJetTags = cms.string('pfCombinedCvsLJetTags'),
     CvsLNegCJetTags = cms.string('pfNegativeCombinedCvsLJetTags'),
-    CvsLPosCJetTags = cms.string('pfPositiveCombinedCvsLJetTags')   
+    CvsLPosCJetTags = cms.string('pfPositiveCombinedCvsLJetTags')
 )

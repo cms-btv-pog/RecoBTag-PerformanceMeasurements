@@ -15,7 +15,7 @@ options.register('runOnData', False,
     VarParsing.varType.bool,
     "Run this on real data"
 )
-options.register('outFilename', 'JetTree',
+options.register('outFilename', 'JetTree.root',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Output file name"
@@ -361,22 +361,22 @@ if options.defaults:
 	except ImportError:
 		raise ValueError('The default settings named %s.py are not present in PerformanceMeasurements/python/defaults/' % options.defaults)
 	if not hasattr(defaults, 'common') or not isinstance(defaults.common, dict):
-		raise RuntimeError('the default file %s.py does not contain a dictionary named common' % options.defaults)  
+		raise RuntimeError('the default file %s.py does not contain a dictionary named common' % options.defaults)
 	items = defaults.common.items()
-	if hasattr(defaults, 'data') and options.runOnData: 
+	if hasattr(defaults, 'data') and options.runOnData:
 		if not isinstance(defaults.data, dict):
 			raise RuntimeError('the default file %s.py contains an object called "data" which is not a dictionary' % options.defaults)
 		items.extend(defaults.data.items())
-	if hasattr(defaults, 'mc') and not options.runOnData: 
+	if hasattr(defaults, 'mc') and not options.runOnData:
 		if not isinstance(defaults.mc, dict):
 			raise RuntimeError('the default file %s.py contains an object called "mc" which is not a dictionary' % options.defaults)
 		items.extend(defaults.mc.items())
 	for key, value in items:
 		if key not in options._beenSet:
-			raise ValueError('The key set by the defaults: %s does not exist among the cfg options!' % key)		
+			raise ValueError('The key set by the defaults: %s does not exist among the cfg options!' % key)
 		elif not options._beenSet[key]:
 			if key == 'inputFiles' and options.inputFiles: continue #skip input files that for some reason are never considered set
-			print 'setting default option for', key
+			print ('setting default option for', key)
 			setattr(options, key, value)
 
 from RecoBTag.PerformanceMeasurements.BTagAnalyzer_cff import *
@@ -407,48 +407,48 @@ for switch in options_to_change:
   if switch not in options._beenSet:
     raise ValueError('The option set by the variables: %s does not exist among the cfg options!' % switch)
   elif not options._beenSet[switch]:
-    print 'Turning on %s, as some stored variables demands it' % switch
+    print ('Turning on %s, as some stored variables demands it' % switch)
     setattr(options, switch, True)
 
 
 ## Use either PFchs or Puppi
 if options.usePFchs and options.usePuppi:
-    print "WARNING: Both usePFchs and usePuppi set to True. Giving priority to Puppi."
+    print ("WARNING: Both usePFchs and usePuppi set to True. Giving priority to Puppi.")
     options.usePFchs = False
 
 ## Resolve potential conflicts in Puppi usage
 if options.usePuppi and not options.usePuppiForFatJets:
-    print "WARNING: usePuppi set to True while usePuppiForFatJets set to False. Puppi will be used for all jet types."
+    print ("WARNING: usePuppi set to True while usePuppiForFatJets set to False. Puppi will be used for all jet types.")
     options.usePuppiForFatJets = True
 
-print "Running on data: %s"%('True' if options.runOnData else 'False')
-print "Running using FastSim samples: %s"%('True' if options.fastSim else 'False')
-print "Running on MiniAOD: %s"%('True' if options.miniAOD else 'False')
-print "Using PFchs: %s"%('True' if options.usePFchs else 'False')
-print "Using Puppi: %s"%('True' if options.usePuppi else 'False')
-print "Using Puppi for fat jets: %s"%('True' if options.usePuppiForFatJets else 'False')
-print "Using Puppi for b tagging: %s"%('True' if (options.usePuppi and options.usePuppiForBTagging) else 'False')
+print ("Running on data: %s"%('True' if options.runOnData else 'False'))
+print ("Running using FastSim samples: %s"%('True' if options.fastSim else 'False'))
+print ("Running on MiniAOD: %s"%('True' if options.miniAOD else 'False'))
+print ("Using PFchs: %s"%('True' if options.usePFchs else 'False'))
+print ("Using Puppi: %s"%('True' if options.usePuppi else 'False'))
+print ("Using Puppi for fat jets: %s"%('True' if options.usePuppiForFatJets else 'False'))
+print ("Using Puppi for b tagging: %s"%('True' if (options.usePuppi and options.usePuppiForBTagging) else 'False'))
 
 ## Subjets only stored when also running over fat jets
 if options.runSubJets and not options.runFatJets:
-    print "WARNING: You are attempting to store subjet information without running over fat jets. Please enable running over fat jets in order to store the subjet information."
+    print ("WARNING: You are attempting to store subjet information without running over fat jets. Please enable running over fat jets in order to store the subjet information.")
     options.runSubJets = False
 
 if not options.miniAOD and options.runDeepFlavourTagVariables: #FIXME
-    print "WARNING: switching off DeepFlavour, as it is not supported in AOD"
+    print ("WARNING: switching off DeepFlavour, as it is not supported in AOD")
     options.runDeepFlavourTagVariables = False
 
 if options.doBoostedCommissioning:
-    print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
+    print ("**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********")
     options.processStdAK4Jets=False
-    print "Option processStdAK4Jets will be set to '",options.processStdAK4Jets,"'"
-    options.runFatJets=True  
+    print ("Option processStdAK4Jets will be set to '",options.processStdAK4Jets,"'")
+    options.runFatJets=True
     options.runSubJets = True
-    print "Option runFatJets will be set to '",options.runFatJets,"'"
-    print "Option runSubJets  will be set to '",options.runSubJets,"'"
-    print "********************"
+    print ("Option runFatJets will be set to '",options.runFatJets,"'")
+    print ("Option runSubJets  will be set to '",options.runSubJets,"'")
+    print ("********************")
 if options.runCTagVariables:
-    print "**********You are making NTuple for CTag*************" 
+    print ("**********You are making NTuple for CTag*************")
 
 ## Global tag
 globalTag = options.mcGlobalTag
@@ -613,7 +613,7 @@ bTagDiscriminators = set([
 
 ## Legacy taggers not supported with MiniAOD
 if options.miniAOD and options.useLegacyTaggers:
-    print "WARNING: Legacy taggers not supported with MiniAOD"
+    print ("WARNING: Legacy taggers not supported with MiniAOD")
     options.useLegacyTaggers = False
 
 ## If using legacy taggers
@@ -634,40 +634,40 @@ if options.jetAlgo == 'AntiKt':
 if not options.runFatJetClustering:
     options.runFatJetClustering = options.runJetClustering
 if not options.miniAOD and options.usePuppi and not options.runJetClustering:
-    print "WARNING: You requested Puppi jets which are not stored in AOD. Enabling jet clustering."
+    print ("WARNING: You requested Puppi jets which are not stored in AOD. Enabling jet clustering.")
     options.runJetClustering = True
 
 if options.miniAOD and not (options.usePFchs or options.usePuppi) and not options.runJetClustering:
-    print "WARNING: You requested non-PU-subtracted jets which are not stored in MiniAOD. Enabling jet clustering."
+    print ("WARNING: You requested non-PU-subtracted jets which are not stored in MiniAOD. Enabling jet clustering.")
     options.runJetClustering = True
 
-print "Jet clustering: %s"%('True' if options.runJetClustering else 'False')
+print ("Jet clustering: %s"%('True' if options.runJetClustering else 'False'))
 
 ## Figure out if fat jet clustering is needed
 if options.runFatJets and (options.jetAlgo != 'AntiKt' or options.fatJetRadius != 0.8) and not options.runFatJetClustering:
-    print "WARNING: You requested fat jets with an algorithm or size not stored in any of the data-tiers. Enabling fat jet clustering."
+    print ("WARNING: You requested fat jets with an algorithm or size not stored in any of the data-tiers. Enabling fat jet clustering.")
     options.runFatJetClustering = True
 
 if options.runFatJets and not (options.usePFchs or options.usePuppi or options.usePuppiForFatJets) and not options.runFatJetClustering:
-    print "WARNING: You requested non-PU-subtracted fat jets which are not stored in any of the data-tiers. Enabling fat jet clustering."
+    print ("WARNING: You requested non-PU-subtracted fat jets which are not stored in any of the data-tiers. Enabling fat jet clustering.")
     options.runFatJetClustering = True
 
 if options.miniAOD and options.runFatJets and options.usePFchs and not options.usePuppiForFatJets and not options.runFatJetClustering:
-    print "WARNING: You requested CHS fat jets which are not stored in MiniAOD. Enabling fat jet clustering."
+    print ("WARNING: You requested CHS fat jets which are not stored in MiniAOD. Enabling fat jet clustering.")
     options.runFatJetClustering = True
 
 if not options.miniAOD and options.runFatJets and (options.usePuppi or options.usePuppiForFatJets) and not options.runFatJetClustering:
-    print "WARNING: You requested Puppi fat jets which are not stored in AOD. Enabling fat jet clustering."
+    print ("WARNING: You requested Puppi fat jets which are not stored in AOD. Enabling fat jet clustering.")
     options.runFatJetClustering = True
 
 if options.miniAOD and options.runSubJets and options.usePruned and not options.runFatJetClustering:
-    print "WARNING: You requested pruned subjets which are not stored in MiniAOD. Enabling fat jet clustering."
+    print ("WARNING: You requested pruned subjets which are not stored in MiniAOD. Enabling fat jet clustering.")
     options.runFatJetClustering = True
 
 if not options.miniAOD and options.runSubJets and options.usePruned and not options.runFatJetClustering:
-    print "WARNING: You requested pruned subjets which are not stored in AOD. Will run pruned fat jet clustering."
+    print ("WARNING: You requested pruned subjets which are not stored in AOD. Will run pruned fat jet clustering.")
 
-print "Fat jet clustering: %s"%('True' if options.runFatJetClustering else 'False')
+print ("Fat jet clustering: %s"%('True' if options.runFatJetClustering else 'False'))
 
 ## For fat jets we want to re-run all taggers in order to use the setup adapted to the larger fat jet cone size
 bTagInfosFat = copy.deepcopy(bTagInfos_noDeepFlavour)
@@ -694,18 +694,19 @@ bTagDiscriminatorsFat.update(set([
     'pfMassIndependentDeepDoubleCvBJetTags:probHbb',
     'pfMassIndependentDeepDoubleCvBJetTags:probHcc',
 ]))
-## Add DeepBoostedJet discriminators
-from RecoBTag.ONNXRuntime.pfDeepBoostedJet_cff import _pfMassDecorrelatedDeepBoostedJetTagsProbs, _pfMassDecorrelatedDeepBoostedJetTagsMetaDiscrs
-bTagDiscriminatorsFat.update(set([]) if (options.useLegacyTaggers or not options.miniAOD) else set([
-    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:bbvsLight",
-    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ccvsLight",
-    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:TvsQCD",
-    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHccvsQCD",
-    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:WvsQCD",
-    "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHbbvsQCD"
-]))
+# ## Add DeepBoostedJet discriminators
+# from RecoBTag.MXNet.pfDeepBoostedJet_cff import _pfMassDecorrelatedDeepBoostedJetTagsProbs, _pfMassDecorrelatedDeepBoostedJetTagsMetaDiscrs
+# bTagDiscriminatorsFat.update(set([]) if (options.useLegacyTaggers or not options.miniAOD) else set([
+#     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:bbvsLight",
+#     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ccvsLight",
+#     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:TvsQCD",
+#     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHccvsQCD",
+#     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:WvsQCD",
+#     "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHbbvsQCD"
+# ]))
+
 ## Add DeepBoostedJet tag infos
-bTagInfosFat += ([] if (options.useLegacyTaggers or not options.miniAOD) else ['pfDeepBoostedJetTagInfos'])
+# bTagInfosFat += ([] if (options.useLegacyTaggers or not options.miniAOD) else ['pfDeepBoostedJetTagInfos'])
 
 if options.runJetClustering:
     options.remakeAllDiscr = True
@@ -722,7 +723,7 @@ bTagDiscriminatorsSoftDrop = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
 if options.miniAOD and not options.runJetClustering and not options.remakeAllDiscr:
     from PhysicsTools.PatAlgos.producersLayer1.jetProducer_cfi import _patJets as patJetsDefault
     storedDiscriminators = set([x.value() for x in patJetsDefault.discriminatorSources])
-    print "INFO: Removing b-tag discriminators already stored in MiniAOD (with the exception of JP taggers)"
+    print ("INFO: Removing b-tag discriminators already stored in MiniAOD (with the exception of JP taggers)")
     jptaggers = {i for i in bTagDiscriminators if 'ProbabilityBJetTags' in i or i.startswith('pfDeepCSV')}
     bTagDiscriminators = (bTagDiscriminators - storedDiscriminators) | jptaggers
 if options.miniAOD and not options.runFatJetClustering and not options.remakeAllDiscr:
@@ -807,7 +808,9 @@ process.source = cms.Source("PoolSource",
 if options.miniAOD:
     process.source.fileNames = [
         #/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM
-        '/store/mc/RunIIFall17MiniAOD/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/00000/C8E934F8-1C06-E811-888D-0242AC130002.root'
+        #'/store/mc/RunIIFall17MiniAOD/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/00000/C8E934F8-1C06-E811-888D-0242AC130002.root'
+            # '/store/relval/CMSSW_11_2_0_pre9/RelValTTbar_14TeV/MINIAODSIM/PU_112X_mcRun3_2021_realistic_v11-v1/00000/05bad550-adf9-4037-8346-0abc65102b37.root'
+            '/store/mc/Run3Winter21DRMiniAOD/TT_TuneCP5_14TeV-powheg-pythia8/MINIAODSIM/FlatPU30to80_112X_mcRun3_2021_realistic_v16-v2/110000/4edf2114-0dc8-4277-95c5-e55989d35c9e.root'
     ]
     if options.runOnData:
         process.source.fileNames = [
@@ -834,24 +837,24 @@ if options.inputFiles:
     process.source.fileNames = options.inputFiles
 
 ## Define the output file name
-if options.runOnData :
-    options.outFilename += '_data'
-else :
-    options.outFilename += '_mc'
-
-if options.runFatJets :
-    options.outFilename += '_FatJets'
-
-if options.runSubJets :
-    options.outFilename += '_Subjets'
-
-if options.fastSim :
-    options.outFilename += '_FastSim'
-
-if options.doBoostedCommissioning:
-  options.outFilename += '_BoostedCommissioning' 
-
-options.outFilename += '.root'
+# if options.runOnData :
+#     options.outFilename += '_data'
+# else :
+#     options.outFilename += '_mc'
+#
+# if options.runFatJets :
+#     options.outFilename += '_FatJets'
+#
+# if options.runSubJets :
+#     options.outFilename += '_Subjets'
+#
+# if options.fastSim :
+#     options.outFilename += '_FastSim'
+#
+# if options.doBoostedCommissioning:
+#   options.outFilename += '_BoostedCommissioning'
+#
+# options.outFilename += '.root'
 
 ## Output file
 process.TFileService = cms.Service("TFileService",
@@ -894,7 +897,7 @@ process.GlobalTag.globaltag = globalTag
 #process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer("PoolDBESSource","BTauMVAJetTagComputerRecord")
 
 if options.usePrivateJEC and options.runFatJets:
-	print "\n No private UL2018 JECs available yet for FatJets! Using whatever is in the GT."
+     print( "\n No private UL2018 JECs available yet for FatJets! Using whatever is in the GT.")
 
 if options.usePrivateJEC and not options.runFatJets:
 
@@ -903,12 +906,13 @@ if options.usePrivateJEC and not options.runFatJets:
     dbfile=''
     if options.runOnData: dbfile=options.jecDBFileData
     else: dbfile=options.jecDBFileMC
-    print "\nUsing private SQLite file", dbfile, "\n"
+    print ("\nUsing private SQLite file", dbfile, "\n")
+
     CondDBJECFile = CondDB.clone(connect = cms.string( "sqlite_fip:RecoBTag/PerformanceMeasurements/data/"+dbfile+'.db' ) )
     if options.runOnData: tagPrefix='JetCorrectorParametersCollection_Summer19UL16APV_RunBCDEF_RunGH_V7_DATA'
     else: tagPrefix='JetCorrectorParametersCollection_'+dbfile
     process.jec = cms.ESSource("PoolDBESSource",
-            CondDBJECFile,
+                               CondDBJECFile,
 		    toGet =  cms.VPSet(
 			    # cms.PSet(
 # 				    record = cms.string("JetCorrectionsRecord"),
@@ -946,13 +950,13 @@ if options.usePrivateJEC and not options.runFatJets:
     process.es_prefer_jec = cms.ESPrefer("PoolDBESSource",'jec')
 
 ### to activate the new JP calibration: using the data base
-trkProbaCalibTag = options.JPCalibration
-process.GlobalTag.toGet = cms.VPSet(
-    cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-      tag = cms.string(trkProbaCalibTag),
-      connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS")
-    )
-)
+# trkProbaCalibTag = options.JPCalibration
+# process.GlobalTag.toGet = cms.VPSet(
+#     cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
+#       tag = cms.string(trkProbaCalibTag),
+#       connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS")
+#     )
+# )
 
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
 process.load("Configuration.Geometry.GeometryRecoDB_cff")
@@ -1470,7 +1474,7 @@ if options.miniAOD:
 if options.changeMinNumberOfHits:
     for m in process.producerNames().split(' '):
         if m.startswith('pfImpactParameterTagInfos'):
-            print "Changing 'minimumNumberOfHits' for " + m + " to " + str(options.minNumberOfHits)
+            print ("Changing 'minimumNumberOfHits' for " + m + " to " + str(options.minNumberOfHits))
             getattr(process, m).minimumNumberOfHits = cms.int32(options.minNumberOfHits)
 
 from PhysicsTools.PatAlgos.tools.pfTools import *
@@ -1483,7 +1487,7 @@ for i in ['patJets', 'patJetsFatPF', 'patJetsSoftDropSubjetsPF', 'patJetsPrunedS
           'updatedPatJetsTransientCorrected', 'updatedPatJetsTransientCorrectedFatPF', 'updatedPatJetsTransientCorrectedSoftDropSubjetsPF']:
     m = i + postfix
     if hasattr(process,m) and getattr( getattr(process,m), 'addBTagInfo' ):
-        print "Switching 'addTagInfos' for " + m + " to 'True'"
+        print ("Switching 'addTagInfos' for " + m + " to 'True'")
         setattr( getattr(process,m), 'addTagInfos', cms.bool(True) )
 
 #-------------------------------------
@@ -1562,7 +1566,7 @@ for requiredGroup in process.btagana.groups:
 
 process.btagana.MaxEta                = options.maxJetEta ## for extended forward pixel coverage
 process.btagana.MinPt                 = options.minJetPt
-process.btagana.tracksColl            = cms.InputTag(trackSource) 
+process.btagana.tracksColl            = cms.InputTag(trackSource)
 process.btagana.useSelectedTracks     = options.useSelectedTracks ## False if you want to run on all tracks : for commissioning studies
 process.btagana.useTrackHistory       = options.useTrackHistory ## Can only be used with GEN-SIM-RECODEBUG files
 process.btagana.produceJetTrackTruthTree = options.useTrackHistory ## can only be used with GEN-SIM-RECODEBUG files and when useTrackHistory is True
@@ -1656,16 +1660,16 @@ if options.doBoostedCommissioning:
     process.btaganaFatJets.runCSVTagVariablesSubJets = True
     process.btaganaFatJets.runDeepDoubleXTagVariables = True
     process.btaganaFatJets.runDeepBoostedJetTagVariables = True
-    print "**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********"
-    print "runHadronVariables set to '",process.btaganaFatJets.runHadronVariables,"'"
-    print "runQuarkVariables set to '",process.btaganaFatJets.runQuarkVariables,"'"
-    print "runPFMuonVariables set to '",process.btaganaFatJets.runPFMuonVariables,"'"
-    print "For fat jets: runCSVTagVariables set to '",process.btaganaFatJets.runCSVTagVariables,"'"
-    print "For fat jets: runCSVTagTrackVariables set to '",process.btaganaFatJets.runCSVTagTrackVariables,"'"
-    print "For subjets:  runCSVTagVariablesSubJets set to '",process.btaganaFatJets.runCSVTagVariablesSubJets,"'"
-    print "For fat jets: runDeepDoubleXTagVariables set to '",process.btaganaFatJets.runDeepDoubleXTagVariables,"'"
-    print "For fat jets: runDeepBoostedJetTagVariables set to '",process.btaganaFatJets.runDeepBoostedJetTagVariables,"'"
-    print "********************"
+    print ("**********NTuples will be made for boosted b tag commissioning. The following switches will be reset:**********")
+    print( "runHadronVariables set to '",process.btaganaFatJets.runHadronVariables,"'")
+    print ("runQuarkVariables set to '",process.btaganaFatJets.runQuarkVariables,"'")
+    print ("runPFMuonVariables set to '",process.btaganaFatJets.runPFMuonVariables,"'")
+    print ("For fat jets: runCSVTagVariables set to '",process.btaganaFatJets.runCSVTagVariables,"'")
+    print ("For fat jets: runCSVTagTrackVariables set to '",process.btaganaFatJets.runCSVTagTrackVariables,"'")
+    print ("For subjets:  runCSVTagVariablesSubJets set to '",process.btaganaFatJets.runCSVTagVariablesSubJets,"'")
+    print ("For fat jets: runDeepDoubleXTagVariables set to '",process.btaganaFatJets.runDeepDoubleXTagVariables,"'")
+    print ("For fat jets: runDeepBoostedJetTagVariables set to '",process.btaganaFatJets.runDeepBoostedJetTagVariables,"'")
+    print ("********************")
 
 if process.btagana.produceJetTrackTruthTree:
     process.load("SimTracker.TrackerHitAssociation.tpClusterProducer_cfi")
@@ -1724,9 +1728,9 @@ if options.processStdAK4Jets and options.useTTbarFilter:
 
 #Trick to make it work in 9_1_X
 process.tsk = cms.Task()
-for mod in process.producers_().itervalues():
+for mod in process.producers_().values():
     process.tsk.add(mod)
-for mod in process.filters_().itervalues():
+for mod in process.filters_().values():
     process.tsk.add(mod)
 
 process.p = cms.Path(

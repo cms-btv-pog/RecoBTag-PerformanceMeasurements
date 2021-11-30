@@ -1,0 +1,10 @@
+*.pyc
+*.root
+*.txt
+*.*~
+#*.*#
+__init__.py
+*.log
+
+pydump.py
+test/CRAB/crab_projects_*
