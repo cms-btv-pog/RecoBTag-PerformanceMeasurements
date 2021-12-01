@@ -11,7 +11,7 @@ mc = {
 	}
 
 data = {
-	'inputFiles' : ['/store/data/Run2017C/JetHT/MINIAOD/17Nov2017-v1/20000/00791B22-DCD3-E711-9BF9-001E67396E64.root'],	
+	'inputFiles' : ['/store/data/Run2017C/JetHT/MINIAOD/17Nov2017-v1/20000/00791B22-DCD3-E711-9BF9-001E67396E64.root'],
   'JPCalibration' : 'JPcalib_Data94X_2017_v1',
 	'dataGlobalTag' : '94X_dataRun2_ReReco_EOY17_v2',
 }

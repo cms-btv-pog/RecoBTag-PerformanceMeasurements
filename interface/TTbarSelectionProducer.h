@@ -2,7 +2,7 @@
 //
 // Package:    TTbarSelectionProducer
 // Class:      TTbarSelectionProducer
-// 
+//
 /**\class TTbarSelectionProducer TTbarSelectionProducer.cc bTag/TTbarSelectionProducer/src/TTbarSelectionProducer.cc
 
  Description: [one line class summary]
@@ -50,10 +50,9 @@
 #include "DataFormats/Common/interface/ValueMap.h"
 #include "DataFormats/EgammaCandidates/interface/ConversionFwd.h"
 #include "DataFormats/EgammaCandidates/interface/Conversion.h"
-#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
-#include "RecoEgamma/EgammaTools/interface/ConversionFinder.h"
+#include "CommonTools/Egamma/interface/ConversionTools.h"
 
 #include "TLorentzVector.h"
 
@@ -88,7 +87,7 @@ class TTbarSelectionProducer : public edm::EDProducer {
       virtual void beginJob() ;
       virtual void produce(edm::Event&, const edm::EventSetup&);
       virtual void endJob() ;
-      
+
       virtual void beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
       virtual void endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
 
@@ -100,10 +99,10 @@ class TTbarSelectionProducer : public edm::EDProducer {
       std::vector<int> trigChannels_;
       std::vector<std::string> trigNamesToSel_;
       bool doTrigSel_;
-  
+
       //gen particles
       edm::EDGetTokenT<reco::GenParticleCollection> prunedGenParticleCollectionName_;
-      edm::EDGetTokenT<GenEventInfoProduct> generatorevt_;     
+      edm::EDGetTokenT<GenEventInfoProduct> generatorevt_;
       edm::EDGetTokenT<LHEEventProduct> generatorlhe_;
 
       //MET filters
@@ -115,32 +114,32 @@ class TTbarSelectionProducer : public edm::EDProducer {
       edm::EDGetTokenT<reco::VertexCollection> vtxToken_;
       edm::EDGetTokenT<reco::BeamSpot> bsToken_;
 
-      //Configuration for electrons      
+      //Configuration for electrons
       edm::EDGetTokenT<edm::View<pat::Electron> > electronToken_;
       edm::EDGetTokenT<reco::ConversionCollection> conversionsToken_;
       edm::EDGetTokenT<edm::ValueMap<bool> > electronIdMapToken_;
-      double electron_cut_pt_ ; 
+      double electron_cut_pt_ ;
       double electron_cut_eta_;
       double electron_cut_iso_;
-   
+
       //Configuration for muons
       edm::EDGetTokenT<pat::MuonCollection> muonToken_;
       double muon_cut_pt_ ;
       double muon_cut_eta_ ;
       double muon_cut_iso_;
-   
-      //Configuration for jets 
+
+      //Configuration for jets
       edm::EDGetTokenT<pat::JetCollection> jetToken_;
       double jet_cut_pt_ ;
       double jet_cut_eta_ ;
-   
-      //Configuration for met 
+
+      //Configuration for met
       edm::EDGetTokenT<pat::METCollection> metToken_;
       double met_cut_ ;
-   
+
       // ----- histo -------
       std::map<std::string, TH1F *> histos_;
-  
+
       //verbose level
       int verbose_;
 

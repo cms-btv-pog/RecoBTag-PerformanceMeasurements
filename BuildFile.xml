@@ -18,8 +18,13 @@
 <use   name="JetMETCorrections/Objects"/>
 <use   name="RecoBTag/BTagTools"/>
 <use   name="RecoMuon/TrackingTools"/>
+<use   name="SimGeneral/HepPDTRecord"/>
+<use   name="fastjet"/>
+<use   name="fastjet-contrib"/>
 <use   name="SimDataFormats/Track"/>
+<!--
 <use   name="SimDataFormats/JetMatching"/>
+-->
 <use   name="SimTracker/TrackAssociation"/>
 <use   name="SimTracker/Records"/>
 <use   name="TrackingTools/TransientTrack"/>
