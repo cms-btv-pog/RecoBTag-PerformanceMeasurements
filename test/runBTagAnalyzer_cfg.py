@@ -486,8 +486,8 @@ bTagInfosLegacy = [
    ,'inclusiveSecondaryVertexFinderTagInfos'
    ,'secondaryVertexNegativeTagInfos'
    ,'inclusiveSecondaryVertexFinderNegativeTagInfos'
-   ,'softPFMuonsTagInfos'
-   ,'softPFElectronsTagInfos'
+        ,'softPFMuonsTagInfos'
+#   ,'softPFElectronsTagInfos'
 ]
 bTagInfos = [
     'pfImpactParameterTagInfos'
@@ -496,7 +496,7 @@ bTagInfos = [
    ,'pfSecondaryVertexNegativeTagInfos'
    ,'pfInclusiveSecondaryVertexFinderNegativeTagInfos'
    ,'softPFMuonsTagInfos'
-   ,'softPFElectronsTagInfos'
+#   ,'softPFElectronsTagInfos'
    ,'pfInclusiveSecondaryVertexFinderCvsLTagInfos'
    ,'pfInclusiveSecondaryVertexFinderNegativeCvsLTagInfos'
    ,'pfDeepFlavourTagInfos'
@@ -527,9 +527,9 @@ bTagDiscriminatorsLegacy = set([
    ,'softPFMuonBJetTags'
    ,'positiveSoftPFMuonBJetTags'
    ,'negativeSoftPFMuonBJetTags'
-   ,'softPFElectronBJetTags'
-   ,'positiveSoftPFElectronBJetTags'
-   ,'negativeSoftPFElectronBJetTags'
+#   ,'softPFElectronBJetTags'
+#   ,'positiveSoftPFElectronBJetTags'
+#   ,'negativeSoftPFElectronBJetTags'
    ,'combinedMVAv2BJetTags'
    ,'negativeCombinedMVAv2BJetTags'
    ,'positiveCombinedMVAv2BJetTags'
@@ -558,9 +558,9 @@ bTagDiscriminators = set([
    ,'softPFMuonBJetTags'
    ,'positiveSoftPFMuonBJetTags'
    ,'negativeSoftPFMuonBJetTags'
-   ,'softPFElectronBJetTags'
-   ,'positiveSoftPFElectronBJetTags'
-   ,'negativeSoftPFElectronBJetTags'
+#   ,'softPFElectronBJetTags'
+#   ,'positiveSoftPFElectronBJetTags'
+#   ,'negativeSoftPFElectronBJetTags'
    ,'pfCombinedMVAV2BJetTags'
    ,'pfNegativeCombinedMVAV2BJetTags'
    ,'pfPositiveCombinedMVAV2BJetTags'
@@ -722,7 +722,9 @@ bTagDiscriminatorsSoftDrop = copy.deepcopy(bTagDiscriminators_no_deepFlavour)
 ## If using MiniAOD and not reclustering jets, only run taggers not already stored (with the exception of JP taggers and DeepCSV)
 if options.miniAOD and not options.runJetClustering and not options.remakeAllDiscr:
     from PhysicsTools.PatAlgos.producersLayer1.jetProducer_cfi import _patJets as patJetsDefault
-    storedDiscriminators = set([x.value() for x in patJetsDefault.discriminatorSources])
+    print(patJetsDefault.discriminatorSources)
+    #storedDiscriminators = set([x.value() for x in patJetsDefault.discriminatorSources])
+    storedDiscriminators = set([x for x in patJetsDefault.discriminatorSources])
     print ("INFO: Removing b-tag discriminators already stored in MiniAOD (with the exception of JP taggers)")
     jptaggers = {i for i in bTagDiscriminators if 'ProbabilityBJetTags' in i or i.startswith('pfDeepCSV')}
     bTagDiscriminators = (bTagDiscriminators - storedDiscriminators) | jptaggers
@@ -1703,6 +1705,7 @@ if process.btagana.produceJetTrackTruthTree:
 #process.trackingFailureFilter.VertexSource = cms.InputTag('goodOfflinePrimaryVertices')
 #---------------------------------------
 
+
 #---------------------------------------
 ## Event counter
 from RecoBTag.PerformanceMeasurements.eventcounter_cfi import eventCounter
@@ -1729,6 +1732,7 @@ if options.processStdAK4Jets and options.useTTbarFilter:
     process.analyzerSeq.replace( process.btagana, process.ttbarselectionproducer * process.ttbarselectionfilter * process.btagana )
 #---------------------------------------
 
+
 #Trick to make it work in 9_1_X
 process.tsk = cms.Task()
 for mod in process.producers_().values():
@@ -1747,4 +1751,4 @@ process.p = cms.Path(
 # Delete predefined output module (needed for running with CRAB)
 del process.out
 
-#open('pydump.py','w').write(process.dumpPython())
+open('pydump.py','w').write(process.dumpPython())
